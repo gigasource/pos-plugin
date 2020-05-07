@@ -92,6 +92,12 @@ module.exports = function (cms) {
       callback(store.id);
     })
 
+    socket.on('getPairStatus', async (deviceId, callback) => {
+      const device = await cms.getModel('Device').findById(deviceId)
+      if (!device) return callback({error: 'Device not found'})
+      return callback({success: true})
+    })
+
     // TODO: analysis side fx
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
       internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
