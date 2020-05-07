@@ -578,14 +578,17 @@
         })
       },
       async playBell() {
-        this.bell.addEventListener('play', () => {
-          console.log('bell playing')
-          this.bellPlaying = true;
-        })
-
-        const play = async (event, repeat = false) => {
+        const play = async () => {
           if (this.pendingOrders.length) await this.bell.play()
 
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) {
+            console.log('bell end')
+            this.bellPlaying = false
+            this.bell.removeEventListener('ended', play)
+          }
+
+          const repeat = setting.onlineDevice.soundLoop === 'repeat'
           if (!repeat || !this.pendingOrders || !this.pendingOrders.length)  {
             console.log('bell end')
             this.bellPlaying = false
@@ -604,7 +607,7 @@
         }
 
         console.log(`loop: ${loop}`)
-        this.bell.addEventListener('ended', loop === 'once' ? play : e => play(e, true))
+        this.bell.addEventListener('ended',  play)
       }
     },
     async created() {
@@ -613,6 +616,11 @@
       const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
       if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
       this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
+      this.bell.addEventListener('play', () => {
+        console.log('bell playing')
+        this.bellPlaying = true;
+      })
+
       await this.updateOnlineOrders()
 
       // add online orders: cms.socket.emit('added-online-order')
