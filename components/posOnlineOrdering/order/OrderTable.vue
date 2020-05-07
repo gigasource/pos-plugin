@@ -195,7 +195,8 @@
           success: false
         },
         couponCode: '',
-        confirming: false
+        confirming: false,
+        listDiscounts: []
       }
     },
     filters: {
@@ -205,7 +206,8 @@
         return 0
       }
     },
-    created() {
+    async created() {
+      this.listDiscounts = await cms.getModel('Discount').find()
     },
     computed: {
       confirmView() { return !this.orderView },
@@ -262,7 +264,7 @@
       },
       discounts() {
         this.couponTf.success = false
-        let discounts = cms.getList('Discount')
+        let discounts = _.cloneDeep(this.listDiscounts)
         discounts = discounts.filter(discount => {
           return discount.store === this.store._id && discount.type.includes(this.orderType) && discount.enabled
         })
