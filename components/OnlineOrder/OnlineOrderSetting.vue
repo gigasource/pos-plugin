@@ -22,6 +22,10 @@
           </div>
         </div>
       </div>
+      <g-btn-bs v-if="connected" large background-color="#424242" text-color="#FFF" style="margin-top: 24px;"
+                @click.stop="dialog.disconnect = true">
+        {{$t('onlineOrder.settings.unpair')}}
+      </g-btn-bs>
       <g-divider style="margin-top: 20px"/>
     </div>
     <div class="online-order-setting__title">{{$t('onlineOrder.settings.generalSettings')}}</div>

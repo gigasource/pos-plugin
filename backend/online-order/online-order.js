@@ -22,6 +22,7 @@ function createOnlineOrderSocket(deviceId) {
 
     onlineOrderSocket.once('connect', () => {
       onlineOrderSocket.off('reconnecting');
+      deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
     });
 
@@ -31,6 +32,10 @@ function createOnlineOrderSocket(deviceId) {
         cleanupOnlineOrderSocket();
       }
     });
+
+    onlineOrderSocket.on('reconnect', () => {
+      deviceSockets.forEach(socket => socket.emit('webShopConnected'))
+    })
 
     onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
       if (!orderData) return
@@ -137,6 +142,8 @@ function createOnlineOrderSocket(deviceId) {
     })
 
     onlineOrderSocket.on('disconnect', () => {
+      deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
+
       activeProxies = 0;
       if (proxyClient) {
         proxyClient.destroy();
@@ -220,6 +227,13 @@ module.exports = async cms => {
 
       onlineOrderSocket.emit('getWebshopId', deviceId, callback);
     });
+
+    socket.on('getPairStatus', async callback => {
+      const deviceId = await getDeviceId()
+      if (!onlineOrderSocket || !deviceId) return callback({error: 'Device not paired'});
+
+      onlineOrderSocket.emit('getPairStatus', deviceId, callback);
+    })
 
     socket.on('registerOnlineOrderDevice', async (pairingCode, callback) => {
       const deviceId = await getDeviceId(pairingCode)

@@ -583,31 +583,32 @@
 
           const setting = await cms.getModel('PosSetting').findOne()
           if (!setting.onlineDevice.sound) {
-            console.log('bell end')
             this.bellPlaying = false
             this.bell.removeEventListener('ended', play)
           }
 
           const repeat = setting.onlineDevice.soundLoop === 'repeat'
           if (!repeat || !this.pendingOrders || !this.pendingOrders.length)  {
-            console.log('bell end')
             this.bellPlaying = false
             this.bell.removeEventListener('ended', play)
           }
         }
 
-        const setting = await cms.getModel('PosSetting').findOne()
-        if (!setting.onlineDevice.sound) return
-        const loop = setting.onlineDevice.soundLoop
-        await play()
+        try {
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) return
+          const loop = setting.onlineDevice.soundLoop
+          await play()
 
-        if (!loop || loop === 'none') {
-          this.bellPlaying = false
-          return
+          if (!loop || loop === 'none') {
+            this.bellPlaying = false
+            return
+          }
+
+          this.bell.addEventListener('ended', play)
+        } catch (e) {
+          this.bell.addEventListener('canplaythrough', () => this.bell.play())
         }
-
-        console.log(`loop: ${loop}`)
-        this.bell.addEventListener('ended',  play)
       }
     },
     async created() {
@@ -617,7 +618,6 @@
       if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
       this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
       this.bell.addEventListener('play', () => {
-        console.log('bell playing')
         this.bellPlaying = true;
       })
 
@@ -636,7 +636,6 @@
       pendingOrders: {
         async handler(val) {
           if (val && val.length) {
-            console.log('play bell now', this.bellPlaying)
             if (!this.bellPlaying) await this.playBell()
           }
         },
