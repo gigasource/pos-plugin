@@ -105,6 +105,8 @@
         this.$set(this, 'store', await cms.getModel('Store').findOne({_id: this.store._id}))
       },
       async updateStore(change) {
+        if (change.orderTimeOut)
+          window.cms.socket.emit('updateOrderTimeOut', this.store._id, change.orderTimeOut)
         await cms.getModel('Store').updateOne({_id: this.store._id}, change)
         Object.assign(this.store, change)
       },

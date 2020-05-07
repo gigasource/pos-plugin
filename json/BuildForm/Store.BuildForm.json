@@ -271,6 +271,12 @@
       ],
       "type": "object",
       "addable": true
+    },
+    {
+      "_id": "5eb3dc1e2a445016e7510af9",
+      "schemaType": "number",
+      "key": "orderTimeOut",
+      "type": "input@number"
     }
   ],
   "name": "Store",

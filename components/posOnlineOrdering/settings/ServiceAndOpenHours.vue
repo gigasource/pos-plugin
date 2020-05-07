@@ -58,6 +58,10 @@
           <g-text-field-bs type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue"/>
         </div>
       </div>
+      <div class="row-flex align-items-center">
+        <span style="margin-right: 10px;">Order timeout (min)</span>
+        <g-select style="width: 80px" text-field-component="GTextFieldBs" v-model="computedOrderTimeOut" :items="orderTimeOuts"/>
+      </div>
     </div>
   </div>
 </template>
@@ -86,11 +90,13 @@
           active: false,
           value: 0
         })
-      }
+      },
+      orderTimeOut: Number,
     },
     data: function () {
       return {
         days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        orderTimeOuts: _.map([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], v => ({ value: v, text: v })),
         errors: [],
       }
     },
@@ -117,6 +123,14 @@
         },
         set(value) {
           this.$emit('update', { minimumOrderValue: value })
+        }
+      },
+      computedOrderTimeOut: {
+        get() {
+          return this.orderTimeOut
+        },
+        set(value) {
+          this.$emit('update', { orderTimeOut: value })
         }
       },
       computedOpenHours() {
