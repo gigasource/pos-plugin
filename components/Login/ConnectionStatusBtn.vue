@@ -30,6 +30,7 @@
  .g-btn-bs {
    font-size: 14px;
    padding: 0 8px;
+   height: 100%;
  }
 
   .no-internet {

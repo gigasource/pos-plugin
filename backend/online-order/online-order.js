@@ -5,6 +5,7 @@ const io = require('socket.io-client');
 const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const url = require('url');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 const {webshopUrl, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
@@ -14,6 +15,15 @@ let deviceSockets = [];
 let webShopConnected = false
 
 function createOnlineOrderSocket(deviceId, cms) {
+
+  function scheduleDeclineOrder(date, _id, cb) {
+    const timeOut = dayjs(date).diff(dayjs(), 'millisecond')
+    setTimeout(async () => {
+      await cms.getModel('Order').findOneAndUpdate({ _id }, { status: 'declined' })
+      cb()
+    }, timeOut)
+  }
+
   const maxConnectionAttempt = 5;
   return new Promise((resolve, reject) => {
     if (onlineOrderSocket) return resolve()
@@ -48,13 +58,13 @@ function createOnlineOrderSocket(deviceId, cms) {
     onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
       if (!orderData) return
       let { orderType: type, paymentType, customer, products: items,
-        createdDate: dateString, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
 
       items = items.map(item => {
         if (item.originalPrice) return item;
         return { originalPrice: item.price, ...item };
       });
-      const date = new Date(dateString)
+      const date = new Date(createdDate)
       const vDiscount = orderUtil.calOrderDiscount(items).toFixed(2)
       const vSum = (orderUtil.calOrderTotal(items) + orderUtil.calOrderModifier(items) + shippingFee).toFixed(2)
       const vTax = orderUtil.calOrderTax(items).toFixed(2)
@@ -74,6 +84,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         payment: [{ type: paymentType, value: vSum }],
         type,
         date,
+        ...timeoutDate && {timeoutDate: new Date(timeoutDate)},
         vDate: await getVDate(date),
         bookingNumber: getBookingNumber(date),
         shippingFee,
@@ -89,8 +100,15 @@ function createOnlineOrderSocket(deviceId, cms) {
         ...type === 'delivery' && {deliveryTime},
       }
 
-      await cms.getModel('Order').create(order)
+      const result = await cms.getModel('Order').create(order)
       deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'))
+
+      if (timeoutDate) {
+        scheduleDeclineOrder(timeoutDate, result._id, () => {
+          deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'));
+        })
+      }
+
       ackFn();
     });
 
@@ -176,7 +194,7 @@ async function getDeviceId(pairingCode) {
   const posSettings = await cms.getModel('PosSetting').findOne({});
   const {onlineDevice} = posSettings;
 
-  if (onlineDevice.id && onlineDevice.paired) {
+  if (onlineDevice.id) {
     return onlineDevice.id
   } else {
     if (!pairingCode) {
@@ -198,11 +216,10 @@ async function getDeviceId(pairingCode) {
   }
 }
 
-async function updateDeviceStatus(paired, deviceId = null) {
+async function updateDeviceStatus(deviceId = null) {
   const SettingModel = cms.getModel('PosSetting');
   const {onlineDevice: deviceInfo} = (await SettingModel.findOne({}));
 
-  deviceInfo.paired = paired;
   deviceInfo.id = deviceId;
 
   await cms.getModel('PosSetting').updateOne({}, {onlineDevice: deviceInfo});
@@ -223,7 +240,7 @@ module.exports = async cms => {
     if (deviceId) await createOnlineOrderSocket(deviceId, cms);
   } catch (e) {
     console.error(e);
-    await updateDeviceStatus(false);
+    await updateDeviceStatus();
   }
 
   cms.socket.on('connect', socket => {
@@ -264,7 +281,7 @@ module.exports = async cms => {
       if (deviceId) {
         try {
           await createOnlineOrderSocket(deviceId, cms);
-          await updateDeviceStatus(true, deviceId);
+          await updateDeviceStatus(deviceId);
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
           console.error(e);
@@ -283,7 +300,7 @@ module.exports = async cms => {
         proxyClient = null;
       }
 
-      await updateDeviceStatus(false);
+      await updateDeviceStatus();
       callback();
     });
 

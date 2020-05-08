@@ -3,8 +3,8 @@
 </template>
 
 <script>
-  import {getHighestFavouriteProductOrder, getHighestProductOrder, getProductGridOrder} from '../logic/productUtils';
-  import {getProvided} from '../logic/commonUtils';
+  import { getHighestFavouriteProductOrder, getHighestProductOrder, getProductGridOrder } from '../logic/productUtils';
+  import { getProvided } from '../logic/commonUtils';
 
   export default {
     name: 'SettingsStore',
@@ -812,14 +812,15 @@
 
         if (posSettings.onlineDevice && this.$router.currentRoute.path === '/pos-login') {
           this.onlineDevice = posSettings.onlineDevice
-          if (!posSettings.onlineDevice.paired && !posSettings.skipPairing) this.$router.push('/pos-setup')
+          const { id } = posSettings.onlineDevice;
+          if (!id && !posSettings.skipPairing) this.$router.push('/pos-setup')
         }
 
         // listens for unpair event
         cms.socket.on('unpairDevice', () => {
           this.unregisterOnlineOrder(async () => {
             this.onlineDevice = Object.assign({}, this.onlineDevice, {
-              paired: false
+              id: null
             })
             await this.updateOnlineDevice(this.onlineDevice)
             this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')

@@ -166,7 +166,7 @@
       onlineDevice(val) {
         this.internalDevice = val
 
-        if (this.internalDevice && this.internalDevice.paired) this.connected = true;
+        if (this.internalDevice && this.internalDevice.id) this.connected = true;
       }
     },
     methods: {
@@ -183,7 +183,6 @@
           } else {
             this.computedDevice = {
               id: deviceId,
-              paired: true,
               url: this.webshopUrl,
               sound: this.internalDevice.sound,
             }
@@ -199,7 +198,6 @@
         this.$emit('unregisterOnlineOrder', () => {
           this.computedDevice = {
             id: null,
-            paired: false,
             url: this.webshopUrl,
             sound: this.internalDevice.sound,
           }

@@ -13,6 +13,9 @@
     },
     mounted() {
       this.getStoreId()
+    },
+    activated() {
+      this.getStoreId()
     }
   }
 </script>
