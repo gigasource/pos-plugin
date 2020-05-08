@@ -15,10 +15,9 @@ let webShopConnected = false
 
 function createOnlineOrderSocket(deviceId, cms) {
   const maxConnectionAttempt = 5;
-
   return new Promise((resolve, reject) => {
     if (onlineOrderSocket) return resolve()
-
+    console.log('Creating online order')
     onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
 
     onlineOrderSocket.once('connect', async () => {
@@ -26,17 +25,18 @@ function createOnlineOrderSocket(deviceId, cms) {
         const deviceId = await getDeviceId();
         onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
       }
-      onlineOrderSocket.off('reconnecting');
       webShopConnected = true
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
     });
 
     onlineOrderSocket.on('reconnecting', function (numberOfAttempt) {
-      if (numberOfAttempt >= maxConnectionAttempt) {
+      //fixme: find better solutions
+      /*if (numberOfAttempt >= maxConnectionAttempt) {
         reject(`Can not pair with server at address ${webshopUrl}`);
         cleanupOnlineOrderSocket();
-      }
+      }*/
+      console.log('reconnecting');
     });
 
     onlineOrderSocket.on('reconnect', () => {
