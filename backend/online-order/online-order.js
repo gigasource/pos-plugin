@@ -30,13 +30,17 @@ function createOnlineOrderSocket(deviceId, cms) {
     console.log('Creating online order')
     onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
 
+    onlineOrderSocket.on('connect', () => console.log('external socket connect'))
+
     onlineOrderSocket.once('connect', async () => {
+      console.log('connect');
       if (cms.utils.getShouldUpdateApp()) {
         const deviceId = await getDeviceId();
         onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
       }
       webShopConnected = true
-      deviceSockets.forEach(socket => socket.emit('webShopConnected'))
+      cms.socket.emit('webShopConnected');
+      //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
     });
 
@@ -52,7 +56,9 @@ function createOnlineOrderSocket(deviceId, cms) {
     onlineOrderSocket.on('reconnect', () => {
       console.log('reconnect')
       webShopConnected = true
-      deviceSockets.forEach(socket => socket.emit('webShopConnected'))
+      console.log(JSON.stringify(deviceSockets))
+      cms.socket.emit('webShopConnected')
+      //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
 
     onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
@@ -101,7 +107,8 @@ function createOnlineOrderSocket(deviceId, cms) {
       }
 
       const result = await cms.getModel('Order').create(order)
-      deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'))
+      cms.socket.emit('updateOnlineOrders')
+      //deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'))
 
       if (timeoutDate) {
         scheduleDeclineOrder(timeoutDate, result._id, () => {
@@ -116,11 +123,13 @@ function createOnlineOrderSocket(deviceId, cms) {
       await Promise.all(_.map(data, async (enabled, name) => {
         return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
       }))
-      deviceSockets.forEach(socket => socket.emit('updateAppFeature')) // emit to all frontends
+      cms.socket.emit('updateAppFeature')
+      //deviceSockets.forEach(socket => socket.emit('updateAppFeature')) // emit to all frontends
     })
 
     onlineOrderSocket.on('unpairDevice', async () => {
-      deviceSockets.forEach(socket => socket.emit('unpairDevice'))
+      cms.socket.emit('unpairDevice')
+      //deviceSockets.forEach(socket => socket.emit('unpairDevice'))
     })
 
     onlineOrderSocket.on('startRemoteControl', (proxyServerPort, callback) => {
@@ -179,7 +188,8 @@ function createOnlineOrderSocket(deviceId, cms) {
     onlineOrderSocket.on('disconnect', () => {
       console.log('disconnect');
       webShopConnected = false
-      deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
+      cms.socket.emit('webShopDisconnected')
+      //deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
 
       activeProxies = 0;
       if (proxyClient) {
@@ -235,18 +245,22 @@ function cleanupOnlineOrderSocket() {
 }
 
 module.exports = async cms => {
-  try {
-    const deviceId = await getDeviceId();
-    if (deviceId) await createOnlineOrderSocket(deviceId, cms);
-  } catch (e) {
-    console.error(e);
+  cms.socket.once('connect', async socket => {
+    try {
+      const deviceId = await getDeviceId();
+      if (deviceId) await createOnlineOrderSocket(deviceId, cms);
+    } catch (e) {
+      console.error(e);
     await updateDeviceStatus();
-  }
+    }
 
-  cms.socket.on('connect', socket => {
-    deviceSockets.push(socket)
+    console.log('internal socket connect')
+    //deviceSockets.push(socket)
 
-    socket.on('disconnect', () => deviceSockets = deviceSockets.filter(sk => sk !== socket));
+    socket.on('disconnect', () => {
+      console.log('internal socket disconnect')
+      //deviceSockets = deviceSockets.filter(sk => sk !== socket)
+    });
 
     socket.on('getWebshopUrl', callback => callback(webshopUrl));
 
