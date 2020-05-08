@@ -25,7 +25,7 @@
                 <div style="color: #747474">We apologize for any convenience caused. You can <span class="link-try-again" @click="tryAgain">try again</span>!</div>
               </div>
               <div v-else-if="confirmed">
-                <div>Your order is confirmed for </div>
+                <div>Your order is confirmed </div>
                 <div style="font-weight: bold">{{ deliveryTime }}</div>
               </div>
               <div v-else-if="cancelled">
@@ -76,7 +76,7 @@
             </div>
             <div class="row-flex align-items-start">
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
-              <div>There might be a serious connectivity issue at the restaurant</div>
+              <div>There might be a serious connectivity issue at the restaurant.</div>
             </div>
             <p class="fw-700 i mt-2">For more information, call us directly:</p>
             <div class="phone">

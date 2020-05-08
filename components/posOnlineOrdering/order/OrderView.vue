@@ -711,12 +711,14 @@
     .pos-order__left .pos-order__left__header {
       img {
         max-height: 50px;
-        max-width: 100px;
+        max-width: 90px;
+        margin-top: 4px;
+        margin-left: 4px;
       }
 
       .pos-order__left__header--info {
         font-size: 12px;
-        margin-right: 8px;
+        margin-right: 4px;
       }
     }
   }
