@@ -79,13 +79,18 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
-        const storeGroups = _.map(store.groups, g => g._id)
         const user = cms.loginUser.user
         let userManageThisStore = false
         if (user.role.name !== 'admin') {
-          const userStoreGroups = _.map(user.storeGroups, g => g._id)
-          userManageThisStore = _.intersection(storeGroups, userStoreGroups).length > 0
+          if (user.role.name === 'device') {
+            userManageThisStore = store && (user.store._id === store._id)
+          } else {
+            const userStoreGroups = _.map(user.storeGroups, g => g._id)
+            const storeGroups = _.map(store.groups, g => g._id)
+            userManageThisStore = _.intersection(storeGroups, userStoreGroups).length > 0
+          }
         }
+        
         if (user.role.name === 'admin' || userManageThisStore) {
           this.permissionDenied = false
           this.$set(this, 'store', store)

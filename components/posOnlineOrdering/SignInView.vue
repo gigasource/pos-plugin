@@ -84,6 +84,13 @@
         }
       }
     },
+    async created() {
+      const { access_token, redirect_to } = this.$route.params
+      if (access_token)
+        await axios.post('/authenticateWithAccessToken', { access_token })
+      if (redirect_to)
+        location.href = redirect_to
+    },
     mounted() {
       this.$nextTick(() => {
         this.$refs.email.$refs.input.focus()
