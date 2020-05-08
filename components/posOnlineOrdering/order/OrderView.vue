@@ -29,12 +29,12 @@
                       </div>
                     </div>
                   </g-menu>
-<!--                  <template v-if="storeWorkingTime">
+                  <template v-if="storeWorkingTime">
                     <span style="margin-right: 3px;">|</span>
                     <g-icon size="16">access_time</g-icon>
                     <span style="color: #424242; margin-left: 3px">{{ storeWorkingTime }}</span>
                   </template>
-                  <span v-else>today</span>-->
+                  <span v-else>today</span>
                 </div>
               </div>
               <div class="address">
@@ -277,7 +277,7 @@
       isStoreOpening() {
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
-            if (this.now >= openTime && this.now <= closeTime) return true
+            if (this.now >= this.get24HourValue(openTime) && this.now <= this.get24HourValue(closeTime)) return true
           }
         }
 
@@ -292,7 +292,15 @@
         }
       },
       storeWorkingTime() {
-        return this.todayOpenHour ? `${this.todayOpenHour.openTime} - ${this.todayOpenHour.closeTime}` : null
+        if (this.todayOpenHour) {
+          for (const {openTime, closeTime} of this.todayOpenHour) {
+            if (this.now >= this.get24HourValue(openTime) && this.now <= this.get24HourValue(closeTime)) {
+              return `${openTime} - ${closeTime}`
+            }
+          }
+
+        }
+        return null
       },
       storeWorkingDay() {
         return this.store.openHours.map(oh => {
