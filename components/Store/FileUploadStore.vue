@@ -51,7 +51,6 @@
         await this.createFolder(`/update/${groupName}`, version)
       },
       uploadApp(groupName, file, version) {
-        debugger
         return new Promise(async (resolve ,reject) => {
           this.showFileUploadProgressDialog = true
           this.uploadingItems.push(this.gridFsHandler.uploadFile(file, `/update/${groupName}/${version}`, response => {
