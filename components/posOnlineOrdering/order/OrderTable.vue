@@ -77,7 +77,7 @@
                 </template>
                 <div>
                   <div v-if="!couponTf.active" @click="couponTf.active = true"><u>Apply coupon code</u></div>
-                  <g-text-field-bs v-if="couponTf.active" placeholder="COUPON CODE" suffix="Apply" @click:append-outer="applyCoupon" v-model="couponTf.value"/>
+                  <g-text-field-bs v-if="couponTf.active" placeholder="COUPON CODE" suffix="Apply" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
                   <div class="error-message">{{couponTf.error}}</div>
                   <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
                     <g-icon size="12" color="green">check</g-icon>
@@ -289,7 +289,7 @@
           if (coupon) {
             if (!this.couponCode) return false
             if (coupon.toLowerCase() !== this.couponCode.toLowerCase()) {
-              this.couponTf.error = 'Invalid Coupon!'
+              if(this.couponTf.error === '' && !this.couponTf.success) this.couponTf.error = 'Invalid Coupon!'
               return false
             }
             this.couponTf.error = 'Not applicable for this order!'
@@ -308,9 +308,9 @@
             if (this.orderType !== 'delivery' || !zipCode.includes(this.customer.zipCode)) return false
           }
 
-          this.couponTf.error = ''
           if(coupon && this.couponCode && coupon.toLowerCase() === this.couponCode.toLowerCase()) {
             this.couponTf.success = true
+            this.couponTf.error = ''
           }
           return true
         })
@@ -339,7 +339,9 @@
         return total < 0 ? 0 : total
       },
       deliveryTimeList() {
-        let deliveryTimeList = []
+        let list = []
+        const today = new Date()
+        const {hour: baseHour, minute: baseMinute} = this.incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime}) => {
@@ -352,33 +354,30 @@
             closeTimeMinute = parseInt(closeTimeMinute)
 
             while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute <= closeTimeMinute)) {
-              const today = new Date()
+              if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute))
+                list.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
-              if (openTimeHour >= today.getHours() && openTimeMinute >= today.getMinutes() + 15)
-                deliveryTimeList.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
-
-              openTimeMinute += this.store.deliveryTimeInterval
-              if (openTimeMinute >= 60) {
-                openTimeHour++
-                openTimeMinute = 0
-              }
+              const newTime = this.incrementTime(openTimeHour, openTimeMinute, this.store.deliveryTimeInterval || 15)
+              openTimeHour = newTime.hour
+              openTimeMinute = newTime.minute
             }
           })
         }
 
-        deliveryTimeList = _.uniq(deliveryTimeList).sort()
-        deliveryTimeList.unshift(this.asap)
-        return deliveryTimeList
+        list = _.uniq(list).sort()
+        list.unshift(this.asap)
+
+        return list
       },
     },
     watch: {
-      discounts(val) {
-        if (!val || !val.length) return
-
-        if (val.some(discount => discount.coupon === this.couponCode)) {
-          this.couponTf.error = ''
-        }
-      },
+      // discounts(val) {
+      //   if (!val || !val.length) return
+      //
+      //   if (val.some(discount => discount.coupon === this.couponCode)) {
+      //     this.couponTf.error = ''
+      //   }
+      // },
       confirmView(val) {
         this.$emit('confirm-view', val)
         const wrapper = document.getElementById('table-content')
@@ -441,6 +440,7 @@
           takeOut: true,
           orderToken,
           deliveryTime: this.deliveryTime === this.asap ? 'asap' : this.deliveryTime,
+          discounts: this.discounts,
         }
 
         if (!this.store.useMultiplePrinters) {
@@ -479,11 +479,25 @@
         this.$emit('back') // for mobile
       },
       applyCoupon() {
+        this.couponTf.error = ''
         this.couponCode = this.couponTf.value
         if(this.discounts.length === 0) {
           this.couponTf.error = 'Invalid Coupon!'
         }
-      }
+      },
+      clearCouponValidate() {
+        this.couponCode = ''
+        this.couponTf.error = ''
+        this.couponTf.success = false
+      },
+      incrementTime(hour, minute, interval = 15) {
+        minute += interval
+        if (minute >= 60) {
+          hour++
+          minute -= 60
+        }
+        return {hour, minute}
+      },
     }
   }
 </script>
@@ -900,6 +914,7 @@
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     right: 4px;
+    top: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -920,6 +935,9 @@
   }
 
   input {
+    user-select: text !important;
+    margin: 0;
+
     &:-webkit-autofill,
     &:-webkit-autofill:hover,
     &:-webkit-autofill:focus,

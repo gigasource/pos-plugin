@@ -759,6 +759,7 @@
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     right: 4px;
+    top: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
