@@ -536,3 +536,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-online-order-menu {
+  background-image: url("../assets/online-order-menu.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
