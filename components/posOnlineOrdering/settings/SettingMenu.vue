@@ -13,7 +13,7 @@
           <g-switch v-model="collapse" label="Collapse overflow text"/>
           <g-spacer/>
           <g-btn-bs @click="openWebShop" border-color="gray">Preview</g-btn-bs>
-          <g-btn-bs background-color="#2979FF" icon="add_circle"
+          <g-btn-bs background-color="#2979FF" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
             Add new category
           </g-btn-bs>
@@ -105,7 +105,7 @@
     },
     data: function () {
       return {
-        showProducts: {},
+        showProducts: _.reduce(this.categories, (acc, v) => { acc[v._id] = true; return acc }, {}) ,
         showAddNewProductPanel: {},
         editingProducts: {},
         selectedCategoryId: null,

@@ -1,8 +1,8 @@
 <template>
   <div style="border-bottom: 1px solid #E0E0E0">
     <template v-if="mode === 'view'">
-      <div class="menu-setting-item">
-        <div class="ta-center" @mouseenter="positioning = true" @mouseleave="positioning = false">
+      <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
+        <div class="ta-center">
           <p v-if="positioning">
             <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
           </p>
@@ -11,8 +11,14 @@
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
         </div>
-        <img v-if="image" :src="`${image}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
-        <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
+        <div class="r">
+          <img v-if="image" :src="`${image}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
+          <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
+          <div class="icon-eyes">
+            <g-icon v-if="showImage" size="14" color="white" @click="toggleImage">visibility</g-icon>
+            <g-icon v-else size="14" color="white" @click="toggleImage">visibility_off</g-icon>
+          </div>
+        </div>
         <div class="menu-setting-item__content px-2">
           <div class="menu-setting-item__name row-flex">
             <span class="col-1">{{id ? id + '.' : ''}}</span>
@@ -65,6 +71,7 @@
           :tax="tax"
           :available-printers="availablePrinters"
           :use-multiple-printers="useMultiplePrinters"
+          :show-image="showImage"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -77,7 +84,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage'],
     data: function () {
       return {
         mode: 'view',
@@ -124,6 +131,10 @@
           if (this.index === this.maxIndex - 1) return
           this.$emit('swap', this.index, this.index+1)
         }
+      },
+      toggleImage() {
+        const val = this.showImage
+        this.$emit('save', {showImage: !val})
       }
     }
   }
@@ -142,6 +153,20 @@
       width: 80px;
       height: 80px;
       border-radius: 10px;
+
+      & ~ .icon-eyes {
+        position: absolute;
+        bottom: -12px;
+        right: -12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1px solid white;
+        background: #757575;
+      }
     }
 
     &__content {

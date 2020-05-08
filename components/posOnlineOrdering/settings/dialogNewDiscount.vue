@@ -367,9 +367,11 @@
 
     .bs-tf-wrapper ::v-deep {
       .bs-tf-input {
-        text-align: center;
         font-weight: 700;
         width: 100%;
+      }
+      input[type=number] {
+        text-align: center;
       }
     }
   }

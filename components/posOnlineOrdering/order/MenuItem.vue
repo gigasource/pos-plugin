@@ -1,7 +1,9 @@
 <template>
   <div class="po-menu-item">
-    <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
-    <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
+    <div v-if="showImage">
+      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
+      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
+    </div>
     <div class="po-menu-item__content">
       <div :class="['po-menu-item__name', collapseText && 'collapse']">{{ name }}</div>
       <div :class="['po-menu-item__desc', collapseText && 'collapse']">{{ desc }}</div>
@@ -54,7 +56,8 @@
         }),
       },
       disabled: Boolean,
-      collapseText: Boolean
+      collapseText: Boolean,
+      showImage: Boolean,
     },
     filters: {
       currency(val) {

@@ -522,3 +522,10 @@ body::-webkit-scrollbar {
   background-position: center;
   fill: none !important;
 }
+
+.icon-phone_blue {
+  background-image: url("../assets/phone_blue.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

@@ -28,7 +28,7 @@
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
             <div class="span-2">
-              <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" :value="store.country" @input="updateDebounce({country: $event})"/>
+              <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country" @input="updateDebounce({country: $event})"/>
             </div>
           </div>
         </div>
@@ -73,6 +73,7 @@
           {name: 'Italy', locale: 'it'},
           {name: 'Singapore', locale: 'en'},
         ],
+        country: this.store.country || ''
       }
     },
     computed: {},

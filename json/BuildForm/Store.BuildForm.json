@@ -252,6 +252,31 @@
       "schemaType": "boolean",
       "key": "collapseText",
       "type": "input@switch"
+    },
+    {
+      "_id": "5eb38c4842901c23a0bd6a88",
+      "schemaType": "object",
+      "key": "minimumOrderValue",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@checkbox"
+        }
+      ],
+      "type": "object",
+      "addable": true
+    },
+    {
+      "_id": "5eb3dc1e2a445016e7510af9",
+      "schemaType": "number",
+      "key": "orderTimeOut",
+      "type": "input@number"
     }
   ],
   "name": "Store",

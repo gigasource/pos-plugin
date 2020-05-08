@@ -79,6 +79,10 @@
       groupPrinters: Array,
       availablePrinters: Array,
       useMultiplePrinters: Boolean,
+      showImage: {
+        type: Boolean,
+        default: true
+      }
     },
     data: function () {
       let internalPrinter
@@ -152,6 +156,7 @@
           groupPrinters: this.internalPrinter,
           price: this.internalPrice,
           tax: this.internalTax,
+          showImage: this.showImage
         })
       }
     }

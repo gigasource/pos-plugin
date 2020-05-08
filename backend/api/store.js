@@ -3,25 +3,24 @@ const _ = require('lodash')
 const express = require('express')
 const router = express.Router()
 const https = require('https');
-
-router.post('/subscribe', async (req, res) => {
-    const subscriptionModel = cms.getModel('Subscription')
-    const { email, storeId } = req.body
-    const subscription = await subscriptionModel.findOne({ email })
-    if (!subscription)
-        await subscriptionModel.create({ email, store: storeId })
-    res.status(200).json({ message: 'Subscribe succeeded' })
-})
-
-router.post('/unsubscribe', async(req, res) => {
-    const subscriptionModel = cms.getModel('Subscription')
-    const { email, storeId } = req.body
-    await subscription.remove({email, store: storeId})
-    res.status(200).send('Your email address has been removed from subscriber list. You\'re no longer to receive any email from this store.')
-})
+const http = require('http');
 
 // upload-zone
-router.get('/upload-zone/prepare', async (req, res) => https.get(req.query.url, getRes => getRes.pipe(res)));
+router.get('/upload-zone/prepare', async (req, res) => {
+  try {
+    const protocol = req.query.url.startsWith('https') ? https: http;
+    protocol.get(req.query.url, getRes => {
+      if (getRes.headers['content-length'] < 1024) {
+        res.status(400).end('Bad request')
+      } else {
+        res.set('Cache-Control', 'public, max-age=31557600')
+        getRes.pipe(res)
+      }
+    })
+  } catch (e) {
+    console.log(e)
+  }
+});
 
 // generate unique id for store
 router.get('/generate-id', async (req, res) => {

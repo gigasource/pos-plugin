@@ -49,10 +49,24 @@
           </g-radio-group>
         </div>
       </div>
+      <div class="row-flex align-items-center">
+        <div class="col-10">
+          <g-switch :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
+                    @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
+        </div>
+        <div class="col-2">
+          <g-text-field-bs type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue"/>
+        </div>
+      </div>
+      <div class="row-flex align-items-center">
+        <span style="margin-right: 10px;">Order timeout (min)</span>
+        <g-select style="width: 80px" text-field-component="GTextFieldBs" v-model="computedOrderTimeOut" :items="orderTimeOuts"/>
+      </div>
     </div>
   </div>
 </template>
 <script>
+  const _12HourTimeRegex = /^(?<hours>1[0-2]|0?[0-9]):(?<minutes>[0-5][0-9])(:(?<seconds>[0-5][0-9]))? ?(?<meridiems>[AaPp][Mm])$/i
   const _24HourTimeRegex = /^(?<hours>2[0-3]|[0-1]?[0-9]):(?<minutes>[0-5][0-9])(:(?<seconds>[0-5][0-9]))?$/i
 
   import _ from 'lodash'
@@ -69,12 +83,22 @@
           name: '',
           locale: ''
         })
-      }
+      },
+      minimumOrderValue: {
+        type: Object,
+        default: () => ({
+          active: false,
+          value: 0
+        })
+      },
+      orderTimeOut: Number,
     },
     data: function () {
       return {
         days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        errors: []
+        orderTimeOuts: _.map([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], v => ({ value: v, text: v })),
+        errors: [],
+        timeout: this.orderTimeOut || ''
       }
     },
     computed: {
@@ -92,6 +116,23 @@
         },
         set(value) {
           this.$emit('update', { pickup: value === "1" })
+        }
+      },
+      computedMinimumOrderValue: {
+        get() {
+          return this.minimumOrderValue
+        },
+        set(value) {
+          this.$emit('update', { minimumOrderValue: value })
+        }
+      },
+      computedOrderTimeOut: {
+        get() {
+          return this.timeout
+        },
+        set(value) {
+          this.$emit('update', { orderTimeOut: value })
+          this.timeout = value
         }
       },
       computedOpenHours() {
@@ -140,17 +181,21 @@
       updateOpenHours() {
         this.$emit('update', { openHours: this.openHours })
       },
+      get24HourValue(time) {
+        time = _.toLower(time)
+        return _.includes(time, 'm') ? dayjs(time, 'hh:mma').format('HH:mm') : time
+      },
       updateHours(time, index, isOpenTime) {
         const openHour = this.openHours[index]
         this.$set(this.errors[index], 'message', '')
-        if(!_24HourTimeRegex.exec(time)) {
+        if(!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
           this.$set(this.errors[index], `${isOpenTime ? 'open' : 'close'}`, true)
           this.$set(this.errors[index], 'message', `${isOpenTime ? 'Open' : 'Close'} time is invalid!`)
           return
         }
         if(isOpenTime) {
           this.$set(this.errors[index], 'open', false)
-          if(time < openHour.closeTime) {
+          if(this.get24HourValue(time) < this.get24HourValue(openHour.closeTime)) {
             this.$set(openHour, `openTime`, time)
             this.$set(this.errors[index], 'close', false)
           }
@@ -160,7 +205,7 @@
           }
         } else {
           this.$set(this.errors[index], 'close', false)
-          if(time > openHour.openTime) {
+          if(this.get24HourValue(time) > this.get24HourValue(openHour.openTime)) {
             this.$set(openHour, `closeTime`, time)
             this.$set(this.errors[index], 'open', false)
           }
@@ -170,7 +215,12 @@
           }
         }
         this.$emit('update', {openHours: this.openHours})
-      }
+      },
+      toggleMinimumOrderValue(active) {
+        this.computedMinimumOrderValue = Object.assign({}, this.computedMinimumOrderValue, { active })
+      },
+      setMinimumOrderValue(value) {
+        this.computedMinimumOrderValue = Object.assign({}, this.computedMinimumOrderValue, { value })}
     }
   }
 </script>
@@ -276,6 +326,14 @@
           font-weight: 600;
         }
       }
+
+      .g-switch-wrapper {
+        margin: 16px 0;
+      }
+    }
+
+    .bs-tf-wrapper ::v-deep .bs-tf-input {
+      width: 100%;
     }
   }
 </style>

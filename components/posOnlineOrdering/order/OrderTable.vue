@@ -35,7 +35,7 @@
             <div v-if="orderView && hasMenuItem"
                  v-for="(item, index) in orderItems" :key="index"
                  class="po-order-table__item">
-              <div class="row-flex align-items-center">
+              <div class="row-flex align-items-center mt-1">
                 <div :class="['po-order-table__item__name', store.collapseText && 'collapse']">{{ item.name }}</div>
                 <g-spacer/>
 
@@ -61,6 +61,10 @@
                 <g-radio small color="#1271ff" :label="$t('store.pickup')" value="pickup" :disabled="!store.pickup"/>
                 <g-radio small color="#1271ff" :label="$t('store.delivery')" value="delivery" :disabled="!store.delivery"/>
               </g-radio-group>
+              <span v-if="orderType === 'delivery' && !satisfyMinimumValue && store.minimumOrderValue && store.minimumOrderValue.active"
+                    style="color: #4CAF50; font-size: 15px">
+                Delivery service is not available for orders less than {{$t('common.currency')}}{{store.minimumOrderValue.value}}.
+              </span>
               <div class="section-form">
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
                 <g-text-field v-model="customer.company" :label="$t('store.company')" clearable clear-icon="icon-cancel@16" prepend-icon="icon-company@16"/>
@@ -74,6 +78,10 @@
                   <div v-if="!couponTf.active" @click="couponTf.active = true"><u>Apply coupon code</u></div>
                   <g-text-field-bs v-if="couponTf.active" placeholder="COUPON CODE" suffix="Apply" @click:append-outer="applyCoupon" v-model="couponTf.value"/>
                   <div class="error-message">{{couponTf.error}}</div>
+                  <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
+                    <g-icon size="12" color="green">check</g-icon>
+                    Coupon applied!
+                  </div>
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
@@ -110,10 +118,11 @@
         </div>
       </div>
       <!-- footer -->
+      <g-spacer/>
       <div :class="['po-order-table__footer', !isOpening && 'disabled']">
         <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
         <g-spacer/>
-        <g-btn-bs v-if="orderView" style="position: relative; justify-content: flex-start" width="154" large rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="orderItems.length === 0">
+        <g-btn-bs v-if="orderView" style="position: relative; justify-content: flex-start" width="154" large rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView">
           {{$t('store.payment')}}
           <div class="icon-payment">
             <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
@@ -124,7 +133,7 @@
       <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
         <g-badge :value="true" color="#4CAF50" overlay>
           <template v-slot:badge>
-            {{orderItems.length}}
+            {{totalItems}}
           </template>
           <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
             <g-icon>icon-menu2</g-icon>
@@ -132,15 +141,15 @@
         </g-badge>
         <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
         <g-spacer/>
-        <g-btn-bs v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
+        <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
+        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
           {{$t('store.confirm')}}
         </g-btn-bs>
       </div>
     </div>
 
     <!-- Order created -->
-    <order-created v-if="dialog.value" v-model="dialog.value" :order="dialog.order" @close="closeOrderSuccess"/>
+    <order-created v-if="dialog.value" v-model="dialog.value" :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"  @close="closeOrderCreatedDialog"/>
   </div>
 </template>
 <script>
@@ -156,6 +165,9 @@
       store: Object,
       isOpening: Boolean,
       merchantMessage: String,
+      orderItems: Array,
+      totalPrice: Number,
+      totalItems: Number
     },
     data() {
       return {
@@ -179,14 +191,14 @@
         couponTf: {
           active: false,
           error: '',
-          value: ''
+          value: '',
+          success: false
         },
         couponCode: '',
-        totalPrice: 0,
-        totalItems: 0
+        confirming: false,
+        listDiscounts: []
       }
     },
-    injectService: ['PosOnlineOrderStore:(orderItems,decreaseOrRemoveItems,increaseOrAddNewItems,clearOrder)'],
     filters: {
       currency(value) {
         if (value != null)
@@ -194,18 +206,19 @@
         return 0
       }
     },
-    created() {
-      this.$watch('orderItems', orderItems => {
-        this.totalPrice = orderItems ? orderItems.reduce((sum, item) => {
-          return sum + item.price * item.quantity
-        }, 0) : 0
-        this.totalItems = orderItems ? orderItems.reduce((quan, item) => {
-          return quan + item.quantity
-        },0) : 0
-      })
+    async created() {
+      this.listDiscounts = await cms.getModel('Discount').find({store: this.store._id})
     },
     computed: {
       confirmView() { return !this.orderView },
+      allowConfirmView() {
+        return this.orderItems.length
+      },
+      satisfyMinimumValue() {
+        return this.store.minimumOrderValue && this.store.minimumOrderValue.active
+          ? this.totalPrice >= this.store.minimumOrderValue.value
+          : true
+      },
       orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
@@ -231,9 +244,11 @@
       unavailableConfirm() {
         const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
         if (this.orderType === 'delivery') {
-          for(const fn of this.validateZipcode) {
-            if(typeof fn === 'function' && typeof fn(this.customer.zipCode) === "string")
+          if (!this.satisfyMinimumValue) return true
+          for (const fn of this.validateZipcode) {
+            if (typeof fn === 'function' && typeof fn(this.customer.zipCode) === 'string') {
               return true
+            }
           }
           return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5
         }
@@ -248,20 +263,21 @@
         return rules
       },
       discounts() {
-        let discounts = cms.getList('Discount')
+        this.couponTf.success = false
+        let discounts = _.cloneDeep(this.listDiscounts)
         discounts = discounts.filter(discount => {
-          return discount.store === this.store._id && discount.type.includes(this.orderType) && discount.enabled
+          return discount.type.includes(this.orderType) && discount.enabled
         })
         if (!discounts.length) return discounts
 
         const applicableDiscounts = discounts.filter(({ conditions: { coupon, daysOfWeek, timePeriod, total, zipCode } }) => {
           if (coupon) {
             if (!this.couponCode) return false
-            if (coupon !== this.couponCode) {
+            if (coupon.toLowerCase() !== this.couponCode.toLowerCase()) {
               this.couponTf.error = 'Invalid Coupon!'
               return false
             }
-            this.couponTf.error = 'No applicable for this order!'
+            this.couponTf.error = 'Not applicable for this order!'
           }
           if (total && total.min && this.totalPrice < total.min) return false
           if (total && total.max && this.totalPrice > total.max) return false
@@ -278,6 +294,9 @@
           }
 
           this.couponTf.error = ''
+          if(coupon && this.couponCode && coupon.toLowerCase() === this.couponCode.toLowerCase()) {
+            this.couponTf.success = true
+          }
           return true
         })
 
@@ -315,6 +334,8 @@
       },
       confirmView(val) {
         this.$emit('confirm-view', val)
+        const wrapper = document.getElementById('table-content')
+        wrapper && wrapper.scroll({top: 0})
       }
     },
     methods: {
@@ -325,13 +346,15 @@
         this.view = 'order'
       },
       removeItem(item) {
-        this.decreaseOrRemoveItems(item)
+        this.$emit('decrease', item)
       },
       addItem(item) {
-        this.increaseOrAddNewItems(item)
+        this.$emit('increase', item)
       },
       async confirmPayment() {
-        if (this.unavailableConfirm) return
+        if (this.unavailableConfirm || this.confirming) return
+
+        this.confirming = true
 
         const {note, ...customer} = this.customer;
 
@@ -383,11 +406,14 @@
           items: this.orderItems,
           shippingFee: this.shippingFee,
           totalPrice: this.totalPrice,
-          status: 'inProgress'
+          status: 'inProgress',
+          discounts: this.discounts,
+          effectiveTotal: this.effectiveTotal
         }
 
-        // clear customer info at this place is incorrect
-        // TODO:
+        this.dialog.value = true
+      },
+      closeOrderCreatedDialog() {
         this.customer = {
           name: '',
           company: '',
@@ -398,15 +424,17 @@
           note: ''
         }
 
-        this.dialog.value = true
-      },
-      closeOrderSuccess() {
-        this.clearOrder()
+        this.confirming = false
+
+        this.$emit('clear')
         this.view = 'order'
         this.$emit('back') // for mobile
       },
       applyCoupon() {
         this.couponCode = this.couponTf.value
+        if(this.discounts.length === 0) {
+          this.couponTf.error = 'Invalid Coupon!'
+        }
       }
     }
   }
@@ -462,7 +490,6 @@
 
     &__content {
       flex: 1;
-      margin-bottom: 100px;
       overflow: auto;
       scrollbar-width: none; // firefox
 
@@ -678,10 +705,7 @@
     }
 
     &__footer {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      height: 80px;
+      min-height: 80px;
       border-radius: 0 25px 0 0;
       display: flex;
       align-items: center;
@@ -716,11 +740,12 @@
 
   @media screen and (max-width: 1139px) {
     .po-order-table {
-      background: #F2F2F2;
+      background: #FFF;
 
       &__main {
         padding: 0;
-        height: 100%;
+        height: calc(100% - 72px);
+        background: #F2F2F2;
       }
 
       &__header {
@@ -842,6 +867,10 @@
 </style>
 
 <style lang="scss">
+  .g-icon {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   input {
     &:-webkit-autofill,
     &:-webkit-autofill:hover,

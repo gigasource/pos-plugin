@@ -13,10 +13,13 @@
                   <span class="sub-title">{{store.phone}}</span>
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;">
+                <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;" @click="dialog.hour = true">
                   <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
                     <template v-slot:activator="{on}">
-                      <span @mouseenter="on.mouseenter" @mouseleave="on.mouseleave" @click="dialog.hour = true" :style="storeOpenStatusStyle">{{ storeOpenStatus }}</span>
+                      <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave" :style="storeOpenStatusStyle" class="row-flex align-items-center mr-1">
+                        {{ storeOpenStatus }}
+                        <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
+                      </div>
                     </template>
                     <div class="menu-hour">
                       <div class="fw-700 mb-2">Open hours:</div>
@@ -43,7 +46,7 @@
           <div class="pos-order__info" v-if="orderItems.length > 0">
             <g-badge :value="true" color="#4CAF50" overlay>
               <template v-slot:badge>
-                {{orderItems.length}}
+                {{totalItems}}
               </template>
               <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
                 <g-icon>icon-menu2</g-icon>
@@ -51,7 +54,12 @@
             </g-badge>
             <div class="pos-order__info--total">{{ totalPrice | currency }}</div>
             <g-spacer/>
-            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 16px" @click="showOrder = true">CHECK OUT</g-btn-bs>
+            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative; justify-content: flex-start" @click="showOrder = true" width="150">
+              {{$t('store.payment')}}
+              <div class="icon-payment">
+                <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+              </div>
+            </g-btn-bs>
           </div>
           <div class="pos-order__tab">
             <div class="pos-order__tab--icon">
@@ -86,10 +94,12 @@
             </div>
             <div class="pos-order__tab--content-footer"></div>
           </div>
-          <order-table v-if="showOrder" @back="showOrder = false" :store="store" :is-opening="isStoreOpening"/>
+          <order-table v-if="showOrder" :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening"
+                       @back="showOrder = false" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
         <div class="pos-order__right">
-          <order-table :store="store" :is-opening="isStoreOpening" :merchant-message="merchantMessage" @confirm-view="menuItemDisabled = $event"/>
+          <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems"  :is-opening="isStoreOpening" :merchant-message="merchantMessage"
+                       @confirm-view="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
       
         <!-- Merchant dialog -->
@@ -124,7 +134,6 @@
 
   export default {
     name: 'OrderView',
-    injectService: ['PosOnlineOrderStore:(orderItems, increaseOrAddNewItems, decreaseOrRemoveItems)'],
     components: { CreatedOrder, MenuItem, OrderTable},
     data: function () {
       return {
@@ -144,7 +153,8 @@
         throttle: null,
         choosing: 0,
         menuHour: false,
-        menuItemDisabled: false
+        menuItemDisabled: false,
+        orderItems: [],
       }
     },
     filters: {
@@ -195,7 +205,7 @@
     },
     beforeDestroy() {
       clearInterval(this.dayInterval)
-      this.$refs['tab-content'].removeEventListener('scroll', this.throttle)
+      this.$refs['tab-content'] && this.$refs['tab-content'].removeEventListener('scroll', this.throttle)
       // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
@@ -215,6 +225,9 @@
       },
       totalPrice() {
         return _.sumBy(this.orderItems, item => item.price * item.quantity)
+      },
+      totalItems() {
+        return _.sumBy(this.orderItems, item => item.quantity)
       },
       categoriesViewModel() {
         const categories = _.cloneDeep(this.categories)
@@ -270,7 +283,6 @@
       storeOpenStatusStyle() {
         return {
           color: this.isStoreOpening ? '#4CAF50' : "#FF4452",
-          'margin-right': '5px'
         }
       },
       storeWorkingTime() {
@@ -299,6 +311,29 @@
       }
     },
     methods: {
+      increaseOrAddNewItems(item) {
+        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
+        if (indexOfItem < 0) {
+          this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
+        } else {
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
+          this.orderItems.splice(indexOfItem, 1, item)
+        }
+      },
+      decreaseOrRemoveItems(item) {
+        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
+        if (indexOfItem < 0)
+          return;
+        if (this.orderItems[indexOfItem].quantity > 1) {
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity - 1})
+          this.orderItems.splice(indexOfItem, 1, item)
+        } else
+          this.orderItems.splice(indexOfItem, 1)
+
+      },
+      clearOrder() {
+        this.orderItems.splice(0, this.orderItems.length)
+      },
       getOpenHour(dayInWeekIndex) {
         for (let openHour of this.store.openHours) {
           if (openHour.dayInWeeks[dayInWeekIndex])
@@ -320,12 +355,11 @@
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))
       },
       getCategoryStyle(cate) {
-        const common = {cursor: 'pointer', padding: '20px 24px', whiteSpace: 'nowrap', '-webkit-tap-highlight-color': 'transparent'};
         return cate._id === this.selectedCategoryId ? {
           fontWeight: 'bold',
           borderBottom: '2px solid #000',
-          color: '#000000', ...common
-        } : {borderBottom: '2px solid transparent', color: '#424242', ...common}
+          color: '#000000',
+        } : {borderBottom: '2px solid transparent', color: '#424242'}
       },
       addItemToOrder(item) {
         this.increaseOrAddNewItems(item)
@@ -514,6 +548,16 @@
         &::-webkit-scrollbar {
           display: none;
         }
+
+        div {
+          cursor: pointer;
+          display : flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 24px;
+          white-space: nowrap;
+          -webkit-tap-highlight-color: transparent;
+        }
       }
 
       &--content {
@@ -598,7 +642,8 @@
         border-radius: 0;
         overflow: hidden;
         position: relative;
-
+        flex-basis: 48px;
+        margin-top: 8px;
 
         &--icon {
           img {
@@ -611,6 +656,7 @@
         &--content {
           padding-left: 16px;
           padding-right: 16px;
+          margin-top: 4px;
 
           .sub-title {
             font-size: 18px;
@@ -648,9 +694,9 @@
         position: fixed;
         top: 0;
         left: 0;
-        bottom: 72px;
+        bottom: 0;
         right: 0;
-        height: calc(100% - 72px);
+        height: 100%;
       }
     }
 
@@ -662,8 +708,16 @@
   }
 
   @media screen and (max-width: 350px) {
-    .pos-order__left .pos-order__left__header .pos-order__left__header--info {
-      font-size: 12px;
+    .pos-order__left .pos-order__left__header {
+      img {
+        max-height: 50px;
+        max-width: 100px;
+      }
+
+      .pos-order__left__header--info {
+        font-size: 12px;
+        margin-right: 8px;
+      }
     }
   }
 
@@ -698,6 +752,18 @@
     min-width: 280px;
   }
 
+  .icon-payment {
+    position: absolute;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
   @media screen and (max-width: 1139px) {
     .menu-hour {
       display: none;

@@ -293,6 +293,7 @@
             }
           ],
           pickup: true,
+          delivery: true,
           deliveryFee: {
             acceptOrderInOtherZipCodes: true,
             defaultFee: 0,

@@ -105,6 +105,8 @@
         this.$set(this, 'store', await cms.getModel('Store').findOne({_id: this.store._id}))
       },
       async updateStore(change) {
+        if (change.orderTimeOut)
+          window.cms.socket.emit('updateOrderTimeOut', this.store._id, change.orderTimeOut)
         await cms.getModel('Store').updateOne({_id: this.store._id}, change)
         Object.assign(this.store, change)
       },
@@ -199,8 +201,17 @@
       },
       async deleteProduct(_id) {
         if (!_id) return
-        await cms.getModel('Product').remove({_id: _id, store: this.store._id})
-        await this.loadProducts()
+        const product = await cms.getModel('Product').findOne({_id}, { image: 1 })
+        if (product) {
+          const image = product.image
+          try {
+            await this.$getService('FileUploadStore').removeFile(image)
+          } catch (e) {
+            console.log(e)
+          }
+          await cms.getModel('Product').remove({_id: _id, store: this.store._id})
+          await this.loadProducts()
+        }
       },
 
       // Discounts
