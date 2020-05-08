@@ -411,7 +411,12 @@ module.exports = {
     printing: {
       delivery: 'Lieferschein',
       company: 'Firma',
-      dateFormat: 'DD.MM.YYYY, HH:mm'
+      dateFormat: 'DD.MM.YYYY, HH:mm',
+      item: 'Artikel',
+      quantity: 'Menge',
+      price: 'E.P',
+      total: 'Summe',
+      currency: 'EUR',
     }
   }
 }

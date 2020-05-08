@@ -1,8 +1,23 @@
 <template>
   <div class="kitchen-report-main-container">
-    <div class="header" :style="wrapperStyle">
-      <div style="text-align: center; font-size: 40px; margin: 20px 0">Liefer #{{orderNumber}}</div>
+    <div class="header" :style="wrapperStyle" v-if="deliveryTime">
+      <div style="font-size: 40px; margin-bottom: 20px">
+        <span>{{locale.printing.delivery}} #{{orderNumber}}</span>
+        <span style="float: right">{{deliveryTime}}</span>
+      </div>
+      <div v-if="customerCompany" style="font-size: 40px; margin-bottom: 20px">
+        <span style="background-color: black; color: white">{{locale.printing.company}}</span>
+      </div>
     </div>
+    <div class="header" :style="wrapperStyle" v-else>
+      <div style="text-align: center; font-size: 40px; margin-bottom: 20px">{{locale.printing.delivery}} #{{orderNumber}}</div>
+      <div v-if="customerCompany" style="text-align: center; font-size: 40px; margin-bottom: 20px">
+        <span style="background-color: black; color: white">{{locale.printing.company}}</span>
+      </div>
+    </div>
+
+    <br v-if="deliveryTime"/>
+
     <div class="info">
       <div>{{customerName}}</div>
       <div v-if="customerCompany">{{customerCompany}}</div>
@@ -16,10 +31,10 @@
       <table>
         <thead>
         <tr style="font-weight: bold">
-          <th width="42%" style="text-align: left; padding-left: 12px">Artikel</th>
-          <th width="5%" style="text-align: right">Menge</th>
-          <th width="18%" style="text-align: right">E.P</th>
-          <th width="25%" style="text-align: right; padding-right: 2px;">Summe</th>
+          <th width="42%" style="text-align: left; padding-left: 12px">{{locale.printing.item}}</th>
+          <th width="5%" style="text-align: right">{{locale.printing.quantity}}</th>
+          <th width="18%" style="text-align: right">{{locale.printing.price}}</th>
+          <th width="25%" style="text-align: right; padding-right: 2px;">{{locale.printing.total}}</th>
         </tr>
         </thead>
         <tr v-for="item in items">
@@ -32,8 +47,8 @@
     </div>
     <div class="divider-dashed"/>
     <div class="bold" style="font-size: 30px; margin-top: 20px">
-      <span>Summe</span>
-      <span class="float-right">EUR {{orderSum | convertMoney}}</span>
+      <span>{{locale.printing.total}}</span>
+      <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
     </div>
     <div class="footer text-center">{{date}}</div>
   </div>
@@ -54,7 +69,9 @@
       customerAddress: String,
       customerZipCode: String,
       note: String,
-      orderSum: Number
+      orderSum: Number,
+      deliveryTime: String,
+      locale: Object,
     },
     filters: {
       convertMoney(value) {
