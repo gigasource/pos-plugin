@@ -1,34 +1,41 @@
 <template>
   <div class="pos-login">
-    <template v-if="signInView">
-      <div class="title">Welcome Back</div>
-      <div class="sub-title">New to Online Ordering?
-        <a class="ref" @click="showSignUpView">Sign Up</a>
-      </div>
-      <div class="pos-login__input">
-        <g-text-field-bs label="Email" rounded border-color="white" large class="mb-4" placeholder="Your email"
-                 v-model="email" ref="email"/>
-        <g-text-field-bs type="password" label="Password" rounded border-color="white" large placeholder="Your password"
-                 v-model="password" @enterpressed="signIn"/>
-        <div v-if="signInMessage" class="message message-sign-in">{{signInMessage}}</div>
-        <div class="remember-forgot">
-          <g-checkbox label="Remember me" v-model="rememberSignIn" color="white"/>
-          <a>Forgot Password?</a>
-        </div>
-        <g-btn-bs class="login-btn" rounded large background-color="#1271ff" @click="signIn">Log In</g-btn-bs>
+    <template v-if="signInByToken">
+      <div style="width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div style="opacity: 0.8; color: #FFF; font-size: 40px; text-shadow: 0px 0px 20px rgba(0,0,0,1)">Logging in...</div>
       </div>
     </template>
-    <template v-else-if="signUpView">
-      <div class="title">Create Your Account</div>
-      <div class="sub-title" style="margin-bottom: 41px">Already have Online Ordering account?
-        <a class="ref" @click="showSignInView">Sign In</a></div>
-      <div class="pos-login__input">
-        <g-text-field-bs label="Email" large rounded border-color="white" class="mb-4" v-model="email"/>
-        <g-text-field-bs type="password" label="Password" large rounded border-color="white" class="mb-4" v-model="password"/>
-        <g-text-field-bs type="password" label="Type your password again" large rounded border-color="white" v-model="retypePassword"/>
-        <div v-if="signUpMessage" class="message message-sign-up">{{signUpMessage}}</div>
-        <g-btn-bs large rounded background-color="#1271ff" class="login-btn" @click="signUp">Sign Up</g-btn-bs>
-      </div>
+    <template v-else>
+      <template v-if="signInView">
+        <div class="title">Welcome Back</div>
+        <div class="sub-title">New to Online Ordering?
+          <a class="ref" @click="showSignUpView">Sign Up</a>
+        </div>
+        <div class="pos-login__input">
+          <g-text-field-bs label="Email" rounded border-color="white" large class="mb-4" placeholder="Your email"
+                           v-model="email" ref="email"/>
+          <g-text-field-bs type="password" label="Password" rounded border-color="white" large placeholder="Your password"
+                           v-model="password" @enterpressed="signIn"/>
+          <div v-if="signInMessage" class="message message-sign-in">{{signInMessage}}</div>
+          <div class="remember-forgot">
+            <g-checkbox label="Remember me" v-model="rememberSignIn" color="white"/>
+            <a>Forgot Password?</a>
+          </div>
+          <g-btn-bs class="login-btn" rounded large background-color="#1271ff" @click="signIn">Log In</g-btn-bs>
+        </div>
+      </template>
+      <template v-else-if="signUpView">
+        <div class="title">Create Your Account</div>
+        <div class="sub-title" style="margin-bottom: 41px">Already have Online Ordering account?
+          <a class="ref" @click="showSignInView">Sign In</a></div>
+        <div class="pos-login__input">
+          <g-text-field-bs label="Email" large rounded border-color="white" class="mb-4" v-model="email"/>
+          <g-text-field-bs type="password" label="Password" large rounded border-color="white" class="mb-4" v-model="password"/>
+          <g-text-field-bs type="password" label="Type your password again" large rounded border-color="white" v-model="retypePassword"/>
+          <div v-if="signUpMessage" class="message message-sign-up">{{signUpMessage}}</div>
+          <g-btn-bs large rounded background-color="#1271ff" class="login-btn" @click="signUp">Sign Up</g-btn-bs>
+        </div>
+      </template>
     </template>
   </div>
 </template>
@@ -49,7 +56,8 @@
         errorMessage: '',
         signInMessage: '',
         signUpMessage: '',
-        waitingSendResetPasswordResponse: false
+        waitingSendResetPasswordResponse: false,
+        signInByToken: false,
       }
     },
     computed: {
@@ -84,9 +92,19 @@
         }
       }
     },
+    async created() {
+      const { access_token, redirect_to } = this.$route.query
+      if (access_token) {
+        this.signInByToken = true
+        await axios.post('/authenticate-with-access-token', { access_token })
+      }
+      if (redirect_to)
+        location.href = redirect_to
+    },
     mounted() {
       this.$nextTick(() => {
-        this.$refs.email.$refs.input.focus()
+        if (!this.signInByToken)
+          this.$refs.email.$refs.input.focus()
       })
     }
   }

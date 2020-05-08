@@ -18,11 +18,13 @@
             color="#536DFE"/>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'" :value="openHour.openTime"
+          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+                               :value="country.name !== 'United State' ? openHour.openTime : get12HourValue(openHour.openTime)"
                                @input="updateHours($event, index, true)"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].close && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'" :value="openHour.closeTime"
+          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+                               :value="country.name !== 'United State' ? openHour.closeTime : get12HourValue(openHour.closeTime)"
                                @input="updateHours($event, index, false)"/>
         </div>
         <g-spacer/>
@@ -234,7 +236,12 @@
         time = _.toLower(time)
         return _.includes(time, 'm') ? dayjs(time, 'hh:mma').format('HH:mm') : time
       },
+      get12HourValue(time) {
+        return dayjs(time, 'HH:mm').format('hh:mm A')
+      },
       updateHours(time, index, isOpenTime) {
+        time = this.get24HourValue(time)
+
         const openHour = this.openHoursData[index]
         this.$set(this.errors[index], 'message', '')
         if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
