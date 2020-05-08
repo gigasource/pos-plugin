@@ -103,7 +103,8 @@
     },
     mounted() {
       this.$nextTick(() => {
-        this.$refs.email.$refs.input.focus()
+        if (!this.signInByToken)
+          this.$refs.email.$refs.input.focus()
       })
     }
   }
