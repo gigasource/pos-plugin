@@ -339,7 +339,9 @@
         return total < 0 ? 0 : total
       },
       deliveryTimeList() {
-        let deliveryTimeList = []
+        let list = []
+        const today = new Date()
+        const {hour: baseHour, minute: baseMinute} = this.incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime}) => {
@@ -352,23 +354,20 @@
             closeTimeMinute = parseInt(closeTimeMinute)
 
             while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute <= closeTimeMinute)) {
-              const today = new Date()
+              if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute))
+                list.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
-              if (openTimeHour >= today.getHours() && openTimeMinute >= today.getMinutes() + 15)
-                deliveryTimeList.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
-
-              openTimeMinute += this.store.deliveryTimeInterval
-              if (openTimeMinute >= 60) {
-                openTimeHour++
-                openTimeMinute = 0
-              }
+              const newTime = this.incrementTime(openTimeHour, openTimeMinute, this.store.deliveryTimeInterval || 15)
+              openTimeHour = newTime.hour
+              openTimeMinute = newTime.minute
             }
           })
         }
 
-        deliveryTimeList = _.uniq(deliveryTimeList).sort()
-        deliveryTimeList.unshift(this.asap)
-        return deliveryTimeList
+        list = _.uniq(list).sort()
+        list.unshift(this.asap)
+
+        return list
       },
     },
     watch: {
@@ -483,7 +482,16 @@
         if(this.discounts.length === 0) {
           this.couponTf.error = 'Invalid Coupon!'
         }
-      }
+      },
+
+      incrementTime(hour, minute, interval = 15) {
+        minute += interval
+        if (minute >= 60) {
+          hour++
+          minute -= 60
+        }
+        return {hour, minute}
+      },
     }
   }
 </script>
