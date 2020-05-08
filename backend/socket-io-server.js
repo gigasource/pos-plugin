@@ -92,6 +92,24 @@ module.exports = function (cms) {
       callback(store.id);
     })
 
+    socket.on('getWebShopSettingUrl', async (deviceId, callback) => {
+      const device = await cms.getModel('Device').findById(deviceId);
+      if (!device) return callback(null);
+
+      const store = await cms.getModel('Store').findById(device.storeId);
+      if (!store) return callback(null);
+
+      const user = await cms.getModel('User').findOne({ store: store._id })
+      if (!user) return callback(null);
+      // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
+      const accessToken = await cms.utils.generateAccessToken(user.username,  user.password)
+      if (accessToken) {
+        callback && callback(`http://localhost:8888/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}`)
+      } else {
+        callback && callback(null)
+      }
+    })
+
     socket.on('getPairStatus', async (deviceId, callback) => {
       const device = await cms.getModel('Device').findById(deviceId)
       if (!device) return callback({error: 'Device not found'})

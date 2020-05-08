@@ -112,13 +112,18 @@ router.post('/new-store', async (req, res) => {
     }
   })
 
+  const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
+
   // create store owner
   const storeOwner = await cms.getModel('User').create({
     name: `${settingName}__owner`,
     username: `${alias}__owner__${new Date().getTime()}`,
     password: new Date().getTime(),
     store: createdStore._id,
-    createBy: req.session.user._id
+    createBy: req.session.user._id,
+    role: deviceRole._id,
+    active: true,
+    permissions: [{ permission: 'manageStore', value: true }]
   })
 
   res.json({
