@@ -634,9 +634,9 @@
         localStorage.setItem('orderHistoryPageSize', newVal)
       },
       pendingOrders: {
-        async handler(val) {
+        async handler(val, oldVal) {
           if (val && val.length) {
-            if (!this.bellPlaying) await this.playBell()
+            if ((!oldVal || (oldVal && val.length > oldVal.length)) && !this.bellPlaying) await this.playBell()
           }
         },
         immediate: true

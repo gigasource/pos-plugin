@@ -856,6 +856,12 @@
             "once",
             "repeat"
           ]
+        },
+        {
+          "schemaType": "number",
+          "key": "orderTimeout",
+          "type": "input@number",
+          "addable": true
         }
       ]
     },

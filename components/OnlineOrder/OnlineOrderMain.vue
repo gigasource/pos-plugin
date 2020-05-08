@@ -47,12 +47,22 @@
                       <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier.name}}</span>)</span>
                     </template>
                   </div>
-                  <div class="col-2 fs-small-2 ta-right">€{{item.price | formatMoney(decimals)}}</div>
+                  <div class="col-2 fs-small-2 ta-right">€{{ item.originalPrice ||item.price | formatMoney(decimals)}}</div>
+                </div>
+              </div>
+              <div v-if="order.discounts && order.discounts.length">
+                <div class="row-flex align-items-start" v-for="discount in order.discounts">
+                  <div>
+                    <span>{{discount.coupon ? `Coupon ` : discount.name}}</span>
+                    <span style="color: #757575; font-style: italic" v-if="discount.coupon">({{discount.coupon}})</span>
+                  </div>
+                  <g-spacer/>
+                  <div class="fs-small-2">{{`-${$t('common.currency')}${discount.value}`}}</div>
                 </div>
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
                 <div class="col-10 fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="col-2 fs-small-2 ta-right">€{{order.shippingFee || 0}}</div>
+                <div class="col-2 fs-small-2 ta-right">€{{getShippingFee(order)}}</div>
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
@@ -186,7 +196,8 @@
         dialog: {
           order: {},
           reason: false,
-        }
+        },
+        orderTimeout: 0
       }
     },
     watch: {
@@ -255,6 +266,10 @@
       },
       getDeliveryDate(order) {
         return dayjs(order.date).add(order.prepareTime, 'minute').toDate()
+      },
+      getShippingFee(order) {
+        const freeShipping = order.discounts.find(item => item.type === 'freeShipping');
+        return freeShipping ? freeShipping.value : order.shippingFee;
       }
     },
     mounted() {
