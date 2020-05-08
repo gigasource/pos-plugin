@@ -7,7 +7,7 @@
       "collectionName": "ComponentBuilder",
       "permission": "read",
       "queryCondition": {
-        "_code_": "const cms = require('cms');\nmodule.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({groups: {\n    $elemMatch: {$in: user.storeGroups}\n  }}).select('_id').lean()).map(r => r._id);\n  \n  return {\n    find: {\n      store: {\n        $in: stores\n      }\n    }\n  }\n}",
+        "_code_": "",
         "_code_type_": "commonJs"
       }
     },
@@ -17,7 +17,7 @@
       "collectionName": "Category",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}\n",
         "_code_type_": "commonJs"
       }
     },
@@ -27,7 +27,7 @@
       "collectionName": "Product",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}\n",
         "_code_type_": "commonJs"
       }
     },
@@ -37,7 +37,7 @@
       "collectionName": "Store",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      _id: { $in: stores }\n    }\n  }\n}\n",
         "_code_type_": "commonJs"
       }
     },
@@ -47,29 +47,49 @@
       "collectionName": "StoreGroup",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports = (user) => {\n  return {\n    find: { _id: user.storeGroups }\n  }\n}",
         "_code_type_": "commonJs"
       }
     },
     {
       "hideFields": [],
       "_id": "5e96bf6fbcf0ca5a39f5ffea",
-      "collectionName": "OnlineOrderDevice",
+      "collectionName": "Device",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}\n",
         "_code_type_": "commonJs"
       }
     },
     {
       "hideFields": [],
-      "_id": "5e96bf6fbcf0ca5a39f5ffeb",
-      "collectionName": "Subscription",
+      "_id": "5e96d0f37ac9d25a6f915094",
+      "collectionName": "User",
       "permission": "write",
       "queryCondition": {
-        "_code_": "",
+        "_code_": "module.exports = (user) => {\n  return {\n    find: { _id: user._id }\n  }\n}",
         "_code_type_": "commonJs"
       }
+    },
+    {
+      "hideFields": [],
+      "_id": "5ea402222f85593578fc1c2d",
+      "collectionName": "Role",
+      "permission": "read",
+      "queryCondition": {
+        "_code_": "module.exports = (user) => {\n  return {\n    find: { _id: user.role._id }\n  }\n}",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3f21292ce831bcc65649c",
+      "collectionName": "Discount",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      },
+      "permission": "write"
     }
   ],
   "name": "user"

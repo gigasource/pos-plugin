@@ -148,8 +148,8 @@
       },
       confirmProgress() {
         const x = this.waited / this.orderProcessTimeOut
-        // Refs: https://easings.net/#easeOutSine
-        return 100 * (1 - Math.sin((x * Math.PI) / 2))
+        // Refs: https://easings.net/#easeOutCubic
+        return 100 * (Math.pow(1 - x, 3)) // 1 - (1 - Math.pow(1 - x, 3))
       },
       waitingConfirmMessage() {
         if (this.remainConfirmTime > this.orderProcessTimeOut * 3/4)

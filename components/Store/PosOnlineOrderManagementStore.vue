@@ -279,41 +279,9 @@
           })
         })
       },
-      async addStore({ settingName, groups, settingAddress }) {
-        const alias = this.getUniqueStoreAlias(_.toLower(settingName))
-        const id = await this.getUniqueStoreId()
-        await cms.getModel('Store').create({
-          id, settingName, settingAddress, alias, groups,
-          addedDate: dayjs(),
-          openHours: [
-            {
-              dayInWeeks: [true, true, true, true, true, true, true],
-              openTime: '06:30',
-              closeTime: '22:30'
-            }
-          ],
-          pickup: true,
-          delivery: true,
-          deliveryFee: {
-            acceptOrderInOtherZipCodes: true,
-            defaultFee: 0,
-            fees: []
-          }
-        })
+      async addStore({ settingName, settingAddress, groups, country }) {
+        await axios.post('/store/new-store', { settingName, settingAddress, groups, country })
         await this.loadStores()
-      },
-
-      getUniqueStoreAlias(alias) {
-        let ctr = 0
-        let newAlias
-        do {
-          ctr++
-          newAlias = alias + ctr
-        } while(_.includes(this.storeAlias, newAlias))
-        return newAlias
-      },
-      async getUniqueStoreId() {
-        return (await axios.get('/store/generate-id')).data.id
       },
 
       async removeStore(groupId, store) {

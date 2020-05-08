@@ -1,0 +1,66 @@
+{
+  "_id": "5eb3ec737d150119e156b655",
+  "collectionPermission": [
+    {
+      "hideFields": [],
+      "_id": "5eb3ed347d150119e156b658",
+      "collectionName": "ComponentBuilder",
+      "permission": "read",
+      "queryCondition": {
+        "_code_": "",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3ed347d150119e156b659",
+      "collectionName": "Category",
+      "permission": "write",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      store: user.store\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3ed347d150119e156b65a",
+      "collectionName": "Product",
+      "permission": "write",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      store: user.store\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3ed347d150119e156b65b",
+      "collectionName": "Store",
+      "permission": "write",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      _id: user.store\n    },\n    findOne: {\n      _id: user.store\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3ed347d150119e156b65c",
+      "collectionName": "Discount",
+      "permission": "write",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      store: user.store\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb3f2f792ce831bcc6564b6",
+      "collectionName": "User",
+      "permission": "read",
+      "queryCondition": {
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      _id: user._id\n    }\n  }\n}\n",
+        "_code_type_": "commonJs"
+      }
+    }
+  ],
+  "name": "device"
+}

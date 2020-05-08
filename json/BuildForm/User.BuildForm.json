@@ -115,6 +115,15 @@
       "schemaType": "boolean",
       "key": "active",
       "type": "input@switch"
+    },
+    {
+      "_id": "5eb3fdfbf556991d506f9a5e",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "autopopulate": true,
+      "type": "ref-select",
+      "labelProp": "name"
     }
   ],
   "name": "User",
