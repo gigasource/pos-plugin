@@ -1,5 +1,6 @@
 FROM registry.gigasource.io/pos-restaurant AS intermediate
 ARG CONFIG_FILE_NAME
+ARG BASE_VERSION
 WORKDIR /root/cms-boilerplate
 RUN mkdir -p /root/cms-boilerplate/storage
 COPY ./ssh ./ssh
