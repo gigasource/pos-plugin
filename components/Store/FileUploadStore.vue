@@ -6,7 +6,6 @@
   />
 </template>
 <script>
-  import _ from 'lodash'
   import createGridFsHandlers from 'vue-file-explorer/api-handlers/grid-fs'
   import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
   import FileUploadProgressDialog from 'vue-file-explorer/components/FileExplorerPanel/dialogs/FileUploadProgressDialog.vue'
@@ -47,18 +46,14 @@
           }))
         })
       },
-      async prepareUploadAppFolder(fileName, version) {
-        const baseName = this.getBaseName(fileName)
-        await this.createFolder('/update', baseName)
-        await this.createFolder(`/update/${baseName}`, version)
+      async prepareUploadAppFolder(groupName, version) {
+        await this.createFolder('/update', groupName)
+        await this.createFolder(`/update/${groupName}`, version)
       },
-      getBaseName(fileName) {
-        return fileName.substr(0, _.lastIndexOf(fileName, '.'))
-      },
-      uploadApp(file, version) {
+      uploadApp(groupName, file, version) {
         return new Promise(async (resolve ,reject) => {
           this.showFileUploadProgressDialog = true
-          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, `/update/${this.getBaseName(file.name)}/${version}`, response => {
+          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, `/update/${groupName}/${version}`, response => {
             if (response.data[0].uploadSuccess) {
               const files = [response.data[0].createdFile]
               const downloadUrl = this.gridFsHandler.insertDownloadUrl(files)[0].downloadUrl

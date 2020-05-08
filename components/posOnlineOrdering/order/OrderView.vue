@@ -29,12 +29,12 @@
                       </div>
                     </div>
                   </g-menu>
-                  <template v-if="storeWorkingTime">
+<!--                  <template v-if="storeWorkingTime">
                     <span style="margin-right: 3px;">|</span>
                     <g-icon size="16">access_time</g-icon>
                     <span style="color: #424242; margin-left: 3px">{{ storeWorkingTime }}</span>
                   </template>
-                  <span v-else>today</span>
+                  <span v-else>today</span>-->
                 </div>
               </div>
               <div class="address">
@@ -101,7 +101,7 @@
           <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems"  :is-opening="isStoreOpening" :merchant-message="merchantMessage"
                        @confirm-view="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
-      
+
         <!-- Merchant dialog -->
         <g-dialog v-model="dialog.closed" persistent>
           <div class="dialog-closed">
@@ -245,22 +245,24 @@
       },
       nextOpenHour() {
         if (this.todayOpenHour) {
-          if (this.get24HourValue(this.todayOpenHour.openTime) > this.now)
-            return {
-              day: this.dayInWeeks[this.dayInWeekIndex],
-              hour: this.todayOpenHour.openTime
+          for (const {openTime} of this.todayOpenHour) {
+            if (this.now < openTime)
+              return {
+                day: 'today',
+                hour: openTime
+              }
           }
         }
-        
+
         let dayInWeekIndex = this.dayInWeekIndex
         do {
           dayInWeekIndex++
-          if (dayInWeekIndex >= this.dayInWeeks.length - 1)
-            dayInWeekIndex = 0
+          if (dayInWeekIndex >= this.dayInWeeks.length - 1) dayInWeekIndex = 0
           let openHour = this.getOpenHour(dayInWeekIndex)
-          if (openHour) {
+
+          if (openHour && openHour.length > 0) {
             return {
-              hour: openHour.openTime,
+              hour: openHour[0].openTime,
               day: dayInWeekIndex === this.dayInWeekIndex + 1 ? 'tomorrow' : this.dayInWeeks[dayInWeekIndex]
             }
           }
@@ -269,12 +271,16 @@
       merchantMessage() {
         if (this.nextOpenHour)
           return `The merchant is temporarily closed and will not accept orders until ${this.nextOpenHour.hour } ${ this.nextOpenHour.day }. Please come back after that. We apologize for any inconvenience caused.`
+
         return  'The merchant is temporarily closed. We apologize for any inconvenience caused.'
       },
       isStoreOpening() {
         if (this.todayOpenHour) {
-          return this.get24HourValue(this.todayOpenHour.openTime) <= this.now && this.now <= this.get24HourValue(this.todayOpenHour.closeTime)
+          for (const {openTime, closeTime} of this.todayOpenHour) {
+            if (this.now >= openTime && this.now <= closeTime) return true
+          }
         }
+
         return false
       },
       storeOpenStatus() {
@@ -335,10 +341,15 @@
         this.orderItems.splice(0, this.orderItems.length)
       },
       getOpenHour(dayInWeekIndex) {
-        for (let openHour of this.store.openHours) {
-          if (openHour.dayInWeeks[dayInWeekIndex])
-            return _.pick(openHour, 'openTime', 'closeTime')
-        }
+        const openHours = []
+
+        this.store.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
+          if (dayInWeeks[dayInWeekIndex]) {
+            openHours.push({openTime, closeTime})
+          }
+        })
+
+        return openHours
       },
       get24HourValue(time) {
         time = _.toLower(time)
@@ -632,12 +643,12 @@
           }
         }
       }
-  
+
       .title {
         font-size: 20px;
         margin: 4px 8px 8px;
       }
-      
+
       .pos-order__tab {
         border-radius: 0;
         overflow: hidden;
@@ -766,7 +777,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   @media screen and (max-width: 1139px) {
     .menu-hour {
       display: none;

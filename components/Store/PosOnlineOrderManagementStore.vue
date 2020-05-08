@@ -379,8 +379,9 @@
       },
 
       async uploadAppItem({ file, group, version, type, base, release, note }) {
-        await this.$getService('FileUploadStore').prepareUploadAppFolder(file.name, version)
-        const uploadPath = await this.$getService('FileUploadStore').uploadApp(file, version)
+        const appItemGroupName = _.find(this.apps, app => app._id === group).name
+        await this.$getService('FileUploadStore').prepareUploadAppFolder(appItemGroupName, version)
+        const uploadPath = await this.$getService('FileUploadStore').uploadApp(appItemGroupName, file, version)
         await cms.getModel('AppItem').create({ version, type, changeLog: note, uploadPath, uploadDate: new Date(), app: group, baseVersion: base, release })
         await this.loadAppItems()
       },

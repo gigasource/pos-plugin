@@ -112,10 +112,11 @@ module.exports = {
       datetime: 'Date/Time',
       sales: 'Sales',
       total: 'Total',
-      currency: '€',
+      currency: '$',
       discount: 'Discount',
       tax: 'Tax',
       subtotal: 'Subtotal',
+      asap: 'As soon as possible',
     },
 
     //reports
