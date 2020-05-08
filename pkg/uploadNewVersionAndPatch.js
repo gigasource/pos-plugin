@@ -3,9 +3,10 @@ const argv = require('yargs').argv;
 const upload = new uploader({domain: argv.domain, apiBaseUrl: '/cms-files'});
 const version = require('../package').version;
 const path = require('path');
+const appName = 'pos-restaurant.apk'
 console.log("The domain is", argv.domain);
 upload({
-  filePath: path.resolve(__dirname, './android-dist/originalBuild/app-release.apk'),
+  filePath: path.resolve(__dirname, `./android-dist/originalBuild/${appName}`),
   group: 'POS_Android',
   version: version,
   type: 'APK',

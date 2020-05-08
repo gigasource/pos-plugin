@@ -92,7 +92,7 @@ android.applicationVariants.all { variant ->
                     commandLine 'jarsigner', '-verbose', '-sigalg', 'SHA1withRSA', '-digestalg', 'SHA1', '-keystore', 'release.keystore', '-storepass', '123456', '../originalBuild/app-release-unsigned.apk', 'key0'
                 }
                 exec {
-                    commandLine 'mv', '../originalBuild/app-release-unsigned.apk', '../originalBuild/app-release.apk'
+                    commandLine 'mv', '../originalBuild/app-release-unsigned.apk', '../originalBuild/pos-restaurant.apk'
                 }
             } catch (Exception e) {
                 throw new GradleScriptException("Something went wrong when adding patch to apk", e);

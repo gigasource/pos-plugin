@@ -45,9 +45,9 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
     mkdir originalBuild && \
     cp /pos-restaurant/app.apk ./originalBuild/ && \
     ./gradlew addPatchToApkProRelease && \
-    /opt/android-sdk/build-tools/28.0.3/zipalign -f -v 4 /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/app-release.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/app-release1.apk && \
-    rm /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/app-release.apk && \
-    mv /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/app-release1.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/app-release.apk && \
+    /opt/android-sdk/build-tools/28.0.3/zipalign -f -v 4 /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/temp.apk && \
+    rm /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk && \
+    mv /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/temp.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk && \
     ./gradlew uploadApkAndPatchProRelease
 # Cleanup unused & sensitive files
 WORKDIR /root/cms-boilerplate
