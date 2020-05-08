@@ -205,6 +205,8 @@
               versions,
               // store selected version to update, default set to latest version
               updateVersion: deviceVersions.length && deviceVersions[0].value,
+              // boolean value used to prevent the user update twice
+              canUpdate: true
             }
           })
         }
@@ -327,6 +329,11 @@
       async updateDeviceAppVersion(device) {
         if (!device.updateVersion)
           return
+        
+        // prevent re-update
+        // TODO: UX
+        device.canUpdate = false
+        
         const {socket} = window.cms
         socket.emit('updateApp', device._id, device.updateVersion)
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)

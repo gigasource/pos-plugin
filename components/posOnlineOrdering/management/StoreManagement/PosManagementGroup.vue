@@ -56,7 +56,7 @@
                   <div class="row-flex col-4">
                     <template v-if="updateAppPerm">
                       <g-select class="w-60" :items="device.versions" v-model="device.updateVersion"/>
-                      <p v-if="device.updateVersion" class="ml-3 text-indigo-accent-2" style="cursor: pointer"
+                      <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2" style="cursor: pointer"
                          @click="$emit('update:deviceAppVersion', device)">Update</p>
                     </template>
                   </div>
