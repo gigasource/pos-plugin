@@ -94,15 +94,17 @@
     },
     async created() {
       const { access_token, redirect_to } = this.$route.query
-      this.signInByToken = true
-      if (access_token)
+      if (access_token) {
+        this.signInByToken = true
         await axios.post('/authenticate-with-access-token', { access_token })
+      }
       if (redirect_to)
         location.href = redirect_to
     },
     mounted() {
       this.$nextTick(() => {
-        this.$refs.email.$refs.input.focus()
+        if (!this.signInByToken)
+          this.$refs.email.$refs.input.focus()
       })
     }
   }

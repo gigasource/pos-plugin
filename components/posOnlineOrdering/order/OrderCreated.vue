@@ -44,12 +44,12 @@
               <div>{{ item.price * (item.quantity || 1) | currency }}</div>
             </div>
           </div>
-          <div class="mt-2 row-flex fs-small">
+          <div class="order-info">
             <span>{{$t('store.total')}} <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
             <g-spacer/>
             <span>{{ order.totalPrice | currency }}</span>
           </div>
-          <div :class="order.discounts.length === 0 ? 'order-detail' : ['mt-2', 'row-flex','fs-small']">
+          <div :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
             <span>{{$t('store.shippingFee')}}:</span>
             <g-spacer/>
             <span>{{ order.shippingFee | currency }}</span>
@@ -61,7 +61,7 @@
               <span>-{{ value | currency }}</span>
             </div>
           </div>
-          <div class="mt-2 row-flex fw-700 fs-small">
+          <div class="order-info fw-700">
             <span>{{$t('store.total')}}</span>
             <g-spacer/>
             <span>{{ order.effectiveTotal | currency}}</span>
@@ -69,7 +69,7 @@
         </template>
         <template v-else>
           <div class="more-info">
-            <p class="fw-700 i mt-3">Some possible reasons for this issue:</p>
+            <p class="fw-700 i">Some possible reasons for this issue:</p>
             <div class="row-flex align-items-start">
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
               <div>The restaurant staffs are currently busy and cannot handle your order quick enough.</div>
@@ -79,15 +79,15 @@
               <div>There might be a serious connectivity issue at the restaurant</div>
             </div>
             <p class="fw-700 i mt-2">For more information, call us directly:</p>
-            <div class="row-flex justify-center align-items-center my-2">
+            <div class="phone">
               <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
-              <div class="fw-600 fs-large-2 text-indigo-accent-2">{{phone}}</div>
+              <div class="fw-600 text-indigo-accent-2">{{phone}}</div>
             </div>
           </div>
         </template>
 
       </div>
-      <div v-if="orderHasBeenProcessed || orderMissed" class="cpn-order-created__actions">
+      <div v-show="orderHasBeenProcessed || orderMissed" class="cpn-order-created__actions">
         <g-btn-bs width="98" text-color="#536DFE" rounded @click="close">Close</g-btn-bs>
       </div>
     </div>
@@ -253,14 +253,15 @@
     &__content {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       max-height: calc(100% - 120px);
+      font-size: 14px;
 
       .order-item {
-        flex: 1;
-        overflow: hidden auto;
+        overflow: auto;
         scrollbar-width: none; // firefox
         border-bottom: 1px solid #d8d8d8;
+        min-height: 0;
+        -webkit-overflow-scrolling: touch;
 
         &::-webkit-scrollbar {
           display: none;
@@ -302,9 +303,16 @@
         }
       }
 
+      .order-info {
+        display: flex;
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+
       .order-discount {
         display: flex;
-        margin-top: 4px;
+        padding-top: 4px;
+        padding-bottom: 4px;
         font-size: 14px;
 
         &:last-child {
@@ -350,6 +358,18 @@
     }
   }
 
+  .more-info {
+    margin-top: 16px;
+
+    .phone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px;
+      font-size: 20px;
+    }
+  }
+
   @media screen and (max-width: 1139px) {
     .cpn-order-created {
       padding: 24px;
@@ -363,6 +383,65 @@
 
     .more-info {
       font-size: 14px;
+    }
+  }
+
+  @media screen and (max-height: 600px) {
+    .cpn-order-created {
+      padding-top: 12px;
+      padding-bottom: 12px;
+
+      &__header {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 18px;
+      }
+
+      &__content {
+        max-height: calc(100% - 90px);
+        font-size: 12px;
+        line-height: 1.2;
+
+        .order-message {
+          font-size: 14px;
+        }
+
+        .order-detail {
+          padding: 4px 0;
+          font-size: 12px;
+
+          &__index {
+            width: 14px;
+            height: 14px;
+            line-height: 14px;
+            font-size: 11px;
+          }
+        }
+
+        .order-discount, .order-info {
+          font-size: 12px;
+          padding-top: 2px;
+          padding-bottom: 2px;
+        }
+
+        .more-info {
+          font-size: 12px;
+          margin-top: 8px;
+
+          .g-icon {
+            transform: scale(0.75);
+          }
+
+          .phone {
+            font-size: 14px;
+          }
+        }
+      }
+
+      &__actions {
+        padding-top: 0;
+        margin-top: 4px;
+      }
     }
   }
 

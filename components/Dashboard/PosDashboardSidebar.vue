@@ -105,12 +105,15 @@
       &__username {
         word-break: break-all;
         -webkit-line-clamp: 2;
-        display: -webkit-box;
         -webkit-box-orient: vertical;
         overflow: hidden;
         font-size: 14px;
         font-weight: 600;
         padding-left: 8px;
+        max-width: 140px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
       }
       
       $avatarSize: 40px;
