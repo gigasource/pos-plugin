@@ -9,7 +9,7 @@ upload({
   group: 'POS_Android',
   version: version,
   type: 'APK',
-  base: '1.0.1',
+  base: process.env.BASE_VERSION || '1.0.0',
   release: 'Stable',
   note: 'New version'
 })
@@ -18,7 +18,7 @@ upload({
   group: 'POS_Android',
   version: version,
   type: 'PATCH',
-  base: '1.0.1',
+  base: process.env.BASE_VERSION || '1.0.0',
   release: 'Stable',
   note: 'New version'
 })
