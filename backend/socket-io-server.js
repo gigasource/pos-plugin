@@ -103,6 +103,11 @@ module.exports = function (cms) {
       internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
     })
 
+    socket.on('updateVersion', async (appVersion, _id) => {
+      const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
+      internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
+    })
+
     if (socket.request._query && socket.request._query.clientId) {
       const clientId = socket.request._query.clientId;
       updateDeviceAndNotify(true, clientId);
