@@ -12,7 +12,7 @@ let proxyClient = null;
 let activeProxies = 0;
 let deviceSockets = [];
 
-function createOnlineOrderSocket(deviceId) {
+function createOnlineOrderSocket(deviceId, cms) {
   const maxConnectionAttempt = 5;
 
   return new Promise((resolve, reject) => {
@@ -20,7 +20,11 @@ function createOnlineOrderSocket(deviceId) {
 
     onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
 
-    onlineOrderSocket.once('connect', () => {
+    onlineOrderSocket.once('connect', async () => {
+      if (cms.utils.getShouldUpdateApp()) {
+        const deviceId = await getDeviceId();
+        onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
+      }
       onlineOrderSocket.off('reconnecting');
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
@@ -201,7 +205,7 @@ function cleanupOnlineOrderSocket() {
 module.exports = async cms => {
   try {
     const deviceId = await getDeviceId();
-    if (deviceId) await createOnlineOrderSocket(deviceId);
+    if (deviceId) await createOnlineOrderSocket(deviceId, cms);
   } catch (e) {
     console.error(e);
     await updateDeviceStatus(false);
@@ -240,7 +244,7 @@ module.exports = async cms => {
 
       if (deviceId) {
         try {
-          await createOnlineOrderSocket(deviceId);
+          await createOnlineOrderSocket(deviceId, cms);
           await updateDeviceStatus(true, deviceId);
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
