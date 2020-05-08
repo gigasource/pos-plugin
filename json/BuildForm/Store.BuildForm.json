@@ -101,18 +101,14 @@
           "clipboardType": "cut"
         },
         {
-          "_id": "5e859b5eb7b7b30cc39f2635",
-          "schemaType": "date",
+          "schemaType": "string",
           "key": "openTime",
-          "type": "input@date",
-          "clipboardType": "cut"
+          "type": "input"
         },
         {
-          "_id": "5e859b5eb7b7b30cc39f2636",
-          "schemaType": "date",
+          "schemaType": "string",
           "key": "closeTime",
-          "type": "input@date",
-          "clipboardType": "cut"
+          "type": "input"
         }
       ],
       "type": "array"
