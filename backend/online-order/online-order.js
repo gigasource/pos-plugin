@@ -159,6 +159,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     })
 
     onlineOrderSocket.on('disconnect', () => {
+      console.log('disconnect');
       webShopConnected = false
       deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
 
