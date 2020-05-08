@@ -141,8 +141,8 @@
         </g-badge>
         <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
         <g-spacer/>
-        <g-btn-bs v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
+        <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
+        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
           {{$t('store.confirm')}}
         </g-btn-bs>
       </div>
