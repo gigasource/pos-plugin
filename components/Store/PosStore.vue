@@ -171,6 +171,10 @@
           if (version) this.version = version
         })
 
+        cms.socket.emit('socketConnected', value => {
+          this.webShopConnected = value
+        })
+
         cms.socket.on('webShopConnected', () => {
           this.webShopConnected = true
           this.getStoreId()
