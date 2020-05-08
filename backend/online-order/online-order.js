@@ -46,7 +46,8 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
       if (!orderData) return
-      let { orderType: type, paymentType, customer, products: items, createdDate: dateString, shippingFee, note, orderToken, discounts } = orderData
+      let { orderType: type, paymentType, customer, products: items,
+        createdDate: dateString, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
 
       items = items.map(item => {
         if (item.originalPrice) return item;
@@ -83,7 +84,8 @@ function createOnlineOrderSocket(deviceId, cms) {
         online: true,
         note,
         onlineOrderId: orderToken,
-        discounts
+        discounts,
+        deliveryTime,
       }
 
       await cms.getModel('Order').create(order)

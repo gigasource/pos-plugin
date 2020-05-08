@@ -543,6 +543,19 @@
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
       },
       async acceptPendingOrder(order) {
+        if (order.deliveryTime === 'asap') {
+          const now = new Date()
+          let minute = now.getMinutes() + order.prepareTime
+          let hour = now.getHours()
+
+          if (minute >= 60) {
+            hour++
+            minute -= 60
+          }
+
+          order.deliveryTime = `${hour}:${minute.toString().length === 1 ? '0' + minute : minute}`
+        }
+
         const status = 'kitchen'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {

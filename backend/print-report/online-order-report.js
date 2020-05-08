@@ -22,7 +22,8 @@ async function makePrintData(cms, {orderId}) {
     items,
     shippingFee,
     vSum: orderSum,
-    date
+    date,
+    deliveryTime,
   } = order;
 
   return {
@@ -37,12 +38,13 @@ async function makePrintData(cms, {orderId}) {
     shippingFee,
     orderSum,
     date: dayjs(date).format(localeObj.printing.dateFormat),
+    deliveryTime,
     locale: localeObj,
   };
 }
 
 async function printEscPos(escPrinter, printData) {
-  const {
+  let {
     orderNumber,
     customerName,
     customerPhone,
@@ -55,12 +57,13 @@ async function printEscPos(escPrinter, printData) {
     orderSum,
     date,
     locale,
+    deliveryTime,
   } = printData;
 
   escPrinter.alignCenter();
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
-  escPrinter.println(`${locale.printing.delivery} #${orderNumber}`)
+  escPrinter.leftRight(`${locale.printing.delivery} #${orderNumber}`, deliveryTime)
   if (customerCompany) {
     escPrinter.invert(true);
     escPrinter.println(`${locale.printing.company}`);

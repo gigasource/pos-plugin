@@ -1191,6 +1191,12 @@
           "type": "input@number"
         }
       ]
+    },
+    {
+      "_id": "5eb4fe288b0bccd478bec9de",
+      "schemaType": "string",
+      "key": "deliveryTime",
+      "type": "input"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
