@@ -40,6 +40,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     });
 
     onlineOrderSocket.on('reconnect', () => {
+      console.log('reconnect')
       webShopConnected = true
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
