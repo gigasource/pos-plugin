@@ -5,7 +5,11 @@
       "hideFields": [],
       "_id": "5eb3ed347d150119e156b658",
       "collectionName": "ComponentBuilder",
-      "permission": "read"
+      "permission": "read",
+      "queryCondition": {
+        "_code_": "",
+        "_code_type_": "commonJs"
+      }
     },
     {
       "hideFields": [],
@@ -33,7 +37,7 @@
       "collectionName": "Store",
       "permission": "write",
       "queryCondition": {
-        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      _id: user.store\n    }\n  }\n}\n",
+        "_code_": "module.exports =  async function(user) {\n  return {\n    find: {\n      _id: user.store\n    },\n    findOne: {\n      _id: user.store\n    }\n  }\n}\n",
         "_code_type_": "commonJs"
       }
     },
