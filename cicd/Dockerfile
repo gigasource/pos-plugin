@@ -10,7 +10,10 @@ RUN rm -rf ~/.ssh && \
     mv ./cms-configs/$CONFIG_FILE_NAME ./config/config.js && \
     export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
     GIGASOURCE_ACCESS_TOKEN=$(cat ./gigasource-access-token) && \
-    cd cms && \
+    cd cms-configs && \
+    git pull && \
+    cp pos-restaurant/pos-restaurant.js ../config/config.js && \
+    cd ../cms && \
     git pull && \
     cd ../backoffice && \
     git pull && \
