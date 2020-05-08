@@ -33,26 +33,26 @@
                 Note: {{order.note}}
               </div>
               <div class="row-flex" v-if="order.type === 'delivery'">
-                <div class="w-10">
+                <div style="flex: 0 0 25px">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
                 <div class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
-                  <div class="w-10 fw-700">{{item.quantity}}x</div>
-                  <div class="flex-equal fs-small-2 pl-1" style="line-height: 20px">
+                  <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
+                  <div class="flex-equal fs-small-2 pl-1">
                     {{item.id}}. {{item.name}}
                     <template v-if="item.modifiers.length > 0">
                       <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier.name}}</span>)</span>
                     </template>
                   </div>
-                  <div class="col-3 fs-small-2 ta-right" style="line-height: 20px">€{{item.price | formatMoney(decimals)}}</div>
+                  <div class="col-2 fs-small-2 ta-right">€{{item.price | formatMoney(decimals)}}</div>
                 </div>
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
-                <div class="col-9 fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="col-3 fs-small-2 ta-right">€{{order.shippingFee || 0}}</div>
+                <div class="col-10 fw-700">{{$t('onlineOrder.shippingFee')}}</div>
+                <div class="col-2 fs-small-2 ta-right">€{{order.shippingFee || 0}}</div>
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
@@ -275,7 +275,6 @@
 <style scoped lang="scss">
   .main {
     background-image: url('/plugins/pos-plugin/assets/out.png');
-    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
