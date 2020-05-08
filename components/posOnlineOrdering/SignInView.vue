@@ -41,6 +41,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import axios from 'axios';
 
   export default {
     name: 'SignInView',
@@ -97,13 +98,14 @@
       if (access_token) {
         this.signInByToken = true
         await axios.post('/authenticate-with-access-token', { access_token })
+        localStorage.setItem('__token', access_token);
+        axios.defaults.headers.Authorazation = `Bearer ${access_token}`;
       }
       if (redirect_to)
         location.href = redirect_to
     },
     mounted() {
       this.$nextTick(() => {
-        if (!this.signInByToken)
           this.$refs.email.$refs.input.focus()
       })
     }
