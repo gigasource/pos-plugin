@@ -149,7 +149,7 @@
     </div>
 
     <!-- Order created -->
-    <order-created v-if="dialog.value" v-model="dialog.value" :order="dialog.order" :phone="store.phone" @close="closeOrderCreatedDialog"/>
+    <order-created v-if="dialog.value" v-model="dialog.value" :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"  @close="closeOrderCreatedDialog"/>
   </div>
 </template>
 <script>
@@ -207,7 +207,7 @@
       }
     },
     async created() {
-      this.listDiscounts = await cms.getModel('Discount').find()
+      this.listDiscounts = await cms.getModel('Discount').find({store: this.store._id})
     },
     computed: {
       confirmView() { return !this.orderView },
@@ -266,14 +266,14 @@
         this.couponTf.success = false
         let discounts = _.cloneDeep(this.listDiscounts)
         discounts = discounts.filter(discount => {
-          return discount.store === this.store._id && discount.type.includes(this.orderType) && discount.enabled
+          return discount.type.includes(this.orderType) && discount.enabled
         })
         if (!discounts.length) return discounts
 
         const applicableDiscounts = discounts.filter(({ conditions: { coupon, daysOfWeek, timePeriod, total, zipCode } }) => {
           if (coupon) {
             if (!this.couponCode) return false
-            if (coupon !== this.couponCode) {
+            if (coupon.toLowerCase() !== this.couponCode.toLowerCase()) {
               this.couponTf.error = 'Invalid Coupon!'
               return false
             }
@@ -294,7 +294,7 @@
           }
 
           this.couponTf.error = ''
-          if(coupon && this.couponCode && coupon === this.couponCode) {
+          if(coupon && this.couponCode && coupon.toLowerCase() === this.couponCode.toLowerCase()) {
             this.couponTf.success = true
           }
           return true
@@ -406,7 +406,9 @@
           items: this.orderItems,
           shippingFee: this.shippingFee,
           totalPrice: this.totalPrice,
-          status: 'inProgress'
+          status: 'inProgress',
+          discounts: this.discounts,
+          effectiveTotal: this.effectiveTotal
         }
 
         this.dialog.value = true

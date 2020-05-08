@@ -98,6 +98,7 @@
         days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         orderTimeOuts: _.map([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], v => ({ value: v, text: v })),
         errors: [],
+        timeout: this.orderTimeOut || ''
       }
     },
     computed: {
@@ -127,10 +128,11 @@
       },
       computedOrderTimeOut: {
         get() {
-          return this.orderTimeOut
+          return this.timeout
         },
         set(value) {
           this.$emit('update', { orderTimeOut: value })
+          this.timeout = value
         }
       },
       computedOpenHours() {

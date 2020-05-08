@@ -18,7 +18,7 @@
                     <template v-slot:activator="{on}">
                       <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave" :style="storeOpenStatusStyle" class="row-flex align-items-center mr-1">
                         {{ storeOpenStatus }}
-                        <g-icon size="16" :style="storeOpenStatusStyle">info</g-icon>
+                        <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
                       </div>
                     </template>
                     <div class="menu-hour">

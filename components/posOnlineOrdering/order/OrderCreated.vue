@@ -18,7 +18,7 @@
                 </div>
               </div>
             </div>
-            <div style="font-size: 18px; margin-top: 13px; margin-bottom: 30px; max-width: 350px">
+            <div class="order-message">
               <div v-if="waitingConfirm" v-html>{{ waitingConfirmMessage }}</div>
               <div v-else-if="orderMissed">
                 <div style="color: #E57373">Order missed</div>
@@ -37,25 +37,34 @@
         </div>
 
         <template v-if="!orderMissed">
-          <div v-for="(item, index) in order.items" :key="index" class="order-detail">
-            <div class="order-detail__index" >{{ item.quantity || 1}}</div>
-            <div class="order-detail__name">{{ item.name }}</div>
-            <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+          <div class="order-item">
+            <div v-for="(item, index) in order.items" :key="index" class="order-detail">
+              <div class="order-detail__index" >{{ item.quantity || 1}}</div>
+              <div class="order-detail__name">{{ item.name }}</div>
+              <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+            </div>
           </div>
           <div class="mt-2 row-flex fs-small">
             <span>{{$t('store.total')}} <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
             <g-spacer/>
             <span>{{ order.totalPrice | currency }}</span>
           </div>
-          <div class="order-detail">
+          <div :class="order.discounts.length === 0 ? 'order-detail' : ['mt-2', 'row-flex','fs-small']">
             <span>{{$t('store.shippingFee')}}:</span>
             <g-spacer/>
             <span>{{ order.shippingFee | currency }}</span>
           </div>
+          <div v-if="order.discounts.length > 0">
+            <div class="order-discount" v-for="{name, coupon, value} in order.discounts">
+              <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
+              <g-spacer/>
+              <span>-{{ value | currency }}</span>
+            </div>
+          </div>
           <div class="mt-2 row-flex fw-700 fs-small">
             <span>{{$t('store.total')}}</span>
             <g-spacer/>
-            <span>{{ (order.totalPrice + order.shippingFee) | currency}}</span>
+            <span>{{ order.effectiveTotal | currency}}</span>
           </div>
         </template>
         <template v-else>
@@ -70,7 +79,7 @@
               <div>There might be a serious connectivity issue at the restaurant</div>
             </div>
             <p class="fw-700 i mt-2">For more information, call us directly:</p>
-            <div class="row-flex justify-center align-items-center mt-2">
+            <div class="row-flex justify-center align-items-center my-2">
               <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
               <div class="fw-600 fs-large-2 text-indigo-accent-2">{{phone}}</div>
             </div>
@@ -91,6 +100,10 @@
       value: Boolean,
       order: Object,
       phone: [Number, String],
+      timeout: {
+        type: Number,
+        default: 3
+      }
     },
     filters: {
       currency(value) {
@@ -104,7 +117,6 @@
         deliveryTime: '',
         cancelledReason: '',
         sprintTimeOut: 60,
-        orderProcessTimeOut: 180, // 3 minutes
         waited: 0,
         circularSize: 70,
         status: 'inProgress', // inProgress, kitchen, declined,
@@ -118,6 +130,9 @@
         set(val) {
           this.$emit('input', val)
         }
+      },
+      orderProcessTimeOut() {
+        return this.timeout * 60
       },
       orderHasBeenProcessed() {
         return this.order.status !== 'inProgress'
@@ -236,12 +251,20 @@
     }
 
     &__content {
-      overflow: hidden scroll;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       max-height: calc(100% - 120px);
-      scrollbar-width: none; // firefox
 
-      &::-webkit-scrollbar {
-        display: none;
+      .order-item {
+        flex: 1;
+        overflow: hidden auto;
+        scrollbar-width: none; // firefox
+        border-bottom: 1px solid #d8d8d8;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
       }
 
       .order-detail {
@@ -250,6 +273,10 @@
         padding-top: 8px;
         padding-bottom: 8px;
         font-size: 14px;
+
+        &:last-child {
+          border-bottom: none;
+        }
 
         &__index {
           width: 20px;
@@ -272,6 +299,16 @@
           overflow: hidden;
           text-overflow: ellipsis;
           flex: 1;
+        }
+      }
+
+      .order-discount {
+        display: flex;
+        margin-top: 4px;
+        font-size: 14px;
+
+        &:last-child {
+          border-bottom: 1px solid #D8D8D8;
         }
       }
 
@@ -298,6 +335,7 @@
 
     .order-message {
       font-size: 18px;
+      margin-top: 12px;
 
       .link-try-again {
         color: #536DFE;
