@@ -11,6 +11,7 @@ let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
 let deviceSockets = [];
+let webShopConnected = false
 
 function createOnlineOrderSocket(deviceId, cms) {
   const maxConnectionAttempt = 5;
@@ -26,6 +27,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
       }
       onlineOrderSocket.off('reconnecting');
+      webShopConnected = true
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
     });
@@ -38,16 +40,17 @@ function createOnlineOrderSocket(deviceId, cms) {
     });
 
     onlineOrderSocket.on('reconnect', () => {
+      webShopConnected = true
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
 
     onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
       if (!orderData) return
-      let {orderType: type, paymentType, customer, products: items, createdDate: dateString, shippingFee, note, orderToken} = orderData
+      let { orderType: type, paymentType, customer, products: items, createdDate: dateString, shippingFee, note, orderToken, discounts } = orderData
 
       items = items.map(item => {
         if (item.originalPrice) return item;
-        return {originalPrice: item.price, ...item};
+        return { originalPrice: item.price, ...item };
       });
       const date = new Date(dateString)
       const vDiscount = orderUtil.calOrderDiscount(items).toFixed(2)
@@ -66,7 +69,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         items,
         customer,
         deliveryDate: dayjs(),
-        payment: [{type: paymentType, value: vSum}],
+        payment: [{ type: paymentType, value: vSum }],
         type,
         date,
         vDate: await getVDate(date),
@@ -79,7 +82,8 @@ function createOnlineOrderSocket(deviceId, cms) {
         received: vSum,
         online: true,
         note,
-        onlineOrderId: orderToken
+        onlineOrderId: orderToken,
+        discounts
       }
 
       await cms.getModel('Order').create(order)
@@ -141,11 +145,18 @@ function createOnlineOrderSocket(deviceId, cms) {
     })
 
     onlineOrderSocket.on('updateOrderTimeOut', async (orderTimeOut) => {
-      // TODO:
-      console.log(orderTimeOut)
+      if (_.isNil(orderTimeOut)) return
+
+      try {
+        await cms.getModel('PosSetting').findOneAndUpdate({},
+          { $set: { 'onlineDevice.orderTimeout': orderTimeOut } })
+      } catch (e) {
+        console.error('Error updating order timeout', e)
+      }
     })
 
     onlineOrderSocket.on('disconnect', () => {
+      webShopConnected = false
       deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
 
       activeProxies = 0;
@@ -237,6 +248,10 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback({error: 'Device not paired'});
 
       onlineOrderSocket.emit('getPairStatus', deviceId, callback);
+    })
+
+    socket.on('socketConnected', async callback => {
+      callback(webShopConnected)
     })
 
     socket.on('registerOnlineOrderDevice', async (pairingCode, callback) => {
