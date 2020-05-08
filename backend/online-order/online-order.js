@@ -40,6 +40,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     });
 
     onlineOrderSocket.on('reconnect', () => {
+      console.log('reconnect')
       webShopConnected = true
       deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
@@ -158,6 +159,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     })
 
     onlineOrderSocket.on('disconnect', () => {
+      console.log('disconnect');
       webShopConnected = false
       deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
 
