@@ -268,6 +268,8 @@
         return dayjs(order.date).add(order.prepareTime, 'minute').toDate()
       },
       getShippingFee(order) {
+        if (!order.discounts) return order.shippingFee
+
         const freeShipping = order.discounts.find(item => item.type === 'freeShipping');
         return freeShipping ? freeShipping.value : order.shippingFee;
       }
