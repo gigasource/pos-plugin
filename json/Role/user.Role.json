@@ -5,11 +5,7 @@
       "hideFields": [],
       "_id": "5e86e3828197ab54362973fd",
       "collectionName": "ComponentBuilder",
-      "permission": "read",
-      "queryCondition": {
-        "_code_": "",
-        "_code_type_": "commonJs"
-      }
+      "permission": "read"
     },
     {
       "hideFields": [],
@@ -37,7 +33,7 @@
       "collectionName": "Store",
       "permission": "write",
       "queryCondition": {
-        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      _id: { $in: stores }\n    }\n  }\n}\n",
+        "_code_": "module.exports =  async function(user) {  \n  let stores = (await cms.getModel('Store').find({    \n    groups: { $elemMatch: { $in: user.storeGroups }}  \n  }).select('_id').lean()).map(r => r._id);  \n  return {    \n    find: {      \n      _id: { $in: stores }    \n    }  \n  }\n}",
         "_code_type_": "commonJs"
       }
     },
@@ -90,6 +86,16 @@
         "_code_type_": "commonJs"
       },
       "permission": "write"
+    },
+    {
+      "hideFields": [],
+      "_id": "5eb52f080c15741739051bf7",
+      "collectionName": "PosSetting",
+      "permission": "read",
+      "queryCondition": {
+        "_code_": "",
+        "_code_type_": "commonJs"
+      }
     }
   ],
   "name": "user"
