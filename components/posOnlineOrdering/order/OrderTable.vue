@@ -72,6 +72,7 @@
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
+                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
                 <div>
@@ -196,7 +197,10 @@
         },
         couponCode: '',
         confirming: false,
-        listDiscounts: []
+        listDiscounts: [],
+        storeOpenHours: null,
+        deliveryTime: null,
+        asap: 'As soon as possible',
       }
     },
     filters: {
@@ -208,6 +212,17 @@
     },
     async created() {
       this.listDiscounts = await cms.getModel('Discount').find({store: this.store._id})
+
+      this.deliveryTime = this.asap
+
+      const {openHours} = this.store
+      this.storeOpenHours = openHours.filter(({dayInWeeks}) => {
+        let today = new Date().getDay()
+        today -= 1
+        if (today === -1) today = 6
+
+        return dayInWeeks[today]
+      })
     },
     computed: {
       confirmView() { return !this.orderView },
@@ -322,7 +337,39 @@
         const totalDiscount = this.discounts.reduce((total, {value}) => total + value, 0)
         const total = this.totalPrice + this.shippingFee - totalDiscount;
         return total < 0 ? 0 : total
-      }
+      },
+      deliveryTimeList() {
+        let deliveryTimeList = []
+
+        if (this.storeOpenHours) {
+          this.storeOpenHours.forEach(({openTime, closeTime}) => {
+            let [openTimeHour, openTimeMinute] = openTime.split(':')
+            let [closeTimeHour, closeTimeMinute] = closeTime.split(':')
+
+            openTimeHour = parseInt(openTimeHour)
+            openTimeMinute = parseInt(openTimeMinute)
+            closeTimeHour = parseInt(closeTimeHour)
+            closeTimeMinute = parseInt(closeTimeMinute)
+
+            while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute <= closeTimeMinute)) {
+              const today = new Date()
+
+              if (openTimeHour >= today.getHours() && openTimeMinute >= today.getMinutes() + 15)
+                deliveryTimeList.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
+
+              openTimeMinute += this.store.deliveryTimeInterval
+              if (openTimeMinute >= 60) {
+                openTimeHour++
+                openTimeMinute = 0
+              }
+            }
+          })
+        }
+
+        deliveryTimeList = _.uniq(deliveryTimeList).sort()
+        deliveryTimeList.unshift(this.asap)
+        return deliveryTimeList
+      },
     },
     watch: {
       // discounts(val) {
@@ -368,7 +415,7 @@
             ...orderItem.note && {modifiers: [{name: orderItem.note, price: 0, quantity: 1}]},
           }
         })
-        
+
         if (this.discounts && this.discounts.length) {
           const discount = _.reduce(this.discounts.filter(i => i.type !== 'freeShipping'), (acc, { value }) => {
             return acc + value
@@ -377,11 +424,11 @@
 
           products = orderUtil.applyDiscountForOrder(products, { difference: discount, value })
         }
-        
+
         // an identifier for an order
         const generateOrderTokenResponse = await axios.get(`${location.origin}/store/order-token`)
         const orderToken = generateOrderTokenResponse.data.token
-        
+
         const orderData = {
           orderType: this.orderType,
           paymentType: this.paymentType,
@@ -393,6 +440,7 @@
           totalPrice: this.totalPrice,
           takeOut: true,
           orderToken,
+          deliveryTime: this.deliveryTime === this.asap ? 'asap' : this.deliveryTime,
           discounts: this.discounts,
         }
 

@@ -13,11 +13,10 @@ module.exports = cms => {
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
   cms.app.get('/health-check', (req, res) => res.status(200).send('OK'));
 
-  cms.app.use(/^\/$/, async (req, res, next) => {
+  cms.app.use(/^\/$/, async (req, res) => {
     if (!req.session.userId)
       return res.redirect('/sign-in')
     else
       return res.redirect('/management')
-    next()
   })
 }
