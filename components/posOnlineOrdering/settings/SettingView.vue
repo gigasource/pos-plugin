@@ -6,7 +6,7 @@
     <template v-else>
       <!-- sidebar -->
       <pos-dashboard-sidebar default-path="item.0" :items="sidebarItems" @node-selected="onNodeSelected"/>
-  
+
       <!-- content -->
       <div style="background-color: #F4F7FB; flex: 1; padding: 50px 5%">
         <restaurant-information
@@ -16,7 +16,8 @@
         <service-and-open-hours
             v-if="view === 'service-and-open-hours'"
             v-bind="store"
-            @update="updateStore"/>
+            @update="updateStore"
+            @update:deliveryTimeInterval="updateDeliveryTimeInterval"/>
         <setting-menu
             v-if="view === 'settings-menu'"
             :store="store"
@@ -110,10 +111,13 @@
         this.$set(this, 'store', await cms.getModel('Store').findOne({_id: this.store._id}))
       },
       async updateStore(change) {
-        if (change.orderTimeOut)
-          window.cms.socket.emit('updateOrderTimeOut', this.store._id, change.orderTimeOut)
+        if (change.orderTimeOut) window.cms.socket.emit('updateOrderTimeOut', this.store._id, change.orderTimeOut)
+
         await cms.getModel('Store').updateOne({_id: this.store._id}, change)
         Object.assign(this.store, change)
+      },
+      async updateDeliveryTimeInterval(val) {
+        await this.updateStore({deliveryTimeInterval: val})
       },
       changeView(view, title) {
         if(view) {
@@ -140,7 +144,7 @@
           callback && callback({ ok: false, message: 'Category name is missing!' })
           return
         }
-        
+
         const isDuplicateName = _.find(this.categories, c => c.name === name)
         if (isDuplicateName) {
           callback && callback({ ok: false, message: 'This name is already taken!' })
@@ -157,23 +161,23 @@
           callback && callback(false)
           return
         }
-        
+
         const category = _.find(this.categories, c => c._id === _id)
         if (category.name === name)
           return
-        
+
         const isDuplicateName = _.find(this.categories, c => c.name === name && c._id !== _id)
         if (isDuplicateName) {
           alert('This name is already taken!')
           callback && callback(false)
           return
         }
-        
+
         await cms.getModel('Category').updateOne({_id}, { name })
         await this.loadCategories()
         callback && callback(true)
       },
-      
+
       async deleteCategory(_id) {
         await cms.getModel('Product').remove({ category: _id })
         await cms.getModel('Category').remove({_id: _id})
@@ -191,7 +195,7 @@
         await cms.getModel('Category').updateOne({_id: oldId}, {position: newIndex})
         await cms.getModel('Category').updateOne({_id: swapId}, {position: oldIndex})
       },
-      
+
       // products
       async loadProducts() {
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))

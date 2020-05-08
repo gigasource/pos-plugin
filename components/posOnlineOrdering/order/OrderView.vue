@@ -18,7 +18,7 @@
                     <template v-slot:activator="{on}">
                       <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave" :style="storeOpenStatusStyle" class="row-flex align-items-center mr-1">
                         {{ storeOpenStatus }}
-                        <g-icon size="16" :style="storeOpenStatusStyle">info</g-icon>
+                        <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
                       </div>
                     </template>
                     <div class="menu-hour">
@@ -54,7 +54,7 @@
             </g-badge>
             <div class="pos-order__info--total">{{ totalPrice | currency }}</div>
             <g-spacer/>
-            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 16px" @click="showOrder = true" width="160">
+            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative; justify-content: flex-start" @click="showOrder = true" width="150">
               {{$t('store.payment')}}
               <div class="icon-payment">
                 <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>

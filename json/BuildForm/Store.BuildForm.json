@@ -277,6 +277,13 @@
       "schemaType": "number",
       "key": "orderTimeOut",
       "type": "input@number"
+    },
+    {
+      "_id": "5eb4d7804e7469d08e20e589",
+      "schemaType": "number",
+      "key": "deliveryTimeInterval",
+      "default": "15",
+      "type": "input@number"
     }
   ],
   "name": "Store",
