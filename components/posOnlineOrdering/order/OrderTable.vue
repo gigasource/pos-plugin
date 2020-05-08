@@ -430,13 +430,15 @@
         const generateOrderTokenResponse = await axios.get(`${location.origin}/store/order-token`)
         const orderToken = generateOrderTokenResponse.data.token
 
+        const createdDate = new Date();
         const orderData = {
           orderType: this.orderType,
           paymentType: this.paymentType,
           customer,
           products,
           note,
-          createdDate: new Date(),
+          createdDate,
+          ...this.store.orderTimeOut && { timeoutDate: dayjs(createdDate).add(this.store.orderTimeOut, 'minute').toDate() },
           shippingFee: this.discounts.some(item => item.type === 'freeShipping') ? 0 : this.shippingFee,
           totalPrice: this.totalPrice,
           takeOut: true,
