@@ -104,7 +104,7 @@ module.exports = function (cms) {
       // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
       const accessToken = await cms.utils.generateAccessToken(user.username,  user.password)
       if (accessToken) {
-        callback && callback(`http://localhost:8888/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}`)
+        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}`)
       } else {
         callback && callback(null)
       }
