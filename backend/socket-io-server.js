@@ -105,7 +105,7 @@ module.exports = function (cms) {
 
     socket.on('updateVersion', async (appVersion, _id) => {
       const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
-      internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
+      if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
     })
 
     if (socket.request._query && socket.request._query.clientId) {
