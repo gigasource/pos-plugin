@@ -288,5 +288,14 @@ module.exports = async cms => {
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
       onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
     })
+
+    socket.on('getWebShopSettingUrl', async (callback) => {
+      const deviceId = await getDeviceId();
+      if (!onlineOrderSocket || !deviceId) return callback(null);
+
+      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, (webShopSettingUrl) => {
+        callback && callback( `${webshopUrl}${webShopSettingUrl}`)
+      })
+    })
   })
 }

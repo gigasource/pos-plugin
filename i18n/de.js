@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Tischplan bearbeiten',
       editMenuCard: 'Menü bearbeiten',
       printerSettings: 'Druckereinstellungen',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online-Bestellung Menü'
     },
 
     //article view

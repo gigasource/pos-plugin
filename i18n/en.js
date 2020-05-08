@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Edit Table Plan',
       editMenuCard: 'Edit Menu Card',
       printerSettings: 'Printer Settings',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online Order Menu'
     },
 
     //article view
