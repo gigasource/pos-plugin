@@ -200,7 +200,7 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
-        asap: 'As soon as possible',
+        asap: $t('common.asap'),
       }
     },
     filters: {
@@ -352,6 +352,8 @@
             openTimeMinute = parseInt(openTimeMinute)
             closeTimeHour = parseInt(closeTimeHour)
             closeTimeMinute = parseInt(closeTimeMinute)
+
+            if (isNaN(openTimeHour) || isNaN(openTimeMinute) || isNaN(closeTimeHour) || isNaN(closeTimeMinute)) return
 
             while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute <= closeTimeMinute)) {
               if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute))

@@ -22,6 +22,11 @@ module.exports = {
       items: 'Artikel',
       shippingFee: 'Liefergebühr',
       company: 'Firmenname',
-    }
+    },
+
+    common: {
+      currency: '€',
+      asap: 'So schnell wie möglich',
+    },
   }
 }

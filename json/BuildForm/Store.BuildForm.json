@@ -275,7 +275,7 @@
       "type": "input@number"
     },
     {
-      "_id": "5eb4d7804e7469d08e20e589",
+      "_id": "5eb5332513e1dddd8223695d",
       "schemaType": "number",
       "key": "deliveryTimeInterval",
       "default": "15",
