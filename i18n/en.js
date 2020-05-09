@@ -293,7 +293,23 @@ module.exports = {
       orderSuccessfully: 'Order Successfully',
       items: 'Items',
       shippingFee: 'Shipping Fee',
-      company: 'Company Name'
+      company: 'Company Name',
+      waiting1: 'Sending your order to the restaurant...',
+      waiting2: 'Please wait while we proceed your order...',
+      waiting3: 'The process might take a while...',
+      waiting4: 'Hold on! The restaurant might be crowded at the moment...',
+      orderMissed: 'Order missed',
+      apology: 'We apologize for any convenience caused. You can {0}',
+      tryAgain: 'try again!',
+      possibleReasons: 'Some possible reasons for this issue',
+      reason1: 'The restaurant staffs are currently busy and cannot handle your order quick enough.',
+      reason2: 'There might be a serious connectivity issue at the restaurant.',
+      callUs: 'For more information, call us directly',
+      close: 'Close',
+      orderConfirmed: 'Your order is confirmed',
+      orderCancelled: 'Sorry, your order has been cancelled!',
+      reason: 'Reason',
+      emptyCart: 'Your order list is currently empty.'
     }
   }
 }

@@ -22,6 +22,22 @@ module.exports = {
       items: 'Artikel',
       shippingFee: 'Liefergebühr',
       company: 'Firmenname',
+      waiting1: 'Bestellung wird an das Restaurant gesendet...',
+      waiting2: 'Ihre Bestellung wird bearbeitet. Bitte warten...',
+      waiting3: 'Der Vorgang dauert einen Moment...',
+      waiting4: 'Bitte warten! Es könnte gerade viel los sein ;) .. ',
+      orderMissed: 'Bestellung fehlgeschlagen',
+      apology: 'Wir bitten um Entschuldigung. Bitte {0}',
+      tryAgain: 'erneut Versuchen!',
+      possibleReasons: 'Mögliche Gründe',
+      reason1: 'Das Personal hat es nicht rechtzeitig geschafft Ihre Bestellung entgegen zu nehmen.',
+      reason2: 'Möglicherweise gab es Verbindungsprobleme.',
+      callUs: 'Für weitere Informationen, rufen Sie uns direkt an',
+      close: 'Beenden',
+      orderConfirmed: 'Bestellung bestätigt',
+      orderCancelled: 'Entschuldigung, Ihre Bestellung wurde storniert.',
+      reason: 'Grund',
+      emptyCart: 'Dein Warenkorb ist leer.'
     },
 
     common: {

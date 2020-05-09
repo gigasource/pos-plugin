@@ -27,7 +27,7 @@
             <div v-if="orderView && noMenuItem" style="margin-top: 100px; display: flex; justify-content: center; flex-direction: column">
               <img src="/plugins/pos-plugin/assets/empty_order2.svg">
               <div style="margin-top: 10px; font-size: 15px; text-align: center; color: #616161;">
-                Your order list is currently empty.
+                {{$t('store.emptyCart')}}
               </div>
             </div>
 
@@ -477,6 +477,7 @@
         }
 
         this.confirming = false
+        this.couponCode = ''
 
         this.$emit('clear')
         this.view = 'order'

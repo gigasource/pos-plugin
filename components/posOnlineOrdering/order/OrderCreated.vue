@@ -21,16 +21,18 @@
             <div class="order-message">
               <div v-if="waitingConfirm" v-html>{{ waitingConfirmMessage }}</div>
               <div v-else-if="orderMissed">
-                <div style="color: #E57373">Order missed</div>
-                <div style="color: #747474">We apologize for any convenience caused. You can <span class="link-try-again" @click="tryAgain">try again</span>!</div>
+                <div style="color: #E57373">{{$t('store.orderMissed')}}</div>
+                <i18n path="store.apology" tag="div" for="store.tryAgain">
+                  <span class="link-try-again" @click="tryAgain">{{$t('store.tryAgain')}}</span>
+                </i18n>
               </div>
               <div v-else-if="confirmed">
-                <div>Your order is confirmed </div>
+                <div>{{$t('store.orderConfirmed')}}</div>
                 <div style="font-weight: bold">{{ deliveryTime }}</div>
               </div>
               <div v-else-if="cancelled">
-                <div style="color: #E57373">Sorry, your order has been cancelled!</div>
-                <div style="color: #747474">Reason: {{ cancelledReason }}</div>
+                <div style="color: #E57373">{{$t('store.orderCancelled')}}</div>
+                <div style="color: #747474">{{$t('store.reason')}}: {{ cancelledReason }}</div>
               </div>
             </div>
           </div>
@@ -69,16 +71,16 @@
         </template>
         <template v-else>
           <div class="more-info">
-            <p class="fw-700 i">Some possible reasons for this issue:</p>
+            <p class="fw-700 i">{{$t('store.possibleReasons')}}:</p>
             <div class="row-flex align-items-start">
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
-              <div>The restaurant staffs are currently busy and cannot handle your order quick enough.</div>
+              <div>{{$t('store.reason1')}}</div>
             </div>
             <div class="row-flex align-items-start">
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
-              <div>There might be a serious connectivity issue at the restaurant.</div>
+              <div>{{$t('store.reason2')}}</div>
             </div>
-            <p class="fw-700 i mt-2">For more information, call us directly:</p>
+            <p class="fw-700 i mt-2">{{$t('store.callUs')}}:</p>
             <div class="phone">
               <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
               <div class="fw-600 text-indigo-accent-2">{{phone}}</div>
@@ -153,13 +155,13 @@
       },
       waitingConfirmMessage() {
         if (this.remainConfirmTime > this.orderProcessTimeOut * 3/4)
-          return `Sending your order to the restaurant...`
+          return $t('store.waiting1')
         else if (this.remainConfirmTime > this.orderProcessTimeOut / 2)
-          return `Please wait while we proceed your order...`
+          return $t('store.waiting2')
         else if (this.remainConfirmTime > this.orderProcessTimeOut / 4)
-          return `The process might take a while...`
+          return $t('store.waiting3')
         else
-          return `Hold on! The restaurant might be crowded at the moment...`
+          return $t('store.waiting4')
       },
       orderMissed() {
         return this.order.status === 'inProgress' && this.waited >= this.orderProcessTimeOut
