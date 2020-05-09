@@ -251,7 +251,7 @@
           if (pHost) proxyHost = pHost.replace('${port}', proxyPort)
 
           if (proxyPort) {
-            const iframeSrc = `${proxyHost}/pos-dashboard`
+            const iframeSrc = `${proxyHost}`
             this.iframeSrc = iframeSrc
             this.showIframe = true
 
