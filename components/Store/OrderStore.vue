@@ -565,7 +565,7 @@
         this.printOnlineOrderKitchen(order._id).catch(e => console.error(e))
         this.printOnlineOrderReport(order._id).catch(e => console.error(e))
         await this.updateOnlineOrders()
-        const extraInfo = `${order.type === 'delivery' ? 'Delivery' : (order.type === 'pickup') ? 'Pick up' : ''} in ${order.prepareTime} minutes`
+        const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', { 0: order.prepareTime })
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
       },
       async setPendingOrder(order) {

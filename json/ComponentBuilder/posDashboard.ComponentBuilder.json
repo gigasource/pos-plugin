@@ -1,6 +1,11 @@
 {
   "events": [],
   "_id": "5e71e4ae91c0240483d1659a",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n    view: null\n  }\n}",
+    "_code_type_": "commonJs"
+  },
+  "isProduction": true,
   "items": [
     {
       "choice": "view",
@@ -118,10 +123,10 @@
           "content": {
             "props": {
               "afterMountFn": {
-                "_code_": "module.exports = function () {\n  const rooms = this.$getService('RoomStore').rooms\n  if (rooms.length > 0) {\n    this.$emit('update:view', {\n      name: 'Restaurant',\n      params: {\n        id: rooms[0]._id\n      }\n    })\n  }\n}",
+                "_code_": "module.exports = function () {\n  const rooms = this.$getService('RoomStore').rooms\n  this.$emit('update:view', {\n                name: 'Functions',\n                params: ''\n              })\n}",
                 "_code_type_": "commonJs"
               },
-              "defaultPath": "item.0.item.0",
+              "defaultPath": "item.0",
               "items": []
             },
             "preprocess": []
@@ -294,10 +299,5 @@
   "props": {
     "fields": []
   },
-  "renderToRoute": "pos-dashboard",
-  "isProduction": true,
-  "data": {
-    "_code_": "module.exports = {\n  data: {\n    view: null\n  }\n}",
-    "_code_type_": "commonJs"
-  }
+  "renderToRoute": "pos-dashboard"
 }

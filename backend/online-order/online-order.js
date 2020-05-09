@@ -310,6 +310,14 @@ module.exports = async cms => {
         try {
           await createOnlineOrderSocket(deviceId, cms);
           await updateDeviceStatus(deviceId);
+
+          onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
+            await Promise.all(_.map(data, async (enabled, name) => {
+              return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
+            }))
+            socket.emit('updateAppFeature')
+          })
+
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
           console.error(e);

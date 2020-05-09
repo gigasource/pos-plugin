@@ -8,7 +8,7 @@
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
-    <g-divider color="#9e9e9e"/>
+    <g-divider color="#9e9e9e" v-if="computedBtnGroup1.length"/>
     <div class="function--down">
       <div v-for="(btn, i) in computedBtnGroup2" :key="`down_${i}`"
            class="function-btn"

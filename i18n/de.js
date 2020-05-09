@@ -390,6 +390,8 @@ module.exports = {
       shippingFee: 'Liefergebühr',
       noPending: 'No Pending orders yet',
       noKitchen: 'No orders sent to kitchen',
+      deliveryIn: 'Lieferung in {0} Minuten.',
+      pickUpIn: 'Abholung in {0} Minuten.',
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',

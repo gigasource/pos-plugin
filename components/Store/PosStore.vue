@@ -27,6 +27,16 @@
         version: '0.0.0',
         dashboardSidebar: [
           {
+            icon: 'icon-functions',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Functions',
+                params: ''
+              })
+            },
+            title: this.$t('sidebar.functions')
+          },
+          {
             icon: 'icon-restaurant',
             children() {
               const rooms = this.$getService('RoomStore').rooms
@@ -104,16 +114,6 @@
             ],
             title: this.$t('onlineOrder.onlineOrders'),
             feature: 'onlineOrdering'
-          },
-          {
-            icon: 'icon-functions',
-            onClick() {
-              this.$emit('update:view', {
-                name: 'Functions',
-                params: ''
-              })
-            },
-            title: this.$t('sidebar.functions')
           }
         ]
       }
