@@ -16,7 +16,7 @@
           <span class="fw-700 fs-large">{{order.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}}</span>
         </div>
 
-        <div class="row-flex mb-2" v-if="order.customer">
+        <div class="row-flex mb-2" v-if="order.type === 'delivery'">
           <div style="flex: 0 0 30px">
             <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
           </div>
@@ -52,9 +52,8 @@
         </div>
       </g-card-text>
       <g-card-actions>
-        <g-btn-bs background-color="#E57373" text-color="white" @click.stop="declineOrder(order)">Cancel & move to declined orders</g-btn-bs>
-        <g-btn-bs background-color="#4CAF50" text-color="white" @click.stop="setPendingOrder(order)">Return to pending orders</g-btn-bs>
-        <g-btn-bs background-color="#2979FF" text-color="white" @click.stop="completeOrder(order)">Complete order & Print receipt</g-btn-bs>
+        <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">Cancel & move to declined orders</g-btn-bs>
+        <g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" @click.stop="completeOrder(order)">Complete order</g-btn-bs>
       </g-card-actions>
     </g-card>
   </g-dialog>

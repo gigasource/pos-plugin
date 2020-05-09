@@ -842,9 +842,21 @@
           "type": "input@switch"
         },
         {
-          "schemaType": "boolean",
-          "key": "paired",
-          "type": "input@switch"
+          "schemaType": "string",
+          "key": "soundLoop",
+          "type": "input@select",
+          "optionsType": "onlyValue",
+          "options": [
+            "none",
+            "once",
+            "repeat"
+          ]
+        },
+        {
+          "schemaType": "number",
+          "key": "orderTimeout",
+          "type": "input@number",
+          "addable": true
         }
       ]
     },

@@ -15,7 +15,7 @@
         </div>
         <div class="row-flex" style="margin-top: 24px;">
           <div class="dialog-message--note">
-            <b>Note: </b>Please contact your local provide start using the program. Internet connection is required.
+            <b>Note: </b>Please contact your local provider start using the program. Internet connection is required.
           </div>
           <div>
             <g-btn-bs :background-color="pairing ? 'grey': '#2979FF'" text-color="white" width="7.5em" height="44px"

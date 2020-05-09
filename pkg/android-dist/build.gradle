@@ -32,6 +32,6 @@ task clean(type: Delete) {
 
 buildscript {
     dependencies {
-        classpath "com.tencent.tinker:tinker-patch-gradle-plugin:1.9.14"
+        classpath "com.tencent.tinker:tinker-patch-gradle-plugin:1.9.14.6"
     }
 }

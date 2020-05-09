@@ -8,6 +8,7 @@ const net = require("net");
 const uuidV1 = require('uuid/v1');
 const os = require('os');
 const request = require('request');
+const normalizeString = require('./normalize-string');
 
 const {png, pngCompress} = require('./png');
 
@@ -812,8 +813,8 @@ module.exports = class EscPrinter {
   }
 
   append(buff) {
-
     if (typeof buff == "string") {
+      buff = normalizeString(buff);
 
       // Remove special characters
       if (this.config.removeSpecialCharacters) {
@@ -874,7 +875,7 @@ module.exports = class EscPrinter {
 
 
   // Options: text, align, width, bold
-  tableCustom(data) {
+  tableCustom(data, options = {}) {
     let j;
     let spaces;
     let cellWidth = this.printerConfig.width / data.length;
@@ -887,6 +888,7 @@ module.exports = class EscPrinter {
       obj.text = obj.text.toString();
 
       if (obj.width) cellWidth = this.printerConfig.width * obj.width;
+      if (options.textDoubleWith) cellWidth /= 2;
       if (obj.bold) this.bold(true);
 
       // If text is too wide go to next line
@@ -916,18 +918,18 @@ module.exports = class EscPrinter {
       } else {
         if (obj.text !== '') this.append(obj.text);
         spaces = cellWidth - obj.text.toString().length;
+        if (i === data.length - 1) spaces = Math.floor(spaces);
         for (j = 0; j < spaces; j++) {
           this.append(new Buffer(" "));
         }
-
       }
 
       if (obj.bold) this.bold(false);
 
-
       if (tooLong) {
         secondLineEnabled = true;
-        obj.text = obj.originalText.substring(cellWidth - 1);
+        if (options.textDoubleWith) obj.text = obj.originalText.substring(cellWidth);
+        else obj.text = obj.originalText.substring(cellWidth - 1);
         secondLine.push(obj);
       } else {
         obj.text = "";
@@ -935,11 +937,11 @@ module.exports = class EscPrinter {
       }
     }
 
-    this.newLine();
+    if (!options.textDoubleWith) this.newLine();
 
     // Print the second line
     if (secondLineEnabled) {
-      this.tableCustom(secondLine);
+      this.tableCustom(secondLine, options);
     }
   }
 

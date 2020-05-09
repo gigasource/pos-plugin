@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Edit Table Plan',
       editMenuCard: 'Edit Menu Card',
       printerSettings: 'Printer Settings',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online Order Menu'
     },
 
     //article view
@@ -190,10 +191,12 @@ module.exports = {
       promotionalApplied: 'Promotional Applied',
       barcode: 'Barcode',
       amount: 'Amount',
-      staff: 'Staff',
+      staff: 'User',
       info: 'Info',
       filter: 'Filter',
-      deleteOrder: 'Delete Order'
+      deleteOrder: 'Delete Order',
+      type: 'Type',
+      tableNo: 'Table No.'
     },
 
     payment: {
@@ -389,6 +392,8 @@ module.exports = {
       shippingFee: 'Shipping Fee',
       noPending: 'No Pending orders yet',
       noKitchen: 'No orders sent to kitchen',
+      deliveryIn: 'Delivery in {0} minutes',
+      pickUpIn: 'Pick up in {0} minutes',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',
@@ -405,6 +410,17 @@ module.exports = {
         hasSound: 'Incoming order notification sound',
         cancelAndDecline: 'Cancel & move to declined orders',
       }
+    },
+
+    printing: {
+      delivery: 'Delivery',
+      company: 'Company',
+      dateFormat: 'MMM DD, YYYY, HH:mm',
+      item: 'Item',
+      quantity: 'Q.ty',
+      price: 'Price',
+      total: 'Total',
+      currency: 'USD',
     }
   }
 }

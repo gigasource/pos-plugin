@@ -318,6 +318,13 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-cutlery {
+  background-image: url("../assets/cutlery.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-delivery {
   background-image: url("../assets/delivery.svg");
   background-repeat: no-repeat;
@@ -504,6 +511,34 @@ body::-webkit-scrollbar {
 
 .icon-germany {
   background-image: url("../assets/germany.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-wlan {
+  background-image: url("../assets/wlan.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-wlan-disconnected {
+  background-image: url("../assets/wlan-disconnected.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-wlan-error {
+  background-image: url("../assets/wlan-error.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-online-order-menu {
+  background-image: url("../assets/online-order-menu.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

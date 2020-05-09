@@ -302,7 +302,9 @@
       },
       async getOrderHistory() {
         const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => ({ ...acc, ...filter['condition'] }), { status: 'paid' });
+        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
+          { ...acc, ...filter['condition'] }),
+          { $or: [{ status: 'paid' }, { status: 'completed' }] });
         const { limit, currentPage } = this.orderHistoryPagination;
         const orders = await orderModel.find(condition).sort({ date: -1 }).skip(limit * (currentPage - 1)).limit(limit);
         this.orderHistoryOrders = orders.map(order => ({
@@ -531,27 +533,49 @@
         this.kitchenOrders = await orderModel.find({ online: true, status: 'kitchen' })
       },
       async declineOrder(order) {
-        await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
+        const status = 'declined'
+        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {
-            status: 'declined'
+            status,
+            user: this.user
           }))
         await this.updateOnlineOrders()
+        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
       },
       async acceptPendingOrder(order) {
-        await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
+        if (order.deliveryTime === 'asap') {
+          const now = new Date()
+          let minute = now.getMinutes() + order.prepareTime
+          let hour = now.getHours()
+
+          if (minute >= 60) {
+            hour++
+            minute -= 60
+          }
+
+          order.deliveryTime = `${hour}:${minute.toString().length === 1 ? '0' + minute : minute}`
+        }
+
+        const status = 'kitchen'
+        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {
-            status: 'kitchen'
+            status,
+            user: this.user
           }))
         this.printOnlineOrderKitchen(order._id).catch(e => console.error(e))
         this.printOnlineOrderReport(order._id).catch(e => console.error(e))
         await this.updateOnlineOrders()
+        const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', { 0: order.prepareTime })
+        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
       },
       async setPendingOrder(order) {
-        await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
+        const status = 'inProgress'
+        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {
-            status: 'inProgress'
+            status,
           }))
         await this.updateOnlineOrders()
+        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status)
       },
       async completeOrder(order) {
         await cms.getModel('Order').findOneAndUpdate({_id: order._id},
@@ -565,6 +589,39 @@
           online: true,
           status
         })
+      },
+      async playBell() {
+        const play = async () => {
+          if (this.pendingOrders.length) await this.bell.play()
+
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) {
+            this.bellPlaying = false
+            this.bell.removeEventListener('ended', play)
+          }
+
+          const repeat = setting.onlineDevice.soundLoop === 'repeat'
+          if (!repeat || !this.pendingOrders || !this.pendingOrders.length)  {
+            this.bellPlaying = false
+            this.bell.removeEventListener('ended', play)
+          }
+        }
+
+        try {
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) return
+          const loop = setting.onlineDevice.soundLoop
+          await play()
+
+          if (!loop || loop === 'none') {
+            this.bellPlaying = false
+            return
+          }
+
+          this.bell.addEventListener('ended', play)
+        } catch (e) {
+          this.bell.addEventListener('canplaythrough', () => this.bell.play())
+        }
       }
     },
     async created() {
@@ -572,12 +629,16 @@
 
       const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
       if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
+      this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
+      this.bell.addEventListener('play', () => {
+        this.bellPlaying = true;
+      })
+
+      await this.updateOnlineOrders()
 
       // add online orders: cms.socket.emit('added-online-order')
       cms.socket.on('updateOnlineOrders', async () => {
         await this.updateOnlineOrders()
-        const bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
-        bell.addEventListener('canplaythrough', () => bell.play())
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
     },
@@ -585,6 +646,14 @@
       'orderHistoryPagination.limit'(newVal) {
         localStorage.setItem('orderHistoryPageSize', newVal)
       },
+      pendingOrders: {
+        async handler(val, oldVal) {
+          if (val && val.length) {
+            if ((!oldVal || (oldVal && val.length > oldVal.length)) && !this.bellPlaying) await this.playBell()
+          }
+        },
+        immediate: true
+      }
     },
     provide() {
       return {

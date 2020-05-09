@@ -191,11 +191,12 @@
                 "justifyContent": "",
                 "columns": [
                   "1fr",
-                  "20%",
                   "4px",
                   "20%",
                   "4px",
                   "20%",
+                  "4px",
+                  "15%",
                   "4px",
                   "20%"
                 ],
@@ -210,7 +211,7 @@
                   {
                     "name": "id-button",
                     "top": 2,
-                    "left": 6,
+                    "left": 7,
                     "width": 1,
                     "height": 1,
                     "margin": "",
@@ -234,7 +235,7 @@
                   {
                     "name": "version-button",
                     "top": 2,
-                    "left": 4,
+                    "left": 5,
                     "width": 1,
                     "height": 1,
                     "margin": "",
@@ -258,7 +259,7 @@
                   {
                     "name": "language-button",
                     "top": 2,
-                    "left": 2,
+                    "left": 3,
                     "width": 1,
                     "height": 1,
                     "margin": "",
@@ -282,12 +283,36 @@
                   {
                     "name": "support-button",
                     "top": 2,
-                    "left": 8,
+                    "left": 9,
                     "width": 1,
                     "height": 1,
                     "margin": "",
                     "padding": "",
                     "bgColor": "hsl(53, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "connection-button",
+                    "top": 2,
+                    "left": 1,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(280, 100%, 50%, 50%)",
                     "alignSelf": "",
                     "justifySelf": "",
                     "wrapInDiv": false,
@@ -473,7 +498,8 @@
           "style": {
             "height": "100%"
           }
-        }
+        },
+        "events": {}
       },
       "binding": [],
       "slotScopeBinding": [],
@@ -707,7 +733,20 @@
           "component": "StoreIdBtn",
           "binding": [],
           "slotScopeBinding": [],
-          "slot": "id-button"
+          "slot": "id-button",
+          "url": "plugins/pos-plugin/components/Login/StoreIdBtn.vue",
+          "path": "components/Login/StoreIdBtn.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "ConnectionStatusBtn",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "connection-button",
+          "url": "plugins/pos-plugin/components/Login/ConnectionStatusBtn.vue",
+          "path": "components/Login/ConnectionStatusBtn.vue",
+          "pluginName": "pos-plugin"
         }
       ],
       "slot": null

@@ -50,45 +50,43 @@ android.applicationVariants.all { variant ->
     task("addPatchToApk${variant.name.capitalize()}", dependsOn: "tinkerPatch${variant.name.capitalize()}") {
         doLast {
             try {
-                if (OperatingSystem.current().isMacOsX()) {
-                    try {
-                        exec {
-                            commandLine 'apktool', '-version'
-                            ignoreExitValue = true
-                        }
-                    } catch (Exception e) {
-                        logger.warn("Coudn't find apktool. Try to download apktool");
-                        exec {
-                            commandLine 'chmod', '+x', './download-apktool.sh'
-                        }
-                        exec {
-                            commandLine './download-apktool.sh'
-                        }
+                try {
+                    exec {
+                        commandLine 'apktool', '-version'
+                        ignoreExitValue = true
+                    }
+                } catch (Exception e) {
+                    logger.warn("Coudn't find apktool. Try to download apktool");
+                    exec {
+                        commandLine 'chmod', '+x', './download-apktool.sh'
                     }
                     exec {
-                        commandLine 'rm', '-rf', '../originalBuild/app'
+                        commandLine './download-apktool.sh'
                     }
-                    exec {
-                        commandLine 'apktool', 'd', '-r', '-s', '-o', '../originalBuild/app', '../originalBuild/app.apk'
-                    }
-                    exec {
-                        commandLine 'mkdir', '../originalBuild/app/assets/appAssets/patch'
-                    }
-                    exec {
-                        commandLine 'cp', "./build/outputs/apk/${variant.dirName.split('/')[0]}/tinkerPatch/${variant.dirName}/patch_signed_7zip.apk", "../originalBuild/app/assets/appAssets/patch/"
-                    }
-                    exec {
-                        commandLine 'rm', '-rf', '../originalBuild/app-release-unsigned.apk'
-                    }
-                    exec {
-                        commandLine 'apktool', 'b', '../originalBuild/app', '-o', '../originalBuild/app-release-unsigned.apk'
-                    }
-                    exec {
-                        commandLine 'jarsigner', '-verbose', '-sigalg', 'SHA1withRSA', '-digestalg', 'SHA1', '-keystore', 'release.keystore', '-storepass', '123456', '../originalBuild/app-release-unsigned.apk', 'key0'
-                    }
-                    exec {
-                        commandLine 'mv', '../originalBuild/app-release-unsigned.apk', '../originalBuild/app-release.apk'
-                    }
+                }
+                exec {
+                    commandLine 'rm', '-rf', '../originalBuild/app'
+                }
+                exec {
+                    commandLine 'apktool', 'd', '-r', '-s', '-o', '../originalBuild/app', '../originalBuild/app.apk'
+                }
+                exec {
+                    commandLine 'mkdir', '../originalBuild/app/assets/appAssets/patch'
+                }
+                exec {
+                    commandLine 'cp', "./build/outputs/apk/${variant.dirName.split('/')[0]}/tinkerPatch/${variant.dirName}/patch_signed_7zip.apk", "../originalBuild/app/assets/appAssets/patch/"
+                }
+                exec {
+                    commandLine 'rm', '-rf', '../originalBuild/app-release-unsigned.apk'
+                }
+                exec {
+                    commandLine 'apktool', 'b', '../originalBuild/app', '-o', '../originalBuild/app-release-unsigned.apk'
+                }
+                exec {
+                    commandLine 'jarsigner', '-verbose', '-sigalg', 'SHA1withRSA', '-digestalg', 'SHA1', '-keystore', 'release.keystore', '-storepass', '123456', '../originalBuild/app-release-unsigned.apk', 'key0'
+                }
+                exec {
+                    commandLine 'mv', '../originalBuild/app-release-unsigned.apk', '../originalBuild/pos-restaurant.apk'
                 }
             } catch (Exception e) {
                 throw new GradleScriptException("Something went wrong when adding patch to apk", e);

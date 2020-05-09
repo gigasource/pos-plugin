@@ -479,8 +479,8 @@
                   "type": "event"
                 },
                 {
-                  "service": "SettingsStore:updateDevice",
-                  "local": "updateDevice",
+                  "service": "SettingsStore:updateOnlineDevice",
+                  "local": "updateOnlineDevice",
                   "type": "event"
                 },
                 {
@@ -521,6 +521,11 @@
                 {
                   "service": "PosStore:firstTimeSetup",
                   "local": "firstTimeSetup",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:healthCheck",
+                  "local": "healthCheck",
                   "type": "event"
                 }
               ]

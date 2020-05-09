@@ -3,13 +3,13 @@
     <template v-for="item in values">
       <slot name="item" :item="item" :select="pickValue" :isSelected="isValueSelected">
         <g-btn-bs  @click.stop="pickValue(item)"
-                   :class="[isValueSelected(item) ? 'selected' : null]"
+                   :class="['mb-1',isValueSelected(item) ? 'selected' : null]"
                    border-color="#C4C4C4" text-color="black" width="40" height="30">
           {{item}}
         </g-btn-bs>
       </slot>
     </template>
-    <g-text-field-bs ref="input" v-if="allowCustom" placeholder="Custom..." :value="inputValue" @input="pickCustomValue">
+    <g-text-field-bs ref="input" v-if="allowCustom" placeholder="Custom time" :value="inputValue" @input="pickCustomValue">
       <template v-slot:append-inner>
         <g-icon style="cursor: pointer" @click="dialog = true">icon-keyboard</g-icon>
       </template>
@@ -67,7 +67,17 @@
     }
 
     .bs-tf-wrapper {
-      margin-left: 8px;
+      margin: 0 8px;
+      width: calc(100% - 16px);
+
+      ::v-deep .bs-tf-input {
+        width: 100%;
+        font-size: 14px;
+
+        &::placeholder {
+          font-size: 14px;
+        }
+      }
     }
   }
 </style>

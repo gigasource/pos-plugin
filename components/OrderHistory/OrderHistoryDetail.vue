@@ -1,20 +1,43 @@
 <template>
   <div v-if="orderHistoryCurrentOrder" class="wrapper">
-    <g-row>
-      <div style="width: 50%;">
+    <div class="row-flex" style="padding-bottom: 14px">
+      <div class="pl-2 flex-grow-1">
         <div class="order-title">{{$t('orderHistory.orderNo')}}</div>
         <div class="order-id">{{orderHistoryCurrentOrder.id}}</div>
       </div>
-      <div style="width: 50%;" v-if="orderHistoryCurrentOrder.table">
+      <div class="pl-2 flex-grow-1" v-if="orderHistoryCurrentOrder.table">
         <div class="order-title">Table No</div>
         <div class="order-id">{{orderHistoryCurrentOrder.table}}</div>
       </div>
-    </g-row>
+    </div>
+    <g-divider/>
+    <div style="font-size: 12px; padding: 6px 0">
+      <div class="row-flex">
+        <div class="flex-grow-1" style="opacity: 0.5">Created time</div>
+        <div>{{orderHistoryCurrentOrder.date | formatDate}}</div>
+      </div>
+      <template v-if="orderHistoryCurrentOrder.staff && orderHistoryCurrentOrder.staff.length">
+        <div class="row-flex">
+          <div class="flex-grow-1" style="opacity: 0.5">Created by</div>
+          <span class="ta-right">{{getCreatedUser(orderHistoryCurrentOrder)}}</span>
+        </div>
+        <div class="row-flex">
+          <div class="flex-grow-1" style="opacity: 0.5">Cashier</div>
+          <span class="ta-right">{{getCashierUser(orderHistoryCurrentOrder)}}</span>
+        </div>
+      </template>
+    </div>
+    <g-divider/>
     <g-simple-table striped>
       <tr v-for="product in orderHistoryCurrentOrder.items">
         <td>{{product.quantity}}x</td>
-        <td>{{product.name}}</td>
+        <td>{{product.id}}. {{product.name}}</td>
         <td class="ta-right">€ {{product.originalPrice | formatNumber}}</td>
+      </tr>
+      <tr v-if="orderHistoryCurrentOrder.type">
+        <td></td>
+        <td>Shipping Fee</td>
+        <td class="ta-right">€ {{orderHistoryCurrentOrder.shippingFee | formatNumber}}</td>
       </tr>
     </g-simple-table>
     <g-divider/>
@@ -36,7 +59,6 @@
       <span>{{$t('common.total')}} </span>
       <span class="total__important">€ {{orderHistoryCurrentOrder.amount | formatNumber}}</span>
     </div>
-    <g-divider/>
   </div>
 </template>
 
@@ -52,6 +74,9 @@
       formatNumber: (val) => {
         return isNaN(val) ? '0.00' : val.toFixed(2)
       },
+      formatDate(val) {
+        return dayjs(val).format('DD MMM YY, HH:mm')
+      }
     },
     computed: {
       promotionTotal() {
@@ -60,16 +85,28 @@
       subTotal() {
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.amount - this.orderHistoryCurrentOrder.tax;
       }
+    },
+    methods: {
+      getCreatedUser(order) {
+        if (order.staff && order.staff.length) return _.first(order.staff).name
+        return ''
+      },
+      getCashierUser(order) {
+        if (order.staff && order.staff.length) return _.last(order.staff).name
+        return ''
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
   .wrapper {
-    padding: 16px 4px;
+    padding: 16px 7px;
     box-shadow: -1px 0px 6px rgba(0, 0, 0, 0.25);
     overflow: auto;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
 
     &::-webkit-scrollbar {
       display: none;
@@ -92,6 +129,7 @@
     .g-table {
       margin-top: 16px;
       margin-bottom: 16px;
+      flex-grow: 1;
 
       tr td {
         height: 28px;

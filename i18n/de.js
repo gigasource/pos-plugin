@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Tischplan bearbeiten',
       editMenuCard: 'Menü bearbeiten',
       printerSettings: 'Druckereinstellungen',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online-Bestellung Menü'
     },
 
     //article view
@@ -389,6 +390,8 @@ module.exports = {
       shippingFee: 'Liefergebühr',
       noPending: 'No Pending orders yet',
       noKitchen: 'No orders sent to kitchen',
+      deliveryIn: 'Lieferung in {0} Minuten.',
+      pickUpIn: 'Abholung in {0} Minuten.',
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',
@@ -405,6 +408,17 @@ module.exports = {
         hasSound: 'Klingeln bei Eingang der Bestellung',
         cancelAndDecline: 'Cancel & move to declined orders',
       }
+    },
+
+    printing: {
+      delivery: 'Lieferschein',
+      company: 'Firma',
+      dateFormat: 'DD.MM.YYYY, HH:mm',
+      item: 'Artikel',
+      quantity: 'Menge',
+      price: 'E.P',
+      total: 'Summe',
+      currency: 'EUR',
     }
   }
 }

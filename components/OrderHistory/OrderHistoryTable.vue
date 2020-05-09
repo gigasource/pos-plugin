@@ -3,14 +3,17 @@
     <g-simple-table striped fixed-header>
       <thead>
       <tr>
-        <th class="ta-right" @click="openOrderNumberLookup">{{$t('orderHistory.orderNo')}}
+        <th class="ta-center" @click="openOrderNumberLookup">{{$t('orderHistory.orderNo')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
         <th @click="openDateTimePicker">{{$t('common.datetime')}}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th @click="openBarcodeLookup">{{$t('orderHistory.barcode')}}
+        <th class="ta-center" @click="dialog.type = true">{{$t('orderHistory.type')}}
           <g-icon size="12">mdi-magnify</g-icon>
+        </th>
+        <th class="ta-left" @click="dialog.table = true">{{$t('orderHistory.tableNo')}}
+          <g-icon size="12">mdi-filter</g-icon>
         </th>
         <th class="ta-right" @click="openAmountFilter">{{$t('orderHistory.amount')}}
           <g-icon size="12">mdi-filter</g-icon>
@@ -18,7 +21,6 @@
         <th class="ta-left" @click="openStaffFilter">{{$t('orderHistory.staff')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
-        <th>{{$t('orderHistory.info')}}</th>
       </tr>
       </thead>
       <tr v-if="orderHistoryFilters && orderHistoryFilters.length > 0">
@@ -43,18 +45,25 @@
       <tr v-for="(order, i) in orderHistoryOrders" :key="i" :class="[order._id === orderHistoryCurrentOrder._id && 'tr__active']" @click="chooseOrder(order)">
         <td class="ta-center" style="white-space: nowrap">{{order.id}}</td>
         <td class="ta-center">{{order.dateTime}}</td>
-        <td class="ta-center" style="white-space: nowrap">{{order.bookingNumber}}</td>
+        <td class="ta-center" style="white-space: nowrap; text-transform: capitalize">
+          <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
+          <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+          <g-icon v-if="!order.type">icon-cutlery</g-icon>
+          <span> {{order.type || 'Dine-in'}}</span>
+        </td>
+        <td class="ta-left">{{order.table || ''}}</td>
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
         <td>
           <p class="staff-name">{{getStaffName(order.staff)}}</p>
         </td>
-        <td class="ta-center">{{order.info}}</td>
       </tr>
     </g-simple-table>
     <pos-table-pagination @execQueryByPage="updatePagination"
                           :total-document="totalOrders"
                           :limit.sync="limit"
                           :current-page.sync="currentPage"/>
+    <dialog-selection-filter v-model="dialog.type" :label="$t('orderHistory.type')" :items="items" @submit="setTypeFilter"/>
+    <dialog-number-filter v-model="dialog.table" :label="$t('orderHistory.tableNo')" @submit="setTableFilter"/>
   </div>
 </template>
 <script>
@@ -64,8 +73,21 @@
       value: null,
     },
     injectService: [
-      'OrderStore:(orderHistoryOrders,orderHistoryFilters,orderHistoryCurrentOrder,getOrderHistory,orderHistoryPagination,getTotalOrders,totalOrders)'
+      'OrderStore:(orderHistoryOrders,orderHistoryFilters,orderHistoryCurrentOrder,getOrderHistory,orderHistoryPagination,getTotalOrders,totalOrders,updateOrderHistoryFilter)',
     ],
+    data() {
+      return {
+        dialog: {
+          type: false,
+          table: false,
+        },
+        items: [
+          {text: 'Delivery', value: 'delivery'},
+          {text: 'Pick-up', value: 'pickup'},
+          {text: 'Dine-in', value: 'dinein'}
+        ]
+      }
+    },
     computed: {
       limit: {
         get() {
@@ -121,6 +143,26 @@
       },
       getStaffName(staffs) {
         return staffs.map(s => s.name).join(', ')
+      },
+      setTypeFilter(type) {
+        const filter = {
+          title: this.$t('orderHistory.type'),
+          text: this.items.find(item => item.value === type)['text'],
+          condition: type === 'dinein' ? {type: null} : {type}
+        }
+        this.updateOrderHistoryFilter(filter)
+        this.getOrderHistory()
+        this.getTotalOrders()
+      },
+      setTableFilter(table) {
+        const filter = {
+          title: this.$t('orderHistory.tableNo'),
+          text: table,
+          condition: {table}
+        }
+        this.updateOrderHistoryFilter(filter)
+        this.getOrderHistory()
+        this.getTotalOrders()
       }
     },
     async created() {

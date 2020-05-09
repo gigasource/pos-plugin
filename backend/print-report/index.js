@@ -3,7 +3,7 @@ const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils
 
 module.exports = async function (cms) {
   cms.socket.on('connect', socket => {
-    socket.on('printReport', async (reportType, args, device, callback) => {
+    socket.on('printReport', async (reportType, reportData, device, callback) => {
       let report;
       let type
 
@@ -41,7 +41,7 @@ module.exports = async function (cms) {
       }
 
       try {
-        const printData = await report.makePrintData(cms, args);
+        const printData = await report.makePrintData(cms, reportData);
         const groupPrinters = await getGroupPrinterInfo(cms, device, type);
         const printers = _.flatten(groupPrinters.map(group => ({
           ...group.printers,

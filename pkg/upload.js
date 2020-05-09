@@ -9,6 +9,7 @@ const https = require('https')
 module.exports = function uploader({ domain, apiBaseUrl }) {
   const uploadFileUrl = `${domain}${apiBaseUrl}/files?folderPath=`
   const appMetaDataUrl = `${domain}/app/meta-data`
+  const uploadPath = `/update/POS_Android`
 
   // grid-fs handler methods
   async function getFilesInPath(folderPath) {
@@ -42,17 +43,11 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     if (!folderExist) await createNewFolder(parentPath, folderPath)
   }
 
-  async function prepareUploadAppFolder(fileName, version) {
-    const baseName = getBaseName(fileName)
-    console.log(`creating /update/${baseName} folder`)
-    await createFolder('/update', baseName)
+  async function prepareUploadAppFolder(version) {
+    await createFolder('/update', 'POS_Android');
 
-    console.log(`creating /update/${baseName}/${version} folder`)
-    await createFolder(`/update/${baseName}`, version)
-  }
-
-  function getBaseName(fileName) {
-    return fileName.substr(0, fileName.lastIndexOf('.'))
+    console.log(`creating ${uploadPath}/${version} folder`)
+    await createFolder(uploadPath, version)
   }
 
   return async function uploadApp({ filePath, group, version, type, base, release, note  }) {
@@ -60,10 +55,12 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const fileName = path.parse(filePath).base
 
     // prepare
-    await prepareUploadAppFolder(fileName, version)
+    if (type == 'PATCH') {
+      await prepareUploadAppFolder(version)
+    }
 
     // upload file to file-explorer
-    const folderPath = `/update/${getBaseName(fileName)}/${version}`;
+    const folderPath = `${uploadPath}/${version}`;
     const form = new FormData();
     form.append('file', fs.createReadStream(filePath));
     const response = await axios.post(`${uploadFileUrl}${folderPath}`, form, {
@@ -74,10 +71,10 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     if (!response.data[0].uploadSuccess)
       return;
     const file = response.data[0].createdFile;
-    const uploadPath = _getDownloadUrl(file);
+    const downloadPath = _getDownloadUrl(file);
 
     // upload app meta-data
-    const response2 = await axios.post(appMetaDataUrl, { uploadPath, version, type, note, group, base, release })
+    const response2 = await axios.post(appMetaDataUrl, { uploadPath: downloadPath, version, type, note, group, base, release })
     return response2.data
   }
 }
