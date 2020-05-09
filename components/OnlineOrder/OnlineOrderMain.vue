@@ -77,7 +77,8 @@
                 </template>
               </g-text-field-bs>
             </g-card-actions>
-            <g-card-actions v-if="order.confirmStep2 && order.deliveryTime === 'asap'">
+            <g-card-actions v-if="order.confirmStep2
+              && ((order.type === 'delivery' && order.deliveryTime === 'asap') || (order.type === 'pickup'))">
               <div class="w-100">
                 <p class="ml-2 mb-1">Time to complete (min)</p>
                 <value-picker :values="[15, 30, 45, 60]" :default-value="defaultPrepareTime || 30" allow-custom v-model="order.prepareTime"></value-picker>
@@ -254,11 +255,11 @@
         this.$emit('completeOrder', order)
       },
       onClickAccept(order) {
-        if (order.deliveryTime !== 'asap') return this.acceptOrder(order)
+        if (order.type === 'delivery' && order.deliveryTime !== 'asap') return this.acceptOrder(order)
 
         if (order.declineStep2) this.$set(order, 'declineStep2', false)
         if (!order.confirmStep2) return this.$set(order, 'confirmStep2', true)
-        if (!order.prepareTime) return
+        if (!order.prepareTime) order.prepareTime = this.defaultPrepareTime
         this.acceptOrder(order)
       },
       onClickDecline(order) {

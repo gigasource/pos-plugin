@@ -16,10 +16,15 @@ let webShopConnected = false
 
 function createOnlineOrderSocket(deviceId, cms) {
 
-  function scheduleDeclineOrder(date, _id, cb) {
+  async function scheduleDeclineOrder(date, _id, cb) {
     const timeOut = dayjs(date).diff(dayjs(), 'millisecond')
+
     setTimeout(async () => {
-      await cms.getModel('Order').findOneAndUpdate({ _id }, { status: 'declined' })
+      let model = cms.getModel('Order');
+      const order = await model.findOne({ _id })
+      if (order && order.status !== 'inProgress') return
+
+      await model.findOneAndUpdate({ _id }, { status: 'declined' })
       cb()
     }, timeOut)
   }
@@ -111,8 +116,9 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'))
 
       if (timeoutDate) {
-        scheduleDeclineOrder(timeoutDate, result._id, () => {
-          deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'));
+        await scheduleDeclineOrder(timeoutDate, result._id, () => {
+          cms.socket.emit('updateOnlineOrders')
+          //deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'));
         })
       }
 
@@ -245,15 +251,17 @@ function cleanupOnlineOrderSocket() {
 }
 
 module.exports = async cms => {
-  cms.socket.once('connect', async socket => {
+  cms.socket.once('connect', async () => {
     try {
       const deviceId = await getDeviceId();
       if (deviceId) await createOnlineOrderSocket(deviceId, cms);
     } catch (e) {
       console.error(e);
-    await updateDeviceStatus();
+      await updateDeviceStatus();
     }
+  })
 
+  cms.socket.on('connect', async socket => {
     console.log('internal socket connect')
     //deviceSockets.push(socket)
 
