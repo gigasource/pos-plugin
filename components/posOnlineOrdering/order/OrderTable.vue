@@ -69,6 +69,7 @@
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
                 <g-text-field v-model="customer.company" :label="$t('store.company')" clearable clear-icon="icon-cancel@16" prepend-icon="icon-company@16"/>
                 <g-text-field type="number" v-model="customer.phone" :label="$t('store.telephone')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-phone2@16"/>
+                <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
@@ -478,6 +479,12 @@
 
         this.confirming = false
         this.couponCode = ''
+        this.couponTf = {
+          active: false,
+          error: '',
+          value: '',
+          success: false
+        }
 
         this.$emit('clear')
         this.view = 'order'

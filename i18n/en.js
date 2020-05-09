@@ -288,6 +288,7 @@ module.exports = {
       address: 'Address',
       zipCode: 'Zip Code',
       deliveryTime: 'Delivery Time',
+      pickupTime: 'Pickup Time',
       total: 'Total',
       confirm: 'CONFIRM',
       orderSuccessfully: 'Order Successfully',

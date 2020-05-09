@@ -16,6 +16,7 @@ module.exports = {
       address: 'Adresse',
       zipCode: 'Postleitzahl',
       deliveryTime: 'Lieferzeit',
+      pickupTime: 'Abholzeit',
       total: 'Gesamt',
       confirm: 'Bestätigen',
       orderSuccessfully: 'Bestellung erfolgreich',
