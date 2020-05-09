@@ -50,7 +50,7 @@
       <span>{{locale.printing.total}}</span>
       <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
     </div>
-    <div class="footer text-center">{{date}}</div>
+<!--    <div class="footer text-center">{{date}}</div>-->
   </div>
 </template>
 

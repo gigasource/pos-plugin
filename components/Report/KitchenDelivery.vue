@@ -67,7 +67,7 @@
       </div>
     </div>
     <div class="divider-dashed"/>
-    <div class="footer text-center">{{date}}</div>
+<!--    <div class="footer text-center">{{date}}</div>-->
   </div>
 </template>
 

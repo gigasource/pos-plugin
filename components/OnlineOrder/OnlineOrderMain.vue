@@ -255,7 +255,7 @@
         this.$emit('completeOrder', order)
       },
       onClickAccept(order) {
-        if (order.type === 'delivery' && order.deliveryTime !== 'asap') return this.acceptOrder(order)
+        if (order.deliveryTime !== 'asap') return this.acceptOrder(order)
 
         if (order.declineStep2) this.$set(order, 'declineStep2', false)
         if (!order.confirmStep2) return this.$set(order, 'confirmStep2', true)

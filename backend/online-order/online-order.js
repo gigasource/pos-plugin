@@ -108,7 +108,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         note,
         onlineOrderId: orderToken,
         discounts,
-        ...type === 'delivery' && {deliveryTime},
+        deliveryTime,
       }
 
       const result = await cms.getModel('Order').create(order)

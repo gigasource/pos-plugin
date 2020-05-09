@@ -109,10 +109,10 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.drawLine()
   escPrinter.bold(true)
   escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
-  escPrinter.newLine()
-  escPrinter.alignCenter()
-  escPrinter.setTextNormal()
-  escPrinter.println(date)
+  // escPrinter.newLine()
+  // escPrinter.alignCenter()
+  // escPrinter.setTextNormal()
+  // escPrinter.println(date)
 
   await escPrinter.print()
 }
