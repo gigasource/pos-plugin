@@ -20,8 +20,8 @@
         apiBaseUrl: '/cms-files'
       })
 
-      await this.createFolder('/', 'images')
-      await this.createFolder('/', 'update')
+      await this.createFolderIfNotExisted('/', 'images')
+      await this.createFolderIfNotExisted('/', 'update')
     },
     data() {
       return {
@@ -47,8 +47,8 @@
         })
       },
       async prepareUploadAppFolder(groupName, version) {
-        await this.createFolder('/update', groupName)
-        await this.createFolder(`/update/${groupName}`, version)
+        await this.createFolderIfNotExisted('/update', groupName)
+        await this.createFolderIfNotExisted(`/update/${groupName}`, version)
       },
       uploadApp(groupName, file, version) {
         return new Promise(async (resolve ,reject) => {
@@ -71,18 +71,9 @@
           await this.gridFsHandler.deleteFileByPath(path)
         } catch (e) {}
       },
-      async isFolderExist(folderPath) {
-        try {
-          await this.gridFsHandler.getFilesInPath(folderPath)
-          return true
-        } catch (e) {
-          return false
-        }
-      },
-      async createFolder(parentPath, folderPath) {
-        const separator = _.endsWith(parentPath, '/') ? '' : '/'
-        const folderExist = await this.isFolderExist(`${parentPath}${separator}${folderPath}`)
-        if (!folderExist) await this.gridFsHandler.createNewFolder(parentPath, folderPath)
+      async createFolderIfNotExisted(folderPath, folderName) {
+        const folderExisted = await this.gridFsHandler.checkFileExisted(folderPath, folderName);
+        if (!folderExisted) await this.gridFsHandler.createNewFolder(folderPath, folderName)
       }
     },
     provide() {
