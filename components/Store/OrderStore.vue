@@ -543,6 +543,19 @@
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
       },
       async acceptPendingOrder(order) {
+        if (order.deliveryTime === 'asap') {
+          const now = new Date()
+          let minute = now.getMinutes() + order.prepareTime
+          let hour = now.getHours()
+
+          if (minute >= 60) {
+            hour++
+            minute -= 60
+          }
+
+          order.deliveryTime = `${hour}:${minute.toString().length === 1 ? '0' + minute : minute}`
+        }
+
         const status = 'kitchen'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {
@@ -578,33 +591,37 @@
         })
       },
       async playBell() {
-        this.bell.addEventListener('play', () => {
-          console.log('bell playing')
-          this.bellPlaying = true;
-        })
-
-        const play = async (event, repeat = false) => {
+        const play = async () => {
           if (this.pendingOrders.length) await this.bell.play()
 
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) {
+            this.bellPlaying = false
+            this.bell.removeEventListener('ended', play)
+          }
+
+          const repeat = setting.onlineDevice.soundLoop === 'repeat'
           if (!repeat || !this.pendingOrders || !this.pendingOrders.length)  {
-            console.log('bell end')
             this.bellPlaying = false
             this.bell.removeEventListener('ended', play)
           }
         }
 
-        const setting = await cms.getModel('PosSetting').findOne()
-        if (!setting.onlineDevice.sound) return
-        const loop = setting.onlineDevice.soundLoop
-        await play()
+        try {
+          const setting = await cms.getModel('PosSetting').findOne()
+          if (!setting.onlineDevice.sound) return
+          const loop = setting.onlineDevice.soundLoop
+          await play()
 
-        if (!loop || loop === 'none') {
-          this.bellPlaying = false
-          return
+          if (!loop || loop === 'none') {
+            this.bellPlaying = false
+            return
+          }
+
+          this.bell.addEventListener('ended', play)
+        } catch (e) {
+          this.bell.addEventListener('canplaythrough', () => this.bell.play())
         }
-
-        console.log(`loop: ${loop}`)
-        this.bell.addEventListener('ended', loop === 'once' ? play : e => play(e, true))
       }
     },
     async created() {
@@ -613,6 +630,10 @@
       const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
       if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
       this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
+      this.bell.addEventListener('play', () => {
+        this.bellPlaying = true;
+      })
+
       await this.updateOnlineOrders()
 
       // add online orders: cms.socket.emit('added-online-order')
@@ -626,10 +647,9 @@
         localStorage.setItem('orderHistoryPageSize', newVal)
       },
       pendingOrders: {
-        async handler(val) {
+        async handler(val, oldVal) {
           if (val && val.length) {
-            console.log('play bell now', this.bellPlaying)
-            if (!this.bellPlaying) await this.playBell()
+            if ((!oldVal || (oldVal && val.length > oldVal.length)) && !this.bellPlaying) await this.playBell()
           }
         },
         immediate: true

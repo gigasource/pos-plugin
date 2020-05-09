@@ -1,8 +1,23 @@
 <template>
   <div class="kitchen-report-main-container">
-    <div class="header" :style="wrapperStyle">
-      <div style="text-align: center; font-size: 40px; margin: 20px 0">Liefer #{{orderNumber}}</div>
+    <div class="header" :style="wrapperStyle" v-if="deliveryTime">
+      <div style="font-size: 40px; margin-bottom: 20px">
+        <span>{{locale.printing.delivery}} #{{orderNumber}}</span>
+        <span style="float: right">{{deliveryTime}}</span>
+      </div>
+      <div v-if="customerCompany" style="font-size: 40px; margin-bottom: 20px">
+        <span style="background-color: black; color: white">{{locale.printing.company}}</span>
+      </div>
     </div>
+    <div class="header" :style="wrapperStyle" v-else>
+      <div style="text-align: center; font-size: 40px; margin-bottom: 20px">{{locale.printing.delivery}} #{{orderNumber}}</div>
+      <div v-if="customerCompany" style="text-align: center; font-size: 40px; margin-bottom: 20px">
+        <span style="background-color: black; color: white">{{locale.printing.company}}</span>
+      </div>
+    </div>
+
+    <br v-if="deliveryTime"/>
+
     <div class="info">
       <div>{{customerName}}</div>
       <div v-if="customerCompany">{{customerCompany}}</div>
@@ -71,7 +86,9 @@
       customerAddress: String,
       customerZipCode: String,
       note: String,
-      orderSum: Number
+      orderSum: Number,
+      deliveryTime: String,
+      locale: Object,
     },
     filters: {
       convertMoney(value) {

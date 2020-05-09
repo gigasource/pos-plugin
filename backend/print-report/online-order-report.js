@@ -22,7 +22,8 @@ async function makePrintData(cms, {orderId}) {
     items,
     shippingFee,
     vSum: orderSum,
-    date
+    date,
+    deliveryTime,
   } = order;
 
   return {
@@ -37,12 +38,13 @@ async function makePrintData(cms, {orderId}) {
     shippingFee,
     orderSum,
     date: dayjs(date).format(localeObj.printing.dateFormat),
+    deliveryTime,
     locale: localeObj,
   };
 }
 
 async function printEscPos(escPrinter, printData) {
-  const {
+  let {
     orderNumber,
     customerName,
     customerPhone,
@@ -55,12 +57,18 @@ async function printEscPos(escPrinter, printData) {
     orderSum,
     date,
     locale,
+    deliveryTime,
   } = printData;
 
-  escPrinter.alignCenter();
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
-  escPrinter.println(`${locale.printing.delivery} #${orderNumber}`)
+
+  if (deliveryTime) escPrinter.leftRight(`${locale.printing.delivery} #${orderNumber}`, deliveryTime);
+  else {
+    escPrinter.alignCenter();
+    escPrinter.println(`${locale.printing.delivery} #${orderNumber}`);
+  }
+
   if (customerCompany) {
     escPrinter.invert(true);
     escPrinter.println(`${locale.printing.company}`);
@@ -82,10 +90,10 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.drawLine()
   escPrinter.bold(true)
   escPrinter.tableCustom([
-    {text: 'Artikel', align: 'LEFT', width: 0.4},
-    {text: 'Menge', align: 'RIGHT', width: 0.12},
-    {text: 'E.P', align: 'RIGHT', width: 0.22},
-    {text: 'Summe', align: 'RIGHT', width: 0.22},
+    {text: locale.printing.item, align: 'LEFT', width: 0.4},
+    {text: locale.printing.quantity, align: 'RIGHT', width: 0.12},
+    {text: locale.printing.price, align: 'RIGHT', width: 0.22},
+    {text: locale.printing.total, align: 'RIGHT', width: 0.22},
   ])
   escPrinter.drawLine()
 
@@ -100,7 +108,7 @@ async function printEscPos(escPrinter, printData) {
   })
   escPrinter.drawLine()
   escPrinter.bold(true)
-  escPrinter.leftRight(`Summe`, `EUR ${convertMoney(orderSum)}`)
+  escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
   escPrinter.newLine()
   escPrinter.alignCenter()
   escPrinter.setTextNormal()

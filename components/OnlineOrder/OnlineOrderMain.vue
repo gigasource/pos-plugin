@@ -26,33 +26,48 @@
                 {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
               </div>
               <g-spacer/>
-              <span class="fw-700 fs-small">{{order.date | formatDate}}</span>
+              <span v-if="order.deliveryTime" class="fw-700 fs-small mr-2">({{order.deliveryTime.toString().toUpperCase()}})</span>
+              <template v-if="order.timeoutDate && timeoutProgress[order._id]">
+                <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
+                <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
+              </template>
+              <span class="fw-700 fs-small" v-else>{{order.date | formatDate}}</span>
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
                 Note: {{order.note}}
               </div>
               <div class="row-flex" v-if="order.type === 'delivery'">
-                <div class="w-10">
+                <div style="flex: 0 0 25px">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
                 <div class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
-                  <div class="w-10 fw-700">{{item.quantity}}x</div>
-                  <div class="flex-equal fs-small-2 pl-1" style="line-height: 20px">
-                    {{item.id}}. {{item.name}}
+                  <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
+                  <div class="flex-equal fs-small-2 pl-1">
+                    {{item.id && `${item.id}.`}} {{item.name}}
                     <template v-if="item.modifiers.length > 0">
                       <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier.name}}</span>)</span>
                     </template>
                   </div>
-                  <div class="col-3 fs-small-2 ta-right" style="line-height: 20px">€{{item.price | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2 ta-right">€{{ item.originalPrice ||item.price | formatMoney(decimals)}}</div>
+                </div>
+              </div>
+              <div v-if="order.discounts && order.discounts.length">
+                <div class="row-flex align-items-start" v-for="discount in order.discounts">
+                  <div>
+                    <span>{{discount.coupon ? `Coupon ` : discount.name}}</span>
+                    <span style="color: #757575; font-style: italic" v-if="discount.coupon">({{discount.coupon}})</span>
+                  </div>
+                  <g-spacer/>
+                  <div class="fs-small-2">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
                 </div>
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
-                <div class="col-9 fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="col-3 fs-small-2 ta-right">€{{order.shippingFee || 0}}</div>
+                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
+                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
@@ -62,7 +77,7 @@
                 </template>
               </g-text-field-bs>
             </g-card-actions>
-            <g-card-actions v-if="order.confirmStep2">
+            <g-card-actions v-if="order.confirmStep2 && order.deliveryTime === 'asap'">
               <div class="w-100">
                 <p class="ml-2 mb-1">Time to complete (min)</p>
                 <value-picker :values="[15, 30, 45, 60]" :default-value="defaultPrepareTime || 30" allow-custom v-model="order.prepareTime"></value-picker>
@@ -134,7 +149,7 @@
                   <span v-for="item in order.items">
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
-                      {{item.id}}. {{item.name}}
+                      {{item.id && `${item.id}.`}} {{item.name}}
                       <template v-if="item.modifiers.length > 0">
                         <span class="i text-grey">({{item.modifiers.map(m => m.name).join(', ')}})</span>
                       </template>
@@ -186,11 +201,14 @@
         dialog: {
           order: {},
           reason: false,
-        }
+        },
+        timeoutInterval: {},
+        timeoutProgress: {}
       }
     },
     watch: {
-      pendingOrders(val) {
+      pendingOrders(val, oldVal) {
+        if (val === oldVal) return
         this.internalOrders = val.map(i => ({
           ...i,
           confirmStep2: false,
@@ -198,6 +216,13 @@
           prepareTime: null,
           declineReason: ''
         }))
+
+        const ordersWithTimeout = this.pendingOrders.filter(item => item.timeoutDate)
+        this.timeoutProgress = ordersWithTimeout.reduce((timeouts, order) => {
+          return Object.assign(timeouts, {
+            [order._id]: this.getTimeoutProgress(order)
+          })
+        }, {})
       }
     },
     computed: {
@@ -209,7 +234,7 @@
           } else return current.prepareTime - next.prepareTime
         })
         return this.kitchenOrders
-      }
+      },
     },
     methods: {
       getPaymentTexts(payments) {
@@ -229,6 +254,8 @@
         this.$emit('completeOrder', order)
       },
       onClickAccept(order) {
+        if (order.deliveryTime !== 'asap') return this.acceptOrder(order)
+
         if (order.declineStep2) this.$set(order, 'declineStep2', false)
         if (!order.confirmStep2) return this.$set(order, 'confirmStep2', true)
         if (!order.prepareTime) return
@@ -255,6 +282,31 @@
       },
       getDeliveryDate(order) {
         return dayjs(order.date).add(order.prepareTime, 'minute').toDate()
+      },
+      getShippingFee(order) {
+        if (!order.discounts) return order.shippingFee
+
+        const freeShipping = order.discounts.find(item => item.type === 'freeShipping');
+        return freeShipping ? freeShipping.value : order.shippingFee;
+      },
+      getTimeoutProgress(order) {
+        const calc = () => {
+          clearTimeout(this.timeoutInterval[order._id])
+          const now = new Date()
+          const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
+          const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
+          if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+
+          const x = (timeout - diff) / timeout
+          const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
+          this.$set(order, 'timeoutProgress', progress)
+          this.timeoutInterval[order._id] = setTimeout(calc, 1000)
+
+          this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+        }
+
+        if (!order.timeoutDate) return
+        return calc()
       }
     },
     mounted() {
@@ -268,14 +320,12 @@
         this.$emit('updateOnlineOrders')
       })
     }
-
   }
 </script>
 
 <style scoped lang="scss">
   .main {
     background-image: url('/plugins/pos-plugin/assets/out.png');
-    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
@@ -400,5 +450,15 @@
         background-color: #EFEFEF;
       }
     }
+  }
+
+  .progress-remaining {
+    color: #E57373;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 15px;
+    width: 32px;
+    text-align: center;
   }
 </style>

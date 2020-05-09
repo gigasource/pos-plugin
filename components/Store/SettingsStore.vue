@@ -3,8 +3,8 @@
 </template>
 
 <script>
-  import {getHighestFavouriteProductOrder, getHighestProductOrder, getProductGridOrder} from '../logic/productUtils';
-  import {getProvided} from '../logic/commonUtils';
+  import { getHighestFavouriteProductOrder, getHighestProductOrder, getProductGridOrder } from '../logic/productUtils';
+  import { getProvided } from '../logic/commonUtils';
 
   export default {
     name: 'SettingsStore',
@@ -100,6 +100,7 @@
       await this.getOnlineDevice()
       await this.registerHardware()
       await this.setupPairDevice()
+      await this.getPairStatus()
     },
     watch: {
       'productPagination.limit'(newVal) {
@@ -779,6 +780,24 @@
         await cms.getModel('PosSetting').updateOne({}, {onlineOrderSorting: value});
       },
 
+      getPairStatus() {
+        cms.socket.emit('getPairStatus', ({error}) => {
+          if (error) {
+            console.warn(`Pair status: ${error}`)
+
+            this.unregisterOnlineOrder(async () => {
+              const posSettings = await this.getPosSetting()
+
+              if (posSettings.skipPairing) {
+                this.$router.currentRoute.path !== '/pos-login' && this.$router.push('/pos-login')
+              } else {
+                this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
+              }
+            })
+          }
+        })
+      },
+
       registerOnlineOrder(pairingCode, callback) {
         window.cms.socket.emit('registerOnlineOrderDevice', pairingCode, callback)
       },
@@ -793,17 +812,18 @@
 
         if (posSettings.onlineDevice && this.$router.currentRoute.path === '/pos-login') {
           this.onlineDevice = posSettings.onlineDevice
-          if (!posSettings.onlineDevice.paired && !posSettings.skipPairing) this.$router.push('/pos-setup')
+          const { id } = posSettings.onlineDevice;
+          if (!id && !posSettings.skipPairing) this.$router.push('/pos-setup')
         }
 
         // listens for unpair event
         cms.socket.on('unpairDevice', () => {
           this.unregisterOnlineOrder(async () => {
             this.onlineDevice = Object.assign({}, this.onlineDevice, {
-              paired: false
+              id: null
             })
             await this.updateOnlineDevice(this.onlineDevice)
-            this.$router.push('/pos-setup')
+            this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
           })
         })
       },

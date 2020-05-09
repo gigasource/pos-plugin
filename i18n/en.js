@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Edit Table Plan',
       editMenuCard: 'Edit Menu Card',
       printerSettings: 'Printer Settings',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online Order Menu'
     },
 
     //article view
@@ -412,7 +413,12 @@ module.exports = {
     printing: {
       delivery: 'Delivery',
       company: 'Company',
-      dateFormat: 'MMM DD, YYYY, HH:mm'
+      dateFormat: 'MMM DD, YYYY, HH:mm',
+      item: 'Item',
+      quantity: 'Q.ty',
+      price: 'Price',
+      total: 'Total',
+      currency: 'USD',
     }
   }
 }

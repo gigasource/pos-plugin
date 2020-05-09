@@ -27,7 +27,8 @@ module.exports = {
       editTablePlan: 'Tischplan bearbeiten',
       editMenuCard: 'Menü bearbeiten',
       printerSettings: 'Druckereinstellungen',
-      support: 'Support'
+      support: 'Support',
+      onlineOrdering: 'Online-Bestellung Menü'
     },
 
     //article view
@@ -410,7 +411,12 @@ module.exports = {
     printing: {
       delivery: 'Lieferschein',
       company: 'Firma',
-      dateFormat: 'DD.MM.YYYY, HH:mm'
+      dateFormat: 'DD.MM.YYYY, HH:mm',
+      item: 'Artikel',
+      quantity: 'Menge',
+      price: 'E.P',
+      total: 'Summe',
+      currency: 'EUR',
     }
   }
 }

@@ -1143,12 +1143,13 @@
       "_id": "5ea6b580f6cea7234d3f4d10",
       "schemaType": "array",
       "key": "printer",
-      "type": "array",
+      "type": "input@multiSelect",
       "fields": [
         {
           "schemaType": "string"
         }
-      ]
+      ],
+      "addable": true
     },
     {
       "_id": "5eb289924a624b0a817f8b92",
@@ -1160,6 +1161,41 @@
       "_id": "5eb29901ebdd901532b5b0f1",
       "schemaType": "string",
       "key": "declineReason",
+      "type": "input"
+    },
+    {
+      "_id": "5eb4da42f6e5fe72da56f77e",
+      "schemaType": "array",
+      "key": "discounts",
+      "type": "array",
+      "addable": true,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "type",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "coupon",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5eb4fe288b0bccd478bec9de",
+      "schemaType": "string",
+      "key": "deliveryTime",
       "type": "input"
     }
   ],

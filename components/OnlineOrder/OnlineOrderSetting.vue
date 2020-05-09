@@ -22,6 +22,10 @@
           </div>
         </div>
       </div>
+      <g-btn-bs v-if="connected" large background-color="#424242" text-color="#FFF" style="margin-top: 24px;"
+                @click.stop="dialog.disconnect = true">
+        {{$t('onlineOrder.settings.unpair')}}
+      </g-btn-bs>
       <g-divider style="margin-top: 20px"/>
     </div>
     <div class="online-order-setting__title">{{$t('onlineOrder.settings.generalSettings')}}</div>
@@ -162,7 +166,7 @@
       onlineDevice(val) {
         this.internalDevice = val
 
-        if (this.internalDevice && this.internalDevice.paired) this.connected = true;
+        if (this.internalDevice && this.internalDevice.id) this.connected = true;
       }
     },
     methods: {
@@ -179,7 +183,6 @@
           } else {
             this.computedDevice = {
               id: deviceId,
-              paired: true,
               url: this.webshopUrl,
               sound: this.internalDevice.sound,
             }
@@ -195,7 +198,6 @@
         this.$emit('unregisterOnlineOrder', () => {
           this.computedDevice = {
             id: null,
-            paired: false,
             url: this.webshopUrl,
             sound: this.internalDevice.sound,
           }

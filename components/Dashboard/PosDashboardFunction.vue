@@ -3,7 +3,7 @@
     <div class="function--up" v-show="computedBtnGroup1.length" >
       <div v-for="(btn, i) in computedBtnGroup1" :key="`up_${i}`"
            class="function-btn"
-           @click="changePath(btn.path)">
+           @click="btn.click">
         <g-icon size="60">{{btn.icon}}</g-icon>
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
@@ -12,11 +12,25 @@
     <div class="function--down">
       <div v-for="(btn, i) in computedBtnGroup2" :key="`down_${i}`"
            class="function-btn"
-           @click="changePath(btn.path)">
+           @click="btn.click">
         <g-icon size="60">{{btn.icon}}</g-icon>
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
+    
+    <template>
+      <g-dnd-dialog v-model="showIframe" :width="iframeWidth" :height="iframeHeight" lazy
+                    @close="showIframe = false"
+                    @dragStart="iframeDragging = true" @dragEnd="iframeDragging = false"
+                    @resizeStart="iframeDragging = true" @resizeEnd="iframeDragging = false">
+        <template #title>
+          Online Order Setting
+        </template>
+        <div v-if="showIframe && iframeDragging"
+             style="height: 100%; width: 100%; position: absolute; background: transparent"/>
+        <iframe v-if="showIframe" :src="iframeSrc" width="100%" height="100%" ref="iframe"/>
+      </g-dnd-dialog>
+    </template>
   </div>
 </template>
 
@@ -29,24 +43,31 @@
     },
     data() {
       const i18n = this.$i18n;
-      const { dashboard: { delivery, editMenuCard, editTablePlan, endOfDay, fastCheckout, monthlyReport, orderHistory, printerSettings, settings, staffReport, support } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+      const { dashboard: { delivery, editMenuCard, editTablePlan, endOfDay, fastCheckout, monthlyReport, orderHistory, printerSettings, settings, staffReport, support, onlineOrdering } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
 
       return {
         btnUp: [
-          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', path: '/pos-order-2'},
-          {title: delivery, feature: 'delivery', icon: 'icon-delivery', path: '/pos-delivery'}
+          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-2')},
+          {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-delivery')}
         ],
         btnDown: [
-          {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', path: '/pos-staff-report'},
-          {title: settings, feature: 'settings', icon: 'icon-dashboard', path: '/pos-settings'},
-          {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', path: '/pos-eod-report'},
-          {title: orderHistory, icon: 'icon-history', path: '/pos-order-history'},
-          {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', path: '/pos-month-report'},
-          {title: support, icon: 'icon-support-2', path: '/pos-support'},
-          {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan', path: '/pos-edit-table-plan'},
-          {title: editMenuCard, feature: 'editMenuCard', icon: 'icon-edit-menu-card', path: '/pos-edit-menu-card'},
-          {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting', path: '/pos-printer-setting'},
-        ]
+          {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},
+          {title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => this.changePath('/pos-settings')},
+          {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', click: () => this.changePath('/pos-eod-report')},
+          {title: orderHistory, icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
+          {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
+          {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
+          {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
+          {title: editMenuCard, feature: 'editMenuCard', icon: 'icon-edit-menu-card',  click: () => this.changePath('/pos-edit-menu-card')},
+          {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting',  click: () => this.changePath('/pos-printer-setting')},
+          {title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: this.openStoreSetting },
+        ],
+        showIframe: false,
+        iframeWidth: window.innerWidth,
+        iframeHeight: window.innerHeight,
+        iframeSrc: 'about:blank',
+        iframeDragging: false,
+        iframeRefreshInterval: null,
       }
     },
     computed: {
@@ -74,6 +95,14 @@
       changePath(path) {
         if(path)
           this.$router.push({path})
+      },
+      openStoreSetting() {
+        window.cms.socket.emit('getWebShopSettingUrl', webShopUrl => {
+          if (webShopUrl) {
+            this.iframeSrc = webShopUrl
+            this.showIframe = true
+          }
+        })
       }
     }
   }

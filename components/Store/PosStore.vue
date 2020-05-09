@@ -19,6 +19,8 @@
         incorrectPasscode: false,
         timeFormat: this.$t('dates.timeFormat'),
         dateFormat: this.$t('dates.dateFormat'),
+        webShopConnected: false,
+        storeId: '',
         locale: 'en',
         device: 'Terminal1',
         enabledFeatures: [],
@@ -169,25 +171,34 @@
           if (version) this.version = version
         })
 
-        cms.socket.on('device-paired', () => {
-          //todo on pair device
+        cms.socket.emit('socketConnected', value => {
+          this.webShopConnected = value
         })
 
-        cms.socket.on('device-unpaired', () => {
-          //todo on pair device
-          this.$router.push('/pos-setup')
+        cms.socket.on('webShopConnected', () => {
+          this.webShopConnected = true
+          this.getStoreId()
         })
 
+        cms.socket.on('webShopDisconnected', () => {
+          this.webShopConnected = false
+        })
       },
       async changeLocale(locale) {
         await cms.getModel('SystemConfig').updateOne({ type: 'I18n'}, {'content.locale': locale }, { upsert: true })
         this.locale = locale
         this.$router.go()
+      },
+      getStoreId() {
+        cms.socket.emit('getWebshopId', storeId => {
+          this.storeId = storeId || ''
+        })
       }
     },
     async created() {
       document.title = 'Online Ordering'
       this.initSocket()
+      this.getStoreId()
       this.setDateInterval = setInterval(() => this.systemDate = new Date(), 10000)
 
       const i18nConfig = cms.getList('SystemConfig').find(i => i.type === 'I18n')

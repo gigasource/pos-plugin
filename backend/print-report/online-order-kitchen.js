@@ -18,7 +18,8 @@ async function makePrintData(cms, {orderId}) {
     items,
     shippingFee,
     vSum: orderSum,
-    date
+    date,
+    deliveryTime,
   } = order;
 
 
@@ -34,6 +35,7 @@ async function makePrintData(cms, {orderId}) {
     shippingFee,
     orderSum,
     date: dayjs(date).format(localeObj.printing.dateFormat),
+    deliveryTime,
     locale: localeObj,
   };
 }
@@ -50,20 +52,28 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
     items,
     date,
     locale,
+    deliveryTime,
   } = printData;
 
   let filteredItems = items.filter(item => item.groupPrinter === groupPrinter || item.groupPrinter2 === groupPrinter)
   if (!filteredItems.length) return
 
-  escPrinter.alignCenter();
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
-  escPrinter.println(`${locale.printing.delivery} #${orderNumber}`)
+
+  if (deliveryTime) escPrinter.leftRight(`${locale.printing.delivery} #${orderNumber}`, deliveryTime);
+  else {
+    escPrinter.alignCenter();
+    escPrinter.println(`${locale.printing.delivery} #${orderNumber}`);
+  }
+
   if (customerCompany) {
     escPrinter.invert(true);
     escPrinter.println(`${locale.printing.company}`);
     escPrinter.invert(false);
   }
+
+  escPrinter.newLine()
 
   escPrinter.alignLeft()
   escPrinter.setTextNormal()
