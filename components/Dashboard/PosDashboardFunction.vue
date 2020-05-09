@@ -20,6 +20,8 @@
     
     <template>
       <g-dnd-dialog v-model="showIframe" :width="iframeWidth" :height="iframeHeight" lazy
+                    :show-minimize="false"
+                    :show-maximize="false"
                     @close="showIframe = false"
                     @dragStart="iframeDragging = true" @dragEnd="iframeDragging = false"
                     @resizeStart="iframeDragging = true" @resizeEnd="iframeDragging = false">
