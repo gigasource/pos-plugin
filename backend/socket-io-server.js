@@ -116,6 +116,12 @@ module.exports = function (cms) {
       return callback({success: true})
     })
 
+    socket.on('getAppFeature', async (deviceId, callback) => {
+      const device = await cms.getModel('Device').findById(deviceId)
+      if (!device) return callback({error: 'Device not found'})
+      return callback(device.features)
+    })
+
     // TODO: analysis side fx
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
       internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
@@ -153,7 +159,7 @@ module.exports = function (cms) {
     });
 
     socket.on('updateAppFeature', async (deviceId, features) => {
-      externalSocketIOServer.emitTo(deviceId, 'updateAppFeature', features);
+      externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features);
     });
 
     socket.on('unpairDevice', async deviceId => {
