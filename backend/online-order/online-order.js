@@ -251,17 +251,23 @@ function cleanupOnlineOrderSocket() {
 }
 
 module.exports = async cms => {
-  cms.socket.once('connect', async () => {
-    try {
-      const deviceId = await getDeviceId();
-      if (deviceId) await createOnlineOrderSocket(deviceId, cms);
-    } catch (e) {
-      console.error(e);
-      await updateDeviceStatus();
-    }
+  const initOnlineOrderSocket = _.once(() => {
+    return new Promise(async resolve => {
+        try {
+          const deviceId = await getDeviceId();
+          if (deviceId) await createOnlineOrderSocket(deviceId, cms);
+        } catch (e) {
+          console.error(e);
+          await updateDeviceStatus();
+        }
+      console.log('resolve promise')
+        resolve();
+    })
   })
 
   cms.socket.on('connect', async socket => {
+    await initOnlineOrderSocket();
+
     console.log('internal socket connect')
     //deviceSockets.push(socket)
 
