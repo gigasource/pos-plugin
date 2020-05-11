@@ -414,6 +414,7 @@ module.exports = {
 
     printing: {
       delivery: 'Delivery',
+      pickup: 'Pick-up',
       company: 'Company',
       dateFormat: 'MMM DD, YYYY, HH:mm',
       item: 'Item',

@@ -412,6 +412,7 @@ module.exports = {
 
     printing: {
       delivery: 'Lieferschein',
+      pickup: 'Abholung',
       company: 'Firma',
       dateFormat: 'DD.MM.YYYY, HH:mm',
       item: 'Artikel',

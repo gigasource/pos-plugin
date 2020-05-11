@@ -2,7 +2,7 @@
   <div class="kitchen-report-main-container">
     <div class="header" :style="wrapperStyle" v-if="deliveryTime">
       <div style="font-size: 40px; margin-bottom: 20px">
-        <span>{{locale.printing.delivery}} #{{orderNumber}}</span>
+        <span>{{orderType}} #{{orderNumber}}</span>
         <span style="float: right">{{deliveryTime}}</span>
       </div>
       <div v-if="customerCompany" style="font-size: 40px; margin-bottom: 20px">
@@ -89,6 +89,7 @@
       orderSum: Number,
       deliveryTime: String,
       locale: Object,
+      type: String
     },
     filters: {
       convertMoney(value) {
@@ -111,6 +112,11 @@
         }
         return '40px'
       },
+      orderType() {
+        return this.type === 'delivery'
+          ? this.locale.printing.delivery
+          : this.locale.printing.pickup
+      }
     },
     methods: {
       calculateQuantityColumnWidth(itemQuantity) {

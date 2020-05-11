@@ -24,6 +24,7 @@ async function makePrintData(cms, {orderId}) {
     vSum: orderSum,
     date,
     deliveryTime,
+    type
   } = order;
 
   return {
@@ -40,6 +41,7 @@ async function makePrintData(cms, {orderId}) {
     date: dayjs(date).format(localeObj.printing.dateFormat),
     deliveryTime,
     locale: localeObj,
+    type
   };
 }
 
@@ -58,15 +60,17 @@ async function printEscPos(escPrinter, printData) {
     date,
     locale,
     deliveryTime,
+    type
   } = printData;
 
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
 
-  if (deliveryTime) escPrinter.leftRight(`${locale.printing.delivery} #${orderNumber}`, deliveryTime);
+  const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
+  if (deliveryTime) escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
   else {
     escPrinter.alignCenter();
-    escPrinter.println(`${locale.printing.delivery} #${orderNumber}`);
+    escPrinter.println(`${orderType} #${orderNumber}`);
   }
 
   if (customerCompany) {
