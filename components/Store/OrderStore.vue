@@ -574,7 +574,7 @@
         await cms.getModel('Order').findOneAndUpdate({_id: order._id},
             Object.assign({}, order, {
               status: 'completed',
-              deliveryTime: new Date()
+              deliveryTime: dayjs().format('HH:mm')
             }))
         await this.updateOnlineOrders()
       },
