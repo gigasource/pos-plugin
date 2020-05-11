@@ -573,7 +573,8 @@
       async completeOrder(order) {
         await cms.getModel('Order').findOneAndUpdate({_id: order._id},
             Object.assign({}, order, {
-              status: 'completed'
+              status: 'completed',
+              deliveryTime: new Date()
             }))
         await this.updateOnlineOrders()
       },

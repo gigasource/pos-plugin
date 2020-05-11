@@ -30,7 +30,7 @@
             <p>{{item.payment[0].type}}</p>
           </td>
           <td>{{item.date | formatDate}}</td>
-          <td>{{item.deliveryDate | formatDate}}</td>
+          <td>{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
           <td :class="statusClass">{{$t(`onlineOrder.${item.status}`)}}</td>
         </tr>
