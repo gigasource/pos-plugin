@@ -22,10 +22,22 @@
             </div>
           </div>
         </div>
-        <p class="mt-1 ml-1 mb-2">Condition</p>
+        <p class="mt-1 ml-1 mb-2">Condition (Optional)</p>
         <div class="dialog__condition">
-          <div>
+          <div class="row-flex">
             <g-checkbox color="indigo accent-2" v-model="conditions.total.active" label="Total value*"/>
+            <g-menu v-model="menu[0]" open-on-hover nudge-left="150" nudge-top="10">
+              <template v-slot:activator="{on}">
+                <div v-on="on" style="margin-top: 6px">
+                  <g-icon color="#536DFE" size="20">info</g-icon>
+                </div>
+              </template>
+              <div class="menu-info">
+                <p>• Ticking this option will limit your discount to orders with certain value range.</p>
+                <p>• MIN or MAX value can be left empty. </p>
+                <p><b>E.g:</b> If you want to limit your discount to orders with €10 or more, ticking this option and set MIN value to 10, leaving MAX value empty.</p>
+              </div>
+            </g-menu>
           </div>
           <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.total.active && 'disabled']">
             <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
@@ -35,8 +47,19 @@
               <input type="number" class="ta-center fw-700 fs-large" placeholder="MAX" v-model="conditions.total.value.max"/>
             </div>
           </div>
-          <div>
+          <div class="row-flex">
             <g-checkbox color="indigo accent-2" v-model="conditions.timePeriod.active" label="Time period"/>
+            <g-menu v-model="menu[1]" open-on-hover nudge-left="150" nudge-top="10">
+              <template v-slot:activator="{on}">
+                <div v-on="on" style="margin-top: 6px">
+                  <g-icon color="#536DFE" size="20">info</g-icon>
+                </div>
+              </template>
+              <div class="menu-info">
+                <p>• Ticking this option will limit your discount to orders placed in a certain time period.</p>
+                <p>• Not ticking this option will make your discount always applicable.</p>
+              </div>
+            </g-menu>
           </div>
           <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.timePeriod.active && 'disabled']">
             <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
@@ -46,8 +69,19 @@
               <g-date-picker-input icon="far fa-calendar-alt" class="date-picker" v-model="conditions.timePeriod.value.endDate" :min="conditions.timePeriod.value.startDate"/>
             </div>
           </div>
-          <div>
+          <div class="row-flex">
             <g-checkbox color="indigo accent-2" v-model="conditions.daysOfWeek.active" label="Days of the week"/>
+            <g-menu v-model="menu[2]" open-on-hover nudge-left="150" nudge-top="75">
+              <template v-slot:activator="{on}">
+                <div v-on="on" style="margin-top: 6px">
+                  <g-icon color="#536DFE" size="20">info</g-icon>
+                </div>
+              </template>
+              <div class="menu-info">
+                <p>• Ticking this option will limit your discount to orders placed in a certain days of the week.</p>
+                <p>• Not ticking this option will make your discount applicable everyday during the week.</p>
+              </div>
+            </g-menu>
           </div>
           <div :class="['row-flex', 'br-2', 'flex-wrap', 'b-grey', 'ba-thin', !conditions.daysOfWeek.active && 'disabled']">
             <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Monday"
@@ -65,15 +99,36 @@
             <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Saturday"
                         label="Sat"/>
           </div>
-          <div>
+          <div class="row-flex">
             <g-checkbox color="indigo accent-2" v-model="conditions.zipCode.active" label="Zip code"/>
+            <g-menu v-model="menu[3]" open-on-hover nudge-left="150" nudge-top="10">
+              <template v-slot:activator="{on}">
+                <div v-on="on" style="margin-top: 6px">
+                  <g-icon color="#536DFE" size="20">info</g-icon>
+                </div>
+              </template>
+              <div class="menu-info">
+                <p>• Ticking this option will limit your discount to orders in a certain area.</p>
+                <p>• Not ticking this option will make your discount available to all zip codes.</p>
+              </div>
+            </g-menu>
           </div>
           <div :class="[!conditions.zipCode.active && 'disabled']">
             <g-combobox text-field-component="GTextFieldBs" deletable-chips multiple
                         v-model="conditions.zipCode.value"/>
           </div>
-          <div>
+          <div class="row-flex">
             <g-checkbox color="indigo accent-2" v-model="conditions.coupon.active" label="Coupon"/>
+            <g-menu v-model="menu[4]" open-on-hover nudge-left="150" nudge-top="10">
+              <template v-slot:activator="{on}">
+                <div v-on="on" style="margin-top: 6px">
+                  <g-icon color="#536DFE" size="20">info</g-icon>
+                </div>
+              </template>
+              <div class="menu-info">
+                <p>• Ticking this option will limit your discount to orders with your specified coupon.</p>
+              </div>
+            </g-menu>
           </div>
           <div :class="[!conditions.coupon.active && 'disabled']">
             <g-text-field-bs v-model="conditions.coupon.value"/>
@@ -140,7 +195,8 @@
           { text: `Number (${$t('common.currency')})`, value: 'flat' },
           { text: 'Percentage', value: 'percent' },
           { text: 'Free shipping', value: 'freeShipping' }
-        ]
+        ],
+        menu: [false, false, false, false, false]
       }
     },
     computed: {
@@ -374,5 +430,13 @@
         text-align: center;
       }
     }
+  }
+
+  .menu-info {
+    width: 400px;
+    background: white;
+    padding: 16px 12px;
+    border-radius: 2px;
+    color: #424242;
   }
 </style>

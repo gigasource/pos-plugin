@@ -69,7 +69,9 @@
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
                 <g-text-field v-model="customer.company" :label="$t('store.company')" clearable clear-icon="icon-cancel@16" prepend-icon="icon-company@16"/>
                 <g-text-field type="number" v-model="customer.phone" :label="$t('store.telephone')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-phone2@16"/>
-                <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
+                <template v-if="orderType === 'pickup'">
+                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
+                </template>
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
@@ -157,8 +159,8 @@
 <script>
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
-  import {disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
   import orderUtil from '../../logic/orderUtil';
+  import {get24HourValue, incrementTime} from "../../logic/timeUtil";
 
   export default {
     name: 'OrderTable',
@@ -342,12 +344,12 @@
       deliveryTimeList() {
         let list = []
         const today = new Date()
-        const {hour: baseHour, minute: baseMinute} = this.incrementTime(today.getHours(), today.getMinutes(), 15)
+        const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime}) => {
-            let [openTimeHour, openTimeMinute] = openTime.split(':')
-            let [closeTimeHour, closeTimeMinute] = closeTime.split(':')
+            let [openTimeHour, openTimeMinute] = get24HourValue(openTime).split(':')
+            let [closeTimeHour, closeTimeMinute] = get24HourValue(closeTime).split(':')
 
             openTimeHour = parseInt(openTimeHour)
             openTimeMinute = parseInt(openTimeMinute)
@@ -360,7 +362,7 @@
               if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute))
                 list.push(`${openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
-              const newTime = this.incrementTime(openTimeHour, openTimeMinute, this.store.deliveryTimeInterval || 15)
+              const newTime = incrementTime(openTimeHour, openTimeMinute, this.store.deliveryTimeInterval || 15)
               openTimeHour = newTime.hour
               openTimeMinute = newTime.minute
             }
@@ -374,13 +376,6 @@
       },
     },
     watch: {
-      // discounts(val) {
-      //   if (!val || !val.length) return
-      //
-      //   if (val.some(discount => discount.coupon === this.couponCode)) {
-      //     this.couponTf.error = ''
-      //   }
-      // },
       confirmView(val) {
         this.$emit('confirm-view', val)
         const wrapper = document.getElementById('table-content')
@@ -486,6 +481,8 @@
           success: false
         }
 
+        this.deliveryTime = this.asap
+
         this.$emit('clear')
         this.view = 'order'
         this.$emit('back') // for mobile
@@ -493,22 +490,11 @@
       applyCoupon() {
         this.couponTf.error = ''
         this.couponCode = this.couponTf.value
-        if(this.discounts.length === 0) {
-          this.couponTf.error = 'Invalid Coupon!'
-        }
       },
       clearCouponValidate() {
         this.couponCode = ''
         this.couponTf.error = ''
         this.couponTf.success = false
-      },
-      incrementTime(hour, minute, interval = 15) {
-        minute += interval
-        if (minute >= 60) {
-          hour++
-          minute -= 60
-        }
-        return {hour, minute}
       },
     }
   }

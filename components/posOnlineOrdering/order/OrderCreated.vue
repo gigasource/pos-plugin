@@ -32,7 +32,7 @@
               </div>
               <div v-else-if="cancelled">
                 <div style="color: #E57373">{{$t('store.orderCancelled')}}</div>
-                <div style="color: #747474">{{$t('store.reason')}}: {{ cancelledReason }}</div>
+                <div style="color: #747474" v-if="cancelledReason">{{$t('store.reason')}}: {{ cancelledReason }}</div>
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@
         <template v-else>
           <div class="more-info">
             <p class="fw-700 i">{{$t('store.possibleReasons')}}:</p>
-            <div class="row-flex align-items-start">
+            <div class="row-flex align-items-start mt-1">
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
               <div>{{$t('store.reason1')}}</div>
             </div>
@@ -80,7 +80,7 @@
               <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
               <div>{{$t('store.reason2')}}</div>
             </div>
-            <p class="fw-700 i mt-2">{{$t('store.callUs')}}:</p>
+            <p class="fw-700 i mt-1">{{$t('store.callUs')}}:</p>
             <div class="phone">
               <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
               <div class="fw-600 text-indigo-accent-2">{{phone}}</div>
@@ -253,8 +253,6 @@
     }
 
     &__content {
-      display: flex;
-      flex-direction: column;
       max-height: calc(100% - 120px);
       font-size: 14px;
 
@@ -262,7 +260,7 @@
         overflow: auto;
         scrollbar-width: none; // firefox
         border-bottom: 1px solid #d8d8d8;
-        min-height: 0;
+        max-height: 210px;
         -webkit-overflow-scrolling: touch;
 
         &::-webkit-scrollbar {
@@ -362,13 +360,14 @@
 
   .more-info {
     margin-top: 16px;
+    font-size: 16px;
 
     .phone {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 8px;
-      font-size: 20px;
+      margin: 16px;
+      font-size: 21px;
     }
   }
 
@@ -406,6 +405,10 @@
 
         .order-message {
           font-size: 14px;
+        }
+
+        .order-item {
+          max-height: 125px;
         }
 
         .order-detail {

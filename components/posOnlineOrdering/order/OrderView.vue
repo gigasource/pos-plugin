@@ -131,6 +131,7 @@
   import MenuItem from './MenuItem';
   import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
   import CreatedOrder from './CreatedOrder';
+  import {get24HourValue} from "../../logic/timeUtil";
 
   export default {
     name: 'OrderView',
@@ -277,7 +278,7 @@
       isStoreOpening() {
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
-            if (this.now >= this.get24HourValue(openTime) && this.now <= this.get24HourValue(closeTime)) return true
+            if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) return true
           }
         }
 
@@ -294,7 +295,7 @@
       storeWorkingTime() {
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
-            if (this.now >= this.get24HourValue(openTime) && this.now <= this.get24HourValue(closeTime)) {
+            if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) {
               return `${openTime} - ${closeTime}`
             }
           }
@@ -358,10 +359,6 @@
         })
 
         return openHours
-      },
-      get24HourValue(time) {
-        time = _.toLower(time)
-        return _.includes(time, 'm') ? dayjs(time, 'hh:mma').format('HH:mm') : time
       },
       async loadStore() {
         this.$set(this, 'store', await cms.getModel('Store').findOne({_id: this.store._id}))
