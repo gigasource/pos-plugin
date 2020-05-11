@@ -163,7 +163,7 @@ module.exports = function (cms) {
     });
 
     socket.on('unpairDevice', async deviceId => {
-      externalSocketIOServer.emitTo(deviceId, 'unpairDevice')
+      externalSocketIOServer.emitToPersistent(deviceId, 'unpairDevice')
     })
     socket.on('createOrder', async (storeId, orderData) => {
       storeId = ObjectId(storeId);
