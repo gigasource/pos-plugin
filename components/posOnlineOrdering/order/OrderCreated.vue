@@ -72,14 +72,8 @@
         <template v-else>
           <div class="more-info">
             <p class="fw-700 i">{{$t('store.possibleReasons')}}:</p>
-            <div class="row-flex align-items-start mt-1">
-              <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
-              <div>{{$t('store.reason1')}}</div>
-            </div>
-            <div class="row-flex align-items-start">
-              <g-icon size="8" color="black" class="mr-3 mt-2">fas fa-circle</g-icon>
-              <div>{{$t('store.reason2')}}</div>
-            </div>
+            <div class="ml-1">•  {{$t('store.reason1')}}</div>
+            <div class="ml-1">•  {{$t('store.reason2')}}</div>
             <p class="fw-700 i mt-1">{{$t('store.callUs')}}:</p>
             <div class="phone">
               <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
@@ -253,7 +247,6 @@
     }
 
     &__content {
-      max-height: calc(100% - 120px);
       font-size: 14px;
 
       .order-item {
@@ -387,7 +380,7 @@
     }
   }
 
-  @media screen and (max-height: 600px) {
+  @media screen and (max-height: 720px) {
     .cpn-order-created {
       padding-top: 12px;
       padding-bottom: 12px;

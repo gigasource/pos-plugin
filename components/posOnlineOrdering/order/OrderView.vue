@@ -24,7 +24,7 @@
                     <div class="menu-hour">
                       <div class="fw-700 mb-2">Open hours:</div>
                       <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
-                        <div>{{day.wdayString}}</div>
+                        <div class="mr-2">{{day.wdayString}}</div>
                         <div class="ta-right">{{day.open}} - {{day.close}}</div>
                       </div>
                     </div>
@@ -131,7 +131,7 @@
   import MenuItem from './MenuItem';
   import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
   import CreatedOrder from './CreatedOrder';
-  import {get24HourValue} from "../../logic/timeUtil";
+  import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
 
   export default {
     name: 'OrderView',
@@ -293,10 +293,11 @@
         }
       },
       storeWorkingTime() {
+        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
             if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) {
-              return `${openTime} - ${closeTime}`
+              return `${formatTime(openTime)} - ${formatTime(closeTime)}`
             }
           }
 
@@ -304,6 +305,7 @@
         return null
       },
       storeWorkingDay() {
+        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
         return this.store.openHours.map(oh => {
           let days = []
           for(let i = 0; i < oh.dayInWeeks.length; i++) {
@@ -321,7 +323,7 @@
             }
           }
           const wdayString = days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', ')
-          return { wdayString, open: oh.openTime, close: oh.closeTime }
+          return { wdayString, open: formatTime(oh.openTime), close: formatTime(oh.closeTime) }
         })
       }
     },
@@ -560,6 +562,7 @@
         display: flex;
         overflow: auto;
         scrollbar-width: none; // firefox
+        -ms-overflow-style: none; //edge
 
         &::-webkit-scrollbar {
           display: none;
@@ -582,6 +585,7 @@
         overflow: auto;
         /*scroll-behavior: smooth;*/
         scrollbar-width: none; // firefox
+        -ms-overflow-style: none; //edge
 
         &::-webkit-scrollbar {
           display: none;

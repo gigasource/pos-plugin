@@ -32,7 +32,7 @@ module.exports = {
       tryAgain: 'erneut Versuchen!',
       possibleReasons: 'Mögliche Gründe',
       reason1: 'Das Personal hat es nicht rechtzeitig geschafft Ihre Bestellung entgegen zu nehmen.',
-      reason2: 'Möglicherweise gab es Verbindungsprobleme.',
+      reason2: 'Probleme mit der Verbindung.',
       callUs: 'Für weitere Informationen, rufen Sie uns direkt an',
       close: 'Beenden',
       orderConfirmed: 'Bestellung bestätigt',
