@@ -91,7 +91,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         status: 'inProgress',
         items,
         customer,
-        deliveryDate: dayjs(),
+        deliveryDate: new Date(),
         payment: [{ type: paymentType, value: vSum }],
         type,
         date,
