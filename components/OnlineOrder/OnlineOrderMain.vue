@@ -119,7 +119,7 @@
         </template>
         <template v-else>
           <g-card elevation="0" v-for="(order, index) in sortedKitchenOrders" :key="index"
-                  :style="[order.prepareTime < 10 && {border: '1px solid #FF4452'}]">
+                  :style="[getPendingOrderKitchenTime(order) < 10 && {border: '1px solid #FF4452'}]">
             <g-card-title>
               <div class="fs-small-2 ml-1" style="max-width: calc(100% - 90px); line-height: 1.2">
                 <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
@@ -129,7 +129,7 @@
               <div class="kitchen-orders__timer" @click.stop="openDialog(order)">
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
-                <span class="fw-700 fs-small ml-2">{{getDeliveryDate(order) | formatDate}}</span>
+                <span class="fw-700 fs-small ml-2">{{order.deliveryTime}}</span>
               </div>
             </g-card-title>
             <g-card-text>
@@ -228,11 +228,11 @@
     },
     computed: {
       sortedKitchenOrders() {
-        if (this.onlineOrderSorting) this.internalOrders = this.internalOrders.sort((current, next) => {
-          if (!current.id || next.id) return false
-          if (this.onlineOrderSorting === 'order') {
+        if (this.onlineOrderSorting) return this.kitchenOrders.sort((current, next) => {
+          if (this.onlineOrderSorting === 'order' && current.id && next.id) {
             return next.id - current.id
-          } else return current.prepareTime - next.prepareTime
+          }
+          return this.getPendingOrderKitchenTime(current) - this.getPendingOrderKitchenTime(next)
         })
         return this.kitchenOrders
       },
@@ -308,6 +308,9 @@
 
         if (!order.timeoutDate) return
         return calc()
+      },
+      getPendingOrderKitchenTime(order) {
+        return dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(), 'minute')
       }
     },
     mounted() {

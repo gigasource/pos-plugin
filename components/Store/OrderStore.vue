@@ -544,16 +544,7 @@
       },
       async acceptPendingOrder(order) {
         if (order.deliveryTime === 'asap') {
-          const now = new Date()
-          let minute = now.getMinutes() + order.prepareTime
-          let hour = now.getHours()
-
-          if (minute >= 60) {
-            hour++
-            minute -= 60
-          }
-
-          order.deliveryTime = `${hour}:${minute.toString().length === 1 ? '0' + minute : minute}`
+          order.deliveryTime = dayjs().add(order.prepareTime, 'minute').format('HH:mm')
         }
 
         const status = 'kitchen'
@@ -565,7 +556,9 @@
         this.printOnlineOrderKitchen(order._id).catch(e => console.error(e))
         this.printOnlineOrderReport(order._id).catch(e => console.error(e))
         await this.updateOnlineOrders()
-        const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', { 0: order.prepareTime })
+        const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
+          0: dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(order.date), 'minute')
+        })
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
       },
       async setPendingOrder(order) {
