@@ -11,9 +11,6 @@
         </template>
         <div class="filter">
           <div class="filter-input">
-            <!-- Now user only created by admin so Create by is not needed -->
-            <!--  <div>Create by</div>-->
-            <!--  <g-select text-field-component="GTextFieldBs" v-model="accountFilter.createdBy" :items="managerUsersViewModel"/>-->
             <div>Group</div>
             <g-combobox multiple class="combobox--large" multiple deletable-chips text-field-component="GTextFieldBs" v-model="filter.storeGroups" :items="availableGroupsViewModel"/>
           </div>
@@ -141,7 +138,7 @@
       }
     },
     injectService: [
-      'PosOnlineOrderManagementStore:(accountViewModel,availableGroupsViewModel,managerUsersViewModel,accountSearch,accountFilter)',
+      'PosOnlineOrderManagementStore:(accountViewModel,availableGroupsViewModel,accountSearch,accountFilter)',
       'PosOnlineOrderManagementStore:(createAccount,editAccount,deleteAccount)',
       'PermissionStore:allPermissions'
     ],

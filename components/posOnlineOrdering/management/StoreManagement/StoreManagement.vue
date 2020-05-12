@@ -82,7 +82,6 @@
           :setting-name="selectedStore.settingName"
           :setting-address="selectedStore.settingAddress"
           :alias="selectedStore.alias"
-          :aliases="storeAlias"
           :client-domain="selectedStore.clientDomain"
           :group="selectedStore.groups"
           :online-ordering="selectedStore.onlineOrdering"
@@ -152,7 +151,7 @@
       // store groups
       'PosOnlineOrderManagementStore:(storeGroups,loadStoreGroups,addGroup,changeStoreGroupName,deleteStoreGroup)',
       // stores
-      'PosOnlineOrderManagementStore:(stores,loadStores,addStore,removeStore,updateStore,storeAlias,checkDeviceOnlineStatus)',
+      'PosOnlineOrderManagementStore:(stores,loadStores,addStore,removeStore,updateStore,checkDeviceOnlineStatus)',
       // devices
       'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,updateDeviceFeatures,updateDeviceAppVersion)',
       // app

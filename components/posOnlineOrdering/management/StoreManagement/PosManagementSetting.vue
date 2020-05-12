@@ -100,7 +100,6 @@
       clientDomain: String,
       devices: Array,
       groups: Array,
-      aliases: Array,
       country: Object,
       countries: Array,
     },
