@@ -395,6 +395,7 @@ module.exports = {
       noKitchen: 'No orders sent to kitchen',
       deliveryIn: 'Delivery in {0} minutes',
       pickUpIn: 'Pick up in {0} minutes',
+      total: 'Total',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',
