@@ -221,6 +221,7 @@ async function getDeviceId(pairingCode) {
       requestBody.appName = 'POS_Android'
       requestBody.appVersion = require('../../package').version
       requestBody.hardware = global.APP_CONFIG.deviceName
+      requestBody.release = require('../../package').release
       try {
         const requestResponse = await axios.post(pairingApiUrl, requestBody)
         return requestResponse.data.deviceId

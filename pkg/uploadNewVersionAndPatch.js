@@ -2,6 +2,7 @@ const uploader = require('./upload');
 const argv = require('yargs').argv;
 const upload = new uploader({domain: argv.domain, apiBaseUrl: '/cms-files'});
 const version = require('../package').version;
+const release = require('../package').release;
 const path = require('path');
 const appName = 'pos-restaurant.apk'
 console.log("The domain is", argv.domain);
@@ -11,7 +12,7 @@ upload({
   version: version,
   type: 'APK',
   base: process.env.BASE_VERSION || '1.0.0',
-  release: 'Stable',
+  release: release,
   note: 'New version'
 })
 upload({
@@ -20,6 +21,6 @@ upload({
   version: version,
   type: 'PATCH',
   base: process.env.BASE_VERSION || '1.0.0',
-  release: 'Stable',
+  release: release,
   note: 'New version'
 })
