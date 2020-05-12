@@ -49,7 +49,8 @@
               </div>
 
               <div class="po-order-table__item__note">
-                <g-text-field dense prepend-icon="icon-note@16" :placeholder="`${$t('store.note')}...`" v-model="item.note"/>
+                <g-icon size="16">icon-note</g-icon>
+                <textarea :id="`item_note_${index}`" rows="1" :placeholder="`${$t('store.note')}...`" v-model="item.note"/>
               </div>
 
             </div>
@@ -708,7 +709,7 @@
     &__item {
       align-items: center;
       width: 100%;
-      min-height: 74px;
+      min-height: 64px;
       border-bottom: 1px dashed #d8d8d8;
 
       &__name {
@@ -734,21 +735,20 @@
 
       &__note {
         margin-top: 8px;
+        display: flex;
+        align-items: center;
 
-        .g-tf-wrapper {
-          margin: 0;
-
-          ::v-deep .g-tf {
-            &:before, &:after {
-              display: none;
-            }
-
-            .g-tf-input {
-              font-size: 12px;
-              color: #9E9E9E;
-              font-style: italic;
-            }
-          }
+        textarea {
+          flex: 1;
+          outline: none;
+          border: none;
+          resize: none;
+          background: transparent;
+          padding-left: 8px;
+          font-size: 12px;
+          color: #9E9E9E;
+          font-style: italic;
+          overflow-y: hidden;
         }
       }
 
