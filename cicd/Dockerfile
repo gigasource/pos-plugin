@@ -8,7 +8,7 @@ COPY ./ssh ./ssh
 COPY ./gigasource-access-token ./gigasource-access-token
 RUN cd plugins/pos-plugin/pkg && \
     VALID="$(node check-version.js | grep -o FAILED)" && \
-    if [[ ($VALID == "FAILED") && ($FORCE_UPDATE == false) ]] echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1
+    if [[ ($VALID == "FAILED") && ($FORCE_UPDATE == false) ]] ; then echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1; fi
 
 RUN rm -rf ~/.ssh && \
     mv ./ssh ~/.ssh && \
