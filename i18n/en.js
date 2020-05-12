@@ -251,6 +251,7 @@ module.exports = {
       registered: 'Registered!',
       accessStaffReport: 'Access Staff Report',
       editTablePlan: 'Edit Table Plan',
+      viewOrder: 'View Completed/Declined Orders',
       //company
       companyName: 'Company Name',
       address: 'Address',
