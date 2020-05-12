@@ -155,7 +155,7 @@
             // show in Account.vue
             ..._.pick(account, '_id', 'name', 'username', 'active'),
             storeGroupsStr: _.join(_.map(account.storeGroups, sg => sg.name), ', '),
-            totalStore: _.filter(this.stores, store => _.some(_.map(account.storeGroups, group => this.storeInStoreGroup(store, group)))).length,
+            totalStore: _.filter(this.stores, store => _.some(_.map(account.storeGroups, group => this.storeInGroup(store, group)))).length,
             totalPermissions: perms.length,
             createdBy: account.createdBy && account.createdBy.username,
             status: account.active ? 'active' : 'disabled',
@@ -192,7 +192,7 @@
           ..._.omit(store, 'devices'),
           devices: _.map(store.devices, device => {
             const app = _.find(this.versionControlViewModel, app => app.group === device.appName)
-            const appItem = _.filter(app && app.files, appItem => appItem.version > device.appVersion)
+            const appItem = _.filter(app && app.files, appItem => semverSort([appItem.version, device.appVersion])[1] === appItem.version)
 
             const deviceVersions = appItem.map(this.convertAppItemToViewModel)
             const deviceVersionMap = _.keyBy(deviceVersions, 'version')
