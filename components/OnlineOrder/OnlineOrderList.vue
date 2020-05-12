@@ -5,12 +5,11 @@
         {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
       </div>
       <g-spacer/>
-      <template v-if="status === 'completed'">
-        <span>Order: <span class="summary-value">{{ totalOrder }}</span></span>
-        <span>Total: <span class="summary-value">{{$t('common.currency')}}{{ totalIncome }}</span></span>
-        <g-select text-field-component="GTextFieldBs" :width="130" v-model="dateFilter" :items="dateFilters"/>
-      </template>
-      <div v-else style="height: 54px; width: 1px"></div>
+      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
+      <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
+      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
+      <span class="fw-700 fs-large mr-3">{{$t('common.currency')}}{{ totalIncome }}</span>
+      <g-select prepend-inner-icon="far fa-calendar-alt@16" text-field-component="GTextFieldBs" v-model="dateFilter" :items="dateFilters"/>
     </div>
     <div class="online-order-list__table">
       <g-table elevation="2" fixed-header>
@@ -71,7 +70,7 @@
       return {
         headers: [no, customer, address, amount, received, delivery, type, status],
         dateFilter: 'Today',
-        dateFilters: _.map(['Today', 'Yesterday', 'Last 3 days', 'Last 7 days', 'Last 30 days'], option => ({ text: option, value: option }))
+        dateFilters: ['Today', 'Yesterday', 'Last 3 days', 'Last 7 days', 'Last 30 days']
       }
     },
     filters: {
@@ -134,12 +133,21 @@
       font-weight: 700;
       text-transform: capitalize;
     }
-  
-    .summary-value {
-      font-size: 18px;
-      color: #1D1D26;
-      font-weight: bold;
-      margin-right: 15px;
+
+    .g-select ::v-deep {
+      .bs-tf-label {
+        display: none;
+      }
+
+      .bs-tf-inner-input-group {
+        padding: 0 0 0 8px;
+      }
+
+      .input {
+        font-size: 14px;
+        min-width: 85px;
+        text-align: center;
+      }
     }
 
     &__table {
