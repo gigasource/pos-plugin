@@ -487,6 +487,13 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-chain-blue {
+  background-image: url("../assets/chain_blue.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-preview {
   background-image: url("../assets/preview.svg");
   background-repeat: no-repeat;
