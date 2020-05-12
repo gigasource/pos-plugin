@@ -20,6 +20,7 @@ async function makePrintData(cms, {orderId}) {
     vSum: orderSum,
     date,
     deliveryTime,
+    type
   } = order;
 
 
@@ -37,6 +38,7 @@ async function makePrintData(cms, {orderId}) {
     date: dayjs(date).format(localeObj.printing.dateFormat),
     deliveryTime,
     locale: localeObj,
+    type
   };
 }
 
@@ -53,6 +55,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
     date,
     locale,
     deliveryTime,
+    type
   } = printData;
 
   let filteredItems = items.filter(item => item.groupPrinter === groupPrinter || item.groupPrinter2 === groupPrinter)
@@ -61,10 +64,11 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
 
-  if (deliveryTime) escPrinter.leftRight(`${locale.printing.delivery} #${orderNumber}`, deliveryTime);
+  const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
+  if (deliveryTime) escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
   else {
     escPrinter.alignCenter();
-    escPrinter.println(`${locale.printing.delivery} #${orderNumber}`);
+    escPrinter.println(`${orderType} #${orderNumber}`);
   }
 
   if (customerCompany) {
@@ -122,10 +126,10 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
   escPrinter.setTextNormal()
   escPrinter.bold(true);
   escPrinter.drawLine()
-  escPrinter.newLine()
-  escPrinter.alignCenter()
-  escPrinter.setTextNormal()
-  escPrinter.println(date)
+  // escPrinter.newLine()
+  // escPrinter.alignCenter()
+  // escPrinter.setTextNormal()
+  // escPrinter.println(date)
 
   await escPrinter.print()
 }

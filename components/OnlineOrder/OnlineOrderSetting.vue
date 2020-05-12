@@ -22,10 +22,6 @@
           </div>
         </div>
       </div>
-      <g-btn-bs v-if="connected" large background-color="#424242" text-color="#FFF" style="margin-top: 24px;"
-                @click.stop="dialog.disconnect = true">
-        {{$t('onlineOrder.settings.unpair')}}
-      </g-btn-bs>
       <g-divider style="margin-top: 20px"/>
     </div>
     <div class="online-order-setting__title">{{$t('onlineOrder.settings.generalSettings')}}</div>
@@ -84,16 +80,8 @@
           </g-btn-bs>
         </template>
       </g-grid-select>
-
-<!--      <div style="margin-top: 16px;"><b>Auto decline order</b></div>-->
-<!--      <div>-->
-<!--        <g-switch label="Auto decline order after (min)"/>-->
-<!--        <g-text-field-bs></g-text-field-bs>-->
-<!--      </div>-->
     </div>
 
-    <dialog-connect v-model="dialog.connect" :error="pairError" :pairing="pairing" @confirm="connect"/>
-    <dialog-disconnect v-model="dialog.disconnect" @confirm="disconnect"/>
   </div>
 </template>
 

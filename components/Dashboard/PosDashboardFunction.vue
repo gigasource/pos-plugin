@@ -1,6 +1,6 @@
 <template>
   <div class="function">
-    <div class="function--up" v-show="computedBtnGroup1.length" >
+    <div class="function--up" v-show="computedBtnGroup1 && computedBtnGroup1.length" >
       <div v-for="(btn, i) in computedBtnGroup1" :key="`up_${i}`"
            class="function-btn"
            @click="btn.click">
@@ -8,7 +8,7 @@
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
-    <g-divider color="#9e9e9e" v-if="computedBtnGroup1.length"/>
+    <g-divider color="#9e9e9e" v-if="computedBtnGroup1 && computedBtnGroup1.length"/>
     <div class="function--down">
       <div v-for="(btn, i) in computedBtnGroup2" :key="`down_${i}`"
            class="function-btn"

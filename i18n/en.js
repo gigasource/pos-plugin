@@ -251,6 +251,7 @@ module.exports = {
       registered: 'Registered!',
       accessStaffReport: 'Access Staff Report',
       editTablePlan: 'Edit Table Plan',
+      viewOrder: 'View Completed/Declined Orders',
       //company
       companyName: 'Company Name',
       address: 'Address',
@@ -394,6 +395,7 @@ module.exports = {
       noKitchen: 'No orders sent to kitchen',
       deliveryIn: 'Delivery in {0} minutes',
       pickUpIn: 'Pick up in {0} minutes',
+      total: 'Total',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',
@@ -414,6 +416,7 @@ module.exports = {
 
     printing: {
       delivery: 'Delivery',
+      pickup: 'Pick-up',
       company: 'Company',
       dateFormat: 'MMM DD, YYYY, HH:mm',
       item: 'Item',

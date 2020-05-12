@@ -63,7 +63,7 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const folderPath = `${uploadPath}/${version}`;
     const form = new FormData();
     form.append('file', fs.createReadStream(filePath));
-    const response = await axios.post(`${uploadFileUrl}${folderPath}`, form, {
+    const response = await axios.post(`${uploadFileUrl}${folderPath}&overwrite=true`, form, {
       maxContentLength: 1024 * 1024 * 1024,
       httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       headers: { ...form.getHeaders() }

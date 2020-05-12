@@ -91,7 +91,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         status: 'inProgress',
         items,
         customer,
-        deliveryDate: dayjs(),
+        deliveryDate: new Date(),
         payment: [{ type: paymentType, value: vSum }],
         type,
         date,
@@ -108,7 +108,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         note,
         onlineOrderId: orderToken,
         discounts,
-        ...type === 'delivery' && {deliveryTime},
+        deliveryTime,
       }
 
       const result = await cms.getModel('Order').create(order)
@@ -241,6 +241,7 @@ async function getDeviceId(pairingCode) {
       requestBody.appName = 'POS_Android'
       requestBody.appVersion = require('../../package').version
       requestBody.hardware = global.APP_CONFIG.deviceName
+      requestBody.release = require('../../package').release
       try {
         const requestResponse = await axios.post(pairingApiUrl, requestBody)
         return requestResponse.data.deviceId

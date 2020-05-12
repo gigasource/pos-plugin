@@ -249,6 +249,7 @@ module.exports = {
       registered: 'Registered!',
       accessStaffReport: 'Access Staff Report',
       editTablePlan: 'Edit Table Plan',
+      viewOrder: 'View Completed/Declined Orders',
       //company
       companyName: 'Fimen Name',
       address: 'Adresse',
@@ -392,6 +393,7 @@ module.exports = {
       noKitchen: 'No orders sent to kitchen',
       deliveryIn: 'Lieferung in {0} Minuten.',
       pickUpIn: 'Abholung in {0} Minuten.',
+      total: 'Gesamt',
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',
@@ -412,6 +414,7 @@ module.exports = {
 
     printing: {
       delivery: 'Lieferschein',
+      pickup: 'Abholung',
       company: 'Firma',
       dateFormat: 'DD.MM.YYYY, HH:mm',
       item: 'Artikel',

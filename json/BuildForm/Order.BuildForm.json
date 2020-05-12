@@ -1197,6 +1197,13 @@
       "schemaType": "string",
       "key": "deliveryTime",
       "type": "input"
+    },
+    {
+      "_id": "5eb51b883fabfc7e895e2e3e",
+      "schemaType": "date",
+      "key": "timeoutDate",
+      "type": "input@date",
+      "addable": true
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

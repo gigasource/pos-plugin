@@ -1,7 +1,15 @@
 <template>
   <div class="online-order-list">
-    <div class="online-order-list__title">
-      {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
+    <div class="row-flex align-items-center mb-2">
+      <div class="online-order-list__title">
+        {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
+      </div>
+      <g-spacer/>
+      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
+      <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
+      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
+      <span class="fw-700 fs-large mr-3">{{$t('common.currency')}}{{ totalIncome | formatNumber }}</span>
+      <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
     <div class="online-order-list__table">
       <g-table elevation="2" fixed-header>
@@ -26,11 +34,11 @@
             <div v-else>--</div>
           </td>
           <td>
-            <p class="fw-700">€{{item.payment[0].value}}</p>
+            <p class="fw-700">{{$t('common.currency')}}{{item.payment[0].value}}</p>
             <p>{{item.payment[0].type}}</p>
           </td>
           <td>{{item.date | formatDate}}</td>
-          <td>{{item.deliveryDate | formatDate}}</td>
+          <td>{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
           <td :class="statusClass">{{$t(`onlineOrder.${item.status}`)}}</td>
         </tr>
@@ -41,6 +49,10 @@
 </template>
 
 <script>
+  import dayjs from 'dayjs'
+  import isBetween from 'dayjs/plugin/isBetween'
+  dayjs.extend(isBetween)
+  
   export default {
     name: 'OnlineOrderList',
     injectService: ['OrderStore:getOnlineOrdersWithStatus'],
@@ -56,7 +68,11 @@
       const { onlineOrder: { address, amount, customer, delivery, no, received, status, type } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
 
       return {
-        headers: [no, customer, address, amount, received, delivery, type, status]
+        headers: [no, customer, address, amount, received, delivery, type, status],
+        filter: {
+          fromDate: '',
+          toDate: ''
+        }
       }
     },
     filters: {
@@ -66,10 +82,20 @@
     },
     computed: {
       computedItems() {
-        return this.onlineOrders.map(i => ({ ...i, status: this.status }))
+        const items = this.onlineOrders.map(i => ({ ...i, status: this.status }))
+        if(this.filter.fromDate && this.filter.toDate) {
+          return items.filter(item => dayjs(item.date).isBetween(this.filter.fromDate, this.filter.toDate, 'day', '[]'))
+        }
+        return items
       },
       statusClass() {
         return this.status
+      },
+      totalOrder() {
+        return this.computedItems.length
+      },
+      totalIncome() {
+        return _.sumBy(this.computedItems, item => item.vSum);
       }
     },
     watch: {
@@ -80,10 +106,17 @@
     },
     async mounted() {
       if (this.status) await this.getOnlineOrdersWithStatus(this.status)
+      this.filter.fromDate = dayjs().format('YYYY-MM-DD')
+      this.filter.toDate = dayjs().format('YYYY-MM-DD')
     },
     async activated() {
       if (this.status) await this.getOnlineOrdersWithStatus(this.status)
     },
+    methods: {
+      changeFilter(range) {
+        this.filter = range
+      }
+    }
   }
 </script>
 
@@ -92,13 +125,28 @@
     background-image: url('/plugins/pos-plugin/assets/out.png');
     width: 100%;
     height: 100%;
-    padding: 24px 16px;
+    padding: 16px 16px 24px 16px;
 
     &__title {
       font-size: 15px;
       font-weight: 700;
-      margin-bottom: 16px;
       text-transform: capitalize;
+    }
+
+    .g-select ::v-deep {
+      .bs-tf-label {
+        display: none;
+      }
+
+      .bs-tf-inner-input-group {
+        padding: 0 0 0 8px;
+      }
+
+      .input {
+        font-size: 14px;
+        min-width: 85px;
+        text-align: center;
+      }
     }
 
     &__table {
@@ -135,6 +183,16 @@
           color: #FF5252;
           text-transform: capitalize;
         }
+      }
+    }
+    
+    ::v-deep .bs-tf-wrapper {
+      margin: 8px 0;
+      background-color: #FFF;
+      width: 150px;
+      
+      .bs-tf-label {
+        margin-bottom: 0;
       }
     }
   }

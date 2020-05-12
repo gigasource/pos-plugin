@@ -14,7 +14,7 @@
         "sound": true
       },
       "defaultPrepareTime": 30,
-      "onlineOrderSorting": "order",
+      "onlineOrderSorting": "time",
       "printerGeneralSetting": {
         "entireReceipt": 0
       }

@@ -88,6 +88,9 @@
         <div class="edit__item" v-if="!isAdmin">
           <pos-switch @change="save" dense :label="$t('settings.cancelInvoice')" v-model="selectedUser.cancelInvoice"/>
         </div>
+        <div class="edit__item" v-if="!isAdmin">
+          <pos-switch @change="save" dense :label="$t('settings.viewOrder')" v-model="selectedUser.viewOrder"/>
+        </div>
       </div>
     </g-grid-layout>
     <dialog-user-detail :focusInput.sync="focusInput" v-model="dialogUserDetail"/>
