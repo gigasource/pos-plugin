@@ -822,5 +822,14 @@
       ],
       "id": 55
     }
+  ],
+  "SystemConfig" : [
+    {
+      "_id": "5ea92bdb8e60e34adca96f23",
+      "content": {
+        "locale": "de"
+      },
+      "type": "I18n"
+    }
   ]
 }

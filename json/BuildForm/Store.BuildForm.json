@@ -101,18 +101,14 @@
           "clipboardType": "cut"
         },
         {
-          "_id": "5e859b5eb7b7b30cc39f2635",
-          "schemaType": "date",
+          "schemaType": "string",
           "key": "openTime",
-          "type": "input@date",
-          "clipboardType": "cut"
+          "type": "input"
         },
         {
-          "_id": "5e859b5eb7b7b30cc39f2636",
-          "schemaType": "date",
+          "schemaType": "string",
           "key": "closeTime",
-          "type": "input@date",
-          "clipboardType": "cut"
+          "type": "input"
         }
       ],
       "type": "array"
@@ -171,7 +167,9 @@
       "fields": [
         {
           "schemaType": "number",
-          "key": "defaultFee"
+          "key": "defaultFee",
+          "default": "0",
+          "type": "input@number"
         },
         {
           "schemaType": "array",
@@ -193,7 +191,8 @@
         {
           "schemaType": "boolean",
           "key": "acceptOrderInOtherZipCodes",
-          "type": "input@switch"
+          "type": "input@switch",
+          "default": "true"
         }
       ],
       "type": "object"
@@ -225,6 +224,62 @@
         }
       ],
       "type": "array"
+    },
+    {
+      "_id": "5ea95b6f78a8c35392586ca4",
+      "schemaType": "object",
+      "key": "country",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "locale",
+          "type": "input"
+        }
+      ]
+    },
+    {
+      "_id": "5eb27546dfe7ca5edac50068",
+      "schemaType": "boolean",
+      "key": "collapseText",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5eb38c4842901c23a0bd6a88",
+      "schemaType": "object",
+      "key": "minimumOrderValue",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@checkbox"
+        }
+      ],
+      "type": "object",
+      "addable": true
+    },
+    {
+      "_id": "5eb3dc1e2a445016e7510af9",
+      "schemaType": "number",
+      "key": "orderTimeOut",
+      "type": "input@number"
+    },
+    {
+      "_id": "5eb5332513e1dddd8223695d",
+      "schemaType": "number",
+      "key": "deliveryTimeInterval",
+      "default": "15",
+      "type": "input@number"
     }
   ],
   "name": "Store",

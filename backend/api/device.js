@@ -51,7 +51,6 @@ router.get('/pairing-code', async (req, res) => {
     pairingCode,
     storeId: ObjectId(storeId),
     paired: false,
-    online: false,
   })
 
   res.status(200).json({pairingCode})
@@ -61,28 +60,28 @@ router.post('/register', async (req, res) => {
   // hardware: Sunmi, Kindle-Fire, etc, ...
   // appName: Pos-Germany.apk
   // appVersion: 1.51
-  let {pairingCode, hardware, appName, appVersion } = req.body;
+  let {pairingCode, hardware, appName, appVersion, release } = req.body;
   if (!pairingCode) return res.status(400).json({message: 'Missing pairingCode in request body'});
   const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
   if (deviceInfo) {
     // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
-    await DeviceModel.updateOne({pairingCode}, { name: 'New Device', paired: true, online: false, hardware, appName, appVersion, features: {
-        fastCheckout: true,
-        manualTable: true,
-        delivery: true,
-        editMenuCard: true,
-        tablePlan: true,
+    await DeviceModel.updateOne({pairingCode}, { name: 'New Device', paired: true, hardware, appName, appVersion, release, features: {
+        fastCheckout: false,
+        manualTable: false,
+        delivery: false,
+        editMenuCard: false,
+        tablePlan: false,
         onlineOrdering: false,
-        editTablePlan: true,
-        staffReport: true,
-        eodReport: true,
-        monthlyReport: true,
+        editTablePlan: false,
+        staffReport: false,
+        eodReport: false,
+        monthlyReport: false,
         remoteControl: true,
         proxy: true
       }
     });
     await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
-    cms.socket.emit('updateDeviceStatus', deviceInfo.storeId);
+    cms.socket.emit('reloadStores', deviceInfo.storeId);
     res.status(200).json({deviceId: deviceInfo._id})
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})

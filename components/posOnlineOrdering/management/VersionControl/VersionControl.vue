@@ -44,14 +44,20 @@
         <template v-else>
           <div v-for="(group, i) in listVersionControl" :key="`group_${i}`">
             <div class="version-control__group">
-              <div class="version-control__group-header" @click="toggleGroup(group)">
+              <div class="version-control__group-header" @click="toggleGroup(group)" @mouseenter="toggleEditBtn(i, true)" @mouseleave="toggleEditBtn(i, false)">
                 <g-icon size="20" v-if="group.show">expand_less</g-icon>
                 <g-icon size="20" v-else>expand_more</g-icon>
                 <g-edit-view-input
-                    @click.native.stop.prevent="() => {}"
+                    @click.native.stop.prevent="toggleGroup(group)"
                     :value="group.group"
                     class="ml-2"
-                    @input="(name, cb) => changeGroupName(group, name, cb)"/>
+                    @input="(name, cb) => changeGroupName(group, name, cb)">
+                  <template v-slot:action="{mode, switchToEditMode, applyChange, resetValue}">
+                    <g-icon v-if="editBtn[i] && mode !== 'edit'" @click="switchToEditMode()" size="18" class="ml-1">mdi-pencil-outline</g-icon>
+                    <g-icon v-if="mode === 'edit'" @click="applyChange()" class="ml-1">mdi-check</g-icon>
+                    <g-icon v-if="mode === 'edit'" @click="resetValue()" class="ml-1">mdi-close</g-icon>
+                  </template>
+                </g-edit-view-input>
               </div>
               <g-expand-transition>
                 <div v-if="group.show">
@@ -97,7 +103,7 @@
     
     <dialog-new-app
         v-model="dialog.newApp"
-        @submit="addApp"/>
+        @submit="addNewApp"/>
   </div>
 </template>
 
@@ -127,6 +133,7 @@
           group: null,
           newApp: false
         },
+        editBtn: []
       }
     },
     filters: {
@@ -145,6 +152,14 @@
         return this.versionControlViewModel.length === 0
       }
     },
+    created() {
+      this.editBtn = this.listVersionControl ? this.listVersionControl.map(g => false) : []
+    },
+    // watch: {
+    //   listVersionControl(val) {
+    //     this.editBtn = val.map(g => false)
+    //   }
+    // },
     methods: {
       // app
       changeGroupName(group, name, cb) {
@@ -182,6 +197,15 @@
       },
       download(file) {
         window.open(`${location.origin}${file.uploadPath}`)
+      },
+      toggleEditBtn(index, mode) {
+        if(this.editBtn && this.editBtn.length > 0) {
+          this.$set(this.editBtn, index, mode)
+        }
+      },
+      addNewApp(name, cb) {
+        this.editBtn.push(false)
+        this.addApp(name, cb)
       }
     }
   }
@@ -284,7 +308,7 @@
         font-weight: 700;
         border-bottom: 1px solid #EFEFEF;
 
-        .g-icon {
+        & > .g-icon {
           margin: 16px;
           box-shadow: 0.5px 0px 2px rgba(0, 0, 0, 0.1398);
         }
@@ -309,6 +333,10 @@
         white-space: nowrap;
         font-size: 14px;
         cursor: pointer;
+
+        &:hover {
+          background-color: #EFEFEF;
+        }
       }
     }
   }

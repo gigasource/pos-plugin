@@ -5,6 +5,7 @@
       <g-text-field-bs large label="Name" v-model="name"/>
       <g-select v-if="groups" deletable-chips multiple text-field-component="GTextFieldBs" label="Group" :items="listGroups" v-model="group"/>
       <g-text-field-bs large label="Address" v-model="address"/>
+      <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country"/>
       <div class="dialog-buttons">
         <g-btn-bs large width="100" text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
         <g-btn-bs large width="100" text-color="white" background-color="indigo-accent-2" :disabled="invalid" @click="submit">OK</g-btn-bs>
@@ -19,12 +20,14 @@
     props:{
       value: null,
       groups: Array,
+      countries: Array,
     },
     data() {
       return {
         name: '',
         group: null,
-        address: ''
+        address: '',
+        country: null
       }
     },
     computed: {
@@ -36,6 +39,7 @@
           this.name = ''
           this.group = null
           this.address = ''
+          this.country = null
           this.$emit('input', val)
         }
       },
@@ -56,7 +60,8 @@
         const store = {
           groups: this.group,
           settingName: this.name,
-          settingAddress: this.address
+          settingAddress: this.address,
+          country: this.country
         }
         this.$emit('submit', store)
         this.internalValue = false

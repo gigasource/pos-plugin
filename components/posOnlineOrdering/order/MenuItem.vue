@@ -1,10 +1,12 @@
 <template>
   <div class="po-menu-item">
-    <img v-if="image" alt draggable="false" :src="image" class="po-menu-item__thumbnail"/>
-    <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
+    <div v-if="showImage">
+      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
+      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
+    </div>
     <div class="po-menu-item__content">
-      <div class="po-menu-item__name">{{ name }}</div>
-      <div class="po-menu-item__desc">{{ desc }}</div>
+      <div :class="['po-menu-item__name', collapseText && 'collapse']">{{ name }}</div>
+      <div :class="['po-menu-item__desc', collapseText && 'collapse']">{{ desc }}</div>
       <div class="po-menu-item__prices--under">
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ price | currency }}</div>
         <div v-if="price2"> {{ price2 | currency }}</div>
@@ -17,7 +19,7 @@
     </div>
     <g-icon @click="addToOrder" v-if="isOpening"
             size="28" color="#424242"
-           class="po-menu-item__add">
+            :class="['po-menu-item__add', disabled && 'disabled']">
       add_circle
     </g-icon>
     <div class="po-menu-item__action" v-if="isOpening">
@@ -46,6 +48,16 @@
       quantity: Number,
       currencyUnit: String,
       isOpening: Boolean,
+      imageThumbnailSize: {
+        type: Object,
+        default: () => ({
+          width: 60,
+          height: 60,
+        }),
+      },
+      disabled: Boolean,
+      collapseText: Boolean,
+      showImage: Boolean,
     },
     filters: {
       currency(val) {
@@ -62,7 +74,14 @@
       increaseQuantity() {
         this.$emit('increase', this._id)
       }
-    }
+    },
+    computed: {
+      menuItemThumbnail() {
+        const {width, height} = this.imageThumbnailSize
+
+        return `${this.image}?w=${width}&h=${height}`
+      }
+    },
   }
 </script>
 <style scoped lang="scss">
@@ -70,40 +89,48 @@
     display: flex;
     align-items: flex-start;
     padding-top: 8px;
-    height: 80px;
-    border-bottom: 1px solid rgba(204, 204, 204, 0.4);
-    
+    min-height: 80px;
+
     &__thumbnail {
       border-radius: 15px;
       margin-right: 18px;
       width: 60px;
       height: 60px;
     }
-    
+
     &__name {
       font-weight: bold;
-      font-size: 18px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      max-width: 350px;
+      font-size: 15px;
+      max-width: 100%;
+      user-select: auto;
+
+      &.collapse {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
 
     &__content {
       margin-right: 16px;
+      max-width: calc(100% - 200px);
     }
-    
+
     &__desc {
-      font-size: 14px;
+      font-size: 13px;
       color: #757575;
-      max-width: 350px;
+      max-width: 100%;
       word-break: break-word;
-      -webkit-line-clamp: 2;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+
+      &.collapse {
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        user-select: auto;
+      }
     }
-    
+
     &__prices {
       display: flex;
       flex-direction: column;
@@ -128,10 +155,9 @@
         margin-top: 4px;
       }
     }
-    
+
     &__add {
       margin-left: 10px;
-      margin-right: 30px;
     }
 
     &__action {
@@ -143,10 +169,16 @@
     }
   }
 
-  @media screen and (max-width: 1040px) {
+  @media screen and (max-width: 1139px) {
     .po-menu-item {
       &__content {
         line-height: 1.2;
+        max-width: calc(100% - 160px);
+        margin-right: 4px;
+      }
+
+      &__thumbnail {
+        margin-right: 8px;
       }
 
       &__name {

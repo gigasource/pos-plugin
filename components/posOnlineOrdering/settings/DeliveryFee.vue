@@ -3,7 +3,7 @@
     <div class="delivery-fee__title">Delivery Fee</div>
     <div class="delivery-fee__content">
       <div class="delivery-fee__content-header">
-        <div class="col-9">Zip code includes</div>
+        <div class="col-9">Zip code</div>
         <div class="col-3">Fee (€)</div>
       </div>
       <div class="delivery-fee__content-main">

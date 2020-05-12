@@ -19,16 +19,18 @@
         if (indexOfItem < 0) {
           this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
         } else {
-          this.orderItems[indexOfItem].quantity++
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
+          this.orderItems.splice(indexOfItem, 1, item)
         }
       },
       decreaseOrRemoveItems(item) {
         const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
         if (indexOfItem < 0)
           return;
-        if (this.orderItems[indexOfItem].quantity > 1)
-          this.orderItems[indexOfItem].quantity--;
-        else
+        if (this.orderItems[indexOfItem].quantity > 1) {
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity - 1})
+          this.orderItems.splice(indexOfItem, 1, item)
+        } else
           this.orderItems.splice(indexOfItem, 1)
       },
       clearOrder() {

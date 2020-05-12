@@ -196,8 +196,7 @@
         } catch(e) {
           this.dialog.uploading = false
         }
-        this.cropper && this.cropper.destroy()
-        this.dialog.upload = false
+        this.closeDialog()
       }
     }
   }

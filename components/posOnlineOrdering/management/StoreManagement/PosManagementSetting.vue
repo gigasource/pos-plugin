@@ -4,12 +4,13 @@
     <div class="pos-management-setting__info">
       <div class="pos-management-setting__title">Basic Information</div>
       <g-select large deletable-chips multiple text-field-component="GTextFieldBs" label="Group"
-                :items="groups"
+                :items="groups" class="group"
                 item-text="name"
                 item-value="_id"
                 v-model="computedGroup"/>
       <g-text-field-bs large label="Name" v-model="computedSettingName"/>
       <g-text-field-bs large label="Address" v-model="computedSettingAddress"/>
+      <g-select returnObject item-text="name" large text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="computedCountry"/>
     </div>
     
     <!-- ONLINE ORDER STORE -->
@@ -99,13 +100,16 @@
       clientDomain: String,
       devices: Array,
       groups: Array,
-      aliases: Array,
+      country: Object,
+      countries: Array,
     },
     injectService: ['PosOnlineOrderManagementStore:(stores)'],
     data() {
       return {
         aliasErrMessage: '',
-        clientDomainErrMessage: ''
+        clientDomainErrMessage: '',
+        countryName: this.country && this.country.name || '',
+        groupIds: this.group && this.group.map(g => g._id) || []
       }
     },
     created() {
@@ -119,10 +123,11 @@
       },
       computedGroup: {
         get() {
-          return this.group.map(g => g._id)
+          return this.groupIds
         },
         set(val) {
-          this.updateDebounce({ groups: val })
+          this.update({ groups: val })
+          this.groupIds = val
         }
       },
       computedSettingName: {
@@ -149,6 +154,15 @@
           this.updateDebounce({ onlineOrdering: value === "1" })
         }
       },
+      computedCountry: {
+        get() {
+          return this.countryName
+        },
+        set(val) {
+          this.update({country: val})
+          this.countryName = val.name
+        }
+      }
     },
     methods: {
       async storeAliasValid(alias) {
@@ -221,6 +235,14 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
+      .group ::v-deep .bs-tf-inner-input-group {
+        overflow: auto;
+
+        .input {
+          width: calc(100% - 24px);
+        }
+      }
     }
 
     &__order {

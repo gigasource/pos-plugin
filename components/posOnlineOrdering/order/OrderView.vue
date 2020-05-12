@@ -1,10 +1,9 @@
 <template>
-  <div style="width: 100vw; height: 100vh; background-color: #F2F2F2">
-    <div class="pos-order">
+  <div class="pos-order">
       <template  v-if="store">
         <div class="pos-order__left">
           <div class="pos-order__left__header">
-            <img :src="store.logoImageSrc"/>
+            <img :src="store.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png'"/>
             <div class="pos-order__left__header--info">
               <div>
                 <div class="row-flex align-items-center justify-end">
@@ -14,14 +13,35 @@
                   <span class="sub-title">{{store.phone}}</span>
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;">
-                  <span :style="storeOpenStatusStyle">{{ storeOpenStatus }}</span>
+                <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;" @click="dialog.hour = true">
+                  <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
+                    <template v-slot:activator="{on}">
+                      <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave" :style="storeOpenStatusStyle" class="row-flex align-items-center mr-1">
+                        {{ storeOpenStatus }}
+                        <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
+                      </div>
+                    </template>
+                    <div class="menu-hour">
+                      <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
+                      <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
+                        <div class="mr-2">{{day.wdayString}}</div>
+                        <div class="ta-right">{{day.open}} - {{day.close}}</div>
+                      </div>
+                      <template  v-if="deliveryInfo && deliveryInfo.length > 0">
+                        <div class="fw-700 my-2">Delivery:</div>
+                        <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+                          <div class="mr-2">{{info.title}}</div>
+                          <div class="ta-right">{{info.value}}</div>
+                        </div>
+                      </template>
+                    </div>
+                  </g-menu>
                   <template v-if="storeWorkingTime">
                     <span style="margin-right: 3px;">|</span>
                     <g-icon size="16">access_time</g-icon>
                     <span style="color: #424242; margin-left: 3px">{{ storeWorkingTime }}</span>
                   </template>
-                  <span v-else>today</span>
+                  <span v-else>{{$t('store.today')}}</span>
                 </div>
               </div>
               <div class="address">
@@ -33,7 +53,7 @@
           <div class="pos-order__info" v-if="orderItems.length > 0">
             <g-badge :value="true" color="#4CAF50" overlay>
               <template v-slot:badge>
-                {{orderItems.length}}
+                {{totalItems}}
               </template>
               <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
                 <g-icon>icon-menu2</g-icon>
@@ -41,66 +61,95 @@
             </g-badge>
             <div class="pos-order__info--total">{{ totalPrice | currency }}</div>
             <g-spacer/>
-            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 16px" @click="showOrder = true">CHECK OUT</g-btn-bs>
+            <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative; justify-content: flex-start" @click="showOrder = true" width="150">
+              {{$t('store.payment')}}
+              <div class="icon-payment">
+                <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+              </div>
+            </g-btn-bs>
           </div>
           <div class="pos-order__tab">
             <div class="pos-order__tab--icon">
-              <div class="pos-order__tab--icon-wrapper">
-                <g-icon>icon-fork</g-icon>
+              <g-icon>icon-fork</g-icon>
+            </div>
+            <div class="pos-order__tab--category" id="tab">
+              <div v-for="(category, index) in categoriesViewModel"
+                    :key="`tab_${index}`"
+                    :id="`tab_${category._id}`"
+                    @click="chooseCategory(category._id)"
+                    :style="getCategoryStyle(category)">
+                {{ category.name }}
               </div>
             </div>
-            <span v-for="(category, index) in categoriesViewModel"
-                  :key="`tab_${index}`"
-                  :id="`tab_${category._id}`"
-                  @click="chooseCategory(category._id)"
-                  :style="getCategoryStyle(category)">
-              {{ category.name }}
-            </span>
           </div>
           <div class="pos-order__tab--content" id="tab-content" ref="tab-content">
-            <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" class="mt-2">
-              <div class="sub-title">{{ category && category.name }}</div>
+            <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
+              <div class="sub-title mb-2">{{ category && category.name }}</div>
               <div class="pos-order__tab--content-main">
-                <div v-for="(item, index) in category.items" :key="index">
-                  <menu-item
-                      v-bind="item"
-                      :is-opening="isStoreOpening"
-                      :currency-unit="store.currency"
-                      :quantity="getQuantityInOrder(item)"
-                      @menu-item-selected="addItemToOrder(item)"
-                      @increase="addItemToOrder(item)"
-                      @decrease="removeItemFromOrder(item)"/>
-                </div>
+                <menu-item
+                    v-for="(item, index) in category.items" :key="index"
+                    v-bind="item"
+                    :is-opening="isStoreOpening"
+                    :currency-unit="store.currency"
+                    :quantity="getQuantityInOrder(item)"
+                    :disabled="menuItemDisabled"
+                    :collapse-text="store.collapseText"
+                    @menu-item-selected="addItemToOrder(item)"
+                    @increase="addItemToOrder(item)"
+                    @decrease="removeItemFromOrder(item)"/>
               </div>
             </div>
+            <div class="pos-order__tab--content-footer"></div>
           </div>
-          <order-table v-if="showOrder" @back="showOrder = false" :store="store" :is-opening="isStoreOpening"/>
+          <order-table v-if="showOrder" :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening"
+                       @back="showOrder = false" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
         <div class="pos-order__right">
-          <order-table :store="store" :is-opening="isStoreOpening" :merchant-message="merchantMessage"/>
+          <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems"  :is-opening="isStoreOpening" :merchant-message="merchantMessage"
+                       @confirm-view="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
-      
+
         <!-- Merchant dialog -->
         <g-dialog v-model="dialog.closed" persistent>
           <div class="dialog-closed">
-            <div class="dialog-closed__title">Merchant is temporarily closed</div>
+            <div class="dialog-closed__title">{{$t('store.merchantClose')}}</div>
             <div class="dialog-closed__message">{{ merchantMessage }}</div>
             <g-btn-bs text-color="indigo accent-2" @click="dialog.closed = false">OK</g-btn-bs>
           </div>
         </g-dialog>
+
+        <!-- Dialog Hour -->
+        <g-dialog v-model="dialog.hour" width="400" eager>
+          <div class="bg-white pa-5 r w-100 br-2">
+            <g-icon style="position: absolute; top: 16px; right: 16px" @click="dialog.hour = false" size="16">icon-close</g-icon>
+            <div class="fw-700 mb-2 fs-large">{{$t('store.openHours')}}:</div>
+            <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
+              <div>{{day.wdayString}}</div>
+              <div class="ta-right">{{day.open}} - {{day.close}}</div>
+            </div>
+            <template  v-if="deliveryInfo && deliveryInfo.length > 0">
+              <div class="fw-700 mb-2 mt-3 fs-large">Delivery:</div>
+              <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+                <div class="mr-2">{{info.title}}</div>
+                <div class="ta-right">{{info.value}}</div>
+              </div>
+            </template>
+          </div>
+        </g-dialog>
       </template>
     </div>
-  </div>
 </template>
 <script>
   import _ from 'lodash';
   import OrderTable from './OrderTable';
   import MenuItem from './MenuItem';
+  import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
+  import CreatedOrder from './CreatedOrder';
+  import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
 
   export default {
     name: 'OrderView',
-    injectService: ['PosOnlineOrderStore:(orderItems, increaseOrAddNewItems, decreaseOrRemoveItems)'],
-    components: { MenuItem, OrderTable},
+    components: { CreatedOrder, MenuItem, OrderTable},
     data: function () {
       return {
         selectedCategoryId: null,
@@ -109,12 +158,26 @@
         store: null,
         categories: null,
         products: null,
-        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        dayInWeeks: [
+          this.$t('common.weekday.monday'),
+          this.$t('common.weekday.tuesday'),
+          this.$t('common.weekday.wednesday'),
+          this.$t('common.weekday.thursday'),
+          this.$t('common.weekday.friday'),
+          this.$t('common.weekday.saturday'),
+          this.$t('common.weekday.sunday')
+        ],
         today: dayjs().format("dddd"),
         now: dayjs().format('HH:mm'),
         dialog: {
-          closed: false
+          closed: false,
+          hour: false
         },
+        throttle: null,
+        choosing: 0,
+        menuHour: false,
+        menuItemDisabled: false,
+        orderItems: [],
       }
     },
     filters: {
@@ -146,25 +209,27 @@
     },
     mounted() {
       //scroll
+      this.throttle = _.throttle(this.handleScroll, 100)
       this.$nextTick(() => {
         if(this.$refs) {
           if(!this.$refs.keys) {
             setTimeout(() => {
               const contentRef = this.$refs['tab-content']
-              contentRef && contentRef.addEventListener('scroll', this.handleScroll)
+              contentRef && contentRef.addEventListener('scroll', this.throttle)
+              // contentRef && disableBodyScroll(contentRef)
             }, 500)
           } else {
             const contentRef = this.$refs['tab-content']
-            contentRef && contentRef.addEventListener('scroll', () => {
-              console.log('scroll')
-            })
+            contentRef && contentRef.addEventListener('scroll', this.throttle)
           }
         }
+        smoothScrolling && smoothScrolling()
       })
     },
     beforeDestroy() {
       clearInterval(this.dayInterval)
-      this.$refs['tab-content'].removeEventListener('scroll', this.handleScroll)
+      this.$refs['tab-content'] && this.$refs['tab-content'].removeEventListener('scroll', this.throttle)
+      // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
       shippingFee() {
@@ -184,11 +249,14 @@
       totalPrice() {
         return _.sumBy(this.orderItems, item => item.price * item.quantity)
       },
+      totalItems() {
+        return _.sumBy(this.orderItems, item => item.quantity)
+      },
       categoriesViewModel() {
         const categories = _.cloneDeep(this.categories)
         const products = _.cloneDeep(this.products)
         _.each(categories, cate => {
-          cate.items = _.filter(products, p => p.category._id === cate._id)
+          cate.items = _.orderBy(_.filter(products, p => p.category._id === cate._id), 'position', 'asc')
         })
         return categories
       },
@@ -200,78 +268,178 @@
       },
       nextOpenHour() {
         if (this.todayOpenHour) {
-          if (this.get24HourValue(this.todayOpenHour.openTime) > this.now)
-            return {
-              day: this.dayInWeeks[this.dayInWeekIndex],
-              hour: this.todayOpenHour.openTime
+          for (const {openTime} of this.todayOpenHour) {
+            if (this.now < openTime)
+              return {
+                day: 'today',
+                hour: openTime
+              }
           }
         }
-        
+
         let dayInWeekIndex = this.dayInWeekIndex
         do {
           dayInWeekIndex++
-          if (dayInWeekIndex >= this.dayInWeeks.length - 1)
-            dayInWeekIndex = 0
+          if (dayInWeekIndex >= this.dayInWeeks.length - 1) dayInWeekIndex = 0
           let openHour = this.getOpenHour(dayInWeekIndex)
-          if (openHour) {
+
+          if (openHour && openHour.length > 0) {
             return {
-              hour: openHour.openTime,
-              day: dayInWeekIndex === this.dayInWeekIndex + 1 ? 'tomorrow' : this.dayInWeeks[dayInWeekIndex]
+              hour: openHour[0].openTime,
+              day: this.dayInWeeks[dayInWeekIndex]
             }
           }
         } while (dayInWeekIndex !== this.dayInWeekIndex)
       },
       merchantMessage() {
         if (this.nextOpenHour)
-          return `The merchant is temporarily closed and will not accept orders until ${this.nextOpenHour.hour } ${ this.nextOpenHour.day }. Please come back after that. We apologize for any inconvenience caused.`
-        return  'The merchant is temporarily closed. We apologize for any inconvenience caused.'
+          return `${this.$t('store.merchantClose1', {
+            0: this.nextOpenHour.day,
+            1: this.nextOpenHour.hour
+          })} `
+
+        return  `${this.$t('store.merchantClose2')}`
       },
       isStoreOpening() {
         if (this.todayOpenHour) {
-          return this.get24HourValue(this.todayOpenHour.openTime) <= this.now && this.now <= this.get24HourValue(this.todayOpenHour.closeTime)
+          for (const {openTime, closeTime} of this.todayOpenHour) {
+            if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) return true
+          }
         }
+
         return false
       },
       storeOpenStatus() {
-        return this.isStoreOpening ? '• Open' : '• Closed'
+        return this.isStoreOpening ? `• ${this.$t('store.open')}` : `• ${this.$t('store.closed')}`
       },
       storeOpenStatusStyle() {
         return {
-          color: this.isStoreOpening ? '#4CAF50' : "#424242",
-          'margin-right': '5px'
+          color: this.isStoreOpening ? '#4CAF50' : "#FF4452",
         }
       },
       storeWorkingTime() {
-        return this.todayOpenHour ? `${this.todayOpenHour.openTime} - ${this.todayOpenHour.closeTime}` : null
+        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        if (this.todayOpenHour) {
+          for (const {openTime, closeTime} of this.todayOpenHour) {
+            if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) {
+              return `${formatTime(openTime)} - ${formatTime(closeTime)}`
+            }
+          }
+        }
+        return null
+      },
+      storeWorkingDay() {
+        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        return this.store.openHours.map(oh => {
+          let days = []
+          for(let i = 0; i < oh.dayInWeeks.length; i++) {
+            const weekday = oh.dayInWeeks[i]
+            if(!weekday)
+              days.push({})
+            else {
+              if (days.length === 0) days.push({})
+              let day = _.last(days)
+              if(day.start) {
+                Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+              } else {
+                Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+              }
+            }
+          }
+          const wdayString = days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', ')
+          return { wdayString, open: formatTime(oh.openTime), close: formatTime(oh.closeTime) }
+        })
+      },
+      deliveryInfo() {
+        let info = []
+        if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
+          info.push(
+              {title: 'Minimum order', value: `${$t('common.currency')}${this.store.minimumOrderValue.value}`}
+          )
+        }
+        if (this.store.deliveryFee) {
+          let min = (_.minBy(this.store.deliveryFee.fees, 'fee')).fee
+          let max = (_.maxBy(this.store.deliveryFee.fees, 'fee')).fee
+
+          if (this.store.deliveryFee.acceptOrderInOtherZipCodes) {
+            if (min > this.store.deliveryFee.defaultFee)
+              min = this.store.deliveryFee.defaultFee
+            if (max < this.store.deliveryFee.defaultFee)
+              max = this.store.deliveryFee.defaultFee
+          }
+
+          info.push({
+            title: 'Delivery fee',
+            value: `${$t('common.currency')}${min} - ${$t('common.currency')}${max}`
+          })
+        }
+        return info
       }
     },
     methods: {
-      getOpenHour(dayInWeekIndex) {
-        for (let openHour of this.store.openHours) {
-          if (openHour.dayInWeeks[dayInWeekIndex])
-            return _.pick(openHour, 'openTime', 'closeTime')
+      increaseOrAddNewItems(item) {
+        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
+        if (indexOfItem < 0) {
+          this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
+          this.$nextTick(() => {
+            const textarea = document.getElementById('item_note_'+(this.orderItems.length-1))
+            textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px');
+            textarea.addEventListener('input', function() {
+              this.style.height = 'auto'
+              this.style.height = (this.scrollHeight) + 'px'
+            }, false)
+          })
+        } else {
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
+          this.orderItems.splice(indexOfItem, 1, item)
         }
       },
-      get24HourValue(time) {
-        time = _.toLower(time)
-        return _.includes(time, 'm') ? dayjs(time, 'hh:mma').format('HH:mm') : time
+      decreaseOrRemoveItems(item) {
+        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
+        if (indexOfItem < 0)
+          return;
+        if (this.orderItems[indexOfItem].quantity > 1) {
+          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity - 1})
+          this.orderItems.splice(indexOfItem, 1, item)
+        } else {
+          const textarea = document.getElementById('item_note_' + indexOfItem)
+          textarea.removeEventListener('input', function() {
+            this.style.height = 'auto'
+            this.style.height = (this.scrollHeight) + 'px'
+          })
+          this.orderItems.splice(indexOfItem, 1)
+        }
+      },
+      clearOrder() {
+        this.orderItems.splice(0, this.orderItems.length)
+      },
+      getOpenHour(dayInWeekIndex) {
+        const openHours = []
+
+        this.store.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
+          if (dayInWeeks[dayInWeekIndex]) {
+            openHours.push({openTime, closeTime})
+          }
+        })
+
+        return openHours
       },
       async loadStore() {
         this.$set(this, 'store', await cms.getModel('Store').findOne({_id: this.store._id}))
       },
       async loadCategories() {
-        this.$set(this, 'categories', await cms.getModel('Category').find({ store: this.store._id }, { store: 0 }))
+        const categories = await cms.getModel('Category').find({ store: this.store._id }, { store: 0 })
+        this.$set(this, 'categories', _.orderBy(categories, 'position', 'asc'))
       },
       async loadProducts() {
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))
       },
       getCategoryStyle(cate) {
-        const common = {cursor: 'pointer', padding: '20px 24px', whiteSpace: 'nowrap', '-webkit-tap-highlight-color': 'transparent'};
         return cate._id === this.selectedCategoryId ? {
           fontWeight: 'bold',
           borderBottom: '2px solid #000',
-          color: '#000000', ...common
-        } : {borderBottom: '2px solid transparent', color: '#424242', ...common}
+          color: '#000000',
+        } : {borderBottom: '2px solid transparent', color: '#424242'}
       },
       addItemToOrder(item) {
         this.increaseOrAddNewItems(item)
@@ -286,13 +454,14 @@
         return 0
       },
       elementInWrapper(el) {
-        const {top} = el.getBoundingClientRect()
+        const {top, bottom} = el.getBoundingClientRect()
 
         const wrapper = document.getElementById('tab-content').getBoundingClientRect()
 
-        return top >= wrapper.top;
+        return top >= wrapper.top || bottom >= wrapper.bottom - 100;
       },
       handleScroll() {
+        if(this.choosing > 0) return
         const categoryInViewPort = this.categories.map(c => c._id).map(id => {
           const el = document.getElementById(`category_content_${id}`);
           if(this.elementInWrapper(el)) {
@@ -300,23 +469,31 @@
           }
         })
         this.selectedCategoryId = categoryInViewPort.filter(c => !!c)[0]
+        const wrapper = document.getElementById('tab-content')
+        if(!this.selectedCategoryId || (wrapper.offsetHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
+          this.selectedCategoryId = _.last(this.categories)._id
+        }
       },
       chooseCategory(id) {
-        this.selectedCategoryId = id
+        this.choosing++
         const wrapper = document.getElementById('tab-content')
         const content = document.getElementById(`category_content_${id}`)
         if(wrapper && content) {
-          wrapper.scrollTop = (content.offsetTop - wrapper.offsetTop)
+          wrapper.scroll({top: content.offsetTop - wrapper.offsetTop, left: 0, behavior: "smooth"})
+          this.selectedCategoryId = id
+          setTimeout(() => {
+            this.choosing--
+          }, 1000)
         }
-      }
+      },
     },
     watch: {
       selectedCategoryId(val) {
         const tab = document.getElementById(`tab_${val}`)
+        const wrapper = document.getElementById('tab')
         if(tab) {
-          const wrapper = tab.offsetParent
-          const icon = wrapper.firstChild
-          wrapper.scrollLeft = (tab.offsetLeft - icon.offsetWidth)
+          const siblingWidth = tab.previousSibling ? tab.previousSibling.offsetWidth : 0
+          wrapper.scroll({top: 0, left: (tab.offsetLeft - siblingWidth/2 - wrapper.offsetLeft), behavior: "smooth"})
         }
       }
     }
@@ -324,14 +501,15 @@
 </script>
 <style scoped lang="scss">
   .pos-order {
-    box-sizing: border-box;
     display: flex;
-    width: 100vw;
+    width: 100%;
     max-width: 1140px;
-    margin: 0 auto;
-    height: 100vh;
+    height: 100%;
+    max-height: 100%;
     background-color: #FFF;
     box-shadow: 0 0 2px 2px #D5D5D5;
+    overflow: hidden;
+    align-self: center;
 
     &__left {
       flex: 1;
@@ -355,7 +533,7 @@
           font-size: 15px;
           color: #424242;
           font-weight: 300;
-          margin-top: 8px;
+          padding-top: 8px;
 
           .phone-image {
             width: 24px;
@@ -422,38 +600,54 @@
       background-color: #F8F8F8;
       flex: 0 0 64px;
       margin-top: 16px;
-      align-items: center;
+      align-items: stretch;
       border-top-right-radius: 24px;
       border-bottom-right-radius: 24px;
-      overflow: auto hidden;
+      overflow: hidden;
       position: relative;
       border-right: 16px solid #F8F8F8;
       font-size: 15px;
-      scroll-behavior: smooth;
-      scrollbar-width: none; // firefox
-
-      &::-webkit-scrollbar {
-        display: none;
-      }
+      /*scroll-behavior: smooth;*/
 
       &--icon {
         display: flex;
         align-items: center;
-        height: 100%;
-        position: sticky;
-        left: 0;
         background-color: #F8F8F8;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        padding: 8px 16px;
+        border-right: 1px solid #000;
+      }
 
-        &-wrapper {
-          margin-top: 8px; margin-bottom: 8px; padding: 8px 16px; border-right: 1px solid #000;
+      &--category {
+        height: 100%;
+        display: flex;
+        overflow: auto;
+        scrollbar-width: none; // firefox
+        -ms-overflow-style: none; //edge
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        div {
+          cursor: pointer;
+          display : flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 24px;
+          white-space: nowrap;
+          -webkit-tap-highlight-color: transparent;
         }
       }
 
       &--content {
+        flex: 1;
         margin-top: 30px;
-        overflow: hidden auto;
-        scroll-behavior: smooth;
+        overflow: auto;
+        /*scroll-behavior: smooth;*/
         scrollbar-width: none; // firefox
+        -ms-overflow-style: none; //edge
 
         &::-webkit-scrollbar {
           display: none;
@@ -463,16 +657,26 @@
           flex: 1;
           display: flex;
           flex-direction: column;
-          overflow: hidden auto;
+          overflow: hidden;
           margin-bottom: 5px;
+
+
+          & .po-menu-item:not(:last-child) {
+            border-bottom: 1px solid rgba(204, 204, 204, 0.4);
+          }
         }
       }
     }
   }
 
-  @media screen and (max-width: 1040px) {
+  @media screen and (max-width: 1139px) {
     .pos-order__left {
       padding: 0;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
 
       .pos-order__left__header {
         & > img {
@@ -510,28 +714,20 @@
           }
         }
       }
-  
+
       .title {
         font-size: 20px;
         margin: 4px 8px 8px;
       }
-      
+
       .pos-order__tab {
         border-radius: 0;
-        overflow: auto;
+        overflow: hidden;
         position: relative;
-
-        &::-webkit-scrollbar {
-          display: none;
-        }
+        flex-basis: 48px;
+        margin-top: 8px;
 
         &--icon {
-          position: sticky;
-          top: 0;
-          left: 0;
-          padding: 0;
-          background: #F8F8F8;
-
           img {
             width: 24px;
             height: 24px;
@@ -542,6 +738,7 @@
         &--content {
           padding-left: 16px;
           padding-right: 16px;
+          margin-top: 4px;
 
           .sub-title {
             font-size: 18px;
@@ -552,6 +749,7 @@
       .pos-order__info {
         display: flex;
         position: fixed;
+        z-index: 5;
         bottom: 0;
         width: 100%;
         border-top-right-radius: 32px;
@@ -566,8 +764,8 @@
           margin-left: 16px;
         }
 
-        & ~ .pos-order__tab--content .pos-order__tab--content-main {
-          margin-bottom: 80px;
+        & ~ .pos-order__tab--content .pos-order__tab--content-footer {
+          height: 80px;
         }
       }
 
@@ -578,7 +776,9 @@
         position: fixed;
         top: 0;
         left: 0;
-        height: calc(100% - 72px);
+        bottom: 0;
+        right: 0;
+        height: 100%;
       }
     }
 
@@ -590,8 +790,18 @@
   }
 
   @media screen and (max-width: 350px) {
-    .pos-order__left .pos-order__left__header .pos-order__left__header--info {
-      font-size: 12px;
+    .pos-order__left .pos-order__left__header {
+      img {
+        max-height: 50px;
+        max-width: 90px;
+        margin-top: 4px;
+        margin-left: 4px;
+      }
+
+      .pos-order__left__header--info {
+        font-size: 12px;
+        margin-right: 4px;
+      }
     }
   }
 
@@ -616,6 +826,32 @@
       color: #424242;
       padding-bottom: 36px;
       border-bottom: 1px solid #EFEFEF;
+    }
+  }
+
+  .menu-hour {
+    padding: 16px;
+    background: white;
+    border-radius: 2px;
+    min-width: 280px;
+  }
+
+  .icon-payment {
+    position: absolute;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    right: 4px;
+    top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 1139px) {
+    .menu-hour {
+      display: none;
     }
   }
 </style>

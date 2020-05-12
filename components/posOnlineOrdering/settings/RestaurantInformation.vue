@@ -2,10 +2,10 @@
   <div class="restaurant-info">
     <div class="restaurant-info__title">Store Information</div>
     <div class="restaurant-info__main" v-if="store">
-      <div>
-        <div class="restaurant-info__main--left">
+      <div class="restaurant-info__main--left">
+        <div>
           <div class="mb-3 fw-700">Basic info</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto 1fr; grid-gap: 5px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto 1fr 1fr; grid-gap: 5px">
             <g-text-field-bs large label="Store Name"
                              placeholder="Store Name"
                              :value="store.name"
@@ -21,12 +21,26 @@
                           :value="store.address"
                           @input="updateDebounce({ address: $event })"/>
             </div>
-            <g-text-field-bs label="Zip code"
+            <g-text-field-bs large label="Zip code"
                              :value="store.zipCode"
                              @input="updateDebounce({zipCode: $event})"/>
-            <g-text-field-bs label="Town/City"
+            <g-text-field-bs large label="Town/City"
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
+            <div class="span-2">
+              <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country" @input="updateDebounce({country: $event})"/>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div class="mb-3 fw-700">Embed Code</div>
+          <div>
+            <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" no-resize :value="iframe"></g-textarea>
+            <div class="row-flex align-items-center" style="cursor: pointer">
+              <g-icon size="14" color="#536DFE" class="mr-1 mb-1">icon-chain-blue</g-icon>
+              <span style="color: #536DFE; cursor: pointer" @click.stop="copyCode">Copy Code</span>
+              <g-spacer/>
+            </div>
           </div>
         </div>
       </div>
@@ -47,7 +61,7 @@
 <script>
   import UploadZone from './UploadZone';
   import _ from 'lodash'
-  
+
   // TODO:
   // - remove old image when user change to new image
   // - input debounce
@@ -59,17 +73,36 @@
       store: Object
     },
     data: function () {
-      return {}
+      return {
+        countries: [
+          {name: 'Germany', locale: 'de'},
+          {name: 'United State', locale: 'en'},
+          {name: 'United Kingdom', locale: 'en'},
+          {name: 'Australia', locale: 'en'},
+          {name: 'Canada', locale: 'en'},
+          {name: 'France', locale: 'fr'},
+          {name: 'Italy', locale: 'it'},
+          {name: 'Singapore', locale: 'en'},
+        ],
+        country: this.store.country || ''
+      }
     },
-    computed: {},
+    computed: {
+      iframe() {
+        const storeUrl = [location.origin, 'store', this.store.alias].join('/');
+        return `<div id="embed-btn" data-store="snack1" data-url="${storeUrl}" style="font-family: Muli, sans-serif; color: white; background: #536dfe;font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent;">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
+      }
+    },
     created() {
       this.updateDebounce = _.debounce(this.update, 1000)
     },
     methods: {
       async update(change) {
-        console.log('update', change)
         this.$emit('update', change)
       },
+      async copyCode() {
+        await navigator.clipboard.writeText(this.iframe)
+      }
     }
   }
 </script>
@@ -105,6 +138,12 @@
         margin-right: 4px;
         width: calc(100% - 5px);
 
+        ::v-deep .g-tf {
+          &:before, &:after {
+            display: none;
+          }
+        }
+
         ::v-deep fieldset {
           border-width: 1px !important;
           border-color: #ced4da;
@@ -126,6 +165,7 @@
 
           textarea {
             user-select: text !important;
+            max-height: 120px;
           }
         }
       }

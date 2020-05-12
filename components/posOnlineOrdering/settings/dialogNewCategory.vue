@@ -41,7 +41,6 @@
       },
       submit() {
         this.$emit('submit', this.category, (response) => {
-          console.log(response)
           if (response.ok)
             this.close()
           else

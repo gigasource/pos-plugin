@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.0.0",
+  "version": "1.0.13",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,6 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
-    "@gigasource/nodejs-proxy-server": "^1.0.5",
-    "@gigasource/socket.io-p2p-plugin": "^1.7.5",
     "clone-buffer": "^1.0.0",
     "cropperjs": "^1.5.6",
     "dayjs": "^1.8.17",
@@ -29,6 +27,7 @@
     "q": "^1.5.1",
     "queue": "^6.0.1",
     "randomstring": "^1.1.5",
+    "semver": "^7.3.2",
     "tmp-promise": "^2.0.2",
     "uuid": "^3.3.3"
   }

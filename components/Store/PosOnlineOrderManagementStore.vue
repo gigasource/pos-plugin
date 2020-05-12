@@ -1,27 +1,32 @@
 <template>
-  <g-snackbar v-model="showSnackbar" top right color="#536dfe">{{message}}</g-snackbar>
+  <g-snackbar v-model="snackbar.show" top right :color="`${snackbar.error ? '#ff4452' : '#536dfe'}`">{{snackbar.message}}</g-snackbar>
 </template>
 <script>
   import _ from 'lodash'
+  import semverSort from 'semver/functions/sort'
+
   export default {
     name: 'PosOnlineOrderManagementStore',
     domain: 'PosOnlineOrderManagementStore',
     data: function () {
       return {
         // common
-        showSnackbar: false,
-        message: '',
-        
+        snackbar: {
+          show: false,
+          message: '',
+          error: false
+        },
+
         // store management
         storeGroups: [],
         stores: [],
         searchText: null,
         orderBy: null,
-        
+
         // version control
         apps: [],
         appItems: [],
-        appShows: {},
+        appShows: {}, /*indicate whether app's item of an app will be shown or not*/
         versionControlOrderBy: { order: 'desc', type: 'uploadDate' },
 
         // account management
@@ -40,21 +45,18 @@
       storeGroupNames() {
         return _.map(this.storeGroups, sg => sg.name)
       },
-      storeAlias() {
-        return _.map(this.stores, s => _.toLower(s.alias))
-      },
       searchTextLowerCase() {
         return _.lowerCase(this.searchText)
       },
+      storeFilters() {
+        const search = this.searchTextLowerCase
+        if (search)
+          return store => _.includes(_.lowerCase(store.settingName), search) || _.includes(_.lowerCase(store.settingAddress), search) || _.includes(store.id, search)
+        return null
+      },
       storeSearchSortResult() {
         // apply search
-        const filters = []
-        if (this.searchTextLowerCase) {
-          filters.push(store => _.includes(_.lowerCase(store.settingName), this.searchTextLowerCase))
-          filters.push(store => _.includes(_.lowerCase(store.settingAddress), this.searchTextLowerCase))
-          filters.push(store => _.includes(store.id, this.searchTextLowerCase))
-        }
-        const stores = !this.searchTextLowerCase ? this.stores : _.filter(this.stores, store => _.some(_.map(filters, f => f(store))))
+        const stores = this.storeFilters ? _.filter(this.stores, this.storeFilters) : this.stores
         // apply sort
         switch (this.orderBy) {
           case 'lastUpdated': return _.orderBy(stores, 'addedDate', 'desc')
@@ -66,14 +68,15 @@
       },
       storeManagementViewModel() {
         const storeGroupVMs = _.map(this.storeGroups, group => ({
-          ..._.pick(group, '_id', 'name'),
-          stores: _.map(_.filter(this.storeSearchSortResult, store => this.storeInStoreGroup(store, group)), this.convertStoreToViewModel)
+          _id: group._id,
+          name: group.name,
+          stores: _.map(_.filter(this.storeSearchSortResult, store => this.storeInGroup(store, group)), this.convertStoreToViewModel)
         }))
         if (this.searchText)
-          return _.filter(storeGroupVMs, this.storeGroupHasStores)
+          return _.filter(storeGroupVMs, storeGroupVM => storeGroupVM.stores.length > 0)
         return storeGroupVMs
       },
-      
+
       // version control
       appNames() {
         return _.map(this.apps, app => app.name)
@@ -121,13 +124,17 @@
           return appViewModel
         })
       },
-      
+
       // accounts
       lowerCaseAccountSearch() {
         return _.lowerCase(this.accountSearch)
       },
       searchAndFilteredAccounts() {
-        const filters = [acc => acc]
+        // TODO: Optimize
+        
+        // return only account created by user
+        // automatically created account which linked with specified store will not be returned
+        const filters = [acc => acc.store == null || acc.store.length === 0]
         if (this.accountSearch)
           filters.push(acc => _.lowerCase(acc.name).indexOf(this.lowerCaseAccountSearch) > -1)
         if (this.accountFilter.createdBy)
@@ -142,13 +149,13 @@
         return _.map(this.searchAndFilteredAccounts, account => {
           const perms = _.map(_.filter(account.permissions, perm => perm.value), perm => _.omit(perm, '_id'))
           return {
-            // will be used in dialogAccount.vue
+            // used in dialogAccount.vue
             storeGroups: _.map(account.storeGroups, sg => sg._id),
             permissions: perms,
-            // will be used to show in Account.vue
+            // show in Account.vue
             ..._.pick(account, '_id', 'name', 'username', 'active'),
             storeGroupsStr: _.join(_.map(account.storeGroups, sg => sg.name), ', '),
-            totalStore: _.filter(this.stores, store => _.some(_.map(account.storeGroups, group => this.storeInStoreGroup(store, group)))).length,
+            totalStore: _.filter(this.stores, store => _.some(_.map(account.storeGroups, group => this.storeInGroup(store, group)))).length,
             totalPermissions: perms.length,
             createdBy: account.createdBy && account.createdBy.username,
             status: account.active ? 'active' : 'disabled',
@@ -156,9 +163,6 @@
             menu: false,
           }
         })
-      },
-      managerUsersViewModel() {
-        return _.map(this.managerUsers, user => ({ text: user.username, value: user._id }))
       },
       availableGroupsViewModel() {
         return _.map(this.storeGroups, group => ({ text: group.name, value: group._id }))
@@ -173,28 +177,35 @@
     },
     methods: {
       // common
-      showMessage(message) {
-        this.message = message
-        this.showSnackbar = true
+      showMessage(message, error = true) {
+        this.snackbar.message = message
+        this.snackbar.error = error
+        this.snackbar.show = true
       },
       showSavedMessage() {
-        this.showMessage('Saved')
+        this.showMessage('Saved', false)
       },
-      
+
       // view model helper methods
       convertStoreToViewModel(store) {
         return {
           ..._.omit(store, 'devices'),
           devices: _.map(store.devices, device => {
             const app = _.find(this.versionControlViewModel, app => app.group === device.appName)
-            const appItem = _.filter(app && app.files, appItem => appItem.version > device.appVersion)
-            const deviceVersions = _.orderBy(_.map(appItem, this.convertAppItemToViewModel), 'text', 'desc')
+            const appItem = _.filter(app && app.files, appItem => semverSort([appItem.version, device.appVersion])[1] === appItem.version)
+
+            const deviceVersions = appItem.map(this.convertAppItemToViewModel)
+            const deviceVersionMap = _.keyBy(deviceVersions, 'version')
+            const versions = semverSort(Object.keys(deviceVersionMap)).reverse().map(key => deviceVersionMap[key])
+
             return {
               ...device,
               // store all version of device's app
-              versions: deviceVersions,
+              versions,
               // store selected version to update, default set to latest version
               updateVersion: deviceVersions.length && deviceVersions[0].value,
+              // boolean value used to prevent the user update twice
+              canUpdate: true
             }
           })
         }
@@ -210,13 +221,10 @@
           release: appItem.release
         }
       },
-      storeGroupHasStores(storeGroupVM) {
-        return storeGroupVM.stores.length > 0
-      },
-      storeInStoreGroup(store, storeGroup) {
+      storeInGroup(store, storeGroup) {
         return _.find(store.groups, group => group._id === storeGroup._id)
       },
-      
+
       // store groups
       async loadStoreGroups() {
         let storeGroups
@@ -229,7 +237,7 @@
       },
       async addGroup(name) {
         if (_.includes(this.storeGroupNames, name)) {
-          alert('This name is already taken!')
+          this.showMessage('This name is already taken!')
           return
         }
         const createdGroup = await cms.getModel('StoreGroup').create({ name })
@@ -240,55 +248,43 @@
       },
       async changeStoreGroupName(_id, name, cb) {
         if (_.includes(this.storeGroupNames, name)) {
-          alert('This name is already taken!')
+          this.showMessage('This name is already taken!')
           cb && cb(false)
+          return
         }
         await cms.getModel('StoreGroup').updateOne({_id}, {name})
         await this.loadStoreGroups()
         cb && cb(true)
       },
       async deleteStoreGroup(_id) {
+        // cause be only allow the user to delete empty store group so we don't need to update store
         await cms.getModel('StoreGroup').remove({_id})
+        await cms.updateUserSession()
         await this.loadStoreGroups()
       },
 
       // stores
       async loadStores() {
         const storeGroupIds = _.map(this.storeGroups, sg => sg._id)
-        const stores = await cms.getModel('Store').find({ groups: { $elemMatch: { $in: storeGroupIds } } })
+        const stores = await cms.getModel('Store').find({groups: {$elemMatch: {$in: storeGroupIds}}})
         this.stores.splice(0, this.stores.length, ...stores)
+        await this.checkDeviceOnlineStatus()
       },
-      async addStore({ settingName, groups, settingAddress }) {
-        const alias = this.getUniqueStoreAlias(_.toLower(settingName))
-        const id = await this.getUniqueStoreId()
-        await cms.getModel('Store').create({
-          id, settingName, settingAddress, alias, groups,
-          addedDate: dayjs(),
-          openHours: [
-            {
-              dayInWeeks: [true, true, true, true, true, true, true],
-              openTime: '06:30',
-              closeTime: '22:30'
-            }
-          ],
-          pickup: true
+      checkDeviceOnlineStatus() {
+        return new Promise(resolve => {
+          window.cms.socket.emit('getOnlineDeviceIds', async onlineDeviceIds => {
+            this.stores.forEach(({devices}) => {
+              devices.forEach(device => this.$set(device, 'online', onlineDeviceIds.includes(device._id)))
+            })
+            resolve()
+          })
         })
+      },
+      async addStore({ settingName, settingAddress, groups, country }) {
+        await axios.post('/store/new-store', { settingName, settingAddress, groups, country })
         await this.loadStores()
       },
-      
-      getUniqueStoreAlias(alias) {
-        let ctr = 0
-        let newAlias
-        do {
-          ctr++
-          newAlias = alias + ctr
-        } while(_.includes(this.storeAlias, newAlias))
-        return newAlias
-      },
-      async getUniqueStoreId() {
-        return (await axios.get('/store/generate-id')).data.id
-      },
-      
+
       async removeStore(groupId, store) {
         const indexOfGroup = _.findIndex(store.groups, g => g._id === groupId)
         store.groups.splice(indexOfGroup, 1)
@@ -300,21 +296,21 @@
           await this.loadStores()
         }
       },
-      
+
       async updateStore(_id, change) {
         await cms.getModel('Store').findOneAndUpdate({_id}, {...change})
         this.showSavedMessage()
         await this.loadStores()
       },
-      
+
       // devices
-      
+
       async removeDevice(_id) {
         await axios.post(`/device/unregister`, { _id })
         window.cms.socket.emit('unpairDevice', _id)
         await this.loadStores()
       },
-      
+
       async updateDevice(_id, change) {
         await cms.getModel('Device').updateOne({_id}, change)
         // load store will reload devices
@@ -326,25 +322,29 @@
         socket.emit('updateAppFeature', _id, features)
         await cms.getModel('Device').updateOne({_id}, { features })
         cb && cb()
-        // TODO: update device version UI
       },
 
       async updateDeviceAppVersion(device) {
         if (!device.updateVersion)
           return
+        
+        // prevent re-update
+        // TODO: UX
+        device.canUpdate = false
+        
         const {socket} = window.cms
         socket.emit('updateApp', device._id, device.updateVersion)
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
-        // TODO: update UI
+        // TODO: Update device version in UI
       },
-      
+
       // apps
       async loadApps() {
         const apps = await cms.getModel('App').find({})
         this.apps.splice(0, this.apps.length, ...apps)
       },
-      
+
       async addApp(name, callback) {
         if (_.includes(this.appNames, name)) {
           callback && callback({ ok: false, message: 'App name has been taken!' })
@@ -354,7 +354,7 @@
           await this.loadApps()
         }
       },
-      
+
       async changeAppName(_id, name, callback) {
         let app = _.find(this.apps, app => app.name === name)
         if (app) {
@@ -376,20 +376,21 @@
         callback && callback({ ok: true })
         await this.loadApps()  // TODO: just change app name, consider setting value locally without loadApps
       },
-      
+
       // appItems
       async loadAppItems() {
         const appItems = await cms.getModel('AppItem').find({})
         this.appItems.splice(0, this.appItems.length, ...appItems)
       },
-      
+
       async uploadAppItem({ file, group, version, type, base, release, note }) {
-        await this.$getService('FileUploadStore').prepareUploadAppFolder(file.name, version)
-        const uploadPath = await this.$getService('FileUploadStore').uploadApp(file, version)
+        const appItemGroupName = _.find(this.apps, app => app._id === group).name
+        await this.$getService('FileUploadStore').prepareUploadAppFolder(appItemGroupName, version)
+        const uploadPath = await this.$getService('FileUploadStore').uploadApp(appItemGroupName, file, version)
         await cms.getModel('AppItem').create({ version, type, changeLog: note, uploadPath, uploadDate: new Date(), app: group, baseVersion: base, release })
         await this.loadAppItems()
       },
-      
+
       async editAppItem(_id, { release, note }) {
         const appItem = await cms.getModel('AppItem').findOne({_id})
         if (!appItem)
@@ -397,7 +398,7 @@
         await cms.getModel('AppItem').updateOne({_id}, { changeLog: note, release })
         await this.loadAppItems()
       },
-      
+
       async removeAppItem(_id) {
         const appItem = await cms.getModel('AppItem').findOne({_id})
         // delete file in file explorer
@@ -409,7 +410,7 @@
           await this.loadAppItems()
         }
       },
-      
+
       toggleHideShowApp(_id) {
         if (_.has(this.appShows, _id)) {
           this.appShows[_id] = !this.appShows[_id]
@@ -429,7 +430,7 @@
           this.versionControlOrderBy.order = 'asc'
         }
       },
-      
+
       // Account Management
       async loadAccounts() {
         const accounts = await cms.getModel('User').find({ createdBy: cms.loginUser.user._id })
@@ -458,11 +459,10 @@
           role: userRole._id,
           createdBy: cms.loginUser.user._id
         })
-        
+
         await this.loadAccounts()
       },
       async editAccount(_id, change) {
-        console.log(change)
         if (change.username && _.find(this.accounts, acc => acc.username === change.username && acc._id !== _id)) {
           this.showMessage('Email address has been taken!')
           return
@@ -488,38 +488,43 @@
 
         // stores
         stores: this.stores,
-        storeAlias: this.storeAlias,
         loadStores: this.loadStores,
         addStore: this.addStore,
         removeStore: this.removeStore,
         updateStore: this.updateStore,
-        
+
         // store management display model
         storeManagementViewModel: this.storeManagementViewModel,
         searchText: this.searchText,
         orderBy: this.orderBy,
-        
+
         // devices
         removeDevice: this.removeDevice,
         updateDevice: this.updateDevice,
         updateDeviceFeatures: this.updateDeviceFeatures,
         updateDeviceAppVersion: this.updateDeviceAppVersion,
-        
+
         // apps
         apps: this.apps,
         loadApps: this.loadApps,
         addApp: this.addApp,
         changeAppName: this.changeAppName,
-        
+
         // app items
         loadAppItems: this.loadAppItems,
         uploadAppItem: this.uploadAppItem,
         editAppItem: this.editAppItem,
         removeAppItem: this.removeAppItem,
         appItems: this.appItems,
-        
+
+        // version control
+        versionControlViewModel: this.versionControlViewModel,
+        newAppItemDialogViewModel: this.newAppItemDialogViewModel,
+        versionControlOrderBy: this.versionControlOrderBy,
+        toggleHideShowApp: this.toggleHideShowApp,
+        sortAppItem: this.sortAppItem,
+
         // account management
-        managerUsersViewModel: this.managerUsersViewModel,
         availableGroupsViewModel: this.availableGroupsViewModel,
         accountViewModel: this.accountViewModel,
         accountSearch: this.accountSearch,
@@ -528,14 +533,6 @@
         createAccount: this.createAccount,
         editAccount: this.editAccount,
         deleteAccount: this.deleteAccount,
-        
-        
-        //
-        versionControlViewModel: this.versionControlViewModel,
-        newAppItemDialogViewModel: this.newAppItemDialogViewModel,
-        versionControlOrderBy: this.versionControlOrderBy,
-        toggleHideShowApp: this.toggleHideShowApp,
-        sortAppItem: this.sortAppItem,
       }
     }
   }

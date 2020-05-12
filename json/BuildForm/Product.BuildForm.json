@@ -1,8 +1,6 @@
 {
   "_id": "5c46e1c05889c52fe001ab7b",
-  "__v": 0,
   "alwaysLoad": true,
-  "class": null,
   "extensions": [],
   "fields": [
     {
@@ -22,10 +20,22 @@
       "default": null
     },
     {
+      "_id": "5e858f13b7b7b30cc39f25c4",
+      "schemaType": "string",
+      "key": "desc",
+      "type": "input"
+    },
+    {
       "_id": "5e870a27d06a901255871a64",
       "schemaType": "string",
       "key": "image",
       "type": "input"
+    },
+    {
+      "_id": "5eb3b5de9456427e2515e524",
+      "schemaType": "boolean",
+      "key": "showImage",
+      "type": "input@checkbox"
     },
     {
       "_id": "5c46e2065889c52fe001ab7c",
@@ -42,12 +52,6 @@
       "type": "input@number",
       "label": "",
       "flex": "md4"
-    },
-    {
-      "_id": "5e858f13b7b7b30cc39f25c4",
-      "schemaType": "string",
-      "key": "desc",
-      "type": "input"
     },
     {
       "_id": "5c5eda4514922b1ee01777a3",
@@ -123,11 +127,19 @@
         }
       ],
       "type": "array"
+    },
+    {
+      "_id": "5eb125aec1ff1546fc822115",
+      "schemaType": "number",
+      "key": "position",
+      "type": "input@number"
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",
   "name": "Product",
   "tabs": [],
   "type": "Collection",
-  "title": "name"
+  "title": "name",
+  "__v": 0,
+  "class": null
 }

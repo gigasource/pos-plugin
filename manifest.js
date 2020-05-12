@@ -1,4 +1,5 @@
 module.exports = {
+  onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // {
     //   loader: {

@@ -2,34 +2,89 @@
   <g-dialog v-model="internalValue" width="464" overlayOpacity="0.2" eager persistent>
     <div class="cpn-order-created">
       <div class="cpn-order-created__header">
-        <div class="mt-2">Order Successfully</div>
+        <div class="mt-2">{{$t('store.orderSuccessfully')}}</div>
       </div>
       <div class="cpn-order-created__content">
-        <div v-for="(item, index) in order.items" :key="index" class="order-detail">
-          <div class="order-detail__index" >{{ item.quantity || 1}}</div>
-          <div class="order-detail__name">{{ item.name }}</div>
-          <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+        <!-- Order progress -->
+        <div style="text-align: center">
+          <div class="order-progress">
+            <div style="position:relative; background-color: #EEEEEE; border-radius: 50%; display: inline-block;">
+              <g-progress-circular v-if="waitingConfirm" :rotate="-90" :size="circularSize" width="4" :value="confirmProgress" color="#536DFE"/>
+              <div v-if="waitingConfirm && remainConfirmTime < orderProcessTimeOut * 3/4" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #424242; font-weight: bold; font-size: 18px;">{{ roundedRemainConfirmTIme }}</div>
+              <div v-if="orderHasBeenProcessed || orderMissed" style="padding: 4px;">
+                <div :style="actResultDivStyle">
+                  <img draggable="false" v-if="confirmed" src="/plugins/pos-plugin/assets/order-progress--confirmed.svg">
+                  <img draggable="false" v-else-if="cancelled || orderMissed" src="/plugins/pos-plugin/assets/order-progress--cancelled.svg">
+                </div>
+              </div>
+            </div>
+            <div class="order-message">
+              <div v-if="waitingConfirm" v-html>{{ waitingConfirmMessage }}</div>
+              <div v-else-if="orderMissed">
+                <div style="color: #E57373">{{$t('store.orderMissed')}}</div>
+                <i18n path="store.apology" tag="div" for="store.tryAgain">
+                  <span class="link-try-again" @click="tryAgain">{{$t('store.tryAgain')}}</span>
+                </i18n>
+              </div>
+              <div v-else-if="confirmed">
+                <div>{{$t('store.orderConfirmed')}}</div>
+                <div style="font-weight: bold">{{ deliveryTime }}</div>
+              </div>
+              <div v-else-if="cancelled">
+                <div style="color: #E57373">{{$t('store.orderCancelled')}}</div>
+                <div style="color: #747474" v-if="cancelledReason">{{$t('store.reason')}}: {{ cancelledReason }}</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="mt-2 row-flex fs-small">
-          <span>Total <b>{{ order.items && order.items.length }}</b> items</span>
-          <g-spacer/>
-          <span>{{ order.totalPrice | currency }}</span>
-        </div>
-        <div class="order-detail">
-          <span>Shipping fee:</span>
-          <g-spacer/>
-          <span>{{ order.shippingFee | currency }}</span>
-        </div>
-        <div class="mt-2 row-flex fw-700 fs-small">
-          <span>Total</span>
-          <g-spacer/>
-          <span>{{ (order.totalPrice + order.shippingFee) | currency}}</span>
-        </div>
-        <div class="cpn-order-created__message">Please enter your email address if you would like to receive notifications for future discount & promotion.</div>
-        <g-text-field v-model="email" prepend-icon="email" label="Email"/>
+
+        <template v-if="!orderMissed">
+          <div class="order-item">
+            <div v-for="(item, index) in order.items" :key="index" class="order-detail">
+              <div class="order-detail__index" >{{ item.quantity || 1}}</div>
+              <div class="order-detail__name">{{ item.name }}</div>
+              <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+            </div>
+          </div>
+          <div class="order-info">
+            <span>{{$t('store.total')}} <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
+            <g-spacer/>
+            <span>{{ order.totalPrice | currency }}</span>
+          </div>
+          <div :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
+            <span>{{$t('store.shippingFee')}}:</span>
+            <g-spacer/>
+            <span>{{ order.shippingFee | currency }}</span>
+          </div>
+          <div v-if="order.discounts.length > 0">
+            <div class="order-discount" v-for="{name, coupon, value} in order.discounts">
+              <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
+              <g-spacer/>
+              <span>-{{ value | currency }}</span>
+            </div>
+          </div>
+          <div class="order-info fw-700">
+            <span>{{$t('store.total')}}</span>
+            <g-spacer/>
+            <span>{{ order.effectiveTotal | currency}}</span>
+          </div>
+        </template>
+        <template v-else>
+          <div class="more-info">
+            <p class="fw-700 i">{{$t('store.possibleReasons')}}:</p>
+            <div class="ml-1">•  {{$t('store.reason1')}}</div>
+            <div class="ml-1">•  {{$t('store.reason2')}}</div>
+            <p class="fw-700 i mt-1">{{$t('store.callUs')}}:</p>
+            <div class="phone">
+              <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
+              <div class="fw-600 text-indigo-accent-2">{{phone}}</div>
+            </div>
+          </div>
+        </template>
+
       </div>
-      <div class="cpn-order-created__actions">
-        <g-btn-bs width="98" background-color="#536DFE" text-color="#FFF" rounded @click="confirm">OK</g-btn-bs>
+      <div v-show="orderHasBeenProcessed || orderMissed" class="cpn-order-created__actions">
+        <g-btn-bs width="98" text-color="#536DFE" rounded @click="close">Close</g-btn-bs>
       </div>
     </div>
   </g-dialog>
@@ -37,6 +92,15 @@
 <script>
   export default {
     name: 'OrderCreated',
+    props: {
+      value: Boolean,
+      order: Object,
+      phone: [Number, String],
+      timeout: {
+        type: Number,
+        default: 3
+      }
+    },
     filters: {
       currency(value) {
         if (value)
@@ -44,13 +108,14 @@
         return 0
       }
     },
-    props: {
-      value: Boolean,
-      order: Object,
-    },
     data() {
       return {
-        email: '',
+        deliveryTime: '',
+        cancelledReason: '',
+        sprintTimeOut: 60,
+        waited: 0,
+        circularSize: 70,
+        status: 'inProgress', // inProgress, kitchen, declined,
       }
     },
     computed: {
@@ -61,16 +126,91 @@
         set(val) {
           this.$emit('input', val)
         }
-      }
+      },
+      orderProcessTimeOut() {
+        return this.timeout * 60
+      },
+      orderHasBeenProcessed() {
+        return this.order.status !== 'inProgress'
+      },
+      waitingConfirm() {
+        return this.order.status === 'inProgress' && this.waited < this.orderProcessTimeOut
+      },
+      remainConfirmTime() {
+        return this.orderProcessTimeOut - this.waited
+      },
+      roundedRemainConfirmTIme() {
+        return Math.floor(this.remainConfirmTime)
+      },
+      confirmProgress() {
+        const x = this.waited / this.orderProcessTimeOut
+        // Refs: https://easings.net/#easeOutCubic
+        return 100 * (Math.pow(1 - x, 3)) // 1 - (1 - Math.pow(1 - x, 3))
+      },
+      waitingConfirmMessage() {
+        if (this.remainConfirmTime > this.orderProcessTimeOut * 3/4)
+          return $t('store.waiting1')
+        else if (this.remainConfirmTime > this.orderProcessTimeOut / 2)
+          return $t('store.waiting2')
+        else if (this.remainConfirmTime > this.orderProcessTimeOut / 4)
+          return $t('store.waiting3')
+        else
+          return $t('store.waiting4')
+      },
+      orderMissed() {
+        return this.order.status === 'inProgress' && this.waited >= this.orderProcessTimeOut
+      },
+      confirmed() {
+        return this.order.status === 'kitchen'
+      },
+      cancelled() {
+        return this.order.status === 'declined' || this.waited > this.orderProcessTimeOut
+      },
+      actResultDivStyle() {
+        return {
+          width: `${this.circularSize}px`,
+          height: `${this.circularSize}px`,
+          display: 'flex',
+          'justify-content': 'center',
+          'align-items': 'center',
+          'border-radius': '50%',
+          'background-color': this.confirmed ? '#536DFE' : '#E57373',
+        }
+      },
+      totalItems() {
+        return this.order.items ? this.order.items.reduce((quan, item) => quan + item.quantity, 0) : 0
+      },
     },
     methods: {
-      confirm() {
-        if (this.email)
-          this.$emit('subscribe', this.email)
-        else
-          this.$emit('close')
+      close() {
+        this.$emit('close')
         this.internalValue = false
+      },
+      tryAgain() {
+
       }
+    },
+    created() {
+      window.cms.socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
+        if (orderToken === this.order.orderToken) {
+          this.order.status = orderStatus
+          if (orderStatus === 'declined') {
+            this.cancelledReason = extraInfo
+          } else if (orderStatus === 'kitchen') {
+            this.deliveryTime = extraInfo
+          }
+        }
+      })
+      this.intervalId = setInterval(() => {
+        this.waited += 0.25
+        if (this.waited >= this.orderProcessTimeOut) {
+          clearInterval(this.intervalId)
+        }
+      }, 250)
+    },
+    beforeDestroy() {
+      window.cms.socket.off('updateOrderStatus')
+      clearInterval(this.intervalId)
     }
   }
 </script>
@@ -107,12 +247,30 @@
     }
 
     &__content {
+      font-size: 14px;
+
+      .order-item {
+        overflow: auto;
+        scrollbar-width: none; // firefox
+        border-bottom: 1px solid #d8d8d8;
+        max-height: 210px;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
       .order-detail {
         display: flex;
         border-bottom: 1px solid #D8D8D8;
         padding-top: 8px;
         padding-bottom: 8px;
         font-size: 14px;
+
+        &:last-child {
+          border-bottom: none;
+        }
 
         &__index {
           width: 20px;
@@ -138,15 +296,151 @@
         }
       }
 
+      .order-info {
+        display: flex;
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+
+      .order-discount {
+        display: flex;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        font-size: 14px;
+
+        &:last-child {
+          border-bottom: 1px solid #D8D8D8;
+        }
+      }
+
       .g-tf-wrapper ::v-deep input {
         user-select: text !important;
       }
     }
     
     &__actions {
+      padding-top: 10px;
       display: flex;
       flex-direction: row;
-      justify-content: flex-end;
+      justify-content: center;
+      border-top: 1px solid #eee;
     }
   }
+
+  /* Order progress */
+  .order-progress {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .order-message {
+      font-size: 18px;
+      margin-top: 12px;
+
+      .link-try-again {
+        color: #536DFE;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+  ::v-deep {
+    .g-progress-circular__underlay {
+      stroke: transparent;
+    }
+  }
+
+  .more-info {
+    margin-top: 16px;
+    font-size: 16px;
+
+    .phone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px;
+      font-size: 21px;
+    }
+  }
+
+  @media screen and (max-width: 1139px) {
+    .cpn-order-created {
+      padding: 24px;
+    }
+
+    .order-progress {
+      .order-message {
+        font-size: 16px;
+      }
+    }
+
+    .more-info {
+      font-size: 14px;
+    }
+  }
+
+  @media screen and (max-height: 720px) {
+    .cpn-order-created {
+      padding-top: 12px;
+      padding-bottom: 12px;
+
+      &__header {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 18px;
+      }
+
+      &__content {
+        max-height: calc(100% - 90px);
+        font-size: 12px;
+        line-height: 1.2;
+
+        .order-message {
+          font-size: 14px;
+        }
+
+        .order-item {
+          max-height: 125px;
+        }
+
+        .order-detail {
+          padding: 4px 0;
+          font-size: 12px;
+
+          &__index {
+            width: 14px;
+            height: 14px;
+            line-height: 14px;
+            font-size: 11px;
+          }
+        }
+
+        .order-discount, .order-info {
+          font-size: 12px;
+          padding-top: 2px;
+          padding-bottom: 2px;
+        }
+
+        .more-info {
+          font-size: 12px;
+          margin-top: 8px;
+
+          .g-icon {
+            transform: scale(0.75);
+          }
+
+          .phone {
+            font-size: 14px;
+          }
+        }
+      }
+
+      &__actions {
+        padding-top: 0;
+        margin-top: 4px;
+      }
+    }
+  }
+
 </style>

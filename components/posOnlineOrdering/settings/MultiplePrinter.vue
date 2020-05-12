@@ -10,9 +10,9 @@
           <p class="text-grey-darken-1 fs-small">(Leave this setting off if you use only 1 printer)</p>
         </div>
       </div>
-      <div class="row-flex justify-between mb-2">
+      <div class="row-flex justify-between align-items-center">
         <p class="fw-700">Printer name</p>
-        <div class="text-indigo-accent-2 fw-700" style="cursor: pointer" @click="dialog.newPrinter = true">+ Add New</div>
+        <g-btn-bs class="text-indigo-accent-2 fw-700" @click="dialog.newPrinter = true">+ Add New</g-btn-bs>
       </div>
       <div class="multiple-printer__printer">
         <g-chip v-for="(printer, i) in printers" :key="i" close close-icon="icon-close@14" label @close="removePrinter(printer)">
@@ -112,6 +112,7 @@
       border-radius: 4px;
       display: flex;
       flex-wrap: wrap;
+      min-height: 40px;
 
       .g-chip {
         color: #1d1d26

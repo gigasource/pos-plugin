@@ -1,17 +1,31 @@
 <template>
   <div style="border-bottom: 1px solid #E0E0E0">
     <template v-if="mode === 'view'">
-      <div class="menu-setting-item">
-        <div class="ta-center">{{ index + 1 }}</div>
-        <img v-if="image" :src="image" class="menu-setting-item__image" draggable="false"/>
-        <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
+      <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
+        <div class="ta-center">
+          <p v-if="positioning">
+            <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
+          </p>
+          <p>{{ index + 1 }}</p>
+          <p v-if="positioning">
+            <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
+          </p>
+        </div>
+        <div class="r">
+          <img v-if="image" :src="`${image}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
+          <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
+          <div class="icon-eyes">
+            <g-icon v-if="showImage" size="14" color="white" @click="toggleImage">visibility</g-icon>
+            <g-icon v-else size="14" color="white" @click="toggleImage">visibility_off</g-icon>
+          </div>
+        </div>
         <div class="menu-setting-item__content px-2">
           <div class="menu-setting-item__name row-flex">
-            <span class="col-1">{{id}}.</span>
-            <span class="flex-equal">{{name}}</span>
+            <span class="col-1">{{id ? id + '.' : ''}}</span>
+            <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
             <span class="col-3" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
-          <div class="menu-setting-item__desc">
+          <div :class="['menu-setting-item__desc', collapseText && 'collapse']">
             {{desc}}
           </div>
         </div>
@@ -57,6 +71,7 @@
           :tax="tax"
           :available-printers="availablePrinters"
           :use-multiple-printers="useMultiplePrinters"
+          :show-image="showImage"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -69,10 +84,11 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage'],
     data: function () {
       return {
-        mode: 'view'
+        mode: 'view',
+        positioning: false,
       }
     },
     filters: {
@@ -106,6 +122,19 @@
       },
       emitEditing(editing) {
         this.$emit('editing', editing)
+      },
+      changePosition(up) {
+        if(up) {
+          if (this.index === 0) return
+          this.$emit('swap', this.index, this.index-1)
+        } else {
+          if (this.index === this.maxIndex - 1) return
+          this.$emit('swap', this.index, this.index+1)
+        }
+      },
+      toggleImage() {
+        const val = this.showImage
+        this.$emit('save', {showImage: !val})
       }
     }
   }
@@ -118,12 +147,26 @@
     grid-gap: 15px;
     background-color: #fff;
     align-items: center;
-    height: 112px;
+    min-height: 112px;
 
     &__image {
       width: 80px;
       height: 80px;
       border-radius: 10px;
+
+      & ~ .icon-eyes {
+        position: absolute;
+        bottom: -12px;
+        right: -12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1px solid white;
+        background: #757575;
+      }
     }
 
     &__content {
@@ -143,19 +186,29 @@
     &__price {
       font-weight: 700;
       font-size: 15px;
+
+      .collapse {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 500px;
+      }
     }
 
     &__desc {
       word-break: break-word;
-      -webkit-line-clamp: 2;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
       font-size: 14px;
       font-style: italic;
       color: #757575;
-      max-width: 420px;
+      max-width: 100%;
       margin-bottom: 24px;
+
+      &.collapse {
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
     }
 
     &__tax {

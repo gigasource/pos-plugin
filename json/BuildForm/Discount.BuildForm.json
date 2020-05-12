@@ -1,0 +1,169 @@
+{
+  "_id": "5eafc75a5f063646f6053952",
+  "alwaysLoad": true,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5eafcc965f063646f6053954",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input",
+      "flex": "md6"
+    },
+    {
+      "_id": "5eafe50e0f4f8e81899e4ac4",
+      "schemaType": "array",
+      "key": "type",
+      "type": "input@multiSelect",
+      "flex": "md6",
+      "fields": [
+        {
+          "schemaType": "string"
+        }
+      ],
+      "optionsType": "onlyValue",
+      "options": [
+        "delivery",
+        "pickup"
+      ]
+    },
+    {
+      "_id": "5eb0d1cea8030304d500508a",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select",
+      "flex": "md6",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5eaff558a8030304d5004ee4",
+      "schemaType": "boolean",
+      "key": "enabled",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5eaff12ba8030304d5004ebf",
+      "schemaType": "object",
+      "key": "amount",
+      "type": "object",
+      "addable": null,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "type",
+          "type": "input@select",
+          "addable": null,
+          "optionsType": "onlyValue",
+          "options": [
+            "flat",
+            "percent",
+            "freeShipping"
+          ]
+        },
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5eafe4130f4f8e81899e4ab1",
+      "schemaType": "object",
+      "key": "conditions",
+      "type": "object",
+      "fields": [
+        {
+          "_id": "5eafcc965f063646f6053958",
+          "schemaType": "object",
+          "key": "total",
+          "fields": [
+            {
+              "schemaType": "number",
+              "key": "min",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "max",
+              "type": "input@number"
+            }
+          ],
+          "type": "object",
+          "addable": true,
+          "clipboardType": "cut"
+        },
+        {
+          "schemaType": "object",
+          "key": "timePeriod",
+          "type": "object",
+          "addable": true,
+          "fields": [
+            {
+              "_id": "5eafcc965f063646f6053959",
+              "schemaType": "date",
+              "key": "startDate",
+              "type": "input@date",
+              "addable": null,
+              "clipboardType": "cut"
+            },
+            {
+              "_id": "5eafcc965f063646f605395a",
+              "schemaType": "date",
+              "key": "endDate",
+              "type": "input@date",
+              "addable": null,
+              "clipboardType": "cut"
+            }
+          ]
+        },
+        {
+          "_id": "5eafd0b65f063646f605398d",
+          "schemaType": "array",
+          "key": "daysOfWeek",
+          "fields": [
+            {
+              "schemaType": "string"
+            }
+          ],
+          "type": "input@multiSelect",
+          "addable": true,
+          "optionsType": "onlyValue",
+          "options": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "clipboardType": "cut"
+        },
+        {
+          "_id": "5eafd0b65f063646f605398e",
+          "schemaType": "array",
+          "key": "zipCode",
+          "type": "input@multiSelect",
+          "addable": true,
+          "fields": [
+            {
+              "schemaType": "string"
+            }
+          ],
+          "clipboardType": "cut"
+        },
+        {
+          "schemaType": "string",
+          "key": "coupon",
+          "type": "input",
+          "addable": true
+        }
+      ]
+    }
+  ],
+  "name": "Discount",
+  "tabs": [],
+  "type": "Collection"
+}

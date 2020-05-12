@@ -6,7 +6,6 @@
   />
 </template>
 <script>
-  import _ from 'lodash'
   import createGridFsHandlers from 'vue-file-explorer/api-handlers/grid-fs'
   import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
   import FileUploadProgressDialog from 'vue-file-explorer/components/FileExplorerPanel/dialogs/FileUploadProgressDialog.vue'
@@ -21,8 +20,8 @@
         apiBaseUrl: '/cms-files'
       })
 
-      await this.createFolder('/', 'images')
-      await this.createFolder('/', 'update')
+      await this.createFolderIfNotExisted('/', 'images')
+      await this.createFolderIfNotExisted('/', 'update')
     },
     data() {
       return {
@@ -30,42 +29,43 @@
         showFileUploadProgressDialog: false,
       }
     },
-    computed: {},
     methods: {
       openUploadFileDialog(callback) {
         openUploadFileDialog({ multiple: false, mimeType: 'image/*' }, files => callback(files[0]))
+      },
+      getCdnUrl(url) {
+        if (cms.sharedConfig && cms.sharedConfig.getCdnUrl)
+          return cms.sharedConfig.getCdnUrl(url)
+        return url
       },
       uploadImage(file) {
         return new Promise((resolve, reject) => {
           this.showFileUploadProgressDialog = true
           this.uploadingItems.push(this.gridFsHandler.uploadFile(file, '/images', response => {
             if (response.data[0].uploadSuccess) {
-              resolve(this.gridFsHandler.insertViewUrl([response.data[0].createdFile])[0].viewUrl)
+              const files = [response.data[0].createdFile]
+              const viewUrl = this.gridFsHandler.insertViewUrl(files)[0].viewUrl
+              const cdnViewUrl = this.getCdnUrl(viewUrl)
+              resolve(cdnViewUrl)
             } else {
               reject(response)
             }
           }))
         })
       },
-      async prepareUploadAppFolder(fileName, version) {
-        const baseName = this.getBaseName(fileName)
-        console.log(`creating /update/${baseName} folder`)
-        await this.createFolder('/update', baseName)
-
-        console.log(`creating /update/${baseName}/${version} folder`)
-        await this.createFolder(`/update/${baseName}`, version)
+      async prepareUploadAppFolder(groupName, version) {
+        await this.createFolderIfNotExisted('/update', groupName)
+        await this.createFolderIfNotExisted(`/update/${groupName}`, version)
       },
-      getBaseName(fileName) {
-        return fileName.substr(0, _.lastIndexOf(fileName, '.'))
-      },
-      uploadApp(file, version) {
+      uploadApp(groupName, file, version) {
         return new Promise(async (resolve ,reject) => {
           this.showFileUploadProgressDialog = true
-          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, `/update/${this.getBaseName(file.name)}/${version}`, response => {
+          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, `/update/${groupName}/${version}`, response => {
             if (response.data[0].uploadSuccess) {
               const files = [response.data[0].createdFile]
               const downloadUrl = this.gridFsHandler.insertDownloadUrl(files)[0].downloadUrl
-              resolve(downloadUrl)
+              const cdnDownloadUrl = this.getCdnUrl(downloadUrl)
+              resolve(cdnDownloadUrl)
             } else {
               reject(response)
             }
@@ -73,28 +73,21 @@
         })
       },
 
-      async removeFile(filePath /*view path or download path*/) {
+      async removeFile(filePath) {
+        // TODO: [High] Remove file cdn
         const path = filePath.substr(filePath.indexOf('//') + 1)
-        await this.gridFsHandler.deleteFileByPath(path)
-      },
-      async isFolderExist(folderPath) {
         try {
-          await this.gridFsHandler.getFilesInPath(folderPath)
-          return true
-        } catch (e) {
-          return false
-        }
+          await this.gridFsHandler.deleteFileByPath(path)
+        } catch (e) {}
       },
-      async createFolder(parentPath, folderPath) {
-        const separator = _.endsWith(parentPath, '/') ? '' : '/'
-        const folderExist = await this.isFolderExist(`${parentPath}${separator}${folderPath}`)
-        if (!folderExist) await this.gridFsHandler.createNewFolder(parentPath, folderPath)
+      async createFolderIfNotExisted(folderPath, folderName) {
+        const folderExisted = await this.gridFsHandler.checkFileExisted(folderPath, folderName);
+        if (!folderExisted) await this.gridFsHandler.createNewFolder(folderPath, folderName)
       }
     },
     provide() {
       return {
         openUploadFileDialog: this.openUploadFileDialog,
-        openAndUploadImage: this.openAndUploadImage,
         prepareUploadAppFolder: this.prepareUploadAppFolder,
         uploadImage: this.uploadImage,
         uploadApp: this.uploadApp,
