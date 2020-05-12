@@ -16,7 +16,7 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
     cd plugins/pos-plugin/pkg && \
     git pull && \
     VALID="$(node check-version.js | grep -o FAILED)" && \
-    if [ \( "$VALID" = "FAILED" \) -o \( !$FORCE_UPDATE \) ] ; then echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1; fi
+    if [ "$VALID" = "FAILED" ] ; then if [ "$FORCE_UPDATE" = "false" ] ; then if then echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1; fi ; fi
 
 RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
     GIGASOURCE_ACCESS_TOKEN=$(cat ./gigasource-access-token) && \
