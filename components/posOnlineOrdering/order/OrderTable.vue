@@ -24,8 +24,8 @@
           </template>
           <template v-else>
             <!-- 0 items -->
-            <div v-if="orderView && noMenuItem" style="margin-top: 100px; display: flex; justify-content: center; flex-direction: column">
-              <img src="/plugins/pos-plugin/assets/empty_order2.svg">
+            <div v-if="orderView && noMenuItem" style="margin-top: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column">
+              <img src="/plugins/pos-plugin/assets/empty_order2.svg" style="max-width: 120px">
               <div style="margin-top: 10px; font-size: 15px; text-align: center; color: #616161;">
                 {{$t('store.emptyCart')}}
               </div>
@@ -552,6 +552,7 @@
       flex: 1;
       overflow: auto;
       scrollbar-width: none; // firefox
+      -ms-overflow-style: none; //edge
 
       &::-webkit-scrollbar {
         display: none;
