@@ -18,7 +18,7 @@
         <div id="table-content" class="po-order-table__content">
           <template v-if="!isOpening">
             <div class="message-closed">
-              <div class="message-closed__title">Merchant is temporarily closed</div>
+              <div class="message-closed__title">{{$t('store.merchantClose')}}</div>
               <div class="message-closed__message">{{ merchantMessage }}</div>
             </div>
           </template>
@@ -64,7 +64,7 @@
               </g-radio-group>
               <span v-if="orderType === 'delivery' && !satisfyMinimumValue && store.minimumOrderValue && store.minimumOrderValue.active"
                     style="color: #4CAF50; font-size: 15px">
-                Delivery service is not available for orders less than {{$t('common.currency')}}{{store.minimumOrderValue.value}}.
+                {{$t('store.minimumWarning')}}{{$t('common.currency')}}{{store.minimumOrderValue.value}}.
               </span>
               <div class="section-form">
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
@@ -80,12 +80,12 @@
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
                 <div>
-                  <div v-if="!couponTf.active" @click="couponTf.active = true"><u>Apply coupon code</u></div>
-                  <g-text-field-bs v-if="couponTf.active" placeholder="COUPON CODE" suffix="Apply" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
+                  <div v-if="!couponTf.active" @click="couponTf.active = true"><u>{{$t('store.applyCode')}}</u></div>
+                  <g-text-field-bs v-if="couponTf.active" :placeholder="$t('store.couponCode')" :suffix="$t('store.apply')" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
                   <div class="error-message">{{couponTf.error}}</div>
                   <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
                     <g-icon size="12" color="green">check</g-icon>
-                    Coupon applied!
+                    {{$t('store.couponApplied')}}}}
                   </div>
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
@@ -293,10 +293,10 @@
           if (coupon) {
             if (!this.couponCode) return false
             if (coupon.toLowerCase() !== this.couponCode.toLowerCase()) {
-              if(this.couponTf.error === '' && !this.couponTf.success) this.couponTf.error = 'Invalid Coupon!'
+              if(this.couponTf.error === '' && !this.couponTf.success) this.couponTf.error = this.$t('store.invalidCoupon')
               return false
             }
-            this.couponTf.error = 'Not applicable for this order!'
+            this.couponTf.error = this.$t('store.notApplicable')
           }
           if (total && total.min && this.totalPrice < total.min) return false
           if (total && total.max && this.totalPrice > total.max) return false

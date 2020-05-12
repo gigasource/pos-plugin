@@ -2,12 +2,13 @@ module.exports = {
   de: {
     store: {
       open: 'Geöffnet',
-      closed: 'Closed',
+      closed: 'Geschlossen',
+      today: 'heute',
       orderList: 'Warenkorb',
       totalItems: 'Artikel',
       note: 'Hinweis',
       payment: 'Bestellung',
-      confirmOrder: 'Confirm Order',
+      confirmOrder: 'Bestellung Bestätigen',
       contactInfo: 'KONTAKT INFO',
       pickup: 'Abholen',
       delivery: 'Lieferung',
@@ -38,12 +39,31 @@ module.exports = {
       orderConfirmed: 'Bestellung bestätigt',
       orderCancelled: 'Entschuldigung, Ihre Bestellung wurde storniert.',
       reason: 'Grund',
-      emptyCart: 'Dein Warenkorb ist leer.'
+      emptyCart: 'Dein Warenkorb ist leer.',
+      minimumWarning: 'Mindestbestellwert beträgt ',
+      applyCode: 'Gutscheincode anwenden',
+      couponCode: 'GUTSCHEINCODE',
+      apply: 'Anwenden',
+      couponApplied: 'Gutschein akzeptiert!',
+      invalidCoupon: 'Gutschein ungültig!',
+      notApplicable: 'Gutschein für diese Bestellung nicht anwendbar!',
+      openHours: 'Öffnungszeiten',
+      merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
+      merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.'
     },
 
     common: {
       currency: '€',
       asap: 'So schnell wie möglich',
+      weekday: {
+        monday: 'Montag',
+        tuesday: 'Dienstag',
+        wednesday: 'Mittwoch',
+        thursday: 'Donnerstag',
+        friday: 'Freitag',
+        saturday: 'Samstag',
+        sunday: 'Sonntag'
+      }
     },
   }
 }
