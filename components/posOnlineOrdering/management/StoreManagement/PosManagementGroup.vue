@@ -44,8 +44,10 @@
                      :key="`device_${store.id}_${index}`">
                   <div class="row-flex col-2">
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
-                    <span class="ml-1">{{device.name}} <span
-                        v-if="device.features.onlineOrdering"> (Online ordering)</span></span>
+                    <span class="ml-1">
+                      <div>{{device.name}}</div>
+                      <div style="font-size: 10px; font-style: italic; color: #757575; margin-top: -5px;" v-if="device.features.onlineOrdering"> (Online ordering)</div>
+                    </span>
                   </div>
                   <div class="col-2">
                     {{device.hardware}}
