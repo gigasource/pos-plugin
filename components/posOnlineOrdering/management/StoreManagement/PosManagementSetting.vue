@@ -4,7 +4,7 @@
     <div class="pos-management-setting__info">
       <div class="pos-management-setting__title">Basic Information</div>
       <g-select large deletable-chips multiple text-field-component="GTextFieldBs" label="Group"
-                :items="groups"
+                :items="groups" class="group"
                 item-text="name"
                 item-value="_id"
                 v-model="computedGroup"/>
@@ -101,14 +101,16 @@
       devices: Array,
       groups: Array,
       aliases: Array,
-      country: String,
+      country: Object,
       countries: Array,
     },
     injectService: ['PosOnlineOrderManagementStore:(stores)'],
     data() {
       return {
         aliasErrMessage: '',
-        clientDomainErrMessage: ''
+        clientDomainErrMessage: '',
+        countryName: this.country && this.country.name || '',
+        groupIds: this.group && this.group.map(g => g._id) || []
       }
     },
     created() {
@@ -122,10 +124,11 @@
       },
       computedGroup: {
         get() {
-          return this.group.map(g => g._id)
+          return this.groupIds
         },
         set(val) {
-          this.updateDebounce({ groups: val })
+          this.update({ groups: val })
+          this.groupIds = val
         }
       },
       computedSettingName: {
@@ -154,10 +157,11 @@
       },
       computedCountry: {
         get() {
-          return this.country
+          return this.countryName
         },
         set(val) {
-          this.updateDebounce({country: val})
+          this.update({country: val})
+          this.countryName = val.name
         }
       }
     },
@@ -232,6 +236,14 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
+      .group ::v-deep .bs-tf-inner-input-group {
+        overflow: auto;
+
+        .input {
+          width: calc(100% - 24px);
+        }
+      }
     }
 
     &__order {
