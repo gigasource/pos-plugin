@@ -251,6 +251,7 @@
         if (_.includes(this.storeGroupNames, name)) {
           this.showMessage('This name is already taken!')
           cb && cb(false)
+          return
         }
         await cms.getModel('StoreGroup').updateOne({_id}, {name})
         await this.loadStoreGroups()
