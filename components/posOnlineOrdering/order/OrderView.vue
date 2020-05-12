@@ -27,6 +27,13 @@
                         <div class="mr-2">{{day.wdayString}}</div>
                         <div class="ta-right">{{day.open}} - {{day.close}}</div>
                       </div>
+                      <template  v-if="deliveryInfo && deliveryInfo.length > 0">
+                        <div class="fw-700 my-2">Delivery:</div>
+                        <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+                          <div class="mr-2">{{info.title}}</div>
+                          <div class="ta-right">{{info.value}}</div>
+                        </div>
+                      </template>
                     </div>
                   </g-menu>
                   <template v-if="storeWorkingTime">
@@ -115,11 +122,18 @@
         <g-dialog v-model="dialog.hour" width="400" eager>
           <div class="bg-white pa-5 r w-100 br-2">
             <g-icon style="position: absolute; top: 16px; right: 16px" @click="dialog.hour = false" size="16">icon-close</g-icon>
-            <div class="fw-700 mb-2 fs-large-3">Open Hours</div>
+            <div class="fw-700 mb-2 fs-large">Open Hours:</div>
             <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
               <div>{{day.wdayString}}</div>
               <div class="ta-right">{{day.open}} - {{day.close}}</div>
             </div>
+            <template  v-if="deliveryInfo && deliveryInfo.length > 0">
+              <div class="fw-700 mb-2 mt-3 fs-large">Delivery:</div>
+              <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+                <div class="mr-2">{{info.title}}</div>
+                <div class="ta-right">{{info.value}}</div>
+              </div>
+            </template>
           </div>
         </g-dialog>
       </template>
@@ -300,7 +314,6 @@
               return `${formatTime(openTime)} - ${formatTime(closeTime)}`
             }
           }
-
         }
         return null
       },
@@ -325,6 +338,31 @@
           const wdayString = days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', ')
           return { wdayString, open: formatTime(oh.openTime), close: formatTime(oh.closeTime) }
         })
+      },
+      deliveryInfo() {
+        let info = []
+        if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
+          info.push(
+              {title: 'Minimum order', value: `${$t('common.currency')}${this.store.minimumOrderValue.value}`}
+          )
+        }
+        if (this.store.deliveryFee) {
+          let min = (_.minBy(this.store.deliveryFee.fees, 'fee')).fee
+          let max = (_.maxBy(this.store.deliveryFee.fees, 'fee')).fee
+
+          if (this.store.deliveryFee.acceptOrderInOtherZipCodes) {
+            if (min > this.store.deliveryFee.defaultFee)
+              min = this.store.deliveryFee.defaultFee
+            if (max < this.store.deliveryFee.defaultFee)
+              max = this.store.deliveryFee.defaultFee
+          }
+
+          info.push({
+            title: 'Delivery fee',
+            value: `${$t('common.currency')}${min} - ${$t('common.currency')}${max}`
+          })
+        }
+        return info
       }
     },
     methods: {
@@ -332,6 +370,14 @@
         const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
         if (indexOfItem < 0) {
           this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
+          this.$nextTick(() => {
+            const textarea = document.getElementById('item_note_'+(this.orderItems.length-1))
+            textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px');
+            textarea.addEventListener('input', function() {
+              this.style.height = 'auto'
+              this.style.height = (this.scrollHeight) + 'px'
+            }, false)
+          })
         } else {
           const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
           this.orderItems.splice(indexOfItem, 1, item)
@@ -344,9 +390,14 @@
         if (this.orderItems[indexOfItem].quantity > 1) {
           const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity - 1})
           this.orderItems.splice(indexOfItem, 1, item)
-        } else
+        } else {
+          const textarea = document.getElementById('item_note_' + indexOfItem)
+          textarea.removeEventListener('input', function() {
+            this.style.height = 'auto'
+            this.style.height = (this.scrollHeight) + 'px'
+          })
           this.orderItems.splice(indexOfItem, 1)
-
+        }
       },
       clearOrder() {
         this.orderItems.splice(0, this.orderItems.length)
