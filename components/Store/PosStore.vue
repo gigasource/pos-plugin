@@ -120,13 +120,18 @@
     },
     computed: {
       computedDashboardSidebar() {
+        let sidebar = _.cloneDeep(this.dashboardSidebar)
+        if(this.user && this.user.role !== 'admin' && !this.user.viewOrder) {
+          const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering')
+          onlineOrder.items.splice(1, 2)
+        }
         if (this.user && this.enabledFeatures) {
-          return this.dashboardSidebar.filter(item => {
+          return sidebar.filter(item => {
             if (!item.feature) return true
             return this.enabledFeatures.includes(item.feature)
           })
         }
-        return this.dashboardSidebar
+        return sidebar
       }
     },
     domain: 'PosStore',

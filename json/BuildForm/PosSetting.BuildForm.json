@@ -402,6 +402,11 @@
           "key": "cancelInvoice",
           "type": "input@switch",
           "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOrder",
+          "type": "input@switch"
         }
       ]
     },
