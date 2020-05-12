@@ -134,7 +134,7 @@
         
         // return only account created by user
         // automatically created account which linked with specified store will not be returned
-        const filters = [acc => acc.store === null || acc.store.length === 0]
+        const filters = [acc => acc.store == null || acc.store.length === 0]
         if (this.accountSearch)
           filters.push(acc => _.lowerCase(acc.name).indexOf(this.lowerCaseAccountSearch) > -1)
         if (this.accountFilter.createdBy)
