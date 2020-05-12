@@ -2,8 +2,8 @@
   <div class="restaurant-info">
     <div class="restaurant-info__title">Store Information</div>
     <div class="restaurant-info__main" v-if="store">
-      <div>
-        <div class="restaurant-info__main--left">
+      <div class="restaurant-info__main--left">
+        <div>
           <div class="mb-3 fw-700">Basic info</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto 1fr 1fr; grid-gap: 5px">
             <g-text-field-bs large label="Store Name"
@@ -32,11 +32,11 @@
             </div>
           </div>
         </div>
-        <div class="restaurant-info__main--left col-flex">
+        <div class="mt-3">
           <div class="mb-3 fw-700">Embed Code</div>
           <div>
-            <g-textarea style="border: 1px solid #EFEFEF; padding-left: 4.5rem; padding-right: 4.5rem; color: #162D3D;" class="mb-2 pt-5 pb-5" :value="iframe"></g-textarea>
-            <div class="row-flex align-items-center">
+            <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" no-resize :value="iframe"></g-textarea>
+            <div class="row-flex align-items-center" style="cursor: pointer">
               <g-icon size="14" color="#536DFE" class="mr-1 mb-1">icon-chain-blue</g-icon>
               <span style="color: #536DFE; cursor: pointer" @click.stop="copyCode">Copy Code</span>
               <g-spacer/>
@@ -138,6 +138,12 @@
         margin-right: 4px;
         width: calc(100% - 5px);
 
+        ::v-deep .g-tf {
+          &:before, &:after {
+            display: none;
+          }
+        }
+
         ::v-deep fieldset {
           border-width: 1px !important;
           border-color: #ced4da;
@@ -159,6 +165,7 @@
 
           textarea {
             user-select: text !important;
+            max-height: 120px;
           }
         }
       }

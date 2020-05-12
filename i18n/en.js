@@ -117,6 +117,15 @@ module.exports = {
       tax: 'Tax',
       subtotal: 'Subtotal',
       asap: 'As soon as possible',
+      weekday: {
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday',
+        sunday: 'Sunday'
+      }
     },
 
     //reports
@@ -275,6 +284,7 @@ module.exports = {
     store: {
       open: 'Open',
       closed: 'Closed',
+      today: 'today',
       orderList: 'Order List',
       totalItems: 'Total items',
       note: 'Note',
@@ -310,7 +320,18 @@ module.exports = {
       orderConfirmed: 'Your order is confirmed',
       orderCancelled: 'Sorry, your order has been cancelled!',
       reason: 'Reason',
-      emptyCart: 'Your order list is currently empty.'
+      emptyCart: 'Your order list is currently empty.',
+      minimumWarning: 'Delivery service is not available for orders less than ',
+      applyCode: 'Apply coupon code',
+      couponCode: 'COUPON CODE',
+      apply: 'Apply',
+      couponApplied: 'Coupon applied!',
+      invalidCoupon: 'Invalid coupon!',
+      notApplicable: 'Not applicable for this order!',
+      openHours: 'Open hours',
+      merchantClose: 'Merchant is temporarily closed',
+      merchantClose1: 'The merchant is temporarily closed and will not accept orders until {1} {0}. Please come back after that. We apologize for any inconvenience caused.',
+      merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.'
     }
   }
 }

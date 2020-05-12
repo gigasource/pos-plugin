@@ -22,7 +22,7 @@
                       </div>
                     </template>
                     <div class="menu-hour">
-                      <div class="fw-700 mb-2">Open hours:</div>
+                      <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
                       <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
                         <div class="mr-2">{{day.wdayString}}</div>
                         <div class="ta-right">{{day.open}} - {{day.close}}</div>
@@ -41,7 +41,7 @@
                     <g-icon size="16">access_time</g-icon>
                     <span style="color: #424242; margin-left: 3px">{{ storeWorkingTime }}</span>
                   </template>
-                  <span v-else>today</span>
+                  <span v-else>{{$t('store.today')}}</span>
                 </div>
               </div>
               <div class="address">
@@ -112,7 +112,7 @@
         <!-- Merchant dialog -->
         <g-dialog v-model="dialog.closed" persistent>
           <div class="dialog-closed">
-            <div class="dialog-closed__title">Merchant is temporarily closed</div>
+            <div class="dialog-closed__title">{{$t('store.merchantClose')}}</div>
             <div class="dialog-closed__message">{{ merchantMessage }}</div>
             <g-btn-bs text-color="indigo accent-2" @click="dialog.closed = false">OK</g-btn-bs>
           </div>
@@ -122,7 +122,7 @@
         <g-dialog v-model="dialog.hour" width="400" eager>
           <div class="bg-white pa-5 r w-100 br-2">
             <g-icon style="position: absolute; top: 16px; right: 16px" @click="dialog.hour = false" size="16">icon-close</g-icon>
-            <div class="fw-700 mb-2 fs-large">Open Hours:</div>
+            <div class="fw-700 mb-2 fs-large">{{$t('store.openHours')}}:</div>
             <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
               <div>{{day.wdayString}}</div>
               <div class="ta-right">{{day.open}} - {{day.close}}</div>
@@ -158,7 +158,15 @@
         store: null,
         categories: null,
         products: null,
-        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        dayInWeeks: [
+          this.$t('common.weekday.monday'),
+          this.$t('common.weekday.tuesday'),
+          this.$t('common.weekday.wednesday'),
+          this.$t('common.weekday.thursday'),
+          this.$t('common.weekday.friday'),
+          this.$t('common.weekday.saturday'),
+          this.$t('common.weekday.sunday')
+        ],
         today: dayjs().format("dddd"),
         now: dayjs().format('HH:mm'),
         dialog: {
@@ -278,16 +286,19 @@
           if (openHour && openHour.length > 0) {
             return {
               hour: openHour[0].openTime,
-              day: dayInWeekIndex === this.dayInWeekIndex + 1 ? 'tomorrow' : this.dayInWeeks[dayInWeekIndex]
+              day: this.dayInWeeks[dayInWeekIndex]
             }
           }
         } while (dayInWeekIndex !== this.dayInWeekIndex)
       },
       merchantMessage() {
         if (this.nextOpenHour)
-          return `The merchant is temporarily closed and will not accept orders until ${this.nextOpenHour.hour } ${ this.nextOpenHour.day }. Please come back after that. We apologize for any inconvenience caused.`
+          return `${this.$t('store.merchantClose1', {
+            0: this.nextOpenHour.day,
+            1: this.nextOpenHour.hour
+          })} `
 
-        return  'The merchant is temporarily closed. We apologize for any inconvenience caused.'
+        return  `${this.$t('store.merchantClose2')}`
       },
       isStoreOpening() {
         if (this.todayOpenHour) {
@@ -646,7 +657,7 @@
           flex: 1;
           display: flex;
           flex-direction: column;
-          overflow: hidden auto;
+          overflow: hidden;
           margin-bottom: 5px;
 
 
