@@ -164,9 +164,6 @@
           }
         })
       },
-      managerUsersViewModel() {
-        return _.map(this.managerUsers, user => ({ text: user.username, value: user._id }))
-      },
       availableGroupsViewModel() {
         return _.map(this.storeGroups, group => ({ text: group.name, value: group._id }))
       },
@@ -520,7 +517,6 @@
         appItems: this.appItems,
 
         // account management
-        managerUsersViewModel: this.managerUsersViewModel,
         availableGroupsViewModel: this.availableGroupsViewModel,
         accountViewModel: this.accountViewModel,
         accountSearch: this.accountSearch,
