@@ -517,6 +517,13 @@
         removeAppItem: this.removeAppItem,
         appItems: this.appItems,
 
+        // version control
+        versionControlViewModel: this.versionControlViewModel,
+        newAppItemDialogViewModel: this.newAppItemDialogViewModel,
+        versionControlOrderBy: this.versionControlOrderBy,
+        toggleHideShowApp: this.toggleHideShowApp,
+        sortAppItem: this.sortAppItem,
+
         // account management
         availableGroupsViewModel: this.availableGroupsViewModel,
         accountViewModel: this.accountViewModel,
@@ -526,14 +533,6 @@
         createAccount: this.createAccount,
         editAccount: this.editAccount,
         deleteAccount: this.deleteAccount,
-
-
-        //
-        versionControlViewModel: this.versionControlViewModel,
-        newAppItemDialogViewModel: this.newAppItemDialogViewModel,
-        versionControlOrderBy: this.versionControlOrderBy,
-        toggleHideShowApp: this.toggleHideShowApp,
-        sortAppItem: this.sortAppItem,
       }
     }
   }
