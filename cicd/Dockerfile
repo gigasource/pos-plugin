@@ -1,10 +1,15 @@
 FROM registry.gigasource.io/pos-restaurant AS intermediate
 ARG CONFIG_FILE_NAME
 ARG BASE_VERSION
+ARG FORCE_UPDATE
 WORKDIR /root/cms-boilerplate
 RUN mkdir -p /root/cms-boilerplate/storage
 COPY ./ssh ./ssh
 COPY ./gigasource-access-token ./gigasource-access-token
+RUN cd plugins/pos-plugin/pkg && \
+    VALID="$(node check-version.js | grep -o FAILED)" && \
+    if [[ ($VALID == "FAILED") && ($FORCE_UPDATE == false) ]] echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1
+
 RUN rm -rf ~/.ssh && \
     mv ./ssh ~/.ssh && \
     chmod -R 700 ~/.ssh && \
