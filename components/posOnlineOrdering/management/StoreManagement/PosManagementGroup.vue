@@ -8,7 +8,7 @@
       <g-icon class="icon-first" size="20" v-else>expand_more</g-icon>
       <g-edit-view-input
           :value="name"
-          @click.native.stop.prevent="toggleContent"
+          @click.native.stop.prevent="() => {}"
           @input="(value, cb) => $emit('update:groupName', _id, value, cb)">
         <template v-slot:action="{mode, switchToEditMode, applyChange, resetValue}">
           <g-menu v-if="mode !== 'edit' && manageGroupPerm" v-model="nameEditMenu" close-on-content-click
