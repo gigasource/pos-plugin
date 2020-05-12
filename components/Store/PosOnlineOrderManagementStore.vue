@@ -70,10 +70,10 @@
         const storeGroupVMs = _.map(this.storeGroups, group => ({
           _id: group._id,
           name: group.name,
-          stores: _.map(_.filter(this.storeSearchSortResult, store => this.storeInStoreGroup(store, group)), this.convertStoreToViewModel)
+          stores: _.map(_.filter(this.storeSearchSortResult, store => this.storeInGroup(store, group)), this.convertStoreToViewModel)
         }))
         if (this.searchText)
-          return _.filter(storeGroupVMs, this.storeGroupHasStores)
+          return _.filter(storeGroupVMs, storeGroupVM => storeGroupVM.stores.length > 0)
         return storeGroupVMs
       },
 
@@ -130,7 +130,11 @@
         return _.lowerCase(this.accountSearch)
       },
       searchAndFilteredAccounts() {
-        const filters = [acc => acc]
+        // TODO: Optimize
+        
+        // return only account created by user
+        // automatically created account which linked with specified store will not be returned
+        const filters = [acc => acc.store === null || acc.store.length === 0]
         if (this.accountSearch)
           filters.push(acc => _.lowerCase(acc.name).indexOf(this.lowerCaseAccountSearch) > -1)
         if (this.accountFilter.createdBy)
@@ -220,10 +224,7 @@
           release: appItem.release
         }
       },
-      storeGroupHasStores(storeGroupVM) {
-        return storeGroupVM.stores.length > 0
-      },
-      storeInStoreGroup(store, storeGroup) {
+      storeInGroup(store, storeGroup) {
         return _.find(store.groups, group => group._id === storeGroup._id)
       },
 
