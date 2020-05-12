@@ -1,6 +1,6 @@
 <template>
   <div class="online-order-list">
-    <div style="display: flex; align-items: center">
+    <div class="row-flex align-items-center mb-2">
       <div class="online-order-list__title">
         {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
       </div>
@@ -8,8 +8,8 @@
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
       <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
-      <span class="fw-700 fs-large mr-3">{{$t('common.currency')}}{{ totalIncome }}</span>
-      <g-select prepend-inner-icon="far fa-calendar-alt@16" text-field-component="GTextFieldBs" v-model="dateFilter" :items="dateFilters"/>
+      <span class="fw-700 fs-large mr-3">{{$t('common.currency')}}{{ totalIncome | formatNumber }}</span>
+      <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
     <div class="online-order-list__table">
       <g-table elevation="2" fixed-header>
@@ -50,8 +50,8 @@
 
 <script>
   import dayjs from 'dayjs'
-  import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-  dayjs.extend(isSameOrAfter)
+  import isBetween from 'dayjs/plugin/isBetween'
+  dayjs.extend(isBetween)
   
   export default {
     name: 'OnlineOrderList',
@@ -69,8 +69,10 @@
 
       return {
         headers: [no, customer, address, amount, received, delivery, type, status],
-        dateFilter: 'Today',
-        dateFilters: ['Today', 'Yesterday', 'Last 3 days', 'Last 7 days', 'Last 30 days']
+        filter: {
+          fromDate: '',
+          toDate: ''
+        }
       }
     },
     filters: {
@@ -80,21 +82,11 @@
     },
     computed: {
       computedItems() {
-        const today = dayjs()
-        return this.onlineOrders.filter(i => {
-          switch (this.dateFilter) {
-            case 'Today':
-              return dayjs(i.date).isSame(today, 'date')
-            case 'Yesterday':
-              return dayjs(i.date).isSame(today.subtract(1, 'day'), 'date')
-            case 'Last 3 days':
-              return dayjs(i.date).isSameOrAfter(today.subtract(3, 'day'), 'date')
-            case 'Last 7 days':
-              return dayjs(i.date).isSameOrAfter(today.subtract(7, 'day'), 'date')
-            case 'Last 30 days':
-              return dayjs(i.date).isSameOrAfter(today.subtract(30, 'day'), 'date')
-          }
-        }).map(i => ({ ...i, status: this.status }))
+        const items = this.onlineOrders.map(i => ({ ...i, status: this.status }))
+        if(this.filter.fromDate && this.filter.toDate) {
+          return items.filter(item => dayjs(item.date).isBetween(this.filter.fromDate, this.filter.toDate, 'day'))
+        }
+        return items
       },
       statusClass() {
         return this.status
@@ -114,10 +106,17 @@
     },
     async mounted() {
       if (this.status) await this.getOnlineOrdersWithStatus(this.status)
+      this.filter.fromDate = dayjs().format('YYYY-MM-DD')
+      this.filter.toDate = dayjs().format('YYYY-MM-DD')
     },
     async activated() {
       if (this.status) await this.getOnlineOrdersWithStatus(this.status)
     },
+    methods: {
+      changeFilter(range) {
+        this.filter = range
+      }
+    }
   }
 </script>
 
