@@ -149,10 +149,10 @@
         return _.map(this.searchAndFilteredAccounts, account => {
           const perms = _.map(_.filter(account.permissions, perm => perm.value), perm => _.omit(perm, '_id'))
           return {
-            // will be used in dialogAccount.vue
+            // used in dialogAccount.vue
             storeGroups: _.map(account.storeGroups, sg => sg._id),
             permissions: perms,
-            // will be used to show in Account.vue
+            // show in Account.vue
             ..._.pick(account, '_id', 'name', 'username', 'active'),
             storeGroupsStr: _.join(_.map(account.storeGroups, sg => sg.name), ', '),
             totalStore: _.filter(this.stores, store => _.some(_.map(account.storeGroups, group => this.storeInStoreGroup(store, group)))).length,
@@ -257,7 +257,9 @@
         cb && cb(true)
       },
       async deleteStoreGroup(_id) {
+        // cause be only allow the user to delete empty store group so we don't need to update store
         await cms.getModel('StoreGroup').remove({_id})
+        await cms.updateUserSession()
         await this.loadStoreGroups()
       },
 
