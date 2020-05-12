@@ -31,6 +31,27 @@
       "flex": "md4"
     },
     {
+      "_id": "5eba6b1f155b7c0bc1290ed3",
+      "schemaType": "string",
+      "key": "appRelease",
+      "type": "input@select",
+      "optionsType": "textValue",
+      "options": [
+        {
+          "value": "Beta",
+          "text": "Beta"
+        },
+        {
+          "value": "Archived",
+          "text": "Archived"
+        },
+        {
+          "value": "Stabled",
+          "text": "Stabled"
+        }
+      ]
+    },
+    {
       "_id": "5e9044fdab8e6f23eb5229e6",
       "schemaType": "string",
       "key": "pairingCode",
