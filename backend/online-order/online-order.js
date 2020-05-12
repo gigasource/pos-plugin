@@ -216,12 +216,10 @@ async function getDeviceId(pairingCode) {
     if (!pairingCode) {
       return null
     } else {
-      const packageInfo = require('../../package')
       const pairingApiUrl = `${webshopUrl}/device/register`
       const requestBody = {pairingCode}
       requestBody.appName = 'POS_Android'
-      requestBody.appVersion = packageInfo.version
-      requestBody.appRelease = packageInfo.release
+      requestBody.appVersion = require('../../package').version
       requestBody.hardware = global.APP_CONFIG.deviceName
       requestBody.release = require('../../package').release
       try {
