@@ -29,7 +29,6 @@
         showFileUploadProgressDialog: false,
       }
     },
-    computed: {},
     methods: {
       openUploadFileDialog(callback) {
         openUploadFileDialog({ multiple: false, mimeType: 'image/*' }, files => callback(files[0]))
@@ -44,7 +43,8 @@
           this.showFileUploadProgressDialog = true
           this.uploadingItems.push(this.gridFsHandler.uploadFile(file, '/images', response => {
             if (response.data[0].uploadSuccess) {
-              const viewUrl = this.gridFsHandler.insertViewUrl([response.data[0].createdFile])[0].viewUrl
+              const files = [response.data[0].createdFile]
+              const viewUrl = this.gridFsHandler.insertViewUrl(files)[0].viewUrl
               const cdnViewUrl = this.getCdnUrl(viewUrl)
               resolve(cdnViewUrl)
             } else {
@@ -73,7 +73,8 @@
         })
       },
 
-      async removeFile(filePath /*view path or download path*/) {
+      async removeFile(filePath) {
+        // TODO: [High] Remove file cdn
         const path = filePath.substr(filePath.indexOf('//') + 1)
         try {
           await this.gridFsHandler.deleteFileByPath(path)
@@ -87,7 +88,6 @@
     provide() {
       return {
         openUploadFileDialog: this.openUploadFileDialog,
-        openAndUploadImage: this.openAndUploadImage,
         prepareUploadAppFolder: this.prepareUploadAppFolder,
         uploadImage: this.uploadImage,
         uploadApp: this.uploadApp,
