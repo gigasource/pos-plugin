@@ -84,7 +84,7 @@
       computedItems() {
         const items = this.onlineOrders.map(i => ({ ...i, status: this.status }))
         if(this.filter.fromDate && this.filter.toDate) {
-          return items.filter(item => dayjs(item.date).isBetween(this.filter.fromDate, this.filter.toDate, 'day'))
+          return items.filter(item => dayjs(item.date).isBetween(this.filter.fromDate, this.filter.toDate, 'day', '[]'))
         }
         return items
       },
