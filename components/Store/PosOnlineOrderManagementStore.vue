@@ -322,7 +322,6 @@
         socket.emit('updateAppFeature', _id, features)
         await cms.getModel('Device').updateOne({_id}, { features })
         cb && cb()
-        // TODO: update device version UI
       },
 
       async updateDeviceAppVersion(device) {
@@ -337,7 +336,7 @@
         socket.emit('updateApp', device._id, device.updateVersion)
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
-        // TODO: update UI
+        // TODO: Update device version in UI
       },
 
       // apps
