@@ -26,7 +26,7 @@
         // version control
         apps: [],
         appItems: [],
-        appShows: {},
+        appShows: {}, /*indicate whether app's item of an app will be shown or not*/
         versionControlOrderBy: { order: 'desc', type: 'uploadDate' },
 
         // account management
@@ -48,15 +48,15 @@
       searchTextLowerCase() {
         return _.lowerCase(this.searchText)
       },
+      storeFilters() {
+        const search = this.searchTextLowerCase
+        if (search)
+          return store => _.includes(_.lowerCase(store.settingName), search) || _.includes(_.lowerCase(store.settingAddress), search) || _.includes(store.id, search)
+        return null
+      },
       storeSearchSortResult() {
         // apply search
-        const filters = []
-        if (this.searchTextLowerCase) {
-          filters.push(store => _.includes(_.lowerCase(store.settingName), this.searchTextLowerCase))
-          filters.push(store => _.includes(_.lowerCase(store.settingAddress), this.searchTextLowerCase))
-          filters.push(store => _.includes(store.id, this.searchTextLowerCase))
-        }
-        const stores = !this.searchTextLowerCase ? this.stores : _.filter(this.stores, store => _.some(_.map(filters, f => f(store))))
+        const stores = this.storeFilters ? _.filter(this.stores, this.storeFilters) : this.stores
         // apply sort
         switch (this.orderBy) {
           case 'lastUpdated': return _.orderBy(stores, 'addedDate', 'desc')
