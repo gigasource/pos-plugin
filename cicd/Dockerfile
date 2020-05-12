@@ -6,15 +6,19 @@ WORKDIR /root/cms-boilerplate
 RUN mkdir -p /root/cms-boilerplate/storage
 COPY ./ssh ./ssh
 COPY ./gigasource-access-token ./gigasource-access-token
-RUN cd plugins/pos-plugin/pkg && \
-    VALID="$(node check-version.js | grep -o FAILED)" && \
-    if [[ ($VALID == "FAILED") && ($FORCE_UPDATE == false) ]] ; then echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1; fi
 
 RUN rm -rf ~/.ssh && \
     mv ./ssh ~/.ssh && \
     chmod -R 700 ~/.ssh && \
-    mv ./cms-configs/$CONFIG_FILE_NAME ./config/config.js && \
-    export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
+    mv ./cms-configs/$CONFIG_FILE_NAME ./config/config.js
+
+RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
+    cd plugins/pos-plugin/pkg && \
+    git pull && \
+    VALID="$(node check-version.js | grep -o FAILED)" && \
+    if [ \( "$VALID" = "FAILED" \) -o \( !$FORCE_UPDATE \) ] ; then echo "##################################################################\n#######################  VERSION EXISTED #########################\n##################################################################" && exit 1; fi
+
+RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
     GIGASOURCE_ACCESS_TOKEN=$(cat ./gigasource-access-token) && \
     cd cms-configs && \
     git pull && \
