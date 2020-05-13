@@ -557,7 +557,9 @@
         this.printOnlineOrderReport(order._id).catch(e => console.error(e))
         await this.updateOnlineOrders()
         const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
-          0: dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(order.date), 'minute')
+          0: dayjs(order.deliveryTime, 'HH:mm').isBefore(dayjs(order.date))
+            ? dayjs(order.deliveryTime, 'HH:mm').add(1, 'day').diff(dayjs(order.date), 'minute')
+            : dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(order.date), 'minute')
         })
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
       },
