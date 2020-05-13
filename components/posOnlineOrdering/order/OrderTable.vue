@@ -644,6 +644,7 @@
 
           ::v-deep .bs-tf-input {
             color: rgba(0, 0, 0, 0.87);
+            width: 100%;
           }
         }
       }
