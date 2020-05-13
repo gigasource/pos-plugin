@@ -90,7 +90,7 @@
     computed: {
       iframe() {
         const storeUrl = [location.origin, 'store', this.store.alias].join('/');
-        return `<div id="embed-btn" data-store="snack1" data-url="${storeUrl}" style="font-family: Muli, sans-serif; color: white; background: #536dfe;font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent;">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
+        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-store="snack1" data-url="${storeUrl}">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
       }
     },
     created() {

@@ -3,7 +3,7 @@
     <div class="po-order-table">
       <div  class="po-order-table__header">
         <!-- header image -->
-        <img :src="`${cdnOrderHeaderImage}?w=340&h=180` || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
+        <img :src="cdnOrderHeaderImage || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
       </div>
       <div class="po-order-table__main">
         <!-- header text -->
@@ -378,7 +378,8 @@
         return list
       },
       cdnOrderHeaderImage() {
-        return getCdnUrl(this.store.orderHeaderImageSrc)
+        const url = getCdnUrl(this.store.orderHeaderImageSrc)
+        return  url && `${url}?w=340&h=180`
       }
     },
     watch: {
