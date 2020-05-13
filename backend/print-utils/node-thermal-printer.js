@@ -171,6 +171,47 @@ const UsbManager = {
   }
 }
 
+const integrateQueue = queue({autostart: true, concurrency: 1})
+
+const IntegrateManager = {
+  push: function ({printer, nr}) {
+    console.log('Im fucking printing this !!!')
+    integrateQueue.push(function (next) {
+      let reprintTime = 0
+      const _print = () => {
+        console.log(`bt, print Nt: ${nr}`)
+        printer.printIntegrate().then(function () {
+          if (reprintTime > 10) {
+            cms.io.emit('message', JsonFn.stringify({
+              path: 'printErrorResolve',
+              printer: 'Integrate_Usb',
+              name: 'Integrated_Printer'
+            }))
+          }
+          next();
+        }, (e) => {
+          console.warn(e)
+          if (reprintTime < 500) {
+            const cb = () => {
+              reprintTime++
+              console.log(`reprintTime: ${reprintTime}`)
+              setTimeout(function () {
+                console.log('Wait finished !')
+                _print()
+              }, (reprintTime < 3) ? 500 : 5000)
+            }
+            cb()
+          } else {
+            next()
+            reprintTime++
+          }
+        })
+      }
+      _print()
+    })
+  }
+}
+
 let usb;
 let beepReady = true;
 
@@ -613,6 +654,27 @@ module.exports = class EscPrinter {
     })
   }
 
+  printIntegrate() {
+    return new Promise ((resolve, reject) => {
+      request({
+        encoding: null,
+        method: "POST",
+        uri: `http://127.0.0.1:5000/print`,
+        json: {data: this.buffer.toString('base64')}
+      }, (err, res, body) => {
+        if (err) {
+          console.log('Bluetooth server is died !!!');
+          console.warn(error);
+          return reject(error);
+        }
+        if (!body) return reject(err)
+        console.log("Print Finished !!!".red);
+        this.clear();
+        resolve();
+      })
+    })
+  }
+
   printWithDriver(printerName) {
 
     console.log(printerName);
@@ -678,6 +740,11 @@ module.exports = class EscPrinter {
         printer: this
       });
       nr++;
+    } else if (this.address.printerType === 'integrate') { // must be integrate
+      IntegrateManager.push({
+        printer: this,
+        nr
+      })
     } else if (this.address.printer) {
       this.printWithDriver(this.address.printer);
     }
@@ -699,9 +766,7 @@ module.exports = class EscPrinter {
 
   partialCut() {
     this.linefeed();
-    this.append(this.config.HW_RESET);
     this.append(this.config.PAPER_PART_CUT);
-    this.append(this.config.HW_RESET);
   }
 
   beep() {
