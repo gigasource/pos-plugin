@@ -121,9 +121,13 @@
     computed: {
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
-        if(this.user && this.user.role !== 'admin' && !this.user.viewOrder) {
-          const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering')
-          onlineOrder.items.splice(1, 2)
+        if(this.user && this.user.role !== 'admin') {
+          if (!this.user.viewOnlineOrderMenu) {
+            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering')
+          } else if (!this.user.viewOrder) {
+            const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering')
+            onlineOrder && onlineOrder.items.splice(1, 2)
+          }
         }
         if (this.user && this.enabledFeatures) {
           return sidebar.filter(item => {

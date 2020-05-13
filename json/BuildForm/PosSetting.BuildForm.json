@@ -406,7 +406,20 @@
         {
           "schemaType": "boolean",
           "key": "viewOrder",
-          "type": "input@switch"
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOnlineOrderMenu",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOrderHistory",
+          "type": "input@switch",
+          "flex": "md4"
         }
       ]
     },
