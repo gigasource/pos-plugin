@@ -15,30 +15,11 @@
     domain: 'FileUploadStore',
     components: {FileUploadProgressDialog},
     async created() {
-      const gridFsHandler = createGridFsHandlers({
+      this.gridFsHandler = createGridFsHandlers({
         // namespace: this.$getService('PosStore').accountId,
         apiBaseUrl: '/cms-files'
       })
       
-      this.gridFsHandler = new Proxy(gridFsHandler, {
-        get: function(obj, prop) {
-          if (prop === 'deleteFileByPath') {
-            return function(filePath) {
-              let path;
-              if (filePath.indexOf('//') >= 0)
-                path = filePath.substr(filePath.indexOf('//') + 1)
-              else
-                path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
-              obj['deleteFileByPath'](path);
-              cms.sharedConfig && typeof(cms.sharedConfig.purgeCdn) === 'function' && cms.sharedConfig.purgeCdn(filePath);
-            }
-          }
-
-          // The default behavior to return the value
-          return obj[prop];
-        }
-      })
-
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
     },
@@ -85,7 +66,13 @@
 
       async removeFile(filePath) {
         try {
+          let path;
+          if (filePath.indexOf('//') >= 0)
+            path = filePath.substr(filePath.indexOf('//') + 1)
+          else
+            path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
           await this.gridFsHandler.deleteFileByPath(filePath)
+          cms.sharedConfig && typeof(cms.sharedConfig.purgeCdn) === 'function' && await cms.sharedConfig.purgeCdn(filePath);
         } catch (e) {}
       },
       async createFolderIfNotExisted(folderPath, folderName) {
