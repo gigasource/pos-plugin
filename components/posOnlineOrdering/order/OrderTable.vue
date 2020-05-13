@@ -97,11 +97,11 @@
               <!--              <g-radio color="#1271ff" label="Credit" value="credit"/>-->
               <!--            </g-radio-group>-->
 
-              <div class="section-header">ORDER DETAILS</div>
+              <div class="section-header">{{$t('store.orderDetail')}}</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
                 <div class="order-item-detail__name">{{ item.name }}</div>
-                <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+                <div class="pl-1">{{ item.price * (item.quantity || 1) | currency }}</div>
               </div>
               <div class="order-item-summary">
                 <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
@@ -162,6 +162,7 @@
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
   import {get24HourValue, incrementTime} from "../../logic/timeUtil";
+  import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
 
   export default {
@@ -385,6 +386,11 @@
         this.$emit('confirm-view', val)
         const wrapper = document.getElementById('table-content')
         wrapper && wrapper.scroll({top: 0})
+        if(!val) {
+          this.$nextTick(() => {
+            autoResizeTextarea('.po-order-table__item__note textarea')
+          })
+        }
       }
     },
     methods: {
@@ -750,6 +756,7 @@
           color: #9E9E9E;
           font-style: italic;
           overflow-y: hidden;
+          min-height: 19px;
         }
       }
 
