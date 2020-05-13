@@ -12,7 +12,7 @@
           </p>
         </div>
         <div class="r">
-          <img v-if="image" :src="`${image}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
+          <img v-if="image" :src="`${cdnImage}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
           <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
           <div class="icon-eyes">
             <g-icon v-if="showImage" size="14" color="white" @click="toggleImage">visibility</g-icon>
@@ -79,6 +79,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { getCdnUrl } from '../../Store/utils';
   import SettingNewMenuItem from './SettingNewMenuItem';
   
   export default {
@@ -99,6 +100,9 @@
     computed: {
       groupPrinterStr() {
         return _.join(this.groupPrinters, ',')
+      },
+      cdnImage() {
+        return getCdnUrl(this.image)
       }
     },
     methods: {

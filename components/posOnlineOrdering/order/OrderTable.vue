@@ -3,7 +3,7 @@
     <div class="po-order-table">
       <div  class="po-order-table__header">
         <!-- header image -->
-        <img :src="`${store.orderHeaderImageSrc}?w=340&h=180` || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
+        <img :src="`${cdnOrderHeaderImage}?w=340&h=180` || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
       </div>
       <div class="po-order-table__main">
         <!-- header text -->
@@ -162,6 +162,7 @@
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
   import {get24HourValue, incrementTime} from "../../logic/timeUtil";
+  import { getCdnUrl } from '../../Store/utils';
 
   export default {
     name: 'OrderTable',
@@ -375,6 +376,9 @@
 
         return list
       },
+      cdnOrderHeaderImage() {
+        return getCdnUrl(this.store.orderHeaderImageSrc)
+      }
     },
     watch: {
       confirmView(val) {

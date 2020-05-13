@@ -2,7 +2,7 @@
   <div class="upload-zone">
     <slot v-bind:showUploadDialog="showUploadDialog">
       <div v-if="url" style="height: 244px; display: flex; align-items: center; justify-content: center">
-        <img :src="url" class="uploaded-image" draggable="false"/>
+        <img :src="cdnUrl" class="uploaded-image" draggable="false"/>
         <g-btn-bs @click="showUploadDialog()" class="edit-image-btn" text-color="#424242" background-color="#FFF" :elevation="elevation">
           <g-icon>photo_camera</g-icon>
           <span style="margin-left: 4px">Edit Photo</span>
@@ -69,7 +69,8 @@
 </template>
 <script>
   const Cropper = () => import('cropperjs');
-  
+  import { getCdnUrl } from '../../Store/utils';
+
   export default {
     name: 'UploadZone',
     props: {
@@ -122,6 +123,9 @@
           return URL.createObjectURL(this.file)
         }
       },
+      cdnUrl() {
+        return getCdnUrl(this.url)
+      }
     },
     methods: {
       getTabStyle(tab) {

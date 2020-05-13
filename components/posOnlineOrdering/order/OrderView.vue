@@ -3,7 +3,7 @@
       <template  v-if="store">
         <div class="pos-order__left">
           <div class="pos-order__left__header">
-            <img :src="store.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png'"/>
+            <img :src="cdnStoreImageSrc || '/plugins/pos-plugin/assets/images/logo.png'"/>
             <div class="pos-order__left__header--info">
               <div>
                 <div class="row-flex align-items-center justify-end">
@@ -146,6 +146,7 @@
   import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
   import CreatedOrder from './CreatedOrder';
   import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
+  import { getCdnUrl } from '../../Store/utils';
 
   export default {
     name: 'OrderView',
@@ -376,6 +377,9 @@
           })
         }
         return info
+      },
+      cdnStoreImageSrc() {
+        return getCdnUrl(this.store.logoImageSrc)
       }
     },
     methods: {

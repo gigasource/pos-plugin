@@ -36,6 +36,8 @@
   </div>
 </template>
 <script>
+  import { getCdnUrl } from '../../Store/utils';
+
   export default {
     name: 'MenuItem',
     props: {
@@ -78,8 +80,7 @@
     computed: {
       menuItemThumbnail() {
         const {width, height} = this.imageThumbnailSize
-
-        return `${this.image}?w=${width}&h=${height}`
+        return `${getCdnUrl(this.image)}?w=${width}&h=${height}`
       }
     },
   }
