@@ -1,12 +1,12 @@
 <template>
   <div class="po-menu-item">
-    <div v-if="showImage">
+    <template v-if="showImage">
       <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
       <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
-    </div>
+    </template>
     <div class="po-menu-item__content">
       <div :class="['po-menu-item__name', collapseText && 'collapse']">{{ name }}</div>
-      <div :class="['po-menu-item__desc', collapseText && 'collapse']">{{ desc }}</div>
+      <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
       <div class="po-menu-item__prices--under">
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ price | currency }}</div>
         <div v-if="price2"> {{ price2 | currency }}</div>
@@ -97,6 +97,10 @@
       margin-right: 18px;
       width: 60px;
       height: 60px;
+
+      & ~ .po-menu-item__content {
+        max-width: calc(100% - 200px);
+      }
     }
 
     &__name {
@@ -114,7 +118,7 @@
 
     &__content {
       margin-right: 16px;
-      max-width: calc(100% - 200px);
+      max-width: calc(100% - 140px);
     }
 
     &__desc {
@@ -122,6 +126,7 @@
       color: #757575;
       max-width: 100%;
       word-break: break-word;
+      white-space: pre-wrap;
 
       &.collapse {
         -webkit-line-clamp: 2;
@@ -174,12 +179,16 @@
     .po-menu-item {
       &__content {
         line-height: 1.2;
-        max-width: calc(100% - 160px);
+        max-width: calc(100% - 100px);
         margin-right: 4px;
       }
 
       &__thumbnail {
         margin-right: 8px;
+
+        & ~ .po-menu-item__content {
+          max-width: calc(100% - 160px);
+        }
       }
 
       &__name {
