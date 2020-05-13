@@ -663,7 +663,7 @@ module.exports = class EscPrinter {
         json: {data: this.buffer.toString('base64')}
       }, (err, res, body) => {
         if (err) {
-          console.log('Bluetooth server is died !!!');
+          console.log('Integrate server is died !!!');
           console.warn(error);
           return reject(error);
         }
