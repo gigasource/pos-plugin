@@ -46,8 +46,8 @@
               </div>
             </template>
             <div style="display: flex; justify-content: flex-end; margin-top: 24px">
-              <g-btn-bs height="44" @click="closeDialog">Cancel</g-btn-bs>
-              <g-btn-bs @click="moveToCropView" background-color="#536DFE" width="98" height="44" text-color="#FFF">Next</g-btn-bs>
+              <g-btn-bs width="90" height="44" @click="closeDialog">Cancel</g-btn-bs>
+              <g-btn-bs :disabled="!photoUrl && !file" @click="moveToCropView" background-color="#536DFE" width="98" height="44" text-color="#FFF">Next</g-btn-bs>
             </div>
           </div>
         </template>
@@ -59,7 +59,7 @@
             <img :src="imageSrc" style="height: 281px" ref="previewImage" @load="imageLoaded">
           </div>
           <div style="display: flex; justify-content: flex-end; padding: 35px;">
-            <g-btn-bs height="44" @click="moveToSrcView">Back</g-btn-bs>
+            <g-btn-bs width="90" height="44" @click="moveToSrcView">Back</g-btn-bs>
             <g-btn-bs :disabled="initializingCropper || dialog.uploading" background-color="#536DFE" text-color="#FFF" width="98" height="44" @click="_uploadImage">Save</g-btn-bs>
           </div>
         </template>

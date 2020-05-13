@@ -594,10 +594,6 @@
           ::v-deep .g-tf-append__inner {
             display: none;
           }
-
-          textarea {
-            user-select: text !important;
-          }
         }
 
         .g-textarea ::v-deep textarea,
@@ -623,6 +619,7 @@
             font-size: 15px;
             color: #000000;
             cursor: pointer;
+            padding: 6px;
 
             &:hover {
               background: #EFEFEF;
@@ -931,6 +928,10 @@
 <style lang="scss">
   .g-icon {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  textarea {
+    user-select: text !important;
   }
 
   input {

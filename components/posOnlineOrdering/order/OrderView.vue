@@ -201,8 +201,10 @@
         // TODO
         alert('Store is not exist');
       }
+      this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
+      this.now = dayjs().format('HH:mm')
       this.dayInterval = setInterval(() => {
-        this.today = dayjs().format('dddd')
+        this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
         this.now = dayjs().format('HH:mm')
       }, 1000)
       this.dialog.closed = !this.isStoreOpening
