@@ -66,7 +66,15 @@
 
       async removeFile(filePath) {
         // TODO: [High] Remove file cdn
-        const path = filePath.substr(filePath.indexOf('//') + 1)
+        let path;
+        if (filePath.indexOf('//')) {
+          // old format
+          path = filePath.substr(filePath.indexOf('//') + 1)
+        } else {
+          // new format
+          path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
+        }
+        
         try {
           await this.gridFsHandler.deleteFileByPath(path)
         } catch (e) {}
