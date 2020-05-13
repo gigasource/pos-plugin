@@ -19,7 +19,7 @@
         // namespace: this.$getService('PosStore').accountId,
         apiBaseUrl: '/cms-files'
       })
-
+      
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
     },
@@ -65,18 +65,14 @@
       },
 
       async removeFile(filePath) {
-        // TODO: [High] Remove file cdn
-        let path;
-        if (filePath.indexOf('//')) {
-          // old format
-          path = filePath.substr(filePath.indexOf('//') + 1)
-        } else {
-          // new format
-          path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
-        }
-        
         try {
-          await this.gridFsHandler.deleteFileByPath(path)
+          let path;
+          if (filePath.indexOf('//') >= 0)
+            path = filePath.substr(filePath.indexOf('//') + 1)
+          else
+            path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
+          await this.gridFsHandler.deleteFileByPath(filePath)
+          cms.sharedConfig && typeof(cms.sharedConfig.purgeCdn) === 'function' && await cms.sharedConfig.purgeCdn(filePath);
         } catch (e) {}
       },
       async createFolderIfNotExisted(folderPath, folderName) {
