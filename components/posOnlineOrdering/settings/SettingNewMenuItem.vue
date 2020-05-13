@@ -5,7 +5,7 @@
       <div class="ta-center">{{ index + 1 }}</div>
       <upload-zone class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
         <template v-slot:default="{showUploadDialog}">
-          <img @click="showUploadDialog()" v-if="internalImage" :src="`${internalImage}?w=80&h=80`" draggable="false" style="opacity: 0.8; width: 100%; height: 100%"/>
+          <img @click="showUploadDialog()" v-if="internalImage" :src="`${internalCdnImage}?w=80&h=80`" draggable="false" style="opacity: 0.8; width: 100%; height: 100%"/>
           <div @click="showUploadDialog()" v-else class="menu-setting-new-item__image--upload">
             <img alt src="/plugins/pos-plugin/assets/upload.svg"/>
             <p>Upload</p>
@@ -62,6 +62,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { getCdnUrl } from '../../Store/utils';
   import UploadZone from "./UploadZone";
 
   export default {
@@ -117,6 +118,9 @@
     computed: {
       internalAvailablePrinters() {
         return _.map(this.availablePrinters, printer => ({ text: printer, value: printer }))
+      },
+      internalCdnImage() {
+        return getCdnUrl(this.internalImage)
       }
     },
     methods: {
