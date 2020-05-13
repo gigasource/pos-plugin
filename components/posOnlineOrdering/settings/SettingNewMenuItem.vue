@@ -53,8 +53,14 @@
         </div>
       </div>
     </div>
+    <!-- Choice -->
+    <div v-if="choices" v-for="(choice, i) in choices" :key="i">
+      <div>Add choice here</div>
+    </div>
     <!-- Action button -->
-    <div style="display: flex; justify-content: flex-end; margin: 4px 8px">
+    <div style="display: flex; margin: 4px 8px">
+      <g-btn-bs @click="addChoice">+ Choice</g-btn-bs>
+      <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="!internalName || isNaN(internalPrice) || !internalPrinter" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
     </div>
@@ -83,6 +89,10 @@
       showImage: {
         type: Boolean,
         default: true
+      },
+      choices: {
+        type: Array,
+        default: []
       }
     },
     data: function () {
