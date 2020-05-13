@@ -85,7 +85,7 @@
                   <div class="error-message">{{couponTf.error}}</div>
                   <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
                     <g-icon size="12" color="green">check</g-icon>
-                    {{$t('store.couponApplied')}}}}
+                    {{$t('store.couponApplied')}}
                   </div>
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
