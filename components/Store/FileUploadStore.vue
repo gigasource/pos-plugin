@@ -43,7 +43,7 @@
             } else {
               reject(response)
             }
-          }))
+          }, true))
         })
       },
       async prepareUploadAppFolder(groupName, version) {
@@ -60,7 +60,7 @@
             } else {
               reject(response)
             }
-          }))
+          }, false))
         })
       },
 
