@@ -54,12 +54,38 @@
       </div>
     </div>
     <!-- Choice -->
-    <div v-if="choices" v-for="(choice, i) in choices" :key="i">
-      <div>Add choice here</div>
+    <div class="menu-setting-new-item__choices">
+      <div v-if="choices" v-for="(choice, i) in internalChoices" :key="i" class="menu-setting-new-item__choice">
+        <!-- header -->
+        <div>Type</div><div>Select</div><div>Choice</div><div><span>Option</span><span @click="addOption(i)">+ Add</span></div>
+        <!-- value -->
+        <g-checkbox v-model="choice.mandatory" label="Mandatory" @change="choice.mandatory = $event"/>
+        <div>
+          <g-radio-group v-model="choice.select" row>
+            <g-radio value="one" label="One"/>
+            <g-radio value="many" label="Many"/>
+          </g-radio-group>
+        </div>
+        <g-text-field-bs v-model="choice.name"/>
+        <div>
+          <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt">
+            <div class="item-name col-7">
+              <input type="number" step="1" :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })"/>
+            </div>
+            <div class="item-price col-4">
+              <input type="number" :value="option.price" placeholder="€" @input="e =>  editOption(i, iOpt, { name: option.name, price: parseInt(e.target.value) })"/>
+            </div>
+            <div class="item-btn--delete col-1">
+              <g-icon size="16" color="#424242" @click="removeOption(item)">icon-close</g-icon>
+            </div>
+          </div>
+        </div>
+        <div @click="() => {}" class="menu-setting-new-item__choice__delete-btn">Delete Choice</div>
+      </div>
     </div>
     <!-- Action button -->
-    <div style="display: flex; margin: 4px 8px">
-      <g-btn-bs @click="addChoice">+ Choice</g-btn-bs>
+    <div style="display: flex; padding: 13px 8px; background-color: #FFF">
+      <g-btn-bs @click="addChoice" border-color="#5E76FE" text-color="#5E76FE">+ Choice</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="!internalName || isNaN(internalPrice) || !internalPrinter" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
@@ -112,6 +138,7 @@
         internalTax: this.tax || 7,
         internalImage: this.image,
         internalPrinter,
+        internalChoices: _.cloneDeep(this.choices),
         taxes: [],
       }
     },
@@ -137,6 +164,24 @@
       async getAllTaxCategory() {
         const settings = await cms.getModel('PosSetting').findOne();
         return settings.taxCategory;
+      },
+      addChoice() {
+        this.internalChoices.push({
+          mandatory: false,
+          select: "one",
+          name: '',
+          options: []
+        })
+      },
+      addOption(choiceIndex) {
+        this.internalChoices[choiceIndex].options.push({
+          name: '',
+          price: 0
+        })
+      },
+      editOption(choiceIndex, optionIndex, { name, price }) {
+        this.internalChoices[choiceIndex].options[optionIndex].name = name
+        this.internalChoices[choiceIndex].options[optionIndex].price = price
       },
       getImage(url) {
         this.internalImage = url
@@ -170,7 +215,8 @@
           groupPrinters: this.internalPrinter,
           price: this.internalPrice,
           tax: this.internalTax,
-          showImage: this.showImage
+          showImage: this.showImage,
+          choices: this.internalChoices
         })
       }
     }
@@ -286,6 +332,24 @@
 
     }
 
+    &__choices {
+    }
+    
+    &__choice {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr 2fr;
+      grid-template-rows: 30px 1fr;
+      
+      &__delete-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
     &__image {
       width: 80px;
       height: 80px;

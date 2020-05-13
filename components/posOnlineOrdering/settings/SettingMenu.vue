@@ -35,6 +35,14 @@
               <g-icon v-if="editBtn[index]" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index-1)">fas fa-caret-square-up</g-icon>
               <g-icon v-if="editBtn[index]" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index+1)">fas fa-caret-square-down</g-icon>
               <g-spacer/>
+              <g-btn-bs
+                  background-color="#E3F2FD"
+                  text-color="#536DFE"
+                  border-color="#90CAF9"
+                  @click.stop.prevent="showAddNewProductPanelForCategory(cate)"
+                  :disabled="showAddNewProductPanel[cate._id]">
+                + Add New Item
+              </g-btn-bs>
               <g-icon @click.prevent.stop="openDeleteCategoryDialog(cate)" class="mr-2">mdi-trash-can-outline</g-icon>
               <g-icon v-if="showProducts[cate._id]">fas fa-chevron-up</g-icon>
               <g-icon v-else>fas fa-chevron-down</g-icon>
@@ -70,13 +78,6 @@
                           @cancel="hideAddNewProductPanelForCategory(cate)"
                           @save="addNewProduct({...$event, category: cate._id, order: cate.products.length})"/>
                     </div>
-                  </div>
-                  <div style="height: 40px; background-color: #fff; display: flex; align-items: center; justify-content: center;">
-                    <g-btn-bs text-color="#2979FF"
-                              @click="showAddNewProductPanelForCategory(cate)"
-                              :disabled="showAddNewProductPanel[cate._id]">
-                      + Add New Item
-                    </g-btn-bs>
                   </div>
                 </div>
               </template>
