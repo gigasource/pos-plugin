@@ -52,7 +52,8 @@
           "options": [
             "ip",
             "com",
-            "usb"
+            "usb",
+            "integrate"
           ]
         },
         {
@@ -218,6 +219,6 @@
   "id": "5c5ee40bc1c8891f00507c68",
   "name": "GroupPrinter",
   "tabs": [],
-  "type": "Collection",
-  "title": "name"
+  "title": "name",
+  "type": "Collection"
 }
