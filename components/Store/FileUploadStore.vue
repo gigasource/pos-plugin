@@ -72,7 +72,11 @@
           else
             path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
           await this.gridFsHandler.deleteFileByPath(filePath)
-          cms.sharedConfig && typeof(cms.sharedConfig.purgeCdn) === 'function' && await cms.sharedConfig.purgeCdn(filePath);
+          if (cms.sharedConfig && typeof(cms.sharedConfig.getPurgeCdnData) === 'function') {
+            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(filePath);
+            if (purgeCdnData)
+              axios.get(purgeCdnData.url, purgeCdnData.options)
+          }
         } catch (e) {}
       },
       async createFolderIfNotExisted(folderPath, folderName) {
