@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="row-flex justify-end align-items-center col-4">
-                <span v-if="order.deliveryTime" class="fw-700 fs-small mr-1">{{order.deliveryTime.toString().toUpperCase()}}</span>
+                <span v-if="order.deliveryTime" class="fw-700 fs-small mr-2">{{order.deliveryTime.toString().toUpperCase()}}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
                   <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
