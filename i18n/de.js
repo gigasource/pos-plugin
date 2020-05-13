@@ -422,6 +422,7 @@ module.exports = {
       price: 'E.P',
       total: 'Summe',
       currency: 'EUR',
+      shippingFee: 'Liefergebühr',
     }
   }
 }

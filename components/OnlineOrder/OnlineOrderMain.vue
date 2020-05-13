@@ -18,20 +18,22 @@
         </template>
         <template v-else>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
-            <g-card-title>
-              <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-              <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
-              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 70px); line-height: 1.2">
-                <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
-                {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+            <g-card-title style="align-items: flex-start">
+              <div class="row-flex col-8 align-items-center">
+                <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
+                <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+                <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
+                  <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
+                  {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+                </div>
               </div>
-              <g-spacer/>
-              <span v-if="order.deliveryTime" class="fw-700 fs-small mr-2">({{order.deliveryTime.toString().toUpperCase()}})</span>
-              <template v-if="order.timeoutDate && timeoutProgress[order._id]">
-                <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
-                <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
-              </template>
-              <span class="fw-700 fs-small" v-else>{{order.date | formatDate}}</span>
+              <div class="row-flex justify-end align-items-center col-4">
+                <span v-if="order.deliveryTime" class="fw-700 fs-small mr-1">{{order.deliveryTime.toString().toUpperCase()}}</span>
+                <template v-if="order.timeoutDate && timeoutProgress[order._id]">
+                  <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
+                  <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
+                </template>
+              </div>
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
@@ -41,7 +43,7 @@
                 <div style="flex: 0 0 25px">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
-                <div class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
+                <div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
@@ -55,6 +57,10 @@
                   <div class="fs-small-2 ta-right">€{{ item.originalPrice ||item.price | formatMoney(decimals)}}</div>
                 </div>
               </div>
+              <div v-if="order.type === 'delivery'" class="row-flex">
+                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
+                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
+              </div>
               <div v-if="order.discounts && order.discounts.length">
                 <div class="row-flex align-items-start" v-for="discount in order.discounts">
                   <div>
@@ -64,10 +70,6 @@
                   <g-spacer/>
                   <div class="fs-small-2">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
                 </div>
-              </div>
-              <div v-if="order.type === 'delivery'" class="row-flex">
-                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
@@ -121,7 +123,7 @@
           <g-card elevation="0" v-for="(order, index) in sortedKitchenOrders" :key="index"
                   :style="[getPendingOrderKitchenTime(order) < 10 && {border: '1px solid #FF4452'}]">
             <g-card-title>
-              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 90px); line-height: 1.2">
+              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 96px); line-height: 1.2">
                 <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
                 {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
               </div>

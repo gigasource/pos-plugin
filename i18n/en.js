@@ -424,6 +424,7 @@ module.exports = {
       price: 'Price',
       total: 'Total',
       currency: 'USD',
+      shippingFee: 'Shipping Fee',
     }
   }
 }
