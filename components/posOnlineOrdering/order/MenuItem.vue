@@ -127,12 +127,12 @@
       max-width: 100%;
       word-break: break-word;
       white-space: pre-wrap;
+      overflow: hidden;
 
       &.collapse {
         -webkit-line-clamp: 2;
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        overflow: hidden;
         user-select: auto;
       }
     }
