@@ -33,6 +33,9 @@ android {
         pro {
             dimension "giga"
             buildConfigField("String", "mode", '"--mode=android"')
+            ndk {
+                abiFilters 'armeabi-v7a'
+            }
         }
     }
     sourceSets {

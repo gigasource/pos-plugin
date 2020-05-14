@@ -91,6 +91,12 @@
         <div class="edit__item" v-if="!isAdmin">
           <pos-switch @change="save" dense :label="$t('settings.viewOrder')" v-model="selectedUser.viewOrder"/>
         </div>
+        <div class="edit__item" v-if="!isAdmin">
+          <pos-switch @change="save" dense :label="$t('settings.viewOnlineOrderMenu')" v-model="selectedUser.viewOnlineOrderMenu"/>
+        </div>
+        <div class="edit__item" v-if="!isAdmin">
+          <pos-switch @change="save" dense :label="$t('settings.viewOrderHistory')" v-model="selectedUser.viewOrderHistory"/>
+        </div>
       </div>
     </g-grid-layout>
     <dialog-user-detail :focusInput.sync="focusInput" v-model="dialogUserDetail"/>

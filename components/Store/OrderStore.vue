@@ -543,23 +543,32 @@
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
       },
       async acceptPendingOrder(order) {
-        if (order.deliveryTime === 'asap') {
-          order.deliveryTime = dayjs().add(order.prepareTime, 'minute').format('HH:mm')
-        }
+        try {
+          let deliveryDateTime
 
-        const status = 'kitchen'
-        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
-          Object.assign({}, order, {
-            status,
-            user: this.user
-          }))
-        this.printOnlineOrderKitchen(order._id).catch(e => console.error(e))
-        this.printOnlineOrderReport(order._id).catch(e => console.error(e))
-        await this.updateOnlineOrders()
-        const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
-          0: dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(order.date), 'minute')
-        })
-        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
+          if (order.deliveryTime === 'asap') {
+            deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
+            order.deliveryTime = deliveryDateTime.format('HH:mm')
+          } else {
+            deliveryDateTime = dayjs(order.deliveryTime, 'HH:mm')
+          }
+
+          const status = 'kitchen'
+          const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id },
+            Object.assign({}, order, {
+              status,
+              user: this.user
+            }))
+          this.printOnlineOrderKitchen(order._id)
+          this.printOnlineOrderReport(order._id)
+          await this.updateOnlineOrders()
+          const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
+            0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
+          })
+          window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
+        } catch (e) {
+          console.error(e)
+        }
       },
       async setPendingOrder(order) {
         const status = 'inProgress'

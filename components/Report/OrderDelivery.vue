@@ -40,12 +40,18 @@
         <tr v-for="item in items">
           <td width="42%" style="padding-left: 12px">{{item.id}}. {{item.name}}</td>
           <td width="5%" style="text-align: right">{{item.quantity}}</td>
-          <td width="18%" style="text-align: right">{{item.price | convertMoney}}</td>
-          <td width="25%" style="text-align: right; padding-right: 2px;">{{(item.price * item.quantity) | convertMoney}}</td>
+          <td width="18%" style="text-align: right">{{(item.originalPrice || item.price) | convertMoney}}</td>
+          <td width="25%" style="text-align: right; padding-right: 2px;">{{((item.originalPrice || item.price) * item.quantity) | convertMoney}}</td>
         </tr>
       </table>
     </div>
     <div class="divider-dashed"/>
+    <span>{{locale.printing.shippingFee}}</span>
+    <span>{{getShippingFee(order) | convertMoney}}</span>
+    <div v-for="discount in discounts">
+      <span>{{discount.coupon ? `Coupon (${discount.coupon})` : discount.name}}</span>
+      <span class="float-right">{{discount.value | convertMoney}}</span>
+    </div>
     <div class="bold" style="font-size: 30px; margin-top: 20px">
       <span>{{locale.printing.total}}</span>
       <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
@@ -72,7 +78,8 @@
       orderSum: Number,
       deliveryTime: String,
       locale: Object,
-      type: String
+      type: String,
+      discounts: Array
     },
     filters: {
       convertMoney(value) {
@@ -99,6 +106,14 @@
         return this.type === 'delivery'
           ? this.locale.printing.delivery
           : this.locale.printing.pickup
+      }
+    },
+    methods: {
+      getShippingFee({ discounts, shippingFee }) {
+        if (!discounts || !discounts.length) return shippingFee
+
+        const freeShipping = discounts.find(item => item.type === 'freeShipping');
+        return freeShipping ? freeShipping.value : shippingFee;
       }
     }
   }

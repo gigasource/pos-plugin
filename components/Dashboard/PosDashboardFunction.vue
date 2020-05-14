@@ -56,7 +56,7 @@
           {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},
           {title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => this.changePath('/pos-settings')},
           {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', click: () => this.changePath('/pos-eod-report')},
-          {title: orderHistory, icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
+          {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
           {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
           {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
           {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
@@ -88,6 +88,8 @@
           if (!item.feature) return true
           if (this.user && this.user.role === 'admin')
             if (item.feature === 'settings' || item.feature === 'printerSettings') return true
+          if (item.feature === 'orderHistory')
+            return !!(this.user && (this.user.role === 'admin' || this.user.viewOrderHistory))
           return (this.enabledFeatures.includes(item.feature))
         })
       },

@@ -18,20 +18,22 @@
         </template>
         <template v-else>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
-            <g-card-title>
-              <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-              <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
-              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 70px); line-height: 1.2">
-                <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
-                {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+            <g-card-title style="align-items: flex-start; flex-wrap: nowrap">
+              <div class="row-flex align-items-center flex-grow-1">
+                <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
+                <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+                <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
+                  <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
+                  {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+                </div>
               </div>
-              <g-spacer/>
-              <span v-if="order.deliveryTime" class="fw-700 fs-small mr-2">({{order.deliveryTime.toString().toUpperCase()}})</span>
-              <template v-if="order.timeoutDate && timeoutProgress[order._id]">
-                <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
-                <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
-              </template>
-              <span class="fw-700 fs-small" v-else>{{order.date | formatDate}}</span>
+              <div class="row-flex justify-end align-items-center" style="flex: 0 0 auto">
+                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2">{{order.deliveryTime.toString().toUpperCase()}}</span>
+                <template v-if="order.timeoutDate && timeoutProgress[order._id]">
+                  <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
+                  <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
+                </template>
+              </div>
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
@@ -41,19 +43,21 @@
                 <div style="flex: 0 0 25px">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
-                <div class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
+                <div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
                   <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
                   <div class="flex-equal fs-small-2 pl-1">
                     {{item.id && `${item.id}.`}} {{item.name}}
-                    <template v-if="item.modifiers.length > 0">
-                      <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier.name}}</span>)</span>
-                    </template>
+                    <span class="i text-grey">{{getExtraInfo(item)}}</span>
                   </div>
-                  <div class="fs-small-2 ta-right">€{{ item.originalPrice ||item.price | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2 ta-right">€{{ getItemPrice(item) | formatMoney(decimals)}}</div>
                 </div>
+              </div>
+              <div v-if="order.type === 'delivery'" class="row-flex">
+                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
+                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
               </div>
               <div v-if="order.discounts && order.discounts.length">
                 <div class="row-flex align-items-start" v-for="discount in order.discounts">
@@ -64,10 +68,6 @@
                   <g-spacer/>
                   <div class="fs-small-2">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
                 </div>
-              </div>
-              <div v-if="order.type === 'delivery'" class="row-flex">
-                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
@@ -121,7 +121,7 @@
           <g-card elevation="0" v-for="(order, index) in sortedKitchenOrders" :key="index"
                   :style="[getPendingOrderKitchenTime(order) < 10 && {border: '1px solid #FF4452'}]">
             <g-card-title>
-              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 90px); line-height: 1.2">
+              <div class="fs-small-2 ml-1" style="max-width: calc(100% - 96px); line-height: 1.2">
                 <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
                 {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
               </div>
@@ -151,9 +151,7 @@
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
                       {{item.id && `${item.id}.`}} {{item.name}}
-                      <template v-if="item.modifiers.length > 0">
-                        <span class="i text-grey">({{item.modifiers.map(m => m.name).join(', ')}})</span>
-                      </template>
+                      <span class="i text-grey">{{getExtraInfo(item)}}</span>
                     </span>
                   </span>
                 </div>
@@ -293,17 +291,19 @@
       getTimeoutProgress(order) {
         const calc = () => {
           clearTimeout(this.timeoutInterval[order._id])
-          const now = new Date()
-          const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
-          const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
-          if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+          requestAnimationFrame(() => {
+            const now = new Date()
+            const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
+            const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
+            if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
 
-          const x = (timeout - diff) / timeout
-          const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
-          this.$set(order, 'timeoutProgress', progress)
-          this.timeoutInterval[order._id] = setTimeout(calc, 1000)
+            const x = (timeout - diff) / timeout
+            const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
+            this.$set(order, 'timeoutProgress', progress)
+            this.timeoutInterval[order._id] = setTimeout(calc, 1000)
 
-          this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+            this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+          })
         }
 
         if (!order.timeoutDate) return
@@ -311,6 +311,22 @@
       },
       getPendingOrderKitchenTime(order) {
         return dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(), 'minute')
+      },
+      getItemPrice(item) {
+        let price = item.originalPrice || item.price
+        if(item.modifiers && item.modifiers.length > 0){
+          price += _.sumBy(item.modifiers, m => m.price * m.quantity)
+        }
+        return price
+      },
+      getExtraInfo(item) {
+        let info = ''
+        if(item.modifiers && item.modifiers.length > 0) {
+          info += item.modifiers.map(m => m.name).join(', ')
+          if(item.note) info += ', '
+        }
+        if(item.note) info += item.note
+        return info.length > 0 ? `(${info})` : info
       }
     },
     mounted() {

@@ -7,6 +7,13 @@ function convertMoney(value) {
   return !isNaN(value) ? value.toFixed(2) : value
 }
 
+function getShippingFee({ discounts, shippingFee }) {
+  if (!discounts || !discounts.length) return shippingFee
+
+  const freeShipping = discounts.find(item => item.type === 'freeShipping');
+  return freeShipping ? freeShipping.value : shippingFee;
+}
+
 async function makePrintData(cms, {orderId}) {
   const order = await cms.getModel('Order').findById(orderId);
   const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
@@ -24,7 +31,8 @@ async function makePrintData(cms, {orderId}) {
     vSum: orderSum,
     date,
     deliveryTime,
-    type
+    type,
+    discounts
   } = order;
 
   return {
@@ -41,7 +49,8 @@ async function makePrintData(cms, {orderId}) {
     date: dayjs(date).format(localeObj.printing.dateFormat),
     deliveryTime,
     locale: localeObj,
-    type
+    type,
+    discounts
   };
 }
 
@@ -60,7 +69,8 @@ async function printEscPos(escPrinter, printData) {
     date,
     locale,
     deliveryTime,
-    type
+    type,
+    discounts,
   } = printData;
 
   escPrinter.setTextDoubleHeight();
@@ -106,11 +116,15 @@ async function printEscPos(escPrinter, printData) {
     escPrinter.tableCustom([
       {text: `${item.id}. ${item.name}`, align: 'LEFT', width: 0.4},
       {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
-      {text: `${convertMoney(item.price)}`, align: 'RIGHT', width: 0.22},
-      {text: `${convertMoney(item.price * item.quantity)}`, align: 'RIGHT', width: 0.22},
+      {text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22},
+      {text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22},
     ])
   })
   escPrinter.drawLine()
+  type === 'delivery' && escPrinter.leftRight(locale.printing.shippingFee, convertMoney(getShippingFee(printData)))
+  discounts.forEach(item => {
+    escPrinter.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
+  })
   escPrinter.bold(true)
   escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
   // escPrinter.newLine()
