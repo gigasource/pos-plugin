@@ -70,18 +70,22 @@
         this.lastPos = { x: e.clientX, y: e.clientY }
       }, 20)
     },
-    mounted() {
-      this.$nextTick(() => {
-        const roomEl = this.$refs['room']
+    watch: {
+      roomObjects: {
+        handler() {
+          this.$nextTick(() => {
+            const roomEl = this.$refs['room']
 
-        const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
-        const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
+            const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
+            const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
+            console.log(zoomVerticalRatio)
 
-        if (zoomHorizontalRatio === 1 && zoomVerticalRatio === 1) return
-        roomEl.style.zoom = zoomVerticalRatio < zoomHorizontalRatio
-          ? zoomVerticalRatio.toFixed(1)
-          : zoomHorizontalRatio.toFixed(1)
-      })
+            if (zoomHorizontalRatio >= 1 && zoomVerticalRatio >= 1) return
+            roomEl.style.zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
+          })
+        },
+        immediate: true
+      }
     },
     methods: {
       // styling stuff
