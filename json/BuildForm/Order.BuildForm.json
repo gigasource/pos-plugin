@@ -933,6 +933,11 @@
           "schemaType": "string",
           "key": "desc",
           "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "note",
+          "type": "input"
         }
       ],
       "default": null,

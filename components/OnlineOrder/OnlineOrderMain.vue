@@ -50,11 +50,9 @@
                   <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
                   <div class="flex-equal fs-small-2 pl-1">
                     {{item.id && `${item.id}.`}} {{item.name}}
-                    <template v-if="item.modifiers.length > 0">
-                      <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier.name}}</span>)</span>
-                    </template>
+                    <span class="i text-grey">{{getExtraInfo(item)}}</span>
                   </div>
-                  <div class="fs-small-2 ta-right">€{{ item.originalPrice ||item.price | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2 ta-right">€{{ getItemPrice(item) | formatMoney(decimals)}}</div>
                 </div>
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
@@ -153,9 +151,7 @@
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
                       {{item.id && `${item.id}.`}} {{item.name}}
-                      <template v-if="item.modifiers.length > 0">
-                        <span class="i text-grey">({{item.modifiers.map(m => m.name).join(', ')}})</span>
-                      </template>
+                      <span class="i text-grey">{{getExtraInfo(item)}}</span>
                     </span>
                   </span>
                 </div>
@@ -315,6 +311,22 @@
       },
       getPendingOrderKitchenTime(order) {
         return dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(), 'minute')
+      },
+      getItemPrice(item) {
+        let price = item.originalPrice || item.price
+        if(item.modifiers && item.modifiers.length > 0){
+          price += _.sumBy(item.modifiers, m => m.price * m.quantity)
+        }
+        return price
+      },
+      getExtraInfo(item) {
+        let info = ''
+        if(item.modifiers && item.modifiers.length > 0) {
+          info += item.modifiers.map(m => m.name).join(', ')
+          if(item.note) info += ', '
+        }
+        if(item.note) info += item.note
+        return info.length > 0 ? `(${info})` : info
       }
     },
     mounted() {
