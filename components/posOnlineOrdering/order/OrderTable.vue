@@ -420,9 +420,8 @@
             groupPrinter2: this.store.useMultiplePrinters && orderItem.groupPrinters.length >= 2 && orderItem.groupPrinters[1],
             category: orderItem.category.name,
             originalPrice: orderItem.price,
-            ...  orderItem.note
-                ? {modifiers: orderItem.modifiers.unshift({name: orderItem.note, price: 0, quantity: 1})}
-                : {modifiers: orderItem.modifiers},
+            modifiers: orderItem.modifiers,
+            note: orderItem.note
           }
         })
 
