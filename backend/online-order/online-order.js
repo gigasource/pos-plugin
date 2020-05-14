@@ -167,12 +167,12 @@ function createOnlineOrderSocket(deviceId, cms) {
       if (typeof callback === 'function') callback();
     });
 
-    onlineOrderSocket.on('updateApp', async (uploadPath, ackFn) => {
+    onlineOrderSocket.on('updateApp', async (uploadPath, type, ackFn) => {
       uploadPath = `${global.APP_CONFIG.webshopUrl}${uploadPath}`
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
-        await axios.post('http://localhost:5000/update', {
+        await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
           downlink: uploadPath
         })
       } catch (e) {
@@ -261,7 +261,7 @@ module.exports = async cms => {
           console.error(e);
           await updateDeviceStatus();
         }
-      console.log('resolve promise')
+        console.log('resolve promise')
         resolve();
     })
   })
