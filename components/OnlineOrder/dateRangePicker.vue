@@ -96,7 +96,9 @@
     computed: {
       // custom date format - for display only
       formattedRange() {
-        return `${dayjs(this.from || this.today, DATE_PICKER_FORMAT).format('MMM DD')} - ${dayjs(this.to || this.today, DATE_PICKER_FORMAT).format('MMM DD')}`
+        let from = dayjs(this.from || this.today, DATE_PICKER_FORMAT).format('MMM DD');
+        let to = dayjs(this.to || this.today, DATE_PICKER_FORMAT).format('MMM DD');
+        return from === to ? `${from}` : `${from} - ${to}`
       },
       formattedFromDate() {
         return dayjs(this.fromDate).format(DATE_FORMAT)
@@ -287,7 +289,7 @@
               cursor: pointer;
             }
             .g-table-item__content {
-              font-size: 15px;
+              font-size: 14px;
               cursor: pointer;
             }
             .g-table-item--active {
