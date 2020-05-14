@@ -18,8 +18,8 @@
         </template>
         <template v-else>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
-            <g-card-title style="align-items: flex-start">
-              <div class="row-flex col-8 align-items-center">
+            <g-card-title style="align-items: flex-start; flex-wrap: nowrap">
+              <div class="row-flex align-items-center flex-grow-1">
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
                 <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
@@ -27,8 +27,8 @@
                   {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
                 </div>
               </div>
-              <div class="row-flex justify-end align-items-center col-4">
-                <span v-if="order.deliveryTime" class="fw-700 fs-small mr-2">{{order.deliveryTime.toString().toUpperCase()}}</span>
+              <div class="row-flex justify-end align-items-center" style="flex: 0 0 auto">
+                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2">{{order.deliveryTime.toString().toUpperCase()}}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
                   <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
@@ -295,17 +295,19 @@
       getTimeoutProgress(order) {
         const calc = () => {
           clearTimeout(this.timeoutInterval[order._id])
-          const now = new Date()
-          const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
-          const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
-          if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+          requestAnimationFrame(() => {
+            const now = new Date()
+            const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
+            const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
+            if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
 
-          const x = (timeout - diff) / timeout
-          const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
-          this.$set(order, 'timeoutProgress', progress)
-          this.timeoutInterval[order._id] = setTimeout(calc, 1000)
+            const x = (timeout - diff) / timeout
+            const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
+            this.$set(order, 'timeoutProgress', progress)
+            this.timeoutInterval[order._id] = setTimeout(calc, 1000)
 
-          this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+            this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+          })
         }
 
         if (!order.timeoutDate) return
