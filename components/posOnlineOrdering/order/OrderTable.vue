@@ -421,7 +421,7 @@
             groupPrinter2: this.store.useMultiplePrinters && orderItem.groupPrinters.length >= 2 && orderItem.groupPrinters[1],
             category: orderItem.category.name,
             originalPrice: orderItem.price,
-            ...orderItem.note && {modifiers: [{name: orderItem.note, price: 0, quantity: 1}]},
+            note: orderItem.note,
           }
         })
 
