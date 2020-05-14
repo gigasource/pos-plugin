@@ -169,17 +169,17 @@
           </g-dnd-dialog>
   
           <!-- WebRTC remote control -->
-          <g-dnd-dialog v-if="webRTCiframeSrc" v-model="showWebRTCIframe" :width="iframeWidth"
-                        :height="iframeHeight" lazy @close="stopRemoteControl"
-                        @dragStart="iframeDragging = true" @dragEnd="iframeDragging = false"
-                        @resizeStart="iframeDragging = true" @resizeEnd="iframeDragging = false">
-            <template #title>
-              Remote Control Web RTC
-            </template>
-    
-            <div v-if="showWebRTCIframe && iframeDragging"
-                 style="height: 100%; width: 100%; position: absolute; background: transparent"/>
-            <iframe v-if="showWebRTCIframe" :src="webRTCiframeSrc" width="100%" height="100%"/>
+          <g-dnd-dialog v-if="dialog.webRTC.show"
+                        v-model="dialog.webRTC.show"
+                        lazy
+                        :width="dialog.webRTC.width"
+                        :height="dialog.webRTC.height"
+                        @dragStart="dialog.webRTC.dragging = true" @dragEnd="dialog.webRTC.dragging = false"
+                        @resizeStart="dialog.webRTC.dragging = true" @resizeEnd="dialog.webRTC.dragging = false"
+                        @close="closeWebRTCRemoteControl">
+            <template #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
+            <div v-if="dialog.webRTC.show && dialog.webRTC.dragging" style="height: 100%; width: 100%; position: absolute; background: transparent"/>
+            <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%"/>
           </g-dnd-dialog>
         </div>
       </template>
@@ -226,8 +226,16 @@
         showEditBtn: false,
         
         //
-        webRTCiframeSrc: 'about:blank',
-        showWebRTCIframe: false,
+        dialog: {
+          webRTC: {
+            show: false,
+            width: 1024,
+            height: 600,
+            src: 'about:blank',
+            device: null,
+            dragging: false
+          }
+        }
       }
     },
     computed: {},
@@ -260,11 +268,27 @@
         window.open(`${location.origin}/store/${store.alias || store._id}`)
       },
       openWebRTCRemoteControl(store, device) {
+        this.dialog.webRTC.device = device;
         window.cms.socket.emit('startStream', device._id, (responseData) => {
           console.log(responseData)
           if (responseData.ok) {
-            this.webRTCiframeSrc = `https://mtfk.herokuapp.com/remoteControl.html?deviceId=device_${device._id}`
-            this.showWebRTCIframe = true
+            // delay 3s to waiting device establish connection to screencast
+            setTimeout(() => {
+              this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
+              this.dialog.webRTC.show = true
+            }, 3000)
+          } else {
+            alert(responseData.message)
+          }
+        });
+      },
+      closeWebRTCRemoteControl() {
+        window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id, (responseData) => {
+          console.log(responseData)
+          if (responseData.ok) {
+            this.dialog.webRTC.src = 'about:blank'
+            this.dialog.webRTC.show = false
+            this.dialog.webRTC.device = null
           } else {
             alert(responseData.message)
           }
