@@ -19,7 +19,7 @@
         // namespace: this.$getService('PosStore').accountId,
         apiBaseUrl: '/cms-files'
       })
-
+      
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
     },
@@ -43,7 +43,7 @@
             } else {
               reject(response)
             }
-          }))
+          }, true))
         })
       },
       async prepareUploadAppFolder(groupName, version) {
@@ -60,15 +60,23 @@
             } else {
               reject(response)
             }
-          }))
+          }, false))
         })
       },
 
       async removeFile(filePath) {
-        // TODO: [High] Remove file cdn
-        const path = filePath.substr(filePath.indexOf('//') + 1)
         try {
-          await this.gridFsHandler.deleteFileByPath(path)
+          let path;
+          if (filePath.indexOf('//') >= 0)
+            path = filePath.substr(filePath.indexOf('//') + 1)
+          else
+            path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
+          await this.gridFsHandler.deleteFileByPath(filePath)
+          if (cms.sharedConfig && typeof(cms.sharedConfig.getPurgeCdnData) === 'function') {
+            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(filePath);
+            if (purgeCdnData)
+              axios.get(purgeCdnData.url, purgeCdnData.options)
+          }
         } catch (e) {}
       },
       async createFolderIfNotExisted(folderPath, folderName) {

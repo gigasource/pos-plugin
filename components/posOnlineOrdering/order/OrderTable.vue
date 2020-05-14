@@ -3,7 +3,7 @@
     <div class="po-order-table">
       <div  class="po-order-table__header">
         <!-- header image -->
-        <img :src="`${cdnOrderHeaderImage}?w=340&h=180` || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
+        <img :src="cdnOrderHeaderImage || '/plugins/pos-plugin/assets/images/header.png'" class="po-order-table__header__image"/>
       </div>
       <div class="po-order-table__main">
         <!-- header text -->
@@ -85,7 +85,7 @@
                   <div class="error-message">{{couponTf.error}}</div>
                   <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
                     <g-icon size="12" color="green">check</g-icon>
-                    {{$t('store.couponApplied')}}}}
+                    {{$t('store.couponApplied')}}
                   </div>
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
@@ -97,11 +97,11 @@
               <!--              <g-radio color="#1271ff" label="Credit" value="credit"/>-->
               <!--            </g-radio-group>-->
 
-              <div class="section-header">ORDER DETAILS</div>
+              <div class="section-header">{{$t('store.orderDetail')}}</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
                 <div class="order-item-detail__name">{{ item.name }}</div>
-                <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+                <div class="pl-1">{{ item.price * (item.quantity || 1) | currency }}</div>
               </div>
               <div class="order-item-summary">
                 <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
@@ -162,6 +162,7 @@
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
   import {get24HourValue, incrementTime} from "../../logic/timeUtil";
+  import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
 
   export default {
@@ -377,7 +378,8 @@
         return list
       },
       cdnOrderHeaderImage() {
-        return getCdnUrl(this.store.orderHeaderImageSrc)
+        const url = getCdnUrl(this.store.orderHeaderImageSrc)
+        return  url && `${url}?w=340&h=180`
       }
     },
     watch: {
@@ -385,6 +387,11 @@
         this.$emit('confirm-view', val)
         const wrapper = document.getElementById('table-content')
         wrapper && wrapper.scroll({top: 0})
+        if(!val) {
+          this.$nextTick(() => {
+            autoResizeTextarea('.po-order-table__item__note textarea')
+          })
+        }
       }
     },
     methods: {
@@ -414,7 +421,7 @@
             groupPrinter2: this.store.useMultiplePrinters && orderItem.groupPrinters.length >= 2 && orderItem.groupPrinters[1],
             category: orderItem.category.name,
             originalPrice: orderItem.price,
-            ...orderItem.note && {modifiers: [{name: orderItem.note, price: 0, quantity: 1}]},
+            note: orderItem.note,
           }
         })
 
@@ -638,6 +645,7 @@
 
           ::v-deep .bs-tf-input {
             color: rgba(0, 0, 0, 0.87);
+            width: 100%;
           }
         }
       }
@@ -750,6 +758,7 @@
           color: #9E9E9E;
           font-style: italic;
           overflow-y: hidden;
+          min-height: 19px;
         }
       }
 

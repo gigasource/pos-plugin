@@ -291,6 +291,7 @@ module.exports = {
       payment: 'PAYMENT',
       confirmOrder: 'Confirm Order',
       contactInfo: 'CONTACT INFORMATION',
+      orderDetail: 'ORDER DETAILS',
       pickup: 'Pick Up',
       delivery: 'Delivery',
       name: 'Name',
@@ -331,7 +332,9 @@ module.exports = {
       openHours: 'Open hours',
       merchantClose: 'Merchant is temporarily closed',
       merchantClose1: 'The merchant is temporarily closed and will not accept orders until {1} {0}. Please come back after that. We apologize for any inconvenience caused.',
-      merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.'
+      merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.',
+      minimumOrder: 'Minimum order',
+      deliveryFee: 'Delivery fee',
     }
   }
 }

@@ -25,9 +25,7 @@
             <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
             <span class="col-3" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
-          <div :class="['menu-setting-item__desc', collapseText && 'collapse']">
-            {{desc}}
-          </div>
+          <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
         </div>
         <div class="menu-setting-item__content">
           <div class="menu-setting-item__price">${{price}}</div>
@@ -206,6 +204,7 @@
       color: #757575;
       max-width: 100%;
       margin-bottom: 24px;
+      white-space: pre-wrap;
 
       &.collapse {
         -webkit-line-clamp: 2;

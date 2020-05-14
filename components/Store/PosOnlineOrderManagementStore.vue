@@ -131,7 +131,7 @@
       },
       searchAndFilteredAccounts() {
         // TODO: Optimize
-        
+
         // return only account created by user
         // automatically created account which linked with specified store will not be returned
         const filters = [acc => acc.store == null || acc.store.length === 0]
@@ -195,7 +195,9 @@
             const appItem = _.filter(app && app.files, appItem => semverSort([appItem.version, device.appVersion])[1] === appItem.version)
 
             const deviceVersions = appItem.map(this.convertAppItemToViewModel)
-            const deviceVersionMap = _.keyBy(deviceVersions, 'version')
+            const deviceVersionMap = _.keyBy(deviceVersions, (o) => {
+              return o.version + (o.type === 'PATCH' ? '1' : '0')
+            })
             const versions = semverSort(Object.keys(deviceVersionMap)).reverse().map(key => deviceVersionMap[key])
 
             return {
@@ -327,14 +329,14 @@
       async updateDeviceAppVersion(device) {
         if (!device.updateVersion)
           return
-        
+
         // prevent re-update
         // TODO: UX
         device.canUpdate = false
-        
+
         const {socket} = window.cms
-        socket.emit('updateApp', device._id, device.updateVersion)
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
+        socket.emit('updateApp', device._id, device.updateVersion, versionInfo.type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI
       },

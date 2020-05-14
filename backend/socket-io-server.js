@@ -178,8 +178,8 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData]);
     });
 
-    socket.on('updateApp', async (deviceId, uploadPath) => {
-      externalSocketIOServer.emitToPersistent(deviceId, 'updateApp', [uploadPath]);
+    socket.on('updateApp', async (deviceId, uploadPath, type) => {
+      externalSocketIOServer.emitToPersistent(deviceId, 'updateApp', [uploadPath, type]);
     })
 
     socket.on('startRemoteControl', async (deviceId, callback) => {

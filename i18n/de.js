@@ -10,6 +10,7 @@ module.exports = {
       payment: 'Bestellung',
       confirmOrder: 'Bestellung Bestätigen',
       contactInfo: 'KONTAKT INFO',
+      orderDetail: 'BESTELLDETAILS',
       pickup: 'Abholen',
       delivery: 'Lieferung',
       name: 'Name',
@@ -49,7 +50,9 @@ module.exports = {
       notApplicable: 'Gutschein für diese Bestellung nicht anwendbar!',
       openHours: 'Öffnungszeiten',
       merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
-      merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.'
+      merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.',
+      minimumOrder: 'Mindestbestellwert',
+      deliveryFee: 'Liefergebühr'
     },
 
     common: {

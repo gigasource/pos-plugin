@@ -28,7 +28,7 @@
                         <div class="ta-right">{{day.open}} - {{day.close}}</div>
                       </div>
                       <template  v-if="deliveryInfo && deliveryInfo.length > 0">
-                        <div class="fw-700 my-2">Delivery:</div>
+                        <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
                         <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
                           <div class="mr-2">{{info.title}}</div>
                           <div class="ta-right">{{info.value}}</div>
@@ -128,7 +128,7 @@
               <div class="ta-right">{{day.open}} - {{day.close}}</div>
             </div>
             <template  v-if="deliveryInfo && deliveryInfo.length > 0">
-              <div class="fw-700 mb-2 mt-3 fs-large">Delivery:</div>
+              <div class="fw-700 mb-2 mt-3 fs-large">{{$t('store.delivery')}}:</div>
               <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
                 <div class="mr-2">{{info.title}}</div>
                 <div class="ta-right">{{info.value}}</div>
@@ -146,6 +146,7 @@
   import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
   import CreatedOrder from './CreatedOrder';
   import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
+  import {autoResizeTextarea} from "../../logic/commonUtils";
   import { getCdnUrl } from '../../Store/utils';
 
   export default {
@@ -274,7 +275,7 @@
           for (const {openTime} of this.todayOpenHour) {
             if (this.now < openTime)
               return {
-                day: 'today',
+                day: $t('store.today'),
                 hour: openTime
               }
           }
@@ -356,13 +357,18 @@
       deliveryInfo() {
         let info = []
         if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
-          info.push(
-              {title: 'Minimum order', value: `${$t('common.currency')}${this.store.minimumOrderValue.value}`}
-          )
+          info.push({
+            title: $t('store.minimumOrder'),
+            value: `${$t('common.currency')}${this.store.minimumOrderValue.value}`
+          })
         }
         if (this.store.deliveryFee) {
-          let min = (_.minBy(this.store.deliveryFee.fees, 'fee')).fee
-          let max = (_.maxBy(this.store.deliveryFee.fees, 'fee')).fee
+          let min = _.minBy(this.store.deliveryFee.fees, 'fee')
+                  ? (_.minBy(this.store.deliveryFee.fees, 'fee')).fee
+                  : 0,
+              max = _.maxBy(this.store.deliveryFee.fees, 'fee')
+                  ? (_.maxBy(this.store.deliveryFee.fees, 'fee')).fee
+                  : 0
 
           if (this.store.deliveryFee.acceptOrderInOtherZipCodes) {
             if (min > this.store.deliveryFee.defaultFee)
@@ -371,10 +377,11 @@
               max = this.store.deliveryFee.defaultFee
           }
 
-          info.push({
-            title: 'Delivery fee',
-            value: `${$t('common.currency')}${min} - ${$t('common.currency')}${max}`
-          })
+          if (max !== 0)
+            info.push({
+              title: $t('store.deliveryFee'),
+              value: max > min ? `${$t('common.currency')}${min} - ${$t('common.currency')}${max}` : `${$t('common.currency')}${max}`
+            })
         }
         return info
       },
@@ -388,12 +395,7 @@
         if (indexOfItem < 0) {
           this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
           this.$nextTick(() => {
-            const textarea = document.getElementById('item_note_'+(this.orderItems.length-1))
-            textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px');
-            textarea.addEventListener('input', function() {
-              this.style.height = 'auto'
-              this.style.height = (this.scrollHeight) + 'px'
-            }, false)
+            autoResizeTextarea('#item_note_'+(this.orderItems.length-1))
           })
         } else {
           const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
@@ -500,6 +502,13 @@
         if(tab) {
           const siblingWidth = tab.previousSibling ? tab.previousSibling.offsetWidth : 0
           wrapper.scroll({top: 0, left: (tab.offsetLeft - siblingWidth/2 - wrapper.offsetLeft), behavior: "smooth"})
+        }
+      },
+      showOrder(val) {
+        if(val) {
+          this.$nextTick(() => {
+            autoResizeTextarea('.po-order-table__item__note textarea');
+          })
         }
       }
     }
