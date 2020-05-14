@@ -256,7 +256,7 @@
         }
       },
       totalPrice() {
-        return _.sumBy(this.orderItems, item => item.price * item.quantity)
+        return _.sumBy(this.orderItems, item => (item.price + _.sumBy(item.modifiers, m => m.price * m.quantity)) * item.quantity )
       },
       totalItems() {
         return _.sumBy(this.orderItems, item => item.quantity)
@@ -450,6 +450,10 @@
       },
       openDialogAdd(item) {
         this.selectedProduct = item
+        if(!item.choices || item.choices.length === 0) { //item without choice instancely add
+          this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
+          return
+        }
         this.dialog.add = true
       },
       addItemToOrder(item) {

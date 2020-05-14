@@ -55,32 +55,44 @@
     </div>
     <!-- Choice -->
     <div class="menu-setting-new-item__choices">
-      <div v-if="choices" v-for="(choice, i) in internalChoices" :key="i" class="menu-setting-new-item__choice">
+      <div v-for="(choice, i) in internalChoices"
+           :key="i" class="menu-setting-new-item__choice"
+           @mouseenter="toggleBtn(i)"
+           @mouseleave="toggleBtn(i)">
         <!-- header -->
-        <div>Type</div><div>Select</div><div>Choice</div><div><span>Option</span><span @click="addOption(i)">+ Add</span></div>
+        <div class="ml-1">Type</div>
+        <div class="ml-1">Select</div>
+        <div class="ml-1">Choice</div>
+        <div class="row-flex justify-between ml-1">
+          <div>Option</div>
+          <g-btn-bs text-color="#536DFE" @click="addOption(i)">+ Add</g-btn-bs>
+        </div>
         <!-- value -->
-        <g-checkbox v-model="choice.mandatory" label="Mandatory" @change="choice.mandatory = $event"/>
+        <g-checkbox v-model="choice.mandatory" color="#536DFE" label="Mandatory" @change="choice.mandatory = $event"/>
         <div>
           <g-radio-group v-model="choice.select" row>
-            <g-radio value="one" label="One"/>
-            <g-radio value="many" label="Many"/>
+            <g-radio small color="#536DFE" value="one" label="One"/>
+            <g-radio small color="#536DFE" value="many" label="Many"/>
           </g-radio-group>
         </div>
-        <g-text-field-bs v-model="choice.name"/>
+        <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME"/>
         <div>
           <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt">
-            <div class="item-name col-7">
-              <input type="number" step="1" :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })"/>
+            <div class="item-name col-8">
+              <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })"/>
             </div>
-            <div class="item-price col-4">
-              <input type="number" :value="option.price" placeholder="€" @input="e =>  editOption(i, iOpt, { name: option.name, price: parseInt(e.target.value) })"/>
+            <div class="item-price col-3">
+              <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency')"
+                     @input="e =>  editOption(i, iOpt, { name: option.name, price: parseInt(e.target.value) })"/>
             </div>
-            <div class="item-btn--delete col-1">
-              <g-icon size="16" color="#424242" @click="removeOption(item)">icon-close</g-icon>
+            <div class="item-btn col-1" v-if="choice.options.length > 1">
+              <g-icon size="12" color="#424242" @click="removeOption(i, iOpt)">icon-close</g-icon>
             </div>
           </div>
         </div>
-        <div @click="() => {}" class="menu-setting-new-item__choice__delete-btn">Delete Choice</div>
+        <div v-if="showDeleteBtn[i]" @click="removeChoice(i)" class="menu-setting-new-item__choice__delete-btn">
+          <g-icon color="white" size="16">mdi-trash-can-outline</g-icon>
+        </div>
       </div>
     </div>
     <!-- Action button -->
@@ -88,7 +100,7 @@
       <g-btn-bs @click="addChoice" border-color="#5E76FE" text-color="#5E76FE">+ Choice</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
-      <g-btn-bs :disabled="!internalName || isNaN(internalPrice) || !internalPrinter" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
+      <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
     </div>
   </div>
 </template>
@@ -116,9 +128,13 @@
         type: Boolean,
         default: true
       },
+      available: {
+        type: Boolean,
+        default: true
+      },
       choices: {
         type: Array,
-        default: []
+        default: () => []
       }
     },
     data: function () {
@@ -130,6 +146,9 @@
         internalPrinter = (this.groupPrinters && this.groupPrinters[0]) || this.availablePrinters[0]
       }
 
+      let internalChoices = _.cloneDeep(this.choices)
+      let showDeleteBtn = internalChoices.map(() => false)
+
       return {
         internalId: this.id || '',
         internalName: this.name,
@@ -138,8 +157,9 @@
         internalTax: this.tax || 7,
         internalImage: this.image,
         internalPrinter,
-        internalChoices: _.cloneDeep(this.choices),
         taxes: [],
+        internalChoices,
+        showDeleteBtn,
       }
     },
     async created() {
@@ -158,6 +178,18 @@
       },
       internalCdnImage() {
         return getCdnUrl(this.internalImage)
+      },
+      isDisabledSave() {
+        if(!this.internalName || isNaN(this.internalPrice) || !this.internalPrinter) return true
+        if(this.internalChoices && this.internalChoices.length > 0) {
+          for (const choice of this.internalChoices) {
+            if(!choice.name) return true
+            for (const option of choice.options) {
+              if (!option.name || isNaN(option.price)) return true
+            }
+          }
+        }
+        return false
       }
     },
     methods: {
@@ -170,8 +202,9 @@
           mandatory: false,
           select: "one",
           name: '',
-          options: []
+          options: [{name: '', price: 0}]
         })
+        this.showDeleteBtn.push(false)
       },
       addOption(choiceIndex) {
         this.internalChoices[choiceIndex].options.push({
@@ -181,29 +214,26 @@
       },
       editOption(choiceIndex, optionIndex, { name, price }) {
         this.internalChoices[choiceIndex].options[optionIndex].name = name
-        this.internalChoices[choiceIndex].options[optionIndex].price = price
+        this.internalChoices[choiceIndex].options[optionIndex].price = +price
+      },
+      removeOption(choiceIndex, optionIndex) {
+        if(this.internalChoices[choiceIndex].options.length === 1) return
+        this.internalChoices[choiceIndex].options.splice(optionIndex, 1)
+      },
+      removeChoice(choiceIndex) {
+        this.internalChoices.splice(choiceIndex, 1)
+        this.showDeleteBtn.splice(choiceIndex, 1)
+      },
+      toggleBtn(index) {
+        const value = this.showDeleteBtn[index]
+        this.showDeleteBtn.splice(index, 1, !value)
       },
       getImage(url) {
         this.internalImage = url
       },
       saveMenuItem() {
-        if (!this.internalName) {
-          alert('Product name is missing')
-          return
-        }
-
-        if (!this.internalPrice) {
-          alert('Product\'s price is missing')
-          return
-        }
-
-        if (!this.internalPrinter) {
-          alert('Product\'s printer is missing')
-          return
-        }
-
-        if(isNaN(this.internalPrice)) {
-          alert('Product\'s price must be a number')
+        if (this.isDisabledSave) {
+          alert('Not available to save!')
           return
         }
 
@@ -216,7 +246,8 @@
           price: this.internalPrice,
           tax: this.internalTax,
           showImage: this.showImage,
-          choices: this.internalChoices
+          available: this.available,
+          choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()}))
         })
       }
     }
@@ -340,13 +371,81 @@
       display: grid;
       grid-template-columns: 1fr 1fr 2fr 2fr;
       grid-template-rows: 30px 1fr;
+      padding: 16px 24px;
+      background: #fafafa;
+      border-bottom: 1px solid #efefef;
+      font-size: 15px;
       
       &__delete-btn {
         position: absolute;
         top: 0;
         right: 0;
-        width: 20px;
-        height: 20px;
+        background: #757575;
+        border-radius: 2px;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      ::v-deep .g-checkbox-label,
+      ::v-deep .g-radio-label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-left: 0;
+        margin-bottom: 2px;
+      }
+
+      .bs-tf-wrapper ::v-deep .bs-tf-inner-input-group {
+        background: white;
+
+        .bs-tf-input {
+          text-transform: uppercase;
+          font-weight: 700;
+          font-size: 14px;
+          color: #1d1d26;
+          width: 100%;
+        }
+      }
+
+      .choice-option-item {
+        display: flex;
+        margin: 8px 5px;
+
+        .item-name,
+        .item-price {
+          background: white;
+          border: 1px solid #ced4da;
+          padding: 6px;
+
+          input {
+            width: 100%;
+            outline: none;
+            line-height: 24px;
+            padding: 0;
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+          }
+        }
+
+        .item-name {
+          border-right: none;
+          border-radius: 4px 0 0 4px;
+          padding-left: 12px;
+        }
+
+        .item-price {
+          border-radius: 0 4px 4px 0;
+        }
+
+        .item-btn {
+          display: flex;
+          align-items: center;
+          margin-left: 12px;
+        }
       }
     }
     

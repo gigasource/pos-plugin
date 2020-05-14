@@ -26,34 +26,47 @@
             <span class="col-3" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
           <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
+          <g-chip-group v-if="choices && choices.length > 0" :items="choices">
+              <template v-slot:item="{value, click, active, close}">{{value.name}}</template>
+          </g-chip-group>
         </div>
         <div class="menu-setting-item__content">
           <div class="menu-setting-item__price">${{price}}</div>
           <div class="menu-setting-item__tax">Tax: {{tax}}%</div>
         </div>
         <div class="menu-setting-item__content" style="justify-self: center">
-          <g-tooltip :open-on-hover="true" right speech-bubble color="#000" transition="0.3" remove-content-on-close>
+          <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
             <template v-slot:activator="{on}">
-              <div class="menu-setting-item__btn"
-                   @mouseenter="on.mouseenter"
-                   @mouseleave="on.mouseleave"
-                   @click.stop.prevent="switchToEditMode">
-                <g-icon color="#FFF" small>mdi-pencil-outline</g-icon>
+              <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave">
+                <g-switch :input-value="available" @change="toggleAvailable"/>
               </div>
             </template>
-            <span>Edit</span>
+            <span>Mark as {{available ? 'unavailable' : 'available'}}</span>
           </g-tooltip>
-          <g-tooltip :open-on-hover="true" right speech-bubble color="#000" transition="0.3" remove-content-on-close>
-            <template v-slot:activator="{on}">
-              <div class="menu-setting-item__btn mb-3"
-                   @mouseenter="on.mouseenter"
-                   @mouseleave="on.mouseleave"
-                   @click.stop.prevent="deleteItem">
-                <g-icon color="#FFF" small>mdi-trash-can-outline</g-icon>
-              </div>
-            </template>
-            <span>Delete</span>
-          </g-tooltip>
+          <div class="row-flex">
+            <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
+              <template v-slot:activator="{on}">
+                <div class="menu-setting-item__btn"
+                     @mouseenter="on.mouseenter"
+                     @mouseleave="on.mouseleave"
+                     @click.stop.prevent="switchToEditMode">
+                  <g-icon color="#FFF" small>mdi-pencil-outline</g-icon>
+                </div>
+              </template>
+              <span>Edit</span>
+            </g-tooltip>
+            <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
+              <template v-slot:activator="{on}">
+                <div class="menu-setting-item__btn ml-2"
+                     @mouseenter="on.mouseenter"
+                     @mouseleave="on.mouseleave"
+                     @click.stop.prevent="deleteItem">
+                  <g-icon color="#FFF" small>mdi-trash-can-outline</g-icon>
+                </div>
+              </template>
+              <span>Delete</span>
+            </g-tooltip>
+          </div>
         </div>
       </div>
     </template>
@@ -70,6 +83,8 @@
           :available-printers="availablePrinters"
           :use-multiple-printers="useMultiplePrinters"
           :show-image="showImage"
+          :choices="choices"
+          :available="available"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -83,7 +98,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available'],
     data: function () {
       return {
         mode: 'view',
@@ -137,6 +152,10 @@
       toggleImage() {
         const val = this.showImage
         this.$emit('save', {showImage: !val})
+      },
+      toggleAvailable() {
+        const val = this.available
+        this.$emit('save', {available: !val})
       }
     }
   }
@@ -145,7 +164,7 @@
 <style scoped lang="scss">
   .menu-setting-item {
     display: grid;
-    grid-template-columns: 40px 80px 1fr 60px 50px;
+    grid-template-columns: 40px 80px 1fr 60px 72px;
     grid-gap: 15px;
     background-color: #fff;
     align-items: center;
@@ -212,6 +231,11 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
+    }
+
+    .g-chip-group ::v-deep .g-chip__content {
+      font-size: 14px;
+      font-weight: 700;
     }
 
     &__tax {

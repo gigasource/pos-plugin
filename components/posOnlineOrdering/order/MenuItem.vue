@@ -1,5 +1,5 @@
 <template>
-  <div class="po-menu-item">
+  <div :class="['po-menu-item', !available && 'disabled']">
     <template v-if="showImage">
       <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
       <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
@@ -57,6 +57,7 @@
       collapseText: Boolean,
       showImage: Boolean,
       choices: Array,
+      available: Boolean,
     },
     filters: {
       currency(val) {

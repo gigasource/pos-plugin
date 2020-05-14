@@ -40,7 +40,7 @@
                 <span class="po-order-table__item__name ta-center" style="display: inline-block; min-width: 20px">{{item.quantity}}</span>
                 <g-icon @click.stop="addItem(item)" color="#424242" size="24">add_circle</g-icon>
                 <span class="po-order-table__item__name ml-2">{{ item.name }}</span>
-                <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
+                <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier ml-1">- {{getItemModifiers(item)}}</span>
               </p>
               <div class="po-order-table__item__note">
                 <textarea :id="`item_note_${index}`" rows="1" :placeholder="`${$t('store.note')}...`" v-model="item.note"/>
@@ -94,8 +94,11 @@
               <div class="section-header">{{$t('store.orderDetail')}}</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
-                <div class="order-item-detail__name">{{ item.name }}</div>
-                <div class="pl-1">{{ item.price * (item.quantity || 1) | currency }}</div>
+                <div class="order-item-detail__name">
+                  {{ item.name }}
+                  <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
+                </div>
+                <div class="pl-1">{{ getItemPrice(item) | currency }}</div>
               </div>
               <div class="order-item-summary">
                 <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
@@ -148,7 +151,10 @@
     </div>
 
     <!-- Order created -->
-    <order-created v-if="dialog.value" v-model="dialog.value" :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"  @close="closeOrderCreatedDialog"/>
+    <order-created v-if="dialog.value" v-model="dialog.value"
+                   :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
+                   :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
+                   @close="closeOrderCreatedDialog"/>
   </div>
 </template>
 <script>
@@ -741,7 +747,6 @@
         font-weight: 600;
         color: #424242;
         text-transform: capitalize;
-        margin-left: 4px;
       }
 
       &__price {

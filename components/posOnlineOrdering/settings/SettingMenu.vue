@@ -43,7 +43,11 @@
                   :disabled="showAddNewProductPanel[cate._id]">
                 + Add New Item
               </g-btn-bs>
-              <g-icon @click.prevent.stop="openDeleteCategoryDialog(cate)" class="mr-2">mdi-trash-can-outline</g-icon>
+              <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
+                        @click.prevent.stop="openDeleteCategoryDialog(cate)">
+                <g-icon color="#535962">mdi-trash-can-outline</g-icon>
+              </g-btn-bs>
+              <g-divider vertical inset class="ml-2 mr-3"/>
               <g-icon v-if="showProducts[cate._id]">fas fa-chevron-up</g-icon>
               <g-icon v-else>fas fa-chevron-down</g-icon>
             </div>

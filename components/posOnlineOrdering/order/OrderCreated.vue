@@ -42,8 +42,12 @@
           <div class="order-item">
             <div v-for="(item, index) in order.items" :key="index" class="order-detail">
               <div class="order-detail__index" >{{ item.quantity || 1}}</div>
-              <div class="order-detail__name">{{ item.name }}</div>
-              <div>{{ item.price * (item.quantity || 1) | currency }}</div>
+              <div class="order-detail__name">
+                {{ item.name }}
+                <span v-if="item.modifiers && item.modifiers.length > 0"
+                      style="color: #757575; font-size: 12px; text-transform: capitalize">- {{getItemModifier(item)}}</span>
+              </div>
+              <div>{{ getItemPrice(item) | currency }}</div>
             </div>
           </div>
           <div class="order-info">
@@ -99,7 +103,9 @@
       timeout: {
         type: Number,
         default: 3
-      }
+      },
+      getItemPrice: Function,
+      getItemModifier: Function
     },
     filters: {
       currency(value) {
