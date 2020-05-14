@@ -35,22 +35,16 @@
             <div v-if="orderView && hasMenuItem"
                  v-for="(item, index) in orderItems" :key="index"
                  class="po-order-table__item">
-              <div class="row-flex align-items-center mt-1">
-                <div :class="['po-order-table__item__name', store.collapseText && 'collapse']">{{ item.name }}</div>
-                <g-spacer/>
-
-                <div class="po-order-table__item__price">{{ item.price | currency }}</div>
-
-                <div class="po-order-table__item__action">
-                  <g-icon @click.stop="removeItem(item)" color="#424242" size="28">remove_circle_outline</g-icon>
-                  <span>{{item.quantity}}</span>
-                  <g-icon @click.stop="addItem(item)" color="#424242" size="28">add_circle</g-icon>
-                </div>
-              </div>
-
+              <p>
+                <g-icon @click.stop="removeItem(item)" color="#424242" size="24">remove_circle_outline</g-icon>
+                <span class="po-order-table__item__name ta-center" style="display: inline-block; min-width: 20px">{{item.quantity}}</span>
+                <g-icon @click.stop="addItem(item)" color="#424242" size="24">add_circle</g-icon>
+                <span class="po-order-table__item__name ml-2">{{ item.name }}</span>
+                <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
+              </p>
               <div class="po-order-table__item__note">
-                <g-icon size="16">icon-note</g-icon>
                 <textarea :id="`item_note_${index}`" rows="1" :placeholder="`${$t('store.note')}...`" v-model="item.note"/>
+                <div class="po-order-table__item__price">{{ getItemPrice(item) | currency }}</div>
               </div>
 
             </div>
@@ -404,7 +398,7 @@
         this.$emit('decrease', item)
       },
       addItem(item) {
-        this.$emit('increase', item)
+        this.$emit('increase', Object.assign({}, item, {quantity: 1}))
       },
       async confirmPayment() {
         if (this.unavailableConfirm || this.confirming) return
@@ -420,7 +414,9 @@
             groupPrinter2: this.store.useMultiplePrinters && orderItem.groupPrinters.length >= 2 && orderItem.groupPrinters[1],
             category: orderItem.category.name,
             originalPrice: orderItem.price,
-            ...orderItem.note && {modifiers: [{name: orderItem.note, price: 0, quantity: 1}]},
+            ...  orderItem.note
+                ? {modifiers: orderItem.modifiers.unshift({name: orderItem.note, price: 0, quantity: 1})}
+                : {modifiers: orderItem.modifiers},
           }
         })
 
@@ -507,6 +503,12 @@
         this.couponTf.error = ''
         this.couponTf.success = false
       },
+      getItemPrice(item) {
+        return item.price + _.sumBy(item.modifiers, modifier => modifier.price * modifier.quantity)
+      },
+      getItemModifiers(item) {
+        return item.modifiers.map(m => m.name).join(', ')
+      }
     }
   }
 </script>
@@ -719,11 +721,11 @@
       width: 100%;
       min-height: 64px;
       border-bottom: 1px dashed #d8d8d8;
+      padding: 10px 0;
 
       &__name {
         font-weight: bold;
         font-size: 15px;
-        line-height: 19px;
         word-break: break-word;
 
         &.collapse {
@@ -732,6 +734,14 @@
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+      }
+
+      &__modifier {
+        font-size: 12px;
+        font-weight: 600;
+        color: #424242;
+        text-transform: capitalize;
+        margin-left: 4px;
       }
 
       &__price {
@@ -744,7 +754,6 @@
       &__note {
         margin-top: 8px;
         display: flex;
-        align-items: center;
 
         textarea {
           flex: 1;
@@ -752,12 +761,12 @@
           border: none;
           resize: none;
           background: transparent;
-          padding-left: 8px;
           font-size: 12px;
           color: #9E9E9E;
           font-style: italic;
           overflow-y: hidden;
           min-height: 19px;
+          margin-right: 8px;
         }
       }
 
