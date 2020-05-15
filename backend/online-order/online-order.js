@@ -193,7 +193,7 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('startStream', async (ackFn) => {
       try {
-        const responseData = (await axios.post('http://localhost:5000/start-stream', { screencastId: deviceId })).data
+        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/start-stream`, { screencastId: deviceId })).data
         ackFn && ackFn(responseData)
       } catch (e) {
         ackFn && ackFn({ok: false, message: e})
@@ -203,7 +203,7 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('stopStream', async (ackFn) => {
       try {
-        const responseData = (await axios.post('http://localhost:5000/stop-stream')).data
+        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/stop-stream`)).data
         ackFn && ackFn(responseData)
       } catch (e) {
         ackFn && ackFn({ok: false, message: e})
