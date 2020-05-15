@@ -178,7 +178,7 @@ module.exports = function (cms) {
       socket.join(orderData.orderToken)
 
       const deviceId = device._id.toString();
-      externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData]);
+      externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()]);
     });
 
     socket.on('updateApp', async (deviceId, uploadPath, type) => {
