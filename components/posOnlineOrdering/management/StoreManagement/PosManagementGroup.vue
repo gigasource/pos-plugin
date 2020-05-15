@@ -273,8 +273,8 @@
         this.dialog.webRTC.show = true
       },
       closeWebRTCRemoteControl() {
-        console.log('close web rtc remote control')
         if (this.dialog.webRTC.device) {
+          console.log('close web rtc remote control')
           window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id)
           this.dialog.webRTC.src = 'about:blank'
           this.dialog.webRTC.show = false
