@@ -168,7 +168,6 @@ function createOnlineOrderSocket(deviceId, cms) {
     });
 
     onlineOrderSocket.on('updateApp', async (uploadPath, type, ackFn) => {
-      uploadPath = `${global.APP_CONFIG.webshopUrl}${uploadPath}`
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
