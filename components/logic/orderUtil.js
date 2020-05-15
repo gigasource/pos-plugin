@@ -23,7 +23,7 @@ const orderUtil = {
     return _.sumBy(items, orderUtil.calItemDiscount)
   },
   calItemModifier(item) {
-    return item.modifiers ? _.sum(item.modifiers.map(i => i.price)) : 0
+    return item.modifiers ? _.sum(item.modifiers.map(i => i.price)) * item.quantity : 0
   },
   calOrderModifier(items) {
     return _.sumBy(items, orderUtil.calItemModifier)
