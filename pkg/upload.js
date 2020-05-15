@@ -12,7 +12,7 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
   const uploadPath = `/update/POS_Android`
   // `https://pos.gigasource.io/cms-files/file-existed?filePath=/update/POS_Android/${version}`
   // grid-fs handler methods
-  async function getFilesInPath(folderPath) {
+  async function isFolderExist(folderPath) {
     try {
       const response = (await axios.get(`${domain}${apiBaseUrl}/file-existed?filePath=${folderPath}`))
       return (response && response.data && response.data.existed);
@@ -30,16 +30,6 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
 
   function _getDownloadUrl(file) {
     return `${apiBaseUrl}/files/download/${file.folderPath}${file.fileName}`
-  }
-
-  // ------ end grid-fs file handler
-  async function isFolderExist(folderPath) {
-    try {
-      await getFilesInPath(folderPath)
-      return true
-    } catch (e) {
-      return false
-    }
   }
 
   async function createFolder(parentPath, folderPath) {
