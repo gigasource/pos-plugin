@@ -229,8 +229,8 @@
         dialog: {
           webRTC: {
             show: false,
-            width: 1024,
-            height: 600,
+            width: 1024 + 4 /*border left-right 2px*/,
+            height: 600 + 4 + 32 /*border top-bottom dnd header*/,
             src: 'about:blank',
             device: null,
             dragging: false
@@ -272,11 +272,8 @@
         window.cms.socket.emit('startStream', device._id, (responseData) => {
           console.log(responseData)
           if (responseData.ok) {
-            // delay 3s to waiting device establish connection to screencast
-            setTimeout(() => {
-              this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
-              this.dialog.webRTC.show = true
-            }, 3000)
+            this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
+            this.dialog.webRTC.show = true
           } else {
             alert(responseData.message)
           }
@@ -563,5 +560,11 @@
         }
       }
     }
+  }
+</style>
+<style lang="css">
+  /*change entire web page*/
+  .g-dnddialog-content {
+    overflow-y: initial !important;
   }
 </style>
