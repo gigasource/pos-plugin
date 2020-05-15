@@ -268,28 +268,16 @@
         window.open(`${location.origin}/store/${store.alias || store._id}`)
       },
       openWebRTCRemoteControl(store, device) {
-        this.dialog.webRTC.device = device;
-        window.cms.socket.emit('startStream', device._id, (responseData) => {
-          console.log(responseData)
-          if (responseData.ok) {
-            this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
-            this.dialog.webRTC.show = true
-          } else {
-            alert(responseData.message)
-          }
-        });
+        this.dialog.webRTC.device = device
+        window.cms.socket.emit('startStream', device._id)
+        this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
+        this.dialog.webRTC.show = true
       },
       closeWebRTCRemoteControl() {
-        window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id, (responseData) => {
-          console.log(responseData)
-          if (responseData.ok) {
-            this.dialog.webRTC.src = 'about:blank'
-            this.dialog.webRTC.show = false
-            this.dialog.webRTC.device = null
-          } else {
-            alert(responseData.message)
-          }
-        });
+        window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id)
+        this.dialog.webRTC.src = 'about:blank'
+        this.dialog.webRTC.show = false
+        this.dialog.webRTC.device = null
       },
       startRemoteControl(storeId, deviceId) {
         if (this.disableRemoteControlBtn) return

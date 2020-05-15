@@ -216,16 +216,14 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateOrderTimeOut', orderTimeOut)
     });
 
-    socket.on('startStream', async (deviceId, ack) => {
+    socket.on('startStream', async (deviceId) => {
       if (!deviceId) return
-      externalSocketIOServer.emitTo(deviceId, 'startStream', (res) => {
-        ack && ack(res)
-      })
+      externalSocketIOServer.emitToPersistent(deviceId, 'startStream');
     })
 
-    socket.on('stopStream', async (deviceId, ack) => {
+    socket.on('stopStream', async (deviceId) => {
       if (!deviceId) return
-      externalSocketIOServer.emitTo(deviceId, 'stopStream', ack)
+      externalSocketIOServer.emitToPersistent(deviceId, 'stopStream')
     })
 
     socket.once('disconnect', () => {
