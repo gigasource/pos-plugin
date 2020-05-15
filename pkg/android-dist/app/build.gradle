@@ -15,12 +15,6 @@ android {
             keyAlias "key0"
             keyPassword "123456"
         }
-        debug {
-            storeFile file("release.keystore")
-            storePassword "123456"
-            keyAlias "key0"
-            keyPassword "123456"
-        }
     }
     buildTypes {
         release {
