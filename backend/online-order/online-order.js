@@ -191,6 +191,26 @@ function createOnlineOrderSocket(deviceId, cms) {
       }
     })
 
+    onlineOrderSocket.on('startStream', async (ackFn) => {
+      try {
+        const responseData = (await axios.post('http://localhost:5000/start-stream', { screencastId: deviceId })).data
+        ackFn && ackFn(responseData)
+      } catch (e) {
+        ackFn && ackFn({ok: false, message: e})
+        console.log('start stream error', e);
+      }
+    })
+
+    onlineOrderSocket.on('stopStream', async (ackFn) => {
+      try {
+        const responseData = (await axios.post('http://localhost:5000/stop-stream')).data
+        ackFn && ackFn(responseData)
+      } catch (e) {
+        ackFn && ackFn({ok: false, message: e})
+        console.log('stop stream error', e)
+      }
+    })
+
     onlineOrderSocket.on('disconnect', () => {
       console.log('disconnect');
       webShopConnected = false
