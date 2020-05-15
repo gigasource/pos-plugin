@@ -1,4 +1,4 @@
-const orderUtil = require('../../components/logic/orderUtil')
+const { calOrderDiscount, calOrderModifier, calOrderTax, calOrderTotal, formatOrderItems, getLatestOrderId } = require('../../components/logic/orderUtil')
 const {getBookingNumber, getVDate} = require('../../components/logic/productUtils')
 const _ = require('lodash')
 const io = require('socket.io-client');
@@ -76,20 +76,20 @@ function createOnlineOrderSocket(deviceId, cms) {
         return { originalPrice: item.price, ...item };
       });
       const date = new Date(createdDate)
-      const vDiscount = orderUtil.calOrderDiscount(items).toFixed(2)
-      const vSum = (orderUtil.calOrderTotal(items) + orderUtil.calOrderModifier(items) + shippingFee).toFixed(2)
-      const vTax = orderUtil.calOrderTax(items).toFixed(2)
+      const vDiscount = calOrderDiscount(items).toFixed(2)
+      const vSum = (calOrderTotal(items) + calOrderModifier(items) + shippingFee).toFixed(2)
+      const vTax = calOrderTax(items).toFixed(2)
       const taxGroups = _.groupBy(items, 'tax')
       const vTaxGroups = _.map(taxGroups, (val, key) => ({
         taxType: key,
-        tax: orderUtil.calOrderTax(val),
-        sum: orderUtil.calOrderTotal(val)
+        tax: calOrderTax(val).toFixed(2),
+        sum: calOrderTotal(val).toFixed(2)
       }))
 
       const order = {
-        id: await orderUtil.getLatestOrderId(),
+        id: await getLatestOrderId(),
         status: 'inProgress',
-        items,
+        items: formatOrderItems(items),
         customer,
         deliveryDate: new Date(),
         payment: [{ type: paymentType, value: vSum }],

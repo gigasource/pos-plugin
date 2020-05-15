@@ -103,6 +103,15 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
       {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
     ], {textDoubleWith: true});
 
+    if (item.note) {
+      escPrinter.setTextDoubleWidth();
+      escPrinter.tableCustom([
+        { text: '', align: 'LEFT', width: quantityColumnWidth },
+        { text: '', align: 'LEFT', width: 0.05 },
+        { text: item.note, align: 'LEFT', width: itemsColumnWidth },
+      ], { textDoubleWith: true });
+    }
+
     if (item.modifiers) {
       escPrinter.setTextDoubleWidth();
 
