@@ -4,6 +4,7 @@
 <script>
   import _ from 'lodash'
   import semverSort from 'semver/functions/sort'
+  import { getCdnUrl } from './utils';
 
   export default {
     name: 'PosOnlineOrderManagementStore',
@@ -333,10 +334,10 @@
         // prevent re-update
         // TODO: UX
         device.canUpdate = false
-
+        
         const {socket} = window.cms
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
-        socket.emit('updateApp', device._id, device.updateVersion, versionInfo.type)
+        socket.emit('updateApp', device._id, getCdnUrl(device.updateVersion), versionInfo.type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI
       },
