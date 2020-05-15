@@ -10,10 +10,15 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
   const uploadFileUrl = `${domain}${apiBaseUrl}/files?folderPath=`
   const appMetaDataUrl = `${domain}/app/meta-data`
   const uploadPath = `/update/POS_Android`
-
+  // `https://pos.gigasource.io/cms-files/file-existed?filePath=/update/POS_Android/${version}`
   // grid-fs handler methods
   async function getFilesInPath(folderPath) {
-    return (await axios.get(`${domain}${apiBaseUrl}/file-metadata?folderPath=${folderPath}`)).data
+    try {
+      const response = (await axios.get(`${domain}${apiBaseUrl}/file-existed?filePath=${folderPath}`))
+      return (response && response.data && response.data.existed);
+    } catch (err) {
+      return false
+    }
   }
 
   async function createNewFolder(folderPath, newFolderName = 'New Folder') {
@@ -63,15 +68,18 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const folderPath = `${uploadPath}/${version}`;
     const form = new FormData();
     form.append('file', fs.createReadStream(filePath));
+    let response
     try {
-      const response = await axios.post(`${uploadFileUrl}${folderPath}&overwrite=true`, form, {
+      response = await axios.post(`${uploadFileUrl}${folderPath}&overwrite=true`, form, {
         maxContentLength: 1024 * 1024 * 1024,
         httpsAgent: new https.Agent({rejectUnauthorized: false}),
         headers: {...form.getHeaders()}
       });
     } catch (err) {
+      console.log(`Upload ${filePath} error`)
       if (err.response) {
         console.log(err.response.data);
+        console.log(err.response.code);
       }
     }
     if (!response.data[0].uploadSuccess)
@@ -80,7 +88,24 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const downloadPath = _getDownloadUrl(file);
 
     // upload app meta-data
-    const response2 = await axios.post(appMetaDataUrl, { uploadPath: downloadPath, version, type, note, group, base, release })
+    let response2
+    try {
+      response2 = await axios.post(appMetaDataUrl, {
+        uploadPath: downloadPath,
+        version,
+        type,
+        note,
+        group,
+        base,
+        release
+      })
+    } catch (err) {
+      console.log('Upload metadata error');
+      if (err.response) {
+        console.log(err.response.data);
+        console.log(err.response.code);
+      }
+    }
     return response2.data
   }
 }

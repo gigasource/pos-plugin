@@ -2,7 +2,7 @@ const _ = require('lodash')
 
 const orderUtil = {
   calItemTotal(item) {
-    return +(item.quantity * item.price).toFixed(2);
+    return +(item.quantity * item.price);
   },
   calTax(price, tax) {
     return price * (1 - 1 / (1 + tax / 100))
@@ -23,27 +23,27 @@ const orderUtil = {
     return _.sumBy(items, orderUtil.calItemDiscount)
   },
   calItemModifier(item) {
-    return item.modifiers ? _.sum(item.modifiers.map(i => i.price)) : 0
+    return item.modifiers ? _.sum(item.modifiers.map(i => i.price)) * item.quantity : 0
   },
   calOrderModifier(items) {
     return _.sumBy(items, orderUtil.calItemModifier)
   },
   applyDiscountForOrder(items, { difference, value }) {
     const totalWithoutDiscountResist = difference + value;
-    const percent =  difference / totalWithoutDiscountResist * 100;
+    const percent = difference / totalWithoutDiscountResist * 100;
     let sumDiscount = 0;
     const lastDiscountableItemIndex = _.findLastIndex(items, item => !item.discountResistance);
-    for(let i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
-      if(!item.discountResistance) {
-        if(i < lastDiscountableItemIndex) {
-          item.price = +(item.originalPrice * (100 - percent) / 100).toFixed(2);
+      if (!item.discountResistance) {
+        if (i < lastDiscountableItemIndex) {
+          item.price = +(item.originalPrice * (100 - percent) / 100);
           item.discountUnit = 'percent';
-          item.vDiscount = +(item.originalPrice - item.price).toFixed(2);
+          item.vDiscount = +(item.originalPrice - item.price);
           sumDiscount += this.calItemDiscount(item);
         } else {
           item.discountUnit = 'amount';
-          item.vDiscount = +((difference - sumDiscount)/item.quantity).toFixed(2);
+          item.vDiscount = +((difference - sumDiscount) / item.quantity);
           item.price = item.originalPrice - item.vDiscount;
         }
       }
@@ -70,6 +70,13 @@ const orderUtil = {
       };
     })
   },
+  formatOrderItems(items) {
+    return items.map(i => Object.assign({}, i, {
+      price: i.price.toFixed(2),
+      originalPrice: i.originalPrice.toFixed(2),
+      ...i.vDiscount && { vDiscount: i.vDiscount.toFixed(2) }
+    }))
+  }
 }
 
 module.exports = orderUtil

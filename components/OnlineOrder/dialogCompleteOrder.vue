@@ -28,27 +28,32 @@
             <div class="fw-700" style="flex: 0 0 30px">{{item.quantity}}x</div>
             <div class="flex-equal">
               {{item.name}}
-              <template v-if="item.modifiers.length > 0">
-                <span class="i text-grey">(<span v-for="modifier in item.modifiers">{{modifier}}</span>)</span>
-              </template>
+              <span class="i text-grey">{{getExtraInfo(item)}}</span>
             </div>
-            <div class="col-2 fs-small-2 ta-right">€ {{item.price.toFixed(2)}}</div>
+            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency')}} {{getItemPrice(item)}}</div>
           </div>
         </div>
 
         <div class="dashed-gradient"/>
         <div class="row-flex justify-between mt-2">
           <div>Total <b>{{orderQuantity}}</b> item(s)</div>
-          <div class="ta-right">€ {{order.vSum.toFixed(2)}}</div>
+          <div class="ta-right">{{$t('common.currency')}} {{subTotal | formatMoney}}</div>
         </div>
-        <div class="row-flex justify-between mb-2">
+        <div class="row-flex justify-between">
           <div>{{$t('onlineOrder.shippingFee')}}:</div>
-          <div class="ta-right">€ {{order.shippingFee ? order.shippingFee.toFixed(2) : 0}}</div>
+          <div class="ta-right">{{$t('common.currency')}} {{getShippingFee() | formatMoney}}</div>
         </div>
-        <div class="dashed-gradient"/>
+        <div class="row-flex justify-between" v-for="discount in order.discounts">
+          <div>
+            <span>{{discount.coupon ? 'Coupon ' : discount.name}}</span>
+            <span style="color: #757575; font-style: italic"  v-if="discount.coupon">({{discount.coupon}})</span>:
+          </div>
+          <div class="ta-right">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
+        </div>
+        <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Total</div>
-          <div class="ta-right">€ {{(order.vSum + (order.shippingFee || 0)).toFixed(2)}}</div>
+          <div class="ta-right">{{$t('common.currency')}} {{(order.vSum + (order.shippingFee || 0)) | formatMoney}}</div>
         </div>
       </g-card-text>
       <g-card-actions>
@@ -67,7 +72,17 @@
     },
     data() {
       return {
-        order: null
+        order: null,
+        decimals: 2,
+      }
+    },
+    filters: {
+      formatDate(date) {
+        return dayjs(date).format('HH:mm')
+      },
+      formatMoney(value, decimals = 2) {
+        if (value != null)
+          return !isNaN(value) ? value.toFixed(decimals) : value
       }
     },
     computed: {
@@ -77,7 +92,14 @@
         },
         set(val) {
           this.$emit('input', val)
-        }
+        },
+      },
+      subTotal() {
+        return this.order.items.reduce((sum, { originalPrice, price, quantity }) => sum + (originalPrice || price) * quantity, 0)
+      },
+      totalWithShipping() {
+        const { shippingFee, vSum } = this.order;
+        return vSum + shippingFee
       },
       orderQuantity() {
         return this.order.items.reduce((acc, val) => acc + val.quantity, 0)
@@ -89,6 +111,26 @@
           this.order = order
           this.dialog = true
         }
+      },
+      getItemPrice(item) {
+        let price = item.originalPrice || item.price
+        if (item.modifiers && item.modifiers.length > 0) {
+          price += _.sumBy(item.modifiers, m => m.price * m.quantity)
+        }
+        return price
+      },
+      getExtraInfo(item) {
+        let extrasArr = []
+        if (item.note) extrasArr.push(item.note)
+        if (item.modifiers && item.modifiers.length) extrasArr.push(item.modifiers.map(m => m.name))
+        return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
+      },
+      getShippingFee() {
+        const { discounts, shippingFee } = this.order
+        if (!discounts) return shippingFee
+
+        const freeShipping = discounts.find(item => item.type === 'freeShipping');
+        return freeShipping ? freeShipping.value : shippingFee;
       },
       declineOrder(order) {
         this.$emit('declineOrder', order)
@@ -102,6 +144,9 @@
         this.$emit('completeOrder', order)
         this.dialog = false
       }
+    },
+    mounted() {
+      this.decimals = this.$t('common.currencyDecimal')
     }
   }
 </script>

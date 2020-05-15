@@ -49,6 +49,17 @@
 
         <div class="kitchen-item-modifiers" v-if="item.modifiers"
              :style="{'padding-bottom': index === items.length - 1 ? '0' : '18px'}">
+          <div><table>
+            <tbody>
+            <tr>
+              <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateQuantityColumnWidth(item.quantity)}"></td>
+              <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: '5%'}"></td>
+              <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateItemColumnWidth(item.quantity)}">
+                <span>* {{item.note}}</span>
+              </td>
+            </tr>
+            </tbody>
+          </table></div>
           <div v-for="mod in item.modifiers">
             <table>
               <tbody>
@@ -89,7 +100,7 @@
       orderSum: Number,
       deliveryTime: String,
       locale: Object,
-      type: String
+      type: String,
     },
     filters: {
       convertMoney(value) {
