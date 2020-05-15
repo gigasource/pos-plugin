@@ -63,15 +63,18 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const folderPath = `${uploadPath}/${version}`;
     const form = new FormData();
     form.append('file', fs.createReadStream(filePath));
+    let response
     try {
-      const response = await axios.post(`${uploadFileUrl}${folderPath}&overwrite=true`, form, {
+      response = await axios.post(`${uploadFileUrl}${folderPath}&overwrite=true`, form, {
         maxContentLength: 1024 * 1024 * 1024,
         httpsAgent: new https.Agent({rejectUnauthorized: false}),
         headers: {...form.getHeaders()}
       });
     } catch (err) {
+      console.log(`Upload ${filePath} error`)
       if (err.response) {
         console.log(err.response.data);
+        console.log(err.response.code);
       }
     }
     if (!response.data[0].uploadSuccess)
@@ -80,7 +83,23 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const downloadPath = _getDownloadUrl(file);
 
     // upload app meta-data
-    const response2 = await axios.post(appMetaDataUrl, { uploadPath: downloadPath, version, type, note, group, base, release })
+    try {
+      const response2 = await axios.post(appMetaDataUrl, {
+        uploadPath: downloadPath,
+        version,
+        type,
+        note,
+        group,
+        base,
+        release
+      })
+    } catch (err) {
+      console.log('Upload metadata error');
+      if (err.response) {
+        console.log(err.response.data);
+        console.log(err.response.code);
+      }
+    }
     return response2.data
   }
 }
