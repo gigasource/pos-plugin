@@ -5,6 +5,7 @@
   import _ from 'lodash'
   import semverSort from 'semver/functions/sort'
   import semverLt from 'semver/functions/lt'
+  import { getCdnUrl } from './utils';
 
   export default {
     name: 'PosOnlineOrderManagementStore',
@@ -342,7 +343,7 @@
         const {socket} = window.cms
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
         const type = semverLt(device.appVersion, versionInfo.base) ? 'APK' : 'PATCH'
-        socket.emit('updateApp', device._id, versionInfo[type].downloadPath, type)
+        socket.emit('updateApp', device._id, getCdnUrl(versionInfo[type].downloadPath), type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI
       },

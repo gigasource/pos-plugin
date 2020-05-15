@@ -169,15 +169,14 @@
           </g-dnd-dialog>
   
           <!-- WebRTC remote control -->
-          <g-dnd-dialog v-if="dialog.webRTC.show"
-                        v-model="dialog.webRTC.show"
+          <g-dnd-dialog v-model="dialog.webRTC.show"
                         lazy
                         :width="dialog.webRTC.width"
                         :height="dialog.webRTC.height"
                         @dragStart="dialog.webRTC.dragging = true" @dragEnd="dialog.webRTC.dragging = false"
                         @resizeStart="dialog.webRTC.dragging = true" @resizeEnd="dialog.webRTC.dragging = false"
                         @close="closeWebRTCRemoteControl">
-            <template #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
+            <template v-if="dialog.webRTC.show" #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
             <div v-if="dialog.webRTC.show && dialog.webRTC.dragging" style="height: 100%; width: 100%; position: absolute; background: transparent"/>
             <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%"/>
           </g-dnd-dialog>
@@ -274,10 +273,13 @@
         this.dialog.webRTC.show = true
       },
       closeWebRTCRemoteControl() {
-        window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id)
-        this.dialog.webRTC.src = 'about:blank'
-        this.dialog.webRTC.show = false
-        this.dialog.webRTC.device = null
+        if (this.dialog.webRTC.device) {
+          console.log('close web rtc remote control')
+          window.cms.socket.emit('stopStream', this.dialog.webRTC.device._id)
+          this.dialog.webRTC.src = 'about:blank'
+          this.dialog.webRTC.show = false
+          this.dialog.webRTC.device = null
+        }
       },
       startRemoteControl(storeId, deviceId) {
         if (this.disableRemoteControlBtn) return
