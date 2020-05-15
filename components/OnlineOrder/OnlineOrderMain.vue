@@ -291,6 +291,7 @@
       getTimeoutProgress(order) {
         const calc = () => {
           clearTimeout(this.timeoutInterval[order._id])
+
           requestAnimationFrame(() => {
             const now = new Date()
             const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
@@ -299,10 +300,11 @@
 
             const x = (timeout - diff) / timeout
             const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
-            this.$set(order, 'timeoutProgress', progress)
-            this.timeoutInterval[order._id] = setTimeout(calc, 1000)
 
+            this.$set(order, 'timeoutProgress', progress)
             this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
+
+            this.timeoutInterval[order._id] = setTimeout(calc, 1000)
           })
         }
 
@@ -314,19 +316,16 @@
       },
       getItemPrice(item) {
         let price = item.originalPrice || item.price
-        if(item.modifiers && item.modifiers.length > 0){
+        if (item.modifiers && item.modifiers.length > 0) {
           price += _.sumBy(item.modifiers, m => m.price * m.quantity)
         }
         return price
       },
       getExtraInfo(item) {
-        let info = ''
-        if(item.modifiers && item.modifiers.length > 0) {
-          info += item.modifiers.map(m => m.name).join(', ')
-          if(item.note) info += ', '
-        }
-        if(item.note) info += item.note
-        return info.length > 0 ? `(${info})` : info
+        let extrasArr = []
+        if (item.note) extrasArr.push(item.note)
+        if (item.modifiers && item.modifiers.length) extrasArr.push(item.modifiers.map(m => m.name))
+        return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
       }
     },
     mounted() {
