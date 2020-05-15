@@ -51,7 +51,10 @@ module.exports = function (cms) {
 
   const {io, socket: internalSocketIOServer} = cms;
   const externalSocketIOServer = p2pServerPlugin(io, {
-    saveMessage, loadMessages, deleteMessage,
+    clientOverwrite: true,
+    saveMessage,
+    loadMessages,
+    deleteMessage,
   });
 
   function updateDeviceAndNotify(online, clientId) {
