@@ -10,10 +10,15 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
   const uploadFileUrl = `${domain}${apiBaseUrl}/files?folderPath=`
   const appMetaDataUrl = `${domain}/app/meta-data`
   const uploadPath = `/update/POS_Android`
-
+  // `https://pos.gigasource.io/cms-files/file-existed?filePath=/update/POS_Android/${version}`
   // grid-fs handler methods
   async function getFilesInPath(folderPath) {
-    return (await axios.get(`${domain}${apiBaseUrl}/file-metadata?folderPath=${folderPath}`)).data
+    try {
+      const response = (await axios.get(`${domain}${apiBaseUrl}/file-existed?filePath=${folderPath}`))
+      return (response && response.data && response.data.existed);
+    } catch (err) {
+      return false
+    }
   }
 
   async function createNewFolder(folderPath, newFolderName = 'New Folder') {
