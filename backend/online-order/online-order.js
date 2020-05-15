@@ -66,10 +66,12 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
 
-    onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
+    onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
       let { orderType: type, paymentType, customer, products: items,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
+
+      const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
 
       items = items.map(item => {
         if (item.originalPrice) return item;
@@ -95,7 +97,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         payment: [{ type: paymentType, value: vSum }],
         type,
         date,
-        ...timeoutDate && {timeoutDate: new Date(timeoutDate)},
+        ...timeoutDate && {timeoutDate: dayjs(timeoutDate).add(systemTimeDelta, 'millisecond').toDate()},
         vDate: await getVDate(date),
         bookingNumber: getBookingNumber(date),
         shippingFee,
