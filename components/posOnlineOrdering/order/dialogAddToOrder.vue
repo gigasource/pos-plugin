@@ -15,11 +15,18 @@
             <span class="text-grey-darken-1 fs-small-2 ml-1">({{choice.mandatory ? 'REQUIRED' : 'OPTIONAL'}})</span>
           </div>
           <div class="dialog-content__choice-option">
-            <g-checkbox v-for="option in choice.options"
-                        v-model="modifiers[index]"
-                        color="#536DFE"
-                        :value="option"
-                        :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+            <template v-if="choice.select === 'one' && choice.mandatory">
+              <g-radio-group v-model="modifiers[index]">
+                <g-radio v-for="option in choice.options" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+              </g-radio-group>
+            </template>
+            <template v-else>
+              <g-checkbox v-for="option in choice.options"
+                          v-model="modifiers[index]"
+                          color="#536DFE"
+                          :value="option"
+                          :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+            </template>
           </div>
         </div>
         <div class="dialog-content__note">
@@ -192,15 +199,32 @@
          flex-wrap: wrap;
          align-items: center;
 
-
+         .g-radio-wrapper,
          .g-checkbox-wrapper {
-           margin: 4px 36px 4px 0;
+           margin: 4px 44px 4px 0;
 
+           ::v-deep .g-radio,
+           ::v-deep .g-checkbox {
+             padding-left: 20px;
+           }
+
+           ::v-deep .g-radio-label,
            ::v-deep .g-checkbox-label {
              color: #424242;
              font-size: 15px;
              text-transform: capitalize;
+             margin-left: 0;
            }
+
+           ::v-deep .g-radio .g-radio-checkmark:before,
+           ::v-deep .g-checkbox .g-checkbox-checkmark:before {
+             font-size: 16px;
+           }
+         }
+
+         ::v-deep .radio-group {
+           display: flex;
+           flex-wrap: wrap;
          }
        }
      }
@@ -231,6 +255,31 @@
      margin: 0 -28px -24px -28px;
      padding: 12px 20px 12px 28px;
      border-radius: 0 0 4px 4px;
+   }
+ }
+
+ @media screen and (max-width: 600px) {
+   .dialog {
+     &-content {
+       &__choice {
+         &-option {
+           display: block;
+
+           .g-checkbox-wrapper {
+             padding-top: 2px;
+             padding-bottom: 2px;
+           }
+
+           ::v-deep .radio-group {
+             display: block;
+
+             .g-radio-wrapper {
+               padding-bottom: 4px;
+             }
+           }
+         }
+       }
+     }
    }
  }
 </style>
