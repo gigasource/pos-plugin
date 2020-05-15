@@ -83,8 +83,9 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const downloadPath = _getDownloadUrl(file);
 
     // upload app meta-data
+    let response2
     try {
-      const response2 = await axios.post(appMetaDataUrl, {
+      response2 = await axios.post(appMetaDataUrl, {
         uploadPath: downloadPath,
         version,
         type,
