@@ -57,7 +57,7 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
     /opt/android-sdk/build-tools/28.0.3/zipalign -f -v 4 /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/temp.apk && \
     rm /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk && \
     mv /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/temp.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk && \
-    ./gradlew uploadApkAndPatchProRelease
+    ./gradlew uploadApkAndPatchProRelease -Dorg.gradle.internal.http.socketTimeout=300000 -Dhttp.connectionTimeout=300000
 # Cleanup unused & sensitive files
 WORKDIR /root/cms-boilerplate
 RUN rm -rf ./backoffice && \
