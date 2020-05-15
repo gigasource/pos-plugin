@@ -4,6 +4,7 @@
 <script>
   import _ from 'lodash'
   import semverSort from 'semver/functions/sort'
+  import semverLt from 'semver/functions/lt'
 
   export default {
     name: 'PosOnlineOrderManagementStore',
@@ -195,11 +196,9 @@
             const appItem = _.filter(app && app.files, appItem => semverSort([appItem.version, device.appVersion])[1] === appItem.version)
 
             const deviceVersions = appItem.map(this.convertAppItemToViewModel)
-            const deviceVersionMap = _.keyBy(deviceVersions, (o) => {
-              return o.version + (o.type === 'PATCH' ? '1' : '0')
-            })
-            const versions = semverSort(Object.keys(deviceVersionMap)).reverse().map(key => deviceVersionMap[key])
-
+            const deviceVersionMap = _.groupBy(deviceVersions, 'version')
+            const versions = semverSort(Object.keys(deviceVersionMap)).reverse().map(key => Object.assign(this.convertMapToObject(deviceVersionMap[key]),
+                    { text: key, value: key, base: deviceVersionMap[key][0].base }))
             return {
               ...device,
               // store all version of device's app
@@ -212,15 +211,21 @@
           })
         }
       },
+      convertMapToObject(deviceVersionMap) {
+        return _.reduce(deviceVersionMap, (result, item) => {
+          result[item.type] = item;
+          return result;
+        }, {})
+      },
       convertAppItemToViewModel(appItem) {
         return {
           // info which will be used by GSelect
-          text: `${appItem.version} (${appItem.type} - ${appItem.release})`,
-          value: appItem.uploadPath,
+          downloadPath: appItem.uploadPath,
           // info which will be used to store in Device collection
           version: appItem.version,
           type: appItem.type,
-          release: appItem.release
+          release: appItem.release,
+          base: appItem.base,
         }
       },
       storeInGroup(store, storeGroup) {
@@ -336,7 +341,8 @@
 
         const {socket} = window.cms
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
-        socket.emit('updateApp', device._id, device.updateVersion, versionInfo.type)
+        const type = semverLt(device.appVersion, versionInfo.base) ? 'APK' : 'PATCH'
+        socket.emit('updateApp', device._id, versionInfo[type].downloadPath, type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI
       },
