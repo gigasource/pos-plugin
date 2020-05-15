@@ -25,22 +25,28 @@ const orderUtil = {
     const percent =  difference / totalWithoutDiscountResist * 100;
     let sumDiscount = 0;
     const lastDiscountableItemIndex = _.findLastIndex(items, item => !item.discountResistance);
-    for(let i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
-      if(!item.discountResistance) {
-        if(i < lastDiscountableItemIndex) {
-          item.price = +(item.originalPrice * (100 - percent) / 100).toFixed(2);
+      if (!item.discountResistance) {
+        if (i < lastDiscountableItemIndex) {
+          item.price = +(item.originalPrice * (100 - percent) / 100);
           item.discountUnit = 'percent';
-          item.vDiscount = +(item.originalPrice - item.price).toFixed(2);
+          item.vDiscount = +(item.originalPrice - item.price)
           sumDiscount += this.calItemDiscount(item);
         } else {
           item.discountUnit = 'amount';
-          item.vDiscount = +((difference - sumDiscount)/item.quantity).toFixed(2);
+          item.vDiscount = +((difference - sumDiscount)/item.quantity)
           item.price = item.originalPrice - item.vDiscount;
         }
       }
     }
     return items;
+  },
+  formatItems(items) {
+    return items.map(i => Object.assign(i, {
+      price: i.price.toFixed(2),
+      vDiscount: i.vDiscount.toFixed(2)
+    }))
   }
 }
 

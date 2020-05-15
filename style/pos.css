@@ -536,3 +536,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-upload_white {
+  background-image: url("../assets/upload_white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

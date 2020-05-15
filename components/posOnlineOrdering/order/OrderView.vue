@@ -199,6 +199,17 @@
         // focus on the first category
         if (this.categories.length)
           this.selectedCategoryId = this.categories[0]._id
+        //change store favicon
+        if(store.faviconImageSrc) {
+          const favicons = document.querySelectorAll('link[rel=icon]')
+          for (const favicon of favicons) {
+            const sizes = favicon.sizes && favicon.sizes.value && favicon.sizes.value.split('x')
+            if(sizes.length === 2)
+              favicon.href = `${getCdnUrl(store.faviconImageSrc)}?w=${sizes[0]}&h=${sizes[1]}`
+            else
+              favicon.href = getCdnUrl(store.faviconImageSrc)
+          }
+        }
       } else {
         // TODO
         alert('Store is not exist');

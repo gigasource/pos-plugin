@@ -58,13 +58,6 @@
           </g-radio-group>
         </div>
       </div>
-      <div v-if="delivery" class="row-flex align-items-center">
-        <div class="col-8">Delivery time interval</div>
-        <div class="col-4">
-          <g-select text-field-component="GTextFieldBs" v-model="deliveryTimeIntervalData" :items="deliveryTimeOptions"
-                    @input="updateDeliveryTimeInterval"/>
-        </div>
-      </div>
       <div class="row-flex align-items-center">
         <div class="col-8">
           <g-switch :label="`Require minimum value ${$t('common.currency')} for delivery orders`"

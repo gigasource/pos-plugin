@@ -272,7 +272,8 @@
       "_id": "5eb3dc1e2a445016e7510af9",
       "schemaType": "number",
       "key": "orderTimeOut",
-      "type": "input@number"
+      "type": "input@number",
+      "default": "3"
     },
     {
       "_id": "5eb5332513e1dddd8223695d",
@@ -280,6 +281,11 @@
       "key": "deliveryTimeInterval",
       "default": "15",
       "type": "input@number"
+    },
+    {
+      "schemaType": "string",
+      "key": "faviconImageSrc",
+      "type": "input"
     }
   ],
   "name": "Store",
