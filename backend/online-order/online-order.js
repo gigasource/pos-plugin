@@ -7,12 +7,20 @@ const url = require('url');
 const axios = require('axios');
 const dayjs = require('dayjs');
 
-const {webshopUrl, port: backendPort} = global.APP_CONFIG;
+let customWebshopUrl
+let {webshopUrl, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
 let deviceSockets = [];
 let webShopConnected = false
+
+async function getWebShopUrl(cms) {
+  const posSetting = await cms.getModel('PosSetting').findOne()
+  customWebshopUrl = posSetting.customServerUrl
+  if (customWebshopUrl) return customWebshopUrl
+  return webshopUrl
+}
 
 function createOnlineOrderSocket(deviceId, cms) {
 
@@ -30,10 +38,10 @@ function createOnlineOrderSocket(deviceId, cms) {
   }
 
   const maxConnectionAttempt = 5;
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (onlineOrderSocket) return resolve()
     console.log('Creating online order')
-    onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
+    onlineOrderSocket = io(`${await getWebShopUrl(cms)}?clientId=${deviceId}`);
 
     onlineOrderSocket.on('connect', () => console.log('external socket connect'))
 
@@ -140,13 +148,13 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('unpairDevice'))
     })
 
-    onlineOrderSocket.on('startRemoteControl', (proxyServerPort, callback) => {
+    onlineOrderSocket.on('startRemoteControl', async (proxyServerPort, callback) => {
       activeProxies++;
 
       if (!proxyClient) {
         proxyClient = new ProxyClient({
           clientId: `${deviceId}-proxy-client`,
-          proxyServerHost: `http://${url.parse(webshopUrl).hostname}`,
+          proxyServerHost: `http://${url.parse(await getWebShopUrl(cms)).hostname}`,
           socketIOPort: proxyServerPort,
           remoteHost: 'localhost',
           remotePort: backendPort,
@@ -237,7 +245,7 @@ async function getDeviceId(pairingCode) {
     if (!pairingCode) {
       return null
     } else {
-      const pairingApiUrl = `${webshopUrl}/device/register`
+      const pairingApiUrl = `${await getWebShopUrl(cms)}/device/register`
       const requestBody = {pairingCode}
       requestBody.appName = 'POS_Android'
       requestBody.appVersion = require('../../package').version
@@ -298,7 +306,7 @@ module.exports = async cms => {
       //deviceSockets = deviceSockets.filter(sk => sk !== socket)
     });
 
-    socket.on('getWebshopUrl', callback => callback(webshopUrl));
+    socket.on('getWebshopUrl', async callback => callback(await getWebShopUrl(cms)));
 
     socket.on('getWebshopName', async callback => {
       const deviceId = await getDeviceId();
@@ -370,8 +378,8 @@ module.exports = async cms => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, (webShopSettingUrl) => {
-        callback && callback( `${webshopUrl}${webShopSettingUrl}`)
+      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, async (webShopSettingUrl) => {
+        callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
     })
   })

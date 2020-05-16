@@ -2,7 +2,7 @@
   <div class="background row-flex align-items-center justify-center">
     <g-card persistent width="580">
       <div class="dialog" style="padding: 24px">
-        <div class="dialog-title">Welcome to Gigasource POS</div>
+        <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
         <div class="dialog-title--sub">Pairing Code</div>
         <g-text-field-bs large class="bs-tf__pos" v-model="code" style="margin-bottom: 12px;">
           <template v-slot:append-inner>
@@ -30,13 +30,16 @@
       </div>
     </g-card>
     <dialog-text-filter v-model="dialog.input" label="Code" :defaul-value="code" @submit="changeCode"/>
+    <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl" @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
     <g-btn style="position: absolute; bottom: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
   </div>
 </template>
 
 <script>
+  import DialogCustomUrl from './dialogCustomUrl';
   export default {
     name: "FirstTimeSetUp",
+    components: { DialogCustomUrl },
     data() {
       return {
         dialog: {
@@ -47,7 +50,9 @@
         error: false,
         errorMessage: 'No internet connection',
         pairing: false,
-        offline: false
+        offline: false,
+        clickCount: 0,
+        showCustomUrlDialog: false
       }
     },
     created() {
@@ -86,6 +91,14 @@
           }
           this.pairing = false
         })
+      },
+      secretClick() {
+        if (this.clickCount === 9) {
+          this.showCustomUrlDialog = true
+        } else this.clickCount++
+      },
+      updateServerUrl(url) {
+        this.$emit('updateServerUrl', url)
       }
     }
   }
