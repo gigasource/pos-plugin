@@ -161,8 +161,23 @@ module.exports = function (cms) {
       deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).filter(id => !clientIdList.includes(id)));
     });
 
-    socket.on('updateAppFeature', async (deviceId, features) => {
-      externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features);
+    externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async ({ _id, name, hardware }, features) => {
+      try {
+        await cms.getModel('Device').updateOne({ _id }, { features })
+        cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`, false)
+      } catch (e) {
+        cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true)
+      }
+    });
+
+    socket.on('updateAppFeature', async (deviceId, features, cb) => {
+      try {
+        const device = await cms.getModel('Device').findById(deviceId);
+        externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
+        cb(`Awaiting device feature update for ${device.name}(${device.hardware})`)
+      } catch (e) {
+        cb('Error emitting to device')
+      }
     });
 
     socket.on('unpairDevice', async deviceId => {

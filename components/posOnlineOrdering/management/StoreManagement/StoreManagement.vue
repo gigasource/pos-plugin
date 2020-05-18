@@ -153,7 +153,7 @@
       // stores
       'PosOnlineOrderManagementStore:(stores,loadStores,addStore,removeStore,updateStore,checkDeviceOnlineStatus)',
       // devices
-      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,updateDeviceFeatures,updateDeviceAppVersion)',
+      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,updateDeviceFeatures,updateDeviceAppVersion,showMessage)',
       // app
       'PosOnlineOrderManagementStore:(apps,appItems)',
       // store management permissions
@@ -226,8 +226,9 @@
         this.dialog.featureControl = false
       },
       updateDeviceAppFeature(features) {
-        this.updateDeviceFeatures(this.selectedDevice._id, features, () => {
+        this.updateDeviceFeatures(this.selectedDevice._id, features, (message) => {
           this.dialog.featureControl = false
+          this.showMessage(message, false)
         })
       },
 
