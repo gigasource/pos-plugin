@@ -151,7 +151,7 @@
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
                       {{item.id && `${item.id}.`}} {{item.name}}
-                      <span class="i text-grey">{{getExtraInfo(item)}}</span>
+                      <span class="i text-grey fs-small-2">{{getExtraInfo(item)}}</span>
                     </span>
                   </span>
                 </div>
@@ -174,6 +174,8 @@
   import ValuePicker from './ValuePicker';
   import DialogCompleteOrder from './dialogCompleteOrder';
   import DialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
+  import orderUtil from '../logic/orderUtil'
+
   export default {
     name: 'OnlineOrderMain',
     components: {DialogTextFilter, DialogCompleteOrder, ValuePicker },
@@ -315,17 +317,10 @@
         return dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(), 'minute')
       },
       getItemPrice(item) {
-        let price = item.originalPrice || item.price
-        if (item.modifiers && item.modifiers.length > 0) {
-          price += _.sumBy(item.modifiers, m => m.price * m.quantity)
-        }
-        return price
+        return orderUtil.getItemPrice(item)
       },
       getExtraInfo(item) {
-        let extrasArr = []
-        if (item.note) extrasArr.push(item.note)
-        if (item.modifiers && item.modifiers.length) extrasArr.push(item.modifiers.map(m => m.name))
-        return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
+        return orderUtil.getExtraInfo(item)
       }
     },
     mounted() {
