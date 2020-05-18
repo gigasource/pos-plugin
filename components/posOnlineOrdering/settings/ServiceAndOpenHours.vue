@@ -9,14 +9,15 @@
       </div>
       <div v-for="(openHour, index) in openHoursData" :key="index"
            class="open-hour__row">
-        <g-checkbox
-            v-for="(day, i) in days"
-            :key="`day_${index}_${i}`"
-            v-model="openHour.dayInWeeks[i]"
-            :label="day"
-            @change="checkServiceHourError"
-            color="#536DFE"/>
-        <g-spacer/>
+        <div class="row-flex flex-wrap">
+          <g-checkbox
+              v-for="(day, i) in days"
+              :key="`day_${index}_${i}`"
+              v-model="openHour.dayInWeeks[i]"
+              :label="day"
+              @change="checkServiceHourError"
+              color="#536DFE"/>
+        </div>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
                                :value="getTime(openHour, 'open')"
@@ -27,20 +28,19 @@
                                :value="getTime(openHour, 'close')"
                                @input="updateHours($event, index, false)"/>
         </div>
-        <g-spacer/>
         <div @click="removeOpenHour(openHour)" class="open-hour__row--btn">
           <g-icon size="16">icon-close</g-icon>
         </div>
         <div v-if="errors[index] && errors[index].message" class="error-message">{{errors[index].message}}</div>
       </div>
-      <div class="display-flex">
+      <div class="row-flex">
         <g-spacer/>
         <g-btn-bs background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
                :disabled="hasError || openHoursJson === lastSavedData">Save
         </g-btn-bs>
       </div>
     </div>
-    <div class="service-setting__content w-50">
+    <div class="service-setting__content">
       <div class="mb-3 fw-700">Service</div>
       <div class="row-flex">
         <div class="col-6">
@@ -324,11 +324,10 @@
 </script>
 
 <style scoped lang="scss">
-  .display-flex {
-    display: flex;
-  }
-
   .service-setting {
+    max-height: 100%;
+    overflow-y: auto;
+
     &__title {
       font-weight: 700;
       font-size: 18px;
@@ -339,6 +338,7 @@
       background-color: #FFF;
       border-radius: 5px;
       padding: 25px 25px 20px 25px;
+      display: inline-block;
 
       .btn-add {
         color: #536DFE;
@@ -352,7 +352,6 @@
         background: #FAFAFA;
         border: 1px solid #EFEFEF;
         border-radius: 6px;
-        height: 43px;
         margin-top: 8px;
         margin-bottom: 20px;
         position: relative;
@@ -368,11 +367,13 @@
             border-top-left-radius: 37px;
             border-bottom-left-radius: 37px;
             margin-right: 2px;
+            margin-left: 16px;
           }
 
           &.right {
             border-top-right-radius: 37px;
             border-bottom-right-radius: 37px;
+            margin-right: 16px;
           }
 
           &.error {
@@ -386,10 +387,11 @@
 
         &--btn {
           background: #EFEFEF;
-          width: 43px;
-          height: 43px;
-          line-height: 43px;
-          text-align: center;
+          min-width: 43px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          align-self: stretch;
           border-top-right-radius: inherit;
           border-bottom-right-radius: inherit;
           cursor: pointer;
