@@ -37,12 +37,20 @@
           <th width="25%" style="text-align: right; padding-right: 2px;">{{locale.printing.total}}</th>
         </tr>
         </thead>
-        <tr v-for="item in items">
-          <td width="42%" style="padding-left: 12px">{{item.id}}. {{item.name}}</td>
-          <td width="5%" style="text-align: right">{{item.quantity}}</td>
-          <td width="18%" style="text-align: right">{{(item.originalPrice || item.price) | convertMoney}}</td>
-          <td width="25%" style="text-align: right; padding-right: 2px;">{{((item.originalPrice || item.price) * item.quantity) | convertMoney}}</td>
-        </tr>
+        <template v-for="item in items">
+          <tr>
+            <td width="42%" style="padding-left: 12px">{{item.id && `${item.id}.`}}. {{item.name}}</td>
+            <td width="5%" style="text-align: right">{{item.quantity}}</td>
+            <td width="18%" style="text-align: right">{{(item.originalPrice || item.price) | convertMoney}}</td>
+            <td width="25%" style="text-align: right; padding-right: 2px;">{{((item.originalPrice || item.price) * item.quantity) | convertMoney}}</td>
+          </tr>
+          <tr v-if="item.modifiers && item.modifiers.length" v-for="mod in item.modifiers">
+            <td width="42%" style="padding-left: 12px">* {{mod.name}}</td>
+            <td width="5%" style="text-align: right">{{mod.quantity}}</td>
+            <td width="18%" style="text-align: right">{{mod.price | convertMoney}}</td>
+            <td width="25%" style="text-align: right; padding-right: 2px;">{{(mod.price * mod.quantity) | convertMoney}}</td>
+          </tr>
+        </template>
       </table>
     </div>
     <div class="divider-dashed"/>
