@@ -64,7 +64,6 @@
         if (!val) return
 
         this.$emit('getServerUrl', url => {
-          debugger
           if (!url) {
             this.radioValue = ''
             return
