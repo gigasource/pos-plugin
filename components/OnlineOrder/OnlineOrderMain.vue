@@ -306,7 +306,7 @@
             this.$set(order, 'timeoutProgress', progress)
             this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
 
-            this.timeoutInterval[order._id] = setTimeout(calc, 1000)
+            this.timeoutInterval[order._id] = setTimeout(calc, 250)
           })
         }
 

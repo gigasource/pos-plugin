@@ -1,6 +1,6 @@
 <template>
   <g-btn flat :uppercase="false" height="100%" v-if="storeId">ID: {{storeId}}</g-btn>
-  <g-btn flat :uppercase="false" height="100%" v-else-if="!storeId && skipPairing" @click.stop="pair">Pair</g-btn>
+  <g-btn flat :uppercase="false" height="100%" v-else-if="!storeId || skipPairing" @click.stop="pair">Pair</g-btn>
   <g-btn flat :uppercase="false" height="100%" v-else></g-btn>
 </template>
 

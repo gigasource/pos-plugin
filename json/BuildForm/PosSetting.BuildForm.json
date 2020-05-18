@@ -906,6 +906,12 @@
       "schemaType": "boolean",
       "key": "skipPairing",
       "type": "input@switch"
+    },
+    {
+      "_id": "5ebf5eec5af4ab3673c3a56f",
+      "schemaType": "string",
+      "key": "customServerUrl",
+      "type": "input"
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",
