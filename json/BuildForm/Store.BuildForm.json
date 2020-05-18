@@ -283,9 +283,17 @@
       "type": "input@number"
     },
     {
+      "_id": "5ebe08a82eed8c242f0ad487",
       "schemaType": "string",
       "key": "faviconImageSrc",
       "type": "input"
+    },
+    {
+      "_id": "5ec1fc0b0c4fd967800e3727",
+      "schemaType": "boolean",
+      "key": "displayId",
+      "default": "",
+      "type": "input@switch"
     }
   ],
   "name": "Store",

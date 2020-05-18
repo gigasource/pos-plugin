@@ -10,9 +10,9 @@
       </div>
       <div class="menu-setting__main" v-else>
         <div class="row-flex justify-end mb-2">
-          <g-switch v-model="collapse" label="Collapse overflow text"/>
           <g-spacer/>
-          <g-btn-bs @click="openWebShop" border-color="gray">Preview</g-btn-bs>
+          <g-btn-bs @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
+          <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
           <g-btn-bs background-color="#2979FF" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
             Add new category
@@ -65,6 +65,7 @@
                           :use-multiple-printers="store.useMultiplePrinters"
                           :key="`item_${index}`"
                           :collapse-text="collapse"
+                          :display-id="display"
                           @editing="setEditing(product._id, $event)"
                           @save="updateProduct(product._id, $event)"
                           @delete="openDeleteProductDialog(product._id)"
@@ -92,6 +93,18 @@
       <dialog-new-category v-model="dialog.addNewCategory" @submit="addNewCategory"/>
       <dialog-delete-category v-model="dialog.deleteCategory" @confirm="deleteCategory"/>
       <dialog-delete-item v-model="dialog.deleteProduct" @confirm="deleteProduct"/>
+      <g-dialog v-model="dialog.setting" eager width="531">
+        <div class="dialog">
+          <div class="dialog-title">Settings</div>
+          <g-icon class="dialog-icon--close" size="20" color="black" @click="dialog.setting = false">icon-close</g-icon>
+          <div class="dialog-content">
+            <g-switch label="Collapse overflow text" v-model="collapse"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Limit displaying menu description to 2 lines.</p>
+            <g-switch label="Display item no." v-model="display"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Display menu number on online ordering website</p>
+          </div>
+        </div>
+      </g-dialog>
     </template>
   </div>
 </template>
@@ -106,7 +119,8 @@
       store: Object,
       categories: Array,
       products: Array,
-      collapseText: Boolean
+      collapseText: Boolean,
+      displayId: Boolean
     },
     data: function () {
       return {
@@ -120,6 +134,7 @@
           addNewCategory: false,
           deleteCategory: false,
           deleteProduct: false,
+          setting: false,
         },
         editBtn: []
       }
@@ -145,7 +160,15 @@
           return this.collapseText
         },
         set(val) {
-          this.$emit('change-collapse', {collapseText: val})
+          this.$emit('update-store', {collapseText: val})
+        }
+      },
+      display: {
+        get() {
+          return this.displayId
+        },
+        set(val) {
+          this.$emit('update-store', {displayId: val})
         }
       }
     },
@@ -153,7 +176,7 @@
       categoriesViewModel(val) {
         if(val)
           this.editBtn = val.map(g => false)
-      }
+      },
     },
     methods: {
       setEditing(productId, editing) {
@@ -294,6 +317,28 @@
           }
         }
       }
+    }
+  }
+
+  .dialog {
+    background: white;
+    border-radius: 4px;
+    width: 100%;
+    position: relative;
+    padding: 40px;
+
+    &-title {
+      color: #212121;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 28px;
+      margin-left: 4px;
+    }
+
+    &-icon--close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
     }
   }
 </style>

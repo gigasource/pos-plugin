@@ -78,6 +78,7 @@
     },
     mounted() {
       this.$nextTick(() => {
+        if (this.$refs && this.$refs.email)
           this.$refs.email.$refs.input.focus()
       })
     }

@@ -12,7 +12,7 @@
         <div class="dialog-content__choice" v-for="(choice, index) in choices" :key="index">
           <div class="dialog-content__choice-name">
             <span class="fw-700">{{choice.name}}</span>
-            <span class="text-grey-darken-1 fs-small-2 ml-1">({{choice.mandatory ? 'REQUIRED' : 'OPTIONAL'}})</span>
+            <span class="text-red ml-1">{{choice.mandatory ? '*' : ''}}</span>
           </div>
           <div class="dialog-content__choice-option">
             <template v-if="choice.select === 'one' && choice.mandatory">
@@ -30,7 +30,7 @@
           </div>
         </div>
         <div class="dialog-content__note">
-          <p>Add note <span class="text-grey-darken-1 fs-small-2 ml-1">(OPTIONAL)</span></p>
+          <p>Add note</p>
           <g-text-field-bs prepend-inner-icon="icon-note@16" :placeholder="`${$t('store.note')}...`" v-model="note"/>
         </div>
       </div>
@@ -57,7 +57,7 @@
     props: {
       value: Boolean,
       _id: String,
-      img: String,
+      image: String,
       showImage: {
         type: Boolean,
         default: true
@@ -93,7 +93,7 @@
         }
       },
       computedImg() {
-        const url = getCdnUrl(this.img)
+        const url = getCdnUrl(this.image)
         return url ? `${url}?w=60&h=60` : '/plugins/pos-plugin/assets/empty_dish.svg'
       },
       computedPrice() {

@@ -543,3 +543,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-cog3 {
+  background-image: url("../assets/cog3.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

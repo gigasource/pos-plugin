@@ -83,7 +83,7 @@
             </div>
             <div class="item-price col-3">
               <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency')"
-                     @input="e =>  editOption(i, iOpt, { name: option.name, price: parseInt(e.target.value) })"/>
+                     @input="e =>  editOption(i, iOpt, { name: option.name, price: e.target.value })"/>
             </div>
             <div class="item-btn col-1" v-if="choice.options.length > 1">
               <g-icon size="12" color="#424242" @click="removeOption(i, iOpt)">icon-close</g-icon>

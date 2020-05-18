@@ -6,7 +6,10 @@
            class="po-menu-item__thumbnail"/>
     </template>
     <div class="po-menu-item__content">
-      <div :class="['po-menu-item__name', collapseText && 'collapse']">{{ name }}</div>
+      <div :class="['po-menu-item__name', collapseText && 'collapse']">
+        <span v-if="displayId">{{ id }}.</span>
+        {{ name }}
+      </div>
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
       <div class="po-menu-item__prices--under">
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
@@ -58,6 +61,8 @@
       showImage: Boolean,
       choices: Array,
       available: Boolean,
+      id: String,
+      displayId: Boolean,
     },
     filters: {
       currency(val) {

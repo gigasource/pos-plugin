@@ -21,7 +21,7 @@
         </div>
         <div class="menu-setting-item__content px-2">
           <div class="menu-setting-item__name row-flex">
-            <span class="col-1">{{id ? id + '.' : ''}}</span>
+            <span v-if="displayId" class="mr-1">{{id ? id + '.' : ''}}</span>
             <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
             <span class="col-3" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
@@ -98,7 +98,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId'],
     data: function () {
       return {
         mode: 'view',

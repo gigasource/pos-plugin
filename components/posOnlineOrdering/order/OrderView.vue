@@ -94,6 +94,7 @@
                     :quantity="getQuantityInOrder(item)"
                     :disabled="menuItemDisabled"
                     :collapse-text="store.collapseText"
+                    :display-id="store.displayId"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
