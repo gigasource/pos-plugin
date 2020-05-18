@@ -135,7 +135,7 @@
         this.quantity++
       },
       submit() {
-        let modifiers = _.flatten(this.modifiers.filter(m => !!m && m.length > 0)).map(m => ({
+        let modifiers = _.flatten(this.modifiers.filter(m => !!m)).map(m => ({
           ...m,
           quantity: 1
         }))
