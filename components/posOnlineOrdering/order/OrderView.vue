@@ -94,8 +94,8 @@
                     :quantity="getQuantityInOrder(item)"
                     :disabled="menuItemDisabled"
                     :collapse-text="store.collapseText"
-                    @menu-item-selected="addItemToOrder(item)"
-                    @increase="addItemToOrder(item)"
+                    @menu-item-selected="openDialogAdd(item)"
+                    @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
               </div>
             </div>
@@ -136,6 +136,8 @@
             </template>
           </div>
         </g-dialog>
+
+        <dialog-add-to-order v-bind="this.selectedProduct" v-model="dialog.add" @add="addItemToOrder"/>
       </template>
     </div>
 </template>
@@ -148,10 +150,11 @@
   import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
   import {autoResizeTextarea} from "../../logic/commonUtils";
   import { getCdnUrl } from '../../Store/utils';
+  import DialogAddToOrder from "./dialogAddToOrder";
 
   export default {
     name: 'OrderView',
-    components: { CreatedOrder, MenuItem, OrderTable},
+    components: {DialogAddToOrder, CreatedOrder, MenuItem, OrderTable},
     data: function () {
       return {
         selectedCategoryId: null,
@@ -173,13 +176,15 @@
         now: dayjs().format('HH:mm'),
         dialog: {
           closed: false,
-          hour: false
+          hour: false,
+          add: false,
         },
         throttle: null,
         choosing: 0,
         menuHour: false,
         menuItemDisabled: false,
         orderItems: [],
+        selectedProduct: null,
       }
     },
     filters: {
@@ -262,7 +267,7 @@
         }
       },
       totalPrice() {
-        return _.sumBy(this.orderItems, item => item.price * item.quantity)
+        return _.sumBy(this.orderItems, item => (item.price + _.sumBy(item.modifiers, m => m.price * m.quantity)) * item.quantity )
       },
       totalItems() {
         return _.sumBy(this.orderItems, item => item.quantity)
@@ -402,30 +407,24 @@
     },
     methods: {
       increaseOrAddNewItems(item) {
-        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
-        if (indexOfItem < 0) {
-          this.orderItems.push({ ..._.cloneDeep(item), quantity: 1 })
+        const product = _.find(this.orderItems, i => i._id === item._id && _.xorWith(i.modifiers,item.modifiers, _.isEqual).length === 0)
+        if (!product) {
+          this.orderItems.push(item)
           this.$nextTick(() => {
             autoResizeTextarea('#item_note_'+(this.orderItems.length-1))
           })
         } else {
-          const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity + 1})
-          this.orderItems.splice(indexOfItem, 1, item)
+          product.quantity += item.quantity
         }
       },
       decreaseOrRemoveItems(item) {
-        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id)
+        const indexOfItem = _.findIndex(this.orderItems, i => i._id === item._id && _.xorWith(i.modifiers,item.modifiers, _.isEqual).length === 0)
         if (indexOfItem < 0)
           return;
         if (this.orderItems[indexOfItem].quantity > 1) {
           const item = Object.assign({}, this.orderItems[indexOfItem], {quantity: this.orderItems[indexOfItem].quantity - 1})
           this.orderItems.splice(indexOfItem, 1, item)
         } else {
-          const textarea = document.getElementById('item_note_' + indexOfItem)
-          textarea.removeEventListener('input', function() {
-            this.style.height = 'auto'
-            this.style.height = (this.scrollHeight) + 'px'
-          })
           this.orderItems.splice(indexOfItem, 1)
         }
       },
@@ -460,8 +459,17 @@
           color: '#000000',
         } : {borderBottom: '2px solid transparent', color: '#424242'}
       },
+      openDialogAdd(item) {
+        this.selectedProduct = item
+        if(!item.choices || item.choices.length === 0) { //item without choice instancely add
+          this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
+          return
+        }
+        this.dialog.add = true
+      },
       addItemToOrder(item) {
-        this.increaseOrAddNewItems(item)
+        const product = Object.assign({}, this.selectedProduct, item)
+        this.increaseOrAddNewItems(product)
       },
       removeItemFromOrder(item) {
         this.decreaseOrRemoveItems(item)

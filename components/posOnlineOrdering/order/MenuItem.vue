@@ -1,20 +1,21 @@
 <template>
-  <div class="po-menu-item">
+  <div :class="['po-menu-item', !available && 'disabled']">
     <template v-if="showImage">
       <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
-      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="po-menu-item__thumbnail"/>
+      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
+           class="po-menu-item__thumbnail"/>
     </template>
     <div class="po-menu-item__content">
       <div :class="['po-menu-item__name', collapseText && 'collapse']">{{ name }}</div>
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
       <div class="po-menu-item__prices--under">
-        <div :class="price2 && 'po-menu-item__prices--discount'"> {{ price | currency }}</div>
+        <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
         <div v-if="price2"> {{ price2 | currency }}</div>
       </div>
     </div>
     <g-spacer/>
     <div class="po-menu-item__prices">
-      <div :class="price2 && 'po-menu-item__prices--discount'"> {{ price | currency }}</div>
+      <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
       <div v-if="price2">{{ price2 | currency }}</div>
     </div>
     <g-icon @click="addToOrder" v-if="isOpening"
@@ -23,20 +24,15 @@
       add_circle
     </g-icon>
     <div class="po-menu-item__action" v-if="isOpening">
-      <g-icon @click="addToOrder" v-if="quantity === 0"
+      <g-icon @click="addToOrder"
               size="28" color="#424242">
         add_circle
       </g-icon>
-      <template v-else>
-        <g-icon @click.stop="decreaseQuantity" color="#424242" size="28">remove_circle_outline</g-icon>
-        <span style="margin-left: 4px; margin-right: 4px">{{quantity}}</span>
-        <g-icon @click.stop="increaseQuantity" color="#424242" size="28">add_circle</g-icon>
-      </template>
     </div>
   </div>
 </template>
 <script>
-  import { getCdnUrl } from '../../Store/utils';
+  import {getCdnUrl} from '../../Store/utils';
 
   export default {
     name: 'MenuItem',
@@ -60,6 +56,8 @@
       disabled: Boolean,
       collapseText: Boolean,
       showImage: Boolean,
+      choices: Array,
+      available: Boolean,
     },
     filters: {
       currency(val) {
@@ -81,6 +79,22 @@
       menuItemThumbnail() {
         const {width, height} = this.imageThumbnailSize
         return `${getCdnUrl(this.image)}?w=${width}&h=${height}`
+      },
+      itemPrice() {
+        let min = this.price, max = this.price
+        for (const choice of this.choices) {
+          const minOption = _.minBy(choice.options, 'price')
+          const maxOption = _.maxBy(choice.options, 'price')
+          if (choice.mandatory) {
+            min += minOption.price
+            max += maxOption.price
+          }
+        }
+
+        if (min < max)
+          return `${$t('common.currency')}${min.toFixed(2)} - ${$t('common.currency')}${max.toFixed(2)}`
+        else
+          return `${$t('common.currency')}${min.toFixed(2)}`
       }
     },
   }
@@ -99,7 +113,7 @@
       height: 60px;
 
       & ~ .po-menu-item__content {
-        max-width: calc(100% - 200px);
+        max-width: calc(100% - 260px);
       }
     }
 
@@ -118,7 +132,7 @@
 
     &__content {
       margin-right: 16px;
-      max-width: calc(100% - 140px);
+      max-width: calc(100% - 200px);
     }
 
     &__desc {
@@ -179,7 +193,7 @@
     .po-menu-item {
       &__content {
         line-height: 1.2;
-        max-width: calc(100% - 100px);
+        max-width: calc(100% - 50px);
         margin-right: 4px;
       }
 
@@ -187,7 +201,7 @@
         margin-right: 8px;
 
         & ~ .po-menu-item__content {
-          max-width: calc(100% - 160px);
+          max-width: calc(100% - 110px);
         }
       }
 
@@ -212,7 +226,7 @@
       }
 
       &__action {
-        flex: 0 0 85px;
+        flex: 0 0 30px;
         display: flex;
         align-self: flex-end;
         margin-bottom: 8px;

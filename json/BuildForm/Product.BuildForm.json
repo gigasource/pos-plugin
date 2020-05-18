@@ -1,6 +1,8 @@
 {
   "_id": "5c46e1c05889c52fe001ab7b",
+  "__v": 0,
   "alwaysLoad": true,
+  "class": null,
   "extensions": [],
   "fields": [
     {
@@ -133,13 +135,57 @@
       "schemaType": "number",
       "key": "position",
       "type": "input@number"
+    },
+    {
+      "_id": "5ebbcc7fd517681872f1dba9",
+      "schemaType": "array",
+      "key": "choices",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "mandatory",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "string",
+          "key": "select",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "array",
+          "key": "options",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number"
+            }
+          ],
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "_id": "5ebd03f97604c41966d6637f",
+      "schemaType": "boolean",
+      "key": "available",
+      "type": "input@switch"
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",
   "name": "Product",
   "tabs": [],
   "type": "Collection",
-  "title": "name",
-  "__v": 0,
-  "class": null
+  "title": "name"
 }
