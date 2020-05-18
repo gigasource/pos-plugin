@@ -182,6 +182,7 @@
      overflow-y: auto;
      scrollbar-width: none; // firefox
      -ms-overflow-style: none; //edge
+     padding-bottom: 24px;
 
      &::-webkit-scrollbar {
        display: none;
@@ -230,8 +231,6 @@
      }
 
      &__note {
-       margin-bottom: 24px;
-
        .bs-tf-wrapper {
          margin: 8px 2px;
 
@@ -255,6 +254,7 @@
      margin: 0 -28px -24px -28px;
      padding: 12px 20px 12px 28px;
      border-radius: 0 0 4px 4px;
+     min-height: 60px;
    }
  }
 
