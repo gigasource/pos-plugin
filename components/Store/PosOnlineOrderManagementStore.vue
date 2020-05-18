@@ -177,6 +177,11 @@
       await this.loadAppItems()
       await this.loadAccounts()
     },
+    mounted() {
+      cms.socket.on('updateAppFeatureStatus', (msg, error) => {
+        this.showMessage(msg, error)
+      })
+    },
     methods: {
       // common
       showMessage(message, error = true) {
@@ -327,9 +332,9 @@
 
       async updateDeviceFeatures(_id, features, cb) {
         const {socket} = window.cms
-        socket.emit('updateAppFeature', _id, features)
-        await cms.getModel('Device').updateOne({_id}, { features })
-        cb && cb()
+        socket.emit('updateAppFeature', _id, features, (message) => {
+          cb && cb(message)
+        })
       },
 
       async updateDeviceAppVersion(device) {
