@@ -5,7 +5,7 @@
     </template>
     <template v-else>
       <!-- sidebar -->
-      <pos-dashboard-sidebar default-path="item.0" :items="sidebarItems" @node-selected="onNodeSelected"/>
+      <pos-dashboard-sidebar :default-path="defaultPath" :items="computedSidebar" @node-selected="onNodeSelected"/>
 
       <!-- content -->
       <div style="background-color: #F4F7FB; flex: 1; padding: 50px 5%">
@@ -66,8 +66,18 @@
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
         ],
-        view: 'restaurant-info',
+        sidebarItemsDevice: [
+          {
+            title: 'Service & Open hours',
+            icon: 'mdi-file-document-outline',
+            onClick: () => this.changeView('service-and-open-hours')
+          },
+          {title: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
+          {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+        ],
+        view: '',
         sidebar: '',
+        defaultPath: '',
         //
         store: null,
         categories: null,
@@ -75,6 +85,11 @@
         permissionDenied: true,
         permissionDeniedMessage: '',
         listDiscount: []
+      }
+    },
+    computed: {
+      computedSidebar() {
+        return this.$route.query.device ? this.sidebarItemsDevice : this.sidebarItems
       }
     },
     async created() {
@@ -103,6 +118,14 @@
           this.permissionDeniedMessage = 'Permission denied!'
         }
       }
+
+      if (this.$route.query.device) {
+        this.view = 'settings-menu'
+        this.defaultPath = 'item.1'
+      } else {
+        this.view = 'restaurant-info'
+        this.defaultPath = 'item.0'
+      }
     },
     methods: {
       onNodeSelected(node) {
@@ -121,17 +144,17 @@
         await this.updateStore({deliveryTimeInterval: val})
       },
       changeView(view, title) {
-        if(view) {
+        if (view) {
           this.view = view
           //reset icon
-          for(const item of this.sidebarItems) {
-            if(item.icon.startsWith('icon-') && item.icon.endsWith('_white')) {
+          for (const item of this.computedSidebar) {
+            if (item.icon.startsWith('icon-') && item.icon.endsWith('_white')) {
               this.$set(item, 'icon', item.icon.slice(0, item.icon.length - 6))
             }
           }
         }
-        if(title) {
-          const item = this.sidebarItems.find(i => i.title === title)
+        if (title) {
+          const item = this.computedSidebar.find(i => i.title === title)
           this.$set(item, 'icon', item.icon+'_white')
         }
       },

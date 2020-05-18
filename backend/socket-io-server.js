@@ -107,7 +107,7 @@ module.exports = function (cms) {
       // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
       const accessToken = await cms.utils.generateAccessToken(user.username,  user.password)
       if (accessToken) {
-        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}`)
+        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true`)
       } else {
         callback && callback(null)
       }
