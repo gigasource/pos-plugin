@@ -31,7 +31,7 @@
           </g-chip-group>
         </div>
         <div class="menu-setting-item__content">
-          <div class="menu-setting-item__price">${{price}}</div>
+          <div class="menu-setting-item__price">{{$t('common.currency')}}{{price}}</div>
           <div class="menu-setting-item__tax">Tax: {{tax}}%</div>
         </div>
         <div class="menu-setting-item__content" style="justify-self: center">
