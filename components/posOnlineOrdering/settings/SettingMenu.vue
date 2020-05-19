@@ -170,6 +170,9 @@
         set(val) {
           this.$emit('update-store', {displayId: val})
         }
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     watch: {

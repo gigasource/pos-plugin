@@ -1,148 +1,157 @@
 <template>
-  <g-dialog v-model="internalValue" width="666" eager>
-    <div class="dialog">
-      <div class="dialog__title">Add New Discount</div>
-      <div class="dialog__content">
-        <g-text-field-bs label="Name" v-model="name"/>
-        <div class="row-flex">
-          <div class="col-6">
-            <p class="mt-1 ml-1 mb-2">Type</p>
+  <div>
+    <g-dialog v-model="internalValue" width="666" eager>
+      <div class="dialog">
+        <div class="dialog__title">Add New Discount</div>
+        <div class="dialog__content">
+          <g-text-field-bs label="Name" v-model="name" @click="openDialog('name')"/>
+          <div class="row-flex">
+            <div class="col-6">
+              <p class="mt-1 ml-1 mb-2">Type</p>
+              <div class="row-flex">
+                <g-checkbox color="indigo accent-2" v-model="type" value="delivery" label="Delivery"/>
+                <g-checkbox color="indigo accent-2" v-model="type" value="pickup" label="Pickup"/>
+              </div>
+            </div>
+            <div class="col-6 row-flex">
+              <div class="flex-equal">
+                <g-select :items="amounts" v-model="amount.type" text-field-component="GTextFieldBs" :key="internalValue"
+                          label="Amount"/>
+              </div>
+              <div class="col-3 pt-3" v-if="amount.type !== 'freeShipping'">
+                <g-text-field-bs type="number" large v-model="amount.value" @click="openDialog('amount')"/>
+              </div>
+            </div>
+          </div>
+          <p class="mt-1 ml-1 mb-2">Condition (Optional)</p>
+          <div class="dialog__condition">
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="type" value="delivery" label="Delivery"/>
-              <g-checkbox color="indigo accent-2" v-model="type" value="pickup" label="Pickup"/>
-            </div>
-          </div>
-          <div class="col-6 row-flex">
-            <div class="flex-equal">
-              <g-select :items="amounts" v-model="amount.type" text-field-component="GTextFieldBs" :key="internalValue"
-                        label="Amount"/>
-            </div>
-            <div class="col-3 pt-3" v-if="amount.type !== 'freeShipping'">
-              <g-text-field-bs type="number" large v-model="amount.value"/>
-            </div>
-          </div>
-        </div>
-        <p class="mt-1 ml-1 mb-2">Condition (Optional)</p>
-        <div class="dialog__condition">
-          <div class="row-flex">
-            <g-checkbox color="indigo accent-2" v-model="conditions.total.active" label="Total value*"/>
-            <g-menu v-model="menu[0]" open-on-hover nudge-left="150" nudge-top="10">
-              <template v-slot:activator="{on}">
-                <div v-on="on" style="margin-top: 6px">
-                  <g-icon color="#536DFE" size="20">info</g-icon>
+              <g-checkbox color="indigo accent-2" v-model="conditions.total.active" label="Total value*"/>
+              <g-menu v-model="menu[0]" open-on-hover nudge-left="150" nudge-top="10">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" style="margin-top: 6px">
+                    <g-icon color="#536DFE" size="20">info</g-icon>
+                  </div>
+                </template>
+                <div class="menu-info">
+                  <p>• Ticking this option will limit your discount to orders with certain value range.</p>
+                  <p>• MIN or MAX value can be left empty. </p>
+                  <p><b>E.g:</b> If you want to limit your discount to orders with €10 or more, ticking this option and set MIN value to 10, leaving MAX value empty.</p>
                 </div>
-              </template>
-              <div class="menu-info">
-                <p>• Ticking this option will limit your discount to orders with certain value range.</p>
-                <p>• MIN or MAX value can be left empty. </p>
-                <p><b>E.g:</b> If you want to limit your discount to orders with €10 or more, ticking this option and set MIN value to 10, leaving MAX value empty.</p>
-              </div>
-            </g-menu>
-          </div>
-          <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.total.active && 'disabled']">
-            <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
-              <input type="number" class="ta-center fw-700 fs-large" placeholder="MIN" v-model="conditions.total.value.min"/>
+              </g-menu>
             </div>
-            <div class="col-6 row-flex align-items-center justify-center pa-2">
-              <input type="number" class="ta-center fw-700 fs-large" placeholder="MAX" v-model="conditions.total.value.max"/>
+            <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.total.active && 'disabled']">
+              <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
+                <input type="number" class="ta-center fw-700 fs-large" placeholder="MIN" v-model="conditions.total.value.min" @click="openDialog('min')"/>
+              </div>
+              <div class="col-6 row-flex align-items-center justify-center pa-2">
+                <input type="number" class="ta-center fw-700 fs-large" placeholder="MAX" v-model="conditions.total.value.max" @click="openDialog('max')"/>
+              </div>
+            </div>
+            <div class="row-flex">
+              <g-checkbox color="indigo accent-2" v-model="conditions.timePeriod.active" label="Time period"/>
+              <g-menu v-model="menu[1]" open-on-hover nudge-left="150" nudge-top="10">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" style="margin-top: 6px">
+                    <g-icon color="#536DFE" size="20">info</g-icon>
+                  </div>
+                </template>
+                <div class="menu-info">
+                  <p>• Ticking this option will limit your discount to orders placed in a certain time period.</p>
+                  <p>• Not ticking this option will make your discount always applicable.</p>
+                </div>
+              </g-menu>
+            </div>
+            <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.timePeriod.active && 'disabled']">
+              <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
+                <g-date-picker-input icon="far fa-calendar-alt" class="date-picker" v-model="conditions.timePeriod.value.startDate" :max="conditions.timePeriod.value.endDate"/>
+              </div>
+              <div class="col-6 row-flex align-items-center justify-center pa-2">
+                <g-date-picker-input icon="far fa-calendar-alt" class="date-picker" v-model="conditions.timePeriod.value.endDate" :min="conditions.timePeriod.value.startDate"/>
+              </div>
+            </div>
+            <div class="row-flex">
+              <g-checkbox color="indigo accent-2" v-model="conditions.daysOfWeek.active" label="Days of the week"/>
+              <g-menu v-model="menu[2]" open-on-hover nudge-left="150" nudge-top="75">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" style="margin-top: 6px">
+                    <g-icon color="#536DFE" size="20">info</g-icon>
+                  </div>
+                </template>
+                <div class="menu-info">
+                  <p>• Ticking this option will limit your discount to orders placed in a certain days of the week.</p>
+                  <p>• Not ticking this option will make your discount applicable everyday during the week.</p>
+                </div>
+              </g-menu>
+            </div>
+            <div :class="['row-flex', 'br-2', 'flex-wrap', 'b-grey', 'ba-thin', !conditions.daysOfWeek.active && 'disabled']">
+              <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Monday"
+                          label="Mon"/>
+              <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Thursday"
+                          label="Thu"/>
+              <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Sunday"
+                          label="Sun"/>
+              <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Tuesday"
+                          label="Tue"/>
+              <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Friday"
+                          label="Fri"/>
+              <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Wednesday"
+                          label="Wed"/>
+              <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Saturday"
+                          label="Sat"/>
+            </div>
+            <div class="row-flex">
+              <g-checkbox color="indigo accent-2" v-model="conditions.zipCode.active" label="Zip code"/>
+              <g-menu v-model="menu[3]" open-on-hover nudge-left="150" nudge-top="10">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" style="margin-top: 6px">
+                    <g-icon color="#536DFE" size="20">info</g-icon>
+                  </div>
+                </template>
+                <div class="menu-info">
+                  <p>• Ticking this option will limit your discount to orders in a certain area.</p>
+                  <p>• Not ticking this option will make your discount available to all zip codes.</p>
+                </div>
+              </g-menu>
+            </div>
+            <div :class="[!conditions.zipCode.active && 'disabled']" @click="openDialog('zipCode')">
+              <g-combobox text-field-component="GTextFieldBs" deletable-chips multiple
+                          v-model="conditions.zipCode.value"/>
+            </div>
+            <div class="row-flex">
+              <g-checkbox color="indigo accent-2" v-model="conditions.coupon.active" label="Coupon"/>
+              <g-menu v-model="menu[4]" open-on-hover nudge-left="150" nudge-top="10">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" style="margin-top: 6px">
+                    <g-icon color="#536DFE" size="20">info</g-icon>
+                  </div>
+                </template>
+                <div class="menu-info">
+                  <p>• Ticking this option will limit your discount to orders with your specified coupon.</p>
+                </div>
+              </g-menu>
+            </div>
+            <div :class="[!conditions.coupon.active && 'disabled']">
+              <g-text-field-bs v-model="conditions.coupon.value" @click="openDialog('coupon')"/>
             </div>
           </div>
-          <div class="row-flex">
-            <g-checkbox color="indigo accent-2" v-model="conditions.timePeriod.active" label="Time period"/>
-            <g-menu v-model="menu[1]" open-on-hover nudge-left="150" nudge-top="10">
-              <template v-slot:activator="{on}">
-                <div v-on="on" style="margin-top: 6px">
-                  <g-icon color="#536DFE" size="20">info</g-icon>
-                </div>
-              </template>
-              <div class="menu-info">
-                <p>• Ticking this option will limit your discount to orders placed in a certain time period.</p>
-                <p>• Not ticking this option will make your discount always applicable.</p>
-              </div>
-            </g-menu>
+          <span style="font-style: italic; color: #424242">*MIN or MAX value can be left empty</span>
+          <div class="dialog__action">
+            <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
+            <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" :disabled="isSaveBtnDisabled" @click="submit">Save
+            </g-btn-bs>
           </div>
-          <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.timePeriod.active && 'disabled']">
-            <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
-              <g-date-picker-input icon="far fa-calendar-alt" class="date-picker" v-model="conditions.timePeriod.value.startDate" :max="conditions.timePeriod.value.endDate"/>
-            </div>
-            <div class="col-6 row-flex align-items-center justify-center pa-2">
-              <g-date-picker-input icon="far fa-calendar-alt" class="date-picker" v-model="conditions.timePeriod.value.endDate" :min="conditions.timePeriod.value.startDate"/>
-            </div>
-          </div>
-          <div class="row-flex">
-            <g-checkbox color="indigo accent-2" v-model="conditions.daysOfWeek.active" label="Days of the week"/>
-            <g-menu v-model="menu[2]" open-on-hover nudge-left="150" nudge-top="75">
-              <template v-slot:activator="{on}">
-                <div v-on="on" style="margin-top: 6px">
-                  <g-icon color="#536DFE" size="20">info</g-icon>
-                </div>
-              </template>
-              <div class="menu-info">
-                <p>• Ticking this option will limit your discount to orders placed in a certain days of the week.</p>
-                <p>• Not ticking this option will make your discount applicable everyday during the week.</p>
-              </div>
-            </g-menu>
-          </div>
-          <div :class="['row-flex', 'br-2', 'flex-wrap', 'b-grey', 'ba-thin', !conditions.daysOfWeek.active && 'disabled']">
-            <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Monday"
-                        label="Mon"/>
-            <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Thursday"
-                        label="Thu"/>
-            <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Sunday"
-                        label="Sun"/>
-            <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Tuesday"
-                        label="Tue"/>
-            <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Friday"
-                        label="Fri"/>
-            <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Wednesday"
-                        label="Wed"/>
-            <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Saturday"
-                        label="Sat"/>
-          </div>
-          <div class="row-flex">
-            <g-checkbox color="indigo accent-2" v-model="conditions.zipCode.active" label="Zip code"/>
-            <g-menu v-model="menu[3]" open-on-hover nudge-left="150" nudge-top="10">
-              <template v-slot:activator="{on}">
-                <div v-on="on" style="margin-top: 6px">
-                  <g-icon color="#536DFE" size="20">info</g-icon>
-                </div>
-              </template>
-              <div class="menu-info">
-                <p>• Ticking this option will limit your discount to orders in a certain area.</p>
-                <p>• Not ticking this option will make your discount available to all zip codes.</p>
-              </div>
-            </g-menu>
-          </div>
-          <div :class="[!conditions.zipCode.active && 'disabled']">
-            <g-combobox text-field-component="GTextFieldBs" deletable-chips multiple
-                        v-model="conditions.zipCode.value"/>
-          </div>
-          <div class="row-flex">
-            <g-checkbox color="indigo accent-2" v-model="conditions.coupon.active" label="Coupon"/>
-            <g-menu v-model="menu[4]" open-on-hover nudge-left="150" nudge-top="10">
-              <template v-slot:activator="{on}">
-                <div v-on="on" style="margin-top: 6px">
-                  <g-icon color="#536DFE" size="20">info</g-icon>
-                </div>
-              </template>
-              <div class="menu-info">
-                <p>• Ticking this option will limit your discount to orders with your specified coupon.</p>
-              </div>
-            </g-menu>
-          </div>
-          <div :class="[!conditions.coupon.active && 'disabled']">
-            <g-text-field-bs v-model="conditions.coupon.value"/>
-          </div>
-        </div>
-        <span style="font-style: italic; color: #424242">*MIN or MAX value can be left empty</span>
-        <div class="dialog__action">
-          <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
-          <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" :disabled="isSaveBtnDisabled" @click="submit">Save
-          </g-btn-bs>
         </div>
       </div>
-    </div>
-  </g-dialog>
+    </g-dialog>
+    <!-- dialog input -->
+    <dialog-text-filter label="Name" v-model="dialog.name" :default-value="name" @submit="name = $event"/>
+    <dialog-number-filter label="Amount Value" v-model="dialog.amount" :default-value="amount.value" @submit="amount.value = +$event"/>
+    <dialog-number-filter label="Min Value" v-model="dialog.min" :default-value="conditions.total.value.min" @submit="conditions.total.value.min = +$event"/>
+    <dialog-number-filter label="Max Value" v-model="dialog.max" :default-value="conditions.total.value.max" @submit="conditions.total.value.max = +$event"/>
+    <dialog-number-filter label="Zipcode" v-model="dialog.zipCode"  @submit="conditions.zipCode.value.push($event)"/>
+    <dialog-text-filter label="Coupon" v-model="dialog.coupon" :default-value="conditions.coupon.value" @submit="conditions.coupon.value = $event"/>
+  </div>
 </template>
 
 <script>
@@ -196,7 +205,15 @@
           { text: 'Percentage', value: 'percent' },
           { text: 'Free shipping', value: 'freeShipping' }
         ],
-        menu: [false, false, false, false, false]
+        menu: [false, false, false, false, false],
+        dialog: {
+          name: false,
+          amount: false,
+          min: false,
+          max: false,
+          zipCode: false,
+          coupon: false
+        }
       }
     },
     computed: {
@@ -280,6 +297,10 @@
             value: ''
           }
         }
+      },
+      openDialog(dialogModel) {
+        if(!this.$route.query.device) return
+        this.dialog[dialogModel] = true
       }
     },
     watch: {
@@ -344,9 +365,14 @@
       margin-bottom: 16px;
     }
 
+    &__content {
+      max-height: calc(100% - 52px);
+      overflow: hidden auto;
+    }
+
     &__condition {
       display: grid;
-      grid-template-columns: 30% 70%;
+      grid-template-columns: 30% calc(70% - 8px);
       grid-template-rows: 45px 45px 108px 45px 45px;
       grid-gap: 8px;
 
@@ -398,6 +424,7 @@
             flex-wrap: wrap;
             flex: 1 1 0;
             min-width: 0;
+            align-items: center;
           }
 
           .bs-tf-input {

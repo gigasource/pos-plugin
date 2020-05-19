@@ -1,15 +1,18 @@
 <template>
-  <g-dialog v-model="internalValue" width="40%" eager>
-    <div class="dialog">
-      <div class="dialog-title">Add New Category</div>
-      <g-text-field-bs large label="Category Name:" v-model="category" @input="errorMessage = null"/>
-      <div style="font-style: italic; font-size: 15px; color: #FF5252;">{{errorMessage}}</div>
-      <div class="dialog-buttons">
-        <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
-        <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" @click="submit">OK</g-btn-bs>
+  <div>
+    <g-dialog v-model="internalValue" width="40%" eager>
+      <div class="dialog">
+        <div class="dialog-title">Add New Category</div>
+        <g-text-field-bs large label="Category Name:" v-model="category" @input="errorMessage = null" @click="openDialog"/>
+        <div style="font-style: italic; font-size: 15px; color: #FF5252;">{{errorMessage}}</div>
+        <div class="dialog-buttons">
+          <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
+          <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" @click="submit">OK</g-btn-bs>
+        </div>
       </div>
-    </div>
-  </g-dialog>
+      <dialog-text-filter label="Category" v-model="dialog" :default-value="category" @submit="category = $event"/>
+    </g-dialog>
+  </div>
 </template>
 
 <script>
@@ -21,7 +24,8 @@
     data() {
       return {
         category: '',
-        errorMessage: null
+        errorMessage: null,
+        dialog: false
       }
     },
     computed: {
@@ -46,6 +50,10 @@
           else
             this.errorMessage = response.message
         })
+      },
+      openDialog() {
+        if(!this.$route.query.device) return
+        this.dialog = true
       }
     }
   }

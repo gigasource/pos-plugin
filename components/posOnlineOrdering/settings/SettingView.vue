@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100vh; width: 100vw; display: flex;">
+  <div :class="['setting-view', isInDevice && 'setting-view--mobile']">
     <template v-if="permissionDenied">
       {{ permissionDeniedMessage }}
     </template>
@@ -8,7 +8,7 @@
       <pos-dashboard-sidebar :default-path="defaultPath" :items="computedSidebar" @node-selected="onNodeSelected"/>
 
       <!-- content -->
-      <div style="background-color: #F4F7FB; flex: 1; padding: 50px 5%">
+      <div class="setting-view__content">
         <restaurant-information
             v-if="view === 'restaurant-info'"
             :store="store"
@@ -90,6 +90,9 @@
     computed: {
       computedSidebar() {
         return this.$route.query.device ? this.sidebarItemsDevice : this.sidebarItems
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     async created() {
@@ -291,5 +294,27 @@
     }
   }
 </script>
-<style scoped>
+<style scoped lang="scss">
+  .setting-view {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    position: relative;
+
+    &__content {
+      background-color: #F4F7FB;
+      flex: 1;
+      padding: 50px 5%;
+    }
+
+    &--mobile {
+      ::v-deep .g-sidebar {
+        width: 225px;
+      }
+
+      .setting-view__content {
+        padding: 24px
+      }
+    }
+  }
 </style>

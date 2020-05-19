@@ -15,21 +15,21 @@
       <div class="menu-setting-new-item__content">
         <div class="menu-setting-new-item__content--upper">
           <div class="col-1">
-            <g-text-field-bs small v-model="internalId" type="text" placeholder="No."/>
+            <g-text-field-bs small v-model="internalId" type="text" placeholder="No." @click="openDialogInput('id')"/>
           </div>
           <div class="flex-equal">
-            <g-text-field-bs small v-model="internalName"  placeholder="Name *"/>
+            <g-text-field-bs small v-model="internalName"  placeholder="Name *" @click="openDialogInput('name')"/>
           </div>
           <div class="col-3" v-if="useMultiplePrinters">
             <g-select small text-field-component="GTextFieldBs" v-model="internalPrinter" :items="internalAvailablePrinters"/>
           </div>
           <div class="col-2">
-            <g-text-field-bs small v-model="internalPrice" type="number" placeholder="Price *"/>
+            <g-text-field-bs small v-model="internalPrice" type="number" placeholder="Price *" @click="openDialogInput('price')"/>
           </div>
         </div>
         <div class="menu-setting-new-item__content--lower">
           <div class="col-9">
-            <g-textarea outlined no-resize :rows="2" v-model="internalDesc" placeholder="Description"/>
+            <g-textarea outlined no-resize :rows="2" v-model="internalDesc" placeholder="Description" @click="openDialogInput('desc')"/>
           </div>
           <div class="col-3">
             <div class="menu-setting-new-item__tax">
@@ -75,15 +75,16 @@
             <g-radio small color="#536DFE" value="many" label="Many"/>
           </g-radio-group>
         </div>
-        <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME"/>
+        <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME" @click="openDialogChoiceInput('choice', i)"/>
         <div>
           <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt">
             <div class="item-name col-8">
-              <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })"/>
+              <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })" @click="openDialogChoiceInput('option', i, iOpt)"/>
             </div>
             <div class="item-price col-3">
               <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency')"
-                     @input="e =>  editOption(i, iOpt, { name: option.name, price: e.target.value })"/>
+                     @input="e =>  editOption(i, iOpt, { name: option.name, price: e.target.value })"
+                     @click="openDialogChoiceInput('value', i, iOpt)"/>
             </div>
             <div class="item-btn col-1" v-if="choice.options.length > 1">
               <g-icon size="12" color="#424242" @click="removeOption(i, iOpt)">icon-close</g-icon>
@@ -102,6 +103,15 @@
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
     </div>
+
+    <!-- Dialog -->
+    <dialog-text-filter label="ID" v-model="dialog.id" :default-value="internalId" @submit="internalId = $event"/>
+    <dialog-text-filter label="Name" v-model="dialog.name" :default-value="internalName" @submit="internalName = $event"/>
+    <dialog-text-filter label="Description" v-model="dialog.desc" :default-value="internalDesc" @submit="internalDesc = $event"/>
+    <dialog-number-filter label="Price" v-model="dialog.price" :default-value="internalPrice" @submit="internalPrice = +$event"/>
+    <dialog-text-filter label="Choice Name" v-model="dialog.choice" :default-value="choice.name" @submit="changeChoiceName"/>
+    <dialog-text-filter label="Option Name" v-model="dialog.option" :default-value="choice.option" @submit="changeOption($event, 'name')"/>
+    <dialog-number-filter label="Option Price" v-model="dialog.value" :default-value="choice.value" @submit="changeOption($event, 'price')"/>
   </div>
 </template>
 <script>
@@ -111,7 +121,7 @@
 
   export default {
     name: 'NewMenuItem',
-    components: {UploadZone},
+    components: { UploadZone },
     props: {
       id: String,
       index: Number,
@@ -160,6 +170,22 @@
         taxes: [],
         internalChoices,
         showDeleteBtn,
+        dialog: {
+          id: false,
+          name: false,
+          desc: false,
+          price: false,
+          choice: false,
+          option: false,
+          value: false,
+        },
+        choice: {
+          name: '',
+          option: '',
+          value: 0,
+          choiceIndex: 0,
+          optionIndex: 0
+        }
       }
     },
     async created() {
@@ -190,6 +216,9 @@
           }
         }
         return false
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     methods: {
@@ -249,6 +278,38 @@
           available: this.available,
           choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()}))
         })
+      },
+      openDialogInput(dialogModel) {
+        if(!this.isInDevice) return
+        this.dialog[dialogModel] = true
+      },
+      openDialogChoiceInput(dialogModel, choiceIndex = -1, optionIndex = -1) {
+        if(!this.isInDevice) return
+        this.choice.name = this.internalChoices[choiceIndex].name || ''
+        if(optionIndex > -1) {
+          this.choice.option = this.internalChoices[choiceIndex].options[optionIndex].name || ''
+          this.choice.value = this.internalChoices[choiceIndex].options[optionIndex].price || 0
+        }
+        this.choice.choiceIndex = choiceIndex
+        this.choice.optionIndex = optionIndex
+        this.dialog[dialogModel] = true
+      },
+      changeChoiceName(name) {
+        this.internalChoices[this.choice.choiceIndex].name = name.toUpperCase()
+      },
+      changeOption(value, type) {
+        let option
+        if(type === 'name')
+          option = {
+            name: value,
+            price: this.choice.value
+          }
+        else if (type === 'price')
+          option = {
+            name: this.choice.option,
+            price: +value
+          }
+        this.editOption(this.choice.choiceIndex, this.choice.optionIndex, option)
       }
     }
   }
@@ -482,7 +543,6 @@
       font-size: 13px;
 
       .option {
-        padding: 0px 8px;
         text-align: center;
         font-size: 15px;
         font-style: italic;

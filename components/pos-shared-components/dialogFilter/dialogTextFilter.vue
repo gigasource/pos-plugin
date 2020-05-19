@@ -3,7 +3,7 @@
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
-				<pos-text-field v-model="screenValue" large :label="label" readOnly/>
+				<pos-text-field ref="input" v-model="screenValue" large :label="label" readOnly/>
 				<div class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
@@ -54,8 +54,12 @@
     },
 		watch: {
 			internalValue: function(val) {
-				if(val)
-    			this.screenValue = this.defaultValue;
+				if(val) {
+					this.screenValue = this.defaultValue;
+					setTimeout(() => {
+						this.$refs.input.onFocus()
+					}, 200)
+				}
 			}
 		}
 	}

@@ -18,6 +18,7 @@
               @change="checkServiceHourError"
               color="#536DFE"/>
         </div>
+        <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
                                :value="getTime(openHour, 'open')"
@@ -28,6 +29,7 @@
                                :value="getTime(openHour, 'close')"
                                @input="updateHours($event, index, false)"/>
         </div>
+        <g-spacer/>
         <div @click="removeOpenHour(openHour)" class="open-hour__row--btn">
           <g-icon size="16">icon-close</g-icon>
         </div>
@@ -40,7 +42,7 @@
         </g-btn-bs>
       </div>
     </div>
-    <div class="service-setting__content">
+    <div class="service-setting__content" style="display: inline-block">
       <div class="mb-3 fw-700">Service</div>
       <div class="row-flex">
         <div class="col-6">
@@ -64,7 +66,7 @@
                     @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
         </div>
         <div class="col-4">
-          <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue"/>
+          <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue" @click="openDialogInput"/>
         </div>
       </div>
       <div class="row-flex align-items-center">
@@ -75,6 +77,8 @@
         </div>
       </div>
     </div>
+
+    <dialog-number-filter v-model="dialog.minimumValue" :default-value="computedMinimumOrderValue.value" @submit="setMinimumOrderValue"/>
   </div>
 </template>
 <script>
@@ -120,7 +124,10 @@
           {value: 15, text: '15 minutes'},
           {value: 20, text: '20 minutes'},
           {value: 30, text: '30 minutes'},
-        ]
+        ],
+        dialog: {
+          minimumValue: false
+        }
       }
     },
     computed: {
@@ -319,6 +326,10 @@
             return null
         }
       },
+      openDialogInput() {
+        if (!this.$route.query.device) return
+        this.dialog.minimumValue = true
+      }
     },
   }
 </script>
@@ -338,7 +349,6 @@
       background-color: #FFF;
       border-radius: 5px;
       padding: 25px 25px 20px 25px;
-      display: inline-block;
 
       .btn-add {
         color: #536DFE;

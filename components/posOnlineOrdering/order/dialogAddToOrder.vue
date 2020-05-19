@@ -17,11 +17,11 @@
           <div class="dialog-content__choice-option">
             <template v-if="choice.select === 'one' && choice.mandatory">
               <g-radio-group v-model="modifiers[index]">
-                <g-radio v-for="option in choice.options" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+                <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
               </g-radio-group>
             </template>
             <template v-else>
-              <g-checkbox v-for="option in choice.options"
+              <g-checkbox v-for="option in choice.options" :key="option._id"
                           v-model="modifiers[index]"
                           color="#536DFE"
                           :value="option"
