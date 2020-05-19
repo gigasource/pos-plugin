@@ -19,19 +19,27 @@ const savedMessageSchema = new Schema({
     trim: true,
   },
   ackFnArgs: Array,
+  usageCount: {
+    type: Number,
+    default: 1,
+  },
 }, {
   timestamps: true
 });
 
 const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
 
+function updateMessage(targetClientId, _id, update) {
+  return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
+}
+
 async function saveMessage(targetClientId, message) {
   const result = await SavedMessagesModel.create(Object.assign({targetClientId}, message));
   return result._id;
 }
 
-async function deleteMessage(targetClientId, _id) {
-  await SavedMessagesModel.deleteOne({_id});
+function deleteMessage(targetClientId, _id) {
+  return SavedMessagesModel.deleteOne({_id}).exec();
 }
 
 function loadMessages(targetClientId) {
@@ -55,6 +63,7 @@ module.exports = function (cms) {
     saveMessage,
     loadMessages,
     deleteMessage,
+    updateMessage,
   });
 
   function updateDeviceAndNotify(online, clientId) {
