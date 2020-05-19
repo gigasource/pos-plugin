@@ -235,8 +235,6 @@
       }
     },
     async created() {
-      this.user = cms.getList('PosSetting')[0].user[0]
-
       document.title = 'Online Ordering'
       this.initSocket()
       this.getStoreId()
