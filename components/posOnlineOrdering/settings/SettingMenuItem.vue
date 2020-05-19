@@ -3,11 +3,11 @@
     <template v-if="mode === 'view'">
       <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
         <div class="ta-center">
-          <p v-if="positioning">
+          <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
           </p>
           <p>{{ index + 1 }}</p>
-          <p v-if="positioning">
+          <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
         </div>
@@ -98,7 +98,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing'],
     data: function () {
       return {
         mode: 'view',

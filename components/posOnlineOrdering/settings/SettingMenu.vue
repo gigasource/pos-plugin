@@ -13,7 +13,7 @@
           <g-spacer/>
           <g-btn-bs @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
-          <g-btn-bs background-color="#2979FF" icon="add_circle" style="margin-right: 0"
+          <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
             Add new category
           </g-btn-bs>
@@ -32,8 +32,8 @@
                   <g-icon v-if="mode === 'edit'" @click="resetValue()" class="ml-1">mdi-close</g-icon>
                 </template>
               </g-edit-view-input>
-              <g-icon v-if="editBtn[index]" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index-1)">fas fa-caret-square-up</g-icon>
-              <g-icon v-if="editBtn[index]" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index+1)">fas fa-caret-square-down</g-icon>
+              <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index-1)">fas fa-caret-square-up</g-icon>
+              <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index+1)">fas fa-caret-square-down</g-icon>
               <g-spacer/>
               <g-btn-bs
                   background-color="#E3F2FD"
@@ -66,6 +66,7 @@
                           :key="`item_${index}`"
                           :collapse-text="collapse"
                           :display-id="display"
+                          :editing="editingProduct"
                           @editing="setEditing(product._id, $event)"
                           @save="updateProduct(product._id, $event)"
                           @delete="openDeleteProductDialog(product._id)"
@@ -136,7 +137,8 @@
           deleteProduct: false,
           setting: false,
         },
-        editBtn: []
+        editBtn: [],
+        editingProduct: false
       }
     },
     created() {
@@ -187,6 +189,7 @@
           this.$set(this.editingProducts, productId, editing)
         else
           this.$delete(this.editingProducts, productId)
+        this.editingProduct = editing
       },
       toggleCollapse(category) {
         if (this.showProducts[category._id]) {
