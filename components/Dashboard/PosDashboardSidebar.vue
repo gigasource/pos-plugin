@@ -76,6 +76,10 @@
       if (typeof(this.afterMountFn) === 'function')
         this.afterMountFn()
     },
+    activated() {
+      if (typeof(this.afterMountFn) === 'function')
+        this.afterMountFn()
+    },
     watch: {
       defaultPath(val) {
         this.sidebar = val
