@@ -202,6 +202,21 @@
         cms.socket.emit('getWebshopId', storeId => {
           this.storeId = storeId || ''
         })
+      },
+      async updateServerUrl(url) {
+        try {
+          await cms.getModel('PosSetting').findOneAndUpdate({}, {customServerUrl: url})
+        } catch (e) {
+          console.error(e)
+        }
+      },
+      async getServerUrl(cb) {
+        try {
+          const { customServerUrl } = await cms.getModel('PosSetting').findOne()
+          cb(customServerUrl)
+        } catch (e) {
+          console.error(e)
+        }
       }
     },
     async created() {

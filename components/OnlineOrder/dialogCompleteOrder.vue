@@ -53,7 +53,7 @@
         <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Total</div>
-          <div class="ta-right">{{$t('common.currency')}} {{(order.vSum + (order.shippingFee || 0)) | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency')}} {{(order.vSum + (order.shippingFee || 0)) - (order.vDiscount || 0) | formatMoney}}</div>
         </div>
       </g-card-text>
       <g-card-actions>
@@ -65,6 +65,8 @@
 </template>
 
 <script>
+  import orderUtil from '../logic/orderUtil'
+
   export default {
     name: 'dialogCompleteOrder',
     props: {
@@ -95,7 +97,7 @@
         },
       },
       subTotal() {
-        return this.order.items.reduce((sum, { originalPrice, price, quantity }) => sum + (originalPrice || price) * quantity, 0)
+        return this.order.items.reduce((sum, item) => sum + orderUtil.getItemPrice(item) * item.quantity, 0)
       },
       totalWithShipping() {
         const { shippingFee, vSum } = this.order;
@@ -113,17 +115,10 @@
         }
       },
       getItemPrice(item) {
-        let price = item.originalPrice || item.price
-        if (item.modifiers && item.modifiers.length > 0) {
-          price += _.sumBy(item.modifiers, m => m.price * m.quantity)
-        }
-        return price
+        return orderUtil.getItemPrice(item)
       },
       getExtraInfo(item) {
-        let extrasArr = []
-        if (item.note) extrasArr.push(item.note)
-        if (item.modifiers && item.modifiers.length) extrasArr.push(item.modifiers.map(m => m.name))
-        return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
+        return orderUtil.getExtraInfo(item)
       },
       getShippingFee() {
         const { discounts, shippingFee } = this.order

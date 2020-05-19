@@ -114,11 +114,24 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.setTextNormal()
   items.forEach(item => {
     escPrinter.tableCustom([
-      {text: `${item.id}. ${item.name}`, align: 'LEFT', width: 0.4},
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: 0.4},
       {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
       {text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22},
       {text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22},
     ])
+
+    if (item.modifiers && item.modifiers.length) {
+      item.modifiers.forEach(mod => {
+        const modifierText = `* ${mod.name}`
+
+        escPrinter.tableCustom([
+          {text: modifierText, align: 'LEFT', width: 0.4},
+          {text: `${mod.quantity}`, align: 'RIGHT', width: 0.12},
+          {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
+          {text: `${convertMoney((mod.price) * mod.quantity)}`, align: 'RIGHT', width: 0.22},
+        ])
+      })
+    }
   })
   escPrinter.drawLine()
   type === 'delivery' && escPrinter.leftRight(locale.printing.shippingFee, convertMoney(getShippingFee(printData)))

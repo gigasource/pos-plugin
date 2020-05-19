@@ -7,12 +7,20 @@ const url = require('url');
 const axios = require('axios');
 const dayjs = require('dayjs');
 
-const {webshopUrl, port: backendPort} = global.APP_CONFIG;
+let customWebshopUrl
+let {webshopUrl, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
 let deviceSockets = [];
 let webShopConnected = false
+
+async function getWebShopUrl(cms) {
+  const posSetting = await cms.getModel('PosSetting').findOne()
+  customWebshopUrl = posSetting.customServerUrl
+  if (customWebshopUrl) return customWebshopUrl
+  return webshopUrl
+}
 
 function createOnlineOrderSocket(deviceId, cms) {
 
@@ -30,23 +38,22 @@ function createOnlineOrderSocket(deviceId, cms) {
   }
 
   const maxConnectionAttempt = 5;
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (onlineOrderSocket) return resolve()
     console.log('Creating online order')
-    onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
+    onlineOrderSocket = io(`${await getWebShopUrl(cms)}?clientId=${deviceId}`);
 
     onlineOrderSocket.on('connect', () => console.log('external socket connect'))
 
     onlineOrderSocket.once('connect', async () => {
       console.log('connect');
-      if (cms.utils.getShouldUpdateApp()) {
-        const deviceId = await getDeviceId();
-        onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
-      }
       webShopConnected = true
       cms.socket.emit('webShopConnected');
       //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
+      if (cms.utils.getShouldUpdateApp()) {
+        onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
+      }
     });
 
     onlineOrderSocket.on('reconnecting', function (numberOfAttempt) {
@@ -66,10 +73,12 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
 
-    onlineOrderSocket.on('createOrder', async (orderData, ackFn) => {
+    onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
       let { orderType: type, paymentType, customer, products: items,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
+
+      const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
 
       items = items.map(item => {
         if (item.originalPrice) return item;
@@ -95,7 +104,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         payment: [{ type: paymentType, value: vSum }],
         type,
         date,
-        ...timeoutDate && {timeoutDate: new Date(timeoutDate)},
+        ...timeoutDate && {timeoutDate: dayjs(timeoutDate).add(systemTimeDelta, 'millisecond').toDate()},
         vDate: await getVDate(date),
         bookingNumber: getBookingNumber(date),
         shippingFee,
@@ -125,11 +134,12 @@ function createOnlineOrderSocket(deviceId, cms) {
       ackFn();
     });
 
-    onlineOrderSocket.on('updateAppFeature', async data => {
+    onlineOrderSocket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
         return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
       }))
       cms.socket.emit('updateAppFeature')
+      callback()
       //deviceSockets.forEach(socket => socket.emit('updateAppFeature')) // emit to all frontends
     })
 
@@ -138,13 +148,13 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('unpairDevice'))
     })
 
-    onlineOrderSocket.on('startRemoteControl', (proxyServerPort, callback) => {
+    onlineOrderSocket.on('startRemoteControl', async (proxyServerPort, callback) => {
       activeProxies++;
 
       if (!proxyClient) {
         proxyClient = new ProxyClient({
           clientId: `${deviceId}-proxy-client`,
-          proxyServerHost: `http://${url.parse(webshopUrl).hostname}`,
+          proxyServerHost: `http://${url.parse(await getWebShopUrl(cms)).hostname}`,
           socketIOPort: proxyServerPort,
           remoteHost: 'localhost',
           remotePort: backendPort,
@@ -168,7 +178,6 @@ function createOnlineOrderSocket(deviceId, cms) {
     });
 
     onlineOrderSocket.on('updateApp', async (uploadPath, type, ackFn) => {
-      uploadPath = `${global.APP_CONFIG.webshopUrl}${uploadPath}`
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
@@ -180,7 +189,7 @@ function createOnlineOrderSocket(deviceId, cms) {
       }
     })
 
-    onlineOrderSocket.on('updateOrderTimeOut', async (orderTimeOut) => {
+    onlineOrderSocket.on('updateOrderTimeOut', async (orderTimeOut, ackFn) => {
       if (_.isNil(orderTimeOut)) return
 
       try {
@@ -188,6 +197,8 @@ function createOnlineOrderSocket(deviceId, cms) {
           { $set: { 'onlineDevice.orderTimeout': orderTimeOut } })
       } catch (e) {
         console.error('Error updating order timeout', e)
+      } finally {
+        ackFn()
       }
     })
 
@@ -240,7 +251,7 @@ async function getDeviceId(pairingCode) {
     if (!pairingCode) {
       return null
     } else {
-      const pairingApiUrl = `${webshopUrl}/device/register`
+      const pairingApiUrl = `${await getWebShopUrl(cms)}/device/register`
       const requestBody = {pairingCode}
       requestBody.appName = 'POS_Android'
       requestBody.appVersion = require('../../package').version
@@ -276,22 +287,33 @@ function cleanupOnlineOrderSocket() {
 }
 
 module.exports = async cms => {
-  const initOnlineOrderSocket = _.once(() => {
-    return new Promise(async resolve => {
-        try {
-          const deviceId = await getDeviceId();
-          if (deviceId) await createOnlineOrderSocket(deviceId, cms);
-        } catch (e) {
-          console.error(e);
-          await updateDeviceStatus();
-        }
-        console.log('resolve promise')
+  let initFinished = false;
+  const initOnlineOrderSocket = async function() {
+    try {
+      const deviceId = await getDeviceId();
+      if (deviceId) await createOnlineOrderSocket(deviceId, cms);
+    } catch (e) {
+      console.error(e);
+      await updateDeviceStatus();
+    } finally {
+      cms.emit('initOnlineOrderSocketFinished');
+      initFinished = true;
+    }
+  }
+
+  await initOnlineOrderSocket();
+  const waitInitOnlineOrderSocket = function() {
+    return new Promise(resolve => {
+      if (initFinished) {
         resolve();
+      } else {
+        cms.on('initOnlineOrderSocketFinished', resolve)
+      }
     })
-  })
+  }
 
   cms.socket.on('connect', async socket => {
-    await initOnlineOrderSocket();
+    await waitInitOnlineOrderSocket();
 
     console.log('internal socket connect')
     //deviceSockets.push(socket)
@@ -301,7 +323,7 @@ module.exports = async cms => {
       //deviceSockets = deviceSockets.filter(sk => sk !== socket)
     });
 
-    socket.on('getWebshopUrl', callback => callback(webshopUrl));
+    socket.on('getWebshopUrl', async callback => callback(await getWebShopUrl(cms)));
 
     socket.on('getWebshopName', async callback => {
       const deviceId = await getDeviceId();
@@ -373,8 +395,8 @@ module.exports = async cms => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, (webShopSettingUrl) => {
-        callback && callback( `${webshopUrl}${webShopSettingUrl}`)
+      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, async (webShopSettingUrl) => {
+        callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
     })
   })

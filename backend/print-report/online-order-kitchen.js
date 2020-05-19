@@ -100,7 +100,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
     escPrinter.tableCustom([
       {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
       {text: 'x', align: 'LEFT', width: 0.05, bold: true},
-      {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemsColumnWidth},
     ], {textDoubleWith: true});
 
     if (item.note) {

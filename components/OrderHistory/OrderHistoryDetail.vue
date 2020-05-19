@@ -31,8 +31,11 @@
     <g-simple-table striped>
       <tr v-for="product in orderHistoryCurrentOrder.items">
         <td>{{product.quantity}}x</td>
-        <td>{{product.id}}. {{product.name}}</td>
-        <td class="ta-right">€ {{product.originalPrice | formatNumber}}</td>
+        <td>
+          {{product.id && `${product.id}.`}} {{product.name}}
+          <span class="i text-grey-darken-1">{{getExtraInfo(product)}}</span>
+        </td>
+        <td class="ta-right">€ {{getItemPrice(product) | formatNumber}}</td>
       </tr>
       <tr v-if="orderHistoryCurrentOrder.type">
         <td></td>
@@ -63,6 +66,7 @@
 </template>
 
 <script>
+  import orderUtil from '../logic/orderUtil'
 
   export default {
     name: 'OrderHistoryDetail',
@@ -94,6 +98,12 @@
       getCashierUser(order) {
         if (order.staff && order.staff.length) return _.last(order.staff).name
         return ''
+      },
+      getItemPrice(item) {
+        return orderUtil.getItemPrice(item)
+      },
+      getExtraInfo(item) {
+        return orderUtil.getExtraInfo(item)
       }
     }
   }

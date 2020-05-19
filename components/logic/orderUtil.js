@@ -76,6 +76,19 @@ const orderUtil = {
       originalPrice: i.originalPrice.toFixed(2),
       ...i.vDiscount && { vDiscount: i.vDiscount.toFixed(2) }
     }))
+  },
+  getItemPrice(item) {
+    let price = item.originalPrice || item.price
+    if (item.modifiers && item.modifiers.length > 0) {
+      price += _.sumBy(item.modifiers, m => m.price * m.quantity)
+    }
+    return price
+  },
+  getExtraInfo(item) {
+    let extrasArr = []
+    if (item.modifiers && item.modifiers.length) extrasArr.push(...item.modifiers.map(m => m.name))
+    if (item.note) extrasArr.push(item.note)
+    return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
   }
 }
 
