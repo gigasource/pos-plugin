@@ -27,16 +27,6 @@
         version: '0.0.0',
         dashboardSidebar: [
           {
-            icon: 'icon-functions',
-            onClick() {
-              this.$emit('update:view', {
-                name: 'Functions',
-                params: ''
-              })
-            },
-            title: this.$t('sidebar.functions')
-          },
-          {
             icon: 'icon-restaurant',
             children() {
               const rooms = this.$getService('RoomStore').rooms
@@ -74,6 +64,8 @@
           },
           {
             icon: 'icon-delivery',
+            title: this.$t('onlineOrder.onlineOrders'),
+            feature: 'onlineOrdering',
             items: [
               {
                 icon: 'radio_button_unchecked',
@@ -112,10 +104,18 @@
                 title: this.$t('onlineOrder.declinedOrders')
               }
             ],
-            title: this.$t('onlineOrder.onlineOrders'),
-            feature: 'onlineOrdering'
+          },
+          {
+            icon: 'icon-functions',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Functions',
+                params: ''
+              })
+            },
+            title: this.$t('sidebar.functions')
           }
-        ]
+        ],
       }
     },
     computed: {
@@ -136,6 +136,21 @@
           })
         }
         return sidebar
+      },
+      defaultSidebarPath() {
+        function getPath(items, viewName, prefix) {
+          for (const item of items) {
+            const itemPath = `${prefix}.${items.indexOf(item)}`;
+            if (item.title === viewName) {
+              return itemPath
+            }
+            if (item.items) return getPath(item.items, viewName, `${itemPath}.item`)
+          }
+        }
+
+        let functions = getPath(this.computedDashboardSidebar, this.$t('sidebar.functions'), 'item');
+        let orderDashboard = getPath(this.computedDashboardSidebar, this.$t('onlineOrder.dashboard'), 'item');
+        return orderDashboard || functions
       }
     },
     domain: 'PosStore',
@@ -220,6 +235,8 @@
       }
     },
     async created() {
+      this.user = cms.getList('PosSetting')[0].user[0]
+
       document.title = 'Online Ordering'
       this.initSocket()
       this.getStoreId()

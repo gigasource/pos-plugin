@@ -123,10 +123,9 @@
           "content": {
             "props": {
               "afterMountFn": {
-                "_code_": "module.exports = function () {\n  const rooms = this.$getService('RoomStore').rooms\n  this.$emit('update:view', {\n                name: 'Functions',\n                params: ''\n              })\n}",
+                "_code_": "module.exports = function () {\n  const pathArr = this.defaultPath.split('.');\n  pathArr.shift();\n  const item = _.get(this.items, pathArr.map(i => i === 'item' ? 'items' : i).join('.'))\n  item.onClick.bind(this)()\n}",
                 "_code_type_": "commonJs"
               },
-              "defaultPath": "item.0",
               "items": []
             },
             "preprocess": []
@@ -135,6 +134,11 @@
             {
               "service": "PosStore:computedDashboardSidebar",
               "local": "items",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:defaultSidebarPath",
+              "local": "defaultPath",
               "type": "prop"
             }
           ]
