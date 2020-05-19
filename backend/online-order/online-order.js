@@ -143,9 +143,10 @@ function createOnlineOrderSocket(deviceId, cms) {
       //deviceSockets.forEach(socket => socket.emit('updateAppFeature')) // emit to all frontends
     })
 
-    onlineOrderSocket.on('unpairDevice', async () => {
+    onlineOrderSocket.on('unpairDevice', cb => {
       cms.socket.emit('unpairDevice')
       //deviceSockets.forEach(socket => socket.emit('unpairDevice'))
+      cb();
     })
 
     onlineOrderSocket.on('startRemoteControl', async (proxyServerPort, callback) => {
