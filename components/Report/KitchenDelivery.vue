@@ -55,7 +55,7 @@
               <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateQuantityColumnWidth(item.quantity)}"></td>
               <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: '5%'}"></td>
               <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateItemColumnWidth(item.quantity)}">
-                <span>* {{item.note}}</span>
+                <span v-if="item.note">* {{item.note}}</span>
               </td>
             </tr>
             </tbody>
@@ -67,7 +67,7 @@
                 <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateQuantityColumnWidth(item.quantity)}"></td>
                 <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: '5%'}"></td>
                 <td :style="{'padding-bottom': index === items.length - 1 || item.modifiers ? '0' : '18px', width: calculateItemColumnWidth(item.quantity)}">
-                  <span>* {{mod.name}}</span> <span v-if="mod.price">${{mod.price | convertMoney}}</span>
+                  <span>* {{mod.name}}</span> <span v-if="mod.price">{{locale.printing.currency}} {{mod.price | convertMoney}}</span>
                 </td>
               </tr>
               </tbody>

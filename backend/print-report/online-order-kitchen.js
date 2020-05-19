@@ -3,6 +3,10 @@ const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 const dayjs = require('dayjs')
 
+function convertMoney(value) {
+  return !isNaN(value) ? value.toFixed(2) : value
+}
+
 async function makePrintData(cms, {orderId}) {
   const order = await cms.getModel('Order').findById(orderId).lean();
   const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
@@ -108,7 +112,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
       escPrinter.tableCustom([
         { text: '', align: 'LEFT', width: quantityColumnWidth },
         { text: '', align: 'LEFT', width: 0.05 },
-        { text: item.note, align: 'LEFT', width: itemsColumnWidth },
+        { text: `* ${item.note}`, align: 'LEFT', width: itemsColumnWidth },
       ], { textDoubleWith: true });
     }
 
@@ -116,7 +120,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
       escPrinter.setTextDoubleWidth();
 
       item.modifiers.forEach(mod => {
-        let modifierText = `* ${mod.name}`
+        let modifierText = `* ${mod.name} ${convertMoney(mod.price)}${locale.printing.currency}`
 
         escPrinter.tableCustom([
           {text: '', align: 'LEFT', width: quantityColumnWidth},
