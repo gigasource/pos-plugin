@@ -13,7 +13,9 @@ router.get('/upload-zone/prepare', async (req, res) => {
   try {
     const protocol = req.query.url.startsWith('https') ? https: http;
     protocol.get(req.query.url, getRes => {
-      if (getRes.headers['content-length'] < 1024) {
+      if (!getRes.headers['content-type'].startsWith('image')) {
+        res.status(400).end('Invalid image. Content type received: ', getRes.headers['content-type'])
+      } else if (getRes.headers['content-length'] < 1024) {
         res.status(400).end('Bad request')
       } else {
         res.set('Cache-Control', 'public, max-age=31557600')
