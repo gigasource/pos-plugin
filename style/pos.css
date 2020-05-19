@@ -530,6 +530,13 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-wlan-disconnected-white {
+  background-image: url("../assets/wlan-disconnected-white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-wlan-error {
   background-image: url("../assets/wlan-error.svg");
   background-repeat: no-repeat;

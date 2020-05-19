@@ -11,6 +11,7 @@
   export default {
     name: 'PosStore',
     props: {},
+    injectService: ['Snackbar:(showSnackbar,closeSnackbar)'],
     data() {
       return {
         systemDate: new Date(),
@@ -20,6 +21,7 @@
         timeFormat: this.$t('dates.timeFormat'),
         dateFormat: this.$t('dates.dateFormat'),
         webShopConnected: false,
+        online: false,
         storeId: '',
         locale: 'en',
         device: 'Terminal1',
@@ -232,9 +234,23 @@
         } catch (e) {
           console.error(e)
         }
+      },
+      showOfflineSnackbar() {
+        const contentFn = () => (
+          <div style="margin: 0 auto" class="row-flex align-items-center">
+            <g-icon svg size="20">icon-wlan-disconnected-white</g-icon>
+            <span class="ml-2">No Internet</span>
+          </div>);
+
+        this.showSnackbar(contentFn, '#E57373', 0)
       }
     },
     async created() {
+      window.addEventListener('offline', () => this.online = false)
+      window.addEventListener('online', () => this.online = true)
+
+      this.user = cms.getList('PosSetting')[0].user[0]
+
       document.title = 'Online Ordering'
       this.initSocket()
       this.getStoreId()
@@ -261,6 +277,21 @@
           next('/pos-login')
         } else next()
       })
+    },
+    watch: {
+      online(val) {
+        if (val) {
+          this.closeSnackbar()
+        } else {
+          this.showOfflineSnackbar()
+        }
+      }
+    },
+    mounted() {
+      this.online = navigator.onLine
+      if (!this.online) {
+        this.showOfflineSnackbar()
+      }
     },
     beforeDestroy() {
       this.setDateInterval && clearInterval(this.setDateInterval)

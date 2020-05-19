@@ -5,6 +5,12 @@ module.exports = {
       loader: {
         type: 'vue-singleton'
       },
+      path: 'components/Store/Snackbar.vue',
+    },
+    {
+      loader: {
+        type: 'vue-singleton'
+      },
       path: 'components/Store/PosStore.vue',
     },
     {
