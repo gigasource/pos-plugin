@@ -178,8 +178,17 @@
       await this.loadAccounts()
     },
     mounted() {
-      cms.socket.on('updateAppFeatureStatus', (msg, error) => {
+      cms.socket.on('updateAppFeatureStatus', async (msg, error, device) => {
         this.showMessage(msg, error)
+
+        if (device) {
+          const store = this.stores.find(({ _id }) => _id === device.storeId)
+          if (store) {
+            const deviceToUpdate = store.devices.find(({ _id }) => _id === device._id)
+            this.$set(deviceToUpdate, 'features', device.features)
+            console.log('updated device features')
+          }
+        }
       })
     },
     methods: {

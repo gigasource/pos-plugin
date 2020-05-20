@@ -60,6 +60,8 @@
   </g-dialog>
 </template>
 <script>
+  import _ from 'lodash'
+
   export default {
     name: 'dialogFeatureControl',
     props: {
@@ -79,7 +81,7 @@
         return onlineOrderingDevice == null || onlineOrderingDevice._id === this.device._id
       },
       features() {
-        return this.device.features
+        return _.cloneDeep(this.device.features)
       }
     },
     methods: {

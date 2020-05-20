@@ -170,12 +170,14 @@ module.exports = function (cms) {
       deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).filter(id => !clientIdList.includes(id)));
     });
 
-    externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async ({ _id, name, hardware }, features) => {
+    externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
+      const { _id, name, hardware } = device
       try {
         await cms.getModel('Device').updateOne({ _id }, { features })
-        cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`, false)
+        cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
+          false, Object.assign({}, device.toObject(), { features }))
       } catch (e) {
-        cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true)
+        cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
       }
     });
 
