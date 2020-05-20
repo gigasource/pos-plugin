@@ -83,6 +83,10 @@
     watch: {
       defaultPath(val) {
         this.sidebar = val
+      },
+      items() {
+        if (typeof(this.afterMountFn) === 'function')
+          this.afterMountFn()
       }
     },
     methods: {

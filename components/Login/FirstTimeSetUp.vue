@@ -29,7 +29,7 @@
         </div>
       </div>
     </g-card>
-    <dialog-text-filter v-model="dialog.input" label="Code" :defaul-value="code" @submit="changeCode"/>
+    <dialog-number-filter v-model="dialog.input" label="Pairing Code" @submit="changeCode"/>
     <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl" @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
     <g-btn style="position: absolute; bottom: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
   </div>

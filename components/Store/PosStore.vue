@@ -251,7 +251,6 @@
 
       this.user = cms.getList('PosSetting')[0].user[0]
 
-      document.title = 'Online Ordering'
       this.initSocket()
       this.getStoreId()
       this.setDateInterval = setInterval(() => this.systemDate = new Date(), 10000)
