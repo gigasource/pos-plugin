@@ -186,7 +186,27 @@
           this.cropper.getCroppedCanvas(options).toBlob(async (blob) => {
             let uploadedUrl
             if (this.tab === 'url') {
-              uploadedUrl = await this.uploadImage(new File([blob], this.photoUrl.substr(this.photoUrl.lastIndexOf('/') + 1)), { type: 'image/*' })
+              const fileName = this.photoUrl.substr(this.photoUrl.lastIndexOf('/') + 1)
+              const fileExt = fileName.substr(fileName.lastIndexOf('.') + 1)
+              let mimeType;
+              switch (fileExt) {
+                case 'png':
+                  mimeType = 'image/png';
+                  break;
+                case 'jpg':
+                case 'jpeg':
+                  mimeType = 'image/jpeg';
+                  break;
+                case 'svg':
+                  mimeType = 'image/svg+xml';
+                  break;
+                case 'gif':
+                  mimeType = 'image/gif';
+                  break;
+                default:
+                  mimeType = 'image/*'
+              }
+              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }))
             } else {
               uploadedUrl = await this.uploadImage(new File([blob], this.file.name, { type: this.file.type }))
             }
