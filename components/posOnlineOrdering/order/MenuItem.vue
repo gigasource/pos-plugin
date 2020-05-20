@@ -7,7 +7,7 @@
     </template>
     <div class="po-menu-item__content">
       <div :class="['po-menu-item__name', collapseText && 'collapse']">
-        <span v-if="displayId">{{ id }}.</span>
+        <span v-if="displayId">{{ id && `${id}.` }}</span>
         {{ name }}
       </div>
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
