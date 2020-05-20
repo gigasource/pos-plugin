@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.2",
     "clone-buffer": "^1.0.0",
     "cropperjs": "^1.5.6",
     "dayjs": "^1.8.17",

@@ -85,11 +85,24 @@
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
 
-              <!--            <div class="section-header">PAYMENT</div>-->
-              <!--            <g-radio-group v-model="paymentType" row class="radio-option">-->
-              <!--              <g-radio color="#1271ff" label="Cash" value="cash" class="mr-5"/>-->
-              <!--              <g-radio color="#1271ff" label="Credit" value="credit"/>-->
-              <!--            </g-radio-group>-->
+              <!-- PAYMENT -->
+              <template>
+                <!-- Payment option -->
+                <template>
+                  <div class="section-header">PAYMENT</div>
+                  <g-radio-group v-model="paymentType" row class="radio-option">
+                    <g-radio color="#1271ff" label="Cash" value="cash" class="mr-5"/>
+                    <g-radio color="#1271ff" label="Credit" value="credit"/>
+                    <g-radio color="#1271ff" label="Paypal" value="paypal"/>
+                  </g-radio-group>
+                </template>
+                <!-- Payment detail -->
+                <template>
+                  <div v-if="paymentType === 'paypal'">
+                    <div id="paypal-smart-button-placeholder"></div>
+                  </div>
+                </template>
+              </template>
 
               <div class="section-header">{{$t('store.orderDetail')}}</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
@@ -157,6 +170,7 @@
                    @close="closeOrderCreatedDialog"/>
   </div>
 </template>
+
 <script>
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
