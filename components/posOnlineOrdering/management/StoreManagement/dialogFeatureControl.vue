@@ -48,6 +48,9 @@
         <div class="col-6">
           <g-switch v-model="features.proxy" label="Proxy"/>
         </div>
+        <div class="col-6">
+          <g-switch v-model="features.alwaysOn" label="Always-on"/>
+        </div>
       </div>
       <div class="dlg-feature-control__actions">
         <g-btn-bs @click="close">Cancel</g-btn-bs>
@@ -57,6 +60,8 @@
   </g-dialog>
 </template>
 <script>
+  import _ from 'lodash'
+
   export default {
     name: 'dialogFeatureControl',
     props: {
@@ -76,7 +81,7 @@
         return onlineOrderingDevice == null || onlineOrderingDevice._id === this.device._id
       },
       features() {
-        return this.device.features
+        return _.cloneDeep(this.device.features)
       }
     },
     methods: {

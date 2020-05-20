@@ -112,7 +112,7 @@
     min-height: 80px;
 
     &__thumbnail {
-      border-radius: 15px;
+      border-radius: 11px;
       margin-right: 18px;
       width: 60px;
       height: 60px;

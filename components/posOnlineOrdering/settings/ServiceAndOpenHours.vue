@@ -37,7 +37,7 @@
       </div>
       <div class="row-flex">
         <g-spacer/>
-        <g-btn-bs background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
+        <g-btn-bs width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
                :disabled="hasError || openHoursJson === lastSavedData">Save
         </g-btn-bs>
       </div>

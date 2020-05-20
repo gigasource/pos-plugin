@@ -75,7 +75,9 @@
             <g-radio small color="#536DFE" value="many" label="Many"/>
           </g-radio-group>
         </div>
-        <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME" @click="openDialogChoiceInput('choice', i)"/>
+        <div>
+          <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME" @click="openDialogChoiceInput('choice', i)"/>
+        </div>
         <div>
           <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt">
             <div class="item-name col-8">

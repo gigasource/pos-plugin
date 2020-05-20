@@ -175,6 +175,12 @@
      &__price {
        color: #536DFE;
      }
+
+     &__thumbnail {
+       width: 60px;
+       height: 60px;
+       border-radius: 11px;
+     }
    }
 
    &-content {

@@ -1,10 +1,10 @@
 <template>
   <div class="discount">
     <div class="discount__title">Discount</div>
-    <div class="discount__action-bar">
+    <div :class="['discount__action-bar', isInDevice && 'discount__action-bar--mobile']">
       <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add@20" @click="openDialogDiscount()">Add New Discount</g-btn-bs>
     </div>
-    <div class="discount__table">
+    <div :class="['discount__table', isInDevice && 'discount__table--mobile']">
       <div class="discount__table-header">
         <div class="w-20 pl-2">Name</div>
         <div class="col-2 pl-1">Type</div>
@@ -74,6 +74,11 @@
           delete: false
         },
         selectedDiscount: null,
+      }
+    },
+    computed: {
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     methods: {
@@ -188,6 +193,10 @@
       justify-content: flex-end;
       margin-bottom: 16px;
       margin-right: -8px;
+
+      &--mobile {
+        margin-top: -40px
+      }
     }
 
     &__table {
@@ -196,6 +205,10 @@
       border-radius: 2px;
       overflow: hidden;
       height: calc(100% - 120px);
+
+      &--mobile {
+        height: calc(100% - 55px);
+      }
 
       &-header {
         background: #EFEFEF;

@@ -84,61 +84,61 @@
         {
           "schemaType": "boolean",
           "key": "fastCheckout",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "manualTable",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "delivery",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "editMenuCard",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "tablePlan",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "onlineOrdering",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "editTablePlan",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "staffReport",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "eodReport",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
           "schemaType": "boolean",
           "key": "monthlyReport",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         },
         {
@@ -152,6 +152,12 @@
           "key": "proxy",
           "default": "true",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "alwaysOn",
+          "type": "input@switch",
+          "default": "false"
         }
       ]
     }

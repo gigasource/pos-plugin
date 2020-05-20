@@ -119,7 +119,7 @@
     computed: {
       iframe() {
         const storeUrl = [location.origin, 'store', this.store.alias].join('/');
-        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-store="snack1" data-url="${storeUrl}">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
+        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
       }
     },
     created() {
