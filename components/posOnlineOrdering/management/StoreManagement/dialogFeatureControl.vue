@@ -48,6 +48,9 @@
         <div class="col-6">
           <g-switch v-model="features.proxy" label="Proxy"/>
         </div>
+        <div class="col-6">
+          <g-switch v-model="features.alwaysOn" label="Always-on"/>
+        </div>
       </div>
       <div class="dlg-feature-control__actions">
         <g-btn-bs @click="close">Cancel</g-btn-bs>
