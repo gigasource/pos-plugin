@@ -175,7 +175,7 @@ module.exports = function (cms) {
       try {
         await cms.getModel('Device').updateOne({ _id }, { features })
         cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
-          false, Object.assign({}, device.toObject(), { features }))
+          false, Object.assign({}, device, { features }))
       } catch (e) {
         cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
       }
@@ -183,7 +183,7 @@ module.exports = function (cms) {
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       try {
-        const device = await cms.getModel('Device').findById(deviceId);
+        const device = await cms.getModel('Device').findById(deviceId).lean();
         externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
         cb(`Awaiting device feature update for ${device.name}(${device.hardware})`)
       } catch (e) {
