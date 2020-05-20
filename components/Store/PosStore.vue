@@ -28,9 +28,6 @@
         this.$router.push('/sign-in')
       }
     },
-    beforeCreate() {
-      document.title = 'Online Order'
-    },
     async created() {
       this.setDateInterval = setInterval(() => this.systemDate = new Date(), 10000)
     },
