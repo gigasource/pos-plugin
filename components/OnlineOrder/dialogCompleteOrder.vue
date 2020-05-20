@@ -30,7 +30,7 @@
               {{item.name}}
               <span class="i text-grey">{{getExtraInfo(item)}}</span>
             </div>
-            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency')}} {{getItemPrice(item)}}</div>
+            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency')}} {{getItemPrice(item) | formatMoney}}</div>
           </div>
         </div>
 
