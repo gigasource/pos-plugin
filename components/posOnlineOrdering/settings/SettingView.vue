@@ -313,7 +313,7 @@
       }
 
       .setting-view__content {
-        padding: 24px
+        padding: 16px 24px;
       }
     }
   }

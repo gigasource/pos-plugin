@@ -8,7 +8,7 @@
         <p><span style="color: #536DFE">"Add new category"</span> to get started.</p>
         <g-btn-bs class="btn-add" @click="dialog.addNewCategory = true">+ Add New Category</g-btn-bs>
       </div>
-      <div class="menu-setting__main" v-else>
+      <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
         <div class="row-flex justify-end mb-2">
           <g-spacer/>
           <g-btn-bs @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
@@ -292,6 +292,11 @@
 
     &__main {
       height: calc(100% - 27px - 16px);
+
+      &--mobile {
+        height: calc(100%);
+        margin-top: -43px;
+      }
     }
 
     &__category {
