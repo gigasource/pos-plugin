@@ -148,7 +148,9 @@ module.exports = function (cms) {
 
     // TODO: analysis side fx
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
+      console.debug(`backend received order status for order ${orderToken}`)
       internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
+      console.debug(`backend emitted order status to frontend for order ${orderToken}`)
     })
 
     socket.on('updateVersion', async (appVersion, _id) => {
@@ -203,6 +205,7 @@ module.exports = function (cms) {
 
       // join orderToken room
       socket.join(orderData.orderToken)
+      console.debug(`joined room ${orderData.orderToken}`)
 
       const deviceId = device._id.toString();
       externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()]);
