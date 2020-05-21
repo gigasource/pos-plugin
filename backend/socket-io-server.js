@@ -67,6 +67,18 @@ module.exports = function (cms) {
     updateMessage,
   });
 
+  // ack fns
+  externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
+    const { _id, name, hardware } = device
+    try {
+      await cms.getModel('Device').updateOne({ _id }, { features })
+      cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
+        false, Object.assign({}, device, { features }))
+    } catch (e) {
+      cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
+    }
+  });
+
   function updateDeviceAndNotify(online, clientId) {
     if (online) onlineDeviceIds.push(clientId);
     else onlineDeviceIds = onlineDeviceIds.filter(e => e !== clientId);
@@ -178,20 +190,9 @@ module.exports = function (cms) {
       deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).filter(id => !clientIdList.includes(id)));
     });
 
-    externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
-      const { _id, name, hardware } = device
-      try {
-        await cms.getModel('Device').updateOne({ _id }, { features })
-        cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
-          false, Object.assign({}, device.toObject(), { features }))
-      } catch (e) {
-        cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
-      }
-    });
-
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       try {
-        const device = await cms.getModel('Device').findById(deviceId);
+        const device = await cms.getModel('Device').findById(deviceId).lean();
         externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
         cb(`Awaiting device feature update for ${device.name}(${device.hardware})`)
       } catch (e) {

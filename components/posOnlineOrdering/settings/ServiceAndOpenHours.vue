@@ -65,13 +65,13 @@
           <g-switch :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
                     @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
         </div>
-        <div class="col-4">
+        <div class="col-4 mt-2">
           <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue" @click="openDialogInput"/>
         </div>
       </div>
       <div class="row-flex align-items-center">
         <div class="col-8">Order timeout</div>
-        <div class="col-4">
+        <div class="col-4 mt-2">
           <g-select text-field-component="GTextFieldBs" v-model="computedOrderTimeOut"
                     :items="orderTimeOuts"/>
         </div>

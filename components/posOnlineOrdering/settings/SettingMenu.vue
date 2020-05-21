@@ -11,7 +11,7 @@
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
         <div class="row-flex justify-end mb-2">
           <g-spacer/>
-          <g-btn-bs @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
+          <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">

@@ -8,7 +8,7 @@
           <p class="dialog-header__price">{{$t('common.currency')}}{{computedPrice}}</p>
         </div>
       </div>
-      <div class="dialog-content">
+      <div class="dialog-content" :key="internalValue">
         <div class="dialog-content__choice" v-for="(choice, index) in choices" :key="index">
           <div class="dialog-content__choice-name">
             <span class="fw-700">{{choice.name}}</span>

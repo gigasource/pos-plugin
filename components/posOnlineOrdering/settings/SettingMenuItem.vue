@@ -34,7 +34,7 @@
           <div class="menu-setting-item__price">{{$t('common.currency')}}{{price}}</div>
           <div class="menu-setting-item__tax">Tax: {{tax}}%</div>
         </div>
-        <div class="menu-setting-item__content" style="justify-self: center">
+        <div class="menu-setting-item__content" style="justify-self: center; justify-content: start; padding-top: 2px">
           <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
             <template v-slot:activator="{on}">
               <div @mouseenter="on.mouseenter" @mouseleave="on.mouseleave">
@@ -209,10 +209,13 @@
       font-size: 15px;
 
       .collapse {
+        word-break: break-word;
+        max-width: 100%;
+        white-space: pre-wrap;
+        -webkit-line-clamp: 1;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: 500px;
       }
     }
 

@@ -222,6 +222,7 @@
 
       .bs-tf-wrapper {
         width: auto;
+        margin: 0;
 
         ::v-deep .bs-tf-input-group {
           background: white;
@@ -342,7 +343,7 @@
     font-weight: 600;
 
     &-input {
-      flex: 1 1 0;
+      flex: 1 1 200px;
       /*display: grid;*/
       /*grid-template-columns: 70px 250px;*/
       /*grid-auto-rows: 45px 80px;*/
