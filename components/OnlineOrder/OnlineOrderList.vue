@@ -156,9 +156,27 @@
       .g-table {
         th, td {
           height: 69px;
-          padding: 8px 8px 0;
+          padding: 8px 4px 0;
           vertical-align: top;
           font-size: 14px;
+          word-break: break-word;
+
+          &:nth-child(1) {
+            width: 6%;
+          }
+
+          &:nth-child(2),
+          &:nth-child(3) {
+            width: 21%;
+          }
+
+          &:nth-last-child(-n+5) {
+            width: 10%;
+          }
+
+          &:nth-last-child(1) {
+            width: 12%;
+          }
         }
 
         thead th {
