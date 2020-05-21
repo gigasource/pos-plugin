@@ -86,20 +86,25 @@
               </div>
 
               <!-- PAYMENT -->
-              <template>
+              <template v-if="!unavailableConfirm">
                 <!-- Payment option -->
                 <template>
                   <div class="section-header">PAYMENT</div>
                   <g-radio-group v-model="paymentType" row class="radio-option">
                     <g-radio color="#1271ff" label="Cash" value="cash" class="mr-5"/>
-                    <g-radio color="#1271ff" label="Credit" value="credit"/>
                     <g-radio color="#1271ff" label="Paypal" value="paypal"/>
                   </g-radio-group>
                 </template>
                 <!-- Payment detail -->
                 <template>
                   <div v-if="paymentType === 'paypal'">
-                    <div id="paypal-smart-button-placeholder"></div>
+                    <paypal-smart-button
+                        :self-host="true"
+                        :debug="true"
+                        :order-info="paypalOrderInfo"
+                        :client-id="store.paypalClientId"
+                        @onApprove="confirmPaypalPayment"
+                    />
                   </div>
                 </template>
               </template>
@@ -178,10 +183,11 @@
   import {get24HourValue, incrementTime} from "../../logic/timeUtil";
   import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
+  import PaypalSmartButton from './PaypalSmartButton';
 
   export default {
     name: 'OrderTable',
-    components: { OrderCreated },
+    components: { PaypalSmartButton, OrderCreated },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -221,6 +227,7 @@
         storeOpenHours: null,
         deliveryTime: null,
         asap: $t('common.asap'),
+        paypalOrderDetail: {}
       }
     },
     filters: {
@@ -394,6 +401,46 @@
       cdnOrderHeaderImage() {
         const url = getCdnUrl(this.store.orderHeaderImageSrc)
         return url && `${url}?w=340&h=180`
+      },
+      paypalOrderInfo() {
+        if (!this.store.paypalClientId)
+          return
+        
+        const totalValue = `${_.sumBy(this.orderItems, item => item.price * item.quantity)}`
+        
+        return {
+          // application_context: {
+          //   brand_name: "GigaSource.Co",
+          //   locale: "en-US",
+          // },
+          purchase_units: [{
+            description: `${this.store.name} Order`,
+            amount: {
+              currency_code: "USD",
+              value: totalValue,
+              breakdown: {
+                item_total: {
+                  currency_code: "USD",
+                  value: totalValue
+                }
+              }
+            },
+            items: _.map(this.orderItems, item => ({
+              name: item.name,
+              // description: `${item.desc}`,
+              unit_amount: {
+                currency_code: "USD",
+                value: `${item.price}`
+              },
+              // tax: {
+              //   currency_code: "USD",
+              //   value: item.tax
+              // },
+              quantity: `${item.quantity}`,
+              category: 'PHYSICAL_GOODS'
+            })),
+          }]
+        }
       }
     },
     watch: {
@@ -420,6 +467,10 @@
       },
       addItem(item) {
         this.$emit('increase', Object.assign({}, item, {quantity: 1}))
+      },
+      async confirmPaypalPayment(orderDetails) {
+        this.paypalOrderDetail = orderDetails
+        await this.confirmPayment();
       },
       async confirmPayment() {
         if (this.unavailableConfirm || this.confirming) return
@@ -457,6 +508,7 @@
         const orderData = {
           orderType: this.orderType,
           paymentType: this.paymentType,
+          paypalOrderDetail: this.paypalOrderDetail,
           customer,
           products,
           note,

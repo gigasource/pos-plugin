@@ -197,13 +197,15 @@
       }
     },
     created() {
-      window.cms.socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
-        if (orderToken === this.order.orderToken) {
-          this.order.status = orderStatus
-          if (orderStatus === 'declined') {
-            this.cancelledReason = extraInfo
-          } else if (orderStatus === 'kitchen') {
-            this.deliveryTime = extraInfo
+      window.cms.socket.on('updateOrderStatus', (orderStatus) => {
+        console.log('updateOrderStatus', orderStatus)
+        const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
+        if (onlineOrderId === this.order.orderToken) {
+          this.order.status = status
+          if (status === 'declined') {
+            this.cancelledReason = responseMessage
+          } else if (status === 'kitchen') {
+            this.deliveryTime = responseMessage
           }
         }
       })

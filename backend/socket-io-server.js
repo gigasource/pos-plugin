@@ -5,6 +5,7 @@ const ProxyServer = require('@gigasource/nodejs-proxy-server/libs/server.js');
 const {remoteControlExpressServerPort, remoteControlSocketIOServerPort} = global.APP_CONFIG;
 const deviceStatusSubscribers = {};
 const _ = require('lodash');
+const ppApiv2 = require('./api/payment/paypal/paypalApiV2')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -134,9 +135,16 @@ module.exports = function (cms) {
       return callback(device.features)
     })
 
-    // TODO: analysis side fx
-    socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
-      internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
+    socket.on('updateOrderStatus', async (orderStatus) => {
+      const { onlineOrderId, status, paypalOrderDetail } = orderStatus
+      if (status === "completed") {
+        if (paypalOrderDetail) {
+          const captureResult = await ppApiv2.captureOrder(paypalOrderDetail.orderID, true)
+          console.log(captureResult)
+        }
+      } else {
+        internalSocketIOServer.to(onlineOrderId).emit('updateOrderStatus', orderStatus)
+      }
     })
 
     socket.on('updateVersion', async (appVersion, _id) => {
