@@ -76,7 +76,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
       let { orderType: type, paymentType, customer, products: items,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime } = orderData
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail } = orderData
 
       const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
 
@@ -101,7 +101,10 @@ function createOnlineOrderSocket(deviceId, cms) {
         items: formatOrderItems(items),
         customer,
         deliveryDate: new Date(),
-        payment: [{ type: paymentType, value: vSum }],
+        payment: [{
+          type: paymentType,
+          value: vSum,
+        }],
         type,
         date,
         ...timeoutDate && {timeoutDate: dayjs(timeoutDate).add(systemTimeDelta, 'millisecond').toDate()},
@@ -118,6 +121,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
+        paypalOrderDetail
       }
 
       const result = await cms.getModel('Order').create(order)
@@ -388,8 +392,8 @@ module.exports = async cms => {
       callback();
     });
 
-    socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
-      onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
+    socket.on('updateOrderStatus', (orderStatus) => {
+      onlineOrderSocket.emit('updateOrderStatus', orderStatus)
     })
 
     socket.on('getWebShopSettingUrl', async (callback) => {

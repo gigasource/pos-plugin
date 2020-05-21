@@ -540,7 +540,12 @@
             user: this.user
           }))
         await this.updateOnlineOrders()
-        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
+        window.cms.socket.emit('updateOrderStatus', {
+          onlineOrderId: updatedOrder.onlineOrderId,
+          status: status,
+          responseMessage: order.declineReason,
+          paypalOrderDetail: order.paypalOrderDetail
+        })
       },
       async acceptPendingOrder(order) {
         try {
@@ -562,10 +567,15 @@
           this.printOnlineOrderKitchen(order._id)
           this.printOnlineOrderReport(order._id)
           await this.updateOnlineOrders()
-          const extraInfo = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
+          const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
-          window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
+          window.cms.socket.emit('updateOrderStatus', {
+            onlineOrderId: updatedOrder.onlineOrderId,
+            status: status,
+            responseMessage: acceptResponse,
+            paypalOrderDetail: order.paypalOrderDetail
+          })
         } catch (e) {
           console.error(e)
         }
@@ -577,7 +587,10 @@
             status,
           }))
         await this.updateOnlineOrders()
-        window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status)
+        window.cms.socket.emit('updateOrderStatus', {
+          onlineOrderId: updatedOrder.onlineOrderId,
+          status: status
+        })
       },
       async completeOrder(order) {
         await cms.getModel('Order').findOneAndUpdate({_id: order._id},
