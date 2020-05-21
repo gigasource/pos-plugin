@@ -3,7 +3,10 @@
     <!-- Product info -->
     <div class="menu-setting-new-item__main">
       <div class="ta-center">{{ index + 1 }}</div>
-      <upload-zone class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
+      <div v-if="isInDevice" style="border-radius: 16px; overflow: hidden" @click="dialog.noUpload = true">
+        <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/upload.svg'" style="width: 80px; height: 80px"/>
+      </div>
+      <upload-zone v-else class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
         <template v-slot:default="{showUploadDialog}">
           <img @click="showUploadDialog()" v-if="internalImage" :src="`${internalCdnImage}?w=80&h=80`" draggable="false" style="opacity: 0.8; width: 100%; height: 100%"/>
           <div @click="showUploadDialog()" v-else class="menu-setting-new-item__image--upload">
@@ -24,7 +27,7 @@
             <g-select small text-field-component="GTextFieldBs" v-model="internalPrinter" :items="internalAvailablePrinters"/>
           </div>
           <div class="col-2">
-            <g-text-field-bs small v-model="internalPrice" type="number" placeholder="Price *" @click="openDialogInput('price')"/>
+            <g-text-field-bs small v-model="internalPrice" required type="number" placeholder="Price *" @click="openDialogInput('price')"/>
           </div>
         </div>
         <div class="menu-setting-new-item__content--lower">
@@ -76,10 +79,10 @@
           </g-radio-group>
         </div>
         <div>
-          <g-text-field-bs v-model="choice.name" placeholder="CHOICE NAME" @click="openDialogChoiceInput('choice', i)"/>
+          <g-text-field-bs v-model="choice.name" required placeholder="CHOICE NAME" @click="openDialogChoiceInput('choice', i)"/>
         </div>
         <div>
-          <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt">
+          <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt" :id="`option_${i}_${iOpt}`">
             <div class="item-name col-8">
               <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })" @click="openDialogChoiceInput('option', i, iOpt)"/>
             </div>
@@ -114,6 +117,16 @@
     <dialog-text-filter label="Choice Name" v-model="dialog.choice" :default-value="choice.name" @submit="changeChoiceName"/>
     <dialog-text-filter label="Option Name" v-model="dialog.option" :default-value="choice.option" @submit="changeOption($event, 'name')"/>
     <dialog-number-filter label="Option Price" v-model="dialog.value" :default-value="choice.value" @submit="changeOption($event, 'price')"/>
+    <g-dialog v-model="dialog.noUpload" width="450" eager>
+      <g-card>
+        <g-card-title style="font-size: 24px">
+          Action Denied!
+        </g-card-title>
+        <g-card-text class="text-grey-darken-1 i">
+          This version doesn't support this action. If you want to change or upload image, please try again in the web version.
+        </g-card-text>
+      </g-card>
+    </g-dialog>
   </div>
 </template>
 <script>
@@ -180,6 +193,7 @@
           choice: false,
           option: false,
           value: false,
+          noUpload: false
         },
         choice: {
           name: '',
@@ -244,6 +258,13 @@
         })
       },
       editOption(choiceIndex, optionIndex, { name, price }) {
+        if(!name || price === '' || isNaN(price)) {
+          const option = document.getElementById(`option_${choiceIndex}_${optionIndex}`)
+          option.classList.add('input-error')
+        } else {
+          const option = document.getElementById(`option_${choiceIndex}_${optionIndex}`)
+          option.classList.remove('input-error')
+        }
         this.internalChoices[choiceIndex].options[optionIndex].name = name
         this.internalChoices[choiceIndex].options[optionIndex].price = +price
       },
@@ -475,6 +496,12 @@
       .choice-option-item {
         display: flex;
         margin: 4px;
+
+        &.input-error {
+          .item-name, .item-price {
+            border-color: red;
+          }
+        }
 
         .item-name,
         .item-price {
