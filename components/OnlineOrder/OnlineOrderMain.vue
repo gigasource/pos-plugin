@@ -163,7 +163,6 @@
     </div>
     <dialog-complete-order ref="dialog" v-model="showDialog"
                            @completeOrder="completeOrder"
-                           @setPendingOrder="setPendingOrder"
                            @declineOrder="declineOrder"
     ></dialog-complete-order>
     <dialog-text-filter v-model="dialog.reason" label="Reason" :default-value="dialog.order.declineReason" @submit="submitReason"/>
@@ -247,9 +246,6 @@
       },
       acceptOrder(order) {
         this.$emit('acceptPendingOrder', order)
-      },
-      setPendingOrder(order) {
-        this.$emit('setPendingOrder', order)
       },
       completeOrder(order) {
         this.$emit('completeOrder', order)

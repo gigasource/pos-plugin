@@ -540,12 +540,13 @@
             user: this.user
           }))
         await this.updateOnlineOrders()
-        window.cms.socket.emit('updateOrderStatus', {
+        const orderStatus = {
           onlineOrderId: updatedOrder.onlineOrderId,
           status: status,
           responseMessage: order.declineReason,
           paypalOrderDetail: order.paypalOrderDetail
-        })
+        };
+        window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
         try {
@@ -570,35 +571,31 @@
           const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
-          window.cms.socket.emit('updateOrderStatus', {
+          const orderStatus = {
             onlineOrderId: updatedOrder.onlineOrderId,
             status: status,
             responseMessage: acceptResponse,
             paypalOrderDetail: order.paypalOrderDetail
-          })
+          }
+          window.cms.socket.emit('updateOrderStatus', orderStatus)
         } catch (e) {
           console.error(e)
         }
       },
-      async setPendingOrder(order) {
-        const status = 'inProgress'
-        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
-          Object.assign({}, order, {
-            status,
-          }))
-        await this.updateOnlineOrders()
-        window.cms.socket.emit('updateOrderStatus', {
-          onlineOrderId: updatedOrder.onlineOrderId,
-          status: status
-        })
-      },
       async completeOrder(order) {
-        await cms.getModel('Order').findOneAndUpdate({_id: order._id},
+        const status = 'completed'
+        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({_id: order._id},
             Object.assign({}, order, {
-              status: 'completed',
+              status,
               deliveryTime: dayjs().format('HH:mm')
             }))
         await this.updateOnlineOrders()
+        const orderStatus = {
+          onlineOrderId: updatedOrder.onlineOrderId,
+          status,
+          paypalOrderDetail: order.paypalOrderDetail
+        }
+        window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async getOnlineOrdersWithStatus(status) {
         this.onlineOrders = await cms.getModel('Order').find({

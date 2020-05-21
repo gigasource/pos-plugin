@@ -131,10 +131,6 @@
         this.$emit('declineOrder', order)
         this.dialog = false
       },
-      setPendingOrder(order) {
-        this.$emit('setPendingOrder', order)
-        this.dialog = false
-      },
       completeOrder(order) {
         this.$emit('completeOrder', order)
         this.dialog = false

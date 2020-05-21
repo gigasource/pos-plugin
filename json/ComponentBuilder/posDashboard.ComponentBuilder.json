@@ -244,11 +244,6 @@
                   "type": "event"
                 },
                 {
-                  "service": "OrderStore:setPendingOrder",
-                  "local": "setPendingOrder",
-                  "type": "event"
-                },
-                {
                   "service": "OrderStore:completeOrder",
                   "local": "completeOrder",
                   "type": "event"
