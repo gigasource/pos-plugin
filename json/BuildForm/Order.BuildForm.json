@@ -1209,6 +1209,39 @@
       "key": "timeoutDate",
       "type": "input@date",
       "addable": true
+    },
+    {
+      "_id": "5ec6286590367710590940cd",
+      "schemaType": "object",
+      "key": "paypalOrderDetail",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "billingToken",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "facilitatorAccessToken",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "orderID",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "payerID",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "paymentID",
+          "type": "input"
+        }
+      ]
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
