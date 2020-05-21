@@ -28,7 +28,7 @@
     },
     data() {
       return {
-        radioValue: 'https://pos.gigasource.io',
+        radioValue: '',
         customUrl: '',
         values: ['https://pos.gigasource.io', 'https://online-order.gigasource.io', '']
       }
@@ -60,19 +60,24 @@
       }
     },
     watch: {
-      value(val) {
-        if (!val) return
+      value: {
+        handler(val) {
+          if (!val) return
 
-        this.$emit('getServerUrl', url => {
-          if (!url) {
-            this.radioValue = ''
-            return
-          }
-          if (!this.values.includes(url)) {
-            this.radioValue = 'custom'
-            this.customUrl = url
-          }
-        })
+          this.$emit('getServerUrl', url => {
+            if (!url) {
+              this.radioValue = ''
+              return
+            }
+            if (this.values.includes(url)) {
+              this.radioValue = url
+            } else {
+              this.radioValue = 'custom'
+              this.customUrl = url
+            }
+          })
+        },
+        immediate: true
       }
     }
   }
