@@ -390,6 +390,7 @@ module.exports = async cms => {
 
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
       onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
+      console.debug(`emit order status to server for order ${orderToken}`)
     })
 
     socket.on('getWebShopSettingUrl', async (callback) => {

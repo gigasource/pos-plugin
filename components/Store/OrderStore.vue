@@ -541,6 +541,7 @@
           }))
         await this.updateOnlineOrders()
         window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, order.declineReason)
+        console.debug(`emit order status to backend for order ${updatedOrder.onlineOrderId}`)
       },
       async acceptPendingOrder(order) {
         try {
@@ -566,6 +567,7 @@
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
           window.cms.socket.emit('updateOrderStatus', updatedOrder.onlineOrderId, status, extraInfo)
+          console.debug(`emit order status to backend for order ${updatedOrder.onlineOrderId}`)
         } catch (e) {
           console.error(e)
         }
