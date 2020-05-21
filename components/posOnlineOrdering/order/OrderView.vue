@@ -199,6 +199,7 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
+        store.paypalClientId = "Ad1LWi5RWfH0_7FI1OI3krWGJch3ipnAubkPwktFESDtx_9L3_HZ5jeXXY_NxNnlgaslQ_1OKR03QYlQ"
         this.$set(this, 'store', store)
         await this.loadCategories()
         await this.loadProducts()
