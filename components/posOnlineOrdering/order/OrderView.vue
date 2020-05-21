@@ -403,7 +403,7 @@
         return info
       },
       cdnStoreImageSrc() {
-        return getCdnUrl(this.store.logoImageSrc)
+        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc)
       }
     },
     methods: {

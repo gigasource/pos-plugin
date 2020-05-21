@@ -85,6 +85,7 @@
           :show-image="showImage"
           :choices="choices"
           :available="available"
+          :mark="mark"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -98,7 +99,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark'],
     data: function () {
       return {
         mode: 'view',

@@ -550,3 +550,45 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-allergic {
+  background-image: url("../assets/allergic.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-allergic_full {
+  background-image: url("../assets/allergic_full.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-spicy {
+  background-image: url("../assets/spicy.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-spicy_full {
+  background-image: url("../assets/spicy_full.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-vegeterian {
+  background-image: url("../assets/vegeterian.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-vegeterian_full {
+  background-image: url("../assets/vegeterian_full.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
