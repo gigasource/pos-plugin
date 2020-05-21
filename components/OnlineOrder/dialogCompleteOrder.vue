@@ -53,7 +53,7 @@
         <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Total</div>
-          <div class="ta-right">{{$t('common.currency')}} {{(order.vSum + (order.shippingFee || 0)) | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency')}} {{order.vSum | formatMoney}}</div>
         </div>
       </g-card-text>
       <g-card-actions>
