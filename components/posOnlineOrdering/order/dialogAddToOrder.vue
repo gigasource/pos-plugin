@@ -7,7 +7,7 @@
           <div class="dialog-header__name">
             {{name}}
             <template v-for="(value, type) in mark">
-              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
                   <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
                     <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
@@ -15,8 +15,8 @@
                   </div>
                 </template>
                 <div class="pa-2 bg-white">
-                  <p class="fw-700">{{$t('store.notice')}}</p>
-                  <p>{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                  <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
                 </div>
               </g-menu>
             </template>
