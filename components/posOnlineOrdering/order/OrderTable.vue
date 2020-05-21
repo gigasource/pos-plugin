@@ -356,13 +356,15 @@
           }
         })
       },
+      totalDiscount() {
+        return this.discounts.reduce((total, {value}) => total + value, 0)
+      },
       effectiveTotal() {
         if (!this.orderItems || !this.orderItems.length) return 0
 
         if (!this.confirmView) return this.totalPrice
-
-        const totalDiscount = this.discounts.reduce((total, {value}) => total + value, 0)
-        const total = this.totalPrice + this.shippingFee - totalDiscount;
+        
+        const total = this.totalPrice + this.shippingFee - this.totalDiscount;
         return total < 0 ? 0 : total
       },
       deliveryTimeList() {
@@ -406,22 +408,28 @@
         if (!this.store.paypalClientId)
           return
         
-        const totalValue = `${_.sumBy(this.orderItems, item => item.price * item.quantity)}`
-        
         return {
           // application_context: {
-          //   brand_name: "GigaSource.Co",
-          //   locale: "en-US",
+          //   brand_name: this.store.name,
+          //   locale: "en-US", // TODO: locale
           // },
           purchase_units: [{
             description: `${this.store.name} Order`,
             amount: {
-              currency_code: "USD",
-              value: totalValue,
+              currency_code: "USD", // TODO: currency
+              value: `${this.effectiveTotal.toFixed(2)}`,
               breakdown: {
                 item_total: {
                   currency_code: "USD",
-                  value: totalValue
+                  value: `${this.totalPrice.toFixed(2)}`
+                },
+                discount: {
+                  currency_code: "USD",
+                  value: `${this.totalDiscount.toFixed(2)}`
+                },
+                shipping: {
+                  currency_code: "USD",
+                  value: `${this.shippingFee.toFixed(2)}`
                 }
               }
             },
