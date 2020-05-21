@@ -286,6 +286,7 @@
 
       .bs-tf-wrapper {
         width: auto;
+        margin: 0;
 
         ::v-deep .bs-tf-input-group {
           background: white;

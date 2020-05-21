@@ -18,7 +18,7 @@
             <g-text-field-bs small v-model="internalId" type="text" placeholder="No." @click="openDialogInput('id')"/>
           </div>
           <div class="flex-equal">
-            <g-text-field-bs small v-model="internalName"  placeholder="Name *" @click="openDialogInput('name')"/>
+            <g-text-field-bs small v-model="internalName" required placeholder="Name *" @click="openDialogInput('name')"/>
           </div>
           <div class="col-3" v-if="useMultiplePrinters">
             <g-select small text-field-component="GTextFieldBs" v-model="internalPrinter" :items="internalAvailablePrinters"/>
@@ -469,13 +469,12 @@
           font-weight: 700;
           font-size: 14px;
           color: #1d1d26;
-          width: 100%;
         }
       }
 
       .choice-option-item {
         display: flex;
-        margin: 8px 5px;
+        margin: 4px;
 
         .item-name,
         .item-price {

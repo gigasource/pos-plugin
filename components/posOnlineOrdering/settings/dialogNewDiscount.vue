@@ -18,7 +18,7 @@
                 <g-select :items="amounts" v-model="amount.type" text-field-component="GTextFieldBs" :key="internalValue"
                           label="Amount"/>
               </div>
-              <div class="col-3 pt-3" v-if="amount.type !== 'freeShipping'">
+              <div class="col-3" style="padding-top: 28px" v-if="amount.type !== 'freeShipping'">
                 <g-text-field-bs type="number" large v-model="amount.value" @click="openDialog('amount')"/>
               </div>
             </div>
