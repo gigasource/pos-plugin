@@ -198,6 +198,7 @@
     },
     created() {
       window.cms.socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
+        console.debug(`frontend received status for order ${orderToken}`)
         if (orderToken === this.order.orderToken) {
           this.order.status = orderStatus
           if (orderStatus === 'declined') {

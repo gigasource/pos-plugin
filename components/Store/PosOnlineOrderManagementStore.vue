@@ -186,7 +186,6 @@
           if (store) {
             const deviceToUpdate = store.devices.find(({ _id }) => _id === device._id)
             this.$set(deviceToUpdate, 'features', device.features)
-            console.log('updated device features')
           }
         }
       })
