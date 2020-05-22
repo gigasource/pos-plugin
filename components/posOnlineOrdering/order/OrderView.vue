@@ -427,7 +427,7 @@
               }
               info.push({
                 title: days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', '),
-                value: `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}`
+                value: oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`
               })
             })
           }

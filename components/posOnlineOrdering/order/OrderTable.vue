@@ -246,15 +246,18 @@
           : true
       },
       satisfyDeliveryTime() {
-        let result = false, now = dayjs().format('HH:mm')
-        this.storeOpenHours.forEach(({deliveryStart, deliveryEnd}) => {
+        let result = false, now = dayjs().format('HH:mm'), inWorkingTime = false, havingDeliveryTime = false
+        this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
+          if(deliveryStart && deliveryEnd) havingDeliveryTime = true
           if(now >= deliveryStart && now <= deliveryEnd) result = true
+          if(now >= openTime && now <= closeTime) inWorkingTime = true
         })
+        if(!havingDeliveryTime) result = inWorkingTime
         return result
       },
       deliveryTimeString() {
         let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
-        return this.storeOpenHours.map(oh => `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}`).join(' and ')
+        return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
       },
       orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
