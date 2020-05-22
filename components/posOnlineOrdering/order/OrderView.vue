@@ -164,15 +164,6 @@
         store: null,
         categories: null,
         products: null,
-        dayInWeeks: [
-          this.$t('common.weekday.monday'),
-          this.$t('common.weekday.tuesday'),
-          this.$t('common.weekday.wednesday'),
-          this.$t('common.weekday.thursday'),
-          this.$t('common.weekday.friday'),
-          this.$t('common.weekday.saturday'),
-          this.$t('common.weekday.sunday')
-        ],
         today: dayjs().format("dddd"),
         now: dayjs().format('HH:mm'),
         dialog: {
@@ -258,6 +249,17 @@
       // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
+      dayInWeeks() {
+        return [
+          $t('common.weekday.monday'),
+          $t('common.weekday.tuesday'),
+          $t('common.weekday.wednesday'),
+          $t('common.weekday.thursday'),
+          $t('common.weekday.friday'),
+          $t('common.weekday.saturday'),
+          $t('common.weekday.sunday')
+        ]
+      },
       shippingFee() {
         return this.$refs['order-table'].shippingFee
       },
