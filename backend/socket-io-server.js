@@ -149,6 +149,7 @@ module.exports = function (cms) {
 
     socket.on('updateOrderStatus', async (orderStatus) => {
       const { onlineOrderId, status, paypalOrderDetail } = orderStatus
+      console.debug(`backend received order status for order ${onlineOrderId}`)
       if (status === "completed") {
         if (paypalOrderDetail) {
           const captureResult = await ppApiv2.captureOrder(paypalOrderDetail.orderID, true)
@@ -156,6 +157,7 @@ module.exports = function (cms) {
         }
       } else {
         internalSocketIOServer.to(onlineOrderId).emit('updateOrderStatus', orderStatus)
+        console.debug(`backend emitted order status to frontend for order ${onlineOrderId}`)
       }
     })
 
@@ -211,6 +213,7 @@ module.exports = function (cms) {
 
       // join orderToken room
       socket.join(orderData.orderToken)
+      console.debug(`joined room ${orderData.orderToken}`)
 
       const deviceId = device._id.toString();
       externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()]);

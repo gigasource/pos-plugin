@@ -193,6 +193,11 @@
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         store.paypalClientId = "Ad1LWi5RWfH0_7FI1OI3krWGJch3ipnAubkPwktFESDtx_9L3_HZ5jeXXY_NxNnlgaslQ_1OKR03QYlQ"
         this.$set(this, 'store', store)
+        try {
+          // change locale depend on store setting
+          root.$i18n.locale = this.store.country.locale || 'en'
+        } catch (e) {
+        }
         await this.loadCategories()
         await this.loadProducts()
         // focus on the first category
@@ -407,7 +412,7 @@
         return info
       },
       cdnStoreImageSrc() {
-        return getCdnUrl(this.store.logoImageSrc)
+        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc)
       }
     },
     methods: {

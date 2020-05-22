@@ -336,6 +336,13 @@ module.exports = {
       merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.',
       minimumOrder: 'Minimum order',
       deliveryFee: 'Delivery fee',
+      notice: 'Notice',
+      allergic: 'Allergic',
+      allergicNotice: 'This item may contain food allergens!',
+      spicy: 'Spicy',
+      spicyNotice: 'This item may contain spicy ingredients!',
+      vegeterian: 'Vegeterian',
+      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!'
     }
   }
 }

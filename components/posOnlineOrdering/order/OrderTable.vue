@@ -405,8 +405,7 @@
         return list
       },
       cdnOrderHeaderImage() {
-        const url = getCdnUrl(this.store.orderHeaderImageSrc)
-        return url && `${url}?w=340&h=180`
+        return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=340&h=180`
       },
       paypalOrderInfo() {
         if (!this.store.paypalClientId)

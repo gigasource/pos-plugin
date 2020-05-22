@@ -6,9 +6,43 @@
            class="po-menu-item__thumbnail"/>
     </template>
     <div class="po-menu-item__content">
-      <div :class="['po-menu-item__name', collapseText && 'collapse']">
-        <span v-if="displayId">{{ id && `${id}.` }}</span>
-        {{ name }}
+      <div class="row-flex align-items-center">
+        <div :class="['po-menu-item__name', collapseText && 'collapse']">
+          <span v-if="displayId">{{ id && `${id}.` }}</span>
+          {{ name }}
+          <template v-if="!collapseText">
+            <template v-for="(value, type) in mark">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
+                    <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
+                    <g-icon v-show="!menu[type]" size="20">{{`icon-${type}`}}</g-icon>
+                  </div>
+                </template>
+                <div class="pa-2 bg-white br-2">
+                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                  <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                </div>
+              </g-menu>
+            </template>
+          </template>
+        </div>
+        <template v-if="collapseText">
+          <template v-for="(value, type) in mark">
+            <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+              <template v-slot:activator="{on}">
+                <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent">
+                  <g-icon v-if="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
+                  <g-icon v-else size="20">{{`icon-${type}`}}</g-icon>
+                </div>
+              </template>
+              <div class="pa-2 bg-white br-2">
+                <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+              </div>
+            </g-menu>
+          </template>
+        </template>
       </div>
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
       <div class="po-menu-item__prices--under">
@@ -63,10 +97,20 @@
       available: Boolean,
       id: String,
       displayId: Boolean,
+      mark: Object
     },
     filters: {
       currency(val) {
         return $t('common.currency') + val.toFixed(2)
+      }
+    },
+    data() {
+      return {
+        menu: {
+          allergic: false,
+          spicy: false,
+          vegeterian: false,
+        }
       }
     },
     methods: {
@@ -118,7 +162,7 @@
       height: 60px;
 
       & ~ .po-menu-item__content {
-        max-width: calc(100% - 260px);
+        max-width: calc(100% - 270px);
       }
     }
 
@@ -216,6 +260,7 @@
 
       &__desc {
         font-size: 13px;
+        margin-bottom: 8px;
       }
 
       &__prices {
@@ -244,5 +289,11 @@
         }
       }
     }
+  }
+</style>
+
+<style lang="scss">
+  .menu-status-notification {
+    transform: translateX(-40%);
   }
 </style>

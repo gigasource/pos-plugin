@@ -4,7 +4,7 @@
     <div class="menu-setting-new-item__main">
       <div class="ta-center">{{ index + 1 }}</div>
       <div v-if="isInDevice" style="border-radius: 16px; overflow: hidden" @click="dialog.noUpload = true">
-        <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/upload.svg'" style="width: 80px; height: 80px"/>
+        <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/empty_dish.svg'" style="width: 80px; height: 80px"/>
       </div>
       <upload-zone v-else class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
         <template v-slot:default="{showUploadDialog}">
@@ -103,7 +103,8 @@
     </div>
     <!-- Action button -->
     <div style="display: flex; padding: 13px 8px; background-color: #FFF">
-      <g-btn-bs @click="addChoice" border-color="#5E76FE" text-color="#5E76FE">+ Choice</g-btn-bs>
+      <g-btn-bs @click="addChoice" border-color="#5E76FE">+ Choice</g-btn-bs>
+      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE">Mark item as</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
@@ -127,6 +128,26 @@
         </g-card-text>
       </g-card>
     </g-dialog>
+    <g-dialog v-model="dialog.markItem" width="531" eager>
+      <div class="dialog">
+        <div class="dialog-title">Mark item as</div>
+        <g-icon size="20" class="dialog-icon--close" @click="dialog.markItem = false">icon-close</g-icon>
+        <div class="dialog-content">
+          <g-checkbox color="#536DFE" v-model="internalMark.allergic.active" label="Allergic"/>
+          <g-textarea :disabled="!internalMark.allergic.active" prepend-inner-icon="icon-allergic@20" outlined no-resize :rows="2"
+                      v-model="internalMark.allergic.notice" placeholder="This item may contain food allergens!" @click="openDialogInput('allergic')"/>
+          <g-checkbox color="#536DFE" v-model="internalMark.spicy.active" label="Spicy"/>
+          <g-textarea :disabled="!internalMark.spicy.active" prepend-inner-icon="icon-spicy@20" outlined no-resize :rows="2"
+                      v-model="internalMark.spicy.notice" placeholder="This item may contain spicy ingredients!" @click="openDialogInput('spicy')"/>
+          <g-checkbox color="#536DFE" v-model="internalMark.vegeterian.active" label="Vegeterian"/>
+          <g-textarea :disabled="!internalMark.vegeterian.active" prepend-inner-icon="icon-vegeterian@20" outlined no-resize :rows="2"
+                      v-model="internalMark.vegeterian.notice" placeholder="This item is marked as meat-free and suitable for vegetarians!" @click="openDialogInput('vegeterian')"/>
+        </div>
+      </div>
+    </g-dialog>
+    <dialog-text-filter label="Allergic Notice" v-model="dialog.allergic" :default-value="internalMark.allergic.notice" @submit="changeMarkNotice($event, 'allergic')"/>
+    <dialog-text-filter label="Spicy Notice" v-model="dialog.spicy" :default-value="internalMark.spicy.notice" @submit="changeMarkNotice($event, 'spicy')"/>
+    <dialog-text-filter label="Vegeterian Notice" v-model="dialog.vegeterian" :default-value="internalMark.vegeterian.notice" @submit="changeMarkNotice($event, 'vegeterian')"/>
   </div>
 </template>
 <script>
@@ -160,7 +181,8 @@
       choices: {
         type: Array,
         default: () => []
-      }
+      },
+      mark: Object
     },
     data: function () {
       let internalPrinter
@@ -173,6 +195,20 @@
 
       let internalChoices = _.cloneDeep(this.choices)
       let showDeleteBtn = internalChoices.map(() => false)
+      let internalMark = Object.assign({
+        allergic: {
+          active: false,
+          notice: ''
+        },
+        spicy: {
+          active: false,
+          notice: '',
+        },
+        vegeterian: {
+          active: false,
+          notice: ''
+        }
+      }, this.mark || {})
 
       return {
         internalId: this.id || '',
@@ -193,7 +229,11 @@
           choice: false,
           option: false,
           value: false,
-          noUpload: false
+          noUpload: false,
+          markItem: false,
+          allergic: false,
+          spicy: false,
+          vegeterian: false,
         },
         choice: {
           name: '',
@@ -201,7 +241,8 @@
           value: 0,
           choiceIndex: 0,
           optionIndex: 0
-        }
+        },
+        internalMark
       }
     },
     async created() {
@@ -299,7 +340,8 @@
           tax: this.internalTax,
           showImage: this.showImage,
           available: this.available,
-          choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()}))
+          choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()})),
+          mark: this.internalMark
         })
       },
       openDialogInput(dialogModel) {
@@ -333,6 +375,9 @@
             price: +value
           }
         this.editOption(this.choice.choiceIndex, this.choice.optionIndex, option)
+      },
+      changeMarkNotice(notice, markType) {
+        this.internalMark[markType].notice = notice
       }
     }
   }
@@ -444,10 +489,6 @@
           margin: 0;
         }
       }
-
-    }
-
-    &__choices {
     }
     
     &__choice {
@@ -587,6 +628,73 @@
 
       ::v-deep .g-col {
         padding: 0;
+      }
+    }
+  }
+
+  .dialog {
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+    padding: 24px;
+    position: relative;
+
+    &-title {
+      font-weight: 600;
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #212121;
+    }
+
+    &-icon--close {
+      position: absolute;
+      top: 16px;
+      right: 16px
+    }
+
+    &-content {
+      .g-checkbox-wrapper {
+        margin: 0;
+
+        ::v-deep {
+          .g-checkbox {
+            padding-left: 20px;
+
+            &-label {
+              font-size: 14px;
+              font-weight: 700;
+              color: black;
+            }
+
+            &-checkmark:before {
+              top: 1px;
+            }
+          }
+        }
+      }
+
+      .g-textarea ::v-deep {
+        fieldset {
+          border-color: #9e9e9e !important;
+          border-width: 1px !important;
+        }
+
+        .g-tf-prepend__inner {
+          padding-top: 6px;
+        }
+
+        .g-tf-input {
+          font-size: 14px;
+          color: #424242;
+          padding-top: 6px;
+          padding-bottom: 0;
+          line-height: 18px !important;
+          height: 40px !important;
+        }
+
+        .g-tf-append__inner {
+          display: none;
+        }
       }
     }
   }

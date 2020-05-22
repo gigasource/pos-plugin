@@ -181,6 +181,64 @@
       "schemaType": "boolean",
       "key": "available",
       "type": "input@switch"
+    },
+    {
+      "schemaType": "object",
+      "key": "mark",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "object",
+          "key": "allergic",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "active",
+              "type": "input@switch"
+            },
+            {
+              "schemaType": "string",
+              "key": "notice",
+              "type": "input"
+            }
+          ]
+        },
+        {
+          "schemaType": "object",
+          "key": "spicy",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "active",
+              "type": "input@switch"
+            },
+            {
+              "schemaType": "string",
+              "key": "notice",
+              "type": "input"
+            }
+          ]
+        },
+        {
+          "schemaType": "object",
+          "key": "vegeterian",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "active",
+              "type": "input@switch"
+            },
+            {
+              "schemaType": "string",
+              "key": "notice",
+              "type": "input"
+            }
+          ]
+        }
+      ]
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

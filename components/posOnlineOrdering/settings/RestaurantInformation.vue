@@ -102,14 +102,15 @@
     },
     data: function () {
       return {
+        // now we're currently support de and en
         countries: [
           {name: 'Germany', locale: 'de'},
           {name: 'United State', locale: 'en'},
           {name: 'United Kingdom', locale: 'en'},
           {name: 'Australia', locale: 'en'},
           {name: 'Canada', locale: 'en'},
-          {name: 'France', locale: 'fr'},
-          {name: 'Italy', locale: 'it'},
+          // {name: 'France', locale: 'fr'},
+          // {name: 'Italy', locale: 'it'},
           {name: 'Singapore', locale: 'en'},
         ],
         country: this.store.country || ''

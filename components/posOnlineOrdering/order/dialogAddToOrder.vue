@@ -4,7 +4,23 @@
       <div class="dialog-header">
         <img v-if="showImage" alt :src="computedImg" class="dialog-header__thumbnail"/>
         <div class="ml-4">
-          <p class="dialog-header__name">{{name}}</p>
+          <div class="dialog-header__name">
+            {{name}}
+            <template v-for="(value, type) in mark">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
+                    <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
+                    <g-icon v-show="!menu[type]" size="20">{{`icon-${type}`}}</g-icon>
+                  </div>
+                </template>
+                <div class="pa-2 bg-white">
+                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                  <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                </div>
+              </g-menu>
+            </template>
+          </div>
           <p class="dialog-header__price">{{$t('common.currency')}}{{computedPrice}}</p>
         </div>
       </div>
@@ -74,13 +90,19 @@
       choices: {
         type: Array,
       },
+      mark: Object
     },
     data() {
       const modifiers = this.choices ? this.choices.map(c => c.select === 'one' ? null : []) : []
       return {
         modifiers,
         note: '',
-        quantity: 1
+        quantity: 1,
+        menu: {
+          allergic: false,
+          spicy: false,
+          vegeterian: false,
+        }
       }
     },
     computed: {
@@ -93,8 +115,7 @@
         }
       },
       computedImg() {
-        const url = getCdnUrl(this.image)
-        return url ? `${url}?w=60&h=60` : '/plugins/pos-plugin/assets/empty_dish.svg'
+        return this.image ? `${getCdnUrl(this.image)}?w=60&h=60` : '/plugins/pos-plugin/assets/empty_dish.svg'
       },
       computedPrice() {
         let price = this.price

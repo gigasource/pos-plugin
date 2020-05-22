@@ -53,7 +53,14 @@ module.exports = {
       merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
       merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.',
       minimumOrder: 'Mindestbestellwert',
-      deliveryFee: 'Liefergebühr'
+      deliveryFee: 'Liefergebühr',
+      notice: 'Notice',
+      allergic: 'Allergic',
+      allergicNotice: 'This item may contain food allergens!',
+      spicy: 'Spicy',
+      spicyNotice: 'This item may contain spicy ingredients!',
+      vegeterian: 'Vegeterian',
+      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!'
     },
 
     common: {
