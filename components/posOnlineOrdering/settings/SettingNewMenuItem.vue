@@ -341,7 +341,8 @@
           showImage: this.showImage,
           available: this.available,
           choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()})),
-          mark: this.internalMark
+          mark: this.internalMark,
+          position: this.index
         })
       },
       openDialogInput(dialogModel) {
