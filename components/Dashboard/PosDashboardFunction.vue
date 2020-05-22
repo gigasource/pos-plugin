@@ -85,12 +85,15 @@
         if (!this.enabledFeatures || !this.enabledFeatures.length) return
 
         return this.btnDown.filter(item => {
+          if (!this.user) return false
           if (!item.feature) return true
-          if (this.user && this.user.role === 'admin')
+          if (this.user.role === 'admin')
             if (item.feature === 'settings' || item.feature === 'printerSettings') return true
           if (item.feature === 'orderHistory')
-            return !!(this.user && (this.user.role === 'admin' || this.user.viewOrderHistory))
-          return (this.enabledFeatures.includes(item.feature))
+            return this.user.role === 'admin' || this.user.viewOrderHistory
+          if (item.feature === 'onlineOrdering')
+            return this.user.role === 'admin' || this.user.viewOnlineOrderMenu
+          return this.enabledFeatures.includes(item.feature)
         })
       },
 

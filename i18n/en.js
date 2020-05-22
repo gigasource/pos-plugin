@@ -252,7 +252,7 @@ module.exports = {
       accessStaffReport: 'Access Staff Report',
       editTablePlan: 'Edit Table Plan',
       viewOrder: 'View Completed/Declined Orders',
-      viewOnlineOrderMenu: 'View Online Order Menu',
+      viewOnlineOrderMenu: 'View Online Order Dashboard',
       viewOrderHistory: 'View Order History',
       //company
       companyName: 'Company Name',
