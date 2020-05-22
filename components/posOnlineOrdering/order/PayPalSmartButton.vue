@@ -98,6 +98,14 @@
           container.innerText = ''
           // add new paypal button
           paypal.Buttons({
+            locale: 'en_US',
+            style: {
+              size: 'responsive',
+              color:  'gold',
+              shape:  'pill',
+              label:  'pay',
+              height: 40
+            },
             createOrder: async function (_, actions) {
               return actions.order.create(_this.orderInfo);
             },
