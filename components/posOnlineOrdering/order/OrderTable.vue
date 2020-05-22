@@ -422,7 +422,7 @@
             brand_name: this.store.name,
             locale: customLocale, // using custom locale instead of paypal locale
             landing_page: "NO_PREFERENCE", // let paypal decide whether login page or billing page will be display depend on user login condition
-            shipping_preference: this.orderType === "delivery" ? "SET_PROVIDED_ADDRESS" : "NO_SHIPPING",
+            shipping_preference: "NO_SHIPPING",
             user_action: "CONTINUE"
           },
           purchase_units: [{
@@ -459,20 +459,6 @@
               quantity: `${item.quantity}`,
               category: "PHYSICAL_GOODS"
             })),
-            // use order shipping address instead of PayPal address
-            shipping: this.orderType === "delivery" ? {
-              address: {
-                name: {
-                  full_name: this.customer.name
-                },
-                address_line_1: this.customer.address,
-                address_line_2: "",
-                admin_area_2: "",
-                admin_area_1: "",
-                postal_code: this.customer.zipCode,
-                country_code: countryCode
-              }
-            } : undefined
           }]
         }
       }

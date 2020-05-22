@@ -93,8 +93,7 @@
         if (!this.sdkLoaded || !this.orderInfo)
           return
         const _this = this
-        // clear container
-        const container = document.getElementById(`#${this.containerId}`)
+        let container = document.getElementById(_this.containerId)
         if (container) {
           container.innerText = ''
           // add new paypal button
