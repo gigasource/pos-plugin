@@ -102,16 +102,17 @@
     },
     data: function () {
       return {
-        // now we're currently support de and en
+        // now we're currently support de-DE and en-US
+        // note that, new i18n file should be added for each country
         countries: [
-          {name: 'Germany', locale: 'de'},
-          {name: 'United State', locale: 'en'},
-          {name: 'United Kingdom', locale: 'en'},
-          {name: 'Australia', locale: 'en'},
-          {name: 'Canada', locale: 'en'},
+          {name: 'Germany', locale: 'de-DE'},
+          {name: 'United State', locale: 'en-US'},
+          // {name: 'United Kingdom', locale: 'en-GB'},
+          // {name: 'Australia', locale: 'en'},
+          // {name: 'Canada', locale: 'en'},
           // {name: 'France', locale: 'fr'},
           // {name: 'Italy', locale: 'it'},
-          {name: 'Singapore', locale: 'en'},
+          // {name: 'Singapore', locale: 'en'},
         ],
         country: this.store.country || ''
       }

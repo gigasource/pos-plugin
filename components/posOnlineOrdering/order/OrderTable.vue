@@ -415,37 +415,30 @@
         if (!this.store.paypalClientId)
           return
         
-        // TODO: i18n customize
-        const currencyCode = $t('common.currencyCode');
-        // https://developer.paypal.com/docs/api/reference/country-codes/
-        const countryCode = "DE";
-        //
-        const customLocale = "de-DE"
-        
         return {
           application_context: {
             brand_name: this.store.name,
-            locale: customLocale, // using custom locale instead of paypal locale
+            locale: $t('common.locale'),   // using custom locale instead of paypal user locale
             landing_page: "NO_PREFERENCE", // let paypal decide whether login page or billing page will be display depend on user login condition
-            shipping_preference: "NO_SHIPPING",
+            shipping_preference: "NO_SHIPPING", // hide shipping information in paypal order
             user_action: "CONTINUE"
           },
           purchase_units: [{
             custom_id: `${this.store._id}`, // using custom_id as an identity to identify which store this transaction belong too
             amount: {
-              currency_code: currencyCode,
+              currency_code: this.currencyCode,
               value: `${this.effectiveTotal.toFixed(2)}`,
               breakdown: {
                 item_total: {
-                  currency_code: currencyCode,
+                  currency_code: this.currencyCode,
                   value: `${this.totalPrice.toFixed(2)}`
                 },
                 discount: {
-                  currency_code: currencyCode,
+                  currency_code: this.currencyCode,
                   value: `${this.totalDiscount.toFixed(2)}`
                 },
                 shipping: {
-                  currency_code: currencyCode,
+                  currency_code: this.currencyCode,
                   value: `${this.shippingFee.toFixed(2)}`
                 }
               }
@@ -454,13 +447,9 @@
               name: item.name,
               description: item.desc || '',
               unit_amount: {
-                currency_code: currencyCode,
+                currency_code: this.currencyCode,
                 value: `${item.price}`
               },
-              // tax: {
-              //   currency_code: "USD",
-              //   value: item.tax
-              // },
               quantity: `${item.quantity}`,
               category: "PHYSICAL_GOODS"
             })),

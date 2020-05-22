@@ -1,3 +1,4 @@
+// default i18n
 module.exports = {
   en: {
     //login

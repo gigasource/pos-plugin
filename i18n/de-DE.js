@@ -1,5 +1,5 @@
 module.exports = {
-  de: {
+  'de-DE': {
     store: {
       open: 'Geöffnet',
       closed: 'Geschlossen',
@@ -66,6 +66,8 @@ module.exports = {
     common: {
       currency: '€',
       currencyCode: 'EUR',
+      countryCode: "DE",
+      locale: "de-DE",
       asap: 'So schnell wie möglich',
       weekday: {
         monday: 'Montag',
