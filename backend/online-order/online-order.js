@@ -413,11 +413,11 @@ module.exports = async cms => {
       console.debug(`emit order status to server for order ${orderToken}`)
     })
 
-    socket.on('getWebShopSettingUrl', async (callback) => {
+    socket.on('getWebShopSettingUrl', async (locale, callback) => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, async (webShopSettingUrl) => {
+      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, locale, async (webShopSettingUrl) => {
         callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
     })

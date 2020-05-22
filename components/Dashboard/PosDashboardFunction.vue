@@ -101,7 +101,7 @@
           this.$router.push({path})
       },
       openStoreSetting() {
-        window.cms.socket.emit('getWebShopSettingUrl', webShopUrl => {
+        window.cms.socket.emit('getWebShopSettingUrl', this.$i18n.locale, webShopUrl => {
           if (webShopUrl) {
             this.iframeSrc = webShopUrl
             this.showIframe = true
