@@ -200,6 +200,11 @@
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         this.$set(this, 'store', store)
+        try {
+          // change locale depend on store setting
+          root.$i18n.locale = this.store.country.locale || 'en'
+        } catch (e) {
+        }
         await this.loadCategories()
         await this.loadProducts()
         // focus on the first category
