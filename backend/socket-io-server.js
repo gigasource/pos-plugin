@@ -117,7 +117,7 @@ module.exports = function (cms) {
       callback(store.id);
     })
 
-    socket.on('getWebShopSettingUrl', async (deviceId, callback) => {
+    socket.on('getWebShopSettingUrl', async (deviceId, locale, callback) => {
       const device = await cms.getModel('Device').findById(deviceId);
       if (!device) return callback(null);
 
@@ -129,7 +129,7 @@ module.exports = function (cms) {
       // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
       const accessToken = await cms.utils.generateAccessToken(user.username,  user.password)
       if (accessToken) {
-        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true`)
+        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true&lang=${locale || 'en'}`)
       } else {
         callback && callback(null)
       }
