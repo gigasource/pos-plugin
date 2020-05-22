@@ -5,7 +5,10 @@
 <script>
   export default {
     name: 'PosKeyboardFull',
-    injectService: ['PosStore:locale'],
+    props: {
+      locale: String,
+      value: null
+    },
     data() {
       return {
         keyboardEnglish: [
@@ -142,14 +145,11 @@
           { content: ['.'], style: 'grid-area: keyDot' },
         ],
         templateGerman: 'grid-template-areas: "tab tab q q w w e e r r t t y y u u i i o o p p ue ue ss ss del del key7 key7 key8 key8 key9 key9" ' +
-            '"caps caps caps a a s s d d f f g g h h j j k k l l oe oe ae ae enter enter enter key4 key4 key5 key5 key6 key6" ' +
-            '"shift1 shift1 shift1 shift1 z z x x c c v v b b n n m m comma comma dot dot splash splash shift2 shift2 shift2 shift2 key1 key1 key2 key2 key3 key3" ' +
-            '"sym sym amp amp pct pct pnd pnd space space space space space space space space space space space space at at lang lang larr larr rarr rarr key0 key0 key0 key0 keyDot keyDot";' +
-            'grid-auto-columns: 1fr; grid-gap: 5px',
+          '"caps caps caps a a s s d d f f g g h h j j k k l l oe oe ae ae enter enter enter key4 key4 key5 key5 key6 key6" ' +
+          '"shift1 shift1 shift1 shift1 z z x x c c v v b b n n m m comma comma dot dot splash splash shift2 shift2 shift2 shift2 key1 key1 key2 key2 key3 key3" ' +
+          '"sym sym amp amp pct pct pnd pnd space space space space space space space space space space space space at at lang lang larr larr rarr rarr key0 key0 key0 key0 keyDot keyDot";' +
+          'grid-auto-columns: 1fr; grid-gap: 5px',
       }
-    },
-    props: {
-      value: null,
     },
     computed: {
       internalValue: {
@@ -161,13 +161,15 @@
         }
       },
       keyboardFull() {
-        if(this.locale === 'de')
+        if (this.locale === 'de') {
           return this.keyboardGerman
+        }
         return this.keyboardEnglish
       },
       templateFull() {
-        if(this.locale === 'de')
+        if (this.locale === 'de') {
           return this.templateGerman
+        }
         return this.templateEnglish
       }
     }

@@ -14,7 +14,7 @@
 				</div>
 			</div>
 			<div class="keyboard">
-				<pos-keyboard-full v-model="screenValue"/>
+				<pos-keyboard-full :locale="locale" v-model="screenValue"/>
 			</div>
 		</div>
 	</g-dialog>
@@ -30,6 +30,10 @@
       	type: String,
 				default: ''
 			},
+			locale: {
+      	type: String,
+				default: 'de'
+			}
     },
     data() {
       return {
