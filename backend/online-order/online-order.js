@@ -22,6 +22,15 @@ async function getWebShopUrl(cms) {
   return webshopUrl
 }
 
+async function updateAlwaysOn(enabled) {
+  console.log("Updating always on");
+  try {
+    await axios.post(`http://localhost:5000/update-alwayson-status`, { enabled })
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function createOnlineOrderSocket(deviceId, cms) {
 
   async function scheduleDeclineOrder(date, _id, cb) {
@@ -136,6 +145,13 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
+        if (name === 'alwaysOn') {
+          const oldAlwaysOnValue = await cms.getModel('Feature').findOne({name})
+          console.log(oldAlwaysOnValue.enabled);
+          if (oldAlwaysOnValue.enabled != enabled) {
+            await updateAlwaysOn(enabled)
+          }
+        }
         return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
       }))
       cms.socket.emit('updateAppFeature')
@@ -293,6 +309,10 @@ module.exports = async cms => {
     try {
       const deviceId = await getDeviceId();
       if (deviceId) await createOnlineOrderSocket(deviceId, cms);
+      const alwaysOnFeature = await cms.getModel('Feature').findOne({ name: 'alwaysOn' });
+      if (alwaysOnFeature) {
+        await updateAlwaysOn(alwaysOnFeature.enabled);
+      }
     } catch (e) {
       console.error(e);
       await updateDeviceStatus();
