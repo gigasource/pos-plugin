@@ -55,11 +55,14 @@
     },
     watch: {
       orderInfo() {
-        this.updatePaypalItems()
+        this.updatePaypalItemsDebounce()
       },
       sdkLoaded() {
         this.updatePaypalItems()
       }
+    },
+    created() {
+      this.updatePaypalItemsDebounce = _.debounce(this.updatePaypalItems, 200)
     },
     methods: {
       buildSdkHref() {
@@ -90,6 +93,10 @@
         if (!this.sdkLoaded || !this.orderInfo)
           return
         const _this = this
+        // clear container
+        const container = document.getElementById(`#${this.containerId}`)
+        container.innerText = ''
+        // add new paypal button
         paypal.Buttons({
           createOrder: async function (_, actions) {
             return actions.order.create(_this.orderInfo);
