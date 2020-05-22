@@ -206,7 +206,6 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
-        asap: $t('common.asap'),
       }
     },
     filters: {
@@ -231,6 +230,9 @@
       })
     },
     computed: {
+      asap() {
+        return $t('common.asap')
+      },
       confirmView() { return !this.orderView },
       allowConfirmView() {
         return this.orderItems.length
