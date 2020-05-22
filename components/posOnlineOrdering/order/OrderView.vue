@@ -406,6 +406,31 @@
               title: $t('store.deliveryFee'),
               value: max > min ? `${$t('common.currency')}${min} - ${$t('common.currency')}${max}` : `${$t('common.currency')}${max}`
             })
+
+          if(this.store.openHours) {
+            let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+            this.store.openHours.forEach(oh => {
+              let days = []
+              for(let i = 0; i < oh.dayInWeeks.length; i++) {
+                const weekday = oh.dayInWeeks[i]
+                if(!weekday)
+                  days.push({})
+                else {
+                  if (days.length === 0) days.push({})
+                  let day = _.last(days)
+                  if(day.start) {
+                    Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+                  } else {
+                    Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+                  }
+                }
+              }
+              info.push({
+                title: days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', '),
+                value: `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}`
+              })
+            })
+          }
         }
         return info
       },
@@ -468,11 +493,11 @@
         } : {borderBottom: '2px solid transparent', color: '#424242'}
       },
       openDialogAdd(item) {
-        this.selectedProduct = item
         if(!item.choices || item.choices.length === 0) { //item without choice instancely add
           this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
           return
         }
+        this.selectedProduct = item
         this.dialog.add = true
       },
       addItemToOrder(item) {

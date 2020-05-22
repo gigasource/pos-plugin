@@ -345,7 +345,8 @@ module.exports = {
       spicy: 'Spicy',
       spicyNotice: 'This item may contain spicy ingredients!',
       vegeterian: 'Vegeterian',
-      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!'
+      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!',
+      deliveryTimeWarning: 'Today delivery service is available between ',
     }
   }
 }
