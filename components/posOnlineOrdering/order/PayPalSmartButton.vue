@@ -95,23 +95,25 @@
         const _this = this
         // clear container
         const container = document.getElementById(`#${this.containerId}`)
-        container.innerText = ''
-        // add new paypal button
-        paypal.Buttons({
-          createOrder: async function (_, actions) {
-            return actions.order.create(_this.orderInfo);
-          },
-          onApprove: function (data, actions) {
-            _this.debug && console.log(data)
-            if (this.captureFundImmediately) {
-              actions.order.capture().then(details => {
-                _this.$emit('onFundCaptured', details, data, actions)
-              });
-            } else {
-              _this.$emit('onApprove', data, actions)
+        if (container) {
+          container.innerText = ''
+          // add new paypal button
+          paypal.Buttons({
+            createOrder: async function (_, actions) {
+              return actions.order.create(_this.orderInfo);
+            },
+            onApprove: function (data, actions) {
+              _this.debug && console.log(data)
+              if (this.captureFundImmediately) {
+                actions.order.capture().then(details => {
+                  _this.$emit('onFundCaptured', details, data, actions)
+                });
+              } else {
+                _this.$emit('onApprove', data, actions)
+              }
             }
-          }
-        }).render(`#${this.containerId}`);
+          }).render(`#${this.containerId}`);
+        }
       }
     }
   }

@@ -98,13 +98,13 @@
                 <!-- Payment detail -->
                 <template>
                   <div v-if="paymentType === 'paypal'">
-                    <paypal-smart-button
+                    <pay-pal-smart-button
                         :self-host="true"
                         :debug="true"
                         :order-info="paypalOrderInfo"
                         :client-id="store.paypalClientId"
                         :currency="currencyCode"
-                        @onApprove="confirmPaypalPayment"
+                        @onApprove="confirmPayPalPayment"
                     />
                   </div>
                 </template>
@@ -184,11 +184,11 @@
   import {get24HourValue, incrementTime} from "../../logic/timeUtil";
   import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
-  import PaypalSmartButton from './PaypalSmartButton';
+  import PayPalSmartButton from './PayPalSmartButton';
 
   export default {
     name: 'OrderTable',
-    components: { PaypalSmartButton, OrderCreated },
+    components: { PayPalSmartButton, OrderCreated },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -459,16 +459,16 @@
               quantity: `${item.quantity}`,
               category: "PHYSICAL_GOODS"
             })),
-            // use order shipping address instead of paypal address
+            // use order shipping address instead of PayPal address
             shipping: this.orderType === "delivery" ? {
               address: {
                 name: {
                   full_name: this.customer.name
                 },
                 address_line_1: this.customer.address,
-                address_line_2: "Floor 6",
-                admin_area_2: "San Francisco",
-                admin_area_1: "CA",
+                address_line_2: "",
+                admin_area_2: "",
+                admin_area_1: "",
                 postal_code: this.customer.zipCode,
                 country_code: countryCode
               }
@@ -502,7 +502,7 @@
       addItem(item) {
         this.$emit('increase', Object.assign({}, item, {quantity: 1}))
       },
-      async confirmPaypalPayment(orderDetails) {
+      async confirmPayPalPayment(orderDetails) {
         this.paypalOrderDetail = orderDetails
         await this.confirmPayment();
       },
