@@ -1,3 +1,4 @@
+// default i18n
 module.exports = {
   en: {
     //login
@@ -113,6 +114,9 @@ module.exports = {
       sales: 'Sales',
       total: 'Total',
       currency: '$',
+      currencyCode: "USD",
+      countryCode: "US",
+      locale: "en-US",
       discount: 'Discount',
       tax: 'Tax',
       subtotal: 'Subtotal',
