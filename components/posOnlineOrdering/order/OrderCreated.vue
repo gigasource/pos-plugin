@@ -208,8 +208,9 @@
           }
         }
       })
+      const startTime = new Date().getTime()
       this.intervalId = setInterval(() => {
-        this.waited += 0.25
+        this.waited = Math.floor((new Date().getTime() - startTime) / 1000)
         if (this.waited >= this.orderProcessTimeOut) {
           clearInterval(this.intervalId)
         }
