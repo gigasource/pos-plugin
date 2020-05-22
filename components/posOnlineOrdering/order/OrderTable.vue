@@ -103,6 +103,7 @@
                         :debug="true"
                         :order-info="paypalOrderInfo"
                         :client-id="store.paypalClientId"
+                        :currency="currencyCode"
                         @onApprove="confirmPaypalPayment"
                     />
                   </div>
@@ -211,6 +212,7 @@
           note: ''
         },
         currency: $t('common.currency'),
+        currencyCode: $t('common.currencyCode'),
         dialog: {
           value: false,
           order: {}
@@ -408,36 +410,46 @@
         if (!this.store.paypalClientId)
           return
         
+        // TODO: i18n customize
+        const currencyCode = $t('common.currencyCode');
+        // https://developer.paypal.com/docs/api/reference/country-codes/
+        const countryCode = "DE";
+        //
+        const customLocale = "de-DE"
+        
         return {
-          // application_context: {
-          //   brand_name: this.store.name,
-          //   locale: "en-US", // TODO: locale
-          // },
+          application_context: {
+            brand_name: this.store.name,
+            locale: customLocale, // using custom locale instead of paypal locale
+            landing_page: "NO_PREFERENCE", // let paypal decide whether login page or billing page will be display depend on user login condition
+            shipping_preference: this.orderType === "delivery" ? "SET_PROVIDED_ADDRESS" : "NO_SHIPPING",
+            user_action: "CONTINUE"
+          },
           purchase_units: [{
-            description: `${this.store.name} Order`,
+            custom_id: `${this.store._id}`, // using custom_id as an identity to identify which store this transaction belong too
             amount: {
-              currency_code: "USD", // TODO: currency
+              currency_code: currencyCode,
               value: `${this.effectiveTotal.toFixed(2)}`,
               breakdown: {
                 item_total: {
-                  currency_code: "USD",
+                  currency_code: currencyCode,
                   value: `${this.totalPrice.toFixed(2)}`
                 },
                 discount: {
-                  currency_code: "USD",
+                  currency_code: currencyCode,
                   value: `${this.totalDiscount.toFixed(2)}`
                 },
                 shipping: {
-                  currency_code: "USD",
+                  currency_code: currencyCode,
                   value: `${this.shippingFee.toFixed(2)}`
                 }
               }
             },
             items: _.map(this.orderItems, item => ({
               name: item.name,
-              // description: `${item.desc}`,
+              description: item.desc || '',
               unit_amount: {
-                currency_code: "USD",
+                currency_code: currencyCode,
                 value: `${item.price}`
               },
               // tax: {
@@ -445,8 +457,22 @@
               //   value: item.tax
               // },
               quantity: `${item.quantity}`,
-              category: 'PHYSICAL_GOODS'
+              category: "PHYSICAL_GOODS"
             })),
+            // use order shipping address instead of paypal address
+            shipping: this.orderType === "delivery" ? {
+              address: {
+                name: {
+                  full_name: this.customer.name
+                },
+                address_line_1: this.customer.address,
+                address_line_2: "Floor 6",
+                admin_area_2: "San Francisco",
+                admin_area_1: "CA",
+                postal_code: this.customer.zipCode,
+                country_code: countryCode
+              }
+            } : undefined
           }]
         }
       }
