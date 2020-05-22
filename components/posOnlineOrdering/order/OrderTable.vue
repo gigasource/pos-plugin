@@ -228,7 +228,6 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
-        asap: $t('common.asap'),
         paypalOrderDetail: {}
       }
     },
@@ -254,6 +253,9 @@
       })
     },
     computed: {
+      asap() {
+        return $t('common.asap')
+      },
       confirmView() { return !this.orderView },
       allowConfirmView() {
         return this.orderItems.length
