@@ -252,15 +252,15 @@
     },
     computed: {
       dayInWeeks() {
-       return [
-         $t('common.weekday.monday'),
-         $t('common.weekday.tuesday'),
-         $t('common.weekday.wednesday'),
-         $t('common.weekday.thursday'),
-         $t('common.weekday.friday'),
-         $t('common.weekday.saturday'),
-         $t('common.weekday.sunday')
-       ]
+        return [
+          $t('common.weekday.monday'),
+          $t('common.weekday.tuesday'),
+          $t('common.weekday.wednesday'),
+          $t('common.weekday.thursday'),
+          $t('common.weekday.friday'),
+          $t('common.weekday.saturday'),
+          $t('common.weekday.sunday')
+        ]
       },
       shippingFee() {
         return this.$refs['order-table'].shippingFee
