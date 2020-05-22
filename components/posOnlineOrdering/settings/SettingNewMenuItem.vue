@@ -4,7 +4,7 @@
     <div class="menu-setting-new-item__main">
       <div class="ta-center">{{ index + 1 }}</div>
       <div v-if="isInDevice" style="border-radius: 16px; overflow: hidden" @click="dialog.noUpload = true">
-        <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/upload.svg'" style="width: 80px; height: 80px"/>
+        <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/empty_dish.svg'" style="width: 80px; height: 80px"/>
       </div>
       <upload-zone v-else class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
         <template v-slot:default="{showUploadDialog}">
@@ -134,14 +134,20 @@
         <g-icon size="20" class="dialog-icon--close" @click="dialog.markItem = false">icon-close</g-icon>
         <div class="dialog-content">
           <g-checkbox color="#536DFE" v-model="internalMark.allergic.active" label="Allergic"/>
-          <g-textarea :disabled="!internalMark.allergic.active" prepend-inner-icon="icon-allergic@20" outlined no-resize :rows="2" v-model="internalMark.allergic.notice" placeholder="This item may contain food allergens!" />
+          <g-textarea :disabled="!internalMark.allergic.active" prepend-inner-icon="icon-allergic@20" outlined no-resize :rows="2"
+                      v-model="internalMark.allergic.notice" placeholder="This item may contain food allergens!" @click="openDialogInput('allergic')"/>
           <g-checkbox color="#536DFE" v-model="internalMark.spicy.active" label="Spicy"/>
-          <g-textarea :disabled="!internalMark.spicy.active" prepend-inner-icon="icon-spicy@20" outlined no-resize :rows="2" v-model="internalMark.spicy.notice" placeholder="This item may contain spicy ingredients!" />
+          <g-textarea :disabled="!internalMark.spicy.active" prepend-inner-icon="icon-spicy@20" outlined no-resize :rows="2"
+                      v-model="internalMark.spicy.notice" placeholder="This item may contain spicy ingredients!" @click="openDialogInput('spicy')"/>
           <g-checkbox color="#536DFE" v-model="internalMark.vegeterian.active" label="Vegeterian"/>
-          <g-textarea :disabled="!internalMark.vegeterian.active" prepend-inner-icon="icon-vegeterian@20" outlined no-resize :rows="2" v-model="internalMark.vegeterian.notice" placeholder="This item is marked as meat-free and suitable for vegetarians!" />
+          <g-textarea :disabled="!internalMark.vegeterian.active" prepend-inner-icon="icon-vegeterian@20" outlined no-resize :rows="2"
+                      v-model="internalMark.vegeterian.notice" placeholder="This item is marked as meat-free and suitable for vegetarians!" @click="openDialogInput('vegeterian')"/>
         </div>
       </div>
     </g-dialog>
+    <dialog-text-filter label="Allergic Notice" v-model="dialog.allergic" :default-value="internalMark.allergic.notice" @submit="changeMarkNotice($event, 'allergic')"/>
+    <dialog-text-filter label="Spicy Notice" v-model="dialog.spicy" :default-value="internalMark.spicy.notice" @submit="changeMarkNotice($event, 'spicy')"/>
+    <dialog-text-filter label="Vegeterian Notice" v-model="dialog.vegeterian" :default-value="internalMark.vegeterian.notice" @submit="changeMarkNotice($event, 'vegeterian')"/>
   </div>
 </template>
 <script>
@@ -224,7 +230,10 @@
           option: false,
           value: false,
           noUpload: false,
-          markItem: false
+          markItem: false,
+          allergic: false,
+          spicy: false,
+          vegeterian: false,
         },
         choice: {
           name: '',
@@ -366,6 +375,9 @@
             price: +value
           }
         this.editOption(this.choice.choiceIndex, this.choice.optionIndex, option)
+      },
+      changeMarkNotice(notice, markType) {
+        this.internalMark[markType].notice = notice
       }
     }
   }

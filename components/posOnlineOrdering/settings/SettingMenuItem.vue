@@ -11,7 +11,7 @@
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
         </div>
-        <div class="r">
+        <div class="r mt-3" style="align-self: flex-start">
           <img v-if="image" :src="`${cdnImage}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
           <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
           <div class="icon-eyes">
@@ -23,14 +23,14 @@
           <div class="menu-setting-item__name row-flex">
             <span v-if="displayId" class="mr-1">{{id ? id + '.' : ''}}</span>
             <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
-            <span class="col-3" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
+            <span class="col-3 pl-1" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
           <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
           <g-chip-group v-if="choices && choices.length > 0" :items="choices">
               <template v-slot:item="{value, click, active, close}">{{value.name}}</template>
           </g-chip-group>
         </div>
-        <div class="menu-setting-item__content">
+        <div class="pt-3 h-100">
           <div class="menu-setting-item__price">{{$t('common.currency')}}{{price}}</div>
           <div class="menu-setting-item__tax">Tax: {{tax}}%</div>
         </div>
@@ -245,7 +245,7 @@
     &__tax {
       font-size: 13px;
       font-style: italic;
-      margin-bottom: 24px;
+      margin-top: 16px;
     }
 
     &__btn {

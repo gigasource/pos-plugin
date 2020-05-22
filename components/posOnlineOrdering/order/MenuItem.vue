@@ -162,7 +162,7 @@
       height: 60px;
 
       & ~ .po-menu-item__content {
-        max-width: calc(100% - 260px);
+        max-width: calc(100% - 270px);
       }
     }
 
@@ -260,6 +260,7 @@
 
       &__desc {
         font-size: 13px;
+        margin-bottom: 8px;
       }
 
       &__prices {
