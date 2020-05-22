@@ -115,6 +115,8 @@ module.exports = {
       total: 'Total',
       currency: '$',
       currencyCode: "USD",
+      countryCode: "US",
+      locale: "en-US",
       discount: 'Discount',
       tax: 'Tax',
       subtotal: 'Subtotal',
