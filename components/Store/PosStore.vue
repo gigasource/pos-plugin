@@ -13,10 +13,16 @@
     data() {
       return {
         systemDate: new Date(),
-        timeFormat: this.$t('dates.timeFormat'),
-        dateFormat: this.$t('dates.dateFormat'),
         locale: 'en'
       }
+    },
+    computed: {
+      timeFormat() {
+        return $t('dates.timeFormat')
+      },
+      dateFormat() {
+        return $t('dates.dateFormat')
+      },
     },
     methods: {
       async login(username, password, errCb) {

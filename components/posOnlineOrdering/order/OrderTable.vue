@@ -201,7 +201,7 @@
       return {
         view: 'order',
         orderType: this.store.delivery ? 'delivery' : 'pickup', // delivery || pick-up
-        paymentType: 'cash', // cash || credit
+        paymentType: 'cash', // cash || paypal
         customer: {
           name: '',
           company: '',
@@ -211,8 +211,6 @@
           deliveryTime: '',
           note: ''
         },
-        currency: $t('common.currency'),
-        currencyCode: $t('common.currencyCode'),
         dialog: {
           value: false,
           order: {}
@@ -253,6 +251,12 @@
       })
     },
     computed: {
+      currency() {
+        return $t('common.currency')
+      },
+      currencyCode() {
+        return $t('common.currencyCode')
+      },
       asap() {
         return $t('common.asap')
       },
