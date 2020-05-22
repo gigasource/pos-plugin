@@ -379,6 +379,7 @@ module.exports = {
       pendingOrders: 'Pending Orders',
       sentToKitchen: 'Sent to Kitchen',
       dashboard: 'Dashboard',
+      orderDetails: 'Order Details',
       completedOrders: 'Completed Orders',
       declinedOrders: 'Declined Orders',
       no: 'No.',
@@ -398,6 +399,9 @@ module.exports = {
       deliveryIn: 'Delivery in {0} minutes',
       pickUpIn: 'Pick up in {0} minutes',
       total: 'Total',
+      items: 'item(s)',
+      cancelOrder: 'Cancel & move to declined orders',
+      completeOrder: 'Complete order',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',

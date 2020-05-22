@@ -1,7 +1,7 @@
 <template>
   <g-dialog v-if="order" v-model="dialog" width="580px">
     <g-card class="px-3 pb-2">
-      <g-card-title style="font-size: 20px">Order Details</g-card-title>
+      <g-card-title style="font-size: 20px">{{$t('onlineOrder.orderDetails')}}</g-card-title>
       <g-card-text class="fs-small">
         <div class="row-flex mb-2">
           <div style="flex: 0 0 30px">
@@ -36,7 +36,7 @@
 
         <div class="dashed-gradient"/>
         <div class="row-flex justify-between mt-2">
-          <div>Total <b>{{orderQuantity}}</b> item(s)</div>
+          <div>{{$t('onlineOrder.total')}} <b>{{orderQuantity}}</b> {{$t('onlineOrder.items')}}</div>
           <div class="ta-right">{{$t('common.currency')}} {{subTotal | formatMoney}}</div>
         </div>
         <div class="row-flex justify-between">
@@ -52,13 +52,13 @@
         </div>
         <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
-          <div>Total</div>
+          <div>{{$t('onlineOrder.total')}}</div>
           <div class="ta-right">{{$t('common.currency')}} {{order.vSum | formatMoney}}</div>
         </div>
       </g-card-text>
       <g-card-actions>
-        <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">Cancel & move to declined orders</g-btn-bs>
-        <g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" @click.stop="completeOrder(order)">Complete order</g-btn-bs>
+        <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">{{$t('onlineOrder.cancelOrder')}}</g-btn-bs>
+        <g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" @click.stop="completeOrder(order)">{{$t('onlineOrder.completeOrder')}}</g-btn-bs>
       </g-card-actions>
     </g-card>
   </g-dialog>
