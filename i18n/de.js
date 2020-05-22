@@ -58,6 +58,7 @@ module.exports = {
 
     common: {
       currency: '€',
+      currencyCode: 'EUR',
       asap: 'So schnell wie möglich',
       weekday: {
         monday: 'Montag',

@@ -113,6 +113,7 @@ module.exports = {
       sales: 'Sales',
       total: 'Total',
       currency: '$',
+      currencyCode: "USD",
       discount: 'Discount',
       tax: 'Tax',
       subtotal: 'Subtotal',
