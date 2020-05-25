@@ -207,7 +207,7 @@
       this.deliveryTimeIntervalData = this.deliveryTimeInterval
     },
     mounted() {
-      this.openHoursData = this.openHours
+      this.openHoursData = _.cloneDeep(this.openHours)
       this.lastSavedData = JSON.stringify(this.openHoursData)
       this.errors = this.openHoursData.map(() => ({
         open: false,
@@ -306,19 +306,9 @@
         this.$set(this.errors[index], 'delivery', false)
         this.$set(this.errors[index], 'message', '')
         if(isStartTime) {
-          if(time < openHour.closeTime && time > openHour.openTime && time < openHour.deliveryEnd) {
-            this.$set(openHour, 'deliveryStart', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
+          this.$set(openHour, 'deliveryStart', time)
         } else {
-          if(time < openHour.closeTime && time > openHour.openTime && time > openHour.deliveryStart) {
-            this.$set(openHour, 'deliveryEnd', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
+          this.$set(openHour, 'deliveryEnd', time)
         }
 
         this.checkServiceHourError()
@@ -355,6 +345,7 @@
 
           if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
             this.$set(this.errors[index], 'delivery', true)
+            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
           } else {
             this.$set(this.errors[index], 'delivery', false)
             this.$set(this.errors[index], 'message', '')
