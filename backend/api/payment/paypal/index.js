@@ -107,42 +107,14 @@ router.post('/capture-order', async(req, res) => {
 })
 
 router.get('/list-transaction', async(req, res) => {
-  const { store_id, start_date, end_date } = req.query
-
-  const query =  { start_date, end_date, page_size: 5, transaction_status: 'S' }
-  try {
-    const responses = []
-    let response = await paypalApiV2.listTransaction(query, true)
-    if (response.statusCode === 200) {
-      responses.push(response);
-
-      // read remaining pages
-      const totalPages = response.result.total_pages
-      if (totalPages > 1) {
-        let page = 2;
-        while(page <= totalPages) {
-          response = await paypalApiV2.listTransaction({...query, page});
-          responses.push(response);
-          page++;
-        }
-      }
-
-      try {
-        // TODO: move un-necessary info
-        const transactions = []
-        _.each(responses, response => {
-          transactions.push.apply(transactions, response.result.transaction_details.filter(transaction => transaction.transaction_info.custom_field === store_id))
-        })
-        res.status(200).json({ transactions })
-      } catch (e) {
-        res.status(400).end()
-      }
-    } else {
-      res.status(400).end()
-    }
-  } catch (e) {
-    res.status(500).end()
-  }
+  const {
+    store_id,
+    start_date,
+    end_date,
+    output // detail | net_amount_only | ...
+  } = req.query
+  const transactions = await paypalApiV2.getTransactionByStore({ store_id, start_date, end_date, output })
+  res.json(transactions)
 })
 
 module.exports = router

@@ -37,6 +37,7 @@
         <multiple-printer v-if="view === 'setting-multiple-printer'" :store="store" @update="updateStore"/>
         <discount v-if="view === 'setting-discount'" :list-discount="listDiscount"
                   @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount" @updateDiscount="updateDiscount"/>
+        <payment-providers-transaction v-if="view === 'transaction'" :transaction-info="transactionsViewModel"></payment-providers-transaction>
       </div>
     </template>
   </div>
@@ -49,9 +50,12 @@
   import DeliveryFee from "./DeliveryFee";
   import MultiplePrinter from "./MultiplePrinter";
   import Discount from "./Discount";
+  import dayjs from 'dayjs';
+  import axios from 'axios';
+  import PaymentProvidersTransaction from './PaymentProvidersTransaction';
   export default {
     name: 'SettingView',
-    components: {Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: { PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
     data: function () {
       return {
         sidebarItems: [
@@ -65,6 +69,8 @@
           {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+          {title: 'Payment Setting', icon: 'icon-coupon', onClick: () => this.changeView('payment-provider', 'Payment Setting')},
+          {title: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
         ],
         sidebarItemsDevice: [
           {
@@ -84,7 +90,12 @@
         products: null,
         permissionDenied: true,
         permissionDeniedMessage: '',
-        listDiscount: []
+        listDiscount: [],
+        // payment providers
+        // todo: adjust start date, end date
+        startDate: dayjs('2020-05-01').format('YYYY-MM-DDTHH:mm:ss'),
+        endDate: dayjs('2020-05-30').format('YYYY-MM-DDTHH:mm:ss'),
+        transactions: []
       }
     },
     computed: {
@@ -93,6 +104,21 @@
       },
       isInDevice() {
         return this.$route.query.device
+      },
+      transactionsViewModel() {
+        return _.map(this.transactions, tran => {
+          const tranInfo = tran.transaction_info
+          const payerInfo = tran.payer_info
+          return {
+            transactionId: tranInfo.transaction_id,
+            date: tranInfo.transaction_initiation_date,
+            name: `Payment from ${payerInfo.payer_name.given_name}`,
+            grossAmount: parseFloat(tranInfo.transaction_amount.value) + Math.abs(parseFloat(tranInfo.fee_amount.value)),
+            netAmount: parseFloat(tranInfo.transaction_amount.value),
+            type: 'PayPal',
+            paidBy: payerInfo.email_address
+          }
+        })
       }
     },
     async created() {
@@ -116,6 +142,7 @@
           this.$set(this, 'store', store)
           await this.loadCategories()
           await this.loadProducts()
+          await this.listTransactions()
         } else {
           this.permissionDenied = true;
           this.permissionDeniedMessage = 'Permission denied!'
@@ -290,6 +317,24 @@
         } catch (e) {
           console.error(e)
         }
+      },
+      
+      // Payment Providers
+      async enablePayPal() {
+        await this.setEnablePayPal(true)
+      },
+      async disablePaypal() {
+        await this.setEnablePayPal(false)
+      },
+      async setEnablePayPal(value) {
+        const paymentProviders = this.store.paymentProviders;
+        paymentProviders.paypal = paymentProviders.paypal || {}
+        paymentProviders.paypal.enable = value
+        await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+      },
+      async listTransactions() {
+        const response = await axios.get(`/payment/paypal/list-transaction?store_id=${this.store._id}&start_date=${this.startDate}-0700&end_date=${this.endDate}-0700`)
+        this.transactions.splice(0, this.transactions.length, ...response.data.transactions)
       }
     }
   }
