@@ -57,7 +57,7 @@
             </g-tooltip>
             <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
               <template v-slot:activator="{on}">
-                <div class="menu-setting-item__btn ml-2"
+                <div class="menu-setting-item__btn ml-2" v-show="!isInDevice"
                      @mouseenter="on.mouseenter"
                      @mouseleave="on.mouseleave"
                      @click.stop.prevent="deleteItem">
@@ -117,6 +117,9 @@
       },
       cdnImage() {
         return getCdnUrl(this.image)
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     methods: {
