@@ -157,6 +157,11 @@
     name: 'OrderView',
     components: {DialogAddToOrder, CreatedOrder, MenuItem, OrderTable},
     data: function () {
+      // sunday in dayjs is 0 -> move to 6
+      let weekday = new Date().getUTCDay() - 1
+      if (weekday === -1)
+        weekday = 6
+      
       return {
         selectedCategoryId: null,
         selectedMenuItemId: null,
@@ -164,7 +169,7 @@
         store: null,
         categories: null,
         products: null,
-        today: dayjs().format("dddd"),
+        weekday: weekday,
         now: dayjs().format('HH:mm'),
         dialog: {
           closed: false,
@@ -177,6 +182,7 @@
         menuItemDisabled: false,
         orderItems: [],
         selectedProduct: null,
+        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
       }
     },
     filters: {
@@ -216,10 +222,8 @@
         // TODO
         alert('Store is not exist');
       }
-      this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
       this.now = dayjs().format('HH:mm')
       this.dayInterval = setInterval(() => {
-        this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
         this.now = dayjs().format('HH:mm')
       }, 1000)
       this.dialog.closed = !this.isStoreOpening
@@ -249,17 +253,6 @@
       // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
-      dayInWeeks() {
-        return [
-          $t('common.weekday.monday'),
-          $t('common.weekday.tuesday'),
-          $t('common.weekday.wednesday'),
-          $t('common.weekday.thursday'),
-          $t('common.weekday.friday'),
-          $t('common.weekday.saturday'),
-          $t('common.weekday.sunday')
-        ]
-      },
       shippingFee() {
         return this.$refs['order-table'].shippingFee
       },
@@ -288,11 +281,8 @@
         })
         return categories
       },
-      dayInWeekIndex() {
-        return this.dayInWeeks.indexOf(this.today)
-      },
       todayOpenHour() {
-        return this.getOpenHour(this.dayInWeekIndex)
+        return this.getOpenHour(this.weekday)
       },
       nextOpenHour() {
         if (this.todayOpenHour) {
@@ -304,20 +294,19 @@
               }
           }
         }
-
-        let dayInWeekIndex = this.dayInWeekIndex
+        let dayIndex = this.weekday
         do {
-          dayInWeekIndex++
-          if (dayInWeekIndex >= this.dayInWeeks.length - 1) dayInWeekIndex = 0
-          let openHour = this.getOpenHour(dayInWeekIndex)
-
+          dayIndex++
+          if (dayIndex > 6)
+            dayIndex = 0
+          let openHour = this.getOpenHour(dayIndex)
           if (openHour && openHour.length > 0) {
             return {
               hour: openHour[0].openTime,
-              day: this.dayInWeeks[dayInWeekIndex]
+              day: this.dayInWeeks[dayIndex]
             }
           }
-        } while (dayInWeekIndex !== this.dayInWeekIndex)
+        } while (dayIndex !== this.weekday)
       },
       merchantMessage() {
         if (this.nextOpenHour)
@@ -368,9 +357,13 @@
               if (days.length === 0) days.push({})
               let day = _.last(days)
               if(day.start) {
-                Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+                Object.assign(day, {
+                  end: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                })
               } else {
-                Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+                Object.assign(day, {
+                  start: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                })
               }
             }
           }
@@ -464,11 +457,11 @@
       clearOrder() {
         this.orderItems.splice(0, this.orderItems.length)
       },
-      getOpenHour(dayInWeekIndex) {
+      getOpenHour(weekday) {
         const openHours = []
 
         this.store.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
-          if (dayInWeeks[dayInWeekIndex]) {
+          if (dayInWeeks[weekday]) {
             openHours.push({openTime, closeTime})
           }
         })
