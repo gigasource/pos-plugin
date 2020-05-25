@@ -3,7 +3,7 @@
       <template  v-if="store">
         <div class="pos-order__left">
           <div class="pos-order__left__header">
-            <img :src="cdnStoreImageSrc || '/plugins/pos-plugin/assets/images/logo.png'"/>
+            <img :src="cdnStoreLogoImage"/>
             <div class="pos-order__left__header--info">
               <div>
                 <div class="row-flex align-items-center justify-end">
@@ -219,9 +219,10 @@
           }
         }
       } else {
-        // TODO
+        // TODO: show 404 not found
         alert('Store is not exist');
       }
+      
       this.now = dayjs().format('HH:mm')
       this.dayInterval = setInterval(() => {
         this.now = dayjs().format('HH:mm')
@@ -261,11 +262,6 @@
       },
       selectedMenuItem() {
         return _.find(this.selectedCategory.items, item => item._id === this.selectedMenuItem)
-      },
-      categoryItems() {
-        if (this.selectedCategory) {
-          return this.selectedCategory.items
-        }
       },
       totalPrice() {
         return _.sumBy(this.orderItems, item => (item.price + _.sumBy(item.modifiers, m => m.price * m.quantity)) * item.quantity )
@@ -427,8 +423,8 @@
         }
         return info
       },
-      cdnStoreImageSrc() {
-        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc)
+      cdnStoreLogoImage() {
+        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png')
       }
     },
     methods: {
