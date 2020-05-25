@@ -16,7 +16,12 @@
                 </template>
                 <div class="pa-2 bg-white">
                   <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
-                  <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                  <p class="fs-small text-grey-darken-3">
+                    {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
+                    <template v-if="type === 'allergic'">
+                      {{getAllergicType(value.types)}}
+                    </template>
+                  </p>
                 </div>
               </g-menu>
             </template>
@@ -167,6 +172,11 @@
           modifiers,
         })
         this.internalValue = false
+      },
+      getAllergicType(types) {
+        let allergens = ''
+        allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
+        return allergens
       }
     }
   }

@@ -26,9 +26,28 @@
             <span class="col-3 pl-1" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
           <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
-          <g-chip-group v-if="choices && choices.length > 0" :items="choices">
-              <template v-slot:item="{value, click, active, close}">{{value.name}}</template>
-          </g-chip-group>
+          <div class="menu-setting-item__extra-info">
+            <g-chip v-for="choice in choices" :key="choice._id">{{choice.name}}</g-chip>
+            <template v-for="(value, type) in mark">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+                <template v-slot:activator="{on}">
+                  <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent">
+                    <g-icon v-if="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
+                    <g-icon v-else size="20">{{`icon-${type}`}}</g-icon>
+                  </div>
+                </template>
+                <div class="pa-2 bg-white br-2">
+                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                  <p class="fs-small text-grey-darken-3">
+                    {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
+                    <template v-if="type === 'allergic'">
+                      {{getAllergicType(value.types)}}
+                    </template>
+                  </p>
+                </div>
+              </g-menu>
+            </template>
+          </div>
         </div>
         <div class="pt-3 h-100">
           <div class="menu-setting-item__price">{{$t('common.currency')}}{{price}}</div>
@@ -104,6 +123,11 @@
       return {
         mode: 'view',
         positioning: false,
+        menu: {
+          allergic: false,
+          spicy: false,
+          vegeterian: false
+        }
       }
     },
     filters: {
@@ -157,6 +181,11 @@
       toggleAvailable() {
         const val = this.available
         this.$emit('save', {available: !val})
+      },
+      getAllergicType(types) {
+        let allergens = ''
+        allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
+        return allergens
       }
     }
   }
@@ -237,9 +266,15 @@
       }
     }
 
-    .g-chip-group ::v-deep .g-chip__content {
-      font-size: 14px;
-      font-weight: 700;
+    &__extra-info {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      :v-deep .g-chip__content {
+        font-size: 14px;
+        font-weight: 700;
+      }
     }
 
     &__tax {
