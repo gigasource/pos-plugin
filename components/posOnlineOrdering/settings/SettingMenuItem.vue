@@ -29,7 +29,7 @@
           <div class="menu-setting-item__extra-info">
             <g-chip v-for="choice in choices" :key="choice._id">{{choice.name}}</g-chip>
             <template v-for="(value, type) in mark">
-              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
                   <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent">
                     <g-icon v-if="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
@@ -274,7 +274,7 @@
       align-items: center;
       flex-wrap: wrap;
 
-      :v-deep .g-chip__content {
+      ::v-deep .g-chip__content {
         font-size: 14px;
         font-weight: 700;
       }

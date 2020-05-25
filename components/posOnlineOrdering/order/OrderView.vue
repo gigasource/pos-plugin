@@ -146,8 +146,7 @@
   import _ from 'lodash';
   import OrderTable from './OrderTable';
   import MenuItem from './MenuItem';
-  import {smoothScrolling, disableBodyScroll, enableBodyScroll} from 'pos-vue-framework'
-  import CreatedOrder from './CreatedOrder';
+  import {smoothScrolling} from 'pos-vue-framework'
   import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
   import {autoResizeTextarea} from "../../logic/commonUtils";
   import { getCdnUrl } from '../../Store/utils';
@@ -155,7 +154,7 @@
 
   export default {
     name: 'OrderView',
-    components: {DialogAddToOrder, CreatedOrder, MenuItem, OrderTable},
+    components: {DialogAddToOrder, MenuItem, OrderTable},
     data: function () {
       // sunday in dayjs is 0 -> move to 6
       let weekday = new Date().getUTCDay() - 1
@@ -234,16 +233,12 @@
       this.throttle = _.throttle(this.handleScroll, 100)
       this.$nextTick(() => {
         if(this.$refs) {
-          if(!this.$refs.keys) {
-            setTimeout(() => {
-              const contentRef = this.$refs['tab-content']
-              contentRef && contentRef.addEventListener('scroll', this.throttle)
-              // contentRef && disableBodyScroll(contentRef)
-            }, 500)
-          } else {
-            const contentRef = this.$refs['tab-content']
-            contentRef && contentRef.addEventListener('scroll', this.throttle)
-          }
+          const interval = setInterval(() => {
+            if(this.$refs['tab-content']) {
+              this.$refs['tab-content'].addEventListener('scroll', this.throttle)
+              clearInterval(interval)
+            }
+          }, 500)
         }
         smoothScrolling && smoothScrolling()
       })
@@ -251,7 +246,6 @@
     beforeDestroy() {
       clearInterval(this.dayInterval)
       this.$refs['tab-content'] && this.$refs['tab-content'].removeEventListener('scroll', this.throttle)
-      // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
       shippingFee() {
@@ -408,9 +402,13 @@
                   if (days.length === 0) days.push({})
                   let day = _.last(days)
                   if(day.start) {
-                    Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+                    Object.assign(day, {
+                      end: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                    })
                   } else {
-                    Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+                    Object.assign(day, {
+                      start: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                    })
                   }
                 }
               }
