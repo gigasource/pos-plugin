@@ -76,6 +76,7 @@ module.exports = {
       mustard: 'Senf',
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
+      messageConfirm: 'Your order will be sent to the restaurant.',
     },
 
     common: {

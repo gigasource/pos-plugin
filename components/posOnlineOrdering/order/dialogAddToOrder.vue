@@ -7,7 +7,7 @@
           <div class="dialog-header__name">
             {{name}}
             <template v-for="(value, type) in mark">
-              <g-menu v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+              <g-menu v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
                   <div v-show="value.active" v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
                     <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>

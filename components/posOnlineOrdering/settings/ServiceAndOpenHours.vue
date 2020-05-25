@@ -3,7 +3,7 @@
     <div class="service-setting__title">Service & Open hours</div>
     <div class="service-setting__content mb-2">
       <div style="display: flex">
-        <div class="mb-3 fw-700">Open hours</div>
+        <div class="mb-3 fw-700">Open hours & Delivery hours</div>
         <g-spacer/>
         <g-btn-bs class="btn-add" @click="addNewOpenHour()">+ Add new</g-btn-bs>
       </div>

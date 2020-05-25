@@ -152,7 +152,7 @@
             <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
           </div>
         </g-btn-bs>
-        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="confirmPayment" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
+        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="dialog.confirm = true" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
       </div>
       <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
         <g-badge :value="true" color="#4CAF50" overlay>
@@ -166,7 +166,7 @@
         <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
         <g-spacer/>
         <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
+        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="dialog.confirm = true" style="padding: 8px 16px" elevation="5">
           {{$t('store.confirm')}}
         </g-btn-bs>
       </div>
@@ -177,6 +177,14 @@
                    :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
+    <dialog-order-confirm v-model="dialog.confirm"
+                          :items="orderItems"
+                          :total-items="totalItems"
+                          :total-price="totalPrice"
+                          :shipping-fee="shippingFee"
+                          :discounts="discounts"
+                          :effective-total="effectiveTotal"
+                          @confirm="confirmPayment"/>
   </div>
 </template>
 
@@ -187,11 +195,12 @@
   import {get12HourValue, get24HourValue, incrementTime} from "../../logic/timeUtil";
   import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
+  import DialogOrderConfirm from "./dialogOrderConfirm";
   import PayPalSmartButton from './PayPalSmartButton';
 
   export default {
     name: 'OrderTable',
-    components: { PayPalSmartButton, OrderCreated },
+    components: {DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -216,7 +225,8 @@
         },
         dialog: {
           value: false,
-          order: {}
+          order: {},
+          confirm: false,
         },
         couponTf: {
           active: false,
@@ -399,9 +409,10 @@
         const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
-          this.storeOpenHours.forEach(({deliveryStart, deliveryEnd}) => {
-            let [openTimeHour, openTimeMinute] = get24HourValue(deliveryStart).split(':')
-            let [closeTimeHour, closeTimeMinute] = get24HourValue(deliveryEnd).split(':')
+          this.storeOpenHours.forEach(({openTime, closeTime, deliveryStart, deliveryEnd}) => {
+            const start = deliveryStart ? deliveryStart : openTime, end = deliveryEnd ? deliveryEnd : closeTime
+            let [openTimeHour, openTimeMinute] = get24HourValue(start).split(':')
+            let [closeTimeHour, closeTimeMinute] = get24HourValue(end).split(':')
 
             openTimeHour = parseInt(openTimeHour)
             openTimeMinute = parseInt(openTimeMinute)

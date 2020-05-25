@@ -361,6 +361,7 @@ module.exports = {
       mustard: 'Mustard',
       soya: 'Soya',
       sulphur: 'Sulphur Dioxide',
+      messageConfirm: 'Your order will be sent to the restaurant.',
     }
   }
 }
