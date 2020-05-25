@@ -104,7 +104,7 @@
     <!-- Action button -->
     <div style="display: flex; padding: 13px 8px; background-color: #FFF">
       <g-btn-bs @click="addChoice" border-color="#5E76FE">+ Choice</g-btn-bs>
-      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE">Mark item as</g-btn-bs>
+      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE">Extra info</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
@@ -128,36 +128,18 @@
         </g-card-text>
       </g-card>
     </g-dialog>
-    <g-dialog v-model="dialog.markItem" width="531" eager>
-      <div class="dialog">
-        <div class="dialog-title">Mark item as</div>
-        <g-icon size="20" class="dialog-icon--close" @click="dialog.markItem = false">icon-close</g-icon>
-        <div class="dialog-content">
-          <g-checkbox color="#536DFE" v-model="internalMark.allergic.active" label="Allergic"/>
-          <g-textarea :disabled="!internalMark.allergic.active" prepend-inner-icon="icon-allergic@20" outlined no-resize :rows="2"
-                      v-model="internalMark.allergic.notice" placeholder="This item may contain food allergens!" @click="openDialogInput('allergic')"/>
-          <g-checkbox color="#536DFE" v-model="internalMark.spicy.active" label="Spicy"/>
-          <g-textarea :disabled="!internalMark.spicy.active" prepend-inner-icon="icon-spicy@20" outlined no-resize :rows="2"
-                      v-model="internalMark.spicy.notice" placeholder="This item may contain spicy ingredients!" @click="openDialogInput('spicy')"/>
-          <g-checkbox color="#536DFE" v-model="internalMark.vegeterian.active" label="Vegeterian"/>
-          <g-textarea :disabled="!internalMark.vegeterian.active" prepend-inner-icon="icon-vegeterian@20" outlined no-resize :rows="2"
-                      v-model="internalMark.vegeterian.notice" placeholder="This item is marked as meat-free and suitable for vegetarians!" @click="openDialogInput('vegeterian')"/>
-        </div>
-      </div>
-    </g-dialog>
-    <dialog-text-filter label="Allergic Notice" v-model="dialog.allergic" :default-value="internalMark.allergic.notice" @submit="changeMarkNotice($event, 'allergic')"/>
-    <dialog-text-filter label="Spicy Notice" v-model="dialog.spicy" :default-value="internalMark.spicy.notice" @submit="changeMarkNotice($event, 'spicy')"/>
-    <dialog-text-filter label="Vegeterian Notice" v-model="dialog.vegeterian" :default-value="internalMark.vegeterian.notice" @submit="changeMarkNotice($event, 'vegeterian')"/>
+    <dialog-add-extra-info v-model="dialog.markItem" :mark="internalMark" @save="internalMark = $event"/>
   </div>
 </template>
 <script>
   import _ from 'lodash'
   import { getCdnUrl } from '../../Store/utils';
   import UploadZone from "./UploadZone";
+  import DialogAddExtraInfo from "./dialogAddExtraInfo";
 
   export default {
     name: 'NewMenuItem',
-    components: { UploadZone },
+    components: {DialogAddExtraInfo, UploadZone },
     props: {
       id: String,
       index: Number,
@@ -198,7 +180,8 @@
       let internalMark = Object.assign({
         allergic: {
           active: false,
-          notice: ''
+          notice: '',
+          types: []
         },
         spicy: {
           active: false,
@@ -210,12 +193,14 @@
         }
       }, this.mark || {})
 
+      let internalTax = isNaN(this.tax) ? 7 : this.tax
+
       return {
         internalId: this.id || '',
         internalName: this.name,
         internalDesc: this.desc,
         internalPrice: this.price,
-        internalTax: this.tax || 7,
+        internalTax,
         internalImage: this.image,
         internalPrinter,
         taxes: [],
@@ -231,9 +216,6 @@
           value: false,
           noUpload: false,
           markItem: false,
-          allergic: false,
-          spicy: false,
-          vegeterian: false,
         },
         choice: {
           name: '',
@@ -341,7 +323,8 @@
           showImage: this.showImage,
           available: this.available,
           choices: this.internalChoices.map(choice => ({...choice, name: choice.name.toUpperCase()})),
-          mark: this.internalMark
+          mark: this.internalMark,
+          position: this.index
         })
       },
       openDialogInput(dialogModel) {
@@ -376,9 +359,6 @@
           }
         this.editOption(this.choice.choiceIndex, this.choice.optionIndex, option)
       },
-      changeMarkNotice(notice, markType) {
-        this.internalMark[markType].notice = notice
-      }
     }
   }
 </script>
@@ -632,70 +612,4 @@
     }
   }
 
-  .dialog {
-    width: 100%;
-    background: white;
-    border-radius: 4px;
-    padding: 24px;
-    position: relative;
-
-    &-title {
-      font-weight: 600;
-      font-size: 24px;
-      margin-bottom: 16px;
-      color: #212121;
-    }
-
-    &-icon--close {
-      position: absolute;
-      top: 16px;
-      right: 16px
-    }
-
-    &-content {
-      .g-checkbox-wrapper {
-        margin: 0;
-
-        ::v-deep {
-          .g-checkbox {
-            padding-left: 20px;
-
-            &-label {
-              font-size: 14px;
-              font-weight: 700;
-              color: black;
-            }
-
-            &-checkmark:before {
-              top: 1px;
-            }
-          }
-        }
-      }
-
-      .g-textarea ::v-deep {
-        fieldset {
-          border-color: #9e9e9e !important;
-          border-width: 1px !important;
-        }
-
-        .g-tf-prepend__inner {
-          padding-top: 6px;
-        }
-
-        .g-tf-input {
-          font-size: 14px;
-          color: #424242;
-          padding-top: 6px;
-          padding-bottom: 0;
-          line-height: 18px !important;
-          height: 40px !important;
-        }
-
-        .g-tf-append__inner {
-          display: none;
-        }
-      }
-    }
-  }
 </style>

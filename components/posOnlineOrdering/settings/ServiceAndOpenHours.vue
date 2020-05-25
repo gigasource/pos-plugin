@@ -30,6 +30,17 @@
                                @input="updateHours($event, index, false)"/>
         </div>
         <g-spacer/>
+        <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].delivery && 'error']">
+          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+                               :value="getDeliveryTime(openHour, 'from')"
+                               @input="updateDeliveryHours($event, index, true)"/>
+        </div>
+        <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].delivery && 'error']">
+          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+                               :value="getDeliveryTime(openHour, 'to')"
+                               @input="updateDeliveryHours($event, index, false)"/>
+        </div>
+        <g-spacer/>
         <div @click="removeOpenHour(openHour)" class="open-hour__row--btn">
           <g-icon size="16">icon-close</g-icon>
         </div>
@@ -182,8 +193,8 @@
       hasError() {
         let result = false
 
-        this.errors.forEach(({message, open, close}) => {
-          if ((message && message.length > 0) || open || close) result = true
+        this.errors.forEach(({message, open, close, delivery}) => {
+          if ((message && message.length > 0) || open || close || delivery) result = true
         })
 
         return result
@@ -201,6 +212,7 @@
       this.errors = this.openHoursData.map(() => ({
         open: false,
         close: false,
+        delivery: false,
         message: ''
       }))
     },
@@ -209,7 +221,9 @@
         const newOpenHour = {
           dayInWeeks: [false, false, false, false, false, false, false],
           openTime: '06:30',
-          closeTime: '23:30'
+          closeTime: '23:30',
+          deliveryStart: '06:30',
+          deliveryEnd: '23:30'
         }
         this.openHoursData = [...this.openHoursData, newOpenHour]
 
@@ -238,6 +252,14 @@
         }
         if(type === 'close') {
           return this.country.name === 'United State' ? get12HourValue(openHour.closeTime) : openHour.closeTime
+        }
+      },
+      getDeliveryTime(openHour, type) {
+        if (type === 'from') {
+          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryStart) : openHour.deliveryStart
+        }
+        if (type === 'to') {
+          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryEnd) : openHour.deliveryEnd
         }
       },
       updateHours(time, index, isOpenTime) {
@@ -272,6 +294,35 @@
 
         this.checkServiceHourError()
       },
+      updateDeliveryHours(time, index, isStartTime) {
+        time = get24HourValue(time)
+        const openHour = this.openHoursData[index]
+        this.$set(this.errors[index], 'message', '')
+        if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
+          this.$set(this.errors[index], 'delivery', true)
+          this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
+          return
+        }
+        this.$set(this.errors[index], 'delivery', false)
+        this.$set(this.errors[index], 'message', '')
+        if(isStartTime) {
+          if(time < openHour.closeTime && time > openHour.openTime && time < openHour.deliveryEnd) {
+            this.$set(openHour, 'deliveryStart', time)
+          } else {
+            this.$set(this.errors[index], 'delivery', true)
+            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
+          }
+        } else {
+          if(time < openHour.closeTime && time > openHour.openTime && time > openHour.deliveryStart) {
+            this.$set(openHour, 'deliveryEnd', time)
+          } else {
+            this.$set(this.errors[index], 'delivery', true)
+            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
+          }
+        }
+
+        this.checkServiceHourError()
+      },
       toggleMinimumOrderValue(active) {
         this.computedMinimumOrderValue = Object.assign({}, this.computedMinimumOrderValue, { active })
       },
@@ -279,7 +330,7 @@
         this.computedMinimumOrderValue = Object.assign({}, this.computedMinimumOrderValue, {value})
       },
       checkServiceHourError() {
-        this.openHoursData.forEach(({dayInWeeks, openTime, closeTime}, index) => {
+        this.openHoursData.forEach(({dayInWeeks, openTime, closeTime, deliveryStart, deliveryEnd}, index) => {
           for (let i = 0; i < dayInWeeks.length; i++) {
             if (!dayInWeeks[i]) continue
 
@@ -301,6 +352,14 @@
 
           this.$set(this.errors[index], 'open', false)
           this.$set(this.errors[index], 'close', false)
+
+          if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
+            this.$set(this.errors[index], 'delivery', true)
+          } else {
+            this.$set(this.errors[index], 'delivery', false)
+            this.$set(this.errors[index], 'message', '')
+          }
+
         })
       },
       updateDeliveryTimeInterval() {

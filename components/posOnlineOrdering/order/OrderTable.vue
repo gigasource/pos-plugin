@@ -60,6 +60,9 @@
                     style="color: #4CAF50; font-size: 15px">
                 {{$t('store.minimumWarning')}}{{$t('common.currency')}}{{store.minimumOrderValue.value}}.
               </span>
+              <span v-if="orderType === 'delivery' && !satisfyDeliveryTime" style="color: #4CAF50; font-size: 15px">
+                {{$t('store.deliveryTimeWarning')}}{{deliveryTimeString}}
+              </span>
               <div class="section-form">
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
                 <g-text-field v-model="customer.company" :label="$t('store.company')" clearable clear-icon="icon-cancel@16" prepend-icon="icon-company@16"/>
@@ -181,7 +184,7 @@
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
-  import {get24HourValue, incrementTime} from "../../logic/timeUtil";
+  import {get12HourValue, get24HourValue, incrementTime} from "../../logic/timeUtil";
   import {autoResizeTextarea} from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
   import PayPalSmartButton from './PayPalSmartButton';
@@ -269,6 +272,20 @@
           ? this.totalPrice >= this.store.minimumOrderValue.value
           : true
       },
+      satisfyDeliveryTime() {
+        let result = false, now = dayjs().format('HH:mm'), inWorkingTime = false, havingDeliveryTime = false
+        this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
+          if(deliveryStart && deliveryEnd) havingDeliveryTime = true
+          if(now >= deliveryStart && now <= deliveryEnd) result = true
+          if(now >= openTime && now <= closeTime) inWorkingTime = true
+        })
+        if(!havingDeliveryTime) result = inWorkingTime
+        return result
+      },
+      deliveryTimeString() {
+        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
+      },
       orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
@@ -295,6 +312,7 @@
         const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
         if (this.orderType === 'delivery') {
           if (!this.satisfyMinimumValue) return true
+          if (!this.satisfyDeliveryTime) return true
           for (const fn of this.validateZipcode) {
             if (typeof fn === 'function' && typeof fn(this.customer.zipCode) === 'string') {
               return true
@@ -381,9 +399,9 @@
         const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
-          this.storeOpenHours.forEach(({openTime, closeTime}) => {
-            let [openTimeHour, openTimeMinute] = get24HourValue(openTime).split(':')
-            let [closeTimeHour, closeTimeMinute] = get24HourValue(closeTime).split(':')
+          this.storeOpenHours.forEach(({deliveryStart, deliveryEnd}) => {
+            let [openTimeHour, openTimeMinute] = get24HourValue(deliveryStart).split(':')
+            let [closeTimeHour, closeTimeMinute] = get24HourValue(deliveryEnd).split(':')
 
             openTimeHour = parseInt(openTimeHour)
             openTimeMinute = parseInt(openTimeMinute)

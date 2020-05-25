@@ -109,6 +109,16 @@
           "schemaType": "string",
           "key": "closeTime",
           "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "deliveryStart",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "deliveryEnd",
+          "type": "input"
         }
       ],
       "type": "array"

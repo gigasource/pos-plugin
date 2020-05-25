@@ -21,7 +21,12 @@
                 </template>
                 <div class="pa-2 bg-white br-2">
                   <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
-                  <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                  <p class="fs-small text-grey-darken-3">
+                    {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
+                    <template v-if="type === 'allergic'">
+                      {{getAllergicType(value.types)}}
+                    </template>
+                  </p>
                 </div>
               </g-menu>
             </template>
@@ -38,7 +43,12 @@
               </template>
               <div class="pa-2 bg-white br-2">
                 <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
-                <p class="fs-small text-grey-darken-3">{{value.notice ? value.notice : $t(`store.${type}Notice`)}}</p>
+                <p class="fs-small text-grey-darken-3">
+                  {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
+                  <template v-if="type === 'allergic'">
+                    {{getAllergicType(value.types)}}
+                  </template>
+                </p>
               </div>
             </g-menu>
           </template>
@@ -122,6 +132,11 @@
       },
       increaseQuantity() {
         this.$emit('increase', this._id)
+      },
+      getAllergicType(types) {
+        let allergens = ''
+        allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
+        return allergens
       }
     },
     computed: {

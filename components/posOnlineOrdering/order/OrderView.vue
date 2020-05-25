@@ -3,7 +3,7 @@
       <template  v-if="store">
         <div class="pos-order__left">
           <div class="pos-order__left__header">
-            <img :src="cdnStoreImageSrc || '/plugins/pos-plugin/assets/images/logo.png'"/>
+            <img :src="cdnStoreLogoImage"/>
             <div class="pos-order__left__header--info">
               <div>
                 <div class="row-flex align-items-center justify-end">
@@ -157,6 +157,11 @@
     name: 'OrderView',
     components: {DialogAddToOrder, CreatedOrder, MenuItem, OrderTable},
     data: function () {
+      // sunday in dayjs is 0 -> move to 6
+      let weekday = new Date().getUTCDay() - 1
+      if (weekday === -1)
+        weekday = 6
+      
       return {
         selectedCategoryId: null,
         selectedMenuItemId: null,
@@ -164,6 +169,7 @@
         store: null,
         categories: null,
         products: null,
+        weekday: weekday,
 
         today: dayjs().format("dddd"),
         now: dayjs().format('HH:mm'),
@@ -178,6 +184,7 @@
         menuItemDisabled: false,
         orderItems: [],
         selectedProduct: null,
+        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
       }
     },
     filters: {
@@ -215,13 +222,12 @@
           }
         }
       } else {
-        // TODO
+        // TODO: show 404 not found
         alert('Store is not exist');
       }
-      this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
+      
       this.now = dayjs().format('HH:mm')
       this.dayInterval = setInterval(() => {
-        this.today = this.$t(`common.weekday.${dayjs().format('dddd').toLowerCase()}`)
         this.now = dayjs().format('HH:mm')
       }, 1000)
       this.dialog.closed = !this.isStoreOpening
@@ -251,17 +257,6 @@
       // enableBodyScroll(this.$refs['tab-content'])
     },
     computed: {
-      dayInWeeks() {
-        return [
-          $t('common.weekday.monday'),
-          $t('common.weekday.tuesday'),
-          $t('common.weekday.wednesday'),
-          $t('common.weekday.thursday'),
-          $t('common.weekday.friday'),
-          $t('common.weekday.saturday'),
-          $t('common.weekday.sunday')
-        ]
-      },
       shippingFee() {
         return this.$refs['order-table'].shippingFee
       },
@@ -270,11 +265,6 @@
       },
       selectedMenuItem() {
         return _.find(this.selectedCategory.items, item => item._id === this.selectedMenuItem)
-      },
-      categoryItems() {
-        if (this.selectedCategory) {
-          return this.selectedCategory.items
-        }
       },
       totalPrice() {
         return _.sumBy(this.orderItems, item => (item.price + _.sumBy(item.modifiers, m => m.price * m.quantity)) * item.quantity )
@@ -290,11 +280,8 @@
         })
         return categories
       },
-      dayInWeekIndex() {
-        return this.dayInWeeks.indexOf(this.today)
-      },
       todayOpenHour() {
-        return this.getOpenHour(this.dayInWeekIndex)
+        return this.getOpenHour(this.weekday)
       },
       nextOpenHour() {
         if (this.todayOpenHour) {
@@ -306,20 +293,19 @@
               }
           }
         }
-
-        let dayInWeekIndex = this.dayInWeekIndex
+        let dayIndex = this.weekday
         do {
-          dayInWeekIndex++
-          if (dayInWeekIndex >= this.dayInWeeks.length - 1) dayInWeekIndex = 0
-          let openHour = this.getOpenHour(dayInWeekIndex)
-
+          dayIndex++
+          if (dayIndex > 6)
+            dayIndex = 0
+          let openHour = this.getOpenHour(dayIndex)
           if (openHour && openHour.length > 0) {
             return {
               hour: openHour[0].openTime,
-              day: this.dayInWeeks[dayInWeekIndex]
+              day: this.dayInWeeks[dayIndex]
             }
           }
-        } while (dayInWeekIndex !== this.dayInWeekIndex)
+        } while (dayIndex !== this.weekday)
       },
       merchantMessage() {
         if (this.nextOpenHour)
@@ -370,9 +356,13 @@
               if (days.length === 0) days.push({})
               let day = _.last(days)
               if(day.start) {
-                Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+                Object.assign(day, {
+                  end: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                })
               } else {
-                Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+                Object.assign(day, {
+                  start: $t('common.weekday.' + this.dayInWeeks[i].toLowerCase()).substr(0, 3)
+                })
               }
             }
           }
@@ -408,11 +398,36 @@
               title: $t('store.deliveryFee'),
               value: max > min ? `${$t('common.currency')}${min} - ${$t('common.currency')}${max}` : `${$t('common.currency')}${max}`
             })
+
+          if(this.store.openHours) {
+            let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+            this.store.openHours.forEach(oh => {
+              let days = []
+              for(let i = 0; i < oh.dayInWeeks.length; i++) {
+                const weekday = oh.dayInWeeks[i]
+                if(!weekday)
+                  days.push({})
+                else {
+                  if (days.length === 0) days.push({})
+                  let day = _.last(days)
+                  if(day.start) {
+                    Object.assign(day, {end: this.dayInWeeks[i].slice(0, 3)})
+                  } else {
+                    Object.assign(day, {start: this.dayInWeeks[i].slice(0, 3)})
+                  }
+                }
+              }
+              info.push({
+                title: days.filter(d => !_.isEmpty(d)).map(d => d.start + (d.end ? ` - ${d.end}` : '')).join(', '),
+                value: oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`
+              })
+            })
+          }
         }
         return info
       },
-      cdnStoreImageSrc() {
-        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc)
+      cdnStoreLogoImage() {
+        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png')
       }
     },
     methods: {
@@ -441,11 +456,11 @@
       clearOrder() {
         this.orderItems.splice(0, this.orderItems.length)
       },
-      getOpenHour(dayInWeekIndex) {
+      getOpenHour(weekday) {
         const openHours = []
 
         this.store.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
-          if (dayInWeeks[dayInWeekIndex]) {
+          if (dayInWeeks[weekday]) {
             openHours.push({openTime, closeTime})
           }
         })
@@ -470,11 +485,11 @@
         } : {borderBottom: '2px solid transparent', color: '#424242'}
       },
       openDialogAdd(item) {
-        this.selectedProduct = item
         if(!item.choices || item.choices.length === 0) { //item without choice instancely add
           this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
           return
         }
+        this.selectedProduct = item
         this.dialog.add = true
       },
       addItemToOrder(item) {

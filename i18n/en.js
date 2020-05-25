@@ -341,11 +341,26 @@ module.exports = {
       deliveryFee: 'Delivery fee',
       notice: 'Notice',
       allergic: 'Allergic',
-      allergicNotice: 'This item may contain food allergens!',
+      allergicNotice: 'This item may contain food allergens:',
       spicy: 'Spicy',
       spicyNotice: 'This item may contain spicy ingredients!',
       vegeterian: 'Vegeterian',
-      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!'
+      vegeterianNotice: 'This item is marked as meat-free and suitable for vegetarians!',
+      deliveryTimeWarning: 'Today delivery service is available between ',
+      eggs: 'Eggs',
+      fish: 'Fish',
+      milk: 'Milk',
+      celery: 'Celery',
+      cereal: 'Cereals containing gluten',
+      nuts: 'Nuts',
+      peanuts: 'Peanuts',
+      sesame: 'Sesame Seeds',
+      crustaceans: 'Crustaceans',
+      lupin: 'Lupin',
+      molluscs: 'Molluscs',
+      mustard: 'Mustard',
+      soya: 'Soya',
+      sulphur: 'Sulphur Dioxide',
     }
   }
 }
