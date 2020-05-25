@@ -201,6 +201,17 @@
               "schemaType": "string",
               "key": "notice",
               "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "types",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "type": "input"
+                }
+              ]
             }
           ]
         },
