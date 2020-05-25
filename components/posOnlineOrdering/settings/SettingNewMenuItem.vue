@@ -193,12 +193,14 @@
         }
       }, this.mark || {})
 
+      let internalTax = isNaN(this.tax) ? 7 : this.tax
+
       return {
         internalId: this.id || '',
         internalName: this.name,
         internalDesc: this.desc,
         internalPrice: this.price,
-        internalTax: this.tax || 7,
+        internalTax,
         internalImage: this.image,
         internalPrinter,
         taxes: [],
