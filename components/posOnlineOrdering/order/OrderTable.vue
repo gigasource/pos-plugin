@@ -247,7 +247,7 @@
         addressSuggestions: [],
         addressStr: '',
         addressNo: '',
-        throttledGetSuggestions: null
+        throttledGetSuggestions: null,
         paypalOrderDetail: {}
       }
     },
