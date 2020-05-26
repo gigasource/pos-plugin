@@ -511,13 +511,11 @@
       },
       handleScroll() {
         if(this.choosing > 0) return
-        const categoryInViewPort = this.categories.map(c => c._id).map(id => {
+        const categoryInViewPort = this.categories.filter(({_id: id}) => {
           const el = document.getElementById(`category_content_${id}`);
-          if(this.elementInWrapper(el)) {
-            return id
-          }
+          return this.elementInWrapper(el)
         })
-        this.selectedCategoryId = categoryInViewPort.filter(c => !!c)[0]
+        this.selectedCategoryId = categoryInViewPort[0]._id
         const wrapper = document.getElementById('tab-content')
         if(!this.selectedCategoryId || (wrapper.offsetHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
