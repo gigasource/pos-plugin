@@ -92,7 +92,7 @@
           if (item.feature === 'orderHistory')
             return this.user.role === 'admin' || this.user.viewOrderHistory
           if (item.feature === 'onlineOrdering')
-            return this.user.role === 'admin' || this.user.viewOnlineOrderMenu
+            return (this.user.role === 'admin' || this.user.viewOnlineOrderMenu) && this.enabledFeatures.includes(item.feature)
           return this.enabledFeatures.includes(item.feature)
         })
       },

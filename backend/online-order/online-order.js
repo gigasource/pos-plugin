@@ -421,5 +421,41 @@ module.exports = async cms => {
         callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
     })
+
+    socket.on('getOnlineDeviceServices', async (callback) => {
+      const deviceId = await getDeviceId()
+      if (!onlineOrderSocket || !deviceId) return callback(null);
+
+      try {
+        onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({ services: { delivery, pickup, noteToCustomers }, error }) => {
+          if (error) return callback({ error })
+          await cms.getModel('PosSetting').findOneAndUpdate({}, {
+            $set: {
+              'onlineDevice.services': { delivery, pickup, noteToCustomers: noteToCustomers || '' }
+            }
+          })
+          const services = {delivery, pickup, noteToCustomers}
+          callback({ services })
+        })
+      } catch (error) {
+        const posSetting = cms.getModel('PosSetting').findOne()
+        callback(posSetting.onlineDevice.services, error)
+      }
+    })
+
+    socket.on('updateOnlineDeviceServices', async (services, callback) => {
+      const deviceId = await getDeviceId()
+      if (!onlineOrderSocket || !deviceId) return callback(null);
+
+      try {
+        onlineOrderSocket.emit('updateWebshopServices', deviceId, services, async ({ success, error }) => {
+          if (error) return callback({ error })
+          await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { 'onlineDevice.services': services } })
+          callback({ success })
+        })
+      } catch (error) {
+        callback({ error })
+      }
+    })
   })
 }

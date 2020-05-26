@@ -116,6 +116,17 @@
               })
             },
             title: this.$t('sidebar.functions')
+          },
+          {
+            icon: 'icon-services',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Services',
+                params: ''
+              })
+            },
+            title: 'Services',
+            feature: 'onlineOrdering'
           }
         ],
       }
@@ -123,11 +134,11 @@
     computed: {
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
-        if(this.user && this.user.role !== 'admin') {
+        if (this.user && this.user.role !== 'admin') {
           if (!this.user.viewOnlineOrderMenu) {
             sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering')
           } else if (!this.user.viewOrder) {
-            const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering')
+            const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
             onlineOrder && onlineOrder.items.splice(1, 2)
           }
         }
@@ -243,6 +254,22 @@
           </div>);
 
         this.showSnackbar(contentFn, '#E57373', 0)
+      },
+      showErrorSnackbar(error, timeout = 5000) {
+        const contentFn = () => (
+          <div style="margin: 0 auto" class="row-flex align-items-center">
+            <span>{error.message || error}</span>
+          </div>);
+
+        this.showSnackbar(contentFn, '#E57373', timeout)
+      },
+      showInfoSnackbar(text, timeout = 5000) {
+        const contentFn = () => (
+          <div style="margin: 0 auto" class="row-flex align-items-center">
+            <span>{text}</span>
+          </div>);
+
+        this.showSnackbar(contentFn, '#536dfe', timeout)
       }
     },
     async created() {

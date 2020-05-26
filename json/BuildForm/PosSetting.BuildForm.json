@@ -875,6 +875,28 @@
           "key": "orderTimeout",
           "type": "input@number",
           "addable": true
+        },
+        {
+          "schemaType": "object",
+          "key": "services",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "delivery",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "boolean",
+              "key": "pickup",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "string",
+              "key": "noteToCustomers",
+              "type": "input"
+            }
+          ],
+          "type": "object"
         }
       ]
     },
