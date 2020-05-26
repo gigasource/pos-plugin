@@ -33,13 +33,36 @@
             @update-product="updateProduct"
             @delete-product="deleteProduct"
             @swap-category="swapCategory"/>
-        <delivery-fee v-if="view === 'setting-delivery-fee'" :store="store" @update="updateStore"/>
-        <multiple-printer v-if="view === 'setting-multiple-printer'" :store="store" @update="updateStore"/>
-        <discount v-if="view === 'setting-discount'" :list-discount="listDiscount"
-                  @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount" @updateDiscount="updateDiscount"/>
-        <payment-providers-transaction v-if="view === 'transaction'" :transaction-info="transactionsViewModel"></payment-providers-transaction>
+        <delivery-fee
+            v-if="view === 'setting-delivery-fee'"
+            :store="store"
+            @update="updateStore"/>
+        <multiple-printer
+            v-if="view === 'setting-multiple-printer'"
+            :store="store"
+            @update="updateStore"/>
+        <discount
+            v-if="view === 'setting-discount'"
+            :list-discount="listDiscount"
+            @addDiscount="addDiscount"
+            @getDiscounts="getDiscounts"
+            @removeDiscount="removeDiscount"
+            @updateDiscount="updateDiscount"/>
+        <payment-providers
+            v-if="view === 'payment-provider'"
+            :store="store"
+            @deactivePayPalProvider="dialog.disablePaypalDialog.show = true"
+            @activePayPalProvider="enablePayPal"/>
+        <payment-providers-transaction
+            v-if="view === 'transaction'"
+            :store="store"/>
       </div>
     </template>
+    
+    <disable-paypal-dialog-prompt
+        v-model="dialog.disablePaypalDialog.show"
+        @close="dialog.disablePaypalDialog.show = false"
+        @submit="disablePaypal"/>
   </div>
 </template>
 <script>
@@ -53,9 +76,11 @@
   import dayjs from 'dayjs';
   import axios from 'axios';
   import PaymentProvidersTransaction from './PaymentProvidersTransaction';
+  import PaymentProviders from './PaymentProviders';
+  import DisablePaypalDialogPrompt from './DisablePaypalDialogPrompt';
   export default {
     name: 'SettingView',
-    components: { PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: { DisablePaypalDialogPrompt, PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
     data: function () {
       return {
         sidebarItems: [
@@ -69,8 +94,14 @@
           {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
-          {title: 'Payment Setting', icon: 'icon-coupon', onClick: () => this.changeView('payment-provider', 'Payment Setting')},
-          {title: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
+          {
+            title: 'Payment Setting',
+            icon: 'icon-coupon',
+            onClick: () => this.changeView('payment-provider', 'Payment Setting'),
+            items: [
+              {title: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
+            ]
+          },
         ],
         sidebarItemsDevice: [
           {
@@ -95,7 +126,11 @@
         // todo: adjust start date, end date
         startDate: dayjs('2020-05-01').format('YYYY-MM-DDTHH:mm:ss'),
         endDate: dayjs('2020-05-30').format('YYYY-MM-DDTHH:mm:ss'),
-        transactions: []
+        dialog: {
+          disablePaypalDialog: {
+            show: false
+          }
+        }
       }
     },
     computed: {
@@ -105,21 +140,6 @@
       isInDevice() {
         return this.$route.query.device
       },
-      transactionsViewModel() {
-        return _.map(this.transactions, tran => {
-          const tranInfo = tran.transaction_info
-          const payerInfo = tran.payer_info
-          return {
-            transactionId: tranInfo.transaction_id,
-            date: tranInfo.transaction_initiation_date,
-            name: `Payment from ${payerInfo.payer_name.given_name}`,
-            grossAmount: parseFloat(tranInfo.transaction_amount.value) + Math.abs(parseFloat(tranInfo.fee_amount.value)),
-            netAmount: parseFloat(tranInfo.transaction_amount.value),
-            type: 'PayPal',
-            paidBy: payerInfo.email_address
-          }
-        })
-      }
     },
     async created() {
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
@@ -142,7 +162,6 @@
           this.$set(this, 'store', store)
           await this.loadCategories()
           await this.loadProducts()
-          await this.listTransactions()
         } else {
           this.permissionDenied = true;
           this.permissionDeniedMessage = 'Permission denied!'
@@ -174,6 +193,7 @@
         await this.updateStore({deliveryTimeInterval: val})
       },
       changeView(view, title) {
+        // TODO: Known-issue: This method doesn't work with 2nd level icon
         if (view) {
           this.view = view
           //reset icon
@@ -184,8 +204,9 @@
           }
         }
         if (title) {
-          const item = this.computedSidebar.find(i => i.title === title)
-          this.$set(item, 'icon', item.icon+'_white')
+          let item = this.computedSidebar.find(i => i.title === title)
+          if (item)
+            this.$set(item, 'icon', item.icon+'_white')
         }
       },
 
@@ -231,14 +252,12 @@
         await this.loadCategories()
         callback && callback(true)
       },
-
       async deleteCategory(_id) {
         await cms.getModel('Product').remove({ category: _id })
         await cms.getModel('Category').remove({_id: _id})
         await this.loadCategories()
         await this.loadProducts()
       },
-
       async swapCategory(oldId, swapId, oldIndex, newIndex) {
         const category = _.cloneDeep(this.categories[oldIndex])
         const swapCategory = _.cloneDeep(this.categories[newIndex])
@@ -327,15 +346,11 @@
         await this.setEnablePayPal(false)
       },
       async setEnablePayPal(value) {
-        const paymentProviders = this.store.paymentProviders;
+        const paymentProviders = this.store.paymentProviders || {};
         paymentProviders.paypal = paymentProviders.paypal || {}
         paymentProviders.paypal.enable = value
         await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
       },
-      async listTransactions() {
-        const response = await axios.get(`/payment/paypal/list-transaction?store_id=${this.store._id}&start_date=${this.startDate}-0700&end_date=${this.endDate}-0700`)
-        this.transactions.splice(0, this.transactions.length, ...response.data.transactions)
-      }
     }
   }
 </script>

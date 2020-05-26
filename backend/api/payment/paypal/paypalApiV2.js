@@ -1,16 +1,7 @@
 "use strict"
 const _ = require('lodash')
-
-/**
- * PayPal Node JS SDK dependency
- */
 const checkoutNodeJssdk = require('@paypal/checkout-server-sdk');
-
-/**
- * PayPal HTTP client dependency
- */
 const payPalClient = require('./requests/paypalClient');
-
 const { TransactionsGetRequest } = require('./requests/transactionsGetRequest')
 const { PayoutCreateRequest } = require('./requests/payoutRequest')
 
@@ -85,15 +76,17 @@ async function listTransaction(query, debug) {
 }
 async function getTransactionByStore({store_id, start_date, end_date, output}) {
   const responses = []
+  const outputFields = (output && _.trim(output) !== "") ? _.trim(output).split(',') : []
   const query =  {
     start_date,
     end_date,
     page_size: 500 /*max page size*/,
     transaction_status: 'S', /*succeeded*/
-    fields: 'transaction_info,payer_info'
+    fields: _.uniq(['transaction_info', 'payer_info', ...outputFields]).join(',')
   }
+
   // exec first query
-  let response = await listTransaction(query, true)
+  let response = await listTransaction(query)
   if (response && response.statusCode === 200) {
     responses.push(response);
 
@@ -102,50 +95,52 @@ async function getTransactionByStore({store_id, start_date, end_date, output}) {
     for(let i=2; i<=response.result.total_pages; ++i)
       queries.push({...query, page: i})
 
-    responses.push.apply(responses, await Promise.all(queries.map(qry => listTransaction(qry, true))))
+    // TODO: Known-issue: Load all transaction into memory for multiple request at the same time lead to memory issue
+    responses.push.apply(responses, await Promise.all(queries.map(qry => listTransaction(qry))))
 
     const transactions = []
-    _.each(responses, response => {
-      transactions.push.apply(transactions, response.result.transaction_details.filter(transaction => transaction.transaction_info.custom_field === store_id))
+    _.each(responses, ({ statusCode, result }) => {
+      if (statusCode === 200 && result && Array.isArray(result.transaction_details) && result.transaction_details.length > 0) {
+        transactions.push.apply(transactions, result.transaction_details.filter(tranDetail => tranDetail && tranDetail.transaction_info && tranDetail.transaction_info.custom_field === store_id))
+      }
     })
-
-    if (output === 'net_amount_only') {
-      const netAmount = _.sumBy(transactions, tran => {
-        return tran.transaction_info.transaction_amount.value - tran.transaction_info.fee_amount.value
-      });
-      return { net_amount: netAmount }
-    } else if (output === 'money_only') {
-      const money = transactions.map(tran => ({
-        transaction_amount: tran.transaction_info.transaction_amount,
-        fee_amount: tran.transaction_info.fee_amount,
-        discount_amount: tran.transaction_info.discount_amount,
-      }))
-      return { money }
-    } else {
-      return { transactions }
-    }
+    return { transactions }
   } else {
     return []
   }
 }
-async function payout(requestBody, debug = false) {
-  try {
-    const request = new PayoutCreateRequest();
-    request.requestBody(requestBody);
-    const response = await payPalClient.client().execute(request);
-    if (debug) {
-      console.log(response)
-    }
-    return response;
-  } catch (e) {
-    console.log(e);
+async function getTransactionById({transaction_id, start_date, end_date, output}) {
+  const outputFields = (output && _.trim(output) !== "") ? _.trim(output).split(',') : []
+  const query =  {
+    transaction_id,
+    start_date,
+    end_date,
+    transaction_status: 'S', /*succeeded*/
+    fields: _.uniq(['transaction_info', 'payer_info', ...outputFields]).join(',')
+  }
+  // Note: A transaction ID is not unique in the reporting system.
+  // The response can list two transactions with the same ID.
+  // One transaction can be balance affecting while the other is non-balance affecting.
+  let { statusCode, result } = await listTransaction(query)
+  if (statusCode === 200 && result) {
+      return { transactions: result.transaction_details }
+  } else {
+    return null
+  }
+}
+async function getNetAmountByStore({store_id, start_date, end_date}) {
+  const { transactions } = await getTransactionByStore({store_id, start_date, end_date })
+  return {
+    netAmount: _.sumBy(transactions, tran => {
+      return parseFloat(tran.transaction_info.transaction_amount.value) - Math.abs(parseFloat(tran.transaction_info.fee_amount.value))
+    })
   }
 }
 
 module.exports = {
-  createOrder: createOrder,
-  captureOrder: captureOrder,
-  listTransaction: listTransaction,
-  getTransactionByStore: getTransactionByStore,
-  payout: payout,
+  createOrder,
+  captureOrder,
+  getTransactionByStore,
+  getNetAmountByStore,
+  getTransactionById,
 }

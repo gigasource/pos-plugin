@@ -14,8 +14,9 @@
         :item-children="itemChildren"
         :data="items"
         v-model="sidebar"
+        :no-padding="false"
         @node-selected="onNodeSelected"
-        @node-expansion-toggled="(path, toggled) => $emit('toggle', path, toggled)"/>
+        @node-expansion-toggled="toggleNode"/>
     <slot name="above-spacer"/>
     <g-spacer/>
     <slot name="below-spacer"/>
@@ -83,7 +84,14 @@
         }
         return node.items;
       },
+      toggleNode(path, toggled, node) {
+        this.$emit('toggle', path, toggled)
+        this.selectedNode = node;
+        this.sidebar = path
+        node.onClick && node.onClick.bind(this)();
+      },
       onNodeSelected(node) {
+        console.log(node)
         this.selectedNode = node;
         node.onClick && node.onClick.bind(this)();
       }

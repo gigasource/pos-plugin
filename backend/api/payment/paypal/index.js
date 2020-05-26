@@ -107,13 +107,20 @@ router.post('/capture-order', async(req, res) => {
 })
 
 router.get('/list-transaction', async(req, res) => {
-  const {
-    store_id,
-    start_date,
-    end_date,
-    output // detail | net_amount_only | ...
-  } = req.query
+  const { store_id, start_date, end_date, output } = req.query
   const transactions = await paypalApiV2.getTransactionByStore({ store_id, start_date, end_date, output })
+  res.json(transactions)
+})
+
+router.get('/net-amount', async(req, res) => {
+  const { store_id, start_date, end_date, output } = req.query
+  const netAmount = await paypalApiV2.getNetAmountByStore({ store_id, start_date, end_date, output })
+  res.json(netAmount)
+})
+
+router.get('/transaction-detail', async(req, res) => {
+  const { transaction_id, output, start_date, end_date } = req.query
+  const transactions = await paypalApiV2.getTransactionById({ transaction_id, output, start_date, end_date })
   res.json(transactions)
 })
 
