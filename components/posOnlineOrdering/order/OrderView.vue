@@ -82,7 +82,7 @@
               </div>
             </div>
           </div>
-          <div class="pos-order__tab--content" id="tab-content" ref="tab-content">
+          <div class="pos-order__tab--content" id="tab-content" ref="tab-content" @touchstart="touch">
             <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
               <div class="sub-title mb-2">{{ category && category.name }}</div>
               <div class="pos-order__tab--content-main">
@@ -95,6 +95,7 @@
                     :disabled="menuItemDisabled"
                     :collapse-text="store.collapseText"
                     :display-id="store.displayId"
+                    :scrolling="scrolling"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
@@ -181,7 +182,8 @@
         menuItemDisabled: false,
         orderItems: [],
         selectedProduct: null,
-        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        scrolling: 0
       }
     },
     filters: {
@@ -533,6 +535,9 @@
           }, 1000)
         }
       },
+      touch() {
+        this.scrolling++
+      }
     },
     watch: {
       selectedCategoryId(val) {

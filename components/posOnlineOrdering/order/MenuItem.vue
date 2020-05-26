@@ -107,7 +107,8 @@
       available: Boolean,
       id: String,
       displayId: Boolean,
-      mark: Object
+      mark: Object,
+      scrolling: Number
     },
     filters: {
       currency(val) {
@@ -161,6 +162,15 @@
           return `${$t('common.currency')}${min.toFixed(2)}`
       }
     },
+    watch: {
+      scrolling() {
+        this.menu = {
+          allergic: false,
+          spicy: false,
+          vegeterian: false,
+        }
+      }
+    }
   }
 </script>
 <style scoped lang="scss">
