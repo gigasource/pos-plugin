@@ -301,6 +301,8 @@ module.exports = {
       name: 'Name',
       telephone: 'Telephone',
       address: 'Address',
+      street: 'Street',
+      houseNo: 'No.',
       zipCode: 'Zip Code',
       deliveryTime: 'Delivery Time',
       pickupTime: 'Pickup Time',

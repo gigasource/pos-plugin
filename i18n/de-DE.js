@@ -16,6 +16,8 @@ module.exports = {
       name: 'Name',
       telephone: 'Telefon',
       address: 'Adresse',
+      street: 'Straße',
+      houseNo: 'Nr',
       zipCode: 'Postleitzahl',
       deliveryTime: 'Lieferzeit',
       pickupTime: 'Abholzeit',

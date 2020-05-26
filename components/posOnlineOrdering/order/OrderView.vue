@@ -82,7 +82,7 @@
               </div>
             </div>
           </div>
-          <div class="pos-order__tab--content" id="tab-content" ref="tab-content">
+          <div class="pos-order__tab--content" id="tab-content" ref="tab-content" @touchstart="touch">
             <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
               <div class="sub-title mb-2">{{ category && category.name }}</div>
               <div class="pos-order__tab--content-main">
@@ -95,6 +95,7 @@
                     :disabled="menuItemDisabled"
                     :collapse-text="store.collapseText"
                     :display-id="store.displayId"
+                    :scrolling="scrolling"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
@@ -183,7 +184,8 @@
         menuItemDisabled: false,
         orderItems: [],
         selectedProduct: null,
-        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        scrolling: 0
       }
     },
     filters: {
@@ -512,13 +514,11 @@
       },
       handleScroll() {
         if(this.choosing > 0) return
-        const categoryInViewPort = this.categories.map(c => c._id).map(id => {
+        const categoryInViewPort = this.categories.filter(({_id: id}) => {
           const el = document.getElementById(`category_content_${id}`);
-          if(this.elementInWrapper(el)) {
-            return id
-          }
+          return this.elementInWrapper(el)
         })
-        this.selectedCategoryId = categoryInViewPort.filter(c => !!c)[0]
+        this.selectedCategoryId = categoryInViewPort[0]._id
         const wrapper = document.getElementById('tab-content')
         if(!this.selectedCategoryId || (wrapper.offsetHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
@@ -536,6 +536,9 @@
           }, 1000)
         }
       },
+      touch() {
+        this.scrolling++
+      }
     },
     watch: {
       selectedCategoryId(val) {

@@ -3,7 +3,7 @@
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
-				<pos-text-field ref="input" v-model="screenValue" large :label="label" readOnly/>
+				<pos-text-field :class="!large && 'w-50'" ref="input" v-model="screenValue" large :label="label" readOnly/>
 				<div class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
@@ -33,7 +33,8 @@
 			locale: {
       	type: String,
 				default: 'de'
-			}
+			},
+			large: Boolean //textfield size
     },
     data() {
       return {
@@ -81,7 +82,6 @@
 	}
 
 	.bs-tf-wrapper {
-		width: 50%;
 
 		::v-deep .bs-tf-label {
 			margin-bottom: 16px;

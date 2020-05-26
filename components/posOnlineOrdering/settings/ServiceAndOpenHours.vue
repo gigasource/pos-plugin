@@ -21,32 +21,33 @@
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getTime(openHour, 'open')"
-                               @input="updateHours($event, index, true)"/>
+                               :value="getTime(openHour, 'openTime')"
+                               @input="updateHours($event, index, 'open-Time')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].close && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getTime(openHour, 'close')"
-                               @input="updateHours($event, index, false)"/>
+                               :value="getTime(openHour, 'closeTime')"
+                               @input="updateHours($event, index, 'close-Time')"/>
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].delivery && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getDeliveryTime(openHour, 'from')"
-                               @input="updateDeliveryHours($event, index, true)"/>
+                               :value="getTime(openHour, 'deliveryStart')"
+                               @input="updateHours($event, index, 'delivery-Start')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].delivery && 'error']">
           <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getDeliveryTime(openHour, 'to')"
-                               @input="updateDeliveryHours($event, index, false)"/>
+                               :value="getTime(openHour, 'deliveryEnd')"
+                               @input="updateHours($event, index, 'delivery-End')"/>
         </div>
         <g-spacer/>
-        <div @click="removeOpenHour(openHour)" class="open-hour__row--btn">
+        <div @click="removeOpenHour(index)" class="open-hour__row--btn">
           <g-icon size="16">icon-close</g-icon>
         </div>
         <div v-if="errors[index] && errors[index].message" class="error-message">{{errors[index].message}}</div>
       </div>
       <div class="row-flex">
+        <p>Note: Delivery hours must be within open hours.</p>
         <g-spacer/>
         <g-btn-bs width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
                :disabled="hasError || openHoursJson === lastSavedData">Save
@@ -197,6 +198,10 @@
           if ((message && message.length > 0) || open || close || delivery) result = true
         })
 
+        this.openHoursData.forEach(({dayInWeeks}) => {
+          if(dayInWeeks.filter(d => !!d).length === 0) result = true
+        })
+
         return result
       },
       openHoursJson() {
@@ -207,7 +212,7 @@
       this.deliveryTimeIntervalData = this.deliveryTimeInterval
     },
     mounted() {
-      this.openHoursData = this.openHours
+      this.openHoursData = _.cloneDeep(this.openHours)
       this.lastSavedData = JSON.stringify(this.openHoursData)
       this.errors = this.openHoursData.map(() => ({
         open: false,
@@ -230,13 +235,13 @@
         this.errors.push({
           open: false,
           close: false,
-          message: ''
+          message: '',
+          delivery: false
         })
 
         this.checkServiceHourError()
       },
-      removeOpenHour(openHour) {
-        const i = _.findIndex(this.openHoursData, oh => oh._id === openHour._id)
+      removeOpenHour(i) {
         this.openHoursData.splice(i, 1)
         this.errors.splice(i, 1)
 
@@ -247,80 +252,15 @@
         this.$emit('update', {openHours: this.openHoursData})
       },
       getTime(openHour, type) {
-        if(type === 'open') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.openTime) : openHour.openTime
-        }
-        if(type === 'close') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.closeTime) : openHour.closeTime
-        }
+        return this.country.name === 'United State' ? get12HourValue(openHour[type]) : openHour[type]
       },
-      getDeliveryTime(openHour, type) {
-        if (type === 'from') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryStart) : openHour.deliveryStart
-        }
-        if (type === 'to') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryEnd) : openHour.deliveryEnd
-        }
-      },
-      updateHours(time, index, isOpenTime) {
-        time = get24HourValue(time)
-
-        const openHour = this.openHoursData[index]
-        this.$set(this.errors[index], 'message', '')
+      updateHours(time, index, typeStr) {
         if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
-          this.$set(this.errors[index], `${isOpenTime ? 'open' : 'close'}`, true)
-          this.$set(this.errors[index], 'message', `${isOpenTime ? 'Open' : 'Close'} time is invalid!`)
+          this.$set(this.errors[index], typeStr.split('-')[0], true)
+          this.$set(this.errors[index], 'message', `Invalid time format!`)
           return
         }
-        if (isOpenTime) {
-          this.$set(this.errors[index], 'open', false)
-          if (get24HourValue(time) < get24HourValue(openHour.closeTime)) {
-            this.$set(openHour, `openTime`, time)
-            this.$set(this.errors[index], 'close', false)
-          } else {
-            this.$set(this.errors[index], 'open', true)
-            this.$set(this.errors[index], 'message', 'Open time must be before close time!')
-          }
-        } else {
-          this.$set(this.errors[index], 'close', false)
-          if (get24HourValue(time) > get24HourValue(openHour.openTime)) {
-            this.$set(openHour, `closeTime`, time)
-            this.$set(this.errors[index], 'open', false)
-          } else {
-            this.$set(this.errors[index], 'close', true)
-            this.$set(this.errors[index], 'message', 'Close time must be after open time!')
-          }
-        }
-
-        this.checkServiceHourError()
-      },
-      updateDeliveryHours(time, index, isStartTime) {
-        time = get24HourValue(time)
-        const openHour = this.openHoursData[index]
-        this.$set(this.errors[index], 'message', '')
-        if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
-          this.$set(this.errors[index], 'delivery', true)
-          this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          return
-        }
-        this.$set(this.errors[index], 'delivery', false)
-        this.$set(this.errors[index], 'message', '')
-        if(isStartTime) {
-          if(time < openHour.closeTime && time > openHour.openTime && time < openHour.deliveryEnd) {
-            this.$set(openHour, 'deliveryStart', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
-        } else {
-          if(time < openHour.closeTime && time > openHour.openTime && time > openHour.deliveryStart) {
-            this.$set(openHour, 'deliveryEnd', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
-        }
-
+        this.$set(this.openHoursData[index], typeStr.replace('-', ''), time)
         this.checkServiceHourError()
       },
       toggleMinimumOrderValue(active) {
@@ -331,6 +271,22 @@
       },
       checkServiceHourError() {
         this.openHoursData.forEach(({dayInWeeks, openTime, closeTime, deliveryStart, deliveryEnd}, index) => {
+
+          if(openTime > closeTime) {
+            this.$set(this.errors[index], 'close', true)
+            this.$set(this.errors[index], 'open', true)
+            this.$set(this.errors[index], 'message', `Open time must be before close time!`)
+            return
+          }
+
+          if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
+            this.$set(this.errors[index], 'delivery', true)
+            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
+          } else {
+            this.$set(this.errors[index], 'delivery', false)
+            this.$set(this.errors[index], 'message', '')
+          }
+
           for (let i = 0; i < dayInWeeks.length; i++) {
             if (!dayInWeeks[i]) continue
 
@@ -340,11 +296,20 @@
             for (const {openTime: ot, closeTime: ct, row} of openHoursInDay) {
               if (row === index) continue
 
-              if (openTime > ot && openTime < ct) return this.$set(this.errors[index], 'open', true)
-              if (closeTime > ot && closeTime < ct) return this.$set(this.errors[index], 'close', true)
+              if (openTime > ot && openTime < ct) {
+                this.$set(this.errors[index], 'open', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
+                return
+              }
+              if (closeTime > ot && closeTime < ct) {
+                this.$set(this.errors[index], 'close', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
+                return
+              }
               if (openTime === ot && closeTime) {
                 this.$set(this.errors[index], 'close', true)
                 this.$set(this.errors[index], 'open', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
                 return
               }
             }
@@ -352,14 +317,6 @@
 
           this.$set(this.errors[index], 'open', false)
           this.$set(this.errors[index], 'close', false)
-
-          if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
-            this.$set(this.errors[index], 'delivery', true)
-          } else {
-            this.$set(this.errors[index], 'delivery', false)
-            this.$set(this.errors[index], 'message', '')
-          }
-
         })
       },
       updateDeliveryTimeInterval() {

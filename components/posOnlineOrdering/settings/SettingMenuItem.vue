@@ -1,5 +1,5 @@
 <template>
-  <div style="border-bottom: 1px solid #E0E0E0">
+  <div style="border-bottom: 1px solid #E0E0E0" :id="_id">
     <template v-if="mode === 'view'">
       <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
         <div class="ta-center">
@@ -21,7 +21,7 @@
         </div>
         <div class="menu-setting-item__content px-2">
           <div class="menu-setting-item__name row-flex">
-            <span v-if="displayId" class="mr-1">{{id ? id + '.' : ''}}</span>
+            <span v-if="displayId && id" class="mr-1">{{id + '.'}}</span>
             <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
             <span class="col-3 pl-1" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>

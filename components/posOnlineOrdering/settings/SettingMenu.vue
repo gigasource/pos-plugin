@@ -138,7 +138,8 @@
           setting: false,
         },
         editBtn: [],
-        editingProduct: false
+        editingProduct: false,
+        edittingItems: []
       }
     },
     created() {
@@ -185,10 +186,28 @@
     },
     methods: {
       setEditing(productId, editing) {
-        if (editing)
+        const wrapper = document.querySelector('.menu-setting__category')
+        if (editing) {
           this.$set(this.editingProducts, productId, editing)
-        else
+          this.edittingItems.push({
+            id: productId,
+            top: wrapper.scrollTop
+          })
+        } else {
           this.$delete(this.editingProducts, productId)
+          const item = document.getElementById(productId)
+          const index = this.edittingItems.findIndex(item => item.id === productId)
+          const editingItem = this.edittingItems.splice(index, 1)[0]
+          wrapper.scroll({top: editingItem.top, left: 0})
+          this.edittingItems = this.edittingItems.map((ei, i) => {
+            if(ei.top > editingItem.top && i >= index)
+              return {
+                id: ei.id,
+                top: ei.top - item.offsetHeight + 112
+              }
+            return  ei
+          })
+        }
         this.editingProduct = editing
       },
       toggleCollapse(category) {

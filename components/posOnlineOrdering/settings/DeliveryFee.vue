@@ -9,13 +9,13 @@
       <div class="delivery-fee__content-main">
         <div class="delivery-fee__content-item" v-for="(item, i) in items" :key="i">
           <div class="item-code col-9">
-            <input type="number" step="1" :value="item.zipCode" @input="e => updateZipCodeDebounce(item, e)"/>
+            <input step="1" :value="item.zipCode" @input="e => updateZipCodeDebounce(item, e)"/>
           </div>
           <div class="item-fee col-2">
             <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
           </div>
           <div class="item-btn--delete col-1">
-            <g-icon size="16" color="#424242" @click="removeFee(item)">icon-close</g-icon>
+            <g-icon size="16" color="#424242" @click="removeFee(i)">icon-close</g-icon>
           </div>
         </div>
         <div class="item-btn--add" @click="addNewFee">
@@ -81,7 +81,7 @@
         this.updateFees()
       },
       updateZipCode(item, e) {
-        if(!e.target.value || isNaN(e.target.value)) return
+        if (!e.target.value) return
         _.each(this.store.deliveryFee.fees, fee => {
           if (fee === item)
             fee.zipCode = e.target.value
@@ -117,8 +117,7 @@
           }
         })
       },
-      removeFee(item) {
-        const index = this.store.deliveryFee.fees.findIndex(f => f._id === item._id)
+      removeFee(index) {
         this.store.deliveryFee.fees.splice(index, 1)
         this.updateFees()
       }
