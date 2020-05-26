@@ -15,7 +15,7 @@
             <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
           </div>
           <div class="item-btn--delete col-1">
-            <g-icon size="16" color="#424242" @click="removeFee(item)">icon-close</g-icon>
+            <g-icon size="16" color="#424242" @click="removeFee(i)">icon-close</g-icon>
           </div>
         </div>
         <div class="item-btn--add" @click="addNewFee">
@@ -117,8 +117,7 @@
           }
         })
       },
-      removeFee(item) {
-        const index = this.store.deliveryFee.fees.findIndex(f => f._id === item._id)
+      removeFee(index) {
         this.store.deliveryFee.fees.splice(index, 1)
         this.updateFees()
       }
