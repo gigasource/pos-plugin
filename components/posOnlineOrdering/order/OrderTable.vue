@@ -71,8 +71,8 @@
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
                 </template>
                 <template v-if="orderType === 'delivery'">
-                  <div class="row-flex">
-                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable :arrow="false" clear-icon="icon-cancel@16" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>
+                  <div class="row-flex" style="margin: -16px 0 -24px">
+                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>
                     <g-text-field class="col-3 ml-2" v-model="addressNo" :label="$t('store.houseNo')" required/>
                   </div>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
