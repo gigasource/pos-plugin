@@ -304,6 +304,12 @@
       "key": "displayId",
       "default": "",
       "type": "input@switch"
+    },
+    {
+      "_id": "5ecb9e5bf198ae04f6d52d39",
+      "schemaType": "string",
+      "key": "noteToCustomers",
+      "type": "input"
     }
   ],
   "name": "Store",

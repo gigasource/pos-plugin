@@ -146,6 +146,40 @@ module.exports = function (cms) {
       return callback(device.features)
     })
 
+    socket.on('getOnlineDeviceServices', async (deviceId, callback) => {
+      try {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback({ error: 'Device not found' })
+
+        const store = await cms.getModel('Store').findById(device.storeId)
+        if (!store) return callback({ error: 'Store not found!' })
+
+        const { delivery, pickup, noteToCustomers } = store
+
+        return callback({ services: { delivery, pickup, noteToCustomers } })
+      } catch (error) {
+        callback({ error })
+      }
+    })
+
+    socket.on('updateWebshopServices', async (deviceId, { delivery, pickup, noteToCustomers }, callback) => {
+      try {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback({ error: 'Device not found' })
+
+        await cms.getModel('Store').findOneAndUpdate({ _id: device.storeId }, {
+          $set: {
+            delivery,
+            pickup,
+            noteToCustomers
+          }
+        })
+        callback({ success: true })
+      } catch (error) {
+        callback({ error })
+      }
+    })
+
     // TODO: analysis side fx
     socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
       console.debug(`backend received order status for order ${orderToken}`)
