@@ -8,9 +8,9 @@
       <div class="po-order-table__main">
         <!-- header text -->
         <div class="po-order-table__header__text">
-          <g-icon class="po-order-table__header__icon--mobile" @click="changeView">arrow_back</g-icon>
-          <g-icon class="po-order-table__header__icon" v-if="confirmView" color="#424242" @click="view = 'order'" size="20">arrow_back_ios</g-icon>
-          <div class="po-order-table__header__text--main">{{ confirmView ? $t('store.confirmOrder') : $t('store.orderList') }}</div>
+          <g-icon class="po-order-table__header__icon--mobile" @click="gotoPrevPageMobile">arrow_back</g-icon>
+          <g-icon class="po-order-table__header__icon" v-if="showBackArrowInHeader" color="#424242" @click="gotoPrevPage" size="20">arrow_back_ios</g-icon>
+          <div class="po-order-table__header__text--main">{{ headerTextMain }}</div>
           <div class="po-order-table__header__total" v-if="orderView">{{$t('store.totalItems')}}: {{ totalItems }}</div>
         </div>
 
@@ -90,33 +90,11 @@
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
-
-              <!-- PAYMENT -->
-              <template v-if="!unavailableConfirm">
-                <!-- Payment option -->
-                <template>
-                  <div class="section-header">PAYMENT</div>
-                  <g-radio-group v-model="paymentType" row class="radio-option">
-                    <g-radio color="#1271ff" label="Cash" value="cash" class="mr-5"/>
-                    <g-radio color="#1271ff" label="Paypal" value="paypal"/>
-                  </g-radio-group>
-                </template>
-                <!-- Payment detail -->
-                <template>
-                  <div v-if="paymentType === 'paypal'">
-                    <pay-pal-smart-button
-                        :self-host="true"
-                        :debug="true"
-                        :order-info="paypalOrderInfo"
-                        :client-id="store.paypalClientId"
-                        :currency="currencyCode"
-                        @onApprove="confirmPayPalPayment"
-                    />
-                  </div>
-                </template>
-              </template>
-
-              <div class="section-header">{{$t('store.orderDetail')}}</div>
+            </template>
+            
+            <!-- Payment view -->
+            <template v-if="paymentView">
+              <div class="section-header">Payment</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
                 <div class="order-item-detail__name">
@@ -140,39 +118,52 @@
                 <g-spacer/>
                 <span>-{{ value | currency }}</span>
               </div>
+  
+              <!-- PAYMENT -->
+              <div class="section-header">PAYMENT OPTIONS</div>
+              <div style="margin: 0 auto;">
+                <div class="pay-by-cash-btn" @click="confirmPayment">Pay by Cash</div>
+                <pay-pal-smart-button
+                    :self-host="true"
+                    :debug="true"
+                    :order-info="paypalOrderInfo"
+                    :client-id="store.paypalClientId"
+                    :currency="currencyCode"
+                    @onApprove="confirmPayPalPayment"/>
+              </div>
             </template>
           </template>
         </div>
       </div>
       <!-- footer -->
       <g-spacer/>
-      <div :class="['po-order-table__footer', !isOpening && 'disabled']">
-        <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
-        <g-spacer/>
-        <g-btn-bs v-if="orderView" style="position: relative; justify-content: flex-start" width="154" large rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView">
-          {{$t('store.payment')}}
-          <div class="icon-payment">
-            <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
-          </div>
-        </g-btn-bs>
-        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="dialog.confirm = true" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
-      </div>
-      <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
-        <g-badge :value="true" color="#4CAF50" overlay>
-          <template v-slot:badge>
-            {{totalItems}}
-          </template>
-          <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
-            <g-icon>icon-menu2</g-icon>
-          </div>
-        </g-badge>
-        <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
-        <g-spacer/>
-        <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="dialog.confirm = true" style="padding: 8px 16px" elevation="5">
-          {{$t('store.confirm')}}
-        </g-btn-bs>
-      </div>
+      <template v-if="view !== 'payment'">
+        <div :class="['po-order-table__footer', !isOpening && 'disabled']">
+          <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
+          <g-spacer/>
+          <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative; justify-content: flex-start">
+            {{$t('store.payment')}}
+            <div class="icon-payment">
+              <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+            </div>
+          </g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >{{$t('store.confirm')}}</g-btn-bs>
+        </div>
+        <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
+          <g-badge :value="true" color="#4CAF50" overlay>
+            <template v-slot:badge>
+              {{totalItems}}
+            </template>
+            <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
+              <g-icon>icon-menu2</g-icon>
+            </div>
+          </g-badge>
+          <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
+          <g-spacer/>
+          <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.confirm')}}</g-btn-bs>
+        </div>
+      </template>
     </div>
 
     <!-- Order created -->
@@ -298,7 +289,9 @@
       asap() {
         return $t('common.asap')
       },
-      confirmView() { return !this.orderView },
+      orderView() { return this.view === 'order' },
+      confirmView() { return this.view === 'confirm'},
+      paymentView() { return this.view === 'payment' },
       allowConfirmView() {
         return this.orderItems.length
       },
@@ -321,7 +314,6 @@
         let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
         return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
       },
-      orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
       storeZipCodes() {
@@ -523,7 +515,21 @@
             })),
           }]
         }
-      }
+      },
+      headerTextMain() {
+        switch(this.view) {
+          case 'order': return $t('store.orderList');
+          case 'confirm': return $t('store.confirmOrder');
+          case 'payment': return 'Payment'; // TODO: i18n
+        }
+      },
+      showBackArrowInHeader() {
+        switch (this.view) {
+          case 'order': return false;
+          case 'confirm': return true;
+          case 'payment': return true;
+        }
+      },
     },
     watch: {
       confirmView(val) {
@@ -538,11 +544,32 @@
       }
     },
     methods: {
-      changeView() {
-        if(this.view === 'order') {
-          this.$emit('back')
+      // event handler when user click to back button in order table (for desktop view)
+      gotoPrevPage() {
+        switch (this.view) {
+          case 'order':
+            return;
+          case 'confirm':
+            this.view = 'order';
+            break;
+          case 'payment':
+            this.view = 'confirm';
+            break;
         }
-        this.view = 'order'
+      },
+      // event handler when user tap to back button in order table (for mobile view)
+      gotoPrevPageMobile() {
+        switch (this.view) {
+          case 'order':
+            this.$emit('back')
+            break;
+          case 'confirm':
+            this.view = 'order';
+            break;
+          case 'payment':
+            this.view = 'confirm';
+            break;
+        }
       },
       removeItem(item) {
         this.$emit('decrease', item)
@@ -985,7 +1012,23 @@
       display: none;
     }
   }
-
+  .pay-by-cash-btn {
+    background-color: #2979ff;
+    color: #FFF;
+    width: 100%;
+    border-radius: 20px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    max-width: 750px;
+    
+    &:hover {
+      filter: brightness(85%);
+    }
+  }
+  
   @media screen and (max-width: 1139px) {
     .po-order-table {
       background: #FFF;
