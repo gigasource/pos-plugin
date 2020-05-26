@@ -9,7 +9,7 @@
       <div class="delivery-fee__content-main">
         <div class="delivery-fee__content-item" v-for="(item, i) in items" :key="i">
           <div class="item-code col-9">
-            <input type="number" step="1" :value="item.zipCode" @input="e => updateZipCodeDebounce(item, e)"/>
+            <input step="1" :value="item.zipCode" @input="e => updateZipCodeDebounce(item, e)"/>
           </div>
           <div class="item-fee col-2">
             <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
@@ -81,7 +81,7 @@
         this.updateFees()
       },
       updateZipCode(item, e) {
-        if(!e.target.value || isNaN(e.target.value)) return
+        if (!e.target.value) return
         _.each(this.store.deliveryFee.fees, fee => {
           if (fee === item)
             fee.zipCode = e.target.value

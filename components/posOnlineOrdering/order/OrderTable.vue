@@ -71,7 +71,10 @@
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
                 </template>
                 <template v-if="orderType === 'delivery'">
-                  <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
+                  <div class="row-flex">
+                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable :arrow="false" clear-icon="icon-cancel@16" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>
+                    <g-text-field class="col-3 ml-2" v-model="addressNo" :label="$t('store.houseNo')" required/>
+                  </div>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
@@ -172,10 +175,10 @@
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
-  import {get12HourValue, get24HourValue, incrementTime} from "../../logic/timeUtil";
-  import {autoResizeTextarea} from '../../logic/commonUtils'
+  import { get12HourValue, get24HourValue, incrementTime } from '../../logic/timeUtil';
+  import { autoResizeTextarea } from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
-  import DialogOrderConfirm from "./dialogOrderConfirm";
+  import DialogOrderConfirm from './dialogOrderConfirm';
 
   export default {
     name: 'OrderTable',
@@ -219,6 +222,12 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
+        lat: null,
+        long: null,
+        addressSuggestions: [],
+        addressStr: '',
+        addressNo: '',
+        throttledGetSuggestions: null
       }
     },
     filters: {
@@ -241,6 +250,22 @@
 
         return dayInWeeks[today]
       })
+
+      // get address from street & house no.
+      this.$watch(vm => [vm.addressNo, vm.addressStr], () => {
+        const address = `${this.addressStr} ${this.addressNo}`;
+        this.$set(this.customer, 'address', address)
+      })
+
+      // geolocation for address
+      this.throttledGetSuggestions = _.throttle(this.getSuggestions, 500)
+      navigator.geolocation.getCurrentPosition(pos => {
+        this.lat = pos.coords.latitude
+        this.long = pos.coords.longitude
+      }, () => {
+        this.lat = null
+        this.long = null
+      }, {  enableHighAccuracy: true })
     },
     computed: {
       asap() {
@@ -272,6 +297,15 @@
       orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
+      storeZipCodes() {
+        return this.store.deliveryFee.fees.map(({ zipCode, fee }) => {
+          if (zipCode.includes(',') || zipCode.includes(';')) {
+            zipCode = zipCode.replace(/\s/g, '')
+            zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+          }
+          return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee })) : { zipCode, fee }
+        }).flat()
+      },
       shippingFee() {
         if (!this.orderItems || this.orderItems.length === 0)
           return 0;
@@ -280,7 +314,7 @@
           return 0
 
         // calculate zip code from store setting
-        for (let deliveryFee of this.store.deliveryFee.fees) {
+        for (const deliveryFee of this.storeZipCodes) {
          if (_.lowerCase(_.trim(deliveryFee.zipCode)) === _.lowerCase(_.trim(this.customer.zipCode)))
            return deliveryFee.fee
         }
@@ -307,7 +341,13 @@
       validateZipcode() {
         const rules = []
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes) {
-          const zipCodes = this.store.deliveryFee.fees.map(f => f.zipCode)
+          const zipCodes = this.store.deliveryFee.fees.map(({ zipCode }) => {
+            if (zipCode.includes(',') || zipCode.includes(';')) {
+              zipCode = zipCode.replace(/\s/g, '')
+              zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+            }
+            return zipCode;
+          }).flat()
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
         return rules
@@ -543,6 +583,22 @@
       },
       getItemModifiers(item) {
         return item.modifiers.map(m => m.name).join(', ')
+      },
+      async getSuggestions(text) {
+        if (!text) return []
+
+        let url = `https://pelias.gigasource.io/v1/autocomplete?layers=street&text=${encodeURI(text)}`
+        if (this.lat && this.long) url += `&focus.point.lat=${this.lat}&focus.point.lon=${this.long}`
+
+        try {
+          const { data: {features} } = await axios.get(url)
+          this.addressSuggestions = features.map(feature => {
+            const { name } = feature.properties // street name
+            return `${name}`
+          })
+        } catch (e) {
+          console.warn(e)
+        }
       }
     }
   }
