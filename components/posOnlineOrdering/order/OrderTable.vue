@@ -428,11 +428,13 @@
       },
       effectiveTotal() {
         if (!this.orderItems || !this.orderItems.length) return 0
-
-        if (!this.confirmView) return this.totalPrice
-        
-        const total = this.totalPrice + this.shippingFee - this.totalDiscount;
-        return total < 0 ? 0 : total
+        switch (this.view) {
+          case 'order': return this.totalPrice;
+          case 'confirm':
+          case 'payment':
+            const total = this.totalPrice + this.shippingFee - this.totalDiscount;
+            return total < 0 ? 0 : total
+        }
       },
       deliveryTimeList() {
         let list = []
@@ -474,6 +476,8 @@
       paypalOrderInfo() {
         if (!this.store.paypalClientId)
           return
+        
+        // this.totalPrice + this.shippingFee - this.totalDiscount;
         
         return {
           application_context: {
