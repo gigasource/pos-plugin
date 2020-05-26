@@ -295,7 +295,6 @@
         const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
         if (this.orderType === 'delivery') {
           if (!this.satisfyMinimumValue) return true
-          if (!this.satisfyDeliveryTime) return true
           for (const fn of this.validateZipcode) {
             if (typeof fn === 'function' && typeof fn(this.customer.zipCode) === 'string') {
               return true
