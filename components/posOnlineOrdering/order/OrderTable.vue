@@ -72,7 +72,7 @@
                 </template>
                 <template v-if="orderType === 'delivery'">
                   <div class="row-flex" style="margin: -16px 0 -24px">
-                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>
+                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable clear-icon="icon-cancel@16" :arrow="availableStreetAutocomplete" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>
                     <g-text-field class="col-3 ml-2" v-model="addressNo" :label="$t('store.houseNo')" required/>
                   </div>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
@@ -334,7 +334,7 @@
               return true
             }
           }
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5
+          return check || !this.addressStr || !this.addressNo || !this.customer.zipCode || this.customer.zipCode.length < 5
         }
         return check
       },
@@ -449,6 +449,9 @@
       },
       cdnOrderHeaderImage() {
         return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=340&h=180`
+      },
+      availableStreetAutocomplete() {
+        return this.addressSuggestions.length > 0
       }
     },
     watch: {

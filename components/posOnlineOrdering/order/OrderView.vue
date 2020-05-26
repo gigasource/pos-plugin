@@ -638,9 +638,6 @@
       .sub-title {
         font-size: 20px;
         font-weight: 700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .pos-order__info {
