@@ -68,6 +68,7 @@
             icon: 'icon-delivery',
             title: this.$t('onlineOrder.onlineOrders'),
             feature: 'onlineOrdering',
+            key: 'Dashboard',
             items: [
               {
                 icon: 'radio_button_unchecked',
@@ -126,7 +127,8 @@
               })
             },
             title: 'Services',
-            feature: 'onlineOrdering'
+            feature: 'onlineOrdering',
+            key: 'Service'
           }
         ],
       }
@@ -134,12 +136,16 @@
     computed: {
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
+        debugger
         if (this.user && this.user.role !== 'admin') {
-          if (!this.user.viewOnlineOrderMenu) {
-            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering')
+          if (!this.user.viewOnlineOrderDashboard) {
+            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Dashboard')
           } else if (!this.user.viewOrder) {
             const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
             onlineOrder && onlineOrder.items.splice(1, 2)
+          }
+          if(!this.user.viewOnlineOrderMenu) {
+            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
           }
         }
         if (this.user && this.enabledFeatures) {

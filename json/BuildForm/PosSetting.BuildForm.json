@@ -420,6 +420,12 @@
           "key": "viewOrderHistory",
           "type": "input@switch",
           "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOnlineOrderDashboard",
+          "type": "input@switch",
+          "flex": "md4"
         }
       ]
     },

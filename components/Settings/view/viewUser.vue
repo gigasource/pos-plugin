@@ -89,6 +89,9 @@
           <pos-switch @change="save" dense :label="$t('settings.cancelInvoice')" v-model="selectedUser.cancelInvoice"/>
         </div>
         <div class="edit__item" v-if="!isAdmin">
+          <pos-switch @change="save" dense :label="$t('settings.viewOnlineOrderDashboard')" v-model="selectedUser.viewOnlineOrderDashboard"/>
+        </div>
+        <div class="edit__item" v-if="!isAdmin">
           <pos-switch @change="save" dense :label="$t('settings.viewOrder')" v-model="selectedUser.viewOrder"/>
         </div>
         <div class="edit__item" v-if="!isAdmin">
