@@ -832,6 +832,14 @@
         this.$router.go(-1)
       },
 
+      getOnlineDeviceServices(callback) {
+        cms.socket.emit('getOnlineDeviceServices', callback)
+      },
+
+      updateOnlineDeviceServices(services, callback) {
+        cms.socket.emit('updateOnlineDeviceServices', services, callback)
+      },
+
       //generic
       async registerHardware() {
         const posSettings = await this.getPosSetting()
