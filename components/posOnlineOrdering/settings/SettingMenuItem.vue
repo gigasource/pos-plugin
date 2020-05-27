@@ -27,7 +27,22 @@
           </div>
           <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
           <div class="menu-setting-item__extra-info">
-            <g-chip v-for="choice in choices" :key="choice._id">{{choice.name}}</g-chip>
+            <template v-for="(choice, i) in choices">
+              <g-menu v-model="menu.choice[i]" open-on-hover nudge-bottom="5" max-width="375" min-width="250" content-class="menu-status-notification">
+                <template v-slot:activator="{on}">
+                  <div v-on="on">
+                    <g-chip>{{choice.name}}</g-chip>
+                  </div>
+                </template>
+                <div class="pa-3 bg-white br-2">
+                  <p class="fw-700 fs-small mb-1">{{choice.name}}:</p>
+                  <div v-for="option in choice.options" :key="option._id" class="fs-small row-flex justify-between">
+                    <p>{{option.name}}</p>
+                    <p class="pl-5">{{option.price}}</p>
+                  </div>
+                </div>
+              </g-menu>
+            </template>
             <template v-for="(value, type) in mark">
               <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
@@ -126,7 +141,8 @@
         menu: {
           allergic: false,
           spicy: false,
-          vegeterian: false
+          vegeterian: false,
+          choice: []
         }
       }
     },
@@ -189,6 +205,13 @@
         let allergens = ''
         allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
         return allergens
+      }
+    },
+    watch: {
+      choices(val) {
+        if(val) {
+          this.menu.choice = _.map(val, () => false)
+        }
       }
     }
   }
