@@ -63,6 +63,7 @@
 		width: 100%;
 		background-color: #FFFFFF;
 		padding: 16px;
+		overflow: scroll;
 
 		.icon {
 			float: right;
