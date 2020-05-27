@@ -139,6 +139,15 @@
           </div>
         </g-dialog>
 
+        <!-- Dialog Note -->
+        <g-dialog v-model="dialog.note" width="400">
+          <div class="dialog-closed">
+            <div class="dialog-closed__title">{{$t('store.note')}}</div>
+            <div class="dialog-closed__message">{{ store.noteToCustomers }}</div>
+            <g-btn-bs text-color="indigo accent-2" @click="dialog.note = false">OK</g-btn-bs>
+          </div>
+        </g-dialog>
+
         <dialog-add-to-order v-bind="this.selectedProduct" v-model="dialog.add" @add="addItemToOrder"/>
       </template>
     </div>
@@ -175,6 +184,7 @@
           closed: false,
           hour: false,
           add: false,
+          note: false,
         },
         throttle: null,
         choosing: 0,
@@ -219,6 +229,7 @@
               favicon.href = getCdnUrl(store.faviconImageSrc)
           }
         }
+        if(store.noteToCustomers) this.dialog.note = true
       } else {
         // TODO: show 404 not found
         alert('Store is not exist');
