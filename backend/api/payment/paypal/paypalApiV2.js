@@ -104,7 +104,7 @@ async function getTransactionByStore({store_id, start_date, end_date, output}) {
         transactions.push.apply(transactions, result.transaction_details.filter(tranDetail => tranDetail && tranDetail.transaction_info && tranDetail.transaction_info.custom_field === store_id))
       }
     })
-    return { transactions }
+    return { transactions, lastRefreshedDateTime: response.result.last_refreshed_datetime }
   } else {
     return []
   }
@@ -129,11 +129,23 @@ async function getTransactionById({transaction_id, start_date, end_date, output}
   }
 }
 async function getNetAmountByStore({store_id, start_date, end_date}) {
-  const { transactions } = await getTransactionByStore({store_id, start_date, end_date })
-  return {
-    netAmount: _.sumBy(transactions, tran => {
-      return parseFloat(tran.transaction_info.transaction_amount.value) - Math.abs(parseFloat(tran.transaction_info.fee_amount.value))
-    })
+  const { transactions, lastRefreshedDateTime } = await getTransactionByStore({store_id, start_date, end_date })
+
+  // Expected that all transaction has been confirmed have the same currency code
+  //
+  if (transactions && transactions.length) {
+    return {
+      currencyCode: transactions[0].transaction_info.transaction_amount.currency_code,
+      lastRefreshedDateTime,
+      netAmount: _.sumBy(transactions, tran => {
+        return parseFloat(tran.transaction_info.transaction_amount.value) - Math.abs(parseFloat(tran.transaction_info.fee_amount.value))
+      })
+    }
+  } else {
+    return {
+      currencyCode: 'USD',
+      netAmount: 0
+    }
   }
 }
 

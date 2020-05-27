@@ -9,13 +9,13 @@
         </div>
         <div class="provider__description">
           <div>Enable customers to pay by their PayPal accounts or credit/debit cards.</div>
-          <img draggable="false" src="/plugins/pos-plugin/assets/wallet.svg"/>
+<!--          <img draggable="false" src="/plugins/pos-plugin/assets/wallet.svg"/>-->
         </div>
         <template v-if="PayPalActive">
           <div class="provider__balance-info">
             <div class="provider__balance-info__kv">
-              <span class="provider__balance-info__key">Net amount: </span>
-              <span class="provider__balance-info__value">{{netAmount === -1 ? 'Calculating...' : `\$${netAmount}` }}</span>
+              <span class="provider__balance-info__key">PayPal Balance: </span>
+              <span class="provider__balance-info__value">{{netAmount === -1 ? 'Calculating...' : `${currencyCode}${netAmount}` }}</span>
             </div>
           </div>
           <div class="provider__notice">
@@ -24,6 +24,10 @@
               <li>Your pending balance is automatically transfered to your bank account on the first day of the following month.</li>
               <li>Addition fee will be added for each transaction.</li>
             </ul>
+          </div>
+          <div style="font-style: italic; font-size: small;margin-bottom: 10px; color: #616161;">
+            <div>(*) Last update: {{lastRefreshedDateTime}}</div>
+            <div>(*) It takes a maximum of three hours for executed transactions to be added into net amount.</div>
           </div>
           <div style="display: flex; justify-content: flex-end">
             <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="deactivePayPalCheckout" style="margin-right: 0">Deactive Paypal Checkout</g-btn-bs>
@@ -39,6 +43,8 @@
   </div>
 </template>
 <script>
+  import { currencyCodeToSymbol } from '../../Store/currencyHelper';
+
   export default {
     name: 'PaymentProviders',
     props: {
@@ -47,6 +53,8 @@
     data: function () {
       return {
         netAmount: -1,
+        currencyCode: '',
+        lastRefreshedDateTime: null,
       }
     },
     computed: {
@@ -56,10 +64,12 @@
     },
     created() {
       const now = dayjs()
-      const startDate = now.format('YYYY-MM') + '-01T00:00:00-0700'
-      const endDate = now.format('YYYY-MM-DD') + 'T23:59:59-0700'
+      const startDate = now.format('YYYY-MM') + '-01T00:00:00-0000'
+      const endDate = now.format('YYYY-MM-DD') + 'T23:59:59-0000'
       axios.get(`/payment/paypal/net-amount?store_id=${this.store._id}&start_date=${startDate}&end_date=${endDate}`).then(result => {
         this.netAmount = result.data.netAmount
+        this.currencyCode = currencyCodeToSymbol(result.data.currencyCode);
+        this.lastRefreshedDateTime = dayjs(result.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
       })
     },
     methods: {

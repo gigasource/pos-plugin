@@ -122,7 +122,7 @@
               <!-- PAYMENT -->
               <div class="section-header">PAYMENT OPTIONS</div>
               <div style="margin: 0 auto;">
-                <div class="pay-by-cash-btn" @click="confirmPayment">Pay by Cash</div>
+                <div class="pay-by-cash-btn" @click="confirmCashPayment">Pay by Cash</div>
                 <pay-pal-smart-button
                     :self-host="true"
                     :debug="true"
@@ -583,8 +583,14 @@
       },
       async confirmPayPalPayment(orderDetails) {
         this.paypalOrderDetail = orderDetails
+        this.paymentType = 'paypal'
         await this.confirmPayment();
       },
+      async confirmCashPayment() {
+        this.paymentType = 'cash'
+        await this.confirmPayment();
+      },
+      
       async confirmPayment() {
         if (this.unavailableConfirm || this.confirming) return
 

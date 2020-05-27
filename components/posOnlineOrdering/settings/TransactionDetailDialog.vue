@@ -136,8 +136,8 @@
       },
       async loadTransaction() {
         const query = {
-          start_date: this.startDate + '-0700',
-          end_date: this.endDate + '-0700',
+          start_date: this.startDate + '-0000',
+          end_date: this.endDate + '-0000',
           transaction_id: this.transactionId,
           output: 'cart_info'
         }
