@@ -222,8 +222,6 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
-        lat: null,
-        long: null,
         addressSuggestions: [],
         addressStr: '',
         addressNo: '',
@@ -259,13 +257,6 @@
 
       // geolocation for address
       this.throttledGetSuggestions = _.throttle(this.getSuggestions, 500)
-      navigator.geolocation.getCurrentPosition(pos => {
-        this.lat = pos.coords.latitude
-        this.long = pos.coords.longitude
-      }, () => {
-        this.lat = null
-        this.long = null
-      }, {  enableHighAccuracy: true })
     },
     computed: {
       asap() {
@@ -291,7 +282,7 @@
         return result
       },
       deliveryTimeString() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
       },
       orderView() { return this.view === 'order' },
@@ -591,7 +582,6 @@
         if (!text) return []
 
         let url = `https://pelias.gigasource.io/v1/autocomplete?layers=street&text=${encodeURI(text)}`
-        if (this.lat && this.long) url += `&focus.point.lat=${this.lat}&focus.point.lon=${this.long}`
 
         try {
           const { data: {features} } = await axios.get(url)

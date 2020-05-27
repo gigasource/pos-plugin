@@ -327,7 +327,7 @@
         }
       },
       storeWorkingTime() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
             if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) {
@@ -338,7 +338,7 @@
         return null
       },
       storeWorkingDay() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         return this.store.openHours.map(oh => {
           let days = []
           for(let i = 0; i < oh.dayInWeeks.length; i++) {
@@ -393,7 +393,7 @@
             })
 
           if(this.store.openHours) {
-            let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+            let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
             this.store.openHours.forEach(oh => {
               let days = []
               for(let i = 0; i < oh.dayInWeeks.length; i++) {

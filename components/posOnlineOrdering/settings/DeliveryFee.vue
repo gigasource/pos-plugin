@@ -23,6 +23,7 @@
         </div>
         <p class="mt-1">Note: You can put zip codes with the same fee in a single line, separated by “,” or “;”</p>
       </div>
+      <div>Note: You can put zip codes with the same fee in a single line, separated by "," or ";"</div>
       <g-switch v-model="acceptOrderInOtherZipCodes" label="Accept orders with other zip codes"/>
       <div class="row-flex align-items-center">
         <span class="fw-700 mr-2 nowrap">Shipping fee for other zip codes</span>

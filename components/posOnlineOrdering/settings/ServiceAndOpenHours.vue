@@ -20,23 +20,23 @@
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'openTime')"
                                @input="updateHours($event, index, 'open-Time')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].close && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'closeTime')"
                                @input="updateHours($event, index, 'close-Time')"/>
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'deliveryStart')"
                                @input="updateHours($event, index, 'delivery-Start')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'deliveryEnd')"
                                @input="updateHours($event, index, 'delivery-End')"/>
         </div>
@@ -252,7 +252,7 @@
         this.$emit('update', {openHours: this.openHoursData})
       },
       getTime(openHour, type) {
-        return this.country.name === 'United State' ? get12HourValue(openHour[type]) : openHour[type]
+        return this.country.name === 'United States' ? get12HourValue(openHour[type]) : openHour[type]
       },
       updateHours(time, index, typeStr) {
         if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {

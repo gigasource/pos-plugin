@@ -104,8 +104,8 @@
       return {
         // now we're currently support de and en
         countries: [
-          {name: 'Germany', locale: 'de'},
-          {name: 'United State', locale: 'en'},
+          {name: 'Germany', locale: 'de-DE'},
+          {name: 'United States', locale: 'en-US'},
           {name: 'United Kingdom', locale: 'en'},
           {name: 'Australia', locale: 'en'},
           {name: 'Canada', locale: 'en'},
