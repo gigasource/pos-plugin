@@ -430,7 +430,7 @@
         return list
       },
       cdnOrderHeaderImage() {
-        return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=340&h=180`
+        return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=680&h=390`
       },
       availableStreetAutocomplete() {
         return this.addressSuggestions.length > 0
