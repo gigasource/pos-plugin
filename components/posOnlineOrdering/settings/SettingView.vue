@@ -25,6 +25,7 @@
             :products="products"
             :collapse-text="store.collapseText"
             :display-id="store.displayId"
+            :display-image="store.displayImage"
             @update-store="updateStore"
             @add-new-category="addNewCategory"
             @change-category-name="changeCategoryName"

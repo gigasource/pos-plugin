@@ -329,6 +329,12 @@
       ],
       "type": "object",
       "addable": true
+    },
+    {
+      "_id": "5ece487fe5da86fae97e5db6",
+      "schemaType": "boolean",
+      "key": "displayImage",
+      "type": "input@switch"
     }
   ],
   "name": "Store",

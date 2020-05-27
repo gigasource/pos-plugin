@@ -1,7 +1,7 @@
 <template>
   <div style="border-bottom: 1px solid #E0E0E0" :id="_id">
     <template v-if="mode === 'view'">
-      <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
+      <div :class="['menu-setting-item', !displayImage && 'no-image']" @mouseenter="positioning = true" @mouseleave="positioning = false">
         <div class="ta-center">
           <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
@@ -11,7 +11,7 @@
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
         </div>
-        <div class="r mt-3" style="align-self: flex-start">
+        <div v-if="displayImage" class="r mt-3" style="align-self: flex-start">
           <img v-if="image" :src="`${cdnImage}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
           <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
           <div class="icon-eyes">
@@ -120,6 +120,7 @@
           :choices="choices"
           :available="available"
           :mark="mark"
+          :display-image="displayImage"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -133,7 +134,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark', 'displayImage'],
     data: function () {
       return {
         mode: 'view',
@@ -225,6 +226,10 @@
     background-color: #fff;
     align-items: center;
     min-height: 112px;
+
+    &.no-image {
+      grid-template-columns: 40px 1fr 60px 72px;
+    }
 
     &__image {
       width: 80px;

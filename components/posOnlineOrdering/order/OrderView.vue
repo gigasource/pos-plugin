@@ -98,6 +98,7 @@
                     :collapse-text="store.collapseText"
                     :display-id="store.displayId"
                     :scrolling="scrolling"
+                    :display-image="store.displayImage"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>

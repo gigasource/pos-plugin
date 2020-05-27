@@ -65,8 +65,9 @@
                           :use-multiple-printers="store.useMultiplePrinters"
                           :key="`item_${index}`"
                           :collapse-text="collapse"
-                          :display-id="display"
+                          :display-id="showId"
                           :editing="editingProduct"
+                          :displayImage="showImage"
                           @editing="setEditing(product._id, $event)"
                           @save="updateProduct(product._id, $event)"
                           @delete="openDeleteProductDialog(product._id)"
@@ -101,8 +102,10 @@
           <div class="dialog-content">
             <g-switch label="Collapse overflow text" v-model="collapse"/>
             <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Limit displaying menu description to 2 lines.</p>
-            <g-switch label="Display item no." v-model="display"/>
+            <g-switch label="Display item no." v-model="showId"/>
             <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Display menu number on online ordering website</p>
+            <g-switch label="Display item image" v-model="showImage"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Display menu image on online ordering website</p>
           </div>
         </div>
       </g-dialog>
@@ -121,7 +124,8 @@
       categories: Array,
       products: Array,
       collapseText: Boolean,
-      displayId: Boolean
+      displayId: Boolean,
+      displayImage: Boolean,
     },
     data: function () {
       return {
@@ -166,7 +170,7 @@
           this.$emit('update-store', {collapseText: val})
         }
       },
-      display: {
+      showId: {
         get() {
           return this.displayId
         },
@@ -176,6 +180,14 @@
       },
       isInDevice() {
         return this.$route.query.device
+      },
+      showImage: {
+        get() {
+          return this.displayImage
+        },
+        set(val) {
+          this.$emit('update-store', {displayImage: val})
+        }
       }
     },
     watch: {
