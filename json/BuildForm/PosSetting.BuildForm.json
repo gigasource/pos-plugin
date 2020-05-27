@@ -420,6 +420,12 @@
           "key": "viewOrderHistory",
           "type": "input@switch",
           "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOnlineOrderDashboard",
+          "type": "input@switch",
+          "flex": "md4"
         }
       ]
     },
@@ -875,6 +881,28 @@
           "key": "orderTimeout",
           "type": "input@number",
           "addable": true
+        },
+        {
+          "schemaType": "object",
+          "key": "services",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "delivery",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "boolean",
+              "key": "pickup",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "string",
+              "key": "noteToCustomers",
+              "type": "input"
+            }
+          ],
+          "type": "object"
         }
       ]
     },

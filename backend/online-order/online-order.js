@@ -22,6 +22,15 @@ async function getWebShopUrl(cms) {
   return webshopUrl
 }
 
+async function updateAlwaysOn(enabled) {
+  console.log("Updating always on");
+  try {
+    await axios.post(`http://localhost:5000/update-alwayson-status`, { enabled })
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function createOnlineOrderSocket(deviceId, cms) {
 
   async function scheduleDeclineOrder(date, _id, cb) {
@@ -140,6 +149,13 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
+        if (name === 'alwaysOn') {
+          const oldAlwaysOnValue = await cms.getModel('Feature').findOne({name})
+          console.log(oldAlwaysOnValue.enabled);
+          if (oldAlwaysOnValue.enabled != enabled) {
+            await updateAlwaysOn(enabled)
+          }
+        }
         return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
       }))
       cms.socket.emit('updateAppFeature')
@@ -297,6 +313,10 @@ module.exports = async cms => {
     try {
       const deviceId = await getDeviceId();
       if (deviceId) await createOnlineOrderSocket(deviceId, cms);
+      const alwaysOnFeature = await cms.getModel('Feature').findOne({ name: 'alwaysOn' });
+      if (alwaysOnFeature) {
+        await updateAlwaysOn(alwaysOnFeature.enabled);
+      }
     } catch (e) {
       console.error(e);
       await updateDeviceStatus();
@@ -394,15 +414,52 @@ module.exports = async cms => {
 
     socket.on('updateOrderStatus', (orderStatus) => {
       onlineOrderSocket.emit('updateOrderStatus', orderStatus)
+      console.debug(`emit order status to server for order ${orderStatus}`)
     })
 
-    socket.on('getWebShopSettingUrl', async (callback) => {
+    socket.on('getWebShopSettingUrl', async (locale, callback) => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, async (webShopSettingUrl) => {
+      onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, locale, async (webShopSettingUrl) => {
         callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
+    })
+
+    socket.on('getOnlineDeviceServices', async (callback) => {
+      const deviceId = await getDeviceId()
+      if (!onlineOrderSocket || !deviceId) return callback(null);
+
+      try {
+        onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({ services: { delivery, pickup, noteToCustomers }, error }) => {
+          if (error) return callback({ error })
+          await cms.getModel('PosSetting').findOneAndUpdate({}, {
+            $set: {
+              'onlineDevice.services': { delivery, pickup, noteToCustomers: noteToCustomers || '' }
+            }
+          })
+          const services = {delivery, pickup, noteToCustomers}
+          callback({ services })
+        })
+      } catch (error) {
+        const posSetting = cms.getModel('PosSetting').findOne()
+        callback(posSetting.onlineDevice.services, error)
+      }
+    })
+
+    socket.on('updateOnlineDeviceServices', async (services, callback) => {
+      const deviceId = await getDeviceId()
+      if (!onlineOrderSocket || !deviceId) return callback(null);
+
+      try {
+        onlineOrderSocket.emit('updateWebshopServices', deviceId, services, async ({ success, error }) => {
+          if (error) return callback({ error })
+          await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { 'onlineDevice.services': services } })
+          callback({ success })
+        })
+      } catch (error) {
+        callback({ error })
+      }
     })
   })
 }

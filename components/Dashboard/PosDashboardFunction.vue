@@ -85,12 +85,15 @@
         if (!this.enabledFeatures || !this.enabledFeatures.length) return
 
         return this.btnDown.filter(item => {
+          if (!this.user) return false
           if (!item.feature) return true
-          if (this.user && this.user.role === 'admin')
+          if (this.user.role === 'admin')
             if (item.feature === 'settings' || item.feature === 'printerSettings') return true
           if (item.feature === 'orderHistory')
-            return !!(this.user && (this.user.role === 'admin' || this.user.viewOrderHistory))
-          return (this.enabledFeatures.includes(item.feature))
+            return this.user.role === 'admin' || this.user.viewOrderHistory
+          if (item.feature === 'onlineOrdering')
+            return (this.user.role === 'admin' || this.user.viewOnlineOrderMenu) && this.enabledFeatures.includes(item.feature)
+          return this.enabledFeatures.includes(item.feature)
         })
       },
 
@@ -101,7 +104,7 @@
           this.$router.push({path})
       },
       openStoreSetting() {
-        window.cms.socket.emit('getWebShopSettingUrl', webShopUrl => {
+        window.cms.socket.emit('getWebShopSettingUrl', this.$i18n.locale, webShopUrl => {
           if (webShopUrl) {
             this.iframeSrc = webShopUrl
             this.showIframe = true

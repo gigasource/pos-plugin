@@ -3,9 +3,12 @@ apply from: '../pos-android/app/build.gradle'
 android {
     def packageJson = file('../../../package.json')
     def parsedJson = new groovy.json.JsonSlurper().parseText(packageJson.text)
+    def versionArray = parsedJson.version.split('\\.')
+    def newVersionCode = versionArray[0].toInteger() * 1000 + versionArray[1].toInteger() * 100 + versionArray[2].toInteger()
+    println newVersionCode
     defaultConfig {
         applicationId "io.gigasource.pos"
-        versionCode 1
+        versionCode newVersionCode
         versionName parsedJson.version
     }
     signingConfigs {

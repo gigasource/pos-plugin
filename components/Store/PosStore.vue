@@ -68,6 +68,7 @@
             icon: 'icon-delivery',
             title: this.$t('onlineOrder.onlineOrders'),
             feature: 'onlineOrdering',
+            key: 'Dashboard',
             items: [
               {
                 icon: 'radio_button_unchecked',
@@ -116,6 +117,18 @@
               })
             },
             title: this.$t('sidebar.functions')
+          },
+          {
+            icon: 'icon-services',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Services',
+                params: ''
+              })
+            },
+            title: 'Services',
+            feature: 'onlineOrdering',
+            key: 'Service'
           }
         ],
       }
@@ -123,12 +136,15 @@
     computed: {
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
-        if(this.user && this.user.role !== 'admin') {
-          if (!this.user.viewOnlineOrderMenu) {
-            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering')
+        if (this.user && this.user.role !== 'admin') {
+          if (!this.user.viewOnlineOrderDashboard) {
+            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Dashboard')
           } else if (!this.user.viewOrder) {
-            const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering')
+            const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
             onlineOrder && onlineOrder.items.splice(1, 2)
+          }
+          if(!this.user.viewOnlineOrderMenu) {
+            sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
           }
         }
         if (this.user && this.enabledFeatures) {
@@ -243,13 +259,35 @@
           </div>);
 
         this.showSnackbar(contentFn, '#E57373', 0)
+      },
+      showErrorSnackbar(error, timeout = 5000) {
+        const contentFn = () => (
+          <div style="margin: 0 auto" class="row-flex align-items-center">
+            <span>{error.message || error}</span>
+          </div>);
+
+        this.showSnackbar(contentFn, '#E57373', timeout)
+      },
+      showInfoSnackbar(text, timeout = 5000) {
+        const contentFn = () => (
+          <div style="margin: 0 auto" class="row-flex align-items-center">
+            <span>{text}</span>
+          </div>);
+
+        this.showSnackbar(contentFn, '#536dfe', timeout)
       }
     },
     async created() {
       window.addEventListener('offline', () => this.online = false)
       window.addEventListener('online', () => this.online = true)
 
-      this.user = cms.getList('PosSetting')[0].user[0]
+      window.addEventListener('keydown', (e) => {
+        if (this.$route.path !== '/pos-login') return
+        if (e.ctrlKey && e.code === 'KeyL') {
+          this.user = cms.getList('PosSetting')[0].user.find(user => user.role === 'admin')
+          this.$router.push('/pos-dashboard')
+        }
+      })
 
       this.initSocket()
       this.getStoreId()

@@ -288,6 +288,38 @@
                 }
               ],
               "isScopedSlot": true
+            },
+            {
+              "choice": "view",
+              "component": "OnlineOrderServices",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "Services",
+              "inject": [
+                {
+                  "service": "SettingsStore:getOnlineDeviceServices",
+                  "local": "getOnlineDeviceServices",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:updateOnlineDeviceServices",
+                  "local": "updateOnlineDeviceServices",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:showErrorSnackbar",
+                  "local": "showErrorSnackbar",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:showInfoSnackbar",
+                  "local": "showInfoSnackbar",
+                  "type": "event"
+                }
+              ],
+              "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderServices.vue",
+              "path": "components/OnlineOrder/OnlineOrderServices.vue",
+              "pluginName": "pos-plugin"
             }
           ]
         }

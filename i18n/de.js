@@ -250,6 +250,7 @@ module.exports = {
       accessStaffReport: 'Access Staff Report',
       editTablePlan: 'Edit Table Plan',
       viewOrder: 'View Completed/Declined Orders',
+      viewOnlineOrderDashboard: 'View Online Order Dashboard',
       viewOnlineOrderMenu: 'View Online Order Menu',
       viewOrderHistory: 'View Order History',
       //company
@@ -377,6 +378,7 @@ module.exports = {
       pendingOrders: 'offene Bestellung',
       sentToKitchen: 'In Bearbeitung (Küche)',
       dashboard: 'Übersicht',
+      orderDetails: 'Bestelldetails',
       completedOrders: 'abgeschlossene Bestellungen',
       declinedOrders: 'abgelehnte Bestellungen',
       no: 'Nr.',
@@ -396,6 +398,9 @@ module.exports = {
       deliveryIn: 'Lieferung in {0} Minuten.',
       pickUpIn: 'Abholung in {0} Minuten.',
       total: 'Gesamt',
+      items: 'Artikel',
+      cancelOrder: 'Stornieren',
+      completeOrder: 'Fertig',
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',
