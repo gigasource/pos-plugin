@@ -71,10 +71,6 @@
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
                 </template>
                 <template v-if="orderType === 'delivery'">
-<!--                  <div class="row-flex" style="margin: -16px 0 -24px">-->
-<!--                    <g-combobox class="col-9" v-model="addressStr" :items="addressSuggestions" :label="$t('store.street')" required clearable clear-icon="icon-cancel@16" :arrow="availableStreetAutocomplete" prepend-icon="icon-place@16" @update:searchText="throttledGetSuggestions"/>-->
-<!--                    <g-text-field class="col-3 ml-2" v-model="addressNo" :label="$t('store.houseNo')" required/>-->
-<!--                  </div>-->
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required/>
@@ -250,14 +246,8 @@
         return dayInWeeks[today]
       })
 
-      // get address from street & house no.
-      // this.$watch(vm => [vm.addressNo, vm.addressStr], () => {
-      //   const address = `${this.addressStr} ${this.addressNo}`;
-      //   this.$set(this.customer, 'address', address)
-      // })
-
-      // geolocation for address
-      this.throttledGetSuggestions = _.throttle(this.getSuggestions, 500)
+      // get geocode & distance from address & zipCode
+      this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
     },
     computed: {
       asap() {
@@ -326,7 +316,6 @@
               return true
             }
           }
-          // return check || !this.addressStr || !this.addressNo || !this.customer.zipCode || this.customer.zipCode.length < 5
           return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5
         }
         return check
@@ -594,7 +583,31 @@
         } catch (e) {
           console.warn(e)
         }
-      }
+      },
+      getGeocode: _.debounce(async function (values) {
+        const [address, zipCode] = values
+        if (!address || !zipCode) return
+
+        let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
+        if (this.store.coordinates) {
+          const {lat, long} = this.store.coordinates
+          url += `&focus.point.lat=${lat}&focus.point.lon=${long}`
+        }
+
+        try {
+          const { data: {features} } = await axios.get(url)
+          if (features && features.length) {
+            const foundLocation = features.find(location => location.properties.postalcode === zipCode)
+            if (foundLocation) {
+              // todo get distance
+              const { properties: { distance }, geometry: { coordinates } } = foundLocation
+              console.log(`Coords: ${coordinates}, Distance: ${distance}`)
+            }
+          }
+        } catch (e) {
+          console.warn(e)
+        }
+      })
     }
   }
 </script>

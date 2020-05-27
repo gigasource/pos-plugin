@@ -310,6 +310,25 @@
       "schemaType": "string",
       "key": "noteToCustomers",
       "type": "input"
+    },
+    {
+      "_id": "5ece314fc7908d07be96dbfb",
+      "schemaType": "object",
+      "key": "coordinates",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "long",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "lat",
+          "type": "input@number"
+        }
+      ],
+      "type": "object",
+      "addable": true
     }
   ],
   "name": "Store",
