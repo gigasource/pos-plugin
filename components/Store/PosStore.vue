@@ -136,7 +136,6 @@
     computed: {
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
-        debugger
         if (this.user && this.user.role !== 'admin') {
           if (!this.user.viewOnlineOrderDashboard) {
             sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Dashboard')
