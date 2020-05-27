@@ -52,6 +52,7 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
     rm -rf originalBuild && \
     mkdir originalBuild && \
     cp /pos-restaurant/app.apk ./originalBuild/ && \
+    ./gradlew build && \
     ./gradlew addPatchToApkProRelease && \
     /opt/android-sdk/build-tools/28.0.3/zipalign -f -v 4 /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/temp.apk && \
     rm /root/cms-boilerplate/plugins/pos-plugin/pkg/android-dist/originalBuild/pos-restaurant.apk && \
