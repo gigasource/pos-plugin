@@ -720,6 +720,7 @@
 
   @media screen and (max-width: 1139px) {
     .pos-order__left {
+      padding: 0;
 
       &__header {
         & > img {
