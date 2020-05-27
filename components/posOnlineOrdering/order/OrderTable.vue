@@ -124,6 +124,7 @@
               <div style="margin: 0 auto;">
                 <div class="pay-by-cash-btn" @click="confirmCashPayment">Pay by Cash</div>
                 <pay-pal-smart-button
+                    v-if="isPaymentViaPayPalEnable"
                     :self-host="true"
                     :debug="true"
                     :order-info="paypalOrderInfo"
@@ -534,6 +535,9 @@
           case 'payment': return true;
         }
       },
+      isPaymentViaPayPalEnable() {
+        return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
+      }
     },
     watch: {
       confirmView(val) {
