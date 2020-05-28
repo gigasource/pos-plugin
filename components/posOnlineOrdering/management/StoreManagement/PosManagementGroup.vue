@@ -15,7 +15,8 @@
                   nudge-bottom="5" nudge-left="30">
             <template v-slot:activator="{on}">
               <div class="btn-edit" :style="[nameEditMenu && {background: '#F4F5FA'}]">
-                <g-icon v-if="showEditBtn || nameEditMenu" :class="[nameEditMenu && 'btn-edit--active']" size="16" @click="on.click">mdi-pencil-outline
+                <g-icon v-if="showEditBtn || nameEditMenu" :class="[nameEditMenu && 'btn-edit--active']" size="16"
+                        @click="on.click">mdi-pencil-outline
                 </g-icon>
               </div>
             </template>
@@ -46,7 +47,8 @@
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
                     <span class="ml-1">
                       <div>{{device.name}}</div>
-                      <div style="font-size: 10px; font-style: italic; color: #757575; margin-top: -5px;" v-if="device.features.onlineOrdering"> (Online ordering)</div>
+                      <div style="font-size: 10px; font-style: italic; color: #757575; margin-top: -5px;"
+                           v-if="device.features.onlineOrdering"> (Online ordering)</div>
                     </span>
                   </div>
                   <div class="col-2">
@@ -58,7 +60,8 @@
                   <div class="row-flex col-4">
                     <template v-if="updateAppPerm">
                       <g-select class="w-60" :items="device.versions" v-model="device.updateVersion"/>
-                      <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2" style="cursor: pointer"
+                      <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2"
+                         style="cursor: pointer"
                          @click="$emit('update:deviceAppVersion', device)">Update</p>
                     </template>
                   </div>
@@ -91,7 +94,9 @@
                         <div v-if="settingsPerm" class="menu-action__option"
                              @click="$emit('open:deleteDeviceDialog', device)">Delete device
                         </div>
-                        <div v-if="featureControlPerm" class="menu-action__option" @click="openWebRTCRemoteControl(store, device)">Open WebRTC Remote Control</div>
+                        <div v-if="featureControlPerm" class="menu-action__option"
+                             @click="openWebRTCRemoteControl(store, device)">Open WebRTC Remote Control
+                        </div>
                       </div>
                     </g-menu>
                   </div>
@@ -165,9 +170,9 @@
 
             <div v-if="showIframe && iframeDragging"
                  style="height: 100%; width: 100%; position: absolute; background: transparent"/>
-            <iframe v-if="showIframe" :src="iframeSrc" width="100%" height="100%" @load="onIframeLoad" ref="iframe"/>
+            <iframe v-if="showIframe" :src="proxyUrl" width="100%" height="100%" @load="onIframeLoad" ref="iframe"/>
           </g-dnd-dialog>
-  
+
           <!-- WebRTC remote control -->
           <g-dnd-dialog v-model="dialog.webRTC.show"
                         lazy
@@ -177,7 +182,8 @@
                         @resizeStart="dialog.webRTC.dragging = true" @resizeEnd="dialog.webRTC.dragging = false"
                         @close="closeWebRTCRemoteControl">
             <template v-if="dialog.webRTC.show" #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
-            <div v-if="dialog.webRTC.show && dialog.webRTC.dragging" style="height: 100%; width: 100%; position: absolute; background: transparent"/>
+            <div v-if="dialog.webRTC.show && dialog.webRTC.dragging"
+                 style="height: 100%; width: 100%; position: absolute; background: transparent"/>
             <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%"/>
           </g-dnd-dialog>
         </div>
@@ -213,7 +219,6 @@
         iframeWidth: window.innerWidth * 0.6,
         iframeHeight: window.innerHeight * 0.6,
         showIframe: false,
-        iframeSrc: 'about:blank',
         iframeDragging: false,
         iframeRefreshInterval: null,
         remoteControlDeviceId: null,
@@ -222,8 +227,9 @@
         selectedStore: null,
         selectedDevice: null,
         proxyInfo: null,
+        proxyUrl: 'about:blank',
         showEditBtn: false,
-        
+
         //
         dialog: {
           webRTC: {
@@ -288,26 +294,24 @@
         this.remoteControlDeviceId = deviceId
         const {socket} = window.cms
 
-        socket.emit('startRemoteControl', this.remoteControlDeviceId, proxyPort => {
-          let proxyHost = `${location.protocol}//${location.hostname}:${proxyPort}`
-          const {proxyHost: pHost, proxyRetryInterval} = this.proxyInfo
+        socket.emit('startRemoteControl', this.remoteControlDeviceId, (proxyHost, proxyPort) => {
+          let proxyUrl = `${location.protocol}//${location.hostname}:${proxyPort}`
 
-          if (pHost) proxyHost = pHost.replace('${port}', proxyPort)
+          const {proxyUrlTemplate, proxyRetryInterval} = this.proxyInfo
+          if (proxyUrlTemplate) proxyUrl = proxyUrlTemplate.replace('${port}', proxyPort)
 
           if (proxyPort) {
-            const iframeSrc = `${proxyHost}`
-            this.iframeSrc = iframeSrc
+            this.proxyUrl = proxyUrl
             this.showIframe = true
 
             if (proxyRetryInterval > 0) {
               this.iframeRefreshInterval = setInterval(() => {
-                this.iframeSrc = ''
-                this.$nextTick(() => this.iframeSrc = iframeSrc)
+                this.proxyUrl = ''
+                this.$nextTick(() => this.proxyUrl = proxyUrl)
               }, proxyRetryInterval)
             }
           } else {
-            // TODO: handle error
-            console.error('Error occurred: proxyPort === null')
+            console.error('Error occurred: no proxy port is available')
           }
         })
       },
