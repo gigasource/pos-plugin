@@ -88,7 +88,6 @@
           :devices="selectedStore.devices"
           :groups="storeGroups"
           :country="selectedStore.country"
-          :countries="countries"
           @update="updateStore(selectedStore._id, $event)"/>
     </template>
 
@@ -114,6 +113,7 @@
   </div>
 </template>
 <script>
+  import supportedCountries from '../../../Store/supportedCountries';
   export default {
     name: 'StoreManagement',
     props: {},
@@ -133,16 +133,7 @@
           pairNewDeviceSuccess: false,
           editDeviceName: false,
         },
-        countries: [
-          {name: 'Germany', locale: 'de-DE'},
-          {name: 'United States', locale: 'en-US'},
-          {name: 'United Kingdom', locale: 'en'},
-          {name: 'Australia', locale: 'en'},
-          {name: 'Canada', locale: 'en'},
-          {name: 'France', locale: 'fr'},
-          {name: 'Italy', locale: 'it'},
-          {name: 'Singapore', locale: 'en'},
-        ],
+        countries: supportedCountries,
       }
     },
     injectService: [
