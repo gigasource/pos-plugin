@@ -62,7 +62,15 @@ async function captureOrder(orderId, debug=false) {
     console.log(e)
   }
 }
-async function listTransaction(query, debug) {
+
+/**
+ * Execute list transaction query
+ * @param query
+ * @param debug
+ * @returns {Promise<*>}
+ * @private
+ */
+async function _execListTransaction(query, debug) {
   try {
     const request = new TransactionsGetRequest(query);
     const response = await payPalClient.client().execute(request)
@@ -74,30 +82,47 @@ async function listTransaction(query, debug) {
     console.log(e)
   }
 }
-async function getTransactionByStore({store_id, start_date, end_date, output}) {
+
+/**
+ * Execute single/multiple transaction queries base on params
+ * @param store_id
+ * @param start_date
+ * @param end_date
+ * @param output
+ * @param page_index
+ * @param page_size
+ * @returns {Promise<{lastRefreshedDateTime: *, transactions: []}|*[]>}
+ */
+async function getStoreTransaction({
+                    store_id,             /*Transaction of specified store*/
+                    start_date, end_date, /*Allow filter*/
+                    output,               /*Allow options field to get transaction order detail*/
+                    page_index, page_size   /*Pagination*/
+}) {
   const responses = []
   const outputFields = (output && _.trim(output) !== "") ? _.trim(output).split(',') : []
   const query =  {
     start_date,
     end_date,
-    page_size: 500 /*max page size*/,
+    page_size: 500,
     transaction_status: 'S', /*succeeded*/
     transaction_type: 'T0006', /*Checkout API*/
     fields: _.uniq(['transaction_info', 'payer_info', ...outputFields]).join(',')
   }
 
   // exec first query
-  let response = await listTransaction(query)
+  let response = await _execListTransaction(query)
   if (response && response.statusCode === 200) {
     responses.push(response);
 
-    // build remain query
-    const queries = []
-    for(let i=2; i<=response.result.total_pages; ++i)
-      queries.push({...query, page: i})
-
+    // continue execute to gather all transaction
     // TODO: Known-issue: Load all transaction into memory for multiple request at the same time lead to memory issue
-    responses.push.apply(responses, await Promise.all(queries.map(qry => listTransaction(qry))))
+    if (response.result.total_pages > 1) {
+      const queries = []
+      for(let i=2; i<=response.result.total_pages; ++i)
+        queries.push({...query, page: i})
+      responses.push.apply(responses, await Promise.all(queries.map(qry => _execListTransaction(qry))))
+    }
 
     const transactions = []
     _.each(responses, ({ statusCode, result }) => {
@@ -105,12 +130,26 @@ async function getTransactionByStore({store_id, start_date, end_date, output}) {
         transactions.push.apply(transactions, result.transaction_details.filter(tranDetail => tranDetail && tranDetail.transaction_info && tranDetail.transaction_info.custom_field === store_id))
       }
     })
-    return { transactions, lastRefreshedDateTime: response.result.last_refreshed_datetime }
+
+    return {
+      transactions,
+      totalPages: response.result.total_pages,
+      lastRefreshedDateTime: response.result.last_refreshed_datetime
+    }
   } else {
     return []
   }
 }
-async function getTransactionById({transaction_id, start_date, end_date, output}) {
+
+/**
+ * Get transaction detail
+ * @param transaction_id
+ * @param start_date
+ * @param end_date
+ * @param output
+ * @returns {Promise<null|{transactions: *}>}
+ */
+async function getStoreTransactionById({transaction_id, start_date, end_date, output}) {
   const outputFields = (output && _.trim(output) !== "") ? _.trim(output).split(',') : []
   const query =  {
     transaction_id,
@@ -122,37 +161,59 @@ async function getTransactionById({transaction_id, start_date, end_date, output}
   // Note: A transaction ID is not unique in the reporting system.
   // The response can list two transactions with the same ID.
   // One transaction can be balance affecting while the other is non-balance affecting.
-  let { statusCode, result } = await listTransaction(query)
+  let { statusCode, result } = await _execListTransaction(query)
   if (statusCode === 200 && result) {
       return { transactions: result.transaction_details }
   } else {
     return null
   }
 }
-async function getNetAmountByStore({store_id, start_date, end_date}) {
-  const { transactions, lastRefreshedDateTime } = await getTransactionByStore({store_id, start_date, end_date })
 
-  // Expected that all transaction has been confirmed have the same currency code
-  //
+/**
+ * Get actual received amount per transaction
+ * @param tran
+ * @returns {number}
+ */
+function _getActualReceivedAmount(tran) {
+  // actual received
+  // note that, fee returned from PayPal is nagative value
+  // so adding fee is actual remove it from transaction amount
+  let tranAmount = tran.transaction_info.transaction_amount.value;
+  let feeAmount = tran.transaction_info.fee_amount.value
+  return parseFloat(tranAmount) + parseFloat(feeAmount)
+}
+
+/**
+ * Get balance of store
+ * @param store_id
+ * @param start_date
+ * @param end_date
+ * @returns {Promise<{balances: [{netAmount: number, currencyCode: string}], lastRefreshedDateTime: *}|{balances: [], lastRefreshedDateTime: *}>}
+ */
+async function getStoreBalance({store_id, start_date, end_date}) {
+  const { transactions, lastRefreshedDateTime } = await getStoreTransaction({ store_id, start_date, end_date })
   if (transactions && transactions.length) {
-    return {
-      currencyCode: transactions[0].transaction_info.transaction_amount.currency_code,
-      lastRefreshedDateTime,
-      netAmount: _.sumBy(transactions, tran => {
-        const tranInfo = tran.transaction_info
-        if (!tranInfo)
-          return 0;
-        const tranAmount = tran.transaction_info.transaction_amount
-        if (!tranAmount)
-          return 0;
-        const feeAmount = tran.transaction_info.fee_amount || { value: 0 }
-        return parseFloat(tranAmount.value) - Math.abs(parseFloat(feeAmount.value))
+    const transactionMap = _.groupBy(transactions, t => t.transaction_info.transaction_amount.currency_code)
+    // calculate balances by currency code
+    const balances = []
+    _.each(_.keys(transactionMap), currencyCode => {
+      balances.push({
+        currencyCode,
+        netAmount: _.sumBy(transactionMap[currencyCode], _getActualReceivedAmount).toFixed(2)
       })
+    })
+    return {
+      lastRefreshedDateTime,
+      balances,
     }
   } else {
+    // empty balance
     return {
-      currencyCode: 'USD',
-      netAmount: 0
+      lastRefreshedDateTime,
+      balances: [{
+        currencyCode: 'USD',
+        netAmount: 0
+      }]
     }
   }
 }
@@ -160,7 +221,7 @@ async function getNetAmountByStore({store_id, start_date, end_date}) {
 module.exports = {
   createOrder,
   captureOrder,
-  getTransactionByStore,
-  getNetAmountByStore,
-  getTransactionById,
+  getStoreTransaction,
+  getStoreBalance,
+  getStoreTransactionById,
 }

@@ -4,10 +4,6 @@
     <div class="row-flex align-items-center mb-4">
       <div class="provider-transaction__title">Transaction History</div>
       <g-spacer/>
-      <div>
-        <span class="text-grey-darken-1 fs-small mr-1">Total: </span>
-        <span class="w-700 fs-large mr-3"> {{ loadingTransaction ? '...' : `${currencyCode}${totalNetAmount}` }}</span>
-      </div>
       <date-range-picker :from="startDate" :to="endDate" @save="changeDate"/>
     </div>
     
@@ -117,14 +113,6 @@
           }
         })
       },
-      totalNetAmount() {
-        if (this.transactionInfo && this.transactionInfo.length)
-          return _.sumBy(this.transactionInfo, tran => tran.netAmount)
-      },
-      currencyCode() {
-        if (this.transactionInfo && this.transactionInfo.length)
-          return this.transactionInfo[0].currencyCode
-      }
     },
     created() {
       this.listTransactions()
@@ -162,6 +150,7 @@
         const queryStr = _.keys(query).map(k => `${k}=${query[k]}`).join('&')
         const response = await axios.get(`/payment/paypal/list-transaction?${queryStr}`)
         this.transactions.splice(0, this.transactions.length, ...response.data.transactions)
+        this.totalPages = response.data.totalPages
         this.lastRefreshedDateTime = dayjs(response.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
         this.loadingTransaction = false
       }

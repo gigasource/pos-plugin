@@ -13,9 +13,12 @@
         </div>
         <template v-if="PayPalActive">
           <div class="provider__balance-info">
-            <div class="provider__balance-info__kv">
-              <span class="provider__balance-info__key">PayPal Balance: </span>
-              <span class="provider__balance-info__value">{{netAmount === -1 ? 'Calculating...' : `${currencyCode}${netAmount}` }}</span>
+            <div class="provider__balance-info__key">PayPal Balance: </div>
+            <div class="provider__balance-info__value">
+              <div v-if="balances.length === 0">Calculating...</div>
+              <div v-else v-for="(balance, i) in balances" :key="i">
+                {{ balance.currencyCode | currencySymbol }}{{balance.netAmount}}
+              </div>
             </div>
           </div>
           <div class="provider__notice">
@@ -50,10 +53,14 @@
     props: {
       store: Object,
     },
+    filters: {
+      currencySymbol(code) {
+        return currencyCodeToSymbol(code);
+      }
+    },
     data: function () {
       return {
-        netAmount: -1,
-        currencyCode: '',
+        balances: [],
         lastRefreshedDateTime: null,
       }
     },
@@ -66,9 +73,8 @@
       const now = dayjs()
       const startDate = now.format('YYYY-MM') + '-01T00:00:00-0000'
       const endDate = now.format('YYYY-MM-DD') + 'T23:59:59-0000'
-      axios.get(`/payment/paypal/net-amount?store_id=${this.store._id}&start_date=${startDate}&end_date=${endDate}`).then(result => {
-        this.netAmount = result.data.netAmount
-        this.currencyCode = currencyCodeToSymbol(result.data.currencyCode);
+      axios.get(`/payment/paypal/balance?store_id=${this.store._id}&start_date=${startDate}&end_date=${endDate}`).then(result => {
+        this.balances.splice(0, this.balances.length, ...result.data.balances)
         this.lastRefreshedDateTime = dayjs(result.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
       })
     },
