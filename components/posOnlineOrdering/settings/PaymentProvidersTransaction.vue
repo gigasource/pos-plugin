@@ -8,8 +8,8 @@
     </div>
     
     <!-- Transaction table -->
-    <div class="provider-transaction__table">
-      <g-table elevation="2" fixed-header>
+    <div class="provider-transaction__table" style="box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);">
+      <g-table elevation="0" fixed-header>
         <thead>
           <tr>
             <th v-for="header in headers">{{header}}</th>
@@ -17,7 +17,7 @@
         </thead>
         <tbody>
           <template v-if="!loadingTransaction">
-            <tr v-for="tran in transactionInfo" :key="tran.transactionId" @click="showTransactionDetailDialog(tran.transactionId)" style="cursor:pointer">
+            <tr v-for="tran in transactionInfoPage" :key="tran.transactionId" @click="showTransactionDetailDialog(tran.transactionId)" style="cursor:pointer">
               <td>{{tran.date | fullDate}}</td>
               <td>{{tran.name}}</td>
               <td>{{tran.currencyCode}}{{tran.grossAmount}}</td>
@@ -29,7 +29,14 @@
           </template>
         </tbody>
       </g-table>
-      <div v-if="loadingTransaction">
+      <div v-if="!loadingTransaction" class="row-flex justify-end" style="background-color: #efefef;">
+        <div v-for="pageEntry in pageEntries"
+             :key="pageEntry" @click="moveToPage(pageEntry)"
+             style="padding: 5px 10px; margin: 5px; border-radius: 4px; background-color: #DDD; cursor:pointer;">
+          {{pageEntry}}
+        </div>
+      </div>
+      <div v-else>
         Loading transaction info...
       </div>
     </div>
@@ -84,6 +91,12 @@
         endDate: endDate,
         month: dayjs().format('YYYY-MM'),
         headers: ['Date', 'Name', 'Gross', 'Fee', 'Net', 'Type', 'Paid by'],
+        pagination: {
+          index: 1,
+          current: 1,
+          total: 1,
+          itemsPerPage: 30
+        },
         dialog: {
           transactionDetail: {
             show: false,
@@ -113,6 +126,28 @@
           }
         })
       },
+      transactionInfoPage() {
+        let start = (this.pagination.current - 1) * this.pagination.itemsPerPage
+        if (start > this.transactionInfo.length)
+          return []
+        
+        let end = start + this.pagination.itemsPerPage
+        if (end > this.transactionInfo.length)
+          end = this.transactionInfo.length
+        
+        let pageItems = []
+        for (let i = start; i< end; ++i) {
+          pageItems.push(this.transactionInfo[i])
+        }
+        return pageItems
+      },
+      pageEntries() {
+        const entries = []
+        for(let i=1; i<=this.pagination.total; ++i) {
+          entries.push(i)
+        }
+        return entries
+      }
     },
     created() {
       this.listTransactions()
@@ -150,10 +185,13 @@
         const queryStr = _.keys(query).map(k => `${k}=${query[k]}`).join('&')
         const response = await axios.get(`/payment/paypal/list-transaction?${queryStr}`)
         this.transactions.splice(0, this.transactions.length, ...response.data.transactions)
-        this.totalPages = response.data.totalPages
+        this.pagination.total = Math.floor(response.data.transactions.length / this.pagination.itemsPerPage) + (response.data.transactions.length % this.pagination.itemsPerPage === 0 ? 0 : 1)
         this.lastRefreshedDateTime = dayjs(response.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
         this.loadingTransaction = false
-      }
+      },
+      moveToPage(index) {
+        this.pagination.current = index
+      },
     }
   }
 </script>
