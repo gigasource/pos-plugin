@@ -104,7 +104,7 @@
     <!-- Action button -->
     <div style="display: flex; padding: 13px 8px; background-color: #FFF">
       <g-btn-bs @click="addChoice" border-color="#5E76FE">+ Choice</g-btn-bs>
-      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE">Extra info</g-btn-bs>
+      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE" icon="check@20">Extra info</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
       <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
@@ -113,7 +113,7 @@
     <!-- Dialog -->
     <dialog-text-filter label="ID" v-model="dialog.id" :default-value="internalId" @submit="internalId = $event"/>
     <dialog-text-filter label="Name" v-model="dialog.name" :default-value="internalName" @submit="internalName = $event"/>
-    <dialog-text-filter label="Description" v-model="dialog.desc" :default-value="internalDesc" @submit="internalDesc = $event"/>
+    <dialog-text-filter label="Description" v-model="dialog.desc" large :default-value="internalDesc" @submit="internalDesc = $event"/>
     <dialog-number-filter label="Price" v-model="dialog.price" :default-value="internalPrice" @submit="internalPrice = +$event"/>
     <dialog-text-filter label="Choice Name" v-model="dialog.choice" :default-value="choice.name" @submit="changeChoiceName"/>
     <dialog-text-filter label="Option Name" v-model="dialog.option" :default-value="choice.option" @submit="changeOption($event, 'name')"/>

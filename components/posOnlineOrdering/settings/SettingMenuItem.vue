@@ -1,7 +1,7 @@
 <template>
-  <div style="border-bottom: 1px solid #E0E0E0">
+  <div style="border-bottom: 1px solid #E0E0E0" :id="_id">
     <template v-if="mode === 'view'">
-      <div class="menu-setting-item" @mouseenter="positioning = true" @mouseleave="positioning = false">
+      <div :class="['menu-setting-item', !displayImage && 'no-image']" @mouseenter="positioning = true" @mouseleave="positioning = false">
         <div class="ta-center">
           <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
@@ -11,7 +11,7 @@
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
         </div>
-        <div class="r mt-3" style="align-self: flex-start">
+        <div v-if="displayImage" class="r mt-3" style="align-self: flex-start">
           <img v-if="image" :src="`${cdnImage}?w=80&h=80`" class="menu-setting-item__image" draggable="false"/>
           <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg" class="menu-setting-item__image"/>
           <div class="icon-eyes">
@@ -21,15 +21,30 @@
         </div>
         <div class="menu-setting-item__content px-2">
           <div class="menu-setting-item__name row-flex">
-            <span v-if="displayId" class="mr-1">{{id ? id + '.' : ''}}</span>
+            <span v-if="displayId && id" class="mr-1">{{id + '.'}}</span>
             <span :class="['flex-equal', collapseText && 'collapse']">{{name}}</span>
             <span class="col-3 pl-1" v-if="useMultiplePrinters">{{groupPrinterStr}}</span>
           </div>
           <pre :class="['menu-setting-item__desc', collapseText && 'collapse']" v-html="desc"/>
           <div class="menu-setting-item__extra-info">
-            <g-chip v-for="choice in choices" :key="choice._id">{{choice.name}}</g-chip>
+            <template v-for="(choice, i) in choices">
+              <g-menu v-model="menu.choice[i]" open-on-hover nudge-bottom="5" max-width="375" min-width="250" content-class="menu-status-notification">
+                <template v-slot:activator="{on}">
+                  <div v-on="on">
+                    <g-chip>{{choice.name}}</g-chip>
+                  </div>
+                </template>
+                <div class="pa-3 bg-white br-2">
+                  <p class="fw-700 fs-small mb-1">{{choice.name}}:</p>
+                  <div v-for="option in choice.options" :key="option._id" class="fs-small row-flex justify-between">
+                    <p>{{option.name}}</p>
+                    <p class="pl-5">{{option.price}}</p>
+                  </div>
+                </div>
+              </g-menu>
+            </template>
             <template v-for="(value, type) in mark">
-              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
                   <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent">
                     <g-icon v-if="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
@@ -105,6 +120,7 @@
           :choices="choices"
           :available="available"
           :mark="mark"
+          :display-image="displayImage"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -118,7 +134,7 @@
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark', 'displayImage'],
     data: function () {
       return {
         mode: 'view',
@@ -126,7 +142,8 @@
         menu: {
           allergic: false,
           spicy: false,
-          vegeterian: false
+          vegeterian: false,
+          choice: []
         }
       }
     },
@@ -190,6 +207,13 @@
         allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
         return allergens
       }
+    },
+    watch: {
+      choices(val) {
+        if(val) {
+          this.menu.choice = _.map(val, () => false)
+        }
+      }
     }
   }
 </script>
@@ -202,6 +226,10 @@
     background-color: #fff;
     align-items: center;
     min-height: 112px;
+
+    &.no-image {
+      grid-template-columns: 40px 1fr 60px 72px;
+    }
 
     &__image {
       width: 80px;
@@ -274,7 +302,7 @@
       align-items: center;
       flex-wrap: wrap;
 
-      :v-deep .g-chip__content {
+      ::v-deep .g-chip__content {
         font-size: 14px;
         font-weight: 700;
       }

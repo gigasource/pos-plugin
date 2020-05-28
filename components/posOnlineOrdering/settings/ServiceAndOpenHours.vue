@@ -3,7 +3,7 @@
     <div class="service-setting__title">Service & Open hours</div>
     <div class="service-setting__content mb-2">
       <div style="display: flex">
-        <div class="mb-3 fw-700">Open hours</div>
+        <div class="mb-3 fw-700">Open hours & Delivery hours</div>
         <g-spacer/>
         <g-btn-bs class="btn-add" @click="addNewOpenHour()">+ Add new</g-btn-bs>
       </div>
@@ -20,33 +20,34 @@
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getTime(openHour, 'open')"
-                               @input="updateHours($event, index, true)"/>
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
+                               :value="getTime(openHour, 'openTime')"
+                               @input="updateHours($event, index, 'open-Time')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].close && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getTime(openHour, 'close')"
-                               @input="updateHours($event, index, false)"/>
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
+                               :value="getTime(openHour, 'closeTime')"
+                               @input="updateHours($event, index, 'close-Time')"/>
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getDeliveryTime(openHour, 'from')"
-                               @input="updateDeliveryHours($event, index, true)"/>
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
+                               :value="getTime(openHour, 'deliveryStart')"
+                               @input="updateHours($event, index, 'delivery-Start')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
-                               :value="getDeliveryTime(openHour, 'to')"
-                               @input="updateDeliveryHours($event, index, false)"/>
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
+                               :value="getTime(openHour, 'deliveryEnd')"
+                               @input="updateHours($event, index, 'delivery-End')"/>
         </div>
         <g-spacer/>
-        <div @click="removeOpenHour(openHour)" class="open-hour__row--btn">
+        <div @click="removeOpenHour(index)" class="open-hour__row--btn">
           <g-icon size="16">icon-close</g-icon>
         </div>
         <div v-if="errors[index] && errors[index].message" class="error-message">{{errors[index].message}}</div>
       </div>
       <div class="row-flex">
+        <p>Note: Delivery hours must be within open hours.</p>
         <g-spacer/>
         <g-btn-bs width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
                :disabled="hasError || openHoursJson === lastSavedData">Save
@@ -56,24 +57,16 @@
     <div class="service-setting__content" style="display: inline-block">
       <div class="mb-3 fw-700">Service</div>
       <div class="row-flex">
-        <div class="col-6">
-          <div class="mb-2">Delivery</div>
-          <g-radio-group v-model="computedDelivery" row>
-            <g-radio small color="#536DFE" label="Yes" value="1" :class="[delivery === '1' && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" value="0" :class="[delivery === '0' && 'selected']"/>
-          </g-radio-group>
-        </div>
-        <div class="col-6">
-          <div class="mb-2">Allow pick-up</div>
-          <g-radio-group v-model="computedPickup" row>
-            <g-radio small color="#536DFE" label="Yes" value="1" :class="[pickup === '1' && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" value="0" :class="[pickup === '0' && 'selected']"/>
-          </g-radio-group>
-        </div>
+        <g-switch color="#536DFE" class="col-6" label="Delivery" v-model="computedDelivery"/>
+        <g-switch color="#536DFE" class="col-6" label="Allow pick-up" v-model="computedPickup"/>
+      </div>
+      <div class="fw-700 mt-2">Note for customers</div>
+      <div>
+        <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote"/>
       </div>
       <div class="row-flex align-items-center">
         <div class="col-8">
-          <g-switch :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
+          <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
                     @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
         </div>
         <div class="col-4 mt-2">
@@ -121,6 +114,7 @@
         default: 15,
       },
       orderTimeOut: Number,
+      noteToCustomers: String
     },
     data: function () {
       return {
@@ -144,18 +138,18 @@
     computed: {
       computedDelivery: {
         get() {
-          return this.delivery ? "1" : "0"
+          return this.delivery
         },
         set(value) {
-          this.$emit('update', { delivery: value === "1" })
+          this.$emit('update', { delivery: value })
         }
       },
       computedPickup: {
         get() {
-          return this.pickup ? "1" : "0"
+          return this.pickup
         },
         set(value) {
-          this.$emit('update', { pickup: value === "1" })
+          this.$emit('update', { pickup: value })
         }
       },
       computedMinimumOrderValue: {
@@ -197,17 +191,29 @@
           if ((message && message.length > 0) || open || close || delivery) result = true
         })
 
+        this.openHoursData.forEach(({dayInWeeks}) => {
+          if(dayInWeeks.filter(d => !!d).length === 0) result = true
+        })
+
         return result
       },
       openHoursJson() {
         return JSON.stringify(this.openHoursData)
       },
+      computedNote: {
+        get() {
+          return this.noteToCustomers
+        },
+        set(val) {
+          this.$emit('update', {noteToCustomers: val})
+        }
+      }
     },
     created() {
       this.deliveryTimeIntervalData = this.deliveryTimeInterval
     },
     mounted() {
-      this.openHoursData = this.openHours
+      this.openHoursData = _.cloneDeep(this.openHours)
       this.lastSavedData = JSON.stringify(this.openHoursData)
       this.errors = this.openHoursData.map(() => ({
         open: false,
@@ -230,13 +236,13 @@
         this.errors.push({
           open: false,
           close: false,
-          message: ''
+          message: '',
+          delivery: false
         })
 
         this.checkServiceHourError()
       },
-      removeOpenHour(openHour) {
-        const i = _.findIndex(this.openHoursData, oh => oh._id === openHour._id)
+      removeOpenHour(i) {
         this.openHoursData.splice(i, 1)
         this.errors.splice(i, 1)
 
@@ -247,80 +253,15 @@
         this.$emit('update', {openHours: this.openHoursData})
       },
       getTime(openHour, type) {
-        if(type === 'open') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.openTime) : openHour.openTime
-        }
-        if(type === 'close') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.closeTime) : openHour.closeTime
-        }
+        return this.country.name === 'United States' ? get12HourValue(openHour[type]) : openHour[type]
       },
-      getDeliveryTime(openHour, type) {
-        if (type === 'from') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryStart) : openHour.deliveryStart
-        }
-        if (type === 'to') {
-          return this.country.name === 'United State' ? get12HourValue(openHour.deliveryEnd) : openHour.deliveryEnd
-        }
-      },
-      updateHours(time, index, isOpenTime) {
-        time = get24HourValue(time)
-
-        const openHour = this.openHoursData[index]
-        this.$set(this.errors[index], 'message', '')
+      updateHours(time, index, typeStr) {
         if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
-          this.$set(this.errors[index], `${isOpenTime ? 'open' : 'close'}`, true)
-          this.$set(this.errors[index], 'message', `${isOpenTime ? 'Open' : 'Close'} time is invalid!`)
+          this.$set(this.errors[index], typeStr.split('-')[0], true)
+          this.$set(this.errors[index], 'message', `Invalid time format!`)
           return
         }
-        if (isOpenTime) {
-          this.$set(this.errors[index], 'open', false)
-          if (get24HourValue(time) < get24HourValue(openHour.closeTime)) {
-            this.$set(openHour, `openTime`, time)
-            this.$set(this.errors[index], 'close', false)
-          } else {
-            this.$set(this.errors[index], 'open', true)
-            this.$set(this.errors[index], 'message', 'Open time must be before close time!')
-          }
-        } else {
-          this.$set(this.errors[index], 'close', false)
-          if (get24HourValue(time) > get24HourValue(openHour.openTime)) {
-            this.$set(openHour, `closeTime`, time)
-            this.$set(this.errors[index], 'open', false)
-          } else {
-            this.$set(this.errors[index], 'close', true)
-            this.$set(this.errors[index], 'message', 'Close time must be after open time!')
-          }
-        }
-
-        this.checkServiceHourError()
-      },
-      updateDeliveryHours(time, index, isStartTime) {
-        time = get24HourValue(time)
-        const openHour = this.openHoursData[index]
-        this.$set(this.errors[index], 'message', '')
-        if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
-          this.$set(this.errors[index], 'delivery', true)
-          this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          return
-        }
-        this.$set(this.errors[index], 'delivery', false)
-        this.$set(this.errors[index], 'message', '')
-        if(isStartTime) {
-          if(time < openHour.closeTime && time > openHour.openTime && time < openHour.deliveryEnd) {
-            this.$set(openHour, 'deliveryStart', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
-        } else {
-          if(time < openHour.closeTime && time > openHour.openTime && time > openHour.deliveryStart) {
-            this.$set(openHour, 'deliveryEnd', time)
-          } else {
-            this.$set(this.errors[index], 'delivery', true)
-            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
-          }
-        }
-
+        this.$set(this.openHoursData[index], typeStr.replace('-', ''), time)
         this.checkServiceHourError()
       },
       toggleMinimumOrderValue(active) {
@@ -331,6 +272,22 @@
       },
       checkServiceHourError() {
         this.openHoursData.forEach(({dayInWeeks, openTime, closeTime, deliveryStart, deliveryEnd}, index) => {
+
+          if(openTime > closeTime) {
+            this.$set(this.errors[index], 'close', true)
+            this.$set(this.errors[index], 'open', true)
+            this.$set(this.errors[index], 'message', `Open time must be before close time!`)
+            return
+          }
+
+          if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
+            this.$set(this.errors[index], 'delivery', true)
+            this.$set(this.errors[index], 'message', `Delivery time is invalid!`)
+          } else {
+            this.$set(this.errors[index], 'delivery', false)
+            this.$set(this.errors[index], 'message', '')
+          }
+
           for (let i = 0; i < dayInWeeks.length; i++) {
             if (!dayInWeeks[i]) continue
 
@@ -340,11 +297,20 @@
             for (const {openTime: ot, closeTime: ct, row} of openHoursInDay) {
               if (row === index) continue
 
-              if (openTime > ot && openTime < ct) return this.$set(this.errors[index], 'open', true)
-              if (closeTime > ot && closeTime < ct) return this.$set(this.errors[index], 'close', true)
+              if (openTime > ot && openTime < ct) {
+                this.$set(this.errors[index], 'open', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
+                return
+              }
+              if (closeTime > ot && closeTime < ct) {
+                this.$set(this.errors[index], 'close', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
+                return
+              }
               if (openTime === ot && closeTime) {
                 this.$set(this.errors[index], 'close', true)
                 this.$set(this.errors[index], 'open', true)
+                this.$set(this.errors[index], 'message', 'Overlapping open hours!')
                 return
               }
             }
@@ -352,14 +318,6 @@
 
           this.$set(this.errors[index], 'open', false)
           this.$set(this.errors[index], 'close', false)
-
-          if(deliveryStart < openTime || deliveryStart > closeTime || deliveryEnd < openTime || deliveryEnd > closeTime || deliveryStart > deliveryEnd) {
-            this.$set(this.errors[index], 'delivery', true)
-          } else {
-            this.$set(this.errors[index], 'delivery', false)
-            this.$set(this.errors[index], 'message', '')
-          }
-
         })
       },
       updateDeliveryTimeInterval() {
@@ -506,6 +464,41 @@
 
     .bs-tf-wrapper ::v-deep .bs-tf-input {
       width: 100%;
+    }
+
+    .g-textarea {
+      margin: 8px 0;
+      width: calc(100% - 10px);
+
+      ::v-deep .g-tf {
+        &:before, &:after {
+          display: none;
+        }
+      }
+
+      ::v-deep fieldset {
+        border-width: 1px !important;
+        border-color: #ced4da;
+
+        &:focus-within {
+          border-color: #80bdff !important;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+          z-index: 2;
+        }
+
+        .g-tf-input {
+          padding: 12px;
+          font-size: 15px;
+        }
+
+        .g-tf-append__inner {
+          display: none;
+        }
+
+        textarea {
+          user-select: text !important;
+        }
+      }
     }
   }
 </style>

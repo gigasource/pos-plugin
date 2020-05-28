@@ -25,6 +25,7 @@
             :products="products"
             :collapse-text="store.collapseText"
             :display-id="store.displayId"
+            :display-image="store.displayImage"
             @update-store="updateStore"
             @add-new-category="addNewCategory"
             @change-category-name="changeCategoryName"
@@ -141,7 +142,11 @@
         if (change.orderTimeOut) window.cms.socket.emit('updateOrderTimeOut', this.store._id, change.orderTimeOut)
 
         await cms.getModel('Store').updateOne({_id: this.store._id}, change)
-        Object.assign(this.store, change)
+        for (const key in change) {
+          if (change.hasOwnProperty(key)) {
+            this.$set(this.store, key, change[key])
+          }
+        }
       },
       async updateDeliveryTimeInterval(val) {
         await this.updateStore({deliveryTimeInterval: val})

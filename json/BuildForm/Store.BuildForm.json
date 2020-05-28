@@ -304,6 +304,37 @@
       "key": "displayId",
       "default": "",
       "type": "input@switch"
+    },
+    {
+      "_id": "5ecb9e5bf198ae04f6d52d39",
+      "schemaType": "string",
+      "key": "noteToCustomers",
+      "type": "input"
+    },
+    {
+      "_id": "5ece314fc7908d07be96dbfb",
+      "schemaType": "object",
+      "key": "coordinates",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "long",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "lat",
+          "type": "input@number"
+        }
+      ],
+      "type": "object",
+      "addable": true
+    },
+    {
+      "_id": "5ece487fe5da86fae97e5db6",
+      "schemaType": "boolean",
+      "key": "displayImage",
+      "type": "input@switch"
     }
   ],
   "name": "Store",

@@ -16,6 +16,8 @@ module.exports = {
       name: 'Name',
       telephone: 'Telefon',
       address: 'Adresse',
+      street: 'Straße',
+      houseNo: 'Nr',
       zipCode: 'Postleitzahl',
       deliveryTime: 'Lieferzeit',
       pickupTime: 'Abholzeit',
@@ -76,6 +78,7 @@ module.exports = {
       mustard: 'Senf',
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
+      messageConfirm: 'Your order will be sent to the restaurant.',
     },
 
     common: {

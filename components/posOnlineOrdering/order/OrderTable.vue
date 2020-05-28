@@ -133,7 +133,7 @@
             <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
           </div>
         </g-btn-bs>
-        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="confirmPayment" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
+        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="dialog.confirm = true" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
       </div>
       <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
         <g-badge :value="true" color="#4CAF50" overlay>
@@ -147,7 +147,7 @@
         <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
         <g-spacer/>
         <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="confirmPayment" style="padding: 8px 16px" elevation="5">
+        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="dialog.confirm = true" style="padding: 8px 16px" elevation="5">
           {{$t('store.confirm')}}
         </g-btn-bs>
       </div>
@@ -158,19 +158,28 @@
                    :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
+    <dialog-order-confirm v-model="dialog.confirm"
+                          :items="orderItems"
+                          :total-items="totalItems"
+                          :total-price="totalPrice"
+                          :shipping-fee="shippingFee"
+                          :discounts="discounts"
+                          :effective-total="effectiveTotal"
+                          @confirm="confirmPayment"/>
   </div>
 </template>
 <script>
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
   import orderUtil from '../../logic/orderUtil';
-  import {get12HourValue, get24HourValue, incrementTime} from "../../logic/timeUtil";
-  import {autoResizeTextarea} from '../../logic/commonUtils'
+  import { get12HourValue, get24HourValue, incrementTime } from '../../logic/timeUtil';
+  import { autoResizeTextarea } from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
+  import DialogOrderConfirm from './dialogOrderConfirm';
 
   export default {
     name: 'OrderTable',
-    components: { OrderCreated },
+    components: {DialogOrderConfirm, OrderCreated },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -196,7 +205,8 @@
         currency: $t('common.currency'),
         dialog: {
           value: false,
-          order: {}
+          order: {},
+          confirm: false,
         },
         couponTf: {
           active: false,
@@ -209,6 +219,12 @@
         listDiscounts: [],
         storeOpenHours: null,
         deliveryTime: null,
+        addressSuggestions: [],
+        addressStr: '',
+        addressNo: '',
+        throttledGetSuggestions: null,
+        now: null,
+        timeInterval: null
       }
     },
     filters: {
@@ -221,7 +237,11 @@
     async created() {
       this.listDiscounts = await cms.getModel('Discount').find({store: this.store._id})
 
-      this.deliveryTime = this.asap
+      // this.deliveryTime = this.asap
+      this.now = dayjs().format('HH:mm')
+      this.timeInterval = setInterval(() => {
+        this.now = dayjs().format('HH:mm')
+      }, 60000)
 
       const {openHours} = this.store
       this.storeOpenHours = openHours.filter(({dayInWeeks}) => {
@@ -231,6 +251,12 @@
 
         return dayInWeeks[today]
       })
+
+      // get geocode & distance from address & zipCode
+      this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
+    },
+    beforeDestroy() {
+      clearInterval(this.timeInterval)
     },
     computed: {
       asap() {
@@ -246,22 +272,31 @@
           : true
       },
       satisfyDeliveryTime() {
-        let result = false, now = dayjs().format('HH:mm'), inWorkingTime = false, havingDeliveryTime = false
-        this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
+        let result = false, inWorkingTime = false, havingDeliveryTime = false
+        this.storeOpenHours && this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
           if(deliveryStart && deliveryEnd) havingDeliveryTime = true
-          if(now >= deliveryStart && now <= deliveryEnd) result = true
-          if(now >= openTime && now <= closeTime) inWorkingTime = true
+          if(this.now >= deliveryStart && this.now <= deliveryEnd) result = true
+          if(this.now >= openTime && this.now <= closeTime) inWorkingTime = true
         })
         if(!havingDeliveryTime) result = inWorkingTime
         return result
       },
       deliveryTimeString() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
       },
       orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
+      storeZipCodes() {
+        return this.store.deliveryFee.fees.map(({ zipCode, fee }) => {
+          if (zipCode.includes(',') || zipCode.includes(';')) {
+            zipCode = zipCode.replace(/\s/g, '')
+            zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+          }
+          return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee })) : { zipCode, fee }
+        }).flat()
+      },
       shippingFee() {
         if (!this.orderItems || this.orderItems.length === 0)
           return 0;
@@ -270,7 +305,7 @@
           return 0
 
         // calculate zip code from store setting
-        for (let deliveryFee of this.store.deliveryFee.fees) {
+        for (const deliveryFee of this.storeZipCodes) {
          if (_.lowerCase(_.trim(deliveryFee.zipCode)) === _.lowerCase(_.trim(this.customer.zipCode)))
            return deliveryFee.fee
         }
@@ -285,20 +320,25 @@
         const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
         if (this.orderType === 'delivery') {
           if (!this.satisfyMinimumValue) return true
-          if (!this.satisfyDeliveryTime) return true
           for (const fn of this.validateZipcode) {
             if (typeof fn === 'function' && typeof fn(this.customer.zipCode) === 'string') {
               return true
             }
           }
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5
+          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime
         }
         return check
       },
       validateZipcode() {
         const rules = []
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes) {
-          const zipCodes = this.store.deliveryFee.fees.map(f => f.zipCode)
+          const zipCodes = this.store.deliveryFee.fees.map(({ zipCode }) => {
+            if (zipCode.includes(',') || zipCode.includes(';')) {
+              zipCode = zipCode.replace(/\s/g, '')
+              zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+            }
+            return zipCode;
+          }).flat()
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
         return rules
@@ -370,9 +410,10 @@
         const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 15)
 
         if (this.storeOpenHours) {
-          this.storeOpenHours.forEach(({deliveryStart, deliveryEnd}) => {
-            let [openTimeHour, openTimeMinute] = get24HourValue(deliveryStart).split(':')
-            let [closeTimeHour, closeTimeMinute] = get24HourValue(deliveryEnd).split(':')
+          this.storeOpenHours.forEach(({openTime, closeTime, deliveryStart, deliveryEnd}) => {
+            const start = deliveryStart ? deliveryStart : openTime, end = deliveryEnd ? deliveryEnd : closeTime
+            let [openTimeHour, openTimeMinute] = get24HourValue(start).split(':')
+            let [closeTimeHour, closeTimeMinute] = get24HourValue(end).split(':')
 
             openTimeHour = parseInt(openTimeHour)
             openTimeMinute = parseInt(openTimeMinute)
@@ -393,12 +434,15 @@
         }
 
         list = _.uniq(list).sort()
-        list.unshift(this.asap)
+        if(this.satisfyDeliveryTime) list.unshift(this.asap)
 
         return list
       },
       cdnOrderHeaderImage() {
-        return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=340&h=180`
+        return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=680&h=390`
+      },
+      availableStreetAutocomplete() {
+        return this.addressSuggestions.length > 0
       }
     },
     watch: {
@@ -411,6 +455,12 @@
             autoResizeTextarea('.po-order-table__item__note textarea')
           })
         }
+      },
+      satisfyDeliveryTime(val) {
+        if(val)
+          this.deliveryTime = this.asap
+        else
+          this.deliveryTime = ''
       }
     },
     methods: {
@@ -533,7 +583,46 @@
       },
       getItemModifiers(item) {
         return item.modifiers.map(m => m.name).join(', ')
-      }
+      },
+      async getSuggestions(text) {
+        if (!text) return []
+
+        let url = `https://pelias.gigasource.io/v1/autocomplete?layers=street&text=${encodeURI(text)}`
+
+        try {
+          const { data: {features} } = await axios.get(url)
+          this.addressSuggestions = features.map(feature => {
+            const { name } = feature.properties // street name
+            return `${name}`
+          })
+        } catch (e) {
+          console.warn(e)
+        }
+      },
+      getGeocode: _.debounce(async function (values) {
+        const [address, zipCode] = values
+        if (!address || !zipCode) return
+
+        let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
+        if (this.store.coordinates) {
+          const {lat, long} = this.store.coordinates
+          url += `&focus.point.lat=${lat}&focus.point.lon=${long}`
+        }
+
+        try {
+          const { data: {features} } = await axios.get(url)
+          if (features && features.length) {
+            const foundLocation = features.find(location => location.properties.postalcode === zipCode)
+            if (foundLocation) {
+              // todo get distance
+              const { properties: { distance }, geometry: { coordinates } } = foundLocation
+              console.log(`Coords: ${coordinates}, Distance: ${distance}`)
+            }
+          }
+        } catch (e) {
+          console.warn(e)
+        }
+      })
     }
   }
 </script>

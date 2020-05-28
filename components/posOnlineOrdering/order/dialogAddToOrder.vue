@@ -7,23 +7,24 @@
           <div class="dialog-header__name">
             {{name}}
             <template v-for="(value, type) in mark">
-              <g-menu v-model="menu[type]" open-on-hover nudge-bottom="5" content-class="menu-status-notification">
-                <template v-slot:activator="{on}">
-                  <div v-show="value.active" v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
-                    <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
-                    <g-icon v-show="!menu[type]" size="20">{{`icon-${type}`}}</g-icon>
-                  </div>
-                </template>
-                <div class="pa-2 bg-white">
-                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
-                  <p class="fs-small text-grey-darken-3">
-                    {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
-                    <template v-if="type === 'allergic'">
-                      {{getAllergicType(value.types)}}
-                    </template>
-                  </p>
-                </div>
-              </g-menu>
+<!--              <g-menu v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">-->
+<!--                <template v-slot:activator="{on}">-->
+<!--                  <div v-show="value.active" v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">-->
+<!--                    <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>-->
+<!--                    <g-icon v-show="!menu[type]" size="20">{{`icon-${type}`}}</g-icon>-->
+<!--                  </div>-->
+<!--                </template>-->
+<!--                <div class="pa-2 bg-white">-->
+<!--                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>-->
+<!--                  <p class="fs-small text-grey-darken-3">-->
+<!--                    {{value.notice ? value.notice : $t(`store.${type}Notice`)}}-->
+<!--                    <template v-if="type === 'allergic'">-->
+<!--                      {{getAllergicType(value.types)}}-->
+<!--                    </template>-->
+<!--                  </p>-->
+<!--                </div>-->
+<!--              </g-menu>-->
+              <g-icon v-show="value.active" size="20" class="ml-2">{{`icon-${type}`}}</g-icon>
             </template>
           </div>
           <p class="dialog-header__price">{{$t('common.currency')}}{{computedPrice}}</p>

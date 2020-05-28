@@ -301,6 +301,8 @@ module.exports = {
       name: 'Name',
       telephone: 'Telephone',
       address: 'Address',
+      street: 'Street',
+      houseNo: 'No.',
       zipCode: 'Zip Code',
       deliveryTime: 'Delivery Time',
       pickupTime: 'Pickup Time',
@@ -361,6 +363,7 @@ module.exports = {
       mustard: 'Mustard',
       soya: 'Soya',
       sulphur: 'Sulphur Dioxide',
+      messageConfirm: 'Your order will be sent to the restaurant.',
     }
   }
 }
