@@ -149,6 +149,7 @@
     
     &__notice {
       color: #616161;
+      margin-top: 20px;
       &>ul {
         margin-block-start: 0 !important;
         font-style: italic;
