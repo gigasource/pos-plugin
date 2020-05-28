@@ -237,9 +237,11 @@
       },
       showAddNewProductPanelForCategory(cate) {
         this.$set(this.showAddNewProductPanel, cate._id, true)
-        const wrapper = document.getElementById('menu-setting')
-        const panel = document.getElementById('new_product_' + cate._id)
-        wrapper.scrollTop = panel.getBoundingClientRect().top - 48
+        this.$nextTick(() => {
+          const wrapper = document.getElementById('menu-setting')
+          const panel = document.getElementById('new_product_' + cate._id)
+          wrapper.scroll({top: panel.getBoundingClientRect().top - wrapper.getBoundingClientRect().top - 48, left: 0, behavior: 'smooth'})
+        })
       },
       hideAddNewProductPanelForCategory(cate) {
         this.$set(this.showAddNewProductPanel, cate._id, false)
