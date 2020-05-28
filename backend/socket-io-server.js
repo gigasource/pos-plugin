@@ -1,10 +1,9 @@
 const {p2pServerPlugin} = require('@gigasource/socket.io-p2p-plugin');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const ProxyServer = require('@gigasource/nodejs-proxy-server/libs/server.js');
-const {remoteControlExpressServerPort, remoteControlSocketIOServerPort} = global.APP_CONFIG;
 const deviceStatusSubscribers = {};
 const _ = require('lodash');
+const axios = require('axios');
 const ppApiv2 = require('./api/payment/paypal/paypalApiV2')
 
 const Schema = mongoose.Schema
@@ -51,13 +50,6 @@ module.exports = function (cms) {
   const DeviceModel = cms.getModel('Device');
   let onlineDeviceIds = [];
 
-  const proxyServer = new ProxyServer({
-    expressServerPort: remoteControlExpressServerPort,
-    socketIOServerPort: remoteControlSocketIOServerPort || 8901,
-    ignoreStreamError: true,
-  });
-  // for destroy: proxyServer.destroy();
-
   const {io, socket: internalSocketIOServer} = cms;
   const externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
@@ -69,11 +61,11 @@ module.exports = function (cms) {
 
   // ack fns
   externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
-    const { _id, name, hardware } = device
+    const {_id, name, hardware} = device
     try {
-      await cms.getModel('Device').updateOne({ _id }, { features })
+      await cms.getModel('Device').updateOne({_id}, {features})
       cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
-        false, Object.assign({}, device, { features }))
+          false, Object.assign({}, device, {features}))
     } catch (e) {
       cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
     }
@@ -124,10 +116,10 @@ module.exports = function (cms) {
       const store = await cms.getModel('Store').findById(device.storeId);
       if (!store) return callback(null);
 
-      const user = await cms.getModel('User').findOne({ store: store._id })
+      const user = await cms.getModel('User').findOne({store: store._id})
       if (!user) return callback(null);
       // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
-      const accessToken = await cms.utils.generateAccessToken(user.username,  user.password)
+      const accessToken = await cms.utils.generateAccessToken(user.username, user.password)
       if (accessToken) {
         callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true&lang=${locale || 'en'}`)
       } else {
@@ -150,34 +142,34 @@ module.exports = function (cms) {
     socket.on('getOnlineDeviceServices', async (deviceId, callback) => {
       try {
         const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({ error: 'Device not found' })
+        if (!device) return callback({error: 'Device not found'})
 
         const store = await cms.getModel('Store').findById(device.storeId)
-        if (!store) return callback({ error: 'Store not found!' })
+        if (!store) return callback({error: 'Store not found!'})
 
-        const { delivery, pickup, noteToCustomers } = store
+        const {delivery, pickup, noteToCustomers} = store
 
-        return callback({ services: { delivery, pickup, noteToCustomers } })
+        return callback({services: {delivery, pickup, noteToCustomers}})
       } catch (error) {
-        callback({ error })
+        callback({error})
       }
     })
 
-    socket.on('updateWebshopServices', async (deviceId, { delivery, pickup, noteToCustomers }, callback) => {
+    socket.on('updateWebshopServices', async (deviceId, {delivery, pickup, noteToCustomers}, callback) => {
       try {
         const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({ error: 'Device not found' })
+        if (!device) return callback({error: 'Device not found'})
 
-        await cms.getModel('Store').findOneAndUpdate({ _id: device.storeId }, {
+        await cms.getModel('Store').findOneAndUpdate({_id: device.storeId}, {
           $set: {
             delivery,
             pickup,
             noteToCustomers
           }
         })
-        callback({ success: true })
+        callback({success: true})
       } catch (error) {
-        callback({ error })
+        callback({error})
       }
     })
 
@@ -215,7 +207,7 @@ module.exports = function (cms) {
     socket.on('getOnlineDeviceIds', callback => callback(onlineDeviceIds));
 
     socket.on('getProxyInfo', callback => callback({
-      proxyHost: global.APP_CONFIG.proxyHost,
+      proxyUrlTemplate: global.APP_CONFIG.proxyUrlTemplate,
       proxyRetryInterval: global.APP_CONFIG.proxyRetryInterval,
     }));
 
@@ -262,27 +254,37 @@ module.exports = function (cms) {
       if (!deviceId) {
         callback(null);
       } else {
-        remoteControlDeviceId = deviceId;
-        externalSocketIOServer.emitTo(deviceId, 'startRemoteControl', remoteControlSocketIOServerPort || 8901, async () => {
-          const proxyPort = await proxyServer.startProxy(`${deviceId}-proxy-client`);
+        let {proxyServerHost, proxyServerPort, proxyUrlTemplate} = global.APP_CONFIG;
 
-          if (!proxyPort) {
+        remoteControlDeviceId = deviceId;
+        externalSocketIOServer.emitTo(deviceId, 'startRemoteControl', proxyServerHost, proxyServerPort, async () => {
+          let error;
+
+          try {
+            const {proxyPort} = (await axios.post(`${proxyServerHost}:${proxyServerPort}/start-proxy?proxyClientId=${deviceId}-proxy-client`)).data;
+
+            if (!proxyPort) error = 'No port is available for proxying';
+            else callback(proxyUrlTemplate, proxyPort);
+          } catch (e) {
+            error = e;
+          }
+
+          if (error) {
+            console.error(error);
             externalSocketIOServer.emitTo(deviceId, 'stopRemoteControl');
             callback(null);
-          } else {
-            callback(proxyPort);
           }
-        })
+        });
       }
     });
 
     socket.on('stopRemoteControl', async deviceId => {
       if (!deviceId) return
-      proxyServer.stopProxy(`${deviceId}-proxy-client`);
 
-      externalSocketIOServer.emitTo(deviceId, 'stopRemoteControl', () => {
-        remoteControlDeviceId = null;
-      })
+      const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;
+      await axios.delete(`${proxyServerHost}:${proxyServerPort}/stop-proxy?proxyClientId=${deviceId}-proxy-client`);
+
+      externalSocketIOServer.emitTo(deviceId, 'stopRemoteControl', () => remoteControlDeviceId = null);
     });
 
     socket.on('updateOrderTimeOut', async (storeId, orderTimeOut) => {
@@ -302,11 +304,13 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(deviceId, 'stopStream')
     })
 
-    socket.once('disconnect', () => {
+    socket.once('disconnect', async () => {
       delete deviceStatusSubscribers[socket.id]
 
       if (!remoteControlDeviceId) return
-      proxyServer.stopProxy(`${remoteControlDeviceId}-proxy-client`);
+
+      const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;
+      await axios.delete(`${proxyServerHost}:${proxyServerPort}/stop-proxy?proxyClientId=${remoteControlDeviceId}-proxy-client`);
       remoteControlDeviceId = null;
     });
   });

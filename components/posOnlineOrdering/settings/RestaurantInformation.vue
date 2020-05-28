@@ -29,7 +29,7 @@
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
             <div class="span-2">
-              <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country" @input="updateDebounce({country: $event})"/>
+              <g-text-field-bs :value="store.country.name" label="Country" readonly/>
             </div>
           </div>
         </div>
@@ -102,21 +102,7 @@
       store: Object
     },
     data: function () {
-      return {
-        // now we're currently support de-DE and en-US
-        // note that, new i18n file should be added for each country
-        countries: [
-          {name: 'Germany', locale: 'de-DE'},
-          {name: 'United States', locale: 'en-US'},
-          // {name: 'United Kingdom', locale: 'en-GB'},
-          // {name: 'Australia', locale: 'en'},
-          // {name: 'Canada', locale: 'en'},
-          // {name: 'France', locale: 'fr'},
-          // {name: 'Italy', locale: 'it'},
-          // {name: 'Singapore', locale: 'en'},
-        ],
-        country: this.store.country || '',
-      }
+      return {}
     },
     injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems)'],
     computed: {
@@ -127,7 +113,7 @@
       coords() {
         if (!this.store.coordinates || !this.store.coordinates.lat || !this.store.coordinates.long) return
         return `Coordinates: ${this.store.coordinates.long}, ${this.store.coordinates.lat}`
-      }
+      },
     },
     created() {
       this.updateDebounce = _.debounce(this.update, 1000)

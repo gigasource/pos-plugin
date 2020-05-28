@@ -235,6 +235,8 @@
         addressStr: '',
         addressNo: '',
         throttledGetSuggestions: null,
+        now: null,
+        timeInterval: null,
         paypalOrderDetail: {}
       }
     },
@@ -248,7 +250,11 @@
     async created() {
       this.listDiscounts = await cms.getModel('Discount').find({store: this.store._id})
 
-      this.deliveryTime = this.asap
+      // this.deliveryTime = this.asap
+      this.now = dayjs().format('HH:mm')
+      this.timeInterval = setInterval(() => {
+        this.now = dayjs().format('HH:mm')
+      }, 60000)
 
       const {openHours} = this.store
       this.storeOpenHours = openHours.filter(({dayInWeeks}) => {
@@ -261,6 +267,9 @@
 
       // get geocode & distance from address & zipCode
       this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
+    },
+    beforeDestroy() {
+      clearInterval(this.timeInterval)
     },
     computed: {
       currency() {
@@ -284,11 +293,11 @@
           : true
       },
       satisfyDeliveryTime() {
-        let result = false, now = dayjs().format('HH:mm'), inWorkingTime = false, havingDeliveryTime = false
-        this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
+        let result = false, inWorkingTime = false, havingDeliveryTime = false
+        this.storeOpenHours && this.storeOpenHours.forEach(({deliveryStart, deliveryEnd, openTime, closeTime}) => {
           if(deliveryStart && deliveryEnd) havingDeliveryTime = true
-          if(now >= deliveryStart && now <= deliveryEnd) result = true
-          if(now >= openTime && now <= closeTime) inWorkingTime = true
+          if(this.now >= deliveryStart && this.now <= deliveryEnd) result = true
+          if(this.now >= openTime && this.now <= closeTime) inWorkingTime = true
         })
         if(!havingDeliveryTime) result = inWorkingTime
         return result
@@ -336,7 +345,7 @@
               return true
             }
           }
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5
+          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime
         }
         return check
       },
@@ -449,7 +458,7 @@
         }
 
         list = _.uniq(list).sort()
-        list.unshift(this.asap)
+        if(this.satisfyDeliveryTime) list.unshift(this.asap)
 
         return list
       },
@@ -534,6 +543,12 @@
             autoResizeTextarea('.po-order-table__item__note textarea')
           })
         }
+      },
+      satisfyDeliveryTime(val) {
+        if(val)
+          this.deliveryTime = this.asap
+        else
+          this.deliveryTime = ''
       }
     },
     methods: {
