@@ -138,7 +138,14 @@ async function getNetAmountByStore({store_id, start_date, end_date}) {
       currencyCode: transactions[0].transaction_info.transaction_amount.currency_code,
       lastRefreshedDateTime,
       netAmount: _.sumBy(transactions, tran => {
-        return parseFloat(tran.transaction_info.transaction_amount.value) - Math.abs(parseFloat(tran.transaction_info.fee_amount.value))
+        const tranInfo = tran.transaction_info
+        if (!tranInfo)
+          return 0;
+        const tranAmount = tran.transaction_info.transaction_amount
+        if (!tranAmount)
+          return 0;
+        const feeAmount = tran.transaction_info.fee_amount || { value: 0 }
+        return parseFloat(tranAmount.value) - Math.abs(parseFloat(feeAmount.value))
       })
     }
   } else {
