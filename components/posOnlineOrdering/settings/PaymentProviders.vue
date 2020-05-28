@@ -16,9 +16,11 @@
             <div class="provider__balance-info__key">PayPal Balance: </div>
             <div class="provider__balance-info__value">
               <div v-if="balances.length === 0">Calculating...</div>
-              <div v-else v-for="(balance, i) in balances" :key="i">
-                {{ balance.currencyCode | currencySymbol }}{{balance.netAmount}}
-              </div>
+              <ul v-else>
+                <li v-for="(balance, i) in balances" :key="i">
+                  {{ balance.currencyCode | currencySymbol }}{{balance.netAmount}}
+                </li>
+              </ul>
             </div>
           </div>
           <div class="provider__notice">
