@@ -20,23 +20,23 @@
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].open && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'openTime')"
                                @input="updateHours($event, index, 'open-Time')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].close && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'closeTime')"
                                @input="updateHours($event, index, 'close-Time')"/>
         </div>
         <g-spacer/>
         <div :class="['open-hour__row--hour', 'left', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'deliveryStart')"
                                @input="updateHours($event, index, 'delivery-Start')"/>
         </div>
         <div :class="['open-hour__row--hour', 'right', errors[index] && errors[index].delivery && 'error']">
-          <g-time-picker-input :use24Hours="country.name !== 'United State'"
+          <g-time-picker-input :use24Hours="country.name !== 'United States'"
                                :value="getTime(openHour, 'deliveryEnd')"
                                @input="updateHours($event, index, 'delivery-End')"/>
         </div>
@@ -57,24 +57,16 @@
     <div class="service-setting__content" style="display: inline-block">
       <div class="mb-3 fw-700">Service</div>
       <div class="row-flex">
-        <div class="col-6">
-          <div class="mb-2">Delivery</div>
-          <g-radio-group v-model="computedDelivery" row>
-            <g-radio small color="#536DFE" label="Yes" value="1" :class="[delivery === '1' && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" value="0" :class="[delivery === '0' && 'selected']"/>
-          </g-radio-group>
-        </div>
-        <div class="col-6">
-          <div class="mb-2">Allow pick-up</div>
-          <g-radio-group v-model="computedPickup" row>
-            <g-radio small color="#536DFE" label="Yes" value="1" :class="[pickup === '1' && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" value="0" :class="[pickup === '0' && 'selected']"/>
-          </g-radio-group>
-        </div>
+        <g-switch color="#536DFE" class="col-6" label="Delivery" v-model="computedDelivery"/>
+        <g-switch color="#536DFE" class="col-6" label="Allow pick-up" v-model="computedPickup"/>
+      </div>
+      <div class="fw-700 mt-2">Note for customers</div>
+      <div>
+        <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote"/>
       </div>
       <div class="row-flex align-items-center">
         <div class="col-8">
-          <g-switch :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
+          <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
                     @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
         </div>
         <div class="col-4 mt-2">
@@ -122,6 +114,7 @@
         default: 15,
       },
       orderTimeOut: Number,
+      noteToCustomers: String
     },
     data: function () {
       return {
@@ -145,18 +138,18 @@
     computed: {
       computedDelivery: {
         get() {
-          return this.delivery ? "1" : "0"
+          return this.delivery
         },
         set(value) {
-          this.$emit('update', { delivery: value === "1" })
+          this.$emit('update', { delivery: value })
         }
       },
       computedPickup: {
         get() {
-          return this.pickup ? "1" : "0"
+          return this.pickup
         },
         set(value) {
-          this.$emit('update', { pickup: value === "1" })
+          this.$emit('update', { pickup: value })
         }
       },
       computedMinimumOrderValue: {
@@ -207,6 +200,14 @@
       openHoursJson() {
         return JSON.stringify(this.openHoursData)
       },
+      computedNote: {
+        get() {
+          return this.noteToCustomers
+        },
+        set(val) {
+          this.$emit('update', {noteToCustomers: val})
+        }
+      }
     },
     created() {
       this.deliveryTimeIntervalData = this.deliveryTimeInterval
@@ -252,7 +253,7 @@
         this.$emit('update', {openHours: this.openHoursData})
       },
       getTime(openHour, type) {
-        return this.country.name === 'United State' ? get12HourValue(openHour[type]) : openHour[type]
+        return this.country.name === 'United States' ? get12HourValue(openHour[type]) : openHour[type]
       },
       updateHours(time, index, typeStr) {
         if (!_24HourTimeRegex.exec(time) && !_12HourTimeRegex.exec(time)) {
@@ -463,6 +464,41 @@
 
     .bs-tf-wrapper ::v-deep .bs-tf-input {
       width: 100%;
+    }
+
+    .g-textarea {
+      margin: 8px 0;
+      width: calc(100% - 10px);
+
+      ::v-deep .g-tf {
+        &:before, &:after {
+          display: none;
+        }
+      }
+
+      ::v-deep fieldset {
+        border-width: 1px !important;
+        border-color: #ced4da;
+
+        &:focus-within {
+          border-color: #80bdff !important;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+          z-index: 2;
+        }
+
+        .g-tf-input {
+          padding: 12px;
+          font-size: 15px;
+        }
+
+        .g-tf-append__inner {
+          display: none;
+        }
+
+        textarea {
+          user-select: text !important;
+        }
+      }
     }
   }
 </style>

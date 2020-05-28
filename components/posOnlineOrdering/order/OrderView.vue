@@ -68,17 +68,19 @@
               </div>
             </g-btn-bs>
           </div>
-          <div class="pos-order__tab">
-            <div class="pos-order__tab--icon">
-              <g-icon>icon-fork</g-icon>
-            </div>
-            <div class="pos-order__tab--category" id="tab">
-              <div v-for="(category, index) in categoriesViewModel"
-                    :key="`tab_${index}`"
-                    :id="`tab_${category._id}`"
-                    @click="chooseCategory(category._id)"
-                    :style="getCategoryStyle(category)">
-                {{ category.name }}
+          <div class="pos-order__tab--wrapper">
+            <div class="pos-order__tab">
+              <div class="pos-order__tab--icon">
+                <g-icon>icon-fork</g-icon>
+              </div>
+              <div class="pos-order__tab--category" id="tab">
+                <div v-for="(category, index) in categoriesViewModel"
+                     :key="`tab_${index}`"
+                     :id="`tab_${category._id}`"
+                     @click="chooseCategory(category._id)"
+                     :style="getCategoryStyle(category)">
+                  {{ category.name }}
+                </div>
               </div>
             </div>
           </div>
@@ -96,6 +98,7 @@
                     :collapse-text="store.collapseText"
                     :display-id="store.displayId"
                     :scrolling="scrolling"
+                    :display-image="store.displayImage"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
@@ -139,6 +142,15 @@
           </div>
         </g-dialog>
 
+        <!-- Dialog Note -->
+        <g-dialog v-model="dialog.note" width="400">
+          <div class="dialog-closed">
+            <div class="dialog-closed__title">{{$t('store.note')}}</div>
+            <div class="dialog-closed__message">{{ store.noteToCustomers }}</div>
+            <g-btn-bs text-color="indigo accent-2" @click="dialog.note = false">OK</g-btn-bs>
+          </div>
+        </g-dialog>
+
         <dialog-add-to-order v-bind="this.selectedProduct" v-model="dialog.add" @add="addItemToOrder"/>
       </template>
     </div>
@@ -177,6 +189,7 @@
           closed: false,
           hour: false,
           add: false,
+          note: false,
         },
         throttle: null,
         choosing: 0,
@@ -222,6 +235,7 @@
               favicon.href = getCdnUrl(store.faviconImageSrc)
           }
         }
+        if(store.noteToCustomers) this.dialog.note = true
       } else {
         // TODO: show 404 not found
         alert('Store is not exist');
@@ -237,14 +251,13 @@
       //scroll
       this.throttle = _.throttle(this.handleScroll, 100)
       this.$nextTick(() => {
-        if(this.$refs) {
-          const interval = setInterval(() => {
-            if(this.$refs['tab-content']) {
-              this.$refs['tab-content'].addEventListener('scroll', this.throttle)
-              clearInterval(interval)
-            }
-          }, 500)
-        }
+          // const interval = setInterval(() => {
+          //   if(document.documentElement) {
+          //     document.documentElement.addEventListener('scroll', this.throttle)
+          //     clearInterval(interval)
+          //   }
+          // }, 500)
+        document.addEventListener('scroll', this.throttle)
         smoothScrolling && smoothScrolling()
       })
     },
@@ -330,7 +343,7 @@
         }
       },
       storeWorkingTime() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
             if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) {
@@ -341,7 +354,7 @@
         return null
       },
       storeWorkingDay() {
-        let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+        let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         return this.store.openHours.map(oh => {
           let days = []
           for(let i = 0; i < oh.dayInWeeks.length; i++) {
@@ -396,7 +409,7 @@
             })
 
           if(this.store.openHours) {
-            let formatTime = (this.store.country && this.store.country.name === 'United State') ? get12HourValue : get24HourValue
+            let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
             this.store.openHours.forEach(oh => {
               let days = []
               for(let i = 0; i < oh.dayInWeeks.length; i++) {
@@ -505,28 +518,22 @@
           return this.orderItems[indexOfItem].quantity
         return 0
       },
-      elementInWrapper(el) {
-        const {top, bottom} = el.getBoundingClientRect()
-
-        const wrapper = document.getElementById('tab-content').getBoundingClientRect()
-
-        return top >= wrapper.top || bottom >= wrapper.bottom - 100;
-      },
       handleScroll() {
         if(this.choosing > 0) return
-        const categoryInViewPort = this.categories.filter(({_id: id}) => {
+        const categoryInViewPort = _.filter(this.categories, ({_id: id}) => {
           const el = document.getElementById(`category_content_${id}`);
-          return this.elementInWrapper(el)
+          const {top, bottom} = el.getBoundingClientRect()
+          return top >= (window.innerWidth > 1140 ? 64 : 48) || bottom >= (window.innerHeight - 100);
         })
         this.selectedCategoryId = categoryInViewPort[0]._id
-        const wrapper = document.getElementById('tab-content')
-        if(!this.selectedCategoryId || (wrapper.offsetHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
+        const wrapper = document.documentElement
+        if(!this.selectedCategoryId || (window.innerHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
         }
       },
       chooseCategory(id) {
         this.choosing++
-        const wrapper = document.getElementById('tab-content')
+        const wrapper = document.documentElement
         const content = document.getElementById(`category_content_${id}`)
         if(wrapper && content) {
           wrapper.scroll({top: content.offsetTop - wrapper.offsetTop, left: 0, behavior: "smooth"})
@@ -564,19 +571,13 @@
     display: flex;
     width: 100%;
     max-width: 1140px;
-    height: 100%;
-    max-height: 100%;
     background-color: #FFF;
     box-shadow: 0 0 2px 2px #D5D5D5;
-    overflow: hidden;
     align-self: center;
 
     &__left {
       flex: 1;
       padding: 24px 60px 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
 
       &__header {
         display: flex;
@@ -641,9 +642,6 @@
       .sub-title {
         font-size: 20px;
         font-weight: 700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .pos-order__info {
@@ -658,29 +656,34 @@
     &__tab {
       display: flex;
       background-color: #F8F8F8;
-      flex: 0 0 64px;
-      margin-top: 16px;
       align-items: stretch;
       border-top-right-radius: 24px;
       border-bottom-right-radius: 24px;
-      overflow: hidden;
-      position: relative;
       border-right: 16px solid #F8F8F8;
       font-size: 15px;
-      /*scroll-behavior: smooth;*/
+
+      &--wrapper {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: white;
+        max-width: 680px;
+        padding-bottom: 16px;
+        padding-top: 16px;
+      }
 
       &--icon {
         display: flex;
         align-items: center;
         background-color: #F8F8F8;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        padding: 8px 16px;
+        padding: 4px 16px;
+        margin-top: 12px;
+        margin-bottom: 12px;
         border-right: 1px solid #000;
       }
 
       &--category {
-        height: 100%;
+        height: 64px;
         display: flex;
         overflow: auto;
         scrollbar-width: none; // firefox
@@ -702,43 +705,28 @@
       }
 
       &--content {
-        flex: 1;
-        margin-top: 30px;
-        overflow: auto;
-        /*scroll-behavior: smooth;*/
-        scrollbar-width: none; // firefox
-        -ms-overflow-style: none; //edge
-
-        &::-webkit-scrollbar {
-          display: none;
-        }
+        position: sticky;
+        top: 80px;
 
         &-main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          margin-bottom: 5px;
-
-
-          & .po-menu-item:not(:last-child) {
+          .po-menu-item:not(:last-child) {
             border-bottom: 1px solid rgba(204, 204, 204, 0.4);
           }
         }
       }
+    }
+
+    &__right > div {
+      position: sticky;
+      top: 0;
     }
   }
 
   @media screen and (max-width: 1139px) {
     .pos-order__left {
       padding: 0;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
 
-      .pos-order__left__header {
+      &__header {
         & > img {
           max-width: 130px;
           max-height: 65px;
@@ -782,12 +770,18 @@
 
       .pos-order__tab {
         border-radius: 0;
-        overflow: hidden;
-        position: relative;
-        flex-basis: 48px;
-        margin-top: 8px;
+
+        &--wrapper {
+          max-width: 100vw;
+          padding-bottom: 8px;
+          padding-top: 8px;
+        }
 
         &--icon {
+          padding: 6px;
+          margin-top: 6px;
+          margin-bottom: 6px;
+
           img {
             width: 24px;
             height: 24px;
@@ -795,10 +789,15 @@
           }
         }
 
+        &--category {
+          height: 48px
+        }
+
         &--content {
           padding-left: 16px;
           padding-right: 16px;
           margin-top: 4px;
+          top: 64px;
 
           .sub-title {
             font-size: 18px;

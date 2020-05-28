@@ -21,6 +21,7 @@
         <div class="item-btn--add" @click="addNewFee">
           <g-icon size="40" color="#2979FF">add</g-icon>
         </div>
+        <p class="mt-1">Note: You can put zip codes with the same fee in a single line, separated by “,” or “;”</p>
       </div>
       <g-switch v-model="acceptOrderInOtherZipCodes" label="Accept orders with other zip codes"/>
       <div class="row-flex align-items-center">

@@ -1,6 +1,5 @@
-/* hide scrollbar from view port*/
-body::-webkit-scrollbar {
-  display: none;
+.body-wrapper__responsive__vertical {
+  height: auto !important;
 }
 
 .icon-add_user {

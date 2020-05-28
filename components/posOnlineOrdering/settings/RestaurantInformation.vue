@@ -23,7 +23,8 @@
             </div>
             <g-text-field-bs large label="Zip code"
                              :value="store.zipCode"
-                             @input="updateDebounce({zipCode: $event})"/>
+                             :hint="coords"
+                             @input="updateDebounce({zipCode: $event.trim()})"/>
             <g-text-field-bs large label="Town/City"
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
@@ -106,7 +107,7 @@
         // note that, new i18n file should be added for each country
         countries: [
           {name: 'Germany', locale: 'de-DE'},
-          {name: 'United State', locale: 'en-US'},
+          {name: 'United States', locale: 'en-US'},
           // {name: 'United Kingdom', locale: 'en-GB'},
           // {name: 'Australia', locale: 'en'},
           // {name: 'Canada', locale: 'en'},
@@ -114,7 +115,7 @@
           // {name: 'Italy', locale: 'it'},
           // {name: 'Singapore', locale: 'en'},
         ],
-        country: this.store.country || ''
+        country: this.store.country || '',
       }
     },
     injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems)'],
@@ -122,10 +123,17 @@
       iframe() {
         const storeUrl = [location.origin, 'store', this.store.alias].join('/');
         return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}">Preview Webshop</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/download/js-scripts/webshop-embed.js"><\/script>`
+      },
+      coords() {
+        if (!this.store.coordinates || !this.store.coordinates.lat || !this.store.coordinates.long) return
+        return `Coordinates: ${this.store.coordinates.long}, ${this.store.coordinates.lat}`
       }
     },
     created() {
       this.updateDebounce = _.debounce(this.update, 1000)
+    },
+    mounted() {
+      this.$watch(vm => [vm.store.address, vm.store.zipCode], this.getStoreCoords, { immediate: !this.store.coordinates })
     },
     methods: {
       async update(change) {
@@ -146,7 +154,28 @@
       },
       cdnUrl(url) {
         return `${getCdnUrl(url)}?w=60&h=60`
-      }
+      },
+      getStoreCoords: _.debounce(async function (value) {
+        const [address, zipCode] = value
+        if (!address || !zipCode) return
+
+        const url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
+
+        try {
+          const { data: {features} } = await axios.get(url)
+          if (features && features.length) {
+            const foundLocation = features.find(location => location.properties.postalcode === zipCode)
+            if (foundLocation) {
+              const [long, lat] = foundLocation.geometry.coordinates
+              await this.update({ coordinates: { long, lat }})
+              console.log('updated coords')
+            }
+          }
+        } catch (e) {
+          console.warn(e)
+        }
+
+      }, 500)
     }
   }
 </script>
