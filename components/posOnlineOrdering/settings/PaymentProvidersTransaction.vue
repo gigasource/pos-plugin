@@ -101,7 +101,8 @@
         return _.map(this.transactions, tran => {
           const tranInfo = tran.transaction_info
           const payerInfo = tran.payer_info
-          const fee = Math.abs(parseFloat(tranInfo.fee_amount.value))
+          const feeAmount = (tranInfo.fee_amount && tranInfo.fee_amount.value) || "0"
+          const fee = Math.abs(parseFloat(feeAmount))
           return {
             transactionId: tranInfo.transaction_id,
             date: tranInfo.transaction_initiation_date,

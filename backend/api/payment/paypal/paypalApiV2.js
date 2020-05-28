@@ -82,6 +82,7 @@ async function getTransactionByStore({store_id, start_date, end_date, output}) {
     end_date,
     page_size: 500 /*max page size*/,
     transaction_status: 'S', /*succeeded*/
+    transaction_type: 'T0006', /*Checkout API*/
     fields: _.uniq(['transaction_info', 'payer_info', ...outputFields]).join(',')
   }
 
