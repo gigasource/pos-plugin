@@ -95,7 +95,7 @@
           {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
-          {
+          cms.loginUser.user.role.name === "admin" && {
             title: 'Payment Setting',
             icon: 'icon-coupon',
             onClick: () => this.changeView('payment-provider', 'Payment Setting'),
