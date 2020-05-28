@@ -84,6 +84,12 @@ module.exports = {
     },
     // {
     //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/migrate-data/index.js'
+    // },
+    // {
+    //   loader: {
     //     type: 'ssr'
     //   },
     //   path: 'components/Report/MonthReport.vue'

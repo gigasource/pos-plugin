@@ -205,12 +205,13 @@
           return this.noteToCustomers
         },
         set(val) {
-          this.$emit('update', {noteToCustomers: val})
+          this.updateNoteDebounce(val)
         }
       }
     },
     created() {
       this.deliveryTimeIntervalData = this.deliveryTimeInterval
+      this.updateNoteDebounce = _.debounce(this.updateNote, 1000)
     },
     mounted() {
       this.openHoursData = _.cloneDeep(this.openHours)
@@ -346,6 +347,9 @@
       openDialogInput() {
         if (!this.$route.query.device) return
         this.dialog.minimumValue = true
+      },
+      updateNote(noteToCustomers) {
+        this.$emit('update', {noteToCustomers})
       }
     },
   }

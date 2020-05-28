@@ -200,7 +200,8 @@
           address: '',
           zipCode: '',
           deliveryTime: '',
-          note: ''
+          note: '',
+          distance: null
         },
         currency: $t('common.currency'),
         dialog: {
@@ -289,7 +290,7 @@
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
       storeZipCodes() {
-        return this.store.deliveryFee.fees.map(({ zipCode, fee }) => {
+        return this.store.deliveryFee.zipCodeFees.map(({ zipCode, fee }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
             zipCode = zipCode.replace(/\s/g, '')
             zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
@@ -301,18 +302,28 @@
         if (!this.orderItems || this.orderItems.length === 0)
           return 0;
 
-        if (this.orderType === 'pickup' || this.orderType === 'pickup' || !this.store.deliveryFee)
+        if (this.orderType === 'pickup' || !this.store.deliveryFee)
           return 0
 
-        // calculate zip code from store setting
-        for (const deliveryFee of this.storeZipCodes) {
-         if (_.lowerCase(_.trim(deliveryFee.zipCode)) === _.lowerCase(_.trim(this.customer.zipCode)))
-           return deliveryFee.fee
+        if(this.store.deliveryFee.type === 'zipCode') {
+          for (const deliveryFee of this.storeZipCodes) {
+            if (_.lowerCase(_.trim(deliveryFee.zipCode)) === _.lowerCase(_.trim(this.customer.zipCode)))
+              return deliveryFee.fee
+          }
+
+          // other zip code will get default fee if store accept order from another zip code
+          if (this.store.deliveryFee && this.store.deliveryFee.acceptOrderInOtherZipCodes)
+            return this.store.deliveryFee.defaultFee
         }
 
-        // other zip code will get default fee if store accept order from another zip code
-        if (this.store.deliveryFee && this.store.deliveryFee.acceptOrderInOtherZipCodes)
-          return this.store.deliveryFee.defaultFee
+        if(this.store.deliveryFee.type === 'distance') {
+          if(this.customer.distance) {
+            for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
+              if (this.customer.distance < deliveryFee.radius)
+                return deliveryFee.fee
+            }
+          }
+        }
 
         return 0
       },
@@ -617,10 +628,14 @@
               // todo get distance
               const { properties: { distance }, geometry: { coordinates } } = foundLocation
               console.log(`Coords: ${coordinates}, Distance: ${distance}`)
+              this.customer.distance = distance
+            } else {
+              this.customer.distance = 0
             }
           }
         } catch (e) {
           console.warn(e)
+          this.customer.distance = 0
         }
       })
     }
