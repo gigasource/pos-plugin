@@ -11,73 +11,111 @@ let {webshopUrl, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
-let webShopConnected = false
+let webShopConnected = false;
 
-async function getWebShopUrl(cms) {
-  const posSetting = await cms.getModel('PosSetting').findOne()
-  customWebshopUrl = posSetting.customServerUrl
-  if (customWebshopUrl) return customWebshopUrl
-  return webshopUrl
-}
+const RECREATE_INTERVAL = 30000; // socket.io will try to recreate client socket every 30 seconds if current socket disconnects or fails to reconnects too many times
+const NO_OF_ATTEMPT_BEFORE_RECREATE = 5; // if number of 'reconnecting' attempt > 5, recreate interval will be triggered
+let recreateOnlineOrderSocketInterval = null;
+let initFinished = false;
 
-async function updateAlwaysOn(enabled) {
-  console.log("Updating always on");
-  try {
-    await axios.post(`http://localhost:5000/update-alwayson-status`, {enabled})
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function createOnlineOrderSocket(deviceId, cms) {
-
-  async function scheduleDeclineOrder(date, _id, cb) {
-    const timeOut = dayjs(date).diff(dayjs(), 'millisecond')
-
-    setTimeout(async () => {
-      let model = cms.getModel('Order');
-      const order = await model.findOne({_id})
-      if (order && order.status !== 'inProgress') return
-
-      await model.findOneAndUpdate({_id}, {status: 'declined'})
-      cb()
-    }, timeOut)
+module.exports = async cms => {
+  async function getWebShopUrl() {
+    const posSetting = await cms.getModel('PosSetting').findOne()
+    customWebshopUrl = posSetting.customServerUrl
+    if (customWebshopUrl) return customWebshopUrl
+    return webshopUrl
   }
 
-  // const maxConnectionAttempt = 5;
-  return new Promise(async (resolve, reject) => {
-    if (onlineOrderSocket) return resolve()
-    console.log('Creating online order')
-    onlineOrderSocket = io(`${await getWebShopUrl(cms)}?clientId=${deviceId}`);
+  async function updateAlwaysOn(enabled) {
+    console.log("Updating always on");
+    try {
+      await axios.post(`http://localhost:5000/update-alwayson-status`, {enabled})
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-    onlineOrderSocket.on('connect', () => console.debug('external socket connect'));
+  function startSocketRecreateInterval() {
+    if (!recreateOnlineOrderSocketInterval) {
+      console.debug('startSocketRecreateInterval');
 
-    onlineOrderSocket.once('connect', async () => {
+      recreateOnlineOrderSocketInterval = setInterval(async () => {
+        console.debug('recreateOnlineOrderSocket');
+        const deviceId = await getDeviceId();
+
+        if (deviceId) await createOnlineOrderSocket(deviceId);
+      }, RECREATE_INTERVAL);
+    }
+  }
+
+  function stopSocketRecreateInterval() {
+    if (recreateOnlineOrderSocketInterval) {
+      console.debug('stopSocketRecreateInterval');
+      clearInterval(recreateOnlineOrderSocketInterval);
+      recreateOnlineOrderSocketInterval = null;
+    }
+  }
+
+  function createOnlineOrderListeners(socket, deviceId) {
+    // event logs for debugging
+    console.debug('Creating onlineOrderSocket');
+    socket.on('connect', () => console.debug('onlineOrderSocket connected'));
+    socket.on('disconnect', () => console.debug(`onlineOrderSocket disconnected`));
+    socket.on('reconnecting', numberOfAttempt => console.debug(`onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
+    socket.on('reconnect', () => console.debug('onlineOrderSocket reconnected'));
+    socket.on('reconnect_error', err => {
+      console.debug(`onlineOrderSocket reconnect error:`);
+      console.debug(err);
+    });
+
+    // connection related logic
+    socket.on('connect', async () => {
+      stopSocketRecreateInterval();
+
       webShopConnected = true
       cms.socket.emit('webShopConnected');
-      resolve();
 
-      if (cms.utils.getShouldUpdateApp()) onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
+      if (cms.utils.getShouldUpdateApp()) socket.emit('updateVersion', require('../../package').version, deviceId);
     });
 
-    onlineOrderSocket.on('reconnecting', function (numberOfAttempt) {
-      //fixme: find better solutions
-      /*if (numberOfAttempt >= maxConnectionAttempt) {
-        reject(`Can not pair with server at address ${webshopUrl}`);
-        cleanupOnlineOrderSocket();
-      }*/
-      console.debug(`onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`);
-    });
+    socket.on('reconnect', () => {
+      stopSocketRecreateInterval();
 
-    onlineOrderSocket.on('reconnect_error', err => console.debug(`onlineOrderSocket reconnect error: ${err}`));
-
-    onlineOrderSocket.on('reconnect', () => {
-      console.debug('reconnect')
       webShopConnected = true
       cms.socket.emit('webShopConnected')
-    })
+    });
 
-    onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
+    socket.on('disconnect', () => {
+      startSocketRecreateInterval();
+      webShopConnected = false
+      cms.socket.emit('webShopDisconnected')
+
+      activeProxies = 0;
+      if (proxyClient) {
+        proxyClient.destroy();
+        proxyClient = null;
+      }
+    });
+
+    socket.on('reconnecting', numberOfAttempt => {
+      if (numberOfAttempt > NO_OF_ATTEMPT_BEFORE_RECREATE) startSocketRecreateInterval();
+    });
+
+    // listeners for features
+    async function scheduleDeclineOrder(date, _id, cb) {
+      const timeOut = dayjs(date).diff(dayjs(), 'millisecond')
+
+      setTimeout(async () => {
+        let model = cms.getModel('Order');
+        const order = await model.findOne({_id})
+        if (order && order.status !== 'inProgress') return
+
+        await model.findOneAndUpdate({_id}, {status: 'declined'})
+        cb()
+      }, timeOut)
+    }
+
+    socket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
       let {
         orderType: type, paymentType, customer, products: items,
@@ -137,8 +175,7 @@ function createOnlineOrderSocket(deviceId, cms) {
 
       ackFn();
     });
-
-    onlineOrderSocket.on('updateAppFeature', async (data, callback) => {
+    socket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
         if (name === 'alwaysOn') {
           const oldAlwaysOnValue = await cms.getModel('Feature').findOne({name})
@@ -151,14 +188,12 @@ function createOnlineOrderSocket(deviceId, cms) {
       }))
       cms.socket.emit('updateAppFeature')
       callback()
-    })
-
-    onlineOrderSocket.on('unpairDevice', cb => {
+    });
+    socket.on('unpairDevice', cb => {
       cms.socket.emit('unpairDevice')
       cb();
-    })
-
-    onlineOrderSocket.on('startRemoteControl', async (proxyServerHost, proxyServerPort, callback) => {
+    });
+    socket.on('startRemoteControl', async (proxyServerHost, proxyServerPort, callback) => {
       activeProxies++;
 
       if (!proxyClient) {
@@ -175,8 +210,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         callback();
       }
     });
-
-    onlineOrderSocket.on('stopRemoteControl', callback => {
+    socket.on('stopRemoteControl', callback => {
       if (activeProxies > 0) activeProxies--;
 
       if (activeProxies === 0 && proxyClient) {
@@ -186,8 +220,7 @@ function createOnlineOrderSocket(deviceId, cms) {
 
       if (typeof callback === 'function') callback();
     });
-
-    onlineOrderSocket.on('updateApp', async (uploadPath, type, ackFn) => {
+    socket.on('updateApp', async (uploadPath, type, ackFn) => {
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
@@ -197,9 +230,8 @@ function createOnlineOrderSocket(deviceId, cms) {
       } catch (e) {
         console.error('Update app error or this is not an android device');
       }
-    })
-
-    onlineOrderSocket.on('updateOrderTimeOut', async (orderTimeOut, ackFn) => {
+    });
+    socket.on('updateOrderTimeOut', async (orderTimeOut, ackFn) => {
       if (_.isNil(orderTimeOut)) return
 
       try {
@@ -210,9 +242,8 @@ function createOnlineOrderSocket(deviceId, cms) {
       } finally {
         ackFn()
       }
-    })
-
-    onlineOrderSocket.on('startStream', async (cb) => {
+    });
+    socket.on('startStream', async (cb) => {
       try {
         console.log('on start stream')
         const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/start-stream`, {screencastId: deviceId})).data
@@ -222,9 +253,8 @@ function createOnlineOrderSocket(deviceId, cms) {
       }
 
       cb && cb()
-    })
-
-    onlineOrderSocket.on('stopStream', async (cb) => {
+    });
+    socket.on('stopStream', async (cb) => {
       try {
         console.log('on stop stream')
         const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/stop-stream`)).data
@@ -234,88 +264,78 @@ function createOnlineOrderSocket(deviceId, cms) {
       }
 
       cb && cb()
-    })
+    });
+  }
 
-    onlineOrderSocket.on('disconnect', () => {
-      console.debug('disconnect');
-      webShopConnected = false
-      cms.socket.emit('webShopDisconnected')
-      //deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
+  function createOnlineOrderSocket(deviceId) {
+    return new Promise(async resolve => {
+      if (onlineOrderSocket) onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
 
-      activeProxies = 0;
-      if (proxyClient) {
-        proxyClient.destroy();
-        proxyClient = null;
-      }
-    })
-  });
-}
+      const webshopUrl = await getWebShopUrl();
+      onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
+      onlineOrderSocket.once('connect', resolve);
+      createOnlineOrderListeners(onlineOrderSocket, deviceId);
+    });
+  }
 
-async function getDeviceId(pairingCode) {
-  const posSettings = await cms.getModel('PosSetting').findOne({});
-  const {onlineDevice} = posSettings;
+  function removeOnlineOrderSocket() {
+    if (onlineOrderSocket) {
+      onlineOrderSocket.off();
+      onlineOrderSocket.disconnect();
+      onlineOrderSocket = null;
+    }
+  }
 
-  if (onlineDevice.id) {
-    return onlineDevice.id
-  } else {
-    if (!pairingCode) {
-      return null
+  async function getDeviceId(pairingCode) {
+    const posSettings = await cms.getModel('PosSetting').findOne({});
+    const {onlineDevice} = posSettings;
+
+    if (onlineDevice.id) {
+      return onlineDevice.id
     } else {
-      const pairingApiUrl = `${await getWebShopUrl(cms)}/device/register`
-      const requestBody = {pairingCode}
-      requestBody.appName = 'POS_Android'
-      requestBody.appVersion = require('../../package').version
-      requestBody.hardware = global.APP_CONFIG.deviceName
-      requestBody.release = require('../../package').release
-      try {
-        const requestResponse = await axios.post(pairingApiUrl, requestBody)
-        return requestResponse.data.deviceId
-      } catch (e) {
-        console.error(e)
+      if (!pairingCode) {
         return null
+      } else {
+        const pairingApiUrl = `${await getWebShopUrl()}/device/register`
+        const requestBody = {pairingCode}
+        requestBody.appName = 'POS_Android'
+        requestBody.appVersion = require('../../package').version
+        requestBody.hardware = global.APP_CONFIG.deviceName
+        requestBody.release = require('../../package').release
+        try {
+          const requestResponse = await axios.post(pairingApiUrl, requestBody)
+          return requestResponse.data.deviceId
+        } catch (e) {
+          console.error(e)
+          return null
+        }
       }
     }
   }
-}
 
-async function updateDeviceStatus(deviceId = null) {
-  const SettingModel = cms.getModel('PosSetting');
-  const {onlineDevice: deviceInfo} = (await SettingModel.findOne({}));
+  async function updateDeviceStatus(deviceId = null) {
+    const SettingModel = cms.getModel('PosSetting');
+    const {onlineDevice: deviceInfo} = (await SettingModel.findOne({}));
 
-  deviceInfo.id = deviceId;
+    deviceInfo.id = deviceId;
 
-  await cms.getModel('PosSetting').updateOne({}, {onlineDevice: deviceInfo});
-}
-
-function cleanupOnlineOrderSocket() {
-  if (onlineOrderSocket) {
-    onlineOrderSocket.off();
-    onlineOrderSocket.disconnect();
-    onlineOrderSocket.destroy();
-    onlineOrderSocket = null;
-  }
-}
-
-module.exports = async cms => {
-  let initFinished = false;
-  const initOnlineOrderSocket = async function () {
-    try {
-      const deviceId = await getDeviceId();
-      if (deviceId) await createOnlineOrderSocket(deviceId, cms);
-      const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
-      if (alwaysOnFeature) {
-        await updateAlwaysOn(alwaysOnFeature.enabled);
-      }
-    } catch (e) {
-      console.error(e);
-      await updateDeviceStatus();
-    } finally {
-      cms.emit('initOnlineOrderSocketFinished');
-      initFinished = true;
-    }
+    await cms.getModel('PosSetting').updateOne({}, {onlineDevice: deviceInfo});
   }
 
-  await initOnlineOrderSocket();
+  try {
+    const deviceId = await getDeviceId();
+    if (deviceId) await createOnlineOrderSocket(deviceId);
+  } catch (e) {
+    console.error(`Create online order socket error: ${e}`);
+    await updateDeviceStatus();
+  } finally {
+    cms.emit('initOnlineOrderSocketFinished');
+    initFinished = true;
+  }
+
+  const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
+  if (alwaysOnFeature) await updateAlwaysOn(alwaysOnFeature.enabled);
+
   const waitInitOnlineOrderSocket = function () {
     return new Promise(resolve => {
       if (initFinished) {
@@ -367,7 +387,7 @@ module.exports = async cms => {
 
       if (deviceId) {
         try {
-          await createOnlineOrderSocket(deviceId, cms);
+          await createOnlineOrderSocket(deviceId);
           await updateDeviceStatus(deviceId);
 
           onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
@@ -388,7 +408,7 @@ module.exports = async cms => {
     });
 
     socket.on('unregisterOnlineOrderDevice', async callback => {
-      cleanupOnlineOrderSocket();
+      removeOnlineOrderSocket();
 
       if (proxyClient) {
         proxyClient.destroy();
@@ -409,7 +429,7 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
       onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, locale, async (webShopSettingUrl) => {
-        callback && callback(`${await getWebShopUrl(cms)}${webShopSettingUrl}`)
+        callback && callback(`${await getWebShopUrl()}${webShopSettingUrl}`)
       })
     })
 
