@@ -256,6 +256,15 @@
       // get geocode & distance from address & zipCode
       this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
     },
+    mounted() {
+      const tb = document.getElementById('table-content')
+      tb.addEventListener('scroll', () => {
+        const menu = document.querySelectorAll('.g-menu--content')
+        menu.forEach(m => {
+          m.style.display = 'none'
+        })
+      })
+    },
     beforeDestroy() {
       clearInterval(this.timeInterval)
     },
@@ -778,6 +787,10 @@
             width: 100%;
           }
         }
+
+        .g-select ::v-deep .g-tf-input {
+          display: none;
+        }
       }
 
       .order-item-detail {
@@ -1132,6 +1145,12 @@
       bottom: 0;
       right: 0;
       background: rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  @media screen and (min-width: 1140px) {
+    .g-menu--content {
+      position: fixed !important;
     }
   }
 </style>

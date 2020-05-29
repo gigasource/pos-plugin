@@ -568,6 +568,7 @@
     display: flex;
     width: 100%;
     max-width: 1140px;
+    min-height: 100vh;
     background-color: #FFF;
     box-shadow: 0 0 2px 2px #D5D5D5;
     align-self: center;
@@ -882,6 +883,7 @@
       color: #424242;
       padding-bottom: 36px;
       border-bottom: 1px solid #EFEFEF;
+      white-space: pre-wrap;
     }
   }
 
