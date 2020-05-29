@@ -13,7 +13,7 @@ let proxyClient = null;
 let activeProxies = 0;
 let webShopConnected = false;
 
-const RECREATE_INTERVAL = 30000; // socket.io will try to recreate client socket every 30 seconds if current socket disconnects or fails to reconnects too many times
+const RECREATE_INTERVAL = 60000; // socket.io will try to recreate client socket every 60 seconds if current socket disconnects or fails to reconnects too many times
 const NO_OF_ATTEMPT_BEFORE_RECREATE = 5; // if number of 'reconnecting' attempt > 5, recreate interval will be triggered
 let recreateOnlineOrderSocketInterval = null;
 let initFinished = false;
