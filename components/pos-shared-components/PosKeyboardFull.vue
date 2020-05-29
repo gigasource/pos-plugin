@@ -1,5 +1,5 @@
 <template>
-  <g-keyboard-auto :items="keyboardFull" :template="templateFull"></g-keyboard-auto>
+  <g-keyboard-auto :items="keyboardFull" :template="templateFull" @submit="enterPressed"></g-keyboard-auto>
 </template>
 
 <script>
@@ -36,7 +36,7 @@
           { content: ['j', 'J'], img: '', style: 'grid-area: j' },
           { content: ['k', 'K'], img: '', style: 'grid-area: k' },
           { content: ['l', 'L'], img: '', style: 'grid-area: l' },
-          { content: [], img: 'delivery/key_enter', style: 'grid-area: enter; background-color: #e0e0e0', type: 'enter' },
+          { content: [], img: 'delivery/key_enter', style: 'grid-area: enter; background-color: #e0e0e0', type: 'enter', action: 'enter' },
           { content: [], img: 'delivery/key_shift', style: 'grid-area: shift1; background-color: #e0e0e0', type: 'shift', action: 'shift' },
           { content: ['z', 'Z'], img: '', style: 'grid-area: z' },
           { content: ['x', 'X'], img: '', style: 'grid-area: x' },
@@ -107,7 +107,7 @@
           { content: ['l', 'L'], img: '', style: 'grid-area: l' },
           { content: ['ö', 'Ö'], img: '', style: 'grid-area: oe' },
           { content: ['ä', 'Ä'], img: '', style: 'grid-area: ae' },
-          { content: [], img: 'delivery/key_enter', style: 'grid-area: enter; background-color: #e0e0e0', type: 'enter' },
+          { content: [], img: 'delivery/key_enter', style: 'grid-area: enter; background-color: #e0e0e0', type: 'enter', action: 'enter' },
           { content: [], img: 'delivery/key_shift', style: 'grid-area: shift1; background-color: #e0e0e0', type: 'shift', action: 'shift' },
           { content: ['z', 'Z'], img: '', style: 'grid-area: z' },
           { content: ['x', 'X'], img: '', style: 'grid-area: x' },
@@ -169,6 +169,11 @@
         if(this.locale === 'de')
           return this.templateGerman
         return this.templateEnglish
+      }
+    },
+    methods: {
+      enterPressed(val) {
+        this.$emit('enter-pressed', val)
       }
     }
   }
