@@ -76,7 +76,7 @@
           iframeStyle += 'height: 100%'
         iframe.setAttribute('style', iframeStyle)
         container.appendChild(iframe)
-        iframe.addEventListener('load', () => {
+        iframe.addEventListener('load', function() {
           container.removeChild(loading)
         })
       }
