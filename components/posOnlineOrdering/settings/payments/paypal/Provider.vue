@@ -28,7 +28,7 @@
       </div>
       <div style="font-style: italic; font-size: small;margin-bottom: 10px; color: #616161;">
         <div>(*) Last update: {{lastRefreshedDateTime}}</div>
-        <div>(*) It takes a maximum of three hours for executed transactions to be added into net amount.</div>
+        <div>(*) It takes a maximum of three hours for executed transactions to be added into balance.</div>
       </div>
       <div style="display: flex; justify-content: flex-end">
         <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="deactivePayPalCheckout" style="margin-right: 0">Deactive Paypal Checkout</g-btn-bs>
