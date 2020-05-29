@@ -82,12 +82,12 @@ module.exports = {
       },
       path: 'backend/initDemoData/initDemoData.js'
     },
-    // {
-    //   loader: {
-    //     type: 'backend-api'
-    //   },
-    //   path: 'backend/migrate-data/index.js'
-    // },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/migrate-data/index.js'
+    },
     // {
     //   loader: {
     //     type: 'ssr'
