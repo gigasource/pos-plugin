@@ -37,7 +37,7 @@
       </template>
       <template v-if="type === 'distance'">
         <p class="fs-small"><b>Address: </b>{{address}}</p>
-        <p class="fs-small"><b>Coordination: </b>{{obtainedCoordination}}</p>
+        <p class="fs-small"><b>Coordinates: </b>{{obtainedCoordination}}</p>
         <div class="delivery-fee__content-header">
           <div class="col-9">Radius (km)</div>
           <div class="col-3">Fee (€)</div>
@@ -121,7 +121,7 @@
         return this.deliveryFee.distanceFees
       },
       obtainedCoordination () {
-        return _.isEmpty(this.coordinates) ? 'Not Obtained' : 'Obtained'
+        return _.isEmpty(this.coordinates) ? 'Not Obtained - please edit your shop address' : 'Obtained'
       }
     },
     methods: {

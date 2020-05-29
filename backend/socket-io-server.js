@@ -307,16 +307,12 @@ module.exports = function (cms) {
       return { latitude, longitude }
     }
 
-    function calcDistanceByCoords(fromCoords, toCoords) {
-      const geolib = require('geolib')
-      return geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
-    }
-
     socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
       const toCoords = await getCoordsByPostalCode(code)
       if (!toCoords) callback()
 
-      const distance = calcDistanceByCoords(fromCoords, toCoords)
+      const geolib = require('geolib')
+      const distance = geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
       callback(distance)
     })
 
