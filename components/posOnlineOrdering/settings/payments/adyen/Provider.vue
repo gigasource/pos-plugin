@@ -103,7 +103,7 @@
     },
     computed: {
       isActivated() {
-        return this.store.paymentProviders.adyen.accountHolder
+        return this.store.paymentProviders.adyen && this.store.paymentProviders.adyen.accountHolder
       },
       documentDataNumberRequired() {
         // https://docs.adyen.com/marketpay/onboarding-and-verification/verification-checks/identity-check#providing-an-id-number
