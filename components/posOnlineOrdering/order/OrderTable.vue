@@ -624,8 +624,9 @@
         if (!address || !zipCode) return
 
         let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
+        const {lat, long} = this.store.coordinates
+
         if (this.store.coordinates) {
-          const {lat, long} = this.store.coordinates
           url += `&focus.point.lat=${lat}&focus.point.lon=${long}`
         }
 
@@ -636,17 +637,23 @@
             if (foundLocation) {
               // todo get distance
               const { properties: { distance }, geometry: { coordinates } } = foundLocation
-              console.log(`Coords: ${coordinates}, Distance: ${distance}`)
+              console.log(`[Geocode]${this.store.alias}|PeliasAPI|distance:${distance}`)
               this.customer.distance = distance
             } else {
-              this.customer.distance = 0
+              await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
             }
           }
         } catch (e) {
           console.warn(e)
-          this.customer.distance = 0
+          await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
         }
-      })
+      }, 1000),
+      async getDistanceByPostalCode(code, fromCoords) {
+        cms.socket.emit('getDistanceByPostalCode', code, fromCoords, distance => {
+          console.log(`[Geocode]${this.store.alias}|GoogleAPI|distance:${distance}`)
+          this.customer.distance = distance || 0
+        })
+      }
     }
   }
 </script>
