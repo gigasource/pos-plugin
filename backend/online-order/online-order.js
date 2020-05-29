@@ -1,9 +1,8 @@
-const { calOrderDiscount, calOrderModifier, calOrderTax, calOrderTotal, formatOrderItems, getLatestOrderId } = require('../../components/logic/orderUtil')
+const {calOrderDiscount, calOrderModifier, calOrderTax, calOrderTotal, formatOrderItems, getLatestOrderId} = require('../../components/logic/orderUtil')
 const {getBookingNumber, getVDate} = require('../../components/logic/productUtils')
 const _ = require('lodash')
 const io = require('socket.io-client');
 const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
-const url = require('url');
 const axios = require('axios');
 const dayjs = require('dayjs');
 
@@ -25,7 +24,7 @@ async function getWebShopUrl(cms) {
 async function updateAlwaysOn(enabled) {
   console.log("Updating always on");
   try {
-    await axios.post(`http://localhost:5000/update-alwayson-status`, { enabled })
+    await axios.post(`http://localhost:5000/update-alwayson-status`, {enabled})
   } catch (e) {
     console.error(e);
   }
@@ -38,15 +37,15 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     setTimeout(async () => {
       let model = cms.getModel('Order');
-      const order = await model.findOne({ _id })
+      const order = await model.findOne({_id})
       if (order && order.status !== 'inProgress') return
 
-      await model.findOneAndUpdate({ _id }, { status: 'declined' })
+      await model.findOneAndUpdate({_id}, {status: 'declined'})
       cb()
     }, timeOut)
   }
 
-  const maxConnectionAttempt = 5;
+  // const maxConnectionAttempt = 5;
   return new Promise(async (resolve, reject) => {
     if (onlineOrderSocket) return resolve()
     console.log('Creating online order')
@@ -84,14 +83,16 @@ function createOnlineOrderSocket(deviceId, cms) {
 
     onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
-      let { orderType: type, paymentType, customer, products: items,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail } = orderData
+      let {
+        orderType: type, paymentType, customer, products: items,
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
+      } = orderData
 
       const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
 
       items = items.map(item => {
         if (item.originalPrice) return item;
-        return { originalPrice: item.price, ...item };
+        return {originalPrice: item.price, ...item};
       });
       const date = new Date(createdDate)
       const vDiscount = calOrderDiscount(items).toFixed(2)
@@ -110,10 +111,7 @@ function createOnlineOrderSocket(deviceId, cms) {
         items: formatOrderItems(items),
         customer,
         deliveryDate: new Date(),
-        payment: [{
-          type: paymentType,
-          value: vSum,
-        }],
+        payment: [{ type: paymentType, value: vSum }],
         type,
         date,
         ...timeoutDate && {timeoutDate: dayjs(timeoutDate).add(systemTimeDelta, 'millisecond').toDate()},
@@ -156,7 +154,7 @@ function createOnlineOrderSocket(deviceId, cms) {
             await updateAlwaysOn(enabled)
           }
         }
-        return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
+        return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
       }))
       cms.socket.emit('updateAppFeature')
       callback()
@@ -169,13 +167,13 @@ function createOnlineOrderSocket(deviceId, cms) {
       cb();
     })
 
-    onlineOrderSocket.on('startRemoteControl', async (proxyServerPort, callback) => {
+    onlineOrderSocket.on('startRemoteControl', async (proxyServerHost, proxyServerPort, callback) => {
       activeProxies++;
 
       if (!proxyClient) {
         proxyClient = new ProxyClient({
           clientId: `${deviceId}-proxy-client`,
-          proxyServerHost: `http://${url.parse(await getWebShopUrl(cms)).hostname}`,
+          proxyServerHost,
           socketIOPort: proxyServerPort,
           remoteHost: 'localhost',
           remotePort: backendPort,
@@ -215,7 +213,7 @@ function createOnlineOrderSocket(deviceId, cms) {
 
       try {
         await cms.getModel('PosSetting').findOneAndUpdate({},
-          { $set: { 'onlineDevice.orderTimeout': orderTimeOut } })
+            {$set: {'onlineDevice.orderTimeout': orderTimeOut}})
       } catch (e) {
         console.error('Error updating order timeout', e)
       } finally {
@@ -226,7 +224,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     onlineOrderSocket.on('startStream', async (cb) => {
       try {
         console.log('on start stream')
-        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/start-stream`, { screencastId: deviceId })).data
+        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/start-stream`, {screencastId: deviceId})).data
         console.log(responseData)
       } catch (e) {
         console.log('start stream error', e);
@@ -309,11 +307,11 @@ function cleanupOnlineOrderSocket() {
 
 module.exports = async cms => {
   let initFinished = false;
-  const initOnlineOrderSocket = async function() {
+  const initOnlineOrderSocket = async function () {
     try {
       const deviceId = await getDeviceId();
       if (deviceId) await createOnlineOrderSocket(deviceId, cms);
-      const alwaysOnFeature = await cms.getModel('Feature').findOne({ name: 'alwaysOn' });
+      const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
       if (alwaysOnFeature) {
         await updateAlwaysOn(alwaysOnFeature.enabled);
       }
@@ -327,7 +325,7 @@ module.exports = async cms => {
   }
 
   await initOnlineOrderSocket();
-  const waitInitOnlineOrderSocket = function() {
+  const waitInitOnlineOrderSocket = function () {
     return new Promise(resolve => {
       if (initFinished) {
         resolve();
@@ -385,7 +383,7 @@ module.exports = async cms => {
 
           onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
             await Promise.all(_.map(data, async (enabled, name) => {
-              return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
+              return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
             }))
             socket.emit('updateAppFeature')
           })
@@ -422,7 +420,7 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
       onlineOrderSocket.emit('getWebShopSettingUrl', deviceId, locale, async (webShopSettingUrl) => {
-        callback && callback( `${await getWebShopUrl(cms)}${webShopSettingUrl}`)
+        callback && callback(`${await getWebShopUrl(cms)}${webShopSettingUrl}`)
       })
     })
 
@@ -431,15 +429,15 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
       try {
-        onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({ services: { delivery, pickup, noteToCustomers }, error }) => {
-          if (error) return callback({ error })
+        onlineOrderSocket.emit('getOnlineDeviceServices', deviceId, async ({services: {delivery, pickup, noteToCustomers}, error}) => {
+          if (error) return callback({error})
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
             $set: {
-              'onlineDevice.services': { delivery, pickup, noteToCustomers: noteToCustomers || '' }
+              'onlineDevice.services': {delivery, pickup, noteToCustomers: noteToCustomers || ''}
             }
           })
           const services = {delivery, pickup, noteToCustomers}
-          callback({ services })
+          callback({services})
         })
       } catch (error) {
         const posSetting = cms.getModel('PosSetting').findOne()
@@ -452,13 +450,13 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
       try {
-        onlineOrderSocket.emit('updateWebshopServices', deviceId, services, async ({ success, error }) => {
-          if (error) return callback({ error })
-          await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { 'onlineDevice.services': services } })
-          callback({ success })
+        onlineOrderSocket.emit('updateWebshopServices', deviceId, services, async ({success, error}) => {
+          if (error) return callback({error})
+          await cms.getModel('PosSetting').findOneAndUpdate({}, {$set: {'onlineDevice.services': services}})
+          callback({success})
         })
       } catch (error) {
-        callback({ error })
+        callback({error})
       }
     })
   })
