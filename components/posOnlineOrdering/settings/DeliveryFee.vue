@@ -167,7 +167,7 @@
       },
       updateFees() {
         if(this.type === 'zipCode')
-          this.updateDeliveryFee({fees: this.deliveryFee.zipCodeFees})
+          this.updateDeliveryFee({zipCodeFees: this.deliveryFee.zipCodeFees})
         if(this.type === 'distance')
           this.updateDeliveryFee({distanceFees: this.deliveryFee.distanceFees})
       },
@@ -199,6 +199,8 @@
 <style scoped lang="scss">
   .delivery-fee {
     font-size: 14px;
+    max-height: 100%;
+    overflow: auto;
 
     &__title {
       font-size: 18px;

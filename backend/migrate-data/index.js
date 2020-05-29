@@ -14,9 +14,8 @@ module.exports = (cms) => {
           const stores = await cms.getModel('Store').find().lean()
           for(const store of stores) {
             const fees = store.deliveryFee.fees || []
-            console.log(fees)
             await cms.getModel('Store').updateOne({_id: store._id}, {
-              deliveryFee: Object.assign({}, store.deliveryFee, {zipCodeFees: fees})
+              deliveryFee: Object.assign({}, store.deliveryFee, {zipCodeFees: fees, type: 'zipCode'})
             })
           }
         }
