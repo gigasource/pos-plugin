@@ -240,7 +240,8 @@
         this.$nextTick(() => {
           const wrapper = document.getElementById('menu-setting')
           const panel = document.getElementById('new_product_' + cate._id)
-          wrapper.scroll({top: panel.getBoundingClientRect().top - wrapper.getBoundingClientRect().top - 48, left: 0, behavior: 'smooth'})
+          const top = wrapper.scrollTop
+          wrapper.scroll({top: top + panel.getBoundingClientRect().top - wrapper.getBoundingClientRect().top - 48, left: 0, behavior: 'smooth'})
         })
       },
       hideAddNewProductPanelForCategory(cate) {
