@@ -146,7 +146,7 @@
         <g-dialog v-model="dialog.note" width="400">
           <div class="dialog-closed">
             <div class="dialog-closed__title">{{$t('store.note')}}</div>
-            <div class="dialog-closed__message">{{ store.noteToCustomers }}</div>
+            <pre class="dialog-closed__message">{{ store.noteToCustomers }}</pre>
             <g-btn-bs text-color="indigo accent-2" @click="dialog.note = false">OK</g-btn-bs>
           </div>
         </g-dialog>

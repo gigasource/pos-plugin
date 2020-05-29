@@ -120,21 +120,9 @@
         &:-webkit-autofill:hover,
         &:-webkit-autofill:focus,
         &:-webkit-autofill:active {
-          animation: autofill 0s forwards;
-        }
-
-        @keyframes autofill {
-          100% {
-            background: transparent;
-            color: inherit;
-          }
-        }
-
-        @-webkit-keyframes autofill {
-          100% {
-            background: transparent;
-            color: inherit;
-          }
+          transition-delay: 9999s;
+          transition-property: background-color;
+          color: white !important;
         }
       }
 

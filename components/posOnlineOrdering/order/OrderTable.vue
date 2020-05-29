@@ -1096,14 +1096,14 @@
 
     @keyframes autofill {
       100% {
-        background: transparent;
+        background: transparent !important;
         color: inherit;
       }
     }
 
     @-webkit-keyframes autofill {
       100% {
-        background: transparent;
+        background: transparent !important;
         color: inherit;
       }
     }
