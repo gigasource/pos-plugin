@@ -527,6 +527,8 @@
         if(!this.selectedCategoryId || (window.innerHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
         }
+
+        document.querySelectorAll('.g-menu--content').forEach(menu => { menu.style.display = 'none' })
       },
       chooseCategory(id) {
         this.choosing++

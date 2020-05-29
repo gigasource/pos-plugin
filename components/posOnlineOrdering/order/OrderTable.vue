@@ -1147,10 +1147,4 @@
       background: rgba(0, 0, 0, 0.12);
     }
   }
-
-  @media screen and (min-width: 1140px) {
-    .g-menu--content {
-      position: fixed !important;
-    }
-  }
 </style>
