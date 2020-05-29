@@ -23,16 +23,20 @@
       var existingIframe = document.getElementById('webshop-iframe-container');
 
       if (existingIframe) {
-        if (existingIframe.style.visibility === 'hidden')
+        if (existingIframe.style.visibility === 'hidden') {
           existingIframe.style.visibility = 'visible'
-        else
+          document.body.style.overflow = 'hidden'
+        }
+        else {
           existingIframe.style.visibility = 'hidden'
+          document.body.style.overflow = 'auto'
+        }
       } else {
         // insert overlay
         var container = document.createElement('div')
         container.setAttribute('id', 'webshop-iframe-container')
         container.setAttribute('style', 'position: fixed; z-index: 999; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
-        document.body.appendChild(container)
+        el.parentElement.appendChild(container)
 
         //insert loading circular
         var loading = document.createElement('div')
