@@ -1,32 +1,25 @@
 <template>
   <div class="provider-transaction">
-    <!-- Action bar -->
-    <div class="row-flex align-items-center mb-4">
-      <div class="provider-transaction__title">Transaction History</div>
-      <g-spacer/>
-      <date-range-picker :from="startDate" :to="endDate" @save="changeDate"/>
-    </div>
-    
     <!-- Transaction table -->
     <div class="provider-transaction__table" style="box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);">
       <g-table elevation="0" fixed-header>
         <thead>
-          <tr>
-            <th v-for="header in headers">{{header}}</th>
-          </tr>
+        <tr>
+          <th v-for="header in headers">{{header}}</th>
+        </tr>
         </thead>
         <tbody>
-          <template v-if="!loadingTransaction">
-            <tr v-for="tran in transactionInfoPage" :key="tran.transactionId" @click="showTransactionDetailDialog(tran.transactionId)" style="cursor:pointer">
-              <td>{{tran.date | fullDate}}</td>
-              <td>{{tran.name}}</td>
-              <td>{{tran.currencyCode}}{{tran.grossAmount}}</td>
-              <td>{{tran.currencyCode}}{{tran.feeAmount}}</td>
-              <td>{{tran.currencyCode}}{{tran.netAmount}}</td>
-              <td>{{tran.type}}</td>
-              <td>{{tran.paidBy}}</td>
-            </tr>
-          </template>
+        <template v-if="!loadingTransaction">
+          <tr v-for="tran in transactionInfoPage" :key="tran.transactionId" @click="showTransactionDetailDialog(tran.transactionId)" style="cursor:pointer">
+            <td>{{tran.date | fullDate}}</td>
+            <td>{{tran.name}}</td>
+            <td>{{tran.currencyCode}}{{tran.grossAmount}}</td>
+            <td>{{tran.currencyCode}}{{tran.feeAmount}}</td>
+            <td>{{tran.currencyCode}}{{tran.netAmount}}</td>
+            <td>{{tran.type}}</td>
+            <td>{{tran.paidBy}}</td>
+          </tr>
+        </template>
         </tbody>
       </g-table>
       <div v-if="!loadingTransaction" class="row-flex justify-end" style="background-color: #efefef;">
@@ -40,13 +33,13 @@
         Loading transaction info...
       </div>
     </div>
-    
+  
     <!-- notice -->
     <div style="font-style: italic; font-size: small;margin-top: 10px">
       <div>(*) Last update: {{lastRefreshedDateTime}}</div>
       <div>(*) It takes a maximum of three hours for executed transactions to appear in the list transactions call.</div>
     </div>
-    
+  
     <!-- Transaction detail dialog -->
     <transaction-detail-dialog
         v-if="dialog.transactionDetail.show"
@@ -58,16 +51,17 @@
   </div>
 </template>
 <script>
-  import DateRangePicker from './dateRangePicker';
   import TransactionDetailDialog from './TransactionDetailDialog';
+  import { currencyCodeToSymbol } from '../../../../Store/currencyHelper';
   import axios from 'axios';
-  import { currencyCodeToSymbol } from '../../Store/currencyHelper';
-
+  
   export default {
-    name: 'PaymentProvidersTransaction',
-    components: { TransactionDetailDialog, DateRangePicker },
+    name: 'PayPalTransactions',
+    components: {TransactionDetailDialog},
     props: {
       store: Object,
+      startDate: String,
+      endDate: String,
     },
     filters: {
       fullDate(val) {
@@ -75,20 +69,10 @@
       }
     },
     data: function () {
-      const startDate = dayjs().format('YYYY-MM') + '-01T00:00:00'
-      const endDate = dayjs().format('YYYY-MM-DD') + 'T23:59:59'
-      
       return {
         loadingTransaction: false,
         transactions: [],
         lastRefreshedDateTime: null,
-        selectedProvider: 'PayPal',
-        providers: [
-          { text: 'All', value: 'All' },
-          { text: 'PayPal', value: 'PayPal' }
-        ],
-        startDate: startDate,
-        endDate: endDate,
         month: dayjs().format('YYYY-MM'),
         headers: ['Date', 'Name', 'Gross', 'Fee', 'Net', 'Type', 'Paid by'],
         pagination: {
@@ -104,6 +88,9 @@
           }
         }
       }
+    },
+    created() {
+      this.listTransactions()
     },
     computed: {
       transactionInfo() {
@@ -130,11 +117,11 @@
         let start = (this.pagination.current - 1) * this.pagination.itemsPerPage
         if (start > this.transactionInfo.length)
           return []
-        
+
         let end = start + this.pagination.itemsPerPage
         if (end > this.transactionInfo.length)
           end = this.transactionInfo.length
-        
+
         let pageItems = []
         for (let i = start; i< end; ++i) {
           pageItems.push(this.transactionInfo[i])
@@ -149,24 +136,7 @@
         return entries
       }
     },
-    created() {
-      this.listTransactions()
-    },
     methods: {
-      changeDate(val) {
-        const dateFormatPattern = 'YYYY-MM-DDTHH:mm:ss'
-        const fromDateDayJs = dayjs(val.fromDate)
-        const toDateDayJs = dayjs(val.toDate)
-        this.startDate = fromDateDayJs.format(dateFormatPattern)
-        const dayDiffs = toDateDayJs.diff(fromDateDayJs, 'day')
-        if (dayDiffs > 31) {
-          alert('The maximum supported date range is 31 days.')
-          this.endDate = fromDateDayJs.add(30, 'day').format(dateFormatPattern)
-        } else {
-          this.endDate = toDateDayJs.format(dateFormatPattern)
-        }
-        this.listTransactions()
-      },
       showTransactionDetailDialog(tranId) {
         this.dialog.transactionDetail.show = true
         this.dialog.transactionDetail.transactionId = tranId
@@ -204,11 +174,11 @@
       font-size: 18px;
       line-height: 23px;
     }
-  
+    
     &__table {
       height: calc(100% - 40px);
       width: 100%;
-    
+      
       .g-table {
         th, td {
           height: 40px;
@@ -216,7 +186,7 @@
           vertical-align: top;
           font-size: 14px;
           word-break: break-word;
-        
+          
           &:nth-child(1) {
             width: 20%;
           }
@@ -231,25 +201,25 @@
             width: 8%;
           }
         }
-      
+        
         thead th {
           background: #EFEFEF;
           font-size: 12px;
           color: #757575;
           height: 38px;
         }
-      
+        
         tr:nth-child(even) {
           td {
             background: #F8F8FB;
           }
         }
-      
+        
         .completed {
           color: #4CAF50;
           text-transform: capitalize;
         }
-      
+        
         .declined {
           color: #FF5252;
           text-transform: capitalize;

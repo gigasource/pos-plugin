@@ -79,7 +79,7 @@
   import axios from 'axios';
 
   export default {
-    name: 'TransactionDetailDialog',
+    name: 'PayPalTransactionDetailDialog',
     props: {
       value: Boolean,
       transactionId: String,

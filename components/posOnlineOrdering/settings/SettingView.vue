@@ -41,18 +41,13 @@
         <payment-providers
             v-if="view === 'payment-provider'"
             :store="store"
-            @deactivePayPalProvider="dialog.disablePaypalDialog.show = true"
-            @activePayPalProvider="enablePayPal"/>
+            @deactive="deactivePaymentProvider($event)"
+            @active="(name, metaData) => activePaymentProvider(name, metaData)"/>
         <payment-providers-transaction
             v-if="view === 'transaction'"
             :store="store"/>
       </div>
     </template>
-    
-    <disable-paypal-dialog-prompt
-        v-model="dialog.disablePaypalDialog.show"
-        @close="dialog.disablePaypalDialog.show = false"
-        @submit="disablePaypal"/>
   </div>
 </template>
 <script>
@@ -64,13 +59,13 @@
   import MultiplePrinter from "./MultiplePrinter";
   import Discount from "./Discount";
   import dayjs from 'dayjs';
-  import axios from 'axios';
-  import PaymentProvidersTransaction from './PaymentProvidersTransaction';
-  import PaymentProviders from './PaymentProviders';
-  import DisablePaypalDialogPrompt from './DisablePaypalDialogPrompt';
+  // payments
+  import PaymentProviders from './payments/PaymentProviders';
+  import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
+  
   export default {
     name: 'SettingView',
-    components: { DisablePaypalDialogPrompt, PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: { PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
     data: function () {
       return {
         sidebarItems: [
@@ -112,15 +107,6 @@
         permissionDenied: true,
         permissionDeniedMessage: '',
         listDiscount: [],
-        // payment providers
-        // todo: adjust start date, end date
-        startDate: dayjs('2020-05-01').format('YYYY-MM-DDTHH:mm:ss'),
-        endDate: dayjs('2020-05-30').format('YYYY-MM-DDTHH:mm:ss'),
-        dialog: {
-          disablePaypalDialog: {
-            show: false
-          }
-        }
       }
     },
     computed: {
@@ -333,17 +319,31 @@
       },
       
       // Payment Providers
-      async enablePayPal() {
-        await this.setEnablePayPal(true)
+      async deactivePaymentProvider(name) {
+        await this.setPaymentProvider(name, false)
       },
-      async disablePaypal() {
-        await this.setEnablePayPal(false)
+      async activePaymentProvider(name, metaData) {
+        await this.setPaymentProvider(name, true, metaData)
       },
-      async setEnablePayPal(value) {
+      async setPaymentProvider(name, value, metaData) {
         const paymentProviders = this.store.paymentProviders || {};
-        paymentProviders.paypal = paymentProviders.paypal || {}
-        paymentProviders.paypal.enable = value
-        await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+        paymentProviders[name] = paymentProviders[name] || {}
+        paymentProviders[name].enable = value
+        
+        switch (name) {
+          case 'paypal':
+            await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+            break;
+          case 'adyen':
+            const response = (await axios.post('/payment/adyen/createAccountHolder', { metaData })).data;
+            if (response.ok) {
+              paymentProviders.accountHolder = metaData
+              await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+            } else {
+              alert(response.message)
+            }
+            break;
+        }
       },
     }
   }

@@ -20,7 +20,7 @@
 </template>
 <script>
   export default {
-    name: 'DisablePaypalDialogPrompt',
+    name: 'DisablePayPalPromptDialog',
     props: {
       value: Boolean
     },
