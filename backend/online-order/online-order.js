@@ -11,7 +11,6 @@ let {webshopUrl, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
-let deviceSockets = [];
 let webShopConnected = false
 
 async function getWebShopUrl(cms) {
@@ -51,17 +50,14 @@ function createOnlineOrderSocket(deviceId, cms) {
     console.log('Creating online order')
     onlineOrderSocket = io(`${await getWebShopUrl(cms)}?clientId=${deviceId}`);
 
-    onlineOrderSocket.on('connect', () => console.log('external socket connect'))
+    onlineOrderSocket.on('connect', () => console.debug('external socket connect'));
 
     onlineOrderSocket.once('connect', async () => {
-      console.log('connect');
       webShopConnected = true
       cms.socket.emit('webShopConnected');
-      //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
       resolve();
-      if (cms.utils.getShouldUpdateApp()) {
-        onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
-      }
+
+      if (cms.utils.getShouldUpdateApp()) onlineOrderSocket.emit('updateVersion', require('../../package').version, deviceId);
     });
 
     onlineOrderSocket.on('reconnecting', function (numberOfAttempt) {
@@ -70,15 +66,15 @@ function createOnlineOrderSocket(deviceId, cms) {
         reject(`Can not pair with server at address ${webshopUrl}`);
         cleanupOnlineOrderSocket();
       }*/
-      console.log('reconnecting');
+      console.debug(`onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`);
     });
 
+    onlineOrderSocket.on('reconnect_error', err => console.debug(`onlineOrderSocket reconnect error: ${err}`));
+
     onlineOrderSocket.on('reconnect', () => {
-      console.log('reconnect')
+      console.debug('reconnect')
       webShopConnected = true
-      console.log(JSON.stringify(deviceSockets))
       cms.socket.emit('webShopConnected')
-      //deviceSockets.forEach(socket => socket.emit('webShopConnected'))
     })
 
     onlineOrderSocket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
@@ -132,12 +128,10 @@ function createOnlineOrderSocket(deviceId, cms) {
 
       const result = await cms.getModel('Order').create(order)
       cms.socket.emit('updateOnlineOrders')
-      //deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'))
 
       if (timeoutDate) {
         await scheduleDeclineOrder(timeoutDate, result._id, () => {
           cms.socket.emit('updateOnlineOrders')
-          //deviceSockets.forEach(socket => socket.emit('updateOnlineOrders'));
         })
       }
 
@@ -157,12 +151,10 @@ function createOnlineOrderSocket(deviceId, cms) {
       }))
       cms.socket.emit('updateAppFeature')
       callback()
-      //deviceSockets.forEach(socket => socket.emit('updateAppFeature')) // emit to all frontends
     })
 
     onlineOrderSocket.on('unpairDevice', cb => {
       cms.socket.emit('unpairDevice')
-      //deviceSockets.forEach(socket => socket.emit('unpairDevice'))
       cb();
     })
 
@@ -245,7 +237,7 @@ function createOnlineOrderSocket(deviceId, cms) {
     })
 
     onlineOrderSocket.on('disconnect', () => {
-      console.log('disconnect');
+      console.debug('disconnect');
       webShopConnected = false
       cms.socket.emit('webShopDisconnected')
       //deviceSockets.forEach(socket => socket.emit('webShopDisconnected'))
@@ -338,11 +330,9 @@ module.exports = async cms => {
     await waitInitOnlineOrderSocket();
 
     console.log('internal socket connect')
-    //deviceSockets.push(socket)
 
     socket.on('disconnect', () => {
       console.log('internal socket disconnect')
-      //deviceSockets = deviceSockets.filter(sk => sk !== socket)
     });
 
     socket.on('getWebshopUrl', async callback => callback(await getWebShopUrl(cms)));
