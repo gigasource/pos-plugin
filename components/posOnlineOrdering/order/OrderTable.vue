@@ -515,7 +515,7 @@
             },
             items: _.map(this.orderItems, item => ({
               name: item.name,
-              description: item.desc || '',
+              description: '',
               unit_amount: {
                 currency_code: this.currencyCode,
                 value: `${item.price}`
