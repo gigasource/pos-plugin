@@ -295,6 +295,27 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(deviceId, 'stopStream')
     })
 
+    async function getCoordsByPostalCode(code) {
+      //todo support countries
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
+
+      const response = await axios.get(url)
+      const { results } = response.data
+      if (!results || !results.length) return
+
+      const { geometry: { location: { lat: latitude, lng: longitude } } } = results[0]
+      return { latitude, longitude }
+    }
+
+    socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
+      const toCoords = await getCoordsByPostalCode(code)
+      if (!toCoords) callback()
+
+      const geolib = require('geolib')
+      const distance = geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
+      callback(distance)
+    })
+
     socket.once('disconnect', async () => {
       delete deviceStatusSubscribers[socket.id]
 
