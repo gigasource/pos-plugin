@@ -1,9 +1,8 @@
-"use strict"
+;"use strict"
 const _ = require('lodash')
 const checkoutNodeJssdk = require('@paypal/checkout-server-sdk');
 const payPalClient = require('./requests/paypalClient');
 const { TransactionsGetRequest } = require('./requests/transactionsGetRequest')
-const { PayoutCreateRequest } = require('./requests/payoutRequest')
 
 async function createOrder(requestBody, debug=false) {
   try {
