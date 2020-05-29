@@ -183,7 +183,7 @@
         },
         {
           "schemaType": "array",
-          "key": "fees",
+          "key": "zipCodeFees",
           "fields": [
             {
               "schemaType": "string",
@@ -203,6 +203,29 @@
           "key": "acceptOrderInOtherZipCodes",
           "type": "input@switch",
           "default": "true"
+        },
+        {
+          "schemaType": "string",
+          "key": "type",
+          "type": "input",
+          "default": "zipCode"
+        },
+        {
+          "schemaType": "array",
+          "key": "distanceFees",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "number",
+              "key": "radius",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "fee",
+              "type": "input@number"
+            }
+          ]
         }
       ],
       "type": "object"
@@ -334,7 +357,8 @@
       "_id": "5ece487fe5da86fae97e5db6",
       "schemaType": "boolean",
       "key": "displayImage",
-      "type": "input@switch"
+      "type": "input@switch",
+      "default": true
     },
     {
       "_id": "5eccfab2fa747314f6e8daa6",

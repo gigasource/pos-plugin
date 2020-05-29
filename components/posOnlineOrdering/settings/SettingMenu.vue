@@ -18,7 +18,7 @@
             Add new category
           </g-btn-bs>
         </div>
-        <div class="menu-setting__category">
+        <div class="menu-setting__category" id="menu-setting">
           <div v-for="(cate, index) in categoriesViewModel" :key="index" class="mb-1">
             <div @click="toggleCollapse(cate)" class="menu-setting__category__header" @mouseenter="toggleEditBtn(index, true)" @mouseleave="toggleEditBtn(index, false)">
               <g-edit-view-input
@@ -40,7 +40,8 @@
                   text-color="#536DFE"
                   border-color="#90CAF9"
                   @click.stop.prevent="showAddNewProductPanelForCategory(cate)"
-                  :disabled="showAddNewProductPanel[cate._id]">
+                  :disabled="showAddNewProductPanel[cate._id]"
+                  style="white-space: nowrap">
                 + Add New Item
               </g-btn-bs>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
@@ -77,7 +78,7 @@
                       <img src="/plugins/pos-plugin/assets/no-items.svg" class="mb-2"/>
                       <div class="text-grey">No item in this group.</div>
                     </div>
-                    <div v-if="showAddNewProductPanel[cate._id]">
+                    <div v-if="showAddNewProductPanel[cate._id]" :id="`new_product_${cate._id}`">
                       <setting-new-menu-item
                           :index="cate.products.length"
                           :available-printers="store.printers"
@@ -236,6 +237,12 @@
       },
       showAddNewProductPanelForCategory(cate) {
         this.$set(this.showAddNewProductPanel, cate._id, true)
+        this.$nextTick(() => {
+          const wrapper = document.getElementById('menu-setting')
+          const panel = document.getElementById('new_product_' + cate._id)
+          const top = wrapper.scrollTop
+          wrapper.scroll({top: top + panel.getBoundingClientRect().top - wrapper.getBoundingClientRect().top - 48, left: 0, behavior: 'smooth'})
+        })
       },
       hideAddNewProductPanelForCategory(cate) {
         this.$set(this.showAddNewProductPanel, cate._id, false)

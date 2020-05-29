@@ -34,21 +34,10 @@
             @update-product="updateProduct"
             @delete-product="deleteProduct"
             @swap-category="swapCategory"/>
-        <delivery-fee
-            v-if="view === 'setting-delivery-fee'"
-            :store="store"
-            @update="updateStore"/>
-        <multiple-printer
-            v-if="view === 'setting-multiple-printer'"
-            :store="store"
-            @update="updateStore"/>
-        <discount
-            v-if="view === 'setting-discount'"
-            :list-discount="listDiscount"
-            @addDiscount="addDiscount"
-            @getDiscounts="getDiscounts"
-            @removeDiscount="removeDiscount"
-            @updateDiscount="updateDiscount"/>
+        <delivery-fee v-if="view === 'setting-delivery-fee'" v-bind="store" @update="updateStore"/>
+        <multiple-printer v-if="view === 'setting-multiple-printer'" :store="store" @update="updateStore"/>
+        <discount v-if="view === 'setting-discount'" :list-discount="listDiscount"
+                  @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount" @updateDiscount="updateDiscount"/>
         <payment-providers
             v-if="view === 'payment-provider'"
             :store="store"
