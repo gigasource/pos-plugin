@@ -20,8 +20,8 @@
             <div class="item-fee col-2">
               <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
             </div>
-            <div class="item-btn--delete col-1">
-              <g-icon size="16" color="#424242" @click="removeFee(i)">icon-close</g-icon>
+            <div class="item-btn--delete col-1" @click.stop="removeFee(i)">
+              <g-icon size="16" color="#424242">icon-close</g-icon>
             </div>
           </div>
           <div class="item-btn--add" @click="addNewFee">
@@ -50,14 +50,15 @@
             <div class="item-fee col-2">
               <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
             </div>
-            <div class="item-btn--delete col-1">
-              <g-icon size="16" color="#424242" @click="removeFee(i)">icon-close</g-icon>
+            <div class="item-btn--delete col-1" @click.stop="removeFee(i)">
+              <g-icon size="16" color="#424242">icon-close</g-icon>
             </div>
           </div>
           <div class="item-btn--add" @click="addNewFee">
             <g-icon size="40" color="#2979FF">add</g-icon>
           </div>
         </div>
+        <p class="mt-3">Note: Shipping services are not available for locations outside of the configured radius.</p>
       </template>
     </div>
   </div>
@@ -126,9 +127,9 @@
     },
     methods: {
       addNewFee() {
-        if(this.type === 'zipCode')
+        if (this.type === 'zipCode')
           this.deliveryFee.zipCodeFees.push({zipCode: '', fee: 0})
-        if(this.type === 'distance')
+        if (this.type === 'distance')
           this.deliveryFee.distanceFees.push({radius: 0, fee: 0})
         this.updateFees()
       },
@@ -141,14 +142,14 @@
         this.updateFees()
       },
       updateFee(item, e) {
-        if(!e.target.value || isNaN(e.target.value)) return
-        if(this.type === 'zipCode')
+        if (!e.target.value || isNaN(e.target.value)) return
+        if (this.type === 'zipCode')
           _.each(this.deliveryFee.zipCodeFees, fee => {
             if (fee === item) {
               fee.fee = e.target.value
             }
           })
-        if(this.type === 'distance')
+        if (this.type === 'distance')
           _.each(this.deliveryFee.distanceFees, fee => {
             if (fee === item) {
               fee.fee = e.target.value
@@ -157,7 +158,7 @@
         this.updateFees()
       },
       updateRadius(item, e) {
-        if(!e.target.value || isNaN(e.target.value)) return
+        if (!e.target.value || isNaN(e.target.value)) return
           _.each(this.deliveryFee.distanceFees, fee => {
             if (fee === item) {
               fee.radius = e.target.value
@@ -166,13 +167,13 @@
         this.updateFees()
       },
       updateFees() {
-        if(this.type === 'zipCode')
+        if (this.type === 'zipCode')
           this.updateDeliveryFee({zipCodeFees: this.deliveryFee.zipCodeFees})
-        if(this.type === 'distance')
+        if (this.type === 'distance')
           this.updateDeliveryFee({distanceFees: this.deliveryFee.distanceFees})
       },
       setDefaultFee(value) {
-        if(!value || isNaN(value)) return
+        if (!value || isNaN(value)) return
         this.updateDeliveryFee({defaultFee: value})
       },
       updateDeliveryFee(change) {
@@ -186,9 +187,9 @@
         })
       },
       removeFee(index) {
-        if(this.type === 'zipCode')
+        if (this.type === 'zipCode')
           this.deliveryFee.zipCodeFees.splice(index, 1)
-        if(this.type === 'distance')
+        if (this.type === 'distance')
           this.deliveryFee.distanceFees.splice(index, 1)
         this.updateFees()
       },

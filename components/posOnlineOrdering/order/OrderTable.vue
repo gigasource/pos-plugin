@@ -60,6 +60,10 @@
                     style="color: #4CAF50; font-size: 15px">
                 {{$t('store.minimumWarning')}}{{$t('common.currency')}}{{store.minimumOrderValue.value}}.
               </span>
+              <span v-if="orderType === 'delivery' && distanceExceedingRadius"
+                    style="color: #4CAF50; font-size: 15px">
+                Delivery services are not available for addresses further than {{maxShippingRadius}}km.
+              </span>
               <span v-if="orderType === 'delivery' && !satisfyDeliveryTime" style="color: #4CAF50; font-size: 15px">
                 {{$t('store.deliveryTimeWarning')}}{{deliveryTimeString}}
               </span>
@@ -325,8 +329,8 @@
             return this.store.deliveryFee.defaultFee
         }
 
-        if(this.store.deliveryFee.type === 'distance') {
-          if(this.customer.distance) {
+        if (this.store.deliveryFee.type === 'distance') {
+          if (this.customer.distance) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
               if (this.customer.distance < deliveryFee.radius)
                 return deliveryFee.fee
@@ -345,7 +349,7 @@
               return true
             }
           }
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime
+          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime || this.distanceExceedingRadius
         }
         return check
       },
@@ -461,8 +465,15 @@
       cdnOrderHeaderImage() {
         return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=680&h=390`
       },
-      availableStreetAutocomplete() {
-        return this.addressSuggestions.length > 0
+      maxShippingRadius() {
+        if (this.store.deliveryFee.distanceFees)
+          return _.maxBy(this.store.deliveryFee.distanceFees, i => i.radius).radius
+      },
+      distanceExceedingRadius() {
+        if (this.store.deliveryFee.type === 'distance') {
+          if (this.customer.distance && this.customer.distance > this.maxShippingRadius) return true
+        }
+        return false
       }
     },
     watch: {
