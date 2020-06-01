@@ -39,7 +39,10 @@
       </div>
       <div class="dialog-action">
         <g-btn-bs text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
-        <g-btn-bs width="110" text-color="white" background-color="#536DFE" rounded @click="confirm">{{$t('store.confirm')}}</g-btn-bs>
+        <g-btn-bs width="110" text-color="white" background-color="#536DFE" :disabled="loading" rounded @click="confirm">
+          <template v-if="loading"><g-progress-circular class="mr-2" indeterminate/></template>
+          <template v-else>{{$t('store.confirm')}}</template>
+        </g-btn-bs>
       </div>
     </div>
   </g-dialog>
@@ -55,7 +58,8 @@
       totalPrice: Number,
       shippingFee: Number,
       discounts: Array,
-      effectiveTotal: Number
+      effectiveTotal: Number,
+      loading: Boolean
     },
     filters: {
       currency(value) {
@@ -83,7 +87,6 @@
       },
       confirm() {
         this.$emit('confirm')
-        this.internalValue = false
       }
     }
   }

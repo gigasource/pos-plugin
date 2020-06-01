@@ -158,7 +158,7 @@
     </div>
 
     <!-- Order created -->
-    <order-created v-if="dialog.value" v-model="dialog.value"
+    <order-created v-if="dialog.value" v-model="dialog.value" :order-extra-info="dialog.extraInfo"
                    :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
@@ -169,6 +169,7 @@
                           :shipping-fee="shippingFee"
                           :discounts="discounts"
                           :effective-total="effectiveTotal"
+                          :loading="dialog.loading"
                           @confirm="confirmPayment"/>
   </div>
 </template>
@@ -212,6 +213,8 @@
           value: false,
           order: {},
           confirm: false,
+          extraInfo: '',
+          loading: false
         },
         couponTf: {
           active: false,
@@ -267,6 +270,26 @@
         menu.forEach(m => {
           m.style.display = 'none'
         })
+      })
+
+      cms.socket.on('noOnlineOrderDevice', (orderToken) => {
+        if (orderToken === this.dialog.order.orderToken) {
+          this.dialog.value = true
+          this.dialog.loading = false
+          this.dialog.confirm = false
+          this.$set(this.dialog.order, 'status', 'failedToSend')
+        }
+      })
+
+      cms.socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
+        console.debug(`frontend received status for order ${orderToken}`)
+        if (orderToken === this.dialog.order.orderToken) {
+          this.dialog.value = true
+          this.dialog.loading = false
+          this.dialog.confirm = false
+          this.$set(this.dialog.order, 'status', orderStatus)
+          this.dialog.extraInfo = extraInfo
+        }
       })
     },
     beforeDestroy() {
@@ -572,7 +595,7 @@
           effectiveTotal: this.effectiveTotal
         }
 
-        this.dialog.value = true
+        this.dialog.loading = true
       },
       closeOrderCreatedDialog() {
         this.customer = {

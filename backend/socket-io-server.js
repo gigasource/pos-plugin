@@ -28,6 +28,8 @@ const savedMessageSchema = new Schema({
 });
 
 const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
+const sendOrderTimeouts = {};
+const SEND_TIMEOUT = 10000;
 
 function updateMessage(targetClientId, _id, update) {
   return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
@@ -74,6 +76,14 @@ module.exports = function (cms) {
     } catch (e) {
       cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
     }
+  });
+
+  externalSocketIOServer.registerAckFunction('createOrderAck', orderToken => {
+    if (sendOrderTimeouts[orderToken]) {
+      clearTimeout(sendOrderTimeouts[orderToken]);
+      delete sendOrderTimeouts[orderToken]
+    }
+    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, 'inProgress')
   });
 
   function notifyDeviceStatusChanged(clientId) {
@@ -221,14 +231,23 @@ module.exports = function (cms) {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
 
-      if (!device) return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
-
       // join orderToken room
       socket.join(orderData.orderToken)
       console.debug(`joined room ${orderData.orderToken}`)
 
+      if (!device) {
+        internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
+        return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
+      }
+
       const deviceId = device._id.toString();
-      externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()]);
+      const removePersistentMsg = await externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()],
+        'createOrderAck', [orderData.orderToken]);
+
+      sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
+        internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
+        removePersistentMsg()
+      }, SEND_TIMEOUT);
     });
 
     socket.on('updateApp', async (deviceId, uploadPath, type) => {
