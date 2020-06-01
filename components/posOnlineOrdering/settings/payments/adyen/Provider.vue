@@ -1,5 +1,5 @@
 <template>
-  <div class="provider">
+  <div class="provider col-flex">
     <div class="provider__logo">
       <img draggable="false" src="/plugins/pos-plugin/assets/adyen.svg" width="95"/>
     </div>
@@ -9,35 +9,45 @@
   
     <div>
       <div>Please provide information so we can use it as a wallet for your store</div>
-      <div>
-        <div>Email</div>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.email" prefix="Email" placeholder="tim@green.com" required/>
-      </div>
-      <div>
-        <div>Individual Details:</div>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.firstName" placeholder="Tim" prefix="First Name" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.lastName" prefix="Last Name" placeholder="Green" required/>
-        <g-select text-field-component="GTextFieldBs" v-model="accountHolder.accountHolderDetails.individualDetails.name.gender" :items="genders" prefix="Gender" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.personalData.dateOfBirth" prefix="Date Of Birth" placeholder="1987-01-01" required/>
-        <g-text-field-bs v-if="documentDataNumberRequired" v-model="accountHolder.accountHolderDetails.individualDetails.personalData.documentData.number" prefix="Document Data Number" placeholder="123-45-6789" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.fullPhoneNumber" prefix="Full Phone Number" placeholder="+49 561 7009xx" required/>
-      </div>
-      <div>
-        <div>Address:</div>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.postalCode" prefix="PostalCode" placeholder="34119" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.houseNumberOrName" prefix="House Number Or Name" placeholder="68-72" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.street" prefix="Street" placeholder="Königstor" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.city" prefix="City" placeholder="Kassel" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.country" prefix="Country Code" placeholder="DE" required/>
-      </div>
-      <div>
-        <div>Bank Account Details</div>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].ownerName" prefix="Owner Name" placeholder="Tim" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].countryCode" prefix="Country Code" placeholder="DE" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].currencyCode" prefix="Currency Code" placeholder="EUR" required/>
-        <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].iban" prefix="IBAN" placeholder="DE41100000000000xxxx78" required/>
-      </div>
+      
+      <g-sections v-model="activeItem" style="margin-bottom: 20px">
+        <g-sections-item header="Email">
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.email" prefix="Email" placeholder="tim@green.com" required/>
+        </g-sections-item>
+        <g-sections-item header="Individual Detail">
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.firstName" placeholder="Tim" prefix="First Name" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.lastName" prefix="Last Name" placeholder="Green" required/>
+          <g-select text-field-component="GTextFieldBs" v-model="accountHolder.accountHolderDetails.individualDetails.name.gender" :items="genders" prefix="Gender" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.personalData.dateOfBirth" prefix="Date Of Birth" placeholder="1987-01-01" required/>
+          <g-text-field-bs v-if="documentDataNumberRequired" v-model="accountHolder.accountHolderDetails.individualDetails.personalData.documentData.number" prefix="Document Data Number" placeholder="123-45-6789" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.fullPhoneNumber" prefix="Full Phone Number" placeholder="+49 561 7009xx" required/>
+        </g-sections-item>
+        <g-sections-item header="Address">
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.postalCode" prefix="PostalCode" placeholder="34119" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.houseNumberOrName" prefix="House Number Or Name" placeholder="68-72" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.street" prefix="Street" placeholder="Königstor" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.city" prefix="City" placeholder="Kassel" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.country" prefix="Country Code" placeholder="DE" required/>
+        </g-sections-item>
+        <g-sections-item header="Bank Account Details">
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].ownerName" prefix="Owner Name" placeholder="Tim" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].countryCode" prefix="Country Code" placeholder="DE" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].currencyCode" prefix="Currency Code" placeholder="EUR" required/>
+          <g-text-field-bs v-model="accountHolder.accountHolderDetails.bankAccountDetails[0].iban" prefix="IBAN" placeholder="DE41100000000000xxxx78" required/>
+        </g-sections-item>
+        <g-sections-item header="Photo ID">
+          <g-select text-field-component="GTextFieldBs" v-model="photoIdKind" :items="supportedPhotoIdKinds" prefix="Photo ID Type"/>
+          <div v-if="photoIdKind === 'Passport'">
+            <g-text-field-bs type="file" prefix="Passport" @change="setFrontPhoto"/>
+          </div>
+          <div v-else>
+            <g-text-field-bs type="file" prefix="Front" @change="setFrontPhoto"/>
+            <g-text-field-bs type="file" prefix="Back" @change="setBackPhoto"/>
+          </div>
+        </g-sections-item>
+      </g-sections>
     </div>
+    <g-spacer/>
     <div style="display: flex; justify-content: flex-end">
       <g-btn-bs v-if="isActivated" background-color="#536DFE" text-color="#FFF" @click="$emit('deactive')" style="margin-right: 0">Deactive Adyen</g-btn-bs>
       <g-btn-bs v-else background-color="#536DFE" text-color="#FFF" @click="activateAdyen" style="margin-right: 0">Activate Adyen</g-btn-bs>
@@ -47,8 +57,8 @@
 <script>
   // https://docs.adyen.com/marketpay/onboarding-and-verification/verification-checks
   
-  
-  
+  import { getBase64 } from '../../../../Store/utils';
+
   export default {
     name: 'AdyenProvider',
     props: {
@@ -56,12 +66,26 @@
     },
     data: function () {
       return {
+        activeItem: 'Email',
+        
         // available options
         genders: [
           { text: 'Male', value: 'MALE' },
           { text: 'Female', value: 'FEMALE' },
           { text: 'Unknown', value: 'UNKNOWN' },
         ],
+        
+        supportedPhotoIdKinds: [
+          { text: 'Passport', value: 'Passport' },
+          { text: 'ID card', value: 'ID card' },
+          { text: "Driver's license", value: "Driver's license" }
+        ],
+        photoIdKind: 'Passport',
+        frontPhotoFile: null,
+        frontPhotoBase64: null,
+        backPhotoFile: null,
+        backPhotoBase64: null,
+        
         // model
         accountHolder: {
           "accountHolderCode": "GENERATE",
@@ -114,7 +138,12 @@
       }
     },
     methods: {
-      activateAdyen() {
+      async activateAdyen() {
+        if (!this.frontPhotoFile || (this.photoIdKind !== 'Passport' && !this.backPhotoFile)) {
+          alert('Missing photo id')
+          return;
+        }
+        await this.convertImageFileToBase64()
         this.generateAccountHolderCode()
         this.removeUnnecessaryInfo()
         this.$emit('active', this.accountHolder)
@@ -132,6 +161,18 @@
             delete this.accountHolder.accountHolderDetails.individualDetails.personalData.documentData
             break;
         }
+      },
+      async convertImageFileToBase64() {
+        this.frontPhotoBase64 = await getBase64(this.frontPhotoFile)
+        if (this.photoIdKind !== 'Passport') {
+          this.backPhotoBase64 = await getBase64(this.backPhotoFile)
+        }
+      },
+      setFrontPhoto(e) {
+        this.frontPhotoFile = e.target.files[0]
+      },
+      setBackPhoto(e) {
+        this.backPhotoFile = e.target.files[0]
       }
     }
   }
