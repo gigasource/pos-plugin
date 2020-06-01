@@ -1,9 +1,10 @@
 const {p2pServerPlugin} = require('@gigasource/socket.io-p2p-plugin');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const deviceStatusSubscribers = {};
 const _ = require('lodash');
 const axios = require('axios');
+const redisAdapter = require('socket.io-redis');
+const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -47,9 +48,14 @@ function loadMessages(targetClientId) {
 
 module.exports = function (cms) {
   const DeviceModel = cms.getModel('Device');
-  let onlineDeviceIds = [];
 
   const {io, socket: internalSocketIOServer} = cms;
+
+  if (global.APP_CONFIG.redis) {
+    const {host, port, password} = global.APP_CONFIG.redis;
+    io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
+  }
+
   const externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
     saveMessage,
@@ -70,21 +76,18 @@ module.exports = function (cms) {
     }
   });
 
-  function updateDeviceAndNotify(online, clientId) {
-    if (online) onlineDeviceIds.push(clientId);
-    else onlineDeviceIds = onlineDeviceIds.filter(e => e !== clientId);
-
-    Object.keys(deviceStatusSubscribers).forEach(socketId => {
-      const deviceWatchList = deviceStatusSubscribers[socketId]
-
-      if (deviceWatchList && deviceWatchList.includes(clientId)) {
-        internalSocketIOServer.connected[socketId].emit('updateDeviceStatus');
-      }
-    });
+  function notifyDeviceStatusChanged(clientId) {
+    internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus');
   }
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
+    if (socket.request._query && socket.request._query.clientId) {
+      const clientId = socket.request._query.clientId;
+      notifyDeviceStatusChanged(clientId);
+      socket.once('disconnect', () => notifyDeviceStatusChanged(clientId));
+    }
+
     socket.on('getWebshopName', async (deviceId, callback) => {
       const DeviceModel = cms.getModel('Device');
       const StoreModel = cms.getModel('Store');
@@ -182,33 +185,24 @@ module.exports = function (cms) {
     socket.on('updateVersion', async (appVersion, _id) => {
       const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
       if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
-    })
-
-    if (socket.request._query && socket.request._query.clientId) {
-      const clientId = socket.request._query.clientId;
-      updateDeviceAndNotify(true, clientId);
-      socket.once('disconnect', () => updateDeviceAndNotify(false, clientId));
-    }
+    });
   });
 
   // internalSocketIOServer is another Socket.io namespace for frontend to connect (use /app namespace)
   internalSocketIOServer.on('connect', socket => {
     let remoteControlDeviceId = null;
 
-    socket.on('getOnlineDeviceIds', callback => callback(onlineDeviceIds));
+    socket.on('getOnlineDeviceIds', callback => callback(global.APP_CONFIG.redis
+        ? Array.from(externalSocketIOServer.clusterClients)
+        : externalSocketIOServer.getAllClientId()));
 
     socket.on('getProxyInfo', callback => callback({
       proxyUrlTemplate: global.APP_CONFIG.proxyUrlTemplate,
       proxyRetryInterval: global.APP_CONFIG.proxyRetryInterval,
     }));
 
-    socket.on('watchDeviceStatus', clientIdList => {
-      deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).concat(clientIdList));
-    });
-
-    socket.on('unwatchDeviceStatus', clientIdList => {
-      deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).filter(id => !clientIdList.includes(id)));
-    });
+    socket.on('watchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.join(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
+    socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       try {
@@ -317,8 +311,6 @@ module.exports = function (cms) {
     })
 
     socket.once('disconnect', async () => {
-      delete deviceStatusSubscribers[socket.id]
-
       if (!remoteControlDeviceId) return
 
       const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;
