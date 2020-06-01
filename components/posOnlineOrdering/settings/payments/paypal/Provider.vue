@@ -90,9 +90,9 @@
     background: #FFF;
     border-radius: 4px;
     padding: 30px;
-    
+  
     &__logo {
-    
+      height: 53px;
     }
     
     &__description {

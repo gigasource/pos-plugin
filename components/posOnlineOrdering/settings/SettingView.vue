@@ -322,25 +322,33 @@
       async deactivePaymentProvider(name) {
         await this.setPaymentProvider(name, false)
       },
-      async activePaymentProvider(name, metaData) {
-        await this.setPaymentProvider(name, true, metaData)
+      async activePaymentProvider(name, metadata) {
+        await this.setPaymentProvider(name, true, metadata)
       },
-      async setPaymentProvider(name, value, metaData) {
+      async setPaymentProvider(name, value, metadata) {
         const paymentProviders = this.store.paymentProviders || {};
         paymentProviders[name] = paymentProviders[name] || {}
         paymentProviders[name].enable = value
-        
         switch (name) {
           case 'paypal':
             await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
             break;
           case 'adyen':
-            const response = (await axios.post('/payment/adyen/createAccountHolder', { metaData })).data;
-            if (response.ok) {
-              paymentProviders.accountHolder = metaData
-              await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+            if (value) {
+              // https://docs.adyen.com/marketpay/marketpay-structure#account-holder-statuses
+              const response = (await axios.post('/payment/adyen/createAccountHolder', { metadata })).data;
+              if (response.ok) {
+                paymentProviders[name].accountHolder = metadata // store metadata or store response is better???
+                await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
+              } else {
+                alert(response.message)
+              }
             } else {
-              alert(response.message)
+              // deactive: suspend or close?
+              // payout balance to bank account
+              let response = (await axios.post('/payment/adyen/payout-all', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data
+              // then close account
+              response = (await axios.post('/payment/adyen/closeAccountHolder', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data;
             }
             break;
         }

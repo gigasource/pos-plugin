@@ -1,15 +1,13 @@
 <template>
   <g-dialog :value="value" @input="cancel">
     <div style="width: 600px; height: 400px; margin:0 auto; background-color: #FFF; border-radius: 5px;padding: 30px;">
-      <div style="font-style: normal; font-weight: 600; font-size: 24px;">Disable PayPal Checkout</div>
+      <div style="font-style: normal; font-weight: 600; font-size: 24px;">Disable {{ name }}</div>
       <div style="height: 200px; width: 500px; margin: 30px auto;">
-        <div>Disable PayPal Checkout will prevent your customer to order using PayPal account, debit/credit card. Are you sure you want to disable this option?</div>
+        <div>Disable {{ name }} will prevent your customer to order using {{ name }} account, debit/credit card. Are you sure you want to disable this option?</div>
         <div style="color: #616161">
           <div class="mt-4">Note:</div>
           <div style="font-size: 14px; font-style: italic">Your pending balance is automatically transfered to your bank account on the first day of the following month.</div>
         </div>
-        
-        
       </div>
       <div class="row-flex justify-end">
         <g-btn-bs width="100" background-color="#536DFE" text-color="#FFF" @click="cancel">Cancel</g-btn-bs>
@@ -20,9 +18,10 @@
 </template>
 <script>
   export default {
-    name: 'DisablePayPalPromptDialog',
+    name: 'DisablePromptDialog',
     props: {
-      value: Boolean
+      value: Boolean,
+      name: String
     },
     data: function () {
       return {}
