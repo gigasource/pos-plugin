@@ -122,13 +122,16 @@
                 <div class="pay-by-cash-btn" @click="confirmCashPayment">Pay by Cash</div>
                 <pay-pal-smart-button
                     v-if="isPaymentViaPayPalEnable"
-                    :self-host="true"
+                    self-host
                     :debug="true"
                     :order-info="paypalOrderInfo"
                     :client-id="store.paypalClientId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
-                <adyen-checkout environment="test" self-host/>
+                <adyen-checkout
+                    v-if="isPaymentViaAdyenEnable"
+                    self-host
+                    environment="test"/>
               </div>
             </template>
           </template>
@@ -544,6 +547,9 @@
       },
       isPaymentViaPayPalEnable() {
         return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
+      },
+      isPaymentViaAdyenEnable() {
+        return this.store.paymentProviders && this.store.paymentProviders.adyen && this.store.paymentProviders.adyen.enable
       }
     },
     watch: {
