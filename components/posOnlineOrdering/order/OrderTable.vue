@@ -293,6 +293,7 @@
       })
     },
     beforeDestroy() {
+      window.cms.socket.off('updateOrderStatus')
       clearInterval(this.timeInterval)
     },
     computed: {
