@@ -232,8 +232,7 @@
         addressNo: '',
         throttledGetSuggestions: null,
         now: null,
-        timeInterval: null,
-        outOfRange: false
+        timeInterval: null
       }
     },
     filters: {
@@ -335,7 +334,6 @@
         }).flat()
       },
       shippingFee() {
-        this.outOfRange = false
         if (!this.orderItems || this.orderItems.length === 0)
           return 0;
 
@@ -360,7 +358,6 @@
                 return deliveryFee.fee
             }
           }
-          this.outOfRange = true
         }
 
         return 0
@@ -384,7 +381,7 @@
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
-        if (this.store.deliveryFee.type === 'distance' && this.outOfRange) {
+        if (this.store.deliveryFee.type === 'distance' && (!this.customer.distance || this.distanceExceedingRadius)) {
           rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
