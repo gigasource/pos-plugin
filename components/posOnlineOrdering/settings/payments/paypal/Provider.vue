@@ -1,45 +1,50 @@
 <template>
-  <div class="provider">
-    <div class="provider__logo">
+  <section class="provider">
+    <header class="provider__logo">
       <img draggable="false" src="/plugins/pos-plugin/assets/paypal.png"/>
-    </div>
-    <div class="provider__description">
-      <div>Enable customers to pay by their PayPal accounts or credit/debit cards.</div>
-      <!--          <img draggable="false" src="/plugins/pos-plugin/assets/wallet.svg"/>-->
-    </div>
+    </header>
+    
+    <section class="provider__description">
+      <p>{{$t('paymentProviders.paypal.desc')}}</p>
+    </section>
+    
     <template v-if="providerActivated">
-      <div class="provider__balance-info">
-        <div class="provider__balance-info__key">PayPal Balance: </div>
+      <section class="provider__balance-info">
+        <p style="font-weight: bold;font-size: 18px;">{{$t('paymentProviders.paypal.balance')}}</p>
         <div class="provider__balance-info__value">
-          <div v-if="balances.length === 0">Calculating...</div>
+          <div v-if="balances.length === 0">{{$t('paymentProviders.paypal.calculating')}}</div>
           <ul v-else class="mt-1">
             <li v-for="(balance, i) in balances" :key="i">
-              {{ balance.currencyCode | currencySymbol }}{{balance.netAmount}}
+              {{ balance.currencyCode | currencySymbol }}{{ balance.netAmount }}
             </li>
           </ul>
         </div>
-      </div>
-      <div class="provider__notice">
-        <div>Note:</div>
+      </section>
+      
+      <section class="provider__notice">
+        <p>{{$t('paymentProviders.paypal.note')}}</p>
         <ul>
-          <li>Your pending balance is automatically transfered to your bank account on the first day of the following month.</li>
-          <li>Addition fee will be added for each transaction.</li>
+          <li>{{$t('paymentProviders.paypal.noteContent1')}}</li>
+          <li>{{$t('paymentProviders.paypal.noteContent2')}}</li>
         </ul>
-      </div>
-      <div style="font-style: italic; font-size: small;margin-bottom: 10px; color: #616161;">
-        <div>(*) Last update: {{lastRefreshedDateTime}}</div>
-        <div>(*) It takes a maximum of three hours for executed transactions to be added into balance.</div>
-      </div>
-      <div style="display: flex; justify-content: flex-end">
+      </section>
+      
+      <section class="i mb-2" style="font-size: small; color: #616161;">
+        <div>(*) {{$t('paymentProviders.paypal.lastUpdate')}}{{lastRefreshedDateTime}}</div>
+        <div>(*) {{$t('paymentProviders.paypal.transactionHistoryNotice')}}</div>
+      </section>
+      
+      <footer class="row-flex justify-end">
         <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="deactivePayPalCheckout" style="margin-right: 0">Deactive Paypal Checkout</g-btn-bs>
-      </div>
+      </footer>
     </template>
+    
     <template v-else>
-      <div style="display: flex; justify-content: flex-end">
+      <footer class="row-flex justify-end">
         <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="activePayPalCheckout" style="margin-right: 0">Activate PayPal Checkout</g-btn-bs>
-      </div>
+      </footer>
     </template>
-  </div>
+  </section>
 </template>
 <script>
   import { currencyCodeToSymbol } from '../../../../Store/currencyHelper';
@@ -105,17 +110,6 @@
     }
     
     &__balance-info {
-      
-      &__kv {
-        /*display: flex;*/
-        /*justify-content: space-between;*/
-      }
-      
-      &__key {
-        font-weight: bold;
-        font-size: 18px;
-      }
-      
       &__value {
         color: #536DFE;
         font-family: Muli;

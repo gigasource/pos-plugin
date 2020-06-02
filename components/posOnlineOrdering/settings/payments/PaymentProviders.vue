@@ -1,20 +1,25 @@
 <template>
-  <div class="payment-provider-view">
-    <div class="payment-provider-view__title">Payment Setting</div>
-    <div class="payment-provider-list">
+  <section>
+    <header
+        class="mb-3"
+        style="font-family: Muli; font-weight: bold; font-size: 18px; line-height: 23px;">
+      Payment Setting
+    </header>
+    
+    <section class="row-flex flex-wrap justify-between">
       <component
           v-for="provider in providers"
           :is="provider.component"
           :store="store"
           @deactive="showDisableProviderDialog(provider.name)"
           @active="$emit('active', provider.name, $event)"/>
-    </div>
+    </section>
     
     <disable-prompt-dialog
       v-if="dialog.disableProvider.show"
       @cancel="hideProviderDialog"
       @submit="$emit('disable', dialog.disableProvider.name)"/>
-  </div>
+  </section>
 </template>
 <script>
   import PaypalProvider from './paypal/Provider';
@@ -63,20 +68,6 @@
 </script>
 <style scoped lang="scss">
   .payment-provider-view {
-    &__title {
-      font-family: Muli;
-      font-style: normal;
-      font-weight: bold;
-      font-size: 18px;
-      line-height: 23px;
-      margin-bottom: 15px;
-    }
-  }
-  
-  .payment-provider-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
+
   }
 </style>

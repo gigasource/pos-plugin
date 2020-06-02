@@ -48,48 +48,6 @@
         height: 53px;
       }
     }
-    
-    &__description {
-      color: #757575;
-      font-size: 16px;
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-    
-    &__balance-info {
-      
-      &__kv {
-        /*display: flex;*/
-        /*justify-content: space-between;*/
-      }
-      
-      &__key {
-        font-weight: bold;
-        font-size: 18px;
-      }
-      
-      &__value {
-        color: #536DFE;
-        font-family: Muli;
-        font-style: normal;
-        font-weight: 600;
-        font-size: 18px;
-      }
-    }
-    
-    &__notice {
-      color: #616161;
-      margin-top: 20px;
-      &>ul {
-        margin-block-start: 0 !important;
-        font-style: italic;
-        &>li {
-          font-size: 14px;
-        }
-      }
-    }
   }
   
   ::v-deep {
