@@ -202,9 +202,18 @@ module.exports = function (cms) {
   internalSocketIOServer.on('connect', socket => {
     let remoteControlDeviceId = null;
 
-    socket.on('getOnlineDeviceIds', async callback => callback(global.APP_CONFIG.redis
-        ? Array.from(await externalSocketIOServer.getClusterClientIds())
-        : externalSocketIOServer.getAllClientId()));
+    socket.on('getOnlineDeviceIds', async callback => {
+      if (global.APP_CONFIG.redis) {
+        try {
+          const clusterClientList = await externalSocketIOServer.getClusterClientIds();
+          return callback(Array.from(clusterClientList));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      callback(externalSocketIOServer.getAllClientId());
+    });
 
     socket.on('getProxyInfo', callback => callback({
       proxyUrlTemplate: global.APP_CONFIG.proxyUrlTemplate,
@@ -242,7 +251,7 @@ module.exports = function (cms) {
 
       const deviceId = device._id.toString();
       const removePersistentMsg = await externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()],
-        'createOrderAck', [orderData.orderToken]);
+          'createOrderAck', [orderData.orderToken]);
 
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
         internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
@@ -313,11 +322,11 @@ module.exports = function (cms) {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
 
       const response = await axios.get(url)
-      const { results } = response.data
+      const {results} = response.data
       if (!results || !results.length) return
 
-      const { geometry: { location: { lat: latitude, lng: longitude } } } = results[0]
-      return { latitude, longitude }
+      const {geometry: {location: {lat: latitude, lng: longitude}}} = results[0]
+      return {latitude, longitude}
     }
 
     socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
