@@ -231,7 +231,7 @@
             },
             bankAccountDetails: []
           },
-          "legalEntity": "Individual"
+          legalEntity: "Individual",
         },
 
         verification: {
@@ -318,7 +318,11 @@
         )
       },
       isPhotoIdProvided() {
-        return !(!this.frontPhotoFile || (this.photoIdKind !== 'Passport' && !this.backPhotoFile))
+        if (this.photoIdKind === 'Passport') {
+          return this.frontPhotoFile || this.frontPhotoBase64
+        } else {
+          return (this.frontPhotoFile || this.frontPhotoBase64) && (this.backPhotoFile || this.backPhotoBase64)
+        }
       },
       isDocumentDataRequired() {
         // add more country at this step
@@ -346,7 +350,15 @@
         await this.convertImageFileToBase64()
         this.generateAccountHolderCode()
         this.removeUnnecessaryInfo()
-        this.$emit('active', this.accountHolder)
+        this.$emit('active', {
+          // used by our app
+          photoIdKind: this.photoIdKind,
+          frontPhotoBase64: this.frontPhotoBase64,
+          backPhotoBase64: this.backPhotoBase64,
+          verification: this.verification,
+          // used by adyen
+          accountHolder: this.accountHolder
+        })
       },
       generateAccountHolderCode() {
         // Must be between three (3) and fifty (50) characters long. Only letters, digits, and hyphens (-) are permitted.
@@ -363,10 +375,11 @@
         }
       },
       async convertImageFileToBase64() {
-        this.frontPhotoBase64 = await getBase64(this.frontPhotoFile)
-        if (this.photoIdKind !== 'Passport') {
+        if (this.frontPhotoFile)
+          this.frontPhotoBase64 = await getBase64(this.frontPhotoFile)
+        
+        if (this.photoIdKind !== 'Passport' && this.backPhotoFile)
           this.backPhotoBase64 = await getBase64(this.backPhotoFile)
-        }
       },
     }
   }

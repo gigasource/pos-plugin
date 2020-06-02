@@ -336,9 +336,11 @@
           case 'adyen':
             if (value) {
               // https://docs.adyen.com/marketpay/marketpay-structure#account-holder-statuses
-              const response = (await axios.post('/payment/adyen/createAccountHolder', { metadata })).data;
+              // TODO: store frontPhotoBase64, backPhotoBase64 or upload front, back image into gridFs then refer link is better?
+              const { photoIdKind, frontPhotoBase64, backPhotoBase64, accountHolder, verification } = metadata.accountHolder
+              const response = (await axios.post('/payment/adyen/createAccountHolder', { metadata: accountHolder })).data;
               if (response.ok) {
-                paymentProviders[name].accountHolder = metadata // store metadata or store response is better???
+                paymentProviders[name] = metadata // TODO: store metadata or store response is better???
                 await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
               } else {
                 alert(response.message)
