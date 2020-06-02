@@ -232,7 +232,8 @@
         addressNo: '',
         throttledGetSuggestions: null,
         now: null,
-        timeInterval: null
+        timeInterval: null,
+        outOfRange: false
       }
     },
     filters: {
@@ -335,6 +336,7 @@
         }).flat()
       },
       shippingFee() {
+        this.outOfRange = false
         if (!this.orderItems || this.orderItems.length === 0)
           return 0;
 
@@ -359,6 +361,7 @@
                 return deliveryFee.fee
             }
           }
+          this.outOfRange = true
         }
 
         return 0
@@ -378,7 +381,7 @@
       },
       validateZipcode() {
         const rules = []
-        if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes) {
+        if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.store.deliveryFee.fees.map(({ zipCode }) => {
             if (zipCode.includes(',') || zipCode.includes(';')) {
               zipCode = zipCode.replace(/\s/g, '')
@@ -387,6 +390,9 @@
             return zipCode;
           }).flat()
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
+        }
+        if (this.store.deliveryFee.type === 'distance' && this.outOfRange) {
+          rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
       },
