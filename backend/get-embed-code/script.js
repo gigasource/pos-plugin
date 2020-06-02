@@ -19,6 +19,7 @@
     el.onclick = function (event) {
       var isMobile = mobileCheck()
       var url = event.target.getAttribute('data-url')
+      window.location = '#'
 
       var existingIframe = document.getElementById('webshop-iframe-container');
 
@@ -36,7 +37,7 @@
         var container = document.createElement('div')
         container.setAttribute('id', 'webshop-iframe-container')
         container.setAttribute('style', 'position: fixed; z-index: 999; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
-        el.parentElement.appendChild(container)
+        document.body.appendChild(container)
 
         //insert loading circular
         var loading = document.createElement('div')
@@ -73,15 +74,33 @@
         var iframe = document.createElement('iframe')
         iframe.setAttribute('src', url)
         iframe.setAttribute('id', 'webshop-iframe')
-        var iframeStyle = 'border: none; width: 100%;'
-        if(isMobile) {
-          iframeStyle += 'height: calc(100% - 52px)'
-        } else
-          iframeStyle += 'height: 100%'
+        var iframeStyle = 'border: none; width: 100%; height: 100%'
+
+        if (isMobile) {
+          window.onpopstate = function (e) {
+            if (container.style.visibility !== 'hidden') {
+              e.preventDefault()
+              container.style.visibility = 'hidden'
+              document.body.style.overflow = 'auto'
+            }
+          }
+        }
+
         iframe.setAttribute('style', iframeStyle)
         container.appendChild(iframe)
         iframe.addEventListener('load', function() {
           container.removeChild(loading)
+
+          // insert close btn
+          var closeBtn = document.createElement('button')
+          closeBtn.setAttribute('id', 'iframe-close-btn')
+          closeBtn.innerText = 'CLOSE'
+          closeBtn.setAttribute('style', 'position: absolute;top: 10px;right: 50%;transform: translateX(650px);height: 32px;width: 64px;font-size: 14px;')
+          closeBtn.onclick = function () {
+            container.style.visibility = 'hidden'
+            document.body.style.overflow = 'auto'
+          }
+          container.appendChild(closeBtn)
         })
       }
     }
