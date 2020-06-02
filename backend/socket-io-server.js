@@ -202,8 +202,8 @@ module.exports = function (cms) {
   internalSocketIOServer.on('connect', socket => {
     let remoteControlDeviceId = null;
 
-    socket.on('getOnlineDeviceIds', callback => callback(global.APP_CONFIG.redis
-        ? Array.from(externalSocketIOServer.clusterClients)
+    socket.on('getOnlineDeviceIds', async callback => callback(global.APP_CONFIG.redis
+        ? Array.from(await externalSocketIOServer.getClusterClientIds())
         : externalSocketIOServer.getAllClientId()));
 
     socket.on('getProxyInfo', callback => callback({
