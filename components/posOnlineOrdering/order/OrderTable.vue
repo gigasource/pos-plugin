@@ -128,6 +128,7 @@
                     :client-id="store.paypalClientId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
+                <adyen-checkout environment="test" self-host/>
               </div>
             </template>
           </template>
@@ -189,10 +190,11 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
   import PayPalSmartButton from './PayPalSmartButton';
+  import AdyenCheckout from './AdyenCheckout';
 
   export default {
     name: 'OrderTable',
-    components: {DialogOrderConfirm, OrderCreated, PayPalSmartButton },
+    components: { AdyenCheckout, DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,
