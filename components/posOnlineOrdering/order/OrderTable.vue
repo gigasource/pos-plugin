@@ -329,8 +329,7 @@
       storeZipCodes() {
         return this.store.deliveryFee.zipCodeFees.map(({ zipCode, fee }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
-            zipCode = zipCode.replace(/\s/g, '')
-            zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+            zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
           }
           return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee })) : { zipCode, fee }
         }).flat()
@@ -382,13 +381,7 @@
       validateZipcode() {
         const rules = []
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
-          const zipCodes = this.store.deliveryFee.fees.map(({ zipCode }) => {
-            if (zipCode.includes(',') || zipCode.includes(';')) {
-              zipCode = zipCode.replace(/\s/g, '')
-              zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
-            }
-            return zipCode;
-          }).flat()
+          const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
         if (this.store.deliveryFee.type === 'distance' && this.outOfRange) {
