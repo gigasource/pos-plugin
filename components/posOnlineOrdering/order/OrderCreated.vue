@@ -224,7 +224,7 @@
       }
     },
     created() {
-      this.$watch(this.order.status, val => {
+      this.$watch('order.status', val => {
         if (val === 'inProgress') {
           const startTime = new Date().getTime()
           this.intervalId = setInterval(() => {
