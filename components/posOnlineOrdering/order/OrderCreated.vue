@@ -14,7 +14,7 @@
               <div v-if="orderHasBeenProcessed || orderMissed" style="padding: 4px;">
                 <div :style="actResultDivStyle">
                   <img draggable="false" v-if="confirmed" src="/plugins/pos-plugin/assets/order-progress--confirmed.svg">
-                  <img draggable="false" v-else-if="cancelled || orderMissed" src="/plugins/pos-plugin/assets/order-progress--cancelled.svg">
+                  <img draggable="false" v-else-if="cancelled || orderMissed || failedToSend" src="/plugins/pos-plugin/assets/order-progress--cancelled.svg">
                 </div>
               </div>
             </div>
@@ -34,11 +34,27 @@
                 <div style="color: #E57373">{{$t('store.orderCancelled')}}</div>
                 <div style="color: #747474" v-if="cancelledReason">{{$t('store.reason')}}: {{ cancelledReason }}</div>
               </div>
+              <div v-else-if="failedToSend">
+                <div style="color: #E57373">Failed to send your order</div>
+                <div style="color: #747474; font-style: italic">Please call us directly to place your order</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <template v-if="!orderMissed">
+        <template v-if="failedToSend">
+          <div class="more-info">
+            <p class="fw-700 i">Some possible reasons for this issue:</p>
+            <div class="ml-1">•  The system is having a technical difficulty in sending your order</div>
+            <div class="ml-1">•  There might be a serious connectivity issue at the restaurant</div>
+            <p class="fw-700 i mt-1">{{$t('store.callUs')}}:</p>
+            <div class="phone">
+              <g-icon class="mr-1" size="20">icon-phone_blue</g-icon>
+              <div class="fw-600 text-indigo-accent-2">{{phone}}</div>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="!orderMissed">
           <div class="order-item">
             <div v-for="(item, index) in order.items" :key="index" class="order-detail">
               <div class="order-detail__index" >{{ item.quantity || 1}}</div>
@@ -87,7 +103,7 @@
         </template>
 
       </div>
-      <div v-show="orderHasBeenProcessed || orderMissed" class="cpn-order-created__actions">
+      <div v-show="orderHasBeenProcessed || orderMissed || failedToSend" class="cpn-order-created__actions">
         <g-btn-bs width="98" text-color="#536DFE" rounded @click="close">Close</g-btn-bs>
       </div>
     </div>
@@ -105,7 +121,8 @@
         default: 3
       },
       getItemPrice: Function,
-      getItemModifier: Function
+      getItemModifier: Function,
+      orderExtraInfo: String
     },
     filters: {
       currency(value) {
@@ -116,12 +133,9 @@
     },
     data() {
       return {
-        deliveryTime: '',
-        cancelledReason: '',
         sprintTimeOut: 60,
         waited: 0,
         circularSize: 70,
-        status: 'inProgress', // inProgress, kitchen, declined,
       }
     },
     computed: {
@@ -186,6 +200,19 @@
       totalItems() {
         return this.order.items ? this.order.items.reduce((quan, item) => quan + item.quantity, 0) : 0
       },
+      cancelledReason() {
+        if (this.order.status === 'declined') {
+          return this.extraInfo
+        }
+      },
+      deliveryTime() {
+        if (this.order.status === 'kitchen') {
+          return extraInfo
+        }
+      },
+      failedToSend() {
+        return this.order.status === 'failedToSend'
+      }
     },
     methods: {
       close() {
@@ -197,25 +224,17 @@
       }
     },
     created() {
-      window.cms.socket.on('updateOrderStatus', (orderStatus) => {
-        console.log('updateOrderStatus', orderStatus)
-        const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
-        if (onlineOrderId === this.order.orderToken) {
-          this.order.status = status
-          if (status === 'declined') {
-            this.cancelledReason = responseMessage
-          } else if (status === 'kitchen') {
-            this.deliveryTime = responseMessage
-          }
+      this.$watch(this.order.status, val => {
+        if (val === 'inProgress') {
+          const startTime = new Date().getTime()
+          this.intervalId = setInterval(() => {
+            this.waited = Math.floor((new Date().getTime() - startTime) / 1000)
+            if (this.waited >= this.orderProcessTimeOut) {
+              clearInterval(this.intervalId)
+            }
+          }, 250)
         }
-      })
-      const startTime = new Date().getTime()
-      this.intervalId = setInterval(() => {
-        this.waited = Math.floor((new Date().getTime() - startTime) / 1000)
-        if (this.waited >= this.orderProcessTimeOut) {
-          clearInterval(this.intervalId)
-        }
-      }, 250)
+      }, { immediate: true })
     },
     beforeDestroy() {
       window.cms.socket.off('updateOrderStatus')

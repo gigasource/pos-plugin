@@ -142,6 +142,12 @@
           this.permissionDenied = true;
           this.permissionDeniedMessage = 'Permission denied!'
         }
+
+        try {
+          // change locale depend on store setting
+          root.$i18n.locale = this.store.country.locale || 'en'
+        } catch (e) {
+        }
       }
 
       if (this.$route.query.device) {

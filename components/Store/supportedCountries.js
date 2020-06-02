@@ -2,7 +2,7 @@
 export default [
   {name: 'Germany', locale: 'de-DE'},
   {name: 'United States', locale: 'en-US'},
-  // {name: 'United Kingdom', locale: 'en'},
+  {name: 'United Kingdom', locale: 'en-GB'},
   // {name: 'Australia', locale: 'en'},
   // {name: 'Canada', locale: 'en'},
   // {name: 'France', locale: 'fr'},

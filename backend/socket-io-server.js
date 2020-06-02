@@ -1,9 +1,10 @@
 const {p2pServerPlugin} = require('@gigasource/socket.io-p2p-plugin');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const deviceStatusSubscribers = {};
 const _ = require('lodash');
 const axios = require('axios');
+const redisAdapter = require('socket.io-redis');
+const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
 const ppApiv2 = require('./api/payment/paypal/paypalApiV2')
 
 const Schema = mongoose.Schema
@@ -28,6 +29,8 @@ const savedMessageSchema = new Schema({
 });
 
 const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
+const sendOrderTimeouts = {};
+const SEND_TIMEOUT = 10000;
 
 function updateMessage(targetClientId, _id, update) {
   return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
@@ -48,9 +51,14 @@ function loadMessages(targetClientId) {
 
 module.exports = function (cms) {
   const DeviceModel = cms.getModel('Device');
-  let onlineDeviceIds = [];
 
   const {io, socket: internalSocketIOServer} = cms;
+
+  if (global.APP_CONFIG.redis) {
+    const {host, port, password} = global.APP_CONFIG.redis;
+    io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
+  }
+
   const externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
     saveMessage,
@@ -71,21 +79,26 @@ module.exports = function (cms) {
     }
   });
 
-  function updateDeviceAndNotify(online, clientId) {
-    if (online) onlineDeviceIds.push(clientId);
-    else onlineDeviceIds = onlineDeviceIds.filter(e => e !== clientId);
+  externalSocketIOServer.registerAckFunction('createOrderAck', orderToken => {
+    if (sendOrderTimeouts[orderToken]) {
+      clearTimeout(sendOrderTimeouts[orderToken]);
+      delete sendOrderTimeouts[orderToken]
+    }
+    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, 'inProgress')
+  });
 
-    Object.keys(deviceStatusSubscribers).forEach(socketId => {
-      const deviceWatchList = deviceStatusSubscribers[socketId]
-
-      if (deviceWatchList && deviceWatchList.includes(clientId)) {
-        internalSocketIOServer.connected[socketId].emit('updateDeviceStatus');
-      }
-    });
+  function notifyDeviceStatusChanged(clientId) {
+    internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus');
   }
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
+    if (socket.request._query && socket.request._query.clientId) {
+      const clientId = socket.request._query.clientId;
+      notifyDeviceStatusChanged(clientId);
+      socket.once('disconnect', () => notifyDeviceStatusChanged(clientId));
+    }
+
     socket.on('getWebshopName', async (deviceId, callback) => {
       const DeviceModel = cms.getModel('Device');
       const StoreModel = cms.getModel('Store');
@@ -191,33 +204,33 @@ module.exports = function (cms) {
     socket.on('updateVersion', async (appVersion, _id) => {
       const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
       if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
-    })
-
-    if (socket.request._query && socket.request._query.clientId) {
-      const clientId = socket.request._query.clientId;
-      updateDeviceAndNotify(true, clientId);
-      socket.once('disconnect', () => updateDeviceAndNotify(false, clientId));
-    }
+    });
   });
 
   // internalSocketIOServer is another Socket.io namespace for frontend to connect (use /app namespace)
   internalSocketIOServer.on('connect', socket => {
     let remoteControlDeviceId = null;
 
-    socket.on('getOnlineDeviceIds', callback => callback(onlineDeviceIds));
+    socket.on('getOnlineDeviceIds', async callback => {
+      if (global.APP_CONFIG.redis) {
+        try {
+          const clusterClientList = await externalSocketIOServer.getClusterClientIds();
+          return callback(Array.from(clusterClientList));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      callback(externalSocketIOServer.getAllClientId());
+    });
 
     socket.on('getProxyInfo', callback => callback({
       proxyUrlTemplate: global.APP_CONFIG.proxyUrlTemplate,
       proxyRetryInterval: global.APP_CONFIG.proxyRetryInterval,
     }));
 
-    socket.on('watchDeviceStatus', clientIdList => {
-      deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).concat(clientIdList));
-    });
-
-    socket.on('unwatchDeviceStatus', clientIdList => {
-      deviceStatusSubscribers[socket.id] = _.uniq((deviceStatusSubscribers[socket.id] || []).filter(id => !clientIdList.includes(id)));
-    });
+    socket.on('watchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.join(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
+    socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       try {
@@ -236,14 +249,23 @@ module.exports = function (cms) {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
 
-      if (!device) return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
-
       // join orderToken room
       socket.join(orderData.orderToken)
       console.debug(`joined room ${orderData.orderToken}`)
 
+      if (!device) {
+        internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
+        return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
+      }
+
       const deviceId = device._id.toString();
-      externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()]);
+      const removePersistentMsg = await externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()],
+          'createOrderAck', [orderData.orderToken]);
+
+      sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
+        internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
+        removePersistentMsg()
+      }, SEND_TIMEOUT);
     });
 
     socket.on('updateApp', async (deviceId, uploadPath, type) => {
@@ -304,9 +326,28 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(deviceId, 'stopStream')
     })
 
-    socket.once('disconnect', async () => {
-      delete deviceStatusSubscribers[socket.id]
+    async function getCoordsByPostalCode(code) {
+      //todo support countries
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
 
+      const response = await axios.get(url)
+      const {results} = response.data
+      if (!results || !results.length) return
+
+      const {geometry: {location: {lat: latitude, lng: longitude}}} = results[0]
+      return {latitude, longitude}
+    }
+
+    socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
+      const toCoords = await getCoordsByPostalCode(code)
+      if (!toCoords) callback()
+
+      const geolib = require('geolib')
+      const distance = geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
+      callback(distance)
+    })
+
+    socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 
       const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;

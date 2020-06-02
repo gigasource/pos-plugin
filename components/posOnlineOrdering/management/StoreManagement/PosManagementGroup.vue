@@ -74,7 +74,7 @@
                                   ? 'pos-management-group__content-btn' : 'pos-management-group__content-btn--disabled'"
                              @mouseenter="on.mouseenter"
                              @mouseleave="on.mouseleave"
-                             @click="() => {startRemoteControl(device.storeId, device._id); on.mouseleave()}">
+                             @click="() => {startRemoteControl(device); on.mouseleave()}">
                         </div>
                       </template>
                       <span>Remote Control</span>
@@ -287,8 +287,8 @@
           this.dialog.webRTC.device = null
         }
       },
-      startRemoteControl(storeId, deviceId) {
-        if (this.disableRemoteControlBtn) return
+      startRemoteControl({_id: deviceId, online}) {
+        if (!online || this.disableRemoteControlBtn) return
         this.disableRemoteControlBtn = true
 
         this.remoteControlDeviceId = deviceId

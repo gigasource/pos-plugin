@@ -82,12 +82,12 @@ module.exports = {
       },
       path: 'backend/initDemoData/initDemoData.js'
     },
-    // {
-    //   loader: {
-    //     type: 'backend-api'
-    //   },
-    //   path: 'backend/migrate-data/index.js'
-    // },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/migrate-data/index.js'
+    },
     // {
     //   loader: {
     //     type: 'ssr'
@@ -135,6 +135,12 @@ module.exports = {
         type: 'i18n'
       },
       path: 'i18n/en-US.js'
+    },
+    {
+      loader: {
+        type: 'i18n'
+      },
+      path: 'i18n/en-GB.js'
     }
   ]
 };

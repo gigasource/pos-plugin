@@ -146,7 +146,7 @@
         <g-dialog v-model="dialog.note" width="400">
           <div class="dialog-closed">
             <div class="dialog-closed__title">{{$t('store.note')}}</div>
-            <div class="dialog-closed__message">{{ store.noteToCustomers }}</div>
+            <pre class="dialog-closed__message">{{ store.noteToCustomers }}</pre>
             <g-btn-bs text-color="indigo accent-2" @click="dialog.note = false">OK</g-btn-bs>
           </div>
         </g-dialog>
@@ -530,6 +530,8 @@
         if(!this.selectedCategoryId || (window.innerHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
         }
+
+        document.querySelectorAll('.g-menu--content').forEach(menu => { menu.style.display = 'none' })
       },
       chooseCategory(id) {
         this.choosing++
@@ -571,6 +573,7 @@
     display: flex;
     width: 100%;
     max-width: 1140px;
+    min-height: 100vh;
     background-color: #FFF;
     box-shadow: 0 0 2px 2px #D5D5D5;
     align-self: center;
@@ -885,6 +888,7 @@
       color: #424242;
       padding-bottom: 36px;
       border-bottom: 1px solid #EFEFEF;
+      white-space: pre-wrap;
     }
   }
 

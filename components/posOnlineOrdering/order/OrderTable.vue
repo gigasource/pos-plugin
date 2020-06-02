@@ -60,6 +60,10 @@
                     style="color: #4CAF50; font-size: 15px">
                 {{$t('store.minimumWarning')}}{{$t('common.currency')}}{{store.minimumOrderValue.value}}.
               </span>
+              <span v-if="orderType === 'delivery' && distanceExceedingRadius"
+                    style="color: #4CAF50; font-size: 15px">
+                Delivery services are not available for addresses further than {{maxShippingRadius}}km.
+              </span>
               <span v-if="orderType === 'delivery' && !satisfyDeliveryTime" style="color: #4CAF50; font-size: 15px">
                 {{$t('store.deliveryTimeWarning')}}{{deliveryTimeString}}
               </span>
@@ -73,7 +77,7 @@
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
-                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required/>
+                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required :key="orderType"/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
                 <div>
@@ -169,7 +173,7 @@
     </div>
 
     <!-- Order created -->
-    <order-created v-if="dialog.value" v-model="dialog.value"
+    <order-created v-if="dialog.value" v-model="dialog.value" :order-extra-info="dialog.extraInfo"
                    :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
@@ -180,6 +184,7 @@
                           :shipping-fee="shippingFee"
                           :discounts="discounts"
                           :effective-total="effectiveTotal"
+                          :loading="dialog.loading"
                           @confirm="confirmPayment"/>
   </div>
 </template>
@@ -225,6 +230,8 @@
           value: false,
           order: {},
           confirm: false,
+          extraInfo: '',
+          loading: false
         },
         couponTf: {
           active: false,
@@ -274,6 +281,36 @@
       // get geocode & distance from address & zipCode
       this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
     },
+    mounted() {
+      const tb = document.getElementById('table-content')
+      tb.addEventListener('scroll', () => {
+        const menu = document.querySelectorAll('.g-menu--content')
+        menu.forEach(m => {
+          m.style.display = 'none'
+        })
+      })
+
+      cms.socket.on('noOnlineOrderDevice', (orderToken) => {
+        if (orderToken === this.dialog.order.orderToken) {
+          this.dialog.value = true
+          this.dialog.loading = false
+          this.dialog.confirm = false
+          this.$set(this.dialog.order, 'status', 'failedToSend')
+        }
+      })
+
+      cms.socket.on('updateOrderStatus', (orderStatus) => {
+        const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
+        console.debug(`frontend received status for order ${onlineOrderId}`)
+        if (onlineOrderId === this.dialog.order.orderToken) {
+          this.dialog.value = true
+          this.dialog.loading = false
+          this.dialog.confirm = false
+          this.$set(this.dialog.order, 'status', status)
+          this.dialog.extraInfo = responseMessage
+        }
+      })
+    },
     beforeDestroy() {
       clearInterval(this.timeInterval)
     },
@@ -317,8 +354,7 @@
       storeZipCodes() {
         return this.store.deliveryFee.zipCodeFees.map(({ zipCode, fee }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
-            zipCode = zipCode.replace(/\s/g, '')
-            zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
+            zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
           }
           return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee })) : { zipCode, fee }
         }).flat()
@@ -341,8 +377,8 @@
             return this.store.deliveryFee.defaultFee
         }
 
-        if(this.store.deliveryFee.type === 'distance') {
-          if(this.customer.distance) {
+        if (this.store.deliveryFee.type === 'distance') {
+          if (this.customer.distance) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
               if (this.customer.distance < deliveryFee.radius)
                 return deliveryFee.fee
@@ -361,21 +397,18 @@
               return true
             }
           }
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime
+          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime || this.distanceExceedingRadius
         }
         return check
       },
       validateZipcode() {
         const rules = []
-        if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes) {
-          const zipCodes = this.store.deliveryFee.fees.map(({ zipCode }) => {
-            if (zipCode.includes(',') || zipCode.includes(';')) {
-              zipCode = zipCode.replace(/\s/g, '')
-              zipCode = zipCode.includes(',') ? zipCode.split(',') : zipCode.split(';')
-            }
-            return zipCode;
-          }).flat()
+        if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
+          const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
+        }
+        if (this.store.deliveryFee.type === 'distance' && (!this.customer.distance || this.distanceExceedingRadius)) {
+          rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
       },
@@ -451,7 +484,14 @@
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime, deliveryStart, deliveryEnd}) => {
-            const start = deliveryStart ? deliveryStart : openTime, end = deliveryEnd ? deliveryEnd : closeTime
+            let start, end
+            if(this.orderType === 'delivery') {
+              start = deliveryStart ? deliveryStart : openTime
+              end = deliveryEnd ? deliveryEnd : closeTime
+            } else {
+              start = openTime
+              end = closeTime
+            }
             let [openTimeHour, openTimeMinute] = get24HourValue(start).split(':')
             let [closeTimeHour, closeTimeMinute] = get24HourValue(end).split(':')
 
@@ -474,15 +514,22 @@
         }
 
         list = _.uniq(list).sort()
-        if(this.satisfyDeliveryTime) list.unshift(this.asap)
+        if(this.satisfyDeliveryTime || this.orderType === 'pickup') list.unshift(this.asap)
 
         return list
       },
       cdnOrderHeaderImage() {
         return this.store.orderHeaderImageSrc && `${getCdnUrl(this.store.orderHeaderImageSrc)}?w=680&h=390`
       },
-      availableStreetAutocomplete() {
-        return this.addressSuggestions.length > 0
+      maxShippingRadius() {
+        if (this.store.deliveryFee.distanceFees)
+          return _.maxBy(this.store.deliveryFee.distanceFees, i => i.radius).radius
+      },
+      distanceExceedingRadius() {
+        if (this.store.deliveryFee.type === 'distance') {
+          if (this.customer.distance && this.customer.distance > this.maxShippingRadius) return true
+        }
+        return false
       },
       paypalOrderInfo() {
         if (!this.store.paypalClientId)
@@ -565,6 +612,13 @@
       },
       satisfyDeliveryTime(val) {
         if(val)
+          this.deliveryTime = this.asap
+        else
+          this.deliveryTime = ''
+      },
+      orderType(val) {
+        if(_.includes(this.deliveryTimeList, this.deliveryTime)) return
+        if(this.satisfyDeliveryTime || val === 'pickup')
           this.deliveryTime = this.asap
         else
           this.deliveryTime = ''
@@ -680,7 +734,7 @@
           effectiveTotal: this.effectiveTotal
         }
 
-        this.dialog.value = true
+        this.dialog.loading = true
       },
       closeOrderCreatedDialog() {
         this.customer = {
@@ -743,8 +797,9 @@
         if (!address || !zipCode) return
 
         let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
+        const {lat, long} = this.store.coordinates
+
         if (this.store.coordinates) {
-          const {lat, long} = this.store.coordinates
           url += `&focus.point.lat=${lat}&focus.point.lon=${long}`
         }
 
@@ -755,17 +810,23 @@
             if (foundLocation) {
               // todo get distance
               const { properties: { distance }, geometry: { coordinates } } = foundLocation
-              console.log(`Coords: ${coordinates}, Distance: ${distance}`)
+              console.log(`[Geocode]${this.store.alias}|PeliasAPI|distance:${distance}`)
               this.customer.distance = distance
             } else {
-              this.customer.distance = 0
+              await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
             }
           }
         } catch (e) {
           console.warn(e)
-          this.customer.distance = 0
+          await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
         }
-      })
+      }, 1000),
+      async getDistanceByPostalCode(code, fromCoords) {
+        cms.socket.emit('getDistanceByPostalCode', code, fromCoords, distance => {
+          console.log(`[Geocode]${this.store.alias}|GoogleAPI|distance:${distance}`)
+          this.customer.distance = distance || 0
+        })
+      }
     }
   }
 </script>
@@ -906,6 +967,7 @@
             width: 100%;
           }
         }
+
       }
 
       .order-item-detail {
@@ -1240,14 +1302,14 @@
 
     @keyframes autofill {
       100% {
-        background: transparent;
+        background: transparent !important;
         color: inherit;
       }
     }
 
     @-webkit-keyframes autofill {
       100% {
-        background: transparent;
+        background: transparent !important;
         color: inherit;
       }
     }
