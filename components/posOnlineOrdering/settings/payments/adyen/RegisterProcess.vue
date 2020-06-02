@@ -1,20 +1,20 @@
 <template>
-  <div>
+  <section>
     <template v-if="page === 'welcome'">
-      <div class="intro">
+      <p class="intro">
         <a href="https://www.adyen.com/" target="_blank">Adyen</a> is a Dutch payment company that allows businesses to accept e-commerce, mobile, and point-of-sale payments.&nbsp;
         Adyen has more than 3,500 customers and is listed on the stock exchange Euronext.
-      </div>
+      </p>
     </template>
     
     <template v-if="page === 'edit-basic-info'">
-      <div>Please provide information so we can use it as a wallet for your store</div>
-      <div>
-        <div>Email address</div>
+      <p>Please provide information so we can use it as a wallet for your store</p>
+      <section>
+        <header>Email address</header>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.email" prefix="Email" placeholder="tim@green.com" required/>
-      </div>
+      </section>
   
-      <div>
+      <section>
         <div>
           Photo Id
           <g-tooltip open-on-hover color="#414141" speech-bubble>
@@ -38,48 +38,57 @@
           </g-tooltip>
         </div>
         <g-select text-field-component="GTextFieldBs" v-model="photoIdKind" :items="supportedPhotoIdKinds" prefix="Photo ID Type"/>
-        <div v-if="photoIdKind === 'Passport'">
+        <template v-if="photoIdKind === 'Passport'">
           <g-text-field-bs type="file" prefix="Passport" @change="setFrontPhoto"/>
-        </div>
-        <div v-else>
+        </template>
+        <template v-else>
           <g-text-field-bs type="file" prefix="Front" @change="setFrontPhoto"/>
           <g-text-field-bs type="file" prefix="Back" @change="setBackPhoto"/>
-        </div>
-      </div>
+        </template>
+      </section>
       
-      <div>
-        <div>Individual Detail</div>
+      <section>
+        <p>Individual Detail</p>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.firstName" placeholder="Tim" prefix="First Name" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.name.lastName" prefix="Last Name" placeholder="Green" required/>
         <g-select text-field-component="GTextFieldBs" v-model="accountHolder.accountHolderDetails.individualDetails.name.gender" :items="genders" prefix="Gender" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.individualDetails.personalData.dateOfBirth" prefix="Date Of Birth" placeholder="1987-01-01" required/>
         <g-text-field-bs v-if="documentDataNumberRequired" v-model="accountHolder.accountHolderDetails.individualDetails.personalData.documentData.number" prefix="Document Data Number" placeholder="123-45-6789" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.fullPhoneNumber" prefix="Full Phone Number" placeholder="+49 561 7009xx" required/>
-      </div>
+      </section>
       
-      <div>
-        <div>Address</div>
+      <section>
+        <p>Address</p>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.postalCode" prefix="PostalCode" placeholder="34119" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.houseNumberOrName" prefix="House Number Or Name" placeholder="68-72" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.street" prefix="Street" placeholder="Königstor" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.city" prefix="City" placeholder="Kassel" required/>
         <g-text-field-bs v-model="accountHolder.accountHolderDetails.address.country" prefix="Country Code" placeholder="DE" required/>
-      </div>
+      </section>
     </template>
-
     
     <template v-if="page === 'edit-bank'">
-      <div>
-        <div>Bank account details</div>
-        <g-btn-bs @click="addNewBankAccount">+ New banks</g-btn-bs>
-        <div v-for="(bankAccountDetail, i) in accountHolder.accountHolderDetails.bankAccountDetails" :key="i">
+      <section>
+        <p>Bank account details</p>
+        <section class="row-flex justify-end mb-4">
+          <g-btn-bs
+              background-color="#536DFE"
+              text-color="#FFF"
+              @click="addNewBankAccount"
+              style="margin: 0">Add new bank</g-btn-bs>
+        </section>
+        <section
+            v-for="(bankAccountDetail, i) in accountHolder.accountHolderDetails.bankAccountDetails" :key="i"
+            class="r pt-5 br-2 mb-4" style="border: 1px solid #aaa;">
           <g-text-field-bs v-model="bankAccountDetail.ownerName" prefix="Owner Name" placeholder="Tim" required/>
           <g-text-field-bs v-model="bankAccountDetail.countryCode" prefix="Country Code" placeholder="DE" required/>
           <g-text-field-bs v-model="bankAccountDetail.currencyCode" prefix="Currency Code" placeholder="EUR" required/>
           <g-text-field-bs v-model="bankAccountDetail.iban" prefix="IBAN" placeholder="DE41100000000000xxxx78" required/>
-          <g-btn-bs @click="removeBankAccount(i)">Remove bank account</g-btn-bs>
-        </div>
-      </div>
+          <div class="abs" style="top: 5px; right:5px;">
+            <div @click="removeBankAccount(i)" class="br-2 ta-center" style="border: 1px solid #888; width: 22px; height: 22px; line-height: 22px; cursor: pointer">x</div>
+          </div>
+        </section>
+      </section>
     </template>
     
     <template v-if="page === 'verification-status'">
@@ -95,11 +104,12 @@
     </template>
     
     <g-spacer/>
-    <div style="display: flex; margin-top: 40px;">
+    
+    <footer style="display: flex; margin-top: 40px;">
       <g-btn-bs
           v-if="prevBtn"
-          background-color="#536DFE"
-          text-color="#FFF"
+          background-color="#eee"
+          text-color="#444"
           @click="prevBtn.action" style="margin-right: 0">{{ prevBtn.text }}</g-btn-bs>
       <g-spacer/>
       <g-btn-bs
@@ -107,8 +117,8 @@
           background-color="#536DFE"
           text-color="#FFF"
           @click="nextBtn.action" style="margin-right: 0">{{ nextBtn.text }}</g-btn-bs>
-    </div>
-  </div>
+    </footer>
+  </section>
 </template>
 <script>
   // https://docs.adyen.com/marketpay/onboarding-and-verification/verification-checks
@@ -137,7 +147,7 @@
             name: 'edit-basic-info',
             prev: {
               action: () => this.page = 'welcome',
-              text: 'Back',
+              text: '< Cancel',
             },
             next: {
               action: () => {
@@ -147,28 +157,28 @@
                 else
                   alert('Please fill all info before continue proceed')
               },
-              text: 'Next'
+              text: 'Edit Bank Accounts >'
             }
           },
           {
             name: 'edit-bank',
             prev: {
               action: () => this.page = 'edit-basic-info',
-              text: 'Back'
+              text: '< Edit Basic Info'
             },
             next: {
               action: async () => {
                 await this.activateAdyen()
                 this.page = 'verification-status';
               },
-              text: 'Next'
+              text: 'Verify >'
             }
           },
           {
             name: 'verification-status',
             prev: {
               action: () => this.page = 'edit-bank',
-              text: 'Back'
+              text: '< Edit Bank Accounts'
             },
             next: null
           }
@@ -249,7 +259,38 @@
         return this.currentPage.next
       }
     },
+    created() {
+      // TODO: remove when live
+      this.addMockInfo()
+    },
     methods: {
+      addMockInfo() {
+        this.$set(this.accountHolder, 'accountHolderDetails', {
+          email: "tim@green.com",
+          fullPhoneNumber: "+49 561 700933",
+          individualDetails: {
+            name: {
+              firstName: "Tim",
+              gender: "MALE",
+              lastName: "Green"
+            },
+            personalData: {
+              dateOfBirth: "1987-01-01",
+              documentData: {
+                number: ''
+              }
+            }
+          },
+          address: {
+            city: "Kassel",
+            country: "DE",
+            houseNumberOrName: "68",
+            postalCode: "34119",
+            street: "Kognistor"
+          },
+          bankAccountDetails: [],
+        })
+      },
       // basic info
       setFrontPhoto(e) {
         this.frontPhotoFile = e.target.files[0]
