@@ -77,7 +77,7 @@
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
-                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required/>
+                  <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required :key="orderType"/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
                 <div>
@@ -458,7 +458,14 @@
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime, deliveryStart, deliveryEnd}) => {
-            const start = deliveryStart ? deliveryStart : openTime, end = deliveryEnd ? deliveryEnd : closeTime
+            let start, end
+            if(this.orderType === 'delivery') {
+              start = deliveryStart ? deliveryStart : openTime
+              end = deliveryEnd ? deliveryEnd : closeTime
+            } else {
+              start = openTime
+              end = closeTime
+            }
             let [openTimeHour, openTimeMinute] = get24HourValue(start).split(':')
             let [closeTimeHour, closeTimeMinute] = get24HourValue(end).split(':')
 
@@ -481,7 +488,7 @@
         }
 
         list = _.uniq(list).sort()
-        if(this.satisfyDeliveryTime) list.unshift(this.asap)
+        if(this.satisfyDeliveryTime || this.orderType === 'pickup') list.unshift(this.asap)
 
         return list
       },
@@ -512,6 +519,13 @@
       },
       satisfyDeliveryTime(val) {
         if(val)
+          this.deliveryTime = this.asap
+        else
+          this.deliveryTime = ''
+      },
+      orderType(val) {
+        if(_.includes(this.deliveryTimeList, this.deliveryTime)) return
+        if(this.satisfyDeliveryTime || val === 'pickup')
           this.deliveryTime = this.asap
         else
           this.deliveryTime = ''
@@ -829,9 +843,6 @@
           }
         }
 
-        .g-select ::v-deep .g-tf-input {
-          display: none;
-        }
       }
 
       .order-item-detail {
