@@ -348,7 +348,8 @@
             } else {
               // deactive: suspend or close?
               // payout balance to bank account
-              let response = (await axios.post('/payment/adyen/payout-all', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data
+              // manually send payout request to adyen api
+              let response = (await axios.post('/payment/adyen/payout', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data
               // then close account
               response = (await axios.post('/payment/adyen/closeAccountHolder', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data;
             }
