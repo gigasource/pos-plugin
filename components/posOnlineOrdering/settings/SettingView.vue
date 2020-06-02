@@ -340,7 +340,10 @@
               const { photoIdKind, frontPhotoBase64, backPhotoBase64, accountHolder, verification } = metadata.accountHolder
               const response = (await axios.post('/payment/adyen/createAccountHolder', { metadata: accountHolder })).data;
               if (response.ok) {
-                paymentProviders[name] = metadata // TODO: store metadata or store response is better???
+                // TODO: store metadata or store response is better???
+                // TODO: createAccountHolder's response or 'ACCOUNT_HOLDER_CREATED' notification
+                // should be consider as the final result? And what is the different between them?
+                paymentProviders[name] = metadata
                 await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
               } else {
                 alert(response.message)

@@ -3,15 +3,13 @@ const express = require('express')
 const router = express.Router()
 const _ = require('lodash')
 
-// TODO: Hanlde axios response.
-
 router.post('/createAccountHolder', async (req, res) => {
-  const response = await adyenApi.Account.createAccountHolder(req.body.metadata)
+  const response = (await adyenApi.Account.createAccountHolder(req.body.metadata)).data
   res.json(response)
 })
 
 router.post('/closeAccountHolder', async (req, res) => {
-  const response = await adyenApi.Account.closeAccountHolder(req.body.metadata)
+  const response = (await adyenApi.Account.closeAccountHolder(req.body.metadata)).data
   res.json(response)
 })
 
@@ -19,7 +17,7 @@ router.post('/closeAccountHolder', async (req, res) => {
  * get account holder check status
  */
 router.post('/checkAccountHolder', async (req, res) => {
-  const response = await adyenApi.Account.checkAccountHolder(req.body.metadata)
+  const response = (await adyenApi.Account.checkAccountHolder(req.body.metadata)).data
   res.json(response)
 })
 
@@ -27,12 +25,12 @@ router.post('/checkAccountHolder', async (req, res) => {
  * Update account info, link to bank account, add photo id, etc
  */
 router.post('/updateAccountHolder', async (req, res) => {
-  const response = await adyenApi.Account.updateAccountHolder(req.body.metadata)
+  const response = (await adyenApi.Account.updateAccountHolder(req.body.metadata)).data
   res.json(response);
 })
 
 router.post('/deleteBankAccounts', async (req, res) => {
-  const response = await adyenApi.Account.deleteBankAccounts(req.body.metadata)
+  const response = (await adyenApi.Account.deleteBankAccounts(req.body.metadata)).data
   res.json(response);
 })
 
@@ -40,40 +38,42 @@ router.post('/deleteBankAccounts', async (req, res) => {
  * get account holder balance
  */
 router.post('/accountHolderBalance', async (req, res) => {
-  const response = await adyenApi.Account.accountHolderBalance(req.body.metadata)
+  const response = (await adyenApi.Account.accountHolderBalance(req.body.metadata)).data
   res.json(response)
 })
 
-
 // CHECKOUT
 router.post('/paymentMethods', async (req, res) => {
-  const response = await adyenApi.Checkout.paymentMethods(req.body.metadata)
+  const response = (await adyenApi.Checkout.paymentMethods(req.body.metadata)).data
   res.json(response)
 })
 
 router.post('/payments', async (req, res) => {
   // TODO: service side validation to prevent hack
-  const response = await adyenApi.Checkout.payments(req.body.metadata)
+  const response = (await adyenApi.Checkout.payments(req.body.metadata)).data
   res.json(response)
 })
 
 router.post('/payments/details', async(req, res) => {
-  const response = await adyenApi.Checkout.paymentDetails(req.body.metadata)
+  const response = (await adyenApi.Checkout.paymentDetails(req.body.metadata)).data
   res.json(response)
 })
 
 // PAYOUT
 router.post('/payout', async (req, res) => {
-  const response = await adyenApi.Payout.payout(req.body.metadata)
+  const response = (await adyenApi.Payout.payout(req.body.metadata)).data
   res.json(response)
 })
 
 // NOTIFICATION
 router.post('/notification-handler', async(req, res) => {
-  const {} = req.body
-  switch(req.body.eventType) {
+  const {eventType} = req.body
+  switch(eventType) {
     case 'ACCOUNT_HOLDER_CREATED':
       onAccountHolderCreated(req)
+      break;
+    case 'ACCOUNT_HOLDER_UPCOMING_DEADLINE':
+      onAccountHolderUpcommingDeadline(req)
       break;
     case 'ACCOUNT_HOLDER_UPDATED':
       onAccountHolderUpdated(req)
@@ -104,6 +104,14 @@ router.post('/notification-handler', async(req, res) => {
  * @param data
  */
 function onAccountHolderCreated(request) {
+
+}
+
+/**
+ * https://docs.adyen.com/api-explorer/#/NotificationService/v5/post/ACCOUNT_HOLDER_UPCOMING_DEADLINE
+ * @param request
+ */
+function onAccountHolderUpcommingDeadline(request) {
 
 }
 
@@ -159,6 +167,7 @@ function onPaymentFailure(request) {
 (async function(){
   const unregisteredNotifications = [
       'ACCOUNT_HOLDER_CREATED',
+      'ACCOUNT_HOLDER_UPCOMING_DEADLINE',
       'ACCOUNT_HOLDER_UPDATED',
       'ACCOUNT_HOLDER_STATUS_CHANGE',
       'ACCOUNT_HOLDER_VERIFICATION',
