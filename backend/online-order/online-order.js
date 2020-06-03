@@ -117,6 +117,11 @@ module.exports = async cms => {
 
     socket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
+
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const { onlineDevice: {store: {name, alias}} } = posSetting
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `Order ${orderData.orderToken}: received order`)
+
       let {
         orderType: type, paymentType, customer, products: items,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime
@@ -173,6 +178,7 @@ module.exports = async cms => {
         })
       }
 
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `Order ${orderData.orderToken}: send ack fn`)
       ackFn();
     });
     socket.on('updateAppFeature', async (data, callback) => {
@@ -361,7 +367,13 @@ module.exports = async cms => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebshopName', deviceId, callback);
+      onlineOrderSocket.emit('getWebshopName', deviceId, async ({settingName, name, alias}) => {
+        const posSettings = await cms.getModel('PosSetting').findOne({});
+        if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias};
+        await cms.getModel('PosSetting').updateOne({}, posSettings);
+
+        callback(settingName);
+      }) ;
     });
 
     socket.on('getWebshopId', async callback => {
@@ -419,9 +431,13 @@ module.exports = async cms => {
       callback();
     });
 
-    socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
-      onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo)
-      console.debug(`emit order status to server for order ${orderToken}`)
+    socket.on('updateOrderStatus', async (orderToken, orderStatus, extraInfo) => {
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const { onlineDevice: {store: {name, alias}} } = posSetting
+
+      onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo, name, alias)
+
+      console.debug(`sentry:orderToken=${orderToken},store=${name},alias=${alias}`, `Order ${orderToken}: emit status:${orderStatus}; message:${extraInfo}`)
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {

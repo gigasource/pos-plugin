@@ -96,7 +96,8 @@
     props: {
       onlineDevice: null,
       defaultPrepareTime: Number,
-      onlineOrderSorting: String
+      onlineOrderSorting: String,
+      webshopName: String
     },
     data() {
       return {
@@ -117,7 +118,6 @@
           {text: 'Until Confirm', value: 'repeat'},
         ],
         webshopUrl: '',
-        webshopName: '',
         webshopAvailable: true,
         pairError: null,
         pairing: false,
@@ -204,18 +204,10 @@
         this.dialog.connect = true
         this.pairError = null
         this.pairing = false
-      },
-      getWebshopName() {
-        window.cms.socket.emit('getWebshopName', webshopName => {
-          if (!webshopName) this.webshopName = 'Web shop name not available'
-          else this.webshopName = webshopName
-        })
       }
     },
     mounted() {
-      this.getWebshopName()
-
-      window.cms.socket.emit('getWebshopUrl', async webshopUrl => {
+      cms.socket.emit('getWebshopUrl', async webshopUrl => {
         this.webshopUrl = webshopUrl
 
         try {

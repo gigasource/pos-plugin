@@ -84,7 +84,8 @@
         //online order
         onlineDevice: null,
         defaultPrepareTime: null,
-        onlineOrderSorting: null
+        onlineOrderSorting: null,
+        webshopName: ''
       }
     },
     async created() {
@@ -101,6 +102,7 @@
       await this.registerHardware()
       await this.setupPairDevice()
       await this.getPairStatus()
+      await this.getWebshopName()
     },
     watch: {
       'productPagination.limit'(newVal) {
@@ -803,6 +805,13 @@
 
       unregisterOnlineOrder(callback) {
         window.cms.socket.emit('unregisterOnlineOrderDevice', callback)
+      },
+
+      getWebshopName() {
+        cms.socket.emit('getWebshopName', webshopName => {
+          if (!webshopName) this.webshopName = 'Web shop name not available'
+          else this.webshopName = webshopName
+        })
       },
 
       async setupPairDevice() {
