@@ -212,7 +212,6 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
-        // TODO: Get paypal clientID
         store.paypalClientId = cms.sharedConfig.PAYPAL_APP_CLIENT_ID
         this.$set(this, 'store', store)
         try {
