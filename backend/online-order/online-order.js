@@ -120,7 +120,7 @@ module.exports = async cms => {
 
       const posSetting = await cms.getModel('PosSetting').findOne()
       const { onlineDevice: {store: {name, alias}} } = posSetting
-      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `Order ${orderData.orderToken}: received order`)
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `[1] Order ${orderData.orderToken}: received order`)
 
       let {
         orderType: type, paymentType, customer, products: items,
@@ -178,7 +178,7 @@ module.exports = async cms => {
         })
       }
 
-      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `Order ${orderData.orderToken}: send ack fn`)
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `[2] Order ${orderData.orderToken}: send ack fn`)
       ackFn();
     });
     socket.on('updateAppFeature', async (data, callback) => {
@@ -437,7 +437,7 @@ module.exports = async cms => {
 
       onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo, name, alias)
 
-      console.debug(`sentry:orderToken=${orderToken},store=${name},alias=${alias}`, `Order ${orderToken}: emit status:${orderStatus}; message:${extraInfo}`)
+      console.debug(`sentry:orderToken=${orderToken},store=${name},alias=${alias}`, `[3] Order ${orderToken}: emit status:${orderStatus}; message:${extraInfo}`)
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {
