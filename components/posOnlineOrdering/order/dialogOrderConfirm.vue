@@ -39,8 +39,8 @@
       </div>
       <div class="dialog-action">
         <g-btn-bs text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
-        <g-btn-bs width="110" text-color="white" background-color="#536DFE" :disabled="loading" rounded @click="confirm">
-          <template v-if="loading"><g-progress-circular class="mr-2" indeterminate/></template>
+        <g-btn-bs width="110" text-color="white" :background-color="loading ? 'grey' : '#536DFE'" :disabled="loading" rounded @click="confirm">
+          <template v-if="loading"><g-progress-circular indeterminate/></template>
           <template v-else>{{$t('store.confirm')}}</template>
         </g-btn-bs>
       </div>

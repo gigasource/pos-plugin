@@ -29,7 +29,7 @@ const savedMessageSchema = new Schema({
 
 const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
 const sendOrderTimeouts = {};
-const SEND_TIMEOUT = 10000;
+const SEND_TIMEOUT = 30000;
 
 function updateMessage(targetClientId, _id, update) {
   return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
