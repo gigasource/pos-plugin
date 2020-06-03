@@ -115,7 +115,8 @@
               <div class="order-item-summary" >
                 <span>{{$t('store.shippingFee')}}:</span>
                 <g-spacer/>
-                <span>{{ shippingFee | currency }}</span>
+                <span v-if="calculatingShippingFee">{{calculatingText}}</span>
+                <span v-else>{{ shippingFee | currency }}</span>
               </div>
               <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
                 <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
@@ -232,7 +233,9 @@
         addressNo: '',
         throttledGetSuggestions: null,
         now: null,
-        timeInterval: null
+        timeInterval: null,
+        calculatingShippingFee: false,
+        calculatingText: ''
       }
     },
     filters: {
@@ -382,7 +385,7 @@
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
-        if (this.store.deliveryFee.type === 'distance' && ((!this.customer.distance && this.customer.distance !== 0) || this.distanceExceedingRadius)) {
+        if (this.store.deliveryFee.type === 'distance' && this.customer.distance === undefined) {
           rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
@@ -521,11 +524,23 @@
           this.deliveryTime = ''
       },
       orderType(val) {
-        if(_.includes(this.deliveryTimeList, this.deliveryTime)) return
-        if(this.satisfyDeliveryTime || val === 'pickup')
+        if (_.includes(this.deliveryTimeList, this.deliveryTime)) return
+        if (this.satisfyDeliveryTime || val === 'pickup')
           this.deliveryTime = this.asap
         else
           this.deliveryTime = ''
+      },
+      calculatingShippingFee(val) {
+        if (val) {
+          let count = 0;
+          this.calculatingDotsInterval = setInterval(() => {
+            count++;
+            this.calculatingText = `Calculating${new Array(count % 4 + 1).join('.')}`;
+          }, 300);
+        } else {
+          clearInterval(this.calculatingDotsInterval);
+          this.calculatingText = ''
+        }
       }
     },
     methods: {
@@ -669,6 +684,9 @@
         const [address, zipCode] = values
         if (!address || !zipCode) return
 
+        this.calculatingShippingFee = true
+        this.customer.distance = -1
+
         let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
         const {lat, long} = this.store.coordinates
 
@@ -692,6 +710,8 @@
         } catch (e) {
           console.warn(e)
           await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
+        } finally {
+          this.calculatingShippingFee = false
         }
       }, 1000),
       async getDistanceByPostalCode(code, fromCoords) {
