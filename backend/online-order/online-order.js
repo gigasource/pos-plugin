@@ -435,7 +435,7 @@ module.exports = async cms => {
     socket.on('updateOrderStatus', async (orderStatus) => {
       const posSetting = await cms.getModel('PosSetting').findOne()
       const { onlineDevice: {store: {name, alias}} } = posSetting
-      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, name, alias})
+      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias})
       const { onlineOrderId, status, responseMessage } = orderStatus
       console.debug(`sentry:orderToken=${onlineOrderId},store=${name},alias=${alias}`, `[3] Order ${onlineOrderId}: emit status:${status}; message:${responseMessage}`)
     })
