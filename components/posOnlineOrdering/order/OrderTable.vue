@@ -76,7 +76,7 @@
                 </template>
                 <template v-if="orderType === 'delivery'">
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
-                  <g-text-field :rules="validateZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
+                  <g-text-field :rules="validateZipcode" :error="errorZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required :key="orderType"/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
@@ -112,7 +112,8 @@
               <div class="order-item-summary" >
                 <span>{{$t('store.shippingFee')}}:</span>
                 <g-spacer/>
-                <span>{{ shippingFee | currency }}</span>
+                <span v-if="calculatingShippingFee">{{calculatingText}}</span>
+                <span v-else>{{ shippingFee | currency }}</span>
               </div>
               <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
                 <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
@@ -251,6 +252,9 @@
         throttledGetSuggestions: null,
         now: null,
         timeInterval: null,
+        calculatingShippingFee: false,
+        calculatingText: '',
+        errorZipcode: '',
         paypalOrderDetail: {}
       }
     },
@@ -278,9 +282,17 @@
 
         return dayInWeeks[today]
       })
-
-      // get geocode & distance from address & zipCode
-      this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
+      if(this.store.deliveryFee && this.store.deliveryFee.type === 'distance') {
+        // get geocode & distance from address & zipCode
+        this.$watch(vm => [vm.customer.address, vm.customer.zipCode], this.getGeocode)
+        // watch distance to validate zipcode
+        this.$watch(vm => vm.customer.distance, function(distance) {
+          if(distance === undefined)
+            this.errorZipcode = 'Invalid zip code!'
+          else
+            this.errorZipcode = ''
+        })
+      }
     },
     mounted() {
       const tb = document.getElementById('table-content')
@@ -313,6 +325,7 @@
       })
     },
     beforeDestroy() {
+      window.cms.socket.off('updateOrderStatus')
       clearInterval(this.timeInterval)
     },
     computed: {
@@ -379,7 +392,7 @@
         }
 
         if (this.store.deliveryFee.type === 'distance') {
-          if (this.customer.distance) {
+          if (this.customer.distance >= 0) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
               if (this.customer.distance < deliveryFee.radius)
                 return deliveryFee.fee
@@ -407,9 +420,6 @@
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
-        }
-        if (this.store.deliveryFee.type === 'distance' && (!this.customer.distance || this.distanceExceedingRadius)) {
-          rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
       },
@@ -618,11 +628,23 @@
           this.deliveryTime = ''
       },
       orderType(val) {
-        if(_.includes(this.deliveryTimeList, this.deliveryTime)) return
-        if(this.satisfyDeliveryTime || val === 'pickup')
+        if (_.includes(this.deliveryTimeList, this.deliveryTime)) return
+        if (this.satisfyDeliveryTime || val === 'pickup')
           this.deliveryTime = this.asap
         else
           this.deliveryTime = ''
+      },
+      calculatingShippingFee(val) {
+        if (val) {
+          let count = 0;
+          this.calculatingDotsInterval = setInterval(() => {
+            count++;
+            this.calculatingText = `Calculating${new Array(count % 4 + 1).join('.')}`;
+          }, 300);
+        } else {
+          clearInterval(this.calculatingDotsInterval);
+          this.calculatingText = ''
+        }
       }
     },
     methods: {
@@ -745,7 +767,8 @@
           address: '',
           zipCode: '',
           deliveryTime: '',
-          note: ''
+          note: '',
+          distance: null
         }
 
         this.confirming = false
@@ -797,6 +820,8 @@
         const [address, zipCode] = values
         if (!address || !zipCode) return
 
+        this.calculatingShippingFee = true
+
         let url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
         const {lat, long} = this.store.coordinates
 
@@ -820,12 +845,14 @@
         } catch (e) {
           console.warn(e)
           await this.getDistanceByPostalCode(zipCode, {latitude: lat, longitude: long})
+        } finally {
+          this.calculatingShippingFee = false
         }
       }, 1000),
       async getDistanceByPostalCode(code, fromCoords) {
         cms.socket.emit('getDistanceByPostalCode', code, fromCoords, distance => {
           console.log(`[Geocode]${this.store.alias}|GoogleAPI|distance:${distance}`)
-          this.customer.distance = distance || 0
+          this.customer.distance = distance
         })
       }
     }

@@ -389,14 +389,15 @@
           })
         }
         if (this.store.deliveryFee) {
-          let min = _.minBy(this.store.deliveryFee.fees, 'fee')
-                  ? (_.minBy(this.store.deliveryFee.fees, 'fee')).fee
+          const type = this.store.deliveryFee.type
+          let min = _.minBy(this.store.deliveryFee[`${type}Fees`], 'fee')
+                  ? (_.minBy(this.store.deliveryFee[`${type}Fees`], 'fee')).fee
                   : 0,
-              max = _.maxBy(this.store.deliveryFee.fees, 'fee')
-                  ? (_.maxBy(this.store.deliveryFee.fees, 'fee')).fee
+              max = _.maxBy(this.store.deliveryFee[`${type}Fees`], 'fee')
+                  ? (_.maxBy(this.store.deliveryFee[`${type}Fees`], 'fee')).fee
                   : 0
 
-          if (this.store.deliveryFee.acceptOrderInOtherZipCodes) {
+          if (this.store.deliveryFee.acceptOrderInOtherZipCodes && type === 'zipCode') {
             if (min > this.store.deliveryFee.defaultFee)
               min = this.store.deliveryFee.defaultFee
             if (max < this.store.deliveryFee.defaultFee)

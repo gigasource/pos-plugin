@@ -224,7 +224,7 @@
       }
     },
     created() {
-      this.$watch(this.order.status, val => {
+      this.$watch('order.status', val => {
         if (val === 'inProgress') {
           const startTime = new Date().getTime()
           this.intervalId = setInterval(() => {
@@ -237,7 +237,6 @@
       }, { immediate: true })
     },
     beforeDestroy() {
-      window.cms.socket.off('updateOrderStatus')
       clearInterval(this.intervalId)
     }
   }
@@ -249,7 +248,7 @@
     border-radius: 4px;
     box-shadow: 0px 0px 28px rgba(58, 56, 56, 0.15);
     padding: 24px 48px;
-    
+
     &__header {
       font-weight: bold;
       font-size: 20px;
@@ -266,7 +265,7 @@
         max-width: 60px;
       }
     }
-    
+
     &__message {
       margin-top: 24px;
       font-size: 14px;
@@ -345,7 +344,7 @@
         user-select: text !important;
       }
     }
-    
+
     &__actions {
       padding-top: 10px;
       display: flex;

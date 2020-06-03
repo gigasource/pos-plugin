@@ -9,11 +9,12 @@
 
   function getEmbed() {
     var el = document.getElementById('webshop-embed-btn')
+    var buttonWidth = (el.getAttribute('data-width') || '100') + 'px'
 
     var styleEl = document.createElement('style')
     document.head.appendChild(styleEl)
     var stylesheet = styleEl.sheet
-    stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; color: white; background: #536dfe;font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; bottom: 8px; right: 8px; z-index: 1000}')
+    stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; bottom: 8px; right: 8px; z-index: 1000; width:' + buttonWidth + '}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
 
     el.onclick = function (event) {
@@ -27,8 +28,7 @@
         if (existingIframe.style.visibility === 'hidden') {
           existingIframe.style.visibility = 'visible'
           document.body.style.overflow = 'hidden'
-        }
-        else {
+        } else {
           existingIframe.style.visibility = 'hidden'
           document.body.style.overflow = 'auto'
         }
@@ -42,12 +42,12 @@
         //insert loading circular
         var loading = document.createElement('div')
         loading.setAttribute('style', 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1')
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         svg.setAttribute('width', '50px')
         svg.setAttribute('height', '50px')
         svg.setAttribute('viewBox', '25 25 50 50')
         svg.setAttribute('style', 'animation: rotating 1s linear infinite')
-        var circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+        var circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
         circle1.setAttribute('fill', 'transparent')
         circle1.setAttribute('cx', '50')
         circle1.setAttribute('cy', '50')
@@ -57,7 +57,7 @@
         circle1.setAttribute('stroke-dashoffset', '0')
         circle1.setAttribute('stroke', '#9e9e9e')
         svg.appendChild(circle1)
-        var circle2 = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+        var circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
         circle2.setAttribute('fill', 'transparent')
         circle2.setAttribute('cx', '50')
         circle2.setAttribute('cy', '50')
@@ -76,19 +76,20 @@
         iframe.setAttribute('id', 'webshop-iframe')
         var iframeStyle = 'border: none; width: 100%; height: 100%'
 
-        if (isMobile) {
-          window.onpopstate = function (e) {
-            if (container.style.visibility !== 'hidden') {
-              e.preventDefault()
-              container.style.visibility = 'hidden'
-              document.body.style.overflow = 'auto'
-            }
+        // hide container on history back()
+        window.onpopstate = function (e) {
+          if (container.style.visibility !== 'hidden') {
+            e.preventDefault()
+            container.style.visibility = 'hidden'
+            document.body.style.overflow = 'auto'
           }
         }
 
         iframe.setAttribute('style', iframeStyle)
         container.appendChild(iframe)
-        iframe.addEventListener('load', function() {
+        iframe.addEventListener('load', function () {
+          document.body.style.overflow = 'hidden'
+
           container.removeChild(loading)
 
           // insert close btn

@@ -30,7 +30,7 @@ const savedMessageSchema = new Schema({
 
 const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
 const sendOrderTimeouts = {};
-const SEND_TIMEOUT = 10000;
+const SEND_TIMEOUT = 30000;
 
 function updateMessage(targetClientId, _id, update) {
   return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
@@ -83,7 +83,9 @@ module.exports = function (cms) {
     }
   });
 
-  externalSocketIOServer.registerAckFunction('createOrderAck', orderToken => {
+  externalSocketIOServer.registerAckFunction('createOrderAck', (orderToken, storeName, storeAlias) => {
+    console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias}`,
+      `Order ${orderToken}: received ack from device, status = inProgress`);
     if (sendOrderTimeouts[orderToken]) {
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
@@ -113,7 +115,7 @@ module.exports = function (cms) {
       const store = await StoreModel.findById(device.storeId);
       if (!store) return callback(null);
 
-      callback(store.settingName);
+      callback({ settingName: store.settingName, name: store.name, alias: store.alias});
     });
 
     socket.on('getWebshopId', async (deviceId, callback) => {
@@ -192,8 +194,9 @@ module.exports = function (cms) {
 
     // TODO: analysis side fx
     socket.on('updateOrderStatus', async (orderStatus) => {
-      const { onlineOrderId, status, paypalOrderDetail } = orderStatus
-      console.debug(`backend received order status for order ${onlineOrderId}`)
+      const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
+      console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias}`,
+          `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
       if (status === "completed") {
         if (paypalOrderDetail) {
           const captureResult = await ppApiv2.captureOrder(paypalOrderDetail.orderID, true)
@@ -253,9 +256,12 @@ module.exports = function (cms) {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
 
+      const { name: storeName, alias: storeAlias } = await cms.getModel('Store').findById(storeId)
+      Object.assign(orderData, {storeName, storeAlias})
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias}`,
+        `Order ${orderData.orderToken}: send to device`);
       // join orderToken room
       socket.join(orderData.orderToken)
-      console.debug(`joined room ${orderData.orderToken}`)
 
       if (!device) {
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
@@ -264,7 +270,7 @@ module.exports = function (cms) {
 
       const deviceId = device._id.toString();
       const removePersistentMsg = await externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()],
-          'createOrderAck', [orderData.orderToken]);
+          'createOrderAck', [orderData.orderToken, storeName, storeAlias]);
 
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
         internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
