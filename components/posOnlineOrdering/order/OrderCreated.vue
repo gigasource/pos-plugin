@@ -202,12 +202,12 @@
       },
       cancelledReason() {
         if (this.order.status === 'declined') {
-          return this.extraInfo
+          return this.orderExtraInfo
         }
       },
       deliveryTime() {
         if (this.order.status === 'kitchen') {
-          return this.extraInfo
+          return this.orderExtraInfo
         }
       },
       failedToSend() {
