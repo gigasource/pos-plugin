@@ -90,7 +90,7 @@ module.exports = function (cms) {
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
     }
-    updateOrderStatus(orderToken, { onlineOrderId: orderToken, responseMessage: 'inProgress' })
+    updateOrderStatus(orderToken, { onlineOrderId: orderToken, status: 'inProgress' })
   });
 
   function notifyDeviceStatusChanged(clientId) {
@@ -273,7 +273,7 @@ module.exports = function (cms) {
           'createOrderAck', [orderData.orderToken, storeName, storeAlias]);
 
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
-        internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
+        updateOrderStatus(orderData.orderToken, { onlineOrderId: orderData.orderToken, status: 'failedToSend' })
         removePersistentMsg()
       }, SEND_TIMEOUT);
     });
