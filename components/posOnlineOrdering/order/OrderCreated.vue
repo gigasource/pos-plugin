@@ -207,7 +207,7 @@
       },
       deliveryTime() {
         if (this.order.status === 'kitchen') {
-          return extraInfo
+          return this.extraInfo
         }
       },
       failedToSend() {
