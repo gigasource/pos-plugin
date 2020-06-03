@@ -550,8 +550,16 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
 .icon-services {
   background-image: url("../assets/services.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-cross-red {
+  background-image: url("../assets/cross-red.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

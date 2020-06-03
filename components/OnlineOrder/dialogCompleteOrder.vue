@@ -55,6 +55,13 @@
           <div>{{$t('onlineOrder.total')}}</div>
           <div class="ta-right">{{$t('common.currency')}} {{order.vSum | formatMoney}}</div>
         </div>
+        <div class="row-flex justify-between mt-1" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
+          <div>Payment</div>
+          <div class="ta-right row-flex align-items-center" style="text-transform: capitalize">
+            <img v-if="paymentMethod.icon" :src="paymentMethod.icon" class="mr-1"/>
+            <span>{{paymentMethod.type}}</span>
+          </div>
+        </div>
       </g-card-text>
       <g-card-actions>
         <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">{{$t('onlineOrder.cancelOrder')}}</g-btn-bs>
@@ -105,6 +112,11 @@
       },
       orderQuantity() {
         return this.order.items.reduce((acc, val) => acc + val.quantity, 0)
+      },
+      paymentMethod() {
+        const { value, type } = this.order.payment[0];
+        let payment = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return Object.assign(payment || {}, { value, type })
       }
     },
     methods: {

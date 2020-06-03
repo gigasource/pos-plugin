@@ -85,17 +85,19 @@
               </div>
             </g-card-actions>
             <g-card-actions>
-              <g-btn-bs v-if="!order.confirmStep2 && !order.declineStep2" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onClickDecline(order)">
-                No
+              <g-btn-bs v-if="!order.confirmStep2 && !order.declineStep2" height="54" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onClickDecline(order)">
+                <g-icon size="14">icon-cross-red</g-icon>
               </g-btn-bs>
-              <g-btn-bs v-if="order.confirmStep2 || order.declineStep2" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onBack(order)">
+              <g-btn-bs v-if="order.confirmStep2 || order.declineStep2" height="54" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onBack(order)">
                 Back
               </g-btn-bs>
-              <g-btn-bs v-if="order.declineStep2" background-color="#E0E0E0" text-color="black" style="flex: 1" @click="declineOrder(order)">
+              <g-btn-bs v-if="order.declineStep2" height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click="declineOrder(order)">
                 Confirm
               </g-btn-bs>
-              <g-btn-bs v-else icon="icon-printer-setting" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
-                {{getPaymentTexts(order.payment)}}
+              <g-btn-bs v-else height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
+                <img v-if="getPayment(order.payment).icon" :src="getPayment(order.payment).icon" :alt="getPayment(order.payment).type" class="mr-2"/>
+                <span v-else class="mr-2">{{getPayment(order.payment).type}}</span>
+                <span>{{$t('common.currency')}}{{getPayment(order.payment).value | formatMoney(decimals)}}</span>
               </g-btn-bs>
             </g-card-actions>
           </g-card>
@@ -238,9 +240,11 @@
       },
     },
     methods: {
-      getPaymentTexts(payments) {
-        const currency = this.$t('common.currency')
-        return payments.map(i => `${i.type} - ${currency}${!i.value ? 0 : i.value.toFixed(this.decimals)}`).join(', ')
+      getPayment(payments) {
+        const { value, type } = payments[0];
+        // todo: dont call this method from template, map orders instead, move posSettings to props
+        let payment = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return Object.assign(payment || {}, { value, type })
       },
       declineOrder(order) {
         this.$emit('declineOrder', order)
