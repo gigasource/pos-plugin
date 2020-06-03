@@ -353,7 +353,7 @@
         }
 
         if (this.store.deliveryFee.type === 'distance') {
-          if (this.customer.distance) {
+          if (this.customer.distance >= 0) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
               if (this.customer.distance < deliveryFee.radius)
                 return deliveryFee.fee
@@ -382,7 +382,7 @@
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
         }
-        if (this.store.deliveryFee.type === 'distance' && (!this.customer.distance || this.distanceExceedingRadius)) {
+        if (this.store.deliveryFee.type === 'distance' && ((!this.customer.distance && this.customer.distance !== 0) || this.distanceExceedingRadius)) {
           rules.push((val) => val.length < 5 || 'Shipping service is not available to your area!')
         }
         return rules
@@ -697,7 +697,7 @@
       async getDistanceByPostalCode(code, fromCoords) {
         cms.socket.emit('getDistanceByPostalCode', code, fromCoords, distance => {
           console.log(`[Geocode]${this.store.alias}|GoogleAPI|distance:${distance}`)
-          this.customer.distance = distance || 0
+          this.customer.distance = distance
         })
       }
     }
