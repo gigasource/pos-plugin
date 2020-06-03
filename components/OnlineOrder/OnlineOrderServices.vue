@@ -34,7 +34,7 @@
     <div class="online-order-services__item">
       <div class="online-order-services__title">Note to Customers</div>
       <div class="online-order-services__content">
-        <g-textarea v-model="note" no-resize outlined rows="5" placeholder="Note..."/>
+        <g-textarea v-model="note" no-resize outlined rows="5" placeholder="Note..." @click="dialog.text = true"/>
 
         <!--        <div class="row-flex align-items-center">-->
         <!--          <div style="font-weight: bold;">Automatically turn off note after</div>-->
@@ -47,6 +47,8 @@
       <g-spacer/>
       <g-btn-bs background-color="#536DFE" style="margin: 0; width: 96px;" text-color="white" @click.stop="save">Save</g-btn-bs>
     </div>
+
+    <dialog-blogtext-input v-model="dialog.text" label="Note" :default-value="note" @submit="changeNote"/>
   </div>
 </template>
 
@@ -73,6 +75,9 @@
         delivery: null,
         pickup: null,
         note: '',
+        dialog: {
+          text: false
+        }
       }
     },
     methods: {
@@ -111,6 +116,9 @@
           this.pickup = pickup
           this.note = noteToCustomers || ''
         })
+      },
+      changeNote(val) {
+        this.note = val
       }
     },
     mounted() {

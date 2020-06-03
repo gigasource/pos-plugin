@@ -547,7 +547,6 @@
           paypalOrderDetail: order.paypalOrderDetail
         };
         window.cms.socket.emit('updateOrderStatus', orderStatus)
-        console.debug(`emit order status to backend for order ${updatedOrder.onlineOrderId}`)
       },
       async acceptPendingOrder(order) {
         try {
@@ -579,7 +578,6 @@
             paypalOrderDetail: order.paypalOrderDetail
           }
           window.cms.socket.emit('updateOrderStatus', orderStatus)
-          console.debug(`emit order status to backend for order ${updatedOrder.onlineOrderId}`)
         } catch (e) {
           console.error(e)
         }

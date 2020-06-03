@@ -903,6 +903,23 @@
             }
           ],
           "type": "object"
+        },
+        {
+          "schemaType": "object",
+          "key": "store",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "alias",
+              "type": "input"
+            }
+          ],
+          "type": "object"
         }
       ]
     },
