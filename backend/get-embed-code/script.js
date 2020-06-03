@@ -9,11 +9,12 @@
 
   function getEmbed() {
     var el = document.getElementById('webshop-embed-btn')
+    var buttonWidth = (el.getAttribute('data-width') || '100') + 'px'
 
     var styleEl = document.createElement('style')
     document.head.appendChild(styleEl)
     var stylesheet = styleEl.sheet
-    stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; color: white; background: #536dfe;font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; bottom: 8px; right: 8px; z-index: 1000}')
+    stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; bottom: 8px; right: 8px; z-index: 1000; width:' + buttonWidth + '}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
 
     el.onclick = function (event) {
