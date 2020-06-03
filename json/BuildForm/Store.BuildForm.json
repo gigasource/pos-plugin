@@ -183,7 +183,7 @@
         },
         {
           "schemaType": "array",
-          "key": "zipCodeFees",
+          "key": "fees",
           "fields": [
             {
               "schemaType": "string",
@@ -208,7 +208,8 @@
           "schemaType": "string",
           "key": "type",
           "type": "input",
-          "default": "zipCode"
+          "default": "zipCode",
+          "optionsType": null
         },
         {
           "schemaType": "array",
@@ -335,32 +336,6 @@
       "type": "input"
     },
     {
-      "_id": "5ece314fc7908d07be96dbfb",
-      "schemaType": "object",
-      "key": "coordinates",
-      "fields": [
-        {
-          "schemaType": "number",
-          "key": "long",
-          "type": "input@number"
-        },
-        {
-          "schemaType": "number",
-          "key": "lat",
-          "type": "input@number"
-        }
-      ],
-      "type": "object",
-      "addable": true
-    },
-    {
-      "_id": "5ece487fe5da86fae97e5db6",
-      "schemaType": "boolean",
-      "key": "displayImage",
-      "type": "input@switch",
-      "default": true
-    },
-    {
       "_id": "5eccfab2fa747314f6e8daa6",
       "schemaType": "object",
       "key": "paymentProviders",
@@ -373,12 +348,41 @@
               "schemaType": "boolean",
               "key": "enable",
               "type": "input@switch"
+            },
+            {
+              "schemaType": "string",
+              "key": "token",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "tokenSecret",
+              "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "scope",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "key": "scope",
+                  "type": "input"
+                }
+              ]
             }
           ],
           "type": "object"
         }
       ],
       "type": "object"
+    },
+    {
+      "_id": "5ece487fe5da86fae97e5db6",
+      "schemaType": "boolean",
+      "key": "displayImage",
+      "type": "input@switch",
+      "default": "true"
     }
   ],
   "name": "Store",

@@ -127,9 +127,10 @@
                 <pay-pal-smart-button
                     v-if="isPaymentViaPayPalEnable"
                     self-host
-                    :debug="true"
+                    debug
                     :order-info="paypalOrderInfo"
                     :client-id="store.paypalClientId"
+                    :merchant-id="store.paymentProviders.paypal.merchantId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
                 <adyen-checkout
@@ -546,7 +547,7 @@
             user_action: "CONTINUE"
           },
           purchase_units: [{
-            custom_id: `${this.store._id}`, // using custom_id as an identity to identify which store this transaction belong too
+            custom_id: `${this.customer.name}_${this.customer.phone}`, // TODO: Verify again
             amount: {
               currency_code: this.currencyCode,
               value: `${this.effectiveTotal.toFixed(2)}`,

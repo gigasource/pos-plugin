@@ -31,7 +31,7 @@
       // If this prop is true, actions.order.capture() will be invoked in onApprove
       // then 'onFundCaptured' event will be emitted if fund capture succeeded
       // If this prop is false, 'onApprove' event will be emitted
-      captureFundImmediately: Boolean
+      captureFundImmediately: Boolean,
     },
     data: function () {
       return {
@@ -110,14 +110,7 @@
               return actions.order.create(_this.orderInfo);
             },
             onApprove: function (data, actions) {
-              _this.debug && console.log(data)
-              if (this.captureFundImmediately) {
-                actions.order.capture().then(details => {
-                  _this.$emit('onFundCaptured', details, data, actions)
-                });
-              } else {
-                _this.$emit('onApprove', data, actions)
-              }
+              _this.$emit('onApprove', data, actions)
             }
           }).render(`#${this.containerId}`);
         }

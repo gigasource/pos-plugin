@@ -59,6 +59,10 @@ module.exports = function (cms) {
     io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
   }
 
+  function updateOrderStatus(orderToken, status) {
+    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
+  }
+
   const externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
     saveMessage,
@@ -84,7 +88,7 @@ module.exports = function (cms) {
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
     }
-    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, 'inProgress')
+    updateOrderStatus(orderToken, { onlineOrderId: orderToken, responseMessage: 'inProgress' })
   });
 
   function notifyDeviceStatusChanged(clientId) {
@@ -196,7 +200,7 @@ module.exports = function (cms) {
           console.log(captureResult)
         }
       } else {
-        internalSocketIOServer.to(onlineOrderId).emit('updateOrderStatus', orderStatus)
+        updateOrderStatus(onlineOrderId, orderStatus)
         console.debug(`backend emitted order status to frontend for order ${onlineOrderId}`)
       }
     })

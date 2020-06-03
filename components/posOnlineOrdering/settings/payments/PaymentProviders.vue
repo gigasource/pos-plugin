@@ -17,8 +17,10 @@
     
     <disable-prompt-dialog
       v-if="dialog.disableProvider.show"
+      v-model="dialog.disableProvider.show"
+      :name="dialog.disableProvider.name"
       @cancel="hideProviderDialog"
-      @submit="$emit('disable', dialog.disableProvider.name)"/>
+      @submit="$emit('deactive', dialog.disableProvider.name)"/>
   </section>
 </template>
 <script>
