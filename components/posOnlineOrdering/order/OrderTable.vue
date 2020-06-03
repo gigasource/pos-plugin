@@ -616,7 +616,8 @@
           address: '',
           zipCode: '',
           deliveryTime: '',
-          note: ''
+          note: '',
+          distance: null
         }
 
         this.confirming = false
