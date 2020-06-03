@@ -134,10 +134,10 @@
                     :merchant-id="store.paymentProviders.paypal.merchantId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
-                <adyen-checkout
-                    v-if="isPaymentViaAdyenEnable"
-                    self-host
-                    environment="test"/>
+<!--                <adyen-checkout-->
+<!--                    v-if="isPaymentViaAdyenEnable"-->
+<!--                    self-host-->
+<!--                    environment="test"/>-->
               </div>
             </template>
           </template>
@@ -200,11 +200,11 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
   import PayPalSmartButton from './PayPalSmartButton';
-  import AdyenCheckout from './AdyenCheckout';
+  // import AdyenCheckout from './AdyenCheckout';
 
   export default {
     name: 'OrderTable',
-    components: { AdyenCheckout, DialogOrderConfirm, OrderCreated, PayPalSmartButton },
+    components: { /*AdyenCheckout,*/ DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,

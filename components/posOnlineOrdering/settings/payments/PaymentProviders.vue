@@ -25,14 +25,14 @@
 </template>
 <script>
   import PaypalProvider from './paypal/Provider';
-  import AdyenProvider from './adyen/Provider';
+  // import AdyenProvider from './adyen/Provider';
   import DisablePromptDialog from './DisablePromptDialog';
 
   export default {
     name: 'PaymentProviders',
     components: {
       PaypalProvider,
-      AdyenProvider,
+      // AdyenProvider,
       DisablePromptDialog
     },
     props: {
@@ -42,7 +42,7 @@
       return {
         providers: [
           { name: 'paypal', component: PaypalProvider },
-          { name: 'adyen', component: AdyenProvider }
+          // { name: 'adyen', component: AdyenProvider }
         ],
         dialog: {
           disableProvider: {
