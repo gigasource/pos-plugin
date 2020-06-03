@@ -87,6 +87,8 @@
         iframe.setAttribute('style', iframeStyle)
         container.appendChild(iframe)
         iframe.addEventListener('load', function () {
+          document.body.style.overflow = 'hidden'
+
           container.removeChild(loading)
 
           // insert close btn
