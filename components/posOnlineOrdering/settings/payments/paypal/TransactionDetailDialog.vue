@@ -84,7 +84,8 @@
       value: Boolean,
       transactionId: String,
       startDate: String,
-      endDate: String
+      endDate: String,
+      store: Object,
     },
     data: function () {
       return {
@@ -139,7 +140,8 @@
           start_date: this.startDate + '-0000',
           end_date: this.endDate + '-0000',
           transaction_id: this.transactionId,
-          output: 'cart_info'
+          output: 'cart_info',
+          store_id: this.store._id
         }
         const queryStr = _.keys(query).map(k => `${k}=${query[k]}`).join('&')
         const response = await axios.get(`/payment/paypal/transaction-detail?${queryStr}`)

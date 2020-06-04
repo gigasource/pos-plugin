@@ -1,41 +1,9 @@
 ;"use strict"
 const _ = require('lodash')
 const checkoutNodeJssdk = require('@paypal/checkout-server-sdk');
-const payPalClient = require('./requests/paypalClient');
 const { TransactionsGetRequest } = require('./requests/transactionsGetRequest')
 
-async function createOrder(requestBody, debug=false) {
-  try {
-    const request = new checkoutNodeJssdk.orders.OrdersCreateRequest();
-    request.prefer("return=representation")
-    request.requestBody(requestBody);
-    const response = await payPalClient.client().execute(request);
-    if (debug){
-      console.log("Creating Order with Complete Payload:");
-      console.log("Status Code: " + response.statusCode);
-      console.log("Status: " + response.result.status);
-      console.log("Order ID: " + response.result.id);
-      console.log("Intent: " + response.result.intent);
-      console.log("Links: ");
-      response.result.links.forEach((item, index) => {
-        let rel = item.rel;
-        let href = item.href;
-        let method = item.method;
-        let message = `\t${rel}: ${href}\tCall Type: ${method}`;
-        console.log(message);
-      });
-      console.log(`Gross Amount: ${response.result.purchase_units[0].amount.currency_code} ${response.result.purchase_units[0].amount.value}`);
-
-      // To toggle print the whole body comment/uncomment the below line
-      console.log(JSON.stringify(response.result, null, 4));
-    }
-    return response;
-  }
-  catch (e) {
-    console.log(e)
-  }
-}
-async function captureOrder(orderId, debug=false) {
+async function captureOrder(payPalClient, orderId, debug=false) {
   try {
     const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderId);
     request.requestBody({});
@@ -69,7 +37,7 @@ async function captureOrder(orderId, debug=false) {
  * @returns {Promise<*>}
  * @private
  */
-async function _execListTransaction(query, debug) {
+async function _execListTransaction(payPalClient, query, debug) {
   try {
     const request = new TransactionsGetRequest(query);
     const response = await payPalClient.client().execute(request)
@@ -92,7 +60,7 @@ async function _execListTransaction(query, debug) {
  * @param page_size
  * @returns {Promise<{lastRefreshedDateTime: *, transactions: []}|*[]>}
  */
-async function getStoreTransaction({
+async function getStoreTransaction(payPalClient, {
                     store_id,             /*Transaction of specified store*/
                     start_date, end_date, /*Allow filter*/
                     output,               /*Allow options field to get transaction order detail*/
@@ -110,7 +78,7 @@ async function getStoreTransaction({
   }
 
   // exec first query
-  let response = await _execListTransaction(query)
+  let response = await _execListTransaction(payPalClient, query)
   if (response && response.statusCode === 200) {
     responses.push(response);
 
@@ -120,7 +88,7 @@ async function getStoreTransaction({
       const queries = []
       for(let i=2; i<=response.result.total_pages; ++i)
         queries.push({...query, page: i})
-      responses.push.apply(responses, await Promise.all(queries.map(qry => _execListTransaction(qry))))
+      responses.push.apply(responses, await Promise.all(queries.map(qry => _execListTransaction(payPalClient, qry))))
     }
 
     const transactions = []
@@ -148,7 +116,7 @@ async function getStoreTransaction({
  * @param output
  * @returns {Promise<null|{transactions: *}>}
  */
-async function getStoreTransactionById({transaction_id, start_date, end_date, output}) {
+async function getStoreTransactionById(payPalClient, {transaction_id, start_date, end_date, output}) {
   const outputFields = (output && _.trim(output) !== "") ? _.trim(output).split(',') : []
   const query =  {
     transaction_id,
@@ -160,7 +128,7 @@ async function getStoreTransactionById({transaction_id, start_date, end_date, ou
   // Note: A transaction ID is not unique in the reporting system.
   // The response can list two transactions with the same ID.
   // One transaction can be balance affecting while the other is non-balance affecting.
-  let { statusCode, result } = await _execListTransaction(query)
+  let { statusCode, result } = await _execListTransaction(payPalClient, query)
   if (statusCode === 200 && result) {
       return { transactions: result.transaction_details }
   } else {
@@ -189,8 +157,8 @@ function _getActualReceivedAmount(tran) {
  * @param end_date
  * @returns {Promise<{balances: [{netAmount: number, currencyCode: string}], lastRefreshedDateTime: *}|{balances: [], lastRefreshedDateTime: *}>}
  */
-async function getStoreBalance({store_id, start_date, end_date}) {
-  const { transactions, lastRefreshedDateTime } = await getStoreTransaction({ store_id, start_date, end_date })
+async function getStoreBalance(payPalClient, {store_id, start_date, end_date}) {
+  const { transactions, lastRefreshedDateTime } = await getStoreTransaction(payPalClient,{ store_id, start_date, end_date })
   if (transactions && transactions.length) {
     const transactionMap = _.groupBy(transactions, t => t.transaction_info.transaction_amount.currency_code)
     // calculate balances by currency code
@@ -218,7 +186,6 @@ async function getStoreBalance({store_id, start_date, end_date}) {
 }
 
 module.exports = {
-  createOrder,
   captureOrder,
   getStoreTransaction,
   getStoreBalance,

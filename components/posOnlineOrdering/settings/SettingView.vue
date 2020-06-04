@@ -46,11 +46,6 @@
         <payment-providers-transaction
             v-if="view === 'transaction'"
             :store="store"/>
-        
-        <setting-pay-pal-progress
-            v-if="dialog.settingPayPal.show"
-            v-model="dialog.settingPayPal.show"
-            :progress="dialog.settingPayPal.progress"/>
       </div>
     </template>
   </div>
@@ -67,11 +62,10 @@
   // payments
   import PaymentProviders from './payments/PaymentProviders';
   import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
-  import SettingPayPalProgress from './payments/paypal/SettingPayPalProgress';
   
   export default {
     name: 'SettingView',
-    components: { SettingPayPalProgress, PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: { PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
     data: function () {
       return {
         sidebarItems: [
@@ -113,13 +107,6 @@
         permissionDenied: true,
         permissionDeniedMessage: '',
         listDiscount: [],
-        //
-        dialog: {
-          settingPayPal: {
-            show: false,
-            progress: '',
-          }
-        }
       }
     },
     computed: {
@@ -147,46 +134,6 @@
         }
         
         if (user.role.name === 'admin' || userManageThisStore) {
-          
-          // on paypal permission granted
-          const { request_token, verification_code } = this.$route.query
-          if (request_token && verification_code) {
-            this.dialog.settingPayPal.show = true
-            
-            this.dialog.settingPayPal.progress = 'Generating access token...'
-            axios
-              .post(`${location.origin}/payment/paypal/getAccessToken`, { token: request_token, verifier: verification_code })
-              .then(response => {
-                const {token, tokenSecret, scope} = response.data
-                this.dialog.settingPayPal.progress = 'Gathering merchant id...'
-                axios
-                  .post(`${location.origin}/payment/paypal/getBasicPersonalData`, { token, tokenSecret })
-                  .then(response => {
-                    const basicPersonalData = response.data
-                    const merchantId = basicPersonalData.payer_id
-  
-                    this.dialog.settingPayPal.progress = 'Storing data...'
-                    const paymentProviders = store.paymentProviders || { }
-                    paymentProviders.paypal = paymentProviders.paypal || { }
-                    paymentProviders.paypal = {
-                      ...paymentProviders.paypal,
-                      ...{
-                        enable: true,
-                        merchantId,
-                        token,
-                        tokenSecret,
-                        scope
-                      }
-                    }
-                    cms.getModel('Store')
-                       .findOneAndUpdate({ _id: store._id }, { paymentProviders })
-                       .then (() => {
-                          this.dialog.settingPayPal.progress = 'completed'
-                        })
-                  })
-                })
-            }
-
           this.permissionDenied = false
           this.$set(this, 'store', store)
           await this.loadCategories()
@@ -385,19 +332,13 @@
         await this.setPaymentProvider(name, true, metadata)
       },
       async setPaymentProvider(name, value, metadata) {
+        const paymentProviders = this.store.paymentProviders || {};
         switch (name) {
           case 'paypal':
-            if (value) {
-              // TODO: Prevent the user click multiple times
-              await this.requestPayPalPermission()
-            } else {
-              const paymentProviders = this.store.paymentProviders || {};
-              paymentProviders[name] = { enable: false }
-              await cms.getModel('Store').updateOne({ _id: this.store._id }, { paymentProviders })
-            }
+            paymentProviders[name] = { enable: value, ...metadata }
+            await cms.getModel('Store').updateOne({ _id: this.store._id }, { paymentProviders })
             break;
           case 'adyen':
-            const paymentProviders = this.store.paymentProviders || {};
             paymentProviders[name] = paymentProviders[name] || {}
             paymentProviders[name].enable = value
             if (value) {
@@ -423,21 +364,6 @@
               response = (await axios.post('/payment/adyen/closeAccountHolder', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data;
             }
             break;
-        }
-      },
-      async requestPayPalPermission() {
-        // EXPRESS_CHECKOUT: Allow payment via PayPal
-        // DIRECT_PAYMENT: Allow payment via credit, debit card, mastercard, visa
-        // TRANSACTION_SEARCH: Search transaction <from - to>
-        // TRANSACTION_DETAILS: Search transaction detail
-        // ACCESS_BASIC_PERSONAL_DATA: Gathering payer_id (merchant id)
-        const response = (await axios.post(`${location.origin}/payment/paypal/requestPermissions`, {
-          scope: ['EXPRESS_CHECKOUT', 'DIRECT_PAYMENT', 'ACCESS_BASIC_PERSONAL_DATA', 'TRANSACTION_SEARCH', 'TRANSACTION_DETAILS'],
-          callback: location.href
-        })).data
-        
-        if (response.ok) {
-          window.open(response.grantPermissionUrl, '_self');
         }
       }
     }

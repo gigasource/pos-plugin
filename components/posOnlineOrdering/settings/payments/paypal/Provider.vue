@@ -8,7 +8,7 @@
       <p>{{$t('paymentProviders.paypal.desc')}}</p>
     </section>
     
-    <template v-if="providerActivated">
+    <template v-if="providerActivated()">
       <section class="provider__balance-info">
         <p style="font-weight: bold;font-size: 18px;">{{$t('paymentProviders.paypal.balance')}}</p>
         <div class="provider__balance-info__value">
@@ -40,6 +40,10 @@
     </template>
     
     <template v-else>
+      <section>
+        <g-text-field-bs v-model="clientId" prefix="Client ID"/>
+        <g-text-field-bs v-model="secretToken" prefix="Secret Token"/>
+      </section>
       <footer class="row-flex justify-end">
         <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="activePayPalCheckout" style="margin-right: 0">Activate PayPal Checkout</g-btn-bs>
       </footer>
@@ -61,30 +65,38 @@
     },
     data: function () {
       return {
-        balances: [],
+        // register
+        clientId: '',
+        secretToken: '',
+        
+        // registered
+        
         lastRefreshedDateTime: null,
       }
     },
     computed: {
+    },
+    created() {
+      // TODO: Only get balance if
+      if (this.providerActivated()) {
+        const now = dayjs()
+        const startDate = now.format('YYYY-MM') + '-01T00:00:00-0000'
+        const endDate = now.format('YYYY-MM-DD') + 'T23:59:59-0000'
+        axios.get(`/payment/paypal/balance?store_id=${this.store._id}&start_date=${startDate}&end_date=${endDate}`).then(result => {
+          this.balances.splice(0, this.balances.length, ...result.data.balances)
+          this.lastRefreshedDateTime = dayjs(result.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
+        })
+      }
+    },
+    methods: {
       providerActivated() {
         return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
       },
-    },
-    created() {
-      const now = dayjs()
-      const startDate = now.format('YYYY-MM') + '-01T00:00:00-0000'
-      const endDate = now.format('YYYY-MM-DD') + 'T23:59:59-0000'
-      axios.get(`/payment/paypal/balance?store_id=${this.store._id}&start_date=${startDate}&end_date=${endDate}`).then(result => {
-        this.balances.splice(0, this.balances.length, ...result.data.balances)
-        this.lastRefreshedDateTime = dayjs(result.data.lastRefreshedDateTime).format('YYYY-MM-DD HH:mm:ss [GMT]Z')
-      })
-    },
-    methods: {
       deactivePayPalCheckout() {
         this.$emit('deactive')
       },
       activePayPalCheckout() {
-        this.$emit('active')
+        this.$emit('active', { clientId: this.clientId, secretToken: this.secretToken })
       }
     }
   }
@@ -129,6 +141,12 @@
           font-size: 14px;
         }
       }
+    }
+  }
+  
+  ::v-deep {
+    .bs-tf-input-prepend > *:first-child {
+      width: 100px;
     }
   }
 </style>

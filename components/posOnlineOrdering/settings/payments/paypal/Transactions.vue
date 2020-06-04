@@ -46,6 +46,7 @@
         v-model="dialog.transactionDetail.show"
         :start-date="startDate"
         :end-date="endDate"
+        :store="store"
         :transaction-id="dialog.transactionDetail.transactionId"
         @close="hideTransactionDetailDialog"/>
   </div>
