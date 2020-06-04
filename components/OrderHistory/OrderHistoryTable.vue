@@ -18,6 +18,9 @@
         <th class="ta-right" @click="openAmountFilter">{{$t('orderHistory.amount')}}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
+        <th class="ta-left" @click="dialog.payment = true">Payment
+          <g-icon size="12">mdi-filter</g-icon>
+        </th>
         <th class="ta-left" @click="openStaffFilter">{{$t('orderHistory.staff')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
@@ -53,6 +56,10 @@
         </td>
         <td class="ta-left">{{order.table || ''}}</td>
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
+        <td class="ta-left" style="text-transform: capitalize">
+          <img v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" class="mr-2"/>
+          <span style="vertical-align: middle">{{getOrderPayment(order).type}}</span>
+        </td>
         <td>
           <p class="staff-name">{{getStaffName(order.staff)}}</p>
         </td>
@@ -62,7 +69,8 @@
                           :total-document="totalOrders"
                           :limit.sync="limit"
                           :current-page.sync="currentPage"/>
-    <dialog-selection-filter v-model="dialog.type" :label="$t('orderHistory.type')" :items="items" @submit="setTypeFilter"/>
+    <dialog-selection-filter v-model="dialog.type" :label="$t('orderHistory.type')" :items="orderTypes" @submit="setTypeFilter"/>
+    <dialog-selection-filter v-model="dialog.payment" label="Payment Method" :items="paymentMethods" @submit="setPaymentFilter"/>
     <dialog-number-filter v-model="dialog.table" :label="$t('orderHistory.tableNo')" @submit="setTableFilter"/>
   </div>
 </template>
@@ -80,12 +88,14 @@
         dialog: {
           type: false,
           table: false,
+          payment: false
         },
-        items: [
+        orderTypes: [
           {text: 'Delivery', value: 'delivery'},
           {text: 'Pick-up', value: 'pickup'},
           {text: 'Dine-in', value: 'dinein'}
-        ]
+        ],
+        paymentMethods: []
       }
     },
     computed: {
@@ -130,13 +140,11 @@
       async removeFilter(filter) {
         const index = this.orderHistoryFilters.findIndex(f => f.title === filter.title);
         this.orderHistoryFilters.splice(index, 1);
-        await this.getOrderHistory();
-        await this.getTotalOrders();
+        await this.applyFilter()
       },
       async clearFilters() {
         this.orderHistoryFilters = [];
-        await this.getOrderHistory();
-        await this.getTotalOrders();
+        await this.applyFilter()
       },
       async updatePagination() {
         await this.getOrderHistory();
@@ -144,34 +152,55 @@
       getStaffName(staffs) {
         return staffs.map(s => s.name).join(', ')
       },
-      setTypeFilter(type) {
+      async setTypeFilter(type) {
         const filter = {
           title: this.$t('orderHistory.type'),
-          text: this.items.find(item => item.value === type)['text'],
-          condition: type === 'dinein' ? {type: null} : {type}
+          text: this.orderTypes.find(item => item.value === type)['text'],
+          condition: type === 'dinein' ? { type: null } : { type }
         }
-        this.updateOrderHistoryFilter(filter)
-        this.getOrderHistory()
-        this.getTotalOrders()
+        await this.applyFilter(filter)
       },
-      setTableFilter(table) {
+      async setTableFilter(table) {
         const filter = {
           title: this.$t('orderHistory.tableNo'),
           text: table,
-          condition: {table}
+          condition: { table }
         }
-        this.updateOrderHistoryFilter(filter)
-        this.getOrderHistory()
-        this.getTotalOrders()
+        await this.applyFilter(filter)
+      },
+      getPaymentMethods() {
+        this.paymentMethods = cms.getList('PosSetting')[0].payment.map(({ name }) => ({
+          text: name.charAt(0).toUpperCase() + name.slice(1),
+          value: name
+        }))
+      },
+      async setPaymentFilter(payment) {
+        await this.applyFilter({
+          title: 'Payment Method',
+          text: 'Payment Method',
+          condition: { payment: { $elemMatch: { type: payment } } }
+        })
+      },
+      async applyFilter(filter) {
+        filter && this.updateOrderHistoryFilter(filter)
+        await this.getOrderHistory()
+        await this.getTotalOrders()
+      },
+      getOrderPayment({ payment }) {
+        const { value, type } = payment[0];
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return Object.assign(paymentMethod || {}, { value, type })
       }
     },
     async created() {
       await this.getOrderHistory();
       await this.getTotalOrders();
+      this.getPaymentMethods()
     },
     async activated() {
       await this.getOrderHistory();
       await this.getTotalOrders();
+      this.getPaymentMethods()
     }
   }
 </script>
