@@ -385,6 +385,7 @@
               return true
             }
           }
+          if(this.errorZipcode || (this.store.deliveryFee.type === 'distance' && this.customer.distance === null)) return true
           return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime || this.distanceExceedingRadius
         }
         return check
