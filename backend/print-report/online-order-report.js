@@ -14,6 +14,11 @@ function getShippingFee({ discounts, shippingFee }) {
   return freeShipping ? freeShipping.value : shippingFee;
 }
 
+function getPayment({ payment }) {
+  const { type } = payment[0];
+  return type.charAt(0).toUpperCase() + type.slice(1) //capitalize
+}
+
 async function makePrintData(cms, {orderId}) {
   const order = await cms.getModel('Order').findById(orderId);
   const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
@@ -50,7 +55,8 @@ async function makePrintData(cms, {orderId}) {
     deliveryTime,
     locale: localeObj,
     type,
-    discounts
+    discounts,
+    payment: getPayment(order)
   };
 }
 
@@ -71,6 +77,7 @@ async function printEscPos(escPrinter, printData) {
     deliveryTime,
     type,
     discounts,
+    payment
   } = printData;
 
   escPrinter.setTextDoubleHeight();
@@ -140,6 +147,7 @@ async function printEscPos(escPrinter, printData) {
   })
   escPrinter.bold(true)
   escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
+  escPrinter.leftRight('Payment', payment)
   // escPrinter.newLine()
   // escPrinter.alignCenter()
   // escPrinter.setTextNormal()

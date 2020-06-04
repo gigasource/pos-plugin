@@ -68,6 +68,10 @@
       <span>{{locale.printing.total}}</span>
       <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
     </div>
+    <div class="bold" style="font-size: 30px">
+      <span>Payment</span>
+      <span class="float-right">{{payment}}</span>
+    </div>
 <!--    <div class="footer text-center">{{date}}</div>-->
   </div>
 </template>
@@ -92,7 +96,8 @@
       locale: Object,
       type: String,
       discounts: Array,
-      shippingFee: Number
+      shippingFee: Number,
+      payment: String
     },
     filters: {
       convertMoney(value) {
