@@ -102,7 +102,9 @@ router.post('/new-store', async (req, res) => {
       {
         dayInWeeks: [true, true, true, true, true, true, true],
         openTime: '06:30',
-        closeTime: '22:30'
+        closeTime: '22:30',
+        deliveryStart: '06:30',
+        deliveryEnd: '22:30'
       }
     ],
     pickup: true,
@@ -110,8 +112,12 @@ router.post('/new-store', async (req, res) => {
     deliveryFee: {
       acceptOrderInOtherZipCodes: true,
       defaultFee: 0,
-      fees: []
-    }
+      type: 'zipCode',
+      zipCodeFees: [],
+      distanceFees: []
+    },
+    orderTimeOut: 3,
+    deliveryTimeInterval: 15
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})

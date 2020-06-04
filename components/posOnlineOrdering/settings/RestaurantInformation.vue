@@ -29,7 +29,7 @@
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
             <div class="span-2">
-              <g-text-field-bs :value="store.country.name" label="Country" readonly/>
+              <g-text-field-bs large :value="store.country.name" label="Country" readonly/>
             </div>
           </div>
         </div>
