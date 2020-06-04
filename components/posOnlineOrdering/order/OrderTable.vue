@@ -112,7 +112,7 @@
                 <g-spacer/>
                 <span>{{ totalPrice | currency }}</span>
               </div>
-              <div class="order-item-summary" >
+              <div class="order-item-summary" v-if="orderType === 'delivery'">
                 <span>{{$t('store.shippingFee')}}:</span>
                 <g-spacer/>
                 <span v-if="calculatingShippingFee">{{calculatingText}}</span>
@@ -171,6 +171,7 @@
                           :discounts="discounts"
                           :effective-total="effectiveTotal"
                           :loading="dialog.loading"
+                          :type="orderType"
                           @confirm="confirmPayment"/>
   </div>
 </template>
@@ -620,6 +621,7 @@
         this.dialog.order = {
           orderToken: orderToken,
           items: this.orderItems,
+          type: this.orderType,
           shippingFee: this.shippingFee,
           totalPrice: this.totalPrice,
           status: 'inProgress',

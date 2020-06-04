@@ -21,7 +21,7 @@
           <g-spacer/>
           <span>{{ totalPrice | currency }}</span>
         </div>
-        <div class="order-item-summary" >
+        <div class="order-item-summary" v-if="type === 'delivery'">
           <span>{{$t('store.shippingFee')}}:</span>
           <g-spacer/>
           <span>{{ shippingFee | currency }}</span>
@@ -59,7 +59,8 @@
       shippingFee: Number,
       discounts: Array,
       effectiveTotal: Number,
-      loading: Boolean
+      loading: Boolean,
+      type: String,
     },
     filters: {
       currency(value) {

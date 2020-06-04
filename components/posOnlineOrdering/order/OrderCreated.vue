@@ -71,7 +71,7 @@
             <g-spacer/>
             <span>{{ order.totalPrice | currency }}</span>
           </div>
-          <div :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
+          <div v-if="order.type === 'delivery'" :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
             <span>{{$t('store.shippingFee')}}:</span>
             <g-spacer/>
             <span>{{ order.shippingFee | currency }}</span>
