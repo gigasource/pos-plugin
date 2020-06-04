@@ -74,7 +74,7 @@ module.exports = async cms => {
 
       webShopConnected = true
       cms.socket.emit('webShopConnected');
-
+      console.debug(`sentry:onConnect=${cms.utils.getShouldUpdateApp()}`, '')
       if (cms.utils.getShouldUpdateApp()) socket.emit('updateVersion', require('../../package').version, deviceId);
     });
 
