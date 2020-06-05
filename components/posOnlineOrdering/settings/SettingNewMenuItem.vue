@@ -273,6 +273,9 @@
           options: [{name: '', price: 0}]
         })
         this.showDeleteBtn.push(false)
+
+        const wrapper = document.querySelector('.menu-setting__category')
+        wrapper.scroll({top: wrapper.scrollTop + 113})
       },
       addOption(choiceIndex) {
         this.internalChoices[choiceIndex].options.push({
