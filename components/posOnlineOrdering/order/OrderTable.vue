@@ -557,7 +557,7 @@
             user_action: "CONTINUE"
           },
           purchase_units: [{
-            custom_id: `${this.customer.name}_${this.customer.phone}`, // TODO: Verify again
+            custom_id: `${this.store._id}`,
             amount: {
               currency_code: this.currencyCode,
               value: `${this.effectiveTotal.toFixed(2)}`,
