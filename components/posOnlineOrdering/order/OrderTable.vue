@@ -129,6 +129,7 @@
                     v-if="isPaymentViaPayPalEnable"
                     self-host
                     debug
+                    use-custom-capture-order
                     :order-info="paypalOrderInfo"
                     :client-id="store.paymentProviders.paypal.clientId"
                     :currency="currencyCode"
@@ -198,7 +199,7 @@
   import { autoResizeTextarea } from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
-  import PayPalSmartButton from './PayPalSmartButton';
+  import PayPalSmartButton from '@gigasource/payment-provider/src/PayPal/frontend/PayPalSmartButton';
   // import AdyenCheckout from './AdyenCheckout';
 
   export default {

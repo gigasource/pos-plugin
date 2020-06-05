@@ -5,7 +5,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const redisAdapter = require('socket.io-redis');
 const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
-const ppApiv2 = require('./api/payment/paypal/paypalApiV2')
+const ppApiv2 = require('./api/payment/paypal/payPalApiV2Adapter')
 const createPayPalClient = require('./api/payment/paypal/createPayPalClient')
 
 const Schema = mongoose.Schema
