@@ -109,7 +109,7 @@
                 <g-spacer/>
                 <span>{{ totalPrice | currency }}</span>
               </div>
-              <div class="order-item-summary" >
+              <div class="order-item-summary" v-if="orderType === 'delivery'">
                 <span>{{$t('store.shippingFee')}}:</span>
                 <g-spacer/>
                 <span v-if="calculatingShippingFee">{{calculatingText}}</span>
@@ -187,6 +187,7 @@
                           :discounts="discounts"
                           :effective-total="effectiveTotal"
                           :loading="dialog.loading"
+                          :type="orderType"
                           @confirm="confirmPayment"/>
   </div>
 </template>
@@ -411,6 +412,7 @@
               return true
             }
           }
+          if(this.errorZipcode || (this.store.deliveryFee.type === 'distance' && this.customer.distance === null)) return true
           return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime || this.distanceExceedingRadius
         }
         return check
@@ -745,6 +747,7 @@
         this.dialog.order = {
           orderToken: orderToken,
           items: this.orderItems,
+          type: this.orderType,
           shippingFee: this.shippingFee,
           totalPrice: this.totalPrice,
           status: 'inProgress',

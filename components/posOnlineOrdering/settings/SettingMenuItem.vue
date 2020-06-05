@@ -35,7 +35,7 @@
                   </div>
                 </template>
                 <div class="pa-3 bg-white br-2">
-                  <p class="fw-700 fs-small mb-1">{{choice.name}}:</p>
+                  <p class="fw-700 fs-small mb-1">{{choice.name}} <span v-if="choice.mandatory" style="color: red">*</span></p>
                   <div v-for="option in choice.options" :key="option._id" class="fs-small row-flex justify-between">
                     <p>{{option.name}}</p>
                     <p class="pl-5">{{option.price}}</p>

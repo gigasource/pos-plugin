@@ -28,8 +28,13 @@
         </div>
         <div class="dlg-feature-control__body__line"></div>
         <div class="col-12">
-          <g-switch :disabled="!canUseOnlineOrdering" v-model="features.onlineOrdering" label="Online Ordering"/>
+          <g-switch :disabled="!canUseFeature('onlineOrdering')" v-model="features.onlineOrdering" label="Online Ordering"/>
           <div style="font-size: 12px;">Note: Only one device can connect to online ordering at a time.</div>
+        </div>
+        <div class="dlg-feature-control__body__line"></div>
+        <div class="col-12">
+          <g-switch :disabled="!canUseFeature('reservation')" v-model="features.reservation" label="Reservation"/>
+          <div style="font-size: 12px;">Note: Only one device can connect to reservation service at a time.</div>
         </div>
         <div class="dlg-feature-control__body__line"></div>
         <div class="col-6">
@@ -76,10 +81,6 @@
       deviceInfo() {
         return `${this.device.name}, ${this.device.hardware}, ${this.device.appName}, ${this.device.appVersion}, ${this.device.appRelease}`
       },
-      canUseOnlineOrdering() {
-        const onlineOrderingDevice = _.find(this.store.devices, d => d.features.onlineOrdering)
-        return onlineOrderingDevice == null || onlineOrderingDevice._id === this.device._id
-      },
       features() {
         return _.cloneDeep(this.device.features)
       }
@@ -90,7 +91,11 @@
       },
       save() {
         this.$emit('save', this.features)
-      }
+      },
+      canUseFeature(feature) {
+        const device = _.find(this.store.devices, d => d.features[feature])
+        return device == null || device._id === this.device._id
+      },
     }
   }
 </script>

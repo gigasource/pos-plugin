@@ -29,7 +29,7 @@
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
             <div class="span-2">
-              <g-text-field-bs :value="store.country.name" label="Country" readonly/>
+              <g-text-field-bs large :value="store.country.name" label="Country" readonly/>
             </div>
           </div>
         </div>
@@ -108,7 +108,7 @@
     computed: {
       iframe() {
         const storeUrl = [location.origin, 'store', this.store.alias].join('/');
-        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120"><img src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering"></div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
+        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120"><img style="pointer-events: none" src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering"></div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
       },
       coords() {
         if (!this.store.coordinates || !this.store.coordinates.lat || !this.store.coordinates.long) return

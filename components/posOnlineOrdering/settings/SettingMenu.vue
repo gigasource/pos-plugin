@@ -248,7 +248,11 @@
         this.$set(this.showAddNewProductPanel, cate._id, false)
       },
       addNewCategory(name, callback) {
-        this.$emit('add-new-category', name, callback)
+        this.$emit('add-new-category', name, (response) => {
+          callback(response)
+          const wrapper = document.querySelector('.menu-setting__category')
+          wrapper.scroll({top: wrapper.scrollHeight, behavior: 'smooth'})
+        })
       },
       changeCategoryName(categoryId, name, callback) {
         this.$emit('change-category-name', categoryId, name, callback)

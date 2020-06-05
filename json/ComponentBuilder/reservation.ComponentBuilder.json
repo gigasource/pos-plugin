@@ -1,0 +1,25 @@
+{
+  "events": [],
+  "_id": "5ed8d8412f608c316de1b5ce",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "Reservation",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/posOnlineOrdering/reservation/Reservation.vue",
+      "path": "components/posOnlineOrdering/reservation/Reservation.vue",
+      "pluginName": "pos-plugin",
+      "content": {
+        "props": {},
+        "events": {}
+      }
+    }
+  ],
+  "name": "reservation",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "reservation/:storeIdOrAlias"
+}

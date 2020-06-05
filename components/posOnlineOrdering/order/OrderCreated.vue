@@ -1,7 +1,7 @@
 <template>
   <g-dialog v-model="internalValue" width="464" overlayOpacity="0.2" eager persistent>
     <div class="cpn-order-created">
-      <div class="cpn-order-created__header">
+      <div class="cpn-order-created__header" v-if="confirmed">
         <div class="mt-2">{{$t('store.orderSuccessfully')}}</div>
       </div>
       <div class="cpn-order-created__content">
@@ -71,7 +71,7 @@
             <g-spacer/>
             <span>{{ order.totalPrice | currency }}</span>
           </div>
-          <div :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
+          <div v-if="order.type === 'delivery'" :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
             <span>{{$t('store.shippingFee')}}:</span>
             <g-spacer/>
             <span>{{ order.shippingFee | currency }}</span>

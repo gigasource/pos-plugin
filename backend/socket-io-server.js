@@ -363,11 +363,20 @@ module.exports = function (cms) {
 
     socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
       const toCoords = await getCoordsByPostalCode(code)
-      if (!toCoords) callback()
+      if (!toCoords || !fromCoords) return callback()
 
       const geolib = require('geolib')
       const distance = geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
       callback(distance)
+    })
+
+    socket.on('createReservation', async (storeId, reservationData) => {
+      storeId = ObjectId(storeId);
+      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
+      if(device) {
+        const deviceId = device._id.toString();
+        await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
+      }
     })
 
     socket.once('disconnect', async () => {

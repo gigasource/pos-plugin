@@ -158,6 +158,11 @@
           "key": "alwaysOn",
           "type": "input@switch",
           "default": "false"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "reservation",
+          "type": "input@switch"
         }
       ]
     }
