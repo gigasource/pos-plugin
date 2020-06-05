@@ -6,7 +6,7 @@ const axios = require('axios');
 const redisAdapter = require('socket.io-redis');
 const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
 const ppApiv2 = require('./api/payment/paypal/payPalApiV2Adapter')
-const createPayPalClient = require('./api/payment/paypal/createPayPalClient')
+const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/backend/createPayPalClient')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
