@@ -70,7 +70,7 @@
         secretToken: '',
         
         // registered
-        
+        balances: [],
         lastRefreshedDateTime: null,
       }
     },

@@ -351,25 +351,13 @@
             },
             {
               "schemaType": "string",
-              "key": "token",
+              "key": "clientId",
               "type": "input"
             },
             {
               "schemaType": "string",
-              "key": "tokenSecret",
+              "key": "secretToken",
               "type": "input"
-            },
-            {
-              "schemaType": "array",
-              "key": "scope",
-              "type": "array",
-              "fields": [
-                {
-                  "schemaType": "string",
-                  "key": "scope",
-                  "type": "input"
-                }
-              ]
             }
           ],
           "type": "object"

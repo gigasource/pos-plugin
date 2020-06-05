@@ -7,7 +7,7 @@ async function captureOrder(payPalClient, orderId, debug=false) {
   try {
     const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderId);
     request.requestBody({});
-    const response = await payPalClient.client().execute(request);
+    const response = await payPalClient.execute(request);
     if (debug){
       console.log("Status Code: " + response.statusCode);
       console.log("Status: " + response.result.status);
@@ -40,7 +40,7 @@ async function captureOrder(payPalClient, orderId, debug=false) {
 async function _execListTransaction(payPalClient, query, debug) {
   try {
     const request = new TransactionsGetRequest(query);
-    const response = await payPalClient.client().execute(request)
+    const response = await payPalClient.execute(request)
     if (debug) {
       console.log(response)
     }
