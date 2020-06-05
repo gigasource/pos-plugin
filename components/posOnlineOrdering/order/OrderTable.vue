@@ -130,8 +130,7 @@
                     self-host
                     debug
                     :order-info="paypalOrderInfo"
-                    :client-id="store.paypalClientId"
-                    :merchant-id="store.paymentProviders.paypal.merchantId"
+                    :client-id="store.paymentProviders.paypal.clientId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
 <!--                <adyen-checkout-->
@@ -366,7 +365,7 @@
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
       storeZipCodes() {
-        return this.store.deliveryFee.zipCodeFees.map(({ zipCode, fee }) => {
+        return (this.store.deliveryFee.zipCodeFees || []).map(({ zipCode, fee }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
             zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
           }
@@ -543,11 +542,6 @@
         return false
       },
       paypalOrderInfo() {
-        if (!this.store.paypalClientId)
-          return
-        
-        // this.totalPrice + this.shippingFee - this.totalDiscount;
-        
         return {
           application_context: {
             brand_name: this.store.name,

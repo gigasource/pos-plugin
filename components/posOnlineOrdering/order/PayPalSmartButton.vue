@@ -58,7 +58,9 @@
         this.updatePaypalItemsDebounce()
       },
       sdkLoaded() {
-        this.updatePaypalItems()
+        if (this.sdkLoaded) {
+          this.updatePaypalItems()
+        }
       }
     },
     created() {
@@ -90,11 +92,16 @@
         return href
       },
       updatePaypalItems() {
-        if (!this.sdkLoaded || !this.orderInfo)
+        if (!this.sdkLoaded || !this.orderInfo) {
+          console.log('sdk is not loaded or order info is missing')
           return
+        }
+        
         const _this = this
         let container = document.getElementById(_this.containerId)
-        if (container) {
+        if (!container) {
+          console.log('paypal container missing')
+        } else {
           container.innerText = ''
           // add new paypal button
           paypal.Buttons({

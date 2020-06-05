@@ -6,6 +6,7 @@ const axios = require('axios');
 const redisAdapter = require('socket.io-redis');
 const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
 const ppApiv2 = require('./api/payment/paypal/paypalApiV2')
+const createPayPalClient = require('./api/payment/paypal/createPayPalClient')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -197,9 +198,21 @@ module.exports = function (cms) {
       const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
       console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias}`,
           `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
+
       if (status === "completed") {
         if (paypalOrderDetail) {
-          const captureResult = await ppApiv2.captureOrder(paypalOrderDetail.orderID, true)
+          const store = await cms.getModel('Store').findOne({ alias: storeAlias })
+          if (!store) {
+            // store information is missing, so order will not be processed
+            console.error('Cannot find store for current order.')
+            return;
+          }
+
+          const ppClient = createPayPalClient(
+              store.paymentProviders.paypal.clientId,
+              store.paymentProviders.paypal.secretToken)
+
+          const captureResult = await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
           console.log(captureResult)
         }
       } else {
