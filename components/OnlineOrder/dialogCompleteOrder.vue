@@ -39,7 +39,7 @@
           <div>{{$t('onlineOrder.total')}} <b>{{orderQuantity}}</b> {{$t('onlineOrder.items')}}</div>
           <div class="ta-right">{{$t('common.currency')}} {{subTotal | formatMoney}}</div>
         </div>
-        <div class="row-flex justify-between">
+        <div class="row-flex justify-between" v-if="order.type === 'delivery'">
           <div>{{$t('onlineOrder.shippingFee')}}:</div>
           <div class="ta-right">{{$t('common.currency')}} {{getShippingFee() | formatMoney}}</div>
         </div>

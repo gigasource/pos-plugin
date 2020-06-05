@@ -59,8 +59,17 @@
     </div>
     <g-divider/>
     <div class="total">
-      <span>{{$t('common.total')}} </span>
-      <span class="total__important">€ {{orderHistoryCurrentOrder.amount | formatNumber}}</span>
+      <div class="row-flex align-items-center" style="justify-content: space-between">
+        <span>{{$t('common.total')}} </span>
+        <span class="total__important">€ {{orderHistoryCurrentOrder.amount | formatNumber}}</span>
+      </div>
+      <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
+        <span>Payment</span>
+        <div class="row-flex align-items-center">
+          <img :src="payment.icon" v-if="payment.icon" class="mr-2">
+          <span>{{payment.name || payment.type}}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -88,6 +97,11 @@
       },
       subTotal() {
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.amount - this.orderHistoryCurrentOrder.tax;
+      },
+      payment() {
+        const { value, type } = this.orderHistoryCurrentOrder.payment[0]
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return Object.assign(paymentMethod || {}, { value, type })
       }
     },
     methods: {
@@ -194,9 +208,6 @@
     }
 
     .total {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       font-size: 12px;
       line-height: 15px;
       margin: 16px 4px;

@@ -303,7 +303,7 @@
               {},
               {
                 $push: {
-                  payment: {...newPayment}
+                  payment: {...newPayment, editable: true}
                 }
               }
           )

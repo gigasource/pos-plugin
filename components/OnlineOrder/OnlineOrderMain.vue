@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="row-flex justify-end align-items-center" style="flex: 0 0 auto">
-                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2">{{order.deliveryTime.toString().toUpperCase()}}</span>
+                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2">{{order.deliveryTime}}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
                   <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
@@ -57,7 +57,7 @@
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
                 <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="fs-small-2 ta-right">€{{getShippingFee(order) | formatMoney(decimals)}}</div>
+                <div class="fs-small-2 ta-right">€{{order.shippingFee | formatMoney(decimals)}}</div>
               </div>
               <div v-if="order.discounts && order.discounts.length">
                 <div class="row-flex align-items-start" v-for="discount in order.discounts">
@@ -95,9 +95,9 @@
                 Confirm
               </g-btn-bs>
               <g-btn-bs v-else height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
-                <img v-if="getPayment(order.payment).icon" :src="getPayment(order.payment).icon" :alt="getPayment(order.payment).type" class="mr-2"/>
-                <span v-else class="mr-2">{{getPayment(order.payment).type}}</span>
-                <span>{{$t('common.currency')}}{{getPayment(order.payment).value | formatMoney(decimals)}}</span>
+                <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" class="mr-2"/>
+                <span v-else class="mr-2">{{order.payment.type}}</span>
+                <span>{{$t('common.currency')}}{{order.payment.value | formatMoney(decimals)}}</span>
               </g-btn-bs>
             </g-card-actions>
           </g-card>
@@ -211,8 +211,10 @@
     watch: {
       pendingOrders(val, oldVal) {
         if (val === oldVal) return
-        this.internalOrders = val.map(i => ({
-          ...i,
+        this.internalOrders = val.map(order => Object.assign({}, order, {
+          deliveryTime: order.deliveryTime.toString().toUpperCase(),
+          shippingFee: this.getShippingFee(order),
+          payment: this.getPayment(order),
           confirmStep2: false,
           declineStep2: false,
           prepareTime: null,
@@ -239,11 +241,10 @@
       },
     },
     methods: {
-      getPayment(payments) {
-        const { value, type } = payments[0];
-        // todo: dont call this method from template, map orders instead, move posSettings to props
-        let payment = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
-        return Object.assign(payment || {}, { value, type })
+      getPayment({ payment }) {
+        const { value, type } = payment[0];
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return Object.assign(paymentMethod || {}, { value, type })
       },
       declineOrder(order) {
         this.$emit('declineOrder', order)
