@@ -591,3 +591,41 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-reservation_complete {
+  background-image: url("../assets/reservation_complete.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-reservation_time {
+  background-image: url("../assets/reservation_time.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-reservation_date {
+  background-image: url("../assets/reservation_date.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-reservation_people {
+  background-image: url("../assets/reservation_people.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
+.icon-reservation_done {
+  background-image: url("../assets/reservation_done.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
