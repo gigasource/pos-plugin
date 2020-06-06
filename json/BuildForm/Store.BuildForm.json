@@ -208,8 +208,7 @@
           "schemaType": "string",
           "key": "type",
           "type": "input",
-          "default": "zipCode",
-          "optionsType": null
+          "default": "zipCode"
         },
         {
           "schemaType": "array",
@@ -359,7 +358,7 @@
       "schemaType": "boolean",
       "key": "displayImage",
       "type": "input@switch",
-      "default": "true"
+      "default": true
     },
     {
       "_id": "5eccfab2fa747314f6e8daa6",
