@@ -716,7 +716,7 @@
         const orderData = {
           orderType: this.orderType,
           paymentType: this.paymentType,
-          paypalOrderDetail: this.paypalOrderDetail,
+          paypalOrderDetail: _.pick(this.paypalOrderDetail, ['orderID', 'payerID', 'paymentID']),
           customer,
           products,
           note,
