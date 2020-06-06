@@ -1218,16 +1218,6 @@
       "fields": [
         {
           "schemaType": "string",
-          "key": "billingToken",
-          "type": "input"
-        },
-        {
-          "schemaType": "string",
-          "key": "facilitatorAccessToken",
-          "type": "input"
-        },
-        {
-          "schemaType": "string",
           "key": "orderID",
           "type": "input"
         },
