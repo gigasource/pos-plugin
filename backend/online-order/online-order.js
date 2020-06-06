@@ -74,7 +74,9 @@ module.exports = async cms => {
 
       webShopConnected = true
       cms.socket.emit('webShopConnected');
-      console.debug(`sentry:onConnect=${cms.utils.getShouldUpdateApp()}`, '')
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const { onlineDevice: {store: {name, alias}} } = posSetting
+      console.debug(`sentry:onConnect=true,store=${name}`, `Value of shouldUpdate: ${cms.utils.getShouldUpdateApp()}`)
       if (cms.utils.getShouldUpdateApp()) socket.emit('updateVersion', require('../../package').version, deviceId);
     });
 
@@ -230,8 +232,12 @@ module.exports = async cms => {
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
+        const posSetting = await cms.getModel('PosSetting').findOne()
+        const { onlineDevice: {store: {name, alias}} } = posSetting
+        console.log(name);
         await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
-          downlink: uploadPath
+          downlink: uploadPath,
+          store: (name ? name : 'ABC')
         })
       } catch (e) {
         console.error('Update app error or this is not an android device');
