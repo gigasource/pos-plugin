@@ -106,7 +106,7 @@
         products: null,
         permissionDenied: true,
         permissionDeniedMessage: '',
-        listDiscount: [],
+        listDiscount: []
       }
     },
     computed: {
@@ -115,7 +115,7 @@
       },
       isInDevice() {
         return this.$route.query.device
-      },
+      }
     },
     async created() {
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
@@ -179,7 +179,6 @@
         await this.updateStore({deliveryTimeInterval: val})
       },
       changeView(view, title) {
-        // TODO: Known-issue: This method doesn't work with 2nd level icon
         if (view) {
           this.view = view
           //reset icon
@@ -191,6 +190,7 @@
         }
         if (title) {
           let item = this.computedSidebar.find(i => i.title === title)
+          // TODO: Known-issue: 2nd level won't highlighted
           if (item)
             this.$set(item, 'icon', item.icon+'_white')
         }
@@ -337,32 +337,6 @@
           case 'paypal':
             paymentProviders[name] = { enable: value, ...metadata }
             await cms.getModel('Store').updateOne({ _id: this.store._id }, { paymentProviders })
-            break;
-          case 'adyen':
-            paymentProviders[name] = paymentProviders[name] || {}
-            paymentProviders[name].enable = value
-            if (value) {
-              // https://docs.adyen.com/marketpay/marketpay-structure#account-holder-statuses
-              // TODO: store frontPhotoBase64, backPhotoBase64 or upload front, back image into gridFs then refer link is better?
-              const { photoIdKind, frontPhotoBase64, backPhotoBase64, accountHolder, verification } = metadata.accountHolder
-              const response = (await axios.post('/payment/adyen/createAccountHolder', { metadata: accountHolder })).data;
-              if (response.ok) {
-                // TODO: store metadata or store response is better???
-                // TODO: createAccountHolder's response or 'ACCOUNT_HOLDER_CREATED' notification
-                // should be consider as the final result? And what is the different between them?
-                paymentProviders[name] = metadata
-                await cms.getModel('Store').findOneAndUpdate({ _id: this.store._id}, { paymentProviders: paymentProviders })
-              } else {
-                alert(response.message)
-              }
-            } else {
-              // deactive: suspend or close?
-              // payout balance to bank account
-              // manually send payout request to adyen api
-              let response = (await axios.post('/payment/adyen/payout', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data
-              // then close account
-              response = (await axios.post('/payment/adyen/closeAccountHolder', { accountHolderCode: paymentProviders[name].accountHolder.accountHolderCode })).data;
-            }
             break;
         }
       }

@@ -134,10 +134,6 @@
                     :client-id="store.paymentProviders.paypal.clientId"
                     :currency="currencyCode"
                     @onApprove="confirmPayPalPayment"/>
-<!--                <adyen-checkout-->
-<!--                    v-if="isPaymentViaAdyenEnable"-->
-<!--                    self-host-->
-<!--                    environment="test"/>-->
               </div>
             </template>
           </template>
@@ -201,11 +197,10 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
   import PayPalSmartButton from '@gigasource/payment-provider/src/PayPal/frontend/PayPalSmartButton';
-  // import AdyenCheckout from './AdyenCheckout';
 
   export default {
     name: 'OrderTable',
-    components: { /*AdyenCheckout,*/ DialogOrderConfirm, OrderCreated, PayPalSmartButton },
+    components: { DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,
