@@ -200,7 +200,7 @@
 
   export default {
     name: 'OrderTable',
-    components: { DialogOrderConfirm, OrderCreated, PayPalSmartButton },
+    components: {DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -597,9 +597,6 @@
       },
       isPaymentViaPayPalEnable() {
         return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
-      },
-      isPaymentViaAdyenEnable() {
-        return this.store.paymentProviders && this.store.paymentProviders.adyen && this.store.paymentProviders.adyen.enable
       }
     },
     watch: {

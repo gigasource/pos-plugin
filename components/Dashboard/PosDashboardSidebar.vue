@@ -91,7 +91,6 @@
         node.onClick && node.onClick.bind(this)();
       },
       onNodeSelected(node) {
-        console.log(node)
         this.selectedNode = node;
         node.onClick && node.onClick.bind(this)();
       }

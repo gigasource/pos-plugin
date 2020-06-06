@@ -9,17 +9,15 @@
   
     <!-- Transactions -->
     <paypal-transactions :store="store" :start-date="startDate" :end-date="endDate"/>
-    <adyen-transactions :store="store" :start-date="startDate" :end-date="endDate"/>
   </div>
 </template>
 <script>
   import DateRangePicker from '../dateRangePicker';
   import PaypalTransactions from './paypal/Transactions';
-  import AdyenTransactions from './adyen/Transactions';
 
   export default {
     name: 'PaymentProvidersTransaction',
-    components: { AdyenTransactions, PaypalTransactions, DateRangePicker },
+    components: { PaypalTransactions, DateRangePicker },
     props: {
       store: Object,
     },

@@ -212,12 +212,10 @@ module.exports = function (cms) {
               store.paymentProviders.paypal.clientId,
               store.paymentProviders.paypal.secretToken)
 
-          const captureResult = await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
-          console.log(captureResult)
+          await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
         }
       } else {
         updateOrderStatus(onlineOrderId, orderStatus)
-        console.debug(`backend emitted order status to frontend for order ${onlineOrderId}`)
       }
     })
 

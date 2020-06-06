@@ -65,7 +65,7 @@
   
   export default {
     name: 'SettingView',
-    components: { PaymentProviders, PaymentProvidersTransaction, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: {Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
     data: function () {
       return {
         sidebarItems: [

@@ -182,7 +182,6 @@
         categories: null,
         products: null,
         weekday: weekday,
-
         today: dayjs().format("dddd"),
         now: dayjs().format('HH:mm'),
         dialog: {
