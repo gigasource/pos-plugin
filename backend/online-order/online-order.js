@@ -234,10 +234,10 @@ module.exports = async cms => {
       try {
         const posSetting = await cms.getModel('PosSetting').findOne()
         const { onlineDevice: {store: {name, alias}} } = posSetting
-        console.log(name);
+
         await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
           downlink: uploadPath,
-          store: (name ? name : 'ABC')
+          store: (name ? name : '')
         })
       } catch (e) {
         console.error('Update app error or this is not an android device');
