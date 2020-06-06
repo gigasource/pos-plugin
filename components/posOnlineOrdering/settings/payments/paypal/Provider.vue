@@ -25,7 +25,6 @@
         <p>{{$t('paymentProviders.paypal.note')}}</p>
         <ul>
           <li>{{$t('paymentProviders.paypal.noteContent1')}}</li>
-          <li>{{$t('paymentProviders.paypal.noteContent2')}}</li>
         </ul>
       </section>
       

@@ -372,8 +372,7 @@ module.exports = {
         balance: 'Balance: ',
         calculating: 'Calculating...',
         note: 'Note:',
-        noteContent1: 'Your pending balance is automatically transfered to your bank account on the first day of the following month.',
-        noteContent2: 'Addition fee will be added for each transaction.',
+        noteContent1: 'Addition fee will be added for each transaction.',
         lastUpdate: 'Last update: ',
         transactionHistoryNotice: 'It takes a maximum of three hours for executed transactions to be added into balance.'
       },
