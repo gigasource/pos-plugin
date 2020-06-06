@@ -33,6 +33,8 @@
         android:hardwareAccelerated="false"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
+        <meta-data android:name="io.sentry.dsn" android:value="https://28b4f1f486bf4df98c79cf061f25bc02@sentry.gigasource.io/7"/>
+        <meta-data android:name="io.sentry.debug" android:value="true"/>
         <provider
             android:authorities="io.gigasource.pos.fileProvider"
             android:name="androidx.core.content.FileProvider"
