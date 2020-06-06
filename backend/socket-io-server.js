@@ -208,11 +208,15 @@ module.exports = function (cms) {
             return;
           }
 
-          const ppClient = createPayPalClient(
-              store.paymentProviders.paypal.clientId,
-              store.paymentProviders.paypal.secretToken)
+          try {
+            const ppClient = createPayPalClient(
+                store.paymentProviders.paypal.clientId,
+                store.paymentProviders.paypal.secretToken)
 
-          await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
+            await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
+          } catch (e) {
+            console.log('updateOrderStatus->captureOrder', e)
+          }
         }
       } else {
         updateOrderStatus(onlineOrderId, orderStatus)
