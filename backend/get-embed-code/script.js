@@ -36,7 +36,7 @@
         // insert overlay
         var container = document.createElement('div')
         container.setAttribute('id', 'webshop-iframe-container')
-        container.setAttribute('style', 'position: fixed; z-index: 999; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
+        container.setAttribute('style', 'position: fixed; z-index: 1001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
         document.body.appendChild(container)
 
         //insert loading circular
