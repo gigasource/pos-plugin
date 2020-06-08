@@ -97,7 +97,15 @@ module.exports = function (cms) {
     if (socket.request._query && socket.request._query.clientId) {
       const clientId = socket.request._query.clientId;
       notifyDeviceStatusChanged(clientId);
-      socket.once('disconnect', () => notifyDeviceStatusChanged(clientId));
+      socket.once('disconnect', () => {
+        /*
+          if Redis adapter is used, clientId removal on Redis server is delayed for 3 seconds to avoid bug
+          (this behavior is in @gigasource/socket.io-p2p-plugin package, check redis.js file),
+          therefore notifyDeviceStatusChanged is delayed for 5 seconds
+        */
+        if (global.APP_CONFIG.redis) setTimeout(() => notifyDeviceStatusChanged(clientId), 5000);
+        else notifyDeviceStatusChanged(clientId);
+      });
     }
 
     socket.on('getWebshopName', async (deviceId, callback) => {
