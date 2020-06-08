@@ -183,6 +183,12 @@ module.exports = async cms => {
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `[2] Order ${orderData.orderToken}: send ack fn`)
       ackFn();
     });
+
+    socket.on('createReservation', (reservationData, ackFn) => {
+      //todo save reservation logic
+
+    })
+
     socket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
         if (name === 'alwaysOn') {
