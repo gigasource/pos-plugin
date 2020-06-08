@@ -184,9 +184,15 @@ module.exports = async cms => {
       ackFn();
     });
 
-    socket.on('createReservation', (reservationData, ackFn) => {
-      //todo save reservation logic
+    socket.on('createReservation', async (reservationData, ackFn) => {
+      const { date, time } = reservationData
+      const [ hour, minute ] = time.split(':')
+      await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
+        date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate()
+      }))
+      cms.socket.emit('updateReservationList')
 
+      ackFn()
     })
 
     socket.on('updateAppFeature', async (data, callback) => {
