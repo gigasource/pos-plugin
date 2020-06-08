@@ -315,13 +315,6 @@ module.exports = function (cms) {
       externalSocketIOServer.emitTo(deviceId, 'stopRemoteControl', () => remoteControlDeviceId = null);
     });
 
-    socket.on('updateOrderTimeOut', async (storeId, orderTimeOut) => {
-      storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
-      if (!device) return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
-      externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateOrderTimeOut', orderTimeOut)
-    });
-
     socket.on('startStream', async (deviceId) => {
       if (!deviceId) return
       externalSocketIOServer.emitToPersistent(deviceId, 'startStream');

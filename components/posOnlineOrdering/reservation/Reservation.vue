@@ -105,7 +105,7 @@
         <div class="reservation-content__title mt-3 mb-1">Order Information</div>
         <div class="reservation-info--order">
           <p>{{dateLabel}}. {{timeLabel}}</p>
-          <p>{{peopleLabel}}. "{{customer.note}}"</p>
+          <p>{{peopleLabel}}. {{customer.note && `"${customer.note}"`}}</p>
         </div>
         <div class="reservation-content__title mt-3 mb-1">Customer Information</div>
         <div class="reservation-info--customer">
