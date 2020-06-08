@@ -15,6 +15,18 @@
       "type": "input@date"
     },
     {
+      "_id": "5edde3a7d8a7fe1cddba2ed5",
+      "schemaType": "string",
+      "key": "status",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "pending",
+        "declined",
+        "completed"
+      ]
+    },
+    {
       "_id": "5eddb6be21777a54b01e01b0",
       "schemaType": "object",
       "key": "customer",

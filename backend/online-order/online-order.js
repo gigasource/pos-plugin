@@ -188,7 +188,8 @@ module.exports = async cms => {
       const { date, time } = reservationData
       const [ hour, minute ] = time.split(':')
       await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
-        date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate()
+        date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
+        status: 'pending'
       }))
       cms.socket.emit('updateReservationList')
 
