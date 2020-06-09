@@ -158,7 +158,7 @@
           }
         }
 
-        while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute <= closeTimeMinute)) {
+        while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute < closeTimeMinute)) {
           time.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
           openTimeMinute += 30

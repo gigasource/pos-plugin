@@ -109,7 +109,7 @@
         let hours = [], start = 0, end = 24
         if(this.reservationSetting) {
           if(this.reservationSetting.openTime) start = +this.reservationSetting.openTime.split(':')[0]
-          if(this.reservationSetting.closeTime) end = +this.reservationSetting.closeTime.split(':')[0] + 1
+          if(this.reservationSetting.closeTime) end = +this.reservationSetting.closeTime.split(':')[0] + (this.reservationSetting.closeTime.split(':')[1] > 0 ? 1 : 0)
         }
         for(let i = start; i < end; i++) {
           const time = `${i < 10 ? '0'+i : i}h`

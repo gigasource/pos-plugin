@@ -957,6 +957,54 @@
       "schemaType": "string",
       "key": "customServerUrl",
       "type": "input"
+    },
+    {
+      "_id": "5edf3aa09c050511ef6620b6",
+      "schemaType": "object",
+      "key": "reservation",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "activeReservation",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "soundNotification",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "hideEmpty",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "number",
+          "key": "removeOverdueAfter",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "string",
+          "key": "openTime",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "closeTime",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "maxGuest",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "maxDay",
+          "type": "input@number"
+        }
+      ]
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",
