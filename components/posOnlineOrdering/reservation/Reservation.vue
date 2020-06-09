@@ -59,13 +59,11 @@
         <template v-if="step === 1 || step === 2">
           <div class="reservation-content__title">People</div>
           <div class="row-flex align-items-center" style="margin-left: -8px; margin-bottom: 32px">
-            <g-btn-bs width="36" height="36" border-color="#454F5B" :disabled="people === 0" rounded @click="decreasePeople">
-              <g-icon color="#454F5B" size="20">remove</g-icon>
-            </g-btn-bs>
-            <div class="reservation-content__people">{{people}}</div>
-            <g-btn-bs width="36" height="36" border-color="#454F5B" rounded @click="increasePeople">
-              <g-icon color="#454F5B" size="20">add</g-icon>
-            </g-btn-bs>
+            <g-btn-bs width="42" height="40" :background-color="people === 1 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(1)">1</g-btn-bs>
+            <g-btn-bs width="42" height="40" :background-color="people === 2 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(2)">2</g-btn-bs>
+            <g-btn-bs width="42" height="40" :background-color="people === 3 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(3)">3</g-btn-bs>
+            <g-btn-bs width="42" height="40" :background-color="people === 4 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(4)">4</g-btn-bs>
+            <g-select :class="['select-people', people === peopleSelected && peopleSelected !== 0 && 'selected']" :key="`people_${people}`" text-field-component="GTextFieldBs" v-model="peopleSelected" :items="peopleList" @input="choosePeople(peopleSelected, false)"/>
           </div>
           <div class="reservation-content__title">Date</div>
           <g-date-picker width="360" :min="today" no-title :disabled="people === 0" v-model="date" @input="chooseDate" :class="errorDate && 'error-picker'"/>
@@ -134,6 +132,8 @@
         mode: 'reservation',
         step: 1,
         people: 0,
+        peopleList: [{text: 'Select', value: 0}],
+        peopleSelected: 0,
         date: '',
         time: '',
         today: '',
@@ -168,6 +168,9 @@
       if(storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         if(store) this.store = store
+      }
+      for(let i = 5; i <= 40; i++) {
+        this.peopleList.push({text: i, value: i})
       }
     },
     computed: {
@@ -249,12 +252,13 @@
       changeStep(step) {
         this.step = step
       },
-      decreasePeople() {
-        this.people--
-      },
-      increasePeople() {
-        this.people++
-        this.changeStep(2)
+      choosePeople(number, updateSelect = true) {
+        this.people = number
+        if(updateSelect) this.peopleSelected = 0
+        if(number === 0)
+          this.changeStep(1)
+        else
+          this.changeStep(2)
       },
       chooseDate(date) {
         let err = true
@@ -526,10 +530,10 @@
       &__time {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        grid-auto-rows: 40px;
+        grid-auto-rows: 42px;
         grid-gap: 12px 20px;
         overflow: auto;
-        max-height: 335px;
+        max-height: 340px;
         scrollbar-width: none; // firefox
         -ms-overflow-style: none; //edge
 
@@ -592,6 +596,40 @@
 
           textarea {
             padding-left: 6px;
+          }
+        }
+      }
+
+      .select-people {
+        min-width: 110px;
+        margin-left: 8px;
+
+        ::v-deep {
+          .bs-tf-wrapper {
+            margin: 0;
+            background: #f5f5f5;
+            border-radius: 4px;
+
+            .bs-tf-input-group {
+              border-color: transparent !important;
+
+              .bs-tf-inner-input-group {
+                height: 40px;
+              }
+            }
+          }
+        }
+
+        &.selected {
+          ::v-deep {
+            .bs-tf-wrapper {
+              background: #1271FF;
+
+              .bs-tf-append-inner .g-icon,
+              .input {
+                color: white;
+              }
+            }
           }
         }
       }
