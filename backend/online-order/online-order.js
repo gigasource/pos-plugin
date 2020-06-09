@@ -139,7 +139,7 @@ module.exports = async cms => {
 
       let {
         orderType: type, paymentType, customer, products: items,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
       } = orderData
 
       const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
@@ -182,6 +182,7 @@ module.exports = async cms => {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
+        paypalOrderDetail
       }
 
       const result = await cms.getModel('Order').create(order)
@@ -467,14 +468,13 @@ module.exports = async cms => {
       callback();
     });
 
-    socket.on('updateOrderStatus', async (orderToken, orderStatus, extraInfo) => {
+    socket.on('updateOrderStatus', async (orderStatus) => {
       const posSetting = await cms.getModel('PosSetting').findOne()
-      const {onlineDevice: {store: {name, alias}}} = posSetting
-
-      onlineOrderSocket.emit('updateOrderStatus', orderToken, orderStatus, extraInfo, name, alias)
-
-      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderToken}`,
-          `[3] Order ${orderToken}: emit status: ${orderStatus}; message: ${extraInfo}`)
+      const { onlineDevice: {store: {name, alias}} } = posSetting
+      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias})
+      const { onlineOrderId, status, responseMessage } = orderStatus
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId}`,
+          `[3] Order ${onlineOrderId}: emit status:${status}; message:${responseMessage}`)
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {
