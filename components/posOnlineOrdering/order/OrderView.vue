@@ -111,7 +111,7 @@
         </div>
         <div class="pos-order__right">
           <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening" :merchant-message="merchantMessage"
-                       @confirm-view="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
+                       @disable-menu="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
 
         <!-- Merchant dialog -->
