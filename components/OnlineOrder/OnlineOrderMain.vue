@@ -212,7 +212,7 @@
       pendingOrders(val, oldVal) {
         if (val === oldVal) return
         this.internalOrders = val.map(order => Object.assign({}, order, {
-          deliveryTime: order.deliveryTime.toString(),
+          ...order.deliveryTime ? {deliveryTime: order.deliveryTime.toString()} : {},
           shippingFee: this.getShippingFee(order),
           payment: this.getPayment(order),
           confirmStep2: false,
