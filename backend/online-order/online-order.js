@@ -55,8 +55,9 @@ module.exports = async cms => {
       console.debug(getBaseSentryTags('socketConnection'), 'startSocketRecreateInterval');
 
       recreateOnlineOrderSocketInterval = setInterval(async () => {
-        console.debug(getBaseSentryTags('socketConnection'), 'recreateOnlineOrderSocket');
         const deviceId = await getDeviceId();
+        const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
+        console.debug(sentryTags, 'recreateOnlineOrderSocket');
 
         if (deviceId) await createOnlineOrderSocket(deviceId);
       }, RECREATE_INTERVAL);
@@ -65,7 +66,11 @@ module.exports = async cms => {
 
   function stopSocketRecreateInterval() {
     if (recreateOnlineOrderSocketInterval) {
-      console.debug(getBaseSentryTags('socketConnection'), 'stopSocketRecreateInterval');
+      getDeviceId().then(deviceId => {
+        const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
+        console.debug(sentryTags, 'stopSocketRecreateInterval');
+      });
+
       clearInterval(recreateOnlineOrderSocketInterval);
       recreateOnlineOrderSocketInterval = null;
     }
@@ -73,12 +78,13 @@ module.exports = async cms => {
 
   function createOnlineOrderListeners(socket, deviceId) {
     // event logs for debugging
-    console.debug(getBaseSentryTags('socketConnection'), 'Creating onlineOrderSocket');
-    socket.on('connect', () => console.debug(getBaseSentryTags('socketConnection'), 'onlineOrderSocket connected'));
-    socket.on('disconnect', () => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket disconnected`));
-    socket.on('reconnecting', numberOfAttempt => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
-    socket.on('reconnect', () => console.debug(getBaseSentryTags('socketConnection'), 'onlineOrderSocket reconnected'));
-    socket.on('reconnect_error', err => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket reconnect error: ` + err.stack));
+    const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
+    console.debug(sentryTags, 'Creating onlineOrderSocket');
+    socket.on('connect', () => console.debug(sentryTags, 'onlineOrderSocket connected'));
+    socket.on('disconnect', () => console.debug(sentryTags, `onlineOrderSocket disconnected`));
+    socket.on('reconnecting', numberOfAttempt => console.debug(sentryTags, `onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
+    socket.on('reconnect', () => console.debug(sentryTags, 'onlineOrderSocket reconnected'));
+    socket.on('reconnect_error', err => console.debug(sentryTags, `onlineOrderSocket reconnect error: ` + err.stack));
 
     // connection related logic
     socket.on('connect', async () => {
