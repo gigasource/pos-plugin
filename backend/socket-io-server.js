@@ -95,13 +95,16 @@ module.exports = function (cms) {
   });
 
   function notifyDeviceStatusChanged(clientId) {
-    internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus');
+    console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Backend notifies frontend to update online/offline status`);
+    internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus', clientId);
   }
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId) {
       const clientId = socket.request._query.clientId;
+      console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} connected`);
+
       notifyDeviceStatusChanged(clientId);
       socket.once('disconnect', () => {
         /*
@@ -109,6 +112,7 @@ module.exports = function (cms) {
           (this behavior is in @gigasource/socket.io-p2p-plugin package, check redis.js file),
           therefore notifyDeviceStatusChanged is delayed for 5 seconds
         */
+        console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} disconnected`);
         if (global.APP_CONFIG.redis) {
           setTimeout(() => notifyDeviceStatusChanged(clientId), 5000);
         } else {
