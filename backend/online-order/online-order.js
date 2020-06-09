@@ -263,11 +263,12 @@ module.exports = async cms => {
       if (typeof callback === 'function') callback();
     });
     socket.on('updateApp', async (uploadPath, type, ackFn) => {
-      console.log(`Updating ${uploadPath}`);
-      ackFn();
       try {
-        const posSetting = await cms.getModel('PosSetting').findOne()
-        const {onlineDevice: {store: {name, alias}}} = posSetting
+        const posSetting = await cms.getModel('PosSetting').findOne();
+        const {onlineDevice} = posSetting;
+        const {store: {name, alias}} = onlineDevice;
+
+        console.log(`sentry:clientId=${onlineDevice.id},eventType=updateApp`, `Updating ${uploadPath}`);
 
         await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
           downlink: uploadPath,
@@ -276,6 +277,8 @@ module.exports = async cms => {
       } catch (e) {
         console.error('Update app error or this is not an android device');
       }
+
+      ackFn();
     });
     socket.on('startStream', async (cb) => {
       try {
