@@ -25,23 +25,25 @@
           <div class="reservation-tab__content-row--hour">
             {{rih.time}}
           </div>
-          <div v-for="(reservation, i) in rih.reservations" :key="`${rih.time}_${i}`"
-               :class="['reservation-info', reservation.status === 'completed' && 'reservation-info--completed', reservation.status === 'pending' && 'reservation-info--pending']">
-            <div class="reservation-info__time">{{reservation.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}}</div>
-            <div class="reservation-info__customer">
-              <div class="reservation-info__customer--name">{{reservation.customer.name}}</div>
-              <div class="reservation-info__customer--phone">{{reservation.customer.phone}}</div>
-              <div v-if="reservation.note" class="reservation-info__customer--note">Note: {{reservation.note}}</div>
-            </div>
-            <div class="reservation-info__guest">
-              Guest: <span class="fw-700 fs-small">{{reservation.noOfGuests}}</span>
-            </div>
-            <div class="reservation-info__action">
-              <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">Arrived</g-btn-bs>
-              <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">Modify</g-btn-bs>
-              <g-btn-bs background-color="#E57373">
-                <g-icon>icon-delete</g-icon>
-              </g-btn-bs>
+          <div class="flex-grow-1">
+            <div v-for="(reservation, i) in rih.reservations" :key="`${rih.time}_${i}`"
+                 :class="['reservation-info', reservation.status === 'completed' && 'reservation-info--completed', reservation.status === 'pending' && 'reservation-info--pending']">
+              <div class="reservation-info__time">{{reservation.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}}</div>
+              <div class="reservation-info__customer">
+                <div class="reservation-info__customer--name">{{reservation.customer.name}}</div>
+                <div class="reservation-info__customer--phone">{{reservation.customer.phone}}</div>
+                <div v-if="reservation.note" class="reservation-info__customer--note">Note: {{reservation.note}}</div>
+              </div>
+              <div class="reservation-info__guest">
+                Guest: <span class="fw-700 fs-small">{{reservation.noOfGuests}}</span>
+              </div>
+              <div class="reservation-info__action">
+                <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">Arrived</g-btn-bs>
+                <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">Modify</g-btn-bs>
+                <g-btn-bs background-color="#E57373">
+                  <g-icon>icon-delete</g-icon>
+                </g-btn-bs>
+              </div>
             </div>
           </div>
         </div>
@@ -111,9 +113,9 @@
         }
         for(let i = start; i < end; i++) {
           const time = `${i < 10 ? '0'+i : i}h`
-          const hour = dayjs(this.date).hour(i).minute(0).toDate(), nextHour = dayjs(this.date).hour(i+1).minute(0).toDate()
-          const reservations = this.reservations.filter(r => r.date >= hour && r.date < nextHour)
-          hours.push({time, reservations})
+          const hour = dayjs(this.date).hour(i).minute(0).second(0).format('DD/MM/YYYY HH:mm:ss'), nextHour = dayjs(this.date).hour(i+1).minute(0).second(0).format('DD/MM/YYYY HH:mm:ss')
+          const reservations = this.reservations.filter(r => dayjs(r.date).format('DD/MM/YYYY HH:mm:ss') >= hour && dayjs(r.date).format('DD/MM/YYYY HH:mm:ss') < nextHour)
+          hours.push({time,reservations: _.sortBy(reservations, r => r.date)})
         }
         return hours
       }
@@ -262,7 +264,6 @@
    &-info {
      display: flex;
      color: #424242;
-     flex-grow: 1;
 
      &__time,
      &__guest {
@@ -304,10 +305,18 @@
 
      &--completed {
        background: #FFECB3;
+
+       &:not(:last-child) {
+         border-bottom: 1px solid #E6D39A;
+       }
      }
 
      &--pending {
        background: #E0E0E0;
+
+       &:not(:last-child) {
+         border-bottom: 1px solid #C7C7C7;
+       }
      }
    }
  }
