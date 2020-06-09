@@ -272,7 +272,8 @@ module.exports = async cms => {
 
         await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
           downlink: uploadPath,
-          store: (name ? name : '')
+          store: (name ? name : ''),
+          clientID: onlineDevice.id
         })
       } catch (e) {
         console.error('Update app error or this is not an android device');
