@@ -601,7 +601,7 @@
     },
     watch: {
       confirmView(val) {
-        this.$emit('confirm-view', val || this.view === 'payment')
+        this.$emit('disable-menu', val)
         const wrapper = document.getElementById('table-content')
         wrapper && wrapper.scroll({top: 0})
         if(!val) {
@@ -609,6 +609,9 @@
             autoResizeTextarea('.po-order-table__item__note textarea')
           })
         }
+      },
+      paymentView(val) {
+        this.$emit('disable-menu', val)
       },
       satisfyDeliveryTime(val) {
         if(val)
