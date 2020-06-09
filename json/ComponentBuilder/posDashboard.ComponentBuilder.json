@@ -320,6 +320,20 @@
               "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderServices.vue",
               "path": "components/OnlineOrder/OnlineOrderServices.vue",
               "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "ReservationsList",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "Reservation",
+              "url": "plugins/pos-plugin/components/Reservation/ReservationsList.vue",
+              "path": "components/Reservation/ReservationsList.vue",
+              "pluginName": "pos-plugin",
+              "content": {
+                "props": {},
+                "events": {}
+              }
             }
           ]
         }

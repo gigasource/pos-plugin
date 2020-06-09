@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="row-flex justify-end align-items-center" style="flex: 0 0 auto">
-                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2">{{order.deliveryTime}}</span>
+                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">{{order.deliveryTime}}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
                   <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
@@ -212,7 +212,7 @@
       pendingOrders(val, oldVal) {
         if (val === oldVal) return
         this.internalOrders = val.map(order => Object.assign({}, order, {
-          deliveryTime: order.deliveryTime.toString().toUpperCase(),
+          deliveryTime: order.deliveryTime.toString(),
           shippingFee: this.getShippingFee(order),
           payment: this.getPayment(order),
           confirmStep2: false,

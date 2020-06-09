@@ -1,0 +1,65 @@
+{
+  "_id": "5eddb64321777a54b01e01ac",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5eddb6be21777a54b01e01ae",
+      "schemaType": "number",
+      "key": "noOfGuests",
+      "type": "input@number"
+    },
+    {
+      "_id": "5eddb6be21777a54b01e01af",
+      "schemaType": "date",
+      "key": "date",
+      "type": "input@date"
+    },
+    {
+      "_id": "5edde3a7d8a7fe1cddba2ed5",
+      "schemaType": "string",
+      "key": "status",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "pending",
+        "declined",
+        "completed"
+      ]
+    },
+    {
+      "_id": "5eddb6be21777a54b01e01b0",
+      "schemaType": "object",
+      "key": "customer",
+      "type": "object",
+      "addable": true,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "email",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "phone",
+          "type": "input"
+        }
+      ]
+    },
+    {
+      "_id": "5eddb6be21777a54b01e01b1",
+      "schemaType": "string",
+      "key": "note",
+      "type": "input",
+      "addable": true
+    }
+  ],
+  "tabs": [],
+  "alwaysLoad": true,
+  "name": "Reservation",
+  "type": "Collection"
+}

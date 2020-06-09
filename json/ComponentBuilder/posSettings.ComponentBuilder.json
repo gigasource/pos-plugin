@@ -534,6 +534,20 @@
                   "type": "prop"
                 }
               ]
+            },
+            {
+              "choice": "view",
+              "component": "ReservationSettings",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "reservation",
+              "content": {
+                "props": {},
+                "events": {}
+              },
+              "url": "plugins/pos-plugin/components/Reservation/ReservationSettings.vue",
+              "path": "components/Reservation/ReservationSettings.vue",
+              "pluginName": "pos-plugin"
             }
           ],
           "inject": [

@@ -6,8 +6,11 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 
-let customWebshopUrl
-let {webshopUrl, port: backendPort} = global.APP_CONFIG;
+let webshopUrl;
+let storeName;
+let storeAlias;
+
+let {webshopUrl: webshopUrlFromConfig, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
@@ -21,9 +24,21 @@ let initFinished = false;
 module.exports = async cms => {
   async function getWebShopUrl() {
     const posSetting = await cms.getModel('PosSetting').findOne()
-    customWebshopUrl = posSetting.customServerUrl
-    if (customWebshopUrl) return customWebshopUrl
+
+    if (posSetting.onlineDevice && posSetting.onlineDevice.store) {
+      const {onlineDevice: {store: {name, alias}}} = posSetting;
+      storeName = name;
+      storeAlias = alias;
+    }
+
+    webshopUrl = posSetting.customServerUrl ? posSetting.customServerUrl : webshopUrlFromConfig;
     return webshopUrl
+  }
+
+  function getBaseSentryTags(eventType) {
+    const appVersion = require('../../package').version;
+    const {deviceName} = global.APP_CONFIG;
+    return `sentry:webshopUrl=${webshopUrl},store=${storeName},alias=${storeAlias},version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
   }
 
   async function updateAlwaysOn(enabled) {
@@ -37,7 +52,7 @@ module.exports = async cms => {
 
   function startSocketRecreateInterval() {
     if (!recreateOnlineOrderSocketInterval) {
-      console.debug('startSocketRecreateInterval');
+      console.debug(getBaseSentryTags('socketConnection'), 'startSocketRecreateInterval');
 
       recreateOnlineOrderSocketInterval = setInterval(async () => {
         console.debug('recreateOnlineOrderSocket');
@@ -50,7 +65,7 @@ module.exports = async cms => {
 
   function stopSocketRecreateInterval() {
     if (recreateOnlineOrderSocketInterval) {
-      console.debug('stopSocketRecreateInterval');
+      console.debug(getBaseSentryTags('socketConnection'), 'stopSocketRecreateInterval');
       clearInterval(recreateOnlineOrderSocketInterval);
       recreateOnlineOrderSocketInterval = null;
     }
@@ -58,15 +73,12 @@ module.exports = async cms => {
 
   function createOnlineOrderListeners(socket, deviceId) {
     // event logs for debugging
-    console.debug('Creating onlineOrderSocket');
-    socket.on('connect', () => console.debug('onlineOrderSocket connected'));
-    socket.on('disconnect', () => console.debug(`onlineOrderSocket disconnected`));
-    socket.on('reconnecting', numberOfAttempt => console.debug(`onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
-    socket.on('reconnect', () => console.debug('onlineOrderSocket reconnected'));
-    socket.on('reconnect_error', err => {
-      console.debug(`onlineOrderSocket reconnect error:`);
-      console.debug(err);
-    });
+    console.debug(getBaseSentryTags('socketConnection'), 'Creating onlineOrderSocket');
+    socket.on('connect', () => console.debug(getBaseSentryTags('socketConnection'), 'onlineOrderSocket connected'));
+    socket.on('disconnect', () => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket disconnected`));
+    socket.on('reconnecting', numberOfAttempt => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
+    socket.on('reconnect', () => console.debug(getBaseSentryTags('socketConnection'), 'onlineOrderSocket reconnected'));
+    socket.on('reconnect_error', err => console.debug(getBaseSentryTags('socketConnection'), `onlineOrderSocket reconnect error: ` + err.stack));
 
     // connection related logic
     socket.on('connect', async () => {
@@ -74,7 +86,9 @@ module.exports = async cms => {
 
       webShopConnected = true
       cms.socket.emit('webShopConnected');
-      console.debug(`sentry:onConnect=${cms.utils.getShouldUpdateApp()}`, '')
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const {onlineDevice: {store: {name, alias}}} = posSetting
+      console.debug(`sentry:onConnect=true,store=${name}`, `Value of shouldUpdate: ${cms.utils.getShouldUpdateApp()}`)
       if (cms.utils.getShouldUpdateApp()) socket.emit('updateVersion', require('../../package').version, deviceId);
     });
 
@@ -119,8 +133,9 @@ module.exports = async cms => {
       if (!orderData) return
 
       const posSetting = await cms.getModel('PosSetting').findOne()
-      const { onlineDevice: {store: {name, alias}} } = posSetting
-      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `[1] Order ${orderData.orderToken}: received order`)
+      const {onlineDevice: {store: {name, alias}}} = posSetting
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken}`,
+          `[1] Order ${orderData.orderToken}: received order`)
 
       let {
         orderType: type, paymentType, customer, products: items,
@@ -179,9 +194,23 @@ module.exports = async cms => {
         })
       }
 
-      console.debug(`sentry:orderToken=${orderData.orderToken},store=${name},alias=${alias}`, `[2] Order ${orderData.orderToken}: send ack fn`)
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken}`,
+          `[2] Order ${orderData.orderToken}: send ack fn`)
       ackFn();
     });
+
+    socket.on('createReservation', async (reservationData, ackFn) => {
+      const {date, time} = reservationData
+      const [hour, minute] = time.split(':')
+      await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
+        date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
+        status: 'pending'
+      }))
+      cms.socket.emit('updateReservationList')
+
+      ackFn()
+    })
+
     socket.on('updateAppFeature', async (data, callback) => {
       await Promise.all(_.map(data, async (enabled, name) => {
         if (name === 'alwaysOn') {
@@ -231,8 +260,12 @@ module.exports = async cms => {
       console.log(`Updating ${uploadPath}`);
       ackFn();
       try {
+        const posSetting = await cms.getModel('PosSetting').findOne()
+        const {onlineDevice: {store: {name, alias}}} = posSetting
+
         await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
-          downlink: uploadPath
+          downlink: uploadPath,
+          store: (name ? name : '')
         })
       } catch (e) {
         console.error('Update app error or this is not an android device');
@@ -369,12 +402,15 @@ module.exports = async cms => {
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
       onlineOrderSocket.emit('getWebshopName', deviceId, async ({settingName, name, alias}) => {
+        storeName = name;
+        storeAlias = alias;
+
         const posSettings = await cms.getModel('PosSetting').findOne({});
         if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias};
         await cms.getModel('PosSetting').updateOne({}, posSettings);
 
         callback(settingName);
-      }) ;
+      });
     });
 
     socket.on('getWebshopId', async callback => {
@@ -437,7 +473,8 @@ module.exports = async cms => {
       const { onlineDevice: {store: {name, alias}} } = posSetting
       onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias})
       const { onlineOrderId, status, responseMessage } = orderStatus
-      console.debug(`sentry:orderToken=${onlineOrderId},store=${name},alias=${alias}`, `[3] Order ${onlineOrderId}: emit status:${status}; message:${responseMessage}`)
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId}`,
+          `[3] Order ${onlineOrderId}: emit status:${status}; message:${responseMessage}`)
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {
