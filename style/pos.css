@@ -558,6 +558,13 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-cross-red {
+  background-image: url("../assets/cross-red.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-reservation_make {
   background-image: url("../assets/reservation_make.svg");
   background-repeat: no-repeat;

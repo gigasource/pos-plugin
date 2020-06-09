@@ -139,6 +139,7 @@
               })
             },
             title: 'Reservation',
+            feature: 'reservation'
           }
         ],
       }

@@ -95,7 +95,7 @@
                 Confirm
               </g-btn-bs>
               <g-btn-bs v-else height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
-                <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" class="mr-2"/>
+                <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" style="height: 16px" class="mr-2"/>
                 <span v-else class="mr-2">{{order.payment.type}}</span>
                 <span>{{$t('common.currency')}}{{order.payment.value | formatMoney(decimals)}}</span>
               </g-btn-bs>
