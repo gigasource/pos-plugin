@@ -55,7 +55,7 @@ module.exports = async cms => {
       console.debug(getBaseSentryTags('socketConnection'), 'startSocketRecreateInterval');
 
       recreateOnlineOrderSocketInterval = setInterval(async () => {
-        console.debug('recreateOnlineOrderSocket');
+        console.debug(getBaseSentryTags('socketConnection'), 'recreateOnlineOrderSocket');
         const deviceId = await getDeviceId();
 
         if (deviceId) await createOnlineOrderSocket(deviceId);
@@ -132,15 +132,15 @@ module.exports = async cms => {
     socket.on('createOrder', async (orderData, serverDateTime, ackFn) => {
       if (!orderData) return
 
-      const posSetting = await cms.getModel('PosSetting').findOne()
-      const {onlineDevice: {store: {name, alias}}} = posSetting
-      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken}`,
-          `[1] Order ${orderData.orderToken}: received order`)
+      const newOrderId = await getLatestOrderId()
 
       let {
         orderType: type, paymentType, customer, products: items,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
       } = orderData
+
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`,
+          `3. Restaurant backend: Order id ${newOrderId}: received order from online-order`, JSON.stringify(items));
 
       const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
 
@@ -160,7 +160,7 @@ module.exports = async cms => {
       }))
 
       const order = {
-        id: await getLatestOrderId(),
+        id: newOrderId,
         status: 'inProgress',
         items: formatOrderItems(items),
         customer,
@@ -186,16 +186,16 @@ module.exports = async cms => {
       }
 
       const result = await cms.getModel('Order').create(order)
-      cms.socket.emit('updateOnlineOrders')
+      cms.socket.emit('updateOnlineOrders', getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`)
 
       if (timeoutDate) {
         await scheduleDeclineOrder(timeoutDate, result._id, () => {
-          cms.socket.emit('updateOnlineOrders')
+          cms.socket.emit('updateOnlineOrders', getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`)
         })
       }
 
-      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken}`,
-          `[2] Order ${orderData.orderToken}: send ack fn`)
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`,
+          `4. Restaurant backend: Order id ${newOrderId}: send ack fn to online-order`)
       ackFn();
     });
 
@@ -460,9 +460,10 @@ module.exports = async cms => {
       const posSetting = await cms.getModel('PosSetting').findOne()
       const { onlineDevice: {store: {name, alias}} } = posSetting
       onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias})
-      const { onlineOrderId, status, responseMessage } = orderStatus
-      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId}`,
-          `[3] Order ${onlineOrderId}: emit status:${status}; message:${responseMessage}`)
+      const { orderId, onlineOrderId, status, responseMessage } = orderStatus
+
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
+          `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {

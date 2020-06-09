@@ -541,11 +541,14 @@
           }))
         await this.updateOnlineOrders()
         const orderStatus = {
+          orderId: updatedOrder.id,
           onlineOrderId: updatedOrder.onlineOrderId,
           status: status,
           responseMessage: order.declineReason,
           paypalOrderDetail: order.paypalOrderDetail
         };
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+            `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
@@ -572,11 +575,15 @@
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
           const orderStatus = {
+            orderId: updatedOrder.id,
             onlineOrderId: updatedOrder.onlineOrderId,
             status: status,
             responseMessage: acceptResponse,
             paypalOrderDetail: order.paypalOrderDetail
           }
+
+          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+              `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           window.cms.socket.emit('updateOrderStatus', orderStatus)
         } catch (e) {
           console.error(e)
@@ -591,10 +598,14 @@
             }))
         await this.updateOnlineOrders()
         const orderStatus = {
+          orderId: updatedOrder.id,
           onlineOrderId: updatedOrder.onlineOrderId,
           status,
           paypalOrderDetail: order.paypalOrderDetail
         }
+
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+            `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async getOnlineOrdersWithStatus(status) {
@@ -666,7 +677,8 @@
       await this.updateOnlineOrders()
 
       // add online orders: cms.socket.emit('added-online-order')
-      cms.socket.on('updateOnlineOrders', async () => {
+      cms.socket.on('updateOnlineOrders', async sentryTagString => {
+        console.debug(sentryTagString, '7. Restaurant frontend: received updateOnlineOrders signal')
         await this.updateOnlineOrders()
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
