@@ -70,7 +70,7 @@
               <div class="section-form">
                 <g-text-field v-model="customer.name" :label="$t('store.name')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-person@16"/>
                 <g-text-field v-model="customer.company" :label="$t('store.company')" clearable clear-icon="icon-cancel@16" prepend-icon="icon-company@16"/>
-                <g-text-field type="number" v-model="customer.phone" :label="$t('store.telephone')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-phone2@16"/>
+                <g-text-field :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" :label="$t('store.telephone')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-phone2@16"/>
                 <template v-if="orderType === 'pickup'">
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.pickupTime')" required/>
                 </template>
@@ -403,6 +403,11 @@
       },
       unavailableConfirm() {
         const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
+        for (const fn of this.validatePhone) {
+          if (typeof fn === 'function' && typeof fn(this.customer.phone) === 'string') {
+            return true
+          }
+        }
         if (this.orderType === 'delivery') {
           if (!this.satisfyMinimumValue) return true
           for (const fn of this.validateZipcode) {
@@ -420,6 +425,13 @@
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
+        }
+        return rules
+      },
+      validatePhone() {
+        const rules = []
+        if(this.store.country && this.store.country.locale === 'de-DE') {
+          rules.push(val => (val.startsWith('0') && val.length === 11) || (val.startsWith('49') && val.length === 12) || 'Invalid phone number!')
         }
         return rules
       },
