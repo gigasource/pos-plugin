@@ -83,7 +83,7 @@
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
             </template>
-            
+
             <!-- Payment view -->
             <template v-if="paymentView">
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
@@ -310,7 +310,10 @@
 
       cms.socket.on('updateOrderStatus', (orderStatus) => {
         const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
-        console.debug(`frontend received status for order ${onlineOrderId}`)
+
+        console.debug(`sentry:orderToken=${onlineOrderId},store=${this.store.name},alias=${this.store.alias}`,
+            `${status === 'inProgress' ? '6' : '11'}. Online order frontend: received status: ${status}`);
+
         if (onlineOrderId === this.dialog.order.orderToken) {
           this.dialog.value = true
           this.dialog.loading = false
@@ -682,7 +685,7 @@
         this.paymentType = 'cash'
         this.dialog.confirm = true
       },
-      
+
       async confirmPayment() {
         if (this.unavailableConfirm || this.confirming) return
 
@@ -737,6 +740,8 @@
           Object.assign(orderData, {printers: [this.store.printers[0]]})
         }
 
+        console.debug(`sentry:orderToken=${orderToken},store=${this.store.name},alias=${this.store.alias}`,
+            `1. Online order frontend: send order to backend`, JSON.stringify(products));
         window.cms.socket.emit('createOrder', this.store._id, orderData)
 
         this.dialog.order = {
@@ -1167,12 +1172,12 @@
     margin-bottom: 15px;
     max-width: 750px;
     cursor: pointer;
-    
+
     &:hover {
       filter: brightness(85%);
     }
   }
-  
+
   @media screen and (max-width: 1139px) {
     .po-order-table {
       background: #FFF;

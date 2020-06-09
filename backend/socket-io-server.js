@@ -86,7 +86,7 @@ module.exports = function (cms) {
 
   externalSocketIOServer.registerAckFunction('createOrderAck', (orderToken, storeName, storeAlias, deviceId) => {
     console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId}`,
-        `Order ${orderToken}: received ack from device, status = inProgress`);
+        `5. Online order backend: received ack from device, status = inProgress`);
     if (sendOrderTimeouts[orderToken]) {
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
@@ -207,7 +207,7 @@ module.exports = function (cms) {
       socket.on('updateOrderStatus', async (orderStatus) => {
         const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId}`,
-            `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
+            `10. Online order backend: received order status from restaurant, status = ${status}`);
 
         if (status === 'completed') {
           if (paypalOrderDetail) {
@@ -292,7 +292,7 @@ module.exports = function (cms) {
       Object.assign(orderData, { storeName, storeAlias });
 
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId}`,
-          `Order ${orderData.orderToken}: send to device`);
+          `2. Online order backend: received order from frontend, send to device`);
 
       socket.join(orderData.orderToken);
 
