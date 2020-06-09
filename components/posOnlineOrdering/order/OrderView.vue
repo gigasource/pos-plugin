@@ -27,7 +27,7 @@
                         <div class="mr-2">{{day.wdayString}}</div>
                         <div class="ta-right">{{day.open}} - {{day.close}}</div>
                       </div>
-                      <template  v-if="deliveryInfo && deliveryInfo.length > 0">
+                      <template v-if="deliveryInfo && deliveryInfo.length > 0">
                         <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
                         <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
                           <div class="mr-2">{{info.title}}</div>
@@ -378,6 +378,7 @@
       },
       deliveryInfo() {
         let info = []
+        if (!this.store.delivery) return [{title: 'Not Available'}]
         if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
           info.push({
             title: $t('store.minimumOrder'),
