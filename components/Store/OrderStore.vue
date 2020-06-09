@@ -625,6 +625,22 @@
         } catch (e) {
           this.bell.addEventListener('canplaythrough', () => this.bell.play())
         }
+      },
+      async createReservation(reservation) {
+        await cms.getModel('Reservation').create(reservation)
+      },
+      async getReservations(date, status) {
+        let reservations
+        const dateTo = dayjs(date).hour(0).minute(0).second(0).add(1, 'day').toDate(),
+            dateFrom = dayjs(date).hour(0).minute(0).second(0).toDate()
+        if(status === 'all')
+          reservations = await cms.getModel('Reservation').find({status: {$in: ['pending', 'completed']},date: {$gte: dateFrom, $lte: dateTo}})
+        else
+          reservations = await cms.getModel('Reservation').find({status, date: {$gte: dateFrom, $lte: dateTo}})
+        return reservations
+      },
+      async updateReservation(_id, change) {
+        await cms.getModel('Reservation').findOneAndUpdate({_id}, change)
       }
     },
     async created() {

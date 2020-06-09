@@ -5,16 +5,15 @@
         <template v-for="(item, index) in computedList">
           <slot name="item">
             <div class="scroll-select__container--item" :key="index" :id="item"
-                 :style="{height: computedItemHeight}"
-            >
-              <span>{{item}}</span>
+                 :style="{height: computedItemHeight, color: value === item ? 'white' : '#1d1d26', fontWeight: value === item ? '700' : '400'}">
+              {{item}}
             </div>
           </slot>
         </template>
       </div>
     </div>
     <div class="selected" :style="{height: computedHeight}">
-      <div ref="selected" class="selected--item" :style="{height: computedItemHeight, background: selectedColor}"/>
+      <div ref="selected" class="selected--item" :style="{height: computedItemHeight, top: computedTop, background: selectedColor}"/>
     </div>
   </div>
 </template>
@@ -50,12 +49,14 @@
       },
       computedHeight() {
         return isNaN(+this.height) ? 0 : `${this.height}px`
-      }
+      },
+      computedTop() {
+        return isNaN(+this.itemHeight) ? 0 : `calc(50% - ${this.itemHeight/2}px)`
+      },
     },
     mounted() {
       this.$nextTick(() => {
-        const index = this.items.indexOf(this.value)
-        this.$refs.container.scrollTop = this.itemHeight * index
+        this.scrollToValue()
       })
     },
     methods: {
@@ -63,7 +64,13 @@
         const precision = ('' + this.itemHeight).length - 1
         const index = _.round(event.target.scrollTop / this.itemHeight, precision)
         this.$emit('input', this.items[index])
-      }, 100)
+      }, 100),
+      scrollToValue() {
+        const index = this.items.indexOf(this.value)
+        setTimeout(() => {
+          this.$refs.container.scrollTop = this.itemHeight * index
+        }, 100)
+      }
     }
   }
 </script>
@@ -76,6 +83,9 @@
     scroll-snap-type: y mandatory;
     transform: translateZ(0px);
 
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     &__container {
       position: relative;
@@ -85,6 +95,9 @@
         list-style: none;
         scroll-snap-align: start;
         text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         span {
           vertical-align: middle;
@@ -106,9 +119,9 @@
 
     &--item {
       position: absolute;
-      top: calc(50% - 51px);
       width: 100%;
       z-index: 9;
+      color: white;
     }
   }
 </style>

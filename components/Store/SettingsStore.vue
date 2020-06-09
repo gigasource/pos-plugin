@@ -24,6 +24,7 @@
               { title: sidebar.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo' },
               { title: sidebar.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment' },
               { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax' },
+              { title: 'Reservation', icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'reservation' },
             ]
           },
           { title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings' }
@@ -85,7 +86,9 @@
         onlineDevice: null,
         defaultPrepareTime: null,
         onlineOrderSorting: null,
-        webshopName: ''
+        webshopName: '',
+        //reservation
+        reservationSetting: null,
       }
     },
     async created() {
@@ -901,6 +904,16 @@
         } catch (e) {
           console.warn(e)
         }
+      },
+      //reservation setting
+      async getReservationSetting() {
+        const posSetting = await this.getPosSetting()
+        if(posSetting) {
+          this.reservationSetting = posSetting.reservation || {}
+        }
+      },
+      async updateReservationSetting() {
+        await cms.getModel('PosSetting').findOneAndUpdate({}, {reservation: this.reservationSetting})
       }
     },
     provide() {

@@ -129,6 +129,16 @@
             title: 'Services',
             feature: 'onlineOrdering',
             key: 'Service'
+          },
+          {
+            icon: 'icon-reservation',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Reservation',
+                params: ''
+              })
+            },
+            title: 'Reservation',
           }
         ],
       }
