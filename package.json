@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,9 +17,12 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
+    "@gigasource/payment-provider": "github:gigasource/payment-provider",
+    "@paypal/checkout-server-sdk": "^1.0.2",
     "clone-buffer": "^1.0.0",
     "cropperjs": "^1.5.6",
     "dayjs": "^1.8.17",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "geolib": "^3.3.1",
     "node-thermal-printer": "^1.0.3",

@@ -359,6 +359,36 @@
       "key": "displayImage",
       "type": "input@switch",
       "default": true
+    },
+    {
+      "_id": "5eccfab2fa747314f6e8daa6",
+      "schemaType": "object",
+      "key": "paymentProviders",
+      "fields": [
+        {
+          "schemaType": "object",
+          "key": "paypal",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "enable",
+              "type": "input@switch"
+            },
+            {
+              "schemaType": "string",
+              "key": "clientId",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "secretToken",
+              "type": "input"
+            }
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
     }
   ],
   "name": "Store",

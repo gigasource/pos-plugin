@@ -38,6 +38,14 @@
         <multiple-printer v-if="view === 'setting-multiple-printer'" :store="store" @update="updateStore"/>
         <discount v-if="view === 'setting-discount'" :list-discount="listDiscount"
                   @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount" @updateDiscount="updateDiscount"/>
+        <payment-providers
+            v-if="view === 'payment-provider'"
+            :store="store"
+            @deactive="deactivePaymentProvider($event)"
+            @active="(name, metaData) => activePaymentProvider(name, metaData)"/>
+        <payment-providers-transaction
+            v-if="view === 'transaction'"
+            :store="store"/>
       </div>
     </template>
   </div>
@@ -50,9 +58,14 @@
   import DeliveryFee from "./DeliveryFee";
   import MultiplePrinter from "./MultiplePrinter";
   import Discount from "./Discount";
+  import dayjs from 'dayjs';
+  // payments
+  import PaymentProviders from './payments/PaymentProviders';
+  import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
+  
   export default {
     name: 'SettingView',
-    components: {Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation},
+    components: {Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
     data: function () {
       return {
         sidebarItems: [
@@ -66,6 +79,14 @@
           {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+          cms.loginUser.user.role.name === "admin" && {
+            title: 'Payment Setting',
+            icon: 'icon-coupon',
+            onClick: () => this.changeView('payment-provider', 'Payment Setting'),
+            items: [
+              {title: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
+            ]
+          },
         ],
         sidebarItemsDevice: [
           {
@@ -166,8 +187,10 @@
           }
         }
         if (title) {
-          const item = this.computedSidebar.find(i => i.title === title)
-          this.$set(item, 'icon', item.icon+'_white')
+          let item = this.computedSidebar.find(i => i.title === title)
+          // TODO: Known-issue: 2nd level won't highlighted
+          if (item)
+            this.$set(item, 'icon', item.icon+'_white')
         }
       },
 
@@ -213,14 +236,12 @@
         await this.loadCategories()
         callback && callback(true)
       },
-
       async deleteCategory(_id) {
         await cms.getModel('Product').remove({ category: _id })
         await cms.getModel('Category').remove({_id: _id})
         await this.loadCategories()
         await this.loadProducts()
       },
-
       async swapCategory(oldId, swapId, oldIndex, newIndex) {
         const category = _.cloneDeep(this.categories[oldIndex])
         const swapCategory = _.cloneDeep(this.categories[newIndex])
@@ -298,6 +319,23 @@
           await cb()
         } catch (e) {
           console.error(e)
+        }
+      },
+      
+      // Payment Providers
+      async deactivePaymentProvider(name) {
+        await this.setPaymentProvider(name, false)
+      },
+      async activePaymentProvider(name, metadata) {
+        await this.setPaymentProvider(name, true, metadata)
+      },
+      async setPaymentProvider(name, value, metadata) {
+        const paymentProviders = this.store.paymentProviders || {};
+        switch (name) {
+          case 'paypal':
+            paymentProviders[name] = { enable: value, ...metadata }
+            await cms.getModel('Store').updateOne({ _id: this.store._id }, { paymentProviders })
+            break;
         }
       }
     }

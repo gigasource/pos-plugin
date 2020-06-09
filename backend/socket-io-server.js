@@ -1,10 +1,12 @@
-const {p2pServerPlugin} = require('@gigasource/socket.io-p2p-plugin');
+const { p2pServerPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const _ = require('lodash');
 const axios = require('axios');
 const redisAdapter = require('socket.io-redis');
 const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
+const ppApiv2 = require('./api/payment/paypal/payPalApiV2Adapter')
+const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/backend/createPayPalClient')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -36,26 +38,30 @@ function updateMessage(targetClientId, _id, update) {
 }
 
 async function saveMessage(targetClientId, message) {
-  const result = await SavedMessagesModel.create(Object.assign({targetClientId}, message));
+  const result = await SavedMessagesModel.create(Object.assign({ targetClientId }, message));
   return result._id;
 }
 
 function deleteMessage(targetClientId, _id) {
-  return SavedMessagesModel.deleteOne({_id}).exec();
+  return SavedMessagesModel.deleteOne({ _id }).exec();
 }
 
 function loadMessages(targetClientId) {
-  return SavedMessagesModel.find({targetClientId});
+  return SavedMessagesModel.find({ targetClientId });
 }
 
 module.exports = function (cms) {
   const DeviceModel = cms.getModel('Device');
 
-  const {io, socket: internalSocketIOServer} = cms;
+  const { io, socket: internalSocketIOServer } = cms;
 
   if (global.APP_CONFIG.redis) {
-    const {host, port, password} = global.APP_CONFIG.redis;
-    io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
+    const { host, port, password } = global.APP_CONFIG.redis;
+    io.adapter(redisAdapter({ host, port, password })); //internalSocketIOServer will use adapter too, just need to call this once
+  }
+
+  function updateOrderStatus(orderToken, status) {
+    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
   }
 
   const externalSocketIOServer = p2pServerPlugin(io, {
@@ -68,11 +74,11 @@ module.exports = function (cms) {
 
   // ack fns
   externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
-    const {_id, name, hardware} = device
+    const { _id, name, hardware } = device
     try {
-      await cms.getModel('Device').updateOne({_id}, {features})
+      await cms.getModel('Device').updateOne({ _id }, { features })
       cms.socket.emit('updateAppFeatureStatus', `Updated features successfully for ${name} (${hardware || `No hardware specified`})`,
-          false, Object.assign({}, device, {features}))
+          false, Object.assign({}, device, { features }))
     } catch (e) {
       cms.socket.emit('updateAppFeatureStatus', `Encountered an error updating features for ${name} (${hardware || `No hardware specified`})`, true, null)
     }
@@ -85,7 +91,7 @@ module.exports = function (cms) {
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
     }
-    internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, 'inProgress')
+    updateOrderStatus(orderToken, { onlineOrderId: orderToken, status: 'inProgress' })
   });
 
   function notifyDeviceStatusChanged(clientId) {
@@ -103,8 +109,11 @@ module.exports = function (cms) {
           (this behavior is in @gigasource/socket.io-p2p-plugin package, check redis.js file),
           therefore notifyDeviceStatusChanged is delayed for 5 seconds
         */
-        if (global.APP_CONFIG.redis) setTimeout(() => notifyDeviceStatusChanged(clientId), 5000);
-        else notifyDeviceStatusChanged(clientId);
+        if (global.APP_CONFIG.redis) {
+          setTimeout(() => notifyDeviceStatusChanged(clientId), 5000);
+        } else {
+          notifyDeviceStatusChanged(clientId);
+        }
       });
 
       socket.on('getWebshopName', async (deviceId, callback) => {
@@ -117,7 +126,7 @@ module.exports = function (cms) {
         const store = await StoreModel.findById(device.storeId);
         if (!store) return callback(null);
 
-        callback({settingName: store.settingName, name: store.name, alias: store.alias});
+        callback({ settingName: store.settingName, name: store.name, alias: store.alias });
       });
 
       socket.on('getWebshopId', async (deviceId, callback) => {
@@ -137,7 +146,7 @@ module.exports = function (cms) {
         const store = await cms.getModel('Store').findById(device.storeId);
         if (!store) return callback(null);
 
-        const user = await cms.getModel('User').findOne({store: store._id})
+        const user = await cms.getModel('User').findOne({ store: store._id })
         if (!user) return callback(null);
         // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
         const accessToken = await cms.utils.generateAccessToken(user.username, user.password)
@@ -150,60 +159,82 @@ module.exports = function (cms) {
 
       socket.on('getPairStatus', async (deviceId, callback) => {
         const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({error: 'Device not found'})
-        return callback({success: true})
+        if (!device) return callback({ error: 'Device not found' })
+        return callback({ success: true })
       })
 
       socket.on('getAppFeature', async (deviceId, callback) => {
         const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({error: 'Device not found'})
+        if (!device) return callback({ error: 'Device not found' })
         return callback(device.features)
       })
 
       socket.on('getOnlineDeviceServices', async (deviceId, callback) => {
         try {
           const device = await cms.getModel('Device').findById(deviceId)
-          if (!device) return callback({error: 'Device not found'})
+          if (!device) return callback({ error: 'Device not found' })
 
           const store = await cms.getModel('Store').findById(device.storeId)
-          if (!store) return callback({error: 'Store not found!'})
+          if (!store) return callback({ error: 'Store not found!' })
 
-          const {delivery, pickup, noteToCustomers} = store
+          const { delivery, pickup, noteToCustomers } = store
 
-          return callback({services: {delivery, pickup, noteToCustomers}})
+          return callback({ services: { delivery, pickup, noteToCustomers } })
         } catch (error) {
-          callback({error})
+          callback({ error })
         }
       })
 
-      socket.on('updateWebshopServices', async (deviceId, {delivery, pickup, noteToCustomers}, callback) => {
+      socket.on('updateWebshopServices', async (deviceId, { delivery, pickup, noteToCustomers }, callback) => {
         try {
           const device = await cms.getModel('Device').findById(deviceId)
-          if (!device) return callback({error: 'Device not found'})
+          if (!device) return callback({ error: 'Device not found' })
 
-          await cms.getModel('Store').findOneAndUpdate({_id: device.storeId}, {
+          await cms.getModel('Store').findOneAndUpdate({ _id: device.storeId }, {
             $set: {
               delivery,
               pickup,
               noteToCustomers
             }
           })
-          callback({success: true})
+          callback({ success: true })
         } catch (error) {
-          callback({error})
+          callback({ error })
         }
       })
 
       // TODO: analysis side fx
-      socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo, storeName, storeAlias) => {
-        console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},clientId=${clientId}`,
-            `Order ${orderToken}: updateOrderStatus, status = ${orderStatus}`);
+      socket.on('updateOrderStatus', async (orderStatus) => {
+        const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
+        console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId}`,
+            `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
 
-        internalSocketIOServer.to(orderToken).emit('updateOrderStatus', orderToken, orderStatus, extraInfo);
+        if (status === 'completed') {
+          if (paypalOrderDetail) {
+            const store = await cms.getModel('Store').findOne({ alias: storeAlias })
+            if (!store) {
+              // store information is missing, so order will not be processed
+              console.error('Cannot find store for current order.')
+              return;
+            }
+
+            try {
+              const ppClient = createPayPalClient(
+                  store.paymentProviders.paypal.clientId,
+                  store.paymentProviders.paypal.secretToken)
+
+              await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
+            } catch (e) {
+              console.log('updateOrderStatus->captureOrder', e)
+            }
+          }
+        } else {
+          updateOrderStatus(onlineOrderId, orderStatus)
+        }
       })
 
       socket.on('updateVersion', async (appVersion, _id) => {
-        const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
+        const deviceInfo = await cms.getModel('Device').findOneAndUpdate({ _id }, { appVersion }, { new: true });
         if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
       });
     }
@@ -249,7 +280,7 @@ module.exports = function (cms) {
     })
     socket.on('createOrder', async (storeId, orderData) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
+      const device = await DeviceModel.findOne({ storeId, 'features.onlineOrdering': true });
 
       if (!device) {
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
@@ -257,8 +288,8 @@ module.exports = function (cms) {
       }
 
       const deviceId = device._id.toString();
-      const {name: storeName, alias: storeAlias} = await cms.getModel('Store').findById(storeId);
-      Object.assign(orderData, {storeName, storeAlias});
+      const { name: storeName, alias: storeAlias } = await cms.getModel('Store').findById(storeId);
+      Object.assign(orderData, { storeName, storeAlias });
 
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId}`,
           `Order ${orderData.orderToken}: send to device`);
@@ -269,7 +300,7 @@ module.exports = function (cms) {
           'createOrderAck', [orderData.orderToken, storeName, storeAlias, deviceId]);
 
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
-        internalSocketIOServer.to(orderData.orderToken).emit('updateOrderStatus', orderData.orderToken, 'failedToSend')
+        updateOrderStatus(orderData.orderToken, { onlineOrderId: orderData.orderToken, status: 'failedToSend' })
         removePersistentMsg()
       }, SEND_TIMEOUT);
     });
@@ -282,17 +313,20 @@ module.exports = function (cms) {
       if (!deviceId) {
         callback(null);
       } else {
-        let {proxyServerHost, proxyServerPort, proxyUrlTemplate} = global.APP_CONFIG;
+        let { proxyServerHost, proxyServerPort, proxyUrlTemplate } = global.APP_CONFIG;
 
         remoteControlDeviceId = deviceId;
         externalSocketIOServer.emitTo(deviceId, 'startRemoteControl', proxyServerHost, proxyServerPort, async () => {
           let error;
 
           try {
-            const {proxyPort} = (await axios.post(`${proxyServerHost}:${proxyServerPort}/start-proxy?proxyClientId=${deviceId}-proxy-client`)).data;
+            const { proxyPort } = (await axios.post(`${proxyServerHost}:${proxyServerPort}/start-proxy?proxyClientId=${deviceId}-proxy-client`)).data;
 
-            if (!proxyPort) error = 'No port is available for proxying';
-            else callback(proxyUrlTemplate, proxyPort);
+            if (!proxyPort) {
+              error = 'No port is available for proxying';
+            } else {
+              callback(proxyUrlTemplate, proxyPort);
+            }
           } catch (e) {
             error = e;
           }
@@ -309,7 +343,7 @@ module.exports = function (cms) {
     socket.on('stopRemoteControl', async deviceId => {
       if (!deviceId) return
 
-      const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;
+      const { proxyServerHost, proxyServerPort } = global.APP_CONFIG;
       await axios.delete(`${proxyServerHost}:${proxyServerPort}/stop-proxy?proxyClientId=${deviceId}-proxy-client`);
 
       externalSocketIOServer.emitTo(deviceId, 'stopRemoteControl', () => remoteControlDeviceId = null);
@@ -330,11 +364,11 @@ module.exports = function (cms) {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
 
       const response = await axios.get(url)
-      const {results} = response.data
+      const { results } = response.data
       if (!results || !results.length) return
 
-      const {geometry: {location: {lat: latitude, lng: longitude}}} = results[0]
-      return {latitude, longitude}
+      const { geometry: { location: { lat: latitude, lng: longitude } } } = results[0]
+      return { latitude, longitude }
     }
 
     socket.on('getDistanceByPostalCode', async (code, fromCoords, callback) => {
@@ -348,7 +382,7 @@ module.exports = function (cms) {
 
     socket.on('createReservation', async (storeId, reservationData) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
+      const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
@@ -358,7 +392,7 @@ module.exports = function (cms) {
     socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 
-      const {proxyServerHost, proxyServerPort} = global.APP_CONFIG;
+      const { proxyServerHost, proxyServerPort } = global.APP_CONFIG;
       await axios.delete(`${proxyServerHost}:${proxyServerPort}/stop-proxy?proxyClientId=${remoteControlDeviceId}-proxy-client`);
       remoteControlDeviceId = null;
     });

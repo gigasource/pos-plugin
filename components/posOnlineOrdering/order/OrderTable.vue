@@ -8,9 +8,9 @@
       <div class="po-order-table__main">
         <!-- header text -->
         <div class="po-order-table__header__text">
-          <g-icon class="po-order-table__header__icon--mobile" @click="changeView">arrow_back</g-icon>
-          <g-icon class="po-order-table__header__icon" v-if="confirmView" color="#424242" @click="view = 'order'" size="20">arrow_back_ios</g-icon>
-          <div class="po-order-table__header__text--main">{{ confirmView ? $t('store.confirmOrder') : $t('store.orderList') }}</div>
+          <g-icon class="po-order-table__header__icon--mobile" @click="gotoPrevPageMobile">arrow_back</g-icon>
+          <g-icon class="po-order-table__header__icon" v-if="showBackArrowInHeader" color="#424242" @click="gotoPrevPage" size="20">arrow_back_ios</g-icon>
+          <div class="po-order-table__header__text--main">{{ headerTextMain }}</div>
           <div class="po-order-table__header__total" v-if="orderView">{{$t('store.totalItems')}}: {{ totalItems }}</div>
         </div>
 
@@ -91,14 +91,11 @@
                 </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
-
-              <!--            <div class="section-header">PAYMENT</div>-->
-              <!--            <g-radio-group v-model="paymentType" row class="radio-option">-->
-              <!--              <g-radio color="#1271ff" label="Cash" value="cash" class="mr-5"/>-->
-              <!--              <g-radio color="#1271ff" label="Credit" value="credit"/>-->
-              <!--            </g-radio-group>-->
-
-              <div class="section-header">{{$t('store.orderDetail')}}</div>
+            </template>
+            
+            <!-- Payment view -->
+            <template v-if="paymentView">
+              <div class="section-header">Payment</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
                 <div class="order-item-detail__name">
@@ -123,39 +120,54 @@
                 <g-spacer/>
                 <span>-{{ value | currency }}</span>
               </div>
+  
+              <!-- PAYMENT -->
+              <div class="section-header">PAYMENT OPTIONS</div>
+              <div style="margin: 0 auto;">
+                <div class="pay-by-cash-btn" @click="confirmCashPayment">Pay by Cash</div>
+                <pay-pal-smart-button
+                    v-if="isPaymentViaPayPalEnable"
+                    self-host
+                    debug
+                    use-custom-capture-order
+                    :order-info="paypalOrderInfo"
+                    :client-id="store.paymentProviders.paypal.clientId"
+                    :currency="currencyCode"
+                    @onApprove="confirmPayPalPayment"/>
+              </div>
             </template>
           </template>
         </div>
       </div>
       <!-- footer -->
       <g-spacer/>
-      <div :class="['po-order-table__footer', !isOpening && 'disabled']">
-        <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
-        <g-spacer/>
-        <g-btn-bs v-if="orderView" style="position: relative; justify-content: flex-start" width="154" large rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView">
-          {{$t('store.payment')}}
-          <div class="icon-payment">
-            <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
-          </div>
-        </g-btn-bs>
-        <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" large rounded background-color="#2979FF" @click="dialog.confirm = true" elevation="5">{{$t('store.confirm')}}</g-btn-bs>
-      </div>
-      <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
-        <g-badge :value="true" color="#4CAF50" overlay>
-          <template v-slot:badge>
-            {{totalItems}}
-          </template>
-          <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
-            <g-icon>icon-menu2</g-icon>
-          </div>
-        </g-badge>
-        <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
-        <g-spacer/>
-        <g-btn-bs width="150" v-if="orderView" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-        <g-btn-bs width="150" v-if="confirmView" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="dialog.confirm = true" style="padding: 8px 16px" elevation="5">
-          {{$t('store.confirm')}}
-        </g-btn-bs>
-      </div>
+      <template v-if="view !== 'payment'">
+        <div :class="['po-order-table__footer', !isOpening && 'disabled']">
+          <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
+          <g-spacer/>
+          <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative; justify-content: flex-start">
+            {{$t('store.payment')}}
+            <div class="icon-payment">
+              <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+            </div>
+          </g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >{{$t('store.confirm')}}</g-btn-bs>
+        </div>
+        <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
+          <g-badge :value="true" color="#4CAF50" overlay>
+            <template v-slot:badge>
+              {{totalItems}}
+            </template>
+            <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
+              <g-icon>icon-menu2</g-icon>
+            </div>
+          </g-badge>
+          <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
+          <g-spacer/>
+          <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.confirm')}}</g-btn-bs>
+        </div>
+      </template>
     </div>
 
     <!-- Order created -->
@@ -175,6 +187,7 @@
                           @confirm="confirmPayment"/>
   </div>
 </template>
+
 <script>
   import _ from 'lodash'
   import OrderCreated from './OrderCreated';
@@ -183,10 +196,11 @@
   import { autoResizeTextarea } from '../../logic/commonUtils'
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
+  import PayPalSmartButton from '@gigasource/payment-provider/src/PayPal/frontend/PayPalSmartButton';
 
   export default {
     name: 'OrderTable',
-    components: {DialogOrderConfirm, OrderCreated },
+    components: {DialogOrderConfirm, OrderCreated, PayPalSmartButton },
     props: {
       store: Object,
       isOpening: Boolean,
@@ -199,7 +213,7 @@
       return {
         view: 'order',
         orderType: this.store.delivery ? 'delivery' : 'pickup', // delivery || pick-up
-        paymentType: 'cash', // cash || credit
+        paymentType: 'cash', // cash || paypal
         customer: {
           name: '',
           company: '',
@@ -210,7 +224,6 @@
           note: '',
           distance: null
         },
-        currency: $t('common.currency'),
         dialog: {
           value: false,
           order: {},
@@ -237,7 +250,8 @@
         timeInterval: null,
         calculatingShippingFee: false,
         calculatingText: '',
-        errorZipcode: ''
+        errorZipcode: '',
+        paypalOrderDetail: {}
       }
     },
     filters: {
@@ -294,14 +308,15 @@
         }
       })
 
-      cms.socket.on('updateOrderStatus', (orderToken, orderStatus, extraInfo) => {
-        console.debug(`frontend received status for order ${orderToken}`)
-        if (orderToken === this.dialog.order.orderToken) {
+      cms.socket.on('updateOrderStatus', (orderStatus) => {
+        const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
+        console.debug(`frontend received status for order ${onlineOrderId}`)
+        if (onlineOrderId === this.dialog.order.orderToken) {
           this.dialog.value = true
           this.dialog.loading = false
           this.dialog.confirm = false
-          this.$set(this.dialog.order, 'status', orderStatus)
-          this.dialog.extraInfo = extraInfo
+          this.$set(this.dialog.order, 'status', status)
+          this.dialog.extraInfo = responseMessage
         }
       })
     },
@@ -310,10 +325,18 @@
       clearInterval(this.timeInterval)
     },
     computed: {
+      currency() {
+        return $t('common.currency')
+      },
+      currencyCode() {
+        return $t('common.currencyCode')
+      },
       asap() {
         return $t('common.asap')
       },
-      confirmView() { return !this.orderView },
+      orderView() { return this.view === 'order' },
+      confirmView() { return this.view === 'confirm'},
+      paymentView() { return this.view === 'payment' },
       allowConfirmView() {
         return this.orderItems.length
       },
@@ -336,11 +359,10 @@
         let formatTime = (this.store.country && this.store.country.name === 'United States') ? get12HourValue : get24HourValue
         return this.storeOpenHours.map(oh => oh.deliveryStart && oh.deliveryEnd ? `${formatTime(oh.deliveryStart)} - ${formatTime(oh.deliveryEnd)}` : `${formatTime(oh.openTime)} - ${formatTime(oh.closeTime)}`).join(' and ')
       },
-      orderView() { return this.view === 'order' },
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
       storeZipCodes() {
-        return this.store.deliveryFee.zipCodeFees.map(({ zipCode, fee }) => {
+        return (this.store.deliveryFee.zipCodeFees || []).map(({ zipCode, fee }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
             zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
           }
@@ -450,14 +472,18 @@
           }
         })
       },
+      totalDiscount() {
+        return this.discounts.reduce((total, {value}) => total + value, 0)
+      },
       effectiveTotal() {
         if (!this.orderItems || !this.orderItems.length) return 0
-
-        if (!this.confirmView) return this.totalPrice
-
-        const totalDiscount = this.discounts.reduce((total, {value}) => total + value, 0)
-        const total = this.totalPrice + this.shippingFee - totalDiscount;
-        return total < 0 ? 0 : total
+        switch (this.view) {
+          case 'order': return this.totalPrice;
+          case 'confirm':
+          case 'payment':
+            const total = this.totalPrice + this.shippingFee - this.totalDiscount;
+            return total < 0 ? 0 : total
+        }
       },
       deliveryTimeList() {
         let list = []
@@ -512,6 +538,65 @@
           if (this.customer.distance && this.customer.distance > this.maxShippingRadius) return true
         }
         return false
+      },
+      paypalOrderInfo() {
+        return {
+          application_context: {
+            brand_name: this.store.name,
+            locale: $t('common.locale'),   // using custom locale instead of paypal user locale
+            landing_page: "NO_PREFERENCE", // let paypal decide whether login page or billing page will be display depend on user login condition
+            shipping_preference: "NO_SHIPPING", // hide shipping information in paypal order
+            user_action: "CONTINUE"
+          },
+          purchase_units: [{
+            custom_id: `${this.store._id}`,
+            amount: {
+              currency_code: this.currencyCode,
+              value: `${this.effectiveTotal.toFixed(2)}`,
+              breakdown: {
+                item_total: {
+                  currency_code: this.currencyCode,
+                  value: `${this.totalPrice.toFixed(2)}`
+                },
+                discount: {
+                  currency_code: this.currencyCode,
+                  value: `${this.totalDiscount.toFixed(2)}`
+                },
+                shipping: {
+                  currency_code: this.currencyCode,
+                  value: `${this.shippingFee.toFixed(2)}`
+                }
+              }
+            },
+            items: _.map(this.orderItems, item => ({
+              name: item.name,
+              description: '',
+              unit_amount: {
+                currency_code: this.currencyCode,
+                value: `${item.price}`
+              },
+              quantity: `${item.quantity}`,
+              category: "PHYSICAL_GOODS"
+            })),
+          }]
+        }
+      },
+      headerTextMain() {
+        switch(this.view) {
+          case 'order': return $t('store.orderList');
+          case 'confirm': return $t('store.confirmOrder');
+          case 'payment': return 'Payment'; // TODO: i18n
+        }
+      },
+      showBackArrowInHeader() {
+        switch (this.view) {
+          case 'order': return false;
+          case 'confirm': return true;
+          case 'payment': return true;
+        }
+      },
+      isPaymentViaPayPalEnable() {
+        return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
       }
     },
     watch: {
@@ -552,11 +637,32 @@
       }
     },
     methods: {
-      changeView() {
-        if(this.view === 'order') {
-          this.$emit('back')
+      // event handler when user click to back button in order table (for desktop view)
+      gotoPrevPage() {
+        switch (this.view) {
+          case 'order':
+            return;
+          case 'confirm':
+            this.view = 'order';
+            break;
+          case 'payment':
+            this.view = 'confirm';
+            break;
         }
-        this.view = 'order'
+      },
+      // event handler when user tap to back button in order table (for mobile view)
+      gotoPrevPageMobile() {
+        switch (this.view) {
+          case 'order':
+            this.$emit('back')
+            break;
+          case 'confirm':
+            this.view = 'order';
+            break;
+          case 'payment':
+            this.view = 'confirm';
+            break;
+        }
       },
       removeItem(item) {
         this.$emit('decrease', item)
@@ -564,6 +670,16 @@
       addItem(item) {
         this.$emit('increase', Object.assign({}, item, {quantity: 1}))
       },
+      async confirmPayPalPayment(orderDetails) {
+        this.paypalOrderDetail = orderDetails
+        this.paymentType = 'paypal'
+        await this.confirmPayment();
+      },
+      async confirmCashPayment() {
+        this.paymentType = 'cash'
+        await this.confirmPayment();
+      },
+      
       async confirmPayment() {
         if (this.unavailableConfirm || this.confirming) return
 
@@ -600,6 +716,7 @@
         const orderData = {
           orderType: this.orderType,
           paymentType: this.paymentType,
+          paypalOrderDetail: _.pick(this.paypalOrderDetail, ['orderID', 'payerID', 'paymentID']),
           customer,
           products,
           note,
@@ -1035,7 +1152,23 @@
       display: none;
     }
   }
-
+  .pay-by-cash-btn {
+    background-color: #2979ff;
+    color: #FFF;
+    width: 100%;
+    border-radius: 20px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    max-width: 750px;
+    
+    &:hover {
+      filter: brightness(85%);
+    }
+  }
+  
   @media screen and (max-width: 1139px) {
     .po-order-table {
       background: #FFF;
