@@ -115,129 +115,129 @@ module.exports = function (cms) {
           notifyDeviceStatusChanged(clientId);
         }
       });
-    }
 
-    socket.on('getWebshopName', async (deviceId, callback) => {
-      const DeviceModel = cms.getModel('Device');
-      const StoreModel = cms.getModel('Store');
+      socket.on('getWebshopName', async (deviceId, callback) => {
+        const DeviceModel = cms.getModel('Device');
+        const StoreModel = cms.getModel('Store');
 
-      const device = await DeviceModel.findById(deviceId);
-      if (!device) return callback(null);
+        const device = await DeviceModel.findById(deviceId);
+        if (!device) return callback(null);
 
-      const store = await StoreModel.findById(device.storeId);
-      if (!store) return callback(null);
+        const store = await StoreModel.findById(device.storeId);
+        if (!store) return callback(null);
 
-      callback({ settingName: store.settingName, name: store.name, alias: store.alias });
-    });
+        callback({ settingName: store.settingName, name: store.name, alias: store.alias });
+      });
 
-    socket.on('getWebshopId', async (deviceId, callback) => {
-      const device = await cms.getModel('Device').findById(deviceId);
-      if (!device) return callback(null);
+      socket.on('getWebshopId', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId);
+        if (!device) return callback(null);
 
-      const store = await cms.getModel('Store').findById(device.storeId);
-      if (!store) return callback(null);
+        const store = await cms.getModel('Store').findById(device.storeId);
+        if (!store) return callback(null);
 
-      callback(store.id);
-    })
+        callback(store.id);
+      })
 
-    socket.on('getWebShopSettingUrl', async (deviceId, locale, callback) => {
-      const device = await cms.getModel('Device').findById(deviceId);
-      if (!device) return callback(null);
+      socket.on('getWebShopSettingUrl', async (deviceId, locale, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId);
+        if (!device) return callback(null);
 
-      const store = await cms.getModel('Store').findById(device.storeId);
-      if (!store) return callback(null);
+        const store = await cms.getModel('Store').findById(device.storeId);
+        if (!store) return callback(null);
 
-      const user = await cms.getModel('User').findOne({ store: store._id })
-      if (!user) return callback(null);
-      // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
-      const accessToken = await cms.utils.generateAccessToken(user.username, user.password)
-      if (accessToken) {
-        callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true&lang=${locale || 'en'}`)
-      } else {
-        callback && callback(null)
-      }
-    })
-
-    socket.on('getPairStatus', async (deviceId, callback) => {
-      const device = await cms.getModel('Device').findById(deviceId)
-      if (!device) return callback({ error: 'Device not found' })
-      return callback({ success: true })
-    })
-
-    socket.on('getAppFeature', async (deviceId, callback) => {
-      const device = await cms.getModel('Device').findById(deviceId)
-      if (!device) return callback({ error: 'Device not found' })
-      return callback(device.features)
-    })
-
-    socket.on('getOnlineDeviceServices', async (deviceId, callback) => {
-      try {
-        const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({ error: 'Device not found' })
-
-        const store = await cms.getModel('Store').findById(device.storeId)
-        if (!store) return callback({ error: 'Store not found!' })
-
-        const { delivery, pickup, noteToCustomers } = store
-
-        return callback({ services: { delivery, pickup, noteToCustomers } })
-      } catch (error) {
-        callback({ error })
-      }
-    })
-
-    socket.on('updateWebshopServices', async (deviceId, { delivery, pickup, noteToCustomers }, callback) => {
-      try {
-        const device = await cms.getModel('Device').findById(deviceId)
-        if (!device) return callback({ error: 'Device not found' })
-
-        await cms.getModel('Store').findOneAndUpdate({ _id: device.storeId }, {
-          $set: {
-            delivery,
-            pickup,
-            noteToCustomers
-          }
-        })
-        callback({ success: true })
-      } catch (error) {
-        callback({ error })
-      }
-    })
-
-    // TODO: analysis side fx
-    socket.on('updateOrderStatus', async (orderStatus) => {
-      const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
-      console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId}`,
-          `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
-
-      if (status === 'completed') {
-        if (paypalOrderDetail) {
-          const store = await cms.getModel('Store').findOne({ alias: storeAlias })
-          if (!store) {
-            // store information is missing, so order will not be processed
-            console.error('Cannot find store for current order.')
-            return;
-          }
-
-          try {
-            const ppClient = createPayPalClient(
-                store.paymentProviders.paypal.clientId,
-                store.paymentProviders.paypal.secretToken)
-
-            await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
-          } catch (e) {
-            console.log('updateOrderStatus->captureOrder', e)
-          }
+        const user = await cms.getModel('User').findOne({ store: store._id })
+        if (!user) return callback(null);
+        // permissionPlugin::generateAccessToken(username: String, password: String) -> access_token: String
+        const accessToken = await cms.utils.generateAccessToken(user.username, user.password)
+        if (accessToken) {
+          callback && callback(`/sign-in?access_token=${accessToken}&redirect_to=/setting/${store.alias}?device=true&lang=${locale || 'en'}`)
+        } else {
+          callback && callback(null)
         }
-      } else {
-        updateOrderStatus(onlineOrderId, orderStatus)
-      }
-    })
+      })
 
-    socket.on('updateVersion', async (appVersion, _id) => {
-      const deviceInfo = await cms.getModel('Device').findOneAndUpdate({ _id }, { appVersion }, { new: true });
-      if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
-    });
+      socket.on('getPairStatus', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback({ error: 'Device not found' })
+        return callback({ success: true })
+      })
+
+      socket.on('getAppFeature', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback({ error: 'Device not found' })
+        return callback(device.features)
+      })
+
+      socket.on('getOnlineDeviceServices', async (deviceId, callback) => {
+        try {
+          const device = await cms.getModel('Device').findById(deviceId)
+          if (!device) return callback({ error: 'Device not found' })
+
+          const store = await cms.getModel('Store').findById(device.storeId)
+          if (!store) return callback({ error: 'Store not found!' })
+
+          const { delivery, pickup, noteToCustomers } = store
+
+          return callback({ services: { delivery, pickup, noteToCustomers } })
+        } catch (error) {
+          callback({ error })
+        }
+      })
+
+      socket.on('updateWebshopServices', async (deviceId, { delivery, pickup, noteToCustomers }, callback) => {
+        try {
+          const device = await cms.getModel('Device').findById(deviceId)
+          if (!device) return callback({ error: 'Device not found' })
+
+          await cms.getModel('Store').findOneAndUpdate({ _id: device.storeId }, {
+            $set: {
+              delivery,
+              pickup,
+              noteToCustomers
+            }
+          })
+          callback({ success: true })
+        } catch (error) {
+          callback({ error })
+        }
+      })
+
+      // TODO: analysis side fx
+      socket.on('updateOrderStatus', async (orderStatus) => {
+        const { onlineOrderId, status, paypalOrderDetail, storeName, storeAlias } = orderStatus
+        console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId}`,
+            `Order ${onlineOrderId}: updateOrderStatus, status = ${status}`);
+
+        if (status === 'completed') {
+          if (paypalOrderDetail) {
+            const store = await cms.getModel('Store').findOne({ alias: storeAlias })
+            if (!store) {
+              // store information is missing, so order will not be processed
+              console.error('Cannot find store for current order.')
+              return;
+            }
+
+            try {
+              const ppClient = createPayPalClient(
+                  store.paymentProviders.paypal.clientId,
+                  store.paymentProviders.paypal.secretToken)
+
+              await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
+            } catch (e) {
+              console.log('updateOrderStatus->captureOrder', e)
+            }
+          }
+        } else {
+          updateOrderStatus(onlineOrderId, orderStatus)
+        }
+      })
+
+      socket.on('updateVersion', async (appVersion, _id) => {
+        const deviceInfo = await cms.getModel('Device').findOneAndUpdate({ _id }, { appVersion }, { new: true });
+        if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
+      });
+    }
   });
 
   // internalSocketIOServer is another Socket.io namespace for frontend to connect (use /app namespace)
