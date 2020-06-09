@@ -271,18 +271,6 @@ module.exports = async cms => {
         console.error('Update app error or this is not an android device');
       }
     });
-    socket.on('updateOrderTimeOut', async (orderTimeOut, ackFn) => {
-      if (_.isNil(orderTimeOut)) return
-
-      try {
-        await cms.getModel('PosSetting').findOneAndUpdate({},
-            {$set: {'onlineDevice.orderTimeout': orderTimeOut}})
-      } catch (e) {
-        console.error('Error updating order timeout', e)
-      } finally {
-        ackFn()
-      }
-    });
     socket.on('startStream', async (cb) => {
       try {
         console.log('on start stream')

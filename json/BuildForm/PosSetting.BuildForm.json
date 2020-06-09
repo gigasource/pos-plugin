@@ -877,12 +877,6 @@
           ]
         },
         {
-          "schemaType": "number",
-          "key": "orderTimeout",
-          "type": "input@number",
-          "addable": true
-        },
-        {
           "schemaType": "object",
           "key": "services",
           "fields": [
