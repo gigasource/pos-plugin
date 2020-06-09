@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="internalValue" width="464" eager>
+  <g-dialog v-model="internalValue" width="464" eager :persistent="loading">
     <div class="dialog">
       <div class="dialog-title">Order Confirmation</div>
       <div class="dialog-message">
@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="dialog-action">
-        <g-btn-bs text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
+        <g-btn-bs text-color="#424242" @click="internalValue = false" v-if="!loading">Cancel</g-btn-bs>
         <g-btn-bs width="110" text-color="white" :background-color="loading ? 'grey' : '#536DFE'" :disabled="loading" rounded @click="confirm">
           <template v-if="loading"><g-progress-circular indeterminate/></template>
           <template v-else>{{$t('store.confirm')}}</template>

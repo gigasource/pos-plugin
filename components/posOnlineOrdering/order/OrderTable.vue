@@ -80,22 +80,12 @@
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required :key="orderType"/>
 <!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
-                <div>
-                  <div v-if="!couponTf.active" @click="couponTf.active = true"><u>{{$t('store.applyCode')}}</u></div>
-                  <g-text-field-bs v-if="couponTf.active" :placeholder="$t('store.couponCode')" :suffix="$t('store.apply')" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
-                  <div class="error-message">{{couponTf.error}}</div>
-                  <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
-                    <g-icon size="12" color="green">check</g-icon>
-                    {{$t('store.couponApplied')}}
-                  </div>
-                </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
               </div>
             </template>
             
             <!-- Payment view -->
             <template v-if="paymentView">
-              <div class="section-header">Payment</div>
               <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
                 <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
                 <div class="order-item-detail__name">
@@ -120,7 +110,17 @@
                 <g-spacer/>
                 <span>-{{ value | currency }}</span>
               </div>
-  
+
+              <div>
+                <div v-if="!couponTf.active" @click="couponTf.active = true"><u>{{$t('store.applyCode')}}</u></div>
+                <g-text-field-bs v-if="couponTf.active" :placeholder="$t('store.couponCode')" :suffix="$t('store.apply')" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
+                <div class="error-message">{{couponTf.error}}</div>
+                <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
+                  <g-icon size="12" color="green">check</g-icon>
+                  {{$t('store.couponApplied')}}
+                </div>
+              </div>
+
               <!-- PAYMENT -->
               <div class="section-header">PAYMENT OPTIONS</div>
               <div style="margin: 0 auto;">
@@ -601,7 +601,7 @@
     },
     watch: {
       confirmView(val) {
-        this.$emit('confirm-view', val)
+        this.$emit('confirm-view', val || this.view === 'payment')
         const wrapper = document.getElementById('table-content')
         wrapper && wrapper.scroll({top: 0})
         if(!val) {
@@ -673,11 +673,11 @@
       async confirmPayPalPayment(orderDetails) {
         this.paypalOrderDetail = orderDetails
         this.paymentType = 'paypal'
-        await this.confirmPayment();
+        this.dialog.confirm = true
       },
       async confirmCashPayment() {
         this.paymentType = 'cash'
-        await this.confirmPayment();
+        this.dialog.confirm = true
       },
       
       async confirmPayment() {
@@ -1163,6 +1163,7 @@
     margin-top: 15px;
     margin-bottom: 15px;
     max-width: 750px;
+    cursor: pointer;
     
     &:hover {
       filter: brightness(85%);
