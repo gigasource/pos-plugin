@@ -139,9 +139,11 @@
               })
             },
             title: 'Reservation',
-            feature: 'reservation'
+            feature: 'reservation',
+            key: 'Reservation'
           }
         ],
+        pendingReservationsLength: 0
       }
     },
     computed: {
@@ -154,7 +156,7 @@
             const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
             onlineOrder && onlineOrder.items.splice(1, 2)
           }
-          if(!this.user.viewOnlineOrderMenu) {
+          if (!this.user.viewOnlineOrderMenu) {
             sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
           }
         }
@@ -164,7 +166,13 @@
             return this.enabledFeatures.includes(item.feature)
           })
         }
-        return sidebar
+        return sidebar.map(item => {
+          if (item.key !== 'Reservation') return item
+          return {
+            ...item,
+            ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '' }
+          }
+        })
       },
       defaultSidebarPath() {
         function getPath(items, viewName, prefix) {
@@ -238,7 +246,7 @@
         })
       },
       async changeLocale(locale) {
-        await cms.getModel('SystemConfig').updateOne({ type: 'I18n'}, {'content.locale': locale }, { upsert: true })
+        await cms.getModel('SystemConfig').updateOne({ type: 'I18n' }, { 'content.locale': locale }, { upsert: true })
         this.locale = locale
         this.$router.go()
       },
@@ -249,7 +257,7 @@
       },
       async updateServerUrl(url) {
         try {
-          await cms.getModel('PosSetting').findOneAndUpdate({}, {customServerUrl: url})
+          await cms.getModel('PosSetting').findOneAndUpdate({}, { customServerUrl: url })
         } catch (e) {
           console.error(e)
         }
@@ -286,6 +294,14 @@
           </div>);
 
         this.showSnackbar(contentFn, '#536dfe', timeout)
+      },
+      async getPendingReservationsLength() {
+        const currentDate = dayjs().startOf('day')
+        const reservations = await cms.getModel('Reservation').find({
+          status: 'pending',
+          date: { $gte: currentDate.toDate(), $lt: currentDate.add(1, 'day').toDate() }
+        })
+        this.pendingReservationsLength = reservations.length
       }
     },
     async created() {
@@ -324,6 +340,12 @@
         } else if (!this.user) {
           next('/pos-login')
         } else next()
+      })
+
+      await this.getPendingReservationsLength()
+
+      cms.socket.on('updateReservationList', async () => {
+        await this.getPendingReservationsLength()
       })
     },
     watch: {

@@ -56,13 +56,13 @@
     },
     async created() {
       await this.getReservationSetting()
-      if(this.reservationSetting) {
-        if(this.reservationSetting.maxDay) {
+      if (this.reservationSetting) {
+        if (this.reservationSetting.maxDay) {
           for (let i = 0; i < this.reservationSetting.maxDay - 2; i++) {
-            this.list.date.push(dayjs().add(i+2, 'day').format('DD MMM'))
+            this.list.date.push(dayjs().add(i + 2, 'day').format('DD MMM'))
           }
         }
-        if(this.reservationSetting.maxGuest) {
+        if (this.reservationSetting.maxGuest) {
           for (let i = 0; i < this.reservationSetting.maxGuest - 1; i++) {
             this.list.people.push(`${i + 2} Guests`)
           }
@@ -124,23 +124,24 @@
     watch: {
       internalValue(val) {
         this.resetData()
-        if(val && this.$refs) {
-          if(this.edit) {
+        if (val && this.$refs) {
+          if (this.edit) {
             this.name = this.reservation.customer.name
             this.phone = this.reservation.customer.phone
             this.note = this.reservation.note
             this.people = this.list.people[this.reservation.noOfGuests - 1]
             this.time = dayjs(this.reservation.date).format('HH:mm')
-            const day = dayjs(this.reservation.date).format('DD MMM')
-            if(day === dayjs().format('DD MMM'))
+            const day = dayjs(this.reservation.date)
+            if (day.isSame(new Date(), 'day')) {
               this.date = 'Today'
-            else if(day === dayjs().add(1, 'day').format('DD MMM'))
+            } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
               this.date = 'Tomorrow'
-            else
-              this.date = day
+            } else {
+              this.date = day.format('DD MMM')
+            }
           }
           const interval = setInterval(() => {
-            if(!_.isEmpty(this.$refs)) {
+            if (!_.isEmpty(this.$refs)) {
               this.$refs['scroll-date'].scrollToValue()
               this.$refs['scroll-people'].scrollToValue()
               this.$refs['scroll-time'].scrollToValue()
@@ -155,13 +156,14 @@
     },
     methods: {
       async submit() {
-        if(!this.name || !this.phone) return
+        if (!this.name || !this.phone) return
         const customer = {
           name: this.name,
           phone: this.phone,
           email: this.edit ? this.reservation.customer.email : ''
         }
-        const date = new Date(dayjs().add(this.list.date.indexOf(this.date), 'day').format('MM/DD/YYYY') + ' ' + this.time)
+        const [hour, minute] = this.time.split(':')
+        const date = dayjs().add(this.list.date.indexOf(this.date), 'day').hour(+hour).minute(+minute).toDate()
         const reservation = {
           noOfGuests: this.list.people.indexOf(this.people) + 1,
           date,
@@ -169,7 +171,7 @@
           note: this.note,
           status: 'pending'
         }
-        if(this.edit) {
+        if (this.edit) {
           await this.updateReservation(this.reservation._id, reservation)
         } else {
           await this.createReservation(reservation)
