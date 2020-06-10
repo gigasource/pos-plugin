@@ -229,7 +229,7 @@ module.exports = function (cms) {
             const store = await cms.getModel('Store').findOne({alias: storeAlias})
             if (!store) {
               // store information is missing, so order will not be processed
-              console.error('Cannot find store for current order.')
+              console.debug(`sentry:updateOrderStatus->captureOrder: Cannot find store for current order. Info: alias=${storeAlias}`)
               return;
             }
 
