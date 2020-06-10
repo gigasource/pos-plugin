@@ -101,7 +101,7 @@ module.exports = function (cms) {
   }
 
   externalSocketIOServer.onLibLog((msg, extraInfo) => {
-    let sentryTagString = 'sentry:lib=p2p-Socket.io';
+    let sentryTagString = 'sentry:lib=p2p-Socket.io,eventType=socketConnection';
     if (typeof extraInfo === 'object') Object.keys(extraInfo).forEach(key => sentryTagString += `,${key}=${extraInfo[key]}`);
 
     console.debug(sentryTagString, msg);
@@ -124,6 +124,7 @@ module.exports = function (cms) {
         */
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} disconnected`);
         if (global.APP_CONFIG.redis) {
+          // delay a little to give time for updating client list on Redis
           setTimeout(() => notifyDeviceStatusChanged(clientId), 2000);
         } else {
           notifyDeviceStatusChanged(clientId);
