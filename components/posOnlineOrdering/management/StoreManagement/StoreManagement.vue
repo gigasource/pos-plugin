@@ -156,7 +156,10 @@
         if (storeIdList.includes(storeId)) this.loadStores()
       })
 
-      window.cms.socket.on('updateDeviceStatus', this.checkDeviceOnlineStatus)
+      window.cms.socket.on('updateDeviceStatus', clientId => {
+        console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Frontend received updateDeviceStatus signal`);
+        this.checkDeviceOnlineStatus();
+      })
 
       this.$watch('storeManagementViewModel', val => {
         const stores = _.flatten(val.map(e => e.stores))

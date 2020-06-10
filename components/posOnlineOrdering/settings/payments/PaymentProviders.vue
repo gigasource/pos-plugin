@@ -5,16 +5,17 @@
         style="font-family: Muli; font-weight: bold; font-size: 18px; line-height: 23px;">
       Payment Setting
     </header>
-    
+
     <section class="row-flex flex-wrap justify-between">
       <component
-          v-for="provider in providers"
+          v-for="(provider, i) in providers"
+          :key="i"
           :is="provider.component"
           :store="store"
           @deactive="showDisableProviderDialog(provider.name)"
           @active="$emit('active', provider.name, $event)"/>
     </section>
-    
+
     <disable-prompt-dialog
       v-if="dialog.disableProvider.show"
       v-model="dialog.disableProvider.show"
