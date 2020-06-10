@@ -325,15 +325,50 @@
               "choice": "view",
               "component": "ReservationsList",
               "binding": [],
-              "slotScopeBinding": [],
+              "slotScopeBinding": [
+                {}
+              ],
               "slot": "Reservation",
               "url": "plugins/pos-plugin/components/Reservation/ReservationsList.vue",
               "path": "components/Reservation/ReservationsList.vue",
               "pluginName": "pos-plugin",
-              "content": {
-                "props": {},
-                "events": {}
-              }
+              "inject": [
+                {
+                  "service": "OrderStore:reservations",
+                  "local": "reservations",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:getReservations",
+                  "local": "getReservations",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:updateReservation",
+                  "local": "updateReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "SettingsStore:reservationSetting",
+                  "local": "reservationSetting",
+                  "type": "prop"
+                },
+                {
+                  "service": "SettingsStore:getReservationSetting",
+                  "local": "getReservationSetting",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:removeReservation",
+                  "local": "removeReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "OrderStore:completeReservation",
+                  "local": "completeReservation",
+                  "type": "event"
+                }
+              ]
             }
           ]
         }
