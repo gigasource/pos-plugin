@@ -364,7 +364,9 @@ module.exports = {
       soya: 'Soya',
       sulphur: 'Sulphur Dioxide',
       messageConfirm: 'Your order will be sent to the restaurant.',
-      next: 'Next'
+      next: 'Next',
+      deliveryIn: 'Delivery in {0} minutes',
+      pickUpIn: 'Pick up in {0} minutes',
     },
 
     paymentProviders: {

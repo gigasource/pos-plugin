@@ -79,7 +79,9 @@ module.exports = {
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
       messageConfirm: 'Your order will be sent to the restaurant.',
-      next: 'Neben'
+      next: 'Neben',
+      deliveryIn: 'Lieferung in {0} Minuten.',
+      pickUpIn: 'Abholung in {0} Minuten.',
     },
 
     common: {

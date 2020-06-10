@@ -117,7 +117,11 @@ router.post('/new-store', async (req, res) => {
       distanceFees: []
     },
     orderTimeOut: 3,
-    deliveryTimeInterval: 15
+    deliveryTimeInterval: 15,
+    gSms: {
+      enabled: false,
+      timeToComplete: 30
+    }
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})

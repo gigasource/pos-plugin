@@ -391,6 +391,7 @@
       "type": "object"
     },
     {
+      "_id": "5ee0a37093993539e668b53f",
       "schemaType": "object",
       "key": "reservationSetting",
       "fields": [
@@ -422,6 +423,24 @@
         {
           "schemaType": "number",
           "key": "maxDay",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5ee0c09992b170070228dbda",
+      "schemaType": "object",
+      "key": "gSms",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "enabled",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "number",
+          "key": "timeToComplete",
           "type": "input@number"
         }
       ]

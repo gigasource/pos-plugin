@@ -7,9 +7,10 @@ module.exports = cms => {
   })
 
   cms.on('sendOrderMessage', async (storeId, orderData) => {
-    const { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, storeAlias, storeName, totalPrice } = orderData
+    const { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = orderData
 
-    const topic = storeAlias
+    const store = await cms.getModel('Store').findById(storeId)
+    const topic = store.alias
     const message = {
       data: {
         orderType,
@@ -22,15 +23,15 @@ module.exports = cms => {
         total: JSON.stringify(totalPrice),
         deliveryTime: deliveryTime,
         discounts: JSON.stringify(discounts),
-        storeName
+        storeName: store.name
       },
       topic
     }
 
     try {
       const response = await admin.messaging().send(message)
-      console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias}`,
-        `Sent firebase message ${response}`);
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${store.name},alias=${store.alias}`,
+        `Sent firebase message at '${response}'`);
     } catch (e) {
       console.log(e)
     }

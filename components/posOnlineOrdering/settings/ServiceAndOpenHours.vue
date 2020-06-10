@@ -54,30 +54,56 @@
         </g-btn-bs>
       </div>
     </div>
-    <div class="service-setting__content" style="display: inline-block">
-      <div class="mb-3 fw-700">Service</div>
-      <div class="row-flex">
-        <g-switch color="#536DFE" class="col-6" label="Delivery" v-model="computedDelivery"/>
-        <g-switch color="#536DFE" class="col-6" label="Allow pick-up" v-model="computedPickup"/>
-      </div>
-      <div class="fw-700 mt-2">Note for customers</div>
-      <div>
-        <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote"/>
-      </div>
-      <div class="row-flex align-items-center">
-        <div class="col-8">
-          <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
-                    @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
+    <div class="row-flex">
+      <div class="service-setting__content flex-grow-1 mr-2">
+        <div class="mb-3 fw-700">Service</div>
+        <div class="row-flex">
+          <g-switch color="#536DFE" class="col-6" label="Delivery" v-model="computedDelivery"/>
+          <g-switch color="#536DFE" class="col-6" label="Allow pick-up" v-model="computedPickup"/>
         </div>
-        <div class="col-4 mt-2">
-          <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue" @click="openDialogInput"/>
+        <div class="fw-700 mt-2">Note for customers</div>
+        <div>
+          <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote"/>
+        </div>
+        <div class="row-flex align-items-center">
+          <div class="col-8">
+            <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
+                      @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
+          </div>
+          <div class="col-4 mt-2">
+            <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue" @click="openDialogInput"/>
+          </div>
+        </div>
+        <div class="row-flex align-items-center">
+          <div class="col-8">Order timeout</div>
+          <div class="col-4 mt-2">
+            <g-select text-field-component="GTextFieldBs" v-model="computedOrderTimeOut"
+                      :items="orderTimeOuts"/>
+          </div>
         </div>
       </div>
-      <div class="row-flex align-items-center">
-        <div class="col-8">Order timeout</div>
-        <div class="col-4 mt-2">
-          <g-select text-field-component="GTextFieldBs" v-model="computedOrderTimeOut"
-                    :items="orderTimeOuts"/>
+      <div class="service-setting__content" style="max-width: 600px;">
+        <div class="mb-3 fw-700">G-SMS Settings</div>
+        <div class="row-flex">
+          <g-switch color="#536DFE" class="col-6" label="Enabled" :value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
+        </div>
+        <div class="fw-700 mt-2">Default time to complete order</div>
+        <g-grid-select :items="[15, 30, 45, 60]" mandatory :grid="false" class="mb-3"
+                       :value="computedGSms.timeToComplete" @input="setGSmsValue('timeToComplete', $event)"
+        >
+          <template #default="{item, toggleSelect}">
+            <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#E0E0E0" text-color="black" height="30" min-width="72" @click.stop="toggleSelect(item)">
+              {{item}}
+            </g-btn-bs>
+          </template>
+          <template #selected="{item}">
+            <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#90CAF9" background-color="#E3F2FD" text-color="black" height="30" width="72">{{item}}
+            </g-btn-bs>
+          </template>
+        </g-grid-select>
+        <div>
+          <span style="font-weight: 700;">Note: </span>
+          <span>We recommend leaving this setting off by default. For more information, please contact your service provider.</span>
         </div>
       </div>
     </div>
@@ -114,7 +140,8 @@
         default: 15,
       },
       orderTimeOut: Number,
-      noteToCustomers: String
+      noteToCustomers: String,
+      gSms: null
     },
     data: function () {
       return {
@@ -206,6 +233,17 @@
         },
         set(val) {
           this.updateNoteDebounce(val)
+        }
+      },
+      computedGSms: {
+        get() {
+          return this.gSms || {
+            enabled: false,
+            timeToComplete: 30
+          }
+        },
+        set(value) {
+          this.$emit('update', { gSms: value })
         }
       }
     },
@@ -350,6 +388,9 @@
       },
       updateNote(noteToCustomers) {
         this.$emit('update', {noteToCustomers})
+      },
+      setGSmsValue(key, value) {
+        this.computedGSms = Object.assign({}, this.computedGSms, {[key]: value})
       }
     },
   }

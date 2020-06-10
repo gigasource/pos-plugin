@@ -7,6 +7,8 @@ const redisAdapter = require('socket.io-redis');
 const WATCH_DEVICE_STATUS_ROOM_PREFIX = 'watch-online-status-';
 const ppApiv2 = require('./api/payment/paypal/payPalApiV2Adapter')
 const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/backend/createPayPalClient')
+const fs = require('fs')
+const path = require('path')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -297,7 +299,29 @@ module.exports = function (cms) {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
 
+      // fcm
+      const store = await cms.getModel('Store').findById(storeId)
+      if (store.gSms && store.gSms.enabled) {
+        cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+      }
+
       if (!device) {
+        if (store.gSms && store.gSms.enabled) {
+          // accept order on front-end
+          const timeToComplete = store.gSms.timeToComplete || 30
+          const locale = store.country.locale || 'en'
+          const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
+          const localeFilePath = path.join(pluginPath, 'i18n', `${locale}.js`);
+          let responseMessage = ''
+
+          if (fs.existsSync(localeFilePath)) {
+            const { [locale]: { store } } = require(localeFilePath)
+            responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
+          }
+
+          socket.join(orderData.orderToken);
+          return updateOrderStatus(orderData.orderToken, { onlineOrderId: orderData.orderToken, status: 'kitchen', responseMessage })
+        }
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
         return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
       }
@@ -306,7 +330,6 @@ module.exports = function (cms) {
       const {name: storeName, alias: storeAlias} = await cms.getModel('Store').findById(storeId);
       Object.assign(orderData, {storeName, storeAlias});
 
-      cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId}`,
           `2. Online order backend: received order from frontend, send to device`);
 
