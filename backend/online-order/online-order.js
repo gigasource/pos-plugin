@@ -209,7 +209,7 @@ module.exports = async cms => {
       await cms.getModel('PosSetting').findOneAndUpdate({}, {reservation: reservationSetting})
       cms.socket.emit('updateReservationList')
 
-      ackFn && ackFn()
+      typeof ackFn === 'function' && ackFn()
     })
 
     socket.on('createReservation', async (reservationData, ackFn) => {
@@ -221,7 +221,7 @@ module.exports = async cms => {
       }))
       cms.socket.emit('updateReservationList')
 
-      ackFn && ackFn()
+      typeof ackFn === 'function' && ackFn()
     })
 
     socket.on('updateAppFeature', async (data, callback) => {
