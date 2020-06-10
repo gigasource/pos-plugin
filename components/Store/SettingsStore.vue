@@ -24,7 +24,6 @@
               { title: sidebar.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo' },
               { title: sidebar.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment' },
               { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax' },
-              { title: 'Reservation', icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'reservation' },
             ]
           },
           { title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings' }

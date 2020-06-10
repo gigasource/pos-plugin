@@ -985,14 +985,32 @@
           "type": "input@number"
         },
         {
-          "schemaType": "string",
-          "key": "openTime",
-          "type": "input"
-        },
-        {
-          "schemaType": "string",
-          "key": "closeTime",
-          "type": "input"
+          "schemaType": "array",
+          "key": "openHours",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "array",
+              "key": "dayInWeeks",
+              "type": null,
+              "fields": [
+                {
+                  "schemaType": "boolean",
+                  "key": "dayInWeek"
+                }
+              ]
+            },
+            {
+              "schemaType": "string",
+              "key": "openTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "closeTime",
+              "type": "input"
+            }
+          ]
         },
         {
           "schemaType": "number",

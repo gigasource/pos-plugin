@@ -199,6 +199,13 @@ module.exports = async cms => {
       ackFn();
     });
 
+    socket.on('updateReservationSetting', async (reservationSetting, ackFn) => {
+      await cms.getModel('PosSetting').findOneAndUpdate({}, {reservation: reservationSetting})
+      cms.socket.emit('updateReservationList')
+
+      ackFn && ackFn()
+    })
+
     socket.on('createReservation', async (reservationData, ackFn) => {
       const {date, time} = reservationData
       const [hour, minute] = time.split(':')
@@ -208,7 +215,7 @@ module.exports = async cms => {
       }))
       cms.socket.emit('updateReservationList')
 
-      ackFn()
+      ackFn && ackFn()
     })
 
     socket.on('updateAppFeature', async (data, callback) => {

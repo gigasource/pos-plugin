@@ -6,7 +6,7 @@
         <div class="dialog-content--left">
           <scroll-select ref="scroll-date" class="col-4" v-model="date" :items="list.date" :height="250" :item-height="50" selected-color="#1271FF"/>
           <scroll-select ref="scroll-people" class="col-4" v-model="people" :items="list.people" :height="250" :item-height="50" selected-color="#1271FF"/>
-          <scroll-select ref="scroll-time" class="col-4" v-model="time" :items="list.time" :height="250" :item-height="50" selected-color="#1271FF"/>
+          <scroll-select ref="scroll-time" class="col-4" v-model="time" :items="timeList" :height="250" :item-height="50" selected-color="#1271FF"/>
         </div>
         <div class="dialog-content--right">
           <div class="fw-700 mb-2">Make Reservation</div>
@@ -51,12 +51,10 @@
         list: {
           date: ['Today', 'Tomorrow'],
           people: ['1 Guest'],
-          time: [],
         }
       }
     },
     async created() {
-      let open = '06:00', close = '23:30'
       await this.getReservationSetting()
       if(this.reservationSetting) {
         if(this.reservationSetting.maxDay) {
@@ -69,10 +67,7 @@
             this.list.people.push(`${i + 2} Guests`)
           }
         }
-        if(this.reservationSetting.openTime) open = this.reservationSetting.openTime
-        if(this.reservationSetting.closeTime) close = this.reservationSetting.closeTime
       }
-      this.genTimeList(open, close)
       this.resetData()
     },
     computed: {
@@ -83,7 +78,48 @@
         set(val) {
           this.$emit('input', val)
         }
-      }
+      },
+      timeList() {
+        let times = []
+
+        if(this.reservationSetting && this.reservationSetting.openHours && this.date) {
+          const date = this.date === 'Today' ? dayjs() : (this.date === 'Tomorrow' ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
+          const weekday = date.day() === 0 ? 6 : date.day() - 1
+          this.reservationSetting.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
+            if(dayInWeeks[weekday]) {
+              let baseHour, baseMinute
+              if(this.date === 'Today') {
+                baseHour = dayjs().hour()
+                baseMinute = dayjs().minute()
+              } else {
+                [baseHour, baseMinute] = openTime.split(':')
+              }
+              let [openTimeHour, openTimeMinute] = openTime.split(':')
+              let [closeTimeHour, closeTimeMinute] = closeTime.split(':')
+
+              if(openTimeMinute % 30 !== 0) {
+                if(openTimeMinute > 30) {
+                  openTimeMinute = 0
+                  openTimeHour = +openTimeHour + 1
+                } else {
+                  openTimeMinute = 30
+                }
+              }
+              while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
+                if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute))
+                  times.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
+
+                openTimeMinute = +openTimeMinute + 30
+                if(openTimeMinute >= 60) {
+                  openTimeMinute = +openTimeMinute - 60
+                  openTimeHour++
+                }
+              }
+            }
+          })
+        }
+        return times.sort()
+      },
     },
     watch: {
       internalValue(val) {
@@ -112,6 +148,9 @@
             }
           }, 100)
         }
+      },
+      date() {
+        this.time = this.timeList[0] || ''
       }
     },
     methods: {
@@ -139,41 +178,10 @@
         this.internalValue = false
         this.$emit('submit')
       },
-      genTimeList(open, close) {
-        let time = []
-        let [openTimeHour, openTimeMinute] = open.split(':')
-        let [closeTimeHour, closeTimeMinute] = close.split(':')
-
-        openTimeHour = parseInt(openTimeHour)
-        openTimeMinute = parseInt(openTimeMinute)
-        closeTimeHour = parseInt(closeTimeHour)
-        closeTimeMinute = parseInt(closeTimeMinute)
-
-        if(openTimeMinute % 30 !== 0) {
-          if(openTimeMinute < 30)
-            openTimeMinute = 30
-          else {
-            openTimeMinute = 0
-            openTimeHour++
-          }
-        }
-
-        while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute < closeTimeMinute)) {
-          time.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
-
-          openTimeMinute += 30
-          if(openTimeMinute >= 60) {
-            openTimeMinute = openTimeMinute - 60
-            openTimeHour++
-          }
-        }
-
-        this.list.time.push(...time)
-      },
       resetData() {
         this.date = this.list.date[0]
         this.people = this.list.people[0]
-        this.time = this.list.time[0]
+        this.time = this.timeList[0] || ''
         this.name = ''
         this.phone = ''
         this.note = ''
