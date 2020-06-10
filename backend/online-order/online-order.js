@@ -52,12 +52,18 @@ module.exports = async cms => {
 
   function startSocketRecreateInterval() {
     if (!recreateOnlineOrderSocketInterval) {
-      console.debug(getBaseSentryTags('socketConnection'), 'startSocketRecreateInterval');
+      console.debug(getBaseSentryTags('socketConnection'), 'start recreateOnlineOrderSocketInterval');
 
       recreateOnlineOrderSocketInterval = setInterval(async () => {
         const deviceId = await getDeviceId();
         const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
-        console.debug(sentryTags, 'recreateOnlineOrderSocket');
+
+        try {
+          await axios.get(`${webshopUrl}/health-check`);
+          console.debug(sentryTags, 'recreate online order socket in recreateOnlineOrderSocketInterval');
+        } catch (e) {
+          console.debug(sentryTags, 'Could not reach webshop in recreateOnlineOrderSocketInterval', e.stack);
+        }
 
         if (deviceId) await createOnlineOrderSocket(deviceId);
       }, RECREATE_INTERVAL);
@@ -68,7 +74,7 @@ module.exports = async cms => {
     if (recreateOnlineOrderSocketInterval) {
       getDeviceId().then(deviceId => {
         const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
-        console.debug(sentryTags, 'stopSocketRecreateInterval');
+        console.debug(sentryTags, 'stop recreateOnlineOrderSocketInterval');
       });
 
       clearInterval(recreateOnlineOrderSocketInterval);
