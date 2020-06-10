@@ -95,6 +95,12 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/migrate-data/index.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/online-order/online-order.js'
     },
     {

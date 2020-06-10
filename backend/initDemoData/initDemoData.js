@@ -3,7 +3,7 @@ const _ = require('lodash');
 const path = require('path');
 
 module.exports = async function (cms) {
-  cms.on('initData-complete', async () => {
+  cms.on('init-data-complete', async () => {
     try {
       console.log('initDemoData')
       const pluginPath = cms.allPlugins['pos-plugin'].pluginPath;

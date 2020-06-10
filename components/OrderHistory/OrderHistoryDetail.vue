@@ -66,7 +66,7 @@
       <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
         <span>Payment</span>
         <div class="row-flex align-items-center">
-          <img :src="payment.icon" v-if="payment.icon" class="mr-2">
+          <img :src="payment.icon" v-if="payment.icon" style="height: 16px" class="mr-2">
           <span>{{payment.name || payment.type}}</span>
         </div>
       </div>

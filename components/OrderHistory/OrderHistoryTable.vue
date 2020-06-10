@@ -57,7 +57,7 @@
         <td class="ta-left">{{order.table || ''}}</td>
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
         <td class="ta-left" style="text-transform: capitalize">
-          <img v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" class="mr-2"/>
+          <img v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" style="height: 16px;" class="mr-2"/>
           <span style="vertical-align: middle">{{getOrderPayment(order).type}}</span>
         </td>
         <td>

@@ -58,7 +58,7 @@
         <div class="row-flex justify-between mt-1" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Payment</div>
           <div class="ta-right row-flex align-items-center" style="text-transform: capitalize">
-            <img v-if="paymentMethod.icon" :src="paymentMethod.icon" class="mr-1"/>
+            <img v-if="paymentMethod.icon" :src="paymentMethod.icon" style="height: 16px" class="mr-1"/>
             <span>{{paymentMethod.type}}</span>
           </div>
         </div>
