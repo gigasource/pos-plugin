@@ -237,10 +237,10 @@ module.exports = function (cms) {
               const ppClient = createPayPalClient(
                   store.paymentProviders.paypal.clientId,
                   store.paymentProviders.paypal.secretToken)
-
               await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
+              console.debug('sentry:updateOrderStatus->captureOrder', 'completed -> captureOrder has been called.')
             } catch (e) {
-              console.log('updateOrderStatus->captureOrder', e)
+              console.debug('sentry:updateOrderStatus->captureOrder', 'exception')
             }
           }
         } else {
