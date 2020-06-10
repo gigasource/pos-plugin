@@ -314,15 +314,23 @@ module.exports = async cms => {
 
   function createOnlineOrderSocket(deviceId) {
     return new Promise(async resolve => {
+      const webshopUrl = await getWebShopUrl();
+
       if (onlineOrderSocket) {
         onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
         onlineOrderSocket = null;
-      }
 
-      const webshopUrl = await getWebShopUrl();
-      onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
-      onlineOrderSocket.once('connect', resolve);
-      createOnlineOrderListeners(onlineOrderSocket, deviceId);
+        // delay a little for old socket to disconnect first
+        setTimeout(() => {
+          onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
+          onlineOrderSocket.once('connect', resolve);
+          createOnlineOrderListeners(onlineOrderSocket, deviceId);
+        }, 2000);
+      } else {
+        onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
+        onlineOrderSocket.once('connect', resolve);
+        createOnlineOrderListeners(onlineOrderSocket, deviceId);
+      }
     });
   }
 
@@ -478,9 +486,9 @@ module.exports = async cms => {
 
     socket.on('updateOrderStatus', async (orderStatus) => {
       const posSetting = await cms.getModel('PosSetting').findOne()
-      const { onlineDevice: {store: {name, alias}} } = posSetting
+      const {onlineDevice: {store: {name, alias}}} = posSetting
       onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias})
-      const { orderId, onlineOrderId, status, responseMessage } = orderStatus
+      const {orderId, onlineOrderId, status, responseMessage} = orderStatus
 
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
           `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
