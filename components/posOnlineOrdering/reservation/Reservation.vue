@@ -3,7 +3,6 @@
     <template v-if="mode === 'reservation'">
       <div class="reservation-header">
         <div class="reservation-header__title">Table Reservation</div>
-        <g-icon size="20" class="reservation-header__icon--close" @click="closeIframe">icon-close</g-icon>
         <div class="reservation-header__stepper">
           <div class="reservation-header__stepper-step" @click="changeStep(1)">
             <div>
@@ -59,14 +58,14 @@
         <template v-if="step === 1 || step === 2">
           <div class="reservation-content__title">People</div>
           <div class="row-flex align-items-center" style="margin-left: -8px; margin-bottom: 32px">
-            <g-btn-bs width="42" height="40" :background-color="people === 1 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(1)">1</g-btn-bs>
-            <g-btn-bs width="42" height="40" :background-color="people === 2 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(2)">2</g-btn-bs>
-            <g-btn-bs width="42" height="40" :background-color="people === 3 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(3)">3</g-btn-bs>
-            <g-btn-bs width="42" height="40" :background-color="people === 4 ? '#1271FF' : '#F5F5F5'" @click="choosePeople(4)">4</g-btn-bs>
+            <div :class="['btn-people', people === 1 && 'btn-people--selected']" @click="choosePeople(1)">1</div>
+            <div :class="['btn-people', people === 2 && 'btn-people--selected']" @click="choosePeople(2)">2</div>
+            <div :class="['btn-people', people === 3 && 'btn-people--selected']" @click="choosePeople(3)">3</div>
+            <div :class="['btn-people', people === 4 && 'btn-people--selected']" @click="choosePeople(4)">4</div>
             <g-select :class="['select-people', people === peopleSelected && peopleSelected !== 0 && 'selected']" :key="`people_${people}`" text-field-component="GTextFieldBs" v-model="peopleSelected" :items="peopleList" @input="choosePeople(peopleSelected, false)"/>
           </div>
           <div class="reservation-content__title">Date</div>
-          <g-date-picker width="360" :min="today" no-title :disabled="people === 0" v-model="date" @input="chooseDate" :class="errorDate && 'error-picker'"/>
+          <g-date-picker :min="today" :max="maxDay" no-title :disabled="people === 0" v-model="date" @input="chooseDate" :class="errorDate && 'error-picker'"/>
           <div v-if="errorDate" class="error-message">{{errorDate}}</div>
         </template>
         <template v-if="step === 3">
@@ -116,7 +115,7 @@
           <div>Tell your name to our staff. <br>You will be invited to a table.</div>
         </div>
         <g-spacer/>
-        <g-btn-bs class="reservation-btn" @click="closeIframe">OK</g-btn-bs>
+        <g-btn-bs class="reservation-btn" @click="clearData">OK</g-btn-bs>
       </div>
     </template>
   </div>
@@ -137,6 +136,7 @@
         date: '',
         time: '',
         today: '',
+        maxDay: '',
         store: {
           phone: '',
           openHours: [
@@ -165,11 +165,18 @@
     async created() {
       this.today = dayjs().format('YYYY-MM-DD')
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
+      let maxGuest = 40
       if(storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         if(store) this.store = store
+        if(store.reservationSetting) {
+          maxGuest = store.reservationSetting.maxGuest || 40
+          if(store.reservationSetting.maxDay) {
+            this.maxDay = dayjs(new Date).add(store.reservationSetting.maxDay, 'day').format('YYYY-MM-DD')
+          }
+        }
       }
-      for(let i = 5; i <= 40; i++) {
+      for(let i = 5; i <= maxGuest; i++) {
         this.peopleList.push({text: i, value: i})
       }
     },
@@ -231,7 +238,7 @@
                   openTimeMinute = 30
                 }
               }
-              while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute <= +closeTimeMinute)) {
+              while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
                 if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute))
                   times.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
@@ -326,25 +333,17 @@
         this.step = 1
         this.mode = 'reservation'
       },
-      closeIframe() {
-        const iframe = document.querySelector('iframe#reservation-iframe')
-        if (iframe) {
-          iframe.style.visibility = 'hidden'
-        }
-
-        this.clearData()
-      },
     }
   }
 </script>
 
 <style scoped lang="scss">
   .reservation {
-    width: 410px;
+    width: 100%;
     max-width: 410px;
-    height: 742px;
-    max-height: 742px;
     background: white;
+    margin-left: auto;
+    margin-right: auto;
 
     &-header {
       background: #F0F4F7;
@@ -397,7 +396,7 @@
 
           .step-label {
             position: absolute;
-            bottom: -24px;
+            top: 50px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 13px;
@@ -411,6 +410,13 @@
             &--selected {
               font-weight: 700;
               color: #4385F5;
+            }
+          }
+
+          @media screen and (max-width: 370px) {
+            .step-label {
+              white-space: unset;
+              text-align: center;
             }
           }
         }
@@ -451,6 +457,7 @@
 
       .g-picker {
         box-shadow: none;
+        width: 100%;
 
         ::v-deep {
           .g-date-picker-header {
@@ -492,6 +499,10 @@
             }
           }
 
+          .g-picker__body {
+            width: 100% !important;
+          }
+
           .g-date-picker-table {
             padding: 0;
             height: auto;
@@ -500,9 +511,13 @@
               font-size: 14px;
             }
 
+            @media screen and (min-width: 410px) {
+              .g-table-item {
+                width: 45px;
+                height: 45px;
+              }
+            }
             .g-table-item {
-              width: 45px;
-              height: 45px;
               cursor: pointer;
 
               &:hover {
@@ -688,6 +703,23 @@
       font-size: 12px;
       font-style: italic;
       color: #ff4452;
+    }
+
+    .btn-people {
+      width: 40px;
+      height: 40px;
+      min-width: 36px;
+      border-radius: 4px;
+      background: #f5f5f5;
+      margin-left: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &--selected {
+        background: #1271FF;
+        color: #FFFFFF;
+      }
     }
   }
 </style>

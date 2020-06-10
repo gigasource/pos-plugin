@@ -389,6 +389,42 @@
         }
       ],
       "type": "object"
+    },
+    {
+      "schemaType": "object",
+      "key": "reservationSetting",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "activeReservation",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "soundNotification",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "hideEmpty",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "number",
+          "key": "removeOverdueAfter",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "maxGuest",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "maxDay",
+          "type": "input@number"
+        }
+      ]
     }
   ],
   "name": "Store",

@@ -389,6 +389,16 @@ module.exports = function (cms) {
       }
     })
 
+    socket.on('updateReservationSetting', async (storeId, reservationSetting) => {
+      console.log(reservationSetting)
+      storeId = ObjectId(storeId);
+      const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
+      if (device) {
+        const deviceId = device._id.toString();
+        await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
+      }
+    })
+
     socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 

@@ -46,6 +46,7 @@
         <payment-providers-transaction
             v-if="view === 'transaction'"
             :store="store"/>
+        <reservation-setting v-if="view === 'setting-reservation'" :store="store" @update="updateStore"/>
       </div>
     </template>
   </div>
@@ -62,10 +63,11 @@
   // payments
   import PaymentProviders from './payments/PaymentProviders';
   import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
+  import ReservationSetting from "./ReservationSetting";
   
   export default {
     name: 'SettingView',
-    components: {Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
+    components: {ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
     data: function () {
       return {
         sidebarItems: [
@@ -75,6 +77,7 @@
             icon: 'mdi-file-document-outline',
             onClick: () => this.changeView('service-and-open-hours')
           },
+          {title: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
           {title: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
           {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
           {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
@@ -170,6 +173,9 @@
         for (const key in change) {
           if (change.hasOwnProperty(key)) {
             this.$set(this.store, key, change[key])
+          }
+          if(key === 'reservationSetting' || key === 'openHours') {
+            window.cms.socket.emit('updateReservationSetting', this.store._id, {...this.store.reservationSetting, openHours: this.store.openHours})
           }
         }
       },
