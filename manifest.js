@@ -88,6 +88,12 @@ module.exports = {
       },
       path: 'backend/migrate-data/index.js'
     },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/firebase-messaging/index.js'
+    },
     // {
     //   loader: {
     //     type: 'ssr'

@@ -306,6 +306,7 @@ module.exports = function (cms) {
       const {name: storeName, alias: storeAlias} = await cms.getModel('Store').findById(storeId);
       Object.assign(orderData, {storeName, storeAlias});
 
+      cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId}`,
           `2. Online order backend: received order from frontend, send to device`);
 
