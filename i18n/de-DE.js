@@ -97,7 +97,7 @@ module.exports = {
         saturday: 'Samstag',
         sunday: 'Sonntag'
       },
-      phoneRegex: '^(0[0-9]{10,11})|([+]*49[0-9]{10,11})$'
+      phoneRegex: '^(0[0-9]{9,11}$)|(^[+]*49[0-9]{9,11})$'
     },
   }
 }
