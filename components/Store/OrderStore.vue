@@ -34,7 +34,9 @@
         // online order
         pendingOrders: [],
         kitchenOrders: [],
-        onlineOrders: []
+        onlineOrders: [],
+        // reservations
+        reservations: []
       }
     },
     computed: {
@@ -650,18 +652,24 @@
       async createReservation(reservation) {
         await cms.getModel('Reservation').create(reservation)
       },
-      async getReservations(date, status) {
-        let reservations
-        const dateTo = dayjs(date).hour(0).minute(0).second(0).add(1, 'day').toDate(),
-            dateFrom = dayjs(date).hour(0).minute(0).second(0).toDate()
-        if(status === 'all')
-          reservations = await cms.getModel('Reservation').find({status: {$in: ['pending', 'completed']},date: {$gte: dateFrom, $lte: dateTo}})
-        else
-          reservations = await cms.getModel('Reservation').find({status, date: {$gte: dateFrom, $lte: dateTo}})
-        return reservations
+      async getReservations(date = new Date(), status = 'all') {
+        const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
+          dateFrom = dayjs(date).startOf('day').toDate()
+        this.reservations = await cms.getModel('Reservation').find({
+          ...status === 'all' ? { status: { $in: ['pending', 'completed'] } } : { status },
+          date: { $gte: dateFrom, $lte: dateTo }
+        })
       },
       async updateReservation(_id, change) {
-        await cms.getModel('Reservation').findOneAndUpdate({_id}, change)
+        await cms.getModel('Reservation').findOneAndUpdate({ _id }, change)
+      },
+      async completeReservation(_id) {
+        await this.updateReservation(_id, { status: 'completed' })
+        await this.getReservations()
+      },
+      async removeReservation(_id) {
+        await this.updateReservation(_id, { status: 'declined' })
+        await this.getReservations()
       }
     },
     async created() {
@@ -682,6 +690,11 @@
         await this.updateOnlineOrders()
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
+
+      await this.getReservations()
+      cms.socket.on('updateReservationList', async () => {
+        await this.getReservations()
+      })
     },
     watch: {
       'orderHistoryPagination.limit'(newVal) {

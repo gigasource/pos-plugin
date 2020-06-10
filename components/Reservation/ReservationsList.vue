@@ -38,8 +38,12 @@
                 Guest: <span class="fw-700 fs-small">{{reservation.noOfGuests}}</span>
               </div>
               <div class="reservation-info__action">
-                <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">Arrived</g-btn-bs>
-                <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">Modify</g-btn-bs>
+                <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
+                  Arrived
+                </g-btn-bs>
+                <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">
+                  Modify
+                </g-btn-bs>
                 <g-btn-bs background-color="#E57373">
                   <g-icon>icon-delete</g-icon>
                 </g-btn-bs>
@@ -54,17 +58,22 @@
 </template>
 
 <script>
+  import isBetween from 'dayjs/plugin/isBetween'
+  dayjs.extend(isBetween)
+
   export default {
     name: 'ReservationsList',
-    injectService: ['OrderStore:(getReservations, updateReservation)','SettingsStore:(reservationSetting, getReservationSetting)'],
+    props: {
+      reservations: Array,
+      reservationSetting: null,
+    },
     data() {
       return {
-        reservations: [],
         dialog: false,
         listStatus: [
-          {text: 'All', value: 'all'},
-          {text: 'Arrived', value: 'completed'},
-          {text: 'Not arrived', value: 'pending'}
+          { text: 'All', value: 'all' },
+          { text: 'Arrived', value: 'completed' },
+          { text: 'Not arrived', value: 'pending' }
         ],
         status: 'all',
         date: new Date(),
@@ -74,20 +83,22 @@
         selectedReservation: null
       }
     },
-    async created() {
-      await this.getReservationSetting()
-      await this.genReservations()
+    created() {
       this.genWeek(this.date)
+      this.$emit('getReservationSetting')
+    },
+    activated() {
+      this.genReservations()
     },
     watch: {
-      async status(val) {
-        await this.genReservations(this.date, val)
+      status(val) {
+        this.genReservations(this.date, val)
       },
-      async date(val) {
-        await this.genReservations(val, this.status)
+      date(val) {
+        this.genReservations(val, this.status)
       },
       dialog(val) {
-        if(!val) this.edit = false
+        if (!val) this.edit = false
       }
     },
     computed: {
@@ -95,40 +106,40 @@
         return dayjs(this.date).format('DD/MM/YYYY')
       },
       formatedDay() {
-        const day = dayjs(this.date).format('DD MMM YYYY')
-        if(day === dayjs().format('DD MMM YYYY'))
+        const day = dayjs(this.date)
+        if (day.isSame(dayjs(), 'day')) {
           return 'Today'
-        else if(day === dayjs().add(1, 'day').format('DD MMM YYYY'))
+        } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
           return 'Tomorrow'
-        else if(day === dayjs().add(-1, 'day').format('DD MMM YYYY'))
+        } else if (day.isSame(dayjs().add(-1, 'day'), 'day')) {
           return 'Yesterday'
-        else
-          return day
+        } else {
+          return day.format('DD MMM YYYY')
+        }
       },
       reservationInHours() {
         let hours = [], start = 0, end = 24
-        if(this.reservationSetting) {
-          if(this.reservationSetting.openTime) start = +this.reservationSetting.openTime.split(':')[0]
-          if(this.reservationSetting.closeTime) end = +this.reservationSetting.closeTime.split(':')[0] + (this.reservationSetting.closeTime.split(':')[1] > 0 ? 1 : 0)
+        if (this.reservationSetting) {
+          if (this.reservationSetting.openTime) start = +this.reservationSetting.openTime.split(':')[0]
+          if (this.reservationSetting.closeTime) end = +this.reservationSetting.closeTime.split(':')[0] + (this.reservationSetting.closeTime.split(':')[1] > 0 ? 1 : 0)
         }
-        for(let i = start; i < end; i++) {
-          const time = `${i < 10 ? '0'+i : i}h`
-          const hour = dayjs(this.date).hour(i).minute(0).second(0).format('DD/MM/YYYY HH:mm:ss'), nextHour = dayjs(this.date).hour(i+1).minute(0).second(0).format('DD/MM/YYYY HH:mm:ss')
-          const reservations = this.reservations.filter(r => dayjs(r.date).format('DD/MM/YYYY HH:mm:ss') >= hour && dayjs(r.date).format('DD/MM/YYYY HH:mm:ss') < nextHour)
-          hours.push({time,reservations: _.sortBy(reservations, r => r.date)})
+        for (let i = start; i < end; i++) {
+          const time = `${i < 10 ? `0${i}` : i}h`
+          const hour = dayjs(this.date).hour(i).startOf('hour'),
+            nextHour = dayjs(this.date).hour(i + 1).startOf('hour')
+          const reservations = this.reservations.filter(r => dayjs(r.date).isBetween(hour, nextHour, null, '[)'))
+          hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
         }
         return hours
       }
     },
     methods: {
-      async genReservations(date, status) {
-        if(!date) date = this.date
-        if(!status) status = this.status
-        this.reservations = await this.getReservations(date, status)
+      genReservations(date = this.date, status = this.status) {
+        this.$emit('getReservations', date, status)
       },
       genWeek(date) {
         let week = []
-        for(let i = 0; i < 7; i++) {
+        for (let i = 0; i < 7; i++) {
           week.push(dayjs(date).day(i))
         }
         this.week = week
@@ -144,180 +155,178 @@
       chooseDate(day) {
         this.date = day.toDate()
       },
-      async confirm(reservation) {
-        if(reservation.status === 'completed') return
-        reservation.status = 'completed'
-        await this.updateReservation(reservation._id, {status: 'completed'})
+      confirm(reservation) {
+        if (reservation.status === 'completed') return
+        this.$emit('completeReservation', reservation._id)
       },
       modify(reservation) {
         this.edit = true
         this.selectedReservation = reservation
         this.dialog = true
       },
-      async remove(reservation) {
-        _.remove(this.reservations, r => r._id === reservation._id)
-        await this.updateReservation(reservation._id, {status: 'declined'})
+      remove(reservation) {
+        this.$emit('removeReservation', reservation._id)
       },
     }
   }
 </script>
 
 <style scoped lang="scss">
- .reservation {
-   background-image: url('/plugins/pos-plugin/assets/out.png');
-   width: 100%;
-   height: 100%;
-   overflow: hidden;
-   padding-top: 16px;
+  .reservation {
+    /*background-image: url('/plugins/pos-plugin/assets/out.png');*/
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding-top: 16px;
 
-   &-header {
-     display: flex;
-     align-items: center;
+    &-header {
+      display: flex;
+      align-items: center;
 
-     &__day {
-       background: white;
-       box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1398);
-       border-radius: 6px;
-       padding: 6px 12px;
-       margin: 4px 5px 8px;
-     }
+      &__day {
+        background: white;
+        box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1398);
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin: 4px 5px 8px;
+      }
 
-     .g-select {
-       min-width: 115px;
+      .g-select {
+        min-width: 115px;
 
-       ::v-deep .bs-tf-wrapper {
-         background: white;
-         box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1398);
-         border-radius: 6px;
+        ::v-deep .bs-tf-wrapper {
+          background: white;
+          box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1398);
+          border-radius: 6px;
 
-         .bs-tf-input-group {
-           border-color: transparent;
-         }
-       }
-     }
-   }
+          .bs-tf-input-group {
+            border-color: transparent;
+          }
+        }
+      }
+    }
 
-   &-tab {
-     height: calc(100% - 50px);
-     overflow: hidden;
+    &-tab {
+      height: calc(100% - 50px);
+      overflow: hidden;
 
-     &__header {
-       display: flex;
-       width: 100%;
-       border-top: 1px solid #9e9e9e;
-       border-bottom: 1px solid #9e9e9e;
+      &__header {
+        display: flex;
+        width: 100%;
+        border-top: 1px solid #9e9e9e;
+        border-bottom: 1px solid #9e9e9e;
 
-       & > div {
-         flex: 1;
-         align-items: center;
-         justify-content: center;
-         padding: 12px;
-         color: #424242;
-       }
+        & > div {
+          flex: 1;
+          align-items: center;
+          justify-content: center;
+          padding: 12px;
+          color: #424242;
+        }
 
-       &--left, &--right {
-         display: flex;
-         flex: 0 0 54px !important;
-       }
+        &--left, &--right {
+          display: flex;
+          flex: 0 0 54px !important;
+        }
 
-       &--left {
-         border-right: 1px solid #9e9e9e;
-       }
+        &--left {
+          border-right: 1px solid #9e9e9e;
+        }
 
-       &--right {
-         border-left: 1px solid #9e9e9e;
-       }
+        &--right {
+          border-left: 1px solid #9e9e9e;
+        }
 
-       &--day {
-         width: 33px;
-         height: 33px;
-         border-radius: 50%;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-         margin-top: 8px;
+        &--day {
+          width: 33px;
+          height: 33px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 8px;
 
-         &.selected {
-           background: #046EFF;
-           color: white;
-         }
-       }
-     }
+          &.selected {
+            background: #046EFF;
+            color: white;
+          }
+        }
+      }
 
-     &__content {
-       max-height: calc(100% - 80px);
-       overflow: auto;
+      &__content {
+        max-height: calc(100% - 80px);
+        overflow: auto;
 
-       &-row {
-         display: flex;
-         border-bottom: 1px solid #9e9e9e;
+        &-row {
+          display: flex;
+          border-bottom: 1px solid #9e9e9e;
 
-         &--hour {
-           padding: 12px;
-           border-right: 1px solid #9e9e9e;
-           width: 54px;
-         }
-       }
-     }
-   }
+          &--hour {
+            padding: 12px;
+            border-right: 1px solid #9e9e9e;
+            width: 54px;
+          }
+        }
+      }
+    }
 
-   &-info {
-     display: flex;
-     color: #424242;
+    &-info {
+      display: flex;
+      color: #424242;
 
-     &__time,
-     &__guest {
-       padding: 12px;
-       line-height: 1.25;
-     }
+      &__time,
+      &__guest {
+        padding: 12px;
+        line-height: 1.25;
+      }
 
-     &__guest {
-       font-size: 12px;
-       line-height: 20px;
-     }
+      &__guest {
+        font-size: 12px;
+        line-height: 20px;
+      }
 
-     &__customer {
-       padding: 12px;
-       flex: 1;
-       font-size: 15px;
-       line-height: 1.25;
+      &__customer {
+        padding: 12px;
+        flex: 1;
+        font-size: 15px;
+        line-height: 1.25;
 
-       &--name, &--phone {
-         font-weight: 700;
-       }
+        &--name, &--phone {
+          font-weight: 700;
+        }
 
-       &--note {
-         font-size: 12px;
-         font-weight: 400;
-         margin-top: 8px;
-       }
-     }
+        &--note {
+          font-size: 12px;
+          font-weight: 400;
+          margin-top: 8px;
+        }
+      }
 
-     &__action {
-       padding: 0 12px;
-       display: flex;
-       align-items: center;
+      &__action {
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
 
-       .g-btn-bs {
-         font-size: 14px;
-       }
-     }
+        .g-btn-bs {
+          font-size: 14px;
+        }
+      }
 
-     &--completed {
-       background: #FFECB3;
+      &--completed {
+        background: #FFECB3;
 
-       &:not(:last-child) {
-         border-bottom: 1px solid #E6D39A;
-       }
-     }
+        &:not(:last-child) {
+          border-bottom: 1px solid #E6D39A;
+        }
+      }
 
-     &--pending {
-       background: #E0E0E0;
+      &--pending {
+        background: #E0E0E0;
 
-       &:not(:last-child) {
-         border-bottom: 1px solid #C7C7C7;
-       }
-     }
-   }
- }
+        &:not(:last-child) {
+          border-bottom: 1px solid #C7C7C7;
+        }
+      }
+    }
+  }
 </style>
