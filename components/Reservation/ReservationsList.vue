@@ -127,8 +127,13 @@
           const time = `${i < 10 ? `0${i}` : i}h`
           const hour = dayjs(this.date).hour(i).startOf('hour'),
             nextHour = dayjs(this.date).hour(i + 1).startOf('hour')
-          const reservations = this.reservations.filter(r => dayjs(r.date).isBetween(hour, nextHour, null, '[)'))
-          hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
+          const reservations = this.reservations ? this.reservations.filter(r => dayjs(r.date).isBetween(hour, nextHour, null, '[)')) : []
+          if(this.reservationSetting && this.reservationSetting.hideEmpty) {
+            if(reservations.length > 0)
+              hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
+          } else {
+            hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
+          }
         }
         return hours
       }
