@@ -314,10 +314,13 @@ module.exports = async cms => {
 
   function createOnlineOrderSocket(deviceId) {
     return new Promise(async resolve => {
-      if (onlineOrderSocket) onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
+      if (onlineOrderSocket) {
+        onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
+        onlineOrderSocket = null;
+      }
 
       const webshopUrl = await getWebShopUrl();
-      onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`);
+      onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
       onlineOrderSocket.once('connect', resolve);
       createOnlineOrderListeners(onlineOrderSocket, deviceId);
     });
