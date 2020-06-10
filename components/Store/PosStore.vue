@@ -161,7 +161,7 @@
           }
         }
         if (this.user && this.enabledFeatures) {
-          return sidebar.filter(item => {
+          sidebar = sidebar.filter(item => {
             if (!item.feature) return true
             return this.enabledFeatures.includes(item.feature)
           })
