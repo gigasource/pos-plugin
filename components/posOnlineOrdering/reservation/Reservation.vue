@@ -118,6 +118,14 @@
         <g-btn-bs class="reservation-btn mt-5" @click="clearData">New Reservation</g-btn-bs>
       </div>
     </template>
+
+    <g-dialog v-model="dialog.notice" persistent>
+      <div class="dialog-notice">
+        <div class="dialog-notice__title">Notice</div>
+        <div class="dialog-notice__message">The restaurant does not accept reservation request at the moment. Please try again later!</div>
+        <g-btn-bs text-color="indigo accent-2" @click="dialog.notice = false">Close</g-btn-bs>
+      </div>
+    </g-dialog>
   </div>
 </template>
 
@@ -159,7 +167,11 @@
           first: [],
           last: [],
           phone: []
-        }
+        },
+        dialog: {
+          notice: false
+        },
+        noRequest: false
       }
     },
     async created() {
@@ -173,6 +185,10 @@
           maxGuest = store.reservationSetting.maxGuest || 40
           if(store.reservationSetting.maxDay) {
             this.maxDay = dayjs(new Date).add(store.reservationSetting.maxDay, 'day').format('YYYY-MM-DD')
+          }
+          if(!store.reservationSetting.activeReservation) {
+            this.dialog.notice = true
+            this.noRequest = true
           }
         }
       }
@@ -252,6 +268,7 @@
         return times.sort()
       },
       unavailableComplete() {
+        if(this.noRequest) return true
         return this.people === 0 || !this.date || !this.time;
       }
     },
@@ -720,6 +737,30 @@
         background: #1271FF;
         color: #FFFFFF;
       }
+    }
+  }
+
+  .dialog-notice {
+    width: 340px;
+    background: #FFFFFF;
+    box-shadow: 0 0 28px rgba(58, 56, 56, 0.15);
+    border-radius: 4px;
+    padding: 30px 16px 8px;
+    margin: 0 auto;
+    text-align: center;
+
+    &__title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    &__message {
+      font-size: 15px;
+      color: #424242;
+      padding-bottom: 36px;
+      border-bottom: 1px solid #EFEFEF;
+      white-space: pre-wrap;
     }
   }
 </style>
