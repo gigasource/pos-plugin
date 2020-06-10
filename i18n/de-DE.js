@@ -79,6 +79,7 @@ module.exports = {
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
       messageConfirm: 'Your order will be sent to the restaurant.',
+      next: 'Neben'
     },
 
     common: {
@@ -96,7 +97,7 @@ module.exports = {
         saturday: 'Samstag',
         sunday: 'Sonntag'
       },
-      phoneRegex: '^(0[0-9]{10})|([+]*49[0-9]{10})$'
+      phoneRegex: '^(0[0-9]{10,11})|([+]*49[0-9]{10,11})$'
     },
   }
 }

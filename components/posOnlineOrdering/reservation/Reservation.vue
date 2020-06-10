@@ -115,7 +115,7 @@
           <div>Tell your name to our staff. <br>You will be invited to a table.</div>
         </div>
         <g-spacer/>
-        <g-btn-bs class="reservation-btn" @click="clearData">OK</g-btn-bs>
+        <g-btn-bs class="reservation-btn mt-5" @click="clearData">New Reservation</g-btn-bs>
       </div>
     </template>
   </div>

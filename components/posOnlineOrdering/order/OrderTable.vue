@@ -78,9 +78,42 @@
                   <g-text-field v-model="customer.address" :label="$t('store.address')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-place@16"/>
                   <g-text-field :rules="validateZipcode" :error="errorZipcode" type="number" v-model="customer.zipCode" :label="$t('store.zipCode')" required clearable clear-icon="icon-cancel@16" prepend-icon="icon-zip-code@16"/>
                   <g-select v-model="deliveryTime" :items="deliveryTimeList" prepend-icon="icon-delivery-truck@16" :label="$t('store.deliveryTime')" required :key="orderType"/>
-<!--                  <g-time-picker-input v-model="customer.deliveryTime" label="Delivery time" required prepend-icon="icon-delivery-truck@16"/>-->
                 </template>
+                <div>
+                  <div v-if="!couponTf.active" @click="couponTf.active = true"><u>{{$t('store.applyCode')}}</u></div>
+                  <g-text-field-bs v-if="couponTf.active" :placeholder="$t('store.couponCode')" :suffix="$t('store.apply')" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
+                  <div class="error-message">{{couponTf.error}}</div>
+                  <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
+                    <g-icon size="12" color="green">check</g-icon>
+                    {{$t('store.couponApplied')}}
+                  </div>
+                </div>
                 <g-textarea v-model="customer.note" :placeholder="`${$t('store.note')}...`" rows="3" no-resize/>
+                <div class="section-header">{{$t('store.orderDetail')}}</div>
+                <div v-for="(item, index) in orderItems" :key="index" class="order-item-detail">
+                  <div class="order-item-detail__index" >{{ item.quantity || 1}}</div>
+                  <div class="order-item-detail__name">
+                    {{ item.name }}
+                    <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
+                  </div>
+                  <div class="pl-1">{{ getItemPrice(item) | currency }}</div>
+                </div>
+                <div class="order-item-summary">
+                  <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
+                  <g-spacer/>
+                  <span>{{ totalPrice | currency }}</span>
+                </div>
+                <div class="order-item-summary" v-if="orderType === 'delivery'">
+                  <span>{{$t('store.shippingFee')}}:</span>
+                  <g-spacer/>
+                  <span v-if="calculatingShippingFee">{{calculatingText}}</span>
+                  <span v-else>{{ shippingFee | currency }}</span>
+                </div>
+                <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
+                  <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
+                  <g-spacer/>
+                  <span>-{{ value | currency }}</span>
+                </div>
               </div>
             </template>
 
@@ -110,15 +143,10 @@
                 <g-spacer/>
                 <span>-{{ value | currency }}</span>
               </div>
-
-              <div>
-                <div v-if="!couponTf.active" @click="couponTf.active = true"><u>{{$t('store.applyCode')}}</u></div>
-                <g-text-field-bs v-if="couponTf.active" :placeholder="$t('store.couponCode')" :suffix="$t('store.apply')" @click:append-outer="applyCoupon" @input="clearCouponValidate" v-model="couponTf.value"/>
-                <div class="error-message">{{couponTf.error}}</div>
-                <div v-if="couponTf.success" class="i text-green row-flex align-items-center fs-small-2">
-                  <g-icon size="12" color="green">check</g-icon>
-                  {{$t('store.couponApplied')}}
-                </div>
+              <div class="order-item-total">
+                <span>{{$t('store.total')}}</span>
+                <g-spacer/>
+                <span>{{effectiveTotal | currency}}</span>
               </div>
 
               <!-- PAYMENT -->
@@ -151,7 +179,7 @@
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>
           </g-btn-bs>
-          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >{{$t('store.confirm')}}</g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >{{$t('store.next')}}</g-btn-bs>
         </div>
         <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
           <g-badge :value="true" color="#4CAF50" overlay>
@@ -165,7 +193,7 @@
           <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
           <g-spacer/>
           <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.confirm')}}</g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.next')}}</g-btn-bs>
         </div>
       </template>
     </div>
@@ -430,8 +458,9 @@
       },
       validatePhone() {
         const rules = []
-        if(this.store.country && this.store.country.locale === 'de-DE') {
-          rules.push(val => (val.startsWith('0') && val.length === 11) || (val.startsWith('49') && val.length === 12) || 'Invalid phone number!')
+        const phoneRegex = this.$t('common.phoneRegex') && new RegExp(this.$t('common.phoneRegex'))
+        if(this.store.country && this.store.country.locale === 'de-DE' && phoneRegex) {
+          rules.push(val => (phoneRegex.test(val) || 'Invalid phone number!'))
         }
         return rules
       },
@@ -1049,6 +1078,12 @@
         &--end {
           margin-bottom: 100px;
         }
+      }
+      .order-item-total {
+        @extend .order-item-detail;
+        border-bottom: 1px solid transparent;
+        border-top: 1px solid #d8d8d8;
+        font-weight: 700;
       }
 
       .message-closed {
