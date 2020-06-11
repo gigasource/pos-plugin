@@ -5,10 +5,12 @@ const io = require('socket.io-client');
 const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
+const schedule = require('node-schedule')
 
 let webshopUrl;
 let storeName;
 let storeAlias;
+let reservationJobs = {};
 
 let {webshopUrl: webshopUrlFromConfig, port: backendPort} = global.APP_CONFIG;
 let onlineOrderSocket = null;
@@ -85,6 +87,72 @@ module.exports = async cms => {
       clearInterval(recreateOnlineOrderSocketInterval);
       recreateOnlineOrderSocketInterval = null;
     }
+  }
+
+  async function scheduleRemoveReservationJob(reservation) {
+    async function declineReservation() {
+      const res = await cms.getModel('Reservation').findById(reservation._id)
+      if (res.status !== 'declined') {
+        res.status = 'declined'
+        await cms.getModel('Reservation').updateOne({_id: reservation._id}, res) // update db
+      }
+      delete reservationJobs[reservationId] // remove cached job
+      console.debug(getBaseSentryTags('Reservation'), `Restaurant: auto-declined reservation ${reservationId} for ${res.date}`)
+      cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
+      console.debug(getBaseSentryTags('Reservation'), `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+    }
+    if (!reservation) return
+
+    const reservationId = reservation._id;
+    const posSettings = await cms.getModel('PosSetting').findOne()
+    const timeout = posSettings.reservation && posSettings.reservation.removeOverdueAfter
+      ? posSettings.reservation.removeOverdueAfter : 0 // fallback to 0 timeout (no auto-decline)
+
+    if (timeout === 0) { // do not auto-decline, cancel job and return
+      if (reservationJobs[reservationId]) {
+        reservationJobs[reservationId].cancel()
+        delete reservationJobs[reservationId]
+        console.debug(getBaseSentryTags('Reservation'), `Restaurant: cancelled scheduler job for reservation ${reservationId}`)
+      }
+      return
+    }
+
+    const timeoutDateTime = dayjs(reservation.date).add(timeout, 'minute').toDate()
+
+    const execNow = dayjs().isAfter(timeoutDateTime)
+    if (execNow) { // exec now
+      await declineReservation()
+      // check existing jobs and delete them
+      if (reservationJobs[reservationId]) {
+        reservationJobs[reservationId].cancel()
+        delete reservationJobs[reservationId]
+        console.debug(getBaseSentryTags('Reservation'), `Restaurant: cancelled scheduler job for reservation ${reservationId}`)
+      }
+      return
+    }
+
+    // check existing jobs and reschedule
+    if (reservationJobs[reservationId]) {
+      const rescheduleSuccess = schedule.rescheduleJob(reservationJobs[reservationId], timeoutDateTime)
+
+      return console.debug(getBaseSentryTags('Reservation'),
+        rescheduleSuccess
+          ? `Restaurant: Reschedule successful for id ${reservationId} at ${timeoutDateTime}`
+          : `Restaurant: Reschedule failed for id ${reservationId} at ${timeoutDateTime}`
+      )
+    }
+    // else start job
+    reservationJobs[reservationId] = schedule.scheduleJob(timeoutDateTime, declineReservation)
+    console.debug(getBaseSentryTags('Reservation'), `Restaurant: scheduled reservation decline for ${reservationId} (${reservation.date}) at ${timeoutDateTime}`)
+  }
+
+  async function initReservationSchedules() {
+    // fetch all pending reservations
+    let pendingReservations = await cms.getModel('Reservation').find({ status: 'pending' }).lean()
+    // start jobs
+    pendingReservations.forEach(res => {
+      scheduleRemoveReservationJob(res)
+    })
   }
 
   function createOnlineOrderListeners(socket, deviceId) {
@@ -225,6 +293,12 @@ module.exports = async cms => {
           `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch reservation data`)
 
       typeof ackFn === 'function' && ackFn()
+
+      // reschedule existing jobs
+      const pendingReservations = await cms.getModel('Reservation').find({ status: 'pending' }).lean()
+      if (pendingReservations && pendingReservations.length) {
+        pendingReservations.forEach(res => scheduleRemoveReservationJob(res))
+      }
     })
 
     socket.on('createReservation', async (reservationData, ackFn) => {
@@ -234,16 +308,22 @@ module.exports = async cms => {
         customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
         note:${reservationData.note}`)
 
-      const {date, time} = reservationData
-      const [hour, minute] = time.split(':')
-      await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
-        date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
-        status: 'pending'
-      }))
-      cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
-      console.debug(getBaseSentryTags('Reservation'),
-        `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
-      typeof ackFn === 'function' && ackFn()
+      try {
+        const { date, time } = reservationData
+        const [hour, minute] = time.split(':')
+        const reservation = await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
+          date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
+          status: 'pending'
+        }))
+        cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
+        console.debug(getBaseSentryTags('Reservation'),
+          `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+        typeof ackFn === 'function' && ackFn()
+
+        await scheduleRemoveReservationJob(reservation) // create auto-decline job & start job
+      } catch (e) {
+        console.log(e)
+      }
     })
 
     socket.on('updateAppFeature', async (data, callback) => {
@@ -426,6 +506,7 @@ module.exports = async cms => {
 
   const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
   if (alwaysOnFeature) await updateAlwaysOn(alwaysOnFeature.enabled);
+  initReservationSchedules()
 
   const waitInitOnlineOrderSocket = function () {
     return new Promise(resolve => {
