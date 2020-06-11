@@ -225,6 +225,8 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogOrderConfirm from './dialogOrderConfirm';
   import PayPalSmartButton from '@gigasource/payment-provider/src/PayPal/frontend/PayPalSmartButton';
+  import isBetween from 'dayjs/plugin/isBetween'
+  dayjs.extend(isBetween)
 
   export default {
     name: 'OrderTable',
@@ -484,7 +486,8 @@
           if (total && total.min && this.totalPrice < total.min) return false
           if (total && total.max && this.totalPrice > total.max) return false
           if (timePeriod) {
-            if (dayjs().isBefore(dayjs(timePeriod.startDate)) || dayjs().isAfter(dayjs(timePeriod.endDate))) {
+            const start = dayjs(timePeriod.startDate), end = dayjs(timePeriod.endDate).add(1, 'day')
+            if (!dayjs().isBetween(start, end, null, '[)')) {
               return false
             }
           }
