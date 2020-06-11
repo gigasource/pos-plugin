@@ -227,22 +227,23 @@ module.exports = function (cms) {
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
         if (status === 'completed') {
+          console.debug('sentry:eventType=updateOrderStatus,status=completed', JSON.stringify(paypalOrderDetail))
           if (paypalOrderDetail) {
             const store = await cms.getModel('Store').findOne({alias: storeAlias})
             if (!store) {
               // store information is missing, so order will not be processed
-              console.debug(`sentry:updateOrderStatus->captureOrder: Cannot find store for current order. Info: alias=${storeAlias}`)
+              console.debug('sentry:eventType=updateOrderStatus', `Cannot find store for current order. Info: alias=${storeAlias}`)
               return;
             }
 
             try {
-              const ppClient = createPayPalClient(
-                  store.paymentProviders.paypal.clientId,
-                  store.paymentProviders.paypal.secretToken)
-              await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, true)
-              console.debug('sentry:updateOrderStatus->captureOrder', 'completed -> captureOrder has been called.')
+              const { clientId, secretToken } = store.paymentProviders.paypal
+              const ppClient = createPayPalClient(clientId, secretToken)
+              console.debug(`sentry:eventType=updateOrderStatus,clientId=${clientId},secretToken=${secretToken}`, 'Trying to capture order')
+              const result = await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)
+              console.debug('sentry:eventType=updateOrderStatus', 'Order has been captured', JSON.stringify(result))
             } catch (e) {
-              console.debug('sentry:updateOrderStatus->captureOrder', 'exception')
+              console.debug('sentry:eventType=updateOrderStatus', 'exception')
             }
           }
         } else {
