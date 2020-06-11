@@ -85,7 +85,7 @@
       <div class="service-setting__content" style="max-width: 600px;">
         <div class="mb-3 fw-700">G-SMS Settings</div>
         <div class="row-flex">
-          <g-switch color="#536DFE" class="col-6" label="Enabled" :value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
+          <g-switch color="#536DFE" class="col-6" label="Enabled" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
         </div>
         <div class="fw-700 mt-2">Default time to complete order</div>
         <g-grid-select :items="[15, 30, 45, 60]" mandatory :grid="false" class="mb-3"
