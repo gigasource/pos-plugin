@@ -219,14 +219,21 @@ module.exports = async cms => {
     })
 
     socket.on('createReservation', async (reservationData, ackFn) => {
+      console.debug(getBaseSentryTags('Reservation'),
+        `1. Restaurant backend: received reservation:
+        guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
+        customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
+        note:${reservationData.note}`)
+
       const {date, time} = reservationData
       const [hour, minute] = time.split(':')
       await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
         date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
         status: 'pending'
       }))
-      cms.socket.emit('updateReservationList')
-
+      cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
+      console.debug(getBaseSentryTags('Reservation'),
+        `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
       typeof ackFn === 'function' && ackFn()
     })
 
@@ -241,8 +248,15 @@ module.exports = async cms => {
         }
         return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
       }))
-      cms.socket.emit('updateAppFeature')
-      callback()
+      const posSetting = await cms.getModel('PosSetting').findOne({});
+      const sentryTags = posSetting.onlineDevice && posSetting.onlineDevice.id
+          ? getBaseSentryTags('updateAppFeature') + `,clientId=${posSetting.onlineDevice.id}`
+          : getBaseSentryTags('updateAppFeature');
+
+      console.debug(sentryTags, '3. Restaurant backend: received feature update from server, emitting to frontend', JSON.stringify(data));
+
+      cms.socket.emit('updateAppFeature', sentryTags, data);
+      callback();
     });
     socket.on('unpairDevice', cb => {
       cms.socket.emit('unpairDevice')

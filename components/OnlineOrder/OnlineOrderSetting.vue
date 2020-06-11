@@ -10,7 +10,7 @@
               {{connected ? 'Connected' : 'Not connected'}}
             </span>
 
-            <span v-if="connected" style="color: #4CAF50"> ({{this.webshopName}})</span>
+            <span v-if="connected" style="color: #4CAF50"> ({{webshopName}})</span>
           </div>
         </div>
 
@@ -96,17 +96,12 @@
     props: {
       onlineDevice: null,
       defaultPrepareTime: Number,
-      onlineOrderSorting: String,
-      webshopName: String
+      onlineOrderSorting: String
     },
     data() {
       return {
         internalDevice: null,
         connected: false,
-        dialog: {
-          connect: false,
-          disconnect: false
-        },
         deliveryTimes: [15, 30, 45, 60],
         orderSorting: [
           {text: 'Order Number', value: 'order'},
@@ -148,6 +143,12 @@
         set(val) {
           this.$emit('updateOnlineOrderSorting', val)
         }
+      },
+      webshopName() {
+        if (this.onlineDevice && this.onlineDevice.store && this.onlineDevice.store.name) {
+          return this.onlineDevice.store.name.trim()
+        }
+        return ''
       }
     },
     watch: {
@@ -158,52 +159,11 @@
       }
     },
     methods: {
-      async connect(pairingCode) {
-        this.pairing = true
-        this.pairError = null
-
-        this.$emit('registerOnlineOrder', pairingCode, (error, deviceId) => {
-          this.pairing = false
-
-          if (error) {
-            this.connected = false
-            this.pairError = error
-          } else {
-            this.computedDevice = {
-              id: deviceId,
-              url: this.webshopUrl,
-              sound: this.internalDevice.sound,
-            }
-
-            this.connected = true
-            this.dialog.connect = false
-            this.pairError = null
-            this.getWebshopName()
-          }
-        })
-      },
-      disconnect() {
-        this.$emit('unregisterOnlineOrder', () => {
-          this.computedDevice = {
-            id: null,
-            url: this.webshopUrl,
-            sound: this.internalDevice.sound,
-          }
-
-          this.connected = false
-          this.webshopName = ''
-        })
-      },
       updateSound(value) {
         this.computedDevice = Object.assign({}, this.computedDevice, {sound: value})
       },
       updateSoundMode(value) {
         this.computedDevice = Object.assign({}, this.computedDevice, {soundLoop: value})
-      },
-      openConnectDialog() {
-        this.dialog.connect = true
-        this.pairError = null
-        this.pairing = false
       }
     },
     mounted() {

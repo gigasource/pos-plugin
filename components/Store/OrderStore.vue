@@ -692,7 +692,8 @@
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
 
       await this.getReservations()
-      cms.socket.on('updateReservationList', async () => {
+      cms.socket.on('updateReservationList', async sentryTagString => {
+        console.debug(sentryTagString, `3. Restaurant frontend: received 'updateReservationList', refreshing data`)
         await this.getReservations()
       })
     },
