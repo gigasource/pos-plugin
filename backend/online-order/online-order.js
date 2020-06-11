@@ -212,8 +212,12 @@ module.exports = async cms => {
     });
 
     socket.on('updateReservationSetting', async (reservationSetting, ackFn) => {
+      console.debug(getBaseSentryTags('ReservationSetting'),
+          `1. Restaurant backend: received reservation setting:`, JSON.stringify(reservationSetting))
       await cms.getModel('PosSetting').findOneAndUpdate({}, {reservation: reservationSetting})
       cms.socket.emit('updateReservationList')
+      console.debug(getBaseSentryTags('ReservationSetting'),
+          `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch reservation data`)
 
       typeof ackFn === 'function' && ackFn()
     })
