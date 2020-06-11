@@ -24,9 +24,10 @@ async function generateUniqueDeviceCode() {
 async function addPairedDeviceToStore(deviceId, storeId) {
   const store = await StoreModel.findOne({_id: storeId }, {devices: 1})
   const deviceIds = _.map(store.devices, e => e._id)
-  if (!deviceIds.includes(deviceId))
-    deviceIds.push(deviceId)
-  await StoreModel.updateOne({_id: storeId}, { devices: deviceIds });
+
+  if (!deviceIds.includes(deviceId)) deviceIds.push(deviceId)
+
+  return await StoreModel.findOneAndUpdate({_id: storeId}, { devices: deviceIds });
 }
 
 async function removePairedDeviceFromStore(deviceId, storeId) {
@@ -81,9 +82,9 @@ router.post('/register', async (req, res) => {
         alwaysOn: true
       }
     });
-    await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
+    const store = await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
     cms.socket.emit('reloadStores', deviceInfo.storeId);
-    res.status(200).json({deviceId: deviceInfo._id})
+    res.status(200).json({deviceId: deviceInfo._id, storeName: store.name || store.settingName, storeAlias: store.alias});
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
   }

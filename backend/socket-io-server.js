@@ -143,7 +143,7 @@ module.exports = function (cms) {
         const store = await StoreModel.findById(device.storeId);
         if (!store) return callback(null);
 
-        callback({settingName: store.settingName, name: store.name, alias: store.alias});
+        callback({settingName: store.settingName, name: store.name || store.settingName, alias: store.alias});
       });
 
       socket.on('getWebshopId', async (deviceId, callback) => {
