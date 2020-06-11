@@ -437,18 +437,25 @@ module.exports = function (cms) {
         await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
         console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
           `2. Online order backend: sent reservation to device`)
+      } else {
+        console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
+            `2. Online order backend: no device found, cancelled sending`)
       }
-      console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
-        `2. Online order backend: no device found, cancelled sending`)
     })
 
     socket.on('updateReservationSetting', async (storeId, reservationSetting) => {
       console.log(reservationSetting)
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
+      const store = await cms.getModel('Store').findById(storeId);
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
+        console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
+          `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
+      } else {
+        console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
+            `2. Online Order backend: no device found, cancelled sending`)
       }
     })
 
