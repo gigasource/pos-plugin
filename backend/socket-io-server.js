@@ -283,12 +283,19 @@ module.exports = function (cms) {
     socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
+      const device = await cms.getModel('Device').findById(deviceId).lean();
+      const store = await cms.getModel('Store').findById(device.storeId);
+      let sentryTags = `sentry:clientId=${deviceId},eventType=updateAppFeature`;
+      if (store) sentryTags += `,store=${store.settingName},alias=${store.alias}`;
+
       try {
-        const device = await cms.getModel('Device').findById(deviceId).lean();
         externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
-        cb(`Awaiting device feature update for ${device.name}(${device.hardware})`)
+
+        console.debug(sentryTags, `2. Online Order backend: Sending feature update to client with id ${deviceId}`, JSON.stringify(features));
+        cb(`Awaiting device feature update for ${device.name}(${device.hardware})`);
       } catch (e) {
-        cb('Error emitting to device')
+        console.debug(sentryTags, `2. Online Order backend: Error while sending feature update to client with id ${deviceId}`, JSON.stringify(features));
+        cb('Error emitting to device');
       }
     });
 

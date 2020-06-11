@@ -339,6 +339,9 @@
       },
 
       async updateDeviceFeatures(_id, features, cb) {
+        console.debug(`sentry:clientId=${_id},eventType=updateAppFeature`,
+            `1. Online Order frontend: sending feature update to backend with clientId ${_id}`, JSON.stringify(features));
+
         const {socket} = window.cms
         socket.emit('updateAppFeature', _id, features, (message) => {
           cb && cb(message)
