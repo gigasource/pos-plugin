@@ -408,10 +408,10 @@ module.exports = function (cms) {
       externalSocketIOServer.emitToPersistent(deviceId, 'stopStream')
     })
 
-    async function getCoordsByPostalCode(code) {
+    async function getCoordsByPostalCode(code, address) {
       //todo support countries
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
-
+      let url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
+      if (address) url+= `&address=${encodeURI(address)}`
       const response = await axios.get(url)
       const {results} = response.data
       if (!results || !results.length) return
@@ -427,6 +427,13 @@ module.exports = function (cms) {
       const geolib = require('geolib')
       const distance = geolib.getPreciseDistance(fromCoords, toCoords) / 1000   //distance in km
       callback(distance)
+    })
+
+    socket.on('getCoordsByGoogleApi', async (zipCode, address, callback) => {
+      const result = await getCoordsByPostalCode(zipCode, address)
+      if (!result) return callback()
+      const { latitude, longitude } = result
+      callback({long: longitude, lat: latitude})
     })
 
     socket.on('createReservation', async (storeId, reservationData) => {

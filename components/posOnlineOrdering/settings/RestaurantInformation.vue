@@ -119,7 +119,7 @@
       this.updateDebounce = _.debounce(this.update, 1000)
     },
     mounted() {
-      this.$watch(vm => [vm.store.address, vm.store.zipCode], this.getStoreCoords, { immediate: !this.store.coordinates })
+      this.$watch(vm => [vm.store.address, vm.store.townCity , vm.store.zipCode], this.getStoreCoords, { immediate: !this.store.coordinates })
     },
     methods: {
       async update(change) {
@@ -142,8 +142,9 @@
         return `${getCdnUrl(url)}?w=60&h=60`
       },
       getStoreCoords: _.debounce(async function (value) {
-        const [address, zipCode] = value
+        let [address, city, zipCode] = value
         if (!address || !zipCode) return
+        if (city) address += `, ${city}`
 
         const url = `https://pelias.gigasource.io/v1/search?text=${encodeURI(address)}`
 
@@ -154,14 +155,23 @@
             if (foundLocation) {
               const [long, lat] = foundLocation.geometry.coordinates
               await this.update({ coordinates: { long, lat }})
-              console.log('updated coords')
+              console.log(`[Geocode]${this.store.alias}|PeliasAPI|coords:${long}, ${lat}`)
+            } else {
+              await this.getCoordsByGoogleApi(zipCode, address)
             }
           }
         } catch (e) {
           console.warn(e)
+          await this.getCoordsByGoogleApi(zipCode, address)
         }
 
-      }, 500)
+      }, 500),
+      async getCoordsByGoogleApi(code, address) {
+        cms.socket.emit('getCoordsByGoogleApi', code, address, async ({ long, lat }) => {
+          console.log(`[Geocode]${this.store.alias}|GoogleAPI|coords:${long}, ${lat}`)
+          await this.update({ coordinates: { long, lat }})
+        })
+      }
     }
   }
 </script>
