@@ -316,7 +316,12 @@
           note: this.customer.note
         }
 
-        window.cms.socket.emit('createReservation', this.store._id, reservationData)
+        cms.socket.emit('createReservation', this.store._id, reservationData)
+        console.debug(`sentry:reservation,store=${this.store.name},alias=${this.store.alias}`,
+          `1. Online order frontend: received reservation:
+          guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
+          customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
+          note:${reservationData.note}`)
       },
       completeReservation() {
         let err = false

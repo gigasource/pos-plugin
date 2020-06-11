@@ -323,7 +323,9 @@ module.exports = function (cms) {
 
           if (fs.existsSync(localeFilePath)) {
             const { [locale]: { store } } = require(localeFilePath)
-            responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
+            if (store && store.deliveryIn && store.pickUpIn) {
+              responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
+            }
           }
 
           socket.join(orderData.orderToken);
@@ -429,10 +431,15 @@ module.exports = function (cms) {
     socket.on('createReservation', async (storeId, reservationData) => {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
+      const store = await cms.getModel('Store').findById(storeId)
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
+        console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
+          `2. Online order backend: sent reservation to device`)
       }
+      console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
+        `2. Online order backend: no device found, cancelled sending`)
     })
 
     socket.on('updateReservationSetting', async (storeId, reservationSetting) => {
