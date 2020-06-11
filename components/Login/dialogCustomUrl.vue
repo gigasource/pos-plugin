@@ -1,5 +1,5 @@
 <template>
-  <g-dialog width="40%" v-model="internalValue">
+  <g-dialog v-model="internalValue">
     <g-card>
       <g-card-title class="justify-center"><span>Connect to Server</span></g-card-title>
       <g-card-text>
@@ -11,6 +11,9 @@
           <g-text-field-bs :disabled="radioValue !== 'custom'" v-model="customUrl"/>
         </g-radio-group>
       </g-card-text>
+      <div class="pa-3 bg-grey">
+        <pos-keyboard-full/>
+      </div>
       <g-card-actions>
         <g-spacer/>
         <g-btn-bs height="36" width="120" @click.stop="cancel">Cancel</g-btn-bs>
