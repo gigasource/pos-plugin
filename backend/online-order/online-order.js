@@ -22,14 +22,19 @@ let recreateOnlineOrderSocketInterval = null;
 let initFinished = false;
 
 module.exports = async cms => {
-  async function getWebShopUrl() {
-    const posSetting = await cms.getModel('PosSetting').findOne()
-
-    if (posSetting.onlineDevice && posSetting.onlineDevice.store) {
-      const {onlineDevice: {store: {name, alias}}} = posSetting;
+  async function updateStoreName() {
+    const posSettings = await cms.getModel('PosSetting').findOne({});
+    if (posSettings.onlineDevice && posSettings.onlineDevice.store) {
+      const {onlineDevice: {store: {name, alias}}} = posSettings;
       storeName = name;
       storeAlias = alias;
     }
+  }
+
+  await updateStoreName();
+
+  async function getWebShopUrl() {
+    const posSetting = await cms.getModel('PosSetting').findOne()
 
     webshopUrl = posSetting.customServerUrl ? posSetting.customServerUrl : webshopUrlFromConfig;
     return webshopUrl
@@ -384,7 +389,13 @@ module.exports = async cms => {
         requestBody.release = require('../../package').release
         try {
           const requestResponse = await axios.post(pairingApiUrl, requestBody)
-          return requestResponse.data.deviceId
+
+          const {deviceId, storeName: sName, storeAlias: sAlias} = requestResponse.data;
+
+          if (sName) storeName = sName;
+          if (sAlias) storeAlias = sAlias;
+
+          return deviceId
         } catch (e) {
           console.error(e)
           return null
