@@ -241,8 +241,15 @@ module.exports = async cms => {
         }
         return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
       }))
-      cms.socket.emit('updateAppFeature')
-      callback()
+      const posSetting = await cms.getModel('PosSetting').findOne({});
+      const sentryTags = posSetting.onlineDevice && posSetting.onlineDevice.id
+          ? getBaseSentryTags('updateAppFeature') + `,clientId=${posSetting.onlineDevice.id}`
+          : getBaseSentryTags('updateAppFeature');
+
+      console.debug(sentryTags, '3. Restaurant backend: received feature update from server, emitting to frontend', JSON.stringify(data));
+
+      cms.socket.emit('updateAppFeature', sentryTags, data);
+      callback();
     });
     socket.on('unpairDevice', cb => {
       cms.socket.emit('unpairDevice')

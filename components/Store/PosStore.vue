@@ -224,7 +224,8 @@
       },
       //<!--</editor-fold>-->
       initSocket() {
-        cms.socket.on('updateAppFeature', async () => {
+        cms.socket.on('updateAppFeature', async (sentryTags, data) => {
+          console.debug(sentryTags, '4. Restaurant frontend: received feature update from backend, updating features', JSON.stringify(data));
           await this.getEnabledFeatures()
         })
 
