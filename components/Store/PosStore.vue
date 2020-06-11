@@ -143,7 +143,8 @@
             key: 'Reservation'
           }
         ],
-        pendingReservationsLength: 0
+        pendingReservationsLength: 0,
+        reservationBell: null
       }
     },
     computed: {
@@ -302,6 +303,14 @@
           date: { $gte: currentDate.toDate(), $lt: currentDate.add(1, 'day').toDate() }
         })
         this.pendingReservationsLength = reservations.length
+      },
+      async setupReservationBell() {
+        const setting = await cms.getModel('PosSetting').findOne()
+        if(setting.reservation && setting.reservation.soundNotification) {
+          this.reservationBell = new Audio('/plugins/pos-plugin/assets/sounds/reservation-bell.mp3')
+        } else {
+          this.reservationBell = null
+        }
       }
     },
     async created() {
@@ -343,9 +352,11 @@
       })
 
       await this.getPendingReservationsLength()
+      await this.setupReservationBell()
 
       cms.socket.on('updateReservationList', async () => {
         await this.getPendingReservationsLength()
+        await this.setupReservationBell()
       })
     },
     watch: {
@@ -355,6 +366,19 @@
         } else {
           this.showOfflineSnackbar()
         }
+      },
+      pendingReservationsLength: {
+        async handler(val, oldVal) {
+          if(val && !isNaN(val) && !isNaN(oldVal)) {
+            if(val > oldVal && this.reservationBell) {
+              try {
+                await this.reservationBell.play()
+              } catch (e) {
+                this.reservationBell.addEventListener('canplaythrough', () => this.reservationBell.play())
+              }
+            }
+          }
+        },
       }
     },
     mounted() {
