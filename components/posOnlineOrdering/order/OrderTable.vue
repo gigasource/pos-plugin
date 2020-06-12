@@ -341,7 +341,7 @@
       cms.socket.on('updateOrderStatus', (orderStatus) => {
         const {onlineOrderId, status, responseMessage, paypalOrderId} = orderStatus
 
-        console.debug(`sentry:orderToken=${onlineOrderId},store=${this.store.name},alias=${this.store.alias}`,
+        console.debug(`sentry:orderToken=${onlineOrderId},store=${this.store.name},alias=${this.store.alias},eventType=orderStatus`,
             `${status === 'inProgress' ? '6' : '11'}. Online order frontend: received status: ${status}`);
 
         if (onlineOrderId === this.dialog.order.orderToken) {
@@ -784,8 +784,8 @@
           Object.assign(orderData, {printers: [this.store.printers[0]]})
         }
 
-        console.debug(`sentry:orderToken=${orderToken},store=${this.store.name},alias=${this.store.alias}`,
-            `1. Online order frontend: send order to backend`, JSON.stringify(products));
+        console.debug(`sentry:orderToken=${orderToken},store=${this.store.name},alias=${this.store.alias},eventType=orderStatus`,
+            `1. Online Order frontend: send order to backend`, JSON.stringify(products));
         window.cms.socket.emit('createOrder', this.store._id, orderData)
 
         this.dialog.order = {
