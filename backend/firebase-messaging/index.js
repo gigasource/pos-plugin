@@ -29,7 +29,10 @@ module.exports = cms => {
     discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
 
     if (deliveryTime === 'asap') {
-      deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').format('HH:mm')
+      deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').toDate()
+    } else {
+      const [hour, minute] = deliveryTime.split(':')
+      deliveryTime = dayjs().startOf('hour').hour(hour).minute(minute).toDate()
     }
 
     customer = {
