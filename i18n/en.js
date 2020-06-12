@@ -142,7 +142,7 @@ module.exports = {
       datetime: 'Date/Time',
       sales: 'Sales',
       total: 'Total',
-      currency: '€',
+      currency: '$',
       currencyDecimal: '2',
       discount: 'Discount',
       tax: 'Tax',

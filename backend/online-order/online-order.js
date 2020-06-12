@@ -538,12 +538,12 @@ module.exports = async cms => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
 
-      onlineOrderSocket.emit('getWebshopName', deviceId, async ({settingName, name, alias}) => {
+      onlineOrderSocket.emit('getWebshopName', deviceId, async ({settingName, name, alias, locale}) => {
         storeName = name;
         storeAlias = alias;
 
         const posSettings = await cms.getModel('PosSetting').findOne({});
-        if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias};
+        if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias, locale};
         await cms.getModel('PosSetting').updateOne({}, posSettings);
 
         callback(settingName);

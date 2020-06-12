@@ -28,19 +28,19 @@
                         :suffix="newPercent ? '%' : ''"
                         :rules="[rules.percent]"></g-text-field>
         </div>
-        <g-radio color="#1271ff" value="amount" :label="`${$t('dialogs.effective')} ${$t('common.currency')}`"></g-radio>
+        <g-radio color="#1271ff" value="amount" :label="`${$t('dialogs.effective')} ${$t('common.currency', storeLocale)}`"></g-radio>
         <div class="row-flex col-10 m-auto">
           <g-btn :uppercase="false" outlined :class="[disabledAmount && 'disabled']" :disabled="disabledAmount || originalValue - 5 < 0" @click="newAmount = '5'">
-            - {{$t('common.currency')}} 5
+            - {{$t('common.currency', storeLocale)}} 5
           </g-btn>
           <g-btn :uppercase="false" outlined :class="[disabledAmount && 'disabled']" :disabled="disabledAmount || originalValue - 10 < 0" @click="newAmount = '10'">
-            - {{$t('common.currency')}} 10
+            - {{$t('common.currency', storeLocale)}} 10
           </g-btn>
           <g-btn :uppercase="false" outlined :class="[disabledAmount && 'disabled']" :disabled="disabledAmount || originalValue - 15 < 0" @click="newAmount = '15'">
-            - {{$t('common.currency')}} 15
+            - {{$t('common.currency', storeLocale)}} 15
           </g-btn>
           <g-btn :uppercase="false" outlined :class="[disabledAmount && 'disabled']" :disabled="disabledAmount || originalValue - 20 < 0" @click="newAmount = '20'">
-            - {{$t('common.currency')}} 20
+            - {{$t('common.currency', storeLocale)}} 20
           </g-btn>
           <g-text-field dense outlined
                         :class="[disabledAmount && 'disabled', 'tf-amount']"
@@ -63,6 +63,7 @@
 <script>
   export default {
     name: 'ChangeValue',
+    injectService: ['PosStore:storeLocale'],
     props: {
       value: Boolean,
       newValueEditable: false,

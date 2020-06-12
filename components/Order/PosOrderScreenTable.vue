@@ -9,8 +9,8 @@
               <span class="flex-grow-1 pa-2 ta-left">{{$t('order.name')}}</span>
               <span class="w-10 pa-2 ta-center">{{$t('order.unit')}}</span>
               <span class="w-10 pa-2 ta-right">{{$t('order.quantity')}}</span>
-              <span class="w-12 pa-2 ta-right">{{$t('order.each')}}({{$t('common.currency')}})</span>
-              <span class="pa-2 ta-right" style="width: 15%; max-width: 15%">{{$t('common.total')}}({{$t('common.currency')}})</span>
+              <span class="w-12 pa-2 ta-right">{{$t('order.each')}}({{$t('common.currency', storeLocale)}})</span>
+              <span class="pa-2 ta-right" style="width: 15%; max-width: 15%">{{$t('common.total')}}({{$t('common.currency', storeLocale)}})</span>
             </div>
           </th>
         </tr>
@@ -36,7 +36,7 @@
 <script>
   export default {
     name: 'PosOrderScreenTable',
-    injectService: ['OrderStore:(currentOrder)'],
+    injectService: ['OrderStore:(currentOrder)', 'PosStore:storeLocale'],
     data() {
       return {
         viewportRows: 0,

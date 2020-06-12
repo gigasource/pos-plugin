@@ -38,7 +38,7 @@
           <pos-range-slider min="0" max="1000" v-model="price"/>
           <div class="range-value">
             <span>0</span>
-            <span>{{$t('common.currency')}} 1000</span>
+            <span>{{$t('common.currency', storeLocale)}} 1000</span>
           </div>
           <div class="buttons">
             <g-btn :uppercase="false" text @click="dialogAddFilter = false" outlined width="120"
@@ -88,7 +88,7 @@
   export default {
     name: "dialogAddFilter",
     injectService: [
-        'SettingsStore:findCategoryByName'
+        'SettingsStore:findCategoryByName', 'PosStore:storeLocale'
     ],
     props: {
       value: Boolean,

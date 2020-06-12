@@ -30,30 +30,30 @@
               {{item.name}}
               <span class="i text-grey">{{getExtraInfo(item)}}</span>
             </div>
-            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency')}} {{getItemPrice(item) | formatMoney}}</div>
+            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency', storeLocale)}} {{getItemPrice(item) | formatMoney}}</div>
           </div>
         </div>
 
         <div class="dashed-gradient"/>
         <div class="row-flex justify-between mt-2">
           <div>{{$t('onlineOrder.total')}} <b>{{orderQuantity}}</b> {{$t('onlineOrder.items')}}</div>
-          <div class="ta-right">{{$t('common.currency')}} {{subTotal | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{subTotal | formatMoney}}</div>
         </div>
         <div class="row-flex justify-between" v-if="order.type === 'delivery'">
           <div>{{$t('onlineOrder.shippingFee')}}:</div>
-          <div class="ta-right">{{$t('common.currency')}} {{getShippingFee() | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{getShippingFee() | formatMoney}}</div>
         </div>
         <div class="row-flex justify-between" v-for="discount in order.discounts">
           <div>
             <span>{{discount.coupon ? 'Coupon ' : discount.name}}</span>
             <span style="color: #757575; font-style: italic"  v-if="discount.coupon">({{discount.coupon}})</span>:
           </div>
-          <div class="ta-right">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
+          <div class="ta-right">-{{$t('common.currency', storeLocale)}}{{discount.value | formatMoney(decimals)}}</div>
         </div>
         <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>{{$t('onlineOrder.total')}}</div>
-          <div class="ta-right">{{$t('common.currency')}} {{order.vSum | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{order.vSum | formatMoney}}</div>
         </div>
         <div class="row-flex justify-between mt-1" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Payment</div>
@@ -79,6 +79,7 @@
     props: {
       value: Boolean
     },
+    injectService: ['PosStore:storeLocale'],
     data() {
       return {
         order: null,

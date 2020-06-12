@@ -911,6 +911,11 @@
               "schemaType": "string",
               "key": "alias",
               "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "locale",
+              "type": "input"
             }
           ],
           "type": "object"

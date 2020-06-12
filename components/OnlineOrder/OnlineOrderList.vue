@@ -8,7 +8,7 @@
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
       <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
-      <span class="fw-700 fs-large mr-3">{{$t('common.currency')}}{{ totalIncome | formatNumber }}</span>
+      <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatNumber }}</span>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
     <div class="online-order-list__table">
@@ -35,7 +35,7 @@
             <div v-else>--</div>
           </td>
           <td>
-            <p class="fw-700">{{$t('common.currency')}}{{item.payment[0].value}}</p>
+            <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value}}</p>
             <p>{{item.payment[0].type}}</p>
           </td>
           <td>{{item.date | formatDate}}</td>
@@ -53,10 +53,10 @@
   import dayjs from 'dayjs'
   import isBetween from 'dayjs/plugin/isBetween'
   dayjs.extend(isBetween)
-  
+
   export default {
     name: 'OnlineOrderList',
-    injectService: ['OrderStore:getOnlineOrdersWithStatus'],
+    injectService: ['OrderStore:getOnlineOrdersWithStatus', 'PosStore:storeLocale'],
     props: {
       status: String,
       onlineOrders: {
@@ -204,12 +204,12 @@
         }
       }
     }
-    
+
     ::v-deep .bs-tf-wrapper {
       margin: 8px 0;
       background-color: #FFF;
       width: 150px;
-      
+
       .bs-tf-label {
         margin-bottom: 0;
       }

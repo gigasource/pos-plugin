@@ -8,7 +8,7 @@
 			<pos-range-slider :min="min" :max="max" v-model="filter"/>
 			<div class="range-value">
 				<span>{{min === 0 ? min : '€ ' + min}}</span>
-				<span>{{$t('common.currency')}} {{max}}</span>
+				<span>{{$t('common.currency', storeLocale)}} {{max}}</span>
 			</div>
 			<div class="buttons">
 				<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" style="margin-right: 8px">{{$t('ui.cancel')}}</g-btn>
@@ -22,6 +22,7 @@
 
   export default {
     name: 'dialogRangeFilter',
+		injectService: ['PosStore:storeLocale'],
     props: {
       label: null,
       min: {

@@ -24,6 +24,7 @@
         online: false,
         storeId: '',
         locale: 'en',
+        storeLocale: 'en',
         device: 'Terminal1',
         enabledFeatures: [],
         version: '0.0.0',
@@ -333,6 +334,10 @@
       const i18nConfig = cms.getList('SystemConfig').find(i => i.type === 'I18n')
       if (i18nConfig) {
         this.locale = i18nConfig.content.locale
+      }
+      const posSettings = cms.getList('PosSetting')[0]
+      if (posSettings && posSettings.store) {
+        this.storeLocale = posSettings.store.locale || this.locale || 'en'
       }
 
       if (this.$router && this.$router.currentRoute) {

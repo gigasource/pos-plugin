@@ -66,7 +66,7 @@
                     <span style="color: #757575; font-style: italic" v-if="discount.coupon">({{discount.coupon}})</span>
                   </div>
                   <g-spacer/>
-                  <div class="fs-small-2">-{{$t('common.currency')}}{{discount.value | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2">-{{$t('common.currency', storeLocale)}}{{discount.value | formatMoney(decimals)}}</div>
                 </div>
               </div>
             </g-card-text>
@@ -97,7 +97,7 @@
               <g-btn-bs v-else height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
                 <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" style="height: 16px" class="mr-2"/>
                 <span v-else class="mr-2">{{order.payment.type}}</span>
-                <span>{{$t('common.currency')}}{{order.payment.value | formatMoney(decimals)}}</span>
+                <span>{{$t('common.currency', storeLocale)}}{{order.payment.value | formatMoney(decimals)}}</span>
               </g-btn-bs>
             </g-card-actions>
           </g-card>
@@ -180,6 +180,7 @@
   export default {
     name: 'OnlineOrderMain',
     components: {DialogTextFilter, DialogCompleteOrder, ValuePicker },
+    injectService: ['PosStore:storeLocale'],
     props: {
       pendingOrders: Array,
       kitchenOrders: Array,
