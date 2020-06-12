@@ -44,7 +44,7 @@
                 <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">
                   Modify
                 </g-btn-bs>
-                <g-btn-bs background-color="#E57373">
+                <g-btn-bs background-color="#E57373" @click="remove(reservation)">
                   <g-icon>icon-delete</g-icon>
                 </g-btn-bs>
               </div>
@@ -170,6 +170,7 @@
         this.dialog = true
       },
       remove(reservation) {
+        if (reservation.status === 'completed') return
         this.$emit('removeReservation', reservation._id)
       },
     }

@@ -89,6 +89,18 @@ module.exports = async cms => {
     }
   }
 
+  function cancelRemoveReservationJob(reservation) {
+    if (!reservation) return
+    const guestName = reservation.customer.name;
+    const reservationTime = dayjs(reservation.date).format('HH:mm')
+
+    if (reservationJobs[reservation._id]) {
+      reservationJobs[reservation._id].cancel()
+      delete reservationJobs[reservation._id]
+      console.debug(`${getBaseSentryTags('Reservation')},reservation`, `Restaurant: cancelled scheduler job for reservation guest '${guestName}' (${reservationTime})`)
+    }
+  }
+
   async function scheduleRemoveReservationJob(reservation) {
     async function declineReservation() {
       const res = await cms.getModel('Reservation').findById(reservation._id)
@@ -97,24 +109,21 @@ module.exports = async cms => {
         await cms.getModel('Reservation').updateOne({_id: reservation._id}, res) // update db
       }
       delete reservationJobs[reservationId] // remove cached job
-      console.debug(getBaseSentryTags('Reservation'), `Restaurant: auto-declined reservation ${reservationId} for ${res.date}`)
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${reservationId} for ${res.date}`)
       cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
-      console.debug(getBaseSentryTags('Reservation'), `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
     }
     if (!reservation) return
 
     const reservationId = reservation._id;
+    const guestName = reservation.customer.name;
+    const reservationTime = dayjs(reservation.date).format('HH:mm')
     const posSettings = await cms.getModel('PosSetting').findOne()
     const timeout = posSettings.reservation && posSettings.reservation.removeOverdueAfter
       ? posSettings.reservation.removeOverdueAfter : 0 // fallback to 0 timeout (no auto-decline)
 
     if (timeout === 0) { // do not auto-decline, cancel job and return
-      if (reservationJobs[reservationId]) {
-        reservationJobs[reservationId].cancel()
-        delete reservationJobs[reservationId]
-        console.debug(getBaseSentryTags('Reservation'), `Restaurant: cancelled scheduler job for reservation ${reservationId}`)
-      }
-      return
+      return cancelRemoveReservationJob(reservation)
     }
 
     const timeoutDateTime = dayjs(reservation.date).add(timeout, 'minute').toDate()
@@ -123,33 +132,29 @@ module.exports = async cms => {
     if (execNow) { // exec now
       await declineReservation()
       // check existing jobs and delete them
-      if (reservationJobs[reservationId]) {
-        reservationJobs[reservationId].cancel()
-        delete reservationJobs[reservationId]
-        console.debug(getBaseSentryTags('Reservation'), `Restaurant: cancelled scheduler job for reservation ${reservationId}`)
-      }
-      return
+      return cancelRemoveReservationJob(reservation)
     }
 
     // check existing jobs and reschedule
     if (reservationJobs[reservationId]) {
       const rescheduleSuccess = schedule.rescheduleJob(reservationJobs[reservationId], timeoutDateTime)
 
-      return console.debug(getBaseSentryTags('Reservation'),
+      return console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
         rescheduleSuccess
-          ? `Restaurant: Reschedule successful for id ${reservationId} at ${timeoutDateTime}`
-          : `Restaurant: Reschedule failed for id ${reservationId} at ${timeoutDateTime}`
+          ? `Restaurant: Reschedule successful for guest '${guestName}' at ${timeoutDateTime}`
+          : `Restaurant: Reschedule failed for guest '${guestName}' at ${timeoutDateTime}`
       )
     }
     // else start job
     reservationJobs[reservationId] = schedule.scheduleJob(timeoutDateTime, declineReservation)
-    console.debug(getBaseSentryTags('Reservation'), `Restaurant: scheduled reservation decline for ${reservationId} (${reservation.date}) at ${timeoutDateTime}`)
+    console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: scheduled reservation decline for guest '${guestName}' (${reservationTime}) at ${timeoutDateTime}`)
   }
 
   async function initReservationSchedules() {
     // fetch all pending reservations
     let pendingReservations = await cms.getModel('Reservation').find({ status: 'pending' }).lean()
     // start jobs
+    console.debug(getBaseSentryTags('Reservation'), `Restaurant: scheduling Reservation jobs on init`)
     pendingReservations.forEach(res => {
       scheduleRemoveReservationJob(res)
     })
@@ -652,6 +657,30 @@ module.exports = async cms => {
         })
       } catch (error) {
         callback({error})
+      }
+    })
+
+    socket.on('rescheduleReservation', async (_id, change) => {
+      const reservation = await cms.getModel('Reservation').findById(_id)
+      if (!reservation) return
+
+      // logs
+      const guestName = reservation.customer.name;
+      const reservationTime = dayjs(reservation.date).format('HH:mm')
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: Reschedule requested for '${guestName}' (${reservationTime}), change: ${JSON.stringify(change)}`)
+
+      // reschedule here
+      switch (reservation.status) {
+        case 'pending': {
+          await scheduleRemoveReservationJob(reservation)
+          return
+        }
+        case 'completed': {
+          return cancelRemoveReservationJob(reservation)
+        }
+        case 'declined': {
+          return cancelRemoveReservationJob(reservation)
+        }
       }
     })
   })

@@ -662,6 +662,8 @@
       },
       async updateReservation(_id, change) {
         await cms.getModel('Reservation').findOneAndUpdate({ _id }, change)
+        cms.socket.emit('rescheduleReservation', _id, change)
+        await this.getReservations()
       },
       async completeReservation(_id) {
         await this.updateReservation(_id, { status: 'completed' })
