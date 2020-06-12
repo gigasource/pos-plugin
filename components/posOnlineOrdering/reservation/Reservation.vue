@@ -184,7 +184,7 @@
         if(store.reservationSetting) {
           maxGuest = store.reservationSetting.maxGuest || 40
           if(store.reservationSetting.maxDay) {
-            this.maxDay = dayjs(new Date).add(store.reservationSetting.maxDay, 'day').format('YYYY-MM-DD')
+            this.maxDay = dayjs(new Date).add(store.reservationSetting.maxDay - 1, 'day').format('YYYY-MM-DD')
           }
           if(!store.reservationSetting.activeReservation) {
             this.dialog.notice = true
