@@ -86,7 +86,7 @@
           <g-text-field-bs :rules="rules.first" v-model="customer.firstName" @input="rules.first = []" placeholder="First Name*" required/>
           <g-text-field-bs :rules="rules.last" v-model="customer.lastName" @input="rules.last = []" placeholder="Last Name*" required/>
           <g-text-field-bs v-model="customer.email" placeholder="Email"/>
-          <g-text-field-bs :rules="rules.phone" type="number" v-model="customer.phone" @input="rules.phone = []" placeholder="Phone Number" required/>
+          <g-text-field-bs :rules="rules.phone" type="number" v-model="customer.phone" @input="rules.phone = []" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
           <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" @click="completeReservation">Complete</g-btn-bs>
