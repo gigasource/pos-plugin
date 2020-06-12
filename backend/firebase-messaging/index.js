@@ -52,7 +52,7 @@ module.exports = cms => {
         date: JSON.stringify(createdDate),
         shippingFee: JSON.stringify(shippingFee),
         total: JSON.stringify(totalPrice),
-        deliveryTime,
+        deliveryTime: JSON.stringify(deliveryTime),
         discounts: JSON.stringify(discounts)
       },
       notification: {
