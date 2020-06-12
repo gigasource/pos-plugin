@@ -75,6 +75,19 @@ module.exports = function (cms) {
     updateMessage,
   });
 
+  if (global.APP_CONFIG.redis) {
+    process.on('exit', () => {
+      let done = false;
+      // Remove all socket clients belonging to this instance stored in Redis when this instance exits/be killed
+      externalSocketIOServer.removeInstanceClients().then(() => done = true);
+
+      while (!done) {
+        require('deasync').sleep(1000);
+      }
+      process.exit();
+    });
+  }
+
   // ack fns
   externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
     const {_id, name, hardware} = device
