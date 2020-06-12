@@ -87,7 +87,7 @@
               <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })" @click="openDialogChoiceInput('option', i, iOpt)"/>
             </div>
             <div class="item-price col-3">
-              <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency')"
+              <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency', storeCountryLocale)"
                      @input="e =>  editOption(i, iOpt, { name: option.name, price: e.target.value })"
                      @click="openDialogChoiceInput('value', i, iOpt)"/>
             </div>
@@ -164,7 +164,8 @@
         type: Array,
         default: () => []
       },
-      mark: Object
+      mark: Object,
+      storeCountryLocale: Object,
     },
     data: function () {
       let internalPrinter
@@ -473,7 +474,7 @@
         }
       }
     }
-    
+
     &__choice {
       position: relative;
       display: grid;
@@ -483,7 +484,7 @@
       background: #fafafa;
       border-bottom: 1px solid #efefef;
       font-size: 15px;
-      
+
       &__delete-btn {
         position: absolute;
         top: 0;
@@ -561,7 +562,7 @@
         }
       }
     }
-    
+
     &__image {
       width: 80px;
       height: 80px;

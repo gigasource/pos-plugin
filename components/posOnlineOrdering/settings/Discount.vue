@@ -51,7 +51,8 @@
         </template>
       </div>
     </div>
-    <dialog-new-discount v-model="dialog.discount" :edit="dialog.edit" :discount="selectedDiscount" @submit="addDiscount"/>
+    <dialog-new-discount v-model="dialog.discount" :edit="dialog.edit" :discount="selectedDiscount"
+                         @submit="addDiscount" :store-country-locale="storeCountryLocale"/>
     <dialog-delete-item v-model="dialog.delete" type="discount" @confirm="deleteDiscount"/>
   </div>
 </template>
@@ -64,7 +65,8 @@
     name: "Discount",
     components: {DialogDeleteItem, DialogNewDiscount},
     props: {
-      listDiscount: Array
+      listDiscount: Array,
+      storeCountryLocale: String,
     },
     data() {
       return {
@@ -99,7 +101,7 @@
         } else if (type === 'percent') {
           return `${value}%`
         } else {
-          return `${this.$t('common.currency')}${value}`
+          return `${this.$t('common.currency', this.storeCountryLocale)}${value}`
         }
       },
       getCondition(condition) {

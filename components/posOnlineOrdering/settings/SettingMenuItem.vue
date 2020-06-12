@@ -65,7 +65,7 @@
           </div>
         </div>
         <div class="pt-3 h-100">
-          <div class="menu-setting-item__price">{{$t('common.currency')}}{{price}}</div>
+          <div class="menu-setting-item__price">{{$t('common.currency', storeCountryLocale)}}{{price}}</div>
           <div class="menu-setting-item__tax">Tax: {{tax}}%</div>
         </div>
         <div class="menu-setting-item__content" style="justify-self: center; justify-content: start; padding-top: 2px">
@@ -121,6 +121,7 @@
           :available="available"
           :mark="mark"
           :display-image="displayImage"
+          :store-country-locale="storeCountryLocale"
           @cancel="cancelEdit"
           @save="saveProduct"/>
     </template>
@@ -130,11 +131,13 @@
   import _ from 'lodash'
   import { getCdnUrl } from '../../Store/utils';
   import SettingNewMenuItem from './SettingNewMenuItem';
-  
+
   export default {
     name: 'SettingMenuItem',
     components: { SettingNewMenuItem },
-    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters', 'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId', 'editing', 'mark', 'displayImage'],
+    props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters',
+      'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId',
+      'editing', 'mark', 'displayImage', 'storeCountryLocale'],
     data: function () {
       return {
         mode: 'view',
@@ -148,8 +151,8 @@
       }
     },
     filters: {
-      currency(value) {
-        return $t('common.currency') + value
+      currency(value, locale) {
+        return $t('common.currency', locale) + value
       }
     },
     computed: {

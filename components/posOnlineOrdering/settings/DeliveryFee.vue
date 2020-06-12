@@ -10,7 +10,7 @@
       <template v-if="type === 'zipCode'">
         <div class="delivery-fee__content-header">
           <div class="col-9">Zip code</div>
-          <div class="col-3">Fee (€)</div>
+          <div class="col-3">Fee ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in zipCodeFees" :key="i">
@@ -40,7 +40,7 @@
         <p class="fs-small"><b>Coordinates: </b>{{obtainedCoordination}}</p>
         <div class="delivery-fee__content-header">
           <div class="col-9">Radius (km)</div>
-          <div class="col-3">Fee (€)</div>
+          <div class="col-3">Fee ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in distanceFees" :key="i">
@@ -72,7 +72,8 @@
     props: {
       deliveryFee: Object,
       address: String,
-      coordinates: Object
+      coordinates: Object,
+      storeCountryLocale: String,
     },
     data() {
       return {

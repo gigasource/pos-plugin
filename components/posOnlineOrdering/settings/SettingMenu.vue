@@ -72,6 +72,7 @@
                           @editing="setEditing(product._id, $event)"
                           @save="updateProduct(product._id, $event)"
                           @delete="openDeleteProductDialog(product._id)"
+                          :store-country-locale="storeCountryLocale"
                           @swap="(oldIndex, newIndex) => swapProduct(cate, oldIndex, newIndex)"/>
                     </template>
                     <div v-else-if="!showAddNewProductPanel[cate._id]" style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #fff;">
@@ -84,7 +85,8 @@
                           :available-printers="store.printers"
                           :use-multiple-printers="store.useMultiplePrinters"
                           @cancel="hideAddNewProductPanelForCategory(cate)"
-                          @save="addNewProduct({...$event, category: cate._id, order: cate.products.length})"/>
+                          @save="addNewProduct({...$event, category: cate._id, order: cate.products.length})"
+                          :store-country-locale="storeCountryLocale"/>
                     </div>
                   </div>
                 </div>
@@ -155,6 +157,9 @@
       this.editBtn = this.categoriesViewModel ? this.categoriesViewModel.map(g => false) : []
     },
     computed: {
+      storeCountryLocale() {
+        return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
       categoriesViewModel() {
         const categories = _.cloneDeep(this.categories)
         const products = _.cloneDeep(this.products)

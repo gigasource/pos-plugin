@@ -57,13 +57,13 @@
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
       <div class="po-menu-item__prices--under">
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
-        <div v-if="price2"> {{ price2 | currency }}</div>
+        <div v-if="price2"> {{ price2 | currency(storeCountryLocale) }}</div>
       </div>
     </div>
     <g-spacer/>
     <div class="po-menu-item__prices">
       <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
-      <div v-if="price2">{{ price2 | currency }}</div>
+      <div v-if="price2">{{ price2 | currency(storeCountryLocale) }}</div>
     </div>
     <g-icon @click="addToOrder" v-if="isOpening"
             size="28" color="#424242"
@@ -110,10 +110,11 @@
       mark: Object,
       scrolling: Number,
       displayImage: Boolean,
+      storeCountryLocale: String,
     },
     filters: {
-      currency(val) {
-        return $t('common.currency') + val.toFixed(2)
+      currency(val, locale) {
+        return $t('common.currency', locale) + val.toFixed(2)
       }
     },
     data() {
@@ -158,9 +159,9 @@
         }
 
         if (min < max)
-          return `${$t('common.currency')}${min.toFixed(2)} - ${$t('common.currency')}${max.toFixed(2)}`
+          return `${$t('common.currency', this.storeCountryLocale)}${min.toFixed(2)} - ${$t('common.currency', this.storeCountryLocale)}${max.toFixed(2)}`
         else
-          return `${$t('common.currency')}${min.toFixed(2)}`
+          return `${$t('common.currency', this.storeCountryLocale)}${min.toFixed(2)}`
       }
     },
     watch: {

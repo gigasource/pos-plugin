@@ -59,7 +59,7 @@
                 <g-icon>icon-menu2</g-icon>
               </div>
             </g-badge>
-            <div class="pos-order__info--total">{{ totalPrice | currency }}</div>
+            <div class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
             <g-spacer/>
             <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative; justify-content: flex-start" @click="showOrder = true" width="150">
               {{$t('store.payment')}}
@@ -99,6 +99,7 @@
                     :display-id="store.displayId"
                     :scrolling="scrolling"
                     :display-image="store.displayImage"
+                    :store-country-locale="storeCountryLocale"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
                     @decrease="removeItemFromOrder(item)"/>
@@ -151,7 +152,11 @@
           </div>
         </g-dialog>
 
-        <dialog-add-to-order v-bind="this.selectedProduct" v-model="dialog.add" @add="addItemToOrder"/>
+        <dialog-add-to-order
+            v-bind="this.selectedProduct"
+            v-model="dialog.add"
+            @add="addItemToOrder"
+            :store-country-locale="storeCountryLocale"/>
       </template>
     </div>
 </template>
@@ -173,7 +178,7 @@
       let weekday = new Date().getUTCDay() - 1
       if (weekday === -1)
         weekday = 6
-      
+
       return {
         selectedCategoryId: null,
         selectedMenuItemId: null,
@@ -200,9 +205,9 @@
       }
     },
     filters: {
-      currency(value) {
-        if (value)
-          return $t('common.currency') + value.toFixed(2)
+      currency(value, locale) {
+        if (value) return $t('common.currency', locale) + value.toFixed(2)
+
         return 0
       }
     },
@@ -211,11 +216,7 @@
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         this.$set(this, 'store', store)
-        try {
-          // change locale depend on store setting
-          root.$i18n.locale = this.store.country.locale || 'en'
-        } catch (e) {
-        }
+        root.$i18n.locale = (this.store && this.store.country && this.store.country.locale) || 'en'
         await this.loadCategories()
         await this.loadProducts()
         // focus on the first category
@@ -237,7 +238,7 @@
         // TODO: show 404 not found
         alert('Store is not exist');
       }
-      
+
       this.now = dayjs().format('HH:mm')
       this.dayInterval = setInterval(() => {
         this.now = dayjs().format('HH:mm')
@@ -263,6 +264,9 @@
       this.$refs['tab-content'] && this.$refs['tab-content'].removeEventListener('scroll', this.throttle)
     },
     computed: {
+      storeCountryLocale() {
+        return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
       shippingFee() {
         return this.$refs['order-table'].shippingFee
       },
@@ -382,7 +386,7 @@
         if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
           info.push({
             title: $t('store.minimumOrder'),
-            value: `${$t('common.currency')}${this.store.minimumOrderValue.value}`
+            value: `${$t('common.currency', this.storeCountryLocale)}${this.store.minimumOrderValue.value}`
           })
         }
         if (this.store.deliveryFee) {
@@ -404,7 +408,9 @@
           if (max !== 0)
             info.push({
               title: $t('store.deliveryFee'),
-              value: max > min ? `${$t('common.currency')}${min} - ${$t('common.currency')}${max}` : `${$t('common.currency')}${max}`
+              value: max > min
+                  ? `${$t('common.currency', this.storeCountryLocale)}${min} - ${$t('common.currency', this.storeCountryLocale)}${max}`
+                  : `${$t('common.currency', this.storeCountryLocale)}${max}`
             })
 
           if(this.store.openHours) {

@@ -44,7 +44,7 @@
               </p>
               <div class="po-order-table__item__note">
                 <textarea :id="`item_note_${index}`" rows="1" :placeholder="`${$t('store.note')}...`" v-model="item.note"/>
-                <div class="po-order-table__item__price">{{ getItemPrice(item) | currency }}</div>
+                <div class="po-order-table__item__price">{{ getItemPrice(item) | currency(storeCountryLocale) }}</div>
               </div>
 
             </div>
@@ -58,7 +58,7 @@
               </g-radio-group>
               <span v-if="orderType === 'delivery' && !satisfyMinimumValue && store.minimumOrderValue && store.minimumOrderValue.active"
                     style="color: #4CAF50; font-size: 15px">
-                {{$t('store.minimumWarning')}}{{$t('common.currency')}}{{store.minimumOrderValue.value}}.
+                {{$t('store.minimumWarning')}}{{currency}}{{store.minimumOrderValue.value}}.
               </span>
               <span v-if="orderType === 'delivery' && distanceExceedingRadius"
                     style="color: #4CAF50; font-size: 15px">
@@ -96,23 +96,23 @@
                     {{ item.name }}
                     <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
                   </div>
-                  <div class="pl-1">{{ getItemPrice(item) | currency }}</div>
+                  <div class="pl-1">{{ getItemPrice(item) | currency(storeCountryLocale) }}</div>
                 </div>
                 <div class="order-item-summary">
                   <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
                   <g-spacer/>
-                  <span>{{ totalPrice | currency }}</span>
+                  <span>{{ totalPrice | currency(storeCountryLocale) }}</span>
                 </div>
                 <div class="order-item-summary" v-if="orderType === 'delivery'">
                   <span>{{$t('store.shippingFee')}}:</span>
                   <g-spacer/>
                   <span v-if="calculatingShippingFee">{{calculatingText}}</span>
-                  <span v-else>{{ shippingFee | currency }}</span>
+                  <span v-else>{{ shippingFee | currency(storeCountryLocale) }}</span>
                 </div>
                 <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
                   <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
                   <g-spacer/>
-                  <span>-{{ value | currency }}</span>
+                  <span>-{{ value | currency(storeCountryLocale) }}</span>
                 </div>
               </div>
             </template>
@@ -125,28 +125,28 @@
                   {{ item.name }}
                   <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
                 </div>
-                <div class="pl-1">{{ getItemPrice(item) | currency }}</div>
+                <div class="pl-1">{{ getItemPrice(item) | currency(storeCountryLocale) }}</div>
               </div>
               <div class="order-item-summary">
                 <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
                 <g-spacer/>
-                <span>{{ totalPrice | currency }}</span>
+                <span>{{ totalPrice | currency(storeCountryLocale) }}</span>
               </div>
               <div class="order-item-summary" v-if="orderType === 'delivery'">
                 <span>{{$t('store.shippingFee')}}:</span>
                 <g-spacer/>
                 <span v-if="calculatingShippingFee">{{calculatingText}}</span>
-                <span v-else>{{ shippingFee | currency }}</span>
+                <span v-else>{{ shippingFee | currency(storeCountryLocale) }}</span>
               </div>
               <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
                 <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
                 <g-spacer/>
-                <span>-{{ value | currency }}</span>
+                <span>-{{ value | currency(storeCountryLocale) }}</span>
               </div>
               <div class="order-item-total">
                 <span>{{$t('store.total')}}</span>
                 <g-spacer/>
-                <span>{{effectiveTotal | currency}}</span>
+                <span>{{effectiveTotal | currency(storeCountryLocale)}}</span>
               </div>
 
               <!-- PAYMENT -->
@@ -171,7 +171,7 @@
       <g-spacer/>
       <template v-if="view !== 'payment'">
         <div :class="['po-order-table__footer', !isOpening && 'disabled']">
-          <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency }}</span></div>
+          <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency(storeCountryLocale) }}</span></div>
           <g-spacer/>
           <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative; justify-content: flex-start">
             {{$t('store.payment')}}
@@ -190,7 +190,7 @@
               <g-icon>icon-menu2</g-icon>
             </div>
           </g-badge>
-          <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency}}</div>
+          <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency(storeCountryLocale)}}</div>
           <g-spacer/>
           <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
           <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.next')}}</g-btn-bs>
@@ -201,6 +201,7 @@
     <!-- Order created -->
     <order-created v-if="dialog.value" v-model="dialog.value" :order-extra-info="dialog.extraInfo"
                    :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
+                   :store-country-locale="storeCountryLocale"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
     <dialog-order-confirm v-model="dialog.confirm"
@@ -212,6 +213,7 @@
                           :effective-total="effectiveTotal"
                           :loading="dialog.loading"
                           :type="orderType"
+                          :store-country-locale="storeCountryLocale"
                           @confirm="confirmPayment"/>
   </div>
 </template>
@@ -285,9 +287,9 @@
       }
     },
     filters: {
-      currency(value) {
-        if (value != null)
-          return $t('common.currency') + value.toFixed(2)
+      currency(value, locale) {
+        if (value != null) return $t('common.currency', locale) + value.toFixed(2)
+
         return 0
       }
     },
@@ -358,11 +360,14 @@
       clearInterval(this.timeInterval)
     },
     computed: {
+      storeCountryLocale() {
+        return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
       currency() {
-        return $t('common.currency')
+        return $t('common.currency', this.storeCountryLocale) // currency is static
       },
       currencyCode() {
-        return $t('common.currencyCode')
+        return $t('common.currencyCode', this.storeCountryLocale) // currency is static
       },
       asap() {
         return $t('common.asap')

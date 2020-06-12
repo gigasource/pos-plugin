@@ -162,7 +162,8 @@
     props: {
       value: Boolean,
       edit: Boolean,
-      discount: Object
+      discount: Object,
+      storeCountryLocale: String,
     },
     data() {
       return {
@@ -201,7 +202,7 @@
           }
         },
         amounts: [
-          { text: `Number (${$t('common.currency')})`, value: 'flat' },
+          { text: `Number (${$t('common.currency', this.storeCountryLocale)})`, value: 'flat' },
           { text: 'Percentage', value: 'percent' },
           { text: 'Free shipping', value: 'freeShipping' }
         ],

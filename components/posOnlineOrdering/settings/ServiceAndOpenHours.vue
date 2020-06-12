@@ -67,7 +67,7 @@
         </div>
         <div class="row-flex align-items-center">
           <div class="col-8">
-            <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency')} for delivery orders`"
+            <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency', storeCountryLocale)} for delivery orders`"
                       @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
           </div>
           <div class="col-4 mt-2">
@@ -141,7 +141,7 @@
       },
       orderTimeOut: Number,
       noteToCustomers: String,
-      gSms: null
+      gSms: null,
     },
     data: function () {
       return {
@@ -163,6 +163,9 @@
       }
     },
     computed: {
+      storeCountryLocale() {
+        return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
       computedDelivery: {
         get() {
           return this.delivery

@@ -34,10 +34,18 @@
             @update-product="updateProduct"
             @delete-product="deleteProduct"
             @swap-category="swapCategory"/>
-        <delivery-fee v-if="view === 'setting-delivery-fee'" v-bind="store" @update="updateStore"/>
-        <multiple-printer v-if="view === 'setting-multiple-printer'" :store="store" @update="updateStore"/>
+        <delivery-fee
+            v-if="view === 'setting-delivery-fee'"
+            v-bind="store"
+            @update="updateStore"
+            :store-country-locale="storeCountryLocale"/>
+        <multiple-printer
+            v-if="view === 'setting-multiple-printer'"
+            :store="store"
+            @update="updateStore"/>
         <discount v-if="view === 'setting-discount'" :list-discount="listDiscount"
-                  @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount" @updateDiscount="updateDiscount"/>
+                  @addDiscount="addDiscount" @getDiscounts="getDiscounts" @removeDiscount="removeDiscount"
+                  @updateDiscount="updateDiscount" :store-country-locale="storeCountryLocale"/>
         <payment-providers
             v-if="view === 'payment-provider'"
             :store="store"
@@ -114,6 +122,9 @@
       }
     },
     computed: {
+      storeCountryLocale() {
+        return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
       computedSidebar() {
         return this.$route.query.device ? this.sidebarItemsDevice : this.sidebarItems
       },

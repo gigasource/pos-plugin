@@ -13,28 +13,28 @@
               {{ item.name }}
               <span v-if="item.modifiers && item.modifiers.length > 0" class="po-order-table__item__modifier">- {{getItemModifiers(item)}}</span>
             </div>
-            <div class="pl-1">{{ getItemPrice(item) | currency }}</div>
+            <div class="pl-1">{{ getItemPrice(item) | currency(storeCountryLocale) }}</div>
           </div>
         </div>
         <div class="order-item-summary">
           <span>{{$t('store.total')}}: <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
           <g-spacer/>
-          <span>{{ totalPrice | currency }}</span>
+          <span>{{ totalPrice | currency(storeCountryLocale) }}</span>
         </div>
         <div class="order-item-summary" v-if="type === 'delivery'">
           <span>{{$t('store.shippingFee')}}:</span>
           <g-spacer/>
-          <span>{{ shippingFee | currency }}</span>
+          <span>{{ shippingFee | currency(storeCountryLocale) }}</span>
         </div>
         <div class="order-item-summary" v-for="{name, coupon, value} in discounts">
           <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
           <g-spacer/>
-          <span>-{{ value | currency }}</span>
+          <span>-{{ value | currency(storeCountryLocale) }}</span>
         </div>
         <div class="order-item-summary order-item-summary--end fw-700">
           <span>{{$t('store.total')}}</span>
           <g-spacer/>
-          <span>{{effectiveTotal | currency}}</span>
+          <span>{{effectiveTotal | currency(storeCountryLocale)}}</span>
         </div>
       </div>
       <div class="dialog-action">
@@ -61,11 +61,12 @@
       effectiveTotal: Number,
       loading: Boolean,
       type: String,
+      storeCountryLocale: String,
     },
     filters: {
-      currency(value) {
-        if (value != null)
-          return $t('common.currency') + value.toFixed(2)
+      currency(value, locale) {
+        if (value != null) return $t('common.currency', locale) + value.toFixed(2)
+
         return 0
       }
     },

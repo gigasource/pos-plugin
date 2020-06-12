@@ -27,7 +27,7 @@
               <g-icon v-show="value.active" size="20" class="ml-2">{{`icon-${type}`}}</g-icon>
             </template>
           </div>
-          <p class="dialog-header__price">{{$t('common.currency')}}{{computedPrice}}</p>
+          <p class="dialog-header__price">{{$t('common.currency', storeCountryLocale)}}{{computedPrice}}</p>
         </div>
       </div>
       <div class="dialog-content" :key="internalValue">
@@ -39,7 +39,7 @@
           <div class="dialog-content__choice-option">
             <template v-if="choice.select === 'one' && choice.mandatory">
               <g-radio-group v-model="modifiers[index]">
-                <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+                <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency', storeCountryLocale)}${option.price})`"/>
               </g-radio-group>
             </template>
             <template v-else>
@@ -47,7 +47,7 @@
                           v-model="modifiers[index]"
                           color="#536DFE"
                           :value="option"
-                          :label="`${option.name} (${$t('common.currency')}${option.price})`"/>
+                          :label="`${option.name} (${$t('common.currency', storeCountryLocale)}${option.price})`"/>
             </template>
           </div>
         </div>
@@ -96,7 +96,8 @@
       choices: {
         type: Array,
       },
-      mark: Object
+      mark: Object,
+      storeCountryLocale: String,
     },
     data() {
       const modifiers = this.choices ? this.choices.map(c => c.select === 'one' ? null : []) : []

@@ -63,30 +63,30 @@
                 <span v-if="item.modifiers && item.modifiers.length > 0"
                       style="color: #757575; font-size: 12px; text-transform: capitalize">- {{getItemModifier(item)}}</span>
               </div>
-              <div>{{ getItemPrice(item) | currency }}</div>
+              <div>{{ getItemPrice(item) | currency(storeCountryLocale) }}</div>
             </div>
           </div>
           <div class="order-info">
             <span>{{$t('store.total')}} <b>{{ totalItems }}</b> {{$t('store.items')}}</span>
             <g-spacer/>
-            <span>{{ order.totalPrice | currency }}</span>
+            <span>{{ order.totalPrice | currency(storeCountryLocale) }}</span>
           </div>
           <div v-if="order.type === 'delivery'" :class="order.discounts.length === 0 ? 'order-detail' : 'order-info'">
             <span>{{$t('store.shippingFee')}}:</span>
             <g-spacer/>
-            <span>{{ order.shippingFee | currency }}</span>
+            <span>{{ order.shippingFee | currency(storeCountryLocale) }}</span>
           </div>
           <div v-if="order.discounts.length > 0">
             <div class="order-discount" v-for="{name, coupon, value} in order.discounts">
               <span>{{coupon ? `Coupon (${coupon})` : `${name}`}}:</span>
               <g-spacer/>
-              <span>-{{ value | currency }}</span>
+              <span>-{{ value | currency(storeCountryLocale) }}</span>
             </div>
           </div>
           <div class="order-info fw-700">
             <span>{{$t('store.total')}}</span>
             <g-spacer/>
-            <span>{{ order.effectiveTotal | currency}}</span>
+            <span>{{ order.effectiveTotal | currency(storeCountryLocale)}}</span>
           </div>
         </template>
         <template v-else>
@@ -122,12 +122,13 @@
       },
       getItemPrice: Function,
       getItemModifier: Function,
-      orderExtraInfo: String
+      orderExtraInfo: String,
+      storeCountryLocale: String,
     },
     filters: {
-      currency(value) {
-        if (value)
-          return $t('common.currency') + value.toFixed(2)
+      currency(value, locale) {
+        if (value) return $t('common.currency', locale) + value.toFixed(2)
+
         return 0
       }
     },
