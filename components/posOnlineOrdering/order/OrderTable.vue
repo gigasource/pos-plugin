@@ -152,7 +152,7 @@
               <!-- PAYMENT -->
               <div class="section-header">PAYMENT OPTIONS</div>
               <div style="margin: 0 auto;">
-                <div class="pay-by-cash-btn" @click="confirmCashPayment">Pay by Cash</div>
+                <div class="pay-by-cash-btn" @click="confirmCashPayment">{{$t('store.payByCash')}}</div>
                 <pay-pal-smart-button
                     v-if="isPaymentViaPayPalEnable"
                     self-host
@@ -174,12 +174,13 @@
           <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency(storeCountryLocale) }}</span></div>
           <g-spacer/>
           <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative; justify-content: flex-start">
-            {{$t('store.payment')}}
+            {{$t('store.order')}}
             <div class="icon-payment">
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>
           </g-btn-bs>
-          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >{{$t('store.next')}}</g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >
+            <span style="text-transform: capitalize">{{$t('store.payment')}}</span></g-btn-bs>
         </div>
         <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
           <g-badge :value="true" color="#4CAF50" overlay>
