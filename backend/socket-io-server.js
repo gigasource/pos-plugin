@@ -438,7 +438,7 @@ module.exports = function (cms) {
 
     socket.on('createReservation', async (storeId, reservationData) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
+      const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
       const store = await cms.getModel('Store').findById(storeId)
       if (device) {
         const deviceId = device._id.toString();
@@ -447,7 +447,7 @@ module.exports = function (cms) {
           `2. Online order backend: sent reservation to device`)
       } else {
         console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
-            `2. Online order backend: no device found, cancelled sending`)
+          `2. Online order backend: no device found, cancelled sending`)
       }
     })
 
@@ -463,7 +463,7 @@ module.exports = function (cms) {
           `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
       } else {
         console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
-            `2. Online Order backend: no device found, cancelled sending`)
+          `2. Online Order backend: no device found, cancelled sending`)
       }
     })
 

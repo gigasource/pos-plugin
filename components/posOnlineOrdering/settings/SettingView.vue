@@ -64,7 +64,7 @@
   import PaymentProviders from './payments/PaymentProviders';
   import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
   import ReservationSetting from "./ReservationSetting";
-  
+
   export default {
     name: 'SettingView',
     components: {ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
@@ -99,6 +99,7 @@
           },
           {title: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
           {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+          {title: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
         ],
         view: '',
         sidebar: '',
@@ -135,7 +136,7 @@
             userManageThisStore = _.intersection(storeGroups, userStoreGroups).length > 0
           }
         }
-        
+
         if (user.role.name === 'admin' || userManageThisStore) {
           this.permissionDenied = false
           this.$set(this, 'store', store)
@@ -330,7 +331,7 @@
           console.error(e)
         }
       },
-      
+
       // Payment Providers
       async deactivePaymentProvider(name) {
         await this.setPaymentProvider(name, false)

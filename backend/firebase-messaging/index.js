@@ -28,20 +28,31 @@ module.exports = cms => {
       notification: {
         title: store.name,
         body: 'You have a new order!'
-      }
+      },
+      android: {
+        notification: {
+          sound: 'bell'
+        },
+        priority: 'high'
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'bell',
+            contentAvailable: true
+          },
+        }
+      },
+      topic
     }
 
     try {
-      const response = await admin.messaging().sendToTopic(topic, message, {
-        // Required for background/quit data-only messages on iOS
-        contentAvailable: true,
-        // Required for background/quit data-only messages on Android
-        priority: 'high',
-      })
+      const response = await admin.messaging().send(message)
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${store.name},alias=${store.alias}`,
-        `Sent firebase message, messageId: '${response.messageId}'`);
+        `Sent firebase message, messageId: '${response}'`);
     } catch (e) {
-      console.log(e)
+      console.debug(`sentry:orderToken=${orderData.orderToken},store=${store.name},alias=${store.alias}`,
+        `Error sending firebase msg`, e)
     }
   })
 }
