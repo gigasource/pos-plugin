@@ -7,10 +7,34 @@ module.exports = cms => {
   })
 
   cms.on('sendOrderMessage', async (storeId, orderData) => {
-    const { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = orderData
+    let { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = orderData
 
     const store = await cms.getModel('Store').findById(storeId)
     const topic = store.alias
+    products = products.map(({ modifiers, name, note, originalPrice, quantity }) => {
+      if (modifiers && modifiers.length) {
+        const sumOfModifiers = modifiers.reduce((sum, { price, quantity }) => sum + quantity * price, 0)
+        originalPrice = originalPrice + sumOfModifiers
+      }
+
+      return {
+        name,
+        originalPrice,
+        note,
+        modifiers: modifiers.map(({ name }) => name).join(', '),
+        quantity,
+      }
+    })
+
+    discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
+
+    customer = {
+      name: customer.name,
+      phone: customer.phone,
+      zipCode: customer.zipCode,
+      address: customer.address
+    }
+
     const message = {
       data: {
         orderType,
@@ -21,9 +45,8 @@ module.exports = cms => {
         date: JSON.stringify(createdDate),
         shippingFee: JSON.stringify(shippingFee),
         total: JSON.stringify(totalPrice),
-        deliveryTime: deliveryTime,
-        discounts: JSON.stringify(discounts),
-        storeName: store.name
+        deliveryTime,
+        discounts: JSON.stringify(discounts)
       },
       notification: {
         title: store.name,

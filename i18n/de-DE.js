@@ -7,7 +7,8 @@ module.exports = {
       orderList: 'Warenkorb',
       totalItems: 'Artikel',
       note: 'Hinweis',
-      payment: 'Bestellung',
+      order: 'Bestellung',
+      payment: 'Zahlung',
       confirmOrder: 'Bestellung Bestätigen',
       contactInfo: 'KONTAKT INFO',
       orderDetail: 'BESTELLDETAILS',
@@ -82,6 +83,7 @@ module.exports = {
       next: 'Neben',
       deliveryIn: 'Lieferung in {0} Minuten.',
       pickUpIn: 'Abholung in {0} Minuten.',
+      payByCash: 'Barzahlung'
     },
 
     common: {

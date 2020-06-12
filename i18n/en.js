@@ -292,7 +292,8 @@ module.exports = {
       orderList: 'Order List',
       totalItems: 'Total items',
       note: 'Note',
-      payment: 'PAYMENT',
+      order: 'Order',
+      payment: 'Payment',
       confirmOrder: 'Confirm Order',
       contactInfo: 'CONTACT INFORMATION',
       orderDetail: 'ORDER DETAILS',
@@ -367,6 +368,7 @@ module.exports = {
       next: 'Next',
       deliveryIn: 'Delivery in {0} minutes',
       pickUpIn: 'Pick up in {0} minutes',
+      payByCash: 'Pay By Cash'
     },
 
     paymentProviders: {
