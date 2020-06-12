@@ -109,7 +109,7 @@ module.exports = async cms => {
         await cms.getModel('Reservation').updateOne({_id: reservation._id}, res) // update db
       }
       delete reservationJobs[reservationId] // remove cached job
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${reservationId} for ${res.date}`)
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${guestName} (${reservationTime})`)
       cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
       console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
     }
