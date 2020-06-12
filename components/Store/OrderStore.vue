@@ -656,27 +656,28 @@
         const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
           dateFrom = dayjs(date).startOf('day').toDate()
         this.reservations = await cms.getModel('Reservation').find({
-          ...status === 'all' ? { status: { $in: ['pending', 'completed'] } } : { status },
-          date: { $gte: dateFrom, $lte: dateTo }
+          status: (status === 'all' ? { $in: ['pending', 'completed'] } : status),
+          date: { $gte: dateFrom, $lt: dateTo }
         })
       },
       async updateReservation(_id, change) {
         await cms.getModel('Reservation').findOneAndUpdate({ _id }, change)
         cms.socket.emit('rescheduleReservation', _id, change)
-        await this.getReservations()
       },
       async completeReservation(_id) {
         await this.updateReservation(_id, { status: 'completed' })
-        await this.getReservations()
+        const reservation = this.reservations.find(r => r._id === _id)
+        reservation.status = 'completed'
       },
       async removeReservation(_id) {
         await this.updateReservation(_id, { status: 'declined' })
-        await this.getReservations()
+        const index = this.reservations.findIndex(r => r._id === _id)
+        this.reservations.splice(index, 1)
       },
       async checkReservationDay(date) {
         const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
             dateFrom = dayjs(date).startOf('day').toDate()
-        const reservations = await cms.getModel('Reservation').find({date: { $gte: dateFrom, $lte: dateTo }})
+        const reservations = await cms.getModel('Reservation').find({date: { $gte: dateFrom, $lte: dateTo }, status: {$ne: 'declined'}})
         return reservations && reservations.length > 0
       }
     },
