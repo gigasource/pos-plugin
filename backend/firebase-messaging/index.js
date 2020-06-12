@@ -28,6 +28,10 @@ module.exports = cms => {
 
     discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
 
+    if (deliveryTime === 'asap') {
+      deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').format('HH:mm')
+    }
+
     customer = {
       name: customer.name,
       phone: customer.phone,
@@ -61,7 +65,7 @@ module.exports = cms => {
       apns: {
         payload: {
           aps: {
-            sound: 'bell',
+            sound: 'bell.aiff',
             contentAvailable: true
           },
         }
