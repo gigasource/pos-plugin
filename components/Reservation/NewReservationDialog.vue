@@ -97,19 +97,19 @@
               let [openTimeHour, openTimeMinute] = openTime.split(':')
               let [closeTimeHour, closeTimeMinute] = closeTime.split(':')
 
-              if(openTimeMinute % 30 !== 0) {
-                if(openTimeMinute > 30) {
+              if(openTimeMinute % 15 !== 0) {
+                if(openTimeMinute > 45) {
                   openTimeMinute = 0
                   openTimeHour = +openTimeHour + 1
                 } else {
-                  openTimeMinute = 30
+                  openTimeMinute = Math.round(openTimeMinute/15) * 15
                 }
               }
               while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
                 if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute))
                   times.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
 
-                openTimeMinute = +openTimeMinute + 30
+                openTimeMinute = +openTimeMinute + 15
                 if(openTimeMinute >= 60) {
                   openTimeMinute = +openTimeMinute - 60
                   openTimeHour++

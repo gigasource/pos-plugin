@@ -1,27 +1,28 @@
 <template>
   <div class="reservation">
     <div class="reservation-header">
-      <div class="reservation-header__day">{{formatedDay}}</div>
+      <div class="reservation-header__day" @click="backToToday">Back to Today</div>
       <g-select text-field-component="GTextFieldBs" :items="listStatus" v-model="status"/>
       <div></div>
       <g-spacer/>
-      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="dialog = true">Make Reservation</g-btn-bs>
+      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="dialog.reservation = true">Make Reservation</g-btn-bs>
     </div>
     <div class="reservation-tab">
       <div class="reservation-tab__header">
         <div class="reservation-tab__header--left" @click="prevWeek">
           <g-icon>fas fa-long-arrow-alt-left</g-icon>
         </div>
-        <div class="col-flex" v-for="(day, i) in week" :key="day.format('DD/MM/YYYY')" @click="chooseDate(day)">
+        <div class="col-flex" v-for="(day, i) in week" :key="day.date.format('DD/MM/YYYY')" @click="chooseDate(day.date)">
+          <div class="reservation-notification" v-if="day.hasReservation"></div>
           <p class="fw-700 fs-small-2">{{dayInWeeks[i]}}</p>
-          <p :class="['reservation-tab__header--day', day.format('DD/MM/YYYY') === formatedDate && 'selected']">{{day.format('DD')}}</p>
+          <p :class="['reservation-tab__header--day', day.date.format('DD/MM/YYYY') === formatedDate && 'selected']">{{day.date.format('DD')}}</p>
         </div>
         <div class="reservation-tab__header--right" @click="nextWeek">
           <g-icon>fas fa-long-arrow-alt-right</g-icon>
         </div>
       </div>
       <div class="reservation-tab__content">
-        <div v-for="(rih, index) in reservationInHours" :key="index" class="reservation-tab__content-row">
+        <div v-for="(rih, index) in reservationInHours" :key="index" class="reservation-tab__content-row" :id="rih.time">
           <div class="reservation-tab__content-row--hour">
             {{rih.time}}
           </div>
@@ -41,10 +42,10 @@
                 <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
                   Arrived
                 </g-btn-bs>
-                <g-btn-bs background-color="#F9A825" icon="icon-reservation_modify@16" :disabled="reservation.status === 'completed'" @click="modify(reservation)">
-                  Modify
+                <g-btn-bs background-color="#F9A825" :style="reservation.status === 'completed' && {opacity: 0.5}" @click="modify(reservation)">
+                  <g-icon>icon-reservation_modify</g-icon>
                 </g-btn-bs>
-                <g-btn-bs background-color="#E57373">
+                <g-btn-bs background-color="#E57373" @click="remove(reservation)">
                   <g-icon>icon-delete</g-icon>
                 </g-btn-bs>
               </div>
@@ -53,7 +54,36 @@
         </div>
       </div>
     </div>
-    <new-reservation-dialog v-model="dialog" :edit="edit" :reservation="selectedReservation" @submit="genReservations"/>
+    <new-reservation-dialog v-model="dialog.reservation" :edit="edit" :reservation="selectedReservation" @submit="genReservations"/>
+    <g-dialog v-model="dialog.notice" width="338">
+      <g-card>
+        <g-card-title class="justify-center">
+          <div class="fs-large fw-700 pt-3">Notice</div>
+        </g-card-title>
+        <g-card-text class="ta-center">You cannot modify a marked-as-arrived reservation.</g-card-text>
+        <g-divider color="#9e9e9e" inset style="border-bottom: none"/>
+        <g-card-actions style="justify-content: center">
+          <g-btn-bs text-color="#536DFE" @click="dialog.notice = false">Close</g-btn-bs>
+        </g-card-actions>
+      </g-card>
+    </g-dialog>
+    <g-dialog v-model="dialog.delete" width="422">
+      <g-card>
+        <g-card-title><p class="fs-large-3">Delete Reservation</p></g-card-title>
+        <g-card-text>
+          <p class="ta-center pa-3">Are you sure you want to delete the following reservation?</p>
+          <p class="fw-700 ta-center">
+            <span class="mr-1">{{selectedReservation && selectedReservation.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}}</span>
+            <span class="mr-1">{{selectedReservation && selectedReservation.customer.name}}</span>
+            <span class="mr-1">{{selectedReservation && selectedReservation.customer.phone}}</span>
+          </p>
+        </g-card-text>
+        <g-card-actions class="pa-3">
+          <g-btn-bs text-color="#424242" @click="dialog.delete = false">Cancel</g-btn-bs>
+          <g-btn-bs width="80" background-color="#FF5252" text-color="white" @click="confirmRemove">Delete</g-btn-bs>
+        </g-card-actions>
+      </g-card>
+    </g-dialog>
   </div>
 </template>
 
@@ -67,9 +97,14 @@
       reservations: Array,
       reservationSetting: null,
     },
+    injectService: ['OrderStore: checkReservationDay'],
     data() {
       return {
-        dialog: false,
+        dialog: {
+          reservation: false,
+          notice: false,
+          delete: false
+        },
         listStatus: [
           { text: 'All', value: 'all' },
           { text: 'Arrived', value: 'completed' },
@@ -83,9 +118,19 @@
         selectedReservation: null
       }
     },
-    created() {
-      this.genWeek(this.date)
-      this.$emit('getReservationSetting')
+    async created() {
+      await this.genWeek(this.date)
+      this.genReservations()
+    },
+    mounted() {
+      this.$nextTick(() => {
+        const firstReservation = _.minBy(this.reservations, r => r.date)
+        if(firstReservation) {
+          const hour = dayjs(firstReservation.date).format('HH')
+          const row = document.getElementById(hour+'h')
+          row.scrollIntoView()
+        }
+      })
     },
     activated() {
       this.genReservations()
@@ -99,29 +144,32 @@
       },
       dialog(val) {
         if (!val) this.edit = false
+      },
+      reservations(val) {
+        this.$nextTick(() => {
+          const firstReservation = _.minBy(val, r => r.date)
+          if(firstReservation) {
+            const hour = dayjs(firstReservation.date).format('HH')
+            const row = document.getElementById(hour+'h')
+            row.scrollIntoView()
+          }
+        })
       }
     },
     computed: {
       formatedDate() {
         return dayjs(this.date).format('DD/MM/YYYY')
       },
-      formatedDay() {
-        const day = dayjs(this.date)
-        if (day.isSame(dayjs(), 'day')) {
-          return 'Today'
-        } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
-          return 'Tomorrow'
-        } else if (day.isSame(dayjs().add(-1, 'day'), 'day')) {
-          return 'Yesterday'
-        } else {
-          return day.format('DD MMM YYYY')
-        }
-      },
       reservationInHours() {
         let hours = [], start = 0, end = 24
-        if (this.reservationSetting) {
-          if (this.reservationSetting.openTime) start = +this.reservationSetting.openTime.split(':')[0]
-          if (this.reservationSetting.closeTime) end = +this.reservationSetting.closeTime.split(':')[0] + (this.reservationSetting.closeTime.split(':')[1] > 0 ? 1 : 0)
+        if (this.reservationSetting && this.reservationSetting.openHours) {
+          const weekday = dayjs(this.date).day() === 0 ? 6 : dayjs(this.date).day() - 1
+          this.reservationSetting.openHours.forEach(({dayInWeeks, closeTime, openTime}) => {
+            if(dayInWeeks[weekday]) {
+              if(start === 0 || +openTime.split(':')[0] < start) start = +openTime.split(':')[0]
+              if(end === 24 || +closeTime.split(':')[0] > end) end = +closeTime.split(':')[0]
+            }
+          })
         }
         for (let i = start; i < end; i++) {
           const time = `${i < 10 ? `0${i}` : i}h`
@@ -142,20 +190,25 @@
       genReservations(date = this.date, status = this.status) {
         this.$emit('getReservations', date, status)
       },
-      genWeek(date) {
+      async genWeek(date) {
         let week = []
         for (let i = 0; i < 7; i++) {
-          week.push(dayjs(date).day(i))
+          const weekday = dayjs(date).day(i)
+          const hasReservation = await this.checkReservationDay(weekday.toDate())
+          week.push({
+            date: weekday,
+            hasReservation
+          })
         }
         this.week = week
       },
-      prevWeek() {
-        const date = this.week[0].add(-7, 'day').toDate()
-        this.genWeek(date)
+      async prevWeek() {
+        const date = this.week[0].date.add(-7, 'day').toDate()
+        await this.genWeek(date)
       },
-      nextWeek() {
-        const date = this.week[0].add(7, 'day').toDate()
-        this.genWeek(date)
+      async nextWeek() {
+        const date = this.week[0].date.add(7, 'day').toDate()
+        await this.genWeek(date)
       },
       chooseDate(day) {
         this.date = day.toDate()
@@ -165,13 +218,25 @@
         this.$emit('completeReservation', reservation._id)
       },
       modify(reservation) {
+        if(reservation.status === 'completed') {
+          this.dialog.notice = true
+          return
+        }
         this.edit = true
         this.selectedReservation = reservation
-        this.dialog = true
+        this.dialog.reservation = true
       },
       remove(reservation) {
-        this.$emit('removeReservation', reservation._id)
+        this.selectedReservation = reservation
+        this.dialog.delete = true
       },
+      confirmRemove(){
+        this.$emit('removeReservation', this.selectedReservation._id)
+        this.dialog.delete = false
+      },
+      backToToday() {
+        this.date = new Date()
+      }
     }
   }
 </script>
@@ -194,6 +259,7 @@
         border-radius: 6px;
         padding: 6px 12px;
         margin: 4px 5px 8px;
+        cursor: pointer;
       }
 
       .g-select {
@@ -270,6 +336,7 @@
             padding: 12px;
             border-right: 1px solid #9e9e9e;
             width: 54px;
+            min-width: 54px;
           }
         }
       }
@@ -314,6 +381,7 @@
 
         .g-btn-bs {
           font-size: 14px;
+          margin: 0 4px;
         }
       }
 
@@ -332,6 +400,13 @@
           border-bottom: 1px solid #C7C7C7;
         }
       }
+    }
+
+    &-notification {
+      width: 4px;
+      height: 4px;
+      background: #FF4452;
+      border-radius: 50%;
     }
   }
 </style>

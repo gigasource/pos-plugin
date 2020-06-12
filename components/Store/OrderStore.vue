@@ -670,6 +670,12 @@
       async removeReservation(_id) {
         await this.updateReservation(_id, { status: 'declined' })
         await this.getReservations()
+      },
+      async checkReservationDay(date) {
+        const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
+            dateFrom = dayjs(date).startOf('day').toDate()
+        const reservations = await cms.getModel('Reservation').find({date: { $gte: dateFrom, $lte: dateTo }})
+        return reservations && reservations.length > 0
       }
     },
     async created() {
