@@ -268,8 +268,11 @@
         const swapCategory = _.cloneDeep(this.categories[newIndex])
         category.position = newIndex
         swapCategory.position = oldIndex
-        this.categories.splice(oldIndex, 1, swapCategory)
-        this.categories.splice(newIndex, 1, category)
+        if(oldIndex < newIndex) {
+          this.categories.splice(oldIndex, 2, swapCategory, category)
+        } else {
+          this.categories.splice(newIndex, 2, category, swapCategory)
+        }
         await cms.getModel('Category').updateOne({_id: oldId}, {position: newIndex})
         await cms.getModel('Category').updateOne({_id: swapId}, {position: oldIndex})
       },
