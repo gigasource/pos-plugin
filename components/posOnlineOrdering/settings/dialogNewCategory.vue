@@ -3,7 +3,11 @@
     <g-dialog v-model="internalValue" width="40%" eager>
       <div class="dialog">
         <div class="dialog-title">Add New Category</div>
-        <g-text-field-bs large label="Category Name:" v-model="category" @input="errorMessage = null" @click="openDialog"/>
+        <g-text-field-bs large label="Category Name:" v-model="category" @input="errorMessage = null" >
+          <template v-slot:append-inner>
+            <g-icon @click.stop="openDialog" size="16" class="mb-1">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
         <div style="font-style: italic; font-size: 15px; color: #FF5252;">{{errorMessage}}</div>
         <div class="dialog-buttons">
           <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>

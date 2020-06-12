@@ -63,20 +63,28 @@
         </div>
         <div class="fw-700 mt-2">Note for customers</div>
         <div>
-          <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote"/>
+          <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote">
+            <template v-slot:append-inner>
+              <g-icon @click.stop="openDialogInput('note')" size="16" class="mt-2">icon-keyboard</g-icon>
+            </template>
+          </g-textarea>
         </div>
         <div class="row-flex align-items-center">
-          <div class="col-8">
+          <div class="col-lg-8 col-md-7 col-xs-6 pr-1">
             <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency', storeCountryLocale)} for delivery orders`"
                       @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
           </div>
-          <div class="col-4 mt-2">
-            <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue" @click="openDialogInput"/>
+          <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
+            <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue">
+              <template v-slot:append-inner>
+                <g-icon @click.stop="openDialogInput('minimumValue')" size="16" class="mb-1">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
           </div>
         </div>
         <div class="row-flex align-items-center">
-          <div class="col-8">Order timeout</div>
-          <div class="col-4 mt-2">
+          <div class="col-lg-8 col-md-7 col-xs-6">Order timeout</div>
+          <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
             <g-select text-field-component="GTextFieldBs" v-model="computedOrderTimeOut"
                       :items="orderTimeOuts"/>
           </div>
@@ -108,11 +116,12 @@
       </div>
     </div>
 
-    <dialog-number-filter v-model="dialog.minimumValue" :default-value="computedMinimumOrderValue.value" @submit="setMinimumOrderValue"/>
+    <dialog-number-filter label="Minimum Order Value" v-model="dialog.minimumValue" :default-value="computedMinimumOrderValue.value" @submit="setMinimumOrderValue"/>
+    <dialog-text-filter label="Note for Customer" v-model="dialog.note" :default-value="computedNote" @submit="setNoteForCustomer"/>
   </div>
 </template>
 <script>
-  import {get24HourValue, get12HourValue, _12HourTimeRegex, _24HourTimeRegex} from "../../logic/timeUtil";
+  import {get12HourValue, _12HourTimeRegex, _24HourTimeRegex} from "../../logic/timeUtil";
   import _ from 'lodash'
   // TODO: Debounce update openHours open, close time
   export default {
@@ -158,7 +167,8 @@
           {value: 30, text: '30 minutes'},
         ],
         dialog: {
-          minimumValue: false
+          minimumValue: false,
+          note: false
         }
       }
     },
@@ -385,15 +395,18 @@
             return null
         }
       },
-      openDialogInput() {
+      openDialogInput(type) {
         if (!this.$route.query.device) return
-        this.dialog.minimumValue = true
+        this.dialog[type] = true
       },
       updateNote(noteToCustomers) {
         this.$emit('update', {noteToCustomers})
       },
       setGSmsValue(key, value) {
         this.computedGSms = Object.assign({}, this.computedGSms, {[key]: value})
+      },
+      setNoteForCustomer(value) {
+        this.computedNote = value
       }
     },
   }
@@ -537,10 +550,6 @@
         .g-tf-input {
           padding: 12px;
           font-size: 15px;
-        }
-
-        .g-tf-append__inner {
-          display: none;
         }
 
         textarea {

@@ -157,6 +157,8 @@
 
 <style scoped lang="scss">
   .reservation-setting {
+    overflow-y: auto;
+    max-height: 100%;
 
     &__title {
       font-size: 18px;
