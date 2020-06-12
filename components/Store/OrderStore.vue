@@ -549,7 +549,7 @@
           responseMessage: order.declineReason,
           paypalOrderDetail: order.paypalOrderDetail
         };
-        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
@@ -584,7 +584,7 @@
             paypalOrderDetail: order.paypalOrderDetail
           }
 
-          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           window.cms.socket.emit('updateOrderStatus', orderStatus)
         } catch (e) {
@@ -606,7 +606,7 @@
           paypalOrderDetail: order.paypalOrderDetail
         }
 
-        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id}`,
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
