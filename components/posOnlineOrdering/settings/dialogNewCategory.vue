@@ -4,7 +4,7 @@
       <div class="dialog">
         <div class="dialog-title">Add New Category</div>
         <g-text-field-bs large label="Category Name:" v-model="category" @input="errorMessage = null" >
-          <template v-slot:append-inner>
+          <template v-slot:append-inner v-if="isInDevice">
             <g-icon @click.stop="openDialog" size="16" class="mb-1">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
@@ -41,6 +41,9 @@
           this.category = ''
           this.$emit('input', val)
         }
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     methods: {

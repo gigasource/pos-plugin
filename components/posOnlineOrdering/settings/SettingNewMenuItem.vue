@@ -19,14 +19,14 @@
         <div class="menu-setting-new-item__content--upper">
           <div class="w-12">
             <g-text-field-bs small v-model="internalId" type="text" placeholder="No.">
-              <template v-slot:append-inner>
+              <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('id')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
           </div>
           <div class="flex-equal">
             <g-text-field-bs small v-model="internalName" required placeholder="Name *">
-              <template v-slot:append-inner>
+              <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('name')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
@@ -36,7 +36,7 @@
           </div>
           <div class="col-2">
             <g-text-field-bs small v-model="internalPrice" required type="number" placeholder="Price *">
-              <template v-slot:append-inner>
+              <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('price')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
@@ -45,7 +45,7 @@
         <div class="menu-setting-new-item__content--lower">
           <div class="col-9">
             <g-textarea outlined no-resize :rows="2" v-model="internalDesc" placeholder="Description">
-              <template v-slot:append-inner>
+              <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('desc')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
             </g-textarea>
@@ -96,7 +96,7 @@
         </div>
         <div>
           <g-text-field-bs v-model="choice.name" required placeholder="CHOICE NAME">
-            <template v-slot:append-inner>
+            <template v-slot:append-inner v-if="isInDevice">
               <g-icon @click.stop="openDialogChoiceInput('choice', i)" size="16" class="mb-1">icon-keyboard</g-icon>
             </template>
           </g-text-field-bs>
@@ -105,12 +105,12 @@
           <div class="choice-option-item" v-for="(option, iOpt) in choice.options" :key="iOpt" :id="`option_${i}_${iOpt}`">
             <div class="item-name col-8">
               <input :value="option.name" @input="e => editOption(i, iOpt, { name: e.target.value, price: option.price })"/>
-              <g-icon @click="openDialogChoiceInput('option', i, iOpt)" size="16">icon-keyboard</g-icon>
+              <g-icon v-if="isInDevice" @click="openDialogChoiceInput('option', i, iOpt)" size="16">icon-keyboard</g-icon>
             </div>
             <div class="item-price col-3">
               <input type="number" step="0.01" :value="option.price" :placeholder="$t('common.currency', storeCountryLocale)"
                      @input="e =>  editOption(i, iOpt, { name: option.name, price: e.target.value })"/>
-              <g-icon @click="openDialogChoiceInput('value', i, iOpt)" size="16">icon-keyboard</g-icon>
+              <g-icon v-if="isInDevice" @click="openDialogChoiceInput('value', i, iOpt)" size="16">icon-keyboard</g-icon>
             </div>
             <div class="item-btn col-1" v-if="choice.options.length > 1">
               <g-icon size="12" color="#424242" @click="removeOption(i, iOpt)">icon-close</g-icon>

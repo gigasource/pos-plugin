@@ -5,7 +5,7 @@
         <div class="dialog__title">Add New Discount</div>
         <div class="dialog__content">
           <g-text-field-bs label="Name" v-model="name" >
-            <template v-slot:append-inner>
+            <template v-slot:append-inner v-if="isInDevice">
               <g-icon @click.stop="openDialog('name')" size="16" class="mb-1">icon-keyboard</g-icon>
             </template>
           </g-text-field-bs>
@@ -24,7 +24,7 @@
               </div>
               <div class="col-3" style="padding-top: 28px" v-if="amount.type !== 'freeShipping'">
                 <g-text-field-bs type="number" large v-model="amount.value" >
-                  <template v-slot:append-inner>
+                  <template v-slot:append-inner v-if="isInDevice">
                     <g-icon @click.stop="openDialog('amount')" size="16" class="mb-1">icon-keyboard</g-icon>
                   </template>
                 </g-text-field-bs>
@@ -51,11 +51,11 @@
             <div :class="['row-flex', 'br-2', 'b-grey', 'ba-thin', !conditions.total.active && 'disabled']">
               <div class="col-6 b-grey brw-thin row-flex align-items-center justify-center pa-2">
                 <input type="number" class="ta-center fw-700 fs-large" placeholder="MIN" v-model="conditions.total.value.min" />
-                <g-icon @click="openDialog('min')" size="16" class="mb-1">icon-keyboard</g-icon>
+                <g-icon v-if="isInDevice" @click="openDialog('min')" size="16" class="mb-1">icon-keyboard</g-icon>
               </div>
               <div class="col-6 row-flex align-items-center justify-center pa-2">
                 <input type="number" class="ta-center fw-700 fs-large" placeholder="MAX" v-model="conditions.total.value.max" />
-                <g-icon @click="openDialog('max')" size="16" class="mb-1">icon-keyboard</g-icon>
+                <g-icon v-if="isInDevice" @click="openDialog('max')" size="16" class="mb-1">icon-keyboard</g-icon>
               </div>
             </div>
             <div class="row-flex">
@@ -127,7 +127,7 @@
             <div :class="[!conditions.zipCode.active && 'disabled']">
               <g-combobox text-field-component="GTextFieldBs" deletable-chips multiple
                           v-model="conditions.zipCode.value">
-                <template v-slot:append-inner>
+                <template v-slot:append-inner v-if="isInDevice">
                   <g-icon @click.stop="openDialog('zipCode')" size="16">icon-keyboard</g-icon>
                 </template>
               </g-combobox>
@@ -147,7 +147,7 @@
             </div>
             <div :class="[!conditions.coupon.active && 'disabled']">
               <g-text-field-bs v-model="conditions.coupon.value">
-                <template v-slot:append-inner>
+                <template v-slot:append-inner v-if="isInDevice">
                   <g-icon @click.stop="openDialog('coupon')" size="16" class="mb-1">icon-keyboard</g-icon>
                 </template>
               </g-text-field-bs>
@@ -253,6 +253,9 @@
         // }, [])
         //
         // return activeConditions.length === 0
+      },
+      isInDevice() {
+        return this.$route.query.device
       }
     },
     methods: {
