@@ -179,8 +179,12 @@
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>
           </g-btn-bs>
-          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large >
-            <span style="text-transform: capitalize">{{$t('store.payment')}}</span></g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="154" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" large style="position: relative">
+            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.payment')}}</span>
+            <div class="icon-payment">
+              <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+            </div>
+          </g-btn-bs>
         </div>
         <div class="po-order-table__footer--mobile" v-if="orderItems.length > 0">
           <g-badge :value="true" color="#4CAF50" overlay>
@@ -193,8 +197,18 @@
           </g-badge>
           <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency(storeCountryLocale)}}</div>
           <g-spacer/>
-          <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px">{{$t('store.payment')}}</g-btn-bs>
-          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px" >{{$t('store.next')}}</g-btn-bs>
+          <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px; position: relative">
+            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.payment')}}</span>
+            <div class="icon-payment">
+              <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+            </div>
+          </g-btn-bs>
+          <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px; position: relative">
+            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.next')}}</span>
+            <div class="icon-payment">
+              <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
+            </div>
+          </g-btn-bs>
         </div>
       </template>
     </div>
