@@ -86,7 +86,7 @@
           <g-text-field-bs :rules="rules.first" v-model="customer.firstName" @input="rules.first = []" placeholder="First Name*" required/>
           <g-text-field-bs :rules="rules.last" v-model="customer.lastName" @input="rules.last = []" placeholder="Last Name*" required/>
           <g-text-field-bs v-model="customer.email" placeholder="Email"/>
-          <g-text-field-bs :rules="rules.phone" type="number" v-model="customer.phone" @input="rules.phone = []" placeholder="Phone Number*" required/>
+          <g-text-field-bs :class="rules.phone && 'phone-error'" :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" @input="rules.phone = false" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
           <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" @click="completeReservation">Complete</g-btn-bs>
@@ -166,12 +166,13 @@
         rules: {
           first: [],
           last: [],
-          phone: []
+          phone: false
         },
         dialog: {
           notice: false
         },
-        noRequest: false
+        noRequest: false,
+        locale: String,
       }
     },
     async created() {
@@ -189,6 +190,10 @@
           if(!store.reservationSetting.activeReservation) {
             this.dialog.notice = true
             this.noRequest = true
+          }
+          if(store.country) {
+            this.locale = store.country.locale
+            root.$i18n.locale = store.country.locale || 'en'
           }
         }
       }
@@ -270,6 +275,14 @@
       unavailableComplete() {
         if(this.noRequest) return true
         return this.people === 0 || !this.date || !this.time;
+      },
+      validatePhone() {
+        let rules = []
+        const phoneRegex = this.$t('common.phoneRegex') && new RegExp(this.$t('common.phoneRegex'))
+        if(this.locale === 'de-DE' || this.locale === 'de' && phoneRegex) {
+          rules.push(val => (phoneRegex.test(val) || 'Invalid phone number!'))
+        }
+        return rules
       }
     },
     methods: {
@@ -334,7 +347,7 @@
           err = true
         }
         if(!this.customer.phone || isNaN(this.customer.phone)) {
-          this.rules.phone.push(() => ' ')
+          this.rules.phone = true
           err = true
         }
         if(err) return
@@ -742,6 +755,11 @@
         background: #1271FF;
         color: #FFFFFF;
       }
+    }
+
+    .phone-error ::v-deep .bs-tf-inner-input-group {
+      border-color: red !important;
+      box-shadow: 0 0 0 3px rgba(255, 68, 82, 0.25) !important;
     }
   }
 
