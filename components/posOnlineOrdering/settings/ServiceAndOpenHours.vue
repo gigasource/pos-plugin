@@ -117,18 +117,18 @@
           <div class="fw-700 mt-2">Device list</div>
           <div class="service-setting__sms-table">
             <div class="service-setting__sms-table--header">
-              <div class="col-5 pl-1">Name</div>
-              <div class="col-5">Code</div>
-              <g-spacer/>
+              <div class="flex-equal pl-1">Name</div>
+              <div class="flex-equal pl-1">Code</div>
+              <div style="flex: 0 0 120px"/>
             </div>
             <div v-for="(device, i) in smsDevices" :key="`sms_${i}`" class="service-setting__sms-table--device">
-              <div class="col-lg-5 col-md-5 pl-1">{{device.name}}</div>
-              <div class="col-lg-3 col-md-2">{{device.code}}</div>
-              <div class="col-lg-4 col-md-5 row-flex align-items-center justify-end pr-1">
+              <div class="flex-equal pl-1">{{device.name}}</div>
+              <div class="flex-equal pl-1">{{device.code}}</div>
+              <div class="row-flex align-items-center justify-end pr-1">
                 <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" :disabled="device.registered" @click="changeDeviceStatus(device._id)">
                   <g-icon color="#4CAF50">check</g-icon>
                 </g-btn-bs>
-                <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" :disabled="!device.registered" @click="changeDeviceStatus(device._id, false)">
+                <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" @click="removeDevice(device)">
                   <g-icon color="#FF4452">close</g-icon>
                 </g-btn-bs>
                 <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" @click="editSmsDevice(device)">
@@ -163,6 +163,8 @@
       </g-card>
     </g-dialog>
     <dialog-text-filter label="Device Name" v-model="dialog.name" :default-value="device.name" @submit="e => device.name = e"/>
+
+    <dialog-delete-item type="sms device" v-model="device.delete" @confirm="deleteSmsDevice"/>
   </div>
 </template>
 <script>
@@ -219,7 +221,8 @@
         device: {
           dialog: false,
           selected: null,
-          name: ''
+          name: '',
+          delete: false
         }
       }
     },
@@ -484,6 +487,14 @@
         device.name = this.device.name
         this.setGSmsValue('devices', devices)
         this.device.dialog = false
+      },
+      removeDevice(device) {
+        this.device.selected = device
+        this.device.delete = true
+      },
+      deleteSmsDevice() {
+        const devices = _.cloneDeep(this.smsDevices).filter(d => d._id !== this.device.selected._id)
+        this.setGSmsValue('devices', devices)
       }
     },
   }
