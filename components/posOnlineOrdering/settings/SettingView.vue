@@ -172,6 +172,13 @@
         this.view = 'restaurant-info'
         this.defaultPath = 'item.0'
       }
+
+      cms.socket.on('loadStore', storeId => {
+        if (this.store.id === storeId) this.loadStore()
+      })
+    },
+    beforeDestroy() {
+      cms.socket.off('loadStore')
     },
     methods: {
       onNodeSelected(node) {

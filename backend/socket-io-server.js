@@ -126,7 +126,7 @@ module.exports = function (cms) {
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
-    if (socket.request._query && socket.request._query.clientId) {
+    if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
       const clientId = socket.request._query.clientId;
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} connected`);
 
@@ -269,6 +269,16 @@ module.exports = function (cms) {
         if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
       });
     }
+
+    if (socket.request._query && socket.request._query.clientId && socket.request._query.demo) {
+      const clientId = socket.request._query.clientId
+
+      console.log(`connected to demo client ${clientId}`)
+
+      socket.on('disconnect', () => {
+        console.log(`disconnected from demo client ${clientId}`)
+      })
+    }
   });
 
   // internalSocketIOServer is another Socket.io namespace for frontend to connect (use /app namespace)
@@ -324,6 +334,60 @@ module.exports = function (cms) {
       const store = await cms.getModel('Store').findById(storeId)
       if (store.gSms && store.gSms.enabled) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+
+        function formatOrder(orderData) {
+          let { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
+
+          products = products.map(({ modifiers, name, note, originalPrice, quantity }) => {
+            if (modifiers && modifiers.length) {
+              const sumOfModifiers = modifiers.reduce((sum, { price, quantity }) => sum + quantity * price, 0)
+              originalPrice = originalPrice + sumOfModifiers
+            }
+
+            return {
+              name,
+              originalPrice,
+              note,
+              modifiers: modifiers.map(({ name }) => name).join(', '),
+              quantity,
+            }
+          })
+
+          discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
+
+          if (deliveryTime === 'asap') {
+            deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').toDate()
+          } else {
+            const [hour, minute] = deliveryTime.split(':')
+            deliveryTime = dayjs().startOf('hour').hour(hour).minute(minute).toDate()
+          }
+
+          customer = {
+            name: customer.name,
+            phone: customer.phone,
+            zipCode: customer.zipCode,
+            address: customer.address
+          }
+
+          return {
+              orderType,
+              paymentType,
+              customer: JSON.stringify(customer),
+              products: JSON.stringify(products),
+              note,
+              date: createdDate,
+              shippingFee,
+              total: totalPrice,
+              deliveryTime,
+              discounts
+            }
+        }
+
+        const demoDevices = store.gSms.devices
+        demoDevices.filter(i => i.registered).forEach(({ _id }) => {
+          externalSocketIOServer.emitToPersistent(_id, 'createOrder', [formatOrder(orderData)])
+          console.log(`sent order to demo device ${_id}`)
+        })
       }
 
       if (!device) {

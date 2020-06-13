@@ -1,0 +1,47 @@
+const express = require('express')
+
+const router = express.Router()
+const storeModel = cms.getModel('Store');
+
+async function getNewDeviceCode(id) {
+  if (!id) return
+  let code = 0
+
+  const store = await storeModel.findOne({ id })
+  const devices = store.gSms.devices
+  if (!devices || !devices.length) return code
+
+  code = +devices.sort((cur, next) => next.code - cur.code)[0].code + 1
+  return code
+}
+
+router.post('/register', async (req,res) => {
+  try {
+    const { storeId, name } = req.query
+
+    if (!storeId) return res.status(400)
+    const deviceCode = await getNewDeviceCode(storeId)
+
+    await storeModel.findOneAndUpdate({ id: storeId }, {
+      $push: {
+        'gSms.devices': {
+          name: name,
+          code: deviceCode,
+          registered: false
+        }
+      }
+    })
+
+    const updatedStore = await storeModel.findOne({ id: storeId })
+    const { _id, code } = updatedStore.gSms.devices.find(i => i.code === deviceCode + '')
+
+    res.status(200).json({deviceCode: code, id: _id})
+
+    //emit to frontend, refresh device list
+    cms.socket.emit('loadStore', storeId)
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+module.exports = router
