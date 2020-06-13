@@ -10,7 +10,7 @@ module.exports = cms => {
     let { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = orderData
 
     const store = await cms.getModel('Store').findById(storeId)
-    const topic = store.alias
+    const topic = store.id
     products = products.map(({ modifiers, name, note, originalPrice, quantity }) => {
       if (modifiers && modifiers.length) {
         const sumOfModifiers = modifiers.reduce((sum, { price, quantity }) => sum + quantity * price, 0)
