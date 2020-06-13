@@ -64,7 +64,7 @@
         <div class="fw-700 mt-2">Note for customers</div>
         <div>
           <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote">
-            <template v-slot:append-inner>
+            <template v-slot:append-inner v-if="isInDevice">
               <g-icon @click.stop="openDialogInput('note')" size="16" class="mt-2">icon-keyboard</g-icon>
             </template>
           </g-textarea>
@@ -76,7 +76,7 @@
           </div>
           <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
             <g-text-field-bs large type="number" :value="computedMinimumOrderValue.value" @input="setMinimumOrderValue">
-              <template v-slot:append-inner>
+              <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('minimumValue')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
@@ -113,11 +113,56 @@
           <span style="font-weight: 700;">Note: </span>
           <span>We recommend leaving this setting off by default. For more information, please contact your service provider.</span>
         </div>
+        <template v-if="smsDevices && smsDevices.length > 0">
+          <div class="fw-700 mt-2">Device list</div>
+          <div class="service-setting__sms-table">
+            <div class="service-setting__sms-table--header">
+              <div class="col-5 pl-1">Name</div>
+              <div class="col-5">Code</div>
+              <g-spacer/>
+            </div>
+            <div v-for="(device, i) in smsDevices" :key="`sms_${i}`" class="service-setting__sms-table--device">
+              <div class="col-lg-5 col-md-5 pl-1">{{device.name}}</div>
+              <div class="col-lg-3 col-md-2">{{device.code}}</div>
+              <div class="col-lg-4 col-md-5 row-flex align-items-center justify-end pr-1">
+                <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" :disabled="device.registered" @click="changeDeviceStatus(device._id)">
+                  <g-icon color="#4CAF50">check</g-icon>
+                </g-btn-bs>
+                <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" :disabled="!device.registered" @click="changeDeviceStatus(device._id, false)">
+                  <g-icon color="#FF4452">close</g-icon>
+                </g-btn-bs>
+                <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" @click="editSmsDevice(device)">
+                  <g-icon color="yellow-darken 2">brush</g-icon>
+                </g-btn-bs>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
     <dialog-number-filter label="Minimum Order Value" v-model="dialog.minimumValue" :default-value="computedMinimumOrderValue.value" @submit="setMinimumOrderValue"/>
     <dialog-text-filter label="Note for Customer" v-model="dialog.note" :default-value="computedNote" @submit="setNoteForCustomer"/>
+
+    <g-dialog v-model="device.dialog" width="400">
+      <g-card>
+        <g-card-title>
+          <div class="fs-large-2">Edit device name</div>
+        </g-card-title>
+        <div style="padding: 0 12px">
+          <g-text-field-bs label="Name" v-model="device.name">
+            <template v-slot:append-inner v-if="isInDevice">
+              <g-icon @click.stop="openDialogInput('name')" size="16" class="mb-1">icon-keyboard</g-icon>
+            </template>
+          </g-text-field-bs>
+        </div>
+        <g-card-actions>
+          <g-btn-bs text-color="#424242" @click="device.dialog = false">Cancel</g-btn-bs>
+          <g-btn-bs width="80" background-color="indigo accent-2" text-color="white" @click="updateDeviceName">Save</g-btn-bs>
+        </g-card-actions>
+      </g-card>
+    </g-dialog>
+    <dialog-text-filter label="Device Name" v-model="dialog.name" :default-value="device.name" @submit="e => device.name = e"/>
   </div>
 </template>
 <script>
@@ -168,11 +213,20 @@
         ],
         dialog: {
           minimumValue: false,
-          note: false
+          note: false,
+          name: false
+        },
+        device: {
+          dialog: false,
+          selected: null,
+          name: ''
         }
       }
     },
     computed: {
+      isInDevice() {
+        return this.$route.query.device
+      },
       storeCountryLocale() {
         return (this.store && this.store.country && this.store.country.locale) || 'en'
       },
@@ -252,12 +306,16 @@
         get() {
           return this.gSms || {
             enabled: false,
-            timeToComplete: 30
+            timeToComplete: 30,
+            devices: []
           }
         },
         set(value) {
           this.$emit('update', { gSms: value })
         }
+      },
+      smsDevices() {
+        return this.gSms && this.gSms.devices
       }
     },
     created() {
@@ -407,6 +465,25 @@
       },
       setNoteForCustomer(value) {
         this.computedNote = value
+      },
+      changeDeviceStatus(deviceId, status = true) {
+        const devices = _.cloneDeep(this.smsDevices)
+        const device = devices.find(d => d._id === deviceId)
+        if(device.registered === status) return
+        device.registered = status
+        this.setGSmsValue('devices', devices)
+      },
+      editSmsDevice(device) {
+        this.device.selected = device
+        this.device.name = device.name
+        this.device.dialog = true
+      },
+      updateDeviceName() {
+        const devices = _.cloneDeep(this.smsDevices)
+        const device = devices.find(d => d._id === this.device.selected._id)
+        device.name = this.device.name
+        this.setGSmsValue('devices', devices)
+        this.device.dialog = false
       }
     },
   }
@@ -554,6 +631,35 @@
 
         textarea {
           user-select: text !important;
+        }
+      }
+    }
+
+    &__sms-table {
+      background: #FFFFFF;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1398);
+      border-radius: 2px;
+      margin-top: 8px;
+
+      &--header {
+        background: #EFEFEF;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #757575;
+      }
+
+      &--device {
+        display: flex;
+        align-items: center;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        .g-btn-bs {
+          margin: 0 0 0 4px;
+          padding: 4px;
         }
       }
     }

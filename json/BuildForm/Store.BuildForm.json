@@ -442,6 +442,27 @@
           "schemaType": "number",
           "key": "timeToComplete",
           "type": "input@number"
+        },
+        {
+          "schemaType": "array",
+          "key": "devices",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "code",
+              "type": "input"
+            },
+            {
+              "schemaType": "boolean",
+              "key": "registered",
+              "type": "input@switch"
+            }
+          ]
         }
       ]
     }
