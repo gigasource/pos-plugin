@@ -173,8 +173,8 @@
         <div :class="['po-order-table__footer', !isOpening && 'disabled']">
           <div>{{$t('store.total')}}: <span style="font-weight: 700; font-size: 18px; margin-left: 4px">{{ effectiveTotal | currency(storeCountryLocale) }}</span></div>
           <g-spacer/>
-          <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative; justify-content: flex-start">
-            {{$t('store.order')}}
+          <g-btn-bs v-if="orderView" width="154" rounded background-color="#2979FF" @click="view = 'confirm'" :disabled="!allowConfirmView" large style="position: relative">
+            <span class="mr-3">{{$t('store.order')}}</span>
             <div class="icon-payment">
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>
@@ -1195,7 +1195,7 @@
       font-size: 15px;
 
       .g-btn-bs {
-        padding: 8px 18px;
+        padding: 6px 18px;
       }
 
       &--mobile {
