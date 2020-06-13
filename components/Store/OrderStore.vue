@@ -650,7 +650,8 @@
         }
       },
       async createReservation(reservation) {
-        await cms.getModel('Reservation').create(reservation)
+        const res = await cms.getModel('Reservation').create(reservation)
+        cms.socket.emit('scheduleNewReservation', res)
       },
       async getReservations(date = new Date(), status = 'all') {
         const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),

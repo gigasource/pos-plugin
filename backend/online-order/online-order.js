@@ -683,5 +683,13 @@ module.exports = async cms => {
         }
       }
     })
+
+    socket.on('scheduleNewReservation', async (reservation) => {
+      if(!reservation) return
+      const guestName = reservation.customer.name;
+      const reservationTime = dayjs(reservation.date).format('HH:mm')
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: Schedule requested for '${guestName}' (${reservationTime})`)
+      await scheduleRemoveReservationJob(reservation)
+    })
   })
 }
