@@ -128,16 +128,13 @@ module.exports = function (cms) {
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
       const clientId = socket.request._query.clientId;
-      console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} connected`);
+      console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
+          `Client ${clientId} connected, socket id = ${socket.id}`);
 
       notifyDeviceStatusChanged(clientId);
       socket.once('disconnect', () => {
-        /*
-          if Redis adapter is used, clientId removal on Redis server is delayed for 3 seconds to avoid bug
-          (this behavior is in @gigasource/socket.io-p2p-plugin package, check redis.js file),
-          therefore notifyDeviceStatusChanged is delayed for 5 seconds
-        */
-        console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Client ${clientId} disconnected`);
+        console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
+            `Client ${clientId} disconnected, socket id = ${socket.id}`);
         if (global.APP_CONFIG.redis) {
           // delay a little to give time for updating client list on Redis
           setTimeout(() => notifyDeviceStatusChanged(clientId), 2000);
