@@ -337,15 +337,16 @@ module.exports = function (cms) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
         function formatOrder(orderData) {
-          let { orderToken, createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
+          let { orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
 
-          products = products.map(({ modifiers, name, note, originalPrice, quantity }) => {
+          products = products.map(({ id, modifiers, name, note, originalPrice, quantity }) => {
             if (modifiers && modifiers.length) {
               const sumOfModifiers = modifiers.reduce((sum, { price, quantity }) => sum + quantity * price, 0)
               originalPrice = originalPrice + sumOfModifiers
             }
 
             return {
+              id,
               name,
               originalPrice,
               note,
@@ -356,14 +357,11 @@ module.exports = function (cms) {
 
           discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
 
-          if (deliveryTime === 'asap') {
-            deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').toDate()
-          } else {
-            const [hour, minute] = deliveryTime.split(':')
-            console.debug(`sentry:store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: deliveryTime ${deliveryTime}`)
-            deliveryTime = dayjs().startOf('hour').hour(hour).minute(minute).toDate()
-            console.debug(`sentry:store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: parsed deliveryTime ${deliveryTime} | ${jsonFn.clone(deliveryTime)}`)
+          if (deliveryDateTime === 'asap') {
+            const timeToComplete = store.gSms.timeToComplete || 30;
+            deliveryDateTime = dayjs().add(timeToComplete, 'minute').toDate()
           }
+          deliveryDateTime = jsonFn.clone(deliveryDateTime) //stringify
 
           customer = {
             name: customer.name,
@@ -382,7 +380,7 @@ module.exports = function (cms) {
             date: createdDate,
             shippingFee,
             total: totalPrice,
-            deliveryTime: jsonFn.clone(deliveryTime),
+            deliveryTime: deliveryDateTime,
             discounts
           }
         }
@@ -390,9 +388,9 @@ module.exports = function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
           const formattedOrder = [formatOrder(orderData)];
-          console.debug(`sentry:clientId=${_id},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: formatted order: ${JSON.stringify(formattedOrder)}`)
-          externalSocketIOServer.emitToPersistent(_id, 'createOrder', formattedOrder)
-          console.debug(`sentry:clientId=${_id},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
+          const targetClientId = `${store.id}_${_id}`;
+          externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', formattedOrder)
+          console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
             `2a. Online order backend: received order from frontend, sending to demo device`);
         })
       }
@@ -560,9 +558,10 @@ module.exports = function (cms) {
           }
         })
 
-        externalSocketIOServer.emitToPersistent(deviceId, 'unregister')
-        console.debug(`sentry:clientId=${deviceId},store=${name || settingName},alias=${alias},eventType=pair`,
-          `Unpaired demo client ${clientId} connected, socket id = ${socket.id}`)
+        const targetClientId = `${storeId}_${deviceId}`;
+        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister')
+        console.debug(`sentry:clientId=${targetClientId},store=${name || settingName},alias=${alias},eventType=pair`,
+          `Unpaired demo client ${targetClientId} connected, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)
         callback()
       } catch (e) {

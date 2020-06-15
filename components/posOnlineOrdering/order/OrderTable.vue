@@ -781,6 +781,11 @@
         // an identifier for an order
         const generateOrderTokenResponse = await axios.get(`${location.origin}/store/order-token`)
         const orderToken = generateOrderTokenResponse.data.token
+        let deliveryDateTime = this.deliveryTime
+        if (this.deliveryTime !== this.asap) {
+          const [hour, minute] = this.deliveryTimes.split(':')
+          deliveryDateTime = dayjs().startOf('hour').hour(hour).minute(minute).toDate()
+        } else deliveryDateTime = 'asap'
 
         const createdDate = new Date();
         const orderData = {
@@ -797,6 +802,7 @@
           takeOut: true,
           orderToken,
           deliveryTime: this.deliveryTime === this.asap ? 'asap' : this.deliveryTime,
+          deliveryDateTime,
           discounts: this.discounts,
         }
 
