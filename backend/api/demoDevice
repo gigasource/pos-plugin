@@ -35,7 +35,12 @@ router.post('/register', async (req, res) => {
     const updatedStore = await storeModel.findOne({ id: storeId })
     const { _id, code } = updatedStore.gSms.devices.find(i => i.code === deviceCode + '')
 
-    res.status(200).json({ deviceCode: code, id: _id })
+    res.status(200).json({
+      deviceCode: code,
+      id: _id,
+      storeName: updatedStore.name || updatedStore.settingName,
+      storeAlias: updatedStore.alias
+    })
 
     //emit to frontend, refresh device list
     cms.socket.emit('loadStore', storeId)
