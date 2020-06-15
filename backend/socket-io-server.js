@@ -271,10 +271,10 @@ module.exports = function (cms) {
     if (socket.request._query && socket.request._query.clientId && socket.request._query.demo) {
       const clientId = socket.request._query.clientId
 
-      console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id},demo=true`,
+      console.debug(`sentry:clientId=${clientId},eventType=demoApp:socketConnection,socketId=${socket.id}`,
         `Demo client ${clientId} connected, socket id = ${socket.id}`);
       socket.on('disconnect', () => {
-        console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id},demo=true`,
+        console.debug(`sentry:clientId=${clientId},eventType=demoApp:socketConnection,socketId=${socket.id}`,
           `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
       })
     }
@@ -387,8 +387,8 @@ module.exports = function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
           externalSocketIOServer.emitToPersistent(_id, 'createOrder', [formatOrder(orderData)])
-          console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${_id},eventType=orderStatus,demo=true`,
-            `Online order backend: sending order to demo device`);
+          console.debug(`sentry:clientId=${_id},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=demoApp:orderStatus`,
+            `2a. Online order backend: received order from frontend, sending to demo device`);
         })
       }
 
@@ -548,6 +548,7 @@ module.exports = function (cms) {
       if (!storeId || !deviceId) return callback(new Error('no storeId/deviceId'))
 
       try {
+        const { name, settingName, alias } = await cms.getModel('Store').findOne({ id: storeId })
         await cms.getModel('Store').findOneAndUpdate({ id: storeId }, {
           $pull: {
             'gSms.devices': { _id: deviceId }
@@ -555,6 +556,8 @@ module.exports = function (cms) {
         })
 
         externalSocketIOServer.emitToPersistent(deviceId, 'unregister')
+        console.debug(`sentry:clientId=${deviceId},store=${name || settingName},alias=${alias},eventType=demoApp:pair`,
+          `Unpaired demo client ${clientId} connected, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)
         callback()
       } catch (e) {
