@@ -6,13 +6,21 @@
         <img draggable="false" src="/plugins/pos-plugin/assets/folk_knife.svg">
         <p>Menu is currently empty.</p>
         <p><span style="color: #536DFE">"Add new category"</span> to get started.</p>
-        <g-btn-bs class="btn-add" @click="dialog.addNewCategory = true">+ Add New Category</g-btn-bs>
+        <div class="row-flex align-items-center">
+          <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">Add New Category</g-btn-bs>
+          <span class="mt-2">or</span>
+          <g-btn-bs class="btn-add" @click="importMenuItemFromExcel">Import Categories</g-btn-bs>
+        </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
         <div class="row-flex justify-end mb-2">
           <g-spacer/>
           <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
+          <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+                    @click="importMenuItemFromExcel">
+            Import Categories
+          </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
             Add new category
@@ -126,6 +134,10 @@
   import _ from 'lodash'
   import DialogNewCategory from './dialogNewCategory';
   import DialogDeleteCategory from './dialogDeleteCategory';
+  import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
+  import XLSX from 'xlsx'
+  import importMenuItem from '../../Store/importMenuItem';
+  
   export default {
     name: 'SettingMenu',
     components: { DialogDeleteCategory, DialogNewCategory },
@@ -313,7 +325,24 @@
       },
       setCategoryImage(image, categoryId) {
         this.$emit('change-category-image', image, categoryId)
-      }
+      },
+      
+      // import file
+      importMenuItemFromExcel() {
+        const self = this
+        // https://stackoverflow.com/questions/974079/setting-mime-type-for-excel-document
+        openUploadFileDialog({ multiple: false, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }, files => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            importMenuItem(workbook, self.store._id, () => {
+              self.$emit('import-categories-completed')
+            })
+          };
+          reader.readAsArrayBuffer(files[0]);
+        })
+      },
     }
   }
 </script>

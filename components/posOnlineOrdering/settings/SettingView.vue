@@ -34,7 +34,9 @@
             @update-product="updateProduct"
             @delete-product="deleteProduct"
             @swap-category="swapCategory"
-            @change-category-image="changeCategoryImage"/>
+            @change-category-image="changeCategoryImage"
+            @import-categories-completed="reloadCategoriesAndProducts"
+        />
         <delivery-fee
             v-if="view === 'setting-delivery-fee'"
             v-bind="store"
@@ -372,6 +374,10 @@
             await cms.getModel('Store').updateOne({ _id: this.store._id }, { paymentProviders })
             break;
         }
+      },
+      async reloadCategoriesAndProducts(){
+        await this.loadCategories()
+        await this.loadProducts()
       }
     }
   }
