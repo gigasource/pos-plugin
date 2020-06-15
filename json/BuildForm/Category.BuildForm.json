@@ -26,6 +26,12 @@
       "autopopulate": null,
       "type": "ref-select",
       "labelProp": "name"
+    },
+    {
+      "_id": "5ee6e47bb2f18707b5ecba9b",
+      "schemaType": "string",
+      "key": "image",
+      "type": "input"
     }
   ],
   "id": "5c46e2b15889c52fe001ab83",

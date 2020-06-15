@@ -620,12 +620,20 @@
   background-position: center;
 }
 
-
 .icon-reservation_done {
   background-image: url("../assets/reservation_done.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
 }
+
+.icon-upload2 {
+  background-image: url("../assets/upload2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
 
 

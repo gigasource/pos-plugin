@@ -44,6 +44,13 @@
                   style="white-space: nowrap">
                 + Add New Item
               </g-btn-bs>
+              <upload-zone v-if="!isInDevice" style="border: none;" @url="setCategoryImage($event, cate._id)">
+                <template v-slot:default="{showUploadDialog}">
+                  <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
+                    Group Picture
+                  </g-btn-bs>
+                </template>
+              </upload-zone>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
                         @click.prevent.stop="openDeleteCategoryDialog(cate)">
                 <g-icon color="#535962">mdi-trash-can-outline</g-icon>
@@ -303,6 +310,9 @@
         if(category && swapCategory) {
           this.$emit('swap-category', category._id, swapCategory._id, oldIndex, newIndex)
         }
+      },
+      setCategoryImage(image, categoryId) {
+        this.$emit('change-category-image', image, categoryId)
       }
     }
   }

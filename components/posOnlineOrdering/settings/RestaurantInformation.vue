@@ -167,9 +167,15 @@
 
       }, 500),
       async getCoordsByGoogleApi(code, address) {
-        cms.socket.emit('getCoordsByGoogleApi', code, address, async ({ long, lat }) => {
-          console.log(`[Geocode]${this.store.alias}|GoogleAPI|coords:${long}, ${lat}`)
-          await this.update({ coordinates: { long, lat }})
+        cms.socket.emit('getCoordsByGoogleApi', code, address, async (coordinates) => {
+          if (coordinates) {
+            const { long, lat } = coordinates
+            console.log(`[Geocode]${this.store.alias}|GoogleAPI|coords:${long}, ${lat}`)
+            await this.update({ coordinates: {long, lat} })
+          } else {
+            console.log(`[Geocode]${this.store.alias}|GoogleAPI|coords:${coordinates}`)
+            await this.update({ coordinates })
+          }
         })
       }
     }

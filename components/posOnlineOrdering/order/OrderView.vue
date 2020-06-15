@@ -86,7 +86,11 @@
           </div>
           <div class="pos-order__tab--content" id="tab-content" ref="tab-content" @touchstart="touch">
             <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
-              <div class="sub-title mb-2">{{ category && category.name }}</div>
+              <div v-if="category && category.image" class="category-header">
+                <img alt :src="category.image"/>
+                <div>{{ category.name }}</div>
+              </div>
+              <div v-else class="sub-title mb-2">{{ category && category.name }}</div>
               <div class="pos-order__tab--content-main">
                 <menu-item
                     v-for="(item, index) in category.items" :key="index"
@@ -721,6 +725,24 @@
             border-bottom: 1px solid rgba(204, 204, 204, 0.4);
           }
         }
+
+        .category-header {
+          margin-bottom: 16px;
+
+          img {
+            max-height: 167px;
+            width: 100%;
+            border-radius: 20px 20px 0 0;
+          }
+
+          & > div {
+            background: #E8EAF6;
+            border-radius: 0px 0px 20px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 12px 16px;
+          }
+        }
       }
     }
 
@@ -809,6 +831,24 @@
 
           .sub-title {
             font-size: 18px;
+          }
+
+          .category-header {
+            margin-bottom: 8px;
+
+            img {
+              max-height: 75px;
+              width: 100%;
+              border-radius: 10px 10px 0 0;
+            }
+
+            & > div {
+              background: #E8EAF6;
+              border-radius: 0px 0px 10px 10px;
+              font-size: 18px;
+              font-weight: 700;
+              padding: 6px 16px;
+            }
           }
         }
       }

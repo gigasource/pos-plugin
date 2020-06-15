@@ -33,7 +33,8 @@
             @add-new-product="addNewProduct"
             @update-product="updateProduct"
             @delete-product="deleteProduct"
-            @swap-category="swapCategory"/>
+            @swap-category="swapCategory"
+            @change-category-image="changeCategoryImage"/>
         <delivery-fee
             v-if="view === 'setting-delivery-fee'"
             v-bind="store"
@@ -282,6 +283,9 @@
         }
         await cms.getModel('Category').updateOne({_id: oldId}, {position: newIndex})
         await cms.getModel('Category').updateOne({_id: swapId}, {position: oldIndex})
+      },
+      async changeCategoryImage(image, _id) {
+        await cms.getModel('Category').findOneAndUpdate({_id}, {image})
       },
 
       // products
