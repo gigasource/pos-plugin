@@ -30,6 +30,7 @@
           <td>
             <div v-if="item.customer.address">
               <p>{{item.customer.address}}</p>
+              <p>{{item.customer.zipCode}}</p>
             </div>
             <div v-else>--</div>
           </td>
