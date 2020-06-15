@@ -137,8 +137,7 @@ async function importMenuItem(workbox, storeId, onCompleted) {
     await insertProductCategoriesToDatabase(productCategories, storeId)
     onCompleted && onCompleted()
   } catch (e) {
-    window.e = e
-    debugger
+    console.warn(e)
   }
 }
 
