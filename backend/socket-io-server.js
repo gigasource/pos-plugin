@@ -337,7 +337,7 @@ module.exports = function (cms) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
         function formatOrder(orderData) {
-          let { createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
+          let { orderToken, createdDate, customer, deliveryTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
 
           products = products.map(({ modifiers, name, note, originalPrice, quantity }) => {
             if (modifiers && modifiers.length) {
@@ -371,17 +371,18 @@ module.exports = function (cms) {
           }
 
           return {
-              orderType,
-              paymentType,
-              customer: JSON.stringify(customer),
-              products: JSON.stringify(products),
-              note,
-              date: createdDate,
-              shippingFee,
-              total: totalPrice,
-              deliveryTime: jsonFn.clone(deliveryTime),
-              discounts
-            }
+            orderToken,
+            orderType,
+            paymentType,
+            customer: JSON.stringify(customer),
+            products: JSON.stringify(products),
+            note,
+            date: createdDate,
+            shippingFee,
+            total: totalPrice,
+            deliveryTime: jsonFn.clone(deliveryTime),
+            discounts
+          }
         }
 
         const demoDevices = store.gSms.devices
