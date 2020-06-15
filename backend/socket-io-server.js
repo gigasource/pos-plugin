@@ -360,7 +360,9 @@ module.exports = function (cms) {
             deliveryTime = dayjs().add(store.gSms.timeToComplete || 30, 'minute').toDate()
           } else {
             const [hour, minute] = deliveryTime.split(':')
+            console.debug(`sentry:store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: deliveryTime ${deliveryTime}`)
             deliveryTime = dayjs().startOf('hour').hour(hour).minute(minute).toDate()
+            console.debug(`sentry:store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: parsed deliveryTime ${deliveryTime} | ${jsonFn.clone(deliveryTime)}`)
           }
 
           customer = {
@@ -387,7 +389,9 @@ module.exports = function (cms) {
 
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
-          externalSocketIOServer.emitToPersistent(_id, 'createOrder', [formatOrder(orderData)])
+          const formattedOrder = [formatOrder(orderData)];
+          console.debug(`sentry:clientId=${_id},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`, `demo order: formatted order: ${JSON.stringify(formattedOrder)}`)
+          externalSocketIOServer.emitToPersistent(_id, 'createOrder', formattedOrder)
           console.debug(`sentry:clientId=${_id},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
             `2a. Online order backend: received order from frontend, sending to demo device`);
         })
