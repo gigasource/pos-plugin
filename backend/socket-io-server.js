@@ -9,6 +9,7 @@ const ppApiv2 = require('./api/payment/paypal/payPalApiV2Adapter')
 const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/backend/createPayPalClient')
 const fs = require('fs')
 const path = require('path')
+const jsonFn = require('json-fn')
 
 const Schema = mongoose.Schema
 const savedMessageSchema = new Schema({
@@ -378,7 +379,7 @@ module.exports = function (cms) {
               date: createdDate,
               shippingFee,
               total: totalPrice,
-              deliveryTime,
+              deliveryTime: jsonFn.clone(deliveryTime),
               discounts
             }
         }
