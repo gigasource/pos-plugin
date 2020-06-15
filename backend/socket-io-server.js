@@ -270,10 +270,11 @@ module.exports = function (cms) {
     if (socket.request._query && socket.request._query.clientId && socket.request._query.demo) {
       const clientId = socket.request._query.clientId
 
-      console.log(`connected to demo client ${clientId}`)
-
+      console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id},demo=true`,
+        `Demo client ${clientId} connected, socket id = ${socket.id}`);
       socket.on('disconnect', () => {
-        console.log(`disconnected from demo client ${clientId}`)
+        console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id},demo=true`,
+          `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
       })
     }
   });
@@ -327,8 +328,10 @@ module.exports = function (cms) {
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
 
-      // fcm
       const store = await cms.getModel('Store').findById(storeId)
+      const storeName = store.name || store.settingName
+      const storeAlias = store.alias
+
       if (store.gSms && store.gSms.enabled) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
@@ -383,7 +386,8 @@ module.exports = function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
           externalSocketIOServer.emitToPersistent(_id, 'createOrder', [formatOrder(orderData)])
-          console.log(`sent order to demo device ${_id}`)
+          console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${_id},eventType=orderStatus,demo=true`,
+            `Online order backend: sending order to demo device`);
         })
       }
 
@@ -411,7 +415,6 @@ module.exports = function (cms) {
       }
 
       const deviceId = device._id.toString();
-      const {name: storeName, alias: storeAlias} = await cms.getModel('Store').findById(storeId);
       Object.assign(orderData, {storeName, storeAlias});
 
       console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId},eventType=orderStatus`,
@@ -526,7 +529,6 @@ module.exports = function (cms) {
     })
 
     socket.on('updateReservationSetting', async (storeId, reservationSetting) => {
-      console.log(reservationSetting)
       storeId = ObjectId(storeId);
       const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
       const store = await cms.getModel('Store').findById(storeId);
@@ -538,6 +540,24 @@ module.exports = function (cms) {
       } else {
         console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
           `2. Online Order backend: no device found, cancelled sending`)
+      }
+    })
+
+    socket.on('removeGSmsDevice', async (storeId, deviceId, callback = () => null) => {
+      if (!storeId || !deviceId) return callback(new Error('no storeId/deviceId'))
+
+      try {
+        await cms.getModel('Store').findOneAndUpdate({ id: storeId }, {
+          $pull: {
+            'gSms.devices': { _id: deviceId }
+          }
+        })
+
+        externalSocketIOServer.emitToPersistent(deviceId, 'unregister')
+        cms.socket.emit('loadStore', storeId)
+        callback()
+      } catch (e) {
+        callback(e)
       }
     })
 

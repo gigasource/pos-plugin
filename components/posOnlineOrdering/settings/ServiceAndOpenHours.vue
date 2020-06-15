@@ -198,6 +198,7 @@
       orderTimeOut: Number,
       noteToCustomers: String,
       gSms: null,
+      id: String
     },
     data: function () {
       return {
@@ -493,8 +494,9 @@
         this.device.delete = true
       },
       deleteSmsDevice() {
-        const devices = _.cloneDeep(this.smsDevices).filter(d => d._id !== this.device.selected._id)
-        this.setGSmsValue('devices', devices)
+        // const devices = _.cloneDeep(this.smsDevices).filter(d => d._id !== this.device.selected._id)
+        // this.setGSmsValue('devices', devices)
+        cms.socket.emit('removeGSmsDevice', this.id, this.device.selected._id)
       }
     },
   }
