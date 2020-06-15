@@ -15,11 +15,11 @@ async function getNewDeviceCode(id) {
   return code
 }
 
-router.post('/register', async (req,res) => {
+router.post('/register', async (req, res) => {
   try {
     const { storeId, name } = req.query
 
-    if (!storeId) return res.status(400)
+    if (!storeId) return res.sendStatus(400)
     const deviceCode = await getNewDeviceCode(storeId)
 
     await storeModel.findOneAndUpdate({ id: storeId }, {
@@ -35,12 +35,34 @@ router.post('/register', async (req,res) => {
     const updatedStore = await storeModel.findOne({ id: storeId })
     const { _id, code } = updatedStore.gSms.devices.find(i => i.code === deviceCode + '')
 
-    res.status(200).json({deviceCode: code, id: _id})
+    res.status(200).json({ deviceCode: code, id: _id })
 
     //emit to frontend, refresh device list
     cms.socket.emit('loadStore', storeId)
   } catch (e) {
     console.log(e)
+    res.status(500).send('Encountered an error while registering!')
+  }
+})
+
+router.post('/unregister', async (req, res) => {
+  try {
+    const { storeId, deviceId } = req.query
+    if (!deviceId || !storeId) return res.sendStatus(400)
+
+    await storeModel.findOneAndUpdate({ id: storeId }, {
+      $pull: {
+        'gSms.devices': { _id: deviceId }
+      }
+    })
+
+    res.status(200).json({ message: 'Unregistered successfully' })
+
+    //emit to frontend, refresh device list
+    cms.socket.emit('loadStore', storeId)
+  } catch (e) {
+    console.log(e)
+    res.status(500).send('Encountered an error while unregistering!')
   }
 })
 

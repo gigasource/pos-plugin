@@ -541,6 +541,23 @@ module.exports = function (cms) {
       }
     })
 
+    socket.on('removeGSmsDevice', async (storeId, deviceId, callback = () => null) => {
+      if (!storeId || !deviceId) return callback(new Error('no storeId/deviceId'))
+
+      try {
+        await cms.getModel('Store').findOneAndUpdate({ id: storeId }, {
+          $pull: {
+            'gSms.devices': { _id: deviceId }
+          }
+        })
+
+        cms.socket.emit('loadStore', storeId)
+        callback()
+      } catch (e) {
+        callback(e)
+      }
+    })
+
     socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 
