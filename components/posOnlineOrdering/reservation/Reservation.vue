@@ -2,6 +2,7 @@
   <div class="reservation elevation-2">
     <template v-if="mode === 'reservation'">
       <div class="reservation-header">
+        <img v-if="image" alt :src="image" class="reservation-header__logo">
         <div class="reservation-header__title">Table Reservation</div>
         <div class="reservation-header__stepper">
           <div class="reservation-header__stepper-step" @click="changeStep(1)">
@@ -173,6 +174,7 @@
         },
         noRequest: false,
         locale: String,
+        image: null,
       }
     },
     async created() {
@@ -196,6 +198,7 @@
             root.$i18n.locale = store.country.locale || 'en'
           }
         }
+        this.image = store.logoImageSrc
       }
       for(let i = 5; i <= maxGuest; i++) {
         this.peopleList.push({text: i, value: i})
@@ -463,6 +466,12 @@
           background-image: linear-gradient(to right, #8A8F97 50%, transparent 50%);
           background-size: 8px 1px;
         }
+      }
+
+      &__logo {
+        max-width: 80px;
+        margin-left: 50%;
+        transform: translateX(-50%);
       }
     }
 
