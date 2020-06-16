@@ -350,6 +350,7 @@
         return  `${this.$t('store.merchantClose2')}`
       },
       isStoreOpening() {
+        if(!this.store.delivery && !this.store.pickup) return false
         this.dayOff = false
         if(this.store.dayOff && this.store.dayOff.length > 0) {
           let open = true
