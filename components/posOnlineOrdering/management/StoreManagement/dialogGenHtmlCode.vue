@@ -58,7 +58,13 @@
         this.code = ''
         if(this.type === 'order') {
           const storeUrl = [location.origin, 'store', this.alias].join('/');
-          this.code = `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120"><img style="pointer-events: none" src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering"></div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
+          const store = this.stores.find(s => s.alias === this.alias)
+          const image = store.country && store.country.locale.includes('de') ? 'online-order-de.svg' : 'online-order.svg'
+          const fallbackContent = store.country && store.country.locale.includes('de') ? 'Online Bestellen' : 'Online Order'
+          this.code = `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120">
+                  <object style="pointer-events: none; width: 120px" type="image/svg+xml" data="https://pos.gigasource.io/cms-files/files/view/images/${image}">${fallbackContent}</object>
+                </div>
+                <script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
         } else if(this.type === 'reservation') {
           const reservationUrl = [location.origin, 'reservation', this.alias].join('/');
           this.code = `<div id="reservation-embed-btn" class="reservation-embed-btn" data-url="${reservationUrl}" data-width="120">Reservation</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/reservation-embed.js"><\/script>`
