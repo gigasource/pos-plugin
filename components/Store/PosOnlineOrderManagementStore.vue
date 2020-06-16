@@ -256,12 +256,12 @@
         }
         this.storeGroups.splice(0, this.storeGroups.length, ...storeGroups)
       },
-      async addGroup(name) {
+      async addGroup({ name, type }) {
         if (_.includes(this.storeGroupNames, name)) {
           this.showMessage('This name is already taken!')
           return
         }
-        const createdGroup = await cms.getModel('StoreGroup').create({ name })
+        const createdGroup = await cms.getModel('StoreGroup').create({ name, type })
         const storeGroups = [..._.map(cms.loginUser.user.storeGroups, sg => sg._id), createdGroup._id]
         await cms.getModel('User').findOneAndUpdate({_id: cms.loginUser.user._id}, { storeGroups })
         await cms.updateUserSession()

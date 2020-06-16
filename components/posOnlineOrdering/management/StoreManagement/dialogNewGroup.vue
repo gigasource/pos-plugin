@@ -3,6 +3,7 @@
     <div class="dialog">
       <div class="dialog-title">Add New Group</div>
       <g-text-field-bs large label="Group Name:" :rules="rules" placeholder="e.g: Pizza, KFC,..." v-model="group"/>
+      <g-switch v-model="isFranchisesGroup" label="Franchise group"/>
       <div class="dialog-buttons">
         <g-btn-bs width="100" large text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
         <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" :disabled="invalid"
@@ -24,7 +25,8 @@
     },
     data() {
       return {
-        group: ''
+        group: '',
+        isFranchisesGroup: false,
       }
     },
     computed: {
@@ -48,12 +50,14 @@
           return true
         }
         return false
-      }
+      },
     },
     methods: {
       submit() {
-        this.$emit('submit', this.group)
-        this.internalValue = false
+        this.$emit('submit', {
+          name: this.group,
+          type: this.isFranchisesGroup ? 'franchises' : undefined
+        })
       }
     }
   }

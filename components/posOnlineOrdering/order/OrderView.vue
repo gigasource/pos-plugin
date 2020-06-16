@@ -43,6 +43,7 @@
                   </template>
                   <span v-else>{{$t('store.today')}}</span>
                 </div>
+                
               </div>
               <div class="address">
                 <span>{{store.address}}</span>
@@ -162,6 +163,10 @@
             @add="addItemToOrder"
             :store-country-locale="storeCountryLocale"/>
       </template>
+      <div id="webshop-embed-btn" class="webshop-embed-btn" data-url="http://localhost:8888/franchise/5e955b043efd4747223fba89" data-width="120">
+        <img style="pointer-events: none" src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering">
+      </div>
+    <script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"></script>
     </div>
 </template>
 <script>

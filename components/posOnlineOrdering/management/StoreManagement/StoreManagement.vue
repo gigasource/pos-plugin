@@ -93,7 +93,7 @@
     </template>
 
     <!-- dialogs -->
-    <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup($event)" :groups="storeGroups"/>
+    <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup" :groups="storeGroups"/>
     <dialog-new-store v-if="manageStorePerm && storeGroups && dialog.newStore" v-model="dialog.newStore" @submit="addStore($event)" :groups="storeGroups" :countries="countries"/>
     <dialog-delete-item v-if="settingsPerm && dialog.deleteDevice" v-model="dialog.deleteDevice" type="device" @confirm="deleteDevice"/>
     <dialog-pair-new-device v-if="selectedStore && dialog.pairNewDevice" v-model="dialog.pairNewDevice" :store="selectedStore"/>
@@ -119,6 +119,7 @@
 </template>
 <script>
   import supportedCountries from '../../../Store/supportedCountries';
+  
   export default {
     name: 'StoreManagement',
     props: {},
