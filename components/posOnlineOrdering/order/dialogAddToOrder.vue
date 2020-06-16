@@ -129,7 +129,7 @@
         for (const modifier of _.flatten(this.modifiers)) {
           price += modifier ? modifier.price : 0
         }
-        return price
+        return price && price.toFixed(2)
       },
       validateRequiredModifier() {
         if(!this.choices || this.choices.length === 0) return true
