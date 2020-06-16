@@ -465,6 +465,24 @@
           ]
         }
       ]
+    },
+    {
+      "_id": "5ee835754a3631186e4549c6",
+      "schemaType": "array",
+      "key": "dayOff",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "date",
+          "key": "startDate",
+          "type": "input@date"
+        },
+        {
+          "schemaType": "date",
+          "key": "endDate",
+          "type": "input@date"
+        }
+      ]
     }
   ],
   "name": "Store",
