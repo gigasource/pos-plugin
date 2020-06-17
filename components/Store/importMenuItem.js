@@ -82,7 +82,7 @@ function getChoices(choiceStr) {
   // ; : separator or terminate character
   const choicePattern = /(?<choice>(?<choice_name>(\w| )+)(?<mandatory>\*?)(?<quantity>[1|2]):(?<options>[^;]+)+)/g
   // (small=5)(medium=10)
-  const optionPattern = /(?<option>[\w| |\.|ä|ö|ü|Ä|Ö|Ü|ß]+)=(?<price>\d+(\.\d+)?)\)+/g
+  const optionPattern = /\((?<option>[^=]+)=(?<price>\d+(\.\d+)?)\)+/g
   const choices = []
   let match
   while((match = choicePattern.exec(choiceStr)) != null) {
