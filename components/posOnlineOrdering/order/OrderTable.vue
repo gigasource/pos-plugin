@@ -1401,6 +1401,7 @@
     &:-webkit-autofill:focus,
     &:-webkit-autofill:active {
       animation: autofill 0s forwards !important;
+      transition: background-color 5000s ease-in-out 0s;
     }
 
     @keyframes autofill {

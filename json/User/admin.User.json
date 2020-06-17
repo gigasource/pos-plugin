@@ -64,6 +64,11 @@
       "_id": "5ea2c51faa40e927f690df76",
       "permission": "configOnlineOrdering",
       "value": true
+    },
+    {
+      "_id": "5ee89c8cb9315c22d0e106c4",
+      "permission": "viewMonthlyRevenue",
+      "value": true
     }
   ],
   "name": "\u001dadmin",

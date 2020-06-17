@@ -37,12 +37,15 @@
       },
       featureControlPerm() {
         return _.find(this.userPermissions, perm => perm.permission === 'featureControl' && perm.value === true)
+      },
+      viewMonthlyRevenuePerm() {
+        return _.find(this.userPermissions, perm => perm.permission === 'viewMonthlyRevenue' && perm.value === true)
       }
     },
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" ]
+        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue"]
       }
     },
     async created() {
@@ -63,6 +66,7 @@
         settingsPerm: this.settingsPerm,
         updateAppPerm: this.updateAppPerm,
         featureControlPerm: this.featureControlPerm,
+        viewMonthlyRevenuePerm: this.viewMonthlyRevenuePerm,
         allPermissions: this.allPermissions
       }
     }

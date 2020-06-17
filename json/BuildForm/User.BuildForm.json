@@ -91,6 +91,10 @@
             {
               "value": "featureControl",
               "text": "Feature Control"
+            },
+            {
+              "value": "viewMonthlyRevenue",
+              "text": "View Monthly Revenue"
             }
           ]
         },
