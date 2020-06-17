@@ -581,7 +581,8 @@
             onlineOrderId: updatedOrder.onlineOrderId,
             status: status,
             responseMessage: acceptResponse,
-            paypalOrderDetail: order.paypalOrderDetail
+            paypalOrderDetail: order.paypalOrderDetail,
+            total: order.vSum
           }
 
           console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,

@@ -830,7 +830,8 @@
         cms.socket.on('unpairDevice', () => {
           this.unregisterOnlineOrder(async () => {
             this.onlineDevice = Object.assign({}, this.onlineDevice, {
-              id: null
+              id: null,
+              store: {}
             })
             await this.updateOnlineDevice(this.onlineDevice)
             this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
