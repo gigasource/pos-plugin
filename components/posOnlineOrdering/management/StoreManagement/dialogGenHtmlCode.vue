@@ -4,14 +4,6 @@
       <div class="dialog-title">HTML Code</div>
       <g-icon class="dialog-icon--close" size="20" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
-        <div class="row-flex align-items-end">
-          <g-autocomplete text-field-component="GTextFieldBs" label="Store" deletable-chips :items="listStores" v-model="alias"/>
-          <g-radio-group name="type" v-model="type">
-            <g-radio small color="indigo accent-2" value="order" label="Online Order"/>
-            <g-radio small color="indigo accent-2" value="reservation" label="Reservation"/>
-            <g-btn-bs :disabled="!type" style="width: 100%; margin: 0" background-color="indigo accent-2" text-color="white" @click.stop="generateHtmlCode">Generate</g-btn-bs>
-          </g-radio-group>
-        </div>
         <div class="mt-3">
           <div class="block-code">{{code}}</div>
           <g-btn-bs style="margin-left: 0; margin-top: 8px" icon="icon-chain-blue@14" text-color="indigo accent-2" @click="copyCode">Copy Code</g-btn-bs>
@@ -22,18 +14,18 @@
 </template>
 
 <script>
+  import { copyToClipboard, generateEmbededScript } from "../../../Store/utils.js"
+  
   export default {
     name: "dialogGenHtmlCode",
     props: {
-      stores: Array,
+      id: String,
+      locale: String,
+      type: String,
       value: Boolean,
     },
     data() {
-      return {
-        alias: null,
-        type: null,
-        code: ''
-      }
+      return {}
     },
     computed: {
       internalValue: {
@@ -42,36 +34,15 @@
         },
         set(val) {
           this.$emit('input', val)
-          this.alias = null
-          this.type = null
         }
       },
-      listStores() {
-        return this.stores && this.stores.map(s => ({
-          text: s.name ? s.name : s.settingName,
-          value: s.alias
-        }))
-      },
+      code() {
+        return generateEmbededScript({ type: this.type, locale: this.locale, id: this.id })
+      }
     },
     methods: {
-      generateHtmlCode() {
-        this.code = ''
-        if(this.type === 'order') {
-          const storeUrl = [location.origin, 'store', this.alias].join('/');
-          const store = this.stores.find(s => s.alias === this.alias)
-          const image = store.country && store.country.locale.includes('de') ? 'online-order-de.svg' : 'online-order.svg'
-          const fallbackContent = store.country && store.country.locale.includes('de') ? 'Online Bestellen' : 'Online Order'
-          this.code = `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120">
-                  <object style="pointer-events: none; width: 120px" type="image/svg+xml" data="https://pos.gigasource.io/cms-files/files/view/images/${image}">${fallbackContent}</object>
-                </div>
-                <script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
-        } else if(this.type === 'reservation') {
-          const reservationUrl = [location.origin, 'reservation', this.alias].join('/');
-          this.code = `<div id="reservation-embed-btn" class="reservation-embed-btn" data-url="${reservationUrl}" data-width="120">Reservation</div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/reservation-embed.js"><\/script>`
-        }
-      },
       async copyCode() {
-        await navigator.clipboard.writeText(this.code)
+        await copyToClipboard(this.code)
       },
     }
   }
@@ -133,12 +104,11 @@
      }
 
      .block-code {
-       height: 100px;
+       height: 250px;
        border: 1px solid #9e9e9e;
        border-radius: 2px;
        overflow-y: auto;
-       padding: 0 24px;
-       text-align: center;
+       padding: 10px;
      }
    }
  }
