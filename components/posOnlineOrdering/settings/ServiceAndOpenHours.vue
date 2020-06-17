@@ -136,7 +136,7 @@
             <div v-for="(device, i) in smsDevices" :key="`sms_${i}`" class="service-setting__sms-table--device">
               <div class="flex-equal pl-1">{{device.name}}</div>
               <div class="flex-equal pl-1">{{device.code}}</div>
-              <div class="flex-equal pl-1">{{device.orders}}</div>
+              <div class="flex-equal pl-1">{{device.orders || 0}}</div>
               <div class="flex-equal pl-1">{{device.total | currency(country.locale)}}</div>
               <div class="flex-equal pl-1">{{device.lastSeen | time}}</div>
               <div class="row-flex align-items-center justify-end pr-1">
@@ -191,7 +191,7 @@
     name: 'ServiceAndOpenHours',
     filters: {
       currency(val, locale = 'en') {
-        return $t('common.currency', locale) + val.toFixed(2)
+        return `${$t('common.currency', locale)} ${!isNaN(val) && val > 0 ? val.toFixed(2): 0}`
       },
       time(val) {
         const dateObj = dayjs(val);
