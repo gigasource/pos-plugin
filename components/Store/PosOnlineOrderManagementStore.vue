@@ -72,6 +72,7 @@
         const storeGroupVMs = _.map(this.storeGroups, group => ({
           _id: group._id,
           name: group.name,
+          type: group.type,
           stores: _.map(_.filter(this.storeSearchSortResult, store => this.storeInGroup(store, group)), this.convertStoreToViewModel)
         }))
         if (this.searchText)

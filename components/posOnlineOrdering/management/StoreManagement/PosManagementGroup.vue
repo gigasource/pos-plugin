@@ -35,7 +35,7 @@
       </g-edit-view-input>
 
       <!-- Group More Actions -->
-      <g-menu v-if="showGroupActionBtns || menuCtx.showMoreGroupAction" v-model="menuCtx.showMoreGroupAction" close-on-content-click>
+      <g-menu v-if="(showGroupActionBtns || menuCtx.showMoreGroupAction) && type === 'franchises'" v-model="menuCtx.showMoreGroupAction" close-on-content-click>
         <template v-slot:activator="{on}">
           <g-icon @click.prevent.stop="menuCtx.showMoreGroupAction = true">more_horiz</g-icon>
         </template>
@@ -235,6 +235,7 @@
     props: {
       _id: String,
       name: String,
+      type: String,
       stores: Array,
       appItems: Array,
     },
