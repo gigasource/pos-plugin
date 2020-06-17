@@ -180,7 +180,8 @@ async function insertProductCategoriesToDatabase(categories, storeId) {
         category: createdCategory._id,
         store: storeId,
         position: index,
-        showImage: false
+        showImage: true,
+        available: true,
       }))
       await cms.getModel(PRODUCT_COLLECTION).insertMany(products);
     } catch (e) {
