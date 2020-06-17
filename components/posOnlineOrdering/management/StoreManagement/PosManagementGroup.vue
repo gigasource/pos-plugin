@@ -74,10 +74,10 @@
                                   ? 'pos-management-group__content-btn' : 'pos-management-group__content-btn--disabled'"
                              @mouseenter="on.mouseenter"
                              @mouseleave="on.mouseleave"
-                             @click="() => {startRemoteControl(device); on.mouseleave()}">
+                             @click="() => {openWebRTCRemoteControl(store, device); on.mouseleave()}">
                         </div>
                       </template>
-                      <span>Remote Control</span>
+                      <span>Web RTC Remote Control</span>
                     </g-tooltip>
                     <!-- extra actions -->
                     <g-menu v-model="device.menu" close-on-content-click nudge-bottom="5">
@@ -95,7 +95,7 @@
                              @click="$emit('open:deleteDeviceDialog', device)">Delete device
                         </div>
                         <div v-if="featureControlPerm" class="menu-action__option"
-                             @click="openWebRTCRemoteControl(store, device)">Open WebRTC Remote Control
+                             @click="startRemoteControl(device)">Proxy Remote Control
                         </div>
                       </div>
                     </g-menu>
