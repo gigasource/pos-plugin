@@ -12,7 +12,8 @@ const path = require('path')
 const jsonFn = require('json-fn')
 
 const Schema = mongoose.Schema
-const savedMessageSchema = new Schema({
+
+const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', new Schema({
   targetClientId: ObjectId,
   event: {
     type: String,
@@ -30,38 +31,50 @@ const savedMessageSchema = new Schema({
   },
 }, {
   timestamps: true
-});
+}));
 
-const SavedMessagesModel = mongoose.model('SocketIOSavedMessage', savedMessageSchema);
+const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
+  clientId: {
+    type: String,
+    trim: true,
+  },
+  socketId: {
+    type: String,
+    trim: true,
+  },
+}, {
+  timestamps: true,
+}))
+
 const sendOrderTimeouts = {};
 const SEND_TIMEOUT = 30000;
 const SOCKET_IO_REDIS_SYNC_INTERVAL = 60 * 1000;
 
 function updateMessage(targetClientId, _id, update) {
-  return SavedMessagesModel.findByIdAndUpdate(_id, update).exec();
+  return SocketIOSavedMessagesModel.findByIdAndUpdate(_id, update).exec();
 }
 
 async function saveMessage(targetClientId, message) {
-  const result = await SavedMessagesModel.create(Object.assign({targetClientId}, message));
+  const result = await SocketIOSavedMessagesModel.create(Object.assign({targetClientId}, message));
   return result._id;
 }
 
 function deleteMessage(targetClientId, _id) {
-  return SavedMessagesModel.deleteOne({_id}).exec();
+  return SocketIOSavedMessagesModel.deleteOne({_id}).exec();
 }
 
 function loadMessages(targetClientId) {
-  return SavedMessagesModel.find({targetClientId});
+  return SocketIOSavedMessagesModel.find({targetClientId});
 }
 
-module.exports = function (cms) {
+module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
   const {io, socket: internalSocketIOServer} = cms;
 
   if (global.APP_CONFIG.redis) {
     const {host, port, password} = global.APP_CONFIG.redis;
-    io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
+    io.adapter(redisAdapter({host, port, ...password ? {password} : {}})); //internalSocketIOServer will use adapter too, just need to call this once
   }
 
   async function updateOrderStatus(orderToken, status) {
@@ -109,18 +122,34 @@ module.exports = function (cms) {
     updateMessage,
   });
 
-  if (global.APP_CONFIG.redis) {
-    process.on('exit', () => {
-      let done = false;
-      // Remove all socket clients belonging to this instance stored in Redis when this instance exits/be killed
-      externalSocketIOServer.removeInstanceClients().then(() => done = true);
+  // Handling node instance exit/start
+  const savedSentryMessages = await SentrySavedMessagesModel.find({});
+  const savedSentryMessageIds = savedSentryMessages.map(({_id}) => _id);
+  await SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}});
+  savedSentryMessages.forEach(({socketId, clientId}) => {
+    console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socketId}`,
+        `(Startup) Client ${clientId} disconnected, socket id = ${socketId}`);
+  });
 
-      while (!done) {
-        require('deasync').sleep(1000);
-      }
-      process.exit();
-    });
-  }
+  const fn = _.once(async () => {
+    const connectedSockets = externalSocketIOServer.sockets.connected;
+    await Promise.all(Object.keys(connectedSockets).map(async socketId => {
+      const socket = connectedSockets[socketId];
+      const {clientId} = socket;
+
+      return await SentrySavedMessagesModel.create({socketId, clientId});
+    }));
+
+    if (global.APP_CONFIG.redis) {
+      // Remove all socket clients belonging to this instance stored in Redis when this instance exits/be killed
+      await externalSocketIOServer.removeInstanceClients();
+    }
+
+    setTimeout(() => process.exit(), 3000);
+  });
+
+  process.on('SIGINT', fn);
+  // ----------------------------------------
 
   // ack fns
   externalSocketIOServer.registerAckFunction('updateAppFeatureAck', async (device, features) => {
