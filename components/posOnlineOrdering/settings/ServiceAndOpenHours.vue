@@ -98,10 +98,11 @@
           <g-chip v-for="(day, i) in dayOff" :key="`day-off_${i}`" label close close-icon="icon-close@16" @close="deleteDayOff(day)">{{getDayOffLabel(day)}}</g-chip>
         </div>
       </div>
-      <div class="service-setting__content" style="max-width: 600px;">
+      <div class="service-setting__content">
         <div class="mb-3 fw-700">G-SMS Settings</div>
         <div class="row-flex">
           <g-switch color="#536DFE" class="col-6" label="Enabled" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
+          <g-switch color="#536DFE" class="col-6" label="Auto-accept new devices" :input-value="computedGSms.autoAccept" @change="setGSmsValue('autoAccept', $event)"/>
         </div>
         <div class="fw-700 mt-2">Default time to complete order</div>
         <g-grid-select :items="[15, 30, 45, 60]" mandatory :grid="false" class="mb-3"
@@ -127,11 +128,17 @@
             <div class="service-setting__sms-table--header">
               <div class="flex-equal pl-1">Name</div>
               <div class="flex-equal pl-1">Code</div>
+              <div class="flex-equal pl-1">Orders</div>
+              <div class="flex-equal pl-1">Total</div>
+              <div class="flex-equal pl-1">Last Seen at</div>
               <div style="flex: 0 0 120px"/>
             </div>
             <div v-for="(device, i) in smsDevices" :key="`sms_${i}`" class="service-setting__sms-table--device">
               <div class="flex-equal pl-1">{{device.name}}</div>
               <div class="flex-equal pl-1">{{device.code}}</div>
+              <div class="flex-equal pl-1">{{device.orders}}</div>
+              <div class="flex-equal pl-1">{{device.total | currency(country.locale)}}</div>
+              <div class="flex-equal pl-1">{{device.lastSeen | time}}</div>
               <div class="row-flex align-items-center justify-end pr-1">
                 <g-btn-bs background-color="#f0f0f0" border-color="#d8d8d8" :disabled="device.registered" @click="changeDeviceStatus(device._id)">
                   <g-icon color="#4CAF50">check</g-icon>
@@ -182,6 +189,15 @@
   // TODO: Debounce update openHours open, close time
   export default {
     name: 'ServiceAndOpenHours',
+    filters: {
+      currency(val, locale = 'en') {
+        return $t('common.currency', locale) + val.toFixed(2)
+      },
+      time(val) {
+        const dateObj = dayjs(val);
+        return val && dateObj.isValid() ? dateObj.format('MMM DD HH:mm:ss') : ''
+      }
+    },
     props: {
       delivery: Boolean,
       pickup: Boolean,
