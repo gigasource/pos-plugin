@@ -1,50 +1,47 @@
 <template>
   <section class="pa-3 col-flex">
-    <div class="row-flex mb-2 align-items-center">
-      <div style="font-weight: bold; font-size: 20px; line-height: 20px">{{ store.name }}</div>
-      <span style="padding: 0 5px; line-height: 20px">|</span>
-      <div style="display: flex; align-items: center; justify-content: flex-end; white-space: nowrap;" @click="dialog.hour = true">
-        <!-- context menu -->
-        <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
-          <!-- context menu activator -->
-          <template v-slot:activator="{on}">
-            <div @mouseenter="on.mouseenter"
-                 @mouseleave="on.mouseleave"
-                 :style="storeOpenStatusStyle"
-                 class="row-flex align-items-center mr-1">
-              {{ storeOpenStatus }}
-              <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
+    <div style="font-weight: bold; font-size: 20px; line-height: 20px; margin-bottom: 10px">{{ store.name }}</div>
+    <div style="display: flex; align-items: center; white-space: nowrap;" @click="dialog.hour = true">
+      <!-- context menu -->
+      <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
+        <!-- context menu activator -->
+        <template v-slot:activator="{on}">
+          <div @mouseenter="on.mouseenter"
+               @mouseleave="on.mouseleave"
+               :style="storeOpenStatusStyle"
+               class="row-flex align-items-center mr-1">
+            {{ storeOpenStatus }}
+            <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
+          </div>
+        </template>
+      
+        <!-- context menu content -->
+        <div class="menu-hour">
+          <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
+          <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
+            <div class="mr-2">{{day.wdayString}}</div>
+            <div class="ta-right">{{day.open}} - {{day.close}}</div>
+          </div>
+          <template v-if="deliveryInfo && deliveryInfo.length > 0">
+            <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
+            <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+              <div class="mr-2">{{info.title}}</div>
+              <div class="ta-right">{{info.value}}</div>
             </div>
           </template>
-        
-          <!-- context menu content -->
-          <div class="menu-hour">
-            <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
-            <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
-              <div class="mr-2">{{day.wdayString}}</div>
-              <div class="ta-right">{{day.open}} - {{day.close}}</div>
-            </div>
-            <template v-if="deliveryInfo && deliveryInfo.length > 0">
-              <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
-              <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
-                <div class="mr-2">{{info.title}}</div>
-                <div class="ta-right">{{info.value}}</div>
-              </div>
-            </template>
-          </div>
-        </g-menu>
-      </div>
+        </div>
+      </g-menu>
     </div>
     <p>{{ store.address }}</p>
     <p>Pickup service: {{ pickupServiceStatus }}</p>
     <p>Delivery service: {{ deliveryServiceStatus }}</p>
     <g-spacer/>
-    <p class="mt-4" v-if="store.phone">TEL: {{ store.phone }} </p>
+    <p class="mt-2" v-if="store.phone">TEL: {{ store.phone }} </p>
     <div class="mb-2 row-flex">
       <img src="/plugins/pos-plugin/assets/map.svg" draggable="false"/>
       <p class="ml-2" style="font-weight: bold; font-size: 13px; color: #9E9E9E; cursor: pointer" @click="viewMap">VIEW MAP</p>
     </div>
-    <div>
+    <div class="mt-2">
       <g-btn-bs background-color="#000" text-color="#FFF" border-radius="20px" width="128" class="ml-0 mr-0" @click="openStore">Order now</g-btn-bs>
       <g-btn-bs background-color="#FFF" text-color="#000" border-radius="20px" width="128" border-color="#000"  @click="openReservation">Reservation</g-btn-bs>
     </div>

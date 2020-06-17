@@ -1,5 +1,8 @@
 <template>
-  <section class="franchise-view">
+  <section class="franchise-view r">
+    <div @click="close" class="abs" style="top: 20px; right: 20px; width: 20px; height: 20px; cursor: pointer">
+      <img src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
+    </div>
     <div class="header">Select your nearest restaurants</div>
     <div class="store-cards">
       <store-card v-for="store in stores" :key="store._id" :store="store"/>
@@ -33,7 +36,11 @@
       }
     },
     computed: {},
-    methods: {}
+    methods: {
+      close() {
+        window.parent.postMessage('close-iframe', '*')
+      }
+    }
   }
 </script>
 <style scoped lang="scss">
@@ -50,6 +57,7 @@
     font-weight: bold;
     font-size: 25px;
     margin-bottom: 100px;
+    text-align: center;
   }
   
   .store-cards {
