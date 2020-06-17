@@ -122,7 +122,6 @@ function workbox2PJSO(workbox) {
   // SheetName startwith : is document sheet
   // This sheet will be ignored
   const dataSheetNames = _.filter(workbox.SheetNames, sheetName => !_.startsWith(sheetName, '@'))
-  debugger
   return _.map(dataSheetNames, (sheetName, index) => ({
     name: sheetName,
     position: index,
