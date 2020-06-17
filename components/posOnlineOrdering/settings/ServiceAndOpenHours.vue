@@ -89,6 +89,14 @@
                       :items="orderTimeOuts"/>
           </div>
         </div>
+        <div class="row-flex mt-2">
+          <div class="fw-700">Days-off</div>
+          <g-spacer/>
+          <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = true">+ Add new</g-btn-bs>
+        </div>
+        <div class="service-setting__day-off">
+          <g-chip v-for="(day, i) in dayOff" :key="`day-off_${i}`" label close close-icon="icon-close@16" @close="deleteDayOff(day)">{{getDayOffLabel(day)}}</g-chip>
+        </div>
       </div>
       <div class="service-setting__content" style="max-width: 600px;">
         <div class="mb-3 fw-700">G-SMS Settings</div>
@@ -165,6 +173,7 @@
     <dialog-text-filter label="Device Name" v-model="dialog.name" :default-value="device.name" @submit="e => device.name = e"/>
 
     <dialog-delete-item type="sms device" v-model="device.delete" @confirm="deleteSmsDevice"/>
+    <dialog-add-day-off v-model="dialog.dayOff" @submit="addDayOff"/>
   </div>
 </template>
 <script>
@@ -198,7 +207,8 @@
       orderTimeOut: Number,
       noteToCustomers: String,
       gSms: null,
-      id: String
+      id: String,
+      dayOff: Array,
     },
     data: function () {
       return {
@@ -217,7 +227,8 @@
         dialog: {
           minimumValue: false,
           note: false,
-          name: false
+          name: false,
+          dayOff: false
         },
         device: {
           dialog: false,
@@ -495,6 +506,24 @@
       },
       deleteSmsDevice() {
         cms.socket.emit('removeGSmsDevice', this.id, this.device.selected._id)
+      },
+      addDayOff(day) {
+        const dayOff = _.cloneDeep(this.dayOff)
+        dayOff.push(day)
+        this.$emit('update', {dayOff})
+      },
+      deleteDayOff(day) {
+        const dayOff = _.cloneDeep(this.dayOff)
+        _.remove(dayOff, d => d._id === day._id)
+        this.$emit('update', {dayOff})
+      },
+      getDayOffLabel(day) {
+        const start = dayjs(day.startDate).format('DD.MM'),
+              end = dayjs(day.endDate).format('DD.MM')
+        if(start === end)
+          return start
+        else
+          return `${start} - ${end}`
       }
     },
   }
@@ -673,6 +702,14 @@
           padding: 4px;
         }
       }
+    }
+
+    &__day-off {
+      display: flex;
+      flex-wrap: wrap;
+      border: 1px solid #EFEFEF;
+      border-radius: 2px;
+      min-height: 90px;
     }
   }
 </style>

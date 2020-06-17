@@ -3,18 +3,50 @@
 import _ from 'lodash';
 import XLSX from 'xlsx';
 
-const colMappings = ['id', 'name', 'desc', 'price', 'printer', 'tax', 'spicy', 'vegeterian']
 const CATEGORY_COLLECTION = 'Category'
 const PRODUCT_COLLECTION = 'Product'
-
-/**
- * Get header of items from index
- * Consider: Read header from spreadsheet then mapping to property in our db
- * @param colIndex
- * @returns {string}
- */
-function getColumnName(colIndex) {
-  return colMappings[colIndex]
+const allergicMaps = {
+  'eg': 'eggs',
+  'mi': 'milk',
+  'gl': 'cereal', //Cereals containing gluten
+  'pe': 'peanuts',
+  'lu': 'lupin',
+  'cr': 'crustaceans',
+  'mo': 'molluscs',
+  'mu': 'mustard',
+  'fi': 'fish',
+  'ce': 'celery',
+  'nu': 'nuts',
+  'se': 'sesame',
+  'so': 'soya',
+  'su': 'sulphur'
+}
+const directMapping = (key, convert) => (obj, value) => obj[key] = (convert && convert(value)) || value
+const mappingFns = {
+  'id': directMapping('id'),
+  'name': directMapping('name'),
+  'desc': directMapping('desc'),
+  'price': directMapping('price', Number),
+  'printer': (o, v) => o.groupPrinters = (v && _.split(v, ',') || []),
+  'tax': directMapping('tax', Number),
+  'choices': (o, v) => !_.isEmpty(_.trim(v)) && (o.choices = getChoices(v)),
+  'allergic': (o, v) => {
+    o.mark = o.mark || {}
+    const active = !!v
+    o.mark.allergic = {
+      active,
+      notice: '',
+      types: active ? _.split(v, ',').map(al => allergicMaps[_.trim(al)]) : []
+    }
+  },
+  'spicy': (o, v) => {
+    o.mark = o.mark || { }
+    o.mark.spicy = { active: isPropTrue(v), notice: '' }
+  },
+  'vegeterian': (o, v) => {
+    o.mark = o.mark || { }
+    o.mark.vegeterian = { active: isPropTrue(v), notice: '' }
+  },
 }
 
 /**
@@ -40,6 +72,46 @@ function isPropTrue(prop) {
   return prop === '1' || prop === 'true' || prop === 'yes'
 }
 
+function getChoices(choiceStr) {
+  // size*1:(small=5)(medium=10);size*2:(small=5)(medium=10);
+  // size*2:(small=5)(medium=10);
+  // choice name: size
+  // * : mandatory
+  // 1 : select one
+  // (small=5):  option small, value 5
+  // ; : separator or terminate character
+  const choicePattern = /(?<choice>(?<choice_name>(\w| )+)(?<mandatory>\*?)(?<quantity>[1|2]):(?<options>[^;]+)+)/g
+  // (small=5)(medium=10)
+  const optionPattern = /(?<option>[\w| ]+)=(?<price>\d+(\.\d+)?)\)+/g
+  const choices = []
+  let match
+  while((match = choicePattern.exec(choiceStr)) != null) {
+    let choiceName = match.groups['choice_name']
+    let mandatory = match.groups['mandatory']
+    let quantity = match.groups['quantity']
+    let optionsStr = match.groups['options']
+    console.log(optionsStr)
+    const options = []
+    let optionMatch
+    while((optionMatch = optionPattern.exec(optionsStr)) != null) {
+      options.push({
+        name: optionMatch.groups['option'],
+        price: Number(optionMatch.groups['price'])
+      })
+    }
+
+    choices.push({
+      name: choiceName.toUpperCase(),
+      mandatory: mandatory === '*',
+      select: quantity === '1' ? 'one':'many',
+      options: options
+    })
+  }
+
+  console.log('choice:', choiceStr, 'output:', choices)
+  return choices
+}
+
 /**
  * Convert workbox to plain javascript object array
  * Each worksheet will be converted to Category object with props
@@ -50,7 +122,11 @@ function isPropTrue(prop) {
  * @returns {Array}
  */
 function workbox2PJSO(workbox) {
-  return _.map(workbox.SheetNames, (sheetName, index) => ({
+  // SheetName startwith : is document sheet
+  // This sheet will be ignored
+  const dataSheetNames = _.filter(workbox.SheetNames, sheetName => !_.startsWith(sheetName, '@'))
+  debugger
+  return _.map(dataSheetNames, (sheetName, index) => ({
     name: sheetName,
     position: index,
     items: getItemsInCategory(workbox.Sheets[sheetName])
@@ -75,8 +151,9 @@ function getItemsInCategory(sheet) {
     for (colNum = range.s.c; colNum <= range.e.c; colNum++) {
       const nextCell = sheet[XLSX.utils.encode_cell({ r: rowNum, c: colNum })];
       if (typeof nextCell !== 'undefined') {
+        const colName =  sheet[XLSX.utils.encode_cell({ r: 0, c: colNum })].w;
         // https://www.npmjs.com/package/xlsx#cell-object
-        item[getColumnName(colNum)] = nextCell.w
+        mappingFns[colName] && mappingFns[colName](item, nextCell.w)
       }
     }
     // remove invalid item
@@ -103,19 +180,11 @@ async function insertProductCategoriesToDatabase(categories, storeId) {
         })
       }
       const products = _.map(category.items, (item, index) => ({
+        ...item,
         category: createdCategory._id,
         store: storeId,
         position: index,
-        ..._.pick(item, ['name', 'id']),
-        price: Number(item.price || 0),
-        tax: Number(item.tax || 0),
-        showImage: false,
-        groupPrinters: (item.printer && _.split(item.printer, ',')) || [],
-        mark: {
-          allergic: { types: [] },
-          spicy: { active: isPropTrue(item.spicy), notice: '' },
-          vegeterian: { acitive: isPropTrue(item.vegeterian), notice: '' }
-        }
+        showImage: false
       }))
       await cms.getModel(PRODUCT_COLLECTION).insertMany(products);
     } catch (e) {

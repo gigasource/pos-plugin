@@ -47,7 +47,7 @@
                           v-model="modifiers[index]"
                           color="#536DFE"
                           :value="option"
-                          :label="`${option.name} (${$t('common.currency', storeCountryLocale)}${option.price})`"/>
+                          :label="getCheckboxLabel(option)"/>
             </template>
           </div>
         </div>
@@ -129,7 +129,7 @@
         for (const modifier of _.flatten(this.modifiers)) {
           price += modifier ? modifier.price : 0
         }
-        return price
+        return price && price.toFixed(2)
       },
       validateRequiredModifier() {
         if(!this.choices || this.choices.length === 0) return true
@@ -179,6 +179,11 @@
         let allergens = ''
         allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
         return allergens
+      },
+      getCheckboxLabel(option) {
+        if(!option.price)
+          return option.name
+        return `${option.name} (${$t('common.currency', this.storeCountryLocale)}${option.price})`
       }
     }
   }

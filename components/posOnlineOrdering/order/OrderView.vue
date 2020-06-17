@@ -162,6 +162,18 @@
             v-model="dialog.add"
             @add="addItemToOrder"
             :store-country-locale="storeCountryLocale"/>
+
+        <!-- Day off dialog -->
+        <g-dialog v-model="dialog.dayOff" persistent>
+          <div class="dialog-closed">
+            <div class="dialog-closed__title">Notice</div>
+            <div class="dialog-closed__message">
+              <p>Our restaurant is closed today.</p>
+              <p>Thank you for understanding.</p>
+            </div>
+            <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = false">Close</g-btn-bs>
+          </div>
+        </g-dialog>
       </template>
       <div id="webshop-embed-btn" class="webshop-embed-btn" data-url="http://localhost:8888/franchise/5e955b043efd4747223fba89" data-width="120">
         <img style="pointer-events: none" src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering">
@@ -178,6 +190,8 @@
   import {autoResizeTextarea} from "../../logic/commonUtils";
   import { getCdnUrl } from '../../Store/utils';
   import DialogAddToOrder from "./dialogAddToOrder";
+  import isBetween from 'dayjs/plugin/isBetween'
+  dayjs.extend(isBetween)
 
   export default {
     name: 'OrderView',
@@ -202,6 +216,7 @@
           hour: false,
           add: false,
           note: false,
+          dayOff: false
         },
         throttle: null,
         choosing: 0,
@@ -210,7 +225,8 @@
         orderItems: [],
         selectedProduct: null,
         dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        scrolling: 0
+        scrolling: 0,
+        dayOff: false,
       }
     },
     filters: {
@@ -252,7 +268,10 @@
       this.dayInterval = setInterval(() => {
         this.now = dayjs().format('HH:mm')
       }, 1000)
-      this.dialog.closed = !this.isStoreOpening
+      if(!this.dayOff)
+        this.dialog.closed = !this.isStoreOpening
+      else
+        this.dialog.dayOff = true
     },
     mounted() {
       //scroll
@@ -336,6 +355,18 @@
         return  `${this.$t('store.merchantClose2')}`
       },
       isStoreOpening() {
+        if(!this.store.delivery && !this.store.pickup) return false
+        this.dayOff = false
+        if(this.store.dayOff && this.store.dayOff.length > 0) {
+          let open = true
+          this.store.dayOff.forEach(({startDate, endDate}) => {
+            if(dayjs().isBetween(dayjs(startDate), dayjs(endDate))) {
+              this.dayOff = true
+              open = false
+            }
+          })
+          if(!open) return open
+        }
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
             if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) return true

@@ -5,7 +5,7 @@
       <div class="restaurant-info__main--left">
         <div>
           <div class="mb-3 fw-700">Basic info</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto 1fr 1fr; grid-gap: 5px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto; grid-gap: 5px">
             <g-text-field-bs large label="Store Name"
                              placeholder="Store Name"
                              :value="store.name"
@@ -36,7 +36,7 @@
         <div class="mt-3">
           <div class="mb-3 fw-700">Embed Code</div>
           <div>
-            <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" no-resize :value="iframe"></g-textarea>
+            <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" rows="3" no-resize :value="iframe"></g-textarea>
             <div class="row-flex align-items-center" style="cursor: pointer">
               <g-icon size="14" color="#536DFE" class="mr-1 mb-1">icon-chain-blue</g-icon>
               <span style="color: #536DFE; cursor: pointer" @click.stop="copyCode">Copy Code</span>
@@ -108,7 +108,12 @@
     computed: {
       iframe() {
         const storeUrl = [location.origin, 'store', this.store.alias].join('/');
-        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120"><img style="pointer-events: none" src="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg" alt="Online Ordering"></div><script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
+        const image = this.store.country && this.store.country.locale.includes('de') ? 'online-order-de.svg' : 'online-order.svg'
+        const fallbackContent = this.store.country && this.store.country.locale.includes('de') ? 'Online Bestellen' : 'Online Order'
+        return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${storeUrl}" data-width="120">
+                  <object style="pointer-events: none; width: 120px"  type="image/svg+xml" data="https://pos.gigasource.io/cms-files/files/view/images/${image}">${fallbackContent}</object>
+                </div>
+                <script type="application/javascript" src="https://cdn.pos.gigasource.io/cms-files/files/view/js-scripts/webshop-embed.js"><\/script>`
       },
       coords() {
         if (!this.store.coordinates || !this.store.coordinates.lat || !this.store.coordinates.long) return
@@ -220,7 +225,7 @@
       }
 
       .g-textarea {
-        margin-right: 4px;
+        margin: 4px 4px 4px 0;
         width: calc(100% - 5px);
 
         ::v-deep .g-tf {
@@ -250,7 +255,7 @@
 
           textarea {
             user-select: text !important;
-            max-height: 120px;
+            max-height: 100px;
           }
         }
       }
