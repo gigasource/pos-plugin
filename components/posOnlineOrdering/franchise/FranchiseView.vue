@@ -68,13 +68,17 @@
   }
 
   @media screen and (max-width: 1080px) {
-    .franchise-view {
+    .store-cards {
       grid-template-columns: 1fr 1fr !important;
     }
   }
   
   @media screen and (max-width: 640px) {
     .franchise-view {
+      padding: 20px;
+    }
+    
+    .store-cards {
       grid-template-columns: 1fr !important;
     }
   }

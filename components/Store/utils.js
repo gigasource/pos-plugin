@@ -28,7 +28,7 @@ export function generateEmbededScript({ type, locale, id }) {
         image = 'online-order-de.svg'
       } else {
         fallbackContent = 'Online Order & Reservation'
-        image = 'online-order.svg'
+        image = 'online-order-n-reservation.svg'
       }
       objImg = `${location.origin}/cms-files/files/view/images/${image}`
       return `<div id="franchise-embed-btn" class="franchise-embed-btn" data-url="${dataUrl}" data-width="120"><object style="pointer-events: none; width: 120px" type="image/svg+xml" data="${objImg}">${fallbackContent}</object></div><script type="application/javascript" src="${scriptSrc}"><\/script>`
