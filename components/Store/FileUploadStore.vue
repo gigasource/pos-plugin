@@ -17,26 +17,30 @@
     async created() {
       this.gridFsHandler = createGridFsHandlers({
         // namespace: this.$getService('PosStore').accountId,
-        apiBaseUrl: '/cms-files'
+        apiBaseUrl: '/cms-files',
+        imageThumbnailSize: {}
       })
       
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
+
+      this.libraryImages = await this.getLibraryImages('/images/library')
     },
     data() {
       return {
         uploadingItems: [],
         showFileUploadProgressDialog: false,
+        libraryImages: {}
       }
     },
     methods: {
       openUploadFileDialog(callback) {
         openUploadFileDialog({ multiple: false, mimeType: 'image/*' }, files => callback(files[0]))
       },
-      uploadImage(file) {
+      uploadImage(file, path = '/images') {
         return new Promise((resolve, reject) => {
           this.showFileUploadProgressDialog = true
-          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, '/images', response => {
+          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, path, response => {
             if (response.data[0].uploadSuccess) {
               const files = [response.data[0].createdFile]
               resolve(this.gridFsHandler.insertViewUrl(files)[0].viewUrl)
@@ -71,9 +75,9 @@
             path = filePath.substr(filePath.indexOf('//') + 1)
           else
             path = filePath.replace('/cms-files/files/view', '').replace('/cms-files/files/download', '')
-          await this.gridFsHandler.deleteFileByPath(filePath)
+          await this.gridFsHandler.deleteFileByPath(path)
           if (cms.sharedConfig && typeof(cms.sharedConfig.getPurgeCdnData) === 'function') {
-            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(filePath);
+            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(path);
             if (purgeCdnData)
               axios.get(purgeCdnData.url, purgeCdnData.options)
           }
@@ -82,6 +86,17 @@
       async createFolderIfNotExisted(folderPath, folderName) {
         const folderExisted = await this.gridFsHandler.checkFileExisted(folderPath, folderName);
         if (!folderExisted) await this.gridFsHandler.createNewFolder(folderPath, folderName)
+      },
+      async getLibraryImages(path) {
+        const files = await this.gridFsHandler.getFilesInPath(path)
+        let images = files.filter(f => !f.isFolder && f.mimeType.startsWith('image')), library = {images}
+        const folders = files.filter(f => f.isFolder)
+        for(const folder of folders) {
+          const folderFiles = await this.gridFsHandler.getFilesInPath(folder.folderPath.concat(folder.fileName))
+          const folderImages = folderFiles.filter(f => !f.isFolder && f.mimeType.startsWith('image'))
+          library[folder.fileName] = folderImages
+        }
+        return library
       }
     },
     provide() {
@@ -90,7 +105,10 @@
         prepareUploadAppFolder: this.prepareUploadAppFolder,
         uploadImage: this.uploadImage,
         uploadApp: this.uploadApp,
-        removeFile: this.removeFile
+        removeFile: this.removeFile,
+        libraryImages: this.libraryImages,
+        getLibraryImages: this.getLibraryImages,
+        createFolderIfNotExisted: this.createFolderIfNotExisted,
       }
     }
   }

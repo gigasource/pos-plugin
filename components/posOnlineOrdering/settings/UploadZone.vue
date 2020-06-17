@@ -27,27 +27,51 @@
     </slot>
     <!-- -->
     <g-dialog v-model="dialog.upload" persistent>
-      <div style="width: 580px; background-color: #FFF; border-radius: 5px; margin: 0 auto;">
+      <div class="dialog-upload">
         <!-- src -->
-        <div style="font-weight: 600;font-size: 24px;color: #212121; padding: 36px">Upload Photo</div>
+        <div class="dialog-upload__title">Upload Photo</div>
         <template v-if="view === 'src'">
           <div style="margin-bottom: -1px;">
-            <span @click="tab = 'url'" :style=" {...getTabStyle('url'), marginLeft: '35px' }">Paste Photo Url</span>
-            <span @click="tab= 'upload'" :style="getTabStyle('upload')">Upload a photo</span>
+            <span @click="tab = 'url'" :class="['dialog-upload__tab', tab === 'url' && 'dialog-upload__tab--selected']" style="marginLeft: 35px">Paste Photo Url</span>
+            <span @click="tab = 'upload'" :class="['dialog-upload__tab', tab === 'upload' && 'dialog-upload__tab--selected']">Upload a photo</span>
+            <span @click="tab = 'library'" :class="['dialog-upload__tab', tab === 'library' && 'dialog-upload__tab--selected']">Select from library</span>
           </div>
           <div style="border: 1px solid #9E9E9E; background-color: #EFEFEF; padding: 36px; border-radius: 0 0 5px 5px">
             <template v-if="tab === 'url'">
               <g-text-field-bs v-model="photoUrl" label="Photo URL"/>
             </template>
-            <template v-else>
+            <template v-else-if="tab === 'upload'">
               <div style="height: 70px; display: flex; align-items: center; width: 100%; overflow: hidden">
                 <g-btn-bs @click="choosePhoto" background-color="#FFF" border-color="#C4C4C4" text-color="#424242" width="150">Choose Photo</g-btn-bs>
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ fileName }}</div>
               </div>
             </template>
+            <template v-else>
+              <div>
+                <div class="row-flex align-items-center mb-2">
+                  <div class="fw-700 fs-small mr-2">Group</div>
+                  <g-select text-field-component="GTextFieldBs" small v-model="libraryGroup" :items="libraryGroups"/>
+                </div>
+                <g-grid-select :items="library" class="mb-3" v-model="image" item-cols="2" return-object style="background: rgba(196, 196, 196, 0.2); border-radius: 4px; height: 200px; overflow: auto">
+                  <template #default="{item, toggleSelect}">
+                    <div style="border: 1px solid transparent; border-radius: 2px">
+                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 60px; height: 60px" @click.stop="toggleSelect(item)"/>
+                    </div>
+                  </template>
+                  <template #selected="{item}">
+                    <div style="border: 1px solid #1271ff; border-radius: 2px; position: relative">
+                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 60px; height: 60px"/>
+                      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.25)">
+                        <g-icon color="#1271ff" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 50%">check_circle</g-icon>
+                      </div>
+                    </div>
+                  </template>
+                </g-grid-select>
+              </div>
+            </template>
             <div style="display: flex; justify-content: flex-end; margin-top: 24px">
               <g-btn-bs width="90" height="44" @click="closeDialog">Cancel</g-btn-bs>
-              <g-btn-bs :disabled="!photoUrl && !file" @click="moveToCropView" background-color="#536DFE" width="98" height="44" text-color="#FFF">Next</g-btn-bs>
+              <g-btn-bs :disabled="invalidImage" @click="moveToCropView" background-color="#536DFE" width="98" height="44" text-color="#FFF">Next</g-btn-bs>
             </div>
           </div>
         </template>
@@ -103,9 +127,11 @@
           upload: false,
           uploading: false,
         },
+        libraryGroup: 'All',
+        image: null
       }
     },
-    injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems)'],
+    injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems, libraryImages)'],
     computed: {
       fileName() {
         return this.file ? this.file.name : 'No file chosen'
@@ -118,30 +144,39 @@
       imageSrc() {
         if (this.tab === 'url') {
           return this.isExternalFile ? `/store/upload-zone/prepare?url=${this.photoUrl}` : this.photoUrl
-        } else {
+        } else if (this.tab === 'upload') {
           // upload from file
           return URL.createObjectURL(this.file)
+        } else {
+          return this.image.viewUrl
         }
       },
       cdnUrl() {
         return getCdnUrl(this.url)
+      },
+      libraryGroups() {
+        const groups = Object.keys(this.libraryImages).filter(key => key !== 'images')
+        return ['All', ...groups]
+      },
+      library() {
+        if(this.libraryGroup === 'All') {
+          return _.flatten(_.map(this.libraryImages, lib => [...lib]))
+        }
+        return this.libraryImages[this.libraryGroup]
+      },
+      invalidImage() {
+        if(this.tab === 'url') {
+          return !this.photoUrl
+        } else if (this.tab === 'upload') {
+          return !this.file
+        } else if (this.tab === 'library') {
+          return !this.image
+        } else {
+          return true
+        }
       }
     },
     methods: {
-      getTabStyle(tab) {
-        return {
-          display: 'inline-block',
-          'font-family': 'Muli',
-          'font-weight': 'bold',
-          'font-size': '15px',
-          'padding': '8px 10px',
-          'border-radius': '2px 2px 0 0',
-          'border': `1px solid ${ tab === this.tab? '#9E9E9E' : 'transparent' }`,
-          'border-bottom': `1px solid ${ tab === this.tab? 'transparent' : '#9E9E9E' }`,
-          background: tab === this.tab ? '#EFEFEF' : 'transparent',
-          cursor: 'pointer'
-        }
-      },
       showUploadDialog(view = 'src') {
         this.dialog.upload = true
         this.view = view
@@ -207,8 +242,30 @@
                   mimeType = 'image/*'
               }
               uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }))
-            } else {
+            } else if (this.tab === 'upload') {
               uploadedUrl = await this.uploadImage(new File([blob], this.file.name, { type: this.file.type }))
+            } else {
+              const fileName = this.image.viewUrl.substr(this.image.viewUrl.lastIndexOf('/') + 1)
+              const fileExt = fileName.substr(fileName.lastIndexOf('.') + 1)
+              let mimeType;
+              switch (fileExt) {
+                case 'png':
+                  mimeType = 'image/png';
+                  break;
+                case 'jpg':
+                case 'jpeg':
+                  mimeType = 'image/jpeg';
+                  break;
+                case 'svg':
+                  mimeType = 'image/svg+xml';
+                  break;
+                case 'gif':
+                  mimeType = 'image/gif';
+                  break;
+                default:
+                  mimeType = 'image/*'
+              }
+              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }))
             }
             this.$emit('url', uploadedUrl)
             this.dialog.uploading = false
@@ -221,6 +278,12 @@
           this.dialog.uploading = false
         }
         this.closeDialog()
+      },
+      getImageUrl(url) {
+        return getCdnUrl(url)
+      },
+      selectImage(image) {
+        this.image = image
       }
     }
   }
@@ -265,6 +328,55 @@
 
   .bs-tf-wrapper ::v-deep .bs-tf-inner-input-group {
     background: white;
+  }
+
+  .dialog-upload {
+    width: 580px;
+    background-color: #FFF;
+    border-radius: 5px;
+    margin: 0 auto;
+
+    &__title {
+      font-weight: 600;
+      font-size: 24px;
+      color: #212121;
+      padding: 36px;
+    }
+
+    &__tab {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 8px 10px;
+      border-radius: 2px 2px 0 0;
+      border-bottom: 1px solid #9E9E9E;
+      cursor: pointer;
+
+      &--selected {
+        border: 1px solid #9E9E9E;
+        border-bottom: 1px solid transparent;
+        background: #EFEFEF;
+      }
+    }
+
+    .g-select {
+      flex: 0 0 40%;
+
+      ::v-deep {
+        .bs-tf-wrapper {
+          margin: 0;
+          background: #FFFFFF;
+
+          .bs-tf-inner-input-group {
+            height: 30px;
+
+            .bs-tf-input {
+              padding: 0
+            }
+          }
+        }
+      }
+    }
   }
 </style>
 <style lang="scss">
