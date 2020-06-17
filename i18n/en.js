@@ -432,6 +432,7 @@ module.exports = {
       total: 'Total',
       currency: 'USD',
       shippingFee: 'Shipping Fee',
+      paid: 'PAID'
     }
   }
 }

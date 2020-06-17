@@ -216,6 +216,7 @@
       },
       completeSetup() {
         this.$router.push('/pos-login')
+        cms.socket.emit('getWebshopName')
       },
       skipPairing() {
         this.$router.go(-1)
@@ -237,6 +238,11 @@
 
         cms.socket.emit('socketConnected', value => {
           this.webShopConnected = value
+        })
+
+        cms.socket.on('updateReservationList', async () => {
+          await this.getPendingReservationsLength()
+          await this.setupReservationBell()
         })
 
         cms.socket.on('webShopConnected', () => {
@@ -359,11 +365,6 @@
 
       await this.getPendingReservationsLength()
       await this.setupReservationBell()
-
-      cms.socket.on('updateReservationList', async () => {
-        await this.getPendingReservationsLength()
-        await this.setupReservationBell()
-      })
     },
     watch: {
       online(val) {

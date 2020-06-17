@@ -66,13 +66,15 @@
     </div>
     <div class="bold" style="font-size: 30px; margin-top: 20px">
       <span>{{locale.printing.total}}</span>
-      <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
+      <span class="float-right">{{storeLocale.printing.currency}} {{orderSum | convertMoney}}</span>
     </div>
     <div class="bold" style="font-size: 30px">
       <span>Payment</span>
       <span class="float-right">{{payment}}</span>
     </div>
-<!--    <div class="footer text-center">{{date}}</div>-->
+    <div class="footer text-center">
+      <span style="border: 1px solid black; padding: 5px">{{locale.printing.paid}}</span>
+    </div>
   </div>
 </template>
 
@@ -93,7 +95,8 @@
       note: String,
       orderSum: Number,
       deliveryTime: String,
-      locale: Object,
+      locale: null,
+      storeLocale: null,
       type: String,
       discounts: Array,
       shippingFee: Number,
@@ -203,7 +206,7 @@
 
     .footer {
       margin-top: 20px;
-      font-size: 25px;
+      font-size: 40px;
     }
   }
 </style>

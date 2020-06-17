@@ -3,6 +3,9 @@ module.exports = {
     common: {
       currency: '€',
     },
-
+    printing: {
+      currency: 'EUR',
+      paid: 'BEZAHLT'
+    }
   }
 }

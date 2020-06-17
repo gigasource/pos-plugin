@@ -2,6 +2,7 @@ const {convertHtmlToPng} = require('../print-utils/print-utils');
 const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 const dayjs = require('dayjs');
+const fs = require('fs')
 
 function convertMoney(value) {
   return !isNaN(value) ? value.toFixed(2) : value
@@ -22,9 +23,20 @@ function getPayment({ payment }) {
 async function makePrintData(cms, {orderId}) {
   const order = await cms.getModel('Order').findById(orderId);
   const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
+
+  // app locale
   const locale = i18nSetting ? i18nSetting.content.locale : 'en';
   const localeFilePath = `../../i18n/${locale}.js`;
-  const localeObj = require(localeFilePath)[locale];
+  const localeObj = fs.existsSync(localeFilePath) ? require(localeFilePath)[locale] : require(`../../i18n/en.js`).en
+
+  // store locale
+  let storeLocale = 'en'
+  const posSettings = await cms.getModel('PosSetting').findOne()
+  if (posSettings) {
+    if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) storeLocale = posSettings.onlineDevice.store.locale
+  }
+  const storeLocaleFilePath = `../../i18n/${storeLocale}.js`
+  const storeLocaleObj = require(storeLocaleFilePath)[storeLocale] || require(`../../i18n/en.js`).en
 
   if (!order) return null;
 
@@ -54,6 +66,7 @@ async function makePrintData(cms, {orderId}) {
     date: dayjs(date).format(localeObj.printing.dateFormat),
     deliveryTime,
     locale: localeObj,
+    storeLocale: storeLocaleObj,
     type,
     discounts,
     payment: getPayment(order)
@@ -74,6 +87,7 @@ async function printEscPos(escPrinter, printData) {
     orderSum,
     date,
     locale,
+    storeLocale,
     deliveryTime,
     type,
     discounts,
@@ -146,8 +160,15 @@ async function printEscPos(escPrinter, printData) {
     escPrinter.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
   })
   escPrinter.bold(true)
-  escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
+  escPrinter.leftRight(locale.printing.total, `${storeLocale.printing.currency} ${convertMoney(orderSum)}`)
   escPrinter.leftRight('Payment', payment)
+
+  escPrinter.newLine()
+  escPrinter.alignCenter()
+  escPrinter.setTextDoubleHeight()
+  escPrinter.bold(true)
+  escPrinter.println(locale.printing.paid)
+
   // escPrinter.newLine()
   // escPrinter.alignCenter()
   // escPrinter.setTextNormal()
