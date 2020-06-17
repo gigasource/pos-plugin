@@ -39,6 +39,16 @@
                 <div class="fw-700 text-blue-accent-3">ID: {{store.id}}</div>
                 <div>{{store.settingName}}</div>
                 <div>{{store.settingAddress}}</div>
+                <div style="font-size: 12px;">
+                  <div v-if="store.prevMonthReport">
+                    <span style="font-weight: bold;">Previous month: </span>
+                    <span>{{store.prevMonthReport.orders}} orders, {{store.prevMonthReport.total | currency(store.country.locale)}}</span>
+                  </div>
+                  <div v-if="store.currentMonthReport">
+                    <span style="font-weight: bold;">Current month: </span>
+                    <span>{{store.currentMonthReport.orders}} orders, {{store.currentMonthReport.total | currency(store.country.locale)}}</span>
+                  </div>
+                </div>
               </div>
               <div style="flex: 1">
                 <div class="row-flex mb-1" v-for="(device, index) in store.devices"
@@ -212,6 +222,11 @@
       // permissions
       'PermissionStore:(versionControlPerm,manageAccountPerm,manageGroupPerm,manageStorePerm,settingsPerm,updateAppPerm,remoteControlPerm,featureControlPerm,configOnlineOrderingPerm)'
     ],
+    filters: {
+      currency(val, locale = 'en') {
+        return `${$t('common.currency', locale)} ${!isNaN(val) && val > 0 ? val.toFixed(2): 0}`
+      },
+    },
     data() {
       return {
         showContent: false,

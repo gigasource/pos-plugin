@@ -122,8 +122,6 @@ router.post('/new-store', async (req, res) => {
       enabled: false,
       timeToComplete: 30,
       autoAccept: false,
-      total: 0,
-      orders: 0,
       devices: []
     }
   })

@@ -64,8 +64,32 @@ module.exports = function (cms) {
     io.adapter(redisAdapter({host, port, password})); //internalSocketIOServer will use adapter too, just need to call this once
   }
 
-  function updateOrderStatus(orderToken, status) {
+  async function updateOrderStatus(orderToken, status) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
+
+    if (status.status === 'kitchen') {
+      const { storeAlias, total } = status
+      if (!storeAlias) return
+
+      let { lastSyncAt, prevMonthReport, currentMonthReport } = await cms.getModel('Store').findOne({ alias: storeAlias })
+      const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
+
+      if (newMonth) {
+        prevMonthReport = currentMonthReport
+        currentMonthReport = { orders: 1, total }
+      } else {
+        currentMonthReport = {
+          orders: (currentMonthReport.orders || 0) + 1,
+          total: (currentMonthReport.total || 0) + total
+        }
+      }
+
+      await cms.getModel('Store').findOneAndUpdate({ alias: storeAlias }, {
+        $set: {
+          lastSyncAt: new Date(), prevMonthReport, currentMonthReport
+        }
+      })
+    }
   }
 
   async function getDemoDeviceLastSeen(storeId, deviceId) {
@@ -444,7 +468,7 @@ module.exports = function (cms) {
           }
 
           socket.join(orderData.orderToken);
-          return updateOrderStatus(orderData.orderToken, { onlineOrderId: orderData.orderToken, status: 'kitchen', responseMessage })
+          return updateOrderStatus(orderData.orderToken, { storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen', responseMessage, total: orderData.totalPrice })
         }
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
         return console.error('No store device with onlineOrdering feature found, created online order will not be saved');

@@ -504,10 +504,67 @@
           "type": "input@date"
         }
       ]
+    },
+    {
+      "_id": "5ee9e0619761fa001a509906",
+      "schemaType": "object",
+      "key": "prevMonthReport",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "orders",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "total",
+          "type": "input@number"
+        }
+      ],
+      "type": "object",
+      "flex": "md6",
+      "addable": null
+    },
+    {
+      "_id": "5ee9e0619761fa001a509907",
+      "schemaType": "object",
+      "key": "currentMonthReport",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "orders",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "total",
+          "type": "input@number"
+        }
+      ],
+      "type": "object",
+      "flex": "md6",
+      "addable": null
+    },
+    {
+      "_id": "5ee9e0619761fa001a509908",
+      "schemaType": "date",
+      "key": "lastSyncAt",
+      "type": "input@date",
+      "flex": "md4"
     }
   ],
   "name": "Store",
-  "tabs": [],
+  "tabs": [
+    {
+      "fields": [
+        "prevMonthReport",
+        "currentMonthReport",
+        "lastSyncAt"
+      ],
+      "_id": "5ee9e0619761fa001a509909",
+      "name": "report"
+    }
+  ],
   "type": "Collection",
   "title": "name"
 }

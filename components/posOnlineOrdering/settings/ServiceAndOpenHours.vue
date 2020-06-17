@@ -338,6 +338,7 @@
           return this.gSms || {
             enabled: false,
             timeToComplete: 30,
+            autoAccept: false,
             devices: []
           }
         },
