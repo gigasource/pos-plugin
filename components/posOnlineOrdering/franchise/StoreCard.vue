@@ -39,12 +39,15 @@
     <p>Pickup service: {{ pickupServiceStatus }}</p>
     <p>Delivery service: {{ deliveryServiceStatus }}</p>
     <g-spacer/>
-    <p class="mt-4 mb-2">TEL: {{ store.phone }} </p>
+    <p class="mt-4" v-if="store.phone">TEL: {{ store.phone }} </p>
+    <div class="mb-2 row-flex">
+      <img src="/plugins/pos-plugin/assets/map.svg" draggable="false"/>
+      <p class="ml-2" style="font-weight: bold; font-size: 13px; color: #9E9E9E; cursor: pointer" @click="viewMap">VIEW MAP</p>
+    </div>
     <div>
       <g-btn-bs background-color="#000" text-color="#FFF" border-radius="20px" width="128" class="ml-0 mr-0" @click="openStore">Order now</g-btn-bs>
       <g-btn-bs background-color="#FFF" text-color="#000" border-radius="20px" width="128" border-color="#000"  @click="openReservation">Reservation</g-btn-bs>
     </div>
-    <p class="mt-2" style="font-weight: bold; font-size: 13px; color: #9E9E9E; cursor: pointer" @click="viewMap">VIEW MAP</p>
   </section>
 </template>
 <script>
