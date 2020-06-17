@@ -444,6 +444,11 @@
           "type": "input@number"
         },
         {
+          "schemaType": "boolean",
+          "key": "autoAccept",
+          "type": "input@switch"
+        },
+        {
           "schemaType": "array",
           "key": "devices",
           "fields": [
@@ -458,11 +463,27 @@
               "type": "input"
             },
             {
+              "schemaType": "number",
+              "key": "total",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "orders",
+              "type": "input@number"
+            },
+            {
               "schemaType": "boolean",
               "key": "registered",
               "type": "input@switch"
+            },
+            {
+              "schemaType": "date",
+              "key": "lastSeen",
+              "type": "input@date"
             }
-          ]
+          ],
+          "type": "array"
         }
       ]
     },
