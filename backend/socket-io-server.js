@@ -68,6 +68,15 @@ module.exports = function (cms) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
   }
 
+  async function getDemoDeviceLastSeen(storeId, deviceId) {
+    await cms.getModel('Store').findOneAndUpdate({ id: storeId, 'gSms.devices._id': deviceId }, {
+      $set: {
+        'gSms.devices.$.lastSeen': new Date()
+      }
+    })
+    cms.socket.emit('loadStore', storeId)
+  }
+
   const externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
     saveMessage,
@@ -110,6 +119,23 @@ module.exports = function (cms) {
     }
     updateOrderStatus(orderToken, {onlineOrderId: orderToken, status: 'inProgress'})
   });
+
+  externalSocketIOServer.registerAckFunction('demoAppCreateOrderAck', async (storeId, deviceId, orderTotal) => {
+    try {
+      const store = await cms.getModel('Store').findOne({ id: storeId }).lean()
+      const device = store.gSms.devices.find(i => i._id.toString() === deviceId.toString())
+
+      await cms.getModel('Store').findOneAndUpdate({ id: storeId, 'gSms.devices._id': deviceId }, {
+        $set: {
+          'gSms.devices.$.total': (device.total || 0) + orderTotal,
+          'gSms.devices.$.orders': (device.orders || 0) + 1
+        }
+      })
+      cms.socket.emit('loadStore', storeId)
+    } catch (e) {
+      console.log(e)
+    }
+  })
 
   function notifyDeviceStatusChanged(clientId) {
     console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Backend notifies frontend to update online/offline status`);
@@ -273,9 +299,15 @@ module.exports = function (cms) {
 
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
         `Demo client ${clientId} connected, socket id = ${socket.id}`);
+      const [storeId, deviceId] = clientId.split('_')
+      getDemoDeviceLastSeen(storeId, deviceId)
+
       socket.on('disconnect', () => {
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
           `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
+
+        const [storeId, deviceId] = clientId.split('_')
+        getDemoDeviceLastSeen(storeId, deviceId)
       })
     }
   });
@@ -387,9 +419,9 @@ module.exports = function (cms) {
 
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
-          const formattedOrder = [formatOrder(orderData)];
+          const formattedOrder = formatOrder(orderData);
           const targetClientId = `${store.id}_${_id}`;
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', formattedOrder)
+          externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
           console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
             `2a. Online order backend: received order from frontend, sending to demo device`);
         })
@@ -431,6 +463,8 @@ module.exports = function (cms) {
 
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
         updateOrderStatus(orderData.orderToken, {onlineOrderId: orderData.orderToken, status: 'failedToSend'})
+        console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId},eventType=orderStatus`,
+          `2b. Online order backend: failed to reach online order device, cancelling order`)
         removePersistentMsg()
       }, SEND_TIMEOUT);
     });
@@ -565,6 +599,7 @@ module.exports = function (cms) {
         cms.socket.emit('loadStore', storeId)
         callback()
       } catch (e) {
+        console.log(e)
         callback(e)
       }
     })

@@ -120,7 +120,11 @@ router.post('/new-store', async (req, res) => {
     deliveryTimeInterval: 15,
     gSms: {
       enabled: false,
-      timeToComplete: 30
+      timeToComplete: 30,
+      autoAccept: false,
+      total: 0,
+      orders: 0,
+      devices: []
     }
   })
 

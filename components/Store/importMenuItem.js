@@ -82,7 +82,7 @@ function getChoices(choiceStr) {
   // ; : separator or terminate character
   const choicePattern = /(?<choice>(?<choice_name>(\w| )+)(?<mandatory>\*?)(?<quantity>[1|2]):(?<options>[^;]+)+)/g
   // (small=5)(medium=10)
-  const optionPattern = /(?<option>[\w| ]+)=(?<price>\d+(\.\d+)?)\)+/g
+  const optionPattern = /(?<option>[\w| |\.|ä|ö|ü|Ä|Ö|Ü|ß]+)=(?<price>\d+(\.\d+)?)\)+/g
   const choices = []
   let match
   while((match = choicePattern.exec(choiceStr)) != null) {
@@ -90,7 +90,6 @@ function getChoices(choiceStr) {
     let mandatory = match.groups['mandatory']
     let quantity = match.groups['quantity']
     let optionsStr = match.groups['options']
-    console.log(optionsStr)
     const options = []
     let optionMatch
     while((optionMatch = optionPattern.exec(optionsStr)) != null) {
@@ -107,8 +106,6 @@ function getChoices(choiceStr) {
       options: options
     })
   }
-
-  console.log('choice:', choiceStr, 'output:', choices)
   return choices
 }
 
@@ -125,7 +122,6 @@ function workbox2PJSO(workbox) {
   // SheetName startwith : is document sheet
   // This sheet will be ignored
   const dataSheetNames = _.filter(workbox.SheetNames, sheetName => !_.startsWith(sheetName, '@'))
-  debugger
   return _.map(dataSheetNames, (sheetName, index) => ({
     name: sheetName,
     position: index,
