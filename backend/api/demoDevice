@@ -21,13 +21,18 @@ router.post('/register', async (req, res) => {
 
     if (!storeId) return res.sendStatus(400)
     const deviceCode = await getNewDeviceCode(storeId)
+    const store = await storeModel.findOne({ id: storeId })
+    const accept = (store.gSms && store.gSms.autoAccept)
 
     await storeModel.findOneAndUpdate({ id: storeId }, {
       $push: {
         'gSms.devices': {
           name: name,
           code: deviceCode,
-          registered: false
+          registered: accept,
+          total: 0,
+          orders: 0,
+          lastSeen: null
         }
       }
     })
