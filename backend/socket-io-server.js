@@ -34,11 +34,11 @@ const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', new Sc
 }));
 
 const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
-  clientId: {
+  tagString: {
     type: String,
     trim: true,
   },
-  socketId: {
+  message: {
     type: String,
     trim: true,
   },
@@ -126,9 +126,8 @@ module.exports = async function (cms) {
   const savedSentryMessages = await SentrySavedMessagesModel.find({});
   const savedSentryMessageIds = savedSentryMessages.map(({_id}) => _id);
   await SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}});
-  savedSentryMessages.forEach(({socketId, clientId}) => {
-    console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socketId}`,
-        `(Startup) Client ${clientId} disconnected, socket id = ${socketId}`);
+  savedSentryMessages.forEach(({tagString, message}) => {
+    if (tagString && message) console.debug(tagString, message);
   });
 
   const fn = _.once(async () => {
@@ -137,7 +136,10 @@ module.exports = async function (cms) {
       const socket = connectedSockets[socketId];
       const {clientId} = socket;
 
-      return await SentrySavedMessagesModel.create({socketId, clientId});
+      return await SentrySavedMessagesModel.create({
+        tagString: `sentry:clientId=${clientId},eventType=socketConnection,socketId=${socketId}`,
+        message: `2a. (Startup) Client ${clientId} disconnected, socket id = ${socketId}`,
+      });
     }));
 
     if (global.APP_CONFIG.redis) {
@@ -209,12 +211,14 @@ module.exports = async function (cms) {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
       const clientId = socket.request._query.clientId;
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
-          `Client ${clientId} connected, socket id = ${socket.id}`);
+          `1a. Client ${clientId} connected, socket id = ${socket.id}`);
+
+      socket.emit('connection-established', socket.id);
 
       notifyDeviceStatusChanged(clientId);
       socket.once('disconnect', () => {
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
-            `Client ${clientId} disconnected, socket id = ${socket.id}`);
+            `2a. Client ${clientId} disconnected, socket id = ${socket.id}`);
         if (global.APP_CONFIG.redis) {
           // delay a little to give time for updating client list on Redis
           setTimeout(() => notifyDeviceStatusChanged(clientId), 2000);
