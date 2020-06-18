@@ -9,7 +9,7 @@
         <div class="row-flex align-items-center">
           <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">Add New Category</g-btn-bs>
           <span class="mt-2">or</span>
-          <g-btn-bs v-if="importProductMenuItemPerm" class="btn-add" @click="openImportMenuItemDialog">Import Categories</g-btn-bs>
+          <g-btn-bs v-if="imexportable" class="btn-add" @click="openImportMenuItemDialog">Import Categories</g-btn-bs>
         </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
@@ -17,9 +17,13 @@
           <g-spacer/>
           <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
-          <g-btn-bs v-if="importProductMenuItemPerm" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="openImportMenuItemDialog">
-            Import Categories
+            Import
+          </g-btn-bs>
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+                    @click="exportProductMenuItem">
+            Export
           </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
@@ -136,7 +140,7 @@
   import DialogNewCategory from './dialogNewCategory';
   import DialogDeleteCategory from './dialogDeleteCategory';
   import XLSX from 'xlsx'
-  import importMenuItem from '../../Store/importMenuItem';
+  import { imexportMenuItem, exportMenuItem } from '../../Store/imexportMenuItem';
   import DialogImportMenuItem from './dialogImportMenuItem';
   
   export default {
@@ -168,7 +172,7 @@
         editBtn: [],
         editingProduct: false,
         edittingItems: [],
-        importProductMenuItemPerm: cms.loginUser.user.role.name === 'admin'
+        imexportable: cms.loginUser.user.role.name === 'admin'
       }
     },
     created() {
@@ -340,7 +344,7 @@
         reader.onload = function(e) {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, {type: 'array'});
-          importMenuItem({
+          imexportMenuItem({
             workbook: workbook,
             behavior: metadata.importBehavior,
             storeId: self.store._id,
@@ -353,6 +357,9 @@
         };
         reader.readAsArrayBuffer(metadata.file);
       },
+      exportProductMenuItem() {
+        exportMenuItem({ storeId: this.store._id })
+      }
     }
   }
 </script>
