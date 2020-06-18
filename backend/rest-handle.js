@@ -8,7 +8,7 @@ const payment = require('./api/payment')
 
 module.exports = cms => {
   cms.data['loginUrl'] = '/sign-in';
-  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation']
+  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise']
 
   cms.app.use('/device', deviceAPI)
   cms.app.use('/store', storeAPI)

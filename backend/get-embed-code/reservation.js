@@ -21,10 +21,11 @@
       container.setAttribute('style', 'position: fixed; z-index: 1001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
       document.body.appendChild(container)
 
-      container.onclick = function () {
+      function removeContainer() {
         if(document.body.contains(container))
           document.body.removeChild(container)
       }
+      container.onclick = removeContainer
 
       //insert loading circular
       var loading = document.createElement('div')
@@ -75,35 +76,13 @@
       container.appendChild(iframe)
       iframe.addEventListener('load', function () {
         document.body.style.overflow = 'hidden'
-
         container.removeChild(loading)
-        // insert close btn
-        var closeBtn = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-        closeBtn.setAttribute('id', 'iframe-close-btn')
-        closeBtn.setAttribute('style', 'position: absolute;top: 10px;right: 50%;transform: translateX(196px) scale(1.2); cursor: pointer')
-        closeBtn.setAttribute('width', '14px')
-        closeBtn.setAttribute('height', '14px')
-        closeBtn.setAttribute('viewBox', '0 0 14 14')
-        var g1 = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-        g1.setAttribute('transform', 'translate(-798, -29)')
-        closeBtn.appendChild(g1)
-        var g2 = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-        g2.setAttribute('transform', 'translate(192, 0)')
-        g1.appendChild(g2)
-        var g3 = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-        g3.setAttribute('transform', 'translate(613, 36) scale(1, -1) translate(-613, -36) translate(601, 24)')
-        g2.appendChild(g3)
-        var p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
-        p.setAttribute('fill', '#000000')
-        p.setAttribute('points', '19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4 6.4 5 12 10.6 17.6 5 19 6.4 13.4 12')
-        g3.appendChild(p)
+      })
 
-        closeBtn.onclick = function () {
-          if(document.body.contains(container))
-            document.body.removeChild(container)
-          document.body.style.overflow = 'auto'
+      window.addEventListener('message', function(e) {
+        if (e.data === 'close-iframe') {
+          removeContainer()
         }
-        container.appendChild(closeBtn)
       })
     }
   }

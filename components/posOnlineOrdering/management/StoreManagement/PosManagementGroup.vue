@@ -2,10 +2,14 @@
   <div class="pos-management-group">
     <div class="pos-management-group__header"
          @click="toggleContent"
-         @mouseenter="showEditBtn = true"
-         @mouseleave="showEditBtn = false">
+         @mouseenter="showGroupActionBtns = true"
+         @mouseleave="showGroupActionBtns = false">
+
+      <!-- Group expand/collapse -->
       <g-icon class="icon-first" size="20" v-if="showContent">expand_less</g-icon>
       <g-icon class="icon-first" size="20" v-else>expand_more</g-icon>
+
+      <!-- Group name/editname -->
       <g-edit-view-input
           :value="name"
           @click.native.stop.prevent="() => {}"
@@ -15,7 +19,7 @@
                   nudge-bottom="5" nudge-left="30">
             <template v-slot:activator="{on}">
               <div class="btn-edit" :style="[nameEditMenu && {background: '#F4F5FA'}]">
-                <g-icon v-if="showEditBtn || nameEditMenu" :class="[nameEditMenu && 'btn-edit--active']" size="16"
+                <g-icon v-if="showGroupActionBtns || nameEditMenu" :class="[nameEditMenu && 'btn-edit--active']" size="16"
                         @click="on.click">mdi-pencil-outline
                 </g-icon>
               </div>
@@ -29,7 +33,21 @@
           <g-icon v-if="mode === 'edit'" @click="resetValue()" class="ml-1">mdi-close</g-icon>
         </template>
       </g-edit-view-input>
+
+      <!-- Group More Actions -->
+      <g-menu v-if="(showGroupActionBtns || menuCtx.showMoreGroupAction) && type === 'franchises'" v-model="menuCtx.showMoreGroupAction" close-on-content-click>
+        <template v-slot:activator="{on}">
+          <g-icon @click.prevent.stop="menuCtx.showMoreGroupAction = true">more_horiz</g-icon>
+        </template>
+        <div class="menu-action">
+          <div class="menu-action__option row-flex align-items-center" @click="showGroupEmbeddedCode">
+            <img src="/plugins/pos-plugin/assets/coding.svg" draggable="false" width="20"/>
+            <span class="ml-1" style="line-height: 20px">Get embeded code</span>
+          </div>
+        </div>
+      </g-menu>
     </div>
+    
     <g-expand-transition>
       <template v-if="showContent || searchText">
         <div class="pos-management-group__content">
@@ -199,6 +217,8 @@
         </div>
       </template>
     </g-expand-transition>
+  
+    <dialog-gen-html-code v-model="dialog.embeddedCode.show" v-bind="dialog.embeddedCode"/>
   </div>
 </template>
 
@@ -207,13 +227,15 @@
   import DialogFeatureControl from './dialogFeatureControl';
   import DialogPairNewDeviceSuccess from './dialogPairNewDeviceSuccess';
   import DialogEditDeviceName from './dialogEditDeviceName';
+  import DialogGenHtmlCode from './dialogGenHtmlCode';
 
   export default {
     name: "PosManagementGroup",
-    components: {DialogEditDeviceName, DialogPairNewDeviceSuccess, DialogFeatureControl},
+    components: { DialogGenHtmlCode, DialogEditDeviceName, DialogPairNewDeviceSuccess, DialogFeatureControl},
     props: {
       _id: String,
       name: String,
+      type: String,
       stores: Array,
       appItems: Array,
     },
@@ -243,8 +265,13 @@
         selectedDevice: null,
         proxyInfo: null,
         proxyUrl: 'about:blank',
-        showEditBtn: false,
-
+        showGroupActionBtns: false,
+        
+        //
+        menuCtx: {
+          showMoreGroupAction: false,
+        },
+        
         //
         dialog: {
           webRTC: {
@@ -254,6 +281,12 @@
             src: 'about:blank',
             device: null,
             dragging: false
+          },
+          embeddedCode: {
+            show: false,
+            id: null,
+            type: null,
+            locale: null
           }
         }
       }
@@ -342,6 +375,16 @@
       onIframeLoad() {
         if (this.iframeRefreshInterval) clearInterval(this.iframeRefreshInterval)
       },
+      
+      // embedded code
+      showGroupEmbeddedCode() {
+        this.$set(this.dialog, 'embeddedCode', {
+          show: true,
+          id: this._id,
+          locale: null,
+          type: 'franchise'
+        })
+      }
     },
     created() {
       window.cms.socket.emit('getProxyInfo', proxyInfo => this.proxyInfo = proxyInfo)

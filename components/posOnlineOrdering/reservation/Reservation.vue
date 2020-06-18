@@ -1,5 +1,9 @@
 <template>
-  <div class="reservation elevation-2">
+  <div class="reservation elevation-2 r">
+    <div @click="close" class="abs" style="top: 10px; right: 10px; width: 20px; height: 20px; cursor: pointer; z-index: 10">
+      <img src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
+    </div>
+    
     <template v-if="mode === 'reservation'">
       <div class="reservation-header">
         <img v-if="image" alt :src="image" class="reservation-header__logo">
@@ -371,6 +375,9 @@
         this.step = 1
         this.mode = 'reservation'
       },
+      close() {
+        window.parent.postMessage('close-iframe', '*')
+      }
     }
   }
 </script>

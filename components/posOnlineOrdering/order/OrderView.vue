@@ -43,6 +43,7 @@
                   </template>
                   <span v-else>{{$t('store.today')}}</span>
                 </div>
+                
               </div>
               <div class="address">
                 <span>{{store.address}}</span>

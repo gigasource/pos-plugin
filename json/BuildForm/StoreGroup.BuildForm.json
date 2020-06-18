@@ -7,6 +7,18 @@
       "schemaType": "string",
       "key": "name",
       "type": "input"
+    },
+    {
+      "_id": "5ee84078d412ad1232102af9",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5ee84078d412ad1232102afa",
+      "schemaType": "string",
+      "key": "alias",
+      "type": "input"
     }
   ],
   "name": "StoreGroup",

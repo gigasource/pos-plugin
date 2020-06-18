@@ -17,7 +17,6 @@
           </div>
         </g-menu>
         <g-spacer/>
-        <g-btn-bs v-if="manageStorePerm" border-color="#C4C4C4" text-color="#424242" @click="dialog.html = true">HTML Code</g-btn-bs>
         <g-btn-bs v-if="manageStorePerm" border-color="#536DFE" icon="add@16" :disabled="storeGroups.length === 0" @click="dialog.newStore = true">Add New Store</g-btn-bs>
         <g-btn-bs v-if="manageGroupPerm" background-color="#536DFE" text-color="white" icon="add@16" @click="dialog.newGroup = true">Add New Group</g-btn-bs>
       </div>
@@ -93,7 +92,7 @@
     </template>
 
     <!-- dialogs -->
-    <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup($event)" :groups="storeGroups"/>
+    <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup" :groups="storeGroups"/>
     <dialog-new-store v-if="manageStorePerm && storeGroups && dialog.newStore" v-model="dialog.newStore" @submit="addStore($event)" :groups="storeGroups" :countries="countries"/>
     <dialog-delete-item v-if="settingsPerm && dialog.deleteDevice" v-model="dialog.deleteDevice" type="device" @confirm="deleteDevice"/>
     <dialog-pair-new-device v-if="selectedStore && dialog.pairNewDevice" v-model="dialog.pairNewDevice" :store="selectedStore"/>
@@ -119,6 +118,7 @@
 </template>
 <script>
   import supportedCountries from '../../../Store/supportedCountries';
+  
   export default {
     name: 'StoreManagement',
     props: {},
@@ -137,7 +137,6 @@
           pairNewDevice: false,
           pairNewDeviceSuccess: false,
           editDeviceName: false,
-          html: false
         },
         countries: supportedCountries,
       }
