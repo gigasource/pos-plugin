@@ -6,6 +6,8 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule')
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 let webshopUrl;
 let storeName;
@@ -24,6 +26,39 @@ let recreateOnlineOrderSocketInterval = null;
 let initFinished = false;
 
 module.exports = async cms => {
+  const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
+    tagString: {
+      type: String,
+      trim: true,
+    },
+    message: {
+      type: String,
+      trim: true,
+    },
+  }, {
+    timestamps: true,
+  }));
+
+  const savedSentryMessages = await SentrySavedMessagesModel.find({});
+  const savedSentryMessageIds = savedSentryMessages.map(({_id}) => _id);
+  await SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}});
+  savedSentryMessages.forEach(({tagString, message}) => {
+    console.debug(tagString, message);
+  });
+
+  const fn = _.once(async () => {
+    if (onlineOrderSocket && onlineOrderSocket.connected) {
+      await SentrySavedMessagesModel.create({
+        tagString: `sentry:clientId=${onlineOrderSocket.clientId},eventType=socketConnection,socketId=${onlineOrderSocket.serverSocketId}`,
+        message: `2b. (Startup) onlineOrderSocket disconnected`,
+      });
+    }
+
+    process.exit();
+  });
+
+  process.on('SIGINT', fn);
+
   async function updateStoreName() {
     const posSettings = await cms.getModel('PosSetting').findOne({});
     if (posSettings.onlineDevice && posSettings.onlineDevice.store) {
@@ -45,7 +80,11 @@ module.exports = async cms => {
   function getBaseSentryTags(eventType) {
     const appVersion = require('../../package').version;
     const {deviceName} = global.APP_CONFIG;
-    return `sentry:webshopUrl=${webshopUrl},store=${storeName},alias=${storeAlias},version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
+
+    let tag = `sentry:webshopUrl=${webshopUrl},store=${storeName},alias=${storeAlias},version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
+    if (onlineOrderSocket.clientId) tag += `,clientId=${onlineOrderSocket.clientId}`;
+
+    return tag;
   }
 
   async function updateAlwaysOn(enabled) {
@@ -164,11 +203,20 @@ module.exports = async cms => {
     // event logs for debugging
     const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
     console.debug(sentryTags, 'Creating onlineOrderSocket');
+
+    // onlineOrderSocket.clientId = deviceId
+    socket.clientId = deviceId;
     socket.on('connect', () => console.debug(sentryTags, 'onlineOrderSocket connected'));
-    socket.on('disconnect', () => console.debug(sentryTags, `onlineOrderSocket disconnected`));
+    socket.on('disconnect', () => socket.serverSocketId
+        ? console.debug(sentryTags + `,socketId=${socket.serverSocketId}`, '2b. onlineOrderSocket disconnected')
+        : console.debug(sentryTags, 'onlineOrderSocket disconnected'));
     socket.on('reconnecting', numberOfAttempt => console.debug(sentryTags, `onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
     socket.on('reconnect', () => console.debug(sentryTags, 'onlineOrderSocket reconnected'));
     socket.on('reconnect_error', err => console.debug(sentryTags, `onlineOrderSocket reconnect error: ` + err.stack));
+    socket.on('connection-established', socketId => {
+      socket.serverSocketId = socketId;
+      console.debug(sentryTags + `,socketId=${socket.serverSocketId}`, '1b. onlineOrderSocket connected');
+    });
 
     // connection related logic
     socket.on('connect', async () => {
@@ -342,12 +390,8 @@ module.exports = async cms => {
         }
         return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
       }))
-      const posSetting = await cms.getModel('PosSetting').findOne({});
-      const sentryTags = posSetting.onlineDevice && posSetting.onlineDevice.id
-          ? getBaseSentryTags('updateAppFeature') + `,clientId=${posSetting.onlineDevice.id}`
-          : getBaseSentryTags('updateAppFeature');
 
-      console.debug(sentryTags, '3. Restaurant backend: received feature update from server, emitting to frontend', JSON.stringify(data));
+      console.debug(getBaseSentryTags('updateAppFeature'), '3. Restaurant backend: received feature update from server, emitting to frontend', JSON.stringify(data));
 
       cms.socket.emit('updateAppFeature', sentryTags, data);
       callback();
