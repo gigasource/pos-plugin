@@ -288,6 +288,15 @@
       },
       async changeCategoryImage(image, _id) {
         await cms.getModel('Category').findOneAndUpdate({_id}, {image})
+        const cate = this.categories.find(c => c._id === _id)
+        if(!image) {
+          try {
+            await this.$getService('FileUploadStore').removeFile(cate.image)
+          } catch(e) {
+            console.log(e)
+          }
+        }
+        cate.image = image
       },
 
       // products
