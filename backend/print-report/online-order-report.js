@@ -147,9 +147,9 @@ async function printEscPos(escPrinter, printData) {
 
         escPrinter.tableCustom([
           {text: modifierText, align: 'LEFT', width: 0.4},
-          {text: `${mod.quantity}`, align: 'RIGHT', width: 0.12},
+          {text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12},
           {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
-          {text: `${convertMoney((mod.price) * mod.quantity)}`, align: 'RIGHT', width: 0.22},
+          {text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22},
         ])
       })
     }
