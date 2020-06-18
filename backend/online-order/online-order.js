@@ -280,8 +280,6 @@ module.exports = async cms => {
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`,
           `3. Restaurant backend: Order id ${newOrderId}: received order from online-order`, JSON.stringify(items));
 
-      const systemTimeDelta = dayjs(serverDateTime).diff(new Date(), 'millisecond')
-
       items = items.map(item => {
         if (item.originalPrice) return item;
         return {originalPrice: item.price, ...item};
@@ -306,7 +304,7 @@ module.exports = async cms => {
         payment: [{type: paymentType, value: vSum}],
         type,
         date,
-        ...timeoutDate && {timeoutDate: dayjs(timeoutDate).add(systemTimeDelta, 'millisecond').toDate()},
+        ...timeoutDate && {timeoutDate: dayjs(timeoutDate).toDate()},
         vDate: await getVDate(date),
         bookingNumber: getBookingNumber(date),
         shippingFee,
@@ -590,7 +588,7 @@ module.exports = async cms => {
         if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias, locale};
         await cms.getModel('PosSetting').updateOne({}, posSettings);
 
-        callback(settingName);
+        typeof callback === 'function' && callback(settingName);
       });
     });
 
@@ -711,7 +709,8 @@ module.exports = async cms => {
       // logs
       const guestName = reservation.customer.name;
       const reservationTime = dayjs(reservation.date).format('HH:mm')
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: Reschedule requested for '${guestName}' (${reservationTime}), change: ${JSON.stringify(change)}`)
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
+        `2. Restaurant backend: Reschedule requested for '${guestName}' (${reservationTime}), change: ${JSON.stringify(change)}`)
 
       // reschedule here
       switch (reservation.status) {
@@ -732,7 +731,8 @@ module.exports = async cms => {
       if(!reservation) return
       const guestName = reservation.customer.name;
       const reservationTime = dayjs(reservation.date).format('HH:mm')
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: Schedule requested for '${guestName}' (${reservationTime})`)
+      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
+        `Restaurant backend: New schedule created for '${guestName}' (${reservationTime})`)
       await scheduleRemoveReservationJob(reservation)
     })
   })
