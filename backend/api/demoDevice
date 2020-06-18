@@ -48,14 +48,14 @@ router.post('/register', async (req, res) => {
     })
 
     console.debug(`sentry:deviceName=${name},eventType=pair,storeId=${storeId}`,
-      `1. Online-order: Registered demo client ${name} `)
+      `2. Online-order: Registered demo client ${name} `)
     //emit to frontend, refresh device list
     cms.socket.emit('loadStore', storeId)
   } catch (e) {
     console.log(e)
     res.status(500).send('Encountered an error while registering!')
     console.debug(`sentry:deviceName=${name},eventType=pair,storeId=${storeId}`,
-      `1a. Online-order: Failed to register demo client ${name}`, e)
+      `2a. Online-order: Failed to register demo client ${name}`, e)
   }
 })
 
