@@ -648,7 +648,7 @@ module.exports = async function (cms) {
         const targetClientId = `${storeId}_${deviceId}`;
         externalSocketIOServer.emitToPersistent(targetClientId, 'unregister')
         console.debug(`sentry:clientId=${targetClientId},store=${name || settingName},alias=${alias},eventType=pair`,
-          `Unpaired demo client ${targetClientId} connected, socket id = ${socket.id}`)
+          `Online order: Emit event: unpair demo client ${targetClientId}, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)
         callback()
       } catch (e) {

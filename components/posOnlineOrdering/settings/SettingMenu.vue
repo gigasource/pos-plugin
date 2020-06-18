@@ -9,7 +9,7 @@
         <div class="row-flex align-items-center">
           <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">Add New Category</g-btn-bs>
           <span class="mt-2">or</span>
-          <g-btn-bs class="btn-add" @click="importMenuItemFromExcel">Import Categories</g-btn-bs>
+          <g-btn-bs v-if="imexportable" class="btn-add" @click="openImportMenuItemDialog">Import Categories</g-btn-bs>
         </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
@@ -17,9 +17,13 @@
           <g-spacer/>
           <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
-          <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
-                    @click="importMenuItemFromExcel">
-            Import Categories
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+                    @click="openImportMenuItemDialog">
+            Import
+          </g-btn-bs>
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+                    @click="exportProductMenuItem">
+            Export
           </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
@@ -52,13 +56,19 @@
                   style="white-space: nowrap">
                 + Add New Item
               </g-btn-bs>
-              <upload-zone v-if="!isInDevice" style="border: none;" @url="setCategoryImage($event, cate._id)">
-                <template v-slot:default="{showUploadDialog}">
-                  <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
-                    Group Picture
-                  </g-btn-bs>
-                </template>
-              </upload-zone>
+              <template v-if="!isInDevice">
+                <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2">
+                  <template v-slot:default="{showUploadDialog}">
+                    <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
+                      Group Picture
+                    </g-btn-bs>
+                  </template>
+                </upload-zone>
+                <g-btn-bs v-else background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="setCategoryImage('', cate._id)" style="margin: 0">
+                  <g-icon color="#E24C4B" size="16" class="mr-2">close</g-icon>
+                  Group Picture
+                </g-btn-bs>
+              </template>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
                         @click.prevent.stop="openDeleteCategoryDialog(cate)">
                 <g-icon color="#535962">mdi-trash-can-outline</g-icon>
@@ -127,6 +137,7 @@
           </div>
         </div>
       </g-dialog>
+      <dialog-import-menu-item v-model="dialog.importMenuItem" @submit="importMenuItemFromExcel"/>
     </template>
   </div>
 </template>
@@ -134,13 +145,13 @@
   import _ from 'lodash'
   import DialogNewCategory from './dialogNewCategory';
   import DialogDeleteCategory from './dialogDeleteCategory';
-  import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
   import XLSX from 'xlsx'
-  import importMenuItem from '../../Store/importMenuItem';
+  import { imexportMenuItem, exportMenuItem } from '../../Store/imexportMenuItem';
+  import DialogImportMenuItem from './dialogImportMenuItem';
   
   export default {
     name: 'SettingMenu',
-    components: { DialogDeleteCategory, DialogNewCategory },
+    components: { DialogImportMenuItem, DialogDeleteCategory, DialogNewCategory },
     props: {
       store: Object,
       categories: Array,
@@ -162,10 +173,12 @@
           deleteCategory: false,
           deleteProduct: false,
           setting: false,
+          importMenuItem: false,
         },
         editBtn: [],
         editingProduct: false,
-        edittingItems: []
+        edittingItems: [],
+        imexportable: cms.loginUser.user.role.name === 'admin'
       }
     },
     created() {
@@ -328,21 +341,31 @@
       },
       
       // import file
-      importMenuItemFromExcel() {
-        const self = this
-        // https://stackoverflow.com/questions/974079/setting-mime-type-for-excel-document
-        openUploadFileDialog({ multiple: false, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }, files => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            importMenuItem(workbook, self.store._id, () => {
-              self.$emit('import-categories-completed')
-            })
-          };
-          reader.readAsArrayBuffer(files[0]);
-        })
+      openImportMenuItemDialog() {
+        this.dialog.importMenuItem = true
       },
+      importMenuItemFromExcel(metadata, callback) {
+        const self = this
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          imexportMenuItem({
+            workbook: workbook,
+            behavior: metadata.importBehavior,
+            storeId: self.store._id,
+            onCompleted: (isCompleted, error) => {
+              callback && callback(isCompleted, error)
+              if (isCompleted)
+                self.$emit('import-categories-completed')
+            }
+          })
+        };
+        reader.readAsArrayBuffer(metadata.file);
+      },
+      exportProductMenuItem() {
+        exportMenuItem({ storeId: this.store._id })
+      }
     }
   }
 </script>

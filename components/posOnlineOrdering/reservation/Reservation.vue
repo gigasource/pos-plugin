@@ -577,6 +577,7 @@
 
               &__content {
                 font-size: 15px;
+                white-space: nowrap;
               }
 
               &--active {

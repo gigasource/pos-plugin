@@ -57,7 +57,7 @@
                 <div class="fw-700 text-blue-accent-3">ID: {{store.id}}</div>
                 <div>{{store.settingName}}</div>
                 <div>{{store.settingAddress}}</div>
-                <div style="font-size: 12px;">
+                <div style="font-size: 12px;" v-if="viewMonthlyRevenuePerm">
                   <div v-if="store.prevMonthReport">
                     <span style="font-weight: bold;">Previous month: </span>
                     <span>{{store.prevMonthReport.orders}} orders, {{store.prevMonthReport.total | currency(store.country.locale)}}</span>
@@ -242,7 +242,7 @@
     injectService: [
       'PosOnlineOrderManagementStore:(searchText)',
       // permissions
-      'PermissionStore:(versionControlPerm,manageAccountPerm,manageGroupPerm,manageStorePerm,settingsPerm,updateAppPerm,remoteControlPerm,featureControlPerm,configOnlineOrderingPerm)'
+      'PermissionStore:(versionControlPerm,manageAccountPerm,manageGroupPerm,manageStorePerm,settingsPerm,updateAppPerm,remoteControlPerm,featureControlPerm,configOnlineOrderingPerm,viewMonthlyRevenuePerm)'
     ],
     filters: {
       currency(val, locale = 'en') {

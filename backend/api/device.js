@@ -79,7 +79,8 @@ router.post('/register', async (req, res) => {
         monthlyReport: false,
         remoteControl: true,
         proxy: true,
-        alwaysOn: true
+        alwaysOn: true,
+        reservation: false
       }
     });
     const store = await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
