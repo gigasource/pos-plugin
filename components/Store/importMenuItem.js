@@ -110,22 +110,22 @@ function getChoices(choiceStr) {
 }
 
 /**
- * Convert workbox to plain javascript object array
+ * Convert workbook to plain javascript object array
  * Each worksheet will be converted to Category object with props
  *  + name: worksheet name
  *  + position: order of worksheet
  *  + items: worksheet rows -> items
- * @param workbox
+ * @param workbook
  * @returns {Array}
  */
-function workbox2PJSO(workbox) {
+function workbook2PJSO(workbook) {
   // SheetName startwith : is document sheet
   // This sheet will be ignored
-  const dataSheetNames = _.filter(workbox.SheetNames, sheetName => !_.startsWith(sheetName, '@'))
+  const dataSheetNames = _.filter(workbook.SheetNames, sheetName => !_.startsWith(sheetName, '@'))
   return _.map(dataSheetNames, (sheetName, index) => ({
     name: sheetName,
     position: index,
-    items: getItemsInCategory(workbox.Sheets[sheetName])
+    items: getItemsInCategory(workbook.Sheets[sheetName])
   }))
 }
 
@@ -162,9 +162,21 @@ function getItemsInCategory(sheet) {
 /**
  * Insert menu item to database
  * @param categories
+ * @param storeId
+ * @param behavior
  * @returns {Promise<void>}
  */
-async function insertProductCategoriesToDatabase(categories, storeId) {
+async function insertProductCategoriesToDatabase(categories, storeId, behavior) {
+  switch (behavior) {
+    case 'wipeOutOldData':
+      await cms.getModel(CATEGORY_COLLECTION).remove({ store: storeId })
+      await cms.getModel(PRODUCT_COLLECTION).remove({ store: storeId })
+      break;
+    // more behavior
+    default:
+      break;
+  }
+
   const insertTasks = _.map(categories, async category => {
     try {
       let createdCategory = await cms.getModel(CATEGORY_COLLECTION).findOne({ name: category.name, store: storeId })
@@ -194,16 +206,19 @@ async function insertProductCategoriesToDatabase(categories, storeId) {
 
 /**
  * Read product menu item from xlsx file then insert it into database
- * @param workbox
+ * @param workbook
+ * @param storeId
+ * @param onCompleted
+ * @param behavior
  * @returns {Promise<void>}
  */
-async function importMenuItem(workbox, storeId, onCompleted) {
+async function importMenuItem({ workbook, storeId, onCompleted, behavior }) {
   try {
-    const productCategories = workbox2PJSO(workbox)
-    await insertProductCategoriesToDatabase(productCategories, storeId)
-    onCompleted && onCompleted()
+    const productCategories = workbook2PJSO(workbook)
+    await insertProductCategoriesToDatabase(productCategories, storeId, behavior)
+    onCompleted && onCompleted(true)
   } catch (e) {
-    console.warn(e)
+    onCompleted && onCompleted(false, e)
   }
 }
 

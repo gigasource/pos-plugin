@@ -9,7 +9,7 @@
         <div class="row-flex align-items-center">
           <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">Add New Category</g-btn-bs>
           <span class="mt-2">or</span>
-          <g-btn-bs class="btn-add" @click="importMenuItemFromExcel">Import Categories</g-btn-bs>
+          <g-btn-bs v-if="importProductMenuItemPerm" class="btn-add" @click="openImportMenuItemDialog">Import Categories</g-btn-bs>
         </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
@@ -17,8 +17,8 @@
           <g-spacer/>
           <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
-          <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
-                    @click="importMenuItemFromExcel">
+          <g-btn-bs v-if="importProductMenuItemPerm" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+                    @click="openImportMenuItemDialog">
             Import Categories
           </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
@@ -127,6 +127,7 @@
           </div>
         </div>
       </g-dialog>
+      <dialog-import-menu-item v-model="dialog.importMenuItem" @submit="importMenuItemFromExcel"/>
     </template>
   </div>
 </template>
@@ -134,13 +135,13 @@
   import _ from 'lodash'
   import DialogNewCategory from './dialogNewCategory';
   import DialogDeleteCategory from './dialogDeleteCategory';
-  import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
   import XLSX from 'xlsx'
   import importMenuItem from '../../Store/importMenuItem';
+  import DialogImportMenuItem from './dialogImportMenuItem';
   
   export default {
     name: 'SettingMenu',
-    components: { DialogDeleteCategory, DialogNewCategory },
+    components: { DialogImportMenuItem, DialogDeleteCategory, DialogNewCategory },
     props: {
       store: Object,
       categories: Array,
@@ -162,10 +163,12 @@
           deleteCategory: false,
           deleteProduct: false,
           setting: false,
+          importMenuItem: false,
         },
         editBtn: [],
         editingProduct: false,
-        edittingItems: []
+        edittingItems: [],
+        importProductMenuItemPerm: cms.loginUser.user.role.name === 'admin'
       }
     },
     created() {
@@ -328,20 +331,27 @@
       },
       
       // import file
-      importMenuItemFromExcel() {
+      openImportMenuItemDialog() {
+        this.dialog.importMenuItem = true
+      },
+      importMenuItemFromExcel(metadata, callback) {
         const self = this
-        // https://stackoverflow.com/questions/974079/setting-mime-type-for-excel-document
-        openUploadFileDialog({ multiple: false, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }, files => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            importMenuItem(workbook, self.store._id, () => {
-              self.$emit('import-categories-completed')
-            })
-          };
-          reader.readAsArrayBuffer(files[0]);
-        })
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          importMenuItem({
+            workbook: workbook,
+            behavior: metadata.importBehavior,
+            storeId: self.store._id,
+            onCompleted: (isCompleted, error) => {
+              callback && callback(isCompleted, error)
+              if (isCompleted)
+                self.$emit('import-categories-completed')
+            }
+          })
+        };
+        reader.readAsArrayBuffer(metadata.file);
       },
     }
   }
