@@ -207,12 +207,13 @@
                         :width="dialog.webRTC.width"
                         :height="dialog.webRTC.height"
                         @dragStart="dialog.webRTC.dragging = true" @dragEnd="dialog.webRTC.dragging = false"
-                        @resizeStart="dialog.webRTC.dragging = true" @resizeEnd="dialog.webRTC.dragging = false"
-                        @close="closeWebRTCRemoteControl">
+                        @resizeStart="dialog.webRTC.dragging = true" @resizeEnd="handleWebRtcDndDragEnd"
+                        @close="closeWebRTCRemoteControl"
+                        ref="webRtcRemoteControlDialog">
             <template v-if="dialog.webRTC.show" #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
             <div v-if="dialog.webRTC.show && dialog.webRTC.dragging"
                  style="height: 100%; width: 100%; position: absolute; background: transparent"/>
-            <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%"/>
+            <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%" @load="handleWebRtcIframeLoad"/>
           </g-dnd-dialog>
         </div>
       </template>
@@ -280,7 +281,9 @@
             height: 600 + 4 + 32 /*border top-bottom dnd header*/,
             src: 'about:blank',
             device: null,
-            dragging: false
+            dragging: false,
+            deviceSize: null,
+            iframeLoaded: false
           },
           embeddedCode: {
             show: false,
@@ -320,11 +323,59 @@
       openWebShopStore(store) {
         window.open(`${location.origin}/store/${store.alias || store._id}`)
       },
+      handleWebRTCMessage(e) {
+        try {
+          if (e.data.startsWith('webrtc--device-size')) {
+            const sizeData = e.data.replace('webrtc--device-size--', '').split('-')
+            this.$set(this.dialog.webRTC, 'deviceSize', {
+              width: Number(sizeData[0]),
+              height: Number(sizeData[1])
+            })
+            this.adjustWebRtcDnd()
+          }
+        } catch (e) {
+          console.warn(e)
+        }
+      },
+      handleWebRtcIframeLoad() {
+        console.log('iframe webrtc loaded')
+        this.dialog.webRTC.iframeLoaded = true
+        this.adjustWebRtcDnd()
+      },
+      handleWebRtcDndDragEnd() {
+        this.dialog.webRTC.dragging = false
+        this.adjustWebRtcDnd()
+      },
+      adjustWebRtcDnd() {
+        if (!this.dialog.webRTC.iframeLoaded) {
+          console.log('frame is not loaded')
+          return
+        }
+
+        const deviceSize = this.dialog.webRTC.deviceSize
+        if (deviceSize == null) {
+          console.log('device size not received')
+          return
+        }
+
+        const el = this.$refs.webRtcRemoteControlDialog.$el
+        if (!el || !el.style) {
+          console.log('el is missing')
+          return
+        }
+
+        // hmm
+        const remoteControlHeaderHeight = 30
+        const dndTitleBarHeight = 31
+        const dndBorderTopBottomHeight = 4
+        el.style.height = (Math.floor((el.clientWidth - dndBorderTopBottomHeight) * deviceSize.height / deviceSize.width) + 2 * dndBorderTopBottomHeight + remoteControlHeaderHeight + dndTitleBarHeight) + 'px'
+      },
       openWebRTCRemoteControl(store, device) {
         this.dialog.webRTC.device = device
         window.cms.socket.emit('startStream', device._id)
         this.dialog.webRTC.src = `https://screencast.gigasource.io/remoteControl.html?deviceId=device_${device._id}&showMenuButton=false&autoScaleViewport=true`
         this.dialog.webRTC.show = true
+        window.addEventListener('message', this.handleWebRTCMessage)
       },
       closeWebRTCRemoteControl() {
         if (this.dialog.webRTC.device) {
@@ -333,6 +384,7 @@
           this.dialog.webRTC.src = 'about:blank'
           this.dialog.webRTC.show = false
           this.dialog.webRTC.device = null
+          window.removeEventListener('message', this.handleWebRTCMessage)
         }
       },
       startRemoteControl({_id: deviceId, online}) {
