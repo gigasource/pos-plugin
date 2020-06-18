@@ -19,6 +19,7 @@
             <g-textarea rows="3" outlined v-model="note" placeholder="Fill your text" no-resize/>
           </div>
           <div class="row-flex align-center justify-end mt-4" style="margin-right: -4px">
+            <g-btn-bs width="100" border-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
             <g-btn-bs width="140" background-color="#2979FF" @click="submit">Submit</g-btn-bs>
           </div>
         </div>
@@ -204,6 +205,7 @@
       position: absolute;
       top: 16px;
       right: 16px;
+      z-index: 10;
     }
 
     &-content {

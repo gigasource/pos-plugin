@@ -31,7 +31,7 @@
       <table>
         <thead>
         <tr style="font-weight: bold">
-          <th width="42%" style="text-align: left; padding-left: 12px">{{locale.printing.item}}</th>
+          <th width="42%" style="text-align: left; padding-left: 10px">{{locale.printing.item}}</th>
           <th width="5%" style="text-align: right">{{locale.printing.quantity}}</th>
           <th width="18%" style="text-align: right">{{locale.printing.price}}</th>
           <th width="25%" style="text-align: right; padding-right: 2px;">{{locale.printing.total}}</th>
@@ -46,16 +46,16 @@
           </tr>
           <tr v-if="item.modifiers && item.modifiers.length" v-for="mod in item.modifiers">
             <td width="42%" style="padding-left: 12px">* {{mod.name}}</td>
-            <td width="5%" style="text-align: right">{{mod.quantity}}</td>
+            <td width="5%" style="text-align: right">{{mod.quantity * item.quantity}}</td>
             <td width="18%" style="text-align: right">{{mod.price | convertMoney}}</td>
-            <td width="25%" style="text-align: right; padding-right: 2px;">{{(mod.price * mod.quantity) | convertMoney}}</td>
+            <td width="25%" style="text-align: right; padding-right: 2px;">{{(mod.price * mod.quantity * item.quantity) | convertMoney}}</td>
           </tr>
         </template>
       </table>
     </div>
     <div class="divider-dashed"/>
-    <div style="font-size: 25px">
-      <div>
+    <div style="font-size: 25px; padding-top: 10px">
+      <div v-if="type === 'delivery'">
         <span>{{locale.printing.shippingFee}}</span>
         <span class="float-right">{{getShippingFee() | convertMoney}}</span>
       </div>
