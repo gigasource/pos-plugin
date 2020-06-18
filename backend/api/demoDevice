@@ -16,10 +16,10 @@ async function getNewDeviceCode(id) {
 }
 
 router.post('/register', async (req, res) => {
-  try {
-    const { storeId, name } = req.query
+  const { storeId, name } = req.query
+  if (!storeId) return res.sendStatus(400)
 
-    if (!storeId) return res.sendStatus(400)
+  try {
     const deviceCode = await getNewDeviceCode(storeId)
     const store = await storeModel.findOne({ id: storeId })
     const accept = (store.gSms && store.gSms.autoAccept)
@@ -47,32 +47,39 @@ router.post('/register', async (req, res) => {
       storeAlias: updatedStore.alias
     })
 
+    console.debug(`sentry:deviceName=${name},eventType=pair,storeId=${storeId}`,
+      `1. Online-order: Registered demo client ${name} `)
     //emit to frontend, refresh device list
     cms.socket.emit('loadStore', storeId)
   } catch (e) {
     console.log(e)
     res.status(500).send('Encountered an error while registering!')
+    console.debug(`sentry:deviceName=${name},eventType=pair,storeId=${storeId}`,
+      `1a. Online-order: Failed to register demo client ${name}`, e)
   }
 })
 
 router.post('/unregister', async (req, res) => {
-  try {
-    const { storeId, deviceId } = req.query
-    if (!deviceId || !storeId) return res.sendStatus(400)
+  const { storeId, deviceId, deviceName } = req.query
+  if (!deviceId || !storeId) return res.sendStatus(400)
 
+  try {
     await storeModel.findOneAndUpdate({ id: storeId }, {
       $pull: {
         'gSms.devices': { _id: deviceId }
       }
     })
+    res.status(200).json({ message: `Unregistered ${deviceName} successfully` })
 
-    res.status(200).json({ message: 'Unregistered successfully' })
-
+    console.debug(`sentry:deviceName=${deviceName},eventType=pair,storeId=${storeId}`,
+      `Online-order: Successfully unregistered demo client ${deviceName}`)
     //emit to frontend, refresh device list
     cms.socket.emit('loadStore', storeId)
   } catch (e) {
     console.log(e)
     res.status(500).send('Encountered an error while unregistering!')
+    console.debug(`sentry:deviceName=${deviceName},eventType=pair,storeId=${storeId}`,
+      `Online-order: Failed to unregister demo client ${deviceName}`, e)
   }
 })
 
