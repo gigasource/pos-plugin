@@ -39,6 +39,7 @@
             <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
               Generate code to embed online ordering to your website
             </div>
+            <g-spacer/>
             <g-btn-bs width="100" style="margin: 0 4px" @click="openDialogGenerate" background-color="#536DFE" text-color="white">Generate</g-btn-bs>
           </div>
           <template v-if="iframe">
