@@ -761,8 +761,6 @@
           margin-bottom: 16px;
 
           img {
-            max-height: 167px;
-            width: 100%;
             border-radius: 20px 20px 0 0;
           }
 
@@ -868,14 +866,12 @@
             margin-bottom: 8px;
 
             img {
-              max-height: 75px;
-              width: 100%;
-              border-radius: 10px 10px 0 0;
+              border-radius: 8px 8px 0 0;
             }
 
             & > div {
               background: #E8EAF6;
-              border-radius: 0px 0px 10px 10px;
+              border-radius: 0px 0px 8px 8px;
               font-size: 18px;
               font-weight: 700;
               padding: 6px 16px;

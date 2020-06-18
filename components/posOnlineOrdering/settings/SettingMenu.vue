@@ -56,13 +56,19 @@
                   style="white-space: nowrap">
                 + Add New Item
               </g-btn-bs>
-              <upload-zone v-if="!isInDevice" style="border: none;" @url="setCategoryImage($event, cate._id)">
-                <template v-slot:default="{showUploadDialog}">
-                  <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
-                    Group Picture
-                  </g-btn-bs>
-                </template>
-              </upload-zone>
+              <template v-if="!isInDevice">
+                <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2">
+                  <template v-slot:default="{showUploadDialog}">
+                    <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
+                      Group Picture
+                    </g-btn-bs>
+                  </template>
+                </upload-zone>
+                <g-btn-bs v-else background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="setCategoryImage('', cate._id)" style="margin: 0">
+                  <g-icon color="#E24C4B" size="16" class="mr-2">close</g-icon>
+                  Group Picture
+                </g-btn-bs>
+              </template>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
                         @click.prevent.stop="openDeleteCategoryDialog(cate)">
                 <g-icon color="#535962">mdi-trash-can-outline</g-icon>
