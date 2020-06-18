@@ -9,11 +9,21 @@ function convertMoney(value) {
 
 async function makePrintData(cms, {orderId}) {
   const order = await cms.getModel('Order').findById(orderId).lean();
+
+  // app locale
   const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
   const locale = i18nSetting ? i18nSetting.content.locale : 'en';
   const localeFilePath = `../../i18n/${locale}.js`;
   const localeObj = require(localeFilePath)[locale];
 
+  // store locale
+  let storeLocale = 'en'
+  const posSettings = await cms.getModel('PosSetting').findOne()
+  if (posSettings) {
+    if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) storeLocale = posSettings.onlineDevice.store.locale
+  }
+  const storeLocaleFilePath = `../../i18n/${storeLocale}.js`
+  const storeLocaleObj = require(storeLocaleFilePath)[storeLocale] || require(`../../i18n/en.js`).en
   if (!order) return null;
 
   const {
@@ -42,6 +52,7 @@ async function makePrintData(cms, {orderId}) {
     date: dayjs(date).format(localeObj.printing.dateFormat),
     deliveryTime,
     locale: localeObj,
+    storeLocale: storeLocaleObj,
     type
   };
 }
@@ -58,6 +69,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
     items,
     date,
     locale,
+    storeLocale,
     deliveryTime,
     type
   } = printData;
@@ -120,7 +132,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
       escPrinter.setTextDoubleWidth();
 
       item.modifiers.forEach(mod => {
-        let modifierText = `* ${mod.name} ${convertMoney(mod.price)}${locale.printing.currency}`
+        let modifierText = `* ${mod.name} ${convertMoney(mod.price)} ${storeLocale.printing.currency}`
 
         escPrinter.tableCustom([
           {text: '', align: 'LEFT', width: quantityColumnWidth},

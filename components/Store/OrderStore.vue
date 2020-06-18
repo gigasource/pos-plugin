@@ -75,6 +75,10 @@
     },
     methods: {
       //<!--<editor-fold desc="Order screen">-->
+      async getOnlineOrderDeviceId() {
+        const posSetting = await cms.getModel('PosSetting').findOne({})
+        return posSetting.onlineDevice && posSetting.onlineDevice.id
+      },
       async getScrollWindowProducts() {
         const products = {}
         const allProducts = await cms.getModel('Product').find();
@@ -549,8 +553,11 @@
           responseMessage: order.declineReason,
           paypalOrderDetail: order.paypalOrderDetail
         };
-        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
+
+        const clientId = await this.getOnlineOrderDeviceId();
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
+
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
@@ -585,7 +592,8 @@
             total: order.vSum
           }
 
-          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
+          const clientId = await this.getOnlineOrderDeviceId();
+          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           window.cms.socket.emit('updateOrderStatus', orderStatus)
         } catch (e) {
@@ -607,7 +615,8 @@
           paypalOrderDetail: order.paypalOrderDetail
         }
 
-        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus`,
+        const clientId = await this.getOnlineOrderDeviceId();
+        console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
