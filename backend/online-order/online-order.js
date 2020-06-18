@@ -6,8 +6,6 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule')
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
 let webshopUrl;
 let storeName;
@@ -24,37 +22,19 @@ const RECREATE_INTERVAL = 60000; // socket.io will try to recreate client socket
 const NO_OF_ATTEMPT_BEFORE_RECREATE = 5; // if number of 'reconnecting' attempt > 5, recreate interval will be triggered
 let recreateOnlineOrderSocketInterval = null;
 let initFinished = false;
+const {saveDisconnectMessage, sendSavedMessages} = require('./sentry-saved-messages');
 
 module.exports = async cms => {
-  const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
-    tagString: {
-      type: String,
-      trim: true,
-    },
-    message: {
-      type: String,
-      trim: true,
-    },
-  }, {
-    timestamps: true,
-  }));
-
-  const savedSentryMessages = await SentrySavedMessagesModel.find({});
-  const savedSentryMessageIds = savedSentryMessages.map(({_id}) => _id);
-  await SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}});
-  savedSentryMessages.forEach(({tagString, message}) => {
-    console.debug(tagString, message);
-  });
+  sendSavedMessages();
 
   const fn = _.once(async () => {
     if (onlineOrderSocket && onlineOrderSocket.connected) {
-      await SentrySavedMessagesModel.create({
-        tagString: `sentry:clientId=${onlineOrderSocket.clientId},eventType=socketConnection,socketId=${onlineOrderSocket.serverSocketId}`,
-        message: `2b. (Startup) onlineOrderSocket disconnected`,
-      });
+      saveDisconnectMessage(onlineOrderSocket)
+          .catch(err => console.error(err))
+          .finally(() => process.exit());
+    } else {
+      process.exit();
     }
-
-    process.exit();
   });
 
   process.on('SIGINT', fn);
@@ -152,6 +132,7 @@ module.exports = async cms => {
       cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
       console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
     }
+
     if (!reservation) return
 
     const reservationId = reservation._id;
@@ -159,7 +140,7 @@ module.exports = async cms => {
     const reservationTime = dayjs(reservation.date).format('HH:mm')
     const posSettings = await cms.getModel('PosSetting').findOne()
     const timeout = posSettings.reservation && posSettings.reservation.removeOverdueAfter
-      ? posSettings.reservation.removeOverdueAfter : 0 // fallback to 0 timeout (no auto-decline)
+        ? posSettings.reservation.removeOverdueAfter : 0 // fallback to 0 timeout (no auto-decline)
 
     if (timeout === 0) { // do not auto-decline, cancel job and return
       return cancelRemoveReservationJob(reservation)
@@ -179,9 +160,9 @@ module.exports = async cms => {
       const rescheduleSuccess = schedule.rescheduleJob(reservationJobs[reservationId], timeoutDateTime)
 
       return console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
-        rescheduleSuccess
-          ? `Restaurant: Reschedule successful for guest '${guestName}' at ${timeoutDateTime}`
-          : `Restaurant: Reschedule failed for guest '${guestName}' at ${timeoutDateTime}`
+          rescheduleSuccess
+              ? `Restaurant: Reschedule successful for guest '${guestName}' at ${timeoutDateTime}`
+              : `Restaurant: Reschedule failed for guest '${guestName}' at ${timeoutDateTime}`
       )
     }
     // else start job
@@ -191,7 +172,7 @@ module.exports = async cms => {
 
   async function initReservationSchedules() {
     // fetch all pending reservations
-    let pendingReservations = await cms.getModel('Reservation').find({ status: 'pending' }).lean()
+    let pendingReservations = await cms.getModel('Reservation').find({status: 'pending'}).lean()
     // start jobs
     console.debug(getBaseSentryTags('Reservation'), `Restaurant: scheduling Reservation jobs on init`)
     pendingReservations.forEach(res => {
@@ -348,7 +329,7 @@ module.exports = async cms => {
       typeof ackFn === 'function' && ackFn()
 
       // reschedule existing jobs
-      const pendingReservations = await cms.getModel('Reservation').find({ status: 'pending' }).lean()
+      const pendingReservations = await cms.getModel('Reservation').find({status: 'pending'}).lean()
       if (pendingReservations && pendingReservations.length) {
         pendingReservations.forEach(res => scheduleRemoveReservationJob(res))
       }
@@ -356,13 +337,13 @@ module.exports = async cms => {
 
     socket.on('createReservation', async (reservationData, ackFn) => {
       console.debug(getBaseSentryTags('Reservation'),
-        `1. Restaurant backend: received reservation:
+          `1. Restaurant backend: received reservation:
         guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
         customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
         note:${reservationData.note}`)
 
       try {
-        const { date, time } = reservationData
+        const {date, time} = reservationData
         const [hour, minute] = time.split(':')
         const reservation = await cms.getModel('Reservation').create(Object.assign({}, reservationData, {
           date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
@@ -370,7 +351,7 @@ module.exports = async cms => {
         }))
         cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
         console.debug(getBaseSentryTags('Reservation'),
-          `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+            `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
         typeof ackFn === 'function' && ackFn()
 
         await scheduleRemoveReservationJob(reservation) // create auto-decline job & start job
@@ -729,7 +710,7 @@ module.exports = async cms => {
     })
 
     socket.on('scheduleNewReservation', async (reservation) => {
-      if(!reservation) return
+      if (!reservation) return
       const guestName = reservation.customer.name;
       const reservationTime = dayjs(reservation.date).format('HH:mm')
       console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: Schedule requested for '${guestName}' (${reservationTime})`)
