@@ -326,6 +326,8 @@ module.exports = async cms => {
         typeof ackFn === 'function' && ackFn()
 
         await scheduleRemoveReservationJob(reservation) // create auto-decline job & start job
+
+        cms.socket.emit('ringReservationBell')
       } catch (e) {
         console.log(e)
       }

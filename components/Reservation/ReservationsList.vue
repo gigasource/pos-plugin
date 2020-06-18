@@ -121,6 +121,12 @@
     async created() {
       await this.genWeek(this.date)
       this.genReservations()
+
+      cms.socket.on('updateReservationList', async sentryTagString => {
+        console.debug(sentryTagString, `3. Restaurant frontend: received 'updateReservationList', refreshing data`)
+        await this.genReservations()
+        await this.genWeek(this.date)
+      })
     },
     mounted() {
       this.$nextTick(() => {
@@ -230,12 +236,17 @@
         this.selectedReservation = reservation
         this.dialog.delete = true
       },
-      confirmRemove(){
+      async confirmRemove(){
         this.$emit('removeReservation', this.selectedReservation._id)
         this.dialog.delete = false
+        if(this.reservations.length === 1) {
+          await this.genWeek(this.date)
+        }
+        await this.$getService('PosStore').getPendingReservationsLength()
       },
-      backToToday() {
+      async backToToday() {
         this.date = new Date()
+        await this.genWeek(this.date)
       }
     }
   }

@@ -172,7 +172,7 @@
           if (item.key !== 'Reservation') return item
           return {
             ...item,
-            ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '' }
+            ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '', badgeColor: '#FF5252' }
           }
         })
       },
@@ -252,6 +252,14 @@
 
         cms.socket.on('webShopDisconnected', () => {
           this.webShopConnected = false
+        })
+
+        cms.socket.on('ringReservationBell', async () => {
+          try {
+            await this.reservationBell.play()
+          } catch (e) {
+            this.reservationBell.addEventListener('canplaythrough', () => this.reservationBell.play())
+          }
         })
       },
       async changeLocale(locale) {
@@ -374,19 +382,6 @@
           this.showOfflineSnackbar()
         }
       },
-      pendingReservationsLength: {
-        async handler(val, oldVal) {
-          if(val && !isNaN(val) && !isNaN(oldVal)) {
-            if(val > oldVal && this.reservationBell) {
-              try {
-                await this.reservationBell.play()
-              } catch (e) {
-                this.reservationBell.addEventListener('canplaythrough', () => this.reservationBell.play())
-              }
-            }
-          }
-        },
-      }
     },
     mounted() {
       this.online = navigator.onLine
