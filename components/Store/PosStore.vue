@@ -261,6 +261,13 @@
             this.reservationBell.addEventListener('canplaythrough', () => this.reservationBell.play())
           }
         })
+
+        cms.socket.on('getWebshopName', async () => {
+          const posSettings = await cms.getModel('PosSetting').findOne()
+          if (posSettings && posSettings.onlineDevice && posSettings.onlineDevice.store) {
+            this.storeLocale = posSettings.onlineDevice.store.locale || this.locale || 'en'
+          }
+        })
       },
       async changeLocale(locale) {
         await cms.getModel('SystemConfig').updateOne({ type: 'I18n' }, { 'content.locale': locale }, { upsert: true })
@@ -350,8 +357,8 @@
         this.locale = i18nConfig.content.locale
       }
       const posSettings = cms.getList('PosSetting')[0]
-      if (posSettings && posSettings.store) {
-        this.storeLocale = posSettings.store.locale || this.locale || 'en'
+      if (posSettings && posSettings.onlineDevice && posSettings.onlineDevice.store) {
+        this.storeLocale = posSettings.onlineDevice.store.locale || this.locale || 'en'
       }
 
       if (this.$router && this.$router.currentRoute) {

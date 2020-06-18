@@ -1,4 +1,4 @@
-const {convertHtmlToPng} = require('../print-utils/print-utils');
+const { convertHtmlToPng } = require('../print-utils/print-utils');
 const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 const dayjs = require('dayjs');
@@ -20,28 +20,13 @@ function getPayment({ payment }) {
   return type.charAt(0).toUpperCase() + type.slice(1) //capitalize
 }
 
-async function makePrintData(cms, {orderId}) {
+async function makePrintData(cms, { orderId }, locale) {
   const order = await cms.getModel('Order').findById(orderId);
-  const i18nSetting = await cms.getModel('SystemConfig').findOne({type: 'I18n'});
-
-  // app locale
-  const locale = i18nSetting ? i18nSetting.content.locale : 'en';
-  const localeFilePath = `../../i18n/${locale}.js`;
-  const localeObj = fs.existsSync(localeFilePath) ? require(localeFilePath)[locale] : require(`../../i18n/en.js`).en
-
-  // store locale
-  let storeLocale = 'en'
-  const posSettings = await cms.getModel('PosSetting').findOne()
-  if (posSettings) {
-    if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) storeLocale = posSettings.onlineDevice.store.locale
-  }
-  const storeLocaleFilePath = `../../i18n/${storeLocale}.js`
-  const storeLocaleObj = require(storeLocaleFilePath)[storeLocale] || require(`../../i18n/en.js`).en
 
   if (!order) return null;
 
   const {
-    customer: {name, phone, address, zipCode, company},
+    customer: { name, phone, address, zipCode, company },
     note,
     items,
     shippingFee,
@@ -63,10 +48,9 @@ async function makePrintData(cms, {orderId}) {
     items,
     shippingFee,
     orderSum,
-    date: dayjs(date).format(localeObj.printing.dateFormat),
+    date: dayjs(date).format(locale.printing.dateFormat),
     deliveryTime,
-    locale: localeObj,
-    storeLocale: storeLocaleObj,
+    locale,
     type,
     discounts,
     payment: getPayment(order)
@@ -87,7 +71,6 @@ async function printEscPos(escPrinter, printData) {
     orderSum,
     date,
     locale,
-    storeLocale,
     deliveryTime,
     type,
     discounts,
@@ -98,8 +81,9 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.bold(true);
 
   const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
-  if (deliveryTime) escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
-  else {
+  if (deliveryTime) {
+    escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
+  } else {
     escPrinter.alignCenter();
     escPrinter.println(`${orderType} #${orderNumber}`);
   }
@@ -125,20 +109,20 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.drawLine()
   escPrinter.bold(true)
   escPrinter.tableCustom([
-    {text: locale.printing.item, align: 'LEFT', width: 0.4},
-    {text: locale.printing.quantity, align: 'RIGHT', width: 0.12},
-    {text: locale.printing.price, align: 'RIGHT', width: 0.22},
-    {text: locale.printing.total, align: 'RIGHT', width: 0.22},
+    { text: locale.printing.item, align: 'LEFT', width: 0.4 },
+    { text: locale.printing.quantity, align: 'RIGHT', width: 0.12 },
+    { text: locale.printing.price, align: 'RIGHT', width: 0.22 },
+    { text: locale.printing.total, align: 'RIGHT', width: 0.22 },
   ])
   escPrinter.drawLine()
 
   escPrinter.setTextNormal()
   items.forEach(item => {
     escPrinter.tableCustom([
-      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: 0.4},
-      {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
-      {text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22},
-      {text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22},
+      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: 0.4 },
+      { text: `${item.quantity}`, align: 'RIGHT', width: 0.12 },
+      { text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22 },
+      { text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22 },
     ])
 
     if (item.modifiers && item.modifiers.length) {
@@ -146,10 +130,10 @@ async function printEscPos(escPrinter, printData) {
         const modifierText = `* ${mod.name}`
 
         escPrinter.tableCustom([
-          {text: modifierText, align: 'LEFT', width: 0.4},
-          {text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12},
-          {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
-          {text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22},
+          { text: modifierText, align: 'LEFT', width: 0.4 },
+          { text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12 },
+          { text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22 },
+          { text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22 },
         ])
       })
     }
@@ -160,7 +144,7 @@ async function printEscPos(escPrinter, printData) {
     escPrinter.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
   })
   escPrinter.bold(true)
-  escPrinter.leftRight(locale.printing.total, `${storeLocale.printing.currency} ${convertMoney(orderSum)}`)
+  escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
   escPrinter.leftRight('Payment', payment)
 
   escPrinter.newLine()
@@ -181,7 +165,7 @@ async function printSsr(printer, printData) {
   const OrderDelivery = require('../../dist/OrderDelivery.vue');
 
   const component = new Vue({
-    components: {OrderDelivery},
+    components: { OrderDelivery },
     render(h) {
       return h('OrderDelivery', {
         props: {
