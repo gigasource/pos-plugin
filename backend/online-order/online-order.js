@@ -200,6 +200,7 @@ module.exports = async cms => {
     });
 
     // connection related logic
+    socket.on('SERVER_PING', callback => callback(`pong from client ${deviceId}`));
     socket.on('connect', async () => {
       stopSocketRecreateInterval();
 
