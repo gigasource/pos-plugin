@@ -317,23 +317,25 @@ module.exports = async function (cms) {
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
         if (status === 'completed') {
-          console.debug('sentry:eventType=updateOrderStatus,status=completed', JSON.stringify(paypalOrderDetail))
+          console.debug('sentry:eventType=orderStatus,status=completed')
           if (paypalOrderDetail) {
             const store = await cms.getModel('Store').findOne({alias: storeAlias})
-            if (!store) {
+            if (!store || !store.paymentProviders || !store.paymentProviders.paypal) {
               // store information is missing, so order will not be processed
-              console.debug('sentry:eventType=updateOrderStatus', `Cannot find store for current order. Info: alias=${storeAlias}`)
+              console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: paypal token missing. Info: store_alias=${storeAlias}`)
               return;
             }
 
+            const { clientId, secretToken } = store.paymentProviders.paypal
+
             try {
-              const { clientId, secretToken } = store.paymentProviders.paypal
               const ppClient = createPayPalClient(clientId, secretToken)
-              console.debug(`sentry:eventType=updateOrderStatus,clientId=${clientId},secretToken=${secretToken}`, 'Trying to capture order')
               const result = await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)
-              console.debug('sentry:eventType=updateOrderStatus', 'Order has been captured', JSON.stringify(result))
+              const logClientId = (clientId || '').substr(0, 6) // using for log
+              const logSecretToken = (secretToken || '').substr(0, 6) // using for log
+              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(result))
             } catch (e) {
-              console.debug('sentry:eventType=updateOrderStatus', 'exception')
+              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
             }
           }
         } else {
