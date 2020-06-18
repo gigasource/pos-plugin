@@ -30,7 +30,7 @@ export function generateEmbededScript({ type, locale, id }) {
         fallbackContent = 'Online Order & Reservation'
         image = 'online-order-n-reservation.svg'
       }
-      objImg = `${location.origin}/cms-files/files/view/images/${image}`
+      objImg = getCdnUrl(`${location.origin}/cms-files/files/view/images/${image}`)
       return `<div id="franchise-embed-btn" class="franchise-embed-btn" data-url="${dataUrl}" data-width="120"><object style="pointer-events: none; width: 120px" type="image/svg+xml" data="${objImg}">${fallbackContent}</object></div><script type="application/javascript" src="${scriptSrc}"><\/script>`
     case 'webshop':
       dataUrl = `${location.origin}/store/${id}`
@@ -42,7 +42,7 @@ export function generateEmbededScript({ type, locale, id }) {
         fallbackContent = 'Online Order'
         image = 'online-order.svg'
       }
-      objImg = `${location.origin}/cms-files/files/view/images/${image}`
+      objImg = getCdnUrl(`${location.origin}/cms-files/files/view/images/${image}`)
       return `<div id="webshop-embed-btn" class="webshop-embed-btn" data-url="${dataUrl}" data-width="120"><object style="pointer-events: none; width: 120px" type="image/svg+xml" data="${objImg}">${fallbackContent}</object></div><script type="application/javascript" src="${scriptSrc}"><\/script>`
     case 'reservation':
       dataUrl = `${location.origin}/reservation/${id}`
