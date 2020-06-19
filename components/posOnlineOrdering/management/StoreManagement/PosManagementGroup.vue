@@ -47,7 +47,7 @@
         </div>
       </g-menu>
     </div>
-    
+
     <g-expand-transition>
       <template v-if="showContent || searchText">
         <div class="pos-management-group__content">
@@ -125,6 +125,30 @@
                         <div v-if="featureControlPerm" class="menu-action__option"
                              @click="startRemoteControl(device)">Proxy Remote Control
                         </div>
+                      </div>
+                    </g-menu>
+                  </div>
+                </div>
+                <div class="row-flex mb-1" v-for="device in store.gSms.devices" :key="`demoDevice_${device._id}`">
+                  <div class="row-flex col-11 align-items-center">
+                    <g-icon style="min-width: 24px">icon-smart_phone</g-icon>
+                    <span class="ml-1">{{device.name}}</span>
+                    <g-icon class="text-green" v-if="device.registered">done</g-icon>
+                  </div>
+                  <div class="col-1 row-flex align-items-center">
+                    <g-menu v-model="device.menu" close-on-content-click nudge-bottom="5">
+                      <template v-slot:activator="{on}">
+                        <g-icon style="margin-left: 33px;" :class="[device.menu && 'menu--active']" @click="on.click">more_horiz</g-icon>
+                      </template>
+                      <div class="menu-action">
+                        <div :class="device.registered?['menu-action__option--disabled']:['menu-action__option']"
+                             @click.stop="$emit('approveGmsDevice', store._id, device._id)">
+                          Approve
+                        </div>
+                        <div class="menu-action__option"
+                             @click.stop="$emit('open:renameGSmsDeviceDialog', store, device)">Rename</div>
+                        <div class="menu-action__option"
+                             @click.stop="$emit('open:deleteGSmsDeviceDialog', store, device)">Remove</div>
                       </div>
                     </g-menu>
                   </div>
@@ -218,7 +242,7 @@
         </div>
       </template>
     </g-expand-transition>
-  
+
     <dialog-gen-html-code v-model="dialog.embeddedCode.show" v-bind="dialog.embeddedCode"/>
   </div>
 </template>
@@ -267,12 +291,12 @@
         proxyInfo: null,
         proxyUrl: 'about:blank',
         showGroupActionBtns: false,
-        
+
         //
         menuCtx: {
           showMoreGroupAction: false,
         },
-        
+
         //
         dialog: {
           webRTC: {
@@ -427,7 +451,7 @@
       onIframeLoad() {
         if (this.iframeRefreshInterval) clearInterval(this.iframeRefreshInterval)
       },
-      
+
       // embedded code
       showGroupEmbeddedCode() {
         this.$set(this.dialog, 'embeddedCode', {
@@ -661,6 +685,16 @@
 
         &:hover {
           background-color: #EFEFEF;
+        }
+
+        &--disabled {
+          color: #201F2B;
+          opacity: 50%;
+          padding: 8px 36px 8px 12px;
+          white-space: nowrap;
+          font-size: 14px;
+          cursor: default;
+          pointer-events: none;
         }
       }
     }

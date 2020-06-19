@@ -634,6 +634,13 @@
   background-position: center;
 }
 
+.icon-smart_phone {
+  background-image: url("../assets/smart_phone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 
 
 

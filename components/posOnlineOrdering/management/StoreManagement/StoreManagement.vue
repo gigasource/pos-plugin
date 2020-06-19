@@ -63,6 +63,9 @@
                 @open:deleteDeviceDialog="showDeleteDeviceDialog"
                 @view:settings="viewStoreSetting($event)"
                 @open:pairDeviceDialog="showPairDeviceDialog"
+                @approveGmsDevice="approveGmsDevice"
+                @open:renameGSmsDeviceDialog="openRenameGSmsDeviceDialog"
+                @open:deleteGSmsDeviceDialog="openDeleteGSmsDeviceDialog"
                 @updateStores="loadStores()"/>
           </template>
         </div>
@@ -95,6 +98,7 @@
     <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup" :groups="storeGroups"/>
     <dialog-new-store v-if="manageStorePerm && storeGroups && dialog.newStore" v-model="dialog.newStore" @submit="addStore($event)" :groups="storeGroups" :countries="countries"/>
     <dialog-delete-item v-if="settingsPerm && dialog.deleteDevice" v-model="dialog.deleteDevice" type="device" @confirm="deleteDevice"/>
+    <dialog-delete-item v-if="dialog.deleteGSmsDevice" v-model="dialog.deleteGSmsDevice" type="device" @confirm="deleteGSmsDevice"/>
     <dialog-pair-new-device v-if="selectedStore && dialog.pairNewDevice" v-model="dialog.pairNewDevice" :store="selectedStore"/>
     <dialog-pair-new-device-success v-if="selectedStore && dialog.pairNewDeviceSuccess" v-model="dialog.pairNewDeviceSuccess" :store="selectedStore"/>
     <dialog-feature-control
@@ -110,6 +114,11 @@
         :device="selectedDevice"
         @cancel="closeEditDeviceNameDialog"
         @save="updateDeviceName"/>
+    <dialog-edit-device-name
+        v-if="selectedGSmsDevice && dialog.editGSmsDeviceName"
+        v-model="dialog.editGSmsDeviceName"
+        :device="selectedGSmsDevice"
+        @save="renameGSmsDevice"/>
     <dialog-gen-html-code
         v-if="dialog.html"
         v-model="dialog.html"
@@ -118,7 +127,7 @@
 </template>
 <script>
   import supportedCountries from '../../../Store/supportedCountries';
-  
+
   export default {
     name: 'StoreManagement',
     props: {},
@@ -129,14 +138,17 @@
         selectedStore: null,
         deviceIdList: [],
         selectedDevice: null,
+        selectedGSmsDevice: null,
         dialog: {
           newGroup: false,
           newStore: false,
           deleteDevice: false,
+          deleteGSmsDevice: false,
           featureControl: false,
           pairNewDevice: false,
           pairNewDeviceSuccess: false,
           editDeviceName: false,
+          editGSmsDeviceName: false
         },
         countries: supportedCountries,
       }
@@ -149,7 +161,7 @@
       // stores
       'PosOnlineOrderManagementStore:(stores,loadStores,addStore,removeStore,updateStore,checkDeviceOnlineStatus)',
       // devices
-      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,updateDeviceFeatures,updateDeviceAppVersion,showMessage)',
+      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,removeGSmsDevice,updateGSmsDevice,updateDeviceFeatures,updateDeviceAppVersion,showMessage)',
       // app
       'PosOnlineOrderManagementStore:(apps,appItems)',
       // store management permissions
@@ -239,9 +251,35 @@
       closeEditDeviceNameDialog() {
         this.dialog.editDeviceName = false
       },
-      updateDeviceName(_id, name) {
-        this.updateDevice(_id, { name })
+      updateDeviceName(device, name) {
+        this.updateDevice(device._id, { name })
       },
+
+      // gsms devices
+      openRenameGSmsDeviceDialog(store, device) {
+        this.selectedGSmsDevice = Object.assign({
+          ...device,
+          storeId: store._id
+        })
+        this.dialog.editGSmsDeviceName = true
+      },
+      renameGSmsDevice(device, name) {
+        this.updateGSmsDevice(device.storeId, device._id, { name })
+      },
+      openDeleteGSmsDeviceDialog(store, device) {
+        this.selectedGSmsDevice = Object.assign({
+          ...device,
+          storeId: store._id
+        })
+        this.dialog.deleteGSmsDevice = true
+      },
+      deleteGSmsDevice() {
+        const device = this.selectedGSmsDevice
+        this.removeGSmsDevice(device.storeId, device._id)
+      },
+      approveGmsDevice(storeId, deviceId) {
+        this.updateGSmsDevice(storeId, deviceId, { registered: true })
+      }
     }
   }
 </script>

@@ -177,6 +177,8 @@
       await this.loadApps()
       await this.loadAppItems()
       await this.loadAccounts()
+
+      cms.socket.on('loadStore', () => this.loadStores())
     },
     mounted() {
       cms.socket.on('updateAppFeatureStatus', async (msg, error, device) => {
@@ -347,6 +349,28 @@
         socket.emit('updateAppFeature', _id, features, (message) => {
           cb && cb(message)
         })
+      },
+
+      async updateGSmsDevice(storeId, deviceId, change) {
+        change = _.reduce(change, (acc, value, key) => {
+          acc = {
+            ...acc,
+            [`gSms.devices.$.${key}`]: value
+          }
+          return acc
+        }, {})
+
+        await cms.getModel('Store').findOneAndUpdate({_id: storeId, 'gSms.devices._id': deviceId}, { $set: change })
+        await this.loadStores()
+      },
+
+      async removeGSmsDevice(storeId, deviceId) {
+        await cms.getModel('Store').findOneAndUpdate({ _id: storeId }, {
+          $pull: {
+            'gSms.devices': { _id: deviceId }
+          }
+        })
+        await this.loadStores()
       },
 
       async updateDeviceAppVersion(device) {

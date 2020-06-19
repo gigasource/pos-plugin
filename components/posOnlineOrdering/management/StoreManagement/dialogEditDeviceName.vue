@@ -34,7 +34,7 @@
     },
     methods: {
       save() {
-        this.$emit('save', this.device._id, this.internalName)
+        this.$emit('save', this.device, this.internalName)
         this.internalValue = false
       }
     }
@@ -49,13 +49,13 @@
     padding: 40px;
     display: flex;
     flex-direction: column;
-  
+
     &__title {
       font-size: 24px;
       font-weight: 600;
       margin-bottom: 28px;
     }
-  
+
     &__buttons {
       display: flex;
       align-self: flex-end;
