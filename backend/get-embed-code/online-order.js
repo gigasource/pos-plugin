@@ -17,9 +17,9 @@
     stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; bottom: 8px; right: 8px; z-index: 1000; width:' + buttonWidth + '}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
 
-    el.onclick = function (event) {
-      var isMobile = mobileCheck()
-      var url = event.target.getAttribute('data-url')
+    var url = el.getAttribute('data-url')
+
+    function openIframe () {
       window.location = '#'
 
       var existingIframe = document.getElementById('webshop-iframe-container');
@@ -105,6 +105,18 @@
         })
       }
     }
+
+    el.onclick = openIframe
+
+    var btns = document.getElementsByClassName('webshop-btn')
+    for(var i = 0; i < btns.length; i++) {
+      btns[i].onclick = openIframe
+    }
+
+    window.addEventListener('hashchange', function () {
+      var hash = window.location.href.split('#')[1]
+      if(hash === 'webshop-btn') openIframe()
+    })
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

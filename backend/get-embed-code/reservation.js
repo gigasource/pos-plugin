@@ -11,8 +11,9 @@
     stylesheet.insertRule('@media screen and (min-width: 410px) { #reservation-iframe { width: 410px !important; margin-left: calc(50% - 205px); } }')
     stylesheet.insertRule('@media screen and (max-width: 410px) { #iframe-close-btn { transform: scale(1.2) !important; right: 10px !important } }')
 
-    el.onclick = function (event) {
-      var url = event.target.getAttribute('data-url')
+    var url = el.getAttribute('data-url')
+
+    function openIframe() {
       window.location = '#'
 
       // insert overlay
@@ -85,6 +86,18 @@
         }
       })
     }
+
+    el.onclick = openIframe
+
+    var btns = document.getElementsByClassName('reservation-btn')
+    for(var i = 0; i < btns.length; i++) {
+      btns[i].onclick = openIframe
+    }
+
+    window.addEventListener('hashchange', function () {
+      var hash = window.location.href.split('#')[1]
+      if(hash === 'reservation-btn') openIframe()
+    })
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
