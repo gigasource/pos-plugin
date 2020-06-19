@@ -108,7 +108,7 @@ router.post('/new-store', async (req, res) => {
       }
     ],
     pickup: true,
-    delivery: true,
+    delivery: false,
     deliveryFee: {
       acceptOrderInOtherZipCodes: true,
       defaultFee: 0,
@@ -119,9 +119,9 @@ router.post('/new-store', async (req, res) => {
     orderTimeOut: 3,
     deliveryTimeInterval: 15,
     gSms: {
-      enabled: false,
+      enabled: true,
       timeToComplete: 30,
-      autoAccept: false,
+      autoAccept: true,
       devices: []
     }
   })
