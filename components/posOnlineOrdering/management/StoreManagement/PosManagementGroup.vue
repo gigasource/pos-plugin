@@ -689,7 +689,7 @@
 
         &--disabled {
           color: #201F2B;
-          opacity: 50%;
+          opacity: 0.2;
           padding: 8px 36px 8px 12px;
           white-space: nowrap;
           font-size: 14px;
