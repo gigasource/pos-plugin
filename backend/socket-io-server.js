@@ -503,7 +503,9 @@ module.exports = async function (cms) {
           }
 
           socket.join(orderData.orderToken);
-          return updateOrderStatus(orderData.orderToken, { storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen', responseMessage, total: orderData.totalPrice })
+          return updateOrderStatus(orderData.orderToken,
+            { storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
+              responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0) })
         }
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
         return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
