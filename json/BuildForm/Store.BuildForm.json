@@ -424,6 +424,11 @@
           "schemaType": "number",
           "key": "maxDay",
           "type": "input@number"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "emailConfirmation",
+          "type": "input@switch"
         }
       ]
     },
