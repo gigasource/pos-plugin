@@ -116,7 +116,7 @@ module.exports = async cms => {
     if (reservationJobs[reservation._id]) {
       reservationJobs[reservation._id].cancel()
       delete reservationJobs[reservation._id]
-      console.debug(`${getBaseSentryTags('Reservation')},reservation`, `Restaurant: cancelled scheduler job for reservation guest '${guestName}' (${reservationTime})`)
+      console.debug(`${getBaseSentryTags('reservation')},reservation`, `Restaurant: cancelled scheduler job for reservation guest '${guestName}' (${reservationTime})`)
     }
   }
 
@@ -128,9 +128,9 @@ module.exports = async cms => {
         await cms.getModel('Reservation').updateOne({_id: reservation._id}, res) // update db
       }
       delete reservationJobs[reservationId] // remove cached job
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${guestName} (${reservationTime})`)
-      cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+      console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${guestName} (${reservationTime})`)
+      cms.socket.emit('updateReservationList', getBaseSentryTags('reservation'))
+      console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
     }
 
     if (!reservation) return
@@ -159,7 +159,7 @@ module.exports = async cms => {
     if (reservationJobs[reservationId]) {
       const rescheduleSuccess = schedule.rescheduleJob(reservationJobs[reservationId], timeoutDateTime)
 
-      return console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
+      return console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`,
           rescheduleSuccess
               ? `Restaurant: Reschedule successful for guest '${guestName}' at ${timeoutDateTime}`
               : `Restaurant: Reschedule failed for guest '${guestName}' at ${timeoutDateTime}`
@@ -167,14 +167,14 @@ module.exports = async cms => {
     }
     // else start job
     reservationJobs[reservationId] = schedule.scheduleJob(timeoutDateTime, declineReservation)
-    console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`, `Restaurant: scheduled reservation decline for guest '${guestName}' (${reservationTime}) at ${timeoutDateTime}`)
+    console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`, `Restaurant: scheduled reservation decline for guest '${guestName}' (${reservationTime}) at ${timeoutDateTime}`)
   }
 
   async function initReservationSchedules() {
     // fetch all pending reservations
     let pendingReservations = await cms.getModel('Reservation').find({status: 'pending'}).lean()
     // start jobs
-    console.debug(getBaseSentryTags('Reservation'), `Restaurant: scheduling Reservation jobs on init`)
+    console.debug(getBaseSentryTags('reservation'), `Restaurant: scheduling Reservation jobs on init`)
     pendingReservations.forEach(res => {
       scheduleRemoveReservationJob(res)
     })
@@ -318,11 +318,11 @@ module.exports = async cms => {
     });
 
     socket.on('updateReservationSetting', async (reservationSetting, ackFn) => {
-      console.debug(getBaseSentryTags('ReservationSetting'),
+      console.debug(getBaseSentryTags('reservationSetting'),
           `1. Restaurant backend: received reservation setting:`, JSON.stringify(reservationSetting))
       await cms.getModel('PosSetting').findOneAndUpdate({}, {reservation: reservationSetting})
       cms.socket.emit('updateReservationList')
-      console.debug(getBaseSentryTags('ReservationSetting'),
+      console.debug(getBaseSentryTags('reservationSetting'),
           `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch reservation data`)
 
       typeof ackFn === 'function' && ackFn()
@@ -335,10 +335,10 @@ module.exports = async cms => {
     })
 
     socket.on('createReservation', async (reservationData, ackFn) => {
-      console.debug(getBaseSentryTags('Reservation'),
+      console.debug(getBaseSentryTags('reservation'),
           `1. Restaurant backend: received reservation:
         guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
-        customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
+        customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.customer.phone || 'no phone'};
         note:${reservationData.note}`)
 
       try {
@@ -348,8 +348,8 @@ module.exports = async cms => {
           date: dayjs(date, 'YYYY-MM-DD').hour(hour).minute(minute).toDate(),
           status: 'pending'
         }))
-        cms.socket.emit('updateReservationList', getBaseSentryTags('Reservation'))
-        console.debug(getBaseSentryTags('Reservation'),
+        cms.socket.emit('updateReservationList', getBaseSentryTags('reservation'))
+        console.debug(getBaseSentryTags('reservation'),
             `2. Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
         typeof ackFn === 'function' && ackFn()
 
@@ -693,7 +693,7 @@ module.exports = async cms => {
       // logs
       const guestName = reservation.customer.name;
       const reservationTime = dayjs(reservation.date).format('HH:mm')
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
+      console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`,
         `2. Restaurant backend: Reschedule requested for '${guestName}' (${reservationTime}), change: ${JSON.stringify(change)}`)
 
       // reschedule here
@@ -715,7 +715,7 @@ module.exports = async cms => {
       if (!reservation) return
       const guestName = reservation.customer.name;
       const reservationTime = dayjs(reservation.date).format('HH:mm')
-      console.debug(`${getBaseSentryTags('Reservation')},reservationId=${reservation._id}`,
+      console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`,
         `Restaurant backend: New schedule created for '${guestName}' (${reservationTime})`)
       await scheduleRemoveReservationJob(reservation)
     })
