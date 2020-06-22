@@ -19,8 +19,8 @@
   </g-dialog>
 </template>
 <script>
-  import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
-  
+  import openUploadFileDialog from '@gigasource/vue-file-explorer/api-handlers/openUploadFileDialog'
+
   export default {
     name: 'dialogImportMenuItem',
     props: {
@@ -76,7 +76,7 @@
           file: this.file,
           importBehavior: this.importBehavior
         }
-        
+
         const callback = (isCompleted, error) => {
           if (isCompleted) {
             this.close()
@@ -85,7 +85,7 @@
             console.dir(error)
           }
         }
-        
+
         this.$emit('submit', metadata, callback)
       }
     }
@@ -98,7 +98,7 @@
     width: 100%;
     position: relative;
     padding: 40px;
-  
+
     &__title {
       color: #212121;
       font-size: 24px;
@@ -106,9 +106,9 @@
       margin-bottom: 28px;
       margin-left: 4px;
     }
-    
+
     &__content {
-    
+
     }
   }
 </style>

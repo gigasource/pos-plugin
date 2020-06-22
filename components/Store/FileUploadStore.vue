@@ -6,9 +6,9 @@
   />
 </template>
 <script>
-  import createGridFsHandlers from 'vue-file-explorer/api-handlers/grid-fs'
-  import openUploadFileDialog from 'vue-file-explorer/api-handlers/openUploadFileDialog'
-  import FileUploadProgressDialog from 'vue-file-explorer/components/FileExplorerPanel/dialogs/FileUploadProgressDialog.vue'
+  import createGridFsHandlers from '@gigasource/vue-file-explorer/api-handlers/grid-fs'
+  import openUploadFileDialog from '@gigasource/vue-file-explorer/api-handlers/openUploadFileDialog'
+  import FileUploadProgressDialog from '@gigasource/vue-file-explorer/components/FileExplorerPanel/dialogs/FileUploadProgressDialog.vue'
 
   export default {
     name: 'FileUploadStore',
@@ -20,7 +20,7 @@
         apiBaseUrl: '/cms-files',
         imageThumbnailSize: {}
       })
-      
+
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
 
