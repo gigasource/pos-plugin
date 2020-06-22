@@ -555,7 +555,7 @@
       deliveryTimeList() {
         let list = []
         const today = new Date()
-        const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 15)
+        const {hour: baseHour, minute: baseMinute} = incrementTime(today.getHours(), today.getMinutes(), 30)
 
         if (this.storeOpenHours) {
           this.storeOpenHours.forEach(({openTime, closeTime, deliveryStart, deliveryEnd}) => {
