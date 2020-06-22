@@ -94,10 +94,13 @@
       btns[i].onclick = openIframe
     }
 
-    window.addEventListener('hashchange', function () {
-      var hash = window.location.href.split('#')[1]
-      if(hash === 'reservation-btn') openIframe()
-    })
+    btns = document.querySelectorAll('a[href="#reservation-btn"]')
+    for(var i = 0; i < btns.length; i++) {
+      btns[i].onclick = function (e) {
+        e.preventDefault()
+        openIframe()
+      }
+    }
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

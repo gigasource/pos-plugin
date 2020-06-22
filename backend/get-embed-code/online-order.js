@@ -107,16 +107,20 @@
     }
 
     el.onclick = openIframe
-
+    //get by class webshop-btn
     var btns = document.getElementsByClassName('webshop-btn')
     for(var i = 0; i < btns.length; i++) {
       btns[i].onclick = openIframe
     }
 
-    window.addEventListener('hashchange', function () {
-      var hash = window.location.href.split('#')[1]
-      if(hash === 'webshop-btn') openIframe()
-    })
+    //get by href #webshop-btn
+    btns = document.querySelectorAll('a[href="#webshop-btn"]')
+    for(var i = 0; i < btns.length; i++) {
+      btns[i].onclick = function (e) {
+        e.preventDefault()
+        openIframe()
+      }
+    }
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
