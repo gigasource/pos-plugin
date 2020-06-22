@@ -199,7 +199,7 @@
           if(key === 'reservationSetting' || key === 'openHours') {
             const setting = {...this.store.reservationSetting, openHours: this.store.openHours}
             cms.socket.emit('updateReservationSetting', this.store._id, setting)
-            console.debug(`sentry:reservationSetting,store=${this.store.name},alias=${this.store.alias}`,
+            console.debug(`sentry:eventType=reservationSetting,store=${this.store.name},alias=${this.store.alias}`,
             `1. Online Order frontend: sending reservation setting to backend`, JSON.stringify(setting))
           }
         }

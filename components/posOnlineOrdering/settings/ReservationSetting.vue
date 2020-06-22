@@ -6,6 +6,7 @@
         <g-switch class="mb-3" label="Active reservation" v-model="activeReservation"/>
         <g-switch class="mb-3" label="Incoming reservation notification sound" v-model="soundNotification"/>
         <g-switch class="mb-3" label="Hide empty time slots" v-model="hideEmpty"/>
+        <g-switch class="mb-3" label="Send confirmation email" v-model="emailConfirmation"/>
         <p class="fw-700 fs-small mt-3">Automatically remove overdue reservations after (min)</p>
         <g-grid-select :items="removeOverdueAfterList" v-model="removeOverdueAfter" mandatory :grid="false">
           <template #default="{item, toggleSelect}">
@@ -101,6 +102,15 @@
         },
         set(val) {
           this.$set(this.reservationSetting, 'hideEmpty', val)
+          this.updateReservationSetting()
+        }
+      },
+      emailConfirmation: {
+        get() {
+          return this.reservationSetting ? this.reservationSetting.emailConfirmation : false
+        },
+        set(val) {
+          this.$set(this.reservationSetting, 'emailConfirmation', val)
           this.updateReservationSetting()
         }
       },

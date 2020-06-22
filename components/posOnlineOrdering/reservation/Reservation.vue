@@ -3,7 +3,7 @@
     <div @click="close" class="abs" style="top: 10px; right: 10px; width: 20px; height: 20px; cursor: pointer; z-index: 10">
       <img src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
     </div>
-    
+
     <template v-if="mode === 'reservation'">
       <div class="reservation-header">
         <img v-if="image" alt :src="image" class="reservation-header__logo">
@@ -330,6 +330,8 @@
           time: this.time,
           customer: {
             name: `${this.customer.firstName} ${this.customer.lastName}`,
+            firstName: this.customer.firstName,
+            lastName: this.customer.lastName,
             email: this.customer.email,
             phone: this.customer.phone
           },
@@ -337,7 +339,7 @@
         }
 
         cms.socket.emit('createReservation', this.store._id, reservationData)
-        console.debug(`sentry:reservation,store=${this.store.name},alias=${this.store.alias}`,
+        console.debug(`sentry:eventType=reservation,store=${this.store.name},alias=${this.store.alias}`,
           `1. Online order frontend: received reservation:
           guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
           customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};

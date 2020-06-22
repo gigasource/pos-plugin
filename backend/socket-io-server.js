@@ -10,6 +10,7 @@ const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/back
 const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
+const nodemailer= require('nodemailer')
 
 const Schema = mongoose.Schema
 
@@ -67,6 +68,58 @@ function loadMessages(targetClientId) {
   return SocketIOSavedMessagesModel.find({targetClientId});
 }
 
+const mailTransporter = nodemailer.createTransport({
+  pool: true,
+  host: APP_CONFIG.mailConfig.host,
+  port: 465,
+  secure: true,
+  auth: {
+    user: APP_CONFIG.mailConfig.user,
+    pass: APP_CONFIG.mailConfig.pass
+  }
+})
+
+async function sendReservationConfirmationEmail(reservation, storeId) {
+  try {
+    const { customer: { email, firstName, lastName, phone }, noOfGuests, date, time, note } = reservation
+    const store = await cms.getModel('Store').findOne({ id: storeId })
+    if (!email) return
+
+    const storeName = store.name || store.settingName;
+
+    const reservationMailTemplate = `<h3>Hello ${lastName},</h3> 
+    <p>Thank you for making a reservation.</p>
+    <p>Your reservation is recorded as follows:</p>
+    <ul>
+      <li>No. of guests: ${noOfGuests}</li>
+      <li>Date: ${dayjs(date, 'YYYY-MM-DD').format('MMM DD YYYY')}</li>
+      <li>Time: ${time}</li>
+      <li>First name: ${firstName}</li>
+      <li>Last name: ${lastName}</li>
+      <li>Email: ${email}</li>
+      <li>Phone number: ${phone}</li>
+      <li>Note: ${note || ''}</li>
+    </ul>
+    <p>We look forward to your visit and hope we will be enjoying your meal experience at ${storeName} as much as we will be enjoying your company.</p>
+    <p>For more information, please do not hesitate to contact our number directly at ${store.phone}.</p>
+    <p>See you very soon,</p>
+    <p>${storeName} Team</p>`;
+
+    const message = {
+      from: 'no-reply@restaurant.live',
+      to: email,
+      subject: `Confirm reservation for ${storeName}`,
+      html: reservationMailTemplate
+    }
+
+    mailTransporter.sendMail(message, err => {
+      if (err) console.log(err)
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
@@ -105,13 +158,20 @@ module.exports = async function (cms) {
     }
   }
 
-  async function getDemoDeviceLastSeen(storeId, deviceId) {
+  async function setDemoDeviceLastSeen(storeId, deviceId) {
     await cms.getModel('Store').findOneAndUpdate({ id: storeId, 'gSms.devices._id': deviceId }, {
       $set: {
         'gSms.devices.$.lastSeen': new Date()
       }
     })
     cms.socket.emit('loadStore', storeId)
+  }
+
+  async function setDeviceLastSeen(deviceId) {
+    await cms.getModel('Device').updateOne({_id: deviceId}, {
+      $set: { lastSeen: new Date ()}
+    })
+    cms.socket.emit('loadStore')
   }
 
   const externalSocketIOServer = p2pServerPlugin(io, {
@@ -212,13 +272,14 @@ module.exports = async function (cms) {
       const clientId = socket.request._query.clientId;
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
           `1a. Client ${clientId} connected, socket id = ${socket.id}`);
-
+      setDeviceLastSeen(clientId)
       socket.emit('connection-established', socket.id);
 
       notifyDeviceStatusChanged(clientId);
       socket.once('disconnect', () => {
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
             `2a. Client ${clientId} disconnected, socket id = ${socket.id}`);
+        setDeviceLastSeen(clientId)
         if (global.APP_CONFIG.redis) {
           // delay a little to give time for updating client list on Redis
           setTimeout(() => notifyDeviceStatusChanged(clientId), 2000);
@@ -359,14 +420,14 @@ module.exports = async function (cms) {
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
         `Demo client ${clientId} connected, socket id = ${socket.id}`);
       const [storeId, deviceId] = clientId.split('_')
-      getDemoDeviceLastSeen(storeId, deviceId)
+      setDemoDeviceLastSeen(storeId, deviceId)
 
       socket.on('disconnect', () => {
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
           `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
 
         const [storeId, deviceId] = clientId.split('_')
-        getDemoDeviceLastSeen(storeId, deviceId)
+        setDemoDeviceLastSeen(storeId, deviceId)
       })
     }
   });
@@ -619,11 +680,15 @@ module.exports = async function (cms) {
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
-        console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
+        console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
           `2. Online order backend: sent reservation to device`)
       } else {
-        console.debug(`sentry:reservation,store=${store.name},alias=${store.alias}`,
+        console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
           `2. Online order backend: no device found, cancelled sending`)
+      }
+
+      if (store.reservationSetting.emailConfirmation) {
+        sendReservationConfirmationEmail(reservationData, store.id)
       }
     })
 
@@ -634,10 +699,10 @@ module.exports = async function (cms) {
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
-        console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
+        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
           `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
       } else {
-        console.debug(`sentry:reservationSetting,store=${store.name},alias=${store.alias}`
+        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
           `2. Online Order backend: no device found, cancelled sending`)
       }
     })
