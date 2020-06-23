@@ -66,7 +66,7 @@ router.post('/register', async (req, res) => {
   const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
   if (deviceInfo) {
     // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
-    await DeviceModel.updateOne({pairingCode}, { name: 'New Device', paired: true, hardware, appName, appVersion, release, features: {
+    await DeviceModel.updateOne({pairingCode}, { name: hardware || 'New Device', paired: true, hardware, appName, appVersion, release, features: {
         fastCheckout: false,
         manualTable: false,
         delivery: false,
