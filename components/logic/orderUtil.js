@@ -74,7 +74,8 @@ const orderUtil = {
     return items.map(i => Object.assign({}, i, {
       price: i.price.toFixed(2),
       originalPrice: i.originalPrice.toFixed(2),
-      ...i.vDiscount && { vDiscount: i.vDiscount.toFixed(2) }
+      ...i.vDiscount && { vDiscount: i.vDiscount.toFixed(2) },
+      id: i.id || ''
     }))
   },
   getItemPrice(item) {
