@@ -165,6 +165,12 @@
           "type": "input@switch"
         }
       ]
+    },
+    {
+      "_id": "5ef029185e9359a9fb59f51f",
+      "schemaType": "date",
+      "key": "lastSeen",
+      "type": "input@datetime-local"
     }
   ],
   "name": "Device",

@@ -25,7 +25,7 @@
           <div class="col-3"></div>
           <div class="row-flex col-9">
             <div class="col-2">Name</div>
-            <div class="col-2">Device</div>
+            <div class="col-2">Last seen</div>
             <div class="col-3">Current Version</div>
             <div class="col-4">Update</div>
             <div class="col-1">Action</div>

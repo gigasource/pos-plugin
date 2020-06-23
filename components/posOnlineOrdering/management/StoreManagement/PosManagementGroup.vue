@@ -80,7 +80,7 @@
                     </span>
                   </div>
                   <div class="col-2">
-                    {{device.hardware}}
+                    {{device.lastSeen | date}}
                   </div>
                   <div class="row-flex col-3">
                     {{ `${device.appVersion} (${device.appName}, ${device.appRelease})` }}
@@ -130,10 +130,13 @@
                   </div>
                 </div>
                 <div class="row-flex mb-1" v-for="device in store.gSms.devices" :key="`demoDevice_${device._id}`">
-                  <div class="row-flex col-11 align-items-center">
+                  <div class="row-flex col-2 align-items-center">
                     <g-icon style="min-width: 24px">icon-smart_phone</g-icon>
                     <span class="ml-1">{{device.name}}</span>
                     <g-icon class="text-green" v-if="device.registered">done</g-icon>
+                  </div>
+                  <div class="row-flex col-9 align-items-center">
+                    {{device.lastSeen | date}}
                   </div>
                   <div class="col-1 row-flex align-items-center">
                     <g-menu v-model="device.menu" close-on-content-click nudge-bottom="5">
@@ -273,6 +276,10 @@
       currency(val, locale = 'en') {
         return `${$t('common.currency', locale)} ${!isNaN(val) && val > 0 ? val.toFixed(2): 0}`
       },
+      date(val) {
+        if (!val) return ''
+        return dayjs(val).format('DD/MM/YYYY - HH:mm')
+      }
     },
     data() {
       return {
