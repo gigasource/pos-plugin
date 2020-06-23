@@ -1,11 +1,11 @@
 <template>
   <div class="service-setting">
-    <div class="service-setting__title">Service & Open hours</div>
+    <div class="service-setting__title">{{$t('setting.serviceOpenHours')}}</div>
     <div class="service-setting__content mb-2">
       <div style="display: flex">
-        <div class="mb-3 fw-700">Open hours & Delivery hours</div>
+        <div class="mb-3 fw-700">{{$t('setting.openDeliveryHour')}}</div>
         <g-spacer/>
-        <g-btn-bs class="btn-add" @click="addNewOpenHour()">+ Add new</g-btn-bs>
+        <g-btn-bs class="btn-add" @click="addNewOpenHour()">+ {{$t('setting.addNewHour')}}</g-btn-bs>
       </div>
       <div v-for="(openHour, index) in openHoursData" :key="index"
            class="open-hour__row">
@@ -49,17 +49,17 @@
       <div class="row-flex">
         <p>Note: Delivery hours must be within open hours.</p>
         <g-spacer/>
-        <g-btn-bs width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
-               :disabled="hasError || openHoursJson === lastSavedData">Save
+        <g-btn-bs min-width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
+               :disabled="hasError || openHoursJson === lastSavedData">{{$t('setting.save')}}
         </g-btn-bs>
       </div>
     </div>
     <div class="row-flex">
-      <div class="service-setting__content flex-grow-1 mr-2">
+      <div class="service-setting__content col-5 mr-2">
         <div class="mb-3 fw-700">Service</div>
         <div class="row-flex">
-          <g-switch color="#536DFE" class="col-6" label="Delivery" v-model="computedDelivery"/>
-          <g-switch color="#536DFE" class="col-6" label="Allow pick-up" v-model="computedPickup"/>
+          <g-switch color="#536DFE" class="col-6" :label="$t('setting.delivery')" v-model="computedDelivery"/>
+          <g-switch color="#536DFE" class="col-6" :label="$t('setting.pickup')" v-model="computedPickup"/>
         </div>
         <div class="fw-700 mt-2">Note for customers</div>
         <div>
@@ -71,7 +71,7 @@
         </div>
         <div class="row-flex align-items-center">
           <div class="col-lg-8 col-md-7 col-xs-6 pr-1">
-            <g-switch color="#536DFE" :label="`Require minimum value ${$t('common.currency', storeCountryLocale)} for delivery orders`"
+            <g-switch color="#536DFE" :label="$t('setting.requireMinimumOrder', {0: $t('common.currency', storeCountryLocale)})"
                       @change="toggleMinimumOrderValue" :input-value="computedMinimumOrderValue.active"/>
           </div>
           <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
@@ -83,7 +83,7 @@
           </div>
         </div>
         <div class="row-flex align-items-center">
-          <div class="col-lg-8 col-md-7 col-xs-6">Order timeout</div>
+          <div class="col-lg-8 col-md-7 col-xs-6">{{$t('setting.orderTimeout')}}</div>
           <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
             <g-select text-field-component="GTextFieldBs" v-model="computedOrderTimeOut"
                       :items="orderTimeOuts"/>
@@ -98,7 +98,7 @@
           <g-chip v-for="(day, i) in dayOff" :key="`day-off_${i}`" label close close-icon="icon-close@16" @close="deleteDayOff(day)">{{getDayOffLabel(day)}}</g-chip>
         </div>
       </div>
-      <div class="service-setting__content">
+      <div class="service-setting__content col-7">
         <div class="mb-3 fw-700">G-SMS Settings</div>
         <div class="row-flex">
           <g-switch color="#536DFE" class="col-6" label="Enabled" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
@@ -228,7 +228,7 @@
     },
     data: function () {
       return {
-        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        days: [this.$t('common.weekday.monday'), this.$t('common.weekday.tuesday'), this.$t('common.weekday.wednesday'), this.$t('common.weekday.thursday'), this.$t('common.weekday.friday'), this.$t('common.weekday.saturday'), this.$t('common.weekday.sunday')],
         orderTimeOuts: _.map([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], v => ({ value: v, text: `${v} minutes` })),
         errors: [],
         timeout: this.orderTimeOut || '',

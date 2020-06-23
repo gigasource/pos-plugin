@@ -641,6 +641,21 @@
   background-position: center;
 }
 
+.icon-english {
+  background-image: url("../assets/english.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
+.icon-germany {
+  background-image: url("../assets/germany.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 
 
 

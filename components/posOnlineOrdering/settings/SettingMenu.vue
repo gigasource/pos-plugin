@@ -15,8 +15,8 @@
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
         <div class="row-flex justify-end mb-2">
           <g-spacer/>
-          <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">Preview</g-btn-bs>
-          <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">Settings</g-btn-bs>
+          <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">{{$t('setting.preview')}}</g-btn-bs>
+          <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">{{$t('setting.setting')}}</g-btn-bs>
           <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="openImportMenuItemDialog">
             Import
@@ -27,7 +27,7 @@
           </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
-            Add new category
+            Add {{$t('setting.newCategory')}}
           </g-btn-bs>
         </div>
         <div class="menu-setting__category" id="menu-setting">
@@ -54,7 +54,7 @@
                   @click.stop.prevent="showAddNewProductPanelForCategory(cate)"
                   :disabled="showAddNewProductPanel[cate._id]"
                   style="white-space: nowrap">
-                + Add New Item
+                + Add {{$t('setting.newItem')}}
               </g-btn-bs>
               <template v-if="!isInDevice">
                 <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2">

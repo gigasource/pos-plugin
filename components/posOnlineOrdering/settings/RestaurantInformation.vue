@@ -1,52 +1,52 @@
 <template>
   <div class="restaurant-info">
-    <div class="restaurant-info__title">Store Information</div>
+    <div class="restaurant-info__title">{{$t('setting.storeInfo')}}</div>
     <div class="restaurant-info__main" v-if="store">
       <div class="restaurant-info__main--left">
         <div>
-          <div class="mb-3 fw-700">Basic info</div>
+          <div class="mb-3 fw-700">{{$t('setting.basicInfo')}}</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto; grid-gap: 5px">
-            <g-text-field-bs large label="Store Name"
-                             placeholder="Store Name"
+            <g-text-field-bs large :label="$t('setting.storeName')"
+                             :placeholder="$t('setting.storeName')"
                              :value="store.name"
                              @input="updateDebounce({ name: $event })"/>
-            <g-text-field-bs large label="Store Phone"
-                             placeholder="Store Phone"
+            <g-text-field-bs large :label="$t('setting.storePhone')"
+                             :placeholder="$t('setting.storePhone')"
                              :value="store.phone"
                              @input="updateDebounce({ phone: $event })"/>
             <div class="span-2">
-              <p>Store Address</p>
+              <p>{{$t('setting.storeAddress')}}</p>
               <g-textarea outlined no-resize placeholder="Address..."
                           :rows="3"
                           :value="store.address"
                           @input="updateDebounce({ address: $event })"/>
             </div>
-            <g-text-field-bs large label="Zip code"
+            <g-text-field-bs large :label="$t('setting.zipCode')"
                              :value="store.zipCode"
                              :hint="coords"
                              @input="updateDebounce({zipCode: $event.trim()})"/>
-            <g-text-field-bs large label="Town/City"
+            <g-text-field-bs large :label="$t('setting.town')"
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
             <div class="span-2">
-              <g-text-field-bs large :value="store.country.name" label="Country" readonly/>
+              <g-text-field-bs large :value="store.country.name" :label="$t('setting.country')" readonly/>
             </div>
           </div>
         </div>
         <div class="mt-3">
-          <div class="mb-3 fw-700">Embed Code</div>
+          <div class="mb-3 fw-700">{{$t('setting.embedCode')}}</div>
           <div class="row-flex align-items-center">
             <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
               Generate code to embed online ordering to your website
             </div>
             <g-spacer/>
-            <g-btn-bs width="100" style="margin: 0 4px" @click="openDialogGenerate" background-color="#536DFE" text-color="white">Generate</g-btn-bs>
+            <g-btn-bs width="100" style="margin: 0 4px" @click="openDialogGenerate" background-color="#536DFE" text-color="white">{{$t('setting.generate')}}</g-btn-bs>
           </div>
           <template v-if="iframe">
             <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" rows="3" no-resize :value="iframe"></g-textarea>
             <div class="row-flex align-items-center" style="cursor: pointer">
               <g-icon size="14" color="#536DFE" class="mr-1 mb-1">icon-chain-blue</g-icon>
-              <span style="color: #536DFE; cursor: pointer" @click.stop="copyCode">Copy Code</span>
+              <span style="color: #536DFE; cursor: pointer" @click.stop="copyCode">{{$t('setting.copyCode')}}</span>
               <g-spacer/>
             </div>
           </template>
@@ -54,19 +54,19 @@
       </div>
       <div class="restaurant-info__main--right">
         <div>
-          <div class="mb-3 fw-700">Upload photo</div>
+          <div class="mb-3 fw-700">{{$t('setting.uploadPhoto')}}</div>
           <div class="mb-5">
-            <div class="mb-2">Store Photo</div>
+            <div class="mb-2">{{$t('setting.storePhoto')}}</div>
             <upload-zone :url="store.orderHeaderImageSrc" @url="update({ orderHeaderImageSrc: $event })" :option="{maxWidth: 500, maxHeight: 500}" :aspect-ratio="2"/>
           </div>
           <div>
-            <div class="mb-2">Store Logo</div>
+            <div class="mb-2">{{$t('setting.storeLogo')}}</div>
             <upload-zone :url="store.logoImageSrc" @url="update({ logoImageSrc: $event })" :option="{maxHeight: 500, maxWidth: 500}"/>
           </div>
         </div>
         <template>
           <div v-if="!store.faviconImageSrc">
-            <div class="mb-2 fw-700">Upload Favicon</div>
+            <div class="mb-2 fw-700">{{$t('setting.uploadFavicon')}}</div>
             <div class="row-flex align-items-center">
               <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
                 Upload an icon for your online ordering website
@@ -76,9 +76,9 @@
           </div>
           <div v-else class="row-flex align-items-center">
             <div class="mr-2">
-              <div class="mb-2 fw-700">Upload Favicon</div>
+              <div class="mb-2 fw-700">{{$t('setting.uploadFavicon')}}</div>
               <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
-                Choose a favicon image to be displayed
+                {{$t('setting.faviconMessage')}}
               </div>
             </div>
             <div class="favicon">
