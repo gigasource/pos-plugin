@@ -22,6 +22,7 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
 
 RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gradle/bin:/opt/kotlinc/bin:/opt/android-sdk/cmdline-tools/tools/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator && \
     GIGASOURCE_ACCESS_TOKEN=$(cat ./gigasource-access-token) && \
+    git pull && \
     cd cms && \
     git pull && \
     cd ../backoffice && \
