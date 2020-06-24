@@ -1,5 +1,9 @@
 <template>
-  <fragment/>
+  <div>
+    <dialog-pay-pal-transaction-capture-failed
+        v-model="storeDialog.paypalTransactionCaptureFailed.show"
+        :error="storeDialog.paypalTransactionCaptureFailed.error"/>
+  </div>
 </template>
 
 <script>
@@ -37,7 +41,7 @@
         onlineOrders: [],
         // reservations
         reservations: [],
-        dialog: {
+        storeDialog: {
           paypalTransactionCaptureFailed: {
             show: false,
             error: null
@@ -603,14 +607,13 @@
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           window.cms.socket.emit('updateOrderStatus', orderStatus, ({result, error}) => {
             if (error || result !== "COMPLETED") {
-              let errMsg = "PayPal transaction was not captured. Please login to your PayPal account to accept customer's payment manually."
+              let errMsg;
               if (error)
-                errMsg = `${errMsg} Error: ${error}`
+                errMsg = error
               else
-                errMsg = `${errMsg} Capture status: ${result}`
-              debugger
-              this.dialog.paypalTransactionCaptureFailed.show = true
-              this.dialog.paypalTransactionCaptureFailed.error = errMsg
+                errMsg = `Capture status: ${result}`
+              this.storeDialog.paypalTransactionCaptureFailed.show = true
+              this.storeDialog.paypalTransactionCaptureFailed.error = errMsg
             }
           })
         } catch (e) {
