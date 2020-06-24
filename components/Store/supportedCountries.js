@@ -5,7 +5,7 @@ export default [
   {name: 'United Kingdom', locale: 'en-GB'},
   // {name: 'Australia', locale: 'en'},
   // {name: 'Canada', locale: 'en'},
-  // {name: 'France', locale: 'fr'},
+  {name: 'France', locale: 'fr-FR'},
   // {name: 'Italy', locale: 'it'},
   // {name: 'Singapore', locale: 'en'},
 ]

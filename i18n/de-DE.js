@@ -54,7 +54,7 @@ module.exports = {
       openHours: 'Öffnungszeiten',
       merchantClose: 'Das Restaurant ist vorübergehend geschlossen',
       merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
-      merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.',
+      merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.',
       minimumOrder: 'Mindestbestellwert',
       deliveryFee: 'Liefergebühr',
       notice: 'Notice',

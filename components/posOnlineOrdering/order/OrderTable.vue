@@ -474,7 +474,7 @@
         const rules = []
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
-          rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
+          rules.push((val) => val.length < 5 || zipCodes.includes(val) || this.$t('store.unavaibleArea'))
         }
         return rules
       },

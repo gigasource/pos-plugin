@@ -147,6 +147,12 @@ module.exports = {
         type: 'i18n'
       },
       path: 'i18n/en-GB.js'
+    },
+    {
+      loader: {
+        type: 'i18n'
+      },
+      path: 'i18n/fr-FR.js'
     }
   ]
 };
