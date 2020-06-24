@@ -382,7 +382,10 @@ module.exports = async function (cms) {
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
         if (status === 'completed') {
-          console.debug('sentry:eventType=orderStatus,status=completed')
+          // do nothing with completed
+          // now paypal submit will be execute when order status === 'kitchen'
+          return
+        } else if (status === 'kitchen') {
           if (paypalOrderDetail) {
             const store = await cms.getModel('Store').findOne({alias: storeAlias})
             if (!store || !store.paymentProviders || !store.paymentProviders.paypal) {
@@ -403,9 +406,9 @@ module.exports = async function (cms) {
               console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
             }
           }
-        } else {
-          updateOrderStatus(onlineOrderId, orderStatus)
         }
+
+        updateOrderStatus(onlineOrderId, orderStatus)
       })
 
       socket.on('updateVersion', async (appVersion, _id) => {
