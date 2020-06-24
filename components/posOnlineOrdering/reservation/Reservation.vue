@@ -520,6 +520,7 @@
             &__value {
               order: 2;
               flex: 0 0 auto;
+              pointer-events: none;
 
               button {
                 padding: 0;
@@ -527,6 +528,7 @@
                 line-height: 19px;
                 color: #212B36;
                 font-family: Muli, sans-serif;
+                pointer-events: none;
               }
             }
 
