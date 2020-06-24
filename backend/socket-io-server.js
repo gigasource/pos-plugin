@@ -168,10 +168,12 @@ module.exports = async function (cms) {
   }
 
   async function setDeviceLastSeen(deviceId) {
+    const lastSeen = new Date();
+
     await cms.getModel('Device').updateOne({_id: deviceId}, {
-      $set: { lastSeen: new Date ()}
-    })
-    cms.socket.emit('loadStore')
+      $set: { lastSeen }
+    });
+    cms.socket.emit('updateDeviceLastSeen', deviceId, lastSeen);
   }
 
   const externalSocketIOServer = p2pServerPlugin(io, {
