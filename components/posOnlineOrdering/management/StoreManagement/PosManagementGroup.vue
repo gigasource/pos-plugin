@@ -256,6 +256,8 @@
   import DialogPairNewDeviceSuccess from './dialogPairNewDeviceSuccess';
   import DialogEditDeviceName from './dialogEditDeviceName';
   import DialogGenHtmlCode from './dialogGenHtmlCode';
+  import relativeTime from 'dayjs/plugin/relativeTime'
+  dayjs.extend(relativeTime)
 
   export default {
     name: "PosManagementGroup",
@@ -278,7 +280,7 @@
       },
       date(val) {
         if (!val) return ''
-        return dayjs(val).format('DD/MM/YYYY - HH:mm')
+        return dayjs(val).fromNow()
       }
     },
     data() {
