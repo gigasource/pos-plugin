@@ -165,8 +165,7 @@
     </div>
     <dialog-complete-order ref="dialog" v-model="showDialog"
                            @completeOrder="completeOrder"
-                           @declineOrder="declineOrder"
-    ></dialog-complete-order>
+                           @declineOrder="declineOrder"/>
     <dialog-text-filter v-model="dialog.reason" label="Reason" :default-value="dialog.order.declineReason" @submit="submitReason"/>
   </div>
 </template>
@@ -179,7 +178,7 @@
 
   export default {
     name: 'OnlineOrderMain',
-    components: {DialogTextFilter, DialogCompleteOrder, ValuePicker },
+    components: { DialogTextFilter, DialogCompleteOrder, ValuePicker },
     injectService: ['PosStore:storeLocale'],
     props: {
       pendingOrders: Array,

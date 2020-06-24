@@ -1,5 +1,9 @@
 <template>
-  <fragment/>
+  <div>
+    <dialog-pay-pal-transaction-capture-failed
+        v-model="storeDialog.paypalTransactionCaptureFailed.show"
+        :error="storeDialog.paypalTransactionCaptureFailed.error"/>
+  </div>
 </template>
 
 <script>
@@ -36,7 +40,13 @@
         kitchenOrders: [],
         onlineOrders: [],
         // reservations
-        reservations: []
+        reservations: [],
+        storeDialog: {
+          paypalTransactionCaptureFailed: {
+            show: false,
+            error: null
+          }
+        }
       }
     },
     computed: {
@@ -595,7 +605,17 @@
           const clientId = await this.getOnlineOrderDeviceId();
           console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-          window.cms.socket.emit('updateOrderStatus', orderStatus)
+          window.cms.socket.emit('updateOrderStatus', orderStatus, ({result, error}) => {
+            if (error || result !== "COMPLETED") {
+              let errMsg;
+              if (error)
+                errMsg = error
+              else
+                errMsg = `Capture status: ${result}`
+              this.storeDialog.paypalTransactionCaptureFailed.show = true
+              this.storeDialog.paypalTransactionCaptureFailed.error = errMsg
+            }
+          })
         } catch (e) {
           console.error(e)
         }
