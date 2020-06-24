@@ -474,7 +474,7 @@
         const rules = []
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
-          rules.push((val) => val.length < 5 || zipCodes.includes(val) || 'Shipping service is not available to your zip code!')
+          rules.push((val) => val.length < 5 || zipCodes.includes(val) || this.$t('store.unavaibleArea'))
         }
         return rules
       },
@@ -757,9 +757,11 @@
 
         const {note, ...customer} = this.customer;
 
+        // set default id to "" to prevent print undefined in receipt
         let products = _.map(this.orderItems, orderItem => {
           return {
             ..._.omit(orderItem, ['_id', 'category', 'groupPrinters']),
+            id: orderItem.id || "",
             groupPrinter: orderItem.groupPrinters[0],
             groupPrinter2: this.store.useMultiplePrinters && orderItem.groupPrinters.length >= 2 && orderItem.groupPrinters[1],
             category: orderItem.category.name,

@@ -1,15 +1,15 @@
 <template>
   <div class="delivery-fee">
-    <div class="delivery-fee__title">Delivery Fee</div>
+    <div class="delivery-fee__title">{{$t('setting.deliveryFee')}}</div>
     <div class="delivery-fee__content">
       <g-radio-group name="type" v-model="type" row>
-        <g-radio small color="#536DFE" label="Zip code" value="zipCode" :class="[type === 'zipCode' && 'selected']"/>
+        <g-radio small color="#536DFE" :label="$t('setting.zipCode')" value="zipCode" :class="[type === 'zipCode' && 'selected']"/>
         <g-radio small color="#536DFE" label="Distance" value="distance" :class="[type === 'distance' && 'selected']"/>
       </g-radio-group>
       <g-divider class="my-3" color="#efefef"/>
       <template v-if="type === 'zipCode'">
         <div class="delivery-fee__content-header">
-          <div class="col-9">Zip code</div>
+          <div class="col-9">{{$t('setting.zipCode')}}</div>
           <div class="col-3">Fee ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
