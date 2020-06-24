@@ -3,7 +3,7 @@
     <div class="dialog">
       <div class="dialog-title">Extra information</div>
       <div class="dialog-content">
-        <g-checkbox color="#536DFE" v-model="allergic" label="Allergic"/>
+        <g-checkbox color="#536DFE" v-model="allergic" :label="$t('store.allergic')"/>
         <div :class="['allergic-table', !allergic && 'disabled']">
           <g-checkbox color="#536DFE" v-model="types" :label="$t('store.eggs')" value="eggs"/>
           <g-checkbox color="#536DFE" v-model="types" :label="$t('store.fish')" value="fish"/>
@@ -20,12 +20,12 @@
           <g-checkbox color="#536DFE" v-model="types" :label="$t('store.soya')" value="soya"/>
           <g-checkbox color="#536DFE" v-model="types" :label="$t('store.sulphur')" value="sulphur"/>
         </div>
-        <g-checkbox color="#536DFE" v-model="spicy" label="Spicy"/>
-        <g-checkbox color="#536DFE" v-model="vegeterian" label="Vegeterian"/>
+        <g-checkbox color="#536DFE" v-model="spicy" :label="$t('store.spicy')"/>
+        <g-checkbox color="#536DFE" v-model="vegeterian" :label="$t('store.vegeterian')"/>
       </div>
       <div class="dialog-action">
-        <g-btn-bs text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
-        <g-btn-bs text-color="white" background-color="#536DFE" width="80" @click="submit">Save</g-btn-bs>
+        <g-btn-bs text-color="#424242" @click="internalValue = false">{{$t('setting.cancel')}}</g-btn-bs>
+        <g-btn-bs text-color="white" background-color="#536DFE" min-width="80" @click="submit">{{$t('setting.save')}}</g-btn-bs>
       </div>
     </div>
   </g-dialog>

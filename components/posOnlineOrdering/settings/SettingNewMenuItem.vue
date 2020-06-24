@@ -79,15 +79,15 @@
            @mouseenter="toggleBtn(i)"
            @mouseleave="toggleBtn(i)">
         <!-- header -->
-        <div class="ml-1">Type</div>
+        <div class="ml-1">{{$t('setting.type')}}</div>
         <div class="ml-1">Select</div>
-        <div class="ml-1">Choice</div>
+        <div class="ml-1">{{$t('setting.choice')}}</div>
         <div class="row-flex justify-between ml-1">
           <div>Option</div>
           <g-btn-bs text-color="#536DFE" @click="addOption(i)">+ Add</g-btn-bs>
         </div>
         <!-- value -->
-        <g-checkbox v-model="choice.mandatory" color="#536DFE" label="Mandatory" @change="choice.mandatory = $event"/>
+        <g-checkbox v-model="choice.mandatory" color="#536DFE" :label="$t('setting.mandatory')" @change="choice.mandatory = $event"/>
         <div>
           <g-radio-group v-model="choice.select" row>
             <g-radio small color="#536DFE" value="one" label="One"/>
@@ -124,11 +124,11 @@
     </div>
     <!-- Action button -->
     <div style="display: flex; padding: 13px 8px; background-color: #FFF">
-      <g-btn-bs @click="addChoice" border-color="#5E76FE">+ Choice</g-btn-bs>
+      <g-btn-bs @click="addChoice" border-color="#5E76FE">+ {{$t('setting.choice')}}</g-btn-bs>
       <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE" icon="check@20">Extra info</g-btn-bs>
       <g-spacer/>
-      <g-btn-bs @click="$emit('cancel')">Cancel</g-btn-bs>
-      <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">Save</g-btn-bs>
+      <g-btn-bs @click="$emit('cancel')">{{$t('setting.cancel')}}</g-btn-bs>
+      <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">{{$t('setting.save')}}</g-btn-bs>
     </div>
 
     <!-- Dialog -->

@@ -5,7 +5,16 @@
     </template>
     <template v-else>
       <!-- sidebar -->
-      <pos-dashboard-sidebar :default-path="defaultPath" :items="computedSidebar" @node-selected="onNodeSelected"/>
+      <pos-dashboard-sidebar :default-path="defaultPath" :items="computedSidebar" @node-selected="onNodeSelected">
+        <template v-slot:footer>
+          <div class="row-flex align-items-center w-100 py-2">
+            <g-btn-bs icon="icon-logout" @click.stop="logout">Log out</g-btn-bs>
+            <g-spacer/>
+            <g-icon title="German" size="32" style="cursor: pointer; margin-right: 8px" @click.stop="changeLanguage('de-DE')">icon-germany</g-icon>
+            <g-icon title="English" size="32" style="cursor: pointer; margin-right: 8px" @click.stop="changeLanguage('en')">icon-english</g-icon>
+          </div>
+        </template>
+      </pos-dashboard-sidebar>
 
       <!-- content -->
       <div class="setting-view__content">
@@ -80,38 +89,11 @@
     name: 'SettingView',
     components: {ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
     data: function () {
+      const i18n = this.$i18n;
+      let { setting } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+
       return {
-        sidebarItems: [
-          {title: 'Basics', icon: 'airplay', onClick: () => this.changeView('restaurant-info')},
-          {
-            title: 'Service & Open hours',
-            icon: 'mdi-file-document-outline',
-            onClick: () => this.changeView('service-and-open-hours')
-          },
-          {title: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
-          {title: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
-          {title: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
-          {title: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
-          {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
-          cms.loginUser.user.role.name === "admin" && {
-            title: 'Payment Setting',
-            icon: 'icon-coupon',
-            onClick: () => this.changeView('payment-provider', 'Payment Setting'),
-            items: [
-              {title: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
-            ]
-          },
-        ],
-        sidebarItemsDevice: [
-          {
-            title: 'Service & Open hours',
-            icon: 'mdi-file-document-outline',
-            onClick: () => this.changeView('service-and-open-hours')
-          },
-          {title: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
-          {title: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
-          {title: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
-        ],
+        setting,
         view: '',
         sidebar: '',
         defaultPath: '',
@@ -127,6 +109,48 @@
     computed: {
       storeCountryLocale() {
         return (this.store && this.store.country && this.store.country.locale) || 'en'
+      },
+      sidebarItems() {
+        if(this.setting)
+          return [
+            {title: this.setting.basic, key: 'Basic', icon: 'airplay', onClick: () => this.changeView('restaurant-info')},
+            {
+              title: this.setting.serviceOpenHours,
+              key: 'Service',
+              icon: 'mdi-file-document-outline',
+              onClick: () => this.changeView('service-and-open-hours')
+            },
+            {title: this.setting.reservation, key: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
+            {title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
+            {title: this.setting.deliveryFee, key: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
+            {title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
+            {title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+            cms.loginUser.user.role.name === "admin" && {
+              title: 'Payment Setting',
+              icon: 'icon-coupon',
+              key: 'Payment Setting',
+              onClick: () => this.changeView('payment-provider', 'Payment Setting'),
+              items: [
+                {title: 'Transaction', key: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
+              ]
+            },
+          ]
+        return []
+      },
+      sidebarItemsDevice() {
+        if(this.setting)
+          return [
+              {
+                title: this.setting.serviceOpenHours,
+                key: 'Service',
+                icon: 'mdi-file-document-outline',
+                onClick: () => this.changeView('service-and-open-hours')
+              },
+              {title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
+              {title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
+              {title: this.setting.reservation, key: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
+          ]
+        return []
       },
       computedSidebar() {
         return this.$route.query.device ? this.sidebarItemsDevice : this.sidebarItems
@@ -164,6 +188,7 @@
         try {
           // change locale depend on store setting
           root.$i18n.locale = this.store.country.locale || 'en'
+          this.setting = root.$i18n.messages[this.store.country.locale].setting || root.$i18n.messages['en'].setting
         } catch (e) {
         }
       }
@@ -207,7 +232,7 @@
       async updateDeliveryTimeInterval(val) {
         await this.updateStore({deliveryTimeInterval: val})
       },
-      changeView(view, title) {
+      changeView(view, key) {
         if (view) {
           this.view = view
           //reset icon
@@ -217,8 +242,8 @@
             }
           }
         }
-        if (title) {
-          let item = this.computedSidebar.find(i => i.title === title)
+        if (key) {
+          let item = this.computedSidebar.find(i => i.key === key)
           // TODO: Known-issue: 2nd level won't highlighted
           if (item)
             this.$set(item, 'icon', item.icon+'_white')
@@ -387,6 +412,13 @@
       async reloadCategoriesAndProducts(){
         await this.loadCategories()
         await this.loadProducts()
+      },
+      logout() {
+        this.$getService('PosStore').logout()
+      },
+      changeLanguage(locale) {
+        root.$i18n.locale = locale
+        this.setting = root.$i18n.messages[locale].setting
       }
     }
   }
