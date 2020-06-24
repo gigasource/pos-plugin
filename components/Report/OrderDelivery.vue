@@ -66,7 +66,7 @@
     </div>
     <div class="bold" style="font-size: 30px; margin-top: 20px">
       <span>{{locale.printing.total}}</span>
-      <span class="float-right">{{storeLocale.printing.currency}} {{orderSum | convertMoney}}</span>
+      <span class="float-right">{{locale.printing.currency}} {{orderSum | convertMoney}}</span>
     </div>
     <div class="bold" style="font-size: 30px">
       <span>Payment</span>
@@ -96,7 +96,6 @@
       orderSum: Number,
       deliveryTime: String,
       locale: null,
-      storeLocale: null,
       type: String,
       discounts: Array,
       shippingFee: Number,

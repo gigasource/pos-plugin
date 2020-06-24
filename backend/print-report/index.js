@@ -2,6 +2,17 @@ const _ = require('lodash');
 const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils');
 
 module.exports = async function (cms) {
+  async function getLocale() {
+    // store locale
+    let locale = 'en'
+    const posSettings = await cms.getModel('PosSetting').findOne()
+    if (posSettings) {
+      if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) locale = posSettings.onlineDevice.store.locale
+    }
+    const localeFilePath = `../../i18n/${locale}.js`
+    return require(localeFilePath)[locale] || require(`../../i18n/en.js`).en
+  }
+
   cms.socket.on('connect', socket => {
     socket.on('printReport', async (reportType, reportData, device, callback) => {
       let report;
@@ -41,7 +52,8 @@ module.exports = async function (cms) {
       }
 
       try {
-        const printData = await report.makePrintData(cms, reportData);
+        const locale = await getLocale()
+        const printData = await report.makePrintData(cms, reportData, locale);
         const groupPrinters = await getGroupPrinterInfo(cms, device, type);
         const printers = _.flatten(groupPrinters.map(group => ({
           ...group.printers,

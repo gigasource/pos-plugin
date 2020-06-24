@@ -10,7 +10,7 @@
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
-    injectService: ['PosStore:(user, timeFormat, dateFormat, device)'],
+    injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {
         activeTableProduct: null,
@@ -586,7 +586,7 @@
           this.printOnlineOrderKitchen(order._id)
           this.printOnlineOrderReport(order._id)
           await this.updateOnlineOrders()
-          const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', {
+          const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
           const orderStatus = {
