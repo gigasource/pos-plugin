@@ -375,19 +375,22 @@ module.exports = async function (cms) {
         }
       })
 
-      // TODO: analysis side fx
-      socket.on('updateOrderStatus', async (orderStatus) => {
+      socket.on('updateOrderStatus', async (orderStatus, cb) => {
         const {onlineOrderId, status, paypalOrderDetail, storeName, storeAlias} = orderStatus
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId},eventType=orderStatus`,
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
         if (status === 'completed') {
-          console.debug('sentry:eventType=orderStatus,status=completed')
+          // do nothing with completed
+          // now paypal submit will be execute when order status === 'kitchen'
+          return
+        } else if (status === 'kitchen') {
           if (paypalOrderDetail) {
             const store = await cms.getModel('Store').findOne({alias: storeAlias})
             if (!store || !store.paymentProviders || !store.paymentProviders.paypal) {
               // store information is missing, so order will not be processed
               console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: paypal token missing. Info: store_alias=${storeAlias}`)
+              cb && cb({ error: "paypal token missing" })
               return;
             }
 
@@ -395,17 +398,19 @@ module.exports = async function (cms) {
 
             try {
               const ppClient = createPayPalClient(clientId, secretToken)
-              const result = await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)
+              const result = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)).result
               const logClientId = (clientId || '').substr(0, 6) // using for log
               const logSecretToken = (secretToken || '').substr(0, 6) // using for log
               console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(result))
+              cb && cb({ result: result.status })
             } catch (e) {
               console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
+              cb && cb({ error: e.message })
             }
           }
-        } else {
-          updateOrderStatus(onlineOrderId, orderStatus)
         }
+
+        updateOrderStatus(onlineOrderId, orderStatus)
       })
 
       socket.on('updateVersion', async (appVersion, _id) => {
