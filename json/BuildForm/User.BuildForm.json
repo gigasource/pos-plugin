@@ -95,13 +95,18 @@
             {
               "value": "viewMonthlyRevenue",
               "text": "View Monthly Revenue"
+            },
+            {
+              "value": "deleteStore",
+              "text": "Delete Store"
             }
           ]
         },
         {
           "schemaType": "boolean",
           "key": "value",
-          "type": "input@switch"
+          "type": "input@switch",
+          "label": "Enabled"
         }
       ]
     },
@@ -131,7 +136,15 @@
     }
   ],
   "name": "User",
-  "tabs": [],
+  "tabs": [
+    {
+      "fields": [
+        "permissions"
+      ],
+      "_id": "5ef33ba4e1c401619af536bf",
+      "name": "Permission"
+    }
+  ],
   "type": "Collection",
   "extensions": [],
   "alwaysLoad": true,

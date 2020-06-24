@@ -63,6 +63,7 @@
                 @open:deleteDeviceDialog="showDeleteDeviceDialog"
                 @view:settings="viewStoreSetting($event)"
                 @open:pairDeviceDialog="showPairDeviceDialog"
+                @open:deleteStoreConfirm="showDeleteStoreDialog"
                 @approveGmsDevice="approveGmsDevice"
                 @open:renameGSmsDeviceDialog="openRenameGSmsDeviceDialog"
                 @open:deleteGSmsDeviceDialog="openDeleteGSmsDeviceDialog"
@@ -97,6 +98,7 @@
     <!-- dialogs -->
     <dialog-new-group v-if="manageGroupPerm && storeGroups && dialog.newGroup" v-model="dialog.newGroup" @submit="addGroup" :groups="storeGroups"/>
     <dialog-new-store v-if="manageStorePerm && storeGroups && dialog.newStore" v-model="dialog.newStore" @submit="addStore($event)" :groups="storeGroups" :countries="countries"/>
+    <dialog-delete-item v-if="deleteStorePerm && dialog.deleteStore" v-model="dialog.deleteStore" type="store" @confirm="deleteStore"/>
     <dialog-delete-item v-if="settingsPerm && dialog.deleteDevice" v-model="dialog.deleteDevice" type="device" @confirm="deleteDevice"/>
     <dialog-delete-item v-if="dialog.deleteGSmsDevice" v-model="dialog.deleteGSmsDevice" type="device" @confirm="deleteGSmsDevice"/>
     <dialog-pair-new-device v-if="selectedStore && dialog.pairNewDevice" v-model="dialog.pairNewDevice" :store="selectedStore"/>
@@ -142,6 +144,7 @@
         dialog: {
           newGroup: false,
           newStore: false,
+          deleteStore: false,
           deleteDevice: false,
           deleteGSmsDevice: false,
           featureControl: false,
@@ -165,7 +168,7 @@
       // app
       'PosOnlineOrderManagementStore:(apps,appItems)',
       // store management permissions
-      'PermissionStore:(manageGroupPerm,manageStorePerm,settingsPerm)'
+      'PermissionStore:(manageGroupPerm,manageStorePerm,settingsPerm,deleteStorePerm)'
     ],
     mounted() {
       window.cms.socket.on('reloadStores', storeId => {
@@ -209,6 +212,14 @@
       viewStoreSetting(store) {
         this.setSelectedStore(store)
         this.view = 'settings'
+      },
+
+      showDeleteStoreDialog(store) {
+        this.$set(this, 'selectedStore', store)
+        this.dialog.deleteStore = true
+      },
+      deleteStore() {
+        cms.socket.emit('removeStore', this.selectedStore._id, () => this.loadStores())
       },
 
       // pair device

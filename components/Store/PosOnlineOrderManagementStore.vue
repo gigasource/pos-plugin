@@ -293,6 +293,9 @@
         await cms.updateUserSession()
         await this.loadStoreGroups()
       },
+      deleteStore(_id) {
+        cms.socket.emit('removeStore', _id, () => this.loadStores())
+      },
 
       // stores
       async loadStores() {
