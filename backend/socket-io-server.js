@@ -108,7 +108,7 @@ async function sendReservationConfirmationEmail(reservation, storeId) {
     const message = {
       from: 'no-reply@restaurant.live',
       to: email,
-      subject: `Confirm reservation for ${storeName}`,
+      subject: `Your reservation at ${storeName}`,
       html: reservationMailTemplate
     }
 
@@ -692,7 +692,7 @@ module.exports = async function (cms) {
           `2. Online order backend: no device found, cancelled sending`)
       }
 
-      if (store.reservationSetting.emailConfirmation) {
+      if (store.reservationSetting && store.reservationSetting.emailConfirmation) {
         sendReservationConfirmationEmail(reservationData, store.id)
       }
     })
