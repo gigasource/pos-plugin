@@ -165,9 +165,11 @@
     </div>
     <dialog-complete-order ref="dialog" v-model="showDialog"
                            @completeOrder="completeOrder"
-                           @declineOrder="declineOrder"
-    ></dialog-complete-order>
+                           @declineOrder="declineOrder"/>
     <dialog-text-filter v-model="dialog.reason" label="Reason" :default-value="dialog.order.declineReason" @submit="submitReason"/>
+    <dialog-pay-pal-transaction-capture-failed
+        v-model="dialog.paypalTransactionCaptureFailed.show"
+        :error="dialog.paypalTransactionCaptureFailed.error"/>
   </div>
 </template>
 
@@ -176,11 +178,13 @@
   import DialogCompleteOrder from './dialogCompleteOrder';
   import DialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
   import orderUtil from '../logic/orderUtil'
+  import DialogPayPalTransactionCaptureFailed from './dialogPayPalTransactionCaptureFailed';
 
   export default {
     name: 'OnlineOrderMain',
-    components: {DialogTextFilter, DialogCompleteOrder, ValuePicker },
+    components: { DialogPayPalTransactionCaptureFailed, DialogTextFilter, DialogCompleteOrder, ValuePicker },
     injectService: ['PosStore:storeLocale'],
+    injectService: ['OrderStore:dialog'],
     props: {
       pendingOrders: Array,
       kitchenOrders: Array,

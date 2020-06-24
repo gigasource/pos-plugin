@@ -36,7 +36,13 @@
         kitchenOrders: [],
         onlineOrders: [],
         // reservations
-        reservations: []
+        reservations: [],
+        dialog: {
+          paypalTransactionCaptureFailed: {
+            show: false,
+            error: null
+          }
+        }
       }
     },
     computed: {
@@ -595,7 +601,18 @@
           const clientId = await this.getOnlineOrderDeviceId();
           console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-          window.cms.socket.emit('updateOrderStatus', orderStatus)
+          window.cms.socket.emit('updateOrderStatus', orderStatus, ({result, error}) => {
+            if (error || result !== "COMPLETED") {
+              let errMsg = "PayPal transaction was not captured. Please login to your PayPal account to accept customer's payment manually."
+              if (error)
+                errMsg = `${errMsg} Error: ${error}`
+              else
+                errMsg = `${errMsg} Capture status: ${result}`
+              debugger
+              this.dialog.paypalTransactionCaptureFailed.show = true
+              this.dialog.paypalTransactionCaptureFailed.error = errMsg
+            }
+          })
         } catch (e) {
           console.error(e)
         }
