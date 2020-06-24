@@ -62,7 +62,7 @@ module.exports = async cms => {
     const {deviceName} = global.APP_CONFIG;
 
     let tag = `sentry:webshopUrl=${webshopUrl},store=${storeName},alias=${storeAlias},version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
-    if (onlineOrderSocket.clientId) tag += `,clientId=${onlineOrderSocket.clientId}`;
+    if (onlineOrderSocket && onlineOrderSocket.clientId) tag += `,clientId=${onlineOrderSocket.clientId}`;
 
     return tag;
   }
@@ -182,7 +182,7 @@ module.exports = async cms => {
 
   function createOnlineOrderListeners(socket, deviceId) {
     // event logs for debugging
-    const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId}`;
+    const sentryTags = getBaseSentryTags('socketConnection') + `,clientId=${deviceId},clientSocketId=${socket.id}`;
     console.debug(sentryTags, 'Creating onlineOrderSocket');
 
     // onlineOrderSocket.clientId = deviceId
