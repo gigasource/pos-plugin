@@ -21,13 +21,13 @@ module.exports = {
       open: 'Ouvert',
       closed: 'Fermée',
       today: 'aujourd\'hui',
-      orderList: 'Order List',//
+      orderList: 'Détail de la commande',
       totalItems: 'Nombre total d\'articles',
       note: 'Commentaire',
-      order: 'Order', //
+      order: 'Commande',
       payment: 'Paiement',
-      confirmOrder: 'Confirm Order', //
-      contactInfo: 'CONTACT INFORMATION',//
+      confirmOrder: 'Valider la Commande',
+      contactInfo: 'INFORMATION DE CONTACT',
       orderDetail: 'DÉTAIL DE LA COMMANDE',
       pickup: 'Emporter',
       delivery: 'Livraison',
@@ -40,48 +40,48 @@ module.exports = {
       pickupTime: 'Heure de récupération',
       total: 'Montant total',
       confirm: 'Confirmation',
-      orderSuccessfully: 'Order Successfully',//
-      items: 'Items', //
+      orderSuccessfully: 'Commande Validée',
+      items: 'Articles',
       shippingFee: 'Frais de Livraison',
       company: 'Raison sociale',
       waiting1: 'Envoie de la commande au restaurant...',
       waiting2: 'Veuillez patienter commande en cours de traitement...',
-      waiting3: 'The process might take a while...',//
+      waiting3: 'Commande en cours de traitement...',
       waiting4: 'Veuillez patienter...',
       orderMissed: 'Commande perdue',
       apology: 'Nous sommes désolés du désagrément. Vous pouvez {0}',
       tryAgain: 'réessayer!',
       possibleReasons: 'Raison possible de l\'incident',
-      reason1: 'The restaurant staffs are currently busy and cannot handle your order quick enough.',//
+      reason1: 'Commande en attente de validation par le restaurant.',
       reason2: 'Problème de connexion.',
       callUs: 'Pour plus d information veuillez appeler le',
       close: 'Fermer',
-      orderConfirmed: 'Your order is confirmed',//
+      orderConfirmed: 'Commande validée',
       orderCancelled: 'Désolé votre commande a été annulé',
       reason: 'Raison',
-      emptyCart: 'Your order list is currently empty.',//
+      emptyCart: 'Votre panier est vide.',
       minimumWarning: 'Livraison non disponible pour moins de ',
       applyCode: 'Coupon de réduction',
-      couponCode: 'COUPON CODE',//
-      apply: 'Apply',//
+      couponCode: 'CODE DE RÉDUCTION',
+      apply: 'Valider',
       couponApplied: 'Coupon validé!',
       invalidCoupon: 'Coupon invalide!',
-      notApplicable: 'Not applicable for this order!',//
+      notApplicable: 'Non applicable à cette commande!',
       unavaibleArea: 'Secteur non disponible pour la livraison!',
       openHours: 'Horaire d ouverture',
-      merchantClose: 'Merchant is temporarily closed',//
-      merchantClose1: 'The merchant is temporarily closed and will not accept orders until {1} {0}. Please come back after that. We apologize for any inconvenience caused.',//
-      merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.',//
+      merchantClose: 'Ce commerce est actuellement fermé',
+      merchantClose1: 'Le magasin est actuellement fermé. Nous accepterons les commandes à partir de {1} {0}. Veuillez réesaayer plus tard',
+      merchantClose2: 'Le magasin est actuellement fermé.',
       minimumOrder: 'Commande minimum',
       deliveryFee: 'Frais de livraison',
-      notice: 'Notice',//
-      allergic: 'Allergic',//
+      notice: 'Avertissement',
+      allergic: 'Allergen',
       allergicNotice: 'Risque d\'allergènes:',
-      spicy: 'Spicy',//
+      spicy: 'Épicé',
       spicyNotice: 'Plat épicé!',
-      vegeterian: 'Vegetarian',//
+      vegeterian: 'Végétarien',
       vegeterianNotice: 'Plat végétarien!',
-      deliveryTimeWarning: 'Today delivery service is available between ',//
+      deliveryTimeWarning: 'Le service de livraison est diposible entre ',
       eggs: 'Oeuf',
       fish: 'Poisson',
       milk: 'Lait',
@@ -95,11 +95,11 @@ module.exports = {
       molluscs: 'Molusques',
       mustard: 'Wazabi',
       soya: 'Soja',
-      sulphur: 'Sulphur Dioxide',//
-      messageConfirm: 'Your order will be sent to the restaurant.',//
-      next: 'Next',//
+      sulphur: 'Sulfites',
+      messageConfirm: 'Votre commande est envoyée au restaurant.',
+      next: 'Suivant',
       deliveryIn: 'Livraison dans {0} minutes',
-      pickUpIn: 'Pick up in {0} minutes',//
+      pickUpIn: 'Retrait dans {0} minutes',
       payByCash: 'Paiement en espèce'
     },
   }
