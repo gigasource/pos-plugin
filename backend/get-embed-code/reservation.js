@@ -13,6 +13,17 @@
 
     var url = el.getAttribute('data-url')
 
+    function checkIOs12AndLess() {
+      var userAgent = navigator.userAgent.substring(navigator.userAgent.indexOf('(') + 1, navigator.userAgent.indexOf(')'))
+      if(userAgent.includes('iPhone') || userAgent.includes('iPod') || userAgent.includes('iPad')) {
+        var start = userAgent.indexOf('OS ')
+        if( ( userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1 ) && start > -1 ){
+          return +userAgent.substr( start + 3, 3 ).replace( '_', '' ) <= 12
+        }
+      }
+      return false
+    }
+
     function openIframe() {
       window.location = '#'
 
@@ -87,18 +98,25 @@
       })
     }
 
-    el.onclick = openIframe
+    function openNewTab() {
+      window.open(url)
+    }
+
+    var isOldIOs = checkIOs12AndLess()
+    var openFn = isOldIOs ? openNewTab : openIframe
+
+    el.onclick = openFn
 
     var btns = document.getElementsByClassName('reservation-btn')
     for(var i = 0; i < btns.length; i++) {
-      btns[i].onclick = openIframe
+      btns[i].onclick = openFn
     }
 
     btns = document.querySelectorAll('a[href="#reservation-btn"]')
     for(var i = 0; i < btns.length; i++) {
       btns[i].onclick = function (e) {
         e.preventDefault()
-        openIframe()
+        openFn()
       }
     }
   }

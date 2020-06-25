@@ -23,6 +23,7 @@
 
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
+      await this.createFolderIfNotExisted('/', 'store')
 
       this.libraryImages = await this.getLibraryImages('/images/library')
     },
@@ -97,6 +98,39 @@
           library[folder.fileName] = folderImages
         }
         return library
+      },
+      uploadScript(file, storeAlias) {
+        return new Promise(async (resolve, reject) => {
+           await this.createFolderIfNotExisted('/store/', storeAlias)
+           await this.gridFsHandler.uploadFile(file, `/store/${storeAlias}`, response => {
+            if (response && response.data[0].uploadSuccess) {
+              const files = [response.data[0].createdFile]
+              resolve(this.gridFsHandler.insertViewUrl(files)[0].viewUrl)
+            } else {
+              reject(response)
+            }
+          }, false, true)
+        })
+      },
+      async changeStoreEmbedImage(image, folder) {
+        try {
+          const name = 'embed-icon.' + image.fileName.split('.')[1]
+          //delete old image
+          const files = await this.gridFsHandler.getFilesInPath(folder)
+          const oldImage = files.find(f => f.mimeType.startsWith('image') && (f.fileName === name || f.fileName.startsWith('embed-icon')))
+          if (oldImage)
+            await this.gridFsHandler.deleteFile(oldImage)
+          //clone image
+          const newImage = await this.gridFsHandler.cloneFile(folder, image)
+          await this.gridFsHandler.renameFile(newImage, name)
+          if (cms.sharedConfig && typeof (cms.sharedConfig.getPurgeCdnData) === 'function') {
+            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(folder);
+            if (purgeCdnData)
+              axios.get(purgeCdnData.url, purgeCdnData.options)
+          }
+        } catch (e) {
+          console.log(e)
+        }
       }
     },
     provide() {
@@ -109,6 +143,8 @@
         libraryImages: this.libraryImages,
         getLibraryImages: this.getLibraryImages,
         createFolderIfNotExisted: this.createFolderIfNotExisted,
+        uploadScript: this.uploadScript,
+        changeStoreEmbedImage: this.changeStoreEmbedImage,
       }
     }
   }
@@ -116,5 +152,9 @@
 <style>
   .file-upload-dialog {
     transform: scale(0.75) translate(100px, 50px);
+  }
+
+  object img {
+    width: 100%;
   }
 </style>
