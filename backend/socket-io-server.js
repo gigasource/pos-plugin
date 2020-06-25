@@ -198,7 +198,7 @@ module.exports = async function (cms) {
       const socket = connectedSockets[socketId];
       const {clientId} = socket;
 
-      return await SentrySavedMessagesModel.create({
+      if (clientId) return await SentrySavedMessagesModel.create({
         tagString: `sentry:clientId=${clientId},eventType=socketConnection,socketId=${socketId}`,
         message: `2a. (Startup) Client ${clientId} disconnected, socket id = ${socketId}`,
       });
@@ -266,7 +266,14 @@ module.exports = async function (cms) {
     console.debug(sentryTagString, msg);
   });
 
-  if (global.APP_CONFIG.redis) setInterval(() => externalSocketIOServer.syncClientList(), SOCKET_IO_REDIS_SYNC_INTERVAL);
+  if (global.APP_CONFIG.redis) setInterval(() => {
+    externalSocketIOServer.syncClientList()
+        .then(updatedClientIdList => {
+          updatedClientIdList.forEach(clientId =>
+              internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus', clientId));
+        });
+
+  }, SOCKET_IO_REDIS_SYNC_INTERVAL);
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
