@@ -108,7 +108,7 @@ async function sendReservationConfirmationEmail(reservation, storeId) {
     const message = {
       from: 'no-reply@restaurant.live',
       to: email,
-      subject: `Confirm reservation for ${storeName}`,
+      subject: `Your reservation at ${storeName}`,
       html: reservationMailTemplate
     }
 
@@ -168,10 +168,12 @@ module.exports = async function (cms) {
   }
 
   async function setDeviceLastSeen(deviceId) {
+    const lastSeen = new Date();
+
     await cms.getModel('Device').updateOne({_id: deviceId}, {
-      $set: { lastSeen: new Date ()}
-    })
-    cms.socket.emit('loadStore')
+      $set: { lastSeen }
+    });
+    cms.socket.emit('updateDeviceLastSeen', deviceId, lastSeen);
   }
 
   const externalSocketIOServer = p2pServerPlugin(io, {
@@ -196,7 +198,7 @@ module.exports = async function (cms) {
       const socket = connectedSockets[socketId];
       const {clientId} = socket;
 
-      return await SentrySavedMessagesModel.create({
+      if (clientId) return await SentrySavedMessagesModel.create({
         tagString: `sentry:clientId=${clientId},eventType=socketConnection,socketId=${socketId}`,
         message: `2a. (Startup) Client ${clientId} disconnected, socket id = ${socketId}`,
       });
@@ -264,7 +266,14 @@ module.exports = async function (cms) {
     console.debug(sentryTagString, msg);
   });
 
-  if (global.APP_CONFIG.redis) setInterval(() => externalSocketIOServer.syncClientList(), SOCKET_IO_REDIS_SYNC_INTERVAL);
+  if (global.APP_CONFIG.redis) setInterval(() => {
+    externalSocketIOServer.syncClientList()
+        .then(updatedClientIdList => {
+          updatedClientIdList.forEach(clientId =>
+              internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus', clientId));
+        });
+
+  }, SOCKET_IO_REDIS_SYNC_INTERVAL);
 
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
@@ -692,7 +701,7 @@ module.exports = async function (cms) {
           `2. Online order backend: no device found, cancelled sending`)
       }
 
-      if (store.reservationSetting.emailConfirmation) {
+      if (store.reservationSetting && store.reservationSetting.emailConfirmation) {
         sendReservationConfirmationEmail(reservationData, store.id)
       }
     })
@@ -732,6 +741,44 @@ module.exports = async function (cms) {
       } catch (e) {
         console.log(e)
         callback(e)
+      }
+    })
+
+    socket.on('removeStore', async (storeId, cb) => {
+      // remove store
+      await cms.getModel('Store').deleteOne({ _id: storeId })
+
+      // remove devices & unpair all
+      const devices = await cms.getModel('Device').find({ storeId })
+      const deviceIds = devices.map(i => i._id)
+      await cms.getModel('Device').deleteMany({ _id: { $in: deviceIds } })
+      deviceIds.forEach(i => externalSocketIOServer.emitToPersistent(i, 'unpairDevice'))
+
+      // remove products
+      await cms.getModel('Product').deleteMany({ store: storeId })
+
+      // remove discounts
+      await cms.getModel('Discount').deleteMany({ store: storeId })
+
+      // remove store owner user
+      const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
+      await cms.getModel('User').deleteOne({ role: deviceRole._id, store: storeId })
+
+      // run callback
+      typeof cb === 'function' && cb()
+    })
+
+    socket.on('removeStoreGroup', async _id => {
+      // check for stores in group
+      const storesInGroup = await cms.getModel('Store').find({ group: _id })
+      if (!storesInGroup || !storesInGroup.length) {
+        await cms.getModel('StoreGroup').deleteOne({ _id })
+
+        // pull from other users' store groups
+        await cms.getModel('User').updateMany()
+
+        // refresh display
+        cms.socket.emit('loadStore')
       }
     })
 

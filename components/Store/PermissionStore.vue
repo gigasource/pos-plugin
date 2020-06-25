@@ -3,7 +3,8 @@
 </template>
 <script>
   import _ from 'lodash'
-  
+  import { getProvided } from '../logic/commonUtils';
+
   export default {
     name: 'PermissionStore',
     domain: 'PermissionStore',
@@ -40,12 +41,15 @@
       },
       viewMonthlyRevenuePerm() {
         return _.find(this.userPermissions, perm => perm.permission === 'viewMonthlyRevenue' && perm.value === true)
+      },
+      deleteStorePerm() {
+        return _.find(this.userPermissions, perm => perm.permission === 'deleteStore' && perm.value === true)
       }
     },
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue"]
+        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore"]
       }
     },
     async created() {
@@ -57,17 +61,8 @@
     },
     provide() {
       return {
-        versionControlPerm: this.versionControlPerm,
-        manageAccountPerm: this.manageAccountPerm,
-        manageGroupPerm: this.manageGroupPerm,
-        manageStorePerm: this.manageStorePerm,
-        remoteControlPerm: this.remoteControlPerm,
-        configOnlineOrderingPerm: this.configOnlineOrderingPerm,
-        settingsPerm: this.settingsPerm,
-        updateAppPerm: this.updateAppPerm,
-        featureControlPerm: this.featureControlPerm,
-        viewMonthlyRevenuePerm: this.viewMonthlyRevenuePerm,
-        allPermissions: this.allPermissions
+        ...getProvided(this.$data, this),
+        ...getProvided(this.$options.computed, this)
       }
     }
   }

@@ -178,7 +178,14 @@
       await this.loadAppItems()
       await this.loadAccounts()
 
-      cms.socket.on('loadStore', () => this.loadStores())
+      cms.socket.on('updateDeviceLastSeen', (deviceId, lastSeen) => {
+        lastSeen = new Date(lastSeen); // lastSeen is a String
+
+        this.stores.forEach(({devices}) => {
+          const device = devices.find(({_id}) => _id === deviceId)
+          if (device) device.lastSeen = lastSeen
+        })
+      })
     },
     mounted() {
       cms.socket.on('updateAppFeatureStatus', async (msg, error, device) => {
@@ -285,6 +292,9 @@
         await cms.getModel('StoreGroup').remove({_id})
         await cms.updateUserSession()
         await this.loadStoreGroups()
+      },
+      deleteStore(_id) {
+        cms.socket.emit('removeStore', _id, () => this.loadStores())
       },
 
       // stores

@@ -18,7 +18,19 @@ module.exports = (cms) => {
         }))
         console.log(`Migrated data from ${lastVersion} to be compatible with v1.0.23`)
       }
-    } catch (e) {
+
+      if (semver.gt('1.0.37', lastVersion)) { // add deleteStore permission
+        await cms.getModel('User').updateMany({role: 'admin'}, {
+          permissions: {
+            $push: {
+              permission: "deleteStore",
+              value: true
+            }
+          }
+        })
+        console.log(`Migrated data from ${lastVersion} to be compatible with v1.0.37`)
+      }
+      } catch (e) {
       console.log(e)
     }
   })

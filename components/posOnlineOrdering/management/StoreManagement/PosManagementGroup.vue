@@ -179,7 +179,7 @@
                          @mouseenter="on.mouseenter"
                          @mouseleave="on.mouseleave"
                          @click.stop.prevent="openWebShopSetting(store)">
-                      <g-icon size="16">icon-fork_knife_setting</g-icon>
+                      <g-icon size="20">icon-fork_knife_setting</g-icon>
                     </div>
                   </template>
                   <span>Online Ordering Config</span>
@@ -209,6 +209,19 @@
                     </div>
                   </template>
                   <span>Pair New Device</span>
+                </g-tooltip>
+              </div>
+              <div v-if="deleteStorePerm" class="action-item">
+                <g-tooltip open-on-hover bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
+                  <template v-slot:activator="{on}">
+                    <div class="action-item__btn chain"
+                         @mouseenter="on.mouseenter"
+                         @mouseleave="on.mouseleave"
+                         @click.stop.prevent="$emit('open:deleteStoreConfirm', store)">
+                      <g-icon size="20">icon-trash</g-icon>
+                    </div>
+                  </template>
+                  <span>Delete Store</span>
                 </g-tooltip>
               </div>
             </div>
@@ -256,6 +269,8 @@
   import DialogPairNewDeviceSuccess from './dialogPairNewDeviceSuccess';
   import DialogEditDeviceName from './dialogEditDeviceName';
   import DialogGenHtmlCode from './dialogGenHtmlCode';
+  import relativeTime from 'dayjs/plugin/relativeTime'
+  dayjs.extend(relativeTime)
 
   export default {
     name: "PosManagementGroup",
@@ -270,7 +285,7 @@
     injectService: [
       'PosOnlineOrderManagementStore:(searchText)',
       // permissions
-      'PermissionStore:(versionControlPerm,manageAccountPerm,manageGroupPerm,manageStorePerm,settingsPerm,updateAppPerm,remoteControlPerm,featureControlPerm,configOnlineOrderingPerm,viewMonthlyRevenuePerm)'
+      'PermissionStore:(versionControlPerm,manageAccountPerm,manageGroupPerm,manageStorePerm,settingsPerm,updateAppPerm,remoteControlPerm,featureControlPerm,configOnlineOrderingPerm,viewMonthlyRevenuePerm,deleteStorePerm)'
     ],
     filters: {
       currency(val, locale = 'en') {
@@ -278,7 +293,7 @@
       },
       date(val) {
         if (!val) return ''
-        return dayjs(val).format('DD/MM/YYYY - HH:mm')
+        return dayjs(val).fromNow()
       }
     },
     data() {
