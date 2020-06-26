@@ -184,7 +184,7 @@
   </div>
 </template>
 <script>
-  import {get12HourValue, _12HourTimeRegex, _24HourTimeRegex} from "../../logic/timeUtil";
+  import {get12HourValue, get24HourValue, _12HourTimeRegex, _24HourTimeRegex} from "../../logic/timeUtil";
   import _ from 'lodash'
   // TODO: Debounce update openHours open, close time
   export default {
@@ -403,7 +403,7 @@
           this.$set(this.errors[index], 'message', `Invalid time format!`)
           return
         }
-        this.$set(this.openHoursData[index], typeStr.replace('-', ''), time)
+        this.$set(this.openHoursData[index], typeStr.replace('-', ''), get24HourValue(time))
         this.checkServiceHourError()
       },
       toggleMinimumOrderValue(active) {
