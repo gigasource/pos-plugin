@@ -5,6 +5,12 @@
         :error="dialog.prepaidOrderFailed.error"/>
     <dialog-validating-prepaid-order
         v-model="dialog.validatePrepaidOrder.show"/>
+    <dialog-refund-prepaid-transaction-failed
+        v-model="dialog.refundOrderFailed.show"
+        :capture-responses="dialog.refundOrderFailed.captureResponses"
+        :refund-responses="dialog.refundOrderFailed.refundResponses"/>
+    <dialog-refund-order-succeeded
+        v-model="dialog.refundOrderSucceeded.show"/>
   </div>
 </template>
 
@@ -14,10 +20,12 @@
   import { getProvided } from '../logic/commonUtils';
   import DialogValidatingPrepaidOrder from '../OnlineOrder/dialogValidatingPrepaidOrder';
   import DialogCapturePrepaidTransactionFailed from '../OnlineOrder/dialogCapturePrepaidTransactionFailed';
+  import DialogRefundPrepaidTransactionFailed from '../OnlineOrder/dialogRefundPrepaidTransactionFailed';
+  import DialogRefundOrderSucceeded from '../OnlineOrder/dialogRefundOrderSucceeded';
 
   export default {
     name: 'OrderStore',
-    components: { DialogCapturePrepaidTransactionFailed, DialogValidatingPrepaidOrder },
+    components: { DialogRefundOrderSucceeded, DialogRefundPrepaidTransactionFailed, DialogCapturePrepaidTransactionFailed, DialogValidatingPrepaidOrder },
     domain: 'OrderStore',
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
@@ -50,6 +58,14 @@
           prepaidOrderFailed: {
             show: false,
             error: null
+          },
+          refundOrderFailed: {
+            show: false,
+            captureResponses: {},
+            refundResponses: [],
+          },
+          refundOrderSucceeded: {
+            show: false,
           },
           validatePrepaidOrder: {
             show: false,
@@ -557,18 +573,30 @@
         this.kitchenOrders = await orderModel.find({ online: true, status: 'kitchen' })
       },
       isPrepaidOrder(order) {
-        return order.paypalOrderDetail != null
-        // more 3rd party in this method
+        return order.paypalOrderDetail && order.paypalOrderDetail.orderID != null // paypal
+        // more online payment
+      },
+      isCapturedOrder(order) {
+        return order.paypalOrderDetail && order.paypalOrderDetail.response != null // paypal
+        // more online payment
       },
       async declineOrder(order) {
         console.log('decline order', order)
+        
         const status = 'declined'
-        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
-          Object.assign({}, order, {
-            status,
-            user: this.user
-          }))
-        await this.updateOnlineOrders()
+        const updateInfo = Object.assign({}, order, {
+          status,
+          user: this.user
+        })
+        let updatedOrder;
+        if (this.isPrepaidOrder(order)) {
+          updatedOrder = order
+        } else {
+          // TODO: Add option to get updated object
+          updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id}, updateInfo)
+          await this.updateOnlineOrders()
+        }
+        
         const orderStatus = {
           orderId: updatedOrder.id,
           onlineOrderId: updatedOrder.onlineOrderId,
@@ -581,9 +609,42 @@
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
 
-        window.cms.socket.emit('updateOrderStatus', orderStatus)
+        const self = this
+        window.cms.socket.emit('updateOrderStatus', orderStatus, async ({ responseData }) => {
+          if (this.isPrepaidOrder(order)) {
+            // mock failed data
+            // _.each(responseData, r => {
+            //   r.status = "ERROR"
+            //   r.detail = "Lorem irspum for some reason we don't know about the idea behind it"
+            // })
+            
+            const isRefundError = _.find(responseData, refundResponse => refundResponse.status !== "COMPLETED")
+            if (isRefundError) {
+              this.dialog.refundOrderFailed.show = true
+              this.$set(this.dialog.refundOrderFailed, 'captureResponses', updatedOrder.paypalOrderDetail.captureResponses)
+              this.dialog.refundOrderFailed.refundResponses.splice(0, this.dialog.refundOrderFailed.refundResponses.length, ...responseData)
+              // ...
+            } else {
+              this.dialog.refundOrderSucceeded.show = true
+            }
+          
+            // store refund response
+            const updateOrderInfo = Object.assign({}, order, {
+              status: status,
+              user: self.user,
+              paypalOrderDetail: {
+                ...order.paypalOrderDetail,
+                refundResponses: responseData
+              }
+            })
+            
+            await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+            await this.updateOnlineOrders()
+          }
+        })
       },
       async acceptPendingOrder(order) {
+        console.log('accept order', order)
         try {
           let deliveryDateTime
           if (order.deliveryTime === 'asap') {
@@ -647,7 +708,7 @@
                 // store response data for later use
                 updateOrderInfo.paypalOrderDetail = {
                   ...updateOrderInfo.paypalOrderDetail,
-                  response: responseData
+                  captureResponses: responseData
                 }
                 console.log(responseData)
                 await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)

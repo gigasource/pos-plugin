@@ -1233,7 +1233,12 @@
         },
         {
           "schemaType": "mixed",
-          "key": "response"
+          "key": "captureResponses"
+        },
+        {
+          "schemaType": "mixed",
+          "key": "refundResponses",
+          "type": null
         }
       ]
     }

@@ -1,8 +1,8 @@
 <template>
   <g-dialog v-model="value" persistent>
-    <div class="dialog-content">
-      <div class="dialog-content-title">Capturing order's transaction</div>
-      <div class="dialog-content-message">We're capturing money for this order. Please wait...</div>
+    <div class="dlg">
+      <div class="dlg-title">Capturing order's transaction</div>
+      <div class="dlg-message">We're capturing money for this order. Please wait...</div>
     </div>
   </g-dialog>
 </template>
@@ -19,7 +19,7 @@
   }
 </script>
 <style scoped lang="scss">
-  .dialog-content {
+  .dlg {
     width: 500px;
     margin: 0 auto;
     background: white;

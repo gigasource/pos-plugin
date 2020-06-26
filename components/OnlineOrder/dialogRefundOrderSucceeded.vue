@@ -1,47 +1,28 @@
 <template>
   <g-dialog v-model="value" persistent>
     <div class="dlg">
-      <div class="dlg-title">Transaction failed</div>
-      <div class="dlg-message">
-        <div>Error details:</div>
-        <div>{{error}}</div>
-      </div>
+      <div class="dlg-title">Refund order</div>
+      <div class="dlg-message">A refund for this order has been processed.</div>
       <div class="dlg-buttons">
-        <g-btn-bs @click="close" background-color="#536DFE" text-color="white" width="100">OK</g-btn-bs>
+        <g-btn-bs background-color="#2979FF" text-color="white" @click="$emit('input',false)">OK</g-btn-bs>
       </div>
     </div>
   </g-dialog>
 </template>
 <script>
   export default {
-    name: 'dialogCapturePrepaidTransactionFailed',
+    name: 'dialogRefundOrderSucceeded',
     props: {
       value: Boolean,
-      error: String
     },
     data() {
       return {}
-    },
-    computed: {
-      internalValue: {
-        get() {
-          return this.value
-        },
-        set(v) {
-          this.$emit('input', v)
-        }
-      }
-    },
-    methods: {
-      close() {
-        this.internalValue = false
-      }
     }
   }
 </script>
 <style scoped lang="scss">
   .dlg {
-    width: 600px;
+    width: 500px;
     margin: 0 auto;
     background: white;
     padding: 24px;
