@@ -52,7 +52,7 @@
       <template v-if="showContent || searchText">
         <div class="pos-management-group__content">
           <div v-for="(store, i) in stores" :class="getStoreRowClass(i)">
-            <div class="pos-management-group__content-info" @click="toggleStoreSetting(store)">
+            <div class="pos-management-group__content-info" @click.stop="toggleStoreSetting(store)">
               <div style="flex: 0 0 25%; padding-left: 16px">
                 <div class="fw-700 text-blue-accent-3">ID: {{store.id}}</div>
                 <div>{{store.settingName}}</div>
@@ -71,13 +71,25 @@
               <div style="flex: 1">
                 <div class="row-flex mb-1" v-for="(device, index) in store.devices"
                      :key="`device_${store.id}_${index}`">
-                  <div class="row-flex col-2">
+                  <div class="row-flex col-2 align-items-center">
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
-                    <span class="ml-1">
-                      <div>{{device.name}}</div>
-                      <div style="font-size: 10px; font-style: italic; color: #757575; margin-top: -5px;"
-                           v-if="device.features.onlineOrdering"> (Online ordering)</div>
-                    </span>
+                    <span class="ml-1">{{device.name}}</span>
+                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
+                      <span>Online ordering</span>
+                      <template v-slot:activator="{on}">
+                        <div v-if="device.features.onlineOrdering" v-on="on" class="ml-1">
+                          <g-icon size="14" class="ml-1">icon-screen_restaurant</g-icon>
+                        </div>
+                      </template>
+                    </g-tooltip>
+                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
+                      <span>Reservation</span>
+                      <template v-slot:activator="{on}">
+                        <div v-if="device.features.reservation" v-on="on" class="ml-1">
+                          <g-icon size="14">icon-table</g-icon>
+                        </div>
+                      </template>
+                    </g-tooltip>
                   </div>
                   <div class="col-2">
                     {{device.lastSeen | date}}
@@ -527,7 +539,6 @@
         align-items: flex-start;
         font-size: 14px;
         color: #201F28;
-        cursor: pointer;
 
         & > div {
           padding: 10px 0;

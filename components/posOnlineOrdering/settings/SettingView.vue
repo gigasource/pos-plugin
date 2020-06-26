@@ -120,18 +120,18 @@
               icon: 'mdi-file-document-outline',
               onClick: () => this.changeView('service-and-open-hours')
             },
-            {title: this.setting.reservation, key: 'Reservation', icon: 'mdi-file-document-outline', onClick: () => this.changeView('setting-reservation')},
+            {title: this.setting.reservation, key: 'Reservation', icon: 'icon-table_outlined', onClick: () => this.changeView('setting-reservation')},
             {title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
             {title: this.setting.deliveryFee, key: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
             {title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
             {title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
             cms.loginUser.user.role.name === "admin" && {
               title: 'Payment Setting',
-              icon: 'icon-coupon',
+              icon: 'icon-card_outlined',
               key: 'Payment Setting',
               onClick: () => this.changeView('payment-provider', 'Payment Setting'),
               items: [
-                {title: 'Transaction', key: 'Transaction', icon: 'icon-coupon', onClick: () => this.changeView('transaction', 'Transaction')}
+                {title: 'Transaction', key: 'Transaction', icon: 'history', onClick: () => this.changeView('transaction', 'Transaction')}
               ]
             },
           ]
