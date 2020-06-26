@@ -1,8 +1,13 @@
 const _ = require('lodash')
 const PayPalAPIv2 = require('@gigasource/payment-provider/src/PayPal/backend/paypalApiV2')
 
-async function captureOrder(payPalClient, orderId, debug=false) {
-  return await PayPalAPIv2.captureOrder(payPalClient, orderId, debug);
+function captureOrder(payPalClient, orderId, debug=false) {
+  return PayPalAPIv2.captureOrder(payPalClient, orderId, debug);
+}
+
+
+function refundOrder(payPalClient, captureId, refundBody) {
+  return PayPalAPIv2.refund(payPalClient, captureId, refundBody);
 }
 
 /**
@@ -116,6 +121,7 @@ async function getStoreBalance(payPalClient, {store_id, start_date, end_date}) {
 
 module.exports = {
   captureOrder,
+  refundOrder,
   getStoreTransaction,
   getStoreBalance,
   getStoreTransactionById,

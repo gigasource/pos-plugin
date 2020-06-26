@@ -404,14 +404,15 @@ module.exports = async function (cms) {
             }
 
             const { clientId, secretToken } = store.paymentProviders.paypal
+            const logClientId = (clientId || '').substr(0, 6) // using for log
+            const logSecretToken = (secretToken || '').substr(0, 6) // using for log
 
             try {
               const ppClient = createPayPalClient(clientId, secretToken)
-              const result = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)).result
-              const logClientId = (clientId || '').substr(0, 6) // using for log
-              const logSecretToken = (secretToken || '').substr(0, 6) // using for log
-              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(result))
-              cb && cb({ result: result.status })
+              const captureResponse = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false))
+              const responseData = captureResponse.result
+              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(responseData))
+              cb && cb({ result: responseData.status, responseData: responseData })
             } catch (e) {
               console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
               cb && cb({ error: e.message })
