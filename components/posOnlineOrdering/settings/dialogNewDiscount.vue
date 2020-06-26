@@ -153,7 +153,6 @@
               </g-text-field-bs>
             </div>
           </div>
-          <span style="font-style: italic; color: #424242">*MIN or MAX value can be left empty</span>
           <div class="dialog__action">
             <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
             <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" :disabled="isSaveBtnDisabled" @click="submit">Save

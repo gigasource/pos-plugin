@@ -58,7 +58,7 @@
             <g-icon size="40" color="#2979FF">add</g-icon>
           </div>
         </div>
-        <p class="mt-3">Note: Shipping services are not available for locations outside of the configured radius.</p>
+        <p class="mt-3">Note: Shipping service is not available for locations outside of the configured radius.</p>
       </template>
     </div>
   </div>

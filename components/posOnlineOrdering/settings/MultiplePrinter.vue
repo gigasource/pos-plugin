@@ -2,7 +2,6 @@
   <div class="multiple-printer">
     <div class="multiple-printer__title">Multiple Printer</div>
     <div class="multiple-printer__content">
-      <div class="fw-700 mb-3">Use Printer</div>
       <div class="row-flex mb-3">
         <g-switch v-model="multiple"/>
         <div>
