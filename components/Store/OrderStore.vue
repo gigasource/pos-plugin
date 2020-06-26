@@ -1,8 +1,8 @@
 <template>
   <div>
     <dialog-pay-pal-transaction-capture-failed
-        v-model="storeDialog.paypalTransactionCaptureFailed.show"
-        :error="storeDialog.paypalTransactionCaptureFailed.error"/>
+        v-model="dialog.prepaidOrderFailed.show"
+        :error="dialog.prepaidOrderFailed.error"/>
   </div>
 </template>
 
@@ -41,8 +41,8 @@
         onlineOrders: [],
         // reservations
         reservations: [],
-        storeDialog: {
-          paypalTransactionCaptureFailed: {
+        dialog: {
+          prepaidOrderFailed: {
             show: false,
             error: null
           }
@@ -548,6 +548,10 @@
         this.pendingOrders = await orderModel.find({ online: true, status: 'inProgress' })
         this.kitchenOrders = await orderModel.find({ online: true, status: 'kitchen' })
       },
+      isPrepaidOrder(order) {
+        return order.paypalOrderDetail
+        // more 3rd party in this method
+      },
       async declineOrder(order) {
         const status = 'declined'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
@@ -573,26 +577,32 @@
       async acceptPendingOrder(order) {
         try {
           let deliveryDateTime
-
           if (order.deliveryTime === 'asap') {
             deliveryDateTime = dayjs().add(order.prepareTime, 'minute')
             order.deliveryTime = deliveryDateTime.format('HH:mm')
           } else {
             deliveryDateTime = dayjs(order.deliveryTime, 'HH:mm')
           }
-
           const status = 'kitchen'
-          const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id },
-            Object.assign({}, order, {
-              status,
-              user: this.user
-            }))
-          this.printOnlineOrderKitchen(order._id)
-          this.printOnlineOrderReport(order._id)
-          await this.updateOnlineOrders()
           const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
+          
+          // validate prepaid (paypal, etc) before update status
+          let isPrepaidOrder = this.isPrepaidOrder(order);
+          let updatedOrder;
+          let updateOrderInfo; // info which will be added/updated into order documents
+          if (isPrepaidOrder) {
+            // TODO: Do we need to find orderInfo from db, or just need to assign updatedOrder to 'order' object
+            updatedOrder = await cms.getModel('Order').find({ _id: order._id })
+          } else {
+            updateOrderInfo = Object.assign({}, order, { status, user: this.user });
+            updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+            this.printOnlineOrderKitchen(order._id)
+            this.printOnlineOrderReport(order._id)
+            await this.updateOnlineOrders()
+          }
+          
           const orderStatus = {
             orderId: updatedOrder.id,
             onlineOrderId: updatedOrder.onlineOrderId,
@@ -603,20 +613,28 @@
           }
 
           const clientId = await this.getOnlineOrderDeviceId();
-          console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
+          console.debug(
+              `sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-          window.cms.socket.emit('updateOrderStatus', orderStatus, ({result, error}) => {
-            if (error || result !== "COMPLETED") {
-              let errMsg;
-              if (error)
-                errMsg = error
-              else
-                errMsg = `Capture status: ${result}`
-              this.storeDialog.paypalTransactionCaptureFailed.show = true
-              this.storeDialog.paypalTransactionCaptureFailed.error = errMsg
+          
+          window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error}) => {
+            // TODO: Check result response in another language
+            //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
+            //  + transaction info stored in paypalOrderDetail object
+            if (error || result !== 'COMPLETED') {
+              this.dialog.prepaidOrderFailed.show = true
+              this.dialog.prepaidOrderFailed.error = error || `Transaction status: ${result}`
+            } else {
+              if (isPrepaidOrder) {
+                await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+                this.printOnlineOrderKitchen(order._id)
+                this.printOnlineOrderReport(order._id)
+                await this.updateOnlineOrders()
+              }
             }
           })
         } catch (e) {
+          // TODO: Show an error dialog to the user
           console.error(e)
         }
       },
