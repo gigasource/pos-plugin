@@ -1230,6 +1230,10 @@
           "schemaType": "string",
           "key": "paymentID",
           "type": "input"
+        },
+        {
+          "schemaType": "mixed",
+          "key": "response"
         }
       ]
     }

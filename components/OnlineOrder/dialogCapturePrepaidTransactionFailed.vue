@@ -1,10 +1,10 @@
 <template>
-  <g-dialog v-model="value">
+  <g-dialog v-model="value" persistent>
     <div class="dialog-content">
-      <div class="dialog-content-title">PayPal transaction capture failed</div>
+      <div class="dialog-content-title">Transaction failed</div>
       <div class="dialog-content-message">
-        <div class="mb-1">PayPal transaction was not captured. Please login to your PayPal account to accept customer's payment manually.</div>
-        <div>Error details: {{error}}</div>
+        <div>Error details:</div>
+        <div>{{error}}</div>
       </div>
       <div class="dialog-content-buttons">
         <g-btn-bs @click="close" background-color="#536DFE" text-color="white" width="100">OK</g-btn-bs>
@@ -14,7 +14,7 @@
 </template>
 <script>
   export default {
-    name: 'dialogPayPalTransactionCaptureFailed',
+    name: 'dialogCapturePrepaidTransactionFailed',
     props: {
       value: Boolean,
       error: String
@@ -41,7 +41,7 @@
 </script>
 <style scoped lang="scss">
   .dialog-content {
-    width: 500px;
+    width: 600px;
     margin: 0 auto;
     background: white;
     padding: 24px;

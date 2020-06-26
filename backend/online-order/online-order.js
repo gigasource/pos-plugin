@@ -637,7 +637,9 @@ module.exports = async cms => {
       const {orderId, onlineOrderId, status, responseMessage} = orderStatus
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
           `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
-      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias}, ({result, error}) => cb && cb({ result, error}))
+      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias}, ({result, error, responseData}) => {
+        cb && cb({ result, error, responseData })
+      })
     })
 
     socket.on('getWebShopSettingUrl', async (locale, callback) => {

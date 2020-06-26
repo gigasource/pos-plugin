@@ -1,8 +1,10 @@
 <template>
   <div>
-    <dialog-pay-pal-transaction-capture-failed
+    <dialog-capture-prepaid-transaction-failed
         v-model="dialog.prepaidOrderFailed.show"
         :error="dialog.prepaidOrderFailed.error"/>
+    <dialog-validating-prepaid-order
+        v-model="dialog.validatePrepaidOrder.show"/>
   </div>
 </template>
 
@@ -10,9 +12,12 @@
   import orderUtil from '../logic/orderUtil';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
+  import DialogValidatingPrepaidOrder from '../OnlineOrder/dialogValidatingPrepaidOrder';
+  import DialogCapturePrepaidTransactionFailed from '../OnlineOrder/dialogCapturePrepaidTransactionFailed';
 
   export default {
     name: 'OrderStore',
+    components: { DialogCapturePrepaidTransactionFailed, DialogValidatingPrepaidOrder },
     domain: 'OrderStore',
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
@@ -45,6 +50,9 @@
           prepaidOrderFailed: {
             show: false,
             error: null
+          },
+          validatePrepaidOrder: {
+            show: false,
           }
         }
       }
@@ -549,10 +557,11 @@
         this.kitchenOrders = await orderModel.find({ online: true, status: 'kitchen' })
       },
       isPrepaidOrder(order) {
-        return order.paypalOrderDetail
+        return order.paypalOrderDetail != null
         // more 3rd party in this method
       },
       async declineOrder(order) {
+        console.log('decline order', order)
         const status = 'declined'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id},
           Object.assign({}, order, {
@@ -590,13 +599,13 @@
           
           // validate prepaid (paypal, etc) before update status
           let isPrepaidOrder = this.isPrepaidOrder(order);
+          console.log(`is prepaid order? ${isPrepaidOrder}`)
+          // info which will be added/updated into order documents
+          let updateOrderInfo = Object.assign({}, order, { status, user: this.user });
           let updatedOrder;
-          let updateOrderInfo; // info which will be added/updated into order documents
           if (isPrepaidOrder) {
-            // TODO: Do we need to find orderInfo from db, or just need to assign updatedOrder to 'order' object
-            updatedOrder = await cms.getModel('Order').find({ _id: order._id })
+            updatedOrder = order
           } else {
-            updateOrderInfo = Object.assign({}, order, { status, user: this.user });
             updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
             this.printOnlineOrderKitchen(order._id)
             this.printOnlineOrderReport(order._id)
@@ -617,15 +626,30 @@
               `sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           
-          window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error}) => {
+          if (isPrepaidOrder) {
+            this.dialog.validatePrepaidOrder.show = true
+          }
+          
+          window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error, responseData}) => {
             // TODO: Check result response in another language
             //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
             //  + transaction info stored in paypalOrderDetail object
+            if (isPrepaidOrder) {
+              this.dialog.validatePrepaidOrder.show = false
+            }
+            
             if (error || result !== 'COMPLETED') {
               this.dialog.prepaidOrderFailed.show = true
               this.dialog.prepaidOrderFailed.error = error || `Transaction status: ${result}`
             } else {
               if (isPrepaidOrder) {
+                console.log('Prepaid order capture succeeded')
+                // store response data for later use
+                updateOrderInfo.paypalOrderDetail = {
+                  ...updateOrderInfo.paypalOrderDetail,
+                  response: responseData
+                }
+                console.log(responseData)
                 await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
                 this.printOnlineOrderKitchen(order._id)
                 this.printOnlineOrderReport(order._id)
