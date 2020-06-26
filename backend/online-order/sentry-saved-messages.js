@@ -1,18 +1,4 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
-  tagString: {
-    type: String,
-    trim: true,
-  },
-  message: {
-    type: String,
-    trim: true,
-  },
-}, {
-  timestamps: true,
-}));
+const SentrySavedMessagesModel = cms.getModel('SentrySavedMessage');
 
 function sendSavedMessages() {
   SentrySavedMessagesModel.find({}, (err, docs) => {
@@ -27,7 +13,7 @@ function sendSavedMessages() {
 }
 
 function saveDisconnectMessage(onlineOrderSocket) {
-  return SentrySavedMessagesModel.create({
+  if (onlineOrderSocket.clientId) return SentrySavedMessagesModel.create({
     tagString: `sentry:clientId=${onlineOrderSocket.clientId},eventType=socketConnection,socketId=${onlineOrderSocket.serverSocketId}`,
     message: `2b. (Startup) onlineOrderSocket disconnected`,
   });
