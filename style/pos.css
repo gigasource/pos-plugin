@@ -648,7 +648,6 @@
   background-position: center;
 }
 
-
 .icon-germany {
   background-image: url("../assets/germany.svg");
   background-repeat: no-repeat;
@@ -656,6 +655,30 @@
   background-position: center;
 }
 
+.icon-screen_restaurant {
+  background-image: url("../assets/screen_restaurant.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
 
+.icon-table {
+  background-image: url("../assets/table.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
 
+.icon-card_outlined {
+  background-image: url("../assets/card_outlined.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
 
+.icon-table_outlined {
+  background-image: url("../assets/table_outlined.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
