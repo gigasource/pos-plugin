@@ -123,7 +123,16 @@ router.post('/new-store', async (req, res) => {
       timeToComplete: 30,
       autoAccept: true,
       devices: []
-    }
+    },
+    reservationSetting: {
+      activeReservation: true,
+      soundNotification: true,
+      hideEmpty: null,
+      emailConfirmation: true,
+      removeOverdueAfter: 30,
+      maxGuest: 20,
+      maxDay: 7
+    },
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
