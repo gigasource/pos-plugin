@@ -389,13 +389,14 @@ module.exports = async function (cms) {
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId},eventType=orderStatus`,
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
+        // NOTE: cashPayment may have paypalOrderDetail is empty object
         const isPaypalPayment = paypalOrderDetail && paypalOrderDetail.orderID
         const isCashPayment = !isPaypalPayment // more provider here
 
         if (isCashPayment)
           return updateOrderStatus(onlineOrderId, orderStatus)
 
-        // handle prepaid payment
+        // Get Payment provider infomation from store.
         const store = await cms.getModel('Store').findOne({alias: storeAlias});
         function initPayPalClient() {
           if (!store || !store.paymentProviders || !store.paymentProviders.paypal || _.trim(store.paymentProviders.paypal.clientId) === "" || _.trim(store.paymentProviders.paypal.secretToken) === "") {
@@ -408,7 +409,7 @@ module.exports = async function (cms) {
           return createPayPalClient(clientId, secretToken)
         }
 
-        console.log('paypalOrderDetail', paypalOrderDetail)
+        // console.log('paypalOrderDetail', paypalOrderDetail)
 
         switch (status) {
           case 'declined':
@@ -425,21 +426,34 @@ module.exports = async function (cms) {
                 _.each(paypalOrderDetail.captureResponses.purchase_units, purchase_unit => {
                   completedCaptures.push(..._.filter(purchase_unit.payments.captures, capture => capture.status === "COMPLETED"))
                 })
-                console.log('completedCaptures', completedCaptures)
+                // console.log('completedCaptures', completedCaptures)
+
+                // try to refund, return { error } if refundOrder failed for some reason
                 const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
                   try {
                     const refundBody = { amount: capture.amount, note_to_payer: responseMessage || "Order cancelled" }
                     return ppApiv2.refundOrder(ppClient, capture.id, refundBody)
                   } catch (e) {
-                    return false
+                    return { error: e.message }
                   }
                 }))
-                console.log('refundResponses', refundResponses)
+                const responseData = _.map(refundResponses, (response, index) => {
+                  if (!response || !response.result || response.result.status !== "COMPLETED")
+                    return {
+                      status: "ERROR",
+                      detail: response.error,
+                      captureId: completedCaptures[index].id
+                    }
+                  else
+                    return {
+                      ..._.pick(response.result, ['id', 'status']),
+                      captureId: completedCaptures[index].id
+                  }
+                })
+                // console.log('refundResponseData', responseData)
                 // then send back to restaurant
-                cb && cb({ responseData: refundResponses })
+                cb && cb({ responseData })
 
-                // eventhough some refund request failed, we still cancel the order
-                // let restaurant owner process invalid refund requests manually
                 updateOrderStatus(onlineOrderId, orderStatus)
               } catch (e) {
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
