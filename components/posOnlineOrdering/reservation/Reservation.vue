@@ -686,6 +686,11 @@
 
               .bs-tf-inner-input-group {
                 height: 40px;
+
+                .bs-tf-input {
+                  display: none;
+                  pointer-events: none;
+                }
               }
             }
           }

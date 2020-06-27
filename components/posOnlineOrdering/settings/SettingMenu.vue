@@ -57,7 +57,7 @@
                 + Add {{$t('setting.newItem')}}
               </g-btn-bs>
               <template v-if="!isInDevice">
-                <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2">
+                <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2" :option="{maxWidth: 1000}">
                   <template v-slot:default="{showUploadDialog}">
                     <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
                       Group Picture

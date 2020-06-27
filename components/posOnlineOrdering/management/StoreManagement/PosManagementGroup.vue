@@ -77,7 +77,7 @@
                     <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
                       <span>Online ordering</span>
                       <template v-slot:activator="{on}">
-                        <div v-if="device.features.onlineOrdering" v-on="on" class="ml-1">
+                        <div v-if="device.features.onlineOrdering" v-on="on" class="ml-1 h-100 row-flex align-items-center">
                           <g-icon size="14" class="ml-1">icon-screen_restaurant</g-icon>
                         </div>
                       </template>
@@ -85,7 +85,7 @@
                     <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
                       <span>Reservation</span>
                       <template v-slot:activator="{on}">
-                        <div v-if="device.features.reservation" v-on="on" class="ml-1">
+                        <div v-if="device.features.reservation" v-on="on" class="ml-1 h-100 row-flex align-items-center">
                           <g-icon size="14">icon-table</g-icon>
                         </div>
                       </template>
