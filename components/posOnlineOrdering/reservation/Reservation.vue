@@ -281,6 +281,11 @@
       },
       unavailableComplete() {
         if(this.noRequest) return true
+        for(const fn of this.validatePhone) {
+          if(typeof fn === 'function') {
+            if(typeof fn(this.customer.phone) === 'string') return true
+          }
+        }
         return this.people === 0 || !this.date || !this.time;
       },
       validatePhone() {
