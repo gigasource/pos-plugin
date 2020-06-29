@@ -112,12 +112,12 @@
           }, false, true)
         })
       },
-      async changeStoreEmbedImage(image, folder) {
+      async changeStoreEmbedImage(image, folder, type) {
         try {
-          const name = 'embed-icon.' + image.fileName.split('.')[1]
+          const name = `${type.toLowerCase()}-icon.` + image.fileName.split('.')[1]
           //delete old image
           const files = await this.gridFsHandler.getFilesInPath(folder)
-          const oldImage = files.find(f => f.mimeType.startsWith('image') && (f.fileName === name || f.fileName.startsWith('embed-icon')))
+          const oldImage = files.find(f => f.mimeType.startsWith('image') && (f.fileName === name || f.fileName.startsWith(`${type.toLowerCase()}-icon`)))
           if (oldImage)
             await this.gridFsHandler.deleteFile(oldImage)
           //clone image

@@ -284,7 +284,7 @@
         await this.updateButton()
         const url = [location.origin, this.type === 'Reservation' ? 'reservation' : 'store', this.store.alias].join('/'),
               script = location.origin + this.script,
-              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, 'embed-icon'].join('/')
+              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `${this.type.toLowerCase()}-icon`].join('/')
         this.iframe = `<div id="${this.type.toLowerCase()}-embed-btn" class="${this.type.toLowerCase()}-embed-btn" data-url="${url}">
                   <object style="pointer-events: none; max-width: 100%" type="image/svg+xml" data="${image}.svg">
                     <object style="pointer-events: none; max-width: 100%" type="image/jpeg" data="${image}.jpg">
@@ -303,7 +303,7 @@
       },
       async updateButton(close = false) {
         //change image
-        if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`)
+        if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`, this.type)
         //change script
         const header = genScriptHeader(), footer = genScriptFooter(), webshop = getEmbedWebshop.toString(), reservation = getEmbedReservation.toString(), checkIOs = checkIOs12AndLess.toString()
         const fnString = header + checkIOs + genStyleSheet(this.type, this.position, this.size, this.hidden).toString() + (this.type === 'Reservation' ? reservation : webshop) + genReadyState(this.type) + footer
