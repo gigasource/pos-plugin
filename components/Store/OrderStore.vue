@@ -1,24 +1,48 @@
 <template>
   <div>
     <!-- Capture order -->
-    <dialog-order-transaction-capture-failed
-        v-model="dialog.orderTransactionCaptureFailed.show"
-        :error="dialog.orderTransactionCaptureFailed.error"/>
-    <dialog-order-transaction-capturing
-        v-model="dialog.orderTransactionCapturing.show"/>
+    <dialog-common
+        :value="dialog.captureFailed.show"
+        @input="dialog.captureFailed.show = false"
+        title="Capture transaction failed">
+      <div>Error details:</div>
+      <div>{{dialog.captureFailed.error}}</div>
+    </dialog-common>
+    
+    <dialog-common
+        :value="dialog.capturing.show"
+        @input="dialog.capturing.show = false"
+        title="Capturing order's transaction">
+      We're capturing money for this order. Please wait...
+    </dialog-common>
     
     <!-- Refund order -->
-    <dialog-order-transaction-refunding
-        v-model="dialog.orderTransactionRefunding.show"/>
+    <dialog-common
+        :value="dialog.refunding.show"
+        @input="dialog.refunding.show = false"
+        title="Refunding">
+      We're refunding money for this order. Please wait...
+    </dialog-common>
   
     <dialog-order-transaction-refund-failed
-        v-model="dialog.refundOrderFailed.show"
-        :error="dialog.refundOrderFailed.error"
-        :capture-responses="dialog.refundOrderFailed.captureResponses"
-        :refund-responses="dialog.refundOrderFailed.refundResponses"/>
+        v-model="dialog.refundFailed.show"
+        :error="dialog.refundFailed.error"
+        :capture-responses="dialog.refundFailed.captureResponses"
+        :refund-responses="dialog.refundFailed.refundResponses"/>
   
-    <dialog-order-transaction-refund-succeeded
-        v-model="dialog.refundOrderSucceeded.show"/>
+    <dialog-common
+        :value="dialog.refundSucceeded.show"
+        title="Refund Succeeded"
+        @input="dialog.refundSucceeded.show = false">
+      A refund for this order has been processed.
+    </dialog-common>
+    
+    <dialog-order-transaction-refund-confirm
+        v-if="dialog.refundConfirm.show"
+        v-model="dialog.refundConfirm.show"
+        :order="dialog.refundConfirm.order"
+        :store-locale="storeLocale"
+        @submit="doRefundOrder(dialog.refundConfirm.order, dialog.refundConfirm.status)"/>
   </div>
 </template>
 
@@ -29,7 +53,6 @@
 
   export default {
     name: 'OrderStore',
-    components: { },
     domain: 'OrderStore',
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
@@ -59,25 +82,30 @@
         // reservations
         reservations: [],
         dialog: {
-          // capturing
-          orderTransactionCaptureFailed: {
+          // capture
+          capturing: {
+            show: false,
+          },
+          captureFailed: {
             show: false,
             error: null
           },
-          orderTransactionCapturing: {
+          // refund
+          refundConfirm: {
+            show: false,
+            order: null,
+            status: null,
+          },
+          refunding: {
             show: false,
           },
-          // refunding
-          orderTransactionRefunding: {
-            show: false,
-          },
-          refundOrderFailed: {
+          refundFailed: {
             show: false,
             error: null,
             captureResponses: {},
             refundResponses: [],
           },
-          refundOrderSucceeded: {
+          refundSucceeded: {
             show: false,
           },
         },
@@ -660,7 +688,7 @@
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           
           if (isPrepaidOrder) {
-            this.dialog.orderTransactionCapturing.show = true
+            this.dialog.capturing.show = true
           }
           
           window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error, responseData}) => {
@@ -668,12 +696,12 @@
             //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
             //  + transaction info stored in paypalOrderDetail object
             if (isPrepaidOrder) {
-              this.dialog.orderTransactionCapturing.show = false
+              this.dialog.capturing.show = false
             }
             
             if (error || result !== 'COMPLETED') {
-              this.dialog.orderTransactionCaptureFailed.show = true
-              this.dialog.orderTransactionCaptureFailed.error = error || `Transaction status: ${result}`
+              this.dialog.captureFailed.show = true
+              this.dialog.captureFailed.error = error || `Transaction status: ${result}`
             } else {
               if (isPrepaidOrder) {
                 console.log('Prepaid order capture succeeded')
@@ -747,24 +775,29 @@
         return _.find(refundResponses, r => r.status !== "COMPLETED") != null
       },
       refundOrder(order, status) {
-        this.dialog.orderTransactionRefunding.show = true
+        this.dialog.refundConfirm.order = order
+        this.dialog.refundConfirm.status = status
+        this.dialog.refundConfirm.show = true
+      },
+      doRefundOrder(order, status) {
+        this.dialog.refunding.show = true
 
         window.cms.socket.emit('refundOrder', order, async ({error, responseData}) => {
-          this.dialog.orderTransactionRefunding.show = false
+          this.dialog.refunding.show = false
 
           if (error) {
-            this.dialog.refundOrderFailed.show = true
-            this.dialog.refundOrderFailed.error = error
+            this.dialog.refundFailed.show = true
+            this.dialog.refundFailed.error = error
             return
           }
 
           const isRefundError = this.isRefundFailed(responseData)
           if (isRefundError) {
-            this.dialog.refundOrderFailed.show = true
-            this.$set(this.dialog.refundOrderFailed, 'captureResponses', order.paypalOrderDetail.captureResponses)
-            this.dialog.refundOrderFailed.refundResponses.splice(0, this.dialog.refundOrderFailed.refundResponses.length, ...responseData)
+            this.dialog.refundFailed.show = true
+            this.$set(this.dialog.refundFailed, 'captureResponses', order.paypalOrderDetail.captureResponses)
+            this.dialog.refundFailed.refundResponses.splice(0, this.dialog.refundFailed.refundResponses.length, ...responseData)
           } else {
-            this.dialog.refundOrderSucceeded.show = true
+            this.dialog.refundSucceeded.show = true
           }
 
           order.paypalOrderDetail.refundResponses = responseData

@@ -1,36 +1,30 @@
 <template>
-  <g-dialog v-model="value" persistent>
-    <div class="dlg">
-      <div class="dlg-title">Refund failed</div>
-      <div class="dlg-message">
-        <div style="font-size: 18px; margin-bottom: 5px;">Refund details:</div>
-        <div v-for="(refundCapture, index) in refundCaptures" :key="index" class="refund-capture">
-          <div class="refund-capture-header">
-            <div>Capture Id: {{ refundCapture.id }}</div>
-          </div>
-          <div class="refund-capture-body">
-            <div>Amount: {{ refundCapture.amount.value }} {{ refundCapture.amount.currency_code }}</div>
-            <div>Refund Status: <span class="refund-capture-status" :style="{ color: refundCapture.refundStatusColor }">{{ refundCapture.refundStatus }}</span> </div>
-            <div v-if="refundCapture.status === 'COMPLETED' && refundCapture.refundStatus !== 'COMPLETED'">
-              <div>Reason: </div>
-              {{ refundCapture.refundError }}
-            </div>
-          </div>
-        </div>
-        
-        <div v-if="error">
-          {{ error }}
-        </div>
+  <dialog-common v-model="value" title="Refund failed">
+    <div style="font-size: 18px; margin-bottom: 5px;">Refund details:</div>
+    <div v-for="(rc, index) in refundCaptures" :key="index" class="refund-capture">
+      <div class="refund-capture-header">
+        <div>Capture Id: {{ rc.id }}</div>
       </div>
-      <div class="dlg-buttons">
-        <g-btn-bs @click="close" background-color="#2979FF" text-color="white" width="100" style="margin: 0px">OK</g-btn-bs>
+      <div class="refund-capture-body">
+        <div>Amount: {{ rc.amount.value }} {{ rc.amount.currency_code }}</div>
+        <div>Refund Status: <span class="refund-capture-status" :style="{ color: rc.refundStatusColor }">{{ rc.refundStatus }}</span> </div>
+        <div v-if="rc.status === 'COMPLETED' && rc.refundStatus !== 'COMPLETED'">
+          <div>Reason: </div>
+          {{ rc.refundError }}
+        </div>
       </div>
     </div>
-  </g-dialog>
+  
+    <div v-if="error">
+      {{ error }}
+    </div>
+    <template #actions>
+      <g-btn-bs @click="$emit('input', false)" background-color="#2979FF" text-color="#fff" width="100" style="margin: 0">OK</g-btn-bs>
+    </template>
+  </dialog-common>
 </template>
 <script>
   import _ from 'lodash'
-  
   export default {
     name: 'dialogOrderTransactionRefundFailed',
     props: {
@@ -39,18 +33,7 @@
       captureResponses: Object,
       refundResponses: Array,
     },
-    data() {
-      return {}
-    },
     computed: {
-      internalValue: {
-        get() {
-          return this.value
-        },
-        set(v) {
-          this.$emit('input', v)
-        }
-      },
       refundCaptures () {
         let self = this
         const captures = []
@@ -70,46 +53,10 @@
           }
         })
       }
-    },
-    methods: {
-      close() {
-        this.internalValue = false
-      }
     }
   }
 </script>
 <style scoped lang="scss">
-  .dlg {
-    width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 24px;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    &-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #212121;
-      margin-bottom: 24px;
-      align-self: flex-start;
-    }
-  
-    &-message {
-      font-size: 15px;
-      width: 100%;
-      color: #333333;
-    }
-  
-    &-buttons {
-      display: inline-flex;
-      align-self: flex-end;
-      margin-top: 24px;
-    }
-  }
-  
   .refund-capture {
     background-color: #eee;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.3);

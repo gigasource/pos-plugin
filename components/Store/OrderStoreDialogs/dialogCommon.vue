@@ -1,25 +1,26 @@
 <template>
-  <g-dialog v-model="value" persistent>
+  <g-dialog v-model="internalValue" persistent>
     <div class="dlg">
-      <div class="dlg-title">Transaction failed</div>
+      <div class="dlg-title">{{ title }}</div>
       <div class="dlg-message">
-        <div>Error details:</div>
-        <div>{{error}}</div>
+        <slot></slot>
       </div>
       <div class="dlg-buttons">
-        <g-btn-bs @click="close" background-color="#536DFE" text-color="white" width="100">OK</g-btn-bs>
+        <slot name="actions">
+          <g-btn-bs background-color="#2979FF" text-color="white" @click="$emit('input',false)" width="100" style="margin: 0">OK</g-btn-bs>
+        </slot>
       </div>
     </div>
   </g-dialog>
 </template>
 <script>
   export default {
-    name: 'dialogOrderTransactionCaptureFailed',
+    name: 'dialogCommon',
     props: {
+      title: String,
       value: Boolean,
-      error: String
     },
-    data() {
+    data: function () {
       return {}
     },
     computed: {
@@ -32,16 +33,12 @@
         }
       }
     },
-    methods: {
-      close() {
-        this.internalValue = false
-      }
-    }
+    methods: {}
   }
 </script>
 <style scoped lang="scss">
   .dlg {
-    width: 600px;
+    width: 500px;
     margin: 0 auto;
     background: white;
     padding: 24px;
@@ -57,12 +54,13 @@
       margin-bottom: 24px;
       align-self: flex-start;
     }
-  
+    
     &-message {
       font-size: 15px;
+      width: 100%;
       color: #333333;
     }
-  
+    
     &-buttons {
       display: inline-flex;
       align-self: flex-end;
