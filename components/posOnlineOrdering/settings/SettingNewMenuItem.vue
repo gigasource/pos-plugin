@@ -125,10 +125,10 @@
     <!-- Action button -->
     <div style="display: flex; padding: 13px 8px; background-color: #FFF">
       <g-btn-bs @click="addChoice" border-color="#5E76FE">+ {{$t('setting.choice')}}</g-btn-bs>
-      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE" icon="check@20">Extra info</g-btn-bs>
+      <g-btn-bs @click="dialog.markItem = true" border-color="#5E76FE" icon="check@20">{{$t('setting.extraInfo')}}</g-btn-bs>
       <g-spacer/>
       <g-btn-bs @click="$emit('cancel')">{{$t('setting.cancel')}}</g-btn-bs>
-      <g-btn-bs :disabled="isDisabledSave" width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">{{$t('setting.save')}}</g-btn-bs>
+      <g-btn-bs :disabled="isDisabledSave" min-width="80" background-color="#536DFE" text-color="white" @click="saveMenuItem">{{$t('setting.save')}}</g-btn-bs>
     </div>
 
     <!-- Dialog -->

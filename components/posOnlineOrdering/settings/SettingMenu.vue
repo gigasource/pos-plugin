@@ -1,15 +1,15 @@
 <template>
   <div class="menu-setting">
     <template v-if="renderPage">
-      <div class="menu-setting__title mb-3">Menu Settings</div>
+      <div class="menu-setting__title mb-3">{{$t('setting.menuSetting')}}</div>
       <div v-if="!categories || !categories.length" class="menu-setting--empty">
         <img draggable="false" src="/plugins/pos-plugin/assets/folk_knife.svg">
         <p>Menu is currently empty.</p>
         <p><span style="color: #536DFE">"Add new category"</span> to get started.</p>
         <div class="row-flex align-items-center">
-          <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">Add New Category</g-btn-bs>
+          <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">{{$t('setting.newCategory')}}</g-btn-bs>
           <span class="mt-2">or</span>
-          <g-btn-bs v-if="imexportable" class="btn-add" @click="openImportMenuItemDialog">Import Categories</g-btn-bs>
+          <g-btn-bs v-if="imexportable" class="btn-add" @click="openImportMenuItemDialog">{{$t('setting.importCategory')}}</g-btn-bs>
         </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
@@ -17,17 +17,17 @@
           <g-spacer/>
           <g-btn-bs v-if="!isInDevice" @click="openWebShop" border-color="#757575">{{$t('setting.preview')}}</g-btn-bs>
           <g-btn-bs @click="dialog.setting = true" icon="icon-cog3@18" border-color="#757575">{{$t('setting.setting')}}</g-btn-bs>
-          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" style="margin-right: 0"
                     @click="openImportMenuItemDialog">
             Import
           </g-btn-bs>
-          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
+          <g-btn-bs v-if="imexportable" background-color="indigo accent-2" text-color="white" style="margin-right: 0"
                     @click="exportProductMenuItem">
             Export
           </g-btn-bs>
           <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add_circle" style="margin-right: 0"
                     @click="dialog.addNewCategory = true">
-            Add {{$t('setting.newCategory')}}
+            {{$t('setting.newCategory')}}
           </g-btn-bs>
         </div>
         <div class="menu-setting__category" id="menu-setting">
@@ -54,19 +54,19 @@
                   @click.stop.prevent="showAddNewProductPanelForCategory(cate)"
                   :disabled="showAddNewProductPanel[cate._id]"
                   style="white-space: nowrap">
-                + Add {{$t('setting.newItem')}}
+                + {{$t('setting.newItem')}}
               </g-btn-bs>
               <template v-if="!isInDevice">
                 <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2" :option="{maxWidth: 1000}">
                   <template v-slot:default="{showUploadDialog}">
                     <g-btn-bs icon="icon-upload2@18" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="showUploadDialog()" style="margin: 0">
-                      Group Picture
+                     {{$t('setting.groupPicture')}}
                     </g-btn-bs>
                   </template>
                 </upload-zone>
                 <g-btn-bs v-else background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="setCategoryImage('', cate._id)" style="margin: 0">
                   <g-icon color="#E24C4B" size="16" class="mr-2">close</g-icon>
-                  Group Picture
+                  {{$t('setting.groupPicture')}}
                 </g-btn-bs>
               </template>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
@@ -125,15 +125,15 @@
       <dialog-delete-item v-model="dialog.deleteProduct" @confirm="deleteProduct"/>
       <g-dialog v-model="dialog.setting" eager width="531">
         <div class="dialog">
-          <div class="dialog-title">Settings</div>
+          <div class="dialog-title">{{$t('setting.setting')}}</div>
           <g-icon class="dialog-icon--close" size="20" color="black" @click="dialog.setting = false">icon-close</g-icon>
           <div class="dialog-content">
-            <g-switch label="Collapse overflow text" v-model="collapse"/>
-            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Limit displaying menu description to 2 lines.</p>
-            <g-switch label="Display item no." v-model="showId"/>
-            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Display menu number on online ordering website</p>
-            <g-switch label="Display item image" v-model="showImage"/>
-            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">Display menu image on online ordering website</p>
+            <g-switch :label="$t('setting.collapseText')" v-model="collapse"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">{{$t('setting.limitDescription')}}</p>
+            <g-switch :label="$t('setting.displayItemNo')" v-model="showId"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">{{$t('setting.displayMenuNumber')}}</p>
+            <g-switch :label="$t('setting.displayItemImage')" v-model="showImage"/>
+            <p class="fs-small-2 i text-grey-darken-1 ml-1 mb-4">{{$t('setting.displayMenuImage')}}</p>
           </div>
         </div>
       </g-dialog>

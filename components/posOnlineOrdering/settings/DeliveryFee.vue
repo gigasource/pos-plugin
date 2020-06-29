@@ -4,13 +4,13 @@
     <div class="delivery-fee__content">
       <g-radio-group name="type" v-model="type" row>
         <g-radio small color="#536DFE" :label="$t('setting.zipCode')" value="zipCode" :class="[type === 'zipCode' && 'selected']"/>
-        <g-radio small color="#536DFE" label="Distance" value="distance" :class="[type === 'distance' && 'selected']"/>
+        <g-radio small color="#536DFE" :label="$t('setting.distance')" value="distance" :class="[type === 'distance' && 'selected']"/>
       </g-radio-group>
       <g-divider class="my-3" color="#efefef"/>
       <template v-if="type === 'zipCode'">
         <div class="delivery-fee__content-header">
           <div class="col-9">{{$t('setting.zipCode')}}</div>
-          <div class="col-3">Fee ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div class="col-3">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in zipCodeFees" :key="i">
@@ -27,20 +27,20 @@
           <div class="item-btn--add" @click="addNewFee">
             <g-icon size="40" color="#2979FF">add</g-icon>
           </div>
-          <p class="mt-1">Note: You can put zip codes with the same fee in a single line, separated by “,” or “;”</p>
+          <p class="mt-1">{{$t('setting.zipCodeNote')}}</p>
         </div>
-        <g-switch v-model="acceptOrderInOtherZipCodes" label="Accept orders with other zip codes"/>
+        <g-switch v-model="acceptOrderInOtherZipCodes" :label="$t('setting.acceptOtherZipCode')"/>
         <div class="row-flex align-items-center">
-          <span class="fw-700 mr-2 nowrap">Shipping fee for other zip codes</span>
+          <span class="fw-700 mr-2 nowrap">{{$t('setting.otherZipcodeFee')}}</span>
           <g-text-field-bs type="number" class="bs-tf__pos col-2" v-model="defaultFee"/>
         </div>
       </template>
       <template v-if="type === 'distance'">
-        <p class="fs-small"><b>Address: </b>{{address}}</p>
-        <p class="fs-small"><b>Coordinates: </b>{{obtainedCoordination}}</p>
+        <p class="fs-small"><b>{{$t('setting.address')}}: </b>{{address}}</p>
+        <p class="fs-small"><b>{{$t('setting.coordinates')}}: </b>{{obtainedCoordination}}</p>
         <div class="delivery-fee__content-header">
           <div class="col-9">Radius (km)</div>
-          <div class="col-3">Fee ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div class="col-3">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in distanceFees" :key="i">

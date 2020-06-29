@@ -2,7 +2,7 @@
   <div>
     <g-dialog v-model="internalValue" width="666" eager>
       <div class="dialog">
-        <div class="dialog__title">Add New Discount</div>
+        <div class="dialog__title">{{$t('setting.newDiscount')}}</div>
         <div class="dialog__content">
           <g-text-field-bs label="Name" v-model="name" >
             <template v-slot:append-inner v-if="isInDevice">
@@ -11,16 +11,16 @@
           </g-text-field-bs>
           <div class="row-flex">
             <div class="col-6">
-              <p class="mt-1 ml-1 mb-2">Type</p>
+              <p class="mt-1 ml-1 mb-2">{{$t('setting.type')}}</p>
               <div class="row-flex">
-                <g-checkbox color="indigo accent-2" v-model="type" value="delivery" label="Delivery"/>
-                <g-checkbox color="indigo accent-2" v-model="type" value="pickup" label="Pickup"/>
+                <g-checkbox color="indigo accent-2" v-model="type" value="delivery" :label="$t('setting.delivery')"/>
+                <g-checkbox color="indigo accent-2" v-model="type" value="pickup" :label="$t('setting.pickup')"/>
               </div>
             </div>
             <div class="col-6 row-flex">
               <div class="flex-equal">
                 <g-select :items="amounts" v-model="amount.type" text-field-component="GTextFieldBs" :key="internalValue"
-                          label="Amount"/>
+                          :label="$t('setting.amount')"/>
               </div>
               <div class="col-3" style="padding-top: 28px" v-if="amount.type !== 'freeShipping'">
                 <g-text-field-bs type="number" large v-model="amount.value" >
@@ -31,10 +31,10 @@
               </div>
             </div>
           </div>
-          <p class="mt-1 ml-1 mb-2">Condition (Optional)</p>
+          <p class="mt-1 ml-1 mb-2">{{$t('setting.condition')}} (Optional)</p>
           <div class="dialog__condition">
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="conditions.total.active" label="Total value*"/>
+              <g-checkbox color="indigo accent-2" v-model="conditions.total.active" :label="$t('setting.totalValue')"/>
               <g-menu v-model="menu[0]" open-on-hover nudge-left="150" nudge-top="10">
                 <template v-slot:activator="{on}">
                   <div v-on="on" style="margin-top: 6px">
@@ -42,9 +42,9 @@
                   </div>
                 </template>
                 <div class="menu-info">
-                  <p>• Ticking this option will limit your discount to orders with certain value range.</p>
-                  <p>• MIN or MAX value can be left empty. </p>
-                  <p><b>E.g:</b> If you want to limit your discount to orders with €10 or more, ticking this option and set MIN value to 10, leaving MAX value empty.</p>
+                  <p>• {{$t('setting.valueNote1')}}</p>
+                  <p>• {{$t('setting.valueNote2')}}</p>
+                  <p><b>E.g:</b> {{$t('setting.valueNote3')}}</p>
                 </div>
               </g-menu>
             </div>
@@ -59,7 +59,7 @@
               </div>
             </div>
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="conditions.timePeriod.active" label="Time period"/>
+              <g-checkbox color="indigo accent-2" v-model="conditions.timePeriod.active" :label="$t('setting.timePeriod')"/>
               <g-menu v-model="menu[1]" open-on-hover nudge-left="150" nudge-top="10">
                 <template v-slot:activator="{on}">
                   <div v-on="on" style="margin-top: 6px">
@@ -67,8 +67,8 @@
                   </div>
                 </template>
                 <div class="menu-info">
-                  <p>• Ticking this option will limit your discount to orders placed in a certain time period.</p>
-                  <p>• Not ticking this option will make your discount always applicable.</p>
+                  <p>• {{$t('setting.periodNote1')}}</p>
+                  <p>• {{$t('setting.periodNote2')}}</p>
                 </div>
               </g-menu>
             </div>
@@ -81,7 +81,7 @@
               </div>
             </div>
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="conditions.daysOfWeek.active" label="Days of the week"/>
+              <g-checkbox color="indigo accent-2" v-model="conditions.daysOfWeek.active" :label="$t('setting.daysOfWeek')"/>
               <g-menu v-model="menu[2]" open-on-hover nudge-left="150" nudge-top="75">
                 <template v-slot:activator="{on}">
                   <div v-on="on" style="margin-top: 6px">
@@ -89,29 +89,29 @@
                   </div>
                 </template>
                 <div class="menu-info">
-                  <p>• Ticking this option will limit your discount to orders placed in a certain days of the week.</p>
-                  <p>• Not ticking this option will make your discount applicable everyday during the week.</p>
+                  <p>• {{$t('setting.weekdayNote1')}}</p>
+                  <p>• {{$t('setting.weekdayNote2')}}</p>
                 </div>
               </g-menu>
             </div>
             <div :class="['row-flex', 'br-2', 'flex-wrap', 'b-grey', 'ba-thin', !conditions.daysOfWeek.active && 'disabled']">
               <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Monday"
-                          label="Mon"/>
+                          :label="$t('common.weekday.monday')"/>
               <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Thursday"
-                          label="Thu"/>
+                          :label="$t('common.weekday.thursday')"/>
               <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Sunday"
-                          label="Sun"/>
+                          :label="$t('common.weekday.sunday')"/>
               <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Tuesday"
-                          label="Tue"/>
+                          :label="$t('common.weekday.tuesday')"/>
               <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Friday"
-                          label="Fri"/>
+                          :label="$t('common.weekday.friday')"/>
               <g-checkbox color="indigo accent-2" class="col-4" v-model="conditions.daysOfWeek.value" value="Wednesday"
-                          label="Wed"/>
+                          :label="$t('common.weekday.wednesday')"/>
               <g-checkbox color="indigo accent-2" class="col-8" v-model="conditions.daysOfWeek.value" value="Saturday"
-                          label="Sat"/>
+                          :label="$t('common.weekday.saturday')"/>
             </div>
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="conditions.zipCode.active" label="Zip code"/>
+              <g-checkbox color="indigo accent-2" v-model="conditions.zipCode.active" :label="$t('setting.zipCode')"/>
               <g-menu v-model="menu[3]" open-on-hover nudge-left="150" nudge-top="10">
                 <template v-slot:activator="{on}">
                   <div v-on="on" style="margin-top: 6px">
@@ -119,8 +119,8 @@
                   </div>
                 </template>
                 <div class="menu-info">
-                  <p>• Ticking this option will limit your discount to orders in a certain area.</p>
-                  <p>• Not ticking this option will make your discount available to all zip codes.</p>
+                  <p>• {{$t('setting.zipcodeNote1')}}</p>
+                  <p>• {{$t('setting.zipcodeNote2')}}</p>
                 </div>
               </g-menu>
             </div>
@@ -133,7 +133,7 @@
               </g-combobox>
             </div>
             <div class="row-flex">
-              <g-checkbox color="indigo accent-2" v-model="conditions.coupon.active" label="Coupon"/>
+              <g-checkbox color="indigo accent-2" v-model="conditions.coupon.active" :label="$t('setting.coupon')"/>
               <g-menu v-model="menu[4]" open-on-hover nudge-left="150" nudge-top="10">
                 <template v-slot:activator="{on}">
                   <div v-on="on" style="margin-top: 6px">
@@ -141,7 +141,7 @@
                   </div>
                 </template>
                 <div class="menu-info">
-                  <p>• Ticking this option will limit your discount to orders with your specified coupon.</p>
+                  <p>• {{$t('setting.couponNote')}}</p>
                 </div>
               </g-menu>
             </div>
@@ -154,8 +154,8 @@
             </div>
           </div>
           <div class="dialog__action">
-            <g-btn-bs width="100" large text-color="#424242" @click="close()">Cancel</g-btn-bs>
-            <g-btn-bs width="100" large text-color="white" background-color="indigo-accent-2" :disabled="isSaveBtnDisabled" @click="submit">Save
+            <g-btn-bs min-width="100" large text-color="#424242" @click="close()">{{$t('setting.cancel')}}</g-btn-bs>
+            <g-btn-bs min-width="100" large text-color="white" background-color="indigo-accent-2" :disabled="isSaveBtnDisabled" @click="submit">{{$t('setting.save')}}
             </g-btn-bs>
           </div>
         </div>
@@ -166,8 +166,8 @@
     <dialog-number-filter label="Amount Value" v-model="dialog.amount" :default-value="amount.value" @submit="amount.value = +$event"/>
     <dialog-number-filter label="Min Value" v-model="dialog.min" :default-value="conditions.total.value.min" @submit="conditions.total.value.min = +$event"/>
     <dialog-number-filter label="Max Value" v-model="dialog.max" :default-value="conditions.total.value.max" @submit="conditions.total.value.max = +$event"/>
-    <dialog-number-filter label="Zipcode" v-model="dialog.zipCode"  @submit="conditions.zipCode.value.push($event)"/>
-    <dialog-text-filter label="Coupon" v-model="dialog.coupon" :default-value="conditions.coupon.value" @submit="conditions.coupon.value = $event"/>
+    <dialog-number-filter :label="$t('setting.zipCode')" v-model="dialog.zipCode"  @submit="conditions.zipCode.value.push($event)"/>
+    <dialog-text-filter :label="$t('setting.coupon')" v-model="dialog.coupon" :default-value="conditions.coupon.value" @submit="conditions.coupon.value = $event"/>
   </div>
 </template>
 
@@ -219,9 +219,9 @@
           }
         },
         amounts: [
-          { text: `Number (${$t('common.currency', this.storeCountryLocale)})`, value: 'flat' },
-          { text: 'Percentage', value: 'percent' },
-          { text: 'Free shipping', value: 'freeShipping' }
+          { text: `${$t('setting.number')} (${$t('common.currency', this.storeCountryLocale)})`, value: 'flat' },
+          { text: $t('setting.percentage'), value: 'percent' },
+          { text: $t('setting.freeship'), value: 'freeShipping' }
         ],
         menu: [false, false, false, false, false],
         dialog: {

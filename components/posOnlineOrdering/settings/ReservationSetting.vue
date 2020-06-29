@@ -3,11 +3,11 @@
     <div class="reservation-setting__title">Reservation</div>
     <div class="reservation-setting__main" v-if="store">
       <div class="reservation-setting__main--left">
-        <g-switch class="mb-3" label="Active reservation" v-model="activeReservation"/>
-        <g-switch class="mb-3" label="Incoming reservation notification sound" v-model="soundNotification"/>
+        <g-switch class="mb-3" :label="$t('setting.activeReservation')" v-model="activeReservation"/>
+        <g-switch class="mb-3" :label="$t('setting.incomeReservationSound')" v-model="soundNotification"/>
         <g-switch class="mb-3" label="Hide empty time slots" v-model="hideEmpty"/>
         <g-switch class="mb-3" label="Send confirmation email" v-model="emailConfirmation"/>
-        <p class="fw-700 fs-small mt-3">Automatically remove overdue reservations after (min)</p>
+        <p class="fw-700 fs-small mt-3">{{$t('setting.autoRemoveOverdue')}}</p>
         <g-grid-select :items="removeOverdueAfterList" v-model="removeOverdueAfter" mandatory :grid="false">
           <template #default="{item, toggleSelect}">
             <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#E0E0E0" text-color="black" height="30" min-width="72" @click.stop="toggleSelect(item)">{{item}}</g-btn-bs>
@@ -16,7 +16,7 @@
             <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#90CAF9" background-color="#E3F2FD" text-color="black" height="30" width="72">{{item}}</g-btn-bs>
           </template>
         </g-grid-select>
-        <p class="fw-700 fs-small mt-3">Maximum guest allowance</p>
+        <p class="fw-700 fs-small mt-3">{{$t('setting.maxGuest')}}</p>
         <g-grid-select :items="guestAllowances" v-model="maxGuest" mandatory :grid="false">
           <template #default="{item, toggleSelect}">
             <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#E0E0E0" text-color="black" height="30" min-width="72" @click.stop="toggleSelect(item)">{{item}}</g-btn-bs>
@@ -25,7 +25,7 @@
             <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#90CAF9" background-color="#E3F2FD" text-color="black" height="30" width="72">{{item}}</g-btn-bs>
           </template>
         </g-grid-select>
-        <p class="fw-700 fs-small mt-3">Maximum time allowance (days)</p>
+        <p class="fw-700 fs-small mt-3">{{$t('setting.maxTime')}}</p>
         <g-grid-select :items="dayAllowances" v-model="maxDay" mandatory :grid="false">
           <template #default="{item, toggleSelect}">
             <g-btn-bs style="margin: 16px 16px 0 0;" border-color="#E0E0E0" text-color="black" height="30" min-width="72" @click.stop="toggleSelect(item)">{{item}}</g-btn-bs>

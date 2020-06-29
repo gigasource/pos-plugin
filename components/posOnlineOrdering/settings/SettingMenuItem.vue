@@ -87,7 +87,7 @@
                   <g-icon color="#FFF" small>mdi-pencil-outline</g-icon>
                 </div>
               </template>
-              <span>Edit</span>
+              <span>{{$t('setting.edit')}}</span>
             </g-tooltip>
             <g-tooltip :open-on-hover="true" bottom speech-bubble color="#000" transition="0.3" remove-content-on-close>
               <template v-slot:activator="{on}">
@@ -98,7 +98,7 @@
                   <g-icon color="#FFF" small>mdi-trash-can-outline</g-icon>
                 </div>
               </template>
-              <span>Delete</span>
+              <span>{{$t('setting.delete')}}</span>
             </g-tooltip>
           </div>
         </div>

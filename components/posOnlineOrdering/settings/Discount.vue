@@ -1,15 +1,15 @@
 <template>
   <div class="discount">
-    <div class="discount__title">Discount</div>
+    <div class="discount__title">{{$t('setting.discount')}}</div>
     <div :class="['discount__action-bar', isInDevice && 'discount__action-bar--mobile']">
-      <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add@20" @click="openDialogDiscount()">Add New Discount</g-btn-bs>
+      <g-btn-bs background-color="indigo accent-2" text-color="white" icon="add@20" @click="openDialogDiscount()">{{$t('setting.newDiscount')}}</g-btn-bs>
     </div>
     <div :class="['discount__table', isInDevice && 'discount__table--mobile']">
       <div class="discount__table-header">
         <div class="w-20 pl-2">Name</div>
-        <div class="col-2 pl-1">Type</div>
-        <div class="col-2 pl-1">Amount</div>
-        <div class="flex-equal pl-1">Condition</div>
+        <div class="col-2 pl-1">{{$t('setting.type')}}</div>
+        <div class="col-2 pl-1">{{$t('setting.amount')}}</div>
+        <div class="flex-equal pl-1">{{$t('setting.condition')}}</div>
         <div class="col-1 pl-1 ta-center">Status</div>
         <div class="col-1"></div>
       </div>
@@ -18,7 +18,7 @@
           <div class="discount__table-content--empty">
             <img alt src="/plugins/pos-plugin/assets/empty_group.svg"/>
             <p class="text-grey-darken-1 mt-2">No discounts created</p>
-            <g-btn-bs text-color="indigo accent-2" icon="add@16" class="fw-700" @click="openDialogDiscount()">Add New Discount</g-btn-bs>
+            <g-btn-bs text-color="indigo accent-2" icon="add@16" class="fw-700" @click="openDialogDiscount()">{{$t('setting.newDiscount')}}</g-btn-bs>
           </div>
         </template>
         <template v-else>
@@ -41,9 +41,9 @@
                   <g-icon :class="[discount.menu && 'menu--active']" @click="on.click">more_horiz</g-icon>
                 </template>
                 <div class="menu-action">
-                  <div class="menu-action__option" @click="openDialogDiscount(true, discount)">Edit</div>
+                  <div class="menu-action__option" @click="openDialogDiscount(true, discount)">{{$t('setting.edit')}}</div>
                   <div class="menu-action__option" @click="changeStatus(discount)">{{discount.enabled ? 'Disable' : 'Enable'}}</div>
-                  <div class="menu-action__option" @click="openDialogDelete(discount)">Delete</div>
+                  <div class="menu-action__option" @click="openDialogDelete(discount)">{{$t('setting.delete')}}</div>
                 </div>
               </g-menu>
             </div>
@@ -146,7 +146,7 @@
         }
       },
       getActiveStatus(enabled) {
-        return enabled ? 'Active' : 'Inactive'
+        return enabled ? this.$t('setting.active') : this.$t('setting.inactive')
       },
       changeStatus(discount) {
         this.$emit('updateDiscount',

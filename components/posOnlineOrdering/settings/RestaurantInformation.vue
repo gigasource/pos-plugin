@@ -37,7 +37,7 @@
           <div class="mb-3 fw-700">{{$t('setting.embedCode')}}</div>
           <div class="row-flex align-items-center">
             <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
-              Generate code to embed online ordering to your website
+              {{$t('setting.generateCodeEmbed')}}
             </div>
             <g-spacer/>
             <g-btn-bs min-width="100" style="margin: 0 4px" @click="openDialogGenerate" background-color="#536DFE" text-color="white">{{$t('setting.generate')}}</g-btn-bs>

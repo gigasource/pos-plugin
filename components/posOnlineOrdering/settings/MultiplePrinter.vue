@@ -1,24 +1,24 @@
 <template>
   <div class="multiple-printer">
-    <div class="multiple-printer__title">Multiple Printer</div>
+    <div class="multiple-printer__title">{{$t('setting.multiplePrinter')}}</div>
     <div class="multiple-printer__content">
       <div class="row-flex mb-3">
         <g-switch v-model="multiple"/>
         <div>
-          <p class="fw-700 fs-small">Use multiple printer </p>
-          <p class="text-grey-darken-1 fs-small">(Leave this setting off if you use only 1 printer)</p>
+          <p class="fw-700 fs-small">{{$t('setting.useMultiplePrinter')}}</p>
+          <p class="text-grey-darken-1 fs-small">({{$t('setting.onePrinterNote')}})</p>
         </div>
       </div>
       <div class="row-flex justify-between align-items-center">
-        <p class="fw-700">Printer name</p>
-        <g-btn-bs class="text-indigo-accent-2 fw-700" @click="dialog.newPrinter = true">+ Add New</g-btn-bs>
+        <p class="fw-700">{{$t('setting.printerName')}}</p>
+        <g-btn-bs class="text-indigo-accent-2 fw-700" @click="dialog.newPrinter = true">+ {{$t('setting.newPrinter')}}</g-btn-bs>
       </div>
       <div class="multiple-printer__printer">
         <g-chip v-for="(printer, i) in printers" :key="i" close close-icon="icon-close@14" label @close="removePrinter(printer)">
           {{printer}}
         </g-chip>
       </div>
-      <p class="i fs-small mt-2">Note: Printer name must be identical to your POS settings.</p>
+      <p class="i fs-small mt-2">{{$t('setting.printerNameNote')}}</p>
     </div>
     <g-dialog v-model="dialog.newPrinter" width="40%" eager>
       <div class="dialog">
