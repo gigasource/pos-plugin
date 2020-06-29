@@ -409,57 +409,9 @@ module.exports = async function (cms) {
           return createPayPalClient(clientId, secretToken)
         }
 
-        // console.log('paypalOrderDetail', paypalOrderDetail)
-
         switch (status) {
           case 'declined':
-            if (isPaypalPayment) {
-              // is paypal payment but transaction was not captured
-              if (!paypalOrderDetail.captureResponses)
-                return updateOrderStatus(onlineOrderId, orderStatus)
-
-              // if paypal payment captured -> refund
-              try {
-                const ppClient = initPayPalClient()
-                // get all completed capture request
-                const completedCaptures = []
-                _.each(paypalOrderDetail.captureResponses.purchase_units, purchase_unit => {
-                  completedCaptures.push(..._.filter(purchase_unit.payments.captures, capture => capture.status === "COMPLETED"))
-                })
-                // console.log('completedCaptures', completedCaptures)
-
-                // try to refund, return { error } if refundOrder failed for some reason
-                const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
-                  try {
-                    const refundBody = { amount: capture.amount, note_to_payer: responseMessage || "Order cancelled" }
-                    return ppApiv2.refundOrder(ppClient, capture.id, refundBody)
-                  } catch (e) {
-                    return { error: e.message }
-                  }
-                }))
-                const responseData = _.map(refundResponses, (response, index) => {
-                  if (!response || !response.result || response.result.status !== "COMPLETED")
-                    return {
-                      status: "ERROR",
-                      detail: response.error,
-                      captureId: completedCaptures[index].id
-                    }
-                  else
-                    return {
-                      ..._.pick(response.result, ['id', 'status']),
-                      captureId: completedCaptures[index].id
-                  }
-                })
-                // console.log('refundResponseData', responseData)
-                // then send back to restaurant
-                cb && cb({ responseData })
-
-                updateOrderStatus(onlineOrderId, orderStatus)
-              } catch (e) {
-                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
-                cb && cb({ error: e.message })
-              }
-            }
+            updateOrderStatus(onlineOrderId, orderStatus)
             break;
           case 'kitchen':
             if (isPaypalPayment) {
