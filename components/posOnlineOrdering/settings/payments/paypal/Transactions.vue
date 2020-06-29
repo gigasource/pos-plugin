@@ -80,7 +80,7 @@
           index: 1,
           current: 1,
           total: 1,
-          itemsPerPage: 30
+          itemsPerPage: 15
         },
         dialog: {
           transactionDetail: {
