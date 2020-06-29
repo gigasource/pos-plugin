@@ -173,6 +173,11 @@ module.exports = async cms => {
   async function initReservationSchedules() {
     // fetch all pending reservations
     let pendingReservations = await cms.getModel('Reservation').find({status: 'pending'}).lean()
+    // cancel if device is not registered
+    const posSettings = await cms.getModel('PosSetting').findOne()
+    if (!posSettings.onlineDevice.id) {
+      return await cms.getModel('Reservation').updateMany({ _id: { $in: pendingReservations.map(i => i._id) } }, { status: 'declined' })
+    }
     // start jobs
     console.debug(getBaseSentryTags('reservation'), `Restaurant: scheduling Reservation jobs on init`)
     pendingReservations.forEach(res => {

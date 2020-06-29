@@ -72,7 +72,7 @@
       <span>Payment</span>
       <span class="float-right">{{payment}}</span>
     </div>
-    <div class="footer text-center">
+    <div class="footer text-center" v-if="payment !== 'Cash'">
       <span style="border: 1px solid black; padding: 5px">{{locale.printing.paid}}</span>
     </div>
   </div>

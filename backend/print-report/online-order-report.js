@@ -147,11 +147,13 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
   escPrinter.leftRight('Payment', payment)
 
-  escPrinter.newLine()
-  escPrinter.alignCenter()
-  escPrinter.setTextDoubleHeight()
-  escPrinter.bold(true)
-  escPrinter.println(locale.printing.paid)
+  if (payment !== 'Cash') {
+    escPrinter.newLine()
+    escPrinter.alignCenter()
+    escPrinter.setTextDoubleHeight()
+    escPrinter.bold(true)
+    escPrinter.println(locale.printing.paid)
+  }
 
   // escPrinter.newLine()
   // escPrinter.alignCenter()
