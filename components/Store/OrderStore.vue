@@ -715,13 +715,32 @@
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
+      isCaptureRefundExpired(captureResponses) {
+        // find final capture
+        let finalCapture;
+        for(let purchase_unit of captureResponses.purchase_units) {
+          for (let capture of purchase_unit.payments.captures) {
+            if (capture.final_capture) {
+              finalCapture = capture
+              break;
+            }
+          }
+        }
+        
+        // capture not completed, doesn't allow refund
+        if (!finalCapture)
+          return true;
+        
+        const _3HoursBefore = dayjs().subtract(3, 'hour')
+        const createTime = dayjs(finalCapture.create_time)
+        return createTime.isBefore(_3HoursBefore)
+      },
       isRefundable(order) {
         // refundable order is order paid via paypal and money has been captured
         // and not refund yet or refund but some capture failed
-        // TODO: less then 3hrs of process
         return (order.paypalOrderDetail
             && order.paypalOrderDetail.captureResponses
-            && order.paypalOrderDetail.captureResponses.status === "COMPLETED"
+            && order.paypalOrderDetail.captureResponses.status === "COMPLETED" && !this.isCaptureRefundExpired(order.paypalOrderDetail.captureResponses)
             && (!order.paypalOrderDetail.refundResponses || this.isRefundFailed(order.paypalOrderDetail.refundResponses)))
       },
       isRefundFailed(refundResponses) {
