@@ -47,7 +47,7 @@
         <div v-if="errors[index] && errors[index].message" class="error-message">{{errors[index].message}}</div>
       </div>
       <div class="row-flex">
-        <p>Note: Delivery hours must be within open hours.</p>
+        <p>{{$t('setting.deliveryHourNote')}}</p>
         <g-spacer/>
         <g-btn-bs min-width="80" background-color="indigo accent-2" text-color="white" @click="updateOpenHours"
                :disabled="hasError || openHoursJson === lastSavedData">{{$t('setting.save')}}
@@ -90,7 +90,7 @@
           </div>
         </div>
         <div class="row-flex mt-2">
-          <div class="fw-700">Days-off</div>
+          <div class="fw-700">{{$t('setting.daysOff')}}</div>
           <g-spacer/>
           <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = true">+ Add new</g-btn-bs>
         </div>
@@ -99,12 +99,12 @@
         </div>
       </div>
       <div class="service-setting__content col-7">
-        <div class="mb-3 fw-700">G-SMS Settings</div>
+        <div class="mb-3 fw-700">G-SMS {{$t('setting.settings')}}</div>
         <div class="row-flex">
-          <g-switch color="#536DFE" class="col-6" label="Enabled" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
-          <g-switch color="#536DFE" class="col-6" label="Auto-accept new devices" :input-value="computedGSms.autoAccept" @change="setGSmsValue('autoAccept', $event)"/>
+          <g-switch color="#536DFE" class="col-6" :label="$t('setting.enabled')" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
+          <g-switch color="#536DFE" class="col-6" :label="$t('setting.autoAcceptDevice')" :input-value="computedGSms.autoAccept" @change="setGSmsValue('autoAccept', $event)"/>
         </div>
-        <div class="fw-700 mt-2">Default time to complete order</div>
+        <div class="fw-700 mt-2">{{$t('setting.defaultTimeComplete')}}</div>
         <g-grid-select :items="[15, 30, 45, 60]" mandatory :grid="false" class="mb-3"
                        :value="computedGSms.timeToComplete" @input="setGSmsValue('timeToComplete', $event)"
         >
@@ -119,8 +119,8 @@
           </template>
         </g-grid-select>
         <div>
-          <span style="font-weight: 700;">Note: </span>
-          <span>We recommend leaving this setting off by default. For more information, please contact your service provider.</span>
+          <span style="font-weight: 700;">{{$t('store.note')}}: </span>
+          <span>{{$t('setting.recommendGSMS')}}</span>
         </div>
         <template v-if="smsDevices && smsDevices.length > 0">
           <div class="fw-700 mt-2">Device list</div>

@@ -3,7 +3,7 @@
     <header
         class="mb-3"
         style="font-family: Muli; font-weight: bold; font-size: 18px; line-height: 23px;">
-      Payment Setting
+      {{$t('setting.paymentSetting')}}
     </header>
 
     <section class="row-flex flex-wrap justify-between">

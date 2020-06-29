@@ -34,7 +34,7 @@
       </section>
       
       <footer class="row-flex justify-end">
-        <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="deactivePayPalCheckout" style="margin-right: 0">Deactive Paypal Checkout</g-btn-bs>
+        <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="deactivePayPalCheckout" style="margin-right: 0">{{$t('setting.deactivePaypal')}}</g-btn-bs>
       </footer>
     </template>
     
@@ -44,7 +44,7 @@
         <g-text-field-bs v-model="secretToken" prefix="Secret Token"/>
       </section>
       <footer class="row-flex justify-end">
-        <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="activePayPalCheckout" style="margin-right: 0">Activate PayPal Checkout</g-btn-bs>
+        <g-btn-bs background-color="#536DFE" text-color="#FFF" @click="activePayPalCheckout" style="margin-right: 0">{{$t('setting.activePaypal')}}</g-btn-bs>
       </footer>
     </template>
   </section>

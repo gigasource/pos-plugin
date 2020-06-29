@@ -126,12 +126,12 @@
             {title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
             {title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
             cms.loginUser.user.role.name === "admin" && {
-              title: 'Payment Setting',
+              title: this.setting.paymentSetting,
               icon: 'icon-card_outlined',
               key: 'Payment Setting',
               onClick: () => this.changeView('payment-provider', 'Payment Setting'),
               items: [
-                {title: 'Transaction', key: 'Transaction', icon: 'history', onClick: () => this.changeView('transaction', 'Transaction')}
+                {title: this.setting.transaction, key: 'Transaction', icon: 'history', onClick: () => this.changeView('transaction', 'Transaction')}
               ]
             },
           ]

@@ -786,6 +786,17 @@ module.exports = async function (cms) {
           `2. Online order backend: no device found, cancelled sending`)
       }
 
+      if (store.gSms && store.gSms.enabled) {
+        cms.emit('sendReservationMessage', storeId, reservationData)
+        const demoDevices = store.gSms.devices
+        demoDevices.filter(i => i.registered).forEach(({ _id }) => {
+          const targetClientId = `${store.id}_${_id}`;
+          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [reservationData])
+          console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
+            `2a. Online order backend: sent reservation to demo device`)
+        })
+      }
+
       if (store.reservationSetting && store.reservationSetting.emailConfirmation) {
         sendReservationConfirmationEmail(reservationData, store.id)
       }
