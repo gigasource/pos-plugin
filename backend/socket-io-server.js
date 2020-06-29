@@ -385,41 +385,104 @@ module.exports = async function (cms) {
       })
 
       socket.on('updateOrderStatus', async (orderStatus, cb) => {
-        const {onlineOrderId, status, paypalOrderDetail, storeName, storeAlias} = orderStatus
+        const {onlineOrderId, status, paypalOrderDetail, storeName, storeAlias, responseMessage} = orderStatus
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId},eventType=orderStatus`,
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
-        if (status === 'completed') {
-          // do nothing with completed
-          // now paypal submit will be execute when order status === 'kitchen'
-          return
-        } else if (status === 'kitchen') {
-          if (paypalOrderDetail) {
-            const store = await cms.getModel('Store').findOne({alias: storeAlias})
-            if (!store || !store.paymentProviders || !store.paymentProviders.paypal) {
-              // store information is missing, so order will not be processed
-              console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: paypal token missing. Info: store_alias=${storeAlias}`)
-              cb && cb({ error: "paypal token missing" })
-              return;
-            }
+        // NOTE: cashPayment may have paypalOrderDetail is empty object
+        const isPaypalPayment = paypalOrderDetail && paypalOrderDetail.orderID
+        const isCashPayment = !isPaypalPayment // more provider here
 
-            const { clientId, secretToken } = store.paymentProviders.paypal
+        if (isCashPayment)
+          return updateOrderStatus(onlineOrderId, orderStatus)
 
-            try {
-              const ppClient = createPayPalClient(clientId, secretToken)
-              const result = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID, false)).result
-              const logClientId = (clientId || '').substr(0, 6) // using for log
-              const logSecretToken = (secretToken || '').substr(0, 6) // using for log
-              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(result))
-              cb && cb({ result: result.status })
-            } catch (e) {
-              console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},clientId=${logClientId},secretToken=${logSecretToken},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
-              cb && cb({ error: e.message })
-            }
+        // Get Payment provider infomation from store.
+        const store = await cms.getModel('Store').findOne({alias: storeAlias});
+        function initPayPalClient() {
+          if (!store || !store.paymentProviders || !store.paymentProviders.paypal || _.trim(store.paymentProviders.paypal.clientId) === "" || _.trim(store.paymentProviders.paypal.secretToken) === "") {
+            const errMessage = "PayPal provider is not installed"
+            console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: ${errMessage}. Info: store_alias=${storeAlias}`)
+            cb && cb({ error: errMessage })
+            throw errMessage
           }
+          const { clientId, secretToken } = store.paymentProviders.paypal
+          return createPayPalClient(clientId, secretToken)
         }
 
-        updateOrderStatus(onlineOrderId, orderStatus)
+        // console.log('paypalOrderDetail', paypalOrderDetail)
+
+        switch (status) {
+          case 'declined':
+            if (isPaypalPayment) {
+              // is paypal payment but transaction was not captured
+              if (!paypalOrderDetail.captureResponses)
+                return updateOrderStatus(onlineOrderId, orderStatus)
+
+              // if paypal payment captured -> refund
+              try {
+                const ppClient = initPayPalClient()
+                // get all completed capture request
+                const completedCaptures = []
+                _.each(paypalOrderDetail.captureResponses.purchase_units, purchase_unit => {
+                  completedCaptures.push(..._.filter(purchase_unit.payments.captures, capture => capture.status === "COMPLETED"))
+                })
+                // console.log('completedCaptures', completedCaptures)
+
+                // try to refund, return { error } if refundOrder failed for some reason
+                const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
+                  try {
+                    const refundBody = { amount: capture.amount, note_to_payer: responseMessage || "Order cancelled" }
+                    return ppApiv2.refundOrder(ppClient, capture.id, refundBody)
+                  } catch (e) {
+                    return { error: e.message }
+                  }
+                }))
+                const responseData = _.map(refundResponses, (response, index) => {
+                  if (!response || !response.result || response.result.status !== "COMPLETED")
+                    return {
+                      status: "ERROR",
+                      detail: response.error,
+                      captureId: completedCaptures[index].id
+                    }
+                  else
+                    return {
+                      ..._.pick(response.result, ['id', 'status']),
+                      captureId: completedCaptures[index].id
+                  }
+                })
+                // console.log('refundResponseData', responseData)
+                // then send back to restaurant
+                cb && cb({ responseData })
+
+                updateOrderStatus(onlineOrderId, orderStatus)
+              } catch (e) {
+                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
+                cb && cb({ error: e.message })
+              }
+            }
+            break;
+          case 'kitchen':
+            if (isPaypalPayment) {
+              try {
+                const ppClient = initPayPalClient()
+                const captureResponse = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID))
+                const responseData = captureResponse.result
+                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(responseData))
+                cb && cb({ result: responseData.status, responseData: responseData })
+                updateOrderStatus(onlineOrderId, orderStatus)
+              } catch (e) {
+                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
+                cb && cb({ error: e.message })
+              }
+            }
+            break;
+          case 'completed':
+            //
+            break;
+          default:
+            console.warn('Invalid order status', status)
+            break;
+        }
       })
 
       socket.on('updateVersion', async (appVersion, _id) => {
