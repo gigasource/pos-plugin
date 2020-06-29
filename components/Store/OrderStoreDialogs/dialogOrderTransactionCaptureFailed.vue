@@ -14,7 +14,7 @@
 </template>
 <script>
   export default {
-    name: 'dialogCapturePrepaidTransactionFailed',
+    name: 'dialogOrderTransactionCaptureFailed',
     props: {
       value: Boolean,
       error: String

@@ -17,6 +17,10 @@
             </div>
           </div>
         </div>
+        
+        <div v-if="error">
+          {{ error }}
+        </div>
       </div>
       <div class="dlg-buttons">
         <g-btn-bs @click="close" background-color="#2979FF" text-color="white" width="100" style="margin: 0px">OK</g-btn-bs>
@@ -28,10 +32,10 @@
   import _ from 'lodash'
   
   export default {
-    name: 'dialogRefundPrepaidTransactionFailed',
+    name: 'dialogOrderTransactionRefundFailed',
     props: {
       value: Boolean,
-      error: String,
+      error: String, // un-expected error return from server
       captureResponses: Object,
       refundResponses: Array,
     },

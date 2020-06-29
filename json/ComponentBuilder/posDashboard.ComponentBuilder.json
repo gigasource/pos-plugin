@@ -279,11 +279,36 @@
                 {
                   "service": "OrderStore:getOnlineOrdersWithStatus",
                   "local": "getOnlineOrdersWithStatus",
-                  "type": "event"
+                  "type": "prop"
                 },
                 {
                   "service": "OrderStore:onlineOrders",
                   "local": "onlineOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:isRefundable",
+                  "local": "isRefundable",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:isRefundFailed",
+                  "local": "isRefundFailed",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:refundOrder",
+                  "local": "refundOrder",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:user",
+                  "local": "user",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:storeLocale",
+                  "local": "storeLocale",
                   "type": "prop"
                 }
               ],

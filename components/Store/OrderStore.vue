@@ -1,10 +1,24 @@
 <template>
   <div>
-    <dialog-capture-prepaid-transaction-failed
-        v-model="dialog.prepaidOrderFailed.show"
-        :error="dialog.prepaidOrderFailed.error"/>
-    <dialog-validating-prepaid-order
-        v-model="dialog.validatePrepaidOrder.show"/>
+    <!-- Capture order -->
+    <dialog-order-transaction-capture-failed
+        v-model="dialog.orderTransactionCaptureFailed.show"
+        :error="dialog.orderTransactionCaptureFailed.error"/>
+    <dialog-order-transaction-capturing
+        v-model="dialog.orderTransactionCapturing.show"/>
+    
+    <!-- Refund order -->
+    <dialog-order-transaction-refunding
+        v-model="dialog.orderTransactionRefunding.show"/>
+  
+    <dialog-order-transaction-refund-failed
+        v-model="dialog.refundOrderFailed.show"
+        :error="dialog.refundOrderFailed.error"
+        :capture-responses="dialog.refundOrderFailed.captureResponses"
+        :refund-responses="dialog.refundOrderFailed.refundResponses"/>
+  
+    <dialog-order-transaction-refund-succeeded
+        v-model="dialog.refundOrderSucceeded.show"/>
   </div>
 </template>
 
@@ -12,14 +26,10 @@
   import orderUtil from '../logic/orderUtil';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
-  import DialogValidatingPrepaidOrder from '../OnlineOrder/dialogValidatingPrepaidOrder';
-  import DialogCapturePrepaidTransactionFailed from '../OnlineOrder/dialogCapturePrepaidTransactionFailed';
-  import DialogRefundPrepaidTransactionFailed from '../OnlineOrder/dialogRefundPrepaidTransactionFailed';
-  import DialogRefundOrderSucceeded from '../OnlineOrder/dialogRefundOrderSucceeded';
 
   export default {
     name: 'OrderStore',
-    components: { DialogRefundOrderSucceeded, DialogRefundPrepaidTransactionFailed, DialogCapturePrepaidTransactionFailed, DialogValidatingPrepaidOrder },
+    components: { },
     domain: 'OrderStore',
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
@@ -49,14 +59,28 @@
         // reservations
         reservations: [],
         dialog: {
-          prepaidOrderFailed: {
+          // capturing
+          orderTransactionCaptureFailed: {
             show: false,
             error: null
           },
-          validatePrepaidOrder: {
+          orderTransactionCapturing: {
             show: false,
-          }
-        }
+          },
+          // refunding
+          orderTransactionRefunding: {
+            show: false,
+          },
+          refundOrderFailed: {
+            show: false,
+            error: null,
+            captureResponses: {},
+            refundResponses: [],
+          },
+          refundOrderSucceeded: {
+            show: false,
+          },
+        },
       }
     },
     computed: {
@@ -636,7 +660,7 @@
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
           
           if (isPrepaidOrder) {
-            this.dialog.validatePrepaidOrder.show = true
+            this.dialog.orderTransactionCapturing.show = true
           }
           
           window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error, responseData}) => {
@@ -644,12 +668,12 @@
             //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
             //  + transaction info stored in paypalOrderDetail object
             if (isPrepaidOrder) {
-              this.dialog.validatePrepaidOrder.show = false
+              this.dialog.orderTransactionCapturing.show = false
             }
             
             if (error || result !== 'COMPLETED') {
-              this.dialog.prepaidOrderFailed.show = true
-              this.dialog.prepaidOrderFailed.error = error || `Transaction status: ${result}`
+              this.dialog.orderTransactionCaptureFailed.show = true
+              this.dialog.orderTransactionCaptureFailed.error = error || `Transaction status: ${result}`
             } else {
               if (isPrepaidOrder) {
                 console.log('Prepaid order capture succeeded')
@@ -690,6 +714,44 @@
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
         window.cms.socket.emit('updateOrderStatus', orderStatus)
+      },
+      isRefundable(order) {
+        // refundable order is order paid via paypal and money has been captured
+        // and not refund yet or refund but some capture failed
+        // TODO: less then 3hrs of process
+        return (order.paypalOrderDetail
+            && order.paypalOrderDetail.captureResponses
+            && order.paypalOrderDetail.captureResponses.status === "COMPLETED"
+            && (!order.paypalOrderDetail.refundResponses || this.isRefundFailed(order.paypalOrderDetail.refundResponses)))
+      },
+      isRefundFailed(refundResponses) {
+        return _.find(refundResponses, r => r.status !== "COMPLETED") != null
+      },
+      refundOrder(order, status) {
+        this.dialog.orderTransactionRefunding.show = true
+
+        window.cms.socket.emit('refundOrder', order, async ({error, responseData}) => {
+          this.dialog.orderTransactionRefunding.show = false
+
+          if (error) {
+            this.dialog.refundOrderFailed.show = true
+            this.dialog.refundOrderFailed.error = error
+            return
+          }
+
+          const isRefundError = this.isRefundFailed(responseData)
+          if (isRefundError) {
+            this.dialog.refundOrderFailed.show = true
+            this.$set(this.dialog.refundOrderFailed, 'captureResponses', order.paypalOrderDetail.captureResponses)
+            this.dialog.refundOrderFailed.refundResponses.splice(0, this.dialog.refundOrderFailed.refundResponses.length, ...responseData)
+          } else {
+            this.dialog.refundOrderSucceeded.show = true
+          }
+
+          order.paypalOrderDetail.refundResponses = responseData
+          await cms.getModel('Order').updateOne({ _id: order._id }, order)
+          await this.getOnlineOrdersWithStatus(status)
+        })
       },
       async getOnlineOrdersWithStatus(status) {
         this.onlineOrders = await cms.getModel('Order').find({
@@ -801,7 +863,8 @@
       return {
         ...getProvided(this.$data, this),
         ...getProvided(this.$options.methods, this),
-        ...getProvided(this.$options.computed, this)
+        ...getProvided(this.$options.computed, this),
+        isRefundFailed: this.isRefundFailed
       }
     }
   }

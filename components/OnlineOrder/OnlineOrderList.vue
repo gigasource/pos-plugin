@@ -42,6 +42,19 @@
           <td>{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
           <td :class="statusClass">{{$t(`onlineOrder.${item.status}`)}}</td>
+          <td>
+            <!-- ATM, g-menu only contains 1 action so we set this action state as visibility of entire g-menu -->
+            <g-menu v-if="isAdminUser && isRefundable(item)" v-model="item.showMenu" :nudge-bottom="10" close-on-content-click>
+              <template #activator="{on}">
+                <div @click="on.click" :style="moreMenuStyle">···</div>
+              </template>
+              <template #default>
+                <g-card background="white">
+                  <div style="padding: 10px; cursor: pointer" @click="$emit('refundOrder', item, status)">{{ refundStr }}</div>
+                </g-card>
+              </template>
+            </g-menu>
+          </td>
         </tr>
         </tbody>
       </g-table>
@@ -56,20 +69,26 @@
 
   export default {
     name: 'OnlineOrderList',
-    injectService: ['OrderStore:getOnlineOrdersWithStatus', 'PosStore:storeLocale'],
+    components: { },
     props: {
       status: String,
       onlineOrders: {
         type: Array,
         default: () => []
-      }
+      },
+      storeLocale: String,
+      user: Object,
+      isRefundFailed: Function, // (order) => boolean: return refund status of order
+      isRefundable: Function, // (order) => boolean: return true if order can be refund
+      getOnlineOrdersWithStatus: Function,
     },
     data() {
       const i18n = this.$i18n;
-      const { onlineOrder: { address, amount, customer, delivery, no, received, status, type } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
-
+      const { onlineOrder: { address, amount, customer, delivery, no, received, status, type, refund } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+      const headers = [no, customer, address, amount, received, delivery, type, status, '']
       return {
-        headers: [no, customer, address, amount, received, delivery, type, status],
+        headers,
+        refundStr: refund,
         filter: {
           fromDate: '',
           toDate: ''
@@ -97,6 +116,25 @@
       },
       totalIncome() {
         return _.sumBy(this.computedItems, item => item.vSum);
+      },
+      isAdminUser() {
+        return this.user.role === "admin"
+      },
+      moreMenuStyle() {
+        const color = '#999'
+        return {
+          'text-align': 'center',
+          'line-height': '18px',
+          color: color,
+          // border: `1px solid ${color}`,
+          'border-radius': '50%',
+          width: '20px',
+          height: '20px',
+          'box-sizing': 'border-box',
+          'box-shadow': '0px 0px 3px 0px rgba(0,0,0, 0.6)',
+          cursor: 'pointer',
+          'background-color': '#fff'
+        }
       }
     },
     watch: {
@@ -171,12 +209,13 @@
             width: 21%;
           }
 
-          &:nth-last-child(-n+5) {
+          &:nth-last-child(-n+6) {
             width: 10%;
           }
-
+  
+          // actions menu
           &:nth-last-child(1) {
-            width: 12%;
+            width: 40px;
           }
         }
 

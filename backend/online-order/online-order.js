@@ -642,6 +642,17 @@ module.exports = async cms => {
       })
     })
 
+    socket.on('refundOrder', async(order, cb) => {
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const {onlineDevice: {store: {name, alias}}} = posSetting
+      const {id, onlineOrderId} = order
+      console.debug(getBaseSentryTags('refundOrder') + `orderToken=${onlineOrderId},orderId=${id}`,
+          `Restaurant backend: Refund order ${id}`)
+      onlineOrderSocket.emit('refundOrder', { ...order, storeName: name, storeAlias: alias }, ({error, responseData}) => {
+        cb && cb({error, responseData})
+      })
+    })
+
     socket.on('getWebShopSettingUrl', async (locale, callback) => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);

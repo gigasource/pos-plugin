@@ -1,19 +1,17 @@
 <template>
   <g-dialog v-model="value" persistent>
     <div class="dlg">
-      <div class="dlg-title">Refund order</div>
-      <div class="dlg-message">A refund for this order has been processed.</div>
-      <div class="dlg-buttons">
-        <g-btn-bs background-color="#2979FF" text-color="white" @click="$emit('input',false)">OK</g-btn-bs>
-      </div>
+      <div class="dlg-title">Refunding order's transaction</div>
+      <div class="dlg-message">We're refunding money for this order. Please wait...</div>
     </div>
   </g-dialog>
 </template>
 <script>
   export default {
-    name: 'dialogRefundOrderSucceeded',
+    name: 'dialogOrderTransactionRefunding',
     props: {
       value: Boolean,
+      error: String
     },
     data() {
       return {}
@@ -42,12 +40,6 @@
     &-message {
       font-size: 15px;
       color: #333333;
-    }
-  
-    &-buttons {
-      display: inline-flex;
-      align-self: flex-end;
-      margin-top: 24px;
     }
   }
 </style>

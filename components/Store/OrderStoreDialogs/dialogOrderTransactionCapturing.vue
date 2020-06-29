@@ -8,7 +8,7 @@
 </template>
 <script>
   export default {
-    name: 'dialogValidatingPrepaidOrder',
+    name: 'dialogOrderTransactionCapturing',
     props: {
       value: Boolean,
       error: String

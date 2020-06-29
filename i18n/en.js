@@ -403,6 +403,7 @@ module.exports = {
       items: 'item(s)',
       cancelOrder: 'Cancel & move to declined orders',
       completeOrder: 'Complete order',
+      refund: 'Refund',
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',
