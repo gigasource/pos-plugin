@@ -305,10 +305,10 @@
         //change image
         if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`, this.type)
         //change script
-        const header = genScriptHeader(), footer = genScriptFooter(), webshop = getEmbedWebshop.toString(), reservation = getEmbedReservation.toString(), checkIOs = checkIOs12AndLess.toString()
-        const fnString = header + checkIOs + genStyleSheet(this.type, this.position, this.size, this.hidden).toString() + (this.type === 'Reservation' ? reservation : webshop) + genReadyState(this.type) + footer
-        // const minifyString = terser.minify(fnString).code
-        const file = new File([fnString], `${this.type.toLowerCase()}-script.js`, {type: 'text/javascript'})
+        const header = genScriptHeader(), footer = genScriptFooter(), webshop = getEmbedWebshop(), reservation = getEmbedReservation(), checkIOs = checkIOs12AndLess()
+        const fnString = header + checkIOs + genStyleSheet(this.type, this.position, this.size, this.hidden) + (this.type === 'Reservation' ? reservation : webshop) + genReadyState(this.type) + footer
+        const minifyString = terser.minify(fnString).code
+        const file = new File([minifyString], `${this.type.toLowerCase()}-script.js`, {type: 'text/javascript'})
         this.script = await this.$getService('FileUploadStore').uploadScript(file, this.store.alias)
         if(close) this.dialog.generate = false
       }
