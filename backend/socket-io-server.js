@@ -393,21 +393,12 @@ module.exports = async function (cms) {
         const isPaypalPayment = paypalOrderDetail && paypalOrderDetail.orderID
         const isCashPayment = !isPaypalPayment // more provider here
 
+        // skip 'completed' status
+        if (status === "completed")
+          return
+
         if (isCashPayment)
           return updateOrderStatus(onlineOrderId, orderStatus)
-
-        // Get Payment provider infomation from store.
-        const store = await cms.getModel('Store').findOne({alias: storeAlias});
-        function initPayPalClient() {
-          if (!store || !store.paymentProviders || !store.paymentProviders.paypal || _.trim(store.paymentProviders.paypal.clientId) === "" || _.trim(store.paymentProviders.paypal.secretToken) === "") {
-            const errMessage = "PayPal provider is not installed"
-            console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: ${errMessage}. Info: store_alias=${storeAlias}`)
-            cb && cb({ error: errMessage })
-            throw errMessage
-          }
-          const { clientId, secretToken } = store.paymentProviders.paypal
-          return createPayPalClient(clientId, secretToken)
-        }
 
         switch (status) {
           case 'declined':
@@ -416,7 +407,7 @@ module.exports = async function (cms) {
           case 'kitchen':
             if (isPaypalPayment) {
               try {
-                const ppClient = initPayPalClient()
+                const ppClient = await initPayPalClient(storeAlias)
                 const captureResponse = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID))
                 const responseData = captureResponse.result
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(responseData))
@@ -436,6 +427,85 @@ module.exports = async function (cms) {
             break;
         }
       })
+
+      socket.on('refundOrder', async(order, cb) => {
+        const {paypalOrderDetail: pp, storeAlias} = order
+
+        // paypal payment
+        if (pp && pp.orderID && pp.captureResponses) {
+          try {
+            const ppClient = await initPayPalClient(storeAlias)
+            // get all completed capture request
+            let completedCaptures = []
+            _.each(pp.captureResponses.purchase_units, purchase_unit => {
+              completedCaptures.push(..._.filter(purchase_unit.payments.captures, capture => capture.status === "COMPLETED"))
+            })
+
+            // suppose user already make a refund call but get failed result then he/she try refund again
+            // in this case, we just need to make a refund call for in-completed refund
+            if (pp.refundResponses) {
+              const refundedCaptureIds = _.filter(pp.refundResponses, r => r.status !== "COMPLETED").map(r => r.captureId)
+              completedCaptures = _.filter(completedCaptures, cc => refundedCaptureIds.indexOf(cc) === -1)
+            }
+
+            if (completedCaptures.length) {
+              // try to refund, return { error } if refundOrder failed for some reason
+              const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
+                try {
+                  const refundBody = { amount: capture.amount, note_to_payer: "Order cancelled" }
+                  return ppApiv2.refundOrder(ppClient, capture.id, refundBody)
+                } catch (e) {
+                  return { error: e.message }
+                }
+              }))
+
+              const responseData = _.map(refundResponses, (response, index) => {
+                if (!response || !response.result || response.result.status !== "COMPLETED")
+                  return {
+                    status: "ERROR",
+                    detail: response.error,
+                    captureId: completedCaptures[index].id
+                  }
+                else
+                  return {
+                    ..._.pick(response.result, ['id', 'status']),
+                    captureId: completedCaptures[index].id
+                  }
+              })
+
+              // now update refund responses
+              if (pp.refundResponses) {
+                _.each(responseData, rd => {
+                  const oldRdIndex = _.findIndex(pp.refundResponses, r => r.captureId === rd.captureId)
+                  if (oldRdIndex !== -1) // necessary ??
+                    pp.refundResponses[oldRdIndex] = rd
+                })
+              } else if (responseData.length) {
+                pp.refundResponses = responseData
+              }
+            }
+
+            cb && cb({ responseData: pp.refundResponses })
+          } catch (e) {
+            console.debug(`sentry:eventType=refundOrder,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
+            cb && cb({ error: e.message })
+          }
+        } else {
+          cb && cb({ error: "No refund available" })
+        }
+      })
+
+      async function initPayPalClient(storeAlias) {
+        const store = await cms.getModel('Store').findOne({alias: storeAlias});
+        if (!store || !store.paymentProviders || !store.paymentProviders.paypal || _.trim(store.paymentProviders.paypal.clientId) === "" || _.trim(store.paymentProviders.paypal.secretToken) === "") {
+          const errMessage = "PayPal provider is not installed"
+          console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: ${errMessage}. Info: store_alias=${storeAlias}`)
+          cb && cb({ error: errMessage })
+          throw errMessage
+        }
+        const { clientId, secretToken } = store.paymentProviders.paypal
+        return createPayPalClient(clientId, secretToken)
+      }
 
       socket.on('updateVersion', async (appVersion, _id) => {
         const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
