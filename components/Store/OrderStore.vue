@@ -5,12 +5,6 @@
         :error="dialog.prepaidOrderFailed.error"/>
     <dialog-validating-prepaid-order
         v-model="dialog.validatePrepaidOrder.show"/>
-    <dialog-refund-prepaid-transaction-failed
-        v-model="dialog.refundOrderFailed.show"
-        :capture-responses="dialog.refundOrderFailed.captureResponses"
-        :refund-responses="dialog.refundOrderFailed.refundResponses"/>
-    <dialog-refund-order-succeeded
-        v-model="dialog.refundOrderSucceeded.show"/>
   </div>
 </template>
 
@@ -58,14 +52,6 @@
           prepaidOrderFailed: {
             show: false,
             error: null
-          },
-          refundOrderFailed: {
-            show: false,
-            captureResponses: {},
-            refundResponses: [],
-          },
-          refundOrderSucceeded: {
-            show: false,
           },
           validatePrepaidOrder: {
             show: false,
@@ -588,14 +574,8 @@
           status,
           user: this.user
         })
-        let updatedOrder;
-        if (this.isPrepaidOrder(order)) {
-          updatedOrder = order
-        } else {
-          // TODO: Add option to get updated object
-          updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id}, updateInfo)
-          await this.updateOnlineOrders()
-        }
+        const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id}, updateInfo)
+        await this.updateOnlineOrders()
         
         const orderStatus = {
           orderId: updatedOrder.id,
@@ -608,40 +588,8 @@
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-
-        const self = this
-        window.cms.socket.emit('updateOrderStatus', orderStatus, async ({ responseData }) => {
-          if (this.isPrepaidOrder(order)) {
-            // mock failed data
-            // _.each(responseData, r => {
-            //   r.status = "ERROR"
-            //   r.detail = "Lorem irspum for some reason we don't know about the idea behind it"
-            // })
-            
-            const isRefundError = _.find(responseData, refundResponse => refundResponse.status !== "COMPLETED")
-            if (isRefundError) {
-              this.dialog.refundOrderFailed.show = true
-              this.$set(this.dialog.refundOrderFailed, 'captureResponses', updatedOrder.paypalOrderDetail.captureResponses)
-              this.dialog.refundOrderFailed.refundResponses.splice(0, this.dialog.refundOrderFailed.refundResponses.length, ...responseData)
-              // ...
-            } else {
-              this.dialog.refundOrderSucceeded.show = true
-            }
-          
-            // store refund response
-            const updateOrderInfo = Object.assign({}, order, {
-              status: status,
-              user: self.user,
-              paypalOrderDetail: {
-                ...order.paypalOrderDetail,
-                refundResponses: responseData
-              }
-            })
-            
-            await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
-            await this.updateOnlineOrders()
-          }
-        })
+        
+        window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
         console.log('accept order', order)
