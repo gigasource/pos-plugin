@@ -90,7 +90,7 @@
           </div>
         </div>
         <div class="row-flex mt-2">
-          <div class="fw-700">Days-off</div>
+          <div class="fw-700">{{$t('setting.daysOff')}}</div>
           <g-spacer/>
           <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = true">+ Add new</g-btn-bs>
         </div>

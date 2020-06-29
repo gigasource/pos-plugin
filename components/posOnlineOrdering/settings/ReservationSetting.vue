@@ -59,7 +59,7 @@
     data() {
       return {
         reservationSetting: this.store.reservationSetting || {},
-        removeOverdueAfterList: [15, 30, 45, 60, 'Do not delete'],
+        removeOverdueAfterList: [15, 30, 45, 60, $t('setting.dontDelete')],
         guestAllowances: [20, 30, 50, 100],
         dayAllowances: [2, 7, 14, 30],
       }
