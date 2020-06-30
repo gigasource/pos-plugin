@@ -11,6 +11,7 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer= require('nodemailer')
+const uuidv1 = require('uuid')
 
 const Schema = mongoose.Schema
 
@@ -797,7 +798,7 @@ module.exports = async function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
           const targetClientId = `${store.id}_${_id}`;
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [reservationData])
+          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: uuidv1.v1() }])
           console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
             `2a. Online order backend: sent reservation to demo device`)
         })

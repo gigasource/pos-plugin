@@ -26,7 +26,8 @@ module.exports = cms => {
       },
       android: {
         notification: {
-          sound: 'bell'
+          sound: 'bell',
+          channelId: 'GSMS_Order'
         },
         priority: 'high'
       },
@@ -62,7 +63,7 @@ module.exports = cms => {
     const message = {
       notification: {
         title: storeName,
-        body: `You have a new reservation (${displayDate} - ${time})!`
+        body: `You have a new reservation (${displayDate} - ${time})!`,
       },
       data: {
         storeName,
@@ -70,14 +71,15 @@ module.exports = cms => {
       },
       android: {
         notification: {
-          sound: 'bell'
+          sound: 'impressed',
+          channel_id: 'GSMS_Reservation'
         },
         priority: 'high'
       },
       apns: {
         payload: {
           aps: {
-            sound: 'bell.aiff',
+            sound: 'impressed.aiff',
             contentAvailable: true
           },
         }
