@@ -10,6 +10,10 @@ function refundOrder(payPalClient, captureId, refundBody) {
   return PayPalAPIv2.refund(payPalClient, captureId, refundBody);
 }
 
+function orderDetail(paypalClient, captureId) {
+  return PayPalAPIv2.orderDetail(paypalClient, captureId)
+}
+
 /**
  * Execute single/multiple transaction queries base on params
  * @param store_id
@@ -122,6 +126,7 @@ async function getStoreBalance(payPalClient, {store_id, start_date, end_date}) {
 module.exports = {
   captureOrder,
   refundOrder,
+  orderDetail,
   getStoreTransaction,
   getStoreBalance,
   getStoreTransactionById,

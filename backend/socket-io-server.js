@@ -408,10 +408,16 @@ module.exports = async function (cms) {
             if (isPaypalPayment) {
               try {
                 const ppClient = await initPayPalClient(storeAlias)
-                const captureResponse = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID))
-                const responseData = captureResponse.result
-                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(responseData))
-                cb && cb({ result: responseData.status, responseData: responseData })
+                let captureResult;
+                const orderDetail = (await ppApiv2.orderDetail(ppClient, paypalOrderDetail.orderID)).result
+                if (orderDetail.status === "COMPLETED") {
+                  captureResult = _.pick(orderDetail, ['id', 'links', 'payer', 'status'])
+                  captureResult.purchase_units = orderDetail.purchase_units.map(pu => _.pick(pu, ['reference_id', 'payments']))
+                } else {
+                  captureResult = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID)).result
+                }
+                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(captureResult))
+                cb && cb({ result: captureResult.status, responseData: captureResult })
                 updateOrderStatus(onlineOrderId, orderStatus)
               } catch (e) {
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
