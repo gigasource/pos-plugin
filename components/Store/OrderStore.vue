@@ -784,10 +784,16 @@
 
         window.cms.socket.emit('refundOrder', order, async ({error, responseData}) => {
           this.dialog.refunding.show = false
-
           if (error) {
             this.dialog.refundFailed.show = true
-            this.dialog.refundFailed.error = error
+            try {
+              // known error
+              // FULLY_REFUNDED error return when the user refund.
+              let errorObj = JSON.parse(error)
+              this.dialog.refundFailed.error = errorObj.details[0].description
+            } catch (e) {
+              this.dialog.refundFailed.error = error
+            }
             return
           }
 
