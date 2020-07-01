@@ -11,6 +11,7 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer= require('nodemailer')
+const uuidv1 = require('uuid')
 
 const Schema = mongoose.Schema
 
@@ -408,10 +409,16 @@ module.exports = async function (cms) {
             if (isPaypalPayment) {
               try {
                 const ppClient = await initPayPalClient(storeAlias)
-                const captureResponse = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID))
-                const responseData = captureResponse.result
-                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(responseData))
-                cb && cb({ result: responseData.status, responseData: responseData })
+                let captureResult;
+                const orderDetail = (await ppApiv2.orderDetail(ppClient, paypalOrderDetail.orderID)).result
+                if (orderDetail.status === "COMPLETED") {
+                  captureResult = _.pick(orderDetail, ['id', 'links', 'payer', 'status'])
+                  captureResult.purchase_units = orderDetail.purchase_units.map(pu => _.pick(pu, ['reference_id', 'payments']))
+                } else {
+                  captureResult = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID)).result
+                }
+                console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(captureResult))
+                cb && cb({ result: captureResult.status, responseData: captureResult })
                 updateOrderStatus(onlineOrderId, orderStatus)
               } catch (e) {
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
@@ -791,7 +798,7 @@ module.exports = async function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({ _id }) => {
           const targetClientId = `${store.id}_${_id}`;
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [reservationData])
+          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: uuidv1.v1() }])
           console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
             `2a. Online order backend: sent reservation to demo device`)
         })
