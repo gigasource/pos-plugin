@@ -35,6 +35,7 @@
             :collapse-text="store.collapseText"
             :display-id="store.displayId"
             :display-image="store.displayImage"
+            :imexportable="importExportable"
             @update-store="updateStore"
             @add-new-category="addNewCategory"
             @change-category-name="changeCategoryName"
@@ -88,6 +89,7 @@
   export default {
     name: 'SettingView',
     components: {ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
+    injectService: ['PermissionStore:importExportMenu'],
     data: function () {
       const i18n = this.$i18n;
       let { setting } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
@@ -107,6 +109,9 @@
       }
     },
     computed: {
+      importExportable() {
+        return this.importExportMenu != null
+      },
       storeCountryLocale() {
         return (this.store && this.store.country && this.store.country.locale) || 'en'
       },

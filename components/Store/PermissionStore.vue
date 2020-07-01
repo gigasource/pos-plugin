@@ -44,12 +44,18 @@
       },
       deleteStorePerm() {
         return _.find(this.userPermissions, perm => perm.permission === 'deleteStore' && perm.value === true)
+      },
+      /**
+       * Allow specified account to be able to import/export menu in Settings/Menu page
+       */
+      importExportMenu() {
+        return _.find(this.userPermissions, perm => perm.permission === 'importExportMenu' && perm.value === true)
       }
     },
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore"]
+        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu"]
       }
     },
     async created() {

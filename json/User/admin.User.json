@@ -19,10 +19,18 @@
     {
       "_id": "5ea65a770006460546a6a018",
       "name": "SnackOrder"
+    },
+    {
+      "_id": "5eb50e4ffa89cdd960b2d3c7",
+      "name": "Lam test restaurant"
+    },
+    {
+      "_id": "5ebd08d015b0df001a08a0c2",
+      "name": "Demo Account"
     }
   ],
   "_id": "5c88842f1591d506a250b2a5",
-  "password": "gigagiga1!",
+  "password": "admin",
   "role": {
     "_id": "5c8a28801ae07e1cae366e09",
     "collectionPermission": [],
@@ -33,7 +41,7 @@
     {
       "_id": "5ea2bc8f70a2b325a192c66a",
       "permission": "manageGroup",
-      "value": null
+      "value": true
     },
     {
       "_id": "5ea2bd4970a2b325a192c679",
@@ -68,6 +76,16 @@
     {
       "_id": "5ee89c8cb9315c22d0e106c4",
       "permission": "viewMonthlyRevenue",
+      "value": true
+    },
+    {
+      "_id": "5ef33bc6e1c401619af536cc",
+      "permission": "deleteStore",
+      "value": true
+    },
+    {
+      "_id": "5efc73c78d2da33b85b8bebf",
+      "permission": "importExportMenu",
       "value": true
     }
   ],

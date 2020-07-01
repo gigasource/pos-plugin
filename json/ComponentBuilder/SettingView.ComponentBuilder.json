@@ -9,6 +9,16 @@
       "slotScopeBinding": [],
       "url": "plugins/pos-plugin/components/Store/FileUploadStore.vue",
       "path": "components/Store/FileUploadStore.vue",
+      "pluginName": "pos-plugin",
+      "items": []
+    },
+    {
+      "choice": "view",
+      "component": "PermissionStore",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/Store/PermissionStore.vue",
+      "path": "components/Store/PermissionStore.vue",
       "pluginName": "pos-plugin"
     },
     {

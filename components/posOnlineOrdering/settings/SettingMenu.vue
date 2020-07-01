@@ -159,6 +159,7 @@
       collapseText: Boolean,
       displayId: Boolean,
       displayImage: Boolean,
+      imexportable: Boolean
     },
     data: function () {
       return {
@@ -178,7 +179,6 @@
         editBtn: [],
         editingProduct: false,
         edittingItems: [],
-        imexportable: cms.loginUser.user.role.name === 'admin'
       }
     },
     created() {

@@ -99,6 +99,10 @@
             {
               "value": "deleteStore",
               "text": "Delete Store"
+            },
+            {
+              "value": "importExportMenu",
+              "text": "Import Export Menu"
             }
           ]
         },
