@@ -116,21 +116,24 @@
         return (this.store && this.store.country && this.store.country.locale) || 'en'
       },
       sidebarItems() {
-        if(this.setting)
-          return [
-            {title: this.setting.basic, key: 'Basic', icon: 'airplay', onClick: () => this.changeView('restaurant-info')},
+        if(this.setting) {
+          let items = [
+            { title: this.setting.basic, key: 'Basic', icon: 'airplay', onClick: () => this.changeView('restaurant-info') },
             {
               title: this.setting.serviceOpenHours,
               key: 'Service',
               icon: 'mdi-file-document-outline',
               onClick: () => this.changeView('service-and-open-hours')
             },
-            {title: this.setting.reservation, key: 'Reservation', icon: 'icon-table_outlined', onClick: () => this.changeView('setting-reservation')},
-            {title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu')},
-            {title: this.setting.deliveryFee, key: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee')},
-            {title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer')},
-            {title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount')},
-            cms.loginUser.user.role.name === "admin" && {
+            { title: this.setting.reservation, key: 'Reservation', icon: 'icon-table_outlined', onClick: () => this.changeView('setting-reservation') },
+            { title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu') },
+            { title: this.setting.deliveryFee, key: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee') },
+            { title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer') },
+            { title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount') },
+          ]
+          
+          if (cms.loginUser.user.role.name === "admin") {
+            items.push({
               title: this.setting.paymentSetting,
               icon: 'icon-card_outlined',
               key: 'Payment Setting',
@@ -138,8 +141,10 @@
               items: [
                 {title: this.setting.transaction, key: 'Transaction', icon: 'history', onClick: () => this.changeView('transaction', 'Transaction')}
               ]
-            },
-          ]
+            })
+          }
+          return items
+        }
         return []
       },
       sidebarItemsDevice() {
