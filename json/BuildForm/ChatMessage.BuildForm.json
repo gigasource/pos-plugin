@@ -1,0 +1,41 @@
+{
+  "_id": "5efaeec2e057300807490020",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5efaeefde057300807490022",
+      "schemaType": "string",
+      "key": "clientId"
+    },
+    {
+      "_id": "5efaeefde057300807490023",
+      "schemaType": "string",
+      "key": "userId"
+    },
+    {
+      "_id": "5efaeefde057300807490024",
+      "schemaType": "string",
+      "key": "text"
+    },
+    {
+      "_id": "5efaeefde057300807490025",
+      "schemaType": "date",
+      "key": "createdAt"
+    },
+    {
+      "_id": "5efaf4c0e05730080749002f",
+      "schemaType": "boolean",
+      "key": "read",
+      "default": "false"
+    },
+    {
+      "_id": "5efb284f5790080b706b7f1e",
+      "schemaType": "boolean",
+      "key": "fromServer",
+      "default": ""
+    }
+  ],
+  "name": "ChatMessage",
+  "tabs": [],
+  "type": "Collection"
+}

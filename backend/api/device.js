@@ -22,19 +22,19 @@ async function generateUniqueDeviceCode() {
 }
 
 async function addPairedDeviceToStore(deviceId, storeId) {
-  const store = await StoreModel.findOne({_id: storeId }, {devices: 1})
+  const store = await StoreModel.findOne({_id: storeId}, {devices: 1})
   const deviceIds = _.map(store.devices, e => e._id)
 
   if (!deviceIds.includes(deviceId)) deviceIds.push(deviceId)
 
-  return await StoreModel.findOneAndUpdate({_id: storeId}, { devices: deviceIds });
+  return await StoreModel.findOneAndUpdate({_id: storeId}, {devices: deviceIds});
 }
 
 async function removePairedDeviceFromStore(deviceId, storeId) {
-  const store = await StoreModel.findOne({ _id: storeId }, {devices: 1});
+  const store = await StoreModel.findOne({_id: storeId}, {devices: 1});
   const deviceIds = _.map(store.devices, e => e._id)
   const newDeviceIds = _.filter(deviceIds, id => id !== deviceId)
-  await StoreModel.updateOne({ _id: storeId.toString() }, { devices: newDeviceIds });
+  await StoreModel.updateOne({_id: storeId.toString()}, {devices: newDeviceIds});
 }
 
 router.get('/pairing-code', async (req, res) => {
@@ -61,12 +61,13 @@ router.post('/register', async (req, res) => {
   // hardware: Sunmi, Kindle-Fire, etc, ...
   // appName: Pos-Germany.apk
   // appVersion: 1.51
-  let {pairingCode, hardware, appName, appVersion, release } = req.body;
+  let {pairingCode, hardware, appName, appVersion, release} = req.body;
   if (!pairingCode) return res.status(400).json({message: 'Missing pairingCode in request body'});
   const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
   if (deviceInfo) {
     // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
-    await DeviceModel.updateOne({pairingCode}, { name: hardware || 'New Device', paired: true, hardware, appName, appVersion, release, features: {
+    await DeviceModel.updateOne({pairingCode}, {
+      name: hardware || 'New Device', paired: true, hardware, appName, appVersion, release, features: {
         fastCheckout: false,
         manualTable: false,
         delivery: false,
@@ -85,11 +86,38 @@ router.post('/register', async (req, res) => {
     });
     const store = await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
     cms.socket.emit('reloadStores', deviceInfo.storeId);
-    res.status(200).json({deviceId: deviceInfo._id, storeName: store.name || store.settingName, storeAlias: store.alias});
+    res.status(200).json({
+      deviceId: deviceInfo._id,
+      storeName: store.name || store.settingName,
+      storeAlias: store.alias
+    });
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
   }
 })
+
+router.post('/register-mobile-app', async (req, res) => {
+  let {hardware, appName} = req.body;
+  if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
+  if (!appName) return res.status(400).json({error: 'missing appName property in request body'});
+
+  const newDevice = await DeviceModel.create({
+    name: hardware || 'New Device', paired: true, hardware, appName,
+  });
+
+  cms.socket.emit('reloadUnassignedDevices');
+  res.status(200).json(newDevice);
+});
+
+router.get('/unassigned-devices', async (req, res) => {
+  try {
+    const unassignedDevices = await DeviceModel.find({storeId: {$exists: false}}).lean();
+    res.status(200).json(unassignedDevices);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error});
+  }
+});
 
 router.post('/unregister', async (req, res) => {
   const {_id} = req.body;
@@ -102,6 +130,5 @@ router.post('/unregister', async (req, res) => {
     res.status(400).json({message: 'Bad request: Invalid id'})
   }
 })
-
 
 module.exports = router
