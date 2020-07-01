@@ -23,7 +23,7 @@ setTimeout(() => {
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', {text, createdAt});
 
       const savedMsg = await ChatMessageModel.create({clientId, userId, createdAt, text, read: false, fromServer: false});
-      cb && cb(savedMsg);
+      cb && cb(savedMsg._doc);
     });
   });
 
