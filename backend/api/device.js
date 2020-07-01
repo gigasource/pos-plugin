@@ -97,16 +97,23 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/register-mobile-app', async (req, res) => {
-  let {hardware, appName} = req.body;
+  let {hardware, appName, clientId, metadata} = req.body;
+
+  if (clientId) {
+    const foundDevice = await DeviceModel.findOne({_id: clientId, storeId: {$exists: false}})
+    if (foundDevice) return res.status(200).json({registered: true, clientId})
+    else return res.status(200).json({registered: false})
+  }
+
   if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
-  if (!appName) return res.status(400).json({error: 'missing appName property in request body'});
+  if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
 
   const newDevice = await DeviceModel.create({
-    name: hardware || 'New Device', paired: true, hardware, appName,
+    name: hardware || 'New Device', paired: true, hardware, appName, metadata
   });
 
   cms.socket.emit('reloadUnassignedDevices');
-  res.status(200).json(newDevice);
+  res.status(200).json({clientId: newDevice._id});
 });
 
 router.get('/unassigned-devices', async (req, res) => {

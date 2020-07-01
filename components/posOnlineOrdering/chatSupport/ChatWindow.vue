@@ -30,7 +30,7 @@
     </template>
     <template v-else>
       <div class="row-flex justify-center align-items-center fill-height">
-        <span>Select a conversation</span>
+        <span>Select or start a conversation</span>
       </div>
     </template>
   </div>

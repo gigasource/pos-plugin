@@ -236,6 +236,16 @@ Sed convallis ornare turpis rhoncus cursus. Curabitur et erat id nisl fermentum 
         &__header {
           height: 72px;
           border-bottom: 1px solid #EFEFEF;
+
+          .g-select ::v-deep {
+            .g-tf {
+              margin: unset;
+
+              &:before {
+                display: none;
+              }
+            }
+          }
         }
 
         &__list {
