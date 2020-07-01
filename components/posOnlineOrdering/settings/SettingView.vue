@@ -200,6 +200,7 @@
         } else {
           this.permissionDenied = true;
           this.permissionDeniedMessage = 'Permission denied!'
+          return
         }
 
         try {
