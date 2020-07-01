@@ -24,10 +24,10 @@
         <div class="store-management__table-header">
           <div class="col-3"></div>
           <div class="row-flex col-9">
-            <div class="col-2">Name</div>
+            <div class="col-4">Name</div>
             <div class="col-2">Last seen</div>
-            <div class="col-3">Current Version</div>
-            <div class="col-4">Update</div>
+            <div class="col-3 ml-1">Current Version</div>
+            <div class="col-2">Update</div>
             <div class="col-1">Action</div>
           </div>
         </div>

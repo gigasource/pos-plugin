@@ -71,7 +71,7 @@
               <div style="flex: 1">
                 <div class="row-flex mb-1" v-for="(device, index) in store.devices"
                      :key="`device_${store.id}_${index}`">
-                  <div class="row-flex col-2 align-items-center">
+                  <div class="row-flex col-4 align-items-center">
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
                     <span class="ml-1">{{device.name}}</span>
                     <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
@@ -91,15 +91,15 @@
                       </template>
                     </g-tooltip>
                   </div>
-                  <div class="col-2">
+                  <div class="col-2 row-flex align-items-center">
                     {{device.lastSeen | date}}
                   </div>
-                  <div class="row-flex col-3">
+                  <div class="row-flex col-3 ml-1">
                     {{ `${device.appVersion} (${device.appName}, ${device.appRelease})` }}
                   </div>
-                  <div class="row-flex col-4">
+                  <div class="row-flex col-2">
                     <template v-if="updateAppPerm">
-                      <g-select class="w-60" :items="device.versions" v-model="device.updateVersion"/>
+                      <g-select class="w-80" :items="device.versions" v-model="device.updateVersion"/>
                       <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2"
                          style="cursor: pointer"
                          @click="$emit('update:deviceAppVersion', device)">Update</p>
@@ -142,12 +142,12 @@
                   </div>
                 </div>
                 <div class="row-flex mb-1" v-for="device in store.gSms.devices" :key="`demoDevice_${device._id}`">
-                  <div class="row-flex col-2 align-items-center">
+                  <div class="row-flex flex-grow-1 align-items-center mr-1">
                     <g-icon style="min-width: 24px">icon-smart_phone</g-icon>
                     <span class="ml-1">{{device.name}}</span>
                     <g-icon class="text-green" v-if="device.registered">done</g-icon>
                   </div>
-                  <div class="row-flex col-9 align-items-center">
+                  <div class="row-flex col-7 align-items-center">
                     {{device.lastSeen | date}}
                   </div>
                   <div class="col-1 row-flex align-items-center">
