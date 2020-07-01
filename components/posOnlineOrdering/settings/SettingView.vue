@@ -173,6 +173,13 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
+        
+        if (!store) {
+          this.permissionDenied = true;
+          this.permissionDeniedMessage = '404 NOT FOUND!'
+          return
+        }
+
         const user = cms.loginUser.user
         let userManageThisStore = false
         if (user.role.name !== 'admin') {
