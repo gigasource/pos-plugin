@@ -682,3 +682,17 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-chat_white {
+  background-image: url("../assets/chat_white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-contact {
+  background-image: url("../assets/contact.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

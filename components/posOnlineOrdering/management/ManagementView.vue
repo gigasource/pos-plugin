@@ -5,6 +5,7 @@
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
+      <chat-support v-else-if="view === 'chatSupport'"/>
     </div>
   </div>
 </template>
@@ -49,6 +50,12 @@
           } else {
             items.push({ title: 'Account Management', icon: 'icon-account-management', onClick: () => this.changeView('account', 'Account Management') })
           }
+        }
+
+        if (this.view === 'chatSupport') {
+          items.push({ title: 'Chat Support', icon: 'icon-chat_white', onClick: () => this.changeView('chatSupport', 'Chat Support') })
+        } else {
+          items.push({ title: 'Chat Support', icon: 'icon-account-management', onClick: () => this.changeView('chatSupport', 'Chat Support') })
         }
         return items
       },
