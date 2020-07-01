@@ -106,7 +106,12 @@ export function getEmbedWebshop() {
   var isOldIOs = checkIOs12AndLess()
   var openFn = isOldIOs ? openNewTab : openIframe
 
-  el.onclick = openFn
+  el.onclick = function(e) {
+     e.stopPropagation();
+     e.preventDefault();
+     openFn();
+  }
+  
   //get by class webshop-btn
   var btns = document.getElementsByClassName('webshop-btn')
   for(var i = 0; i < btns.length; i++) {
@@ -222,7 +227,11 @@ export function getEmbedReservation() {
     var isOldIOs = checkIOs12AndLess()
     var openFn = isOldIOs ? openNewTab : openIframe
   
-    el.onclick = openFn
+    el.onclick = function(e) {
+     e.stopPropagation();
+     e.preventDefault();
+     openFn();
+    }
   
     var btns = document.getElementsByClassName('reservation-btn')
     for (var i = 0; i < btns.length; i++) {
