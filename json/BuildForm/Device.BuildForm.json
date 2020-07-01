@@ -171,6 +171,12 @@
       "schemaType": "date",
       "key": "lastSeen",
       "type": "input@datetime-local"
+    },
+    {
+      "_id": "5efb2f6e5790080b706b7f3b",
+      "schemaType": "mixed",
+      "key": "metadata",
+      "mixed": true
     }
   ],
   "name": "Device",

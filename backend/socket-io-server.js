@@ -10,10 +10,11 @@ const createPayPalClient = require('@gigasource/payment-provider/src/PayPal/back
 const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
-const nodemailer= require('nodemailer')
+const nodemailer = require('nodemailer')
 const uuidv1 = require('uuid')
 
 const Schema = mongoose.Schema
+let externalSocketIOServer;
 
 const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', new Schema({
   targetClientId: ObjectId,
@@ -82,8 +83,8 @@ const mailTransporter = nodemailer.createTransport({
 
 async function sendReservationConfirmationEmail(reservation, storeId) {
   try {
-    const { customer: { email, firstName, lastName, phone }, noOfGuests, date, time, note } = reservation
-    const store = await cms.getModel('Store').findOne({ id: storeId })
+    const {customer: {email, firstName, lastName, phone}, noOfGuests, date, time, note} = reservation
+    const store = await cms.getModel('Store').findOne({id: storeId})
     if (!email) return
 
     const storeName = store.name || store.settingName;
@@ -135,15 +136,15 @@ module.exports = async function (cms) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
 
     if (status.status === 'kitchen') {
-      const { storeAlias, total } = status
+      const {storeAlias, total} = status
       if (!storeAlias) return
 
-      let { lastSyncAt, prevMonthReport, currentMonthReport } = await cms.getModel('Store').findOne({ alias: storeAlias })
+      let {lastSyncAt, prevMonthReport, currentMonthReport} = await cms.getModel('Store').findOne({alias: storeAlias})
       const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
 
       if (newMonth) {
         prevMonthReport = currentMonthReport
-        currentMonthReport = { orders: 1, total }
+        currentMonthReport = {orders: 1, total}
       } else {
         currentMonthReport = {
           orders: (currentMonthReport.orders || 0) + 1,
@@ -151,7 +152,7 @@ module.exports = async function (cms) {
         }
       }
 
-      await cms.getModel('Store').findOneAndUpdate({ alias: storeAlias }, {
+      await cms.getModel('Store').findOneAndUpdate({alias: storeAlias}, {
         $set: {
           lastSyncAt: new Date(), prevMonthReport, currentMonthReport
         }
@@ -160,7 +161,7 @@ module.exports = async function (cms) {
   }
 
   async function setDemoDeviceLastSeen(storeId, deviceId) {
-    await cms.getModel('Store').findOneAndUpdate({ id: storeId, 'gSms.devices._id': deviceId }, {
+    await cms.getModel('Store').findOneAndUpdate({id: storeId, 'gSms.devices._id': deviceId}, {
       $set: {
         'gSms.devices.$.lastSeen': new Date()
       }
@@ -172,12 +173,12 @@ module.exports = async function (cms) {
     const lastSeen = new Date();
 
     await cms.getModel('Device').updateOne({_id: deviceId}, {
-      $set: { lastSeen }
+      $set: {lastSeen}
     });
     cms.socket.emit('updateDeviceLastSeen', deviceId, lastSeen);
   }
 
-  const externalSocketIOServer = p2pServerPlugin(io, {
+  externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
     saveMessage,
     loadMessages,
@@ -240,10 +241,10 @@ module.exports = async function (cms) {
 
   externalSocketIOServer.registerAckFunction('demoAppCreateOrderAck', async (storeId, deviceId, orderTotal) => {
     try {
-      const store = await cms.getModel('Store').findOne({ id: storeId }).lean()
+      const store = await cms.getModel('Store').findOne({id: storeId}).lean()
       const device = store.gSms.devices.find(i => i._id.toString() === deviceId.toString())
 
-      await cms.getModel('Store').findOneAndUpdate({ id: storeId, 'gSms.devices._id': deviceId }, {
+      await cms.getModel('Store').findOneAndUpdate({id: storeId, 'gSms.devices._id': deviceId}, {
         $set: {
           'gSms.devices.$.total': (device.total || 0) + orderTotal,
           'gSms.devices.$.orders': (device.orders || 0) + 1
@@ -308,7 +309,12 @@ module.exports = async function (cms) {
         const store = await StoreModel.findById(device.storeId);
         if (!store) return callback(null);
 
-        callback({settingName: store.settingName, name: store.name || store.settingName, alias: store.alias, locale: store.country.locale});
+        callback({
+          settingName: store.settingName,
+          name: store.name || store.settingName,
+          alias: store.alias,
+          locale: store.country.locale
+        });
       });
 
       socket.on('getWebshopId', async (deviceId, callback) => {
@@ -418,11 +424,11 @@ module.exports = async function (cms) {
                   captureResult = (await ppApiv2.captureOrder(ppClient, paypalOrderDetail.orderID)).result
                 }
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureSuccess', JSON.stringify(captureResult))
-                cb && cb({ result: captureResult.status, responseData: captureResult })
+                cb && cb({result: captureResult.status, responseData: captureResult})
                 updateOrderStatus(onlineOrderId, orderStatus)
               } catch (e) {
                 console.debug(`sentry:eventType=orderStatus,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'CaptureError')
-                cb && cb({ error: e.message })
+                cb && cb({error: e.message})
               }
             }
             break;
@@ -435,7 +441,7 @@ module.exports = async function (cms) {
         }
       })
 
-      socket.on('refundOrder', async(order, cb) => {
+      socket.on('refundOrder', async (order, cb) => {
         const {paypalOrderDetail: pp, storeAlias} = order
 
         // paypal payment
@@ -459,10 +465,10 @@ module.exports = async function (cms) {
               // try to refund, return { error } if refundOrder failed for some reason
               const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
                 try {
-                  const refundBody = { amount: capture.amount, note_to_payer: "Order cancelled" }
+                  const refundBody = {amount: capture.amount, note_to_payer: "Order cancelled"}
                   return ppApiv2.refundOrder(ppClient, capture.id, refundBody)
                 } catch (e) {
-                  return { error: e.message }
+                  return {error: e.message}
                 }
               }))
 
@@ -492,13 +498,13 @@ module.exports = async function (cms) {
               }
             }
 
-            cb && cb({ responseData: pp.refundResponses })
+            cb && cb({responseData: pp.refundResponses})
           } catch (e) {
             console.debug(`sentry:eventType=refundOrder,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
-            cb && cb({ error: e.message })
+            cb && cb({error: e.message})
           }
         } else {
-          cb && cb({ error: "No refund available" })
+          cb && cb({error: "No refund available"})
         }
       })
 
@@ -507,10 +513,10 @@ module.exports = async function (cms) {
         if (!store || !store.paymentProviders || !store.paymentProviders.paypal || _.trim(store.paymentProviders.paypal.clientId) === "" || _.trim(store.paymentProviders.paypal.secretToken) === "") {
           const errMessage = "PayPal provider is not installed"
           console.debug('sentry:eventType=orderStatus,paymentType=paypal', `2. Error: ${errMessage}. Info: store_alias=${storeAlias}`)
-          cb && cb({ error: errMessage })
+          cb && cb({error: errMessage})
           throw errMessage
         }
-        const { clientId, secretToken } = store.paymentProviders.paypal
+        const {clientId, secretToken} = store.paymentProviders.paypal
         return createPayPalClient(clientId, secretToken)
       }
 
@@ -524,13 +530,13 @@ module.exports = async function (cms) {
       const clientId = socket.request._query.clientId
 
       console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
-        `Demo client ${clientId} connected, socket id = ${socket.id}`);
+          `Demo client ${clientId} connected, socket id = ${socket.id}`);
       const [storeId, deviceId] = clientId.split('_')
       setDemoDeviceLastSeen(storeId, deviceId)
 
       socket.on('disconnect', () => {
         console.debug(`sentry:clientId=${clientId},eventType=socketConnection,socketId=${socket.id}`,
-          `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
+            `Demo client ${clientId} disconnected, socket id = ${socket.id}`);
 
         const [storeId, deviceId] = clientId.split('_')
         setDemoDeviceLastSeen(storeId, deviceId)
@@ -595,11 +601,11 @@ module.exports = async function (cms) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
         function formatOrder(orderData) {
-          let { orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice } = _.cloneDeep(orderData)
+          let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice} = _.cloneDeep(orderData)
 
-          products = products.map(({ id, modifiers, name, note, originalPrice, quantity }) => {
+          products = products.map(({id, modifiers, name, note, originalPrice, quantity}) => {
             if (modifiers && modifiers.length) {
-              const sumOfModifiers = modifiers.reduce((sum, { price, quantity }) => sum + quantity * price, 0)
+              const sumOfModifiers = modifiers.reduce((sum, {price, quantity}) => sum + quantity * price, 0)
               originalPrice = originalPrice + sumOfModifiers
             }
 
@@ -608,7 +614,7 @@ module.exports = async function (cms) {
               name,
               originalPrice,
               note,
-              modifiers: modifiers.map(({ name }) => name).join(', '),
+              modifiers: modifiers.map(({name}) => name).join(', '),
               quantity,
             }
           })
@@ -644,12 +650,12 @@ module.exports = async function (cms) {
         }
 
         const demoDevices = store.gSms.devices
-        demoDevices.filter(i => i.registered).forEach(({ _id }) => {
+        demoDevices.filter(i => i.registered).forEach(({_id}) => {
           const formattedOrder = formatOrder(orderData);
           const targetClientId = `${store.id}_${_id}`;
           externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
           console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
-            `2a. Online order backend: received order from frontend, sending to demo device`);
+              `2a. Online order backend: received order from frontend, sending to demo device`);
         })
       }
 
@@ -663,7 +669,7 @@ module.exports = async function (cms) {
           let responseMessage = ''
 
           if (fs.existsSync(localeFilePath)) {
-            const { [locale]: { store } } = require(localeFilePath)
+            const {[locale]: {store}} = require(localeFilePath)
             if (store && store.deliveryIn && store.pickUpIn) {
               responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
             }
@@ -671,8 +677,10 @@ module.exports = async function (cms) {
 
           socket.join(orderData.orderToken);
           return updateOrderStatus(orderData.orderToken,
-            { storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
-              responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0) })
+              {
+                storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
+                responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
+              })
         }
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
         return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
@@ -692,7 +700,7 @@ module.exports = async function (cms) {
       sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
         updateOrderStatus(orderData.orderToken, {onlineOrderId: orderData.orderToken, status: 'failedToSend'})
         console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId},eventType=orderStatus`,
-          `2b. Online order backend: failed to reach online order device, cancelling order`)
+            `2b. Online order backend: failed to reach online order device, cancelling order`)
         removePersistentMsg()
       }, SEND_TIMEOUT);
     });
@@ -754,7 +762,7 @@ module.exports = async function (cms) {
     async function getCoordsByPostalCode(code, address) {
       //todo support countries
       let url = `https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${code}|country:DE&key=${global.APP_CONFIG.mapsApiKey}`
-      if (address) url+= `&address=${encodeURI(address)}`
+      if (address) url += `&address=${encodeURI(address)}`
       const response = await axios.get(url)
       const {results} = response.data
       if (!results || !results.length) return
@@ -775,32 +783,32 @@ module.exports = async function (cms) {
     socket.on('getCoordsByGoogleApi', async (zipCode, address, callback) => {
       const result = await getCoordsByPostalCode(zipCode, address)
       if (!result) return callback()
-      const { latitude, longitude } = result
+      const {latitude, longitude} = result
       callback({long: longitude, lat: latitude})
     })
 
     socket.on('createReservation', async (storeId, reservationData) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
+      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
       const store = await cms.getModel('Store').findById(storeId)
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
         console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
-          `2. Online order backend: sent reservation to device`)
+            `2. Online order backend: sent reservation to device`)
       } else {
         console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
-          `2. Online order backend: no device found, cancelled sending`)
+            `2. Online order backend: no device found, cancelled sending`)
       }
 
       if (store.gSms && store.gSms.enabled) {
         cms.emit('sendReservationMessage', storeId, reservationData)
         const demoDevices = store.gSms.devices
-        demoDevices.filter(i => i.registered).forEach(({ _id }) => {
+        demoDevices.filter(i => i.registered).forEach(({_id}) => {
           const targetClientId = `${store.id}_${_id}`;
           externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: uuidv1.v1() }])
           console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
-            `2a. Online order backend: sent reservation to demo device`)
+              `2a. Online order backend: sent reservation to demo device`)
         })
       }
 
@@ -811,16 +819,16 @@ module.exports = async function (cms) {
 
     socket.on('updateReservationSetting', async (storeId, reservationSetting) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({ storeId, 'features.reservation': true });
+      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
       const store = await cms.getModel('Store').findById(storeId);
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
         console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
-          `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
+            `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
       } else {
         console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
-          `2. Online Order backend: no device found, cancelled sending`)
+            `2. Online Order backend: no device found, cancelled sending`)
       }
     })
 
@@ -828,17 +836,17 @@ module.exports = async function (cms) {
       if (!storeId || !deviceId) return callback(new Error('no storeId/deviceId'))
 
       try {
-        const { name, settingName, alias } = await cms.getModel('Store').findOne({ id: storeId })
-        await cms.getModel('Store').findOneAndUpdate({ id: storeId }, {
+        const {name, settingName, alias} = await cms.getModel('Store').findOne({id: storeId})
+        await cms.getModel('Store').findOneAndUpdate({id: storeId}, {
           $pull: {
-            'gSms.devices': { _id: deviceId }
+            'gSms.devices': {_id: deviceId}
           }
         })
 
         const targetClientId = `${storeId}_${deviceId}`;
         externalSocketIOServer.emitToPersistent(targetClientId, 'unregister')
         console.debug(`sentry:clientId=${targetClientId},store=${name || settingName},alias=${alias},eventType=pair`,
-          `Online order: Emit event: unpair demo client ${targetClientId}, socket id = ${socket.id}`)
+            `Online order: Emit event: unpair demo client ${targetClientId}, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)
         callback()
       } catch (e) {
@@ -849,23 +857,23 @@ module.exports = async function (cms) {
 
     socket.on('removeStore', async (storeId, cb) => {
       // remove store
-      await cms.getModel('Store').deleteOne({ _id: storeId })
+      await cms.getModel('Store').deleteOne({_id: storeId})
 
       // remove devices & unpair all
-      const devices = await cms.getModel('Device').find({ storeId })
+      const devices = await cms.getModel('Device').find({storeId})
       const deviceIds = devices.map(i => i._id)
-      await cms.getModel('Device').deleteMany({ _id: { $in: deviceIds } })
+      await cms.getModel('Device').deleteMany({_id: {$in: deviceIds}})
       deviceIds.forEach(i => externalSocketIOServer.emitToPersistent(i, 'unpairDevice'))
 
       // remove products
-      await cms.getModel('Product').deleteMany({ store: storeId })
+      await cms.getModel('Product').deleteMany({store: storeId})
 
       // remove discounts
-      await cms.getModel('Discount').deleteMany({ store: storeId })
+      await cms.getModel('Discount').deleteMany({store: storeId})
 
       // remove store owner user
       const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
-      await cms.getModel('User').deleteOne({ role: deviceRole._id, store: storeId })
+      await cms.getModel('User').deleteOne({role: deviceRole._id, store: storeId})
 
       // run callback
       typeof cb === 'function' && cb()
@@ -873,9 +881,9 @@ module.exports = async function (cms) {
 
     socket.on('removeStoreGroup', async _id => {
       // check for stores in group
-      const storesInGroup = await cms.getModel('Store').find({ group: _id })
+      const storesInGroup = await cms.getModel('Store').find({group: _id})
       if (!storesInGroup || !storesInGroup.length) {
-        await cms.getModel('StoreGroup').deleteOne({ _id })
+        await cms.getModel('StoreGroup').deleteOne({_id})
 
         // pull from other users' store groups
         await cms.getModel('User').updateMany()
@@ -893,4 +901,7 @@ module.exports = async function (cms) {
       remoteControlDeviceId = null;
     });
   });
+}
+module.exports.getExternalSocketIoServer = function () {
+  return externalSocketIOServer;
 }
