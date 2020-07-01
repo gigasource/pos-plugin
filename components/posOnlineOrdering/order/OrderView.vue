@@ -88,7 +88,7 @@
           <div class="pos-order__tab--content" id="tab-content" ref="tab-content" @touchstart="touch">
             <div v-for="(category, i) in categoriesViewModel" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
               <div v-if="category && category.image" class="category-header">
-                <img alt :src="category.image"/>
+                <img alt style="width: 100%" :src="category.image"/>
                 <div>{{ category.name }}</div>
               </div>
               <div v-else class="sub-title mb-2">{{ category && category.name }}</div>
