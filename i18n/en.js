@@ -255,6 +255,7 @@ module.exports = {
       viewOnlineOrderDashboard: 'View Online Order Dashboard',
       viewOnlineOrderMenu: 'View Online Order Menu',
       viewOrderHistory: 'View Order History',
+      viewReservation: 'View Reservation',
       //company
       companyName: 'Company Name',
       address: 'Address',

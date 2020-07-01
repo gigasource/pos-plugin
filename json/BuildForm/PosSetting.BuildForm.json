@@ -426,6 +426,11 @@
           "key": "viewOnlineOrderDashboard",
           "type": "input@switch",
           "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewReservation",
+          "type": "input@switch"
         }
       ]
     },

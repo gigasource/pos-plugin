@@ -35,31 +35,31 @@
             <a @click="dialogSelectAvatar = true" class="link-change">{{$t('ui.change')}}</a>
           </div>
         </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.viewOwnReport')" v-model="selectedUser.viewOwnReport"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.viewOtherReport')" v-model="selectedUser.viewOtherReport"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.editArticle')" v-model="selectedUser.editArticle"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.accessZReport')" v-model="selectedUser.accessZReport"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.itemCancellation')" v-model="selectedUser.itemCancellation"/>
-        </div>
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.viewOwnReport')" v-model="selectedUser.viewOwnReport"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.viewOtherReport')" v-model="selectedUser.viewOtherReport"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.editArticle')" v-model="selectedUser.editArticle"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.accessZReport')" v-model="selectedUser.accessZReport"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.itemCancellation')" v-model="selectedUser.itemCancellation"/>-->
+<!--        </div>-->
 <!--        <div class="edit__item" v-if="!isAdmin">-->
 <!--          <pos-switch @change="save" dense label="Allow Table Takeover" v-model="selectedUser.allowTableTakeover"/>-->
 <!--        </div>-->
-        <div class="edit__item" v-if="!isAdmin">
-          <p class="mt-3 ml-1">{{$t('settings.iBtn')}}</p>
-          <p class="mt-2 ml-1">
-            <span class="fs-small text-green-accent-4">{{$t('settings.registered')}}</span>
-            <g-icon class="ml-1" size="20" svg>icon-redo</g-icon>
-          </p>
-        </div>
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <p class="mt-3 ml-1">{{$t('settings.iBtn')}}</p>-->
+<!--          <p class="mt-2 ml-1">-->
+<!--            <span class="fs-small text-green-accent-4">{{$t('settings.registered')}}</span>-->
+<!--            <g-icon class="ml-1" size="20" svg>icon-redo</g-icon>-->
+<!--          </p>-->
+<!--        </div>-->
 <!--        <div class="edit__item" v-if="!isAdmin">-->
 <!--          <pos-switch @change="save" dense label="Allow Item Cancellation after reactivate paid Table" style="max-width: 200px" v-model="selectedUser.itemCancellationReactivePaidTable"/>-->
 <!--        </div>-->
@@ -79,15 +79,15 @@
 <!--        <div class="edit__item" v-if="!isAdmin">-->
 <!--          <pos-switch @change="save" dense label="Allow Table Switch" v-model="selectedUser.allowTableSwitch"/>-->
 <!--        </div>-->
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.openCashdrawerManually')" v-model="selectedUser.openCashdrawerManually"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.discount')" v-model="selectedUser.discount"/>
-        </div>
-        <div class="edit__item" v-if="!isAdmin">
-          <pos-switch @change="save" dense :label="$t('settings.cancelInvoice')" v-model="selectedUser.cancelInvoice"/>
-        </div>
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.openCashdrawerManually')" v-model="selectedUser.openCashdrawerManually"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.discount')" v-model="selectedUser.discount"/>-->
+<!--        </div>-->
+<!--        <div class="edit__item" v-if="!isAdmin">-->
+<!--          <pos-switch @change="save" dense :label="$t('settings.cancelInvoice')" v-model="selectedUser.cancelInvoice"/>-->
+<!--        </div>-->
         <div class="edit__item" v-if="!isAdmin">
           <pos-switch @change="save" dense :label="$t('settings.viewOnlineOrderDashboard')" v-model="selectedUser.viewOnlineOrderDashboard"/>
         </div>
@@ -99,6 +99,9 @@
         </div>
         <div class="edit__item" v-if="!isAdmin">
           <pos-switch @change="save" dense :label="$t('settings.viewOrderHistory')" v-model="selectedUser.viewOrderHistory"/>
+        </div>
+        <div class="edit__item" v-if="!isAdmin">
+          <pos-switch @change="save" dense :label="$t('settings.viewReservation')" v-model="selectedUser.viewReservation"/>
         </div>
       </div>
     </g-grid-layout>
