@@ -37,13 +37,12 @@
     <p>Delivery service: {{ deliveryServiceStatus }}</p>
     <g-spacer/>
     <p class="mt-2" v-if="store.phone">TEL: {{ store.phone }} </p>
-    <div class="mb-2 row-flex">
-      <img src="/plugins/pos-plugin/assets/map.svg" draggable="false"/>
-      <p class="ml-2" style="font-weight: bold; font-size: 13px; color: #9E9E9E; cursor: pointer" @click="viewMap">VIEW MAP</p>
-    </div>
-    <div class="mt-2">
+    <div class="mt-2 row-flex">
       <g-btn-bs background-color="#000" text-color="#FFF" border-radius="20px" width="128" class="ml-0 mr-0" @click="openStore">Order now</g-btn-bs>
       <g-btn-bs background-color="#FFF" text-color="#000" border-radius="20px" width="128" border-color="#000"  @click="openReservation">Reservation</g-btn-bs>
+      <div v-if="viewMapAvailable" class="row-flex justify-center align-items-center br-100" style="border: 1px solid #000; height: 36px; width: 36px; cursor: pointer">
+        <img src="/plugins/pos-plugin/assets/map.svg" draggable="false" @click="viewMap"/>
+      </div>
     </div>
   </section>
 </template>
@@ -202,6 +201,9 @@
         }
         return info
       },
+      viewMapAvailable() {
+        return this.store.coordinates && this.store.coordinates.lat && this.store.coordinates.long
+      }
     },
     methods: {
       getOpenHour(weekday) {
@@ -221,7 +223,7 @@
         location.href = `${location.origin}/reservation/${this.store.alias}`
       },
       viewMap() {
-      
+        window.open(`https://www.google.com/maps/search/?api=1&query=${this.store.coordinates.lat},${this.store.coordinates.long}`, "_blank")
       }
     }
   }

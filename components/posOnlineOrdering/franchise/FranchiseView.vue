@@ -76,6 +76,12 @@
   @media screen and (max-width: 640px) {
     .franchise-view {
       padding: 20px;
+      padding-top: 40px;
+      margin-top: 0;
+    }
+    
+    .header {
+      margin-bottom: 50px;
     }
     
     .store-cards {
