@@ -824,10 +824,10 @@ module.exports = async function (cms) {
       if (device) {
         const deviceId = device._id.toString();
         await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
-        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
+        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`,
             `2. Online Order backend: sent reservation setting to device id=${deviceId}`)
       } else {
-        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`
+        console.debug(`sentry:eventType=reservationSetting,store=${store.name},alias=${store.alias}`,
             `2. Online Order backend: no device found, cancelled sending`)
       }
     })
