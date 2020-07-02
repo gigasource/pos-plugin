@@ -43,7 +43,7 @@
       "collectionName": "StoreGroup",
       "permission": "write",
       "queryCondition": {
-        "_code_": "module.exports = (user) => {\n  return {\n    find: { _id: user.storeGroups }\n  }\n}",
+        "_code_": "module.exports = (user) => {\n  // ATM the query is not used directly in client side because \n  // we gathering storeGroup information via logged user.\n  return {\n    find: { _id: { $in: user.storeGroups } }\n  }\n}",
         "_code_type_": "commonJs"
       }
     },
@@ -81,21 +81,17 @@
       "hideFields": [],
       "_id": "5eb3f21292ce831bcc65649c",
       "collectionName": "Discount",
+      "permission": "write",
       "queryCondition": {
-        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}\n",
+        "_code_": "module.exports =  async function(user) {\n  let stores = (await cms.getModel('Store').find({\n    groups: { $elemMatch: { $in: user.storeGroups }}\n  }).select('_id').lean()).map(r => r._id);\n\n  return {\n    find: {\n      store: { $in: stores }\n    }\n  }\n}",
         "_code_type_": "commonJs"
-      },
-      "permission": "write"
+      }
     },
     {
       "hideFields": [],
       "_id": "5eb52f080c15741739051bf7",
       "collectionName": "PosSetting",
-      "permission": "read",
-      "queryCondition": {
-        "_code_": "",
-        "_code_type_": "commonJs"
-      }
+      "permission": "read"
     },
     {
       "hideFields": [],
@@ -107,11 +103,7 @@
       "hideFields": [],
       "_id": "5eec8c52b0e160206188307e",
       "collectionName": "AppItem",
-      "permission": "read",
-      "queryCondition": {
-        "_code_": "",
-        "_code_type_": "commonJs"
-      }
+      "permission": "read"
     }
   ],
   "name": "user"
