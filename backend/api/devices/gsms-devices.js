@@ -2,19 +2,6 @@ const express = require('express');
 const router = express.Router();
 const DeviceModel = cms.getModel('Device');
 
-router.get('/check-registered/:clientId', async (req, res) => {
-  const {clientId} = req.params;
-
-  if (clientId) {
-    const device = await DeviceModel.findOne({_id: clientId, storeId: {$exists: false}});
-
-    if (device) return res.status(200).json({registered: true, clientId});
-    else return res.status(200).json({registered: false});
-  } else {
-    res.status(400).json({error: `clientId can not be ${clientId}`});
-  }
-});
-
 router.post('/register', async (req, res) => {
   let {hardware, appName, metadata} = req.body;
 
@@ -45,12 +32,13 @@ router.put('/device-metadata', async (req, res) => {
   if (clientId) {
     const foundDevice = await DeviceModel.findOne({_id: clientId, storeId: {$exists: false}})
     if (foundDevice) {
-      if (metadata) { // { deviceLatLong, deviceAddress}
-        await cms.getModel('Device').findOneAndUpdate({ _id: foundDevice._id }, { metadata })
+      if (metadata) { // { deviceLatLong || deviceAddress, deviceIP }
+        await cms.getModel('Device').findOneAndUpdate({ _id: foundDevice._id },
+          { metadata: Object.assign({}, foundDevice.metadata, metadata) })
       }
       return res.sendStatus(204)
     }
-    else return res.status(200).json({registered: false})
+    else return res.status(200).json({unregistered: true})
   }
 });
 
