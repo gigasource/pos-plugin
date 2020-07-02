@@ -1,8 +1,56 @@
 const express = require('express');
 const router = express.Router();
 const DeviceModel = cms.getModel('Device');
+const StoreModel = cms.getModel('Store');
+const ChatMessageModel = cms.getModel('ChatMessage');
+const {getExternalSocketIoServer} = require('../../socket-io-server');
 const _ = require('lodash');
 const axios = require('axios')
+
+router.get('/devices', async (req, res) => {
+  let gsmsDevices = await DeviceModel.find({deviceType: 'gsms'}).lean();
+
+  gsmsDevices = await Promise.all(gsmsDevices.map(async device => {
+    const latesUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false}).sort({createdAt: -1});
+    return {
+      ...device,
+      latestChatMessageDate: latesUnreadMsg ? latesUnreadMsg.createdAt : new Date(0),
+    }
+  }));
+
+  res.status(200).json(gsmsDevices);
+});
+
+router.get('/device-assigned-store/:clientId', async (req, res) => {
+  const {clientId} = req.params;
+  if (!clientId) return res.status(400).json({error: `clientId can not be ${clientId}`});
+
+  const device = await DeviceModel.findById(clientId);
+  if (!device) return res.status(400).json({error: `No device found with ID ${clientId}`});
+
+  const store = await StoreModel.findById(device.storeId || '');
+  if (!store) return res.status(200).json({assignedStore: null});
+
+  res.status(200).json({assignedStore: store.name || store.alias});
+});
+
+router.get('/device-online-status', async (req, res) => {
+  let {clientIds} = req.query;
+  if (!clientIds) return res.status(400).json({error: `clientIds query can not be ${clientIds}`});
+
+  clientIds = clientIds.split(',');
+
+  const clusterClientList = global.APP_CONFIG.redis
+      ? await getExternalSocketIoServer().getClusterClientIds()
+      : getExternalSocketIoServer().getAllClientId();
+
+  const onlineStatusMap = clientIds.reduce((result, clientId) => {
+    result[clientId] = clusterClientList.includes(clientId);
+    return result;
+  }, {});
+
+  res.status(200).json(onlineStatusMap);
+});
 
 router.post('/register', async (req, res) => {
   let {hardware, appName, metadata} = req.body;
@@ -10,29 +58,28 @@ router.post('/register', async (req, res) => {
   if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
   if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
 
+  if (metadata && metadata.deviceLatLong) {
+    const {latitude, longitude} = metadata.deviceLatLong
+
+    const address = await reverseGeocodePelias(latitude, longitude);
+    if (address) metadata.deviceLocation = address
+    console.log(`found address: ${address}`)
+  }
+
   const newDevice = await DeviceModel.create({
-    name: hardware || 'New Device', paired: true, hardware, appName, metadata, deviceType: 'gsms',
+    name: hardware || 'New Device', paired: true, lastSeen: new Date(),
+    hardware, appName, metadata, deviceType: 'gsms',
   });
 
   cms.socket.emit('reloadUnassignedDevices');
   res.status(200).json({clientId: newDevice._id});
 });
 
-router.get('/gsms-devices', async (req, res) => {
-  try {
-    const gsmsDevices = await DeviceModel.find({deviceType: 'gsms'}).lean();
-    res.status(200).json(gsmsDevices);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({error});
-  }
-});
-
 router.put('/device-metadata', async (req, res) => {
   let { clientId, metadata } = req.body;
 
   if (clientId) {
-    const foundDevice = await DeviceModel.findOne({ _id: clientId, storeId: { $exists: false } })
+    const foundDevice = await DeviceModel.findOne({ _id: clientId });
     if (foundDevice) {
       if (metadata) { // { deviceLatLong || deviceAddress, deviceIP }
         if (metadata.deviceLatLong) {
@@ -51,8 +98,11 @@ router.put('/device-metadata', async (req, res) => {
           { metadata: Object.assign({}, foundDevice.metadata, metadata) })
       }
       return res.sendStatus(204)
+    } else {
+      return res.status(400).json({error: `Device with ID ${clientId} not found`});
     }
-    return res.status(200).json({ unregistered: true })
+  } else {
+    res.status(400).json({error: `clientId can not be ${clientId}`});
   }
 });
 

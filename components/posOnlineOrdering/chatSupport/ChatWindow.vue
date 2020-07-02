@@ -6,7 +6,7 @@
           <div class="row-flex justify-end">
             <div class="chat-window__server--bubble mr-3">
               <div style="color: #424242; font-size: 11px;">{{createdAt}}</div>
-              <div>{{text}}</div>
+              <span style="white-space: pre-line">{{text}}</span>
             </div>
             <div class="ta-center">
               <g-icon svg size="32">icon-contact</g-icon>
@@ -30,7 +30,7 @@
     </template>
     <template v-else>
       <div class="row-flex justify-center align-items-center fill-height">
-        <span>Select or start a conversation</span>
+        <span>{{clientId ? 'Empty chat history' : 'Select a conversation'}}</span>
       </div>
     </template>
   </div>
@@ -40,7 +40,8 @@
   export default {
     name: 'ChatWindow',
     props: {
-      texts: Array
+      texts: Array,
+      clientId: String,
     },
     data() {
       return {
@@ -67,14 +68,12 @@
           if (!val || val === oldVal) return
           this.formattedTexts = await Promise.all(val.sort((cur, next) => cur.createdAt - next.createdAt)
           .map(async ({ createdAt, fromServer, text, userId }) => {
-            // const device = await cms.getModel('Device').findById(i.clientId)
-            const device = { metadata: { customerName: 'David' } } // example
             const user = await cms.getModel('User').findById(userId)
 
             return {
               text: text,
               createdAt: dayjs(createdAt).format('DD.MM.YYYY HH:mm'),
-              client: device.metadata.customerName,
+              client: '',
               user: user.name,
               fromServer: fromServer
             };

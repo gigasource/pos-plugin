@@ -177,6 +177,11 @@
       "schemaType": "mixed",
       "key": "metadata",
       "mixed": true
+    },
+    {
+      "_id": "5efc5ba35cd8091e1acbdb74",
+      "schemaType": "string",
+      "key": "deviceType"
     }
   ],
   "name": "Device",

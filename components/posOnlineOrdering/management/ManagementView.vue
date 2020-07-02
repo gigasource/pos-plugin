@@ -13,10 +13,11 @@
   import Account from "./AccountManagement/Account";
   import StoreManagement from './StoreManagement/StoreManagement';
   import VersionControl from "./VersionControl/VersionControl";
+  import ChatSupport from "../chatSupport/ChatSupport";
 
   export default {
     name: 'ManagementView',
-    components: { StoreManagement, Account, VersionControl},
+    components: {ChatSupport, StoreManagement, Account, VersionControl},
     props: {},
     injectService: [
       'PermissionStore:(versionControlPerm,manageAccountPerm)'
