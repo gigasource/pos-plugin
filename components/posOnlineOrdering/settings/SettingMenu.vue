@@ -8,8 +8,10 @@
         <p><span style="color: #536DFE">"Add new category"</span> to get started.</p>
         <div class="row-flex align-items-center">
           <g-btn-bs class="btn-add mr-2" @click="dialog.addNewCategory = true">{{$t('setting.newCategory')}}</g-btn-bs>
-          <span class="mt-2">or</span>
-          <g-btn-bs v-if="imexportable" class="btn-add" @click="openImportMenuItemDialog">{{$t('setting.importCategory')}}</g-btn-bs>
+          <template v-if="imexportable">
+            <span class="mt-2">or</span>
+            <g-btn-bs class="btn-add" @click="openImportMenuItemDialog">{{$t('setting.importCategory')}}</g-btn-bs>
+          </template>
         </div>
       </div>
       <div :class="['menu-setting__main', isInDevice && 'menu-setting__main--mobile']" v-else>
