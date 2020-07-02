@@ -109,6 +109,21 @@ router.get('/check-registered/:clientId', async (req, res) => {
   }
 });
 
+router.post('/update-mobile-app-metadata', async (req, res) => {
+  let {clientId, metadata} = req.body;
+
+  if (clientId) {
+    const foundDevice = await DeviceModel.findOne({_id: clientId, storeId: {$exists: false}})
+    if (foundDevice) {
+      if (metadata) { // { deviceLatLong, deviceAddress}
+        await cms.getModel('Device').findOneAndUpdate({ _id: foundDevice._id }, { metadata })
+      }
+      return res.sendStatus(204)
+    }
+    else return res.status(200).json({registered: false})
+  }
+})
+
 router.post('/register-mobile-app', async (req, res) => {
   let {hardware, appName, metadata} = req.body;
 
