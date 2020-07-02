@@ -5,7 +5,7 @@
     </div>
     <div class="header">Select your nearest restaurants</div>
     <div class="store-cards">
-      <store-card v-for="store in stores" :key="store._id" :store="store"/>
+      <store-card v-for="store in stores" :key="store._id" :store="store" class="store-card"/>
     </div>
   </section>
 </template>
@@ -86,6 +86,18 @@
     
     .store-cards {
       grid-template-columns: 1fr !important;
+    }
+  }
+  
+  @media screen and (max-width: 359px) {
+    .franchise-view {
+      padding: 5px;
+      padding-top: 40px;
+      margin-top: 0;
+    }
+    
+    .store-card {
+      padding: 10px 0 !important;
     }
   }
 </style>
