@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = async function (cms) {
   async function getLocale() {
@@ -10,7 +12,10 @@ module.exports = async function (cms) {
       if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) locale = posSettings.onlineDevice.store.locale
     }
     const localeFilePath = `../../i18n/${locale}.js`
-    return require(localeFilePath)[locale] || require(`../../i18n/en.js`).en
+    const isLocaleFileExist = fs.existsSync(path.resolve(__dirname, localeFilePath))
+    if (isLocaleFileExist)
+      return require(localeFilePath)[locale]
+    return require(`../../i18n/en.js`).en
   }
 
   cms.socket.on('connect', socket => {
