@@ -746,6 +746,7 @@
         this.dialog.confirm = true
       },
       async confirmCashPayment() {
+        this.paypalOrderDetail = {}
         this.paymentType = 'cash'
         this.dialog.confirm = true
       },
