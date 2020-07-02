@@ -62,6 +62,7 @@
           const user = {
             name: this.name,
             passcode: this.passcode,
+            viewReservation: true
           };
           await this.updateUser(null, user);
           const newUser = this.listUsers[this.listUsers.length - 1];

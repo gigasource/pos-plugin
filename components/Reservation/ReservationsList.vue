@@ -5,7 +5,7 @@
       <g-select text-field-component="GTextFieldBs" :items="listStatus" v-model="status"/>
       <div></div>
       <g-spacer/>
-      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="dialog.reservation = true">Make Reservation</g-btn-bs>
+      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="makeReservation">Make Reservation</g-btn-bs>
     </div>
     <div class="reservation-tab">
       <div class="reservation-tab__header">
@@ -36,7 +36,8 @@
                 <div v-if="reservation.note" class="reservation-info__customer--note">Note: {{reservation.note}}</div>
               </div>
               <div class="reservation-info__guest">
-                Guest: <span class="fw-700 fs-small">{{reservation.noOfGuests}}</span>
+                <img alt src="/plugins/pos-plugin/assets/guest.svg"/>
+                <span class="fw-700 fs-small ml-1">{{reservation.noOfGuests}}</span>
               </div>
               <div class="reservation-info__action">
                 <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
@@ -113,7 +114,7 @@
         status: 'all',
         date: new Date(),
         week: [],
-        dayInWeeks: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        dayInWeeks: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         edit: false,
         selectedReservation: null
       }
@@ -198,7 +199,7 @@
       },
       async genWeek(date) {
         let week = []
-        for (let i = 0; i < 7; i++) {
+        for (let i = 1; i < 8; i++) {
           const weekday = dayjs(date).day(i)
           const hasReservation = await this.checkReservationDay(weekday.toDate())
           week.push({
@@ -247,6 +248,10 @@
       async backToToday() {
         this.date = new Date()
         await this.genWeek(this.date)
+      },
+      makeReservation() {
+        this.edit = false
+        this.dialog.reservation = true
       }
     }
   }
@@ -254,7 +259,7 @@
 
 <style scoped lang="scss">
   .reservation {
-    /*background-image: url('/plugins/pos-plugin/assets/out.png');*/
+    background-image: url('/plugins/pos-plugin/assets/out.png');
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -295,14 +300,14 @@
       &__header {
         display: flex;
         width: 100%;
-        border-top: 1px solid #9e9e9e;
-        border-bottom: 1px solid #9e9e9e;
+        background: #FFFFFF;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1398);
 
         & > div {
           flex: 1;
           align-items: center;
           justify-content: center;
-          padding: 12px;
+          padding: 6px 12px;
           color: #424242;
         }
 
@@ -357,15 +362,17 @@
       display: flex;
       color: #424242;
 
-      &__time,
-      &__guest {
+      &__time {
         padding: 12px;
         line-height: 1.25;
       }
 
       &__guest {
         font-size: 12px;
-        line-height: 20px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        margin-right: 50px;
       }
 
       &__customer {
