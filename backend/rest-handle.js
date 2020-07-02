@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const deviceApi = require('./api/device');
+const gsmsDeviceApi = require('./api/devices/gsms-devices');
 const demoApi = require('./api/demoDevice');
 const storeApi = require('./api/store');
 const appManagementApi = require('./api/appManagement');
@@ -12,6 +13,7 @@ module.exports = cms => {
   cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise'];
 
   cms.app.use('/device', deviceApi);
+  cms.app.use('/gsms-device', gsmsDeviceApi);
   cms.app.use('/store', storeApi);
   cms.app.use('/app', appManagementApi);
   cms.app.use('/payment', payment);
