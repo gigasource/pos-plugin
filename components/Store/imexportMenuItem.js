@@ -22,13 +22,18 @@ const allergicMaps = {
   'su': 'sulphur'
 }
 const directMapping = (key, convert) => (obj, value) => obj[key] = (convert && convert(value)) || value
+const taxPattern = /(?<tax>\d+(\.\d+)*)/g
 const mappingFns = {
   'id': directMapping('id'),
   'name': directMapping('name'),
   'desc': directMapping('desc'),
   'price': directMapping('price', Number),
   'printer': (o, v) => o.groupPrinters = (v && _.split(v, ',') || []),
-  'tax': directMapping('tax', Number),
+  'tax': (o, v) => {
+    const result = taxPattern.exec(v)
+    if (result)
+      o.tax = Number(result.groups['tax'])
+  },
   'choices': (o, v) => !_.isEmpty(_.trim(v)) && (o.choices = getChoices(v)),
   'allergic': (o, v) => {
     o.mark = o.mark || {}
@@ -129,6 +134,18 @@ function workbook2PJSO(workbook) {
   }))
 }
 
+// requested by Xuan Anh
+// Automatically add tax 7%, printer: Kitchen if missing
+function enrichItem(item) {
+  if (!item.groupPrinters) {
+    item.groupPrinters = ['Kitchen']
+  }
+  if (!item.tax) {
+    item.tax = 7
+  }
+  return item;
+}
+
 /**
  * Convert sheet rows -> product menu item
  * @param sheet
@@ -154,7 +171,7 @@ function getItemsInCategory(sheet) {
     }
     // remove invalid item
     if (isItemValid(item)) {
-      result.push(item);
+      result.push(enrichItem(item));
     }
   }
   return result;
