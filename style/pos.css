@@ -731,3 +731,24 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-device {
+  background-image: url("../assets/device.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-pen {
+  background-image: url("../assets/pen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-zoom {
+  background-image: url("../assets/zoom.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

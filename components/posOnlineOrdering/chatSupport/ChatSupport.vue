@@ -34,7 +34,6 @@
         <div class="chat-support__container-chat-window__header">
           <chat-info
               v-if="currentClientId"
-              class="pa-2"
               :assigned-store-id="currentDevice.storeId"
               :username="currentUsername"
               :device-name="currentDevice.name"
