@@ -121,11 +121,11 @@ router.put('/chat/set-message-read', async (req, res) => {
 
 router.put('/assign-device/:id', async (req, res) => {
   const {id} = req.params;
-  const {storeId} = req.body;
+  const {storeId, customStoreId} = req.body;
   if (!id) return res.status(400).json({error: `Id can not be ${id}`});
-  if (!storeId) return res.status(400).json({error: `storeId can not be ${storeId}`});
+  if (!storeId && !customStoreId) return res.status(400).json({error: `You must provice either storeId or customStoreId`});
 
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
 
   const device = await DeviceModel.findById(id);
   if (!device) return res.status(400).json({error: `Device with ID ${id} not found`});
@@ -138,10 +138,12 @@ router.put('/assign-device/:id', async (req, res) => {
     }
   }
 
-  const store = await StoreModel.findById(storeId);
-  if (!store) return res.status(400).json({error: `Store with ID ${storeId} not found`});
+  const store = storeId
+    ? await StoreModel.findById(storeId)
+    : await StoreModel.findOne({id: customStoreId});
+  if (!store) return res.status(400).json({error: `Store with ID ${storeId || customStoreId} not found`});
 
-  device.storeId = storeId;
+  device.storeId = store._id;
   device.metadata = device.metadata || {};
   await DeviceModel.updateOne({_id: id}, device);
 
@@ -158,7 +160,7 @@ router.put('/assign-device/:id', async (req, res) => {
         total: 0,
         orders: 0,
       }));
-  await StoreModel.updateOne({_id: storeId}, store);
+  await StoreModel.updateOne({_id: store._id}, store);
 
   getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then(() => {
   });

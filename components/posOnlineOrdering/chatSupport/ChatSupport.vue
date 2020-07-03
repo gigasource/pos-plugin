@@ -229,9 +229,10 @@
 
         const dummyId = uuidv1()
         const userId = cms.loginUser.user._id
+        const clientId = this.currentClientId
 
         const chatPayload = {
-          clientId: this.currentClientId,
+          clientId,
           userId,
           createdAt: new Date(),
           text: this.currentChatMsg,
