@@ -36,17 +36,64 @@
         </g-grid-select>
       </div>
       <div class="reservation-setting__main--right">
-        <div class="mb-3 fw-700">Embed Code</div>
-        <div>
-          <g-textarea style="border: 1px solid #EFEFEF;color: #162D3D" no-resize :value="iframe"></g-textarea>
-          <div class="row-flex align-items-center" style="cursor: pointer">
-            <g-icon size="14" color="#536DFE" class="mr-1 mb-1">icon-chain-blue</g-icon>
-            <span style="color: #536DFE; cursor: pointer; font-weight: 700; font-size: 14px" @click.stop="copyCode">Copy Code</span>
-            <g-spacer/>
+        <div class="row-flex align-items-center">
+          <p class="fw-700 fs-small">{{$t('setting.seatLimit')}}</p>
+          <g-spacer/>
+          <g-btn-bs icon="add@14" text-color="indigo accent-2" @click="dialog.seat = true">Add new</g-btn-bs>
+        </div>
+        <div v-if="seatLimitItems && seatLimitItems.length > 0" class="reservation-setting__seat-table">
+          <div class="reservation-setting__seat-table--header">
+            <div class="col-4 ml-1">From/To</div>
+            <div class="col-5">Day</div>
+            <div class="col-2 ta-center">Seat limit</div>
+          </div>
+          <div v-for="(seat, i) in seatLimitItems" :class="['reservation-setting__seat-table--row', i % 2 !== 0 && 'reservation-setting__seat-table--row--even']" :key="`seat_${i}`">
+            <div class="col-4 ml-1">{{seat.time}}</div>
+            <div class="col-5">{{seat.day}}</div>
+            <div class="col-2 ta-center">{{seat.seat}}</div>
+            <div class="col-1">
+              <g-icon title="Delete" @click="removeSeatLimit(seat._id)" color="#ff4552">mdi-trash-can</g-icon>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <g-dialog v-model="dialog.seat" width="480" eager>
+      <div class="dialog">
+        <div class="dialog-title">Seat Limit</div>
+        <div class="dialog-content">
+          <div>From/to</div>
+          <div class="row-flex">
+            <div class="dialog__time--from">
+              <g-time-picker-input use24Hours :value="newSeatLimit.startTime" @input="newSeatLimit.startTime = $event"/>
+            </div>
+            <div class="dialog__time--to">
+              <g-time-picker-input use24Hours :value="newSeatLimit.endTime" @input="newSeatLimit.endTime = $event"/>
+            </div>
+          </div>
+          <div>Day</div>
+          <div class="row-flex br-1 flex-wrap b-grey ba-thin">
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Mon" label="Mon"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Thu" label="Thu"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Sun" label="Sun"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Tue" label="Tue"/>
+            <g-checkbox color="indigo accent-2" class="col-8" v-model="newSeatLimit.days" value="Fri" label="Fri"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Wed" label="Wed"/>
+            <g-checkbox color="indigo accent-2" v-model="newSeatLimit.days" value="Sat" label="Sat"/>
+          </div>
+          <div>Seat limit</div>
+          <g-text-field-bs v-model="newSeatLimit.seat" type="number"/>
+        </div>
+        <div v-if="errorSeatLimit" class="i fs-small-2 text-red mt-1">Dupplicate time/day with other seat limit!</div>
+        <div class="dialog-action">
+          <g-btn-bs text-color="#424242" @click="closeDialogSeat">Cancel</g-btn-bs>
+          <g-btn-bs :disabled="!this.newSeatLimit.startTime || !this.newSeatLimit.endTime || this.newSeatLimit.days.length === 0 || !this.newSeatLimit.seat
+          || this.newSeatLimit.endTime < this.newSeatLimit.startTime || errorSeatLimit"
+                    width="110" background-color="#1271FF" @click="addSeatLimit">Add</g-btn-bs>
+        </div>
+      </div>
+    </g-dialog>
   </div>
 </template>
 
@@ -62,6 +109,16 @@
         removeOverdueAfterList: [15, 30, 45, 60, $t('setting.dontDelete')],
         guestAllowances: [20, 30, 50, 100],
         dayAllowances: [2, 7, 14, 30],
+        dialog: {
+          seat: false,
+        },
+        seatLimit: (this.store.reservationSetting && this.store.reservationSetting.seatLimit) || [],
+        newSeatLimit: {
+          startTime: '',
+          endTime: '',
+          days: [],
+          seat: '',
+        }
       }
     },
     computed: {
@@ -153,6 +210,29 @@
           this.updateReservationSetting()
         }
       },
+      seatLimitItems() {
+        return this.seatLimit.map(({startTime, endTime, days, seat, _id}) => ({
+          time: `${startTime} - ${endTime}`,
+          day: days.join(', '),
+          seat,
+          _id
+        }))
+      },
+      errorSeatLimit() {
+        if(this.seatLimit && this.seatLimit.length > 0) {
+          if(!this.newSeatLimit.startTime || !this.newSeatLimit.endTime || this.newSeatLimit.days.length === 0 || !this.newSeatLimit.seat || this.newSeatLimit.startTime > this.newSeatLimit.endTime) {
+            return false
+          }
+          for(const seatLimit of this.seatLimit) {
+            if(seatLimit.days.some(s => this.newSeatLimit.days.includes(s)) &&
+                ((seatLimit.startTime >= this.newSeatLimit.startTime && seatLimit.startTime <= this.newSeatLimit.endTime) ||
+                    (seatLimit.endTime >= this.newSeatLimit.startTime && seatLimit.endTime <= this.newSeatLimit.endTime))) {
+              return true
+            }
+          }
+        }
+        return false
+      }
     },
     methods: {
       updateReservationSetting() {
@@ -161,6 +241,26 @@
       async copyCode() {
         await navigator.clipboard.writeText(this.iframe)
       },
+      closeDialogSeat() {
+        this.newSeatLimit.startTime = ''
+        this.newSeatLimit.endTime = ''
+        this.newSeatLimit.days = []
+        this.newSeatLimit.seat = ''
+        this.dialog.seat = false
+      },
+      addSeatLimit() {
+        const item = _.cloneDeep(this.newSeatLimit)
+        this.seatLimit.push(item)
+        this.reservationSetting.seatLimit = this.seatLimit
+        this.updateReservationSetting()
+        this.closeDialogSeat()
+      },
+      removeSeatLimit(_id) {
+        const index = this.seatLimit.findIndex(s => s._id === _id)
+        this.seatLimit.splice(index, 1)
+        this.reservationSetting.seatLimit = this.seatLimit
+        this.updateReservationSetting()
+      }
     }
   }
 </script>
@@ -188,12 +288,12 @@
       }
 
       &--left {
-        flex: 0 0 calc(55% - 12px);
+        flex: 0 0 calc(50% - 12px);
         margin-right: 12px;
       }
 
       &--right {
-        flex: 0 0 calc(45% - 12px);
+        flex: 0 0 calc(50% - 12px);
         margin-left: 12px;
         align-self: flex-start;
 
@@ -233,6 +333,104 @@
           }
         }
       }
+    }
+
+    &__seat-table {
+      background: #FFFFFF;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1398);
+      border-radius: 2px;
+      margin-top: 8px;
+
+      &--header {
+        background: #EFEFEF;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #757575;
+      }
+
+      &--row {
+        display: flex;
+        align-items: center;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        font-size: 14px;
+
+        &--even {
+          background: #FAFAFC;
+        }
+      }
+    }
+  }
+
+  .dialog {
+    background: white;
+    border-radius: 4px;
+    padding: 24px;
+    width: 100%;
+
+    &-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #212121;
+      margin-bottom: 20px;
+    }
+
+    &-content {
+      display: grid;
+      grid-template-columns: 20% 80%;
+      grid-template-rows: auto auto auto;
+      grid-gap: 12px;
+      align-items: center;
+      font-size: 14px;
+
+      .dialog__time {
+        &--from {
+          border-radius: 2px 0 0 2px;
+          border: 1px solid #9e9e9e;
+        }
+
+        &--to {
+          border-radius: 0 2px 2px 0;
+          border: 1px solid #9e9e9e;
+          border-left: none;
+        }
+      }
+
+      ::v-deep .g-tf-wrapper {
+        margin: 0;
+
+        &:before, &:after {
+          display: none;
+        }
+
+        .g-tf-input {
+          text-align: center;
+          padding: 6px 0;
+        }
+      }
+
+      ::v-deep .bs-tf-wrapper {
+        margin: 0;
+        width: 100%;
+
+        .bs-tf-input-group {
+          border-color: #9e9e9e;
+
+          .bs-tf-inner-input-group {
+            border-radius: 2px;
+          }
+        }
+      }
+    }
+
+    &-action {
+      display: flex;
+      margin-top: 16px;
+      justify-content: flex-end;
+      margin-right: -8px;
     }
   }
 </style>

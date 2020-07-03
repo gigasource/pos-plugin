@@ -61,9 +61,9 @@
           <g-switch color="#536DFE" class="col-6" :label="$t('setting.delivery')" v-model="computedDelivery"/>
           <g-switch color="#536DFE" class="col-6" :label="$t('setting.pickup')" v-model="computedPickup"/>
         </div>
-        <div class="fw-700 mt-2">Note for customers</div>
+        <div class="fw-700 mt-2">{{$t('setting.noteForCustomer')}}</div>
         <div>
-          <g-textarea outlined no-resize placeholder="Note..." :rows="3" v-model="computedNote">
+          <g-textarea outlined no-resize :placeholder="`${$t('store.note')}...`" :rows="3" v-model="computedNote">
             <template v-slot:append-inner v-if="isInDevice">
               <g-icon @click.stop="openDialogInput('note')" size="16" class="mt-2">icon-keyboard</g-icon>
             </template>
