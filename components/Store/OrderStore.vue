@@ -771,6 +771,11 @@
             && order.paypalOrderDetail.captureResponses.status === "COMPLETED" && !this.isCaptureRefundExpired(order.paypalOrderDetail.captureResponses)
             && (!order.paypalOrderDetail.refundResponses || this.isRefundFailed(order.paypalOrderDetail.refundResponses)))
       },
+      isRefunded(order) {
+        return (order.paypalOrderDetail
+          && order.paypalOrderDetail.refundResponses
+          && _.every(order.paypalOrderDetail.refundResponses, r => r.status === "COMPLETED"))
+      },
       isRefundFailed(refundResponses) {
         return _.find(refundResponses, r => r.status !== "COMPLETED") != null
       },

@@ -33,6 +33,7 @@ module.exports = {
       cancelOrder: 'Stornieren',
       completeOrder: 'Fertig',
       refund: 'Rückerstattung',
+      refunded: 'erstattet',
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',

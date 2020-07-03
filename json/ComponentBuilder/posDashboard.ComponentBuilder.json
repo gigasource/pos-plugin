@@ -302,6 +302,11 @@
                   "type": "event"
                 },
                 {
+                  "service": "OrderStore:isRefunded",
+                  "local": "isRefunded",
+                  "type": "prop"
+                },
+                {
                   "service": "PosStore:user",
                   "local": "user",
                   "type": "prop"

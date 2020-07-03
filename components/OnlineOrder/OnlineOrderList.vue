@@ -41,7 +41,10 @@
           <td>{{item.date | formatDate}}</td>
           <td>{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
-          <td :class="statusClass">{{$t(`onlineOrder.${item.status}`)}}</td>
+          <td :class="statusClass">
+            <div>{{$t(`onlineOrder.${item.status}`)}}</div>
+            <div style="font-size: x-small; margin-top: -5px"> {{ isRefunded(item) ? refundedStr: '' }}</div>
+          </td>
           <td>
             <!-- ATM, g-menu only contains 1 action so we set this action state as visibility of entire g-menu -->
             <g-menu v-if="isAdminUser && isRefundable(item)" v-model="item.showMenu" :nudge-bottom="10" close-on-content-click>
@@ -80,15 +83,17 @@
       user: Object,
       isRefundFailed: Function, // (order) => boolean: return refund status of order
       isRefundable: Function, // (order) => boolean: return true if order can be refund
+      isRefunded: Function,
       getOnlineOrdersWithStatus: Function,
     },
     data() {
       const i18n = this.$i18n;
-      const { onlineOrder: { address, amount, customer, delivery, no, received, status, type, refund } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+      const { onlineOrder: { address, amount, customer, delivery, no, received, status, type, refund, refunded } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
       const headers = [no, customer, address, amount, received, delivery, type, status, '']
       return {
         headers,
         refundStr: refund,
+        refundedStr: refunded,
         filter: {
           fromDate: '',
           toDate: ''
