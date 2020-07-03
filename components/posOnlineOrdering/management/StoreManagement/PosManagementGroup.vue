@@ -74,7 +74,7 @@
                   <div class="row-flex col-4 align-items-center">
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
                     <span class="ml-1">{{device.name}}</span>
-                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
+                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3" remove-content-on-close>
                       <span>Online ordering</span>
                       <template v-slot:activator="{on}">
                         <div v-if="device.features.onlineOrdering" v-on="on" class="ml-1 h-100 row-flex align-items-center">
@@ -82,7 +82,7 @@
                         </div>
                       </template>
                     </g-tooltip>
-                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3">
+                    <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3" remove-content-on-close>
                       <span>Reservation</span>
                       <template v-slot:activator="{on}">
                         <div v-if="device.features.reservation" v-on="on" class="ml-1 h-100 row-flex align-items-center">
