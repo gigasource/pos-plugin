@@ -69,7 +69,7 @@ router.post('/unregister', async (req, res) => {
   let { storeId, deviceId, deviceName } = req.body
 
   if (!storeId) storeId = req.query.storeId
-  if (!deviceId) deviceName = req.query.deviceId
+  if (!deviceId) deviceId = req.query.deviceId
   if (!deviceName) deviceName = req.query.deviceName
 
   if (!deviceId || !storeId) return res.sendStatus(400)
