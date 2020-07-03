@@ -12,15 +12,22 @@
         </div>
 
         <div class="chat-support__container-contact-list__list col-flex">
-          <div v-for="contact in sortedContactList" @click.stop="setActiveChat(contact)"
-               class="chat-support__container-contact-list__list--item row-flex align-items-center pl-3 pr-3">
+          <div v-for="contact in sortedDeviceList" :key="contact._id" @click.stop="setActiveChat(contact)"
+               class="chat-support__container-contact-list__list--item row-flex align-items-center pl-3 pr-3"
+               :class="contact._id === currentClientId ? 'chat-support__container-contact-list__list--item_active' : ''">
             <div class="chat-support__container-contact-list__list--item_left">
-              <div style="font-weight: bold;">{{contact.metadata.customerName}}</div>
-              <div v-if="contact.metadata.customerPhone">{{contact.metadata.customerPhone}}</div>
+              <div style="font-weight: bold;">
+                <span>{{concatContactName(contact)}}</span>
+              </div>
+              <span>
+                {{concatContactMetadata(contact)}}
+              </span>
             </div>
             <g-spacer/>
-            <div class="chat-support__container-contact-list__list--item_right row-flex align-items-center justify-center">
-              20
+            <div v-if="unreadCountMap[contact._id]"
+                class="chat-support__container-contact-list__list--item_right
+                row-flex align-items-center justify-center">
+              {{unreadCountMap[contact._id]}}
             </div>
           </div>
         </div>
@@ -28,13 +35,34 @@
 
       <div class="chat-support__container-chat-window col-8 col-flex">
         <div class="chat-support__container-chat-window__header">
+          <chat-info
+              v-if="currentClientId"
+              class="pa-2"
+              :assigned-store-id="currentDevice.storeId"
+              :username="currentUsername"
+              :device-name="currentDevice.name"
+              :online="deviceOnlineStatusMap[currentClientId]"
+              :last-seen="currentDevice.lastSeen"
+              :location="currentDeviceLocation"
+              :stores="stores"
+              @assign-store="assignStore"
+              @update-username="updateUsername"/>
         </div>
 
-        <chat-window class="chat-support__container-chat-window__content flex-grow-1" :texts="texts"/>
+        <chat-window class="chat-support__container-chat-window__content flex-grow-1"
+                     :texts="sortedChats"
+                     :client-id="currentClientId"/>
 
         <div class="chat-support__container-chat-window__text-box row-flex">
-          <textarea class="ma-2"/>
-          <g-btn-bs class="ma-2" background-color="#1271FF" text-color="white">Send</g-btn-bs>
+          <textarea class="ma-2 pa-2 fs-normal"
+                    v-model="currentChatMsg"
+                    @keydown.enter.exact="sendChatMsg"
+                    @keydown.etner.shift.exact="currentChatMsg += '\n'"
+                    :disabled="!currentClientId"/>
+          <g-btn-bs class="ma-2"
+                    background-color="#1271FF"
+                    text-color="white"
+                    @click="sendChatMsg">Send</g-btn-bs>
         </div>
       </div>
     </div>
@@ -42,175 +70,232 @@
 </template>
 
 <script>
-  import ChatWindow from './ChatWindow';
+  import ChatWindow from './ChatWindow'
+  import axios from 'axios'
+  import uniqBy from 'lodash/uniqBy'
+  import isNil from 'lodash/isNil'
+  import uuidv1 from 'uuid/v1'
+  import ChatInfo from "./ChatInfo"
 
   export default {
     name: 'ChatSupport',
-    components: { ChatWindow },
+    components: {ChatInfo, ChatWindow },
     data() {
       return {
-        contacts: [
-          {
-            _id: '1',
-            metadata: {
-              customerName: 'David Beckham',
-              customerPhone: '0123456789'
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(10, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '2',
-            metadata: {
-              customerName: 'David Beckham2',
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(20, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '3',
-            metadata: {
-              customerName: 'David Beckham2',
-              customerPhone: '0123456789'
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(30, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '4',
-            metadata: {
-              customerName: 'David Beckham2',
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(40, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '5',
-            metadata: {
-              customerName: 'David Beckham2',
-              customerPhone: '0123456789'
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(50, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '6',
-            metadata: {
-              customerName: 'David Beckham2',
-              customerPhone: '0123456789'
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(60, 'minute').toDate(),
-            location: null
-          },
-          {
-            _id: '7',
-            metadata: {
-              customerName: 'David Beckham2',
-              customerPhone: '0123456789'
-            },
-            name: 'iPhone7',
-            lastSeen: dayjs().subtract(70, 'minute').toDate(),
-            location: null
-          },
-
-        ],
+        devices: [],
         sorting: [
           { text: 'Last contact', value: 'lastSeen' }
         ],
         activeSorting: 'lastSeen',
-        testConvo: [
-          {
-            _id: '1',
-            clientId: '1',
-            userId: '5c88842f1591d506a250b2a5',
-            createdAt: dayjs().subtract(10, 'minute').toDate(),
-            text: 'Hello server',
-            read: true,
-            fromServer: false
-          },
-          {
-            _id: '2',
-            clientId: '1',
-            userId: '5c88842f1591d506a250b2a5',
-            createdAt: dayjs().subtract(8, 'minute').toDate(),
-            text: 'Hello client',
-            read: true,
-            fromServer: true
-          },
-          {
-            _id: '3',
-            clientId: '1',
-            userId: '5c88842f1591d506a250b2a5',
-            createdAt: dayjs().subtract(6, 'minute').toDate(),
-            text: 'How can i have my device running',
-            read: true,
-            fromServer: false
-          },
-          {
-            _id: '4',
-            clientId: '1',
-            userId: '5c88842f1591d506a250b2a5',
-            createdAt: dayjs().subtract(4, 'minute').toDate(),
-            text: 'Give it legs',
-            read: true,
-            fromServer: true
-          },
-          {
-            _id: '5',
-            clientId: '1',
-            userId: '5c88842f1591d506a250b2a5',
-            createdAt: dayjs().subtract(2, 'minute').toDate(),
-            text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vel mi quis sem venenatis sagittis at non mauris. Nam vulputate lacus quis nulla laoreet, id interdum mauris facilisis. Nulla auctor malesuada risus, et tempus mauris. Nullam sit amet ex sit amet lacus ultricies posuere. Nullam ante leo, dignissim nec nunc vel, iaculis finibus nulla. Vivamus consequat aliquet dolor. Nunc justo nunc, facilisis et dolor eleifend, aliquam ultrices orci. Nulla iaculis facilisis ex id pharetra. Vestibulum fringilla, tortor in porttitor mollis, felis urna sagittis tellus, ac varius dolor sapien vel massa. Phasellus sit amet venenatis ipsum, eget cursus nisl. Sed ultricies pretium est eu suscipit. Sed ut metus ut sapien aliquet imperdiet ut sed dui. Nullam cursus ex a nisi accumsan, mollis blandit nibh molestie. Integer ultrices ipsum pharetra, tincidunt nulla quis, mollis mi. Mauris ut imperdiet dui.
-
-Phasellus laoreet, sapien sed commodo rhoncus, urna massa aliquet odio, ut bibendum nulla leo fringilla lacus. Fusce viverra at nunc et blandit. Fusce quis dignissim felis. Nunc eu orci maximus, vulputate mi ut, pretium ante. Curabitur ultricies lacinia sodales. In hac habitasse platea dictumst. Sed pellentesque viverra dui at bibendum. Quisque quis imperdiet odio. Morbi pellentesque massa justo, vitae malesuada mauris tempor et.
-
-Vivamus ut odio ac mauris malesuada sollicitudin. Maecenas eget elit tempus, facilisis est et, volutpat ligula. Nullam nisi arcu, tristique sit amet nisl in, dignissim eleifend lectus. Donec convallis sem sit amet arcu venenatis suscipit. Proin molestie tristique justo quis posuere. Nulla cursus auctor leo, interdum rhoncus dui maximus at. Suspendisse feugiat, risus et euismod feugiat, dolor mi facilisis quam, et accumsan nibh urna sit amet nunc. Sed sagittis dignissim mollis.
-
-Praesent eu pretium augue, non molestie nulla. Morbi sodales blandit mauris et imperdiet. Donec ut ante eu massa malesuada aliquet sit amet in mauris. Suspendisse potenti. In ut lectus diam. Duis pulvinar, nisl sed efficitur varius, nibh risus elementum magna, non tempus lorem orci eget metus. Duis in vehicula risus. Donec vestibulum, felis at ultrices sollicitudin, diam est luctus elit, vel rutrum neque purus a lorem. Vestibulum accumsan rutrum ligula, sit amet malesuada libero tristique non. Integer viverra, tellus non auctor convallis, magna felis ultrices nibh, ut dignissim augue felis vitae enim. Ut quis vehicula ipsum, id consequat nibh. Vivamus pellentesque auctor leo, sit amet pellentesque turpis aliquam nec. Phasellus eu tortor quam. Phasellus commodo pulvinar magna et finibus.
-
-Sed convallis ornare turpis rhoncus cursus. Curabitur et erat id nisl fermentum pulvinar tincidunt porta lorem. Aenean odio est, blandit sed lectus eget, consequat gravida nibh. Nulla venenatis pulvinar lectus, a porta metus posuere quis. Pellentesque at mollis risus, quis gravida nisi. Vestibulum ultrices venenatis erat, eu tempus lacus congue ut. Phasellus tempus lorem vel magna dapibus faucibus. Sed euismod neque id eros ornare tincidunt. Cras arcu enim, aliquet quis libero in, scelerisque vestibulum mauris. Aenean consectetur pellentesque suscipit. Vivamus in mi mauris.
-
-`,
-            read: true,
-            fromServer: false
-          },
-
-        ],
         adminId: '5c88842f1591d506a250b2a5',
-        texts: [],
-        activeChat: null
+
+        stores: [],
+        currentChats: [],
+        currentChatMsg: '',
+        currentClientId: null,
+        unreadCountMap: {},
+        deviceOnlineStatusMap: {},
       }
     },
-    created() {
+    async created() {
+      await this.getGsmsDevices()
 
+      const stores = await cms.getModel('Store').find().lean()
+      this.stores = stores.map(store => {
+        return {
+          _id: store._id,
+          name: `${store.name} (${store.alias})`,
+        }
+      });
+
+      cms.socket.on('chatMessage', this.receiveChatMessage)
+      cms.socket.on('reloadUnassignedDevices', this.getGsmsDevices)
+
+      const updateDeviceStatus = async deviceId => {
+        const clientIds = this.sortedDeviceList.map(({_id}) => _id)
+        if (!clientIds.length || !clientIds.includes(deviceId)) return
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(clientIds)
+      }
+
+      cms.socket.on('gsms-device-connected', updateDeviceStatus)
+      cms.socket.on('gsms-device-disconnected', updateDeviceStatus)
     },
     computed: {
-      sortedContactList() {
+      sortedDeviceList() {
         switch (this.activeSorting) {
           case 'lastSeen': {
-            return this.contacts.sort((cur, next) => {
-              return next.lastSeen - cur.lastSeen
+            return this.devices.sort((cur, next) => {
+              const curLatestMsgDate = cur.latestChatMessageDate.getTime()
+              const nextLatestMsgDate = next.latestChatMessageDate.getTime()
+
+              if (curLatestMsgDate === nextLatestMsgDate) return next.lastSeen - cur.lastSeen
+              else return nextLatestMsgDate - curLatestMsgDate
             })
           }
           default: {
-            return this.contacts
+            return this.devices
           }
         }
+      },
+      sortedChats() {
+        return uniqBy(this.currentChats, '_id').sort((e1, e2) => {
+          return e1.createdAt - e2.createdAt
+        });
+      },
+      currentDevice() {
+        return this.sortedDeviceList.find(({_id}) => _id === this.currentClientId)
+      },
+      currentUsername() {
+        return (this.currentDevice &&
+            this.currentDevice.metadata &&
+            this.currentDevice.metadata.customerName) || 'Unknown name'
+      },
+      currentDeviceLocation() {
+        return (this.currentDevice &&
+            this.currentDevice.metadata &&
+            this.currentDevice.metadata.deviceLocation) || 'Unknown location'
+      }
+    },
+    watch: {
+      async currentClientId() {
+        const getChatApiUrl = `/support/chat/messages?clientId=${this.currentClientId}`
+        let {data: chats} = await axios.get(getChatApiUrl)
+        chats = chats.map(chat => {
+          return {
+            ...chat,
+            createdAt: new Date(chat.createdAt),
+          }
+        })
+        this.currentChats = chats
+
+        await this.setMessagesRead(this.currentClientId)
+      },
+      async devices() {
+        const clientIds = this.sortedDeviceList.map(({_id}) => _id)
+        if (!clientIds.length) return
+
+        const getUnreadMapApiUrl = `/support/chat/unread-messages-count?clientIds=${clientIds.join(',')}&fromServer=false`
+        const {data: unreadCountMap} = await axios.get(getUnreadMapApiUrl)
+        this.unreadCountMap = unreadCountMap
+
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(clientIds)
+
+        cms.socket.emit('watch-chat-message', clientIds)
       }
     },
     methods: {
       filter() {
 
       },
+      async getGsmsDevices() {
+        const {data: gsmsDevices} = await axios.get('/gsms-device/devices');
+
+        this.devices = gsmsDevices;
+        this.devices = this.devices.map(device => ({
+          ...device,
+          lastSeen: new Date(device.lastSeen),
+          latestChatMessageDate: new Date(device.latestChatMessageDate),
+        }))
+
+        return gsmsDevices;
+      },
+      concatContactName(contact) {
+        return contact.name + (contact.metadata && contact.metadata.customerName
+            ? ` - ${contact.metadata.customerName}`
+            : '')
+      },
+      concatContactMetadata(contact) {
+        let result = ''
+
+        if (contact.metadata) {
+          const location = contact.metadata.deviceLocation
+          const phoneNumber = contact.metadata.customerPhone
+
+          if (location) result += location
+
+          if (phoneNumber) {
+            result += result ? ` | ${phoneNumber}` : phoneNumber
+          }
+        }
+
+        return result
+      },
       setActiveChat(contact) {
-        this.activeChat = contact
-        this.texts = this.testConvo.filter(i => i.clientId === contact._id)
+        this.currentClientId = contact._id
+      },
+      sendChatMsg(e) {
+        e.preventDefault()
+        if (!this.currentChatMsg.replace(/\r?\n|\r/g, '').trim().length) return
+
+        const dummyId = uuidv1()
+        const userId = cms.loginUser.user._id
+
+        const chatPayload = {
+          clientId: this.currentClientId,
+          userId,
+          createdAt: new Date(),
+          text: this.currentChatMsg,
+        }
+
+        console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+            `Online-order frontend send chat msg to backend`, JSON.stringify(chatPayload, null, 2))
+
+        cms.socket.emit('chat-message', chatPayload, savedMsg => {
+          console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+              `Online-order frontend received chat msg ack from backend`, JSON.stringify(savedMsg, null, 2))
+
+          this.currentChats = this.currentChats.filter(e => e._id !== dummyId)
+          this.currentChats.push(savedMsg)
+        });
+
+        this.currentChatMsg = ''
+        this.currentChats.push({
+          _id: dummyId,
+          ...chatPayload,
+          fromServer: true,
+        })
+      },
+      async assignStore(storeId) {
+        const deviceId = this.currentClientId
+        const assingApiUrl = `/support/assign-device/${deviceId}`
+        await axios.put(assingApiUrl, {storeId})
+        await this.getGsmsDevices()
+      },
+      receiveChatMessage(chatMessage) {
+        const {clientId, userId, createdAt} = chatMessage
+        console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+            `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
+
+        const device = this.devices.find(({_id}) => _id === clientId)
+
+        if (device) {
+          // this.$set(device, 'latestChatMessageDate', new Date(createdAt))
+          device.latestChatMessageDate = new Date(createdAt)
+        }
+
+        if (clientId === this.currentClientId) {
+          chatMessage.read = true
+          this.currentChats.push(chatMessage)
+          this.setMessagesRead(this.currentClientId)
+        } else if (!isNil(this.unreadCountMap[clientId])) {
+          this.unreadCountMap[clientId]++
+        }
+      },
+      async setMessagesRead(clientId) {
+        const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${clientId}`
+        await axios.put(setMessageReadApiUrl)
+        this.unreadCountMap[clientId] = 0
+      },
+      async getDeviceOnlineStatusMap(clientIds) {
+        const apiUrl = `/gsms-device/device-online-status?clientIds=${clientIds.join(',')}`
+        const {data: onlineStatusMap} = await axios.get(apiUrl)
+        return onlineStatusMap
+      },
+      async updateUsername(username) {
+        const apiUrl = `/gsms-device/device-metadata`
+        const payload = {clientId: this.currentClientId, metadata: {customerName: username}}
+        await axios.put(apiUrl, payload)
+        await this.getGsmsDevices()
       }
     }
   }
@@ -218,7 +303,8 @@ Sed convallis ornare turpis rhoncus cursus. Curabitur et erat id nisl fermentum 
 
 <style scoped lang="scss">
   .chat-support {
-    height: calc(100% - 50px);
+    height: 100%;
+    overflow: hidden;
 
     &__title {
       font-size: 20px;
@@ -228,13 +314,14 @@ Sed convallis ornare turpis rhoncus cursus. Curabitur et erat id nisl fermentum 
     &__container {
       background: white;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 50px);
 
       &-contact-list {
         border-right: 1px solid #EFEFEF;
+        overflow: auto;
 
         &__header {
-          height: 72px;
+          height: 84px;
           border-bottom: 1px solid #EFEFEF;
 
           .g-select ::v-deep {
@@ -268,14 +355,18 @@ Sed convallis ornare turpis rhoncus cursus. Curabitur et erat id nisl fermentum 
               font-weight: bold;
               border-radius: 20px;
             }
+
+            &_active {
+              background: #90cafa;
+            }
           }
         }
       }
 
       &-chat-window {
         &__header {
-          flex-basis: 72px;
-          height: 72px;
+          flex-basis: 84px;
+          height: 84px;
           border-bottom: 1px solid #EFEFEF;
           background: #EFEFEF;
         }

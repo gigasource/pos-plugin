@@ -11,12 +11,12 @@ async function getNewDeviceCode(id) {
   const devices = store.gSms.devices
   if (!devices || !devices.length) return code
 
-  code = +devices.sort((cur, next) => next.code - cur.code)[0].code + 1
+  code = (+devices.sort((cur, next) => next.code - cur.code)[0].code || 0) + 1
   return code
 }
 
 router.post('/register', async (req, res) => {
-  const { storeId, name } = req.body
+  const { storeId, name } = req.body || req.query //todo remove query in later versions
   if (!storeId) return res.sendStatus(400)
 
   try {
@@ -60,7 +60,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/unregister', async (req, res) => {
-  const { storeId, deviceId, deviceName } = req.body
+  const { storeId, deviceId, deviceName } = req.body || req.query //todo remove query in later versions
   if (!deviceId || !storeId) return res.sendStatus(400)
 
   try {
@@ -84,3 +84,4 @@ router.post('/unregister', async (req, res) => {
 })
 
 module.exports = router
+module.exports.getNewDeviceCode = getNewDeviceCode
