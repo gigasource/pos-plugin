@@ -893,7 +893,7 @@
       "role": "user",
       "viewOnlineOrderDashboard": true,
       "viewOrder": true,
-      "viewReservation": true,
+      "viewReservation": true
     }
   ],
   "onlineDevice": {
