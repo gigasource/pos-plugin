@@ -429,6 +429,40 @@
           "schemaType": "boolean",
           "key": "emailConfirmation",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "array",
+          "key": "seatLimit",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "startTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "endTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "days",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "key": "day",
+                  "type": "input"
+                }
+              ]
+            },
+            {
+              "schemaType": "number",
+              "key": "seat",
+              "type": "input@number"
+            }
+          ]
         }
       ]
     },

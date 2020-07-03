@@ -61,7 +61,7 @@
       </div>
       <div class="reservation-content">
         <template v-if="step === 1 || step === 2">
-          <div class="reservation-content__title">People</div>
+          <div class="reservation-content__title">Number of Guest(s)</div>
           <div class="row-flex align-items-center" style="margin-left: -8px; margin-bottom: 32px">
             <div :class="['btn-people', people === 1 && 'btn-people--selected']" @click="choosePeople(1)">1</div>
             <div :class="['btn-people', people === 2 && 'btn-people--selected']" @click="choosePeople(2)">2</div>
@@ -94,7 +94,10 @@
           <g-text-field-bs :class="rules.phone && 'phone-error'" :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" @input="rules.phone = false" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
-          <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" @click="completeReservation">Complete</g-btn-bs>
+          <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" :style="{background: mode === 'processing' ? '#9E9E9E' : '#1271FF'}" @click="completeReservation">
+            <template v-if="mode === 'processing'"><g-progress-circular indeterminate/></template>
+            <template v-else>Complete</template>
+          </g-btn-bs>
         </template>
       </div>
     </template>
@@ -151,6 +154,7 @@
         today: '',
         maxDay: '',
         store: {
+          _id: null,
           phone: '',
           openHours: [
             {
@@ -179,6 +183,8 @@
         noRequest: false,
         locale: String,
         image: null,
+        seatLimit: [],
+        reservations: []
       }
     },
     async created() {
@@ -201,6 +207,7 @@
             this.locale = store.country.locale
             root.$i18n.locale = store.country.locale || 'en'
           }
+          this.seatLimit = store.reservationSetting.seatLimit || []
         }
         this.image = store.logoImageSrc
       }
@@ -267,8 +274,12 @@
                 }
               }
               while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
-                if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute))
-                  times.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
+                if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute)) {
+                  const time = `${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`
+                  if(!this.seatLimitByDay.some(limit => limit.start <= time && limit.end >= time && limit.seat < this.people)) {
+                    times.push(time)
+                  }
+                }
 
                 const newTime = incrementTime(+openTimeHour, +openTimeMinute, 30)
                 openTimeHour = newTime.hour
@@ -291,10 +302,28 @@
       validatePhone() {
         let rules = []
         const phoneRegex = this.$t('common.phoneRegex') && new RegExp(this.$t('common.phoneRegex'))
-        if(this.locale === 'de-DE' || this.locale === 'de' && phoneRegex) {
+        if((this.locale === 'de-DE' || this.locale === 'de') && phoneRegex) {
           rules.push(val => (phoneRegex.test(val) || 'Invalid phone number!'))
         }
         return rules
+      },
+      seatLimitByDay() {
+        let list = []
+        const daysInWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        if(this.date) {
+          const day = daysInWeek[dayjs(this.date).day()]
+          for(const limit of this.seatLimit) {
+            if(limit.days.includes(day)) {
+              const reservedSeat = this.reservations.filter(r => r.time >= limit.startTime && r.time <= limit.endTime).reduce((acc, val) => (acc + val.noOfGuests), 0)
+              list.push({
+                start: limit.startTime,
+                end: limit.endTime,
+                seat: limit.seat - reservedSeat
+              })
+            }
+          }
+        }
+        return list
       }
     },
     methods: {
@@ -309,7 +338,7 @@
         else
           this.changeStep(2)
       },
-      chooseDate(date) {
+      async chooseDate(date) {
         let err = true
         const weekday = dayjs(date).day() === 0 ? 6 : dayjs(date).day() - 1
         this.store.openHours.forEach(({dayInWeeks}) => {
@@ -320,6 +349,7 @@
         if(err)
           this.errorDate = 'Restaurant is closed on the selected date!'
         else {
+          await this.getReservationList(date)
           this.changeStep(3)
           this.errorDate = ''
         }
@@ -343,7 +373,12 @@
           note: this.customer.note
         }
 
-        cms.socket.emit('createReservation', this.store._id, reservationData)
+        cms.socket.emit('createReservation', this.store._id, reservationData, (response) => {
+          if(!response || response.error)
+            this.mode = 'error'
+          if(response.success)
+            this.mode = 'completed'
+        })
         console.debug(`sentry:eventType=reservation,store=${this.store.name},alias=${this.store.alias}`,
           `1. Online order frontend: received reservation:
           guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
@@ -365,8 +400,8 @@
           err = true
         }
         if(err) return
+        this.mode = 'processing'
         this.sendReservation()
-        this.mode = 'completed'
       },
       clearData() {
         this.people = 0
@@ -384,6 +419,9 @@
       },
       close() {
         window.parent.postMessage('close-iframe', '*')
+      },
+      async getReservationList(date) {
+        this.reservations = await cms.getModel('Reservation').find({store: this.store._id, date})
       }
     }
   }
