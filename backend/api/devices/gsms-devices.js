@@ -61,15 +61,22 @@ router.post('/register', async (req, res) => {
   if (metadata && metadata.deviceLatLong) {
     const {latitude, longitude} = metadata.deviceLatLong
 
-    const address = await reverseGeocodePelias(latitude, longitude);
-    if (address) metadata.deviceLocation = address
-    console.log(`found address: ${address}`)
+    try {
+      const address = await reverseGeocodePelias(latitude, longitude);
+      if (address) metadata.deviceLocation = address;
+    } catch (e) {
+      metadata.deviceLocation = 'N/A';
+      console.error('sentry:sentry:eventType=gsmsDeviceRegister', e, JSON.stringify(e, null, 2));
+    }
   }
 
   const newDevice = await DeviceModel.create({
     name: hardware || 'New Device', paired: true, lastSeen: new Date(),
     hardware, appName, metadata, deviceType: 'gsms',
   });
+
+  console.debug(`sentry:eventType=gsmsDeviceRegister,clientId=${newDevice._id}`,
+      'New GSMS device registered');
 
   cms.socket.emit('reloadUnassignedDevices');
   res.status(200).json({clientId: newDevice._id});

@@ -22,9 +22,13 @@ setTimeout(() => {
     }
 
     socket.on('chat-message', async (chatData, cb) => {
-      console.log('msg from client');
       let {clientId, userId, createdAt, text} = chatData;
       createdAt = new Date(createdAt); // createdAt will be String
+
+      const sentryTags = `sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`;
+      const sentryPayload = JSON.stringify(chatData, null, 2);
+
+      console.debug(sentryTags, `Received chat msg from gsms client`, sentryPayload);
 
       if (!userId) userId = (await UserModel.findOne({name: 'admin'}))._id
 
@@ -37,6 +41,7 @@ setTimeout(() => {
         fromServer: false
       });
 
+      console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
 
       cb && cb(savedMsg._doc);
@@ -51,8 +56,11 @@ setTimeout(() => {
     socket.on('chat-message', async (chatData, cb) => {
       let {clientId, userId, createdAt, text} = chatData;
       createdAt = new Date(createdAt); // createdAt will be String
-      const sentryTags = `sentry:eventType:supportChat,clientId=${clientId}`;
+
+      const sentryTags = `sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`;
       const sentryPayload = JSON.stringify(chatData, null, 2);
+
+      console.debug(sentryTags, `Received chat msg from online-order frontend`, sentryPayload);
 
       const receiverDevice = await DeviceModel.findById(clientId);
       if (!receiverDevice) return console.error(sentryTags, `No device found with id ${clientId}`, sentryPayload);
@@ -66,6 +74,7 @@ setTimeout(() => {
         fromServer: true
       });
 
+      console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -114,6 +123,9 @@ router.put('/assign-device/:id', async (req, res) => {
   const {id} = req.params;
   const {storeId} = req.body;
   if (!id) return res.status(400).json({error: `Id can not be ${id}`});
+  if (!storeId) return res.status(400).json({error: `storeId can not be ${storeId}`});
+
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId}`);
 
   const device = await DeviceModel.findById(id);
   if (!device) return res.status(400).json({error: `Device with ID ${id} not found`});
@@ -148,11 +160,14 @@ router.put('/assign-device/:id', async (req, res) => {
       }));
   await StoreModel.updateOne({_id: storeId}, store);
 
-  getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.alias]).then(() => {
+  getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then(() => {
   });
+
   getExternalSocketIoServer().emitToPersistent(id, 'storeAssigned',
       [store.id, store.name || store.settingName, store.alias]).then(() => {
   });
+
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Successfully assigned GSMS device to store with id ${storeId}`);
   res.status(204).send();
 });
 

@@ -228,15 +228,22 @@
         if (!this.currentChatMsg.replace(/\r?\n|\r/g, '').trim().length) return
 
         const dummyId = uuidv1()
+        const userId = cms.loginUser.user._id
 
         const chatPayload = {
           clientId: this.currentClientId,
-          userId: cms.loginUser.user._id,
+          userId,
           createdAt: new Date(),
           text: this.currentChatMsg,
         }
 
+        console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+            `Online-order frontend send chat msg to backend`, JSON.stringify(chatPayload, null, 2))
+
         cms.socket.emit('chat-message', chatPayload, savedMsg => {
+          console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+              `Online-order frontend received chat msg ack from backend`, JSON.stringify(savedMsg, null, 2))
+
           this.currentChats = this.currentChats.filter(e => e._id !== dummyId)
           this.currentChats.push(savedMsg)
         });
@@ -255,7 +262,9 @@
         await this.getGsmsDevices()
       },
       receiveChatMessage(chatMessage) {
-        const {clientId, createdAt} = chatMessage
+        const {clientId, userId, createdAt} = chatMessage
+        console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
+            `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
 
         const device = this.devices.find(({_id}) => _id === clientId)
 
