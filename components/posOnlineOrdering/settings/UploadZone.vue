@@ -52,15 +52,15 @@
                   <div class="fw-700 fs-small mr-2">Group</div>
                   <g-select text-field-component="GTextFieldBs" small v-model="libraryGroup" :items="libraryGroups"/>
                 </div>
-                <g-grid-select :items="library" class="mb-3" v-model="image" item-cols="2" return-object style="background: rgba(196, 196, 196, 0.2); border-radius: 4px; height: 200px; overflow: auto">
+                <g-grid-select :items="library" class="mb-3 no-gutters" v-model="image" item-cols="2" return-object style="background: rgba(196, 196, 196, 0.2); border-radius: 4px; height: 200px; overflow: auto">
                   <template #default="{item, toggleSelect}">
-                    <div style="border: 1px solid transparent; border-radius: 2px">
-                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 60px; height: 60px" @click.stop="toggleSelect(item)"/>
+                    <div style="border: 1px solid transparent; border-radius: 2px; padding: 4px">
+                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 100px; height: 100px" @click.stop="toggleSelect(item)"/>
                     </div>
                   </template>
                   <template #selected="{item}">
-                    <div style="border: 1px solid #1271ff; border-radius: 2px; position: relative">
-                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 60px; height: 60px"/>
+                    <div style="border: 1px solid #1271ff; border-radius: 2px; position: relative; padding: 4px">
+                      <img alt :src="getImageUrl(item.viewUrl)" style="width: 100px; height: 100px"/>
                       <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.25)">
                         <g-icon color="#1271ff" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 50%">check_circle</g-icon>
                       </div>
@@ -331,7 +331,7 @@
   }
 
   .dialog-upload {
-    width: 580px;
+    width: 680px;
     background-color: #FFF;
     border-radius: 5px;
     margin: 0 auto;
