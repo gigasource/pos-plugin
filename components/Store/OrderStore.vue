@@ -858,6 +858,7 @@
       async createReservation(reservation) {
         const res = await cms.getModel('Reservation').create(reservation)
         cms.socket.emit('scheduleNewReservation', res)
+        cms.socket.emit('updateOnlineReservation', res._id, 'create')
       },
       async getReservations(date = new Date(), status = 'all') {
         const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
@@ -880,6 +881,7 @@
         await this.updateReservation(_id, { status: 'declined' })
         const index = this.reservations.findIndex(r => r._id === _id)
         this.reservations.splice(index, 1)
+        cms.socket.emit('updateOnlineReservation', _id, 'delete')
       },
       async checkReservationDay(date) {
         const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
