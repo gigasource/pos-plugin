@@ -99,48 +99,23 @@
     &__client {
 
       &--bubble {
-        background: #C4C4C4;
-        border-radius: 4px;
-        padding: 4px 24px;
+        background: #F5F5F5;
+        border-radius: 20px;
+        padding: 16px;
         position: relative;
-
-        &:after {
-          content: "";
-          position: absolute;
-          display: block;
-          width: 0;
-          z-index: 1;
-          border-style: solid;
-          border-color: transparent #C4C4C4;
-          border-width: 8px 12px 8px 0;
-          top: 39px;
-          left: -11px;
-          margin-top: -20px;
-        }
+        max-width: 60%;
       }
     }
 
     &__server {
 
       &--bubble {
-        background: #90CAF9;
-        border-radius: 4px;
-        padding: 4px 24px;
+        color: white;
+        background: #536DFE;
+        border-radius: 20px;
+        padding: 16px;
         position: relative;
-
-        :after {
-          content: "";
-          position: absolute;
-          display: block;
-          width: 0;
-          z-index: 1;
-          border-style: solid;
-          border-color: transparent #90CAF9;
-          border-width: 8px 0 8px 12px;
-          top: 39px;
-          right: -11px;
-          margin-top: -20px;
-        }
+        max-width: 60%;
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="chat-info">
-    <div class="row-flex justify-start">
+    <div class="chat-info__title row-flex justify-start">
       <g-edit-view-input :value="username" @input="updateUsername"/>
     </div>
 
@@ -88,6 +88,10 @@
   .chat-info {
     width: 100%;
     height: 100%;
+
+    &__title {
+      font-weight: bold;
+    }
   }
 
   .store-assign-box {

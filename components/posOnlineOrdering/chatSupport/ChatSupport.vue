@@ -1,14 +1,12 @@
 <template>
   <div class="chat-support pl-5 pr-5 pt-2">
-    <div class="chat-support__title mb-2">Chat Support</div>
     <div class="chat-support__container row-flex">
-      <div class="chat-support__container-contact-list col-4">
-        <div class="chat-support__container-contact-list__header row-flex align-items-center">
-          <g-select class="ml-3" :items="sorting" v-model="activeSorting"></g-select>
-          <g-spacer/>
-          <g-btn class="mr-2" icon @click.stop="filter">
-            <g-icon>search</g-icon>
-          </g-btn>
+      <div class="chat-support__container-contact-list col-3">
+        <div style="position: sticky; top: 0; background: #F4F7FB">
+          <div class="chat-support__container-contact-list__title mb-2">Chat Support</div>
+          <div class="chat-support__container-contact-list__header row-flex align-items-center">
+            <g-text-field-bs prepend-inner-icon="search" placeholder="Search"/>
+          </div>
         </div>
 
         <div class="chat-support__container-contact-list__list col-flex">
@@ -25,8 +23,7 @@
             </div>
             <g-spacer/>
             <div v-if="unreadCountMap[contact._id]"
-                class="chat-support__container-contact-list__list--item_right
-                row-flex align-items-center justify-center">
+                class="chat-support__container-contact-list__list--item_right row-flex align-items-center justify-center">
               {{unreadCountMap[contact._id]}}
             </div>
           </div>
@@ -307,41 +304,45 @@
     height: 100%;
     overflow: hidden;
 
-    &__title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
     &__container {
-      background: white;
       width: 100%;
       height: calc(100% - 50px);
 
       &-contact-list {
-        border-right: 1px solid #EFEFEF;
         overflow: auto;
+        margin-right: 12px;
+        position: relative;
+
+        &__title {
+          font-size: 20px;
+          font-weight: bold;
+        }
 
         &__header {
-          height: 84px;
-          border-bottom: 1px solid #EFEFEF;
+          height: 60px;
 
-          .g-select ::v-deep {
-            .g-tf {
-              margin: unset;
+          .bs-tf-wrapper ::v-deep {
+            height: 100%;
+            margin: 0;
+            padding: 8px 0;
+            width: 100%;
 
-              &:before {
-                display: none;
-              }
+            .bs-tf-inner-input-group {
+              height: 100%;
+              background: white;
+              border: 1px solid #EEEEEE;
+              border-radius: 2px;
             }
           }
         }
 
         &__list {
-
-
           &--item {
             height: 96px;
-            border-bottom: 1px solid #EFEFEF;
+            border: 1px solid #EEEEEE;
+            border-radius: 2px;
+            margin-bottom: 4px;
+            background: white;
 
             &_left {
 
@@ -358,18 +359,22 @@
             }
 
             &_active {
-              background: #90cafa;
+              background: #F5F5F5;
             }
           }
         }
       }
 
       &-chat-window {
+        background: white;
+        border: 1px solid #EEEEEE;
+        border-radius: 2px;
+
         &__header {
           flex-basis: 84px;
           height: 84px;
           border-bottom: 1px solid #EFEFEF;
-          background: #EFEFEF;
+          background: #F5F5F5;
         }
 
         &__content {
