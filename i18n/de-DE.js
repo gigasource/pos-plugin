@@ -211,6 +211,8 @@ module.exports = {
       displayMenuNumber: 'die Menünummer auf der Online-Bestellwebsite anzeigen.',
       displayItemImage: 'Artikelbild anzeigen',
       displayMenuImage: 'Menübild auf der Online-Bestellwebsite anzeigen.',
+      seatLimit: 'Seat limit',
+      noteForCustomer: 'Hinweis für Kunden',
     },
 
     paymentProviders: {

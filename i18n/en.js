@@ -495,6 +495,7 @@ module.exports = {
       displayItemImage: 'Display item image',
       displayMenuImage: 'Display menu image on online ordering website.',
       seatLimit: 'Seat limit',
+      noteForCustomer: 'Note for customers',
     },
   }
 }
