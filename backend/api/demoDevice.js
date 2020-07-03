@@ -16,7 +16,7 @@ async function getNewDeviceCode(id) {
 }
 
 router.post('/register', async (req, res) => {
-  const { storeId, name } = req.body
+  const { storeId, name } = req.body || req.query //todo remove query in later versions
   if (!storeId) return res.sendStatus(400)
 
   try {
@@ -60,7 +60,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/unregister', async (req, res) => {
-  const { storeId, deviceId, deviceName } = req.body
+  const { storeId, deviceId, deviceName } = req.body || req.query //todo remove query in later versions
   if (!deviceId || !storeId) return res.sendStatus(400)
 
   try {
