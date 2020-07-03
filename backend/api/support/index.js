@@ -169,7 +169,7 @@ router.put('/assign-device/:id', async (req, res) => {
       [store.id, store.name || store.settingName, store.alias]).then(() => {
   });
 
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Successfully assigned GSMS device to store with id ${storeId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${store._id}`, `Successfully assigned GSMS device to store with id ${store._id}`);
   res.status(204).send();
 });
 
