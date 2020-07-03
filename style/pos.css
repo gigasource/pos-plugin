@@ -683,6 +683,41 @@
   background-position: center;
 }
 
+.icon-mobile-phone {
+  background-image: url("../assets/mobile-phone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-last-seen {
+  background-image: url("../assets/last-seen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-location {
+  background-image: url("../assets/location.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-select-store {
+  background-image: url("../assets/select-store.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-chat-support-note {
+  background-image: url("../assets/chat-support-note.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-chat_white {
   background-image: url("../assets/chat_white.svg");
   background-repeat: no-repeat;
