@@ -448,21 +448,33 @@ module.exports = async function (cms) {
         if (pp && pp.orderID && pp.captureResponses) {
           try {
             const ppClient = await initPayPalClient(storeAlias)
-            // get all completed capture request
-            let completedCaptures = []
-            _.each(pp.captureResponses.purchase_units, purchase_unit => {
-              completedCaptures.push(..._.filter(purchase_unit.payments.captures, capture => capture.status === "COMPLETED"))
+            const orderDetail = (await ppApiv2.orderDetail(ppClient, pp.orderID)).result
+            const purchaseUnits = orderDetail.purchase_units
+            // get all current refund transactions
+            let finalRefunds = []
+            _.each(purchaseUnits, pu => {
+              if (pu.payments.refunds && pu.payments.refunds.length) {
+                finalRefunds.push(..._.map(pu.payments.refunds, refund => {
+                  // refund.links = [{ href: '../refunds/refundId, ... }, { href: '.../captures/captureId', ... } ]
+                  const captureHATEOS = refund.links[1].href
+                  const captureId = captureHATEOS.substr(captureHATEOS.lastIndexOf("/") + 1)
+                  return {
+                    id: refund.id,
+                    captureId: captureId,
+                    status: refund.status
+                  }
+                }))
+              }
             })
 
-            // suppose user already make a refund call but get failed result then he/she try refund again
-            // in this case, we just need to make a refund call for in-completed refund
-            if (pp.refundResponses) {
-              const refundedCaptureIds = _.filter(pp.refundResponses, r => r.status !== "COMPLETED").map(r => r.captureId)
-              completedCaptures = _.filter(completedCaptures, cc => refundedCaptureIds.indexOf(cc) === -1)
-            }
+            // get all completed capture (not refunded) transactions
+            // then try to refund
+            let completedCaptures = []
+            _.each(purchaseUnits, pu => {
+              completedCaptures.push(..._.filter(pu.payments.captures, capture => capture.status === "COMPLETED"))
+            })
 
             if (completedCaptures.length) {
-              // try to refund, return { error } if refundOrder failed for some reason
               const refundResponses = await Promise.all(_.map(completedCaptures, capture => {
                 try {
                   const refundBody = {amount: capture.amount, note_to_payer: "Order cancelled"}
@@ -486,19 +498,19 @@ module.exports = async function (cms) {
                   }
               })
 
-              // now update refund responses
-              if (pp.refundResponses) {
-                _.each(responseData, rd => {
-                  const oldRdIndex = _.findIndex(pp.refundResponses, r => r.captureId === rd.captureId)
-                  if (oldRdIndex !== -1) // necessary ??
-                    pp.refundResponses[oldRdIndex] = rd
-                })
-              } else if (responseData.length) {
-                pp.refundResponses = responseData
-              }
+              // each time we use refund api, new refund id will be returned (eventhough with the same captureId)
+              // incase we retry refund the failed refund, we need to update it
+              _.each(responseData, rd => {
+                const oldRdIndex = _.findIndex(finalRefunds, r => r.captureId === rd.captureId)
+                if (oldRdIndex === -1) {
+                  finalRefunds.push(rd)
+                } else {
+                  finalRefunds[oldRdIndex] = rd
+                }
+              })
             }
 
-            cb && cb({responseData: pp.refundResponses})
+            cb && cb({responseData: finalRefunds || []})
           } catch (e) {
             console.debug(`sentry:eventType=refundOrder,paymentType=paypal,store=${storeAlias},paypalMode=${process.env.PAYPAL_MODE}`, 'RefundError')
             cb && cb({error: e.message})

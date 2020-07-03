@@ -607,6 +607,8 @@
         return false
       },
       paypalOrderInfo() {
+        // WARNING: order value should match between what display in GUI and what send to Paypal.
+        let self = this
         return {
           application_context: {
             brand_name: this.store.name,
@@ -640,7 +642,7 @@
               description: '',
               unit_amount: {
                 currency_code: this.currencyCode,
-                value: `${item.price}`
+                value: `${this.getItemPrice(item)}`
               },
               quantity: `${item.quantity}`,
               category: "PHYSICAL_GOODS"
