@@ -8,14 +8,14 @@
       <div>{{ $t('onlineOrder.captureFailedDialog.details') }}:</div>
       <div>{{dialog.captureFailed.error}}</div>
     </dialog-common>
-    
+
     <dialog-common
         :value="dialog.capturing.show"
         @input="dialog.capturing.show = false"
         :title="$t('onlineOrder.capturingDialog.title')">
       {{ $t('onlineOrder.capturingDialog.message') }}
     </dialog-common>
-    
+
     <!-- Refund order -->
     <dialog-common
         :value="dialog.refunding.show"
@@ -23,20 +23,20 @@
         :title="$t('onlineOrder.refundingDialog.title')">
       {{ $t('onlineOrder.refundingDialog.message') }}
     </dialog-common>
-  
+
     <dialog-order-transaction-refund-failed
         v-model="dialog.refundFailed.show"
         :error="dialog.refundFailed.error"
         :capture-responses="dialog.refundFailed.captureResponses"
         :refund-responses="dialog.refundFailed.refundResponses"/>
-  
+
     <dialog-common
         :value="dialog.refundSucceeded.show"
         :title="$t('onlineOrder.refundSucceededDialog.title')"
         @input="dialog.refundSucceeded.show = false">
       {{ $t('onlineOrder.refundSucceededDialog.message') }}
     </dialog-common>
-    
+
     <dialog-order-transaction-refund-confirm
         v-if="dialog.refundConfirm.show"
         v-model="dialog.refundConfirm.show"
@@ -626,7 +626,7 @@
         })
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id}, updateInfo)
         await this.updateOnlineOrders()
-        
+
         const orderStatus = {
           orderId: updatedOrder.id,
           onlineOrderId: updatedOrder.onlineOrderId,
@@ -638,7 +638,7 @@
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-        
+
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
@@ -654,7 +654,7 @@
           const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
-          
+
           // validate prepaid (paypal, etc) before update status
           let isPrepaidOrder = this.isPrepaidOrder(order);
           // info which will be added/updated into order documents
@@ -668,7 +668,7 @@
             this.printOnlineOrderReport(order._id)
             await this.updateOnlineOrders()
           }
-          
+
           const orderStatus = {
             orderId: updatedOrder.id,
             onlineOrderId: updatedOrder.onlineOrderId,
@@ -682,11 +682,11 @@
           console.debug(
               `sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
               `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-          
+
           if (isPrepaidOrder) {
             this.dialog.capturing.show = true
           }
-          
+
           window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error, responseData}) => {
             // TODO: Check result response in another language
             //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
@@ -694,7 +694,7 @@
             if (isPrepaidOrder) {
               this.dialog.capturing.show = false
             }
-            
+
             if (error || result !== 'COMPLETED') {
               this.dialog.captureFailed.show = true
               this.dialog.captureFailed.error = error || `Transaction status: ${result}`
@@ -721,8 +721,7 @@
         const status = 'completed'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({_id: order._id},
             Object.assign({}, order, {
-              status,
-              deliveryTime: dayjs().format('HH:mm')
+              status
             }))
         await this.updateOnlineOrders()
         const orderStatus = {
@@ -748,11 +747,11 @@
             }
           }
         }
-        
+
         // capture not completed, doesn't allow refund
         if (!finalCapture)
           return true;
-        
+
         const _3HoursBefore = dayjs().subtract(3, 'hour')
         const createTime = dayjs(finalCapture.create_time)
         return createTime.isBefore(_3HoursBefore)

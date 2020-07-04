@@ -8,7 +8,7 @@
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
       <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
       <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
-      <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatNumber }}</span>
+      <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
     <div class="online-order-list__table">
@@ -35,7 +35,7 @@
             <div v-else>--</div>
           </td>
           <td>
-            <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value}}</p>
+            <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
             <p>{{item.payment[0].type}}</p>
           </td>
           <td>{{item.date | formatDate}}</td>
@@ -103,6 +103,10 @@
     filters: {
       formatDate(date) {
         return dayjs(date).format('HH:mm')
+      },
+      formatMoney(value, decimals = 2) {
+        if (value != null)
+          return !isNaN(value) ? value.toFixed(decimals) : value
       }
     },
     computed: {
@@ -217,7 +221,7 @@
           &:nth-last-child(-n+6) {
             width: 10%;
           }
-  
+
           // actions menu
           &:nth-last-child(1) {
             width: 40px;

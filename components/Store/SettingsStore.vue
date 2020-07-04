@@ -620,7 +620,14 @@
             type: 'kitchen'
           })
         }
-        const invoicePrinter = groupPrinters.find(p => p.type === 'invoice')
+        let invoicePrinter = groupPrinters.find(p => p.type === 'invoice')
+        if (!invoicePrinter) {
+          invoicePrinter = await cms.getModel('GroupPrinter').create({
+            name: 'Invoice',
+            type: 'invoice',
+            printers: []
+          })
+        }
         const invoice = this.printerSidebar[1]
         invoice.id = invoicePrinter._id
 
