@@ -34,6 +34,51 @@ module.exports = {
       completeOrder: 'Fertig',
       refund: 'Rückerstattung',
       refunded: 'erstattet',
+      refundDialog: {
+        confirmation: 'Bestätigung der Erstattung',
+        confirmMessage: 'Möchten Sie diese Transaktion wirklich zurückerstatten?',
+        //
+        customerInfo: 'Kundeninformation',
+        name: 'Name',
+        phone: 'Telefon',
+        address: 'Adresse',
+        zipCode: 'Postleitzahl',
+        //
+        orderInfo: 'Bestellinfo',
+        totalAmount: 'Gesamtmenge',
+        orderTime: 'Bestellzeitpunkt',
+        deliveryTime: 'Lieferzeit',
+        //
+        items: 'Artikel',
+        cancel: 'Stornieren',
+        ok: 'OK'
+      },
+      refundingDialog: {
+        title: 'Rückerstattung',
+        message: "Wir erstatten Geld für diese Bestellung. Warten Sie mal...",
+      },
+      refundFailedDialog: {
+        title: 'Rückerstattung fehlgeschlagen',
+        detail: 'Rückerstattungsdetails',
+        transactionId: 'Transaktions-ID',
+        amount: 'Menge',
+        refundStatus: 'Rückerstattungsstatus',
+        reason: 'Grund',
+        ok: 'OK'
+      },
+      refundSucceededDialog: {
+        title: 'Rückerstattung erfolgreich',
+        message: 'Eine Rückerstattung für diese Bestellung wurde bearbeitet.'
+      },
+      captureFailedDialog: {
+        title: 'Erfassungstransaktion fehlgeschlagen',
+        details: 'Einzelheiten',
+      },
+      capturingDialog: {
+        title: 'Erfassung der Transaktion',
+        message: "Wir sammeln Geld für diese Bestellung. Warten Sie mal..."
+      },
+
 
       settings: {
         onlineOrderSettings: 'Online Bestellung Einstellungen',

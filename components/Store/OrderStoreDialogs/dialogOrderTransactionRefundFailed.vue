@@ -1,25 +1,22 @@
 <template>
-  <dialog-common v-model="value" title="Refund failed">
-    <div style="font-size: 18px; margin-bottom: 5px;">Refund details:</div>
+  <dialog-common v-model="value" :title="$t('onlineOrder.refundFailedDialog.title')">
+    <div style="font-size: 18px; margin-bottom: 5px;">{{ $t('onlineOrder.refundFailedDialog.detail') }}:</div>
     <div v-for="(rc, index) in refundCaptures" :key="index" class="refund-capture">
       <div class="refund-capture-header">
-        <div>Capture Id: {{ rc.id }}</div>
+        <div>{{ $t('onlineOrder.refundFailedDialog.transactionId') }}: {{ rc.id }}</div>
       </div>
       <div class="refund-capture-body">
-        <div>Amount: {{ rc.amount.value }} {{ rc.amount.currency_code }}</div>
-        <div>Refund Status: <span class="refund-capture-status" :style="{ color: rc.refundStatusColor }">{{ rc.refundStatus }}</span> </div>
+        <div>{{ $t('onlineOrder.refundFailedDialog.amount') }}: {{ rc.amount.value }} {{ rc.amount.currency_code }}</div>
+        <div>{{ $t('onlineOrder.refundFailedDialog.refundStatus') }}: <span class="refund-capture-status" :style="{ color: rc.refundStatusColor }">{{ rc.refundStatus }}</span></div>
         <div v-if="rc.status === 'COMPLETED' && rc.refundStatus !== 'COMPLETED'">
-          <div>Reason: </div>
+          <div>{{ $t('onlineOrder.refundFailedDialog.reason') }}: </div>
           {{ rc.refundError }}
         </div>
       </div>
     </div>
-  
-    <div v-if="error">
-      {{ error }}
-    </div>
+    <div v-if="error">{{ error }} </div>
     <template #actions>
-      <g-btn-bs @click="$emit('input', false)" background-color="#2979FF" text-color="#fff" width="100" style="margin: 0">OK</g-btn-bs>
+      <g-btn-bs @click="$emit('input', false)" background-color="#2979FF" text-color="#fff" width="100" style="margin: 0">{{ $t('onlineOrder.refundFailedDialog.ok') }}</g-btn-bs>
     </template>
   </dialog-common>
 </template>

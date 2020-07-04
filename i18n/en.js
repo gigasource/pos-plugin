@@ -406,6 +406,50 @@ module.exports = {
       completeOrder: 'Complete order',
       refund: 'Refund',
       refunded: 'Refunded',
+      refundDialog: {
+        confirmation: 'Refund confirmation',
+        confirmMessage: 'Are you sure you want to refund this transaction?',
+        //
+        customerInfo: 'Customer info',
+        name: 'Name',
+        phone: 'Phone',
+        address: 'Address',
+        zipCode: 'Zip Code',
+        //
+        orderInfo: 'Order info',
+        totalAmount: 'Total Amount',
+        orderTime: 'Order Time',
+        deliveryTime: 'Delivery Time',
+        //
+        items: 'Items',
+        cancel: 'Cancel',
+        ok: 'OK'
+      },
+      refundingDialog: {
+        title: 'Refunding',
+        message: "We're refunding for this order. Please wait...",
+      },
+      refundFailedDialog: {
+        title: 'Refund failed',
+        detail: 'Refund details',
+        transactionId: 'Capture Id',
+        amount: 'Amount',
+        refundStatus: 'Refund Status',
+        reason: 'Reason',
+        ok: 'OK'
+      },
+      refundSucceededDialog: {
+        title: 'Refund Succeeded',
+        message: 'A refund for this order has been processed.'
+      },
+      captureFailedDialog: {
+        title: 'Capture transaction failed',
+        details: 'Details',
+      },
+      capturingDialog: {
+        title: 'Capturing transaction',
+        message: "We're capturing money for this order. Please wait..."
+      },
 
       settings: {
         onlineOrderSettings: 'Online Order Settings',

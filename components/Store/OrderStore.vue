@@ -4,24 +4,24 @@
     <dialog-common
         :value="dialog.captureFailed.show"
         @input="dialog.captureFailed.show = false"
-        title="Capture transaction failed">
-      <div>Error details:</div>
+        :title="$t('onlineOrder.captureFailedDialog.title')">
+      <div>{{ $t('onlineOrder.captureFailedDialog.details') }}:</div>
       <div>{{dialog.captureFailed.error}}</div>
     </dialog-common>
     
     <dialog-common
         :value="dialog.capturing.show"
         @input="dialog.capturing.show = false"
-        title="Capturing order's transaction">
-      We're capturing money for this order. Please wait...
+        :title="$t('onlineOrder.capturingDialog.title')">
+      {{ $t('onlineOrder.capturingDialog.message') }}
     </dialog-common>
     
     <!-- Refund order -->
     <dialog-common
         :value="dialog.refunding.show"
         @input="dialog.refunding.show = false"
-        title="Refunding">
-      We're refunding money for this order. Please wait...
+        :title="$t('onlineOrder.refundingDialog.title')">
+      {{ $t('onlineOrder.refundingDialog.message') }}
     </dialog-common>
   
     <dialog-order-transaction-refund-failed
@@ -32,9 +32,9 @@
   
     <dialog-common
         :value="dialog.refundSucceeded.show"
-        title="Refund Succeeded"
+        :title="$t('onlineOrder.refundSucceededDialog.title')"
         @input="dialog.refundSucceeded.show = false">
-      A refund for this order has been processed.
+      {{ $t('onlineOrder.refundSucceededDialog.message') }}
     </dialog-common>
     
     <dialog-order-transaction-refund-confirm
@@ -619,8 +619,6 @@
         // more online payment
       },
       async declineOrder(order) {
-        console.log('decline order', order)
-        
         const status = 'declined'
         const updateInfo = Object.assign({}, order, {
           status,
@@ -644,7 +642,6 @@
         window.cms.socket.emit('updateOrderStatus', orderStatus)
       },
       async acceptPendingOrder(order) {
-        console.log('accept order', order)
         try {
           let deliveryDateTime
           if (order.deliveryTime === 'asap') {
@@ -660,7 +657,6 @@
           
           // validate prepaid (paypal, etc) before update status
           let isPrepaidOrder = this.isPrepaidOrder(order);
-          console.log(`is prepaid order? ${isPrepaidOrder}`)
           // info which will be added/updated into order documents
           let updateOrderInfo = Object.assign({}, order, { status, user: this.user });
           let updatedOrder;
@@ -704,13 +700,11 @@
               this.dialog.captureFailed.error = error || `Transaction status: ${result}`
             } else {
               if (isPrepaidOrder) {
-                console.log('Prepaid order capture succeeded')
                 // store response data for later use
                 updateOrderInfo.paypalOrderDetail = {
                   ...updateOrderInfo.paypalOrderDetail,
                   captureResponses: responseData
                 }
-                console.log(responseData)
                 await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
                 this.printOnlineOrderKitchen(order._id)
                 this.printOnlineOrderReport(order._id)
