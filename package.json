@@ -20,6 +20,7 @@
     "@gigasource/payment-provider": "github:gigasource/payment-provider#1.0.3",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "clone-buffer": "^1.0.0",
+    "cron": "^1.8.2",
     "cropperjs": "^1.5.6",
     "dayjs": "^1.8.17",
     "deasync": "^0.1.20",

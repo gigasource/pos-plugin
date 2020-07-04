@@ -94,6 +94,12 @@ module.exports = {
       },
       path: 'backend/firebase-messaging/index.js'
     },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/daily-job/index.js'
+    },
     // {
     //   loader: {
     //     type: 'ssr'
