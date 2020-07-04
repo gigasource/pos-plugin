@@ -56,6 +56,12 @@
       "key": "note",
       "type": "input",
       "addable": true
+    },
+    {
+      "_id": "5efe9e6da5913c3b171a5fe5",
+      "schemaType": "string",
+      "key": "onlineReservationId",
+      "type": "input"
     }
   ],
   "tabs": [],

@@ -61,6 +61,12 @@
 
       &.g-sidebar__medium .g-treeview-title {
         font-size: 14px;
+        white-space: unset;
+        line-height: 1.2;
+      }
+
+      .g-treeview-icon:not(.g-treeview-icon__small) {
+        min-width: 20px;
       }
     }
   }

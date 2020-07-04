@@ -1025,6 +1025,39 @@
           "schemaType": "number",
           "key": "maxDay",
           "type": "input@number"
+        },
+        {
+          "schemaType": "object",
+          "key": "seatLimit",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "startTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "endTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "days",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "key": "day"
+                }
+              ]
+            },
+            {
+              "schemaType": "number",
+              "key": "seat",
+              "type": "input@number"
+            }
+          ]
         }
       ]
     }

@@ -52,7 +52,8 @@
         list: {
           date: ['Today', 'Tomorrow'],
           people: ['1 Guest'],
-        }
+        },
+        reservations: []
       }
     },
     async created() {
@@ -70,6 +71,7 @@
         }
       }
       this.resetData()
+      this.reservations = await this.getReservations()
     },
     computed: {
       internalValue: {
@@ -107,8 +109,12 @@
                 }
               }
               while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
-                if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute))
-                  times.push(`${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`)
+                if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute)) {
+                  const time = `${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`
+                  if(!this.seatLimitByDay.some(limit => limit.start <= time && limit.end >= time && limit.seat < (this.list.people.indexOf(this.people) + 1))) {
+                    times.push(time)
+                  }
+                }
 
                 openTimeMinute = +openTimeMinute + 5
                 if(openTimeMinute >= 60) {
@@ -121,6 +127,24 @@
         }
         return times.sort()
       },
+      seatLimitByDay() {
+        let list = []
+        if(this.date) {
+          const date = this.date === 'Today' ? dayjs() : (this.date === 'Tomorrow' ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
+          const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.day()]
+          for(const limit of this.reservationSetting.seatLimit) {
+            if(limit.days.includes(day)) {
+              const reservedSeat = this.reservations ? this.reservations.filter(r => dayjs(r.date).format('HH:mm') >= limit.startTime && dayjs(r.date).format('HH:mm') <= limit.endTime).reduce((acc, val) => (acc + val.noOfGuests), 0) : 0
+              list.push({
+                start: limit.startTime,
+                end: limit.endTime,
+                seat: limit.seat - reservedSeat
+              })
+            }
+          }
+        }
+        return list
+      }
     },
     watch: {
       internalValue(val) {
@@ -151,7 +175,9 @@
           }, 100)
         }
       },
-      date() {
+      async date(val) {
+        const date = val === 'Today' ? dayjs().toDate() : (val === 'Tomorrow' ? dayjs().add(1, 'day').toDate() : dayjs(val, 'DD MMM').toDate())
+        this.reservations = await this.getReservations(date)
         this.time = this.timeList[0] || ''
       }
     },
@@ -174,6 +200,7 @@
         }
         if (this.edit) {
           await this.updateReservation(this.reservation._id, reservation)
+          cms.socket.emit('updateOnlineReservation', this.reservation._id, 'update')
         } else {
           await this.createReservation(reservation)
         }
@@ -188,7 +215,15 @@
         this.name = ''
         this.phone = ''
         this.note = ''
-      }
+      },
+      async getReservations(date = new Date(), status = 'all') {
+        const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
+            dateFrom = dayjs(date).startOf('day').toDate()
+        return await cms.getModel('Reservation').find({
+          status: (status === 'all' ? { $in: ['pending', 'completed'] } : status),
+          date: { $gte: dateFrom, $lt: dateTo }
+        })
+      },
     }
   }
 </script>

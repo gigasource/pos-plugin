@@ -161,6 +161,9 @@
           if (!this.user.viewOnlineOrderMenu) {
             sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
           }
+          if (!this.user.viewReservation) {
+            sidebar = sidebar.filter(s => s.feature !== 'reservation' || s.key !== 'Reservation')
+          }
         }
         if (this.user && this.enabledFeatures) {
           sidebar = sidebar.filter(item => {

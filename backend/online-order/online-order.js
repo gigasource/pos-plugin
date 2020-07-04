@@ -131,6 +131,7 @@ module.exports = async cms => {
       console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`, `Restaurant: auto-declined reservation ${guestName} (${reservationTime})`)
       cms.socket.emit('updateReservationList', getBaseSentryTags('reservation'))
       console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`, `Restaurant backend: signalled 'updateReservationList' front-end to fetch data`)
+      cms.socket.emit('updateOnlineReservation', reservation._id, 'delete')
     }
 
     if (!reservation) return
@@ -735,6 +736,16 @@ module.exports = async cms => {
       console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`,
         `Restaurant backend: New schedule created for '${guestName}' (${reservationTime})`)
       await scheduleRemoveReservationJob(reservation)
+    })
+
+    socket.on('updateOnlineReservation', async (_id, tag) => {
+      const deviceId = await getDeviceId()
+      const reservation = await cms.getModel('Reservation').findOne({_id})
+      console.debug(`${getBaseSentryTags('reservation')},reservationId=${reservation._id}`,
+          `Restaurant backend: emit update reservation info to online server`)
+      onlineOrderSocket.emit('updateOnlineReservation', reservation, tag, deviceId, async (onlineReservationId) => {
+        await cms.getModel('Reservation').findOneAndUpdate({_id}, {onlineReservationId})
+      })
     })
   })
 }
