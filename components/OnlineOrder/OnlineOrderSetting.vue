@@ -44,22 +44,22 @@
         </g-grid-select>
       </g-row>
 
-      <div style="margin-top: 16px;"><b>Sound</b></div>
+      <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.sound')}}</b></div>
       <g-switch :label="$t('onlineOrder.settings.hasSound')" :input-value="computedDevice.sound"
                 @change="updateSound"
       />
 
-      <div style="margin-top: 16px;"><b>Play notification sound</b></div>
+      <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.playNotificationSound')}}</b></div>
       <g-grid-select :grid="false" :items="soundModes" mandatory :value="computedDevice.soundLoop" @input="updateSoundMode">
         <template #default="{item, toggleSelect}">
           <g-btn-bs border-color="#e0e0e0" text-color="black" height="30"
-                    style="margin-top: 8px;" @click.stop="toggleSelect(item)"
+                    style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
           >{{item.text}}
           </g-btn-bs>
         </template>
         <template #selected="{item}">
           <g-btn-bs border-color="#90CAF9" text-color="black" height="30" background-color="#E3F2FD"
-                    style="margin-top: 8px;" @click.stop="toggleSelect(item)"
+                    style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
           >{{item.text}}
           </g-btn-bs>
         </template>
@@ -104,13 +104,13 @@
         connected: false,
         deliveryTimes: [15, 30, 45, 60],
         orderSorting: [
-          {text: 'Order Number', value: 'order'},
-          {text: 'Time to Complete', value: 'time'},
+          {text: $t('onlineOrder.settings.orderNumber'), value: 'order'},
+          {text: $t('onlineOrder.settings.timeToComplete2'), value: 'time'},
         ],
         soundModes: [
-          {text: 'Once', value: 'none'},
-          {text: 'Twice', value: 'once'},
-          {text: 'Until Confirm', value: 'repeat'},
+          {text: $t('onlineOrder.settings.once'), value: 'none'},
+          {text: $t('onlineOrder.settings.twice'), value: 'once'},
+          {text: $t('onlineOrder.settings.untilConfirm'), value: 'repeat'},
         ],
         webshopUrl: '',
         webshopAvailable: true,

@@ -2,11 +2,11 @@
   <div class="online-order-services">
     <div class="row-flex" style="width: 500px;">
       <div class="online-order-services__item">
-        <div class="online-order-services__title">Delivery</div>
+        <div class="online-order-services__title">{{$t('onlineOrder.delivery')}}</div>
         <div class="online-order-services__content row-flex align-items-center">
           <g-radio-group v-model="delivery" row>
-            <g-radio small color="#536DFE" label="Yes" :value="true" :class="[delivery && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" :value="false" :class="[!delivery && 'selected']"/>
+            <g-radio small color="#536DFE" :label="$t('onlineOrder.yes')" :value="true" :class="[delivery && 'selected']"/>
+            <g-radio small color="#536DFE" :label="$t('onlineOrder.no2')" :value="false" :class="[!delivery && 'selected']"/>
           </g-radio-group>
           <!--        <div class="row-flex align-items-center">-->
           <!--          <div>Automatically turn off after</div>-->
@@ -17,11 +17,11 @@
 
       <g-spacer/>
       <div class="online-order-services__item">
-        <div class="online-order-services__title">Pickup</div>
+        <div class="online-order-services__title">{{$t('onlineOrder.pickup')}}</div>
         <div class="online-order-services__content row-flex align-items-center">
           <g-radio-group v-model="pickup" row>
-            <g-radio small color="#536DFE" label="Yes" :value="true" :class="[pickup && 'selected']"/>
-            <g-radio small color="#536DFE" label="No" :value="false" :class="[!pickup && 'selected']"/>
+            <g-radio small color="#536DFE" :label="$t('onlineOrder.yes')" :value="true" :class="[pickup && 'selected']"/>
+            <g-radio small color="#536DFE" :label="$t('onlineOrder.no2')" :value="false" :class="[!pickup && 'selected']"/>
           </g-radio-group>
           <!--        <div class="row-flex align-items-center">-->
           <!--          <div>Automatically turn off after</div>-->
@@ -32,9 +32,9 @@
     </div>
 
     <div class="online-order-services__item">
-      <div class="online-order-services__title">Note to Customers</div>
+      <div class="online-order-services__title">{{$t('onlineOrder.noteToCustomer')}}</div>
       <div class="online-order-services__content">
-        <g-textarea v-model="note" no-resize outlined rows="5" placeholder="Note..." @click="dialog.text = true"/>
+        <g-textarea v-model="note" no-resize outlined rows="5" :placeholder="`${$t('onlineOrder.note')}...`" @click="dialog.text = true"/>
 
         <!--        <div class="row-flex align-items-center">-->
         <!--          <div style="font-weight: bold;">Automatically turn off note after</div>-->
@@ -45,7 +45,7 @@
 
     <div class="row-flex" style="width: 500px">
       <g-spacer/>
-      <g-btn-bs background-color="#536DFE" style="margin: 0; width: 96px;" text-color="white" @click.stop="save">Save</g-btn-bs>
+      <g-btn-bs background-color="#536DFE" style="margin: 0; width: 96px;" text-color="white" @click.stop="save">{{$t('onlineOrder.save')}}</g-btn-bs>
     </div>
 
     <dialog-blogtext-input v-model="dialog.text" label="Note" :default-value="note" @submit="changeNote"/>

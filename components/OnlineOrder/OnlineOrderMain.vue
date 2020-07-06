@@ -13,7 +13,7 @@
         <template v-if="!internalOrders || !internalOrders.length">
           <div class="pending-orders--empty">
             <img alt src="/plugins/pos-plugin/assets/pending_order.svg"/>
-            <p>No Pending orders yet</p>
+            <p>{{$t('onlineOrder.noPending')}}</p>
           </div>
         </template>
         <template v-else>
@@ -37,7 +37,7 @@
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
-                Note: {{order.note}}
+                {{$t('onlineOrder.note')}}: {{order.note}}
               </div>
               <div class="row-flex" v-if="order.type === 'delivery'">
                 <div style="flex: 0 0 25px">
@@ -71,7 +71,7 @@
               </div>
             </g-card-text>
             <g-card-actions v-if="order.declineStep2">
-              <g-text-field-bs label="Reason to decline (optional)" v-model="order.declineReason">
+              <g-text-field-bs :label="$t('onlineOrder.reasonDecline')" v-model="order.declineReason">
                 <template v-slot:append-inner>
                   <g-icon style="cursor: pointer" @click="openDialogReason(order)">icon-keyboard</g-icon>
                 </template>
@@ -80,7 +80,7 @@
             <g-card-actions v-if="order.confirmStep2
               && ((order.type === 'delivery' && order.deliveryTime === 'asap') || (order.type === 'pickup'))">
               <div class="w-100">
-                <p class="ml-2 mb-1">Time to complete (min)</p>
+                <p class="ml-2 mb-1">{{$t('onlineOrder.settings.timeToComplete2')}} (min)</p>
                 <value-picker :values="[15, 30, 45, 60]" :default-value="defaultPrepareTime || 30" allow-custom v-model="order.prepareTime"></value-picker>
               </div>
             </g-card-actions>
@@ -89,7 +89,7 @@
                 <g-icon size="14">icon-cross-red</g-icon>
               </g-btn-bs>
               <g-btn-bs v-if="order.confirmStep2 || order.declineStep2" height="54" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onBack(order)">
-                Back
+                {{$t('onlineOrder.back')}}
               </g-btn-bs>
               <g-btn-bs v-if="order.declineStep2" height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click="declineOrder(order)">
                 Confirm

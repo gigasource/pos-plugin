@@ -170,4 +170,8 @@
     color: #424242;
     font-size: 14px;
   }
+
+  .g-treeview-wrapper ::v-deep .g-badge-wrapper {
+    margin-right: 16px !important;
+  }
 </style>

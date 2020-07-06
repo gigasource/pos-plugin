@@ -127,7 +127,7 @@
                 params: ''
               })
             },
-            title: 'Services',
+            title: this.$t('sidebar.services'),
             feature: 'onlineOrdering',
             key: 'Service'
           },
@@ -139,7 +139,7 @@
                 params: ''
               })
             },
-            title: 'Reservation',
+            title: this.$t('sidebar.reservation'),
             feature: 'reservation',
             key: 'Reservation'
           }

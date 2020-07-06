@@ -17,7 +17,7 @@
         <div style="display: flex; margin-bottom: 10px;">
           <!-- from date -->
           <div style="width: 50%">
-            <div class="date-range-picker__label">FROM</div>
+            <div class="date-range-picker__label">{{$t('onlineOrder.from')}}</div>
             <g-menu v-model="showFromDatePicker" nudge-bottom="10" content-class="date-picker-content">
               <template #activator="{on}">
                 <div class="date-range-picker__input--from" @click="on.click">
@@ -31,7 +31,7 @@
 
           <!-- to date -->
           <div style="width: 50%">
-            <div class="date-range-picker__label">TO</div>
+            <div class="date-range-picker__label">{{$t('onlineOrder.to')}}</div>
             <g-menu v-model="showToDatePicker" nudge-bottom="10" content-class="date-picker-content">
               <template #activator="{on}">
                 <div class="date-range-picker__input--to" @click="on.click">
@@ -52,10 +52,10 @@
 
         <!-- predefined range button -->
         <div class="row-flex flex-wrap w-100 justify-between">
-          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectToday">Today</g-btn-bs>
-          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectYesterday">Yesterday</g-btn-bs>
-          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectCurrentWeek">This week</g-btn-bs>
-          <g-btn-bs height="40" background-color="#E0E0E0" @click="selectCurrentMonth">This month</g-btn-bs>
+          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectToday">{{$t('onlineOrder.today')}}</g-btn-bs>
+          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectYesterday">{{$t('onlineOrder.yesterday')}}</g-btn-bs>
+          <g-btn-bs class="mb-2" height="40" background-color="#E0E0E0" @click="selectCurrentWeek">{{$t('onlineOrder.thisWeek')}}</g-btn-bs>
+          <g-btn-bs height="40" background-color="#E0E0E0" @click="selectCurrentMonth">{{$t('onlineOrder.thisMonth')}}</g-btn-bs>
         </div>
       </div>
     </g-menu>

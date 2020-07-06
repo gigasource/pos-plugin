@@ -340,7 +340,9 @@ module.exports = {
       manualTable: 'Manual Table',
       functions: 'Functions',
       logOut: 'Log Out',
-      restaurant: 'Restaurant'
+      restaurant: 'Restaurant',
+      services: 'Services',
+      reservation: 'Reservation'
     },
 
     restaurant: {
@@ -465,6 +467,48 @@ module.exports = {
         notPaired: 'Not paired',
         hasSound: 'Incoming order notification sound',
         cancelAndDecline: 'Cancel & move to declined orders',
+        sound: 'Sound',
+        playNotificationSound: 'Play notification sound',
+        once: 'Once',
+        twice: 'Twice',
+        untilConfirm: 'Until confirm',
+        orderNumber: 'Order number',
+        timeToComplete2: 'Time to complete',
+      },
+
+      noteToCustomer: 'Note to customer',
+      reservation: 'Reservation',
+      yes: 'Yes',
+      no2: 'No',
+      note: 'Note',
+      save: 'Save',
+      cancel: 'Cancel',
+      submit: 'Submit',
+      backToday: 'Back to today',
+      makeReservation: 'Make Reservation',
+      fillNumber: 'Fill your number',
+      fillText: 'Fill your text',
+      today: 'Today',
+      tomorrow: 'Tomorrow',
+      arrived: 'Arrived',
+      notArrived: 'Not Arrived',
+      customTime: 'Custom time',
+      reasonDecline: 'Reason to decline (optional)',
+      back: 'Back',
+      from: 'From',
+      to: 'To',
+      yesterday: 'Yesterday',
+      thisWeek: 'This week',
+      thisMonth: 'This month',
+
+      weekday: {
+        mon: 'Mon',
+        tue: 'Tue',
+        wed: 'Wed',
+        thu: 'Thu',
+        fri: 'Fri',
+        sat: 'Sat',
+        sun: 'Sun',
       }
     },
 
@@ -480,6 +524,10 @@ module.exports = {
       currency: 'USD',
       shippingFee: 'Shipping Fee',
       paid: 'PAID'
+    },
+
+    service: {
+
     }
   }
 }

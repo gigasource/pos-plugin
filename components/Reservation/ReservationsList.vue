@@ -1,11 +1,11 @@
 <template>
   <div class="reservation">
     <div class="reservation-header">
-      <div class="reservation-header__day" @click="backToToday">Back to Today</div>
+      <div class="reservation-header__day" @click="backToToday">{{$t('onlineOrder.backToday')}}</div>
       <g-select text-field-component="GTextFieldBs" :items="listStatus" v-model="status"/>
       <div></div>
       <g-spacer/>
-      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="makeReservation">Make Reservation</g-btn-bs>
+      <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" @click="makeReservation">{{$t('onlineOrder.makeReservation')}}</g-btn-bs>
     </div>
     <div class="reservation-tab">
       <div class="reservation-tab__header">
@@ -40,8 +40,8 @@
                 <span class="fw-700 fs-small ml-1">{{reservation.noOfGuests}}</span>
               </div>
               <div class="reservation-info__action">
-                <g-btn-bs width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
-                  Arrived
+                <g-btn-bs min-width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
+                  {{$t('onlineOrder.arrived')}}
                 </g-btn-bs>
                 <g-btn-bs background-color="#F9A825" :style="reservation.status === 'completed' && {opacity: 0.5}" @click="modify(reservation)">
                   <g-icon>icon-reservation_modify</g-icon>
@@ -108,13 +108,13 @@
         },
         listStatus: [
           { text: 'All', value: 'all' },
-          { text: 'Arrived', value: 'completed' },
-          { text: 'Not arrived', value: 'pending' }
+          { text: $t('onlineOrder.arrived'), value: 'completed' },
+          { text: $t('onlineOrder.notArrived'), value: 'pending' }
         ],
         status: 'all',
         date: new Date(),
         week: [],
-        dayInWeeks: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        dayInWeeks: [$t('onlineOrder.weekday.mon'), $t('onlineOrder.weekday.tue'), $t('onlineOrder.weekday.wed'), $t('onlineOrder.weekday.thu'), $t('onlineOrder.weekday.fri'), $t('onlineOrder.weekday.sat'), $t('onlineOrder.weekday.sun')],
         edit: false,
         selectedReservation: null
       }

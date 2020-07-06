@@ -9,18 +9,18 @@
           <scroll-select ref="scroll-time" class="col-4" v-model="time" :items="timeList" :height="250" :item-height="50" selected-color="#1271FF"/>
         </div>
         <div class="dialog-content--right">
-          <div class="fw-700 mb-2">Make Reservation</div>
+          <div class="fw-700 mb-2">{{$t('onlineOrder.makeReservation')}}</div>
           <div class="row-flex">
-            <pos-text-field v-model="name" label="Name" placeholder="Fill your text" required :key="`${internalValue}_name`"/>
-            <pos-text-field v-model="phone" label="Phone" placeholder="Fill your number" number required :key="`${internalValue}_phone`"/>
+            <pos-text-field v-model="name" label="Name" :placeholder="$t('onlineOrder.fillText')" required :key="`${internalValue}_name`"/>
+            <pos-text-field v-model="phone" :label="$t('settings.tel')" :placeholder="$t('onlineOrder.fillNumber')" number required :key="`${internalValue}_phone`"/>
           </div>
           <div>
-            <div class="label">Note</div>
-            <g-textarea rows="3" outlined v-model="note" placeholder="Fill your text" no-resize/>
+            <div class="label">{{$t('onlineOrder.note')}}</div>
+            <g-textarea rows="3" outlined v-model="note" :placeholder="$t('onlineOrder.fillText')" no-resize/>
           </div>
           <div class="row-flex align-center justify-end mt-4" style="margin-right: -4px">
-            <g-btn-bs width="100" border-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
-            <g-btn-bs width="140" background-color="#2979FF" @click="submit">Submit</g-btn-bs>
+            <g-btn-bs width="100" border-color="#424242" @click="internalValue = false">{{$t('onlineOrder.cancel')}}</g-btn-bs>
+            <g-btn-bs width="140" background-color="#2979FF" @click="submit">{{$t('onlineOrder.submit')}}</g-btn-bs>
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@
         people: '',
         time: '',
         list: {
-          date: ['Today', 'Tomorrow'],
+          date: [$t('onlineOrder.today'), $t('onlineOrder.tomorrow')],
           people: ['1 Guest'],
         },
         reservations: []
@@ -86,12 +86,12 @@
         let times = []
 
         if(this.reservationSetting && this.reservationSetting.openHours && this.date) {
-          const date = this.date === 'Today' ? dayjs() : (this.date === 'Tomorrow' ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
+          const date = this.date === $t('onlineOrder.today') ? dayjs() : (this.date === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
           const weekday = date.day() === 0 ? 6 : date.day() - 1
           this.reservationSetting.openHours.forEach(({dayInWeeks, openTime, closeTime}) => {
             if(dayInWeeks[weekday]) {
               let baseHour, baseMinute
-              if(this.date === 'Today') {
+              if(this.date === $t('onlineOrder.today')) {
                 baseHour = dayjs().hour()
                 baseMinute = dayjs().minute()
               } else {
@@ -130,7 +130,7 @@
       seatLimitByDay() {
         let list = []
         if(this.date) {
-          const date = this.date === 'Today' ? dayjs() : (this.date === 'Tomorrow' ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
+          const date = this.date === $t('onlineOrder.today') ? dayjs() : (this.date === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
           const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.day()]
           for(const limit of this.reservationSetting.seatLimit) {
             if(limit.days.includes(day)) {
@@ -147,8 +147,10 @@
       }
     },
     watch: {
-      internalValue(val) {
+      async internalValue(val) {
         this.resetData()
+        const date = this.date === $t('onlineOrder.today') ? dayjs().toDate() : (this.date === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day').toDate() : dayjs(this.date, 'DD MMM').toDate())
+        this.reservations = await this.getReservations(date)
         if (val && this.$refs) {
           if (this.edit) {
             this.name = this.reservation.customer.name
@@ -158,9 +160,9 @@
             this.time = dayjs(this.reservation.date).format('HH:mm')
             const day = dayjs(this.reservation.date)
             if (day.isSame(new Date(), 'day')) {
-              this.date = 'Today'
+              this.date = $t('onlineOrder.today')
             } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
-              this.date = 'Tomorrow'
+              this.date = $t('onlineOrder.tomorrow')
             } else {
               this.date = day.format('DD MMM')
             }
@@ -176,7 +178,7 @@
         }
       },
       async date(val) {
-        const date = val === 'Today' ? dayjs().toDate() : (val === 'Tomorrow' ? dayjs().add(1, 'day').toDate() : dayjs(val, 'DD MMM').toDate())
+        const date = val === $t('onlineOrder.today') ? dayjs().toDate() : (val === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day').toDate() : dayjs(val, 'DD MMM').toDate())
         this.reservations = await this.getReservations(date)
         this.time = this.timeList[0] || ''
       }
