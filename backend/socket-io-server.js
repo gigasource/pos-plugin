@@ -577,6 +577,13 @@ module.exports = async function (cms) {
         const [storeId, deviceId] = clientId.split('_')
         setDemoDeviceLastSeen(storeId, deviceId)
       })
+
+      socket.on('getAllReservations', async (storeId, cb) => {
+        const store = await cms.getModel('Store').findOne({id: storeId})
+        if (!store) return cb([])
+        const reservations = await cms.getModel('Reservation').find({store: store._id}).lean()
+        cb(reservations)
+      })
     }
   });
 
