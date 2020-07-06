@@ -1027,9 +1027,9 @@
           "type": "input@number"
         },
         {
-          "schemaType": "object",
+          "schemaType": "array",
           "key": "seatLimit",
-          "type": "object",
+          "type": "array",
           "fields": [
             {
               "schemaType": "string",
