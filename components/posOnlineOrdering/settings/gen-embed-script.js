@@ -100,7 +100,9 @@ export function getEmbedWebshop() {
   }
 
   function openNewTab() {
-    window.open(url)
+    var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
+    var newTabUrl = ['enjoylocal.de', 'store', alias].join('/')
+    window.open(newTabUrl)
   }
 
   var isOldIOs = checkIOs12AndLess()
@@ -221,7 +223,9 @@ export function getEmbedReservation() {
     }
   
     function openNewTab() {
-      window.open(url)
+      var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
+      var newTabUrl = ['enjoylocal.de', 'reservation', alias].join('/')
+      window.open(newTabUrl)
     }
   
     var isOldIOs = checkIOs12AndLess()
