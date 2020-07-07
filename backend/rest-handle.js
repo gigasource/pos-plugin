@@ -7,7 +7,7 @@ const storeApi = require('./api/store');
 const appManagementApi = require('./api/appManagement');
 const payment = require('./api/payment');
 const supportApi = require('./api/support');
-const restaurantDataBackupApi = require('./api/restaurant-data-backup');
+// const restaurantDataBackupApi = require('./api/restaurant-data-backup');
 const userApi = require('./api/users');
 
 module.exports = cms => {
@@ -22,7 +22,7 @@ module.exports = cms => {
   cms.app.use('/demo', demoApi);
   cms.app.use('/support', supportApi);
   cms.app.use('/users', userApi);
-  cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
+  // cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
   cms.app.get('/health-check', (req, res) => res.status(200).send('OK'));
