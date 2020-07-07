@@ -7,18 +7,49 @@ const {getExternalSocketIoServer} = require('../../socket-io-server');
 const _ = require('lodash');
 const axios = require('axios')
 
+router.get('/devices/:clientId', async (req, res) => {
+  const {clientId} = req.params;
+  if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
+
+  const device = await DeviceModel.findById(clientId);
+  if (!device) return res.status(400).json({error: `Device with ID ${clientId} not found`});
+
+  res.status(200).json(device._doc);
+});
+
 router.get('/devices', async (req, res) => {
-  let gsmsDevices = await DeviceModel.find({deviceType: 'gsms'}).lean();
+  let gsmsDevices = await DeviceModel.find(
+      {deviceType: 'gsms', $or: [{deleted: false}, {deleted: {$exists: false}}]}).lean();
 
   gsmsDevices = await Promise.all(gsmsDevices.map(async device => {
-    const latesUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false}).sort({createdAt: -1});
+    const latestUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false}).sort({createdAt: -1});
+
     return {
       ...device,
-      latestChatMessageDate: latesUnreadMsg ? latesUnreadMsg.createdAt : new Date(0),
+      latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
     }
   }));
 
   res.status(200).json(gsmsDevices);
+});
+
+router.delete('/devices/:clientId', async (req, res) => {
+  const {clientId} = req.params;
+  if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
+
+  const device = await DeviceModel.findById(clientId);
+  if (!device) return res.status(400).json({error: `Device with ID ${clientId} not found`});
+
+  if (device.storeId) {
+    const deviceStore = await StoreModel.findById(device.storeId);
+    if (deviceStore.gSms && deviceStore.gSms.devices) {
+      deviceStore.gSms.devices = deviceStore.gSms.devices.filter(e => e._id.toString() !== clientId);
+      await StoreModel.updateOne({_id: deviceStore._id}, deviceStore);
+    }
+  }
+
+  await DeviceModel.updateOne({_id: device._id}, {deleted: true});
+  res.status(204).send();
 });
 
 router.get('/device-assigned-store/:clientId', async (req, res) => {
@@ -70,39 +101,40 @@ router.post('/register', async (req, res) => {
     }
   }
 
+  const now = new Date();
   const newDevice = await DeviceModel.create({
-    name: hardware || 'New Device', paired: true, lastSeen: new Date(),
-    hardware, appName, metadata, deviceType: 'gsms',
+    name: hardware || 'New Device', paired: true, lastSeen: now, createdAt: now,
+    hardware, appName, metadata, deviceType: 'gsms', notes: [],
   });
 
   console.debug(`sentry:eventType=gsmsDeviceRegister,clientId=${newDevice._id}`,
       'New GSMS device registered');
 
   cms.socket.emit('reloadUnassignedDevices');
-  res.status(200).json({clientId: newDevice._id});
+  res.status(201).json({clientId: newDevice._id});
 });
 
 router.put('/device-metadata', async (req, res) => {
-  let { clientId, metadata } = req.body;
+  let {clientId, metadata} = req.body;
 
   if (clientId) {
-    const foundDevice = await DeviceModel.findOne({ _id: clientId });
+    const foundDevice = await DeviceModel.findOne({_id: clientId});
     if (foundDevice) {
       if (metadata) { // { deviceLatLong || deviceAddress, deviceIP }
         if (metadata.deviceLatLong) {
           // update location
-          const { latitude, longitude } = metadata.deviceLatLong
-          const { longitude: existingLongitude, latitude: existingLatitude } = foundDevice.metadata.deviceLatLong;
+          const {latitude, longitude} = metadata.deviceLatLong
+          const {longitude: existingLongitude, latitude: existingLatitude} = foundDevice.metadata.deviceLatLong;
 
-          if (latitude !== existingLatitude || longitude !== existingLongitude ) {
+          if (latitude !== existingLatitude || longitude !== existingLongitude) {
             const address = await reverseGeocodePelias(latitude, longitude);
             if (address) metadata.deviceLocation = address
             console.log(`found address: ${address}`)
           }
         }
 
-        await cms.getModel('Device').findOneAndUpdate({ _id: foundDevice._id },
-          { metadata: Object.assign({}, foundDevice.metadata, metadata) })
+        await cms.getModel('Device').findOneAndUpdate({_id: foundDevice._id},
+            {metadata: Object.assign({}, foundDevice.metadata, metadata)})
       }
       return res.sendStatus(204)
     } else {
@@ -117,10 +149,10 @@ async function reverseGeocodePelias(lat, long) {
   const url = `https://pelias.gigasource.io/v1/reverse?point.lat=${lat}&point.lon=${long}`
 
   const req = await axios.get(url)
-  const { features } = req.data
+  const {features} = req.data
 
   if (features && features.length) {
-    const { country, label, region, name } = features[0];
+    const {country, label, region, name} = features[0];
     return label || `${name}, ${region}, ${country}`
   }
 
@@ -132,7 +164,7 @@ async function reverseGeocodeGoogle(lat, long) { //fallback
   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`
 
   const req = await axios.get(url)
-  const { results } = req.data
+  const {results} = req.data
 
   if (results && results.length) {
     return results[0]['formatted_address']

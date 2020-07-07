@@ -752,3 +752,17 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-chat-support-note-user {
+  background-image: url("../assets/chat-support-note-user.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-chat-support-note-send {
+  background-image: url("../assets/chat-support-note-send.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
