@@ -5,7 +5,7 @@
       <div class="reservation-setting__main--left">
         <g-switch class="mb-3" :label="$t('setting.activeReservation')" v-model="activeReservation"/>
         <g-switch class="mb-3" :label="$t('setting.incomeReservationSound')" v-model="soundNotification"/>
-        <g-switch class="mb-3" label="Hide empty time slots" v-model="hideEmpty"/>
+        <g-switch class="mb-3" :label="$t('setting.hideEmpty')" v-model="hideEmpty"/>
         <g-switch class="mb-3" label="Send confirmation email" v-model="emailConfirmation"/>
         <p class="fw-700 fs-small mt-3">{{$t('setting.autoRemoveOverdue')}}</p>
         <g-grid-select :items="removeOverdueAfterList" v-model="removeOverdueAfter" mandatory :grid="false">

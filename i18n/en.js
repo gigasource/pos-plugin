@@ -496,6 +496,8 @@ module.exports = {
       displayMenuImage: 'Display menu image on online ordering website.',
       seatLimit: 'Seat limit',
       noteForCustomer: 'Note for customers',
+      hideEmpty: 'Hide empty time slots',
+      sendConfirmEmail: 'Send confirmation email',
     },
   }
 }

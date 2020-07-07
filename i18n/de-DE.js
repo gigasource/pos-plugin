@@ -213,6 +213,7 @@ module.exports = {
       displayMenuImage: 'Menübild auf der Online-Bestellwebsite anzeigen.',
       seatLimit: 'Seat limit',
       noteForCustomer: 'Hinweis für Kunden',
+      hideEmpty: 'leere Zeitsschlitze ausblenden',
     },
 
     paymentProviders: {
