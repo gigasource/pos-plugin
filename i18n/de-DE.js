@@ -221,7 +221,7 @@ module.exports = {
         desc: 'Kunden dürfen mit Paypal-Konten oder Kredit/Debitkarte bezahlen.',
         balance: 'Balance: ',
         calculating: 'Berechnend...',
-        note: 'Notiz:',
+        note: 'Hinweis:',
         noteContent1: 'eine zusätzliche Gebühr wird für jede Transaktion addiert.',
         lastUpdate: 'letzte Aktualisierung: ',
         transactionHistoryNotice: 'Sie brauchen maximal 3 Stunden, damit ausgeführte Transaktionen Ihrem Guthaben gutgeschrieben werden.'
