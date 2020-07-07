@@ -12,7 +12,7 @@
            :key="'chat_window_msg' + _id">
         <div v-if="fromServer"
              class="chat-window__server"
-             :ref="i === 0 ? 'firstChatMsg' : ''">
+             :id="i === 0 ? 'firstChatMsg' : ''">
           <div class="row-flex justify-end">
             <div class="chat-window__server-bubble mr-3"
                  :class="unsent ? 'chat-window__server-bubble--unsent' : ''">
@@ -27,7 +27,7 @@
         </div>
         <div v-else
              class="chat-window__client"
-             :ref="i === 0 ? 'firstChatMsg' : ''">
+             :id="i === 0 ? 'firstChatMsg' : ''">
           <div class="row-flex">
             <div class="ta-center">
               <g-icon size="32">icon-contact</g-icon>
@@ -39,6 +39,14 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div v-if="!autoScrollToBottom && newMessageFromClient" class="new-message-notification ta-center">
+        <span @click="onNewMessageReceivedBtnClick"
+              class="new-message-notification__message">
+          Received new message
+          <g-icon small color="#ffffff">fa fa-arrow-down</g-icon>
+        </span>
       </div>
     </template>
     <template v-else>
@@ -57,6 +65,7 @@
     props: {
       chats: Array,
       device: Object,
+      deviceId: String,
       usernameMap: Object,
 
       loadingMoreChats: Boolean,
@@ -66,6 +75,8 @@
       return {
         formattedTexts: [],
         autoScrollToBottom: true,
+        prevFirstChatMsgEl: null,
+        newMessageFromClient: false,
       }
     },
     mounted() {
@@ -92,14 +103,30 @@
       }
     },
     watch: {
-      device() {
+      deviceId() {
         this.autoScrollToBottom = true
+        this.prevFirstChatMsgEl = null
       },
       chats: {
         async handler(val, oldVal) {
           if (!val || val === oldVal) return
-
           this.scrollToBottom()
+
+          const oldLatestChatMsg = oldVal && oldVal[oldVal.length - 1]
+          const newLatestChatMsg = val[val.length - 1]
+
+          if (!oldLatestChatMsg || !newLatestChatMsg) return
+
+          if (oldLatestChatMsg._id === newLatestChatMsg._id) {
+            this.scrollToPrevLastChat()
+          } else {
+            if (newLatestChatMsg.fromServer) {
+              this.autoScrollToBottom = true
+              this.scrollToBottom()
+            } else {
+              if (!this.autoScrollToBottom) this.newMessageFromClient = true
+            }
+          }
         },
         immediate: true
       }
@@ -113,8 +140,19 @@
           if (el) el.scrollTop = el.scrollHeight
         })
       },
+      scrollToPrevLastChat() {
+        this.$nextTick(() => {
+          if (!this.prevFirstChatMsgEl) return
+          this.prevFirstChatMsgEl.scrollIntoView()
+        })
+      },
+      onNewMessageReceivedBtnClick() {
+        this.newMessageFromClient = false
+        this.autoScrollToBottom = true
+        this.scrollToBottom()
+      },
 
-      onChatWindowScroll: _.debounce(function (e) {
+      onChatWindowScroll: _.debounce(function () {
         if (this.loadingMoreChats) return
 
         const el = this.$refs.chatWindow
@@ -125,10 +163,10 @@
         const scrollHeight = el.scrollHeight
 
         this.autoScrollToBottom = (scrollTop + clientHeight) >= (scrollHeight - 30)
+        if (this.autoScrollToBottom) this.newMessageFromClient = false
 
         if (scrollTop <= 100 && !this.loadingMoreChats && this.moreChatsAvailable) {
-          e.preventDefault()
-          if (this.$refs.chatWindow.scrollTop === 0) this.$refs.chatWindow.scrollTop = 150
+          this.prevFirstChatMsgEl = this.$el.querySelector('#firstChatMsg')
           this.$emit('load-more-chat')
         }
       }, 150),
@@ -144,10 +182,10 @@
 <style scoped lang="scss">
   .chat-window {
     overflow: scroll;
-    padding: 36px;
+    padding: 36px 36px 8px;
+    position: relative;
 
     &__client {
-
       &-bubble {
         background-color: #F5F5F5;
         border-radius: 20px;
@@ -170,6 +208,21 @@
         &--unsent {
           opacity: 0.5;
         }
+      }
+    }
+
+    .new-message-notification {
+      width: 100%;
+      position: sticky;
+      bottom: 0;
+      margin-bottom: -36px;
+      color: white;
+
+      &__message {
+        cursor: pointer;
+        padding: 8px;
+        background-color: #455A64;
+        border-radius: 8px;
       }
     }
   }
