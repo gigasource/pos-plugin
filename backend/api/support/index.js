@@ -7,6 +7,7 @@ const StoreModel = cms.getModel('Store');
 const {getExternalSocketIoServer} = require('../../socket-io-server');
 const {socket: internalSocketIOServer} = cms;
 const {getNewDeviceCode} = require('../demoDevice');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -84,11 +85,11 @@ setTimeout(() => {
 
 router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;
-  if (!clientId) return res.status(400).json({error: `clientId query can not be ${clientId}`});
+  if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
   let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
-  if (offset) query = query.skip(offset);
-  if (n) query = query.limit(n);
+  if (offset) query = query.skip(+offset);
+  if (n) query = query.limit(+n);
 
   query.exec((error, docs) => {
     if (error) return res.status(500).json({error});
@@ -97,15 +98,21 @@ router.get('/chat/messages', async (req, res) => {
   });
 });
 
-router.get('/chat/unread-messages-count', async (req, res) => {
-  let {clientIds, fromServer} = req.query;
-  if (!clientIds) return res.status(400).json({error: `clientIds query can not be ${clientIds}`});
+router.get('/chat/messages-count', async (req, res) => {
+  let {clientIds, fromServer, read} = req.query;
+  if (!clientIds) return res.status(400).json({error: `'clientIds' query can not be '${clientIds}'`});
+  if (read && read !== 'true' && read !== 'false') return res.status(400).json({error: `'read' query can only be 'true' or 'false'`});
+  if (fromServer && fromServer !== 'true' && fromServer !== 'false') return res.status(400).json({error: `'fromServer' query can only be 'true' or 'false'`});
 
   clientIds = clientIds.split(',');
 
   const result = {};
   await Promise.all(clientIds.map(async clientId => {
-    result[clientId] = await ChatMessageModel.countDocuments({clientId, read: false, fromServer});
+    result[clientId] = await ChatMessageModel.countDocuments({
+      clientId,
+      ...read ? {read: read === 'true'} : {},
+      ...fromServer ? {fromServer: fromServer === 'true'} : {},
+    });
   }));
 
   res.status(200).json(result);
@@ -113,10 +120,29 @@ router.get('/chat/unread-messages-count', async (req, res) => {
 
 router.put('/chat/set-message-read', async (req, res) => {
   const {clientId} = req.query;
-  if (!clientId) return res.status(400).json({error: `clientId query can not be ${clientId}`});
+  if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  const a = await ChatMessageModel.updateMany({clientId}, {read: true});
+  await ChatMessageModel.updateMany({clientId}, {read: true});
   res.status(204).send();
+});
+
+router.post('/notes', async (req, res) => {
+  let {clientId, text, userId} = req.body;
+
+  if (!clientId || !text || !userId) return res.status(400).json({error: '3 properties are required in body request: clientId, text, userId'})
+
+  userId = new ObjectId(userId);
+  const createdAt = new Date();
+  const dataToInsert = {_id: ObjectId(), text, userId, createdAt};
+
+  const device = await DeviceModel.findById(clientId);
+  if (!device) return res.status(400).json({error: `No devices found with ID ${clientId}`});
+
+  device.notes = device.notes || [];
+  device.notes.push(dataToInsert);
+
+  await DeviceModel.updateOne({_id: device._id}, device);
+  res.status(201).json(dataToInsert);
 });
 
 router.put('/assign-device/:id', async (req, res) => {
@@ -139,8 +165,8 @@ router.put('/assign-device/:id', async (req, res) => {
   }
 
   const store = storeId
-    ? await StoreModel.findById(storeId)
-    : await StoreModel.findOne({id: customStoreId});
+      ? await StoreModel.findById(storeId)
+      : await StoreModel.findOne({id: customStoreId});
   if (!store) return res.status(400).json({error: `Store with ID ${storeId || customStoreId} not found`});
 
   device.storeId = store._id;
