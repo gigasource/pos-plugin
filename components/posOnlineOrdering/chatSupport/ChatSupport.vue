@@ -65,6 +65,7 @@
                      :chats="sortedChats"
                      :username-map="usernameMap"
                      :device="selectedDevice"
+                     :device-id="selectedDeviceId"
                      :loading-more-chats="loadingMoreChats"
                      :more-chats-available="moreChatsAvailable"
                      @load-more-chat="loadMoreChat"/>
@@ -111,7 +112,7 @@
         loadingMoreChats: false,
         moreChatsAvailable: false,
         loadedChatIndex: 0,
-        chatsPerLoad: 15,
+        chatsPerLoad: 20,
 
         stores: [],
         currentChats: [],
