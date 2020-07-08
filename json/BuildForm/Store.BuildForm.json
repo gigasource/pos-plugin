@@ -558,6 +558,11 @@
           "schemaType": "number",
           "key": "total",
           "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "reservations",
+          "type": "input@number"
         }
       ],
       "type": "object",
@@ -577,6 +582,11 @@
         {
           "schemaType": "number",
           "key": "total",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "reservations",
           "type": "input@number"
         }
       ],

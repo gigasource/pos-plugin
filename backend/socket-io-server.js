@@ -144,9 +144,10 @@ module.exports = async function (cms) {
 
       if (newMonth) {
         prevMonthReport = currentMonthReport
-        currentMonthReport = {orders: 1, total}
+        currentMonthReport = {orders: 1, total, reservations: 0}
       } else {
         currentMonthReport = {
+          ...currentMonthReport,
           orders: (currentMonthReport.orders || 0) + 1,
           total: (currentMonthReport.total || 0) + total
         }
@@ -847,6 +848,23 @@ module.exports = async function (cms) {
       } else {
         const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
         const reservation = await cms.getModel('Reservation').create(Object.assign({}, reservationData, {store: storeId}));
+        let {lastSyncAt, prevMonthReport, currentMonthReport} = store
+        const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
+
+        if (newMonth) {
+          prevMonthReport = currentMonthReport
+          currentMonthReport = {orders: 0, total, reservations: reservationData.noOfGuests}
+        } else {
+          currentMonthReport = {
+            ...currentMonthReport,
+            reservations: (currentMonthReport.reservations || 0) + reservationData.noOfGuests
+          }
+        }
+        await cms.getModel('Store').findOneAndUpdate({_id: storeId}, {
+          $set: {
+            lastSyncAt: new Date(), prevMonthReport, currentMonthReport
+          }
+        })
         if (device) {
           const deviceId = device._id.toString();
           await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [{...reservationData, onlineReservationId: reservation._id}]);
