@@ -26,7 +26,7 @@
                       :value="assignedStoreId"
                       @input="assignStore"
                       placeholder="No store assigned"/>
-      <g-badge :value="true" color="#424242" overlay nudge-top="-4" nudge-right="-4" badge-size="14">
+      <g-badge :value="true" :color="notes.length ? '#536DFE' : '#424242'" overlay nudge-top="-4" nudge-right="-4" badge-size="14">
         <template v-slot:badge>
           <span style="font-size: 9px">{{notes && notes.length || 0}}</span>
         </template>

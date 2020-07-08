@@ -52,7 +52,7 @@
               :last-seen="selectedDevice.lastSeen"
               :location="selectedDeviceLocation"
               :stores="stores"
-              :notes="selectedDevice.notes"
+              :notes="selectedDevice.notes || []"
               :username-map="usernameMap"
               @assign-store="assignStore"
               @update-username="updateUsername"
@@ -280,9 +280,17 @@
         return data
       },
       concatContactName(contact) {
-        return contact.name + (contact.metadata && contact.metadata.customerName
+        const contactStore = this.stores.find(({_id}) => _id === contact.storeId)
+
+        const customerNameString = contact.metadata && contact.metadata.customerName
             ? ` - ${contact.metadata.customerName}`
-            : '')
+            : ''
+
+        const storeNameString = contactStore
+            ? ` - ${contactStore.name}`
+            : ''
+
+        return contact.name + customerNameString + storeNameString
       },
       concatContactMetadata(contact) {
         let result = ''
