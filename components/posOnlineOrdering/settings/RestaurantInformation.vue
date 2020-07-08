@@ -284,7 +284,9 @@
         await this.updateButton()
         const url = [location.origin, this.type === 'Reservation' ? 'reservation' : 'store', this.store.alias].join('/'),
               script = location.origin + this.script,
-              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `${this.type.toLowerCase()}-icon`].join('/')
+              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `${this.type.toLowerCase()}-icon`].join('/'),
+              otherType = this.type === 'Reservation' ? 'webshop' : 'reservation',
+              otherUrl = [location.origin, this.type === 'Reservation' ? 'store' : 'reservation', this.store.alias].join('/')
         this.iframe = `<div id="${this.type.toLowerCase()}-embed-btn" class="${this.type.toLowerCase()}-embed-btn" data-url="${url}">
                   <object style="pointer-events: none; max-width: 100%" type="image/svg+xml" data="${image}.svg">
                     <object style="pointer-events: none; max-width: 100%" type="image/jpeg" data="${image}.jpg">
@@ -298,6 +300,7 @@
                     </object>
                   </object>
                 </div>
+                <div id="${otherType}-embed-btn" data-url="${otherUrl}" style="display: none"></div>
                 <script type="application/javascript" src=${script}><\/script>`
         this.dialog.generate = false
       },
@@ -306,9 +309,9 @@
         if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`, this.type)
         //change script
         const header = genScriptHeader(), footer = genScriptFooter(), webshop = getEmbedWebshop(), reservation = getEmbedReservation(), checkIOs = checkIOs12AndLess()
-        const fnString = header + checkIOs + genStyleSheet(this.type, this.position, this.size, this.hidden) + (this.type === 'Reservation' ? reservation : webshop) + genReadyState(this.type) + footer
+        const fnString = header + checkIOs + genStyleSheet(this.type, this.position, this.size, this.hidden) + reservation + webshop + genReadyState() + footer
         const minifyString = terser.minify(fnString).code
-        const file = new File([minifyString], `${this.type.toLowerCase()}-script.js`, {type: 'text/javascript'})
+        const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
         this.script = await this.$getService('FileUploadStore').uploadScript(file, this.store.alias)
         if(close) this.dialog.generate = false
       }

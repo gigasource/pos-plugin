@@ -157,6 +157,7 @@ export function getEmbedReservation() {
       document.body.appendChild(container)
   
       function removeContainer() {
+        document.body.style.overflow = ''
         if (document.body.contains(container))
           document.body.removeChild(container)
       }
@@ -253,6 +254,14 @@ export function getEmbedReservation() {
 }
 
 export function genReadyState(type) {
+  if(!type)
+    return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
+              getEmbedWebshop()
+              getEmbedReservation()
+            } else {
+              window.addEventListener('load', getEmbedWebshop)
+              window.addEventListener('load', getEmbedReservation)
+            }`
   return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
     getEmbed${type}()
   } else {
