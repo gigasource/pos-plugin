@@ -162,9 +162,7 @@
     },
     computed: {
       sortedNotes() {
-        return this.notes
-            ? this.notes.sort((e1, e2) => e2.createdAt - e1.createdAt)
-            : []
+        return this.notes.sort((e1, e2) => e2.createdAt - e1.createdAt)
       }
     },
     methods: {

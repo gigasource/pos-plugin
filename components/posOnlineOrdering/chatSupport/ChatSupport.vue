@@ -52,7 +52,7 @@
               :last-seen="selectedDevice.lastSeen"
               :location="selectedDeviceLocation"
               :stores="stores"
-              :notes="selectedDevice.notes"
+              :notes="selectedDevice.notes || []"
               :username-map="usernameMap"
               @assign-store="assignStore"
               @update-username="updateUsername"
