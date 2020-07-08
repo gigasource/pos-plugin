@@ -98,7 +98,7 @@
           <g-chip v-for="(day, i) in dayOff" :key="`day-off_${i}`" label close close-icon="icon-close@16" @close="deleteDayOff(day)">{{getDayOffLabel(day)}}</g-chip>
         </div>
       </div>
-      <div class="service-setting__content col-7">
+      <div class="service-setting__content flex-auto">
         <div class="mb-3 fw-700">G-SMS {{$t('setting.settings')}}</div>
         <div class="row-flex">
           <g-switch color="#536DFE" class="col-6" :label="$t('setting.enabled')" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>

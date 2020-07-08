@@ -146,7 +146,7 @@ module.exports = {
       mandatory: 'Pflicht',
       cancel: 'Abbrechen',
       choice: 'Auswahl',
-      deliveryHourNote: 'Notiz: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
+      deliveryHourNote: 'Hinweis: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
       settings: 'Settings',
       enabled: 'Ermöglich',
       autoAcceptDevice: 'Automat akzeptiert neue Geräte.',
