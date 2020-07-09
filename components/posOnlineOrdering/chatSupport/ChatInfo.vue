@@ -8,10 +8,26 @@
       </div>
       <div class="row-flex align-items-center">
         <g-icon :title="deviceName" class="mr-1" size="16">icon-device</g-icon>
-        <span :title="deviceName" class="chat-info__info">{{deviceName}}</span>
+        <span :title="deviceName"
+              class="chat-info__info chat-info--device-name">
+          {{deviceName}}
+        </span>
+
+        <template v-if="deviceIp">
+          <span class="mx-2">|</span>
+          <g-icon :title="deviceIp" class="mr-1" size="16">fa fa-address-book</g-icon>
+          <span :title="deviceIp"
+                class="chat-info__info chat-info--device-ip">
+          {{deviceIp}}
+          </span>
+        </template>
+
         <span class="mx-2">|</span>
         <g-icon :title="location" class="mr-1" size="16" color="#9e9e9e">place</g-icon>
-        <span :title="location" class="chat-info__info">{{location}}</span>
+        <span :title="location"
+              class="chat-info__info chat-info--device-location">
+          {{location}}
+        </span>
       </div>
     </div>
     <div class="chat-info--right">
@@ -159,6 +175,7 @@
       online: Boolean,
       deviceId: String,
       usernameMap: Object,
+      deviceIp: String,
     },
     computed: {
       sortedNotes() {
@@ -211,12 +228,17 @@
     padding: 8px 16px;
 
     &--left, &--right {
-      flex: 0 0 50%;
-      max-width: 50%;
       overflow: hidden;
     }
 
+    &--left {
+      flex: 0 0 60%;
+      max-width: 60%;
+    }
+
     &--right {
+      flex: 0 0 40%;
+      max-width: 40%;
       display: flex;
       align-items: center;
 
@@ -229,8 +251,19 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      max-width: 40%;
       font-size: 14px;
+    }
+
+    &--device-name {
+      max-width: 30%;
+    }
+
+    &--device-ip {
+      max-width: 20%;
+    }
+
+    &--device-location {
+      max-width: 50%;
     }
 
     .contact-note-dialog {

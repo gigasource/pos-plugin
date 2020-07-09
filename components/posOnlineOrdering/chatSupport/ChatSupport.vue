@@ -48,6 +48,7 @@
               :assigned-store-id="selectedDevice.storeId"
               :username="selectedUsername"
               :device-name="selectedDevice.name"
+              :device-ip="(selectedDevice.metadata && selectedDevice.metadata.deviceIp) || ''"
               :online="selectedDevice.online"
               :last-seen="selectedDevice.lastSeen"
               :location="selectedDeviceLocation"
