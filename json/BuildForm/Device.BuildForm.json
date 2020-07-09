@@ -213,6 +213,11 @@
           "key": "createdAt"
         }
       ]
+    },
+    {
+      "_id": "5f070125718195336e826f2e",
+      "schemaType": "string",
+      "key": "hardwareId"
     }
   ],
   "name": "Device",
