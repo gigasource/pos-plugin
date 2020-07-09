@@ -28,9 +28,10 @@
             <g-text-field-bs large :label="$t('setting.town')"
                              :value="store.townCity"
                              @input="updateDebounce({townCity: $event})"/>
-            <div class="span-2">
-              <g-text-field-bs large :value="store.country.name" :label="$t('setting.country')" readonly/>
-            </div>
+            <g-text-field-bs large :value="store.country.name" :label="$t('setting.country')" readonly/>
+            <g-text-field-bs large label="Google My Business Id (Optional)"
+                             :value="store.googleMyBusinessId"
+                             @input="updateDebounce({googleMyBusinessId: $event})"/>
           </div>
         </div>
         <div class="mt-3">
