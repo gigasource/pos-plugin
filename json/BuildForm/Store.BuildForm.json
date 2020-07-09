@@ -429,6 +429,40 @@
           "schemaType": "boolean",
           "key": "emailConfirmation",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "array",
+          "key": "seatLimit",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "startTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "endTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "days",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "key": "day",
+                  "type": "input"
+                }
+              ]
+            },
+            {
+              "schemaType": "number",
+              "key": "seat",
+              "type": "input@number"
+            }
+          ]
         }
       ]
     },
@@ -524,6 +558,11 @@
           "schemaType": "number",
           "key": "total",
           "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "reservations",
+          "type": "input@number"
         }
       ],
       "type": "object",
@@ -544,6 +583,11 @@
           "schemaType": "number",
           "key": "total",
           "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "reservations",
+          "type": "input@number"
         }
       ],
       "type": "object",
@@ -556,6 +600,12 @@
       "key": "lastSyncAt",
       "type": "input@date",
       "flex": "md4"
+    },
+    {
+      "_id": "5f06e5943e51ca2487668e65",
+      "schemaType": "string",
+      "key": "googleMyBusinessId",
+      "type": "input"
     }
   ],
   "name": "Store",
