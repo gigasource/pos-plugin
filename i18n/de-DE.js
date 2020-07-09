@@ -146,7 +146,7 @@ module.exports = {
       mandatory: 'Pflicht',
       cancel: 'Abbrechen',
       choice: 'Auswahl',
-      deliveryHourNote: 'Notiz: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
+      deliveryHourNote: 'Hinweis: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
       settings: 'Settings',
       enabled: 'Ermöglich',
       autoAcceptDevice: 'Automat akzeptiert neue Geräte.',
@@ -211,6 +211,9 @@ module.exports = {
       displayMenuNumber: 'die Menünummer auf der Online-Bestellwebsite anzeigen.',
       displayItemImage: 'Artikelbild anzeigen',
       displayMenuImage: 'Menübild auf der Online-Bestellwebsite anzeigen.',
+      seatLimit: 'Seat limit',
+      noteForCustomer: 'Hinweis für Kunden',
+      hideEmpty: 'leere Zeitsschlitze ausblenden',
     },
 
     paymentProviders: {
@@ -218,7 +221,7 @@ module.exports = {
         desc: 'Kunden dürfen mit Paypal-Konten oder Kredit/Debitkarte bezahlen.',
         balance: 'Balance: ',
         calculating: 'Berechnend...',
-        note: 'Notiz:',
+        note: 'Hinweis:',
         noteContent1: 'eine zusätzliche Gebühr wird für jede Transaktion addiert.',
         lastUpdate: 'letzte Aktualisierung: ',
         transactionHistoryNotice: 'Sie brauchen maximal 3 Stunden, damit ausgeführte Transaktionen Ihrem Guthaben gutgeschrieben werden.'

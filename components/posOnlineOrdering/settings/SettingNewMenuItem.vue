@@ -289,7 +289,7 @@
       },
       addChoice() {
         this.internalChoices.push({
-          mandatory: false,
+          mandatory: true,
           select: "one",
           name: '',
           options: [{name: '', price: 0}]

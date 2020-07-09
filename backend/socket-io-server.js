@@ -144,9 +144,10 @@ module.exports = async function (cms) {
 
       if (newMonth) {
         prevMonthReport = currentMonthReport
-        currentMonthReport = {orders: 1, total}
+        currentMonthReport = {orders: 1, total, reservations: 0}
       } else {
         currentMonthReport = {
+          ...currentMonthReport,
           orders: (currentMonthReport.orders || 0) + 1,
           total: (currentMonthReport.total || 0) + total
         }
@@ -536,6 +537,30 @@ module.exports = async function (cms) {
         const deviceInfo = await cms.getModel('Device').findOneAndUpdate({_id}, {appVersion}, {new: true});
         if (deviceInfo) internalSocketIOServer.emit('reloadStores', deviceInfo.storeId);
       });
+
+      socket.on('updateOnlineReservation', async (reservation, tag, deviceId, callback) => {
+        const _id = reservation.onlineReservationId
+        delete(reservation._id)
+        const date = dayjs(reservation.date).format('YYYY-MM-DD')
+        const time = dayjs(reservation.date).format('HH:mm')
+        const device = await cms.getModel('Device').findById(deviceId)
+        console.debug(`sentry:eventType=reservation,store=${device.storeId},device=${deviceId}`,
+            `Online order backend: receive reservation info from device`)
+        switch (tag) {
+          case 'create':
+            const onlineReservation = await cms.getModel('Reservation').create(Object.assign({}, reservation, {store: device.storeId, date, time}))
+            callback(onlineReservation._id) //update device online reservation id
+            break
+          case 'update':
+            await cms.getModel('Reservation').findOneAndUpdate({_id}, Object.assign({}, reservation, {date, time}))
+            break
+          case 'delete':
+            await cms.getModel('Reservation').deleteOne({_id})
+            break
+          default:
+            break
+        }
+      })
     }
 
     if (socket.request._query && socket.request._query.clientId && socket.request._query.demo) {
@@ -552,6 +577,13 @@ module.exports = async function (cms) {
 
         const [storeId, deviceId] = clientId.split('_')
         setDemoDeviceLastSeen(storeId, deviceId)
+      })
+
+      socket.on('getAllReservations', async (storeId, cb) => {
+        const store = await cms.getModel('Store').findOne({id: storeId})
+        if (!store) return cb([])
+        const reservations = await cms.getModel('Reservation').find({store: store._id}).lean()
+        cb(reservations)
       })
     }
   });
@@ -799,33 +831,65 @@ module.exports = async function (cms) {
       callback({long: longitude, lat: latitude})
     })
 
-    socket.on('createReservation', async (storeId, reservationData) => {
+    socket.on('createReservation', async (storeId, reservationData, callback) => {
       storeId = ObjectId(storeId);
-      const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
-      const store = await cms.getModel('Store').findById(storeId)
-      if (device) {
-        const deviceId = device._id.toString();
-        await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [reservationData]);
+      const store = await cms.getModel('Store').findById(storeId);
+      const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayjs(reservationData.date).day()]
+      const seatLimit = store.reservationSetting.seatLimit.find(limit => (limit.startTime <= reservationData.time && limit.endTime >= reservationData.time && limit.days.includes(day)))
+      let availableSeat
+      if (seatLimit) {
+        const reservations = await cms.getModel('Reservation').find({store: storeId, date: reservationData.date, time: {$gte: seatLimit.startTime, $lte: seatLimit.endTime}})
+        availableSeat = seatLimit.seat - reservations.reduce((seat, r) => (seat + r.noOfGuests), 0)
+      }
+      if(availableSeat && availableSeat < reservationData.noOfGuests) {
         console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
-            `2. Online order backend: sent reservation to device`)
+            `2. Online order backend: not enough available seat for reservation`)
+        callback({error: true})
       } else {
-        console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
-            `2. Online order backend: no device found, cancelled sending`)
-      }
+        const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
+        const reservation = await cms.getModel('Reservation').create(Object.assign({}, reservationData, {store: storeId}));
+        let {lastSyncAt, prevMonthReport, currentMonthReport} = store
+        const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
 
-      if (store.gSms && store.gSms.enabled) {
-        cms.emit('sendReservationMessage', storeId, reservationData)
-        const demoDevices = store.gSms.devices
-        demoDevices.filter(i => i.registered).forEach(({_id}) => {
-          const targetClientId = `${store.id}_${_id}`;
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: uuidv1.v1() }])
-          console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
-              `2a. Online order backend: sent reservation to demo device`)
+        if (newMonth) {
+          prevMonthReport = currentMonthReport
+          currentMonthReport = {orders: 0, total, reservations: reservationData.noOfGuests}
+        } else {
+          currentMonthReport = {
+            ...currentMonthReport,
+            reservations: (currentMonthReport.reservations || 0) + reservationData.noOfGuests
+          }
+        }
+        await cms.getModel('Store').findOneAndUpdate({_id: storeId}, {
+          $set: {
+            lastSyncAt: new Date(), prevMonthReport, currentMonthReport
+          }
         })
-      }
+        if (device) {
+          const deviceId = device._id.toString();
+          await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [{...reservationData, onlineReservationId: reservation._id}]);
+          console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
+              `2. Online order backend: sent reservation to device`)
+        } else {
+          console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias}`,
+              `2. Online order backend: no device found, cancelled sending`)
+        }
 
-      if (store.reservationSetting && store.reservationSetting.emailConfirmation) {
-        sendReservationConfirmationEmail(reservationData, store.id)
+        if (store.gSms && store.gSms.enabled) {
+          cms.emit('sendReservationMessage', storeId, reservationData)
+          const demoDevices = store.gSms.devices
+          demoDevices.filter(i => i.registered).forEach(({_id}) => {
+            const targetClientId = `${store.id}_${_id}`;
+            externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+            console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
+                `2a. Online order backend: sent reservation to demo device`)
+          })
+        }
+
+        if (store.reservationSetting && store.reservationSetting.emailConfirmation) {
+          sendReservationConfirmationEmail(reservationData, store.id)
+        }
+        callback({success: true})
       }
     })
 

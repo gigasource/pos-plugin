@@ -1,0 +1,69 @@
+{
+  "_id": "5efdb2448c021b40c00e0f3f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5efdb2888c021b40c00e0f41",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select"
+    },
+    {
+      "_id": "5efdb2888c021b40c00e0f42",
+      "schemaType": "number",
+      "key": "noOfGuests",
+      "type": "input@number"
+    },
+    {
+      "_id": "5efdb2888c021b40c00e0f43",
+      "schemaType": "string",
+      "key": "date",
+      "type": "input"
+    },
+    {
+      "_id": "5efdb2888c021b40c00e0f44",
+      "schemaType": "string",
+      "key": "time",
+      "type": "input"
+    },
+    {
+      "_id": "5efdb3268c021b40c00e0f7a",
+      "schemaType": "object",
+      "key": "customer",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "firstName",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "lastName",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "email",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "phone",
+          "type": "input"
+        }
+      ]
+    },
+    {
+      "_id": "5efdb45e87215c45363353e9",
+      "schemaType": "string",
+      "key": "note",
+      "type": "input"
+    }
+  ],
+  "name": "Reservation",
+  "tabs": [],
+  "type": "Collection",
+  "title": "name"
+}

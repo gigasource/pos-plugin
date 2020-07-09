@@ -1,33 +1,40 @@
 <template>
   <div class="chat-support pl-5 pr-5 pt-2">
-    <div class="chat-support__title mb-2">Chat Support</div>
     <div class="chat-support__container row-flex">
-      <div class="chat-support__container-contact-list col-4">
-        <div class="chat-support__container-contact-list__header row-flex align-items-center">
-          <g-select class="ml-3" :items="sorting" v-model="activeSorting"></g-select>
-          <g-spacer/>
-          <g-btn class="mr-2" icon @click.stop="filter">
-            <g-icon>search</g-icon>
-          </g-btn>
+      <div class="chat-support__container-contact-list col-3">
+        <div style="position: sticky; top: 0; background: #F4F7FB">
+          <div class="chat-support__container-contact-list__title mb-2 row-flex align-items-center">
+            <span class="fs-large-2">Chat Support</span>
+            <g-spacer/>
+            <g-select class="chat-support__container-contact-list__title__sort"
+                      label="Sort"
+                      :items="sortTypes"
+                      v-model="activeSortType"></g-select>
+          </div>
+          <div class="chat-support__container-contact-list__header row-flex align-items-center">
+            <g-text-field-bs
+                prepend-inner-icon="search"
+                placeholder="Search"
+                v-model="contactSearch"/>
+          </div>
         </div>
 
         <div class="chat-support__container-contact-list__list col-flex">
           <div v-for="contact in sortedDeviceList" :key="contact._id" @click.stop="setActiveChat(contact)"
                class="chat-support__container-contact-list__list--item row-flex align-items-center pl-3 pr-3"
-               :class="contact._id === currentClientId ? 'chat-support__container-contact-list__list--item_active' : ''">
+               :class="contact._id === selectedDeviceId ? 'chat-support__container-contact-list__list--item_active' : ''">
             <div class="chat-support__container-contact-list__list--item_left">
               <div style="font-weight: bold;">
-                <span>{{concatContactName(contact)}}</span>
+                <span>{{contact.name}}</span>
               </div>
               <span>
                 {{concatContactMetadata(contact)}}
               </span>
             </div>
             <g-spacer/>
-            <div v-if="unreadCountMap[contact._id]"
-                class="chat-support__container-contact-list__list--item_right
-                row-flex align-items-center justify-center">
-              {{unreadCountMap[contact._id]}}
+            <div v-if="contact.unread"
+                 class="chat-support__container-contact-list__list--item_right row-flex align-items-center justify-center">
+              {{contact.unread}}
             </div>
           </div>
         </div>
@@ -36,33 +43,46 @@
       <div class="chat-support__container-chat-window col-8 col-flex">
         <div class="chat-support__container-chat-window__header">
           <chat-info
-              v-if="currentClientId"
-              class="pa-2"
-              :assigned-store-id="currentDevice.storeId"
-              :username="currentUsername"
-              :device-name="currentDevice.name"
-              :online="deviceOnlineStatusMap[currentClientId]"
-              :last-seen="currentDevice.lastSeen"
-              :location="currentDeviceLocation"
+              v-if="selectedDeviceId"
+              :device-id="selectedDeviceId"
+              :assigned-store-id="selectedDevice.storeId"
+              :username="selectedUsername"
+              :device-name="selectedDevice.name"
+              :device-ip="(selectedDevice.metadata && selectedDevice.metadata.deviceIp) || ''"
+              :online="selectedDevice.online"
+              :last-seen="selectedDevice.lastSeen"
+              :location="selectedDeviceLocation"
               :stores="stores"
+              :notes="selectedDevice.notes || []"
+              :username-map="usernameMap"
               @assign-store="assignStore"
-              @update-username="updateUsername"/>
+              @update-username="updateUsername"
+              @delete-device="deleteDevice"
+              @add-note="addNote"
+          />
         </div>
 
         <chat-window class="chat-support__container-chat-window__content flex-grow-1"
-                     :texts="sortedChats"
-                     :client-id="currentClientId"/>
+                     :chats="sortedChats"
+                     :username-map="usernameMap"
+                     :device="selectedDevice"
+                     :device-id="selectedDeviceId"
+                     :loading-more-chats="loadingMoreChats"
+                     :more-chats-available="moreChatsAvailable"
+                     @load-more-chat="loadMoreChat"/>
 
         <div class="chat-support__container-chat-window__text-box row-flex">
-          <textarea class="ma-2 pa-2 fs-normal"
+          <textarea class="my-2 ml-2 pa-2 fs-normal"
                     v-model="currentChatMsg"
                     @keydown.enter.exact="sendChatMsg"
                     @keydown.etner.shift.exact="currentChatMsg += '\n'"
-                    :disabled="!currentClientId"/>
-          <g-btn-bs class="ma-2"
+                    :disabled="!selectedDeviceId"/>
+          <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
-                    @click="sendChatMsg">Send</g-btn-bs>
+                    @click="sendChatMsg">
+            <g-icon>icon-chat-support-note-send</g-icon>
+          </g-btn-bs>
         </div>
       </div>
     </div>
@@ -79,22 +99,30 @@
 
   export default {
     name: 'ChatSupport',
-    components: {ChatInfo, ChatWindow },
+    components: {ChatInfo, ChatWindow},
     data() {
       return {
         devices: [],
-        sorting: [
-          { text: 'Last contact', value: 'lastSeen' }
+        sortTypes: [
+          {text: 'Installation date', value: 'mostRecentInstall'},
+          {text: 'Unread messages', value: 'mostRecentChat'},
         ],
-        activeSorting: 'lastSeen',
+        activeSortType: 'mostRecentInstall',
         adminId: '5c88842f1591d506a250b2a5',
+        contactSearch: '',
+        loadingMoreChats: false,
+        moreChatsAvailable: false,
+        loadedChatIndex: 0,
+        chatsPerLoad: 20,
 
         stores: [],
         currentChats: [],
         currentChatMsg: '',
-        currentClientId: null,
+        selectedDeviceId: null,
         unreadCountMap: {},
         deviceOnlineStatusMap: {},
+        // map userId to user's name, used for chat user info & notes feature
+        usernameMap: {},
       }
     },
     async created() {
@@ -104,17 +132,18 @@
       this.stores = stores.map(store => {
         return {
           _id: store._id,
-          name: `${store.name} (${store.alias})`,
+          id: store.id,
+          name: `${store.id}. ${store.name || store.settingName} (${store.alias})`,
         }
-      });
+      }).sort((s1, s2) => +s1.id - +s2.id)
 
       cms.socket.on('chatMessage', this.receiveChatMessage)
       cms.socket.on('reloadUnassignedDevices', this.getGsmsDevices)
 
       const updateDeviceStatus = async deviceId => {
-        const clientIds = this.sortedDeviceList.map(({_id}) => _id)
-        if (!clientIds.length || !clientIds.includes(deviceId)) return
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(clientIds)
+        const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
+        if (!deviceIds.length || !deviceIds.includes(deviceId)) return
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(deviceIds)
       }
 
       cms.socket.on('gsms-device-connected', updateDeviceStatus)
@@ -122,71 +151,91 @@
     },
     computed: {
       sortedDeviceList() {
-        switch (this.activeSorting) {
-          case 'lastSeen': {
-            return this.devices.sort((cur, next) => {
+        let devices = this.devices
+
+        devices = devices.map(d => ({
+          ...d,
+          name: this.concatContactName(d),
+          unread: this.unreadCountMap[d._id],
+          online: this.deviceOnlineStatusMap[d._id],
+        }))
+
+        if (this.contactSearch) devices = devices.filter(d => {
+          if (d._id === this.selectedDeviceId) return true
+          return d.name.toLowerCase().includes(this.contactSearch.toLowerCase())
+        })
+
+        switch (this.activeSortType) {
+          case 'mostRecentInstall': {
+            devices = devices.sort((cur, next) => {
+              const curCreatedAt = cur.createdAt.getTime()
+              const nextCreatedAt = next.createdAt.getTime()
+
+              if (curCreatedAt === nextCreatedAt) return next.lastSeen - cur.lastSeen
+              else return nextCreatedAt - curCreatedAt
+            });
+            break;
+          }
+          case 'mostRecentChat': {
+            devices = devices.sort((cur, next) => {
               const curLatestMsgDate = cur.latestChatMessageDate.getTime()
               const nextLatestMsgDate = next.latestChatMessageDate.getTime()
 
               if (curLatestMsgDate === nextLatestMsgDate) return next.lastSeen - cur.lastSeen
               else return nextLatestMsgDate - curLatestMsgDate
-            })
-          }
-          default: {
-            return this.devices
+            });
+            break;
           }
         }
+
+        return devices
       },
       sortedChats() {
         return uniqBy(this.currentChats, '_id').sort((e1, e2) => {
           return e1.createdAt - e2.createdAt
         });
       },
-      currentDevice() {
-        return this.sortedDeviceList.find(({_id}) => _id === this.currentClientId)
+      selectedDevice() {
+        return this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
       },
-      currentUsername() {
-        return (this.currentDevice &&
-            this.currentDevice.metadata &&
-            this.currentDevice.metadata.customerName) || 'Unknown name'
+      selectedUsername() {
+        return (this.selectedDevice &&
+            this.selectedDevice.metadata &&
+            this.selectedDevice.metadata.customerName) || 'Unknown name'
       },
-      currentDeviceLocation() {
-        return (this.currentDevice &&
-            this.currentDevice.metadata &&
-            this.currentDevice.metadata.deviceLocation) || 'Unknown location'
+      selectedDeviceLocation() {
+        return (this.selectedDevice &&
+            this.selectedDevice.metadata &&
+            this.selectedDevice.metadata.deviceLocation) || 'Unknown location'
       }
     },
     watch: {
-      async currentClientId() {
-        const getChatApiUrl = `/support/chat/messages?clientId=${this.currentClientId}`
-        let {data: chats} = await axios.get(getChatApiUrl)
-        chats = chats.map(chat => {
-          return {
-            ...chat,
-            createdAt: new Date(chat.createdAt),
-          }
-        })
+      async selectedDeviceId() {
+        // Get chat messages of selected device
+        this.loadedChatIndex = this.chatsPerLoad
+        const chats = await this.getChatMessages(this.selectedDeviceId, this.chatsPerLoad)
         this.currentChats = chats
 
-        await this.setMessagesRead(this.currentClientId)
+        // Check if there are more chat messages to load
+        const messageCountObj = await this.getChatMessageCount([this.selectedDeviceId])
+        const messageCount = messageCountObj[this.selectedDeviceId]
+        this.moreChatsAvailable = chats.length <= messageCount
+        // Set unread notification number to 0
+        await this.setMessagesRead(this.selectedDeviceId)
+        // map userId to user's name, used for chat user info & notes feature
+        await this.mapNoteUserIdsToNames()
       },
       async devices() {
-        const clientIds = this.sortedDeviceList.map(({_id}) => _id)
-        if (!clientIds.length) return
+        const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
+        if (!deviceIds.length) return
 
-        const getUnreadMapApiUrl = `/support/chat/unread-messages-count?clientIds=${clientIds.join(',')}&fromServer=false`
-        const {data: unreadCountMap} = await axios.get(getUnreadMapApiUrl)
-        this.unreadCountMap = unreadCountMap
+        this.unreadCountMap = await this.getChatMessageCount(deviceIds, false, false)
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(deviceIds)
 
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(clientIds)
-
-        cms.socket.emit('watch-chat-message', clientIds)
+        cms.socket.emit('watch-chat-message', deviceIds)
       }
     },
     methods: {
-      filter() {
-
-      },
       async getGsmsDevices() {
         const {data: gsmsDevices} = await axios.get('/gsms-device/devices');
 
@@ -195,14 +244,54 @@
           ...device,
           lastSeen: new Date(device.lastSeen),
           latestChatMessageDate: new Date(device.latestChatMessageDate),
+          // backward compatibility, some devices don't have this property
+          createdAt: device.createdAt ? new Date(device.createdAt) : new Date(0),
+          ...device.notes ? {notes: device.notes.map(note => ({...note, createdAt: new Date(note.createdAt)}))} : {}
         }))
 
         return gsmsDevices;
       },
+      async getChatMessages(deviceId, n, offset) {
+        let getChatApiUrl = `/support/chat/messages`
+
+        let {data: chats} = await axios.get(getChatApiUrl, {
+          params: {
+            clientId: deviceId,
+            ...n ? {n} : {},
+            ...offset ? {offset} : {},
+          }
+        })
+        return chats.map(chat => {
+          return {
+            ...chat,
+            createdAt: new Date(chat.createdAt),
+          }
+        })
+      },
+      async getChatMessageCount(deviceIds, fromServer, read) {
+        let apiUrl = `/support/chat/messages-count`
+
+        const {data} = await axios.get(apiUrl, {
+          params: {
+            clientIds: deviceIds.join(','),
+            ...(!_.isNil(fromServer)) ? {fromServer} : {},
+            ...(!_.isNil(read)) ? {read} : {},
+          }
+        })
+        return data
+      },
       concatContactName(contact) {
-        return contact.name + (contact.metadata && contact.metadata.customerName
+        const contactStore = this.stores.find(({_id}) => _id === contact.storeId)
+
+        const customerNameString = contact.metadata && contact.metadata.customerName
             ? ` - ${contact.metadata.customerName}`
-            : '')
+            : ''
+
+        const storeNameString = contactStore
+            ? ` - ${contactStore.name}`
+            : ''
+
+        return contact.name + customerNameString + storeNameString
       },
       concatContactMetadata(contact) {
         let result = ''
@@ -221,7 +310,7 @@
         return result
       },
       setActiveChat(contact) {
-        this.currentClientId = contact._id
+        this.selectedDeviceId = contact._id
       },
       sendChatMsg(e) {
         e.preventDefault()
@@ -229,12 +318,13 @@
 
         const dummyId = uuidv1()
         const userId = cms.loginUser.user._id
+        const clientId = this.selectedDeviceId
 
         const chatPayload = {
-          clientId: this.currentClientId,
+          clientId,
           userId,
           createdAt: new Date(),
-          text: this.currentChatMsg,
+          text: this.currentChatMsg.trim(),
         }
 
         console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
@@ -244,8 +334,12 @@
           console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
               `Online-order frontend received chat msg ack from backend`, JSON.stringify(savedMsg, null, 2))
 
-          this.currentChats = this.currentChats.filter(e => e._id !== dummyId)
-          this.currentChats.push(savedMsg)
+          // this.currentChats = this.currentChats.filter(e => e._id !== dummyId)
+          // this.currentChats.push(savedMsg)
+
+          const sentChat = this.currentChats.find(e => e._id === dummyId)
+          sentChat._id = savedMsg._id
+          sentChat.unsent = false
         });
 
         this.currentChatMsg = ''
@@ -253,10 +347,23 @@
           _id: dummyId,
           ...chatPayload,
           fromServer: true,
+          unsent: true,
         })
       },
+      async addNote(note) {
+        const apiUrl = '/support/notes'
+        const {data} = await axios.post(apiUrl, note)
+        this.selectedDevice.notes = this.selectedDevice.notes || []
+        this.selectedDevice.notes.unshift(data)
+
+        // Force device update to refresh notes
+        const device = this.selectedDevice
+        this.devices = this.devices.filter(({_id}) => _id !== device._id)
+        this.devices.push(device)
+        await this.mapNoteUserIdsToNames()
+      },
       async assignStore(storeId) {
-        const deviceId = this.currentClientId
+        const deviceId = this.selectedDeviceId
         const assingApiUrl = `/support/assign-device/${deviceId}`
         await axios.put(assingApiUrl, {storeId})
         await this.getGsmsDevices()
@@ -273,30 +380,61 @@
           device.latestChatMessageDate = new Date(createdAt)
         }
 
-        if (clientId === this.currentClientId) {
+        if (clientId === this.selectedDeviceId) {
           chatMessage.read = true
           this.currentChats.push(chatMessage)
-          this.setMessagesRead(this.currentClientId)
+          this.setMessagesRead(this.selectedDeviceId)
         } else if (!isNil(this.unreadCountMap[clientId])) {
           this.unreadCountMap[clientId]++
         }
       },
-      async setMessagesRead(clientId) {
-        const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${clientId}`
+      async setMessagesRead(deviceId) {
+        const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${deviceId}`
         await axios.put(setMessageReadApiUrl)
-        this.unreadCountMap[clientId] = 0
+        this.unreadCountMap[deviceId] = 0
       },
-      async getDeviceOnlineStatusMap(clientIds) {
-        const apiUrl = `/gsms-device/device-online-status?clientIds=${clientIds.join(',')}`
+      async getDeviceOnlineStatusMap(deviceIds) {
+        const apiUrl = `/gsms-device/device-online-status?clientIds=${deviceIds.join(',')}`
         const {data: onlineStatusMap} = await axios.get(apiUrl)
         return onlineStatusMap
       },
       async updateUsername(username) {
         const apiUrl = `/gsms-device/device-metadata`
-        const payload = {clientId: this.currentClientId, metadata: {customerName: username}}
+        const payload = {clientId: this.selectedDeviceId, metadata: {customerName: username}}
         await axios.put(apiUrl, payload)
         await this.getGsmsDevices()
-      }
+      },
+      async deleteDevice(deviceId) {
+        const apiUrl = `/gsms-device/devices/${deviceId}`
+        await axios.delete(apiUrl)
+        await this.getGsmsDevices()
+        this.selectedDeviceId = null
+      },
+      async mapNoteUserIdsToNames() {
+        if (!this.selectedDevice.notes) return
+        const noteUserIds = this.selectedDevice.notes.map(({userId}) => userId)
+        const chatUserIds = this.currentChats.map(({userId}) => userId)
+
+        if (noteUserIds) {
+          const userIds = _.uniq(noteUserIds.concat(chatUserIds)).filter(id => !this.usernameMap[id])
+
+          if (userIds.length) {
+            const apiUrl = `/users/username-mapping?userIds=${userIds.join(',')}`
+            const {data} = await axios.get(apiUrl)
+            Object.assign(this.usernameMap, data);
+          }
+        }
+      },
+      async loadMoreChat() {
+        if (!this.moreChatsAvailable || this.loadingMoreChats) return
+        this.loadingMoreChats = true
+
+        const chats = await this.getChatMessages(this.selectedDeviceId, this.chatsPerLoad, this.loadedChatIndex)
+        this.loadedChatIndex += this.chatsPerLoad
+        if (chats.length < this.chatsPerLoad) this.moreChatsAvailable = false
+        this.currentChats = [...chats, ...this.currentChats]
+        this.loadingMoreChats = false
+      },
     }
   }
 </script>
@@ -306,41 +444,40 @@
     height: 100%;
     overflow: hidden;
 
-    &__title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
     &__container {
-      background: white;
       width: 100%;
       height: calc(100% - 50px);
 
       &-contact-list {
-        border-right: 1px solid #EFEFEF;
         overflow: auto;
+        margin-right: 12px;
+        position: relative;
 
         &__header {
-          height: 84px;
-          border-bottom: 1px solid #EFEFEF;
+          height: 60px;
 
-          .g-select ::v-deep {
-            .g-tf {
-              margin: unset;
+          .bs-tf-wrapper ::v-deep {
+            height: 100%;
+            margin: 0;
+            padding: 8px 0;
+            width: 100%;
 
-              &:before {
-                display: none;
-              }
+            .bs-tf-inner-input-group {
+              height: 100%;
+              background: white;
+              border: 1px solid #EEEEEE;
+              border-radius: 2px;
             }
           }
         }
 
         &__list {
-
-
           &--item {
             height: 96px;
-            border-bottom: 1px solid #EFEFEF;
+            border: 1px solid #EEEEEE;
+            border-radius: 2px;
+            margin-bottom: 4px;
+            background: white;
 
             &_left {
 
@@ -357,18 +494,23 @@
             }
 
             &_active {
-              background: #90cafa;
+              background: #536DFE;
+              color: #F5F5F5;
             }
           }
         }
       }
 
       &-chat-window {
+        background: white;
+        border: 1px solid #EEEEEE;
+        border-radius: 2px;
+
         &__header {
           flex-basis: 84px;
           height: 84px;
           border-bottom: 1px solid #EFEFEF;
-          background: #EFEFEF;
+          background: #F5F5F5;
         }
 
         &__content {

@@ -9,14 +9,14 @@
       <div class="row-flex align-items-center">
         <div :class="['po-menu-item__name', collapseText && 'collapse']">
           <span v-if="displayId">{{ id && `${id}.` }}</span>
-          {{ name }}
+          <span>{{ name }}</span>
           <template v-if="!collapseText">
             <template v-for="(value, type) in mark">
-              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
+              <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" nudge-left="10" max-width="375" style="display: inline-block" content-class="menu-status-notification">
                 <template v-slot:activator="{on}">
-                  <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: inline-block">
-                    <g-icon v-show="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
-                    <g-icon v-show="!menu[type]" size="20">{{`icon-${type}`}}</g-icon>
+                  <div v-on="on" class="ml-1" style="line-height: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                    <g-icon v-show="menu[type]" size="18">{{`icon-${type}_full`}}</g-icon>
+                    <g-icon v-show="!menu[type]" size="18">{{`icon-${type}`}}</g-icon>
                   </div>
                 </template>
                 <div class="pa-2 bg-white br-2">
@@ -34,11 +34,11 @@
         </div>
         <template v-if="collapseText">
           <template v-for="(value, type) in mark">
-            <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
+            <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" style="display: inline-block" content-class="menu-status-notification">
               <template v-slot:activator="{on}">
-                <div v-on="on" class="ml-2" style="line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent">
-                  <g-icon v-if="menu[type]" size="20">{{`icon-${type}_full`}}</g-icon>
-                  <g-icon v-else size="20">{{`icon-${type}`}}</g-icon>
+                <div v-on="on" class="ml-1" style="line-height: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent">
+                  <g-icon v-if="menu[type]" size="18">{{`icon-${type}_full`}}</g-icon>
+                  <g-icon v-else size="18">{{`icon-${type}`}}</g-icon>
                 </div>
               </template>
               <div class="pa-2 bg-white br-2">
@@ -96,8 +96,8 @@
       imageThumbnailSize: {
         type: Object,
         default: () => ({
-          width: 60,
-          height: 60,
+          width: 100,
+          height: 100,
         }),
       },
       disabled: Boolean,
@@ -198,6 +198,7 @@
       font-size: 15px;
       max-width: 100%;
       user-select: auto;
+      line-height: 20px;
 
       &.collapse {
         white-space: nowrap;

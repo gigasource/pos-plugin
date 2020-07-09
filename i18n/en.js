@@ -494,6 +494,10 @@ module.exports = {
       displayMenuNumber: 'Display menu number on online ordering website.',
       displayItemImage: 'Display item image',
       displayMenuImage: 'Display menu image on online ordering website.',
+      seatLimit: 'Seat limit',
+      noteForCustomer: 'Note for customers',
+      hideEmpty: 'Hide empty time slots',
+      sendConfirmEmail: 'Send confirmation email',
     },
   }
 }

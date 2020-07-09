@@ -683,6 +683,41 @@
   background-position: center;
 }
 
+.icon-mobile-phone {
+  background-image: url("../assets/mobile-phone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-last-seen {
+  background-image: url("../assets/last-seen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-location {
+  background-image: url("../assets/location.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-select-store {
+  background-image: url("../assets/select-store.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-chat-support-note {
+  background-image: url("../assets/chat-support-note.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-chat_white {
   background-image: url("../assets/chat_white.svg");
   background-repeat: no-repeat;
@@ -692,6 +727,41 @@
 
 .icon-contact {
   background-image: url("../assets/contact.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-device {
+  background-image: url("../assets/device.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-pen {
+  background-image: url("../assets/pen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-zoom {
+  background-image: url("../assets/zoom.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-chat-support-note-user {
+  background-image: url("../assets/chat-support-note-user.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-chat-support-note-send {
+  background-image: url("../assets/chat-support-note-send.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

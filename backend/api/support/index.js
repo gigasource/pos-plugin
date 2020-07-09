@@ -7,6 +7,7 @@ const StoreModel = cms.getModel('Store');
 const {getExternalSocketIoServer} = require('../../socket-io-server');
 const {socket: internalSocketIOServer} = cms;
 const {getNewDeviceCode} = require('../demoDevice');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -84,11 +85,11 @@ setTimeout(() => {
 
 router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;
-  if (!clientId) return res.status(400).json({error: `clientId query can not be ${clientId}`});
+  if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
   let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
-  if (offset) query = query.skip(offset);
-  if (n) query = query.limit(n);
+  if (offset) query = query.skip(+offset);
+  if (n) query = query.limit(+n);
 
   query.exec((error, docs) => {
     if (error) return res.status(500).json({error});
@@ -97,15 +98,21 @@ router.get('/chat/messages', async (req, res) => {
   });
 });
 
-router.get('/chat/unread-messages-count', async (req, res) => {
-  let {clientIds, fromServer} = req.query;
-  if (!clientIds) return res.status(400).json({error: `clientIds query can not be ${clientIds}`});
+router.get('/chat/messages-count', async (req, res) => {
+  let {clientIds, fromServer, read} = req.query;
+  if (!clientIds) return res.status(400).json({error: `'clientIds' query can not be '${clientIds}'`});
+  if (read && read !== 'true' && read !== 'false') return res.status(400).json({error: `'read' query can only be 'true' or 'false'`});
+  if (fromServer && fromServer !== 'true' && fromServer !== 'false') return res.status(400).json({error: `'fromServer' query can only be 'true' or 'false'`});
 
   clientIds = clientIds.split(',');
 
   const result = {};
   await Promise.all(clientIds.map(async clientId => {
-    result[clientId] = await ChatMessageModel.countDocuments({clientId, read: false, fromServer});
+    result[clientId] = await ChatMessageModel.countDocuments({
+      clientId,
+      ...read ? {read: read === 'true'} : {},
+      ...fromServer ? {fromServer: fromServer === 'true'} : {},
+    });
   }));
 
   res.status(200).json(result);
@@ -113,19 +120,38 @@ router.get('/chat/unread-messages-count', async (req, res) => {
 
 router.put('/chat/set-message-read', async (req, res) => {
   const {clientId} = req.query;
-  if (!clientId) return res.status(400).json({error: `clientId query can not be ${clientId}`});
+  if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  const a = await ChatMessageModel.updateMany({clientId}, {read: true});
+  await ChatMessageModel.updateMany({clientId}, {read: true});
   res.status(204).send();
+});
+
+router.post('/notes', async (req, res) => {
+  let {clientId, text, userId} = req.body;
+
+  if (!clientId || !text || !userId) return res.status(400).json({error: '3 properties are required in body request: clientId, text, userId'})
+
+  userId = new ObjectId(userId);
+  const createdAt = new Date();
+  const dataToInsert = {_id: ObjectId(), text, userId, createdAt};
+
+  const device = await DeviceModel.findById(clientId);
+  if (!device) return res.status(400).json({error: `No devices found with ID ${clientId}`});
+
+  device.notes = device.notes || [];
+  device.notes.push(dataToInsert);
+
+  await DeviceModel.updateOne({_id: device._id}, device);
+  res.status(201).json(dataToInsert);
 });
 
 router.put('/assign-device/:id', async (req, res) => {
   const {id} = req.params;
-  const {storeId} = req.body;
+  const {storeId, customStoreId} = req.body;
   if (!id) return res.status(400).json({error: `Id can not be ${id}`});
-  if (!storeId) return res.status(400).json({error: `storeId can not be ${storeId}`});
+  if (!storeId && !customStoreId) return res.status(400).json({error: `You must provice either storeId or customStoreId`});
 
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
 
   const device = await DeviceModel.findById(id);
   if (!device) return res.status(400).json({error: `Device with ID ${id} not found`});
@@ -138,10 +164,12 @@ router.put('/assign-device/:id', async (req, res) => {
     }
   }
 
-  const store = await StoreModel.findById(storeId);
-  if (!store) return res.status(400).json({error: `Store with ID ${storeId} not found`});
+  const store = storeId
+      ? await StoreModel.findById(storeId)
+      : await StoreModel.findOne({id: customStoreId});
+  if (!store) return res.status(400).json({error: `Store with ID ${storeId || customStoreId} not found`});
 
-  device.storeId = storeId;
+  device.storeId = store._id;
   device.metadata = device.metadata || {};
   await DeviceModel.updateOne({_id: id}, device);
 
@@ -158,7 +186,7 @@ router.put('/assign-device/:id', async (req, res) => {
         total: 0,
         orders: 0,
       }));
-  await StoreModel.updateOne({_id: storeId}, store);
+  await StoreModel.updateOne({_id: store._id}, store);
 
   getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then(() => {
   });
@@ -167,7 +195,7 @@ router.put('/assign-device/:id', async (req, res) => {
       [store.id, store.name || store.settingName, store.alias]).then(() => {
   });
 
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Successfully assigned GSMS device to store with id ${storeId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${store._id}`, `Successfully assigned GSMS device to store with id ${store._id}`);
   res.status(204).send();
 });
 

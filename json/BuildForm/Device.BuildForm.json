@@ -182,6 +182,37 @@
       "_id": "5efc5ba35cd8091e1acbdb74",
       "schemaType": "string",
       "key": "deviceType"
+    },
+    {
+      "_id": "5f003d448329ef735ee61a46",
+      "schemaType": "date",
+      "key": "createdAt"
+    },
+    {
+      "_id": "5f004a148329ef735ee61a88",
+      "schemaType": "boolean",
+      "key": "deleted",
+      "default": "false"
+    },
+    {
+      "_id": "5f02a63cf100897cbebd2035",
+      "schemaType": "array",
+      "key": "notes",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "text"
+        },
+        {
+          "schemaType": "objectId",
+          "key": "userId",
+          "ref": "User"
+        },
+        {
+          "schemaType": "date",
+          "key": "createdAt"
+        }
+      ]
     }
   ],
   "name": "Device",
