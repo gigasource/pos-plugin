@@ -103,5 +103,17 @@ router.get('/google-my-business-id', async (req, res) => {
     res.status(200).json({ googleMyBusinessId: store.googleMyBusinessId })
 })
 
+router.get('/revenue-monthly-report', async (req, res) => {
+  const storeId = req.query.storeId
+  const store = await storeModel.findOne({ _id: storeId })
+  if (!store)
+    res.status(400).end()
+  else
+    res.status(200).json({
+      prevMonthReport: store.prevMonthReport,
+      currentMonthReport: store.currentMonthReport
+    })
+})
+
 module.exports = router
 module.exports.getNewDeviceCode = getNewDeviceCode
