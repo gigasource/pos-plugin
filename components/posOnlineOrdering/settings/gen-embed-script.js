@@ -5,7 +5,6 @@ export function getEmbedWebshop() {
   var styleEl = document.createElement('style')
   document.head.appendChild(styleEl)
   var stylesheet = styleEl.sheet
-  stylesheet.insertRule('.webshop-embed-btn { font-family: Muli, sans-serif; font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer;padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; z-index: 1000;-webkit-tap-highlight-color: transparent}')
   stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
 
   var url = el.getAttribute('data-url')
@@ -138,7 +137,6 @@ export function getEmbedReservation() {
     var styleEl = document.createElement('style')
     document.head.appendChild(styleEl)
     var stylesheet = styleEl.sheet
-    stylesheet.insertRule('.reservation-embed-btn { font-family: Muli, sans-serif; font-size: 14px; display: inline-flex;align-items: center;justify-content: center;text-align: center;user-select: none;cursor: pointer; padding: 5px 10px;margin: 0 8px;line-height: 24px;border-radius: 4px;border: 1px solid transparent; position: fixed; z-index: 1000;-webkit-tap-highlight-color: transparent}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
     stylesheet.insertRule('@media screen and (min-width: 410px) { #reservation-iframe { width: 410px !important; margin-left: calc(50% - 205px); } }')
     stylesheet.insertRule('@media screen and (max-width: 410px) { #iframe-close-btn { transform: scale(1.2) !important; right: 10px !important } }')
@@ -253,14 +251,27 @@ export function getEmbedReservation() {
   }`
 }
 
+export function getEmbedBtn(type) {
+  return `function getEmbedBtn() {
+      var el = document.getElementById('giga-embed-btn')
+      var trigger = document.getElementById('${type.toLowerCase()}-embed-btn')
+      el.onclick = function(e) {
+        e.preventDefault()
+        trigger.click()
+      }
+  }`
+}
+
 export function genReadyState(type) {
   if(!type)
     return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
               getEmbedWebshop()
               getEmbedReservation()
+              getEmbedBtn()
             } else {
               window.addEventListener('load', getEmbedWebshop)
               window.addEventListener('load', getEmbedReservation)
+              window.addEventListener('load', getEmbedBtn)
             }`
   return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
     getEmbed${type}()
@@ -278,9 +289,8 @@ export function genScriptFooter() {
 }
 
 
-export function genStyleSheet(type, position, size, hidden) {
-  const className = type.toLowerCase() + '-embed-btn'
-  let style = `.${className} { `
+export function genStyleSheet(position, size, hidden) {
+  let style = `.giga-embed-btn { position: fixed; z-index: 1000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
 
   const directions = position.split('-')
   style += directions[1] + ': 8px;'
