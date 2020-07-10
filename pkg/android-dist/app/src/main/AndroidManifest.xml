@@ -51,8 +51,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <service
@@ -63,6 +61,15 @@
             android:name="io.gigasource.TinkerPatchResultReceiver"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false"/>
+        <receiver android:name="io.gigasource.StartActivityOnBootReceiver"
+            android:label="StartActivityOnBootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
