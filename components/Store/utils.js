@@ -1,6 +1,6 @@
 export function getCdnUrl(url) {
-  if (cms.sharedConfig && cms.sharedConfig.getCdnUrl) return cms.sharedConfig.getCdnUrl(url)
-
+  if (cms.sharedConfig && cms.sharedConfig.getCdnUrl && cms.sharedConfig.CDN_DOMAIN_NAME)
+    return cms.sharedConfig.getCdnUrl(url, cms.sharedConfig.CDN_DOMAIN_NAME)
   return url
 }
 
