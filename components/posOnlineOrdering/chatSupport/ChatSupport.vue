@@ -210,18 +210,21 @@
       }
     },
     watch: {
-      async selectedDeviceId() {
+      async selectedDeviceId(val) {
+        this.currentChats = []
+        if (!val) return
+
         // Get chat messages of selected device
         this.loadedChatIndex = this.chatsPerLoad
-        const chats = await this.getChatMessages(this.selectedDeviceId, this.chatsPerLoad)
+        const chats = await this.getChatMessages(val, this.chatsPerLoad)
         this.currentChats = chats
 
         // Check if there are more chat messages to load
-        const messageCountObj = await this.getChatMessageCount([this.selectedDeviceId])
-        const messageCount = messageCountObj[this.selectedDeviceId]
+        const messageCountObj = await this.getChatMessageCount([val])
+        const messageCount = messageCountObj[val]
         this.moreChatsAvailable = chats.length <= messageCount
         // Set unread notification number to 0
-        await this.setMessagesRead(this.selectedDeviceId)
+        await this.setMessagesRead(val)
         // map userId to user's name, used for chat user info & notes feature
         await this.mapNoteUserIdsToNames()
       },
@@ -252,6 +255,7 @@
         return gsmsDevices;
       },
       async getChatMessages(deviceId, n, offset) {
+        this.loadingMoreChats = true
         let getChatApiUrl = `/support/chat/messages`
 
         let {data: chats} = await axios.get(getChatApiUrl, {
@@ -261,6 +265,8 @@
             ...offset ? {offset} : {},
           }
         })
+
+        this.loadingMoreChats = false
         return chats.map(chat => {
           return {
             ...chat,
@@ -405,10 +411,10 @@
         await this.getGsmsDevices()
       },
       async deleteDevice(deviceId) {
+        this.selectedDeviceId = null
         const apiUrl = `/gsms-device/devices/${deviceId}`
         await axios.delete(apiUrl)
         await this.getGsmsDevices()
-        this.selectedDeviceId = null
       },
       async mapNoteUserIdsToNames() {
         if (!this.selectedDevice.notes) return
@@ -426,14 +432,12 @@
         }
       },
       async loadMoreChat() {
-        if (!this.moreChatsAvailable || this.loadingMoreChats) return
-        this.loadingMoreChats = true
+        if (!this.moreChatsAvailable || this.loadingMoreChats || !this.selectedDeviceId) return
 
         const chats = await this.getChatMessages(this.selectedDeviceId, this.chatsPerLoad, this.loadedChatIndex)
         this.loadedChatIndex += this.chatsPerLoad
         if (chats.length < this.chatsPerLoad) this.moreChatsAvailable = false
         this.currentChats = [...chats, ...this.currentChats]
-        this.loadingMoreChats = false
       },
     }
   }

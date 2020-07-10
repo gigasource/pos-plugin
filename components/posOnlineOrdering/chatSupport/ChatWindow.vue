@@ -2,7 +2,7 @@
   <div class="chat-window col-flex"
        @scroll="onChatWindowScroll"
        ref="chatWindow">
-    <template v-if="processedChats && processedChats.length > 0">
+    <template v-if="deviceId && processedChats && processedChats.length > 0">
       <div class="mb-5 ta-center">
         <g-progress-circular v-if="loadingMoreChats && moreChatsAvailable" indeterminate color="#536DFE"/>
         <span v-else-if="!moreChatsAvailable">No more chat messages available</span>
@@ -51,7 +51,8 @@
     </template>
     <template v-else>
       <div class="row-flex justify-center align-items-center fill-height">
-        <span>{{device ? 'Empty chat history' : 'Select a conversation'}}</span>
+        <span v-if="loadingMoreChats">Loading chat messages</span>
+        <span v-else>{{device ? 'Empty chat history' : 'Select a conversation'}}</span>
       </div>
     </template>
   </div>
@@ -93,7 +94,7 @@
           if (chat.fromServer) {
             username = this.usernameMap[chat.userId]
           } else {
-            username = this.device.metadata
+            username = this.device && this.device.metadata
                 ? (this.device.metadata.customerName ? this.device.metadata.customerName : '')
                 : ''
           }

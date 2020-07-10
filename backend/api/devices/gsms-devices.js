@@ -84,7 +84,7 @@ router.get('/device-online-status', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  let {hardware, appName, metadata} = req.body;
+  let {hardwareId, hardware, appName, metadata} = req.body;
 
   if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
   if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
@@ -102,10 +102,28 @@ router.post('/register', async (req, res) => {
   }
 
   const now = new Date();
-  const newDevice = await DeviceModel.create({
-    name: hardware || 'New Device', paired: true, lastSeen: now, createdAt: now,
-    hardware, appName, metadata, deviceType: 'gsms', notes: [],
-  });
+  let newDevice;
+  if (hardwareId) {
+    newDevice = await DeviceModel.findOne({hardwareId});
+
+    if (newDevice) {
+      newDevice.name = hardware;
+      newDevice.hardware = hardware;
+      newDevice.paired = true;
+      newDevice.lastSeen = now;
+      newDevice.appName = appName;
+      Object.assign(newDevice.metadata, metadata);
+
+      await DeviceModel.updateOne({hardwareId}, newDevice);
+    }
+  }
+
+  if (!newDevice) {
+    newDevice = await DeviceModel.create({
+      name: hardware || 'New Device', paired: true, lastSeen: now, createdAt: now,
+      hardware, appName, metadata, deviceType: 'gsms', notes: [], hardwareId,
+    });
+  }
 
   console.debug(`sentry:eventType=gsmsDeviceRegister,clientId=${newDevice._id}`,
       'New GSMS device registered');

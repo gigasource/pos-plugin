@@ -56,6 +56,9 @@
         <div class="col-6">
           <g-switch v-model="features.alwaysOn" label="Always-on"/>
         </div>
+        <div class="col-6">
+            <g-switch v-model="features.startOnBoot" label="Start on boot"/>
+          </div>
       </div>
       <div class="dlg-feature-control__actions">
         <g-btn-bs @click="close">Cancel</g-btn-bs>
@@ -106,33 +109,33 @@
     border-radius: 4px;
     width: 580px;
     margin: 0 auto;
-    
+
     &__title {
       font-weight: 600;
       font-size: 24px;
       color: #212121;
       margin-bottom: 20px;
     }
-    
+
     &__header {
       display: flex;
       margin-bottom: 10px;
-      
+
       &__group {
         font-weight: bold;
         font-size: 16px;
       }
-      
+
       &__device-info {
         font-size: 14px;
         color: #201F2B;
       }
     }
-    
+
     &__body {
       flex-wrap: wrap;
       margin-bottom: 40px;
-      
+
       &__line {
         background: #EFEFEF;
         height: 1px;
@@ -140,7 +143,7 @@
         margin: 15px 0;
       }
     }
-    
+
     &__actions {
       display: flex;
       justify-content: flex-end;
