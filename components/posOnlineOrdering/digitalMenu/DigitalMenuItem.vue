@@ -7,19 +7,22 @@
     </template>
     <div class="digital-menu-item__content">
       <div class="digital-menu-item__name">{{name}}</div>
-      <div v-if="desc" :class="['r', expandDesc ? 'pb-3' : 'pb-2']">
+      <div v-if="desc" :class="['r', expandDesc ? 'pb-3' : 'pb-1']">
         <pre :id="`desc_${_id}`" :class="['digital-menu-item__desc', !showmore && 'digital-menu-item__desc--collapse']" v-html="desc"></pre>
         <span v-if="expandDesc" class="digital-menu-item__show" @click="toggleShowmore">Show {{ showmore ? 'less' : 'more'}}</span>
       </div>
       <div class="digital-menu-item__choice" v-for="(choice, i) in choices" :key="i">
-        <div class="digital-menu-item__choice--name">{{choice.name}}</div>
+        <div class="digital-menu-item__choice--name">
+          {{choice.name}}
+          <span v-if="choice.mandatory" class="text-red">*</span>
+        </div>
         <div class="digital-menu-item__choice--option" v-for="(option, index) in choice.options" :key="`option_${index}`">
-          <div>{{option.name}}</div>
+          <div class="pr-3">{{option.name}}</div>
           <div class="fw-700">{{option.price | currency(storeCountryLocale)}}</div>
         </div>
       </div>
       <div class="row-flex align-items-center mt-3">
-        <div class="digital-menu-item__price">{{price | currency(storeCountryLocale)}}</div>
+        <div class="digital-menu-item__price">{{ itemPrice }}</div>
         <g-spacer/>
         <template v-for="(value, type) in mark">
           <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
@@ -78,7 +81,9 @@
     },
     filters: {
       currency(val, locale) {
-        return $t('common.currency', locale) + val.toFixed(2)
+        if(val)
+          return $t('common.currency', locale) + val.toFixed(2)
+        return $t('common.currency', locale) + 0
       }
     },
     data() {
@@ -147,7 +152,7 @@
 <style scoped lang="scss">
   .digital-menu-item {
     background: #FFFFFF;
-    box-shadow: -1px 3px 9px rgba(0, 0, 0, 0.14);
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.14);
     border-radius: 15px;
     padding: 12px;
     display: flex;
@@ -209,7 +214,6 @@
 
       &--option {
         display: flex;
-        align-items: center;
         justify-content: space-between;
         color: #424242;
         margin-bottom: 4px;

@@ -14,7 +14,6 @@
         <div v-for="(category, i) in listItem" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
           <div class="digital-menu__title">
             {{ category && category.name }}
-            ({{category && category.items.length}})
           </div>
           <digital-menu-item
                 v-for="(item, index) in category.items" :key="index"
@@ -154,6 +153,7 @@
         display: flex;
         flex-wrap: nowrap;
         z-index: 10;
+        max-width: 100%;
         scrollbar-width: none; // firefox
         -ms-overflow-style: none; //edge
 
