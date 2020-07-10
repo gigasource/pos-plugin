@@ -96,7 +96,7 @@ router.post('/unregister', async (req, res) => {
 
 router.get('/google-my-business-id', async (req, res) => {
   const storeId = req.query.storeId
-  const store = await storeModel.findOne({ _id: storeId })
+  const store = await storeModel.findOne({ id: storeId })
   if (!store)
     res.status(400).end();
   else
@@ -105,7 +105,7 @@ router.get('/google-my-business-id', async (req, res) => {
 
 router.get('/revenue-monthly-report', async (req, res) => {
   const storeId = req.query.storeId
-  const store = await storeModel.findOne({ _id: storeId })
+  const store = await storeModel.findOne({ id: storeId })
   if (!store)
     res.status(400).end()
   else
