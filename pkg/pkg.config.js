@@ -6,27 +6,10 @@ const fs = require('fs');
 
 const gitHash = {};
 
-if (fs.existsSync('../.git')) {
-  gitHash['pos-plugin'] = fs.readFileSync('../.git/ORIG_HEAD', {encoding: 'utf8'});
-}
-if (fs.existsSync(`${pathToBoilerplate}/.git`)) {
-  gitHash['cms-boilerplate'] = fs.readFileSync(`${pathToBoilerplate}/.git/ORIG_HEAD`, {encoding: 'utf8'});
-}
-if (fs.existsSync(`${pathToBoilerplate}/.git/modules/cms`)) {
-  gitHash['cms'] = fs.readFileSync(`${pathToBoilerplate}/.git/modules/cms/ORIG_HEAD`, {encoding: 'utf8'});
-}
-if (fs.existsSync(`${pathToBoilerplate}/.git/modules/backoffice`)) {
-  gitHash['backoffice'] = fs.readFileSync(`${pathToBoilerplate}/.git/modules/backoffice/ORIG_HEAD`, {encoding: 'utf8'});
-}
-
-fs.writeFileSync('./android/hash.json', JSON.stringify(gitHash));
-
 const pkgConfig = {
   assets: [`${pathToBoilerplate}dist/**/*`, `${pathToBoilerplate}config/config.js`, `${pathToBoilerplate}package.json`, `${pathToBoilerplate}cms/package.json`, `${pathToBoilerplate}plugins/*/dist/**/*`],
   scripts: []
 };
-
-pkgConfig.assets.push['./android/hash.json'];
 
 for (let pluginId in config.plugins) {
   const pluginPath = `${pluginsPath}/${config.plugins[pluginId].name}`

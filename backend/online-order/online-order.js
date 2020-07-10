@@ -76,6 +76,14 @@ module.exports = async cms => {
     }
   }
 
+  async function updateStartOnBoot(enabled) {
+    try {
+      await axios.post(`http://localhost:5000/update-startonboot-status`, {enabled})
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   function startSocketRecreateInterval() {
     if (!recreateOnlineOrderSocketInterval) {
       console.debug(getBaseSentryTags('socketConnection'), 'start recreateOnlineOrderSocketInterval');
@@ -376,6 +384,9 @@ module.exports = async cms => {
             await updateAlwaysOn(enabled)
           }
         }
+        if (name === 'startOnBoot') {
+          await updateStartOnBoot(enabled)
+        }
         return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
       }))
 
@@ -543,6 +554,8 @@ module.exports = async cms => {
 
   const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
   if (alwaysOnFeature) await updateAlwaysOn(alwaysOnFeature.enabled);
+  const startOnBootFeature = await cms.getModel('Feature').findOne({name: 'startOnBoot'});
+  if (startOnBootFeature) await updateStartonBoot(startOnBootFeature.enabled);
   initReservationSchedules()
 
   const waitInitOnlineOrderSocket = function () {
