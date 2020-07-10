@@ -284,7 +284,7 @@
         await this.updateButton()
         const url = [location.origin, this.type === 'Reservation' ? 'reservation' : 'store', this.store.alias].join('/'),
               script = location.origin + this.script,
-              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `${this.type.toLowerCase()}-icon`].join('/'),
+              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `embed-icon`].join('/'),
               otherType = this.type === 'Reservation' ? 'webshop' : 'reservation',
               otherUrl = [location.origin, this.type === 'Reservation' ? 'store' : 'reservation', this.store.alias].join('/')
         this.iframe = `<div id="giga-embed-btn" class="giga-embed-btn">
