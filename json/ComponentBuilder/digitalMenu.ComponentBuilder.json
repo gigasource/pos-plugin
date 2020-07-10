@@ -1,0 +1,21 @@
+{
+  "events": [],
+  "_id": "5f07ed59693df09bf5f738f1",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "DigitalMenu",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/posOnlineOrdering/digitalMenu/DigitalMenu.vue",
+      "path": "components/posOnlineOrdering/digitalMenu/DigitalMenu.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "digitalMenu",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "menu/:storeIdOrAlias"
+}
