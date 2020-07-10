@@ -163,6 +163,17 @@
           "schemaType": "boolean",
           "key": "reservation",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "backupDatabase",
+          "default": "false",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "startOnBoot",
+          "type": "input@switch"
         }
       ]
     },
