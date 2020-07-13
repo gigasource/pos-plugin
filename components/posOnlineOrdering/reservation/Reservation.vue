@@ -90,7 +90,7 @@
           <div class="reservation-content__title">Information</div>
           <g-text-field-bs :rules="rules.first" v-model="customer.firstName" @input="rules.first = []" placeholder="First Name*" required/>
           <g-text-field-bs :rules="rules.last" v-model="customer.lastName" @input="rules.last = []" placeholder="Last Name*" required/>
-          <g-text-field-bs v-model="customer.email" placeholder="Email"/>
+          <g-text-field-bs :rules="rules.email" v-model="customer.email" :placeholder="`Email${validateEmail && '*'}`" :required="validateEmail"/>
           <g-text-field-bs :class="rules.phone && 'phone-error'" :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" @input="rules.phone = false" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
@@ -175,7 +175,8 @@
         rules: {
           first: [],
           last: [],
-          phone: false
+          phone: false,
+          email: [],
         },
         dialog: {
           notice: false
@@ -184,7 +185,8 @@
         locale: String,
         image: null,
         seatLimit: [],
-        reservations: []
+        reservations: [],
+        validateEmail: false
       }
     },
     async created() {
@@ -208,6 +210,9 @@
             root.$i18n.locale = store.country.locale || 'en'
           }
           this.seatLimit = store.reservationSetting.seatLimit || []
+          if(store.reservationSetting.emailConfirmation) {
+            this.validateEmail = true
+          }
         }
         this.image = store.logoImageSrc
       }
@@ -218,9 +223,9 @@
     computed: {
       peopleLabel() {
         if (this.people > 1) {
-          return this.people + ' people'
+          return this.people + ' guests'
         } else if (this.people === 1) {
-          return '1 person'
+          return '1 guest'
         } else
           return 'Select person'
       },
@@ -397,6 +402,10 @@
         }
         if(!this.customer.phone || isNaN(this.customer.phone)) {
           this.rules.phone = true
+          err = true
+        }
+        if(this.validateEmail && !this.customer.email) {
+          this.rules.email.push(() => ' ')
           err = true
         }
         if(err) return

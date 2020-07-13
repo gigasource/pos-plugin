@@ -36,7 +36,7 @@
           <digital-menu-item
               v-for="(item, index) in category.items" :key="index"
               v-bind="item"
-              class="mt-2"
+              class="mt-3"
               @add="openDialogAdd(item)"
               :display-id="store.displayId"
               :scrolling="scrolling"
@@ -260,6 +260,12 @@
         display: flex;
         z-index: 10;
         width: 100%;
+        scrollbar-width: none; // firefox
+        -ms-overflow-style: none; //edge
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
       }
 
       &--content {
