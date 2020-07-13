@@ -128,10 +128,14 @@
           uploading: false,
         },
         libraryGroup: 'All',
-        image: null
+        image: null,
+        libraryImages: {}
       }
     },
-    injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems, libraryImages)'],
+    injectService: ['FileUploadStore:(openUploadFileDialog, uploadImage, showFileUploadProgressDialog, uploadingItems, getLibraryImages)'],
+    async created() {
+      this.libraryImages = await this.getLibraryImages('/images/library')
+    },
     computed: {
       fileName() {
         return this.file ? this.file.name : 'No file chosen'

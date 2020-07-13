@@ -24,14 +24,11 @@
       await this.createFolderIfNotExisted('/', 'images')
       await this.createFolderIfNotExisted('/', 'update')
       await this.createFolderIfNotExisted('/', 'store')
-
-      this.libraryImages = await this.getLibraryImages('/images/library')
     },
     data() {
       return {
         uploadingItems: [],
         showFileUploadProgressDialog: false,
-        libraryImages: {}
       }
     },
     methods: {
