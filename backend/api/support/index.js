@@ -136,11 +136,11 @@ router.get('/chat/messages', async (req, res) => {
 
 router.get('/chat/messages-count', async (req, res) => {
   let {clientIds, fromServer, read} = req.query;
-  if (!clientIds) return res.status(400).json({error: `'clientIds' query can not be '${clientIds}'`});
   if (read && read !== 'true' && read !== 'false') return res.status(400).json({error: `'read' query can only be 'true' or 'false'`});
   if (fromServer && fromServer !== 'true' && fromServer !== 'false') return res.status(400).json({error: `'fromServer' query can only be 'true' or 'false'`});
 
-  clientIds = clientIds.split(',');
+  if (clientIds) clientIds = clientIds.split(',');
+  else clientIds = (await DeviceModel.find({deviceType: 'gsms'})).map(({_id}) => _id);
 
   const result = {};
   await Promise.all(clientIds.map(async clientId => {

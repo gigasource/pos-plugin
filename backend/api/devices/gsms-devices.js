@@ -69,9 +69,9 @@ router.get('/device-assigned-store/:clientId', async (req, res) => {
 
 router.get('/device-online-status', async (req, res) => {
   let {clientIds} = req.query;
-  if (!clientIds) return res.status(400).json({error: `clientIds query can not be ${clientIds}`});
 
-  clientIds = clientIds.split(',');
+  if (clientIds) clientIds = clientIds.split(',');
+  else clientIds = (await DeviceModel.find({deviceType: 'gsms'})).map(({_id}) => _id);
 
   const clusterClientList = global.APP_CONFIG.redis
       ? await getExternalSocketIoServer().getClusterClientIds()

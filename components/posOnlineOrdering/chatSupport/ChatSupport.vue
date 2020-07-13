@@ -144,7 +144,7 @@
       const updateDeviceStatus = async deviceId => {
         const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
         if (!deviceIds.length || !deviceIds.includes(deviceId)) return
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(deviceIds)
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap()
       }
 
       cms.socket.on('gsms-device-connected', updateDeviceStatus)
@@ -221,7 +221,7 @@
         this.currentChats = chats
 
         // Check if there are more chat messages to load
-        const messageCountObj = await this.getChatMessageCount([val])
+        const messageCountObj = await this.getChatMessageCount()
         const messageCount = messageCountObj[val]
         this.moreChatsAvailable = chats.length <= messageCount
         // Set unread notification number to 0
@@ -233,8 +233,8 @@
         const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
         if (!deviceIds.length) return
 
-        this.unreadCountMap = await this.getChatMessageCount(deviceIds, false, false)
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap(deviceIds)
+        this.unreadCountMap = await this.getChatMessageCount(null, false, false)
+        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap()
 
         cms.socket.emit('watch-chat-message', deviceIds)
       }
@@ -280,7 +280,7 @@
 
         const {data} = await axios.get(apiUrl, {
           params: {
-            clientIds: deviceIds.join(','),
+            ...deviceIds ? {clientIds: deviceIds.join(',')} : {},
             ...(!_.isNil(fromServer)) ? {fromServer} : {},
             ...(!_.isNil(read)) ? {read} : {},
           }
@@ -403,8 +403,8 @@
         await axios.put(setMessageReadApiUrl)
         this.unreadCountMap[deviceId] = 0
       },
-      async getDeviceOnlineStatusMap(deviceIds) {
-        const apiUrl = `/gsms-device/device-online-status?clientIds=${deviceIds.join(',')}`
+      async getDeviceOnlineStatusMap() {
+        const apiUrl = `/gsms-device/device-online-status`
         const {data: onlineStatusMap} = await axios.get(apiUrl)
         return onlineStatusMap
       },
