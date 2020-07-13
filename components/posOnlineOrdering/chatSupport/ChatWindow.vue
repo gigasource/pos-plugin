@@ -118,7 +118,7 @@
 
           if (!oldLatestChatMsg || !newLatestChatMsg) return
 
-          if (oldLatestChatMsg._id === newLatestChatMsg._id) {
+          if (oldLatestChatMsg._id === newLatestChatMsg._id && oldVal.length !== val.length) {
             this.scrollToPrevLastChat()
           } else {
             if (newLatestChatMsg.fromServer) {
