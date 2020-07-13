@@ -43,8 +43,10 @@ router.delete('/devices/:clientId', async (req, res) => {
   if (device.storeId) {
     const deviceStore = await StoreModel.findById(device.storeId);
     if (deviceStore.gSms && deviceStore.gSms.devices) {
-      deviceStore.gSms.devices = deviceStore.gSms.devices.filter(e => e._id.toString() !== clientId);
-      await StoreModel.updateOne({_id: deviceStore._id}, deviceStore);
+      await StoreModel.findOneAndUpdate(
+        { _id: deviceStore._id },
+        { $pull: { 'gSms.devices': { _id: id } } }
+      )
     }
   }
 
