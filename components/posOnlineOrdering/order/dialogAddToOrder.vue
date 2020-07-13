@@ -51,7 +51,7 @@
             </template>
           </div>
         </div>
-        <div class="dialog-content__note">
+        <div v-if="!noNote" class="dialog-content__note">
           <p>Add note</p>
           <g-text-field-bs prepend-inner-icon="icon-note@16" :placeholder="`${$t('store.note')}...`" v-model="note"/>
         </div>
@@ -98,6 +98,7 @@
       },
       mark: Object,
       storeCountryLocale: String,
+      noNote: Boolean,
     },
     data() {
       const modifiers = this.choices ? this.choices.map(c => c.select === 'one' ? null : []) : []

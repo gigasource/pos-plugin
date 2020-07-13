@@ -1,49 +1,52 @@
 <template>
   <div :class="['digital-menu-item', !available && 'disabled']">
-    <template v-if="showImage && displayImage">
-      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="digital-menu-item__thumbnail"/>
-      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
-           class="digital-menu-item__thumbnail"/>
-    </template>
     <div class="digital-menu-item__content">
-      <div class="digital-menu-item__name">{{name}}</div>
-      <div v-if="desc" :class="['r', expandDesc ? 'pb-3' : 'pb-1']">
-        <pre :id="`desc_${_id}`" :class="['digital-menu-item__desc', !showmore && 'digital-menu-item__desc--collapse']" v-html="desc"></pre>
-        <span v-if="expandDesc" class="digital-menu-item__show" @click="toggleShowmore">Show {{ showmore ? 'less' : 'more'}}</span>
-      </div>
-      <div class="digital-menu-item__choice" v-for="(choice, i) in choices" :key="i">
-        <div class="digital-menu-item__choice--name">
-          {{choice.name}}
-          <span v-if="choice.mandatory" class="text-red">*</span>
-        </div>
-        <div class="digital-menu-item__choice--option" v-for="(option, index) in choice.options" :key="`option_${index}`">
-          <div class="pr-3">{{option.name}}</div>
-          <div class="fw-700">{{option.price | currency(storeCountryLocale)}}</div>
+      <template v-if="showImage && displayImage">
+        <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="digital-menu-item__thumbnail"/>
+        <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
+             class="digital-menu-item__thumbnail"/>
+      </template>
+      <div class="flex-equal">
+        <div class="digital-menu-item__name">{{name}}</div>
+        <div v-if="desc" :class="['r', expandDesc ? 'pb-3' : 'pb-1']">
+          <pre :id="`desc_${_id}`" :class="['digital-menu-item__desc', !showmore && 'digital-menu-item__desc--collapse']" v-html="desc"></pre>
+          <span v-if="expandDesc" class="digital-menu-item__show" @click="toggleShowmore">Show {{ showmore ? 'less' : 'more'}}</span>
         </div>
       </div>
-      <div class="row-flex align-items-center mt-3">
-        <div class="digital-menu-item__price">{{ itemPrice }}</div>
-        <g-spacer/>
-        <template v-for="(value, type) in mark">
-          <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
-            <template v-slot:activator="{on}">
-              <div v-on="on" class="ml-1" style="line-height: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent">
-                <g-icon v-if="menu[type]" size="18">{{`icon-${type}_full`}}</g-icon>
-                <g-icon v-else size="18">{{`icon-${type}`}}</g-icon>
-              </div>
-            </template>
-            <div class="pa-2 bg-white br-2">
-              <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
-              <p class="fs-small text-grey-darken-3">
-                {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
-                <template v-if="type === 'allergic'">
-                  {{getAllergicType(value.types)}}
-                </template>
-              </p>
+    </div>
+    <div class="digital-menu-item__choice" v-for="(choice, i) in choices" :key="i">
+      <div class="digital-menu-item__choice--name">
+        {{choice.name}}
+        <span v-if="choice.mandatory" class="text-red">*</span>
+      </div>
+      <div class="digital-menu-item__choice--option" v-for="(option, index) in choice.options" :key="`option_${index}`">
+        <div class="pr-3">{{option.name}}</div>
+        <div class="fw-700">{{option.price | currency(storeCountryLocale)}}</div>
+      </div>
+    </div>
+    <div class="row-flex align-items-center mt-3">
+      <g-icon size="28" color="#757575" class="mr-1" @click="addToOrder">add_circle</g-icon>
+      <div class="digital-menu-item__price">{{ itemPrice }}</div>
+      <g-spacer/>
+      <template v-for="(value, type) in mark">
+        <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" content-class="menu-status-notification">
+          <template v-slot:activator="{on}">
+            <div v-on="on" class="ml-1" style="line-height: 18px; cursor: pointer; -webkit-tap-highlight-color: transparent">
+              <g-icon v-if="menu[type]" size="18">{{`icon-${type}_full`}}</g-icon>
+              <g-icon v-else size="18">{{`icon-${type}`}}</g-icon>
             </div>
-          </g-menu>
-        </template>
-      </div>
+          </template>
+          <div class="pa-2 bg-white br-2">
+            <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+            <p class="fs-small text-grey-darken-3">
+              {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
+              <template v-if="type === 'allergic'">
+                {{getAllergicType(value.types)}}
+              </template>
+            </p>
+          </div>
+        </g-menu>
+      </template>
     </div>
   </div>
 </template>
@@ -135,6 +138,9 @@
       },
       toggleShowmore() {
         this.showmore = !this.showmore
+      },
+      addToOrder() {
+        this.$emit('add')
       }
     },
     watch: {
@@ -153,20 +159,18 @@
   .digital-menu-item {
     background: #FFFFFF;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.14);
-    border-radius: 15px;
     padding: 12px;
-    display: flex;
     line-height: normal;
 
     &__thumbnail {
       border-radius: 11px;
       margin-right: 16px;
-      width: 72px;
-      height: 72px;
+      width: 100px;
+      height: 100px;
     }
 
     &__content {
-      flex: 1;
+      display: flex;
     }
 
     &__name {
@@ -183,7 +187,7 @@
       margin-bottom: 0;
 
       &--collapse {
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 4;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         user-select: auto;
