@@ -124,7 +124,7 @@
       },
       async getXReport(date) {
         try {
-          const beginHour = cms.getList('PosSetting')[0].generalSetting.beginHour || '00:00'
+          const beginHour = (await cms.getModel('PosSetting').findOne({})).generalSetting.beginHour || '00:00'
           const [hour, minutes] = beginHour.split(':')
           const from = dayjs(date).startOf('day').hour(parseInt(hour)).minute(parseInt(minutes)).toDate()
           const to = dayjs(from).add(1, 'day').toDate()

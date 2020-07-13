@@ -41,5 +41,5 @@
   "name": "EndOfDay",
   "tabs": [],
   "type": "Collection",
-  "alwaysLoad": true
+  "alwaysLoad": null
 }

@@ -1,6 +1,6 @@
 {
   "_id": "5e86c06f8197ab54362972eb",
-  "alwaysLoad": true,
+  "alwaysLoad": null,
   "extensions": [],
   "fields": [
     {
@@ -602,10 +602,11 @@
       "flex": "md4"
     },
     {
-      "_id": "5f06e5943e51ca2487668e65",
+      "_id": "5f0813623b43d31994cd92bf",
       "schemaType": "string",
       "key": "googleMyBusinessId",
-      "type": "input"
+      "type": "input",
+      "label": "google my business id"
     }
   ],
   "name": "Store",
