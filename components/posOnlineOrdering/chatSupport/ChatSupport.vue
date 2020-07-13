@@ -94,8 +94,9 @@
   import axios from 'axios'
   import uniqBy from 'lodash/uniqBy'
   import isNil from 'lodash/isNil'
+  import debounce from 'lodash/debounce'
+  import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
-  import ChatInfo from "./ChatInfo"
 
   export default {
     name: 'ChatSupport',
@@ -322,6 +323,10 @@
         e.preventDefault()
         if (!this.currentChatMsg.replace(/\r?\n|\r/g, '').trim().length) return
 
+        this.sendChatMsgDebounced(this.currentChatMsg)
+        this.currentChatMsg = ''
+      },
+      sendChatMsgDebounced: debounce(function(text) {
         const dummyId = uuidv1()
         const userId = cms.loginUser.user._id
         const clientId = this.selectedDeviceId
@@ -330,7 +335,7 @@
           clientId,
           userId,
           createdAt: new Date(),
-          text: this.currentChatMsg.trim(),
+          text: text.trim(),
         }
 
         console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
@@ -340,22 +345,21 @@
           console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
               `Online-order frontend received chat msg ack from backend`, JSON.stringify(savedMsg, null, 2))
 
-          // this.currentChats = this.currentChats.filter(e => e._id !== dummyId)
-          // this.currentChats.push(savedMsg)
-
           const sentChat = this.currentChats.find(e => e._id === dummyId)
           sentChat._id = savedMsg._id
           sentChat.unsent = false
-        });
+        })
 
-        this.currentChatMsg = ''
         this.currentChats.push({
           _id: dummyId,
           ...chatPayload,
           fromServer: true,
           unsent: true,
         })
-      },
+      }, 500, {
+        leading: true,
+        trailing: false,
+      }),
       async addNote(note) {
         const apiUrl = '/support/notes'
         const {data} = await axios.post(apiUrl, note)
