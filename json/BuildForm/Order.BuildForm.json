@@ -268,7 +268,7 @@
           "choice": "reducer",
           "label": "gross",
           "fn": {
-            "_code_": "const _ = require('lodash');\nmodule.exports = function (sum, item) {\n  return sum + item.price * item.quantity + _.sumBy(item.extra, e => e.price * e.quantity);\n}",
+            "_code_": "const _ = require('lodash');\nmodule.exports = function (sum, item) {\n  return sum + item.price * item.quantity + _.sumBy(item.modifiers, e => e.price * e.quantity);\n}",
             "_code_type_": "commonJs"
           },
           "resultType": "number"
@@ -277,7 +277,7 @@
           "choice": "reducer",
           "label": "net",
           "fn": {
-            "_code_": "const _ = require('lodash');\n\nfunction calNetto(brutto, tax) {\n    if (tax === 0) return brutto;\n    return brutto * (1 / (1 + tax / 100));\n}\n\nmodule.exports = function (sum, item) {\n  const price = item.price * item.quantity + _.sumBy(item.extra, e => e.price * e.quantity);\n  return sum + calNetto(price, item.tax);\n}",
+            "_code_": "const _ = require('lodash');\n\nfunction calNetto(brutto, tax) {\n    if (tax === 0) return brutto;\n    return brutto * (1 / (1 + tax / 100));\n}\n\nmodule.exports = function (sum, item) {\n  const price = item.price * item.quantity + _.sumBy(item.modifiers, e => e.price * e.quantity);\n  return sum + calNetto(price, item.tax);\n}",
             "_code_type_": "commonJs"
           },
           "resultType": "number"
@@ -286,7 +286,7 @@
           "choice": "reducer",
           "label": "salesTax",
           "fn": {
-            "_code_": "const _ = require('lodash');\n\nfunction calTax(brutto, tax) {\n    if (tax === 0) return 0;\n    return brutto * (1 - 1 / (1 + tax / 100));\n}\n\nmodule.exports = function (sum, item) {\n  const price = item.price * item.quantity + _.sumBy(item.extra, e => e.price * e.quantity);\n  return sum + calTax(price, item.tax);\n}",
+            "_code_": "const _ = require('lodash');\n\nfunction calTax(brutto, tax) {\n    if (tax === 0) return 0;\n    return brutto * (1 - 1 / (1 + tax / 100));\n}\n\nmodule.exports = function (sum, item) {\n  const price = item.price * item.quantity + _.sumBy(item.modifiers, e => e.price * e.quantity);\n  return sum + calTax(price, item.tax);\n}",
             "_code_type_": "commonJs"
           },
           "resultType": "number",
@@ -311,17 +311,16 @@
         "_code_": "const _ = require('lodash');\nmodule.exports = function (item) {\n  return !item.excludedFromSales;\n}",
         "_code_type_": "commonJs"
       }
-    },
-    {
-      "_id": "5d1c87b2b56d6abc405cfe6f",
-      "extensionType": "PreComputed",
-      "fn": {
-        "_code_": "const dayjs = require('dayjs');\nmodule.exports = async function (doc, update, cms, next) {\n  update.note = 'test';\n  const date = update.date;\n  update.vDate = dayjs(date).clone().startOf('date').toDate();\n  next();\n}",
-        "_code_type_": "commonJs"
-      }
     }
   ],
   "fields": [
+    {
+      "_id": "5f0c3934d574e706ebd899e7",
+      "schemaType": "objectId",
+      "key": "storeId",
+      "ref": "Store",
+      "type": "ref-select"
+    },
     {
       "_id": "5c45ec7fee5a2d282ff53fdd",
       "schemaType": "number",
@@ -351,7 +350,11 @@
       "options": [
         "paid",
         "inProgress",
-        "cancelled"
+        "cancelled",
+        "kitchen",
+        "delivery",
+        "completed",
+        "declined"
       ],
       "flex": "md2"
     },
@@ -561,7 +564,36 @@
       "schemaType": "mixed",
       "key": "customer",
       "default": null,
-      "mixed": null
+      "mixed": null,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "address",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "phone",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "zipCode",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "company",
+          "type": "input"
+        }
+      ],
+      "type": "object",
+      "addable": true
     },
     {
       "_id": "5c45f82dee5a2d282ff5408b",
@@ -576,7 +608,7 @@
     {
       "_id": "5c45fd79ee5a2d282ff5412c",
       "schemaType": "number",
-      "key": "tipp",
+      "key": "tip",
       "type": "input@number",
       "label": null,
       "flex": "md3",
@@ -701,24 +733,29 @@
         },
         {
           "schemaType": "number",
-          "key": "gang",
+          "key": "course",
           "type": "rating-select",
           "length": 3,
           "flex": "md6",
           "hintPrepend": ""
         },
         {
-          "schemaType": "array",
-          "fields": [
-            {
-              "schemaType": "string"
-            }
-          ],
+          "schemaType": "string",
           "key": "groupPrinter",
-          "type": "ref-multi-select-static",
+          "type": "ref-select-static",
           "flex": "md6",
           "ref": "GroupPrinter",
-          "labelProp": "name"
+          "labelProp": "name",
+          "addable": null
+        },
+        {
+          "schemaType": "string",
+          "key": "groupPrinter2",
+          "type": "ref-select-static",
+          "flex": "md6",
+          "ref": "GroupPrinter",
+          "labelProp": "name",
+          "addable": true
         },
         {
           "schemaType": "string",
@@ -742,7 +779,7 @@
         },
         {
           "schemaType": "array",
-          "key": "extra",
+          "key": "modifiers",
           "type": "tableArray",
           "label": null,
           "flex": null,
@@ -763,14 +800,17 @@
             },
             {
               "schemaType": "number",
+              "key": "quantity",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
               "type": "input@number",
               "key": "originalPrice",
               "addable": false
             }
           ],
-          "expansion": [
-            "originalPrice"
-          ],
+          "expansion": [],
           "addable": true
         },
         {
@@ -885,13 +925,32 @@
               "type": "input"
             }
           ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "separate",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "string",
+          "key": "image",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "desc",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "note",
+          "type": "input"
         }
       ],
       "default": null,
       "label": null,
       "flex": null,
       "expansion": [
-        "extra",
         "originalPrice",
         "taxes",
         "printed",
@@ -911,7 +970,11 @@
         "product",
         "attributes",
         "unit",
-        "discountUnit"
+        "discountUnit",
+        "modifiers",
+        "course",
+        "separate",
+        "groupPrinter2"
       ],
       "addable": false
     },
@@ -1039,6 +1102,152 @@
       "schemaType": "number",
       "key": "vDiscount",
       "type": "input@number"
+    },
+    {
+      "_id": "5e8d420cfca2c23e2450ea41",
+      "schemaType": "boolean",
+      "key": "online",
+      "type": "input@checkbox"
+    },
+    {
+      "_id": "5e8de503fca2c23e2450eabb",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "delivery",
+        "pickup"
+      ]
+    },
+    {
+      "_id": "5e8e3c129239c47dba244c7d",
+      "schemaType": "date",
+      "key": "deliveryDate",
+      "type": "date-picker",
+      "pickerType": "datetime",
+      "pickSeconds": true,
+      "is12Hour": null,
+      "clearable": true,
+      "showIcon": true
+    },
+    {
+      "_id": "5e9028b99239c47dba24521e",
+      "schemaType": "string",
+      "key": "declineReason",
+      "type": "input",
+      "addable": true
+    },
+    {
+      "_id": "5e937be5c5bf7a05a9fec83d",
+      "schemaType": "number",
+      "key": "prepareTime",
+      "type": "input@number",
+      "addable": true
+    },
+    {
+      "_id": "5e991227b7578862f72d84d3",
+      "schemaType": "number",
+      "key": "shippingFee",
+      "type": "input@number"
+    },
+    {
+      "_id": "5ea6b580f6cea7234d3f4d10",
+      "schemaType": "array",
+      "key": "printer",
+      "type": "input@multiSelect",
+      "fields": [
+        {
+          "schemaType": "string"
+        }
+      ],
+      "addable": true
+    },
+    {
+      "_id": "5eb289924a624b0a817f8b92",
+      "schemaType": "string",
+      "key": "onlineOrderId",
+      "type": "input"
+    },
+    {
+      "_id": "5eb29901ebdd901532b5b0f1",
+      "schemaType": "string",
+      "key": "declineReason",
+      "type": "input"
+    },
+    {
+      "_id": "5eb4da42f6e5fe72da56f77e",
+      "schemaType": "array",
+      "key": "discounts",
+      "type": "array",
+      "addable": true,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "type",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "coupon",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5eb4fe288b0bccd478bec9de",
+      "schemaType": "string",
+      "key": "deliveryTime",
+      "type": "input"
+    },
+    {
+      "_id": "5eb51b883fabfc7e895e2e3e",
+      "schemaType": "date",
+      "key": "timeoutDate",
+      "type": "input@date",
+      "addable": true
+    },
+    {
+      "_id": "5ec6286590367710590940cd",
+      "schemaType": "object",
+      "key": "paypalOrderDetail",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "orderID",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "payerID",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "paymentID",
+          "type": "input"
+        },
+        {
+          "schemaType": "mixed",
+          "key": "captureResponses"
+        },
+        {
+          "schemaType": "mixed",
+          "key": "refundResponses",
+          "type": null
+        }
+      ]
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
@@ -1077,7 +1286,13 @@
         "takeOut",
         "id",
         "bookingNumber",
-        "z"
+        "z",
+        "customer",
+        "online",
+        "type",
+        "deliveryDate",
+        "declineReason",
+        "prepareTime"
       ],
       "_id": "5c5fea4caaa95a1fd4011659",
       "name": "info"

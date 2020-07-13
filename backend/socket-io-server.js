@@ -642,6 +642,36 @@ module.exports = async function (cms) {
       const storeName = store.name || store.settingName
       const storeAlias = store.alias
 
+      let {
+        orderType: type, paymentType, customer, products,
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
+      } = orderData
+
+      const order = {
+        storeId,
+        items: products.map(i => ({
+          ...i,
+          price: i.price.toFixed(2),
+          originalPrice: i.originalPrice ? i.originalPrice.toFixed(2) : i.price.toFixed(2),
+          ...i.vDiscount && { vDiscount: i.vDiscount.toFixed(2) },
+          id: i.id || ''
+        })),
+        customer,
+        deliveryDate: new Date(),
+        payment: [{type: paymentType}],
+        type,
+        date: new Date(createdDate),
+        ...timeoutDate && {timeoutDate: dayjs(timeoutDate).toDate()},
+        shippingFee,
+        online: true,
+        note,
+        onlineOrderId: orderToken,
+        discounts,
+        deliveryTime,
+        paypalOrderDetail
+      }
+      await cms.getModel('Order').create(order)
+
       if (store.gSms && store.gSms.enabled) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
