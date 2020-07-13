@@ -563,6 +563,7 @@ module.exports = async function (cms) {
       })
     }
 
+    /** @deprecated */
     if (socket.request._query && socket.request._query.clientId && socket.request._query.demo) {
       const clientId = socket.request._query.clientId
 
@@ -696,7 +697,12 @@ module.exports = async function (cms) {
         const demoDevices = store.gSms.devices
         demoDevices.filter(i => i.registered).forEach(({_id}) => {
           const formattedOrder = formatOrder(orderData);
-          const targetClientId = `${store.id}_${_id}`;
+
+          /** @deprecated */
+          const targetClientIdOld = `${store.id}_${_id}`;
+          externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+
+          const targetClientId = _id;
           externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
           console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
               `2a. Online order backend: received order from frontend, sending to demo device`);
@@ -879,7 +885,12 @@ module.exports = async function (cms) {
           cms.emit('sendReservationMessage', storeId, reservationData)
           const demoDevices = store.gSms.devices
           demoDevices.filter(i => i.registered).forEach(({_id}) => {
-            const targetClientId = `${store.id}_${_id}`;
+
+            /** @deprecated */
+            const targetClientIdOld = `${store.id}_${_id}`;
+            externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+
+            const targetClientId = _id;
             externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id }])
             console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
                 `2a. Online order backend: sent reservation to demo device`)

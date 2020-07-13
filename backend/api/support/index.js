@@ -13,11 +13,25 @@ const ObjectId = require('mongoose').Types.ObjectId;
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
 setTimeout(() => {
   getExternalSocketIoServer().on('connect', socket => {
+    async function setDemoDeviceLastSeen(deviceId) {
+      const device = await cms.getModel('Device').findById(deviceId)
+      const storeId = device.storeId;
+      if (!storeId) return
+      await cms.getModel('Store').findOneAndUpdate({_id: storeId, 'gSms.devices._id': deviceId}, {
+        $set: {
+          'gSms.devices.$.lastSeen': new Date()
+        }
+      })
+      cms.socket.emit('loadStore', storeId)
+    }
+
     if (socket.request._query && socket.request._query.clientId) {
       const deviceId = socket.request._query.clientId;
+      setDemoDeviceLastSeen(deviceId)
       internalSocketIOServer.emit('gsms-device-connected', deviceId);
 
-      socket.on('disconnect', () => {
+      socket.on('disconnect', async () => {
+        await setDemoDeviceLastSeen(deviceId)
         internalSocketIOServer.emit('gsms-device-disconnected', deviceId);
       });
     }
@@ -47,6 +61,28 @@ setTimeout(() => {
 
       cb && cb(savedMsg._doc);
     });
+
+    // for devices with assigned store
+    socket.on('getAllReservations', async (storeId, cb) => {
+      const store = await cms.getModel('Store').findOne({id: storeId})
+      if (!store) return cb([])
+      const reservations = await cms.getModel('Reservation').find({store: store._id}).lean()
+      cb(reservations)
+    })
+
+    socket.on('getMenu', async (storeId, cb) => {
+      const store = await cms.getModel('Store').findOne({id: storeId})
+      if (!store) return cb()
+
+      const categories = await cms.getModel('Category').find({store: store._id}).lean()
+      const products = await cms.getModel('Product').find({store: store._id}).lean()
+      cb(categories, products)
+    })
+
+    socket.on('updateMenu', async (collection, id, value) => {
+      console.log('updateMenu', collection, id, value)
+      // await cms.getModel(collection).findOneAndUpdate(id, value, {upsert: true})
+    })
   });
 
   internalSocketIOServer.on('connect', socket => {
