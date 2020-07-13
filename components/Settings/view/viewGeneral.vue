@@ -117,8 +117,8 @@
 				await this.resetLayoutFnBtn('leftFunctionButtons');
 			}
     },
-    created() {
-      this.getGeneralSettings();
+    async created() {
+      await this.getGeneralSettings();
     }
   }
 </script>

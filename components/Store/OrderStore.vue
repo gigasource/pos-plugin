@@ -233,7 +233,7 @@
               ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
               : [{ name: this.user.name, date: orderDateTime }],
             date: orderDateTime,
-            vDate: getVDate(orderDateTime),
+            vDate: await getVDate(orderDateTime),
             bookingNumber: getBookingNumber(orderDateTime),
             payment: [paymentMethod || { ...this.currentOrder.payment, value: this.paymentTotal }],
             vSum: this.paymentTotal.toFixed(2),
@@ -385,7 +385,7 @@
           status: 'inProgress',
           items: this.getComputedOrderItems(this.currentOrder.items, date),
           date,
-          vDate: getVDate(date),
+          vDate: await getVDate(date),
           user: [{ name: this.user.name || '', date }]
         }
         if (this.currentOrder._id) {

@@ -16,8 +16,8 @@ export function getBookingNumber(dateTime) {
   return dayjs(dateTime).format('YYMMDDHHmmssSSS')
 }
 
-export function getVDate(dateTime) {
-  const beginHour = cms.getList('PosSetting')[0].generalSetting.beginHour || '00:00'
+export async function getVDate(dateTime) {
+  const beginHour = (await cms.getModel('PosSetting').findOne({})).generalSetting.beginHour || '00:00'
   const [hour, minutes] = beginHour.split(':')
   const beginDateTime = dayjs(dateTime).clone().hour(parseInt(hour)).minute(parseInt(minutes))
 

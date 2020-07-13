@@ -309,8 +309,8 @@
         await this.getListPayments();
       },
       //general setting screen
-      getGeneralSettings() {
-        const setting = cms.getList('PosSetting')[0];
+      async getGeneralSettings() {
+        const setting = await cms.getModel('PosSetting').findOne({});
         this.generalSettings = setting.generalSetting || {};
       },
       async updateSettings() {
@@ -528,7 +528,7 @@
       //Fully reset layout of button
       //Usage: resetLayoutFnBtn('leftFunctionButtons')
       async resetLayoutFnBtn(dbButtonList) {
-        const posSettings = cms.getList('PosSetting')[0];
+        const posSettings = await cms.getModel('PosSetting').findOne({});
         // if (dbButtonList === 'leftFunctionButtons') {
         //   this.leftButtonsUpdate++;
         // }
