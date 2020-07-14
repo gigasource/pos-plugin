@@ -90,7 +90,7 @@
           <div class="reservation-content__title">Information</div>
           <g-text-field-bs :rules="rules.first" v-model="customer.firstName" @input="rules.first = []" placeholder="First Name*" required/>
           <g-text-field-bs :rules="rules.last" v-model="customer.lastName" @input="rules.last = []" placeholder="Last Name*" required/>
-          <g-text-field-bs :rules="rules.email" v-model="customer.email" :placeholder="`Email${validateEmail && '*'}`" :required="validateEmail"/>
+          <g-text-field-bs :rules="rules.email" v-model="customer.email" :placeholder="`Email${validateEmail ? '*' : ''}`" :required="validateEmail"/>
           <g-text-field-bs :class="rules.phone && 'phone-error'" :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" @input="rules.phone = false" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
