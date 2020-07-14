@@ -91,8 +91,7 @@ module.exports = cms => {
             contentAvailable: true
           },
         }
-      },
-      topic
+      }
     }
 
     try {
