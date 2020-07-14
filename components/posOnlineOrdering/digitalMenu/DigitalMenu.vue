@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="digital-menu__tab--content" @touchstart="touch">
-        <div v-for="(category, i) in listItem" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-5']">
+        <div v-for="(category, i) in listItem" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-4']">
           <div class="digital-menu__title">
             {{ category && category.name }}
           </div>
@@ -258,6 +258,7 @@
 
     &__tab {
       max-width: 100vw;
+      background: #F2F2F2;
 
       &--category {
         overflow: auto;
@@ -278,6 +279,7 @@
 
       &--content {
         padding-bottom: 16px;
+        padding-top: 8px;
       }
     }
 
@@ -287,6 +289,8 @@
       color: #424242;
       text-transform: uppercase;
       margin-left: 16px;
+      margin-bottom: -8px;
+
     }
 
     &__category {

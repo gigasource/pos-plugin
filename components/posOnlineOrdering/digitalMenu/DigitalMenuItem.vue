@@ -5,7 +5,7 @@
       <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
            class="digital-menu-item__thumbnail"/>
     </template>
-    <div class="digital-menu-item__content">
+    <div :class="['digital-menu-item__content', (!choices || choices.length === 0) && 'digital-menu-item__content--no-choices']">
       <div class="digital-menu-item__name">
           {{name}}
           <template v-for="(value, type) in mark">
@@ -28,11 +28,12 @@
             </g-menu>
           </template>
         </div>
-      <div v-if="desc" :class="['r', expandDesc ? 'pb-3' : 'pb-1']">
-          <pre :id="`desc_${_id}`" :class="['digital-menu-item__desc', !showmore && 'digital-menu-item__desc--collapse']" v-html="desc"></pre>
-          <span v-if="expandDesc" class="digital-menu-item__show" @click="toggleShowmore">Show {{ showmore ? 'less' : 'more'}}</span>
-        </div>
-      <div class="row-flex align-items-center mt-2">
+      <div v-if="desc" class="row-flex pb-1" @click="toggleShowmore">
+        <pre :id="`desc_${_id}`" :class="['digital-menu-item__desc', !showmore && 'digital-menu-item__desc--collapse', (!choices || choices.length === 0) && 'line-4']" v-html="desc"></pre>
+        <g-icon v-if="expandDesc" size="12" class="digital-menu-item__show">fas fa-angle-double-{{showmore ? 'left' : 'right'}}</g-icon>
+      </div>
+      <g-spacer/>
+      <div class="row-flex align-items-center" style="margin-bottom: -8px">
         <div class="digital-menu-item__price">{{ itemPrice }}</div>
         <g-spacer/>
         <g-btn-bs rounded @click="addToOrder">
@@ -69,8 +70,8 @@
       imageThumbnailSize: {
         type: Object,
         default: () => ({
-          width: 100,
-          height: 100,
+          width: 140,
+          height: 140,
         }),
       },
       collapseText: Boolean,
@@ -161,19 +162,28 @@
   .digital-menu-item {
     background: #FFFFFF;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.14);
-    padding: 12px;
+    padding: 8px 6px;
     line-height: normal;
     display: flex;
 
     &__thumbnail {
       border-radius: 11px;
-      margin-right: 16px;
-      width: 100px;
-      height: 100px;
+      margin-right: 6px;
+      width: 140px;
+      height: 140px;
     }
 
     &__content {
       flex: 1;
+
+      &--no-choices {
+        display: flex;
+        flex-direction: column;
+
+        & > div:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
     }
 
     &__name {
@@ -188,23 +198,25 @@
       word-break: break-word;
       white-space: pre-wrap;
       margin-bottom: 0;
+      flex: 1;
 
       &--collapse {
-        -webkit-line-clamp: 2;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         user-select: auto;
         overflow: hidden;
+        -webkit-line-clamp: 2;
+
+        &.line-4 {
+          -webkit-line-clamp: 4;
+        }
       }
     }
 
     &__show {
       font-size: 12px;
-      color: #536DFE;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      cursor: pointer;
+      align-self: flex-end;
+      color: #757575;
     }
 
     &__choice {
@@ -232,7 +244,7 @@
       font-weight: 700;
 
       & ~ .g-btn-bs {
-        padding: 0;
+        padding: 8px;
         margin: 0;
       }
     }
