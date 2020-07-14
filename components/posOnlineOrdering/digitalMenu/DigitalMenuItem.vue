@@ -257,8 +257,12 @@
       font-weight: 700;
 
       & ~ .g-btn-bs {
-        padding: 8px;
+        padding: 2px;
         margin: 0;
+
+        &:hover:before {
+          display: none;
+        }
       }
     }
   }
