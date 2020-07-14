@@ -229,6 +229,14 @@
           wrapper.scroll({top: 0, left: (tab.offsetLeft - siblingWidth/2 - wrapper.offsetLeft), behavior: "smooth"})
         }
       },
+      viewOrder(val) {
+        const html = document.documentElement
+        if(val) {
+          html.style.overflow = 'hidden'
+        } else {
+          html.style.overflow = ''
+        }
+      }
     }
   }
 </script>
@@ -331,7 +339,7 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 74px;
+      bottom: 0;
       z-index: 15;
       background-color: #F2F2F2;
 
@@ -348,7 +356,7 @@
         margin-top: 16px;
         margin-bottom: 0;
         background-color: white;
-        padding: 0 16px;
+        padding: 0 16px 74px;
         height: calc(100% - 68px);
         overflow: auto;
         scrollbar-width: none; // firefox
