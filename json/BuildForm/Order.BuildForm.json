@@ -319,7 +319,9 @@
       "schemaType": "objectId",
       "key": "storeId",
       "ref": "Store",
-      "type": "ref-select"
+      "type": "ref-select",
+      "autopopulate": true,
+      "labelProp": "name"
     },
     {
       "_id": "5c45ec7fee5a2d282ff53fdd",
