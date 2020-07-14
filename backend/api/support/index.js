@@ -112,6 +112,7 @@ setTimeout(() => {
       });
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
+      cms.emit('chatMessage', chatData)
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -283,4 +284,20 @@ async function assignDevice(id, store) {
   });
 }
 
+router.put('/update-token/:id', async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
+  if (!token) return res.status(400).json({ error: `You must provide token` });
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { firebaseToken: token })
+
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device token'})
+  }
+})
 module.exports = router;

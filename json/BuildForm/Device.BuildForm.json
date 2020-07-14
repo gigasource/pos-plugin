@@ -65,7 +65,8 @@
       "ref": "Store",
       "type": "ref-select",
       "labelProp": "name",
-      "flex": "md4"
+      "flex": "md6",
+      "autopopulate": true
     },
     {
       "_id": "5e9566d90b178cdacaade168",
@@ -228,10 +229,29 @@
     {
       "_id": "5f070125718195336e826f2e",
       "schemaType": "string",
-      "key": "hardwareId"
+      "key": "hardwareId",
+      "type": "input",
+      "flex": "md6"
+    },
+    {
+      "_id": "5f0d2f7908fc232407e22048",
+      "schemaType": "string",
+      "key": "firebaseToken",
+      "type": "input",
+      "flex": "md6"
     }
   ],
   "name": "Device",
-  "tabs": [],
+  "tabs": [
+    {
+      "fields": [
+        "storeId",
+        "hardwareId",
+        "firebaseToken"
+      ],
+      "_id": "5f0d2f7908fc232407e22049",
+      "name": "gsms"
+    }
+  ],
   "type": "Collection"
 }
