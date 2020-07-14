@@ -8,11 +8,11 @@
         <template v-slot:badge>
             {{totalItems}}
         </template>
-        <div style="width: 40px; height: 40px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
+        <div @click="viewOrder = true" style="width: 42px; height: 42px; background-color: #ff5252; border-radius: 8px; display: flex; align-items: center; justify-content: center">
             <g-icon>icon-menu2</g-icon>
         </div>
       </g-badge>
-      <div class="digital-menu__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
+      <div @click="viewOrder = true" class="digital-menu__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
       <g-spacer/>
       <g-btn-bs v-if="!viewOrder" background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="viewOrder = true" width="150">
         <span class="mr-3">View</span>
