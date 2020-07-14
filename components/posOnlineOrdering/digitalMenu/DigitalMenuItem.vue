@@ -2,8 +2,9 @@
   <div :class="['digital-menu-item', !available && 'disabled']">
     <template v-if="showImage && displayImage">
       <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="digital-menu-item__thumbnail"/>
-      <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
-           class="digital-menu-item__thumbnail"/>
+      <div v-else class="digital-menu-item__thumbnail--default">
+        <img alt draggable="false" src="/plugins/pos-plugin/assets/thumbnail.svg"/>
+      </div>
     </template>
     <div :class="['digital-menu-item__content', (!choices || choices.length === 0) && 'digital-menu-item__content--no-choices']">
       <div class="digital-menu-item__name">
@@ -167,10 +168,22 @@
     display: flex;
 
     &__thumbnail {
-      border-radius: 11px;
+      border-radius: 6px;
       margin-right: 6px;
       width: 140px;
       height: 140px;
+
+      &--default {
+        border-radius: 6px;
+        margin-right: 6px;
+        width: 140px;
+        height: 140px;
+        background: #F8F8F8;
+        border: 1px solid #EEEEEE;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     &__content {
@@ -246,6 +259,20 @@
       & ~ .g-btn-bs {
         padding: 8px;
         margin: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 350px) {
+    .digital-menu-item {
+      &__thumbnail {
+        width: 100px;
+        height: 100px;
+
+        &--default {
+          width: 100px;
+          height: 100px;
+        }
       }
     }
   }
