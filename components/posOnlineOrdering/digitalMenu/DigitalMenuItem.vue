@@ -229,7 +229,7 @@
     &__show {
       font-size: 12px;
       align-self: flex-end;
-      color: #757575;
+      color: #1271FF;
     }
 
     &__choice {
