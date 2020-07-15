@@ -5,7 +5,45 @@ const StoreModel = cms.getModel('Store');
 const ChatMessageModel = cms.getModel('ChatMessage');
 const {getExternalSocketIoServer} = require('../../socket-io-server');
 const _ = require('lodash');
-const axios = require('axios')
+const axios = require('axios');
+const {extractSortQueries} = require('../utils');
+
+function getAndSortDevices(n = 0, offset = 0, sort) {
+  // unread message count will be dynamic, so getting devices with an offset may result in missing some devices due to order changes
+  const limit = sort.unreadMessages ? n + offset : n;
+  const skip = sort.unreadMessages ? null : offset;
+
+  const steps = [
+    {
+      $match: {deleted: {$ne: true}}
+    },
+    {
+      $lookup: {
+        from: 'chatmessages',
+        let: {deviceId: {$toString: '$_id'}},
+        pipeline: [
+          {
+            $match: {
+              read: false,
+              fromServer: false,
+              $expr: {$eq: ['$clientId', '$$deviceId']},
+            }
+          }
+        ],
+        as: 'chats'
+      }
+    }, {
+      $addFields: {
+        unreadMessages: {$size: '$chats'}
+      }
+    }, {$sort: sort}
+  ];
+
+  if (skip) steps.push({$skip: skip});
+  if (limit) steps.push({$limit: limit});
+
+  return DeviceModel.aggregate(steps);
+}
 
 router.get('/devices/:clientId', async (req, res) => {
   const {clientId} = req.params;
@@ -18,19 +56,26 @@ router.get('/devices/:clientId', async (req, res) => {
 });
 
 router.get('/devices', async (req, res) => {
-  let gsmsDevices = await DeviceModel.find(
-      {deviceType: 'gsms', $or: [{deleted: false}, {deleted: {$exists: false}}]}).lean();
+  let {n = 0, offset = 0, sort = 'createdAt.desc'} = req.query;
 
-  gsmsDevices = await Promise.all(gsmsDevices.map(async device => {
-    const latestUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false}).sort({createdAt: -1});
+  sort = extractSortQueries(sort);
+
+  const clusterClientList = global.APP_CONFIG.redis
+      ? await getExternalSocketIoServer().getClusterClientIds()
+      : getExternalSocketIoServer().getAllClientId();
+
+  let devices = await getAndSortDevices(+n, +offset, sort);
+  devices = await Promise.all(devices.map(async ({chats, ...device}) => {
+    const latestUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false, fromServer: false}).sort({createdAt: -1});
 
     return {
       ...device,
       latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
+      online: clusterClientList.includes(device._id),
     }
   }));
 
-  res.status(200).json(gsmsDevices);
+  res.status(200).json(devices);
 });
 
 router.delete('/devices/:clientId', async (req, res) => {
@@ -45,7 +90,7 @@ router.delete('/devices/:clientId', async (req, res) => {
     if (deviceStore.gSms && deviceStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
         { _id: deviceStore._id },
-        { $pull: { 'gSms.devices': { _id: id } } }
+        { $pull: { 'gSms.devices': { _id: deviceStore._id } } }
       )
     }
   }
@@ -130,7 +175,11 @@ router.post('/register', async (req, res) => {
   console.debug(`sentry:eventType=gsmsDeviceRegister,clientId=${newDevice._id}`,
       'New GSMS device registered');
 
-  cms.socket.emit('reloadUnassignedDevices');
+  cms.socket.emit('newGsmsDevice', {
+    ...newDevice._doc,
+    online: true,
+    unreadMessages: 0,
+  });
   res.status(201).json({clientId: newDevice._id});
 });
 
