@@ -89,29 +89,56 @@ async function sendReservationConfirmationEmail(reservation, storeId) {
 
     const storeName = store.name || store.settingName;
 
-    const reservationMailTemplate = `<h3>Hello ${lastName},</h3> 
-    <p>Thank you for making a reservation.</p>
-    <p>Your reservation is recorded as follows:</p>
-    <ul>
-      <li>No. of guests: ${noOfGuests}</li>
-      <li>Date: ${dayjs(date, 'YYYY-MM-DD').format('MMM DD YYYY')}</li>
-      <li>Time: ${time}</li>
-      <li>First name: ${firstName}</li>
-      <li>Last name: ${lastName}</li>
-      <li>Email: ${email}</li>
-      <li>Phone number: ${phone}</li>
-      <li>Note: ${note || ''}</li>
-    </ul>
-    <p>We look forward to your visit and hope we will be enjoying your meal experience at ${storeName} as much as we will be enjoying your company.</p>
-    <p>For more information, please do not hesitate to contact our number directly at ${store.phone}.</p>
-    <p>See you very soon,</p>
-    <p>${storeName} Team</p>`;
+    const locale = (store.country && store.country.locale && store.country.locale.substring(0, 2).toLowerCase()) || 'en'
+
+    const subject = {
+      'en' : `Reservation Confirm for ${storeName}`,
+      'de' : `Reservierungsbestätigung für ${storeName}`
+    }
+
+    const reservationMailTemplate = {
+      'en' : `<h3>Hello ${lastName},</h3> 
+              <p>Thank you for making a reservation.</p>
+              <p>Your reservation is recorded as follows:</p>
+              <ul>
+                <li>No. of guests: ${noOfGuests}</li>
+                <li>Date: ${dayjs(date, 'YYYY-MM-DD').format('MMM DD YYYY')}</li>
+                <li>Time: ${time}</li>
+                <li>First name: ${firstName}</li>
+                <li>Last name: ${lastName}</li>
+                <li>Email: ${email}</li>
+                <li>Phone number: ${phone}</li>
+                <li>Note: ${note || ''}</li>
+              </ul>
+              <p>We look forward to your visit and hope we will be enjoying your meal experience at ${storeName} as much as we will be enjoying your company.</p>
+              <p>For more information, please do not hesitate to contact our number directly at ${store.phone}.</p>
+              <p>See you very soon,</p>
+              <p>${storeName} Team</p>`,
+      'de' : `<h3>Sehr geehrte/r Frau/Herr ${lastName},</h3> 
+              <p>Vielen Dank für Ihre Reservierung!</p>
+              <p>Ihre Reserviereung wird wie fogt aufgezeichnet:</p>
+              <ul>
+                <li>Gast: ${noOfGuests}</li>
+                <li>Datum: ${dayjs(date, 'YYYY-MM-DD').format('MMM DD YYYY')}</li>
+                <li>Zeit: ${time}</li>
+                <li>Vorname: ${firstName}</li>
+                <li>Nachname: ${lastName}</li>
+                <li>Email: ${email}</li>
+                <li>Telefonnumber: ${phone}</li>
+                <li>Hinweis: ${note || ''}</li>
+              </ul>
+              <p>Wir freuen uns auf Ihren Besuch und hoffen, dass wir Ihr Essenserlebnis im ${storeName} genießen werden genauso wie Ihre Gesamtheit. </p>
+              <p>Für weitere Infomationen bitte kontaktieren Sie uns direkt unter unserer Nummer: ${store.phone}.</p>
+              <p>Bis gleich! </p>
+              <p>Mit freundlichen Grüßen,</p>
+              <p>${storeName} Team</p>`
+    }
 
     const message = {
       from: 'no-reply@restaurant.live',
       to: email,
-      subject: `Your reservation at ${storeName}`,
-      html: reservationMailTemplate
+      subject: subject[locale],
+      html: reservationMailTemplate[locale]
     }
 
     mailTransporter.sendMail(message, err => {
