@@ -79,9 +79,33 @@ setTimeout(() => {
       cb(categories, products)
     })
 
-    socket.on('updateMenu', async (collection, id, value) => {
-      console.log('updateMenu', collection, id, value)
-      // await cms.getModel(collection).findOneAndUpdate(id, value, {upsert: true})
+    socket.on('updateMenu', async (collection, _id, value, cb) => {
+      console.log('updateMenu', collection, _id, value)
+      const clientId = socket.request._query.clientId
+      const device = await cms.getModel('Device').findById(clientId)
+      if (!device.storeId) return
+
+      // insert/update product or category
+      try {
+        const result = _id
+          ? await cms.getModel(collection).findOneAndUpdate({ _id }, value)
+          : await cms.getModel(collection).create({ store: device.storeId, ...value })
+        cb({ success: true, _id: result._id })
+      } catch (error) {
+        cb({ error })
+      }
+    })
+
+    socket.on('deleteMenuItem', async (collection, _id, cb) => {
+      console.log('deleteMenuItem', collection, _id)
+
+      // delete product or category
+      try {
+        await cms.getModel(collection).findOneAndDelete({ _id })
+        cb({ success: true })
+      } catch (error) {
+        cb({ error })
+      }
     })
   });
 
@@ -240,7 +264,6 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
       storeAlias: store.alias
     })
   } catch (e) {
-    debugger
     console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${customStoreId}`,
       `Error assigning GSMS device to store with id ${customStoreId}`, e)
     res.status(500).send('Encountered an error while assigning store')
