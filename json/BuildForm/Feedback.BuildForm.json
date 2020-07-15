@@ -1,0 +1,39 @@
+{
+  "_id": "5f0ebcfeddeb006b82eb4e6e",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f0ebd2addeb006b82eb4e71",
+      "schemaType": "objectId",
+      "key": "storeId",
+      "ref": "Store",
+      "type": "ref-select"
+    },
+    {
+      "_id": "5f0ec03bddeb006b82eb4ea4",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "positive",
+        "negative"
+      ]
+    },
+    {
+      "_id": "5f0ebd2addeb006b82eb4e72",
+      "schemaType": "string",
+      "key": "feedback",
+      "type": "input"
+    },
+    {
+      "_id": "5f0ee614ddeb006b82eb4f79",
+      "schemaType": "date",
+      "key": "created",
+      "type": "input@date"
+    }
+  ],
+  "name": "Feedback",
+  "tabs": [],
+  "type": "Collection"
+}

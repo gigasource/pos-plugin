@@ -766,3 +766,12 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-feedback {
+  background-image: url("../assets/feedback.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+

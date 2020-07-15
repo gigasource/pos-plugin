@@ -607,6 +607,12 @@
       "key": "googleMyBusinessId",
       "type": "input",
       "label": "google my business id"
+    },
+    {
+      "_id": "5f0ecce0ddeb006b82eb4f32",
+      "schemaType": "string",
+      "key": "googleMyBusinessShortcode",
+      "type": "input"
     }
   ],
   "name": "Store",

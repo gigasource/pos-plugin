@@ -32,6 +32,11 @@
             <g-text-field-bs large label="Google My Business Id (Optional)"
                              :value="store.googleMyBusinessId"
                              @input="updateDebounce({googleMyBusinessId: $event})"/>
+            <div class="span-2">
+              <g-text-field-bs large label="Google My Business Shortcode (Optional)"
+                               :value="store.googleMyBusinessShortcode"
+                               @input="updateDebounce({googleMyBusinessShortcode: $event})"/>
+            </div>
           </div>
         </div>
         <div class="mt-3">
