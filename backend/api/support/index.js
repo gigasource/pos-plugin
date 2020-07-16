@@ -74,8 +74,8 @@ setTimeout(() => {
       const store = await StoreModel.findOne({id: storeId})
       if (!store) return cb()
 
-      const categories = await cms.getModel('Category').find({store: store._id}).lean()
-      const products = await cms.getModel('Product').find({store: store._id}).lean()
+      const categories = await cms.getModel('Category').find({store: store._id.toString()}).lean()
+      const products = await cms.getModel('Product').find({store: store._id.toString()}).lean()
       cb(categories, products)
     })
 
@@ -102,6 +102,10 @@ setTimeout(() => {
       // delete product or category
       try {
         await cms.getModel(collection).findOneAndDelete({ _id })
+
+        if (collection === 'Category') { // delete products from said category too
+          await cms.getModel('Product').deleteMany({ category: _id })
+        }
         cb({ success: true })
       } catch (error) {
         cb({ error })
@@ -141,6 +145,19 @@ setTimeout(() => {
 
       cb && cb(savedMsg._doc);
     });
+
+    socket.on('send-menu', async storeId => {
+      const store = await StoreModel.findOne({ _id: storeId })
+      const categories = await cms.getModel('Category').find({ store: store._id }).lean()
+      const products = await cms.getModel('Product').find({ store: store._id }).lean()
+      const gSmsDevices = store.gSms.devices
+
+      gSmsDevices.forEach(device => {
+        const clientId = device._id.toString();
+        getExternalSocketIoServer().emitTo(clientId, 'getNewMenu', categories, products)
+        console.log(`sent new menu to ${clientId}`)
+      })
+    })
   });
 }, 5000);
 
