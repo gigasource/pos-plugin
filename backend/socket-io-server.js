@@ -756,10 +756,10 @@ module.exports = async function (cms) {
           const formattedOrder = formatOrder(orderData);
 
           /** @deprecated */
-          const targetClientIdOld = `${store.id}_${_id}`;
+          const targetClientIdOld = `${store.id}_${_id.toString()}`;
           externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
 
-          const targetClientId = _id;
+          const targetClientId = _id.toString();
           externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
           console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
               `2a. Online order backend: received order from frontend, sending to demo device`);

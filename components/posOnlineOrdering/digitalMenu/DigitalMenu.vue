@@ -1,7 +1,15 @@
 <template>
   <div class="digital-menu">
+    <!-- check google login -->
+    <img style="display:none;"
+         @load="googleLogin = true"
+         @error="googleLogin = false"
+         src="https://accounts.google.com/CheckCookie?continue=https%3A%2F%2Fwww.google.com%2Fintl%2Fen%2Fimages%2Flogos%2Faccounts_logo.png&followup=https%3A%2F%2Fwww.google.com%2Fintl%2Fen%2Fimages%2Flogos%2Faccounts_logo.png&chtml=LoginDoneHtml&checkedDomains=youtube&checkConnection=youtube%3A291%3A1"
+    />
     <div class="digital-menu__logo">
       <img alt :src="cdnStoreLogoImage"/>
+      <g-spacer/>
+      <g-btn-bs icon="icon-feedback" background-color="#ECF0F5" @click="openFeedbackDialog">Feedback</g-btn-bs>
     </div>
     <div class="digital-menu__info" v-if="orderItems.length > 0">
       <g-badge :value="true" color="#4CAF50" overlay>
@@ -73,6 +81,33 @@
         @add="addItemToOrder"
         no-note
         :store-country-locale="storeCountryLocale"/>
+    <g-dialog v-model="dialog.feedback" >
+      <div class="dialog">
+        <template v-if="dialog.mode === 'select'">
+          <div class="dialog-title">Are you happy with our products and services?</div>
+          <div class="dialog-content">
+            <g-btn-bs min-width="90" @click="dialog.mode = 'negative'" vertical>
+              <img alt src="/plugins/pos-plugin/assets/sad.svg"/>
+              <span class="fs-small-2">No, I am not</span>
+            </g-btn-bs>
+            <g-btn-bs min-width="90" @click="submitFeedback('positive')" vertical>
+              <img alt src="/plugins/pos-plugin/assets/happy.svg"/>
+              <span class="fs-small-2">Yes, I am</span>
+            </g-btn-bs>
+          </div>
+        </template>
+        <template v-if="dialog.mode === 'positive'">
+          <div class="dialog-title">Thank you for using our service</div>
+          <div v-if="store.googleMyBusinessShortcode" class="dialog-review" @click="openGoogleReview">Spread the love by leaving a review on Google</div>
+        </template>
+        <template v-if="dialog.mode === 'negative'">
+          <div class="dialog-title">We apologize for any bad experience you might have.</div>
+          <g-spacer/>
+          <g-textarea rows="3" outlined placeholder="Leave us a feedback to improve our services." v-model="feedback"></g-textarea>
+          <g-btn-bs style="align-self: flex-end" text-color="#1400FF" @click="submitFeedback('negative')">Submit</g-btn-bs>
+        </template>
+      </div>
+    </g-dialog>
   </div>
 </template>
 
@@ -102,8 +137,12 @@
         orderItems: [],
         selectedProduct: null,
         dialog: {
-          add: false
-        }
+          add: false,
+          feedback: false,
+          mode: 'select'
+        },
+        googleLogin: false,
+        feedback: ''
       }
     },
     async created() {
@@ -219,6 +258,29 @@
       getItemPrice(item) {
         return item.price + _.sumBy(item.modifiers, modifier => modifier.price * modifier.quantity)
       },
+      openFeedbackDialog() {
+        this.feedback = ''
+        this.dialog.mode = 'select'
+        this.dialog.feedback = true
+      },
+      async submitFeedback(mode) {
+        if(mode === 'positive') {
+          this.dialog.mode = 'positive'
+        }
+        const feedback = {
+          storeId: this.store._id,
+          type: this.dialog.mode,
+          feedback: this.feedback,
+          created: new Date()
+        }
+        await cms.getModel('Feedback').create(feedback)
+        if(mode === 'negative') this.dialog.feedback = false
+      },
+      openGoogleReview() {
+        const url = `https://g.page/${this.store.googleMyBusinessShortcode}/review?gm`
+        this.dialog.feedback = false
+        window.open(url)
+      }
     },
     watch: {
       selectedCategoryId(val) {
@@ -249,7 +311,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 12px 24px 0;
+      padding: 12px 0px 0 16px;
 
       & > img {
         max-width: 50%;
@@ -410,6 +472,49 @@
           text-align: center;
         }
       }
+    }
+  }
+
+  .dialog {
+    width: 100%;
+    height: 200px;
+    background: white;
+    border-radius: 4px;
+    padding: 24px 12px;
+    display: flex;
+    flex-direction: column;
+
+    &-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    &-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .g-textarea {
+      margin: 0;
+
+      ::v-deep textarea {
+        font-size: 12px;
+      }
+    }
+
+    &-review {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1400FF;
+      font-weight: 600;
+      font-size: 12px;
+      padding: 0 20%;
+      text-align: center;
     }
   }
 </style>
