@@ -3,14 +3,14 @@
     <div class="chat-info--left">
       <g-edit-view-input class="fw-700" :value="username" @input="updateUsername"/>
       <div class="row-flex align-items-center text-grey fs-small">
-        <span v-if="online">Active now</span>
-        <span v-else>Last seen {{lastSeen | fromNow}}</span>
+        <span v-if="device.online">Active now</span>
+        <span v-else>Last seen {{device.lastSeen | fromNow}}</span>
       </div>
       <div class="row-flex align-items-center">
-        <g-icon :title="deviceName" class="mr-1" size="16">icon-device</g-icon>
-        <span :title="deviceName"
+        <g-icon :title="device.displayName" class="mr-1" size="16">icon-device</g-icon>
+        <span :title="device.displayName"
               class="chat-info__info chat-info--device-name">
-          {{deviceName}}
+          {{device.displayName}}
         </span>
 
         <template v-if="deviceIp">
@@ -39,12 +39,12 @@
                       :items="stores"
                       item-text="name"
                       item-value="_id"
-                      :value="assignedStoreId"
+                      :value="device.storeId"
                       @input="assignStore"
                       placeholder="No store assigned"/>
-      <g-badge :value="true" :color="notes.length ? '#536DFE' : '#424242'" overlay nudge-top="-4" nudge-right="-4" badge-size="14">
+      <g-badge :value="true" :color="sortedNotes.length ? '#536DFE' : '#424242'" overlay nudge-top="-4" nudge-right="-4" badge-size="14">
         <template v-slot:badge>
-          <span style="font-size: 9px">{{notes && notes.length || 0}}</span>
+          <span style="font-size: 9px">{{sortedNotes.length}}</span>
         </template>
         <g-btn-bs rounded elevation="1" style="border: none; padding: 10px; margin: 0" @click="showNoteDialog = true">
           <g-icon size="16">icon-pen</g-icon>
@@ -67,7 +67,7 @@
     <g-dialog :value="showDeleteConfirmDialog" persistent width="40%">
       <g-card elevation="16">
         <g-card-title class="delete-confirm-dialog--title">
-          Deleting device {{deviceName}}
+          Deleting device {{device.displayName}}
         </g-card-title>
         <g-card-text class="mt-3">
           <span>
@@ -103,8 +103,8 @@
           <div v-for="(note, i) of sortedNotes"
                :key="note._id"
                class="row-flex"
-               :class="i < notes.length - 1 ? 'mb-2 pb-2' : ''"
-               :style="i < notes.length - 1 ? 'border-bottom: 1px solid #EFEFEF' : ''">
+               :class="i < sortedNotes.length - 1 ? 'mb-2 pb-2' : ''"
+               :style="i < sortedNotes.length - 1 ? 'border-bottom: 1px solid #EFEFEF' : ''">
             <div class="col-1 row-flex justify-center">
               <g-icon xLarge>icon-chat-support-note-user</g-icon>
             </div>
@@ -161,25 +161,23 @@
       }
     },
     props: {
+      device: Object,
       username: String,
-      deviceName: String,
-      lastSeen: Date,
       location: String,
       stores: Array,
       storeName: {
         type: String,
         default: 'Unassigned',
       },
-      notes: Array,
       assignedStoreId: String,
-      online: Boolean,
-      deviceId: String,
       usernameMap: Object,
-      deviceIp: String,
     },
     computed: {
       sortedNotes() {
-        return this.notes.sort((e1, e2) => e2.createdAt - e1.createdAt)
+        return (this.device.notes || []).sort((e1, e2) => e2.createdAt - e1.createdAt)
+      },
+      deviceIp() {
+        return (this.device.metadata && this.device.metadata.deviceIp) || ''
       }
     },
     methods: {
@@ -190,7 +188,7 @@
         this.$emit('update-username', username)
       },
       deleteDevice() {
-        this.$emit('delete-device', this.deviceId)
+        this.$emit('delete-device', this.device._id)
         this.showDeleteConfirmDialog = false
       },
       addNote(e) {
@@ -198,7 +196,7 @@
         if (!this.currentNoteText.replace(/\r?\n|\r/g, '').trim().length) return
 
         const note = {
-          clientId: this.deviceId,
+          clientId: this.device._id,
           text: this.currentNoteText,
           userId: cms.loginUser.user._id,
         }
@@ -255,15 +253,15 @@
     }
 
     &--device-name {
-      max-width: 30%;
+      max-width: 25%;
     }
 
     &--device-ip {
-      max-width: 20%;
+      max-width: 30%;
     }
 
     &--device-location {
-      max-width: 50%;
+      max-width: 45%;
     }
 
     .contact-note-dialog {

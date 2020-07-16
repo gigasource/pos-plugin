@@ -1,10 +1,13 @@
 <template>
   <div class="chat-support pl-5 pr-5 pt-2">
     <div class="chat-support__container row-flex">
-      <div class="chat-support__container-contact-list col-3">
+      <div class="chat-support__container-contact-list col-3" @scroll="onDeviceListScroll" ref="deviceList">
         <div style="position: sticky; top: 0; background: #F4F7FB">
           <div class="chat-support__container-contact-list__title mb-2 row-flex align-items-center">
-            <span class="fs-large-2">Chat Support</span>
+            <g-select class="chat-support__container-contact-list__title__filter"
+                      label="Filter"
+                      :items="filterSelections"
+                      v-model="activeFilterSelection"></g-select>
             <g-spacer/>
             <g-select class="chat-support__container-contact-list__title__sort"
                       label="Sort"
@@ -25,35 +28,34 @@
                :class="contact._id === selectedDeviceId ? 'chat-support__container-contact-list__list--item_active' : ''">
             <div class="chat-support__container-contact-list__list--item_left">
               <div style="font-weight: bold;">
-                <span>{{contact.name}}</span>
+                <span>{{contact.displayName}}</span>
               </div>
               <span>
                 {{concatContactMetadata(contact)}}
               </span>
             </div>
             <g-spacer/>
-            <div v-if="contact.unread"
+            <div v-if="contact.unreadMessages"
                  class="chat-support__container-contact-list__list--item_right row-flex align-items-center justify-center">
-              {{contact.unread}}
+              {{contact.unreadMessages}}
             </div>
           </div>
+        </div>
+
+        <div v-if="loadingMoreDevices && moreDevicesAvailable" class="my-2 ta-center">
+          <span >Loading devices</span>
+          <g-progress-circular indeterminate color="#536DFE" class="ml-2"/>
         </div>
       </div>
 
       <div class="chat-support__container-chat-window col-8 col-flex">
         <div class="chat-support__container-chat-window__header">
           <chat-info
-              v-if="selectedDeviceId"
-              :device-id="selectedDeviceId"
-              :assigned-store-id="selectedDevice.storeId"
+              v-if="selectedDevice"
+              :device="selectedDevice"
               :username="selectedUsername"
-              :device-name="selectedDevice.name"
-              :device-ip="(selectedDevice.metadata && selectedDevice.metadata.deviceIp) || ''"
-              :online="selectedDevice.online"
-              :last-seen="selectedDevice.lastSeen"
               :location="selectedDeviceLocation"
               :stores="stores"
-              :notes="selectedDevice.notes || []"
               :username-map="usernameMap"
               @assign-store="assignStore"
               @update-username="updateUsername"
@@ -76,7 +78,7 @@
                     v-model="currentChatMsg"
                     @keydown.enter.exact="sendChatMsg"
                     @keydown.etner.shift.exact="currentChatMsg += '\n'"
-                    :disabled="!selectedDeviceId"/>
+                    :disabled="!selectedDevice"/>
           <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
@@ -95,6 +97,7 @@
   import uniqBy from 'lodash/uniqBy'
   import isNil from 'lodash/isNil'
   import debounce from 'lodash/debounce'
+  import cloneDeep from 'lodash/cloneDeep'
   import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
 
@@ -104,13 +107,30 @@
     data() {
       return {
         devices: [],
+
         sortTypes: [
-          {text: 'Installation date', value: 'mostRecentInstall'},
-          {text: 'Unread messages', value: 'mostRecentChat'},
+          {text: 'Installation date', value: 'createdAt.desc'},
+          {text: 'Unread messages', value: 'unreadMessages.desc'},
         ],
-        activeSortType: 'mostRecentInstall',
+        activeSortType: 'createdAt.desc',
+
+        filterSelections: [
+          {text: 'None', value: 'none'},
+          {text: 'Assigned', value: 'assigned'},
+          {text: 'Unassigned', value: 'unassigned'},
+          {text: 'Chat started', value: 'chatStarted'},
+          {text: 'Chat not started', value: 'chatNotStarted'},
+        ],
+        activeFilterSelection: 'none',
+
         adminId: '5c88842f1591d506a250b2a5',
         contactSearch: '',
+
+        loadingMoreDevices: false,
+        moreDevicesAvailable: true,
+        loadedDeviceIndex: 0,
+        devicesPerLoad: 15,
+
         loadingMoreChats: false,
         moreChatsAvailable: false,
         loadedChatIndex: 0,
@@ -119,9 +139,7 @@
         stores: [],
         currentChats: [],
         currentChatMsg: '',
-        selectedDeviceId: null,
-        unreadCountMap: {},
-        deviceOnlineStatusMap: {},
+        selectedDeviceId: '',
         // map userId to user's name, used for chat user info & notes feature
         usernameMap: {},
       }
@@ -139,54 +157,74 @@
       }).sort((s1, s2) => +s1.id - +s2.id)
 
       cms.socket.on('chatMessage', this.receiveChatMessage)
-      cms.socket.on('reloadUnassignedDevices', this.getGsmsDevices)
+      cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
 
-      const updateDeviceStatus = async deviceId => {
-        const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
-        if (!deviceIds.length || !deviceIds.includes(deviceId)) return
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap()
+      const updateDeviceStatus = async (deviceId, online) => {
+        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+        if (device) device.online = online
       }
 
-      cms.socket.on('gsms-device-connected', updateDeviceStatus)
-      cms.socket.on('gsms-device-disconnected', updateDeviceStatus)
+      cms.socket.on('gsms-device-connected', deviceId => updateDeviceStatus(deviceId, true))
+      cms.socket.on('gsms-device-disconnected', deviceId => updateDeviceStatus(deviceId, false))
     },
     computed: {
       sortedDeviceList() {
-        let devices = this.devices
+        let devices = cloneDeep(this.devices)
 
         devices = devices.map(d => ({
           ...d,
-          name: this.concatContactName(d),
-          unread: this.unreadCountMap[d._id],
-          online: this.deviceOnlineStatusMap[d._id],
+          displayName: this.concatContactName(d),
         }))
 
-        if (this.contactSearch) devices = devices.filter(d => {
-          if (d._id === this.selectedDeviceId) return true
-          return d.name.toLowerCase().includes(this.contactSearch.toLowerCase())
-        })
+        if (this.contactSearch && this.contactSearch.trim().length) {
+          devices = devices.filter(d => {
+            if (d._id === this.selectedDeviceId) return true
+            return d.displayName.toLowerCase().includes(this.contactSearch.toLowerCase())
+          })
+        }
+
+        switch (this.activeFilterSelection) {
+          case 'assigned': {
+            devices = devices.filter(d => !isNil(d.storeId))
+            break;
+          }
+          case 'unassigned': {
+            devices = devices.filter(d => isNil(d.storeId))
+            break;
+          }
+          case 'chatStarted': {
+            devices = devices.filter(d => d.messageCount)
+            break;
+          }
+          case 'chatNotStarted': {
+            devices = devices.filter(d => !d.messageCount)
+            break;
+          }
+        }
 
         switch (this.activeSortType) {
-          case 'mostRecentInstall': {
+          case 'createdAt.desc': {
             devices = devices.sort((cur, next) => {
               const curCreatedAt = cur.createdAt.getTime()
               const nextCreatedAt = next.createdAt.getTime()
 
-              if (curCreatedAt === nextCreatedAt) return next.lastSeen - cur.lastSeen
-              else return nextCreatedAt - curCreatedAt
+              return nextCreatedAt - curCreatedAt
             });
             break;
           }
-          case 'mostRecentChat': {
+          case 'unreadMessages.desc': {
             devices = devices.sort((cur, next) => {
               const curLatestMsgDate = cur.latestChatMessageDate.getTime()
               const nextLatestMsgDate = next.latestChatMessageDate.getTime()
 
-              if (curLatestMsgDate === nextLatestMsgDate) return next.lastSeen - cur.lastSeen
-              else return nextLatestMsgDate - curLatestMsgDate
+              return nextLatestMsgDate - curLatestMsgDate
             });
             break;
           }
+        }
+
+        if (!this.loadingMoreDevices && this.moreDevicesAvailable && devices.length < this.devicesPerLoad) {
+          this.$nextTick(this.getGsmsDevices)
         }
 
         return devices
@@ -211,6 +249,27 @@
       }
     },
     watch: {
+      contactSearch(val, oldVal) {
+        if (val === oldVal || !val.trim().length) return
+
+        this.selectedDeviceId = null
+        this.searchDevices(val)
+      },
+      activeSortType(val, oldVal) {
+        if (val === oldVal || !val.trim().length) return
+
+        this.selectedDeviceId = null
+        if (this.moreDevicesAvailable) {
+          this.loadedDeviceIndex = 0
+          this.loadingMoreDevices = false
+          this.devices = []
+          this.getGsmsDevices()
+        }
+      },
+      activeFilterSelection(val, oldVal) {
+        if (val === oldVal || !val.trim().length) return
+        this.selectedDeviceId = null
+      },
       async selectedDeviceId(val) {
         this.currentChats = []
         if (!val) return
@@ -221,7 +280,7 @@
         this.currentChats = chats
 
         // Check if there are more chat messages to load
-        const messageCountObj = await this.getChatMessageCount()
+        const messageCountObj = await this.getChatMessageCount([val])
         const messageCount = messageCountObj[val]
         this.moreChatsAvailable = chats.length <= messageCount
         // Set unread notification number to 0
@@ -233,27 +292,70 @@
         const deviceIds = this.sortedDeviceList.map(({_id}) => _id)
         if (!deviceIds.length) return
 
-        this.unreadCountMap = await this.getChatMessageCount(null, false, false)
-        this.deviceOnlineStatusMap = await this.getDeviceOnlineStatusMap()
-
         cms.socket.emit('watch-chat-message', deviceIds)
       }
     },
     methods: {
-      async getGsmsDevices() {
-        const {data: gsmsDevices} = await axios.get('/gsms-device/devices');
+      searchDevices: debounce(async function (searchText) {
+        if (!this.moreDevicesAvailable) return
 
-        this.devices = gsmsDevices;
-        this.devices = this.devices.map(device => ({
+        this.loadingMoreDevices = true
+        const searchApiUrl = `gsms-device/devices`
+        let {data: devices} = await axios.get(searchApiUrl, {
+          params: {
+            sort: this.activeSortType === this.sortTypes[0].value ? this.activeSortType : [this.activeSortType, 'createdAt.desc'],
+            nameSearch: searchText,
+          }
+        })
+
+        if (devices.length) {
+          devices = devices.map(this.convertDevice)
+          this.devices = uniqBy([...this.devices, ...devices], '_id')
+        }
+
+        this.loadingMoreDevices = false
+      }, 750),
+      convertDevice(device) {
+        return {
           ...device,
+          messageCount: device.messageCount || 0,
           lastSeen: new Date(device.lastSeen),
           latestChatMessageDate: new Date(device.latestChatMessageDate),
-          // backward compatibility, some devices don't have this property
-          createdAt: device.createdAt ? new Date(device.createdAt) : new Date(0),
+          createdAt: device.createdAt ? new Date(device.createdAt) : new Date(0), // backward compatibility, some devices don't have this property
           ...device.notes ? {notes: device.notes.map(note => ({...note, createdAt: new Date(note.createdAt)}))} : {}
-        }))
+        }
+      },
+      async getGsmsDevices() {
+        if (!this.moreDevicesAvailable || this.loadingMoreDevices) return
 
-        return gsmsDevices;
+        this.loadingMoreDevices = true
+        const {data: gsmsDevices} = await axios.get('/gsms-device/devices', {
+          params: {
+            n: this.devicesPerLoad,
+            offset: this.loadedDeviceIndex,
+            sort: this.activeSortType === this.sortTypes[0].value ? this.activeSortType : [this.activeSortType, 'createdAt.desc'],
+          }
+        })
+
+        this.loadedDeviceIndex += this.devicesPerLoad
+        if (!gsmsDevices.length || (gsmsDevices.length % this.devicesPerLoad > 0)) this.moreDevicesAvailable = false
+
+        this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
+        this.devices = this.devices.map(device => this.convertDevice(device))
+
+        const deviceIds = this.devices.map(({_id}) => _id)
+        this.getChatMessageCount(deviceIds).then(messageCountMap => {
+          Object.keys(messageCountMap).forEach(deviceId => {
+            const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+            if (device) {
+              device.messageCount = messageCountMap[deviceId]
+              this.updateDevice(device)
+            }
+          })
+        })
+
+        this.loadingMoreDevices = false
+        return this.devices
       },
       async getChatMessages(deviceId, n, offset) {
         this.loadingMoreChats = true
@@ -325,6 +427,8 @@
 
         this.sendChatMsgDebounced(this.currentChatMsg)
         this.currentChatMsg = ''
+        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        device.messageCount = device.messageCount + 1
       },
       sendChatMsgDebounced: debounce(function(text) {
         const dummyId = uuidv1()
@@ -376,49 +480,68 @@
         const deviceId = this.selectedDeviceId
         const assingApiUrl = `/support/assign-device/${deviceId}`
         await axios.put(assingApiUrl, {storeId})
-        await this.getGsmsDevices()
+
+        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+
+        if (device) {
+          device.storeId = storeId
+          this.updateDevice(device)
+        }
       },
       receiveChatMessage(chatMessage) {
         const {clientId, userId, createdAt} = chatMessage
         console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
             `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
 
-        const device = this.devices.find(({_id}) => _id === clientId)
+        const device = this.sortedDeviceList.find(({_id}) => _id === clientId)
+        device.messageCount = device.messageCount + 1
 
-        if (device) {
-          // this.$set(device, 'latestChatMessageDate', new Date(createdAt))
-          device.latestChatMessageDate = new Date(createdAt)
-        }
+        if (device) device.latestChatMessageDate = new Date(createdAt)
 
         if (clientId === this.selectedDeviceId) {
           chatMessage.read = true
           this.currentChats.push(chatMessage)
           this.setMessagesRead(this.selectedDeviceId)
-        } else if (!isNil(this.unreadCountMap[clientId])) {
-          this.unreadCountMap[clientId]++
+        } else if (device) {
+          device.unreadMessages = device.unreadMessages || 0
+          device.unreadMessages++
         }
       },
       async setMessagesRead(deviceId) {
+        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+
+        if (device) {
+          device.unreadMessages = 0
+          this.updateDevice(device)
+        }
+
         const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${deviceId}`
         await axios.put(setMessageReadApiUrl)
-        this.unreadCountMap[deviceId] = 0
       },
-      async getDeviceOnlineStatusMap() {
-        const apiUrl = `/gsms-device/device-online-status`
-        const {data: onlineStatusMap} = await axios.get(apiUrl)
-        return onlineStatusMap
+      updateDevice(device) {
+        const deviceIndex = this.devices.findIndex(({_id}) => _id === device._id)
+        this.devices.splice(deviceIndex, 1, {...device})
       },
       async updateUsername(username) {
         const apiUrl = `/gsms-device/device-metadata`
         const payload = {clientId: this.selectedDeviceId, metadata: {customerName: username}}
         await axios.put(apiUrl, payload)
-        await this.getGsmsDevices()
+
+        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+
+        if (device) {
+          device.metadata = device.metadata || {}
+          device.metadata.customerName = username
+          this.updateDevice(device)
+        }
       },
       async deleteDevice(deviceId) {
         this.selectedDeviceId = null
+        const deviceIndex = this.sortedDeviceList.findIndex(({_id}) => _id === deviceId)
+        if (!isNil(deviceIndex)) this.devices.splice(deviceIndex, 1)
+
         const apiUrl = `/gsms-device/devices/${deviceId}`
         await axios.delete(apiUrl)
-        await this.getGsmsDevices()
       },
       async mapNoteUserIdsToNames() {
         if (!this.selectedDevice.notes) return
@@ -443,6 +566,20 @@
         if (chats.length < this.chatsPerLoad) this.moreChatsAvailable = false
         this.currentChats = [...chats, ...this.currentChats]
       },
+      onDeviceListScroll: debounce(function () {
+        // if (this.loadingMoreChats) return
+
+        const el = this.$refs.deviceList
+        if (!el) return
+
+        const scrollTop = el.scrollTop
+        const clientHeight = el.clientHeight
+        const scrollHeight = el.scrollHeight
+
+        if ((scrollTop + clientHeight) >= (scrollHeight - 40)) {
+          this.getGsmsDevices()
+        }
+      }, 300),
     }
   }
 </script>
@@ -476,6 +613,12 @@
               border: 1px solid #EEEEEE;
               border-radius: 2px;
             }
+          }
+        }
+
+        &__title {
+          &__filter, &__sort {
+            min-width: 30%;
           }
         }
 

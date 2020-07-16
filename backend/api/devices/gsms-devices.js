@@ -5,7 +5,87 @@ const StoreModel = cms.getModel('Store');
 const ChatMessageModel = cms.getModel('ChatMessage');
 const {getExternalSocketIoServer} = require('../../socket-io-server');
 const _ = require('lodash');
-const axios = require('axios')
+const axios = require('axios');
+const {extractSortQueries} = require('../utils');
+
+function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
+  // unread message count will be dynamic, so getting devices with an offset may result in missing some devices due to order changes
+  const limit = sort.unreadMessages ? n + offset : n;
+  const skip = sort.unreadMessages ? null : offset;
+
+  const steps = [{$match: {deleted: {$ne: true}}}];
+
+  if (nameSearch) {
+    steps.push({
+      $lookup: {
+        from: 'stores',
+        let: {storeId: {$toObjectId: '$storeId'}},
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ['$_id', '$$storeId']
+            }
+          },
+        }],
+        as: 'store',
+      }
+    });
+
+    steps.push({
+      $unwind: {
+        path: '$store',
+        preserveNullAndEmptyArrays: true
+      }
+    });
+    steps.push({$addFields: {storeName: '$store.name'}});
+    steps.push({$unset: 'store'});
+    steps.push({
+      $addFields: {
+        nameSearchField: {
+          $concat: [
+            '$name',
+            {$cond: [{$ifNull: ['$metadata.customerName', false]}, ' - ', '']},
+            {$ifNull: ['$metadata.customerName', '']},
+            {$cond: [{$ifNull: ['$storeName', false]}, ' - ', '']},
+            {$ifNull: ['$storeName', '']},
+          ]
+        }
+      }
+    });
+    steps.push({$unset: 'storeName'});
+
+    steps.push({
+      $match: {
+        nameSearchField: {$regex: nameSearch, $options: 'i'}
+      }
+    });
+  }
+
+  steps.push({
+    $lookup: {
+      from: 'chatmessages',
+      let: {deviceId: {$toString: '$_id'}},
+      pipeline: [
+        {
+          $match: {
+            read: false,
+            fromServer: false,
+            $expr: {$eq: ['$clientId', '$$deviceId']},
+          }
+        }
+      ],
+      as: 'unreadClientChats'
+    }
+  });
+
+  steps.push({$addFields: {unreadMessages: {$size: '$unreadClientChats'}}});
+  steps.push({$unset: 'unreadClientChats'});
+  steps.push({$sort: sort});
+  if (skip) steps.push({$skip: skip});
+  if (limit) steps.push({$limit: limit});
+
+  return DeviceModel.aggregate(steps);
+}
 
 router.get('/devices/:clientId', async (req, res) => {
   const {clientId} = req.params;
@@ -18,19 +98,30 @@ router.get('/devices/:clientId', async (req, res) => {
 });
 
 router.get('/devices', async (req, res) => {
-  let gsmsDevices = await DeviceModel.find(
-      {deviceType: 'gsms', $or: [{deleted: false}, {deleted: {$exists: false}}]}).lean();
+  let {n = 0, offset = 0, sort = 'createdAt.desc', nameSearch} = req.query;
 
-  gsmsDevices = await Promise.all(gsmsDevices.map(async device => {
-    const latestUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false}).sort({createdAt: -1});
+  sort = extractSortQueries(sort);
+
+  const clusterClientList = global.APP_CONFIG.redis
+      ? await getExternalSocketIoServer().getClusterClientIds()
+      : getExternalSocketIoServer().getAllClientId();
+
+  let devices = await getAndSortDevices(+n, +offset, sort, nameSearch);
+  devices = await Promise.all(devices.map(async device => {
+    const latestUnreadMsg = await ChatMessageModel.findOne({
+      clientId: device._id,
+      read: false,
+      fromServer: false
+    }).sort({createdAt: -1});
 
     return {
       ...device,
       latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
+      online: clusterClientList.includes(device._id),
     }
   }));
 
-  res.status(200).json(gsmsDevices);
+  res.status(200).json(devices);
 });
 
 router.delete('/devices/:clientId', async (req, res) => {
@@ -44,8 +135,8 @@ router.delete('/devices/:clientId', async (req, res) => {
     const deviceStore = await StoreModel.findById(device.storeId);
     if (deviceStore.gSms && deviceStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
-        { _id: deviceStore._id },
-        { $pull: { 'gSms.devices': { _id: id } } }
+          {_id: deviceStore._id},
+          {$pull: {'gSms.devices': {_id: deviceStore._id}}}
       )
     }
   }
@@ -130,7 +221,11 @@ router.post('/register', async (req, res) => {
   console.debug(`sentry:eventType=gsmsDeviceRegister,clientId=${newDevice._id}`,
       'New GSMS device registered');
 
-  cms.socket.emit('reloadUnassignedDevices');
+  cms.socket.emit('newGsmsDevice', {
+    ...newDevice._doc,
+    online: true,
+    unreadMessages: 0,
+  });
   res.status(201).json({clientId: newDevice._id});
 });
 
@@ -144,9 +239,14 @@ router.put('/device-metadata', async (req, res) => {
         if (metadata.deviceLatLong) {
           // update location
           const {latitude, longitude} = metadata.deviceLatLong
-          const {longitude: existingLongitude, latitude: existingLatitude} = foundDevice.metadata.deviceLatLong;
+          let shouldUpdateAddress = true
 
-          if (latitude !== existingLatitude || longitude !== existingLongitude) {
+          if (foundDevice.metadata.deviceLatLong) {
+            const {longitude: existingLongitude, latitude: existingLatitude} = foundDevice.metadata.deviceLatLong;
+            if (latitude === existingLatitude && longitude === existingLongitude) shouldUpdateAddress = false
+          }
+
+          if (shouldUpdateAddress) {
             const address = await reverseGeocodePelias(latitude, longitude);
             if (address) metadata.deviceLocation = address
             console.log(`found address: ${address}`)

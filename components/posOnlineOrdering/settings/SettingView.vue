@@ -131,7 +131,7 @@
             { title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer') },
             { title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount') },
           ]
-          
+
           if (cms.loginUser.user.role.name === "admin") {
             items.push({
               title: this.setting.paymentSetting,
@@ -173,7 +173,7 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
-        
+
         if (!store) {
           this.permissionDenied = true;
           this.permissionDeniedMessage = '404 NOT FOUND!'
@@ -287,6 +287,7 @@
         await cms.getModel('Category').create({name, store: this.store._id, position: this.categories.length})
         await this.loadCategories()
         callback && callback({ok: true})
+        cms.socket.emit('send-menu', this.store._id)
       },
       async changeCategoryName(_id, name, callback) {
         if (_.trim(name) === "") {
@@ -309,12 +310,14 @@
         await cms.getModel('Category').updateOne({_id}, { name })
         await this.loadCategories()
         callback && callback(true)
+        cms.socket.emit('send-menu', this.store._id)
       },
       async deleteCategory(_id) {
         await cms.getModel('Product').remove({ category: _id })
         await cms.getModel('Category').remove({_id: _id})
         await this.loadCategories()
         await this.loadProducts()
+        cms.socket.emit('send-menu', this.store._id)
       },
       async swapCategory(oldId, swapId, oldIndex, newIndex) {
         const category = _.cloneDeep(this.categories[oldIndex])
@@ -328,6 +331,7 @@
         }
         await cms.getModel('Category').updateOne({_id: oldId}, {position: newIndex})
         await cms.getModel('Category').updateOne({_id: swapId}, {position: oldIndex})
+        cms.socket.emit('send-menu', this.store._id)
       },
       async changeCategoryImage(image, _id) {
         await cms.getModel('Category').findOneAndUpdate({_id}, {image})
@@ -340,6 +344,7 @@
           }
         }
         cate.image = image
+        cms.socket.emit('send-menu', this.store._id)
       },
 
       // products
@@ -349,10 +354,12 @@
       async addNewProduct(product) {
         await cms.getModel('Product').create({...product, store: this.store._id})
         await this.loadProducts()
+        cms.socket.emit('send-menu', this.store._id)
       },
       async updateProduct(_id, change) {
         await cms.getModel('Product').updateOne({_id, store: this.store._id}, change)
         await this.loadProducts()
+        cms.socket.emit('send-menu', this.store._id)
       },
       async deleteProduct(_id) {
         if (!_id) return
@@ -366,6 +373,7 @@
           }
           await cms.getModel('Product').remove({_id: _id, store: this.store._id})
           await this.loadProducts()
+          cms.socket.emit('send-menu', this.store._id)
         }
       },
 

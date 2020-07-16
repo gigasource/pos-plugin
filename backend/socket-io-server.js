@@ -11,12 +11,11 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer = require('nodemailer')
-const uuidv1 = require('uuid')
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
 
-const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', new Schema({
+const messageSchema = new Schema({
   targetClientId: ObjectId,
   event: {
     type: String,
@@ -34,7 +33,9 @@ const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', new Sc
   },
 }, {
   timestamps: true
-}));
+});
+messageSchema.index({createdAt: 1},{expireAfterSeconds: 30 * 86400}); // delete saved messages if not sent after 30 days
+const SocketIOSavedMessagesModel = mongoose.model('SocketIOSavedMessage', messageSchema);
 
 const SentrySavedMessagesModel = mongoose.model('SentrySavedMessage', new Schema({
   tagString: {
@@ -756,10 +757,10 @@ module.exports = async function (cms) {
           const formattedOrder = formatOrder(orderData);
 
           /** @deprecated */
-          const targetClientIdOld = `${store.id}_${_id}`;
+          const targetClientIdOld = `${store.id}_${_id.toString()}`;
           externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
 
-          const targetClientId = _id;
+          const targetClientId = _id.toString();
           externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
           console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
               `2a. Online order backend: received order from frontend, sending to demo device`);
