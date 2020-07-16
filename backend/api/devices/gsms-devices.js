@@ -239,9 +239,14 @@ router.put('/device-metadata', async (req, res) => {
         if (metadata.deviceLatLong) {
           // update location
           const {latitude, longitude} = metadata.deviceLatLong
-          const {longitude: existingLongitude, latitude: existingLatitude} = foundDevice.metadata.deviceLatLong;
+          let shouldUpdateAddress = true
 
-          if (latitude !== existingLatitude || longitude !== existingLongitude) {
+          if (foundDevice.metadata.deviceLatLong) {
+            const {longitude: existingLongitude, latitude: existingLatitude} = foundDevice.metadata.deviceLatLong;
+            if (latitude === existingLatitude && longitude === existingLongitude) shouldUpdateAddress = false
+          }
+
+          if (shouldUpdateAddress) {
             const address = await reverseGeocodePelias(latitude, longitude);
             if (address) metadata.deviceLocation = address
             console.log(`found address: ${address}`)
