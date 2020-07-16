@@ -253,15 +253,15 @@
     }
 
     &--device-name {
-      max-width: 30%;
+      max-width: 25%;
     }
 
     &--device-ip {
-      max-width: 20%;
+      max-width: 30%;
     }
 
     &--device-location {
-      max-width: 50%;
+      max-width: 45%;
     }
 
     .contact-note-dialog {

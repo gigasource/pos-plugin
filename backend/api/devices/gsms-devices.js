@@ -44,9 +44,9 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
         nameSearchField: {
           $concat: [
             '$name',
-            ' ',
+            {$cond: [{$ifNull: ['$metadata.customerName', false]}, ' - ', '']},
             {$ifNull: ['$metadata.customerName', '']},
-            ' ',
+            {$cond: [{$ifNull: ['$storeName', false]}, ' - ', '']},
             {$ifNull: ['$storeName', '']},
           ]
         }
