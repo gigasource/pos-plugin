@@ -8,37 +8,79 @@ const _ = require('lodash');
 const axios = require('axios');
 const {extractSortQueries} = require('../utils');
 
-function getAndSortDevices(n = 0, offset = 0, sort) {
+function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
   // unread message count will be dynamic, so getting devices with an offset may result in missing some devices due to order changes
   const limit = sort.unreadMessages ? n + offset : n;
   const skip = sort.unreadMessages ? null : offset;
 
-  const steps = [
-    {
-      $match: {deleted: {$ne: true}}
-    },
-    {
-      $lookup: {
-        from: 'chatmessages',
-        let: {deviceId: {$toString: '$_id'}},
-        pipeline: [
-          {
-            $match: {
-              read: false,
-              fromServer: false,
-              $expr: {$eq: ['$clientId', '$$deviceId']},
-            }
-          }
-        ],
-        as: 'chats'
-      }
-    }, {
-      $addFields: {
-        unreadMessages: {$size: '$chats'}
-      }
-    }, {$sort: sort}
-  ];
+  const steps = [{$match: {deleted: {$ne: true}}}];
 
+  if (nameSearch) {
+    steps.push({
+      $lookup: {
+        from: 'stores',
+        let: {storeId: {$toObjectId: '$storeId'}},
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ['$_id', '$$storeId']
+            }
+          },
+        }],
+        as: 'store',
+      }
+    });
+
+    steps.push({
+      $unwind: {
+        path: '$store',
+        preserveNullAndEmptyArrays: true
+      }
+    });
+    steps.push({$addFields: {storeName: '$store.name'}});
+    steps.push({$unset: 'store'});
+    steps.push({
+      $addFields: {
+        nameSearchField: {
+          $concat: [
+            '$name',
+            ' ',
+            {$ifNull: ['$metadata.customerName', '']},
+            ' ',
+            {$ifNull: ['$storeName', '']},
+          ]
+        }
+      }
+    });
+    steps.push({$unset: 'storeName'});
+
+    steps.push({
+      $match: {
+        nameSearchField: {$regex: nameSearch, $options: 'i'}
+      }
+    });
+  }
+
+  steps.push({
+    $lookup: {
+      from: 'chatmessages',
+      let: {deviceId: {$toString: '$_id'}},
+      pipeline: [
+        {
+          $match: {
+            read: false,
+            fromServer: false,
+            $expr: {$eq: ['$clientId', '$$deviceId']},
+          }
+        }
+      ],
+      as: 'chats'
+    }
+  });
+
+  steps.push({$addFields: {unreadMessages: {$size: '$chats'}}});
+  steps.push({$unset: 'chats'});
+  steps.push({$sort: sort});
   if (skip) steps.push({$skip: skip});
   if (limit) steps.push({$limit: limit});
 
@@ -56,7 +98,7 @@ router.get('/devices/:clientId', async (req, res) => {
 });
 
 router.get('/devices', async (req, res) => {
-  let {n = 0, offset = 0, sort = 'createdAt.desc'} = req.query;
+  let {n = 0, offset = 0, sort = 'createdAt.desc', nameSearch} = req.query;
 
   sort = extractSortQueries(sort);
 
@@ -64,9 +106,13 @@ router.get('/devices', async (req, res) => {
       ? await getExternalSocketIoServer().getClusterClientIds()
       : getExternalSocketIoServer().getAllClientId();
 
-  let devices = await getAndSortDevices(+n, +offset, sort);
-  devices = await Promise.all(devices.map(async ({chats, ...device}) => {
-    const latestUnreadMsg = await ChatMessageModel.findOne({clientId: device._id, read: false, fromServer: false}).sort({createdAt: -1});
+  let devices = await getAndSortDevices(+n, +offset, sort, nameSearch);
+  devices = await Promise.all(devices.map(async device => {
+    const latestUnreadMsg = await ChatMessageModel.findOne({
+      clientId: device._id,
+      read: false,
+      fromServer: false
+    }).sort({createdAt: -1});
 
     return {
       ...device,
@@ -89,8 +135,8 @@ router.delete('/devices/:clientId', async (req, res) => {
     const deviceStore = await StoreModel.findById(device.storeId);
     if (deviceStore.gSms && deviceStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
-        { _id: deviceStore._id },
-        { $pull: { 'gSms.devices': { _id: deviceStore._id } } }
+          {_id: deviceStore._id},
+          {$pull: {'gSms.devices': {_id: deviceStore._id}}}
       )
     }
   }

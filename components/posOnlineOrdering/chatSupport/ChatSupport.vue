@@ -99,6 +99,7 @@
   import uniqBy from 'lodash/uniqBy'
   import isNil from 'lodash/isNil'
   import debounce from 'lodash/debounce'
+  import cloneDeep from 'lodash/cloneDeep'
   import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
 
@@ -159,7 +160,7 @@
     },
     computed: {
       sortedDeviceList() {
-        let devices = this.devices
+        let devices = cloneDeep(this.devices)
 
         devices = devices.map(d => ({
           ...d,
@@ -214,6 +215,11 @@
       }
     },
     watch: {
+      contactSearch(val, oldVal) {
+        if (val === oldVal || !val.trim().length) return
+
+        this.searchDevices(val)
+      },
       activeSortType(val, oldVal) {
         if (val !== oldVal && this.moreDevicesAvailable) {
           this.loadedDeviceIndex = 0
@@ -248,6 +254,25 @@
       }
     },
     methods: {
+      searchDevices: debounce(async function (searchText) {
+        if (!this.moreDevicesAvailable) return
+
+        this.loadingMoreDevices = true
+        const searchApiUrl = `gsms-device/devices`
+        let {data: devices} = await axios.get(searchApiUrl, {
+          params: {
+            sort: this.activeSortType === this.sortTypes[0].value ? this.activeSortType : [this.activeSortType, 'createdAt.desc'],
+            nameSearch: searchText,
+          }
+        })
+
+        if (devices.length) {
+          devices = devices.map(this.convertDevice)
+          this.devices = uniqBy([...this.devices, ...devices], '_id')
+        }
+
+        this.loadingMoreDevices = false
+      }, 750),
       convertDevice(device) {
         return {
           ...device,
