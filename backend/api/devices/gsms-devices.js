@@ -74,12 +74,12 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
           }
         }
       ],
-      as: 'chats'
+      as: 'unreadClientChats'
     }
   });
 
-  steps.push({$addFields: {unreadMessages: {$size: '$chats'}}});
-  steps.push({$unset: 'chats'});
+  steps.push({$addFields: {unreadMessages: {$size: '$unreadClientChats'}}});
+  steps.push({$unset: 'unreadClientChats'});
   steps.push({$sort: sort});
   if (skip) steps.push({$skip: skip});
   if (limit) steps.push({$limit: limit});

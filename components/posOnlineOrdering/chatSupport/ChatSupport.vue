@@ -4,7 +4,10 @@
       <div class="chat-support__container-contact-list col-3" @scroll="onDeviceListScroll" ref="deviceList">
         <div style="position: sticky; top: 0; background: #F4F7FB">
           <div class="chat-support__container-contact-list__title mb-2 row-flex align-items-center">
-            <span class="fs-large-2">Chat Support</span>
+            <g-select class="chat-support__container-contact-list__title__filter"
+                      label="Filter"
+                      :items="filterSelections"
+                      v-model="activeFilterSelection"></g-select>
             <g-spacer/>
             <g-select class="chat-support__container-contact-list__title__sort"
                       label="Sort"
@@ -40,24 +43,19 @@
         </div>
 
         <div v-if="loadingMoreDevices && moreDevicesAvailable" class="my-2 ta-center">
-          <g-progress-circular indeterminate color="#536DFE"/>
+          <span >Loading devices</span>
+          <g-progress-circular indeterminate color="#536DFE" class="ml-2"/>
         </div>
       </div>
 
       <div class="chat-support__container-chat-window col-8 col-flex">
         <div class="chat-support__container-chat-window__header">
           <chat-info
-              v-if="selectedDeviceId"
-              :device-id="selectedDeviceId"
-              :assigned-store-id="selectedDevice.storeId"
+              v-if="selectedDevice"
+              :device="selectedDevice"
               :username="selectedUsername"
-              :device-name="selectedDevice.displayName"
-              :device-ip="(selectedDevice.metadata && selectedDevice.metadata.deviceIp) || ''"
-              :online="selectedDevice.online"
-              :last-seen="selectedDevice.lastSeen"
               :location="selectedDeviceLocation"
               :stores="stores"
-              :notes="selectedDevice.notes || []"
               :username-map="usernameMap"
               @assign-store="assignStore"
               @update-username="updateUsername"
@@ -80,7 +78,7 @@
                     v-model="currentChatMsg"
                     @keydown.enter.exact="sendChatMsg"
                     @keydown.etner.shift.exact="currentChatMsg += '\n'"
-                    :disabled="!selectedDeviceId"/>
+                    :disabled="!selectedDevice"/>
           <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
@@ -109,11 +107,22 @@
     data() {
       return {
         devices: [],
+
         sortTypes: [
           {text: 'Installation date', value: 'createdAt.desc'},
           {text: 'Unread messages', value: 'unreadMessages.desc'},
         ],
         activeSortType: 'createdAt.desc',
+
+        filterSelections: [
+          {text: 'None', value: 'none'},
+          {text: 'Assigned', value: 'assigned'},
+          {text: 'Unassigned', value: 'unassigned'},
+          {text: 'Chat started', value: 'chatStarted'},
+          {text: 'Chat not started', value: 'chatNotStarted'},
+        ],
+        activeFilterSelection: 'none',
+
         adminId: '5c88842f1591d506a250b2a5',
         contactSearch: '',
 
@@ -130,7 +139,7 @@
         stores: [],
         currentChats: [],
         currentChatMsg: '',
-        selectedDeviceId: null,
+        selectedDeviceId: '',
         // map userId to user's name, used for chat user info & notes feature
         usernameMap: {},
       }
@@ -167,10 +176,31 @@
           displayName: this.concatContactName(d),
         }))
 
-        if (this.contactSearch) devices = devices.filter(d => {
-          if (d._id === this.selectedDeviceId) return true
-          return d.displayName.toLowerCase().includes(this.contactSearch.toLowerCase())
-        })
+        if (this.contactSearch && this.contactSearch.trim().length) {
+          devices = devices.filter(d => {
+            if (d._id === this.selectedDeviceId) return true
+            return d.displayName.toLowerCase().includes(this.contactSearch.toLowerCase())
+          })
+        }
+
+        switch (this.activeFilterSelection) {
+          case 'assigned': {
+            devices = devices.filter(d => !isNil(d.storeId))
+            break;
+          }
+          case 'unassigned': {
+            devices = devices.filter(d => isNil(d.storeId))
+            break;
+          }
+          case 'chatStarted': {
+            devices = devices.filter(d => d.messageCount)
+            break;
+          }
+          case 'chatNotStarted': {
+            devices = devices.filter(d => !d.messageCount)
+            break;
+          }
+        }
 
         switch (this.activeSortType) {
           case 'createdAt.desc': {
@@ -191,6 +221,10 @@
             });
             break;
           }
+        }
+
+        if (!this.loadingMoreDevices && this.moreDevicesAvailable && devices.length < this.devicesPerLoad) {
+          this.$nextTick(this.getGsmsDevices)
         }
 
         return devices
@@ -218,15 +252,23 @@
       contactSearch(val, oldVal) {
         if (val === oldVal || !val.trim().length) return
 
+        this.selectedDeviceId = null
         this.searchDevices(val)
       },
       activeSortType(val, oldVal) {
-        if (val !== oldVal && this.moreDevicesAvailable) {
+        if (val === oldVal || !val.trim().length) return
+
+        this.selectedDeviceId = null
+        if (this.moreDevicesAvailable) {
           this.loadedDeviceIndex = 0
           this.loadingMoreDevices = false
           this.devices = []
           this.getGsmsDevices()
         }
+      },
+      activeFilterSelection(val, oldVal) {
+        if (val === oldVal || !val.trim().length) return
+        this.selectedDeviceId = null
       },
       async selectedDeviceId(val) {
         this.currentChats = []
@@ -276,6 +318,7 @@
       convertDevice(device) {
         return {
           ...device,
+          messageCount: device.messageCount || 0,
           lastSeen: new Date(device.lastSeen),
           latestChatMessageDate: new Date(device.latestChatMessageDate),
           createdAt: device.createdAt ? new Date(device.createdAt) : new Date(0), // backward compatibility, some devices don't have this property
@@ -299,6 +342,17 @@
 
         this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
         this.devices = this.devices.map(device => this.convertDevice(device))
+
+        const deviceIds = this.devices.map(({_id}) => _id)
+        this.getChatMessageCount(deviceIds).then(messageCountMap => {
+          Object.keys(messageCountMap).forEach(deviceId => {
+            const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+            if (device) {
+              device.messageCount = messageCountMap[deviceId]
+              this.updateDevice(device)
+            }
+          })
+        })
 
         this.loadingMoreDevices = false
         return this.devices
@@ -373,6 +427,8 @@
 
         this.sendChatMsgDebounced(this.currentChatMsg)
         this.currentChatMsg = ''
+        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        device.messageCount = device.messageCount + 1
       },
       sendChatMsgDebounced: debounce(function(text) {
         const dummyId = uuidv1()
@@ -437,7 +493,8 @@
         console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
             `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
 
-        const device = this.devices.find(({_id}) => _id === clientId)
+        const device = this.sortedDeviceList.find(({_id}) => _id === clientId)
+        device.messageCount = device.messageCount + 1
 
         if (device) device.latestChatMessageDate = new Date(createdAt)
 
@@ -556,6 +613,12 @@
               border: 1px solid #EEEEEE;
               border-radius: 2px;
             }
+          }
+        }
+
+        &__title {
+          &__filter, &__sort {
+            min-width: 30%;
           }
         }
 

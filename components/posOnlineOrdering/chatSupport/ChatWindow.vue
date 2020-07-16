@@ -2,7 +2,7 @@
   <div class="chat-window col-flex"
        @scroll="onChatWindowScroll"
        ref="chatWindow">
-    <template v-if="deviceId && processedChats && processedChats.length > 0">
+    <template v-if="device && processedChats && processedChats.length > 0">
       <div class="mb-5 ta-center">
         <g-progress-circular v-if="loadingMoreChats && moreChatsAvailable" indeterminate color="#536DFE"/>
         <span v-else-if="!moreChatsAvailable">No more chat messages available</span>
