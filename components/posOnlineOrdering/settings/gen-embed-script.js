@@ -102,7 +102,7 @@ export function getEmbedWebshop() {
 
   function openNewTab() {
     var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
-    var newTabUrl = ['enjoylocal.de', 'store', alias].join('/')
+    var newTabUrl = ['https://enjoylocal.de', 'store', alias].join('/')
     window.open(newTabUrl)
   }
 
