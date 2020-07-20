@@ -198,13 +198,13 @@
           <div class="po-order-table__footer--mobile--total">{{effectiveTotal | currency(storeCountryLocale)}}</div>
           <g-spacer/>
           <g-btn-bs v-if="orderView" width="150" rounded background-color="#2979FF" @click="view = 'confirm'" style="padding: 8px 16px; position: relative">
-            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.payment')}}</span>
+            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.order')}}</span>
             <div class="icon-payment">
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>
           </g-btn-bs>
           <g-btn-bs v-if="confirmView" width="150" :disabled="unavailableConfirm" rounded background-color="#2979FF" @click="view = 'payment'" elevation="5" style="padding: 8px 16px; position: relative">
-            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.next')}}</span>
+            <span style="text-transform: capitalize; margin-right: 12px">{{$t('store.payment')}}</span>
             <div class="icon-payment">
               <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
             </div>

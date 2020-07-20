@@ -43,7 +43,7 @@
                   </template>
                   <span v-else>{{$t('store.today')}}</span>
                 </div>
-                
+
               </div>
               <div class="address">
                 <span>{{store.address}}</span>
@@ -63,7 +63,7 @@
             <div class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
             <g-spacer/>
             <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="showOrder = true" width="150">
-              <span class="mr-3">{{$t('store.order')}}</span>
+              <span class="mr-3">{{$t('store.orderList')}}</span>
               <div class="icon-payment">
                 <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
               </div>
