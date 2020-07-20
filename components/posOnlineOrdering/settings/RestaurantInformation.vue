@@ -157,7 +157,7 @@
   import UploadZone from './UploadZone';
   import _ from 'lodash'
   import {getCdnUrl} from "../../Store/utils";
-  import {getEmbedWebshop, getEmbedReservation, genReadyState, genScriptHeader, genScriptFooter, genStyleSheet, checkIOs12AndLess, getEmbedBtn} from './gen-embed-script';
+  import {getEmbedWebshop, getEmbedReservation, genReadyState, genScriptHeader, genScriptFooter, genStyleSheet, checkIOs12AndLess, getEmbedBtn, mobileCheck} from './gen-embed-script';
   const terser = require('terser')
 
   // TODO:
@@ -315,8 +315,8 @@
         //change image
         if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`, 'embed')
         //change script
-        const header = genScriptHeader(), footer = genScriptFooter(), triggerBtn = getEmbedBtn(this.type), webshop = getEmbedWebshop(), reservation = getEmbedReservation(), checkIOs = checkIOs12AndLess()
-        const fnString = header + checkIOs + genStyleSheet(this.position, this.size, this.hidden) + triggerBtn + reservation + webshop + genReadyState() + footer
+        const header = genScriptHeader(), footer = genScriptFooter(), triggerBtn = getEmbedBtn(this.type), webshop = getEmbedWebshop(), reservation = getEmbedReservation(), checkIOs = checkIOs12AndLess(), mobile = mobileCheck()
+        const fnString = header + checkIOs + mobile + genStyleSheet(this.position, this.size, this.hidden) + triggerBtn + reservation + webshop + genReadyState() + footer
         const minifyString = terser.minify(fnString).code
         const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
         this.script = await this.$getService('FileUploadStore').uploadScript(file, this.store.alias)
