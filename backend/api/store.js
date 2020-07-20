@@ -159,4 +159,17 @@ router.post('/new-store', async (req, res) => {
   })
 })
 
+router.post('/new-feedback', async (req, res) => {
+  const { storeId, type, feedback } = req.body
+
+  await cms.getModel('Feedback').create({
+    storeId,
+    type,
+    feedback,
+    created: new Date()
+  })
+
+  res.json({ok: true})
+})
+
 module.exports = router

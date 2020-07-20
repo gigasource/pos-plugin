@@ -83,11 +83,12 @@
         :store-country-locale="storeCountryLocale"/>
     <g-dialog v-model="dialog.feedback" >
       <div class="dialog">
+        <g-icon size="16" class="dialog-icon--close" @click="dialog.feedback = false">icon-close</g-icon>
         <template v-if="dialog.mode === 'select'">
           <div class="dialog-title">Are you happy with our products and services?</div>
           <div class="dialog-content">
             <g-btn-bs min-width="90" @click="dialog.mode = 'negative'" vertical>
-              <img alt src="/plugins/pos-plugin/assets/sad.svg"/>
+              <img alt src="/plugins/pos-plugin/assets/sad.svg" style="margin: 8px"/>
               <span class="fs-small-2">No, I am not</span>
             </g-btn-bs>
             <g-btn-bs min-width="90" @click="submitFeedback('positive')" vertical>
@@ -103,7 +104,7 @@
         <template v-if="dialog.mode === 'negative'">
           <div class="dialog-title">We apologize for any bad experience you might have.</div>
           <g-spacer/>
-          <g-textarea rows="3" outlined placeholder="Leave us a feedback to improve our services." v-model="feedback"></g-textarea>
+          <g-textarea rows="2" no-resize outlined placeholder="Leave us a feedback to improve our services." v-model="feedback"></g-textarea>
           <g-btn-bs style="align-self: flex-end" text-color="#1400FF" @click="submitFeedback('negative')">Submit</g-btn-bs>
         </template>
       </div>
@@ -267,13 +268,11 @@
         if(mode === 'positive') {
           this.dialog.mode = 'positive'
         }
-        const feedback = {
+        await axios.post('/store/new-feedback', {
           storeId: this.store._id,
           type: this.dialog.mode,
-          feedback: this.feedback,
-          created: new Date()
-        }
-        await cms.getModel('Feedback').create(feedback)
+          feedback: this.feedback
+        })
         if(mode === 'negative') this.dialog.feedback = false
       },
       openGoogleReview() {
@@ -480,20 +479,22 @@
     height: 200px;
     background: white;
     border-radius: 4px;
-    padding: 24px 12px;
+    padding: 24px 16px;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     &-title {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       text-align: center;
+      padding: 0 20px;
     }
 
     &-content {
       flex: 1;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-around;
     }
 
@@ -502,6 +503,15 @@
 
       ::v-deep textarea {
         font-size: 12px;
+        padding: 6px 6px 0;
+      }
+
+      ::v-deep .g-tf-append__inner {
+        display: none;
+      }
+
+      ::v-deep fieldset {
+        border: 1px solid #EFEFEF;
       }
     }
 
@@ -511,10 +521,16 @@
       align-items: center;
       justify-content: center;
       color: #1400FF;
-      font-weight: 600;
       font-size: 12px;
       padding: 0 20%;
       text-align: center;
+      text-decoration: underline;
+    }
+
+    &-icon--close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
     }
   }
 </style>
