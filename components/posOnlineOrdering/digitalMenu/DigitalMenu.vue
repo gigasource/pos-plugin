@@ -51,7 +51,7 @@
               :display-image="store.displayImage"
               :store-country-locale="storeCountryLocale"/>
         </div>
-        <div class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1">Free Digital Menu powered by <b>Restaurant Plus</b> 2020</div>
+        <div class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1 fw-600">{{$t('menu.restaurantPlus')}}</div>
       </div>
     </div>
     <template v-if="viewOrder">

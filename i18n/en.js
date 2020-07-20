@@ -513,7 +513,8 @@ module.exports = {
       ggReview: 'Spread the love by leaving a review on Google',
       apology: 'We apologize for any bad experience you might have',
       placeholder: 'Leave us a feedback to improve our services.',
-      view: 'View'
+      view: 'View',
+      restaurantPlus: 'Free Digital Menu powered by Restaurant Plus 2020'
     }
   }
 }
