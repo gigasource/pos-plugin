@@ -225,7 +225,7 @@ export function getEmbedReservation() {
   
     function openNewTab() {
       var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
-      var newTabUrl = ['enjoylocal.de', 'reservation', alias].join('/')
+      var newTabUrl = ['https://enjoylocal.de', 'reservation', alias].join('/')
       window.open(newTabUrl)
     }
   
