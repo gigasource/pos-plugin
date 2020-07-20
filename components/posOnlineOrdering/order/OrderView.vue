@@ -418,7 +418,7 @@
       },
       deliveryInfo() {
         let info = []
-        if (!this.store.delivery) return [{title: 'Not Available'}]
+        if (!this.store.delivery) return [{title: $t('store.notAvailable')}]
         if (this.store.minimumOrderValue && this.store.minimumOrderValue.active) {
           info.push({
             title: $t('store.minimumOrder'),

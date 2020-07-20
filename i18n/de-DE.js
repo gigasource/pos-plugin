@@ -80,10 +80,12 @@ module.exports = {
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
       messageConfirm: 'Your order will be sent to the restaurant.',
-      next: 'Neben',
+      next: 'Nächste',
       deliveryIn: 'Lieferung in {0} Minuten.',
       pickUpIn: 'Abholung in {0} Minuten.',
-      payByCash: 'Barzahlung'
+      payByCash: 'Barzahlung',
+      paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
+      notAvailable: 'Nicht Verfügbar'
     },
 
     common: {
@@ -214,6 +216,7 @@ module.exports = {
       seatLimit: 'Seat limit',
       noteForCustomer: 'Hinweis für Kunden',
       hideEmpty: 'leere Zeitsschlitze ausblenden',
+      addNote: 'Notiz addieren'
     },
 
     paymentProviders: {

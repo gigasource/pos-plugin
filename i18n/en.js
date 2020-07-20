@@ -369,7 +369,9 @@ module.exports = {
       next: 'Next',
       deliveryIn: 'Delivery in {0} minutes',
       pickUpIn: 'Pick up in {0} minutes',
-      payByCash: 'Pay By Cash'
+      payByCash: 'Pay By Cash',
+      paymentOption: 'PAYMENT OPTIONS',
+      notAvailable: 'Not Available'
     },
 
     paymentProviders: {
@@ -498,6 +500,7 @@ module.exports = {
       noteForCustomer: 'Note for customers',
       hideEmpty: 'Hide empty time slots',
       sendConfirmEmail: 'Send confirmation email',
+      addNote: 'Add note'
     },
   }
 }

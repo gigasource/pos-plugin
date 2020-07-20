@@ -150,7 +150,7 @@
               </div>
 
               <!-- PAYMENT -->
-              <div class="section-header">PAYMENT OPTIONS</div>
+              <div class="section-header">{{$t('store.paymentOption')}}</div>
               <div style="margin: 0 auto;">
                 <div class="pay-by-cash-btn" @click="confirmCashPayment">{{$t('store.payByCash')}}</div>
                 <pay-pal-smart-button

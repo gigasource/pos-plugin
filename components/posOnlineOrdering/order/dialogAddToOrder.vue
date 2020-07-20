@@ -52,7 +52,7 @@
           </div>
         </div>
         <div v-if="!noNote" class="dialog-content__note">
-          <p>Add note</p>
+          <p>{{$t('setting.addNote')}}</p>
           <g-text-field-bs prepend-inner-icon="icon-note@16" :placeholder="`${$t('store.note')}...`" v-model="note"/>
         </div>
       </div>
@@ -63,7 +63,7 @@
           <g-icon @click.stop="increaseQuantity" color="#424242" size="28">add_circle</g-icon>
         </div>
         <g-spacer/>
-        <g-btn-bs width="80" height="100%" text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
+        <g-btn-bs min-width="80" height="100%" text-color="#424242" @click="internalValue = false">{{$t('setting.cancel')}}</g-btn-bs>
         <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
                   :disabled="!validateRequiredModifier" @click="submit">OK</g-btn-bs>
       </div>
