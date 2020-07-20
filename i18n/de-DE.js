@@ -233,5 +233,17 @@ module.exports = {
 
       }
     },
+
+    menu: {
+      feedback: 'Rückmeldung',
+      question: 'Sind Sie mit unseren Produkten und Dienstleistungen zufrieden?',
+      positive: 'Ja, gern',
+      negative: 'Nein, danke',
+      thank: 'Vielen dank für Nutzung unserer Dienste',
+      ggReview: 'Verbreiten Sie die Liebe, indem Sie eine Bewertung bei Google hinterlassen',
+      apology: 'Wir entschuldigen uns für die schlechte Erfahrung, die Sie haben könnten',
+      placeholder: 'Hinterlassen Sie bitte uns eine Rückmeldung, um unsere Dienstleistungen zu verbessern.',
+      view: 'Aussicht'
+    }
   }
 }

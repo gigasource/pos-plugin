@@ -9,7 +9,7 @@
     <div class="digital-menu__logo">
       <img alt :src="cdnStoreLogoImage"/>
       <g-spacer/>
-      <g-btn-bs icon="icon-feedback" background-color="#ECF0F5" @click="openFeedbackDialog">Feedback</g-btn-bs>
+      <g-btn-bs icon="icon-feedback" background-color="#ECF0F5" @click="openFeedbackDialog">{{$t('menu.feedback')}}</g-btn-bs>
     </div>
     <div class="digital-menu__info" v-if="orderItems.length > 0">
       <g-badge :value="true" color="#4CAF50" overlay>
@@ -23,7 +23,7 @@
       <div @click="viewOrder = true" class="digital-menu__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
       <g-spacer/>
       <g-btn-bs v-if="!viewOrder" background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="viewOrder = true" width="150">
-        <span class="mr-3">View</span>
+        <span class="mr-3">{{$t('menu.view')}}</span>
         <div class="icon-view">
           <g-icon size="16" color="white" class="ml-1">fas fa-chevron-right</g-icon>
         </div>
@@ -86,26 +86,26 @@
       <div class="dialog">
         <g-icon size="16" class="dialog-icon--close" @click="dialog.feedback = false">icon-close</g-icon>
         <template v-if="dialog.mode === 'select'">
-          <div class="dialog-title">Are you happy with our products and services?</div>
+          <div class="dialog-title">{{$t('menu.question')}}</div>
           <div class="dialog-content">
             <g-btn-bs min-width="90" @click="dialog.mode = 'negative'" vertical>
               <img alt src="/plugins/pos-plugin/assets/sad.svg" class="ma-1"/>
-              <span class="fs-small-2">No, I am not</span>
+              <span class="fs-small-2">{{$t('menu.negative')}}</span>
             </g-btn-bs>
             <g-btn-bs min-width="90" @click="submitFeedback('positive')" vertical>
               <img alt src="/plugins/pos-plugin/assets/happy.svg" class="ma-1"/>
-              <span class="fs-small-2">Yes, I am</span>
+              <span class="fs-small-2">{{$t('menu.positive')}}</span>
             </g-btn-bs>
           </div>
         </template>
         <template v-if="dialog.mode === 'positive'">
-          <div class="dialog-title">Thank you for using our service</div>
-          <div v-if="store.googleMyBusinessShortcode" class="dialog-review" @click="openGoogleReview">Spread the love by leaving a review on Google</div>
+          <div class="dialog-title">{{$t('menu.thank')}}</div>
+          <div v-if="store.googleMyBusinessShortcode" class="dialog-review" @click="openGoogleReview">{{$t('menu.ggReview')}}</div>
         </template>
         <template v-if="dialog.mode === 'negative'">
-          <div class="dialog-title">We apologize for any bad experience you might have.</div>
+          <div class="dialog-title">{{$t('menu.apology')}}</div>
           <g-spacer/>
-          <g-textarea rows="2" no-resize outlined placeholder="Leave us a feedback to improve our services." v-model="feedback"></g-textarea>
+          <g-textarea rows="2" no-resize outlined :placeholder="$t('menu.placeholder')" v-model="feedback"></g-textarea>
           <g-btn-bs style="align-self: flex-end" text-color="#1400FF" @click="submitFeedback('negative')">Submit</g-btn-bs>
         </template>
       </div>
@@ -153,6 +153,7 @@
         this.store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         await this.loadCategories()
         await this.loadProducts()
+        root.$i18n.locale = (this.store && this.store.country && this.store.country.locale) || 'en'
       }
     },
     mounted() {

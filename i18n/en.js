@@ -502,5 +502,18 @@ module.exports = {
       sendConfirmEmail: 'Send confirmation email',
       addNote: 'Add note'
     },
+
+
+    menu: {
+      feedback: 'Feedback',
+      question: 'Are you happy with our products and services?',
+      positive: 'Yes, I am',
+      negative: 'No, I am not',
+      thank: 'Thank you for using our services. ',
+      ggReview: 'Spread the love by leaving a review on Google',
+      apology: 'We apologize for any bad experience you might have',
+      placeholder: 'Leave us a feedback to improve our services.',
+      view: 'View'
+    }
   }
 }
