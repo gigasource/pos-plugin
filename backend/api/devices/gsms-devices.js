@@ -7,6 +7,7 @@ const {getExternalSocketIoServer} = require('../../socket-io-server');
 const _ = require('lodash');
 const axios = require('axios');
 const {extractSortQueries} = require('../utils');
+const dayjs = require('dayjs')
 
 function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
   // unread message count will be dynamic, so getting devices with an offset may result in missing some devices due to order changes
@@ -291,5 +292,74 @@ async function reverseGeocodeGoogle(lat, long) { //fallback
   }
 }
 
+router.get('/google-my-business-id', async (req, res) => {
+  const storeId = req.query.storeId
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  if (!store)
+    res.status(400).end();
+  else
+    res.status(200).json({ googleMyBusinessId: store.googleMyBusinessId })
+})
+
+router.get('/monthly-report', async (req, res) => {
+  const storeId = req.query.storeId
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  if (!store) return res.status(400).end()
+
+  const feedback = await cms.getModel('Feedback').find({
+    storeId: store._id.toString(),
+    created: { $gte: dayjs().startOf('day').subtract(28, 'day').toDate() }
+  })
+  res.status(200).json({
+    prevMonthReport: store.prevMonthReport,
+    currentMonthReport: store.currentMonthReport,
+    feedback
+  })
+})
+
+router.get('/store-locale', async (req, res) => {
+  const storeId = req.query.storeId
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  if (!store) return res.status(400).end()
+
+  let currency, currencyLong
+
+  switch (store.country.locale) {
+    case 'de-DE': {
+      currency = '€'
+      currencyLong = 'EUR'
+      break
+    }
+    case 'en-AU': {
+      currency = 'A$'
+      currencyLong = 'AUD'
+      break
+    }
+    case 'en-GB': {
+      currency = '£'
+      currencyLong = 'GBP'
+      break
+    }
+    case 'en-US': {
+      currency = '$'
+      currencyLong = 'USD'
+      break
+    }
+    case 'fr-FR': {
+      currency = '€'
+      currencyLong = 'EUR'
+      break
+    }
+    default: {
+      currency = '$'
+      currencyLong = 'USD'
+      break
+    }
+  }
+
+  res.status(200).json({
+    currency, currencyLong
+  })
+})
 
 module.exports = router
