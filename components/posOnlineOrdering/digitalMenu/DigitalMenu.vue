@@ -88,11 +88,11 @@
           <div class="dialog-title">Are you happy with our products and services?</div>
           <div class="dialog-content">
             <g-btn-bs min-width="90" @click="dialog.mode = 'negative'" vertical>
-              <img alt src="/plugins/pos-plugin/assets/sad.svg" style="margin: 8px"/>
+              <img alt src="/plugins/pos-plugin/assets/sad.svg" class="ma-1"/>
               <span class="fs-small-2">No, I am not</span>
             </g-btn-bs>
             <g-btn-bs min-width="90" @click="submitFeedback('positive')" vertical>
-              <img alt src="/plugins/pos-plugin/assets/happy.svg"/>
+              <img alt src="/plugins/pos-plugin/assets/happy.svg" class="ma-1"/>
               <span class="fs-small-2">Yes, I am</span>
             </g-btn-bs>
           </div>
