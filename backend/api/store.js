@@ -133,6 +133,9 @@ router.post('/new-store', async (req, res) => {
       maxGuest: 20,
       maxDay: 7
     },
+    printers: [
+      "Kitchen"
+    ],
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
