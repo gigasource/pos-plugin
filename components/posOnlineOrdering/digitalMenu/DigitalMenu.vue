@@ -51,6 +51,7 @@
               :display-image="store.displayImage"
               :store-country-locale="storeCountryLocale"/>
         </div>
+        <div class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1">Free Digital Menu powered by <b>Restaurant Plus</b> 2020</div>
       </div>
     </div>
     <template v-if="viewOrder">
@@ -211,7 +212,7 @@
           const {top, bottom} = el.getBoundingClientRect()
           return top >= 108 || bottom >= (window.innerHeight - 100);
         })
-        this.selectedCategoryId = categoryInViewPort[0]._id
+        this.selectedCategoryId = categoryInViewPort[0] && categoryInViewPort[0]._id
         const wrapper = document.documentElement
         if(!this.selectedCategoryId || (window.innerHeight + wrapper.scrollTop >= wrapper.scrollHeight)) {
           this.selectedCategoryId = _.last(this.categories)._id
@@ -339,7 +340,6 @@
       }
 
       &--content {
-        padding-bottom: 16px;
         padding-top: 8px;
       }
     }
