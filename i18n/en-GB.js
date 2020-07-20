@@ -3,7 +3,7 @@ module.exports = {
     common: {
       currency: '£',
       currencyCode: "GBP",
-      countryCode: "UK",
+      countryCode: "GB",
       locale: "en-GB",
     }
   }
