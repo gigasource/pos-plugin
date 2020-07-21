@@ -563,6 +563,12 @@
           "schemaType": "number",
           "key": "reservations",
           "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "orderTimeouts",
+          "default": "0",
+          "type": "input@number"
         }
       ],
       "type": "object",
@@ -587,6 +593,12 @@
         {
           "schemaType": "number",
           "key": "reservations",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "orderTimeouts",
+          "default": "0",
           "type": "input@number"
         }
       ],
