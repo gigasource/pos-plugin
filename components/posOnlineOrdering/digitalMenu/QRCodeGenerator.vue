@@ -39,7 +39,7 @@
     },
     methods: {
       async createQRcode() {
-        const store = await cms.getModel('Store').find({id: this.storeId})
+        const store = await cms.getModel('Store').findOne({id: this.storeId})
         const url = ['https://enjoylocal.de', 'menu', store.alias].join('/')
         const el = document.getElementById('canvas')
         if(el) {
