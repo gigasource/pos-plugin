@@ -1,0 +1,21 @@
+{
+  "events": [],
+  "_id": "5f16b595a67ecc0201bfe0b0",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "QRCodeGenerator",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/posOnlineOrdering/digitalMenu/QRCodeGenerator.vue",
+      "path": "components/posOnlineOrdering/digitalMenu/QRCodeGenerator.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "qrcode",
+  "name": "qrCodeGenerator"
+}
