@@ -91,7 +91,7 @@
                 <img alt style="width: 100%" :src="category.image"/>
                 <div>{{ category.name }}</div>
               </div>
-              <div v-else class="sub-title mb-2">{{ category && category.name }}</div>
+              <div v-else class="sub-title mb-2" style="word-break: break-all;">{{ category && category.name }}</div>
               <div class="pos-order__tab--content-main">
                 <menu-item
                     v-for="(item, index) in category.items" :key="index"
@@ -166,12 +166,12 @@
         <!-- Day off dialog -->
         <g-dialog v-model="dialog.dayOff" persistent>
           <div class="dialog-closed">
-            <div class="dialog-closed__title">Notice</div>
+            <div class="dialog-closed__title">{{$t('store.notice')}}</div>
             <div class="dialog-closed__message">
-              <p>Our restaurant is closed today.</p>
-              <p>Thank you for understanding.</p>
+              <p>{{$t('setting.daysoffMess')}}</p>
+              <p>{{$t('setting.daysoffMess2')}}</p>
             </div>
-            <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = false">Close</g-btn-bs>
+            <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = false">{{$t('store.close')}}</g-btn-bs>
           </div>
         </g-dialog>
       </template>
@@ -876,6 +876,7 @@
               font-size: 18px;
               font-weight: 700;
               padding: 6px 16px;
+              word-break: break-all;
             }
           }
         }

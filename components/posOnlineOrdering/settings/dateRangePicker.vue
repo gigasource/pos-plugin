@@ -224,7 +224,8 @@
     &__label {
       font-size: 12px;
       color: #9E9E9E;
-      margin-bottom: 8px
+      margin-bottom: 8px;
+      text-transform: uppercase;
     }
 
     &__input {

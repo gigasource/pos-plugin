@@ -1,11 +1,11 @@
 <template>
   <g-dialog v-model="internalValue" width="475" eager>
     <div class="dialog">
-      <div class="dialog-title">Add days-off</div>
+      <div class="dialog-title">{{$t('setting.addDaysoff')}}</div>
       <g-icon class="dialog-icon--close" size="20" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
         <div class="col-6">
-          <div class="date-range-picker__label">FROM</div>
+          <div class="date-range-picker__label">{{$t('setting.from')}}</div>
           <g-menu v-model="showFromDatePicker" nudge-bottom="10" content-class="date-picker-content">
             <template #activator="{on}">
               <div class="date-range-picker__input--from" @click="on.click">
@@ -18,7 +18,7 @@
         </div>
 
         <div class="col-6">
-          <div class="date-range-picker__label">TO</div>
+          <div class="date-range-picker__label">{{$t('setting.to')}}</div>
           <g-menu v-model="showToDatePicker" nudge-bottom="10" content-class="date-picker-content">
             <template #activator="{on}">
               <div class="date-range-picker__input--to" @click="on.click">
@@ -31,11 +31,11 @@
         </div>
       </div>
       <div class="dialog-message">
-        <span class="fw-700 i">Note:</span>
-        For a 1-day period, please leave either field empty.
+        <span class="fw-700 i">{{$t('store.note')}}</span>
+        {{$t('setting.daysoffNote')}}
       </div>
       <div class="dialog-action">
-        <g-btn-bs width="110" height="44" background-color="indigo accent-2" text-color="white" :disabled="invalidDate" @click="submit">Generate</g-btn-bs>
+        <g-btn-bs width="110" height="44" background-color="indigo accent-2" text-color="white" :disabled="invalidDate" @click="submit">{{$t('setting.generate')}}</g-btn-bs>
       </div>
     </div>
   </g-dialog>

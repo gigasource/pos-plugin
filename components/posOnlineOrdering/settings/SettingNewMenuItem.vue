@@ -35,7 +35,7 @@
             <g-select small text-field-component="GTextFieldBs" v-model="internalPrinter" :items="internalAvailablePrinters"/>
           </div>
           <div class="col-2">
-            <g-text-field-bs small v-model="internalPrice" required type="number" placeholder="Price *">
+            <g-text-field-bs small v-model="internalPrice" required type="number" :placeholder="`${$t('setting.price')} *`">
               <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('price')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
@@ -44,7 +44,7 @@
         </div>
         <div class="menu-setting-new-item__content--lower">
           <div class="col-9">
-            <g-textarea outlined no-resize :rows="2" v-model="internalDesc" placeholder="Description">
+            <g-textarea outlined no-resize :rows="2" v-model="internalDesc" :placeholder="$t('setting.desc')">
               <template v-slot:append-inner v-if="isInDevice">
                 <g-icon @click.stop="openDialogInput('desc')" size="16" class="mb-1">icon-keyboard</g-icon>
               </template>
@@ -52,7 +52,7 @@
           </div>
           <div class="col-3">
             <div class="menu-setting-new-item__tax">
-              <div>Tax:</div>
+              <div>{{$t('setting.tax')}}:</div>
               <div>
                 <g-grid-select mandatory :value="internalTax" :items="taxes" :itemCols="Math.round(12/taxes.length)">
                   <template #default="{ toggleSelect, item, index }">

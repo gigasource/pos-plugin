@@ -654,7 +654,7 @@
         switch(this.view) {
           case 'order': return $t('store.orderList');
           case 'confirm': return $t('store.confirmOrder');
-          case 'payment': return 'Payment'; // TODO: i18n
+          case 'payment': return $t('store.payment');
         }
       },
       showBackArrowInHeader() {

@@ -500,7 +500,19 @@ module.exports = {
       noteForCustomer: 'Note for customers',
       hideEmpty: 'Hide empty time slots',
       sendConfirmEmail: 'Send confirmation email',
-      addNote: 'Add note'
+      addNote: 'Add note',
+      fromTo: 'From/To',
+      day: 'Day',
+      add: 'Add',
+      addDaysoff: 'Add days-off',
+      from: 'From',
+      to: 'To',
+      daysoffNote: 'For a 1-day period, please leave either field empty.',
+      daysoffMess: 'Our restaurant is closed today.',
+      daysoffMess2: 'Thank you for understanding.',
+      desc: 'Description',
+      price: 'Price',
+      tax: 'Tax'
     },
 
 

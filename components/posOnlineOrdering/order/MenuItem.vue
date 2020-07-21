@@ -199,6 +199,7 @@
       max-width: 100%;
       user-select: auto;
       line-height: 20px;
+      word-break: break-all;
 
       &.collapse {
         white-space: nowrap;

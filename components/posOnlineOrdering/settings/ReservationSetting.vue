@@ -6,7 +6,7 @@
         <g-switch class="mb-3" :label="$t('setting.activeReservation')" v-model="activeReservation"/>
         <g-switch class="mb-3" :label="$t('setting.incomeReservationSound')" v-model="soundNotification"/>
         <g-switch class="mb-3" :label="$t('setting.hideEmpty')" v-model="hideEmpty"/>
-        <g-switch class="mb-3" label="Send confirmation email" v-model="emailConfirmation"/>
+        <g-switch class="mb-3" :label="$t('setting.sendConfirmEmail')" v-model="emailConfirmation"/>
         <p class="fw-700 fs-small mt-3">{{$t('setting.autoRemoveOverdue')}}</p>
         <g-grid-select :items="removeOverdueAfterList" v-model="removeOverdueAfter" mandatory :grid="false">
           <template #default="{item, toggleSelect}">
@@ -61,9 +61,9 @@
 
     <g-dialog v-model="dialog.seat" width="480" eager>
       <div class="dialog">
-        <div class="dialog-title">Seat Limit</div>
+        <div class="dialog-title">{{$t('setting.seatLimit')}}</div>
         <div class="dialog-content">
-          <div>From/to</div>
+          <div>{{$t('setting.fromTo')}}</div>
           <div class="row-flex">
             <div class="dialog__time--from">
               <g-time-picker-input use24Hours :value="newSeatLimit.startTime" @input="newSeatLimit.startTime = $event"/>
@@ -72,25 +72,25 @@
               <g-time-picker-input use24Hours :value="newSeatLimit.endTime" @input="newSeatLimit.endTime = $event"/>
             </div>
           </div>
-          <div>Day</div>
+          <div>{{$t('setting.day')}}</div>
           <div class="row-flex br-1 flex-wrap b-grey ba-thin">
-            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Mon" label="Mon"/>
-            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Thu" label="Thu"/>
-            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Sun" label="Sun"/>
-            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Tue" label="Tue"/>
-            <g-checkbox color="indigo accent-2" class="col-8" v-model="newSeatLimit.days" value="Fri" label="Fri"/>
-            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Wed" label="Wed"/>
-            <g-checkbox color="indigo accent-2" v-model="newSeatLimit.days" value="Sat" label="Sat"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Mon" :label="$t('common.weekday.monday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Thu" :label="$t('common.weekday.thursday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Sun" :label="$t('common.weekday.sunday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Tue" :label="$t('common.weekday.tuesday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" class="col-8" v-model="newSeatLimit.days" value="Fri" :label="$t('common.weekday.friday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" class="col-3 mr-3" v-model="newSeatLimit.days" value="Wed" :label="$t('common.weekday.wednesday').substring(0,3)"/>
+            <g-checkbox color="indigo accent-2" v-model="newSeatLimit.days" value="Sat" :label="$t('common.weekday.saturday').substring(0,3)"/>
           </div>
-          <div>Seat limit</div>
+          <div>{{$t('setting.seatLimit')}}</div>
           <g-text-field-bs v-model="newSeatLimit.seat" type="number"/>
         </div>
         <div v-if="errorSeatLimit" class="i fs-small-2 text-red mt-1">Dupplicate time/day with other seat limit!</div>
         <div class="dialog-action">
-          <g-btn-bs text-color="#424242" @click="closeDialogSeat">Cancel</g-btn-bs>
+          <g-btn-bs text-color="#424242" @click="closeDialogSeat">{{$t('setting.cancel')}}</g-btn-bs>
           <g-btn-bs :disabled="!this.newSeatLimit.startTime || !this.newSeatLimit.endTime || this.newSeatLimit.days.length === 0 || !this.newSeatLimit.seat
           || this.newSeatLimit.endTime < this.newSeatLimit.startTime || errorSeatLimit"
-                    width="110" background-color="#1271FF" @click="addSeatLimit">Add</g-btn-bs>
+                    width="110" background-color="#1271FF" @click="addSeatLimit">{{$t('setting.add')}}</g-btn-bs>
         </div>
       </div>
     </g-dialog>
