@@ -12,7 +12,7 @@ async function updateStoreRevenue() {
         name: name || settingName,
         _id,
         prevMonthReport: currentMonthReport,
-        currentMonthReport: { orders: 0, total: 0 },
+        currentMonthReport: { orders: 0, total: 0, reservations: 0, orderTimeouts: 0 },
         lastSyncAt: new Date()
       }
     })

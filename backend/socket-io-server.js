@@ -167,26 +167,41 @@ module.exports = async function (cms) {
       const {storeAlias, total} = status
       if (!storeAlias) return
 
-      let {lastSyncAt, prevMonthReport, currentMonthReport} = await cms.getModel('Store').findOne({alias: storeAlias})
-      const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
-
-      if (newMonth) {
-        prevMonthReport = currentMonthReport
-        currentMonthReport = {orders: 1, total, reservations: 0}
-      } else {
-        currentMonthReport = {
-          ...currentMonthReport,
-          orders: (currentMonthReport.orders || 0) + 1,
-          total: (currentMonthReport.total || 0) + total
-        }
-      }
-
-      await cms.getModel('Store').findOneAndUpdate({alias: storeAlias}, {
-        $set: {
-          lastSyncAt: new Date(), prevMonthReport, currentMonthReport
-        }
-      })
+      const store = await cms.getModel('Store').findOne({alias: storeAlias}).lean()
+      await updateStoreReport(store._id, { orders: 1, total })
     }
+
+    await cms.getModel('Order').findOneAndUpdate({ onlineOrderId: orderToken }, { status: status.status })
+  }
+
+  async function updateStoreReport(storeId, change) {
+    const store = await cms.getModel('Store').findById(storeId).lean()
+    if (!store) return
+
+    let { lastSyncAt, prevMonthReport, currentMonthReport } = store
+    const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
+
+    if (newMonth) {
+      prevMonthReport = currentMonthReport
+      currentMonthReport = Object.assign({ orders: 0, total: 0, reservations: 0, orderTimeouts: 0 }, change)
+    } else {
+      const newVal = _.reduce(currentMonthReport, (acc, val, key) => {
+        if (!change[key]) {
+          return  { ...acc, [key]: val }
+        }
+        return {
+          ...acc,
+          [key]: (val || 0) + change[key]
+        }
+      }, {})
+      currentMonthReport = Object.assign({}, currentMonthReport, newVal)
+    }
+
+    await cms.getModel('Store').findOneAndUpdate({ _id: storeId }, {
+      $set: {
+        lastSyncAt: new Date(), prevMonthReport, currentMonthReport
+      }
+    })
   }
 
   async function setDemoDeviceLastSeen(storeId, deviceId) {
@@ -805,11 +820,13 @@ module.exports = async function (cms) {
       const removePersistentMsg = await externalSocketIOServer.emitToPersistent(deviceId, 'createOrder', [orderData, new Date()],
           'createOrderAck', [orderData.orderToken, storeName, storeAlias, deviceId]);
 
-      sendOrderTimeouts[orderData.orderToken] = setTimeout(() => {
+      sendOrderTimeouts[orderData.orderToken] = setTimeout(async () => {
         updateOrderStatus(orderData.orderToken, {onlineOrderId: orderData.orderToken, status: 'failedToSend'})
         console.debug(`sentry:orderToken=${orderData.orderToken},store=${storeName},alias=${storeAlias},clientId=${deviceId},eventType=orderStatus`,
             `2b. Online order backend: failed to reach online order device, cancelling order`)
         removePersistentMsg()
+
+        await updateStoreReport(storeId, { orderTimeouts: 1 })
       }, SEND_TIMEOUT);
     });
 
@@ -912,23 +929,8 @@ module.exports = async function (cms) {
       } else {
         const device = await DeviceModel.findOne({storeId, 'features.reservation': true});
         const reservation = await cms.getModel('Reservation').create(Object.assign({}, reservationData, {store: storeId}));
-        let {lastSyncAt, prevMonthReport, currentMonthReport} = store
-        const newMonth = !lastSyncAt || dayjs().isAfter(dayjs(lastSyncAt), 'month')
+        await updateStoreReport(storeId, { reservations: reservationData.noOfGuests })
 
-        if (newMonth) {
-          prevMonthReport = currentMonthReport
-          currentMonthReport = {orders: 0, total, reservations: reservationData.noOfGuests}
-        } else {
-          currentMonthReport = {
-            ...currentMonthReport,
-            reservations: (currentMonthReport.reservations || 0) + reservationData.noOfGuests
-          }
-        }
-        await cms.getModel('Store').findOneAndUpdate({_id: storeId}, {
-          $set: {
-            lastSyncAt: new Date(), prevMonthReport, currentMonthReport
-          }
-        })
         if (device) {
           const deviceId = device._id.toString();
           await externalSocketIOServer.emitToPersistent(deviceId, 'createReservation', [{...reservationData, onlineReservationId: reservation._id}]);
