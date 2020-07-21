@@ -555,7 +555,7 @@ module.exports = async cms => {
   const alwaysOnFeature = await cms.getModel('Feature').findOne({name: 'alwaysOn'});
   if (alwaysOnFeature) await updateAlwaysOn(alwaysOnFeature.enabled);
   const startOnBootFeature = await cms.getModel('Feature').findOne({name: 'startOnBoot'});
-  if (startOnBootFeature) await updateStartonBoot(startOnBootFeature.enabled);
+  if (startOnBootFeature) await updateStartOnBoot(startOnBootFeature.enabled);
   initReservationSchedules()
 
   const waitInitOnlineOrderSocket = function () {
