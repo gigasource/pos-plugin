@@ -20,7 +20,7 @@
             <g-icon>icon-menu2</g-icon>
         </div>
       </g-badge>
-      <div @click="viewOrder = true" class="digital-menu__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
+      <div id="total" @click="viewOrder = true" class="digital-menu__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
       <g-spacer/>
       <g-btn-bs v-if="!viewOrder" background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="viewOrder = true" width="150">
         <span class="mr-3">{{$t('menu.view')}}</span>
@@ -144,7 +144,8 @@
           mode: 'select'
         },
         googleLogin: false,
-        feedback: ''
+        feedback: '',
+        bouncing: 0
       }
     },
     async created() {
@@ -246,6 +247,7 @@
       openDialogAdd(item) {
         if(!item.choices || item.choices.length === 0) { //item without choice instancely add
           this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
+          this.addBounceAction()
           return
         }
         this.selectedProduct = item
@@ -253,6 +255,7 @@
       },
       addItemToOrder(item) {
         const product = Object.assign({}, this.selectedProduct, item)
+        this.addBounceAction()
         this.increaseOrAddNewItems(product)
       },
       getItemModifiers(item) {
@@ -281,6 +284,17 @@
         const url = `https://g.page/${this.store.googleMyBusinessShortcode}/review?gm`
         this.dialog.feedback = false
         window.open(url)
+      },
+      addBounceAction() {
+        if(this.bouncing > 0) return
+        const price = document.getElementById('total')
+        if(!price) return
+        this.bouncing++
+        price.classList.add('zoom')
+        setTimeout(() => {
+          price.classList.remove('zoom')
+          this.bouncing--
+        }, 1000)
       }
     },
     watch: {
@@ -533,5 +547,25 @@
       top: 8px;
       right: 8px;
     }
+  }
+
+  @keyframes zoom {
+    0% {
+      transform: scale(1);
+    }
+
+    35% {
+      transform: scale(1.3);
+    }
+
+    70% {
+      transform: scale(1);
+    }
+  }
+
+  .zoom {
+    animation-name: zoom;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
   }
 </style>
