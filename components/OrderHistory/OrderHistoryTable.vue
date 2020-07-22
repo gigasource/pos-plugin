@@ -150,7 +150,7 @@
         await this.getOrderHistory();
       },
       getStaffName(staffs) {
-        return staffs.map(s => s.name).join(', ')
+        return staffs ? staffs.map(s => s.name).join(', ') : ''
       },
       async setTypeFilter(type) {
         const filter = {

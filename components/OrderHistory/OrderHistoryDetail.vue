@@ -170,10 +170,11 @@
 
       tr td:nth-child(2) {
         width: 50%;
-        text-overflow: ellipsis;
-        overflow: hidden;
         padding-left: 8px;
         font-weight: bold;
+        white-space: initial;
+        word-break: break-word;
+        line-height: 1.2;
       }
     }
 
