@@ -96,6 +96,24 @@ setTimeout(() => {
       }
     })
 
+    socket.on('updateMenuPosition', async (collection, fromItem, toItem, cb) => {
+      const clientId = socket.request._query.clientId
+      const device = await cms.getModel('Device').findById(clientId)
+      if (!device.storeId) return
+
+      const { _id: fromId, position: fromPosition } = fromItem
+      const { _id: toId, position: toPosition } = toItem
+
+      try {
+        await cms.getModel(collection).findOneAndUpdate({ _id: fromId }, { position: toPosition })
+        await cms.getModel(collection).findOneAndUpdate({ _id: toId }, { position: fromPosition })
+        cb({ success: true })
+      } catch (error) {
+        cb({ error })
+      }
+
+    })
+
     socket.on('deleteMenuItem', async (collection, _id, cb) => {
       console.log('deleteMenuItem', collection, _id)
 
