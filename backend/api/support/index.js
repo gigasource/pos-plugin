@@ -15,6 +15,7 @@ setTimeout(() => {
   getExternalSocketIoServer().on('connect', socket => {
     async function setDemoDeviceLastSeen(deviceId) {
       const device = await DeviceModel.findById(deviceId)
+      if (!device) return
       const storeId = device.storeId;
       if (!storeId) return
       await StoreModel.findOneAndUpdate({_id: storeId, 'gSms.devices._id': deviceId}, {
@@ -66,7 +67,26 @@ setTimeout(() => {
     socket.on('getAllReservations', async (storeId, cb) => {
       const store = await StoreModel.findOne({id: storeId})
       if (!store) return cb([])
-      const reservations = await cms.getModel('Reservation').find({store: store._id}).lean()
+      const reservations = await cms.getModel('Reservation').aggregate(
+        [
+          {
+            $match: { store: store._id }
+          },
+          {
+            $set: {
+              dateTime: {
+                $dateFromString: {
+                  dateString: '$date',
+                  format: '%Y-%m-%d'
+                }
+              }
+            }
+          },
+          {
+            $match: { dateTime: { $gte: dayjs().subtract(1, 'week').startOf('day').toDate() } }
+          }
+        ]
+      )
       cb(reservations)
     })
 
