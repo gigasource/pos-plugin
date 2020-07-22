@@ -15,6 +15,7 @@ setTimeout(() => {
   getExternalSocketIoServer().on('connect', socket => {
     async function setDemoDeviceLastSeen(deviceId) {
       const device = await DeviceModel.findById(deviceId)
+      if (!device) return
       const storeId = device.storeId;
       if (!storeId) return
       await StoreModel.findOneAndUpdate({_id: storeId, 'gSms.devices._id': deviceId}, {
@@ -66,7 +67,26 @@ setTimeout(() => {
     socket.on('getAllReservations', async (storeId, cb) => {
       const store = await StoreModel.findOne({id: storeId})
       if (!store) return cb([])
-      const reservations = await cms.getModel('Reservation').find({store: store._id}).lean()
+      const reservations = await cms.getModel('Reservation').aggregate(
+        [
+          {
+            $match: { store: store._id }
+          },
+          {
+            $set: {
+              dateTime: {
+                $dateFromString: {
+                  dateString: '$date',
+                  format: '%Y-%m-%d'
+                }
+              }
+            }
+          },
+          {
+            $match: { dateTime: { $gte: dayjs().subtract(1, 'week').startOf('day').toDate() } }
+          }
+        ]
+      )
       cb(reservations)
     })
 
@@ -94,6 +114,24 @@ setTimeout(() => {
       } catch (error) {
         cb({ error })
       }
+    })
+
+    socket.on('updateMenuPosition', async (collection, fromItem, toItem, cb) => {
+      const clientId = socket.request._query.clientId
+      const device = await cms.getModel('Device').findById(clientId)
+      if (!device.storeId) return
+
+      const { _id: fromId, position: fromPosition } = fromItem
+      const { _id: toId, position: toPosition } = toItem
+
+      try {
+        await cms.getModel(collection).findOneAndUpdate({ _id: fromId }, { position: toPosition })
+        await cms.getModel(collection).findOneAndUpdate({ _id: toId }, { position: fromPosition })
+        cb({ success: true })
+      } catch (error) {
+        cb({ error })
+      }
+
     })
 
     socket.on('deleteMenuItem', async (collection, _id, cb) => {
