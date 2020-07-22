@@ -29,6 +29,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.12.1",
     "geolib": "^3.3.1",
+    "ioredis": "^4.17.3",
     "node-thermal-printer": "^1.0.3",
     "nodemailer": "^6.4.10",
     "phantom": "^6.3.0",

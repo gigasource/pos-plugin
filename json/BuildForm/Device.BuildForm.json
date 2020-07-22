@@ -66,7 +66,7 @@
       "type": "ref-select",
       "labelProp": "name",
       "flex": "md6",
-      "autopopulate": true
+      "autopopulate": null
     },
     {
       "_id": "5e9566d90b178cdacaade168",
