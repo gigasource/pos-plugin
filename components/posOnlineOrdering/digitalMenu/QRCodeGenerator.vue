@@ -33,14 +33,14 @@
       this.$nextTick(() => {
         const el = document.getElementById('canvas')
         if(el) {
-          QRCode.toCanvas(el, 'https://enjoylocal.de/qrcode')
+          QRCode.toCanvas(el, 'https://m.restaurantplus.net/qrcode')
         }
       })
     },
     methods: {
       async createQRcode() {
         const store = await cms.getModel('Store').findOne({id: this.storeId})
-        const url = ['https://enjoylocal.de', 'menu', store.alias].join('/')
+        const url = ['https://m.restaurantplus.net/', 'menu', store.alias].join('/')
         const el = document.getElementById('canvas')
         if(el) {
           await QRCode.toCanvas(el, url)

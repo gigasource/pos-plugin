@@ -249,7 +249,7 @@ module.exports = {
 
     menu: {
       feedback: 'Rückmeldung',
-      question: 'Sind Sie mit unseren Produkten und Dienstleistungen zufrieden?',
+      question: 'Sind Sie mit unseren Gerichte und Dienstleistungen zufrieden?',
       positive: 'Ja, gern',
       negative: 'Nein, danke',
       thank: 'Vielen dank für Nutzung unserer Dienste',
