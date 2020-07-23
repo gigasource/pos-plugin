@@ -155,10 +155,25 @@ module.exports = async function (cms) {
 
   const {io, socket: internalSocketIOServer} = cms;
 
-  if (global.APP_CONFIG.redis) {
-    const {host, port, password} = global.APP_CONFIG.redis;
-    io.adapter(redisAdapter({host, port, ...password ? {password} : {}})); //internalSocketIOServer will use adapter too, just need to call this once
-  }
+    if (global.APP_CONFIG.redis) {
+      const {hosts, password} = global.APP_CONFIG.redis;
+      const Redis = require("ioredis");
+      const startupRedisNodes = hosts.split(',').map(host => {
+        const hostInfoArr = host.split(':');
+        return {
+          host: hostInfoArr[0],
+          port: hostInfoArr[1],
+        }
+      });
+      const ioredisOpt = {
+        redisOptions: {password}
+      };
+
+      io.adapter(redisAdapter({
+        pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+        subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+      })); //internalSocketIOServer will use adapter too, just need to call this once
+    }
 
   async function updateOrderStatus(orderToken, status) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
@@ -224,6 +239,7 @@ module.exports = async function (cms) {
 
   externalSocketIOServer = p2pServerPlugin(io, {
     clientOverwrite: true,
+    redisClusterEnabled: true,
     saveMessage,
     loadMessages,
     deleteMessage,
