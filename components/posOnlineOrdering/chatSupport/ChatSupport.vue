@@ -82,12 +82,20 @@
           <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
+                    @click="makeAPhoneCall">
+            <g-icon>phone</g-icon>
+          </g-btn-bs>
+          <g-btn-bs class="my-2 px-6"
+                    background-color="#1271FF"
+                    text-color="white"
                     @click="sendChatMsg">
             <g-icon>icon-chat-support-note-send</g-icon>
           </g-btn-bs>
         </div>
       </div>
     </div>
+    
+    <call-center ref="callCenter"/>
   </div>
 </template>
 
@@ -100,10 +108,11 @@
   import cloneDeep from 'lodash/cloneDeep'
   import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
+  import CallCenter from './CallCenter';
 
   export default {
     name: 'ChatSupport',
-    components: {ChatInfo, ChatWindow},
+    components: { CallCenter, ChatInfo, ChatWindow},
     data() {
       return {
         devices: [],
@@ -580,6 +589,9 @@
           this.getGsmsDevices()
         }
       }, 300),
+      makeAPhoneCall() {
+        this.$refs.callCenter.makeAPhoneCall(this.selectedDeviceId)
+      }
     }
   }
 </script>

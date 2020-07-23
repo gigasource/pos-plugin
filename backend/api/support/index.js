@@ -12,7 +12,9 @@ const ObjectId = require('mongoose').Types.ObjectId;
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
 setTimeout(() => {
-  getExternalSocketIoServer().on('connect', socket => {
+  let externalSocketIoServer = getExternalSocketIoServer()
+
+  externalSocketIoServer.on('connect', socket => {
     async function setDemoDeviceLastSeen(deviceId) {
       const device = await DeviceModel.findById(deviceId)
       if (!device) return
@@ -152,9 +154,17 @@ setTimeout(() => {
     })
   });
 
+  externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
+    console.log('makeAPhoneCallAck', clientId, agentId, callAccepted)
+    internalSocketIOServer.in(`makeAPhoneCallAck-from-client-${clientId}`).emit('makeAPhoneCallAck', { clientId, agentId, callAccepted })
+  })
+
   internalSocketIOServer.on('connect', socket => {
     socket.on('watch-chat-message', clientIds => {
-      clientIds.forEach(clientId => socket.join(`chatMessage-from-client-${clientId}`));
+      clientIds.forEach(clientId => {
+        socket.join(`chatMessage-from-client-${clientId}`)
+        socket.join(`makeAPhoneCallAck-from-client-${clientId}`)
+      });
     });
 
     socket.on('chat-message', async (chatData, cb) => {
@@ -196,6 +206,24 @@ setTimeout(() => {
         getExternalSocketIoServer().emitTo(clientId, 'getNewMenu', categories, products)
         console.log(`sent new menu to ${clientId}`)
       })
+    })
+
+    socket.on('makeAPhoneCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send makeAPhoneCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ `device_${clientId}` ], 'makeAPhoneCallAck', [clientId, agentId])
+    })
+
+    socket.on('cancelCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send cancelCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'cancelCall', [])
+    })
+
+    socket.on('endCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send endCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'endCall', [])
     })
   });
 }, 5000);
