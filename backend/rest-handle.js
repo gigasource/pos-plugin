@@ -12,7 +12,7 @@ const userApi = require('./api/users');
 
 module.exports = cms => {
   cms.data['loginUrl'] = '/sign-in';
-  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise', '/menu'];
+  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise', '/menu', '/qrcode'];
 
   cms.app.use('/device', deviceApi);
   cms.app.use('/gsms-device', gsmsDeviceApi);
