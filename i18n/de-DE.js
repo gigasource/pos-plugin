@@ -257,7 +257,8 @@ module.exports = {
       apology: 'Wir entschuldigen uns für die schlechte Erfahrung, die Sie haben könnten',
       placeholder: 'Hinterlassen Sie bitte uns eine Rückmeldung, um unsere Dienstleistungen zu verbessern.',
       view: 'Aussicht',
-      restaurantPlus: 'kostenloses digitales Menü wird durch Restaurant Plus 2020 unterstützt'
+      restaurantPlus: 'kostenloses digitales Menü wird durch Restaurant Plus 2020 unterstützt',
+      submit: 'Einreichen'
     }
   }
 }

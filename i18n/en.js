@@ -526,7 +526,8 @@ module.exports = {
       apology: 'We apologize for any bad experience you might have',
       placeholder: 'Leave us a feedback to improve our services.',
       view: 'View',
-      restaurantPlus: 'Free Digital Menu powered by Restaurant Plus 2020'
+      restaurantPlus: 'Free Digital Menu powered by Restaurant Plus 2020',
+      submit: 'Submit'
     }
   }
 }

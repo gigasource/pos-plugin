@@ -109,7 +109,7 @@
           <div class="dialog-title">{{$t('menu.apology')}}</div>
           <g-spacer/>
           <g-textarea rows="2" no-resize outlined :placeholder="$t('menu.placeholder')" v-model="feedback"></g-textarea>
-          <g-btn-bs style="align-self: flex-end" text-color="#1400FF" @click="submitFeedback('negative')">Submit</g-btn-bs>
+          <g-btn-bs style="align-self: flex-end" text-color="#1400FF" @click="submitFeedback('negative')">{{$t('menu.submit')}}</g-btn-bs>
         </template>
       </div>
     </g-dialog>
