@@ -108,9 +108,10 @@ setTimeout(() => {
       // insert/update product or category
       try {
         const result = _id
-          ? await cms.getModel(collection).findOneAndUpdate({ _id }, value)
+          ? await cms.getModel(collection).findOneAndUpdate({ _id }, value, { new: true })
           : await cms.getModel(collection).create({ store: device.storeId, ...value })
-        cb({ success: true, _id: result._id })
+
+        cb({ success: true, _id: result._id, result })
       } catch (error) {
         cb({ error })
       }

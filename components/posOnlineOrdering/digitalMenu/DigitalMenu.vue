@@ -100,7 +100,10 @@
         </template>
         <template v-if="dialog.mode === 'positive'">
           <div class="dialog-title">{{$t('menu.thank')}}</div>
-          <div v-if="store.googleMyBusinessShortcode" class="dialog-review" @click="openGoogleReview">{{$t('menu.ggReview')}}</div>
+          <div v-if="store.googleMyBusinessShortcode" class="dialog-review" @click="openGoogleReview">
+            <img alt src="/plugins/pos-plugin/assets/google-review.svg"/>
+            {{$t('menu.ggReview')}}
+          </div>
         </template>
         <template v-if="dialog.mode === 'negative'">
           <div class="dialog-title">{{$t('menu.apology')}}</div>
@@ -519,6 +522,7 @@
       ::v-deep textarea {
         font-size: 12px;
         padding: 6px 6px 0;
+        line-height: 1.3 !important;
       }
 
       ::v-deep .g-tf-append__inner {
@@ -533,11 +537,12 @@
     &-review {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       color: #1400FF;
       font-size: 12px;
-      padding: 0 20%;
+      padding: 0 10%;
       text-align: center;
       text-decoration: underline;
     }

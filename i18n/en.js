@@ -518,7 +518,7 @@ module.exports = {
 
     menu: {
       feedback: 'Feedback',
-      question: 'Are you happy with our products and services?',
+      question: 'Are you happy with our food and services?',
       positive: 'Yes, I am',
       negative: 'No, I am not',
       thank: 'Thank you for using our services. ',
