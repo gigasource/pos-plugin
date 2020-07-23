@@ -156,7 +156,7 @@ router.get('/device-assigned-store/:clientId', async (req, res) => {
   const store = await StoreModel.findById(device.storeId || '');
   if (!store) return res.status(200).json({assignedStore: null});
 
-  res.status(200).json({assignedStore: store.name || store.alias});
+  res.status(200).json({_id: store._id.toString(), storeId: store.id, assignedStore: store.name || store.alias});
 });
 
 router.get('/device-online-status', async (req, res) => {
@@ -360,6 +360,6 @@ router.get('/store-locale', async (req, res) => {
   res.status(200).json({
     currency, currencyLong
   })
-})
+});
 
 module.exports = router
