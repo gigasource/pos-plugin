@@ -27,11 +27,11 @@
       </g-overlay>
     </div>
     <div id="print" class="generator-print">
-      <div class="generator-print--content" :style="{...background, marginRight: '40px'}">
-        <canvas id="canvas1" :style="{marginTop: type === 2 ? '150px' : (type === 3 ? '150px' : 0)}"></canvas>
+      <div class="generator-print--content" :style="{...background, marginRight: '300px'}">
+        <canvas id="canvas1" :style="{marginTop: [2,3].includes(type) ? '226px' : 0}"></canvas>
       </div>
       <div class="generator-print--content" :style="background">
-        <canvas id="canvas2" :style="{marginTop: type === 2 ? '150px' : (type === 3 ? '150px' : 0)}"></canvas>
+        <canvas id="canvas2" :style="{marginTop: [2,3].includes(type) ? '226px' : 0}"></canvas>
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@
       this.$nextTick(() => {
         const el = document.getElementById('canvas')
         if(el) {
-          QRCode.toCanvas(el, 'https://m.restaurantplus.net/qrcode')
+          QRCode.toCanvas(el, 'https://m.restaurantplus.net/qrcode', {width: 280, margin: 2})
         }
       })
     },
@@ -73,26 +73,28 @@
     },
     methods: {
       async createQRcode() {
+        this.loading = true
         const store = await cms.getModel('Store').findOne({id: this.storeId})
         const url = ['https://m.restaurantplus.net', 'menu', store.alias].join('/')
         const el = document.getElementById('canvas')
         const el1 = document.getElementById('canvas1')
         const el2 = document.getElementById('canvas2')
         if(el) {
-          await QRCode.toCanvas(el, url)
+          await QRCode.toCanvas(el, url, {width: 280, margin: 2})
         }
         if(el1) {
-          await QRCode.toCanvas(el1, url)
+          await QRCode.toCanvas(el1, url, {width: 1977, margin: 2})
         }
         if(el2) {
-          await QRCode.toCanvas(el2, url)
+          await QRCode.toCanvas(el2, url, {width: 1977, margin: 2})
         }
+        this.loading = false
       },
       async downloadQRCode() {
         const el = document.getElementById('print')
         if(el) {
           this.loading = true
-          const url = await domtoimage.toPng(el, {width: 1680, height: 2380})
+          const url = await domtoimage.toPng(el, {width: 4200, height: 6230})
           const link = document.createElement('a');
           link.download = 'QRCode.png';
           link.href = url;
@@ -139,15 +141,10 @@
 
       &--detail {
         border-radius: 8px;
-        padding: 180px 60px 0;
+        padding: 180px 70px 0;
         width: 420px;
         height: 595px;
         background-size: cover;
-
-        canvas {
-          width: 300px !important;
-          height: 300px !important;
-        }
       }
     }
 
@@ -175,8 +172,7 @@
       display: flex;
       transform: rotate(90deg) translateY(-100%);
       transform-origin:top left;
-      width: 2380px;
-      height: 1680px;
+      height: 4200px;
       background: white;
       position: absolute;
       z-index: 1;
@@ -184,15 +180,10 @@
       left: 0;
 
       &--content {
-        padding: 440px 140px 0;
-        width: 1180px;
-        height: 1680px;
+        padding: 1270px 494px 0;
+        width: 2965px;
+        height: 4200px;
         background-size: cover;
-
-        canvas {
-          width: 880px !important;
-          height: 880px !important;
-        }
       }
     }
   }
