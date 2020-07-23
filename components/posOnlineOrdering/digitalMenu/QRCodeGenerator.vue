@@ -1,5 +1,5 @@
 <template>
-  <div class="r">
+  <div class="generator-wrapper">
     <div class="generator">
       <div class="col-6 mr-4">
         <div class="generator-input">
@@ -27,11 +27,11 @@
       </g-overlay>
     </div>
     <div id="print" class="generator-print">
-      <div class="generator-print--content" :style="background">
-        <canvas id="canvas1" :style="{marginTop: type === 2 ? '38px' : (type === 3 ? '34px' : 0)}"></canvas>
+      <div class="generator-print--content" :style="{...background, marginRight: '40px'}">
+        <canvas id="canvas1" :style="{marginTop: type === 2 ? '150px' : (type === 3 ? '150px' : 0)}"></canvas>
       </div>
       <div class="generator-print--content" :style="background">
-        <canvas id="canvas2" :style="{marginTop: type === 2 ? '38px' : (type === 3 ? '34px' : 0)}"></canvas>
+        <canvas id="canvas2" :style="{marginTop: type === 2 ? '150px' : (type === 3 ? '150px' : 0)}"></canvas>
       </div>
     </div>
   </div>
@@ -92,9 +92,9 @@
         const el = document.getElementById('print')
         if(el) {
           this.loading = true
-          const url = await domtoimage.toJpeg(el)
+          const url = await domtoimage.toPng(el, {width: 1680, height: 2380})
           const link = document.createElement('a');
-          link.download = 'QRCode.jpeg';
+          link.download = 'QRCode.png';
           link.href = url;
           this.loading = false
           link.click();
@@ -112,7 +112,16 @@
     z-index: 2;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
     background: white;
+
+    &-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
 
     &-input {
       display: flex;
@@ -126,6 +135,7 @@
       padding: 56px 44px;
       background-color: #E1F5FE;
       border-radius: 8px;
+      align-self: flex-start;
 
       &--detail {
         border-radius: 8px;
@@ -163,9 +173,10 @@
 
     &-print {
       display: flex;
-      justify-content: space-between;
-      width: 595px;
-      height: 420px;
+      transform: rotate(90deg) translateY(-100%);
+      transform-origin:top left;
+      width: 2380px;
+      height: 1680px;
       background: white;
       position: absolute;
       z-index: 1;
@@ -173,14 +184,14 @@
       left: 0;
 
       &--content {
-        padding: 110px 35px 0;
-        width: 290px;
-        height: 420px;
+        padding: 440px 140px 0;
+        width: 1180px;
+        height: 1680px;
         background-size: cover;
 
         canvas {
-          width: 220px !important;
-          height: 220px !important;
+          width: 880px !important;
+          height: 880px !important;
         }
       }
     }
