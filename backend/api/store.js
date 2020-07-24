@@ -4,6 +4,7 @@ const express = require('express')
 const router = express.Router()
 const https = require('https');
 const http = require('http');
+const axios = require('axios');
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -94,6 +95,9 @@ router.post('/new-store', async (req, res) => {
     aliasIndex++
   } while (_.includes(aliases, alias))
 
+  // Get Google Map Place ID of store
+  const googleMapPlaceId = await getPlaceIdByName(settingName);
+
   // create store
   const createdStore = await cms.getModel('Store').create({
     id, settingName, settingAddress, alias, groups, country,
@@ -136,6 +140,7 @@ router.post('/new-store', async (req, res) => {
     printers: [
       "Kitchen"
     ],
+    ...googleMapPlaceId ? {googleMapPlaceId} : {},
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
@@ -171,5 +176,44 @@ router.post('/new-feedback', async (req, res) => {
 
   res.json({ok: true})
 })
+
+router.post('/sign-in-request', async (req, res) => {
+  const {storeName, googleMapPlaceId, deviceId} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
+
+  const SignInRequestModel = cms.getModel('SignInRequest');
+  const StoreModel = cms.getModel('Store');
+
+  const store = await StoreModel.findOne({googleMapPlaceId});
+  const request = await SignInRequestModel.create({
+    deviceId,
+    approved: false,
+    requestStoreName: storeName,
+    googleMapPlaceId,
+    ...store && {storeId: store._id},
+  });
+
+  res.status(201).json(request._doc);
+});
+
+async function getPlaceIdByName(placeName) {
+  const {mapsApiKey} = global.APP_CONFIG;
+  if (!mapsApiKey) return null;
+
+  const searchApiUrl = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json';
+  let {data: searchResult} = await axios.get(searchApiUrl, {
+    params: {
+      key: mapsApiKey,
+      input: placeName,
+      fields: 'place_id',
+      inputtype: 'textquery',
+    }
+  });
+  if (searchResult.candidates && searchResult.candidates.length) {
+    return searchResult.candidates[0].place_id;
+  } else {
+    return null;
+  }
+}
 
 module.exports = router

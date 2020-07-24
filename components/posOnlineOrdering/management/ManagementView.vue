@@ -6,6 +6,7 @@
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
       <chat-support v-else-if="view === 'chatSupport'"/>
+      <support v-else-if="view === 'support'"/>
     </div>
   </div>
 </template>
@@ -14,10 +15,11 @@
   import StoreManagement from './StoreManagement/StoreManagement';
   import VersionControl from "./VersionControl/VersionControl";
   import ChatSupport from "../chatSupport/ChatSupport";
+  import Support from "./Support/Support";
 
   export default {
     name: 'ManagementView',
-    components: {ChatSupport, StoreManagement, Account, VersionControl},
+    components: {Support, ChatSupport, StoreManagement, Account, VersionControl},
     props: {},
     injectService: [
       'PermissionStore:(versionControlPerm,manageAccountPerm)'
@@ -58,6 +60,8 @@
         } else {
           items.push({ title: 'Chat Support', icon: 'icon-account-management', onClick: () => this.changeView('chatSupport', 'Chat Support') })
         }
+
+        items.push({ title: 'Support', icon: 'headset_mic', onClick: () => this.changeView('support', 'Support') })
         return items
       },
     },

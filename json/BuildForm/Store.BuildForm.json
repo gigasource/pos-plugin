@@ -625,6 +625,13 @@
       "schemaType": "string",
       "key": "googleMyBusinessShortcode",
       "type": "input"
+    },
+    {
+      "_id": "5f1ab9734729674bc3d5e827",
+      "schemaType": "string",
+      "key": "googleMapPlaceId",
+      "type": "input",
+      "label": "Google Map Place ID"
     }
   ],
   "name": "Store",

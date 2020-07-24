@@ -1,0 +1,42 @@
+{
+  "_id": "5f1ac3c4c9e0614f8b5cfa2b",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ac78fd956765083019fb0",
+      "schemaType": "objectId",
+      "key": "deviceId",
+      "ref": "Device",
+      "type": "ref-select"
+    },
+    {
+      "_id": "5f1ac78fd956765083019fb1",
+      "schemaType": "objectId",
+      "key": "storeId",
+      "ref": "Store",
+      "type": "ref-select"
+    },
+    {
+      "_id": "5f1ac4bac9e0614f8b5cfa2f",
+      "schemaType": "boolean",
+      "key": "approved",
+      "default": "false",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f1ac4bac9e0614f8b5cfa30",
+      "schemaType": "string",
+      "key": "requestStoreName",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ac4bac9e0614f8b5cfa31",
+      "schemaType": "string",
+      "key": "googleMapPlaceId",
+      "type": "input"
+    }
+  ],
+  "name": "SignInRequest",
+  "tabs": [],
+  "type": "Collection"
+}
