@@ -1,5 +1,5 @@
 <template>
-  <div class="r">
+  <div class="generator-wrapper">
     <div class="generator">
       <div class="col-6 mr-4">
         <div class="generator-input">
@@ -27,11 +27,11 @@
       </g-overlay>
     </div>
     <div id="print" class="generator-print">
-      <div class="generator-print--content" :style="background">
-        <canvas id="canvas1" :style="{marginTop: type === 2 ? '38px' : (type === 3 ? '34px' : 0)}"></canvas>
+      <div class="generator-print--content" :style="{...background, marginRight: '300px'}">
+        <canvas id="canvas1" :style="{marginTop: [2,3].includes(type) ? '226px' : 0}"></canvas>
       </div>
       <div class="generator-print--content" :style="background">
-        <canvas id="canvas2" :style="{marginTop: type === 2 ? '38px' : (type === 3 ? '34px' : 0)}"></canvas>
+        <canvas id="canvas2" :style="{marginTop: [2,3].includes(type) ? '226px' : 0}"></canvas>
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@
       this.$nextTick(() => {
         const el = document.getElementById('canvas')
         if(el) {
-          QRCode.toCanvas(el, 'https://m.restaurantplus.net/qrcode')
+          QRCode.toCanvas(el, 'https://restaurantplus.net/qrcode', {width: 280, margin: 2})
         }
       })
     },
@@ -73,28 +73,30 @@
     },
     methods: {
       async createQRcode() {
+        this.loading = true
         const store = await cms.getModel('Store').findOne({id: this.storeId})
-        const url = ['https://m.restaurantplus.net', 'menu', store.alias].join('/')
+        const url = ['https://restaurantplus.net', 'menu', store.alias].join('/')
         const el = document.getElementById('canvas')
         const el1 = document.getElementById('canvas1')
         const el2 = document.getElementById('canvas2')
         if(el) {
-          await QRCode.toCanvas(el, url)
+          await QRCode.toCanvas(el, url, {width: 280, margin: 2})
         }
         if(el1) {
-          await QRCode.toCanvas(el1, url)
+          await QRCode.toCanvas(el1, url, {width: 1977, margin: 2})
         }
         if(el2) {
-          await QRCode.toCanvas(el2, url)
+          await QRCode.toCanvas(el2, url, {width: 1977, margin: 2})
         }
+        this.loading = false
       },
       async downloadQRCode() {
         const el = document.getElementById('print')
         if(el) {
           this.loading = true
-          const url = await domtoimage.toJpeg(el)
+          const url = await domtoimage.toPng(el, {width: 4200, height: 6230})
           const link = document.createElement('a');
-          link.download = 'QRCode.jpeg';
+          link.download = 'QRCode.png';
           link.href = url;
           this.loading = false
           link.click();
@@ -112,7 +114,16 @@
     z-index: 2;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
     background: white;
+
+    &-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
 
     &-input {
       display: flex;
@@ -126,18 +137,14 @@
       padding: 56px 44px;
       background-color: #E1F5FE;
       border-radius: 8px;
+      align-self: flex-start;
 
       &--detail {
         border-radius: 8px;
-        padding: 180px 60px 0;
+        padding: 180px 70px 0;
         width: 420px;
         height: 595px;
         background-size: cover;
-
-        canvas {
-          width: 300px !important;
-          height: 300px !important;
-        }
       }
     }
 
@@ -163,9 +170,9 @@
 
     &-print {
       display: flex;
-      justify-content: space-between;
-      width: 595px;
-      height: 420px;
+      transform: rotate(90deg) translateY(-100%);
+      transform-origin:top left;
+      height: 4200px;
       background: white;
       position: absolute;
       z-index: 1;
@@ -173,15 +180,10 @@
       left: 0;
 
       &--content {
-        padding: 110px 35px 0;
-        width: 290px;
-        height: 420px;
+        padding: 1270px 494px 0;
+        width: 2965px;
+        height: 4200px;
         background-size: cover;
-
-        canvas {
-          width: 220px !important;
-          height: 220px !important;
-        }
       }
     }
   }
