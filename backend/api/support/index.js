@@ -211,7 +211,10 @@ setTimeout(() => {
     socket.on('makeAPhoneCall', async (args, ack) => {
       let { clientId, agentId } = args;
       console.log('send makeAPhoneCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ `device_${clientId}` ], 'makeAPhoneCallAck', [clientId, agentId])
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ {
+        version: '0.0.1',
+        clientId: `device_${clientId}`
+      } ], 'makeAPhoneCallAck', [clientId, agentId])
     })
 
     socket.on('cancelCall', async (args, ack) => {

@@ -13,7 +13,12 @@
       </div>
       
       <!-- Screencast host -->
-      <iframe v-if="value.status === 'calling'" :src="getCallingSrc(key)" :key="key" width="500px" height="500px" style="position: fixed; top: 300px; left: 200px;" allow="camera;microphone"></iframe>
+      <iframe v-if="value.status === 'calling'"
+              :src="getCallingSrc(key)"
+              :key="key"
+              style="position: fixed; top: 300px; left: 200px; width: 0; height: 0"
+              allow="camera;microphone">
+      </iframe>
     </div>
   </div>
 </template>
