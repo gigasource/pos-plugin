@@ -55,7 +55,7 @@
       this.$nextTick(() => {
         const el = document.getElementById('canvas')
         if(el) {
-          QRCode.toCanvas(el, 'https://m.restaurantplus.net/qrcode', {width: 280, margin: 2})
+          QRCode.toCanvas(el, 'https://restaurantplus.net/qrcode', {width: 280, margin: 2})
         }
       })
     },
@@ -75,7 +75,7 @@
       async createQRcode() {
         this.loading = true
         const store = await cms.getModel('Store').findOne({id: this.storeId})
-        const url = ['https://m.restaurantplus.net', 'menu', store.alias].join('/')
+        const url = ['https://restaurantplus.net', 'menu', store.alias].join('/')
         const el = document.getElementById('canvas')
         const el1 = document.getElementById('canvas1')
         const el2 = document.getElementById('canvas2')
