@@ -159,6 +159,9 @@ setTimeout(() => {
     internalSocketIOServer.in(`makeAPhoneCallAck-from-client-${clientId}`).emit('makeAPhoneCallAck', { clientId, agentId, callAccepted })
   })
 
+  externalSocketIoServer.registerAckFunction('cancelCallAck', async () => {})
+  externalSocketIoServer.registerAckFunction('endCallAck', async () => {})
+
   internalSocketIOServer.on('connect', socket => {
     socket.on('watch-chat-message', clientIds => {
       clientIds.forEach(clientId => {
@@ -220,13 +223,13 @@ setTimeout(() => {
     socket.on('cancelCall', async (args, ack) => {
       let { clientId, agentId } = args;
       console.log('send cancelCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'cancelCall', [])
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'cancelCall', [{}], 'cancelCallAck', [])
     })
 
     socket.on('endCall', async (args, ack) => {
       let { clientId, agentId } = args;
       console.log('send endCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'endCall', [])
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'endCall', [{}], 'endCallAck', [])
     })
   });
 }, 5000);
