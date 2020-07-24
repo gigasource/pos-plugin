@@ -53,6 +53,8 @@
     },
     created() {
       cms.socket.on('makeAPhoneCallAck', this.makeAPhoneCallAck)
+      cms.socket.on('cancelCallAck', this.cancelCallAck)
+      cms.socket.on('endCallAck', this.endCallAck)
     },
     computed: {
       time() {
@@ -70,11 +72,9 @@
       },
       closeCall(clientId) {
         cms.socket.emit('cancelCall', {clientId})
-        this.$set(this.callees, clientId, {status: 'cancelled'})
       },
       endCall(clientId) {
         cms.socket.emit('endCall', {clientId})
-        this.$set(this.callees, clientId, {status: 'ended'})
         clearInterval(this.timer)
         this.second = 0
       },
@@ -97,6 +97,18 @@
         } else {
           console.log('The customer reject a phone call!')
           this.$set(this.callees, clientId, {status: 'rejected'})
+        }
+      },
+      cancelCallAck({clientId, agentId}) {
+        if (agentId === this.agentId) {
+          console.log('The customer reject a phone call!')
+          this.$set(this.callees, clientId, {status: 'cancelled'})
+        }
+      },
+      endCallAck({clientId, agentId}) {
+        if (agentId === this.agentId) {
+          console.log('The customer reject a phone call!')
+          this.$set(this.callees, clientId, { status: 'ended' })
         }
       },
       // helper
