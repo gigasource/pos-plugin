@@ -1,7 +1,7 @@
 <template>
   <div class="chat-support pl-5 pr-5 pt-2">
     <div class="chat-support__container row-flex">
-      <div class="chat-support__container-contact-list col-3" @scroll="onDeviceListScroll" ref="deviceList">
+      <div class="chat-support__container-contact-list col-4" @scroll="onDeviceListScroll" ref="deviceList">
         <div style="position: sticky; top: 0; background: #F4F7FB">
           <div class="chat-support__container-contact-list__title mb-2 row-flex align-items-center">
             <g-select class="chat-support__container-contact-list__title__filter"
@@ -64,6 +64,8 @@
           />
         </div>
 
+        <call-center :device-id="selectedDeviceId" ref="callCenter"/>
+
         <chat-window class="chat-support__container-chat-window__content flex-grow-1"
                      :chats="sortedChats"
                      :username-map="usernameMap"
@@ -79,6 +81,12 @@
                     @keydown.enter.exact="sendChatMsg"
                     @keydown.etner.shift.exact="currentChatMsg += '\n'"
                     :disabled="!selectedDevice"/>
+          <g-btn-bs class="my-2 px-6"
+                    background-color="#1271FF"
+                    text-color="white"
+                    @click="makeAPhoneCall">
+            <g-icon>phone</g-icon>
+          </g-btn-bs>
           <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
@@ -100,10 +108,11 @@
   import cloneDeep from 'lodash/cloneDeep'
   import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
+  import CallCenter from './CallCenter';
 
   export default {
     name: 'ChatSupport',
-    components: {ChatInfo, ChatWindow},
+    components: { CallCenter, ChatInfo, ChatWindow},
     data() {
       return {
         devices: [],
@@ -580,6 +589,9 @@
           this.getGsmsDevices()
         }
       }, 300),
+      makeAPhoneCall() {
+        this.$refs.callCenter.makeAPhoneCall(this.selectedDeviceId)
+      }
     }
   }
 </script>
@@ -656,6 +668,7 @@
         background: white;
         border: 1px solid #EEEEEE;
         border-radius: 2px;
+        position: relative;
 
         &__header {
           flex-basis: 84px;
