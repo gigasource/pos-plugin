@@ -177,6 +177,25 @@ router.post('/new-feedback', async (req, res) => {
   res.json({ok: true})
 })
 
+router.post('/sign-in-request', async (req, res) => {
+  const {storeName, googleMapPlaceId, deviceId} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
+
+  const SignInRequestModel = cms.getModel('SignInRequest');
+  const StoreModel = cms.getModel('Store');
+
+  const store = await StoreModel.findOne({googleMapPlaceId});
+  const request = await SignInRequestModel.create({
+    deviceId,
+    approved: false,
+    requestStoreName: storeName,
+    googleMapPlaceId,
+    ...store && {storeId: store._id},
+  });
+
+  res.status(201).json(request._doc);
+});
+
 async function getPlaceIdByName(placeName) {
   const {mapsApiKey} = global.APP_CONFIG;
   if (!mapsApiKey) return null;
