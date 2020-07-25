@@ -80,11 +80,8 @@
       },
       // acknowledge
       makeAPhoneCallAck({clientId, agentId, callAccepted}) {
-        console.log(clientId, agentId, callAccepted)
-        if (callAccepted) {
-          if (agentId === this.agentId) {
-            console.log('callee', this.callees[clientId])
-            console.log('update status to calling')
+        if (agentId === this.agentId) {
+          if (callAccepted) {
             if (this.callees[clientId] && this.callees[clientId].status === 'waiting') {
               this.$set(this.callees, clientId, {status: 'calling'})
               this.timer = setInterval(() => {
@@ -92,11 +89,9 @@
               }, 1000)
             }
           } else {
-            console.log('agent mismatch!, current agent: ' + this.agentId + ' received agent: ' + agentId)
+            console.log('The customer reject a phone call!')
+            this.$set(this.callees, clientId, {status: 'rejected'})
           }
-        } else {
-          console.log('The customer reject a phone call!')
-          this.$set(this.callees, clientId, {status: 'rejected'})
         }
       },
       cancelCallAck({clientId, agentId}) {
@@ -107,7 +102,7 @@
       },
       endCallAck({clientId, agentId}) {
         if (agentId === this.agentId) {
-          console.log('The customer reject a phone call!')
+          console.log('End a phone call!')
           this.$set(this.callees, clientId, { status: 'ended' })
         }
       },
