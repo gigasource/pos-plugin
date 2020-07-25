@@ -53,6 +53,8 @@
     },
     created() {
       cms.socket.on('makeAPhoneCallAck', this.makeAPhoneCallAck)
+      cms.socket.on('cancelCallAck', this.cancelCallAck)
+      cms.socket.on('endCallAck', this.endCallAck)
     },
     computed: {
       time() {
@@ -70,21 +72,16 @@
       },
       closeCall(clientId) {
         cms.socket.emit('cancelCall', {clientId})
-        this.$set(this.callees, clientId, {status: 'cancelled'})
       },
       endCall(clientId) {
         cms.socket.emit('endCall', {clientId})
-        this.$set(this.callees, clientId, {status: 'ended'})
         clearInterval(this.timer)
         this.second = 0
       },
       // acknowledge
       makeAPhoneCallAck({clientId, agentId, callAccepted}) {
-        console.log(clientId, agentId, callAccepted)
-        if (callAccepted) {
-          if (agentId === this.agentId) {
-            console.log('callee', this.callees[clientId])
-            console.log('update status to calling')
+        if (agentId === this.agentId) {
+          if (callAccepted) {
             if (this.callees[clientId] && this.callees[clientId].status === 'waiting') {
               this.$set(this.callees, clientId, {status: 'calling'})
               this.timer = setInterval(() => {
@@ -92,11 +89,21 @@
               }, 1000)
             }
           } else {
-            console.log('agent mismatch!, current agent: ' + this.agentId + ' received agent: ' + agentId)
+            console.log('The customer reject a phone call!')
+            this.$set(this.callees, clientId, {status: 'rejected'})
           }
-        } else {
+        }
+      },
+      cancelCallAck({clientId, agentId}) {
+        if (agentId === this.agentId) {
           console.log('The customer reject a phone call!')
-          this.$set(this.callees, clientId, {status: 'rejected'})
+          this.$set(this.callees, clientId, {status: 'cancelled'})
+        }
+      },
+      endCallAck({clientId, agentId}) {
+        if (agentId === this.agentId) {
+          console.log('End a phone call!')
+          this.$set(this.callees, clientId, { status: 'ended' })
         }
       },
       // helper
