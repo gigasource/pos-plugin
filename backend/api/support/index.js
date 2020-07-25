@@ -152,6 +152,12 @@ setTimeout(() => {
         cb({ error })
       }
     })
+
+    socket.on('endCallFromUser', async (clientId, agentId) => {
+      console.log('endCallFromUser', clientId, agentId)
+      clientId = clientId.replace("device_", "")
+      internalSocketIOServer.in(`endCallFromUser-${clientId}`).emit('endCallFromUser', { clientId, agentId })
+    })
   });
 
   externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
@@ -173,9 +179,18 @@ setTimeout(() => {
     socket.on('watch-chat-message', clientIds => {
       clientIds.forEach(clientId => {
         socket.join(`chatMessage-from-client-${clientId}`)
+
+        console.log(`join "makeAPhoneCallAck-from-client-${clientId}"`)
         socket.join(`makeAPhoneCallAck-from-client-${clientId}`)
+
+        console.log(`join "cancelCallAck-from-client-${clientId}"`)
         socket.join(`cancelCallAck-from-client-${clientId}`)
+
+        console.log(`join "endCallAck-from-client-${clientId}"`)
         socket.join(`endCallAck-from-client-${clientId}`)
+
+        console.log(`join "endCallFromUser-${clientId}"`)
+        socket.join(`endCallFromUser-${clientId}`)
       });
     });
 
@@ -225,7 +240,8 @@ setTimeout(() => {
       console.log('send makeAPhoneCall to ' + clientId)
       await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ {
         version: '0.0.1',
-        clientId: `device_${clientId}`
+        clientId: `device_${clientId}`,
+        agentId: agentId
       } ], 'makeAPhoneCallAck', [clientId, agentId])
     })
 
