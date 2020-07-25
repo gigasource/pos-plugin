@@ -9,7 +9,22 @@
           <span class="dot"></span>
           <span class="dot"></span>
         </div>
+        <div class="row-flex align-items-center" v-if="value.status === 'cancelling'">
+          Cancelling
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
         <div v-if="value.status === 'calling'" class="calling-animation">Call in progress</div>
+        <div class="row-flex align-items-center" v-if="value.status === 'ending'">
+          Ending
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <div class="row-flex align-items-center" v-if="value.status === 'ended'">
+          Ended.
+        </div>
         <div v-if="value.status === 'rejected'">Call rejected</div>
         <g-spacer/>
         <!-- Time -->
@@ -17,12 +32,18 @@
         <!-- Actions -->
         <div>
           <g-btn-bs background-color="#FF4452" rounded style="padding: 12px"
-                    v-if="value.status === 'waiting' || value.status === 'rejected'" @click="closeCall(key)">
+                    v-if="value.status === 'waiting'" @click="cancelCall(key)">
             <g-icon size="30" color="white">close</g-icon>
           </g-btn-bs>
+  
           <g-btn-bs background-color="#FF4452" rounded style="padding: 12px"
                     v-if="value.status === 'calling'" @click="endCall(key)">
             <g-icon size="30" style="transform: rotate(-135deg)">fas fa-phone</g-icon>
+          </g-btn-bs>
+          
+          <g-btn-bs background-color="#FF4452" rounded style="padding: 12px"
+                    v-if="value.status === 'rejected' || value.status === 'ended'" @click="closeCall(key)">
+            <g-icon size="30" color="white">close</g-icon>
           </g-btn-bs>
         </div>
 
@@ -55,6 +76,7 @@
       cms.socket.on('makeAPhoneCallAck', this.makeAPhoneCallAck)
       cms.socket.on('cancelCallAck', this.cancelCallAck)
       cms.socket.on('endCallAck', this.endCallAck)
+      cms.socket.on('endCallFromUser', this.endCallFromUser)
     },
     computed: {
       time() {
@@ -70,13 +92,24 @@
         cms.socket.emit('makeAPhoneCall', {clientId, agentId: this.agentId})
         this.$set(this.callees, clientId, {status: 'waiting'})
       },
-      closeCall(clientId) {
-        cms.socket.emit('cancelCall', {clientId})
+      // cancel while 'waiting' the response from customer
+      cancelCall(clientId) {
+        cms.socket.emit('cancelCall', {clientId, agentId: this.agentId})
+        this.$set(this.callees, clientId, {status: 'cancelling'})
       },
+      // end call while 'calling' to the customer
       endCall(clientId) {
-        cms.socket.emit('endCall', {clientId})
+        console.log('ending call')
+        cms.socket.emit('endCall', {clientId, agentId: this.agentId})
+        this.$set(this.callees, clientId, {status: 'ending'})
         clearInterval(this.timer)
+      },
+      // close current call dialog, bubble, etc
+      closeCall(clientId) {
+        console.log('close call')
         this.second = 0
+        this.$set(this.callees, clientId, undefined)
+        delete this.callees[clientId]
       },
       // acknowledge
       makeAPhoneCallAck({clientId, agentId, callAccepted}) {
@@ -89,22 +122,29 @@
               }, 1000)
             }
           } else {
-            console.log('The customer reject a phone call!')
+            console.log('rejected!')
             this.$set(this.callees, clientId, {status: 'rejected'})
           }
         }
       },
       cancelCallAck({clientId, agentId}) {
         if (agentId === this.agentId) {
-          console.log('The customer reject a phone call!')
-          this.$set(this.callees, clientId, {status: 'cancelled'})
+          console.log('cancelled')
+          this.closeCall(clientId)
         }
       },
       endCallAck({clientId, agentId}) {
+        console.log('end call ack')
         if (agentId === this.agentId) {
-          console.log('End a phone call!')
+          console.log('ended')
           this.$set(this.callees, clientId, { status: 'ended' })
         }
+      },
+      endCallFromUser({clientId, agentId}) {
+        if (agentId === this.agentId) {
+          clearInterval(this.timer)
+        }
+        this.endCallAck({clientId, agentId})
       },
       // helper
       getCallingSrc(callee) {
@@ -112,7 +152,7 @@
       },
       getActiveCall(key, status) {
         if (key !== this.deviceId) return false
-        if (['cancelled', 'ended'].includes(status)) return false
+        // if (['cancelled', 'ended'].includes(status)) return false
         return true
       }
     }
