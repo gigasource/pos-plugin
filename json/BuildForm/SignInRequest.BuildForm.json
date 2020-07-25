@@ -5,16 +5,18 @@
     {
       "_id": "5f1ac78fd956765083019fb0",
       "schemaType": "objectId",
-      "key": "deviceId",
+      "key": "device",
       "ref": "Device",
-      "type": "ref-select"
+      "type": "ref-select",
+      "autopopulate": true
     },
     {
       "_id": "5f1ac78fd956765083019fb1",
       "schemaType": "objectId",
-      "key": "storeId",
+      "key": "store",
       "ref": "Store",
-      "type": "ref-select"
+      "type": "ref-select",
+      "autopopulate": true
     },
     {
       "_id": "5f1ac4bac9e0614f8b5cfa2f",

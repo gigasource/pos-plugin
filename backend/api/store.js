@@ -5,6 +5,9 @@ const router = express.Router()
 const https = require('https');
 const http = require('http');
 const axios = require('axios');
+const mongoose = require('mongoose');
+const {getExternalSocketIoServer} = require('../socket-io-server');
+const {assignDevice} = require('../api/support');
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -177,7 +180,7 @@ router.post('/new-feedback', async (req, res) => {
   res.json({ok: true})
 })
 
-router.post('/sign-in-request', async (req, res) => {
+router.post('/sign-in-requests', async (req, res) => {
   const {storeName, googleMapPlaceId, deviceId} = req.body;
   if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
 
@@ -194,6 +197,82 @@ router.post('/sign-in-request', async (req, res) => {
   });
 
   res.status(201).json(request._doc);
+});
+
+router.get('/sign-in-requests', async (req, res) => {
+  const {approved} = req.query;
+  // const condition = approved ? {approved: approved === 'true'} : {};
+  const aggregateSteps = [];
+
+  // const requests = await cms.getModel('SignInRequest').find(condition);
+
+  if (approved === 'true' || approved === 'false') {
+    aggregateSteps.push({$match: {approved: approved === 'true'}});
+  }
+
+  aggregateSteps.push({
+    $lookup: {
+      from: 'stores',
+      localField: 'store',
+      foreignField: '_id',
+      as: 'store',
+    },
+  });
+
+  aggregateSteps.push({
+    $unwind: {
+      path: '$store',
+      preserveNullAndEmptyArrays: true
+    }
+  });
+
+  aggregateSteps.push({
+    $lookup: {
+      from: 'devices',
+      localField: 'device',
+      foreignField: '_id',
+      as: 'device',
+    },
+  });
+
+  aggregateSteps.push({
+    $unwind: {
+      path: '$device',
+      preserveNullAndEmptyArrays: true
+    }
+  });
+
+  const requests = await cms.getModel('SignInRequest').aggregate(aggregateSteps);
+
+  res.status(200).json(requests.map(({device, store, ...e}) => {
+    return {
+      deviceId: device._id,
+      deviceName: device.name,
+      deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
+      ...store && {storeName: store.settingName || store.name, storeId: store._id},
+      ...e,
+    }
+  }));
+});
+
+router.put('/sign-in-requests/:requestId', async (req, res) => {
+  const {requestId} = req.params;
+  if (!requestId) res.status(400).json({error: 'Missing requestId in URL'});
+
+  const {approved, storeId} = req.body;
+  const update = {
+    ...approved && {approved: approved === 'true'},
+    ...storeId && {store: new mongoose.Types.ObjectId(storeId)},
+  }
+
+  const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
+
+  if (approved === 'true') {
+    await assignDevice(request.device._id, request.store);
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn');
+  }
+
+  res.status(200).json(request._doc);
 });
 
 async function getPlaceIdByName(placeName) {
