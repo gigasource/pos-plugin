@@ -61,6 +61,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
+      internalSocketIOServer.emit('chatMessageNotification')
 
       cb && cb(savedMsg._doc);
     });
@@ -250,6 +251,16 @@ setTimeout(() => {
     })
   });
 }, 5000);
+
+router.get('/chat/messages/not-replied', async (req, res) => {
+  const lastMessages = await ChatMessageModel.aggregate([
+    {$sort: {createdAt: -1}},
+    {$group: {_id: '$clientId', fromServer: {$first: '$fromServer'}}},
+    {$match: {fromServer: false}},
+  ]);
+
+  res.status(200).json({notRepliedCount: lastMessages.length});
+})
 
 router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;

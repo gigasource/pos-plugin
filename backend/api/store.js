@@ -192,7 +192,7 @@ router.post('/sign-in-requests', async (req, res) => {
 
   const store = await StoreModel.findOne({googleMapPlaceId});
   const request = await SignInRequestModel.create({
-    deviceId,
+    device: deviceId,
     status: 'pending',
     requestStoreName: storeName,
     googleMapPlaceId,
@@ -200,6 +200,7 @@ router.post('/sign-in-requests', async (req, res) => {
     ...store && {storeId: store._id},
   });
 
+  cms.socket.emit('newSignInRequest', request._doc)
   res.status(201).json(request._doc);
 });
 
@@ -223,7 +224,7 @@ router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
   const {deviceId} = req.params;
   if (!deviceId) return res.status(400).json({error: 'Missing deviceId in URL'});
 
-  const requests = getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
+  const requests = await getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
 
   if (requests && requests.length) {
     const {status} = requests[0];

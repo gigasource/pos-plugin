@@ -531,17 +531,17 @@
             `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
 
         const device = this.sortedDeviceList.find(({_id}) => _id === clientId)
-        device.messageCount = device.messageCount + 1
 
-        if (device) device.latestChatMessageDate = new Date(createdAt)
-
-        if (clientId === this.selectedDeviceId) {
-          chatMessage.read = true
-          this.currentChats.push(chatMessage)
-          this.setMessagesRead(this.selectedDeviceId)
-        } else if (device) {
+        if (device) {
+          device.messageCount = device.messageCount + 1
+          device.latestChatMessageDate = new Date(createdAt)
           device.unreadMessages = device.unreadMessages || 0
           device.unreadMessages++
+          this.updateDevice(device)
+        }
+
+        if (clientId === this.selectedDeviceId) {
+          this.currentChats.push(chatMessage)
         }
       },
       async setMessagesRead(deviceId) {

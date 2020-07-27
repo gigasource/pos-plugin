@@ -16,6 +16,7 @@
   import VersionControl from "./VersionControl/VersionControl";
   import ChatSupport from "../chatSupport/ChatSupport";
   import Support from "./Support/Support";
+  import axios from 'axios';
 
   export default {
     name: 'ManagementView',
@@ -29,7 +30,20 @@
         username: cms.loginUser.user.username,
         view: 'store-management',
         selectedDeviceIdForChat: '',
+        hasNewMessages: false,
+        newChatMessageNotificationSound: new Audio('/plugins/pos-plugin/assets/sounds/new-chat-message.mp3'),
       }
+    },
+    async created() {
+      const {data: {notRepliedCount: notRepliedMessageCount}} = await axios.get('/support/chat/messages/not-replied')
+      this.hasNewMessages = notRepliedMessageCount > 0
+
+      cms.socket.on('chatMessageNotification', () => {
+        if (this.view !== 'chatSupport') {
+          this.hasNewMessages = true
+          this.newChatMessageNotificationSound.play()
+        }
+      })
     },
     computed: {
       sidebarItems() {
@@ -56,11 +70,12 @@
           }
         }
 
-        if (this.view === 'chatSupport') {
-          items.push({ title: 'Chat Support', icon: 'icon-chat_white', onClick: () => this.changeView('chatSupport', 'Chat Support') })
-        } else {
-          items.push({ title: 'Chat Support', icon: 'icon-account-management', onClick: () => this.changeView('chatSupport', 'Chat Support') })
-        }
+        items.push({
+          icon: this.view === 'chatSupport' ? 'icon-chat_white' : 'icon-account-management',
+          ...this.hasNewMessages && {appendIcon: 'icon-new-chat-messages-notification'},
+          title: 'Chat Support',
+          onClick: () => this.changeView('chatSupport', 'Chat Support')
+        })
 
         items.push({ title: 'Sign-in Requests', icon: 'headset_mic', onClick: () => this.changeView('support', 'Sign-in Requests') })
         return items

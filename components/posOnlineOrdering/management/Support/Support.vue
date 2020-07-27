@@ -46,7 +46,7 @@
                               item-text="name"
                               item-value="_id"
                               :value="request.storeId"
-                              @input="val => assignStore(request._id, val)"
+                              @input="val => assignStore(request, val)"
                               placeholder="No store assigned"/>
             </div>
             <div class="w-12">{{request.deviceName}}</div>
@@ -168,6 +168,7 @@
       }
     },
     async created() {
+      cms.socket.on('newSignInRequest', request => this.signInRequests.push(request))
       this.signInRequests = (await axios.get('/store/sign-in-requests')).data
 
       const stores = await cms.getModel('Store').find().lean()
@@ -246,11 +247,14 @@
         await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved'})
         this.signInRequests.find(e => e._id === requestId).status = 'notApproved'
       },
-      async assignStore(requestId, storeId) {
+      async assignStore(request, storeId) {
+        const requestId = request._id
         const newRequest = await axios.put(`/store/sign-in-requests/${requestId}`, {storeId})
-        const {settingName, name, _id} = newRequest.data.store
 
-        Object.assign(this.signInRequests.find(e => e._id === requestId), {storeName: settingName || name, storeId: _id})
+        const {settingName, name, _id} = newRequest.data.store
+        request.storeName = settingName || name
+        request.storeId = _id
+        request.status = 'pending'
       },
       minimizeChat(item) {
         item.minimize = !item.minimize
