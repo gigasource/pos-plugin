@@ -5,6 +5,9 @@ const router = express.Router()
 const https = require('https');
 const http = require('http');
 const axios = require('axios');
+const mongoose = require('mongoose');
+const {getExternalSocketIoServer} = require('../socket-io-server');
+const {assignDevice} = require('../api/support');
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -176,6 +179,119 @@ router.post('/new-feedback', async (req, res) => {
 
   res.json({ok: true})
 })
+
+router.post('/sign-in-requests', async (req, res) => {
+  const {storeName, googleMapPlaceId, deviceId} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
+
+  const SignInRequestModel = cms.getModel('SignInRequest');
+  const StoreModel = cms.getModel('Store');
+
+  const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
+  if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});
+
+  const store = await StoreModel.findOne({googleMapPlaceId});
+  const request = await SignInRequestModel.create({
+    deviceId,
+    status: 'pending',
+    requestStoreName: storeName,
+    googleMapPlaceId,
+    createdAt: new Date(),
+    ...store && {storeId: store._id},
+  });
+
+  res.status(201).json(request._doc);
+});
+
+router.get('/sign-in-requests', async (req, res) => {
+  const {status} = req.query;
+
+  const requests = await getRequestsFromDb({...status && {status}});
+
+  res.status(200).json(requests.map(({device, store, ...e}) => {
+    return {
+      deviceId: device._id,
+      deviceName: device.name,
+      deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
+      ...store && {storeName: store.settingName || store.name, storeId: store._id},
+      ...e,
+    }
+  }));
+});
+
+router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
+  const {deviceId} = req.params;
+  if (!deviceId) return res.status(400).json({error: 'Missing deviceId in URL'});
+
+  const requests = getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
+
+  if (requests && requests.length) {
+    const {status} = requests[0];
+    res.status(200).json({request: {status}});
+  } else {
+    res.status(200).json({request: null});
+  }
+});
+
+router.put('/sign-in-requests/:requestId', async (req, res) => {
+  const {requestId} = req.params;
+  if (!requestId) return res.status(400).json({error: 'Missing requestId in URL'});
+
+  let {status, storeId} = req.body;
+  const update = {
+    ...status && {status},
+    ...storeId && {store: new mongoose.Types.ObjectId(storeId)},
+  }
+
+  const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
+
+  if (status === 'approved') {
+    await assignDevice(request.device._id, request.store);
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
+  }
+
+  res.status(200).json(request._doc);
+});
+
+function getRequestsFromDb(conditions) {
+  const aggregateSteps = [];
+
+  if (typeof conditions === 'object') aggregateSteps.push({$match: conditions});
+
+  aggregateSteps.push({
+    $lookup: {
+      from: 'stores',
+      localField: 'store',
+      foreignField: '_id',
+      as: 'store',
+    },
+  });
+
+  aggregateSteps.push({
+    $unwind: {
+      path: '$store',
+      preserveNullAndEmptyArrays: true
+    }
+  });
+
+  aggregateSteps.push({
+    $lookup: {
+      from: 'devices',
+      localField: 'device',
+      foreignField: '_id',
+      as: 'device',
+    },
+  });
+
+  aggregateSteps.push({
+    $unwind: {
+      path: '$device',
+      preserveNullAndEmptyArrays: true
+    }
+  });
+
+  return cms.getModel('SignInRequest').aggregate(aggregateSteps);
+}
 
 async function getPlaceIdByName(placeName) {
   const {mapsApiKey} = global.APP_CONFIG;

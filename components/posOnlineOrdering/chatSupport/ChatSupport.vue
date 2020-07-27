@@ -1,7 +1,7 @@
 <template>
   <div class="chat-support pl-5 pr-5 pt-2">
     <div class="chat-support__container row-flex">
-      <div class="chat-support__container-contact-list col-3" @scroll="onDeviceListScroll" ref="deviceList">
+      <div class="chat-support__container-contact-list col-4" @scroll="onDeviceListScroll" ref="deviceList">
         <div style="position: sticky; top: 0; background: #F4F7FB">
           <div class="chat-support__container-contact-list__title mb-2 row-flex align-items-center">
             <g-select class="chat-support__container-contact-list__title__filter"
@@ -24,6 +24,7 @@
 
         <div class="chat-support__container-contact-list__list col-flex">
           <div v-for="contact in sortedDeviceList" :key="contact._id" @click.stop="setActiveChat(contact)"
+               :id="'device-' + contact._id"
                class="chat-support__container-contact-list__list--item row-flex align-items-center pl-3 pr-3"
                :class="contact._id === selectedDeviceId ? 'chat-support__container-contact-list__list--item_active' : ''">
             <div class="chat-support__container-contact-list__list--item_left">
@@ -64,6 +65,8 @@
           />
         </div>
 
+        <call-center :device-id="selectedDeviceId" ref="callCenter"/>
+
         <chat-window class="chat-support__container-chat-window__content flex-grow-1"
                      :chats="sortedChats"
                      :username-map="usernameMap"
@@ -79,6 +82,12 @@
                     @keydown.enter.exact="sendChatMsg"
                     @keydown.etner.shift.exact="currentChatMsg += '\n'"
                     :disabled="!selectedDevice"/>
+          <g-btn-bs class="my-2 px-6"
+                    background-color="#1271FF"
+                    text-color="white"
+                    @click="makeAPhoneCall">
+            <g-icon>phone</g-icon>
+          </g-btn-bs>
           <g-btn-bs class="my-2 px-6"
                     background-color="#1271FF"
                     text-color="white"
@@ -100,10 +109,14 @@
   import cloneDeep from 'lodash/cloneDeep'
   import ChatInfo from './ChatInfo'
   import uuidv1 from 'uuid/v1'
+  import CallCenter from './CallCenter';
 
   export default {
     name: 'ChatSupport',
-    components: {ChatInfo, ChatWindow},
+    components: { CallCenter, ChatInfo, ChatWindow},
+    props: {
+      selectedDeviceIdProp: String,
+    },
     data() {
       return {
         devices: [],
@@ -121,7 +134,7 @@
           {text: 'Chat started', value: 'chatStarted'},
           {text: 'Chat not started', value: 'chatNotStarted'},
         ],
-        activeFilterSelection: 'none',
+        activeFilterSelection: 'chatStarted',
 
         adminId: '5c88842f1591d506a250b2a5',
         contactSearch: '',
@@ -129,7 +142,7 @@
         loadingMoreDevices: false,
         moreDevicesAvailable: true,
         loadedDeviceIndex: 0,
-        devicesPerLoad: 15,
+        devicesPerLoad: 50,
 
         loadingMoreChats: false,
         moreChatsAvailable: false,
@@ -160,12 +173,28 @@
       cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
 
       const updateDeviceStatus = async (deviceId, online) => {
-        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+        const device = this.sortedDeviceList.find(({_id}) => _idc === deviceId)
         if (device) device.online = online
       }
 
       cms.socket.on('gsms-device-connected', deviceId => updateDeviceStatus(deviceId, true))
       cms.socket.on('gsms-device-disconnected', deviceId => updateDeviceStatus(deviceId, false))
+    },
+    async mounted() {
+      const selectedDeviceIdProp = this.selectedDeviceIdProp.trim()
+      if (selectedDeviceIdProp) {
+        if (this.devices.map(({_id}) => _id).includes(selectedDeviceIdProp)) {
+          this.selectedDeviceId = selectedDeviceIdProp
+          this.scrollDeviceIntoView(this.selectedDeviceId)
+        } else {
+          const {data: selectedDevice} = await axios.get(`/gsms-device/devices/${selectedDeviceIdProp}`)
+          if (selectedDevice) {
+            this.devices.push(selectedDevice)
+            this.selectedDeviceId = selectedDeviceIdProp
+            this.scrollDeviceIntoView(this.selectedDeviceId)
+          }
+        }
+      }
     },
     computed: {
       sortedDeviceList() {
@@ -283,8 +312,6 @@
         const messageCountObj = await this.getChatMessageCount([val])
         const messageCount = messageCountObj[val]
         this.moreChatsAvailable = chats.length <= messageCount
-        // Set unread notification number to 0
-        await this.setMessagesRead(val)
         // map userId to user's name, used for chat user info & notes feature
         await this.mapNoteUserIdsToNames()
       },
@@ -296,6 +323,12 @@
       }
     },
     methods: {
+      scrollDeviceIntoView(deviceId) {
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#device-' + deviceId)
+          if (el) el.scrollIntoView()
+        })
+      },
       searchDevices: debounce(async function (searchText) {
         if (!this.moreDevicesAvailable) return
 
@@ -343,10 +376,10 @@
         this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
         this.devices = this.devices.map(device => this.convertDevice(device))
 
-        const deviceIds = this.devices.map(({_id}) => _id)
+        const deviceIds = gsmsDevices.map(({_id}) => _id)
         this.getChatMessageCount(deviceIds).then(messageCountMap => {
           Object.keys(messageCountMap).forEach(deviceId => {
-            const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+            const device = this.devices.find(({_id}) => _id === deviceId)
             if (device) {
               device.messageCount = messageCountMap[deviceId]
               this.updateDevice(device)
@@ -421,12 +454,16 @@
       setActiveChat(contact) {
         this.selectedDeviceId = contact._id
       },
-      sendChatMsg(e) {
+      async sendChatMsg(e) {
         e.preventDefault()
         if (!this.currentChatMsg.replace(/\r?\n|\r/g, '').trim().length) return
 
         this.sendChatMsgDebounced(this.currentChatMsg)
         this.currentChatMsg = ''
+
+        // Set unread notification number to 0
+        await this.setMessagesRead(this.selectedDeviceId)
+
         const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
         device.messageCount = device.messageCount + 1
       },
@@ -567,7 +604,7 @@
         this.currentChats = [...chats, ...this.currentChats]
       },
       onDeviceListScroll: debounce(function () {
-        // if (this.loadingMoreChats) return
+        if (this.loadingMoreChats) return
 
         const el = this.$refs.deviceList
         if (!el) return
@@ -580,6 +617,9 @@
           this.getGsmsDevices()
         }
       }, 300),
+      makeAPhoneCall() {
+        this.$refs.callCenter.makeAPhoneCall(this.selectedDeviceId)
+      }
     }
   }
 </script>
@@ -656,6 +696,7 @@
         background: white;
         border: 1px solid #EEEEEE;
         border-radius: 2px;
+        position: relative;
 
         &__header {
           flex-basis: 84px;

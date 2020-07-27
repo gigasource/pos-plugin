@@ -12,7 +12,9 @@ const ObjectId = require('mongoose').Types.ObjectId;
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
 setTimeout(() => {
-  getExternalSocketIoServer().on('connect', socket => {
+  let externalSocketIoServer = getExternalSocketIoServer()
+
+  externalSocketIoServer.on('connect', socket => {
     async function setDemoDeviceLastSeen(deviceId) {
       const device = await DeviceModel.findById(deviceId)
       if (!device) return
@@ -150,11 +152,38 @@ setTimeout(() => {
         cb({ error })
       }
     })
+
+    socket.on('endCallFromUser', async (clientId, agentId) => {
+      console.log('endCallFromUser', clientId, agentId)
+      clientId = clientId.replace("device_", "")
+      internalSocketIOServer.in(`endCallFromUser-${clientId}`).emit('endCallFromUser', { clientId, agentId })
+    })
   });
+
+  externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
+    console.log('makeAPhoneCallAck', clientId, agentId, callAccepted)
+    internalSocketIOServer.in(`makeAPhoneCallAck-from-client-${clientId}`).emit('makeAPhoneCallAck', { clientId, agentId, callAccepted })
+  })
+
+  externalSocketIoServer.registerAckFunction('cancelCallAck', async (clientId, agentId) => {
+    console.log('cancelCallAck', clientId, agentId)
+    internalSocketIOServer.in(`cancelCallAck-from-client-${clientId}`).emit('cancelCallAck', { clientId, agentId })
+  })
+
+  externalSocketIoServer.registerAckFunction('endCallAck', async (clientId, agentId) => {
+    console.log('endCallAck', clientId, agentId)
+    internalSocketIOServer.in(`endCallAck-from-client-${clientId}`).emit('endCallAck', { clientId, agentId })
+  })
 
   internalSocketIOServer.on('connect', socket => {
     socket.on('watch-chat-message', clientIds => {
-      clientIds.forEach(clientId => socket.join(`chatMessage-from-client-${clientId}`));
+      clientIds.forEach(clientId => {
+        socket.join(`chatMessage-from-client-${clientId}`)
+        socket.join(`makeAPhoneCallAck-from-client-${clientId}`)
+        socket.join(`cancelCallAck-from-client-${clientId}`)
+        socket.join(`endCallAck-from-client-${clientId}`)
+        socket.join(`endCallFromUser-${clientId}`)
+      });
     });
 
     socket.on('chat-message', async (chatData, cb) => {
@@ -196,6 +225,28 @@ setTimeout(() => {
         getExternalSocketIoServer().emitTo(clientId, 'getNewMenu', categories, products)
         console.log(`sent new menu to ${clientId}`)
       })
+    })
+
+    socket.on('makeAPhoneCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send makeAPhoneCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ {
+        version: '0.0.1',
+        clientId: `device_${clientId}`,
+        agentId: agentId
+      } ], 'makeAPhoneCallAck', [clientId, agentId])
+    })
+
+    socket.on('cancelCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send cancelCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'cancelCall', [{}], 'cancelCallAck', [clientId, agentId])
+    })
+
+    socket.on('endCall', async (args, ack) => {
+      let { clientId, agentId } = args;
+      console.log('send endCall to ' + clientId)
+      await getExternalSocketIoServer().emitToPersistent(clientId, 'endCall', [{}], 'endCallAck', [clientId, agentId])
     })
   });
 }, 5000);
@@ -380,3 +431,4 @@ router.put('/update-token/:id', async (req, res) => {
   }
 })
 module.exports = router;
+module.exports.assignDevice = assignDevice;

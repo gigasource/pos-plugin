@@ -1,46 +1,68 @@
 <template>
   <div class="support">
-    <div class="support__title">Support</div>
+    <div class="support__header">
+      <g-text-field-bs
+          class="support__header__search mr-3"
+          prepend-inner-icon="search"
+          placeholder="Search"
+          v-model="requestSearchText"/>
+      <g-select class="support__header__filter"
+                label="Filter"
+                :items="filterSelections"
+                v-model="activeFilterSelection"/>
+    </div>
     <div class="support__table">
       <div class="support__table-header">
         <div class="flex-equal pl-2">Restaurant</div>
-        <div style="flex: 0 0 80px">Action</div>
-        <div class="w-12">Type</div>
-        <div class="w-12">Assigned</div>
+        <div style="flex: 0 0 100px">Action</div>
+        <div class="w-10">Type</div>
+        <div class="assigned-store">Assigned</div>
         <div class="w-12">Device</div>
         <div class="col-2">Location</div>
         <div class="w-10"></div>
       </div>
       <div class="support__table-content">
-        <template v-if="!restaurants || restaurants.length === 0">
+        <template v-if="!signInRequests || signInRequests.length === 0">
           <div class="support__table-content--empty">
             <img alt src="/plugins/pos-plugin/assets/empty_group.svg"/>
             <p class="text-grey-darken-1 mt-2">Support restaurants list is currently empty</p>
           </div>
         </template>
         <template v-else>
-          <div v-for="(restaurant, i) in restaurants" :key="i" class="support__table-row">
-            <div class="flex-equal pl-2">{{restaurant.name}}</div>
-            <div style="flex: 0 0 80px">
-              <g-icon size="20" class="mr-1" @click="addChat(restaurant)">far fa-comment-alt</g-icon>
-              <g-icon size="20" class="mr-1" color="#388E3C" @click="openDialogApprove(restaurant)">fas fa-check</g-icon>
-              <g-icon size="20" color="#FF4452">fas fa-times</g-icon>
+          <div v-for="(request, i) in sortedRequests" :key="i" class="support__table-row">
+            <div class="flex-equal pl-2">{{request.requestStoreName}}</div>
+            <div style="flex: 0 0 100px">
+              <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
+              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
+              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
-            <div class="w-12">{{restaurant.type}}</div>
-            <div class="w-12">{{restaurant.assigned}}</div>
-            <div class="w-12">{{restaurant.device}}</div>
-            <div class="col-2">{{restaurant.location}}</div>
+            <div class="w-10">{{request.storeName ? 'Sign in' : 'New restaurant'}}</div>
+            <div class="assigned-store pr-2">
+              <g-autocomplete text-field-component="GTextFieldBs" class="flex-equal"
+                              solo
+                              rounded
+                              :arrow="false"
+                              :items="stores"
+                              item-text="name"
+                              item-value="_id"
+                              :value="request.storeId"
+                              @input="val => assignStore(request._id, val)"
+                              placeholder="No store assigned"/>
+            </div>
+            <div class="w-12">{{request.deviceName}}</div>
+            <div class="col-2">{{request.deviceLocation}}</div>
             <div class="w-10 pr-2">
-              <div v-if="restaurant.complete" class="complete">Completed</div>
-              <div v-else class="complete--not">Complete</div>
+              <div v-if="request.status === 'approved'" class="complete">Approved</div>
+              <div v-else-if="request.status === 'pending'" class="complete complete--not">Pending</div>
+              <div v-else-if="request.status === 'notApproved'" class="complete complete--denied">Not Approved</div>
             </div>
           </div>
         </template>
       </div>
     </div>
     <div class="chat">
-      <div class="chat-item" v-for="(item, index) in chatItems" :key="`chat_${index}`">
-        <div class="chat-item--header" @click.stop="minimizeChat(item)">
+<!--      <div class="chat-item" v-for="(item, index) in chatItems" :key="`chat_${index}`">
+        <div class="chat-item&#45;&#45;header" @click.stop="minimizeChat(item)">
           <div>
             <p class="fs-small fw-700">{{item.restaurant.name}}</p>
             <p class="fs-small-2 text-grey-darken-1">
@@ -53,15 +75,15 @@
           <g-icon @click="closeChat(item)" color="black" size="30">fas fa-times</g-icon>
         </div>
         <template v-if="!item.minimize">
-          <div class="chat-item--main"></div>
-          <div class="chat-item--footer">
+          <div class="chat-item&#45;&#45;main"></div>
+          <div class="chat-item&#45;&#45;footer">
             <textarea rows="1" placeholder="Type a message"/>
-            <g-btn-bs class="chat-item--btn-send">
+            <g-btn-bs class="chat-item&#45;&#45;btn-send">
               <g-icon size="16">icon-chat-support-note-send</g-icon>
             </g-btn-bs>
           </div>
         </template>
-      </div>
+      </div>-->
     </div>
     <g-dialog v-model="dialog.approve" width="381">
       <g-card class="pa-4">
@@ -73,7 +95,22 @@
         <div class="row-flex align-items-center mt-3">
           <g-spacer/>
           <g-btn-bs text-color="#424242" @click="dialog.approve = false">Cancel</g-btn-bs>
-          <g-btn-bs width="100" background-color="#2979FF" text-color="white" @click="approve">Confirm</g-btn-bs>
+          <g-btn-bs width="100" background-color="#2979FF" text-color="white" @click="approveRequest">Confirm</g-btn-bs>
+        </div>
+      </g-card>
+    </g-dialog>
+
+    <g-dialog v-model="dialog.deny" width="381">
+      <g-card class="pa-4">
+        <div class="fs-large-2 fw-600">Deny sign-in request</div>
+        <div class="pa-3 ta-center">
+          <p>Deny the following sign-in request?</p>
+          <p class="fw-700">{{selectedRestaurant && selectedRestaurant.name}}</p>
+        </div>
+        <div class="row-flex align-items-center mt-3">
+          <g-spacer/>
+          <g-btn-bs text-color="#424242" @click="dialog.deny = false">Cancel</g-btn-bs>
+          <g-btn-bs width="100" background-color="#D32F2F" text-color="white" @click="denyRequest">Deny</g-btn-bs>
         </div>
       </g-card>
     </g-dialog>
@@ -81,6 +118,9 @@
 </template>
 
 <script>
+  import axios from 'axios'
+  import cloneDeep from 'lodash/cloneDeep'
+
   export default {
     name: "Support",
     props: {
@@ -88,38 +128,7 @@
     },
     data() {
       return {
-        restaurants: [
-          {
-            id: 1,
-            name: 'Lorem ipsum dolor sit amet',
-            type: 'Sign in',
-            assigned: 'Unassigned',
-            device: 'Galaxy S10',
-            location: 'New York, USA',
-            onlineStatus: '45 mins ago',
-            complete: false
-          },
-          {
-            id: 2,
-            name: 'Lorem ipsum dolor sit amet',
-            type: 'New restaurant',
-            assigned: 'Unassigned',
-            device: 'Galaxy S10',
-            location: 'Los Angeles, USA',
-            onlineStatus: '45 mins ago',
-            complete: true
-          },
-          {
-            id: 3,
-            name: 'Lorem ipsum dolor sit amet',
-            type: 'New restaurant',
-            assigned: 'ABC restaurant',
-            device: 'Galaxy S10',
-            location: 'New York, USA',
-            onlineStatus: '45 mins ago',
-            complete: false
-          }
-        ],
+        signInRequests: [],
         chatItems: [
           {
             minimize: true,
@@ -141,14 +150,73 @@
           },
         ],
         dialog: {
-          approve: false
+          approve: false,
+          deny: false,
         },
-        selectedRestaurant: null
+        selectedRestaurant: null,
+        selectedRequestId: null,
+
+        filterSelections: [
+          {text: 'None', value: 'none'},
+          {text: 'Approved', value: 'approved'},
+          {text: 'Pending', value: 'pending'},
+          {text: 'Not approved', value: 'notApproved'},
+        ],
+        activeFilterSelection: 'pending',
+        requestSearchText: '',
+        stores: [],
+      }
+    },
+    async created() {
+      this.signInRequests = (await axios.get('/store/sign-in-requests')).data
+
+      const stores = await cms.getModel('Store').find().lean()
+      this.stores = stores.map(store => {
+        return {
+          _id: store._id,
+          id: store.id,
+          name: `${store.id}. ${store.name || store.settingName} (${store.alias})`,
+        }
+      }).sort((s1, s2) => +s1.id - +s2.id)
+    },
+    computed: {
+      sortedRequests() {
+        let requests = cloneDeep(this.signInRequests)
+
+        switch (this.activeFilterSelection) {
+          case 'approved': {
+            requests = requests.filter(e => e.status === 'approved')
+            break
+          }
+          case 'pending': {
+            requests = requests.filter(e => e.status === 'pending')
+            break
+          }
+          case 'notApproved': {
+            requests = requests.filter(e => e.status === 'notApproved')
+            break
+          }
+        }
+
+        requests = requests.sort((cur, next) => {
+          const curCreatedAt = (cur.createdAt || new Date()).getTime()
+          const nextCreatedAt = (next.createdAt || new Date()).getTime()
+
+          return nextCreatedAt - curCreatedAt
+        })
+
+        if (this.requestSearchText && this.requestSearchText.trim().length) {
+          requests = requests.filter(r => r.requestStoreName.toLowerCase().includes(this.requestSearchText.toLowerCase()))
+        }
+
+        return requests
       }
     },
     methods: {
-      addChat(restaurant) {
-        const item = this.chatItems.find(i => i.restaurant.id === restaurant.id)
+      addChat(deviceId) {
+        this.$emit('select-chat', deviceId)
+
+/*        const item = this.chatItems.find(i => i.restaurant.id === restaurant.id)
         if(item) {
           this.$set(item, 'minimize', false)
         } else {
@@ -156,15 +224,33 @@
             minimize: false,
             restaurant
           })
-        }
+        }*/
       },
-      openDialogApprove(restaurant) {
-        this.selectedRestaurant = restaurant
+      openDialogApprove(requestId) {
+        this.selectedRequestId = requestId
         this.dialog.approve = true
       },
-      approve() {
-        //TODO add approve action
+      openDialogDeny(requestId) {
+        this.selectedRequestId = requestId
+        this.dialog.deny = true
+      },
+      async approveRequest() {
         this.dialog.approve = false
+        const requestId = this.selectedRequestId
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved'})
+        this.signInRequests.find(e => e._id === requestId).status = 'approved'
+      },
+      async denyRequest() {
+        this.dialog.deny = false
+        const requestId = this.selectedRequestId
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved'})
+        this.signInRequests.find(e => e._id === requestId).status = 'notApproved'
+      },
+      async assignStore(requestId, storeId) {
+        const newRequest = await axios.put(`/store/sign-in-requests/${requestId}`, {storeId})
+        const {settingName, name, _id} = newRequest.data.store
+
+        Object.assign(this.signInRequests.find(e => e._id === requestId), {storeName: settingName || name, storeId: _id})
       },
       minimizeChat(item) {
         item.minimize = !item.minimize
@@ -179,20 +265,54 @@
 </script>
 
 <style scoped lang="scss">
+  .assigned-store {
+    max-width: 20%;
+    width: 20%;
+  }
+
   .support {
     height: 100%;
     width: 100%;
     overflow: hidden;
 
-    &__title {
-      font-size: 20px;
-      line-height: 25px;
-      font-weight: 700;
-      color: #000000;
+    &__header {
       margin-bottom: 16px;
       margin-left: 5px;
-    }
+      display: flex;
+      align-content: center;
 
+      &__filter {
+        display: flex;
+        width: 20%;
+
+        ::v-deep > div:first-child {
+          width: 100%
+        }
+      }
+
+      ::v-deep &__search {
+        display: flex;
+        width: 25%;
+
+        div:first-child {
+          width: 100%
+        }
+
+        .bs-tf-wrapper ::v-deep {
+          height: 100%;
+          margin: 0;
+          padding: 8px 0;
+          width: 100%;
+
+          .bs-tf-inner-input-group {
+            height: 100%;
+            background: white;
+            border: 1px solid #EEEEEE;
+            border-radius: 2px;
+          }
+        }
+      }
+    }
 
     &__table {
       background: #FFFFFF;
@@ -252,14 +372,14 @@
           padding: 8px;
           color: white;
           text-align: center;
+          cursor: pointer;
 
           &--not {
             background: #1271FF;
-            border-radius: 4px;
-            padding: 8px;
-            color: white;
-            text-align: center;
-            cursor: pointer;
+          }
+
+          &--denied {
+            background: #D32F2F;
           }
         }
 
