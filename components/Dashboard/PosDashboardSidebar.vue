@@ -93,6 +93,9 @@
       onNodeSelected(node) {
         this.selectedNode = node;
         node.onClick && node.onClick.bind(this)();
+      },
+      setSidebarItem(itemString) {
+        this.sidebar = itemString
       }
     }
   }
@@ -108,7 +111,7 @@
       line-height: 18px;
       font-weight: 600;
       color: #1d1d26;
-      
+
       &__username {
         word-break: break-all;
         -webkit-line-clamp: 2;
@@ -122,9 +125,9 @@
         text-overflow: ellipsis;
         display: block;
       }
-      
+
       $avatarSize: 40px;
-      
+
       &__avatar {
         width: $avatarSize;
         height: $avatarSize;
@@ -136,7 +139,7 @@
       }
     }
   }
-  
+
   .g-treeview-wrapper ::v-deep .g-treeview-item.g-treeview__active {
     background: linear-gradient(9.78deg, #3949AB 0%, #4FC3F7 100%) !important;
     box-shadow: 0 1px 8px 1px rgba(28, 144, 196, 0.5);
@@ -144,7 +147,7 @@
     border-bottom-right-radius: 4px;
     margin-right: 8px;
   }
-  
+
   .g-btn ::v-deep .g-btn__content {
     justify-content: flex-start;
     color: #424242;

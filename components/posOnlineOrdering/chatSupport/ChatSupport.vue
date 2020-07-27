@@ -24,6 +24,7 @@
 
         <div class="chat-support__container-contact-list__list col-flex">
           <div v-for="contact in sortedDeviceList" :key="contact._id" @click.stop="setActiveChat(contact)"
+               :id="'device-' + contact._id"
                class="chat-support__container-contact-list__list--item row-flex align-items-center pl-3 pr-3"
                :class="contact._id === selectedDeviceId ? 'chat-support__container-contact-list__list--item_active' : ''">
             <div class="chat-support__container-contact-list__list--item_left">
@@ -113,6 +114,9 @@
   export default {
     name: 'ChatSupport',
     components: { CallCenter, ChatInfo, ChatWindow},
+    props: {
+      selectedDeviceIdProp: String,
+    },
     data() {
       return {
         devices: [],
@@ -169,12 +173,28 @@
       cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
 
       const updateDeviceStatus = async (deviceId, online) => {
-        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+        const device = this.sortedDeviceList.find(({_id}) => _idc === deviceId)
         if (device) device.online = online
       }
 
       cms.socket.on('gsms-device-connected', deviceId => updateDeviceStatus(deviceId, true))
       cms.socket.on('gsms-device-disconnected', deviceId => updateDeviceStatus(deviceId, false))
+    },
+    async mounted() {
+      const selectedDeviceIdProp = this.selectedDeviceIdProp.trim()
+      if (selectedDeviceIdProp) {
+        if (this.devices.map(({_id}) => _id).includes(selectedDeviceIdProp)) {
+          this.selectedDeviceId = selectedDeviceIdProp
+          this.scrollDeviceIntoView(this.selectedDeviceId)
+        } else {
+          const {data: selectedDevice} = await axios.get(`/gsms-device/devices/${selectedDeviceIdProp}`)
+          if (selectedDevice) {
+            this.devices.push(selectedDevice)
+            this.selectedDeviceId = selectedDeviceIdProp
+            this.scrollDeviceIntoView(this.selectedDeviceId)
+          }
+        }
+      }
     },
     computed: {
       sortedDeviceList() {
@@ -305,6 +325,12 @@
       }
     },
     methods: {
+      scrollDeviceIntoView(deviceId) {
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#device-' + deviceId)
+          if (el) el.scrollIntoView()
+        })
+      },
       searchDevices: debounce(async function (searchText) {
         if (!this.moreDevicesAvailable) return
 
@@ -576,7 +602,7 @@
         this.currentChats = [...chats, ...this.currentChats]
       },
       onDeviceListScroll: debounce(function () {
-        // if (this.loadingMoreChats) return
+        if (this.loadingMoreChats) return
 
         const el = this.$refs.deviceList
         if (!el) return

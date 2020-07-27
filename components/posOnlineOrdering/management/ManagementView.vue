@@ -1,12 +1,12 @@
 <template>
   <div class="pos-management">
-    <pos-dashboard-sidebar default-path="item.0" :items="sidebarItems" @node-selected="onNodeSelected"/>
+    <pos-dashboard-sidebar default-path="item.0" :items="sidebarItems" @node-selected="onNodeSelected" ref="sidebar"/>
     <div class="pos-management__main">
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
-      <chat-support v-else-if="view === 'chatSupport'"/>
-      <support v-else-if="view === 'support'"/>
+      <chat-support :selected-device-id-prop="selectedDeviceIdForChat" v-else-if="view === 'chatSupport'"/>
+      <support @select-chat="supportSelectChat" v-else-if="view === 'support'"/>
     </div>
   </div>
 </template>
@@ -27,7 +27,8 @@
     data: function () {
       return {
         username: cms.loginUser.user.username,
-        view: 'store-management'
+        view: 'store-management',
+        selectedDeviceIdForChat: '',
       }
     },
     computed: {
@@ -74,6 +75,11 @@
           this.view = view
         }
       },
+      supportSelectChat(deviceId) {
+        this.selectedDeviceIdForChat = deviceId
+        this.changeView('chatSupport', 'Chat Support')
+        this.$refs.sidebar.setSidebarItem('item.3')
+      }
     }
   }
 </script>

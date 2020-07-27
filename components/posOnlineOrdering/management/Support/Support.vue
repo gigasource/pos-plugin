@@ -32,9 +32,9 @@
           <div v-for="(request, i) in sortedRequests" :key="i" class="support__table-row">
             <div class="flex-equal pl-2">{{request.requestStoreName}}</div>
             <div style="flex: 0 0 100px">
-              <g-icon size="20" class="mr-2" @click="addChat(request)">far fa-comment-alt</g-icon>
-              <g-icon v-if="request.storeId" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
-              <g-icon v-if="request.storeId" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
+              <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
+              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
+              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeName ? 'Sign in' : 'New restaurant'}}</div>
             <div class="assigned-store pr-2">
@@ -168,7 +168,7 @@
       }
     },
     async created() {
-      this.signInRequests = (await axios.get('/store/sign-in-requests', {params: {status: 'pending'}})).data
+      this.signInRequests = (await axios.get('/store/sign-in-requests')).data
 
       const stores = await cms.getModel('Store').find().lean()
       this.stores = stores.map(store => {
@@ -213,8 +213,10 @@
       }
     },
     methods: {
-      addChat(restaurant) {
-        const item = this.chatItems.find(i => i.restaurant.id === restaurant.id)
+      addChat(deviceId) {
+        this.$emit('select-chat', deviceId)
+
+/*        const item = this.chatItems.find(i => i.restaurant.id === restaurant.id)
         if(item) {
           this.$set(item, 'minimize', false)
         } else {
@@ -222,7 +224,7 @@
             minimize: false,
             restaurant
           })
-        }
+        }*/
       },
       openDialogApprove(requestId) {
         this.selectedRequestId = requestId

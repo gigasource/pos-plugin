@@ -187,8 +187,8 @@ router.post('/sign-in-requests', async (req, res) => {
   const SignInRequestModel = cms.getModel('SignInRequest');
   const StoreModel = cms.getModel('Store');
 
-  const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId)});
-  if (existingSignInRequest) return res.status(200).json({message: 'This device already has a sign in request'});
+  const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
+  if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});
 
   const store = await StoreModel.findOne({googleMapPlaceId});
   const request = await SignInRequestModel.create({
