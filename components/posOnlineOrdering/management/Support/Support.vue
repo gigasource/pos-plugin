@@ -34,7 +34,7 @@
             <div style="flex: 0 0 100px">
               <g-icon size="20" class="mr-2" @click="addChat(request)">far fa-comment-alt</g-icon>
               <g-icon v-if="request.storeId" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
-              <g-icon v-if="request.storeId" size="20" color="#FF4452" @click="openDialogDelete(request._id)">fas fa-times</g-icon>
+              <g-icon v-if="request.storeId" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeName ? 'Sign in' : 'New restaurant'}}</div>
             <div class="assigned-store pr-2">
@@ -52,9 +52,9 @@
             <div class="w-12">{{request.deviceName}}</div>
             <div class="col-2">{{request.deviceLocation}}</div>
             <div class="w-10 pr-2">
-              <div v-if="request.approved && !request.deleted" class="complete">Approved</div>
-              <div v-else-if="request.deleted" class="complete complete--deleted">Deleted</div>
-              <div v-else class="complete complete--not">Not Approved</div>
+              <div v-if="request.status === 'approved'" class="complete">Approved</div>
+              <div v-else-if="request.status === 'pending'" class="complete complete--not">Pending</div>
+              <div v-else-if="request.status === 'notApproved'" class="complete complete--denied">Not Approved</div>
             </div>
           </div>
         </template>
@@ -95,22 +95,22 @@
         <div class="row-flex align-items-center mt-3">
           <g-spacer/>
           <g-btn-bs text-color="#424242" @click="dialog.approve = false">Cancel</g-btn-bs>
-          <g-btn-bs width="100" background-color="#2979FF" text-color="white" @click="approve">Confirm</g-btn-bs>
+          <g-btn-bs width="100" background-color="#2979FF" text-color="white" @click="approveRequest">Confirm</g-btn-bs>
         </div>
       </g-card>
     </g-dialog>
 
-    <g-dialog v-model="dialog.delete" width="381">
+    <g-dialog v-model="dialog.deny" width="381">
       <g-card class="pa-4">
-        <div class="fs-large-2 fw-600">Delete sign-in request</div>
+        <div class="fs-large-2 fw-600">Deny sign-in request</div>
         <div class="pa-3 ta-center">
-          <p>Delete the following sign-in request?</p>
+          <p>Deny the following sign-in request?</p>
           <p class="fw-700">{{selectedRestaurant && selectedRestaurant.name}}</p>
         </div>
         <div class="row-flex align-items-center mt-3">
           <g-spacer/>
-          <g-btn-bs text-color="#424242" @click="dialog.delete = false">Cancel</g-btn-bs>
-          <g-btn-bs width="100" background-color="#D32F2F" text-color="white" @click="deleteRequest">Delete</g-btn-bs>
+          <g-btn-bs text-color="#424242" @click="dialog.deny = false">Cancel</g-btn-bs>
+          <g-btn-bs width="100" background-color="#D32F2F" text-color="white" @click="denyRequest">Deny</g-btn-bs>
         </div>
       </g-card>
     </g-dialog>
@@ -151,7 +151,7 @@
         ],
         dialog: {
           approve: false,
-          delete: false,
+          deny: false,
         },
         selectedRestaurant: null,
         selectedRequestId: null,
@@ -159,16 +159,16 @@
         filterSelections: [
           {text: 'None', value: 'none'},
           {text: 'Approved', value: 'approved'},
-          {text: 'Not Approved', value: 'notApproved'},
-          {text: 'Deleted', value: 'deleted'},
+          {text: 'Pending', value: 'pending'},
+          {text: 'Not approved', value: 'notApproved'},
         ],
-        activeFilterSelection: 'notApproved',
+        activeFilterSelection: 'pending',
         requestSearchText: '',
         stores: [],
       }
     },
     async created() {
-      this.signInRequests = (await axios.get('/store/sign-in-requests')).data
+      this.signInRequests = (await axios.get('/store/sign-in-requests', {params: {status: 'pending'}})).data
 
       const stores = await cms.getModel('Store').find().lean()
       this.stores = stores.map(store => {
@@ -185,18 +185,25 @@
 
         switch (this.activeFilterSelection) {
           case 'approved': {
-            requests = requests.filter(e => e.approved && !e.deleted)
+            requests = requests.filter(e => e.status === 'approved')
+            break
+          }
+          case 'pending': {
+            requests = requests.filter(e => e.status === 'pending')
             break
           }
           case 'notApproved': {
-            requests = requests.filter(e => !e.approved && !e.deleted)
-            break
-          }
-          case 'deleted': {
-            requests = requests.filter(e => e.deleted)
+            requests = requests.filter(e => e.status === 'notApproved')
             break
           }
         }
+
+        requests = requests.sort((cur, next) => {
+          const curCreatedAt = (cur.createdAt || new Date()).getTime()
+          const nextCreatedAt = (next.createdAt || new Date()).getTime()
+
+          return nextCreatedAt - curCreatedAt
+        })
 
         if (this.requestSearchText && this.requestSearchText.trim().length) {
           requests = requests.filter(r => r.requestStoreName.toLowerCase().includes(this.requestSearchText.toLowerCase()))
@@ -221,21 +228,21 @@
         this.selectedRequestId = requestId
         this.dialog.approve = true
       },
-      openDialogDelete(requestId) {
+      openDialogDeny(requestId) {
         this.selectedRequestId = requestId
-        this.dialog.delete = true
+        this.dialog.deny = true
       },
-      async approve() {
+      async approveRequest() {
         this.dialog.approve = false
         const requestId = this.selectedRequestId
-        await axios.put(`/store/sign-in-requests/${requestId}`, {approved: true})
-        this.signInRequests.find(e => e._id === requestId).approved = true
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved'})
+        this.signInRequests.find(e => e._id === requestId).status = 'approved'
       },
-      async deleteRequest() {
-        this.dialog.delete = false
+      async denyRequest() {
+        this.dialog.deny = false
         const requestId = this.selectedRequestId
-        await axios.delete(`/store/sign-in-requests/${requestId}`)
-        this.signInRequests.find(e => e._id === requestId).deleted = true
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved'})
+        this.signInRequests.find(e => e._id === requestId).status = 'notApproved'
       },
       async assignStore(requestId, storeId) {
         const newRequest = await axios.put(`/store/sign-in-requests/${requestId}`, {storeId})
@@ -369,7 +376,7 @@
             background: #1271FF;
           }
 
-          &--deleted {
+          &--denied {
             background: #D32F2F;
           }
         }

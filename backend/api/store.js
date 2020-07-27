@@ -193,9 +193,10 @@ router.post('/sign-in-requests', async (req, res) => {
   const store = await StoreModel.findOne({googleMapPlaceId});
   const request = await SignInRequestModel.create({
     deviceId,
-    approved: false,
+    status: 'pending',
     requestStoreName: storeName,
     googleMapPlaceId,
+    createdAt: new Date(),
     ...store && {storeId: store._id},
   });
 
@@ -203,9 +204,9 @@ router.post('/sign-in-requests', async (req, res) => {
 });
 
 router.get('/sign-in-requests', async (req, res) => {
-  const {approved} = req.query;
+  const {status} = req.query;
 
-  const requests = await getRequestsFromDb({approved: approved === 'true'})
+  const requests = await getRequestsFromDb({...status && {status}});
 
   res.status(200).json(requests.map(({device, store, ...e}) => {
     return {
@@ -225,8 +226,8 @@ router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
   const requests = getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
 
   if (requests && requests.length) {
-    const {approved} = requests[0];
-    res.status(200).json({request: {approved}});
+    const {status} = requests[0];
+    res.status(200).json({request: {status}});
   } else {
     res.status(200).json({request: null});
   }
@@ -236,28 +237,20 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
   const {requestId} = req.params;
   if (!requestId) return res.status(400).json({error: 'Missing requestId in URL'});
 
-  const {approved, storeId} = req.body;
+  let {status, storeId} = req.body;
   const update = {
-    ...approved && {approved: approved === 'true'},
+    ...status && {status},
     ...storeId && {store: new mongoose.Types.ObjectId(storeId)},
   }
 
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
 
-  if (approved === 'true') {
+  if (status === 'approved') {
     await assignDevice(request.device._id, request.store);
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
   }
 
   res.status(200).json(request._doc);
-});
-
-router.delete('/sign-in-requests/:requestId', async (req, res) => {
-  const {requestId} = req.params;
-  if (!requestId) return res.status(400).json({error: 'Missing requestId in URL'});
-
-  await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, {deleted: true});
-  res.status(204).send();
 });
 
 function getRequestsFromDb(conditions) {

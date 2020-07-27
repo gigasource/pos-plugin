@@ -19,13 +19,6 @@
       "autopopulate": true
     },
     {
-      "_id": "5f1ac4bac9e0614f8b5cfa2f",
-      "schemaType": "boolean",
-      "key": "approved",
-      "default": "false",
-      "type": "input@switch"
-    },
-    {
       "_id": "5f1ac4bac9e0614f8b5cfa30",
       "schemaType": "string",
       "key": "requestStoreName",
@@ -36,6 +29,17 @@
       "schemaType": "string",
       "key": "googleMapPlaceId",
       "type": "input"
+    },
+    {
+      "_id": "5f1e5c074a81b865c59fdf60",
+      "schemaType": "string",
+      "key": "status",
+      "default": "pending"
+    },
+    {
+      "_id": "5f1e5c074a81b865c59fdf61",
+      "schemaType": "date",
+      "key": "createdAt"
     }
   ],
   "name": "SignInRequest",
