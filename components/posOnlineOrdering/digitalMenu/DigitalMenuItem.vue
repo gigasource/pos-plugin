@@ -203,6 +203,7 @@
       font-size: 14px;
       font-weight: 700;
       margin-bottom: 8px;
+      word-break: break-all;
     }
 
     &__desc {

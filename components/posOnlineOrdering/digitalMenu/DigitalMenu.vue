@@ -372,7 +372,7 @@
       text-transform: uppercase;
       margin-left: 16px;
       margin-bottom: -8px;
-
+      word-break: break-all;
     }
 
     &__category {
