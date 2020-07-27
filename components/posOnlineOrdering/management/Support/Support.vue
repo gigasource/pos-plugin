@@ -34,7 +34,7 @@
             <div style="flex: 0 0 100px">
               <g-icon size="20" class="mr-2" @click="addChat(request)">far fa-comment-alt</g-icon>
               <g-icon v-if="request.storeId" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
-              <g-icon v-if="request.storeId" size="20" color="#FF4452">fas fa-times</g-icon>
+              <g-icon v-if="request.storeId" size="20" color="#FF4452" @click="openDialogDelete(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeName ? 'Sign in' : 'New restaurant'}}</div>
             <div class="assigned-store pr-2">
@@ -52,8 +52,9 @@
             <div class="w-12">{{request.deviceName}}</div>
             <div class="col-2">{{request.deviceLocation}}</div>
             <div class="w-10 pr-2">
-              <div v-if="request.approved" class="complete">Approved</div>
-              <div v-else class="complete--not">Not Approved</div>
+              <div v-if="request.approved && !request.deleted" class="complete">Approved</div>
+              <div v-else-if="request.deleted" class="complete complete--deleted">Deleted</div>
+              <div v-else class="complete complete--not">Not Approved</div>
             </div>
           </div>
         </template>
@@ -98,6 +99,21 @@
         </div>
       </g-card>
     </g-dialog>
+
+    <g-dialog v-model="dialog.delete" width="381">
+      <g-card class="pa-4">
+        <div class="fs-large-2 fw-600">Delete sign-in request</div>
+        <div class="pa-3 ta-center">
+          <p>Delete the following sign-in request?</p>
+          <p class="fw-700">{{selectedRestaurant && selectedRestaurant.name}}</p>
+        </div>
+        <div class="row-flex align-items-center mt-3">
+          <g-spacer/>
+          <g-btn-bs text-color="#424242" @click="dialog.delete = false">Cancel</g-btn-bs>
+          <g-btn-bs width="100" background-color="#D32F2F" text-color="white" @click="deleteRequest">Delete</g-btn-bs>
+        </div>
+      </g-card>
+    </g-dialog>
   </div>
 </template>
 
@@ -134,7 +150,8 @@
           },
         ],
         dialog: {
-          approve: false
+          approve: false,
+          delete: false,
         },
         selectedRestaurant: null,
         selectedRequestId: null,
@@ -143,6 +160,7 @@
           {text: 'None', value: 'none'},
           {text: 'Approved', value: 'approved'},
           {text: 'Not Approved', value: 'notApproved'},
+          {text: 'Deleted', value: 'deleted'},
         ],
         activeFilterSelection: 'notApproved',
         requestSearchText: '',
@@ -167,11 +185,15 @@
 
         switch (this.activeFilterSelection) {
           case 'approved': {
-            requests = requests.filter(e => e.approved)
+            requests = requests.filter(e => e.approved && !e.deleted)
             break
           }
           case 'notApproved': {
-            requests = requests.filter(e => !e.approved)
+            requests = requests.filter(e => !e.approved && !e.deleted)
+            break
+          }
+          case 'deleted': {
+            requests = requests.filter(e => e.deleted)
             break
           }
         }
@@ -199,12 +221,21 @@
         this.selectedRequestId = requestId
         this.dialog.approve = true
       },
+      openDialogDelete(requestId) {
+        this.selectedRequestId = requestId
+        this.dialog.delete = true
+      },
       async approve() {
+        this.dialog.approve = false
         const requestId = this.selectedRequestId
         await axios.put(`/store/sign-in-requests/${requestId}`, {approved: true})
         this.signInRequests.find(e => e._id === requestId).approved = true
-
-        this.dialog.approve = false
+      },
+      async deleteRequest() {
+        this.dialog.delete = false
+        const requestId = this.selectedRequestId
+        await axios.delete(`/store/sign-in-requests/${requestId}`)
+        this.signInRequests.find(e => e._id === requestId).deleted = true
       },
       async assignStore(requestId, storeId) {
         const newRequest = await axios.put(`/store/sign-in-requests/${requestId}`, {storeId})
@@ -250,12 +281,26 @@
         }
       }
 
-      &__search {
+      ::v-deep &__search {
         display: flex;
         width: 25%;
 
-        ::v-deep > div:first-child {
+        div:first-child {
           width: 100%
+        }
+
+        .bs-tf-wrapper ::v-deep {
+          height: 100%;
+          margin: 0;
+          padding: 8px 0;
+          width: 100%;
+
+          .bs-tf-inner-input-group {
+            height: 100%;
+            background: white;
+            border: 1px solid #EEEEEE;
+            border-radius: 2px;
+          }
         }
       }
     }
@@ -318,14 +363,14 @@
           padding: 8px;
           color: white;
           text-align: center;
+          cursor: pointer;
 
           &--not {
             background: #1271FF;
-            border-radius: 4px;
-            padding: 8px;
-            color: white;
-            text-align: center;
-            cursor: pointer;
+          }
+
+          &--deleted {
+            background: #D32F2F;
           }
         }
 

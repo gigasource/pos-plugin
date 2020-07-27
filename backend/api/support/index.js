@@ -179,17 +179,9 @@ setTimeout(() => {
     socket.on('watch-chat-message', clientIds => {
       clientIds.forEach(clientId => {
         socket.join(`chatMessage-from-client-${clientId}`)
-
-        console.log(`join "makeAPhoneCallAck-from-client-${clientId}"`)
         socket.join(`makeAPhoneCallAck-from-client-${clientId}`)
-
-        console.log(`join "cancelCallAck-from-client-${clientId}"`)
         socket.join(`cancelCallAck-from-client-${clientId}`)
-
-        console.log(`join "endCallAck-from-client-${clientId}"`)
         socket.join(`endCallAck-from-client-${clientId}`)
-
-        console.log(`join "endCallFromUser-${clientId}"`)
         socket.join(`endCallFromUser-${clientId}`)
       });
     });

@@ -269,10 +269,18 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
 
   if (approved === 'true') {
     await assignDevice(request.device._id, request.store);
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn');
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
   }
 
   res.status(200).json(request._doc);
+});
+
+router.delete('/sign-in-requests/:requestId', async (req, res) => {
+  const {requestId} = req.params;
+  if (!requestId) res.status(400).json({error: 'Missing requestId in URL'});
+
+  await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, {deleted: true});
+  res.status(204).send();
 });
 
 async function getPlaceIdByName(placeName) {
