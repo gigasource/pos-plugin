@@ -632,6 +632,12 @@
       "key": "googleMapPlaceId",
       "type": "input",
       "label": "Google Map Place ID"
+    },
+    {
+      "_id": "5f1e8b7d0514210487cb9cb0",
+      "schemaType": "string",
+      "key": "digitalMenuScript",
+      "type": "input"
     }
   ],
   "name": "Store",

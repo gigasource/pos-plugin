@@ -51,7 +51,8 @@
               :display-image="store.displayImage"
               :store-country-locale="storeCountryLocale"/>
         </div>
-        <div class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1 fw-600">{{$t('menu.restaurantPlus')}}</div>
+        <div v-if="script" v-html="script"/>
+        <div v-else class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1 fw-600">{{$t('menu.restaurantPlus')}}</div>
       </div>
     </div>
     <template v-if="viewOrder">
@@ -148,7 +149,8 @@
         },
         googleLogin: false,
         feedback: '',
-        bouncing: 0
+        bouncing: 0,
+        script: ''
       }
     },
     async created() {
@@ -158,6 +160,7 @@
         await this.loadCategories()
         await this.loadProducts()
         root.$i18n.locale = (this.store && this.store.country && this.store.country.locale) || 'en'
+        this.script = this.store && this.store.digitalMenuScript
       }
     },
     mounted() {
@@ -369,7 +372,7 @@
       text-transform: uppercase;
       margin-left: 16px;
       margin-bottom: -8px;
-
+      word-break: break-all;
     }
 
     &__category {
