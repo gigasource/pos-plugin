@@ -68,6 +68,7 @@
             v-if="view === 'transaction'"
             :store="store"/>
         <reservation-setting v-if="view === 'setting-reservation'" :store="store" @update="updateStore"/>
+        <other-setting v-if="view === 'setting-other'" @update="updateStore"/>
       </div>
     </template>
   </div>
@@ -85,10 +86,13 @@
   import PaymentProviders from './payments/PaymentProviders';
   import PaymentProvidersTransaction from './payments/PaymentProvidersTransaction';
   import ReservationSetting from "./ReservationSetting";
+  import OtherSetting from "./OtherSetting";
 
   export default {
     name: 'SettingView',
-    components: {ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
+    components: {
+      OtherSetting,
+      ReservationSetting, Discount, MultiplePrinter, DeliveryFee, SettingMenu, ServiceAndOpenHours, RestaurantInformation, PaymentProviders, PaymentProvidersTransaction},
     injectService: ['PermissionStore:importExportMenu'],
     data: function () {
       const i18n = this.$i18n;
@@ -125,8 +129,8 @@
               icon: 'mdi-file-document-outline',
               onClick: () => this.changeView('service-and-open-hours')
             },
-            { title: this.setting.reservation, key: 'Reservation', icon: 'icon-table_outlined', onClick: () => this.changeView('setting-reservation') },
-            { title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu') },
+            { title: this.setting.reservation, key: 'Reservation', icon: 'icon-table_outlined', onClick: () => this.changeView('setting-reservation', 'Reservation') },
+            { title: this.setting.menu, key: 'Menu', icon: 'filter_list', onClick: () => this.changeView('settings-menu', 'Menu') },
             { title: this.setting.deliveryFee, key: 'Delivery Fee', icon: 'icon-setting-delivery', onClick: () => this.changeView('setting-delivery-fee', 'Delivery Fee') },
             { title: this.setting.printer, key: 'Multiple Printer', icon: 'icon-setting-multiple', onClick: () => this.changeView('setting-multiple-printer', 'Multiple Printer') },
             { title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount') },
@@ -143,6 +147,10 @@
               ]
             })
           }
+
+          items.push(
+              { title: 'Other', key: 'Other', icon: 'menu', onClick: () => this.changeView('setting-other')}
+          )
           return items
         }
         return []
