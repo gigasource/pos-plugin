@@ -173,7 +173,7 @@
       cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
 
       const updateDeviceStatus = async (deviceId, online) => {
-        const device = this.sortedDeviceList.find(({_id}) => _idc === deviceId)
+        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
         if (device) device.online = online
       }
 
