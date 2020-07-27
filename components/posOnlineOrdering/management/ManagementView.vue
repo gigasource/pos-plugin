@@ -62,7 +62,7 @@
           items.push({ title: 'Chat Support', icon: 'icon-account-management', onClick: () => this.changeView('chatSupport', 'Chat Support') })
         }
 
-        items.push({ title: 'Support', icon: 'headset_mic', onClick: () => this.changeView('support', 'Support') })
+        items.push({ title: 'Sign-in Requests', icon: 'headset_mic', onClick: () => this.changeView('support', 'Sign-in Requests') })
         return items
       },
     },
@@ -77,7 +77,7 @@
       },
       supportSelectChat(deviceId) {
         this.selectedDeviceIdForChat = deviceId
-        this.changeView('chatSupport', 'Chat Support')
+        this.changeView('chatSupport', 'Sign-in Requests')
         this.$refs.sidebar.setSidebarItem('item.3')
       }
     }

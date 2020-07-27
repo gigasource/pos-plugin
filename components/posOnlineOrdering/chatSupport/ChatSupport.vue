@@ -134,7 +134,7 @@
           {text: 'Chat started', value: 'chatStarted'},
           {text: 'Chat not started', value: 'chatNotStarted'},
         ],
-        activeFilterSelection: 'none',
+        activeFilterSelection: 'chatStarted',
 
         adminId: '5c88842f1591d506a250b2a5',
         contactSearch: '',
@@ -142,7 +142,7 @@
         loadingMoreDevices: false,
         moreDevicesAvailable: true,
         loadedDeviceIndex: 0,
-        devicesPerLoad: 15,
+        devicesPerLoad: 50,
 
         loadingMoreChats: false,
         moreChatsAvailable: false,
@@ -312,8 +312,6 @@
         const messageCountObj = await this.getChatMessageCount([val])
         const messageCount = messageCountObj[val]
         this.moreChatsAvailable = chats.length <= messageCount
-        // Set unread notification number to 0
-        await this.setMessagesRead(val)
         // map userId to user's name, used for chat user info & notes feature
         await this.mapNoteUserIdsToNames()
       },
@@ -378,10 +376,10 @@
         this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
         this.devices = this.devices.map(device => this.convertDevice(device))
 
-        const deviceIds = this.devices.map(({_id}) => _id)
+        const deviceIds = gsmsDevices.map(({_id}) => _id)
         this.getChatMessageCount(deviceIds).then(messageCountMap => {
           Object.keys(messageCountMap).forEach(deviceId => {
-            const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+            const device = this.devices.find(({_id}) => _id === deviceId)
             if (device) {
               device.messageCount = messageCountMap[deviceId]
               this.updateDevice(device)
@@ -456,12 +454,16 @@
       setActiveChat(contact) {
         this.selectedDeviceId = contact._id
       },
-      sendChatMsg(e) {
+      async sendChatMsg(e) {
         e.preventDefault()
         if (!this.currentChatMsg.replace(/\r?\n|\r/g, '').trim().length) return
 
         this.sendChatMsgDebounced(this.currentChatMsg)
         this.currentChatMsg = ''
+
+        // Set unread notification number to 0
+        await this.setMessagesRead(this.selectedDeviceId)
+
         const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
         device.messageCount = device.messageCount + 1
       },
