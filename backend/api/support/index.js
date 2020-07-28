@@ -61,6 +61,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
+      internalSocketIOServer.emit('chatMessageNotification')
 
       cb && cb(savedMsg._doc);
     });
@@ -251,6 +252,34 @@ setTimeout(() => {
   });
 }, 5000);
 
+router.get('/chat/messages/not-replied', async (req, res) => {
+  const lastMessages = await ChatMessageModel.aggregate([
+    {$sort: {createdAt: -1}},
+    {
+      $lookup: {
+        from: 'devices',
+        let: {clientId: {$toObjectId: '$clientId'}, falseVal: false},
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                {$expr: {$eq: ['$_id', '$$clientId']}},
+                {deleted: {$ne: true}}
+              ]
+            }
+          },
+        ],
+        as: 'device',
+      }
+    },
+    {$unwind: {path: '$device'}},
+    {$group: {_id: '$clientId', fromServer: {$first: '$fromServer'}}},
+    {$match: {fromServer: false}},
+  ]);
+
+  res.status(200).json({notRepliedCount: lastMessages.length});
+})
+
 router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
@@ -347,6 +376,21 @@ router.put('/assign-device/:id', async (req, res) => {
   }
 });
 
+router.put('/remove-device-store/:deviceId', async (req, res) => {
+  const {deviceId} = req.params;
+  if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
+
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return {error: `Device with ID ${deviceId} not found`};
+
+  if (device.storeId) {
+    await removeDeviceFromOldStore(device);
+    await DeviceModel.updateOne({_id: device._id}, {storeId: null});
+  }
+
+  res.status(204).send();
+});
+
 router.put('/assign-device-to-store/:id', async (req, res) => {
   const { id } = req.params;
   const { customStoreId } = req.body;
@@ -377,23 +421,27 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
   }
 })
 
-async function assignDevice(id, store) {
-  const device = await DeviceModel.findById(id);
-  if (!device) return { error: `Device with ID ${id} not found` };
-
+async function removeDeviceFromOldStore(device) {
   if (device.storeId) {
     const oldStore = await StoreModel.findById(device.storeId);
-    if (oldStore.gSms && oldStore.gSms.devices) {
+    if (oldStore && oldStore.gSms && oldStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
-        { _id: oldStore._id },
-        { $pull: { 'gSms.devices': { _id: id } } }
+          { _id: oldStore._id },
+          { $pull: { 'gSms.devices': { _id: device._id } } }
       )
     }
   }
+}
+
+async function assignDevice(deviceId, store) {
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return { error: `Device with ID ${deviceId} not found` };
+
+  await removeDeviceFromOldStore(device)
 
   device.storeId = store._id;
   device.metadata = device.metadata || {};
-  await DeviceModel.updateOne({ _id: id }, device);
+  await DeviceModel.updateOne({ _id: deviceId }, device);
 
   store.gSms = store.gSms || {};
   store.gSms.enabled = store.gSms.enabled || true;

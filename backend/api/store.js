@@ -78,7 +78,7 @@ router.post('/new-store', async (req, res) => {
     return
   }
 
-  const {settingName, settingAddress, groups, country} = req.body
+  let {settingName, settingAddress, groups, country, googleMapPlaceId} = req.body
 
   const stores = await cms.getModel('Store').find({}, { id: 1, alias: 1 })
 
@@ -98,8 +98,8 @@ router.post('/new-store', async (req, res) => {
     aliasIndex++
   } while (_.includes(aliases, alias))
 
-  // Get Google Map Place ID of store
-  const googleMapPlaceId = await getPlaceIdByName(settingName);
+  // Get Google Map Place ID of store if it's not present
+  if (!googleMapPlaceId) googleMapPlaceId = await getPlaceIdByName(settingName);
 
   // create store
   const createdStore = await cms.getModel('Store').create({
@@ -192,7 +192,7 @@ router.post('/sign-in-requests', async (req, res) => {
 
   const store = await StoreModel.findOne({googleMapPlaceId});
   const request = await SignInRequestModel.create({
-    deviceId,
+    device: deviceId,
     status: 'pending',
     requestStoreName: storeName,
     googleMapPlaceId,
@@ -200,6 +200,7 @@ router.post('/sign-in-requests', async (req, res) => {
     ...store && {storeId: store._id},
   });
 
+  cms.socket.emit('newSignInRequest', request._doc)
   res.status(201).json(request._doc);
 });
 
@@ -208,7 +209,9 @@ router.get('/sign-in-requests', async (req, res) => {
 
   const requests = await getRequestsFromDb({...status && {status}});
 
-  res.status(200).json(requests.map(({device, store, ...e}) => {
+  res.status(200).json(requests.map(({device, store, storeFromGoogleMap, ...e}) => {
+    if (!store) store = storeFromGoogleMap
+
     return {
       deviceId: device._id,
       deviceName: device.name,
@@ -219,11 +222,34 @@ router.get('/sign-in-requests', async (req, res) => {
   }));
 });
 
+router.get('/sign-in-requests/:requestId', async (req, res) => {
+  const {requestId} = req.params;
+  if (!requestId) res.status(400).json({error: 'Missing sign-in request ID in API request'});
+
+  const requests = await getRequestsFromDb({_id: new mongoose.Types.ObjectId(requestId)});
+
+
+  if (requests && requests.length) {
+    let {device, store, storeFromGoogleMap, ...e} = requests[0];
+    if (!store) store = storeFromGoogleMap;
+
+    res.status(200).json({request: {
+        deviceId: device._id,
+        deviceName: device.name,
+        deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
+        ...store && {storeName: store.settingName || store.name, storeId: store._id},
+        ...e,
+      }});
+  } else {
+    res.status(200).json({request: null});
+  }
+});
+
 router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
   const {deviceId} = req.params;
   if (!deviceId) return res.status(400).json({error: 'Missing deviceId in URL'});
 
-  const requests = getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
+  const requests = await getRequestsFromDb({device: new mongoose.Types.ObjectId(deviceId)});
 
   if (requests && requests.length) {
     const {status} = requests[0];
@@ -248,6 +274,8 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
   if (status === 'approved') {
     await assignDevice(request.device._id, request.store);
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
+  } else if (status === 'notApproved') {
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
   }
 
   res.status(200).json(request._doc);
@@ -270,6 +298,22 @@ function getRequestsFromDb(conditions) {
   aggregateSteps.push({
     $unwind: {
       path: '$store',
+      preserveNullAndEmptyArrays: true
+    }
+  });
+
+  aggregateSteps.push({
+    $lookup: {
+      from: 'stores',
+      localField: 'googleMapPlaceId',
+      foreignField: 'googleMapPlaceId',
+      as: 'storeFromGoogleMap',
+    },
+  });
+
+  aggregateSteps.push({
+    $unwind: {
+      path: '$storeFromGoogleMap',
       preserveNullAndEmptyArrays: true
     }
   });

@@ -774,4 +774,16 @@
   background-position: center;
 }
 
+.icon-new-chat-messages-notification {
+  background-image: url("../assets/new-chat-messages-notification.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
 
+.icon-add-restaurant {
+  background-image: url("../assets/add-restaurant.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

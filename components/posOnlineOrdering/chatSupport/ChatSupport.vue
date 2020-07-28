@@ -116,6 +116,7 @@
     components: { CallCenter, ChatInfo, ChatWindow},
     props: {
       selectedDeviceIdProp: String,
+      hasNewMessages: Boolean,
     },
     data() {
       return {
@@ -173,7 +174,7 @@
       cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
 
       const updateDeviceStatus = async (deviceId, online) => {
-        const device = this.sortedDeviceList.find(({_id}) => _idc === deviceId)
+        const device = this.devices.find(({_id}) => _id === deviceId)
         if (device) device.online = online
       }
 
@@ -264,7 +265,7 @@
         });
       },
       selectedDevice() {
-        return this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        return this.devices.find(({_id}) => _id === this.selectedDeviceId)
       },
       selectedUsername() {
         return (this.selectedDevice &&
@@ -464,7 +465,7 @@
         // Set unread notification number to 0
         await this.setMessagesRead(this.selectedDeviceId)
 
-        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        const device = this.devices.find(({_id}) => _id === this.selectedDeviceId)
         device.messageCount = device.messageCount + 1
       },
       sendChatMsgDebounced: debounce(function(text) {
@@ -518,7 +519,7 @@
         const assingApiUrl = `/support/assign-device/${deviceId}`
         await axios.put(assingApiUrl, {storeId})
 
-        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        const device = this.devices.find(({_id}) => _id === this.selectedDeviceId)
 
         if (device) {
           device.storeId = storeId
@@ -530,22 +531,22 @@
         console.debug(`sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`,
             `Online-order frontend received chat msg from backend`, JSON.stringify(chatMessage, null, 2))
 
-        const device = this.sortedDeviceList.find(({_id}) => _id === clientId)
-        device.messageCount = device.messageCount + 1
+        const device = this.devices.find(({_id}) => _id === clientId)
 
-        if (device) device.latestChatMessageDate = new Date(createdAt)
-
-        if (clientId === this.selectedDeviceId) {
-          chatMessage.read = true
-          this.currentChats.push(chatMessage)
-          this.setMessagesRead(this.selectedDeviceId)
-        } else if (device) {
+        if (device) {
+          device.messageCount = device.messageCount + 1
+          device.latestChatMessageDate = new Date(createdAt)
           device.unreadMessages = device.unreadMessages || 0
           device.unreadMessages++
+          this.updateDevice(device)
+        }
+
+        if (clientId === this.selectedDeviceId) {
+          this.currentChats.push(chatMessage)
         }
       },
       async setMessagesRead(deviceId) {
-        const device = this.sortedDeviceList.find(({_id}) => _id === deviceId)
+        const device = this.devices.find(({_id}) => _id === deviceId)
 
         if (device) {
           device.unreadMessages = 0
@@ -554,6 +555,8 @@
 
         const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${deviceId}`
         await axios.put(setMessageReadApiUrl)
+
+        if (!this.devices.find(d => d.unreadMessages > 0) && this.hasNewMessages) this.$emit('all-messages-replied')
       },
       updateDevice(device) {
         const deviceIndex = this.devices.findIndex(({_id}) => _id === device._id)
@@ -564,7 +567,7 @@
         const payload = {clientId: this.selectedDeviceId, metadata: {customerName: username}}
         await axios.put(apiUrl, payload)
 
-        const device = this.sortedDeviceList.find(({_id}) => _id === this.selectedDeviceId)
+        const device = this.devices.find(({_id}) => _id === this.selectedDeviceId)
 
         if (device) {
           device.metadata = device.metadata || {}
@@ -574,7 +577,7 @@
       },
       async deleteDevice(deviceId) {
         this.selectedDeviceId = null
-        const deviceIndex = this.sortedDeviceList.findIndex(({_id}) => _id === deviceId)
+        const deviceIndex = this.devices.findIndex(({_id}) => _id === deviceId)
         if (!isNil(deviceIndex)) this.devices.splice(deviceIndex, 1)
 
         const apiUrl = `/gsms-device/devices/${deviceId}`

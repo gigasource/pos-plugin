@@ -33,10 +33,11 @@
             <div class="flex-equal pl-2">{{request.requestStoreName}}</div>
             <div style="flex: 0 0 100px">
               <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
+              <g-icon v-if="!request.storeId" size="20" class="mr-2" @click="addNewStore(request)">icon-add-restaurant</g-icon>
               <g-icon v-if="request.storeId && request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
-              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
+              <g-icon v-if="request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
-            <div class="w-10">{{request.storeName ? 'Sign in' : 'New restaurant'}}</div>
+            <div class="w-10">{{request.storeId ? 'Sign in' : 'New restaurant'}}</div>
             <div class="assigned-store pr-2">
               <g-autocomplete text-field-component="GTextFieldBs" class="flex-equal"
                               solo
@@ -46,7 +47,7 @@
                               item-text="name"
                               item-value="_id"
                               :value="request.storeId"
-                              @input="val => assignStore(request._id, val)"
+                              @input="val => assignStore(request, val)"
                               placeholder="No store assigned"/>
             </div>
             <div class="w-12">{{request.deviceName}}</div>
@@ -114,18 +115,22 @@
         </div>
       </g-card>
     </g-dialog>
+
+    <dialog-new-store v-model="dialog.newStore"
+                      @submit="addStore($event)"
+                      :google-map-place-id="selectedGoogleMapPlaceId"
+                      :groups="storeGroups"
+                      :countries="countries"/>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
   import cloneDeep from 'lodash/cloneDeep'
+  import supportedCountries from '../../../Store/supportedCountries';
 
   export default {
     name: "Support",
-    props: {
-
-    },
     data() {
       return {
         signInRequests: [],
@@ -152,6 +157,7 @@
         dialog: {
           approve: false,
           deny: false,
+          newStore: false,
         },
         selectedRestaurant: null,
         selectedRequestId: null,
@@ -165,10 +171,15 @@
         activeFilterSelection: 'pending',
         requestSearchText: '',
         stores: [],
+        storeGroups: [],
+        countries: supportedCountries,
+        selectedGoogleMapPlaceId: '',
       }
     },
     async created() {
+      cms.socket.on('newSignInRequest', request => this.signInRequests.push(request))
       this.signInRequests = (await axios.get('/store/sign-in-requests')).data
+      await this.loadStoreGroups()
 
       const stores = await cms.getModel('Store').find().lean()
       this.stores = stores.map(store => {
@@ -210,6 +221,9 @@
         }
 
         return requests
+      },
+      selectedRequest() {
+        return this.signInRequests.find(e => e._id === this.selectedRequestId)
       }
     },
     methods: {
@@ -237,7 +251,7 @@
       async approveRequest() {
         this.dialog.approve = false
         const requestId = this.selectedRequestId
-        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved'})
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved', storeId: this.selectedRequest.storeId})
         this.signInRequests.find(e => e._id === requestId).status = 'approved'
       },
       async denyRequest() {
@@ -246,20 +260,47 @@
         await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved'})
         this.signInRequests.find(e => e._id === requestId).status = 'notApproved'
       },
-      async assignStore(requestId, storeId) {
+      async assignStore(request, storeId) {
+        const requestId = request._id
         const newRequest = await axios.put(`/store/sign-in-requests/${requestId}`, {storeId})
-        const {settingName, name, _id} = newRequest.data.store
 
-        Object.assign(this.signInRequests.find(e => e._id === requestId), {storeName: settingName || name, storeId: _id})
+        const {settingName, name, _id} = newRequest.data.store
+        request.storeName = settingName || name
+        request.storeId = _id
+        request.status = 'pending'
+        this.updateRequest(request)
       },
-      minimizeChat(item) {
+      async addStore({ settingName, settingAddress, groups, country, googleMapPlaceId }) {
+        await axios.post('/store/new-store', { settingName, settingAddress, groups, country, googleMapPlaceId })
+        const {data: {request}} = await axios.get(`/store/sign-in-requests/${this.selectedRequestId}`)
+        if (request) this.updateRequest(request)
+      },
+      addNewStore(request) {
+        this.dialog.newStore = true
+        this.selectedRequestId = request._id
+        this.selectedGoogleMapPlaceId = request.googleMapPlaceId
+      },
+      async loadStoreGroups() {
+        let storeGroups
+        if (cms.loginUser.user.role.name === 'admin') {
+          storeGroups = await cms.getModel('StoreGroup').find({})
+        } else {
+          storeGroups = cms.loginUser.user.storeGroups
+        }
+        this.storeGroups.splice(0, this.storeGroups.length, ...storeGroups)
+      },
+      updateRequest(request) {
+        const requestIndex = this.signInRequests.findIndex(({_id}) => _id === request._id)
+        this.signInRequests.splice(requestIndex, 1, {...request})
+      },
+/*      minimizeChat(item) {
         item.minimize = !item.minimize
       },
       closeChat(item) {
         const index = this.chatItems.findIndex(i => i.restaurant.id === item.restaurant.id)
         if(index > -1)
           this.chatItems.splice(index, 1)
-      }
+      }*/
     }
   }
 </script>
