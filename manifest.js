@@ -65,6 +65,13 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api-before-init-model'
+      },
+      path: 'backend/apply-schema-hooks.js',
+      type: 'backend'
+    },
+    {
+      loader: {
         type: 'backend-api'
       },
       path: 'backend/socket-io-server.js',

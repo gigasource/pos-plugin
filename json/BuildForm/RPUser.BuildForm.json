@@ -1,0 +1,35 @@
+{
+  "_id": "5f1ff65cbf8dea79c686212f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ff690bf8dea79c6862131",
+      "schemaType": "string",
+      "key": "name"
+    },
+    {
+      "_id": "5f1ff690bf8dea79c6862132",
+      "schemaType": "string",
+      "key": "phoneNumber"
+    },
+    {
+      "_id": "5f1ff690bf8dea79c6862133",
+      "schemaType": "array",
+      "key": "addresses",
+      "type": null,
+      "fields": [
+        {
+          "schemaType": "string"
+        }
+      ]
+    },
+    {
+      "_id": "5f1ff775bf8dea79c6862179",
+      "schemaType": "date",
+      "key": "createdAt"
+    }
+  ],
+  "name": "RPUser",
+  "tabs": [],
+  "type": "Collection"
+}

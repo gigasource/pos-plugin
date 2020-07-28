@@ -12,6 +12,8 @@ const {assignDevice} = require('../api/support');
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
 
+const StoreModel = cms.getModel('Store');
+
 // upload-zone
 router.get('/upload-zone/prepare', async (req, res) => {
   try {
@@ -44,7 +46,7 @@ router.post('/validate-alias', async (req, res) => {
     res.json({ ok: false, message: 'Valid characters are a-z, A-Z, 0-9 and \'-\' character!'})
     return
   }
-  const storeWithAlias = await cms.getModel('Store').findOne({ alias: _.toLower(alias) })
+  const storeWithAlias = await StoreModel.findOne({ alias: _.toLower(alias) })
   const urlTaken = (storeWithAlias && storeWithAlias._id.toString() !== store)
   res.json(urlTaken ? {message: 'WebShop URL has been taken!'} : {ok: true})
 })
@@ -54,7 +56,7 @@ router.post('/validate-alias', async (req, res) => {
  */
 router.post('/validate-client-domain', async (req, res) => {
   const { store, clientDomain } = req.body
-  const storeWithClientDomain = await cms.getModel('Store').findOne({ clientDomain })
+  const storeWithClientDomain = await StoreModel.findOne({ clientDomain })
   const urlTaken = (storeWithClientDomain && storeWithClientDomain._id.toString() !== store)
   res.json(urlTaken ? {message: 'Client domain has been taken!'} : {ok: true})
 })
@@ -80,7 +82,7 @@ router.post('/new-store', async (req, res) => {
 
   let {settingName, settingAddress, groups, country, googleMapPlaceId} = req.body
 
-  const stores = await cms.getModel('Store').find({}, { id: 1, alias: 1 })
+  const stores = await StoreModel.find({}, { id: 1, alias: 1 })
 
   // generate unique store id
   const ids = _.map(stores, s => s.id)
@@ -102,7 +104,7 @@ router.post('/new-store', async (req, res) => {
   if (!googleMapPlaceId) googleMapPlaceId = await getPlaceIdByName(settingName);
 
   // create store
-  const createdStore = await cms.getModel('Store').create({
+  const createdStore = await StoreModel.create({
     id, settingName, settingAddress, alias, groups, country,
     addedDate: new Date(),
     openHours: [
@@ -185,7 +187,6 @@ router.post('/sign-in-requests', async (req, res) => {
   if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
-  const StoreModel = cms.getModel('Store');
 
   const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
   if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});

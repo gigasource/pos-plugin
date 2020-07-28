@@ -1,0 +1,86 @@
+{
+  "_id": "5f1ff455bf8dea79c6862107",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ff549bf8dea79c6862109",
+      "schemaType": "string",
+      "key": "name",
+      "type": null
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210a",
+      "schemaType": "number",
+      "key": "quantity",
+      "default": "0",
+      "type": null
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210b",
+      "schemaType": "date",
+      "key": "startDate"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210c",
+      "schemaType": "date",
+      "key": "endDate"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210d",
+      "schemaType": "boolean",
+      "key": "enabled"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210e",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210f",
+      "schemaType": "number",
+      "key": "price",
+      "default": "0"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862110",
+      "schemaType": "string",
+      "key": "discountType"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862111",
+      "schemaType": "number",
+      "key": "discountValue"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862112",
+      "schemaType": "string",
+      "key": "description"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862113",
+      "schemaType": "number",
+      "key": "duration"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862114",
+      "schemaType": "mixed",
+      "key": "conditions",
+      "mixed": true
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862115",
+      "schemaType": "string",
+      "key": "orderType"
+    },
+    {
+      "_id": "5f1ff769bf8dea79c6862168",
+      "schemaType": "date",
+      "key": "createdAt"
+    }
+  ],
+  "name": "RPPromotion",
+  "tabs": [],
+  "type": "Collection"
+}

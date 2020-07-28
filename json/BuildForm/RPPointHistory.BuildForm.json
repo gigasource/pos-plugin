@@ -1,0 +1,45 @@
+{
+  "_id": "5f1ff9d9dac84c7fb5c37643",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ffa35dac84c7fb5c37645",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ffa35dac84c7fb5c37646",
+      "schemaType": "objectId",
+      "key": "user",
+      "ref": "RPUser",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ffa35dac84c7fb5c37647",
+      "schemaType": "number",
+      "key": "value"
+    },
+    {
+      "_id": "5f1ffa35dac84c7fb5c37648",
+      "schemaType": "string",
+      "key": "transactionType"
+    },
+    {
+      "_id": "5f1ffa35dac84c7fb5c37649",
+      "schemaType": "objectId",
+      "key": "voucher",
+      "ref": "RPVoucher",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ffa35dac84c7fb5c3764a",
+      "schemaType": "date",
+      "key": "createdAt"
+    }
+  ],
+  "name": "RPPointHistory",
+  "tabs": [],
+  "type": "Collection"
+}
