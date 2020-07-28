@@ -197,10 +197,18 @@ router.post('/sign-in-requests', async (req, res) => {
     requestStoreName: storeName,
     googleMapPlaceId,
     createdAt: new Date(),
-    ...store && {storeId: store._id},
+    ...store && {store: store._id},
   });
 
-  cms.socket.emit('newSignInRequest', request._doc)
+  const device = await cms.getModel('Device').findById(deviceId);
+  const result = {
+    deviceId: device._id,
+    deviceName: device.name,
+    deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
+    ...store && {storeName: store.settingName || store.name, storeId: store._id},
+    ...request._doc,
+  }
+  cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), storeId: store._id})
   res.status(201).json(request._doc);
 });
 
