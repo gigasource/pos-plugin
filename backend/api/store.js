@@ -78,7 +78,7 @@ router.post('/new-store', async (req, res) => {
     return
   }
 
-  let {settingName, settingAddress, groups, country, googleMapPlaceId} = req.body
+  let {settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location} = req.body
 
   const stores = await cms.getModel('Store').find({}, { id: 1, alias: 1 })
 
@@ -99,7 +99,16 @@ router.post('/new-store', async (req, res) => {
   } while (_.includes(aliases, alias))
 
   // Get Google Map Place ID of store if it's not present
-  if (!googleMapPlaceId) googleMapPlaceId = await getPlaceIdByName(settingName);
+  if (!googleMapPlaceId) {
+    const { place_id, geometry: {location: {lat, lng}} } = await getGooglePlaceByText(`${settingName} ${settingAddress}`);
+    googleMapPlaceId = place_id
+
+    coordinates = {long: lng, lat}
+    location = {
+      type: 'Point',
+      coordinates: [lng, lat]
+    }
+  }
 
   // create store
   const createdStore = await cms.getModel('Store').create({
@@ -144,6 +153,8 @@ router.post('/new-store', async (req, res) => {
       "Kitchen"
     ],
     ...googleMapPlaceId ? {googleMapPlaceId} : {},
+    ...location && { location },
+    ...coordinates && { coordinates }
   })
 
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
@@ -345,7 +356,7 @@ function getRequestsFromDb(conditions) {
   return cms.getModel('SignInRequest').aggregate(aggregateSteps);
 }
 
-async function getPlaceIdByName(placeName) {
+async function getGooglePlaceByText(placeName) {
   const {mapsApiKey} = global.APP_CONFIG;
   if (!mapsApiKey) return null;
 
@@ -354,12 +365,12 @@ async function getPlaceIdByName(placeName) {
     params: {
       key: mapsApiKey,
       input: placeName,
-      fields: 'place_id',
-      inputtype: 'textquery',
+      fields: 'place_id,geometry',
+      inputtype: 'textquery'
     }
   });
   if (searchResult.candidates && searchResult.candidates.length) {
-    return searchResult.candidates[0].place_id;
+    return searchResult.candidates[0];
   } else {
     return null;
   }

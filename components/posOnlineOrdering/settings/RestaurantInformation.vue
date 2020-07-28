@@ -243,7 +243,7 @@
             const foundLocation = features.find(location => location.properties.postalcode === zipCode)
             if (foundLocation) {
               const [long, lat] = foundLocation.geometry.coordinates
-              await this.update({ coordinates: { long, lat }})
+              await this.update({ coordinates: { long, lat }, location: { type: 'Point', coordinates: [long, lat] }})
               console.log(`[Geocode]${this.store.alias}|PeliasAPI|coords:${long}, ${lat}`)
             } else {
               await this.getCoordsByGoogleApi(zipCode, address)
