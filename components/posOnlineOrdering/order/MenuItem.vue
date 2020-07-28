@@ -55,12 +55,19 @@
         </template>
       </div>
       <pre :class="['po-menu-item__desc', collapseText && 'collapse']" v-html="desc"/>
+      <div v-if="desc" class="po-menu-item__desc--mobile" @click="toggleShowmore">
+        <pre :id="`desc_${_id}`" :class="['po-menu-item__desc', !showmore && 'po-menu-item__desc--mobile--collapse']" v-html="desc"></pre>
+        <g-icon v-if="expandDesc" size="12" class="po-menu-item__show">fas fa-angle-double-{{showmore ? 'left' : 'right'}}</g-icon>
+      </div>
+      <g-spacer/>
       <div class="po-menu-item__prices--under">
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
         <div v-if="price2"> {{ price2 | currency(storeCountryLocale) }}</div>
+        <g-spacer/>
+        <g-icon @click="addToOrder" size="28" color="#1271FF">add_circle</g-icon>
       </div>
     </div>
-    <g-spacer/>
+    <g-spacer class="not-in-mobile"/>
     <div class="po-menu-item__prices">
       <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
       <div v-if="price2">{{ price2 | currency(storeCountryLocale) }}</div>
@@ -70,12 +77,6 @@
             :class="['po-menu-item__add', disabled && 'disabled']">
       add_circle
     </g-icon>
-    <div class="po-menu-item__action" v-if="isOpening">
-      <g-icon @click="addToOrder"
-              size="28" color="#424242">
-        add_circle
-      </g-icon>
-    </div>
   </div>
 </template>
 <script>
@@ -96,8 +97,8 @@
       imageThumbnailSize: {
         type: Object,
         default: () => ({
-          width: 100,
-          height: 100,
+          width: 200,
+          height: 200,
         }),
       },
       disabled: Boolean,
@@ -123,8 +124,18 @@
           allergic: false,
           spicy: false,
           vegeterian: false,
-        }
+        },
+        showmore: false,
+        expandDesc: false
       }
+    },
+    mounted() {
+      this.$nextTick(() => {
+        const desc = document.getElementById(`desc_${this._id}`)
+        if(desc && desc.scrollHeight > desc.offsetHeight) {
+          this.expandDesc = true
+        }
+      })
     },
     methods: {
       addToOrder() {
@@ -140,7 +151,10 @@
         let allergens = ''
         allergens += types.map(t => this.$t(`store.${t}`)).join(', ')
         return allergens
-      }
+      },
+      toggleShowmore() {
+        this.showmore = !this.showmore
+      },
     },
     computed: {
       menuItemThumbnail() {
@@ -219,14 +233,33 @@
       max-width: 100%;
       word-break: break-word;
       white-space: pre-wrap;
-      overflow: hidden;
 
       &.collapse {
         -webkit-line-clamp: 2;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         user-select: auto;
+        overflow: hidden;
       }
+
+      &--mobile {
+        display: none;
+
+        &--collapse {
+          display: -webkit-box !important;
+          -webkit-box-orient: vertical;
+          user-select: auto;
+          overflow: hidden;
+          -webkit-line-clamp: 4;
+        }
+      }
+    }
+
+
+    &__show {
+      font-size: 12px;
+      align-self: flex-end;
+      color: #1271FF;
     }
 
     &__prices {
@@ -248,7 +281,6 @@
       &--under {
         display: none;
         font-size: 14px;
-        color: #2979ff;
         font-weight: 700;
         margin-top: 4px;
       }
@@ -269,6 +301,9 @@
 
   @media screen and (max-width: 1139px) {
     .po-menu-item {
+      padding-bottom: 8px;
+      align-items: stretch;
+
       &__content {
         line-height: 1.2;
         max-width: calc(100% - 50px);
@@ -277,9 +312,14 @@
 
       &__thumbnail {
         margin-right: 8px;
+        width: 120px;
+        height: 120px;
 
         & ~ .po-menu-item__content {
-          max-width: calc(100% - 110px);
+          max-width: 100%;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
         }
       }
 
@@ -288,8 +328,19 @@
       }
 
       &__desc {
+        display: none;
         font-size: 13px;
-        margin-bottom: 8px;
+        margin-bottom: 0;
+
+        &--mobile {
+          display: flex;
+          padding-bottom: 4px;
+          max-width: 100%;
+
+          .po-menu-item__desc {
+            display: initial;
+          }
+        }
       }
 
       &__prices {
@@ -297,6 +348,7 @@
 
         &--under {
           display: flex;
+          align-items: center;
         }
       }
 
@@ -317,6 +369,10 @@
           line-height: 28px;
         }
       }
+    }
+
+    .not-in-mobile {
+      display: none;
     }
   }
 </style>
