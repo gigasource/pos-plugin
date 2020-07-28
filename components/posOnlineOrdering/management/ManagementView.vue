@@ -5,7 +5,10 @@
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
-      <chat-support :selected-device-id-prop="selectedDeviceIdForChat" @set-message-read="checkNewMessages" v-else-if="view === 'chatSupport'"/>
+      <chat-support v-else-if="view === 'chatSupport'"
+                    :has-new-messages="hasNewMessages"
+                    :selected-device-id-prop="selectedDeviceIdForChat"
+                    @all-messages-replied="checkNewMessages"/>
       <support @select-chat="supportSelectChat" v-else-if="view === 'support'"/>
     </div>
   </div>

@@ -255,6 +255,24 @@ setTimeout(() => {
 router.get('/chat/messages/not-replied', async (req, res) => {
   const lastMessages = await ChatMessageModel.aggregate([
     {$sort: {createdAt: -1}},
+    {
+      $lookup: {
+        from: 'devices',
+        let: {clientId: {$toObjectId: '$clientId'}, falseVal: false},
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                {$expr: {$eq: ['$_id', '$$clientId']}},
+                {deleted: {$ne: true}}
+              ]
+            }
+          },
+        ],
+        as: 'device',
+      }
+    },
+    {$unwind: {path: '$device'}},
     {$group: {_id: '$clientId', fromServer: {$first: '$fromServer'}}},
     {$match: {fromServer: false}},
   ]);
