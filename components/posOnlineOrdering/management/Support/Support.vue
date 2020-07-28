@@ -33,9 +33,9 @@
             <div class="flex-equal pl-2">{{request.requestStoreName}}</div>
             <div style="flex: 0 0 100px">
               <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
-              <g-icon v-if="!request.storeId" size="20" @click="addNewStore(request)">icon-add-restaurant</g-icon>
+              <g-icon v-if="!request.storeId" size="20" class="mr-2" @click="addNewStore(request)">icon-add-restaurant</g-icon>
               <g-icon v-if="request.storeId && request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
-              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
+              <g-icon v-if="request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeId ? 'Sign in' : 'New restaurant'}}</div>
             <div class="assigned-store pr-2">
