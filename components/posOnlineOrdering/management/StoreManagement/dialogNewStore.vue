@@ -5,6 +5,7 @@
       <g-text-field-bs large label="Name" v-model="name"/>
       <g-select v-if="groups" deletable-chips multiple text-field-component="GTextFieldBs" label="Group" :items="listGroups" v-model="group"/>
       <g-text-field-bs large label="Address" v-model="address"/>
+      <g-text-field-bs v-if="googleMapPlaceId" large label="Google Place ID" readonly :value="googleMapPlaceId"/>
       <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country"/>
       <div class="dialog-buttons">
         <g-btn-bs large width="100" text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
@@ -21,13 +22,14 @@
       value: null,
       groups: Array,
       countries: Array,
+      googleMapPlaceId: String,
     },
     data() {
       return {
         name: '',
         group: null,
         address: '',
-        country: null
+        country: null,
       }
     },
     computed: {
@@ -61,11 +63,12 @@
           groups: this.group,
           settingName: this.name,
           settingAddress: this.address,
-          country: this.country
+          country: this.country,
+          googleMapPlaceId: this.googleMapPlaceId,
         }
         this.$emit('submit', store)
         this.internalValue = false
-      }
+      },
     }
   }
 </script>

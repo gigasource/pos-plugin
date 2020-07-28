@@ -554,6 +554,7 @@
 
         const setMessageReadApiUrl = `/support/chat/set-message-read?clientId=${deviceId}`
         await axios.put(setMessageReadApiUrl)
+        this.$emit('set-message-read')
       },
       updateDevice(device) {
         const deviceIndex = this.devices.findIndex(({_id}) => _id === device._id)
