@@ -222,6 +222,9 @@
 
         return requests
       },
+      selectedRequest() {
+        return this.signInRequests.find(e => e._id === this.selectedRequestId)
+      }
     },
     methods: {
       addChat(deviceId) {
@@ -248,7 +251,7 @@
       async approveRequest() {
         this.dialog.approve = false
         const requestId = this.selectedRequestId
-        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved'})
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'approved', storeId: this.selectedRequest.storeId})
         this.signInRequests.find(e => e._id === requestId).status = 'approved'
       },
       async denyRequest() {
