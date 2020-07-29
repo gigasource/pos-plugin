@@ -5,7 +5,7 @@ const router = express.Router()
 
 const storeModel = cms.getModel('Store');
 
-router.get('/nearby-restaurants', async (req, res) => {
+router.get('/nearby', async (req, res) => {
   const { coordinates } = req.query
   const [long, lat] = coordinates.split(',')
 

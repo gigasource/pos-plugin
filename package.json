@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.0.70",
+  "version": "1.0.71",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,7 @@
     "ioredis": "^4.17.3",
     "node-thermal-printer": "^1.0.3",
     "nodemailer": "^6.4.10",
+    "object-mapper": "^6.2.0",
     "phantom": "^6.3.0",
     "pngjs": "^3.4.0",
     "q": "^1.5.1",

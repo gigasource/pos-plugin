@@ -27,6 +27,8 @@ module.exports = cms => {
   cms.app.use('/v1/restaurant-plus-apis/stores', rpStoreApi)
   cms.app.use('/v1/restaurant-plus-apis/vouchers', rpVoucherApi)
   // cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
+  cms.app.use('/api/v1/restaurant-plus/stores', rpStoreApi)
+  cms.app.use('/api/v1/restaurant-plus/vouchers', rpVoucherApi)
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
   cms.app.get('/health-check', (req, res) => res.status(200).send('OK'));

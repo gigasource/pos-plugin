@@ -5,12 +5,14 @@
     {
       "_id": "5f1ff690bf8dea79c6862131",
       "schemaType": "string",
-      "key": "name"
+      "key": "name",
+      "type": "input"
     },
     {
       "_id": "5f1ff690bf8dea79c6862132",
       "schemaType": "string",
-      "key": "phoneNumber"
+      "key": "phoneNumber",
+      "type": "input"
     },
     {
       "_id": "5f1ff690bf8dea79c6862133",
@@ -26,7 +28,37 @@
     {
       "_id": "5f1ff775bf8dea79c6862179",
       "schemaType": "date",
-      "key": "createdAt"
+      "key": "createdAt",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f200ee7877152840647eb6d",
+      "schemaType": "object",
+      "key": "location",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "type",
+          "default": "Point"
+        },
+        {
+          "schemaType": "array",
+          "key": "coordinates",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "_id": "5f2134ac700e50026fb15941",
+      "schemaType": "number",
+      "key": "rpPoint"
     }
   ],
   "name": "RPUser",
