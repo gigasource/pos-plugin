@@ -9,6 +9,8 @@ const payment = require('./api/payment');
 const supportApi = require('./api/support');
 // const restaurantDataBackupApi = require('./api/restaurant-data-backup');
 const userApi = require('./api/users');
+const rpStoreApi = require('./restaurant-plus-apis/stores')
+const rpVoucherApi = require('./restaurant-plus-apis/vouchers')
 
 module.exports = cms => {
   cms.data['loginUrl'] = '/sign-in';
@@ -22,6 +24,8 @@ module.exports = cms => {
   cms.app.use('/demo', demoApi);
   cms.app.use('/support', supportApi);
   cms.app.use('/users', userApi);
+  cms.app.use('/v1/restaurant-plus-apis/stores', rpStoreApi)
+  cms.app.use('/v1/restaurant-plus-apis/vouchers', rpVoucherApi)
   // cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
