@@ -2,6 +2,21 @@ const { MAX_NEARBY_DISTANCE } = require('./constants');
 const _ = require('lodash')
 const express = require('express')
 const router = express.Router()
+const objectMapper = require('object-mapper');
+
+const mapperConfig = {
+  _id: '_id',
+  id: 'id',
+  name: 'name',
+  address: 'address',
+  settingName: 'settingName',
+  settingAddress: 'settingAddress',
+  'country.name': 'country',
+  openHours: 'openHours',
+  phone: 'phone',
+  onlineOrdering: 'onlineOrdering',
+  pickup: 'pickup',
+};
 
 const storeModel = cms.getModel('Store');
 
@@ -23,7 +38,7 @@ router.get('/nearby', async (req, res) => {
       'zipCode', 'openHours', 'phone', 'location', 'googleMapPlaceId', 'onlineOrdering', 'delivery', 'pickup'])
   })
 
-  res.status(200).json(mappedStores)
+  res.status(200).json(mappedStores.map(e => objectMapper(e, mapperConfig)))
 })
 
 module.exports = router

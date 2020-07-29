@@ -13,7 +13,7 @@ const {respondWithError} = require('./utils');
 
 const mapperConfig = {
   _id: '_id',
-  'restaurantPlusUser._id': 'userID',
+  'restaurantPlusUser._id': 'userId',
   status: 'status',
   startDate: 'startDate',
   endDate: 'endDate',
