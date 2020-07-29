@@ -109,6 +109,7 @@
     border-radius: 4px;
     width: 580px;
     margin: 0 auto;
+    overflow: auto;
 
     &__title {
       font-weight: 600;

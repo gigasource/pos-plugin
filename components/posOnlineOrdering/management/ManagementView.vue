@@ -5,7 +5,10 @@
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
-      <chat-support :selected-device-id-prop="selectedDeviceIdForChat" v-else-if="view === 'chatSupport'"/>
+      <chat-support v-else-if="view === 'chatSupport'"
+                    :has-new-messages="hasNewMessages"
+                    :selected-device-id-prop="selectedDeviceIdForChat"
+                    @all-messages-replied="checkNewMessages"/>
       <support @select-chat="supportSelectChat" v-else-if="view === 'support'"/>
     </div>
   </div>
@@ -35,8 +38,7 @@
       }
     },
     async created() {
-      const {data: {notRepliedCount: notRepliedMessageCount}} = await axios.get('/support/chat/messages/not-replied')
-      this.hasNewMessages = notRepliedMessageCount > 0
+      await this.checkNewMessages()
 
       cms.socket.on('chatMessageNotification', () => {
         if (this.view !== 'chatSupport') {
@@ -71,7 +73,7 @@
         }
 
         items.push({
-          icon: this.view === 'chatSupport' ? 'icon-chat_white' : 'icon-account-management',
+          icon: 'headset_mic',
           ...this.hasNewMessages && {appendIcon: 'icon-new-chat-messages-notification'},
           title: 'Chat Support',
           onClick: () => this.changeView('chatSupport', 'Chat Support')
@@ -94,7 +96,11 @@
         this.selectedDeviceIdForChat = deviceId
         this.changeView('chatSupport', 'Sign-in Requests')
         this.$refs.sidebar.setSidebarItem('item.3')
-      }
+      },
+      async checkNewMessages() {
+        const {data: {notRepliedCount: notRepliedMessageCount}} = await axios.get('/support/chat/messages/not-replied')
+        this.hasNewMessages = notRepliedMessageCount > 0
+      },
     }
   }
 </script>
