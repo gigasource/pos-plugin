@@ -220,7 +220,10 @@
       },
       async _uploadImage() {
         this.dialog.uploading = true
-        const options = { imageSmoothingEnabled: true, imageSmoothingQuality: 'high', ... this.option}
+        const options = {
+          imageSmoothingEnabled: false,
+          ... this.option
+        }
         try {
           this.cropper.getCroppedCanvas(options).toBlob(async (blob) => {
             let uploadedUrl
