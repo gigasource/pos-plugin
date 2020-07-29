@@ -71,8 +71,8 @@
       imageThumbnailSize: {
         type: Object,
         default: () => ({
-          width: 200,
-          height: 200,
+          width: 240,
+          height: 240,
         }),
       },
       collapseText: Boolean,
