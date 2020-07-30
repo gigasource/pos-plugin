@@ -13,7 +13,8 @@
     </div>
     <div class="support__table">
       <div class="support__table-header">
-        <div class="flex-equal pl-2">Restaurant</div>
+        <div class="w-10 pl-2">Date</div>
+        <div class="flex-equal">Restaurant</div>
         <div style="flex: 0 0 100px">Action</div>
         <div class="w-10">Type</div>
         <div class="assigned-store">Assigned</div>
@@ -30,7 +31,8 @@
         </template>
         <template v-else>
           <div v-for="(request, i) in sortedRequests" :key="i" class="support__table-row">
-            <div class="flex-equal pl-2">{{request.requestStoreName}}</div>
+            <div class="w-10 pl-2">{{request.createdAt | formatDate(dateFormat)}}</div>
+            <div class="flex-equal">{{request.requestStoreName}}</div>
             <div style="flex: 0 0 100px">
               <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
               <g-icon v-if="!request.storeId" size="20" class="mr-2" @click="addNewStore(request)">icon-add-restaurant</g-icon>
@@ -128,6 +130,7 @@
   import axios from 'axios'
   import cloneDeep from 'lodash/cloneDeep'
   import supportedCountries from '../../../Store/supportedCountries';
+  import dayjs from 'dayjs'
 
   export default {
     name: "Support",
@@ -191,6 +194,9 @@
       }).sort((s1, s2) => +s1.id - +s2.id)
     },
     computed: {
+      dateFormat() {
+        return $t('dates.dateFormat') + ' ' + $t('dates.timeFormat')
+      },
       sortedRequests() {
         let requests = cloneDeep(this.signInRequests)
 
@@ -209,12 +215,7 @@
           }
         }
 
-        requests = requests.sort((cur, next) => {
-          const curCreatedAt = (cur.createdAt || new Date()).getTime()
-          const nextCreatedAt = (next.createdAt || new Date()).getTime()
-
-          return nextCreatedAt - curCreatedAt
-        })
+        requests = requests.sort((cur, next) => new Date(next.createdAt).getTime() - new Date(cur.createdAt).getTime())
 
         if (this.requestSearchText && this.requestSearchText.trim().length) {
           requests = requests.filter(r => r.requestStoreName.toLowerCase().includes(this.requestSearchText.toLowerCase()))
@@ -301,7 +302,13 @@
         if(index > -1)
           this.chatItems.splice(index, 1)
       }*/
-    }
+    },
+    filters: {
+      formatDate(date, format) {
+        console.info(format)
+        return dayjs(date).format(format)
+      }
+    },
   }
 </script>
 
