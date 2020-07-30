@@ -220,7 +220,8 @@ router.post('/sign-in-requests', async (req, res) => {
     ...store && {storeName: store.settingName || store.name, storeId: store._id},
     ...request._doc,
   }
-  cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), storeId: store._id})
+
+  cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
   res.status(201).json(request._doc);
 });
 
@@ -247,7 +248,6 @@ router.get('/sign-in-requests/:requestId', async (req, res) => {
   if (!requestId) res.status(400).json({error: 'Missing sign-in request ID in API request'});
 
   const requests = await getRequestsFromDb({_id: new mongoose.Types.ObjectId(requestId)});
-
 
   if (requests && requests.length) {
     let {device, store, storeFromGoogleMap, ...e} = requests[0];

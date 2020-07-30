@@ -6,7 +6,7 @@
       <div v-if="isInDevice" style="border-radius: 16px; overflow: hidden" @click="dialog.noUpload = true">
         <img alt :src="internalImage ? `${internalCdnImage}?w=80&h=80` : '/plugins/pos-plugin/assets/empty_dish.svg'" style="width: 80px; height: 80px"/>
       </div>
-      <upload-zone v-else class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 500, maxWidth: 500}" :aspect-ratio="1">
+      <upload-zone v-else class="menu-setting-new-item__image" @url="getImage" :option="{maxHeight: 1024, maxWidth: 1024}" :aspect-ratio="1">
         <template v-slot:default="{showUploadDialog}">
           <img @click="showUploadDialog()" v-if="internalImage" :src="`${internalCdnImage}?w=80&h=80`" draggable="false" style="opacity: 0.8; width: 100%; height: 100%"/>
           <div @click="showUploadDialog()" v-else class="menu-setting-new-item__image--upload">
