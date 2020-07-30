@@ -1,3 +1,4 @@
+const voucherModel = cms.getModel('RPVoucher');
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -19,7 +20,7 @@ const mapperConfig = {
   startDate: 'startDate',
   endDate: 'endDate',
   createdAt: 'createdAt',
-  'promotion.name': 'promotionName',
+  promotion: 'promotion',
 }
 
 router.get('/', async (req, res) => {
@@ -132,6 +133,8 @@ router.post('/', async (req, res) => {
 
 router.get('/nearby', async (req, res) => {
   const { userId, coordinates } = req.query
+  if (!userId || !coordinates) return res.sendStatus(400)
+
   const [long, lat] = coordinates.split(',')
 
   const nearbyStores = await cms.getModel('Store').find({
@@ -158,6 +161,43 @@ router.get('/nearby', async (req, res) => {
     .filter(voucher => voucher.promotion.store._id.toString() === store._id.toString())));
 
   res.status(200).json(sortedVouchers.map(e => objectMapper(e, mapperConfig)));
+})
+
+router.get('/store-vouchers', async (req, res) => {
+  const { userId, storeId } = req.query
+  if (!userId || !storeId) return res.sendStatus(400)
+
+  const vouchers = await voucherModel.aggregate([
+    {
+      $lookup: {
+        from: 'rppromotions',
+        let: {promotion: {$toObjectId: '$promotion'}},
+        pipeline: [{
+          $match: {
+            $expr: {
+              $eq: ['$_id', '$$promotion']
+            }
+          },
+        }],
+        as: 'promotion',
+      }
+    },
+    {
+      $unwind: {
+        path: '$promotion',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $match: {
+        restaurantPlusUser: new ObjectId(userId),
+        'promotion.store': new ObjectId(storeId),
+        status: 'unused'
+      }
+    }
+  ])
+
+  res.status(200).json({vouchers: vouchers.map(e => objectMapper(e, mapperConfig))})
 })
 
 module.exports = router
