@@ -59,6 +59,12 @@
       "_id": "5f2134ac700e50026fb15941",
       "schemaType": "number",
       "key": "rpPoint"
+    },
+    {
+      "_id": "5f227f6c7f0f3e21cada09aa",
+      "schemaType": "string",
+      "key": "firebaseUid",
+      "type": "input"
     }
   ],
   "name": "RPUser",
