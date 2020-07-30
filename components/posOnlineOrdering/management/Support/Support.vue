@@ -210,8 +210,8 @@
         }
 
         requests = requests.sort((cur, next) => {
-          const curCreatedAt = (cur.createdAt || new Date()).getTime()
-          const nextCreatedAt = (next.createdAt || new Date()).getTime()
+          const curCreatedAt = (new Date(cur.createdAt) || new Date()).getTime()
+          const nextCreatedAt = (new Date(next.createdAt) || new Date()).getTime()
 
           return nextCreatedAt - curCreatedAt
         })
