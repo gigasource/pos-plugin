@@ -14,6 +14,7 @@ const rpStoreApi = require('./restaurant-plus-apis/stores')
 const rpVoucherApi = require('./restaurant-plus-apis/vouchers');
 const rpPromotionApi = require('./restaurant-plus-apis/promotions');
 const rpUserApi = require('./restaurant-plus-apis/users');
+const rpPointHistoryApi = require('./restaurant-plus-apis/point-histories');
 
 module.exports = async cms => {
 /*  let stores = await cms.getModel('Store').find();
@@ -76,6 +77,7 @@ module.exports = async cms => {
   cms.app.use('/api/v1/restaurant-plus/vouchers', rpVoucherApi);
   cms.app.use('/api/v1/restaurant-plus/promotions', rpPromotionApi);
   cms.app.use('/api/v1/restaurant-plus/users', rpUserApi);
+  cms.app.use('/api/v1/restaurant-plus/point-histories', rpPointHistoryApi);
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
   cms.app.get('/health-check', (req, res) => res.status(200).send('OK'));

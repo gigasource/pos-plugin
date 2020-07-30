@@ -7,7 +7,7 @@ const PROMOTION_ORDER_TYPE = Object.freeze({
   ONLINE_ORDER: 'onlineOrder',
   DINE_IN: 'dineIn',
 
-  VALUE_ARRAY: ['onlineOrder', 'dineIn'],
+  VALUE_ARRAY: ['onlineOrder', 'dineIn'], //VALUE_ARRAY is used to check validity of request params
 });
 
 const PROMOTION_DISCOUNT_TYPE = Object.freeze({
@@ -15,10 +15,17 @@ const PROMOTION_DISCOUNT_TYPE = Object.freeze({
   PERCENT: 'percent',
 
   VALUE_ARRAY: ['flat', 'percent'],
-})
+});
+
+const POINT_HISTORY_TRANSACTION_TYPE = Object.freeze({
+  STORE_REWARD_POINT: 'storeRewardPoint',
+  USER_BUY_VOUCHER: 'userBuyVoucher',
+
+  VALUE_ARRAY: ['storeRewardPoint', 'userBuyVoucher']
+});
 
 const MAX_NEARBY_DISTANCE = 5000 //5km
 
 module.exports = {
-  VOUCHER_STATUS, MAX_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE
+  VOUCHER_STATUS, MAX_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, POINT_HISTORY_TRANSACTION_TYPE
 }

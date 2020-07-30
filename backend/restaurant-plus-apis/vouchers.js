@@ -7,8 +7,9 @@ const objectMapper = require('object-mapper');
 const VoucherModel = cms.getModel('RPVoucher');
 const PromotionModel = cms.getModel('RPPromotion');
 const UserModel = cms.getModel('RPUser');
+const PointHistoryModel = cms.getModel('RPPointHistory');
 
-const { MAX_NEARBY_DISTANCE, VOUCHER_STATUS } = require('./constants');
+const { MAX_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE } = require('./constants');
 const {respondWithError} = require('./utils');
 
 const mapperConfig = {
@@ -82,8 +83,16 @@ router.post('/', async (req, res) => {
   const user = await UserModel.findById(userId);
   if (!user) return respondWithError(res, 400,'Selected user not found');
 
+  const promoLimitForUser = promotion.limitForUser;
+  const issuedVoucherForUserCount = await VoucherModel.countDocuments({
+    promotion: promotion._id,
+    restaurantPlusUser: ObjectId(userId),
+  });
+
+  if (issuedVoucherForUserCount >= promoLimitForUser) return respondWithError(res, 400, 'Promotion campaign issue limit has been reached for this user');
+
   const promoLimit = promotion.quantity;
-  const issuedVoucherCount = await VoucherModel.find({
+  const issuedVoucherCount = await VoucherModel.countDocuments({
     promotion: promotion._id,
     status: {$in: [VOUCHER_STATUS.UNUSED, VOUCHER_STATUS.USED]},
   });
@@ -108,6 +117,14 @@ router.post('/', async (req, res) => {
     createdAt: now,
     startDate: voucherStartDate,
     endDate: voucherEndDate,
+  });
+
+  await PointHistoryModel.create({
+    voucher: newVoucher._id,
+    user: user._id,
+    value: promotion.price,
+    transactionType: POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER,
+    createdAt: new Date(),
   });
 
   res.status(201).json(objectMapper(newVoucher, mapperConfig));
