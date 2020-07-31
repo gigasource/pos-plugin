@@ -47,10 +47,10 @@ router.post('/authenticate', async (req, res) => {
     let user = await UserModel.findOne({firebaseUid});
 
     if (user) {
-      res.status(200).json(user);
+      res.status(200).json(objectMapper(user, mapperConfig));
     } else {
       user = await UserModel.create({name, phoneNumber, addresses: [], createdAt: new Date(), rpPoint: 0, firebaseUid});
-      res.status(201).json(user);
+      res.status(201).json(objectMapper(user, mapperConfig));
     }
   } else {
     respondWithError(res, 400, 'Invalid token');

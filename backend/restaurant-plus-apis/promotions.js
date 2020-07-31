@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const objectMapper = require('object-mapper');
-const {PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE} = require('./constants');
+const {PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, DEFAULT_PROMOTION_BACKGROUND} = require('./constants');
 
 const {respondWithError} = require('./utils');
 const PromotionModel = cms.getModel('RPPromotion');
@@ -17,28 +17,44 @@ const mapperConfig = {
   description: 'description',
   orderType: 'orderType',
   createdAt: 'createdAt',
+  'store.settingName': {
+    key: 'store.settingName',
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.name
+  },
+  descriptionImageUrl: {
+    key: 'descriptionImageUrl',
+    transform: sourceValue => sourceValue || DEFAULT_PROMOTION_BACKGROUND
+  },
 }
 
 router.get('/', async (req, res) => {
-  const {storeId} = req.query;
-  if (!storeId) return respondWithError(res, 400, 'Missing store ID in request');
+  const {storeId, includeNonStore} = req.query;
 
   const aggregateSteps = [{
-      $lookup: {
-        from: 'rpvouchers',
-        localField: '_id',
-        foreignField: 'promotion',
-        as: 'issuedVouchers'
-      }
-    },
+    $lookup: {
+      from: 'rpvouchers',
+      localField: '_id',
+      foreignField: 'promotion',
+      as: 'issuedVouchers'
+    }
+  },
     {$addFields: {limitNotReached: {$lte: [{$size: '$issuedVouchers'}, '$quantity']}}},
     {$unset: 'issuedVouchers'},
     {
+      $lookup: {
+        from: 'stores',
+        localField: 'store',
+        foreignField: '_id',
+        as: 'store',
+      }
+    },
+    {$unwind: {path: '$store', preserveNullAndEmptyArrays: includeNonStore === 'true'}},
+    {
       $match: {
-        store: ObjectId(storeId),
+        ...storeId && {store: ObjectId(storeId)},
         enabled: true,
         limitNotReached: true,
-      }
+      },
     }];
 
   const promotions = await PromotionModel.aggregate(aggregateSteps);
@@ -66,7 +82,7 @@ router.post('/', async (req, res) => {
     startDate: startDate && new Date(startDate),
     endDate: endDate && new Date(endDate),
     store: storeId,
-    price,
+    price: price || 0,
     discountType,
     discountValue,
     description,

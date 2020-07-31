@@ -8,7 +8,7 @@ const PointHistoryModel = cms.getModel('RPPointHistory');
 const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
 
 router.post('/', async (req, res) => {
-  const {storeId, userId, value, transactionType, voucherId} = req.body;
+  const {storeId, userId, value, transactionType} = req.body;
   if (!userId || !value) return respondWithError(res, 400, 'Missing property in request body');
   if (!POINT_HISTORY_TRANSACTION_TYPE.VALUE_ARRAY.includes(transactionType)) return respondWithError(res, 400, 'Invalid transaction type');
 
