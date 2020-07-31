@@ -8,7 +8,7 @@
     <div class="po-menu-item__content">
       <div class="row-flex align-items-center">
         <div :class="['po-menu-item__name', collapseText && 'collapse']">
-          <span v-if="displayId">{{ id && `${id}.` }}</span>
+          <span v-if="displayId">{{ id && `${id}. ` }}</span>
           <span>{{ name }}</span>
           <template v-if="!collapseText">
             <template v-for="(value, type) in mark">
@@ -194,13 +194,13 @@
     display: flex;
     align-items: flex-start;
     padding-top: 8px;
-    min-height: 80px;
+    min-height: 136px;
 
     &__thumbnail {
       border-radius: 11px;
       margin-right: 18px;
-      width: 60px;
-      height: 60px;
+      width: 120px;
+      height: 120px;
 
       & ~ .po-menu-item__content {
         max-width: calc(100% - 270px);
@@ -306,8 +306,9 @@
 
       &__content {
         line-height: 1.2;
-        max-width: calc(100% - 50px);
+        max-width: 100%;
         margin-right: 4px;
+        flex: 1;
       }
 
       &__thumbnail {
@@ -316,8 +317,8 @@
         height: 120px;
 
         & ~ .po-menu-item__content {
-          max-width: 100%;
           display: flex;
+          max-width: calc(100% - 50px);
           flex-direction: column;
           flex: 1;
         }

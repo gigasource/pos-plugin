@@ -8,6 +8,7 @@
     </template>
     <div :class="['digital-menu-item__content', (!choices || choices.length === 0) && 'digital-menu-item__content--no-choices']">
       <div class="digital-menu-item__name">
+          <span v-if="displayId">{{ id && `${id}. ` }}</span>
           {{name}}
           <template v-for="(value, type) in mark">
             <g-menu v-if="value.active" v-model="menu[type]" open-on-hover nudge-bottom="5" max-width="375" style="display: inline-block" content-class="menu-status-notification">
