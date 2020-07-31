@@ -20,7 +20,14 @@ const mapperConfig = {
   startDate: 'startDate',
   endDate: 'endDate',
   createdAt: 'createdAt',
-  promotion: 'promotion',
+  'promotion.name': 'promotion.name',
+  'promotion.quantity': 'promotion.quantity',
+  'promotion.store.name': 'promotion.storeName',
+  'promotion.store.logoImageSrc': 'promotion.storeLogo',
+  'promotion.price': 'promotion.price',
+  'promotion.discountValue': 'promotion.discountValue',
+  'promotion.discountType': 'promotion.discountType',
+  'promotion.descriptionImageUrl': 'promotion.descriptionImageUrl',
 }
 
 router.get('/', async (req, res) => {
