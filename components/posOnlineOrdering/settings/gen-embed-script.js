@@ -1,20 +1,10 @@
-export function getEmbedWebshop() {
-  return `function getEmbedWebshop() {
-  var el = document.getElementById('webshop-embed-btn')
-
-  var styleEl = document.createElement('style')
-  document.head.appendChild(styleEl)
-  var stylesheet = styleEl.sheet
-  stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
-
-  var url = el.getAttribute('data-url')
-
-  getStyleSheet()
-
-  function openIframe () {
+export function genIframe(type, link, alias) {
+  return `var url${type} = ['https://restaurantplus.net', '${link}', '${alias}'].join('/')
+  
+  function openIframe${type} () {
     window.location = '#'
 
-    var existingIframe = document.getElementById('webshop-iframe-container');
+    var existingIframe = document.getElementById('${type}-iframe-container');
 
     if (existingIframe) {
       if (existingIframe.style.visibility === 'hidden') {
@@ -27,7 +17,7 @@ export function getEmbedWebshop() {
     } else {
       // insert overlay
       var container = document.createElement('div')
-      container.setAttribute('id', 'webshop-iframe-container')
+      container.setAttribute('id', '${type}-iframe-container')
       container.setAttribute('style', 'position: fixed; z-index: 1001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
       document.body.appendChild(container)
 
@@ -64,8 +54,8 @@ export function getEmbedWebshop() {
 
       // insert iframe
       var iframe = document.createElement('iframe')
-      iframe.setAttribute('src', url)
-      iframe.setAttribute('id', 'webshop-iframe')
+      iframe.setAttribute('src', url${type})
+      iframe.setAttribute('id', '${type}-iframe')
       var iframeStyle = 'border: none; width: 100%; height: 100%'
 
       // hide container on history back()
@@ -84,8 +74,7 @@ export function getEmbedWebshop() {
 
         container.removeChild(loading)
         
-        if(!mobileCheck()) {
-        // insert close btn
+        ${type === 'webshop' && `if(!mobileCheck()) {
           var closeBtn = document.createElement('button')
           closeBtn.setAttribute('id', 'iframe-close-btn')
           closeBtn.innerText = 'CLOSE'
@@ -95,191 +84,61 @@ export function getEmbedWebshop() {
             document.body.style.overflow = 'auto'
           }
           container.appendChild(closeBtn)
-        }
-      })
-    }
-  }
-
-  function openNewTab() {
-    var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
-    var newTabUrl = ['https://enjoylocal.de', 'store', alias].join('/')
-    window.open(newTabUrl)
-  }
-
-  var isOldIOs = checkIOs12AndLess()
-  var openFn = isOldIOs ? openNewTab : openIframe
-
-  el.onclick = function(e) {
-     e.stopPropagation();
-     e.preventDefault();
-     openFn();
-  }
-  
-  //get by class webshop-btn
-  var btns = document.getElementsByClassName('webshop-btn')
-  for(var i = 0; i < btns.length; i++) {
-    btns[i].onclick = openFn
-  }
-
-  //get by href #webshop-btn
-  btns = document.querySelectorAll('a[href="#webshop-btn"]')
-  for(var i = 0; i < btns.length; i++) {
-    btns[i].onclick = function (e) {
-      e.preventDefault()
-      openFn()
-    }
-  }
-}`
-}
-
-export function getEmbedReservation() {
-  return `function getEmbedReservation() {
-    var el = document.getElementById('reservation-embed-btn')
-  
-    var styleEl = document.createElement('style')
-    document.head.appendChild(styleEl)
-    var stylesheet = styleEl.sheet
-    stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
-    stylesheet.insertRule('@media screen and (min-width: 410px) { #reservation-iframe { width: 410px !important; margin-left: calc(50% - 205px); } }')
-    stylesheet.insertRule('@media screen and (max-width: 410px) { #iframe-close-btn { transform: scale(1.2) !important; right: 10px !important } }')
-  
-    var url = el.getAttribute('data-url')
-  
-    getStyleSheet()
-  
-    function openIframe() {
-      window.location = '#'
-  
-      // insert overlay
-      var container = document.createElement('div')
-      container.setAttribute('id', 'reservation-iframe-container')
-      container.setAttribute('style', 'position: fixed; z-index: 1001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
-      document.body.appendChild(container)
-  
-      function removeContainer() {
-        document.body.style.overflow = ''
-        if (document.body.contains(container))
-          document.body.removeChild(container)
-      }
-  
-      container.onclick = removeContainer
-  
-      //insert loading circular
-      var loading = document.createElement('div')
-      loading.setAttribute('style', 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1')
-      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-      svg.setAttribute('width', '50px')
-      svg.setAttribute('height', '50px')
-      svg.setAttribute('viewBox', '25 25 50 50')
-      svg.setAttribute('style', 'animation: rotating 1s linear infinite')
-      var circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      circle1.setAttribute('fill', 'transparent')
-      circle1.setAttribute('cx', '50')
-      circle1.setAttribute('cy', '50')
-      circle1.setAttribute('r', '20')
-      circle1.setAttribute('stroke-width', '5')
-      circle1.setAttribute('stroke-dasharray', '0')
-      circle1.setAttribute('stroke-dashoffset', '0')
-      circle1.setAttribute('stroke', '#9e9e9e')
-      svg.appendChild(circle1)
-      var circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
-      circle2.setAttribute('fill', 'transparent')
-      circle2.setAttribute('cx', '50')
-      circle2.setAttribute('cy', '50')
-      circle2.setAttribute('r', '20')
-      circle2.setAttribute('stroke-width', '5')
-      circle2.setAttribute('stroke-dasharray', '120')
-      circle2.setAttribute('stroke-dashoffset', '105')
-      circle2.setAttribute('stroke', '#efefef')
-      svg.appendChild(circle2)
-      loading.appendChild(svg)
-      container.appendChild(loading)
-  
-      // insert iframe
-      var iframe = document.createElement('iframe')
-      iframe.setAttribute('src', url)
-      iframe.setAttribute('id', 'reservation-iframe')
-      var iframeStyle = 'border: none; width: 100%; height: 100%'
-  
-      // hide container on history back()
-      window.onpopstate = function (e) {
-        if (document.body.contains(container)) {
-          e.preventDefault()
-          document.body.removeChild(container)
-        }
-      }
-  
-      iframe.setAttribute('style', iframeStyle)
-      container.appendChild(iframe)
-      iframe.addEventListener('load', function () {
-        document.body.style.overflow = 'hidden'
-        container.removeChild(loading)
+        }`}
       })
   
       window.addEventListener('message', function (e) {
         if (e.data === 'close-iframe') {
-          removeContainer()
+          document.body.style.overflow = ''
+          var existingIframe = document.getElementById('${type}-iframe-container');
+          if(existingIframe) document.body.removeChild(existingIframe)
         }
       })
     }
+  }
+
+  function openNewTab${type}() {
+    window.open(url${type})
+  }
+
+  var openFn${type} = isOldIOs ? openNewTab${type} : openIframe${type}
   
-    function openNewTab() {
-      var alias = url.substring(url.lastIndexOf('/') + 1, url.length)
-      var newTabUrl = ['https://enjoylocal.de', 'reservation', alias].join('/')
-      window.open(newTabUrl)
+  //get by class ${type}-btn
+  var btns = document.getElementsByClassName('${type}-btn')
+  for(var i = 0; i < btns.length; i++) {
+    btns[i].onclick = openFn${type}
+  }
+
+  //get by href #${type}-btn
+  btns = document.querySelectorAll('a[href="#${type}-btn"]')
+  for(var i = 0; i < btns.length; i++) {
+    btns[i].onclick = function (e) {
+      e.preventDefault()
+      openFn${type}()
     }
-  
-    var isOldIOs = checkIOs12AndLess()
-    var openFn = isOldIOs ? openNewTab : openIframe
-  
-    el.onclick = function(e) {
-     e.stopPropagation();
-     e.preventDefault();
-     openFn();
-    }
-  
-    var btns = document.getElementsByClassName('reservation-btn')
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].onclick = openFn
-    }
-  
-    btns = document.querySelectorAll('a[href="#reservation-btn"]')
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].onclick = function (e) {
-        e.preventDefault()
-        openFn()
-      }
-    }
-  }`
+  }\n`
 }
 
-export function getEmbedBtn(type) {
+export function getEmbedBtn(types, alias) {
+  let typeIframeScript = ''
+  for(const type of types) {
+    typeIframeScript += genIframe(type.type, type.link, alias)
+  }
   return `function getEmbedBtn() {
-      var el = document.getElementById('giga-embed-btn')
-      var trigger = document.getElementById('${type.toLowerCase()}-embed-btn')
-      el.onclick = function(e) {
-        e.preventDefault()
-        trigger.click()
-      }
+      var el = document.getElementById('giga-embed-btn');
+      getStyleSheet();
+      var isOldIOs = checkIOs12AndLess();
+      ${typeIframeScript}
+      el.onclick = openFn${types[0].type}
   }`
 }
 
-export function genReadyState(type) {
-  if(!type)
-    return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
-              getEmbedWebshop()
-              getEmbedReservation()
-              getEmbedBtn()
-            } else {
-              window.addEventListener('load', getEmbedWebshop)
-              window.addEventListener('load', getEmbedReservation)
-              window.addEventListener('load', getEmbedBtn)
-            }`
+export function genReadyState() {
   return `if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    getEmbed${type}()
-  } else {
-    window.addEventListener('load', getEmbed${type})
-  }`
+       getEmbedBtn()
+     } else {
+        window.addEventListener('load', getEmbedBtn)
+     }`
 }
 
 export function genScriptHeader() {
@@ -310,16 +169,21 @@ export function genStyleSheet(position, size, hidden) {
       break;
   }
 
+  let width = 0
+
   switch (size) {
     case 'small':
       style += 'width: 80px;';
+      width = '80px';
       break;
     case 'large':
       style += 'width: 120px;';
+      width = '120px';
       break;
     case 'normal':
     default:
       style += 'width: 100px;';
+      width = '100px';
       break;
   }
 
@@ -334,6 +198,8 @@ export function genStyleSheet(position, size, hidden) {
     document.head.appendChild(styleEl)
     var stylesheet = styleEl.sheet
     stylesheet.insertRule('${style}')
+    stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
+    stylesheet.insertRule('.giga-embed-btn object { pointer-events: none; max-width: ${width} }')
   }`
 }
 
@@ -358,4 +224,24 @@ export function mobileCheck() {
     })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
   };`
+}
+
+export function genIcon(alias, mimeType, ext, location) {
+  return `(function () {
+    var el = document.getElementById('giga-embed-btn')
+    if(!el) {
+      el = document.createElement('div')
+      el.id = 'giga-embed-btn'
+      el.classList.add('giga-embed-btn')
+      document.body.appendChild(el)
+    }
+    if(el && !el.hasChildNodes()) {
+      var url = ['${location}', 'cms-files', 'files', 'view', 'store', '${alias}', 'embed-icon.${ext}'].join('/')
+      var image = document.createElement('object')
+      image.setAttribute('type', '${mimeType}')
+      image.setAttribute('data', url)
+      image.innerText = 'Online Order'
+      el.appendChild(image)
+    }
+  })();`
 }

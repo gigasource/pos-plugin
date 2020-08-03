@@ -103,11 +103,10 @@
         <div style="font-weight: 600; font-size: 22px; margin-bottom: 16px">Generate Embed Code</div>
         <div>
           <p>Choose type</p>
-          <g-radio-group v-model="type" name="type" row>
-            <g-radio class="col-3" small color="#1271ff" label="Online Order" value="Webshop"/>
-            <g-radio class="col-3" small color="#1271ff" label="Reservation" value="Reservation"/>
-          </g-radio-group>
-          <g-checkbox color="indigo accent-2" v-model="hidden" label="Hide icon" style="margin-left: 0"/>
+          <div class="row-flex flex-wrap">
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'store', order: 1}" label="Online Order"/>
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 2}" label="Reservation"/>
+          </div>
           <p>Choose position</p>
           <g-radio-group v-model="position" name="position" row>
             <g-radio class="col-3" small color="#1271ff" label="Top Left" value="top-left"/>
@@ -123,7 +122,10 @@
             <g-radio class="col-3" small color="#1271ff" label="Normal" value="normal"/>
             <g-radio class="col-3" small color="#1271ff" label="Large" value="large"/>
           </g-radio-group>
-          <p style="margin-bottom: 16px">Choose an icon</p>
+          <p style="display: flex; align-items: center; justify-content: space-between">
+            Choose an icon
+            <g-checkbox color="indigo accent-2" v-model="hidden" label="Hide icon"/>
+          </p>
           <g-grid-select id="icon-select" :items="listImage" class="mb-3" v-model="image" return-object style="align-items: stretch; background: rgba(196, 196, 196, 0.2); border: 1px solid #9e9e9e; border-radius: 2px; height: 200px; overflow: auto">
             <template #default="{item, toggleSelect}">
               <div style="border-radius: 2px; padding: 4px; height: 100%; display: flex; align-items: center; cursor: pointer">
@@ -146,8 +148,8 @@
         </div>
         <div class="row-flex align-items-center justify-end mt-3">
           <g-btn-bs @click="dialog.generate = false" text-color="#424242">Cancel</g-btn-bs>
-          <g-btn-bs :disabled="!hidden && !image" @click="updateButton"  background-color="#4CAF50" text-color="white" width="100">Update</g-btn-bs>
-          <g-btn-bs :disabled="!hidden && !image" @click="generateCode"  background-color="#536DFE" text-color="white" width="100">Generate</g-btn-bs>
+          <g-btn-bs :disabled="(!hidden && !image) || type.length === 0" @click="updateButton"  background-color="#4CAF50" text-color="white" width="100">Update</g-btn-bs>
+          <g-btn-bs :disabled="(!hidden && !image) || type.length === 0" @click="generateCode"  background-color="#536DFE" text-color="white" width="100">Generate</g-btn-bs>
         </div>
       </div>
     </g-dialog>
@@ -157,7 +159,16 @@
   import UploadZone from './UploadZone';
   import _ from 'lodash'
   import {getCdnUrl} from "../../Store/utils";
-  import {getEmbedWebshop, getEmbedReservation, genReadyState, genScriptHeader, genScriptFooter, genStyleSheet, checkIOs12AndLess, getEmbedBtn, mobileCheck} from './gen-embed-script';
+  import {
+    genReadyState,
+    genScriptHeader,
+    genScriptFooter,
+    genStyleSheet,
+    checkIOs12AndLess,
+    getEmbedBtn,
+    mobileCheck,
+    genIcon
+  } from './gen-embed-script';
   const terser = require('terser')
 
   // TODO:
@@ -179,7 +190,7 @@
           generate: false
         },
         script: '',
-        type: 'Webshop',
+        type: [],
         position: 'bottom-right',
         size: 'normal',
         hidden: false,
@@ -288,35 +299,44 @@
       },
       async generateCode() {
         await this.updateButton()
-        const url = [location.origin, this.type === 'Reservation' ? 'reservation' : 'store', this.store.alias].join('/'),
-              script = location.origin + this.script,
-              image = [location.origin, 'cms-files', 'files', 'view', 'store', this.store.alias, `embed-icon`].join('/'),
-              otherType = this.type === 'Reservation' ? 'webshop' : 'reservation',
-              otherUrl = [location.origin, this.type === 'Reservation' ? 'store' : 'reservation', this.store.alias].join('/')
-        this.iframe = `<div id="giga-embed-btn" class="giga-embed-btn">
-                  <object style="pointer-events: none; max-width: 100%" type="image/svg+xml" data="${image}.svg">
-                    <object style="pointer-events: none; max-width: 100%" type="image/jpeg" data="${image}.jpg">
-                      <object style="pointer-events: none; max-width: 100%" type="image/jpeg" data="${image}.jpeg">
-                        <object style="pointer-events: none; max-width: 100%" type="image/png" data="${image}.png">
-                          <object style="pointer-events: none; max-width: 100%" type="image/svg+xml" data="https://pos.gigasource.io/cms-files/files/view/images/embed-icon.svg">
-                            Online Order
-                          </object>
-                         </object>
-                      </object>
-                    </object>
-                  </object>
-                </div>
-                <div id="${this.type.toLowerCase()}-embed-btn" data-url="${url}" style="display: none"></div>
-                <div id="${otherType}-embed-btn" data-url="${otherUrl}" style="display: none"></div>
-                <script type="application/javascript" src=${script}><\/script>`
+        const script = `var turn = 0;
+                  function finishLoad() {
+                    turn = 100;
+                    console.log('finished loading script');
+                  }
+                  function load() {
+                    console.log('load script turn ' + (turn + 1));
+                    if(turn < 100) {
+                      turn++;
+                      var head = document.getElementsByTagName('head')[0];
+                      var oldScript = document.querySelector('script.giga-embed-script');
+                      if(oldScript) head.removeChild(oldScript);
+                      var script= document.createElement('script');
+                      script.src = '${location.origin + this.script}';
+                      script.onload = finishLoad;
+                      script.onerror = load;
+                      script.async = true;
+                      script.classList.add('giga-embed-script');
+                      head.appendChild(script);
+                    }
+                  }
+                  load()`
+        this.iframe = `<script type="application/javascript">
+                  ${terser.minify(script).code}
+                <\/script>`
         this.dialog.generate = false
       },
       async updateButton(close = false) {
         //change image
         if(this.image) await this.changeStoreEmbedImage(this.image, `/store/${this.store.alias}/`, 'embed')
         //change script
-        const header = genScriptHeader(), footer = genScriptFooter(), triggerBtn = getEmbedBtn(this.type), webshop = getEmbedWebshop(), reservation = getEmbedReservation(), checkIOs = checkIOs12AndLess(), mobile = mobileCheck()
-        const fnString = header + checkIOs + mobile + genStyleSheet(this.position, this.size, this.hidden) + triggerBtn + reservation + webshop + genReadyState() + footer
+        const header = genScriptHeader(),
+            footer = genScriptFooter(),
+            triggerBtn = getEmbedBtn(_.orderBy(this.type, 'order'), this.store.alias),
+            checkIOs = checkIOs12AndLess(),
+            mobile = mobileCheck(),
+            icon = genIcon(this.store.alias, this.image.mimeType, this.image.fileName.split('.')[1], 'https://cdn.restaurantplus.net')
+        const fnString = header + checkIOs + mobile + genStyleSheet(this.position, this.size, this.hidden) + icon + triggerBtn + genReadyState() + footer
         const minifyString = terser.minify(fnString).code
         const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
         this.script = await this.$getService('FileUploadStore').uploadScript(file, this.store.alias)

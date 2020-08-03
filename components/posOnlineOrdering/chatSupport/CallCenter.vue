@@ -15,6 +15,12 @@
           <span class="dot"></span>
           <span class="dot"></span>
         </div>
+        <div class="row-flex align-items-center" v-if="value.status === 'connecting'">
+          Connecting
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
         <div v-if="value.status === 'calling'" class="calling-animation">Call in progress</div>
         <div class="row-flex align-items-center" v-if="value.status === 'ending'">
           Ending
@@ -48,7 +54,7 @@
         </div>
 
         <!-- Screencast host -->
-        <iframe v-if="value.status === 'calling'"
+        <iframe v-if="value.status === 'connecting' || value.status === 'calling'"
                 :src="getCallingSrc(key)"
                 :key="key"
                 style="position: fixed; top: 300px; left: 200px; width: 0; height: 0"
@@ -77,6 +83,10 @@
       cms.socket.on('cancelCallAck', this.cancelCallAck)
       cms.socket.on('endCallAck', this.endCallAck)
       cms.socket.on('endCallFromUser', this.endCallFromUser)
+      window.addEventListener('message', this.handlemessage)
+    },
+    beforeDestroy() {
+      window.removeEventListener('message', this.handlemessage)
     },
     computed: {
       time() {
@@ -116,14 +126,22 @@
         if (agentId === this.agentId) {
           if (callAccepted) {
             if (this.callees[clientId] && this.callees[clientId].status === 'waiting') {
-              this.$set(this.callees, clientId, {status: 'calling'})
-              this.timer = setInterval(() => {
-                this.second++
-              }, 1000)
+              this.$set(this.callees, clientId, {status: 'connecting'})
+              this.connectingClientId = clientId // work-around
             }
           } else {
             console.log('rejected!')
             this.$set(this.callees, clientId, {status: 'rejected'})
+          }
+        }
+      },
+      handlemessage(e) {
+        console.log(e.data)
+        if (e.data.startsWith('webrtc--onMediaStreamReady')) {
+          console.log('webrtc--onMediaStreamReady')
+          if (this.connectingClientId) {
+            this.$set(this.callees, this.connectingClientId, {status: 'calling'})
+            this.timer = setInterval(() => this.second++, 1000)
           }
         }
       },

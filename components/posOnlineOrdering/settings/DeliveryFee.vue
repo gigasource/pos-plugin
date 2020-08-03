@@ -9,16 +9,20 @@
       <g-divider class="my-3" color="#efefef"/>
       <template v-if="type === 'zipCode'">
         <div class="delivery-fee__content-header">
-          <div class="col-9">{{$t('setting.zipCode')}}</div>
-          <div class="col-3">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div :class="requireMinOrder ? 'col-7' : 'col-9'">{{$t('setting.zipCode')}}</div>
+          <div class="col-2">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div v-if="requireMinOrder" class="col-2">{{$t('setting.minOrder')}} ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in zipCodeFees" :key="i">
-            <div class="item-code col-9">
+            <div :class="['item-code', requireMinOrder ? 'col-7' : 'col-9']">
               <input step="1" :value="item.zipCode" @input="e => updateZipCodeDebounce(item, e)"/>
             </div>
-            <div class="item-fee col-2">
+            <div :class="[requireMinOrder ? 'item-fee' : 'item-min', 'col-2']">
               <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
+            </div>
+            <div v-if="requireMinOrder" class="item-min col-2">
+              <input type="number" :value="item.minOrder" placeholder="€" @input="e => updateMinOrderDebounce(item, e)"/>
             </div>
             <div class="item-btn--delete col-1" @click.stop="removeFee(i)">
               <g-icon size="16" color="#424242">icon-close</g-icon>
@@ -29,6 +33,7 @@
           </div>
           <p class="mt-1">{{$t('setting.zipCodeNote')}}</p>
         </div>
+        <g-switch v-model="requireMinOrder" :label="$t('setting.requireMinOrder')"/>
         <g-switch v-model="acceptOrderInOtherZipCodes" :label="$t('setting.acceptOtherZipCode')"/>
         <div class="row-flex align-items-center">
           <span class="fw-700 mr-2 nowrap">{{$t('setting.otherZipcodeFee')}}</span>
@@ -84,6 +89,7 @@
       this.updateZipCodeDebounce = _.debounce(this.updateZipCode, 1000)
       this.updateFeeDebounce = _.debounce(this.updateFee, 1000)
       this.updateRadiusDebounce = _.debounce(this.updateRadius, 1000)
+      this.updateMinOrderDebounce = _.debounce(this.updateMinOrder, 1000)
     },
     mounted() {
       const inputs = document.querySelectorAll('input[type=number]')
@@ -124,6 +130,14 @@
       },
       obtainedCoordination () {
         return _.isEmpty(this.coordinates) ? 'Not Obtained - please edit your shop address' : 'Obtained'
+      },
+      requireMinOrder: {
+        get() {
+          return this.deliveryFee.requireMinOrder
+        },
+        set(val) {
+          this.updateDeliveryFee({requireMinOrder: val})
+        }
       }
     },
     methods: {
@@ -194,6 +208,16 @@
           this.deliveryFee.distanceFees.splice(index, 1)
         this.updateFees()
       },
+      updateMinOrder(item, e) {
+        if (!e.target.value || isNaN(e.target.value)) return
+        if (this.type === 'zipCode')
+          _.each(this.deliveryFee.zipCodeFees, fee => {
+            if (fee === item) {
+              fee.minOrder = e.target.value
+            }
+          })
+        this.updateFees()
+      },
     }
   }
 </script>
@@ -233,7 +257,8 @@
         background: #EFEFEF;
 
         .item-code,
-        .item-fee {
+        .item-fee,
+        .item-min {
           padding: 12px 16px;
           font-weight: 700;
           background: #FAFAFA;
@@ -251,7 +276,7 @@
           border-radius: 4px 0 0 4px;
         }
 
-        .item-fee {
+        .item-min {
           border-radius: 0 4px 4px 0;
           border-left: none;
         }
@@ -265,11 +290,11 @@
         }
 
         &:focus-within {
-          .item-code, .item-fee {
+          .item-code, .item-fee, .item-min {
             border: 1px solid #526dfe;
           }
 
-          .item-fee {
+          .item-fee, .item-min {
             border-left: none;
           }
         }

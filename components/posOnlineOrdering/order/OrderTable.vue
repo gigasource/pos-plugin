@@ -415,11 +415,11 @@
       noMenuItem() { return !this.hasMenuItem },
       hasMenuItem() { return this.orderItems.length > 0 },
       storeZipCodes() {
-        return (this.store.deliveryFee.zipCodeFees || []).map(({ zipCode, fee }) => {
+        return (this.store.deliveryFee.zipCodeFees || []).map(({ zipCode, fee, minOrder }) => {
           if (zipCode.includes(',') || zipCode.includes(';')) {
             zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
           }
-          return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee })) : { zipCode, fee }
+          return zipCode instanceof Array ? zipCode.map(code => ({ zipCode: code, fee, minOrder: minOrder || 0 })) : { zipCode, fee, minOrder: minOrder || 0  }
         }).flat()
       },
       shippingFee() {
@@ -475,6 +475,11 @@
         if (this.store.deliveryFee && !this.store.deliveryFee.acceptOrderInOtherZipCodes && this.store.deliveryFee.type === 'zipCode') {
           const zipCodes = this.storeZipCodes.map(({zipCode}) => zipCode)
           rules.push((val) => val.length < 5 || zipCodes.includes(val) || this.$t('store.unavaibleArea'))
+        }
+        if(this.store.deliveryFee && this.store.deliveryFee.type === 'zipCode' && this.store.deliveryFee.requireMinOrder) {
+          const minOrders = _.mapValues(_.mapKeys(this.storeZipCodes, c => c.zipCode), c => c.minOrder)
+          const orderTotal = this.totalPrice
+          rules.push(val => val.length < 5 || minOrders[val] < orderTotal || this.$t('store.zipCodeMinOrder', {'0': minOrders[val]}))
         }
         return rules
       },
