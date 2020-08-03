@@ -349,6 +349,8 @@
 <style scoped lang="scss">
   .restaurant-info {
     font-size: 15px;
+    overflow: auto;
+    height: 100%;
 
     &__title {
       font-size: 18px;
