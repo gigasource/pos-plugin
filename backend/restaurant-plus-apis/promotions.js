@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
     {$unwind: {path: '$store', preserveNullAndEmptyArrays: includeNonStore === 'true'}},
     {
       $match: {
-        ...storeId && {store: ObjectId(storeId)},
+        ...storeId && {'store._id': ObjectId(storeId)},
         enabled: true,
         limitNotReached: true,
       },
