@@ -364,7 +364,7 @@ router.put('/assign-device/:id', async (req, res) => {
 
     getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then();
 
-    getExternalSocketIoServer().emitToPersistent(id, 'storeAssigned', [store.id, store.name || store.settingName, store.alias]).then();
+    getExternalSocketIoServer().emitToPersistent(id, 'storeAssigned', [store.id, store.name || store.settingName, store.alias, store._id]).then();
 
     console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`,
       `Successfully assigned GSMS device to store with id ${storeId || customStoreId}`);
@@ -412,7 +412,8 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
     res.status(200).json({
       storeId: store.id,
       storeName: store.name || store.settingName,
-      storeAlias: store.alias
+      storeAlias: store.alias,
+      _id: store._id.toString()
     })
   } catch (e) {
     console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${customStoreId}`,
