@@ -21,9 +21,17 @@ const mapperConfig = {
   endDate: 'endDate',
   createdAt: 'createdAt',
   'promotion.name': 'promotion.name',
+  'promotion.description': 'promotion.description',
   'promotion.quantity': 'promotion.quantity',
-  'promotion.store.name': 'promotion.storeName',
-  'promotion.store.logoImageSrc': 'promotion.storeLogo',
+  'promotion.orderType': 'promotion.orderType',
+  'promotion.store.settingName': {
+    key: 'promotion.storeName',
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.settingName || sourceObject.store.name
+  },
+  'promotion.store.logoImageSrc': {
+    key: 'promotion.storeLogo',
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.logoImageSrc
+  },
   'promotion.price': 'promotion.price',
   'promotion.discountValue': 'promotion.discountValue',
   'promotion.discountType': 'promotion.discountType',
@@ -46,6 +54,16 @@ router.get('/', async (req, res) => {
     }
   });
   aggregateSteps.push({$unwind: {path: '$promotion'}});
+  aggregateSteps.push({$addFields: {storeId: '$promotion.store'}});
+  aggregateSteps.push({
+    $lookup: {
+      from: 'stores',
+      localField: 'storeId',
+      foreignField: '_id',
+      as: 'store',
+    }
+  });
+  aggregateSteps.push({$unwind: {path: '$store'}});
 
   if (nameSearch) aggregateSteps.push({$match: {promotionName: {$regex: nameSearch, $options: 'i'}}});
   if (status) aggregateSteps.push({$match: {status}});
