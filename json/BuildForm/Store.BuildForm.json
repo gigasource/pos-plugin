@@ -194,6 +194,11 @@
               "schemaType": "number",
               "key": "fee",
               "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "minOrder",
+              "type": "input@number"
             }
           ],
           "type": "array"
@@ -226,6 +231,11 @@
               "type": "input@number"
             }
           ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "requireMinOrder",
+          "type": "input@switch"
         }
       ],
       "type": "object"

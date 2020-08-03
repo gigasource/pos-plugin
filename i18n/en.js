@@ -371,7 +371,8 @@ module.exports = {
       pickUpIn: 'Pick up in {0} minutes',
       payByCash: 'Pay By Cash',
       paymentOption: 'PAYMENT OPTIONS',
-      notAvailable: 'Not Available'
+      notAvailable: 'Not Available',
+      zipCodeMinOrder: 'The minimum order value in your area is ${0}.'
     },
 
     paymentProviders: {
@@ -512,7 +513,9 @@ module.exports = {
       daysoffMess2: 'Thank you for understanding.',
       desc: 'Description',
       price: 'Price',
-      tax: 'Tax'
+      tax: 'Tax',
+      minOrder: 'Min order',
+      requireMinOrder: 'Require minimum order value for each zipcode'
     },
 
 

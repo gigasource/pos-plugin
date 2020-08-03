@@ -123,7 +123,7 @@
           if (cms.sharedConfig && typeof (cms.sharedConfig.getPurgeCdnData) === 'function') {
             const purgeCdnData = cms.sharedConfig.getPurgeCdnData(folder);
             if (purgeCdnData)
-              axios.get(purgeCdnData.url, purgeCdnData.options)
+              await axios.get(purgeCdnData.url, purgeCdnData.options)
           }
         } catch (e) {
           console.log(e)

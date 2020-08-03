@@ -85,7 +85,8 @@ module.exports = {
       pickUpIn: 'Abholung in {0} Minuten.',
       payByCash: 'Barzahlung',
       paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
-      notAvailable: 'Nicht Verfügbar'
+      notAvailable: 'Nicht Verfügbar',
+      zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist ${0}.'
     },
 
     common: {
@@ -229,7 +230,9 @@ module.exports = {
       daysoffMess2: 'Vielen Dank für Ihr Verständnis.',
       desc: 'Beschreibung',
       price: 'Preis',
-      tax: 'Steuer'
+      tax: 'Steuer',
+      minOrder: 'Mindestbestell',
+      requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern'
     },
 
     paymentProviders: {
