@@ -412,7 +412,8 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
     res.status(200).json({
       storeId: store.id,
       storeName: store.name || store.settingName,
-      storeAlias: store.alias
+      storeAlias: store.alias,
+      _id: store._id.toString()
     })
   } catch (e) {
     console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${customStoreId}`,
