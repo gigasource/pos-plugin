@@ -22,6 +22,8 @@ const mapperConfig = {
   calcDistance: 'calcDistance',
   logoImageSrc: 'logoImageSrc',
   orderHeaderImageSrc: 'orderHeaderImageSrc',
+  location: 'location',
+  clientDomain: 'clientDomain'
 };
 
 const storeModel = cms.getModel('Store');

@@ -28,10 +28,7 @@ const mapperConfig = {
     key: 'promotion.storeName',
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.settingName || sourceObject.store.name
   },
-  'promotion.store.logoImageSrc': {
-    key: 'promotion.storeLogo',
-    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.logoImageSrc
-  },
+  'promotion.store.logoImageSrc': 'promotion.storeLogo',
   'promotion.price': 'promotion.price',
   'promotion.discountValue': 'promotion.discountValue',
   'promotion.discountType': 'promotion.discountType',
