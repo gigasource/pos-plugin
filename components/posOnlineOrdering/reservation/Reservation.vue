@@ -411,6 +411,7 @@
           guests:${reservationData.noOfGuests};date:${reservationData.date};time:${reservationData.time};
           customer:${reservationData.customer.name || 'no name'},${reservationData.customer.email || 'no email'},${reservationData.phone || 'no phone'};
           note:${reservationData.note}`)
+        this.dialog.confirm = false
       },
       completeReservation() {
         let err = false
@@ -455,7 +456,6 @@
         this.reservations = await cms.getModel('Reservation').find({store: this.store._id, date})
       },
       closeDialogConfirm() {
-        this.clearData()
         this.dialog.confirm = false
       }
     }
