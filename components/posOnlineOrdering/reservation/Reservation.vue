@@ -94,9 +94,8 @@
           <g-text-field-bs :class="rules.phone && 'phone-error'" :rules="validatePhone" validate-on-blur type="number" v-model="customer.phone" @input="rules.phone = false" placeholder="Phone Number*" required/>
           <div class="reservation-content__title mt-4">Note</div>
           <g-textarea no-resize rows="3" v-model="customer.note"/>
-          <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" :style="{background: mode === 'processing' ? '#9E9E9E' : '#1271FF'}" @click="completeReservation">
-            <template v-if="mode === 'processing'"><g-progress-circular indeterminate/></template>
-            <template v-else>Complete</template>
+          <g-btn-bs :disabled="unavailableComplete" class="reservation-btn" @click="dialog.confirm = true">
+            Complete
           </g-btn-bs>
         </template>
       </div>
@@ -133,6 +132,25 @@
         <div class="dialog-notice__message">The restaurant does not accept reservation request at the moment. Please try again later!</div>
         <g-btn-bs text-color="indigo accent-2" @click="dialog.notice = false">Close</g-btn-bs>
       </div>
+    </g-dialog>
+
+    <g-dialog v-model="dialog.confirm" width="392">
+      <g-card class="pa-3">
+        <div class="fs-large-3 fw-600 mb-4">Confirm Reservation</div>
+        <div class="ta-center mb-3">
+          Are you sure you want to book the following reservation?
+        </div>
+        <div class="ta-center fw-700 mb-4">
+          {{reservationDetail}}
+        </div>
+        <div class="row-flex justify-end">
+          <g-btn-bs text-color="#424242" @click="closeDialogConfirm">Cancel</g-btn-bs>
+          <g-btn-bs min-width="100" text-color="white" :style="{background: mode === 'processing' ? '#9E9E9E' : '#1271FF'}" @click="completeReservation">
+            <template v-if="mode === 'processing'"><g-progress-circular indeterminate/></template>
+            <template v-else>Confirm</template>
+        </g-btn-bs>
+        </div>
+      </g-card>
     </g-dialog>
   </div>
 </template>
@@ -179,7 +197,8 @@
           email: [],
         },
         dialog: {
-          notice: false
+          notice: false,
+          confirm: false,
         },
         noRequest: false,
         locale: String,
@@ -329,6 +348,9 @@
           }
         }
         return list
+      },
+      reservationDetail() {
+        return `${this.date && dayjs(this.date).format('DD/MM')} ${this.timeLabel} - ${this.peopleLabel} - ${this.customer.firstName} ${this.customer.lastName}`
       }
     },
     methods: {
@@ -431,6 +453,10 @@
       },
       async getReservationList(date) {
         this.reservations = await cms.getModel('Reservation').find({store: this.store._id, date})
+      },
+      closeDialogConfirm() {
+        this.clearData()
+        this.dialog.confirm = false
       }
     }
   }
