@@ -50,4 +50,14 @@ router.get('/nearby', async (req, res) => {
   res.status(200).json(mappedStores.map(e => objectMapper(e, mapperConfig)))
 })
 
+router.get('/:id/menu', async (req, res) => {
+  const { id } = req.params
+  if (!id) res.sendStatus(400)
+
+  const products = await cms.getModel('Product').find({ store: id }).lean()
+  const categories = await cms.getModel('Category').find({ store: id }).lean()
+
+  res.status(200).json({ products, categories })
+})
+
 module.exports = router
