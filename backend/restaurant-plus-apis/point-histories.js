@@ -10,6 +10,7 @@ const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
 router.post('/', async (req, res) => {
   const {storeId, userId, value, transactionType} = req.body;
   if (!userId || !value) return respondWithError(res, 400, 'Missing property in request body');
+  if (typeof value !== 'number') return respondWithError(res, 400, "Property 'value' must be number");
   if (!POINT_HISTORY_TRANSACTION_TYPE.VALUE_ARRAY.includes(transactionType)) return respondWithError(res, 400, 'Invalid transaction type');
 
   switch (transactionType) {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {respondWithError} = require('./utils');
+const ObjectId = require('mongoose').Types.ObjectId;
 const UserModel = cms.getModel('RPUser');
 const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin'); // admin is initialized in another file
@@ -14,6 +15,7 @@ const mapperConfig = {
   rpPoints: 'rpPoints',
   createdAt: 'createdAt',
   firebaseUid: 'firebaseUid',
+  email: 'email',
 }
 
 function verifyIdToken(idToken) {
@@ -28,6 +30,20 @@ router.get('/by-id/:userId', async (req, res) => {
   if (!user) return respondWithError(res, 400, 'Invalid user id');
 
   res.status(200).json(objectMapper(user, mapperConfig));
+});
+
+router.put('/:userId', async (req, res) => {
+  const {userId} = req.params;
+  if (!userId) return respondWithError(res, 400, 'Missing user id in request');
+
+  const {name, email, addresses} = req.body;
+  const newUser = await UserModel.findOneAndUpdate({_id: ObjectId(userId)}, {
+    ...name && name,
+    ...addresses && addresses,
+    ...email && email,
+  }, {new: true});
+
+  res.status(200).json(objectMapper(newUser, mapperConfig));
 });
 
 router.post('/authenticate', async (req, res) => {

@@ -66,6 +66,11 @@
       "schemaType": "mixed",
       "key": "rpPoints",
       "mixed": true
+    },
+    {
+      "_id": "5f291972efb0379d70c579b6",
+      "schemaType": "string",
+      "key": "email"
     }
   ],
   "name": "RPUser",
