@@ -5,11 +5,11 @@
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
-      <chat-support v-else-if="view === 'chatSupport'"
+      <chat-support v-else-if="view === 'chatSupport' && chatSupportPerm"
                     :has-new-messages="hasNewMessages"
                     :selected-device-id-prop="selectedDeviceIdForChat"
                     @all-messages-replied="checkNewMessages"/>
-      <support @select-chat="supportSelectChat" v-else-if="view === 'support'"/>
+      <support @select-chat="supportSelectChat" v-else-if="view === 'support' && chatSupportPerm"/>
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@
     components: {Support, ChatSupport, StoreManagement, Account, VersionControl},
     props: {},
     injectService: [
-      'PermissionStore:(versionControlPerm,manageAccountPerm)'
+      'PermissionStore:(versionControlPerm,manageAccountPerm,chatSupportPerm,signInSupportPerm)'
     ],
     data: function () {
       return {

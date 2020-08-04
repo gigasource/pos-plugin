@@ -50,6 +50,14 @@
        */
       importExportMenu() {
         return _.find(this.userPermissions, perm => perm.permission === 'importExportMenu' && perm.value === true)
+      },
+      chatSupportPerm() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
+      },
+      signInSupportPerm() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
       }
     },
     data() {
