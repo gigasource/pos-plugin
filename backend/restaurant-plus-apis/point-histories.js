@@ -1,11 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const {respondWithError} = require('./utils');
+const objectMapper = require('object-mapper');
 
 const UserModel = cms.getModel('RPUser');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
 const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
+
+const mapperConfig = {
+  _id: '_id',
+  store: 'store',
+  restaurantPlusUser: 'user',
+  value: 'value',
+  transactionType: 'transactionType',
+  createdAt: 'createdAt',
+}
+
+router.get('/', async (req, res) => {
+
+});
 
 router.post('/', async (req, res) => {
   const {storeId, userId, value, transactionType} = req.body;
@@ -19,7 +33,7 @@ router.post('/', async (req, res) => {
 
       const transaction = await PointHistoryModel.create({
         store: storeId,
-        user: userId,
+        restaurantPlusUser: userId,
         value,
         transactionType,
         createdAt: new Date(),
@@ -32,7 +46,7 @@ router.post('/', async (req, res) => {
 
       await UserModel.updateOne({_id: user._id}, {rpPoints: currentUserPoints});
 
-      res.status(201).json(transaction);
+      res.status(201).json(objectMapper(transaction, mapperConfig));
       break;
     }
 /*    case POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER: {
