@@ -85,6 +85,18 @@ module.exports = {
       },
       path: 'style/pos.css'
     },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/bridge/node_bridge.js'
+    // },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/bridge/rn_bridge.js'
+    },
     {
       loader: {
         type: 'backend-api'

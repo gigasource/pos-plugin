@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preinstall": "if [ ! -d android-dist/pos-android ]; then cd android-dist; git clone git@github.com:gigasource/pos-android.git; fi",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pkg:macos": "pkg --config pkg.config.js --targets node10-macos-x64 --output out/app index.js --no-bytecode",
-    "build:android": "node android/pkg.js",
+    "build:ios:nativescript": "cd nativescript && tns build ios --env.uglify && cp -R platforms/ios/nativescript/app ../runtime/ios-runtime/projects/MyApp/",
+    "build:android:nativescript": "cd nativescript && tns build android  --env.uglify && cp -R platforms/android/app/src/main/assets/app ../runtime/android-runtime/test-app/app/src/main/assets/",
+    "build": "node android/pkg.js",
     "build:win32": "node win32/pkg.js",
-    "build:android:dest": "node android/pkg.js && cp build/app-android android-dist/app/src/main/assets/appAssets/app",
+    "build:android:dest": "node android/pkg.js && cp build/app-android runtime/android-runtime/test-app/app/src/main/assets/nodejs-project/ && cp build/app-android.js runtime/android-runtime/test-app/app/src/main/assets/nodejs-project/",
+    "build:ios:dest": "node ios/pkg.js && cp build/app-ios runtime/ios-runtime/projects/MyApp/nodejs-project/ && cp build/app-ios.js runtime/ios-runtime/projects/MyApp/nodejs-project/",
+    "build:ios": "npm run build:ios:dest && npm run build:ios:nativescript",
+    "build:android": "npm run build:android:dest && npm run build:android:nativescript",
     "prebuild:apk": "if [ ! -d ../../../dist ]; then cd ../../../;npm run build; fi",
     "build:apk": "npm run build:android:dest && cd android-dist && ./gradlew build"
   },
@@ -18,7 +22,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "form-data": "^3.0.0",
-    "giga-pkg-patches": "github:gigasource/giga-pkg-patches#1.0.2",
+    "giga-pkg-patches": "github:gigasource/giga-pkg-patches#1.0.3",
     "pkg": "^4.4.4",
     "yargs": "^15.3.1"
   }

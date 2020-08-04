@@ -1,0 +1,7 @@
+<Page xmlns="http://www.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo">
+    <!-- >> web-view-xml -->
+    <GridLayout>
+        <WebView loaded="onWebViewLoaded" id="myWebView" src="{{ webViewSrc }}"/>
+    </GridLayout>
+    <!-- << web-view-xml -->
+</Page>
