@@ -309,14 +309,14 @@
                     if(turn < 100) {
                       turn++;
                       var head = document.getElementsByTagName('head')[0];
-                      var oldScript = document.querySelector('script.giga-embed-script');
+                      var oldScript = document.querySelector('script.restaurant-plus-embed-script');
                       if(oldScript) head.removeChild(oldScript);
                       var script= document.createElement('script');
                       script.src = '${location.origin + this.script}';
                       script.onload = finishLoad;
                       script.onerror = load;
                       script.async = true;
-                      script.classList.add('giga-embed-script');
+                      script.classList.add('restaurant-plus-embed-script');
                       head.appendChild(script);
                     }
                   }
@@ -349,6 +349,8 @@
 <style scoped lang="scss">
   .restaurant-info {
     font-size: 15px;
+    overflow: auto;
+    height: 100%;
 
     &__title {
       font-size: 18px;

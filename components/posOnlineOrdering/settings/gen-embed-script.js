@@ -125,7 +125,7 @@ export function getEmbedBtn(types, alias) {
     typeIframeScript += genIframe(type.type, type.link, alias)
   }
   return `function getEmbedBtn() {
-      var el = document.getElementById('giga-embed-btn');
+      var el = document.getElementById('restaurant-plus-embed-btn');
       getStyleSheet();
       var isOldIOs = checkIOs12AndLess();
       ${typeIframeScript}
@@ -151,7 +151,7 @@ export function genScriptFooter() {
 
 
 export function genStyleSheet(position, size, hidden) {
-  let style = `.giga-embed-btn { position: fixed; z-index: 1000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
+  let style = `.restaurant-plus-embed-btn { position: fixed; z-index: 1000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
 
   const directions = position.split('-')
   style += directions[1] + ': 8px;'
@@ -199,7 +199,7 @@ export function genStyleSheet(position, size, hidden) {
     var stylesheet = styleEl.sheet
     stylesheet.insertRule('${style}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
-    stylesheet.insertRule('.giga-embed-btn object { pointer-events: none; max-width: ${width} }')
+    stylesheet.insertRule('.restaurant-plus-embed-btn object { pointer-events: none; max-width: ${width} }')
   }`
 }
 
@@ -228,11 +228,11 @@ export function mobileCheck() {
 
 export function genIcon(alias, mimeType, ext, location) {
   return `(function () {
-    var el = document.getElementById('giga-embed-btn')
+    var el = document.getElementById('restaurant-plus-embed-btn')
     if(!el) {
       el = document.createElement('div')
-      el.id = 'giga-embed-btn'
-      el.classList.add('giga-embed-btn')
+      el.id = 'restaurant-plus-embed-btn'
+      el.classList.add('restaurant-plus-embed-btn')
       document.body.appendChild(el)
     }
     if(el && !el.hasChildNodes()) {

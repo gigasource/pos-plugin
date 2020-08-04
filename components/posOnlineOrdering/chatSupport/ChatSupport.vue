@@ -56,7 +56,7 @@
               :device="selectedDevice"
               :username="selectedUsername"
               :location="selectedDeviceLocation"
-              :stores="stores"
+              :stores="availableStores"
               :username-map="usernameMap"
               @assign-store="assignStore"
               @update-username="updateUsername"
@@ -114,6 +114,9 @@
   export default {
     name: 'ChatSupport',
     components: { CallCenter, ChatInfo, ChatWindow},
+    injectService: [
+      'PermissionStore:(appReviewerPerm)'
+    ],
     props: {
       selectedDeviceIdProp: String,
       hasNewMessages: Boolean,
@@ -159,8 +162,6 @@
       }
     },
     async created() {
-      await this.getGsmsDevices()
-
       const stores = await cms.getModel('Store').find().lean()
       this.stores = stores.map(store => {
         return {
@@ -169,6 +170,8 @@
           name: `${store.id}. ${store.name || store.settingName} (${store.alias})`,
         }
       }).sort((s1, s2) => +s1.id - +s2.id)
+      
+      await this.getGsmsDevices()
 
       cms.socket.on('chatMessage', this.receiveChatMessage)
       cms.socket.on('newGsmsDevice', device => this.devices.unshift(this.convertDevice(device)))
@@ -252,7 +255,7 @@
             break;
           }
         }
-
+        
         if (!this.loadingMoreDevices && this.moreDevicesAvailable && devices.length < this.devicesPerLoad) {
           this.$nextTick(this.getGsmsDevices)
         }
@@ -276,6 +279,15 @@
         return (this.selectedDevice &&
             this.selectedDevice.metadata &&
             this.selectedDevice.metadata.deviceLocation) || 'Unknown location'
+      },
+      demoStore() {
+        return _.find(this.stores, store => store && store.name && store.name.indexOf("(enjoysushi)") > -1)
+      },
+      availableStores() {
+        if (this.appReviewerPerm)
+          return this.demoStore? [this.demoStore] : []
+        else
+          return this.stores
       }
     },
     watch: {
@@ -376,7 +388,7 @@
 
         this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
         this.devices = this.devices.map(device => this.convertDevice(device))
-
+        
         const deviceIds = gsmsDevices.map(({_id}) => _id)
         this.getChatMessageCount(deviceIds).then(messageCountMap => {
           Object.keys(messageCountMap).forEach(deviceId => {
@@ -389,6 +401,15 @@
         })
 
         this.loadingMoreDevices = false
+        
+        if (this.appReviewerPerm) {
+          if (this.demoStore) {
+            this.$set(this, 'devices', _.filter(this.devices, device => device.storeId === this.demoStore._id))
+          } else {
+            this.$set(this, 'devices', [])
+          }
+        }
+
         return this.devices
       },
       async getChatMessages(deviceId, n, offset) {
@@ -503,6 +524,11 @@
         trailing: false,
       }),
       async addNote(note) {
+        if (this.appReviewerPerm) {
+          alert("Warning: add note in review mode is not allowed")
+          return
+        }
+        
         const apiUrl = '/support/notes'
         const {data} = await axios.post(apiUrl, note)
         this.selectedDevice.notes = this.selectedDevice.notes || []
@@ -515,6 +541,10 @@
         await this.mapNoteUserIdsToNames()
       },
       async assignStore(storeId) {
+        if (this.appReviewerPerm) {
+          alert("Warning: assign store in review mode has been disabled")
+          return
+        }
         const deviceId = this.selectedDeviceId
         const assingApiUrl = `/support/assign-device/${deviceId}`
         await axios.put(assingApiUrl, {storeId})
@@ -563,6 +593,11 @@
         this.devices.splice(deviceIndex, 1, {...device})
       },
       async updateUsername(username) {
+        if (this.appReviewerPerm) {
+          alert("Warning: update username in review mode is not allowed")
+          return
+        }
+        
         const apiUrl = `/gsms-device/device-metadata`
         const payload = {clientId: this.selectedDeviceId, metadata: {customerName: username}}
         await axios.put(apiUrl, payload)
@@ -576,6 +611,10 @@
         }
       },
       async deleteDevice(deviceId) {
+        if (this.appReviewerPerm) {
+          alert("Warning: delete device in review mode is not allowed")
+          return
+        }
         this.selectedDeviceId = null
         const deviceIndex = this.devices.findIndex(({_id}) => _id === deviceId)
         if (!isNil(deviceIndex)) this.devices.splice(deviceIndex, 1)

@@ -5,11 +5,11 @@
       <store-management v-if="view === 'store-management'"/>
       <version-control v-else-if="view === 'version' && versionControlPerm"/>
       <account v-else-if="view === 'account' && manageAccountPerm"/>
-      <chat-support v-else-if="view === 'chatSupport'"
+      <chat-support v-else-if="view === 'chatSupport' && (chatSupportPerm || appReviewerPerm)"
                     :has-new-messages="hasNewMessages"
                     :selected-device-id-prop="selectedDeviceIdForChat"
                     @all-messages-replied="checkNewMessages"/>
-      <support @select-chat="supportSelectChat" v-else-if="view === 'support'"/>
+      <support @select-chat="supportSelectChat" v-else-if="view === 'support' && signInSupportPerm"/>
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@
     components: {Support, ChatSupport, StoreManagement, Account, VersionControl},
     props: {},
     injectService: [
-      'PermissionStore:(versionControlPerm,manageAccountPerm)'
+      'PermissionStore:(versionControlPerm,manageAccountPerm,chatSupportPerm,signInSupportPerm,appReviewerPerm)'
     ],
     data: function () {
       return {
@@ -72,14 +72,18 @@
           }
         }
 
-        items.push({
-          icon: 'headset_mic',
-          ...this.hasNewMessages && {appendIcon: 'icon-new-chat-messages-notification'},
-          title: 'Chat Support',
-          onClick: () => this.changeView('chatSupport', 'Chat Support')
-        })
-
-        items.push({ title: 'Sign-in Requests', icon: 'headset_mic', onClick: () => this.changeView('support', 'Sign-in Requests') })
+        if (this.chatSupportPerm || this.appReviewerPerm) {
+          items.push({
+            icon: 'headset_mic',
+            ...this.hasNewMessages && {appendIcon: 'icon-new-chat-messages-notification'},
+            title: 'Chat Support',
+            onClick: () => this.changeView('chatSupport', 'Chat Support')
+          })
+        }
+        
+        if (this.signInSupportPerm) {
+          items.push({ title: 'Sign-in Requests', icon: 'headset_mic', onClick: () => this.changeView('support', 'Sign-in Requests') })
+        }
         return items
       },
     },

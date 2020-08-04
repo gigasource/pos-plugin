@@ -50,12 +50,24 @@
        */
       importExportMenu() {
         return _.find(this.userPermissions, perm => perm.permission === 'importExportMenu' && perm.value === true)
+      },
+      chatSupportPerm() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
+      },
+      signInSupportPerm() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
+      },
+      // permission used for Apple's App Store and Google Play
+      appReviewerPerm() {
+        return _.find(this.userPermissions, perm => perm.permission === 'appReview' && perm.value === true)
       }
     },
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu"]
+        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu", "appReview"]
       }
     },
     async created() {

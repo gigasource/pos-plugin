@@ -103,6 +103,14 @@
             {
               "value": "importExportMenu",
               "text": "Import Export Menu"
+            },
+            {
+              "value": "backupDatabaseCredentials",
+              "text": "Get Backup Database Credentials"
+            },
+            {
+              "value": "appReview",
+              "text": "App Review"
             }
           ]
         },
