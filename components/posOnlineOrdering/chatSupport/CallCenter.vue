@@ -136,8 +136,7 @@
         }
       },
       handlemessage(e) {
-        console.log(e.data)
-        if (e.data.startsWith('webrtc--onMediaStreamReady')) {
+        if (typeof(e.data) == 'string' && e.data.startsWith('webrtc--onMediaStreamReady')) {
           console.log('webrtc--onMediaStreamReady')
           if (this.connectingClientId) {
             this.$set(this.callees, this.connectingClientId, {status: 'calling'})
