@@ -24,9 +24,10 @@ const mapperConfig = {
   'promotion.description': 'promotion.description',
   'promotion.quantity': 'promotion.quantity',
   'promotion.orderType': 'promotion.orderType',
+  'promotion.store._id': 'promotion.store._id',
   'promotion.store.settingName': {
     key: 'promotion.storeName',
-    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.settingName || sourceObject.store.name
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.promotion.store.name
   },
   'promotion.store.logoImageSrc': 'promotion.storeLogo',
   'promotion.price': 'promotion.price',
@@ -73,7 +74,7 @@ router.get('/by-id/:voucherId', async (req, res) => {
   const {voucherId} = req.params;
   if (!voucherId) return respondWithError(res, 400, 'Missing voucher ID in request');
 
-  const voucher = await VoucherModel.findById(voucherId);
+  const voucher = await VoucherModel.findById(voucherId).populate('promotion.store');
   res.status(200).json(objectMapper(voucher, mapperConfig));
 });
 

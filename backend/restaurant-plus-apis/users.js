@@ -10,8 +10,10 @@ const mapperConfig = {
   _id: '_id',
   name: 'name',
   phoneNumber: 'phoneNumber',
-  addresses: 'addresses',
+  addresses: 'addresses[]',
   rpPoint: 'rpPoint',
+  createdAt: 'createdAt',
+  firebaseUid: 'firebaseUid',
 }
 
 function verifyIdToken(idToken) {
@@ -58,8 +60,8 @@ router.post('/authenticate', async (req, res) => {
 });
 
 router.post('/check-id-token', async (req, res) => {
-  const {idToken, uid} = req.body;
-  if (!idToken || !uid) return respondWithError(res, 400, 'Missing property in request body');
+  const {idToken, uid, userId} = req.body;
+  if (!idToken || !uid || !userId) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token format');
 
   let decodedIdToken;
@@ -71,11 +73,15 @@ router.post('/check-id-token', async (req, res) => {
     decodedIdToken = null
   }
 
-  if (decodedIdToken && decodedIdToken.uid === uid) {
-    res.status(204).send();
-  } else {
-    respondWithError(res, 400, 'Invalid token');
+  if (decodedIdToken) {
+    const user = await UserModel.findById(userId);
+
+    if (user.firebaseUid === uid && decodedIdToken.uid === uid) {
+      return res.status(200).json(objectMapper(user, mapperConfig));
+    }
   }
+
+  respondWithError(res, 400, 'Invalid token');
 });
 
 module.exports = router;

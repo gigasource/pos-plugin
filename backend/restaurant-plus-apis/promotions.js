@@ -27,6 +27,7 @@ const mapperConfig = {
     key: 'descriptionImageUrl',
     transform: sourceValue => sourceValue || DEFAULT_PROMOTION_BACKGROUND
   },
+  issuedVoucherCount: 'issuedVoucherCount',
 }
 
 router.get('/', async (req, res) => {
@@ -40,7 +41,12 @@ router.get('/', async (req, res) => {
       as: 'issuedVouchers'
     }
   },
-    {$addFields: {limitNotReached: {$lte: [{$size: '$issuedVouchers'}, '$quantity']}}},
+    {
+      $addFields: {
+        limitNotReached: {$lte: [{$size: '$issuedVouchers'}, '$quantity']},
+        issuedVoucherCount: {$size: '$issuedVouchers'},
+      }
+    },
     {$unset: 'issuedVouchers'},
     {
       $lookup: {
@@ -66,7 +72,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const {
     name, quantity, startDate, endDate, storeId, price, discountType, discountValue, description, orderType, limitForUser,
-    duration, descriptionImageUrl,
+    duration, descriptionImageUrl, enabled
   } = req.body;
 
   if (!name || !storeId || !orderType) return respondWithError(res, 400, 'Missing property in request body');
@@ -80,21 +86,59 @@ router.post('/', async (req, res) => {
 
   const newPromotion = await PromotionModel.create({
     name,
-    quantity: quantity || 0,
+    quantity: +quantity || 0,
     startDate: startDate && new Date(startDate),
     endDate: endDate && new Date(endDate),
+    enabled,
     store: storeId,
-    price: price || 0,
+    price: +price || 0,
     discountType,
     discountValue,
     description,
     orderType,
-    limitForUser: limitForUser || 0,
-    duration: duration || 0,
+    limitForUser: +limitForUser || 0,
+    duration: +duration || 0,
     descriptionImageUrl,
   });
 
   res.status(201).json(newPromotion);
+});
+
+router.put('/:promotionId', async (req, res) => {
+  const {promotionId} = req.params;
+  const {
+    name, quantity, startDate, endDate, storeId, price, discountType, discountValue, description, orderType, limitForUser,
+    duration, descriptionImageUrl, enabled
+  } = req.body;
+
+  if (!promotionId) return respondWithError(res, 400, 'Missing promotion ID in request');
+  if (!name || !storeId || !orderType) return respondWithError(res, 400, 'Missing property in request body');
+  if (quantity < 0) return respondWithError(res, 400, 'Invalid quantity');
+  if (price < 0) return respondWithError(res, 400, 'Invalid price');
+  if (discountValue < 0) return respondWithError(res, 400, 'Invalid discount value');
+  if (limitForUser < 0) return respondWithError(res, 400, 'Invalid voucher limit for user');
+  if (duration < 0) return respondWithError(res, 400, 'Invalid voucher duration');
+  if (!PROMOTION_ORDER_TYPE.VALUE_ARRAY.includes(orderType)) return respondWithError(res, 400, 'Invalid voucher order type');
+  if (!PROMOTION_DISCOUNT_TYPE.VALUE_ARRAY.includes(discountType)) return respondWithError(res, 400, 'Invalid voucher discount type');
+
+  const newPromotion = await PromotionModel.findOneAndUpdate({_id: promotionId}, {
+    ...name && {name},
+    ...quantity && {quantity: +quantity},
+    ...startDate && {startDate: new Date(startDate)},
+    ...endDate && {endDate: new Date(endDate)},
+    ...enabled && {enabled},
+    ...storeId && {store: storeId},
+    ...price && {price: +price},
+    ...discountType && {discountType},
+    ...discountValue && {discountValue},
+    ...description && {description},
+    ...orderType && {orderType},
+    ...limitForUser && {limitForUser: +limitForUser},
+    ...duration && {duration: +duration},
+    ...descriptionImageUrl && {descriptionImageUrl},
+  }, {new: true});
+
+  res.status(200).json(newPromotion);
 });
 
 module.exports = router;
