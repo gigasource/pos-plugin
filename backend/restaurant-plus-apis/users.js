@@ -11,7 +11,7 @@ const mapperConfig = {
   name: 'name',
   phoneNumber: 'phoneNumber',
   addresses: 'addresses[]',
-  rpPoint: 'rpPoint',
+  rpPoints: 'rpPoints',
   createdAt: 'createdAt',
   firebaseUid: 'firebaseUid',
 }
@@ -51,7 +51,7 @@ router.post('/authenticate', async (req, res) => {
     if (user) {
       res.status(200).json(objectMapper(user, mapperConfig));
     } else {
-      user = await UserModel.create({name, phoneNumber, addresses: [], createdAt: new Date(), rpPoint: 0, firebaseUid});
+      user = await UserModel.create({name, phoneNumber, addresses: [], createdAt: new Date(), rpPoints: {}, firebaseUid});
       res.status(201).json(objectMapper(user, mapperConfig));
     }
   } else {

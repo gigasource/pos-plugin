@@ -25,9 +25,11 @@ router.post('/', async (req, res) => {
       });
 
       const user = await UserModel.findById(userId);
-      const currentUserPoint = user.rpPoint;
+      const currentUserPoints = user.rpPoints;
 
-      await UserModel.updateOne({_id: user._id}, {rpPoint: currentUserPoint - value});
+      currentUserPoints[storeId] = (currentUserPoints[storeId] || 0) + value
+
+      await UserModel.updateOne({_id: user._id}, {rpPoints: currentUserPoints});
 
       res.status(201).json(transaction);
       break;
