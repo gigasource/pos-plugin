@@ -145,7 +145,7 @@ router.post('/', async (req, res) => {
 
   await PointHistoryModel.create({
     voucher: newVoucher._id,
-    user: user._id,
+    restaurantPlusUser: user._id,
     value: promotion.price,
     transactionType: POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER,
     createdAt: new Date(),

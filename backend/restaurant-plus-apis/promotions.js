@@ -19,6 +19,7 @@ const mapperConfig = {
   createdAt: 'createdAt',
   startDate: 'startDate',
   endDate: 'endDate',
+  'store._id': 'store._id',
   'store.settingName': {
     key: 'store.settingName',
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.name

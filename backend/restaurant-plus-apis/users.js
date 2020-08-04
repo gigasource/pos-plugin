@@ -3,6 +3,8 @@ const router = express.Router();
 const {respondWithError} = require('./utils');
 const ObjectId = require('mongoose').Types.ObjectId;
 const UserModel = cms.getModel('RPUser');
+const StoreModel = cms.getModel('Store');
+const PointHistoryModel = cms.getModel('RPPointHistory');
 const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin'); // admin is initialized in another file
 const objectMapper = require('object-mapper');
@@ -18,9 +20,47 @@ const mapperConfig = {
   email: 'email',
 }
 
+const storeMapperConfig = {
+  _id: '_id',
+  logoImageSrc: 'logoImageSrc',
+  settingName: {
+    key: 'name',
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.name
+  },
+}
+
 function verifyIdToken(idToken) {
   return admin.auth().verifyIdToken(idToken);
 }
+
+router.get('/rp-points/:userId', async (req, res) => {
+  const {userId} = req.params;
+  if (!userId) return respondWithError(res, 400, 'Missing user id in request');
+
+  const user = await UserModel.findById(userId);
+  if (!user) return respondWithError(res, 400, 'Invalid user id');
+
+  const {rpPoints} = user;
+  const storeIds = Object.keys(rpPoints);
+
+  const transactions = await PointHistoryModel.aggregate([
+    {$match: {store: {$in: storeIds.map(e => ObjectId(e))}, restaurantPlusUser: ObjectId(userId)}},
+    {$sort: {createdAt: -1}},
+    {$group: {_id: '$store', createdAt: {$first: '$createdAt'}}},
+  ]);
+
+  const stores = await StoreModel.find({_id: {$in: storeIds}});
+  storeIds.forEach(storeId => {
+    const pointValue = rpPoints[storeId];
+    rpPoints[storeId] = {
+      value: pointValue,
+      store: objectMapper(stores.find(({_id}) => _id.toString() === storeId)._doc, storeMapperConfig),
+      lastTransactionDate: transactions.find(({_id}) => _id.toString() === storeId).createdAt,
+    }
+  });
+
+  res.status(200).json(rpPoints);
+})
 
 router.get('/by-id/:userId', async (req, res) => {
   const {userId} = req.params;
@@ -67,7 +107,14 @@ router.post('/authenticate', async (req, res) => {
     if (user) {
       res.status(200).json(objectMapper(user, mapperConfig));
     } else {
-      user = await UserModel.create({name, phoneNumber, addresses: [], createdAt: new Date(), rpPoints: {}, firebaseUid});
+      user = await UserModel.create({
+        name,
+        phoneNumber,
+        addresses: [],
+        createdAt: new Date(),
+        rpPoints: {},
+        firebaseUid
+      });
       res.status(201).json(objectMapper(user, mapperConfig));
     }
   } else {

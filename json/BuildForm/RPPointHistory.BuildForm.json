@@ -12,7 +12,7 @@
     {
       "_id": "5f1ffa35dac84c7fb5c37646",
       "schemaType": "objectId",
-      "key": "user",
+      "key": "restaurantPlusUser",
       "ref": "RPUser",
       "autopopulate": true
     },
