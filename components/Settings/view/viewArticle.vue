@@ -96,22 +96,28 @@
         get() {
           return this.productPagination.limit;
         },
-        async set(val) {
+        set(val) {
           this.productPagination.limit = val;
-          await this.getListProducts();
         }
       },
       currentPage: {
         get() {
           return this.productPagination.currentPage
         },
-        async set(val) {
+        set(val) {
           this.productPagination.currentPage = val
-          await this.getListProducts()
           this.selectedProductIDs = []
           this.selectedProduct = null
         }
       }
+    },
+    watch: {
+      async limit() {
+        await this.getListProducts();
+      },
+      async currentPage() {
+        await this.getListProducts();
+      },
     },
     methods: {
       async addFilter(filter) {
