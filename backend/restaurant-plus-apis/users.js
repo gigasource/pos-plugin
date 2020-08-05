@@ -88,8 +88,8 @@ router.put('/:userId', async (req, res) => {
 });
 
 router.post('/authenticate', async (req, res) => {
-  const {idToken, firebaseToken, phoneNumber, name} = req.body;
-  if (!idToken || !phoneNumber || !name) return respondWithError(res, 400, 'Missing property in request body');
+  const {idToken, firebaseToken, phoneNumber, name, signInType} = req.body;
+  if (!idToken || (signInType === 'phoneNumber' && !phoneNumber) || !name) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
   let decodedIdToken;
@@ -112,11 +112,12 @@ router.post('/authenticate', async (req, res) => {
     } else {
       user = await UserModel.create({
         name,
-        phoneNumber,
+        ...phoneNumber && {phoneNumber},
         addresses: [],
         createdAt: new Date(),
         rpPoints: {},
-        firebaseUid
+        firebaseUid,
+        initialSignInType: signInType,
       });
       res.status(201).json(objectMapper(user, mapperConfig));
     }

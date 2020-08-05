@@ -71,6 +71,18 @@
       "_id": "5f291972efb0379d70c579b6",
       "schemaType": "string",
       "key": "email"
+    },
+    {
+      "_id": "5f2a3c0550f58db79db2800d",
+      "schemaType": "string",
+      "key": "firebaseToken",
+      "type": "input"
+    },
+    {
+      "_id": "5f2a88b94ad262b2ae412130",
+      "schemaType": "string",
+      "key": "initialSignInType",
+      "type": "input"
     }
   ],
   "name": "RPUser",
