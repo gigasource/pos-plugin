@@ -111,6 +111,14 @@
             {
               "value": "appReview",
               "text": "App Review"
+            },
+            {
+              "value": "chatSupport",
+              "text": "Chat Support"
+            },
+            {
+              "value": "signInRequest",
+              "text": "Sign In Request"
             }
           ]
         },
