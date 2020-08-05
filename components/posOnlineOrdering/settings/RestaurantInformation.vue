@@ -299,6 +299,7 @@
       },
       async generateCode() {
         await this.updateButton()
+        const origin = location.origin.includes('online-order') || location.origin.includes('8888') ? location.origin : 'https://cdn.restaurantplus.net'
         const script = `var turn = 0;
                   function finishLoad() {
                     turn = 100;
@@ -312,7 +313,7 @@
                       var oldScript = document.querySelector('script.restaurant-plus-embed-script');
                       if(oldScript) head.removeChild(oldScript);
                       var script= document.createElement('script');
-                      script.src = '${location.origin + this.script}';
+                      script.src = '${origin + this.script}';
                       script.onload = finishLoad;
                       script.onerror = load;
                       script.async = true;

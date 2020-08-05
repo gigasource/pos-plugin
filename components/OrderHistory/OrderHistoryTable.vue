@@ -71,19 +71,25 @@
         get() {
           return this.orderHistoryPagination.limit;
         },
-        async set(val) {
+        set(val) {
           this.orderHistoryPagination.limit = val;
-          await this.getOrderHistory();
         }
       },
       currentPage: {
         get() {
           return this.orderHistoryPagination.currentPage;
         },
-        async set(val) {
+        set(val) {
           this.orderHistoryPagination.currentPage = val;
-          await this.getOrderHistory();
         }
+      }
+    },
+    watch: {
+      async limit() {
+        await this.getOrderHistory();
+      },
+      async currentPage() {
+        await this.getOrderHistory();
       }
     },
     methods: {
