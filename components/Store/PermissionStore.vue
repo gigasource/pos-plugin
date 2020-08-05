@@ -67,7 +67,7 @@
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl",
+        allPermissions: [ "manageGroup", "settings", "manageStore", "manageStorePayment", "updateApp", "remoteControl",
           "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu",
           "appReview", 'chatSupport', 'signInRequest']
       }

@@ -119,6 +119,10 @@
             {
               "value": "signInRequest",
               "text": "Sign In Request"
+            },
+            {
+              "value": "manageStorePayment",
+              "text": "Manage Store Payment"
             }
           ]
         },
