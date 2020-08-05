@@ -103,7 +103,6 @@
         view: '',
         sidebar: '',
         defaultPath: '',
-        //
         store: null,
         categories: null,
         products: null,
@@ -136,7 +135,10 @@
             { title: this.setting.discount, key: 'Discount', icon: 'icon-coupon', onClick: () => this.changeView('setting-discount', 'Discount') },
           ]
 
-          if (cms.loginUser.user.role.name === "admin") {
+          const managePaymentPermission =
+              cms.loginUser.user.permissions.find(e => e.permission === 'manageStorePayment' && e.value === true);
+
+          if (cms.loginUser.user.role.name === "admin" || managePaymentPermission) {
             items.push({
               title: this.setting.paymentSetting,
               icon: 'icon-card_outlined',
