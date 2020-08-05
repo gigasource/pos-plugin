@@ -73,4 +73,14 @@ router.get('/:id/menu', async (req, res) => {
   res.status(200).json({ products, categories })
 })
 
+router.post('/reservation', async (req, res) => {
+  const { storeId, reservation } = req.body
+  if (!storeId || !reservation) res.sendStatus(400)
+
+  await cms.getModel('Reservation').create({...reservation, store: storeId})
+  // todo emit to manager app
+
+  res.sendStatus(200)
+})
+
 module.exports = router
