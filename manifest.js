@@ -60,6 +60,12 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/firebase-messaging/admin.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/rest-handle.js',
       type: 'backend'
     },

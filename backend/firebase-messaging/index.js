@@ -1,12 +1,8 @@
-const admin = require('firebase-admin')
+const {firebaseAdminInstance} = require('./admin')
 const dayjs = require('dayjs')
 
 module.exports = cms => {
-  const config = APP_CONFIG.firebaseAdminConfig
-  admin.initializeApp({
-    credential: admin.credential.cert(config)
-  })
-
+  const admin = firebaseAdminInstance()
   cms.on('sendOrderMessage', async (storeId, orderData) => {
     const store = await cms.getModel('Store').findById(storeId)
     /** @deprecated */

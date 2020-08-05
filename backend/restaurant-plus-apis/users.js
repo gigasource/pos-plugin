@@ -76,18 +76,19 @@ router.put('/:userId', async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
-  const {name, email, addresses} = req.body;
+  const {name, email, addresses, firebaseToken} = req.body;
   const newUser = await UserModel.findOneAndUpdate({_id: ObjectId(userId)}, {
-    ...name && name,
-    ...addresses && addresses,
-    ...email && email,
+    ...name && {name},
+    ...addresses && {addresses},
+    ...email && {email},
+    ...firebaseToken && {firebaseToken}
   }, {new: true});
 
   res.status(200).json(objectMapper(newUser, mapperConfig));
 });
 
 router.post('/authenticate', async (req, res) => {
-  const {idToken, phoneNumber, name} = req.body;
+  const {idToken, firebaseToken, phoneNumber, name} = req.body;
   if (!idToken || !phoneNumber || !name) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
@@ -106,6 +107,8 @@ router.post('/authenticate', async (req, res) => {
 
     if (user) {
       res.status(200).json(objectMapper(user, mapperConfig));
+      // update firebaseToken whenever login success
+      if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {firebaseToken});
     } else {
       user = await UserModel.create({
         name,

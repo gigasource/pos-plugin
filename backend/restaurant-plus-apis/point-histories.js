@@ -2,11 +2,15 @@ const express = require('express');
 const router = express.Router();
 const {respondWithError} = require('./utils');
 const objectMapper = require('object-mapper');
+const {firebaseAdminInstance} = require('../firebase-messaging/admin');
+const admin = firebaseAdminInstance();
 
 const UserModel = cms.getModel('RPUser');
+const StoreModel = cms.getModel('Store');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
 const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
+
 
 const mapperConfig = {
   _id: '_id',
@@ -15,6 +19,27 @@ const mapperConfig = {
   value: 'value',
   transactionType: 'transactionType',
   createdAt: 'createdAt',
+}
+
+async function notifyToClient(type = "", title = "", message = "", token = "") {
+  const firebaseMsg = {
+    notification: {
+      title,
+      body: message
+    },
+    data: {
+      type,
+      message
+    }
+  }
+  return admin.messaging().sendToDevice(
+    [token],
+    {...firebaseMsg},
+    {
+      contentAvailable: true,
+      priority: 'high',
+    }
+  )
 }
 
 router.get('/', async (req, res) => {
@@ -47,6 +72,12 @@ router.post('/', async (req, res) => {
       await UserModel.updateOne({_id: user._id}, {rpPoints: currentUserPoints});
 
       res.status(201).json(objectMapper(transaction, mapperConfig));
+
+      if (user.firebaseToken) {
+        const store = await StoreModel.findOne({_id: storeId});
+        await notifyToClient('reward_point', 'Point received',
+          `You have received ${value} reward points from ${store.name}`, user.firebaseToken)
+      }
       break;
     }
 /*    case POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER: {
