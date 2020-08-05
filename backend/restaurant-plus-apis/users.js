@@ -89,7 +89,7 @@ router.put('/:userId', async (req, res) => {
 
 router.post('/authenticate', async (req, res) => {
   const {idToken, firebaseToken, phoneNumber, name, signInType} = req.body;
-  if (!idToken || (signInType === 'phoneNumber' && !phoneNumber) || !name) return respondWithError(res, 400, 'Missing property in request body');
+  if (!idToken) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
   let decodedIdToken;
@@ -111,7 +111,7 @@ router.post('/authenticate', async (req, res) => {
       if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {firebaseToken});
     } else {
       user = await UserModel.create({
-        name,
+        name: name || '',
         ...phoneNumber && {phoneNumber},
         addresses: [],
         createdAt: new Date(),
