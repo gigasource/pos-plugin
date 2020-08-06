@@ -3,6 +3,7 @@ const _ = require('lodash')
 const express = require('express')
 const router = express.Router()
 const objectMapper = require('object-mapper');
+const { getExternalSocketIoServer } = require('../socket-io-server');
 const {respondWithError} = require('./utils');
 
 const mapperConfig = {
@@ -77,8 +78,19 @@ router.post('/reservation', async (req, res) => {
   const { storeId, reservation } = req.body
   if (!storeId || !reservation) res.sendStatus(400)
 
-  await cms.getModel('Reservation').create({...reservation, store: storeId})
+  const newReservation = await cms.getModel('Reservation').create({...reservation, store: storeId})
   // todo emit to manager app
+  const store = await StoreModel.findById(storeId)
+
+  if (store.gSms && store.gSms.enabled) {
+    const demoDevices = store.gSms.devices
+    demoDevices.filter(i => i.registered).forEach(({_id}) => {
+      const targetClientId = _id;
+      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createReservation', [newReservation._doc])
+      console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
+        `2. Online order backend: sent reservation to demo device`)
+    })
+  }
 
   res.sendStatus(200)
 })

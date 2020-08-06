@@ -147,5 +147,30 @@ module.exports = cms => {
       console.debug(sentryTags, `Online order backend: Error sending support message notification`, sentryPayload);
     }
   })
+
+  cms.on('sendClientReservationStatus', async reservationId => {
+    const reservation = await cms.getModel('Reservation').findById(reservationId).lean()
+    if (!reservation.userId) return
+    const user = await cms.getModel('RPUser').findById(reservation.userId)
+
+    const message = {
+      notification: {
+        title: 'Reservation status',
+        body: reservation.status === 'accepted' ? 'Reservation accepted' : 'Reservation declined',
+      },
+      data: {
+        type: 'reservation',
+        reservation
+      },
+      token: user.firebaseToken
+    }
+
+    try {
+      await admin.messaging().send(message)
+      console.log('sent reservation update notification')
+    } catch (e) {
+      console.log('failed to send reservation update notification')
+    }
+  })
 }
 

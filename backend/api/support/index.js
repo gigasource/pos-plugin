@@ -159,6 +159,18 @@ setTimeout(() => {
       clientId = clientId.replace("device_", "")
       internalSocketIOServer.in(`endCallFromUser-${clientId}`).emit('endCallFromUser', { clientId, agentId })
     })
+
+    socket.on('updateReservationStatus', async (reservationId, status, cb) => {
+      console.log('updateReservationStatus', reservationId, status)
+
+      try {
+        await cms.getModel('Reservation').findOneAndUpdate({ _id: ObjectId(reservationId) }, { status })
+        cb({ success: true })
+        cms.emit('sendClientReservationStatus', reservationId)
+      } catch (error) {
+        cb({ error })
+      }
+    })
   });
 
   externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
