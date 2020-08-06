@@ -152,22 +152,25 @@ module.exports = cms => {
     const reservation = await cms.getModel('Reservation').findById(reservationId).lean()
     if (!reservation.userId) return
     const user = await cms.getModel('RPUser').findById(reservation.userId)
+    const store = await cms.getModel('Store').findById(reservation.store)
+    const reservationDate = dayjs(reservation.date, 'YYYY-MM-DD').format('MMM DD')
 
+    const storeName = store.name || store.settingName;
     const message = {
       notification: {
-        title: 'Reservation status',
-        body: reservation.status === 'accepted' ? 'Reservation accepted' : 'Reservation declined',
+        title: `Reservation ${reservation.status}`,
+        body: `Your reservation at ${storeName} at ${reservation.time}, ${reservationDate} is ${reservation.status}`,
       },
       data: {
         type: 'reservation',
-        reservation
+        reservation: JSON.stringify({ ...reservation, storeName, storePhone: store.phone })
       },
       token: user.firebaseToken
     }
 
     try {
-      await admin.messaging().send(message)
-      console.log('sent reservation update notification')
+      const response = await admin.messaging().send(message)
+      console.log('sent reservation update notification', response)
     } catch (e) {
       console.log('failed to send reservation update notification')
     }
