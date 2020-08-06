@@ -1,7 +1,7 @@
 <template>
   <div :class="['digital-menu-item', !available && 'disabled']">
     <template v-if="showImage && displayImage">
-      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="digital-menu-item__thumbnail"/>
+      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="digital-menu-item__thumbnail" @click.stop="openImage"/>
       <div v-else class="digital-menu-item__thumbnail--default">
         <img alt draggable="false" src="/plugins/pos-plugin/assets/thumbnail.svg"/>
       </div>
@@ -146,6 +146,9 @@
       },
       addToOrder() {
         this.$emit('add')
+      },
+      openImage() {
+        this.$emit('image', this.image, this.desc)
       }
     },
     watch: {
