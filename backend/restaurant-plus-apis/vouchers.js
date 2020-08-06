@@ -152,6 +152,9 @@ router.post('/', async (req, res) => {
     createdAt: new Date(),
   });
 
+  newVoucher.promotion = promotion;
+  newVoucher.restaurantPlusUser = user;
+
   res.status(201).json(objectMapper(newVoucher, mapperConfig));
 });
 
