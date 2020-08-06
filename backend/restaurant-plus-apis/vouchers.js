@@ -37,7 +37,7 @@ const mapperConfig = {
 }
 
 router.get('/', async (req, res) => {
-  const {userId, nameSearch, status} = req.query;
+  const {userId, storeId, nameSearch, status} = req.query;
   if (!userId) return respondWithError(res, 400, 'Missing user ID in request');
 
   const aggregateSteps = [];
@@ -64,6 +64,7 @@ router.get('/', async (req, res) => {
   aggregateSteps.push({$unwind: {path: '$store'}});
 
   if (nameSearch) aggregateSteps.push({$match: {promotionName: {$regex: nameSearch, $options: 'i'}}});
+  if (storeId) aggregateSteps.push({$match: {storeId: ObjectId(storeId)}});
   if (status) aggregateSteps.push({$match: {status}});
 
   const userVouchers = await VoucherModel.aggregate(aggregateSteps);
