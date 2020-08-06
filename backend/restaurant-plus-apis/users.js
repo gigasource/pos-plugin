@@ -40,7 +40,7 @@ router.get('/rp-points/:userId', async (req, res) => {
   const user = await UserModel.findById(userId);
   if (!user) return respondWithError(res, 400, 'Invalid user id');
 
-  const {rpPoints} = user;
+  const {rpPoints = {}} = user;
   const storeIds = Object.keys(rpPoints);
 
   const transactions = await PointHistoryModel.aggregate([
@@ -88,7 +88,7 @@ router.put('/:userId', async (req, res) => {
 });
 
 router.post('/authenticate', async (req, res) => {
-  const {idToken, firebaseToken, phoneNumber, name, signInType} = req.body;
+  let {idToken, firebaseToken, phoneNumber, name, signInType} = req.body;
   if (!idToken) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
@@ -102,6 +102,7 @@ router.post('/authenticate', async (req, res) => {
   }
 
   if (decodedIdToken) {
+    name = name || decodedIdToken.name || '';
     const firebaseUid = decodedIdToken.uid;
     let user = await UserModel.findOne({firebaseUid});
 

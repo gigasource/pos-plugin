@@ -26,8 +26,9 @@ const POINT_HISTORY_TRANSACTION_TYPE = Object.freeze({
 
 const MAX_NEARBY_DISTANCE = 5000; //5km
 const DEFAULT_PROMOTION_BACKGROUND = 'https://online-order.gigasource.io/cms-files/files/view/Restaurant%20Plus%20images/default-restaurant-plus-promo-background.png';
+const PELIAS_HOST = 'https://pelias.gigasource.io'
 
 module.exports = {
   VOUCHER_STATUS, MAX_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, POINT_HISTORY_TRANSACTION_TYPE,
-  DEFAULT_PROMOTION_BACKGROUND,
+  DEFAULT_PROMOTION_BACKGROUND, PELIAS_HOST,
 }
