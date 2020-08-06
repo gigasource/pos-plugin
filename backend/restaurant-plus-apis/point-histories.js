@@ -15,8 +15,8 @@ const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
 
 const mapperConfig = {
   _id: '_id',
-/*  store: 'store',
-  restaurantPlusUser: 'user',*/
+  'store._id': 'storeId',
+  'restaurantPlusUser._id': 'userId',
   value: 'value',
   transactionType: 'transactionType',
   createdAt: 'createdAt',
