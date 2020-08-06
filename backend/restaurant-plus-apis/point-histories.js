@@ -4,6 +4,7 @@ const {respondWithError} = require('./utils');
 const objectMapper = require('object-mapper');
 const {firebaseAdminInstance} = require('../firebase-messaging/admin');
 const admin = firebaseAdminInstance();
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const UserModel = cms.getModel('RPUser');
 const StoreModel = cms.getModel('Store');
@@ -14,8 +15,8 @@ const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
 
 const mapperConfig = {
   _id: '_id',
-  store: 'store',
-  restaurantPlusUser: 'user',
+/*  store: 'store',
+  restaurantPlusUser: 'user',*/
   value: 'value',
   transactionType: 'transactionType',
   createdAt: 'createdAt',
@@ -43,7 +44,15 @@ async function notifyToClient(type = "", title = "", message = "", token = "") {
 }
 
 router.get('/', async (req, res) => {
+  const {storeId, userId} = req.query;
+  if (!userId) return respondWithError(res, 400, 'Missing property in request');
 
+  const transactions = await PointHistoryModel.find({
+    restaurantPlusUser: ObjectId(userId),
+    ...storeId && {store: ObjectId(storeId)},
+  });
+
+  res.status(200).json(transactions.map(e => objectMapper(e, mapperConfig)));
 });
 
 router.post('/', async (req, res) => {
