@@ -44,16 +44,20 @@
         <p class="fs-small"><b>{{$t('setting.address')}}: </b>{{address}}</p>
         <p class="fs-small"><b>{{$t('setting.coordinates')}}: </b>{{obtainedCoordination}}</p>
         <div class="delivery-fee__content-header">
-          <div class="col-9">Radius (km)</div>
-          <div class="col-3">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div :class="requireMinOrder ? 'col-7' : 'col-9'">Radius (km)</div>
+          <div class="col-2">{{$t('setting.fee')}} ({{$t('common.currency', storeCountryLocale)}})</div>
+          <div v-if="requireMinOrder" class="col-2">{{$t('setting.minOrder')}} ({{$t('common.currency', storeCountryLocale)}})</div>
         </div>
         <div class="delivery-fee__content-main">
           <div class="delivery-fee__content-item" v-for="(item, i) in distanceFees" :key="i">
-            <div class="item-code col-9">
+            <div :class="['item-code', requireMinOrder ? 'col-7' : 'col-9']">
               <input type="number" :value="item.radius" @input="e => updateRadiusDebounce(item, e)"/>
             </div>
-            <div class="item-fee col-2">
+            <div :class="[requireMinOrder ? 'item-fee' : 'item-min', 'col-2']">
               <input type="number" :value="item.fee" placeholder="€" @input="e => updateFeeDebounce(item, e)"/>
+            </div>
+            <div v-if="requireMinOrder" class="item-min col-2">
+              <input type="number" :value="item.minOrder" placeholder="€" @input="e => updateMinOrderDebounce(item, e)"/>
             </div>
             <div class="item-btn--delete col-1" @click.stop="removeFee(i)">
               <g-icon size="16" color="#424242">icon-close</g-icon>
@@ -63,7 +67,8 @@
             <g-icon size="40" color="#2979FF">add</g-icon>
           </div>
         </div>
-        <p class="mt-3">Note: Shipping service is not available for locations outside of the configured radius.</p>
+        <p class="mt-3">{{$t('setting.distanceNote')}}</p>
+        <g-switch v-model="requireMinOrder" :label="$t('setting.requireMinOrderDistance')"/>
       </template>
     </div>
   </div>
@@ -212,6 +217,12 @@
         if (!e.target.value || isNaN(e.target.value)) return
         if (this.type === 'zipCode')
           _.each(this.deliveryFee.zipCodeFees, fee => {
+            if (fee === item) {
+              fee.minOrder = e.target.value
+            }
+          })
+        if (this.type === 'distance')
+          _.each(this.deliveryFee.distanceFees, fee => {
             if (fee === item) {
               fee.minOrder = e.target.value
             }
