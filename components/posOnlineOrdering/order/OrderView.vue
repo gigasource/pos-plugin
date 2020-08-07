@@ -60,7 +60,7 @@
                 <g-icon>icon-menu2</g-icon>
               </div>
             </g-badge>
-            <div class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
+            <div id="total" class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
             <g-spacer/>
             <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="showOrder = true" width="150">
               <span class="mr-3">{{$t('store.orderList')}}</span>
@@ -557,6 +557,7 @@
       openDialogAdd(item) {
         if(!item.choices || item.choices.length === 0) { //item without choice instancely add
           this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
+          this.addBounceAction()
           return
         }
         this.selectedProduct = item
@@ -564,6 +565,7 @@
       },
       addItemToOrder(item) {
         const product = Object.assign({}, this.selectedProduct, item)
+        this.addBounceAction()
         this.increaseOrAddNewItems(product)
       },
       removeItemFromOrder(item) {
@@ -609,7 +611,18 @@
         this.dialog.image.src = getCdnUrl(src)
         this.dialog.image.desc = desc
         this.dialog.image.active = true
-      }
+      },
+      addBounceAction() {
+        if(this.bouncing > 0) return
+        const price = document.getElementById('total')
+        if(!price) return
+        this.bouncing++
+        price.classList.add('zoom')
+        setTimeout(() => {
+          price.classList.remove('zoom')
+          this.bouncing--
+        }, 1000)
+      },
     },
     watch: {
       selectedCategoryId(val) {
@@ -1011,5 +1024,25 @@
     .menu-hour {
       display: none;
     }
+  }
+
+  @keyframes zoom {
+    0% {
+      transform: scale(1);
+    }
+
+    35% {
+      transform: scale(1.3);
+    }
+
+    70% {
+      transform: scale(1);
+    }
+  }
+
+  .zoom {
+    animation-name: zoom;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
   }
 </style>
