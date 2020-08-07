@@ -443,8 +443,13 @@
         if (this.store.deliveryFee.type === 'distance') {
           if (this.customer.distance >= 0) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
-              if (this.customer.distance < deliveryFee.radius)
+              if (this.customer.distance < deliveryFee.radius) {
+                if (this.store.deliveryFee.requireMinOrder && deliveryFee.minOrder > this.totalPrice)
+                  this.errorZipcode = this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': deliveryFee.minOrder})
+                else
+                  this.errorZipcode = ''
                 return deliveryFee.fee
+              }
             }
           }
         }
@@ -479,7 +484,7 @@
         if(this.store.deliveryFee && this.store.deliveryFee.type === 'zipCode' && this.store.deliveryFee.requireMinOrder) {
           const minOrders = _.mapValues(_.mapKeys(this.storeZipCodes, c => c.zipCode), c => c.minOrder)
           const orderTotal = this.totalPrice
-          rules.push(val => val.length < 5 || minOrders[val] < orderTotal || this.$t('store.zipCodeMinOrder', {'0': minOrders[val]}))
+          rules.push(val => val.length < 5 || minOrders[val] < orderTotal || this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': minOrders[val]}))
         }
         return rules
       },

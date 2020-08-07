@@ -229,6 +229,11 @@
               "schemaType": "number",
               "key": "fee",
               "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "minOrder",
+              "type": "input@number"
             }
           ]
         },

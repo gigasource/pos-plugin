@@ -273,6 +273,7 @@
       font-size: 18px;
       color: #2979ff;
       font-weight: 700;
+      white-space: nowrap;
 
       &--discount {
         font-size: 14px;
