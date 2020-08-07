@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const {respondWithError} = require('./utils');
-const {PELIAS_HOST} = require('./constants');
+const {respondWithError, getDistance, applyDiscountForOrder} = require('./utils');
 const StoreModel = cms.getModel("Store");
 const OrderModel = cms.getModel("Order");
-const axios = require('axios');
 const ObjectId = require('mongoose').Types.ObjectId;
 const objectMapper = require('object-mapper');
 const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
+const _ = require('lodash')
 
 const mapperConfig = {
   _id: '_id',
@@ -60,27 +59,78 @@ router.post('/calculate-shipping-fee', async (req, res) => {
   const store = await StoreModel.findById(storeId);
   if (!store) return respondWithError(res, 400, 'Invalid store ID');
 
-  let geoApiUrl = `${PELIAS_HOST}/v1/search?text=${encodeURI(customerAddress)}`;
+  if (!store.deliveryFee) return respondWithError(res, 400, 'No delivery setup for store!')
 
-  if (this.store.coordinates) {
-    const {lat, long} = store.coordinates;
-    geoApiUrl += `&focus.point.lat=${lat}&focus.point.lon=${long}`;
+  if (store.deliveryFee.type === 'zipCode') {
+    const zipCodeFees = (store.deliveryFee.zipCodeFees || []).map(({zipCode, fee, minOrder}) => {
+      if (zipCode.includes(',') || zipCode.includes(';')) {
+        zipCode = zipCode.replace(/\s/g, '').replace(/;/g, ',').split(',')
+      }
+      return zipCode instanceof Array ? zipCode.map(code => ({zipCode: code, fee, minOrder: minOrder || 0})) : {
+        zipCode,
+        fee,
+        minOrder: minOrder || 0
+      }
+    }).flat()
+
+    for (const deliveryFee of zipCodeFees) {
+      if (_.lowerCase(_.trim(deliveryFee.zipCode)) === _.lowerCase(_.trim(customerZipCode.toString())))
+        return res.status(200).json({shippingFee: deliveryFee.fee})
+    }
+
+    if (store.deliveryFee.acceptOrderInOtherZipCodes)
+      return res.status(200).json({shippingFee: store.deliveryFee.defaultFee})
   }
 
-  try {
-    const {data: {features}} = await axios.get(geoApiUrl);
-    if (features && features.length) {
-      const foundLocation = features.find(location => location.properties.postalcode === customerZipCode);
-      if (foundLocation) {
-        const {properties: {distance}, geometry: {coordinates}} = foundLocation;
-        this.customer.distance = distance;
-      } else {
-        await this.getDistanceByPostalCode(customerZipCode, {latitude: lat, longitude: long});
+  if (store.deliveryFee.type === 'distance') {
+    let distance = await getDistance(customerAddress, customerZipCode, store.coordinates)
+    if (distance === undefined || distance === null)
+      return respondWithError(res, 400, "Can't calculate the distance between restaurant and customer!")
+    if (distance >= 0) {
+      for (const deliveryFee of _.sortBy(store.deliveryFee.distanceFees, 'radius')) {
+        if (distance < deliveryFee.radius)
+          return res.status(200).json({shippingFee: deliveryFee.fee})
       }
     }
-  } catch (e) {
-    await this.getDistanceByPostalCode(customerZipCode, {latitude: lat, longitude: long});
   }
 });
 
+router.post('/create-order', async (req, res) => {
+  const {order} = req.body
+  let {storeId, items, type, customer, payment, note, deliveryTime, date, user, voucher, shippingFee, total, discountValue, timeoutDate} = order
+
+  const store = await StoreModel.findById(storeId)
+  if (!store) return respondWithError(res, 400, 'Invalid store ID!')
+
+  if (discountValue > 0) {
+    items = applyDiscountForOrder(items, {difference: discountValue, value: (total - discountValue)})
+  }
+
+  await cms.getModel('Order').create({
+    storeId,
+    items: items.map(item => ({
+      ..._.omit(item, ['_id', 'groupPrinters']),
+      groupPrinter: item.groupPrinters[0],
+      groupPrinter2: store.useMultiplePrinters && item.groupPrinters.length >= 2 && item.groupPrinters[1],
+      price: +item.price.toFixed(2),
+      originalPrice: item.originalPrice ? +item.originalPrice.toFixed(2) : +item.price.toFixed(2),
+      ...item.vDiscount && { vDiscount: +item.vDiscount.toFixed(2) },
+      id: item.id || ''
+    })),
+    customer,
+    payment,
+    type,
+    deliveryTime,
+    deliveryDate: date,
+    date,
+    timeoutDate,
+    shippingFee,
+    note,
+    online: true,
+    restaurantPlusUser: user && user._id,
+    restaurantPlusVoucher: voucher && voucher._id
+  })
+
+  res.sendStatus(200)
+})
 module.exports = router;
