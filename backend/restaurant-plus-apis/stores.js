@@ -28,6 +28,8 @@ const mapperConfig = {
   clientDomain: 'clientDomain',
   displayImage: 'displayImage',
   displayId: 'displayId',
+  orderTimeOut: 'orderTimeOut',
+  delivery: 'delivery'
 };
 
 const StoreModel = cms.getModel('Store');
@@ -58,7 +60,7 @@ router.get('/nearby', async (req, res) => {
   const mappedStores = nearbyStores.map(store => {
     return _.pick(store, ['_id', 'id', 'name', 'address', 'settingName', 'settingAddress', 'townCity', 'country',
       'zipCode', 'openHours', 'phone', 'location', 'googleMapPlaceId', 'onlineOrdering', 'delivery', 'pickup',
-      'reservationSetting', 'calcDistance', 'logoImageSrc', 'orderHeaderImageSrc', 'displayId', 'displayImage'])
+      'reservationSetting', 'calcDistance', 'logoImageSrc', 'orderHeaderImageSrc', 'displayId', 'displayImage', 'orderTimeOut'])
   })
 
   res.status(200).json(mappedStores.map(e => objectMapper(e, mapperConfig)))
