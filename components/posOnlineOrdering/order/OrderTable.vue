@@ -333,7 +333,15 @@
           if(distance === undefined)
             this.errorZipcode = 'Invalid zip code!'
           else
-            this.errorZipcode = ''
+            for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
+              if (this.customer.distance < deliveryFee.radius) {
+                if (this.store.deliveryFee.requireMinOrder && deliveryFee.minOrder > this.totalPrice)
+                  this.errorZipcode = this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': deliveryFee.minOrder})
+                else
+                  this.errorZipcode = ''
+                return
+              }
+            }
         })
       }
     },
@@ -444,10 +452,6 @@
           if (this.customer.distance >= 0) {
             for (const deliveryFee of _.sortBy(this.store.deliveryFee.distanceFees, 'radius')) {
               if (this.customer.distance < deliveryFee.radius) {
-                if (this.store.deliveryFee.requireMinOrder && deliveryFee.minOrder > this.totalPrice)
-                  this.errorZipcode = this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': deliveryFee.minOrder})
-                else
-                  this.errorZipcode = ''
                 return deliveryFee.fee
               }
             }

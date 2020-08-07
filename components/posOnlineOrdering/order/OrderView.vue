@@ -182,7 +182,7 @@
             <img alt :src="dialog.image.src" style="width: 300px; height: 300px; border-radius: 6px"/>
             <pre style="font-size: 13px; color: #757575; padding: 16px 16px 0; white-space: pre-wrap; word-break: break-word" v-html="dialog.image.desc"/>
             <g-divider color="#efefef" style="margin: 8px"/>
-            <g-btn-bs text-color="#424242" @click="dialog.image.active = false">{{$t('store.close')}}</g-btn-bs>
+            <g-btn-bs text-color="#424242" @click="closeDialogImage">{{$t('store.close')}}</g-btn-bs>
           </div>
         </g-dialog>
       </template>
@@ -610,6 +610,7 @@
       openDialogImage(src, desc) {
         this.dialog.image.src = getCdnUrl(src)
         this.dialog.image.desc = desc
+        document.documentElement.style.overflow = 'hidden'
         this.dialog.image.active = true
       },
       addBounceAction() {
@@ -623,6 +624,10 @@
           this.bouncing--
         }, 1000)
       },
+      closeDialogImage() {
+        document.documentElement.style.overflow = ''
+        this.dialog.image.active = false
+      }
     },
     watch: {
       selectedCategoryId(val) {
