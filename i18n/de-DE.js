@@ -172,7 +172,7 @@ module.exports = {
       distance: 'Distanz',
       address: 'Adresse',
       coordinates: 'Koordinaten',
-      fee: 'Prei',
+      fee: 'Preis',
       multiplePrinter: 'Mehrere Drucker',
       useMultiplePrinter: 'mehrere Drucker verwenden',
       onePrinterNote: 'Lassen Sie diese Einstellung ausschalten , wenn Sie nur 1 Drucker verwenden',
