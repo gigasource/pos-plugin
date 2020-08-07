@@ -18,6 +18,7 @@ const mapperConfig = {
   createdAt: 'createdAt',
   firebaseUid: 'firebaseUid',
   email: 'email',
+  avatar: 'avatar',
 }
 
 const storeMapperConfig = {
@@ -76,12 +77,13 @@ router.put('/:userId', async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
-  const {name, email, addresses, firebaseToken} = req.body;
+  const {name, email, addresses, firebaseToken, avatar} = req.body;
   const newUser = await UserModel.findOneAndUpdate({_id: ObjectId(userId)}, {
     ...name && {name},
     ...addresses && {addresses},
     ...email && {email},
-    ...firebaseToken && {firebaseToken}
+    ...firebaseToken && {firebaseToken},
+    ...avatar && {avatar},
   }, {new: true});
 
   res.status(200).json(objectMapper(newUser, mapperConfig));
