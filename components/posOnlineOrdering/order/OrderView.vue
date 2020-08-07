@@ -107,7 +107,8 @@
                     :store-country-locale="storeCountryLocale"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
-                    @decrease="removeItemFromOrder(item)"/>
+                    @decrease="removeItemFromOrder(item)"
+                    @image="openDialogImage"/>
               </div>
             </div>
             <div class="pos-order__tab--content-footer"></div>
@@ -174,6 +175,16 @@
             <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = false">{{$t('store.close')}}</g-btn-bs>
           </div>
         </g-dialog>
+
+        <!-- Show image dialog -->
+        <g-dialog v-model="dialog.image.active" width="348">
+          <div style="width: 100%; background: white; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding: 16px">
+            <img alt :src="dialog.image.src" style="width: 300px; height: 300px; border-radius: 6px"/>
+            <pre style="font-size: 13px; color: #757575; padding: 16px 16px 0; white-space: pre-wrap; word-break: break-word" v-html="dialog.image.desc"/>
+            <g-divider color="#efefef" style="margin: 8px"/>
+            <g-btn-bs text-color="#424242" @click="dialog.image.active = false">{{$t('store.close')}}</g-btn-bs>
+          </div>
+        </g-dialog>
       </template>
     </div>
 </template>
@@ -212,7 +223,12 @@
           hour: false,
           add: false,
           note: false,
-          dayOff: false
+          dayOff: false,
+          image: {
+            active: false,
+            src: '',
+            desc: ''
+          }
         },
         throttle: null,
         choosing: 0,
@@ -588,6 +604,11 @@
       },
       touch() {
         this.scrolling++
+      },
+      openDialogImage(src, desc) {
+        this.dialog.image.src = getCdnUrl(src)
+        this.dialog.image.desc = desc
+        this.dialog.image.active = true
       }
     },
     watch: {
