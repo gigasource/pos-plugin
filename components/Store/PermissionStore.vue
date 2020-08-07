@@ -52,12 +52,12 @@
         return _.find(this.userPermissions, perm => perm.permission === 'importExportMenu' && perm.value === true)
       },
       chatSupportPerm() {
-        if (cms.loginUser.user)
-          return cms.loginUser.user.role.name === 'admin'
+        return (cms.loginUser.user && cms.loginUser.user.role.name === 'admin')
+            || _.find(this.userPermissions, perm => perm.permission === 'chatSupport' && perm.value === true)
       },
       signInSupportPerm() {
-        if (cms.loginUser.user)
-          return cms.loginUser.user.role.name === 'admin'
+        return (cms.loginUser.user && cms.loginUser.user.role.name === 'admin')
+            || _.find(this.userPermissions, perm => perm.permission === 'signInRequest' && perm.value === true)
       },
       // permission used for Apple's App Store and Google Play
       appReviewerPerm() {
@@ -67,7 +67,9 @@
     data() {
       return {
         userPermissions: [],
-        allPermissions: [ "manageGroup", "settings", "manageStore", "updateApp", "remoteControl", "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu", "appReview"]
+        allPermissions: [ "manageGroup", "settings", "manageStore", "manageStorePayment", "updateApp", "remoteControl",
+          "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu",
+          "appReview", 'chatSupport', 'signInRequest']
       }
     },
     async created() {

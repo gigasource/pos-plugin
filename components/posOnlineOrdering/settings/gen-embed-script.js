@@ -18,7 +18,7 @@ export function genIframe(type, link, alias) {
       // insert overlay
       var container = document.createElement('div')
       container.setAttribute('id', '${type}-iframe-container')
-      container.setAttribute('style', 'position: fixed; z-index: 1001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
+      container.setAttribute('style', 'position: fixed; z-index: 1000001; top: 0; left: 0; bottom: 0; right: 0; background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(1.5px); visibility: visible')
       document.body.appendChild(container)
 
       //insert loading circular
@@ -151,7 +151,7 @@ export function genScriptFooter() {
 
 
 export function genStyleSheet(position, size, hidden) {
-  let style = `.restaurant-plus-embed-btn { position: fixed; z-index: 1000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
+  let style = `.restaurant-plus-embed-btn { position: fixed; z-index: 1000000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
 
   const directions = position.split('-')
   style += directions[1] + ': 8px;'

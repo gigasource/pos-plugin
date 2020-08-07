@@ -39,7 +39,7 @@ module.exports = {
       reason1: 'Das Personal hat es nicht rechtzeitig geschafft Ihre Bestellung entgegen zu nehmen.',
       reason2: 'Probleme mit der Verbindung.',
       callUs: 'Für weitere Informationen, rufen Sie uns direkt an',
-      close: 'Beenden',
+      close: 'Schließen',
       orderConfirmed: 'Bestellung bestätigt',
       orderCancelled: 'Entschuldigung, Ihre Bestellung wurde storniert.',
       reason: 'Grund',
@@ -86,7 +86,7 @@ module.exports = {
       payByCash: 'Barzahlung',
       paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
       notAvailable: 'Nicht Verfügbar',
-      zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist ${0}.'
+      zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.'
     },
 
     common: {
@@ -172,7 +172,7 @@ module.exports = {
       distance: 'Distanz',
       address: 'Adresse',
       coordinates: 'Koordinaten',
-      fee: 'Frei',
+      fee: 'Preis',
       multiplePrinter: 'Mehrere Drucker',
       useMultiplePrinter: 'mehrere Drucker verwenden',
       onePrinterNote: 'Lassen Sie diese Einstellung ausschalten , wenn Sie nur 1 Drucker verwenden',
@@ -232,7 +232,9 @@ module.exports = {
       price: 'Preis',
       tax: 'Steuer',
       minOrder: 'Mindestbestell',
-      requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern'
+      requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern',
+      distanceNote: 'Notiz: Versand-Service ist nicht verfügbar für außerhalb Standorte des konfigurierten Radius.',
+      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius'
     },
 
     paymentProviders: {

@@ -1,7 +1,7 @@
 <template>
   <div :class="['po-menu-item', !available && 'disabled']">
     <template v-if="showImage && displayImage">
-      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail"/>
+      <img v-if="image" alt draggable="false" :src="menuItemThumbnail" class="po-menu-item__thumbnail" @click.stop="openImage"/>
       <img v-else alt draggable="false" src="/plugins/pos-plugin/assets/empty_dish.svg"
            class="po-menu-item__thumbnail"/>
     </template>
@@ -155,6 +155,9 @@
       toggleShowmore() {
         this.showmore = !this.showmore
       },
+      openImage() {
+        this.$emit('image', this.image, this.desc)
+      }
     },
     computed: {
       menuItemThumbnail() {
@@ -270,6 +273,7 @@
       font-size: 18px;
       color: #2979ff;
       font-weight: 700;
+      white-space: nowrap;
 
       &--discount {
         font-size: 14px;

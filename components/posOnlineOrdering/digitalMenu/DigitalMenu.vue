@@ -49,7 +49,8 @@
               :display-id="store.displayId"
               :scrolling="scrolling"
               :display-image="store.displayImage"
-              :store-country-locale="storeCountryLocale"/>
+              :store-country-locale="storeCountryLocale"
+              @image="openDialogImage"/>
         </div>
         <div v-if="script" v-html="script"/>
         <div v-else class="bg-white mt-2 fs-small ta-center text-grey-darken-3 py-1 fw-600">{{$t('menu.restaurantPlus')}}</div>
@@ -114,6 +115,16 @@
         </template>
       </div>
     </g-dialog>
+
+    <!-- Show image dialog -->
+    <g-dialog v-model="dialog.image.active" width="348">
+      <div style="width: 100%; background: white; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding: 16px">
+        <img alt :src="dialog.image.src" style="width: 300px; height: 300px; border-radius: 6px"/>
+        <pre style="font-size: 13px; color: #757575; padding: 16px 16px 0; white-space: pre-wrap; word-break: break-word" v-html="dialog.image.desc"/>
+        <g-divider color="#efefef" style="margin: 8px"/>
+        <g-btn-bs text-color="#424242" @click="closeDialogImage">{{$t('store.close')}}</g-btn-bs>
+      </div>
+    </g-dialog>
   </div>
 </template>
 
@@ -145,7 +156,12 @@
         dialog: {
           add: false,
           feedback: false,
-          mode: 'select'
+          mode: 'select',
+          image: {
+            active: false,
+            src: '',
+            desc: ''
+          }
         },
         googleLogin: false,
         feedback: '',
@@ -301,6 +317,16 @@
           price.classList.remove('zoom')
           this.bouncing--
         }, 1000)
+      },
+      openDialogImage(src, desc) {
+        this.dialog.image.src = getCdnUrl(src)
+        this.dialog.image.desc = desc
+        document.documentElement.style.overflow = 'hidden'
+        this.dialog.image.active = true
+      },
+      closeDialogImage() {
+        document.documentElement.style.overflow = ''
+        this.dialog.image.active = false
       }
     },
     watch: {

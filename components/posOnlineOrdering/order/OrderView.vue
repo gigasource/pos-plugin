@@ -60,7 +60,7 @@
                 <g-icon>icon-menu2</g-icon>
               </div>
             </g-badge>
-            <div class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
+            <div id="total" class="pos-order__info--total">{{ totalPrice | currency(storeCountryLocale) }}</div>
             <g-spacer/>
             <g-btn-bs background-color="#2979FF" rounded style="padding: 8px 24px; position: relative" @click="showOrder = true" width="150">
               <span class="mr-3">{{$t('store.orderList')}}</span>
@@ -107,7 +107,8 @@
                     :store-country-locale="storeCountryLocale"
                     @menu-item-selected="openDialogAdd(item)"
                     @increase="increaseOrAddNewItems(item)"
-                    @decrease="removeItemFromOrder(item)"/>
+                    @decrease="removeItemFromOrder(item)"
+                    @image="openDialogImage"/>
               </div>
             </div>
             <div class="pos-order__tab--content-footer"></div>
@@ -174,6 +175,16 @@
             <g-btn-bs text-color="indigo accent-2" @click="dialog.dayOff = false">{{$t('store.close')}}</g-btn-bs>
           </div>
         </g-dialog>
+
+        <!-- Show image dialog -->
+        <g-dialog v-model="dialog.image.active" width="348">
+          <div style="width: 100%; background: white; border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding: 16px">
+            <img alt :src="dialog.image.src" style="width: 300px; height: 300px; border-radius: 6px"/>
+            <pre style="font-size: 13px; color: #757575; padding: 16px 16px 0; white-space: pre-wrap; word-break: break-word" v-html="dialog.image.desc"/>
+            <g-divider color="#efefef" style="margin: 8px"/>
+            <g-btn-bs text-color="#424242" @click="closeDialogImage">{{$t('store.close')}}</g-btn-bs>
+          </div>
+        </g-dialog>
       </template>
     </div>
 </template>
@@ -212,7 +223,12 @@
           hour: false,
           add: false,
           note: false,
-          dayOff: false
+          dayOff: false,
+          image: {
+            active: false,
+            src: '',
+            desc: ''
+          }
         },
         throttle: null,
         choosing: 0,
@@ -541,6 +557,7 @@
       openDialogAdd(item) {
         if(!item.choices || item.choices.length === 0) { //item without choice instancely add
           this.increaseOrAddNewItems(Object.assign({}, item, {quantity: 1, modifiers: []}))
+          this.addBounceAction()
           return
         }
         this.selectedProduct = item
@@ -548,6 +565,7 @@
       },
       addItemToOrder(item) {
         const product = Object.assign({}, this.selectedProduct, item)
+        this.addBounceAction()
         this.increaseOrAddNewItems(product)
       },
       removeItemFromOrder(item) {
@@ -588,6 +606,27 @@
       },
       touch() {
         this.scrolling++
+      },
+      openDialogImage(src, desc) {
+        this.dialog.image.src = getCdnUrl(src)
+        this.dialog.image.desc = desc
+        document.documentElement.style.overflow = 'hidden'
+        this.dialog.image.active = true
+      },
+      addBounceAction() {
+        if(this.bouncing > 0) return
+        const price = document.getElementById('total')
+        if(!price) return
+        this.bouncing++
+        price.classList.add('zoom')
+        setTimeout(() => {
+          price.classList.remove('zoom')
+          this.bouncing--
+        }, 1000)
+      },
+      closeDialogImage() {
+        document.documentElement.style.overflow = ''
+        this.dialog.image.active = false
       }
     },
     watch: {
@@ -990,5 +1029,25 @@
     .menu-hour {
       display: none;
     }
+  }
+
+  @keyframes zoom {
+    0% {
+      transform: scale(1);
+    }
+
+    35% {
+      transform: scale(1.3);
+    }
+
+    70% {
+      transform: scale(1);
+    }
+  }
+
+  .zoom {
+    animation-name: zoom;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
   }
 </style>

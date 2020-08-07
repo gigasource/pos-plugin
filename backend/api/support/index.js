@@ -108,10 +108,12 @@ setTimeout(() => {
     })
 
     socket.on('updateMenu', async (collection, _id, value, cb) => {
-      console.log('updateMenu', collection, _id, value)
       const clientId = socket.request._query.clientId
       const device = await cms.getModel('Device').findById(clientId)
       if (!device.storeId) return
+      const store = await cms.getModel('Store').findById(device.storeId)
+      console.debug(`sentry:store=${store.name || store.settingName},alias=${store.alias},eventType=updateMenu,deviceId=${device._id}`,
+        _id ? `Updating ${collection} item ${_id}` : `Adding ${collection} item`, value)
 
       // insert/update product or category
       try {

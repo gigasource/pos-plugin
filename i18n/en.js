@@ -372,7 +372,7 @@ module.exports = {
       payByCash: 'Pay By Cash',
       paymentOption: 'PAYMENT OPTIONS',
       notAvailable: 'Not Available',
-      zipCodeMinOrder: 'The minimum order value in your area is ${0}.'
+      zipCodeMinOrder: 'The minimum order value in your area is {0}{1}.'
     },
 
     paymentProviders: {
@@ -515,7 +515,9 @@ module.exports = {
       price: 'Price',
       tax: 'Tax',
       minOrder: 'Min order',
-      requireMinOrder: 'Require minimum order value for each zipcode'
+      requireMinOrder: 'Require minimum order value for each zipcode',
+      distanceNote: 'Note: Shipping service is not available for locations outside of the configured radius.',
+      requireMinOrderDistance: 'Require minimum order value for each radius'
     },
 
 
