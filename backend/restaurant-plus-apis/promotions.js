@@ -33,6 +33,7 @@ const mapperConfig = {
 
 router.get('/', async (req, res) => {
   const {storeId, includeNonStore} = req.query;
+  const now = new Date();
 
   const aggregateSteps = [{
     $lookup: {
@@ -63,6 +64,10 @@ router.get('/', async (req, res) => {
         ...storeId && {'store._id': ObjectId(storeId)},
         enabled: true,
         limitNotReached: true,
+        $and: [
+          {$or: [{startDate: {$exists: false}}, {startDate: {$lte: now}}]},
+          {$or: [{endDate: {$exists: false}}, {endDate: {$gte: now}}]}
+        ],
       },
     }];
 
