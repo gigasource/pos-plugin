@@ -83,6 +83,18 @@
       "schemaType": "string",
       "key": "initialSignInType",
       "type": "input"
+    },
+    {
+      "_id": "5f2bc38d20b6875e653def7d",
+      "schemaType": "string",
+      "key": "avatar",
+      "type": "input"
+    },
+    {
+      "_id": "5f2d3f0638dc9a020fccc505",
+      "schemaType": "mixed",
+      "key": "lastUsedAddress",
+      "mixed": true
     }
   ],
   "name": "RPUser",

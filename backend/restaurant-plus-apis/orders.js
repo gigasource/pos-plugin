@@ -144,8 +144,11 @@ router.post('/', async (req, res) => {
   sendNotificationToDevice({
     firebaseToken: rpUser.firebaseToken,
     storeName: store.name || store.settingName,
-    orderId: order._id.toString(),
+    orderId: newOrder._id.toString(),
   });
+
+  UserModel.updateOne({_id: user._id}, {lastUsedAddress: {address: customer.address, zipCode: customer.zipCode}}).exec();
+
   res.status(201).send();
 });
 
@@ -207,7 +210,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
 
       customer = {
         name: customer.name,
-        phone: customer.phone,
+        phoneNumber: customer.phoneNumber,
         zipCode: customer.zipCode,
         address: customer.address
       }
