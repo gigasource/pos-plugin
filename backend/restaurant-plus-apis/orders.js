@@ -25,10 +25,8 @@ const mapperConfig = {
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.storeId.name
   },
   date: 'date',
-  orderSum: {
-    key: 'vSum',
-    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.orderSum
-  },
+  vSum: 'orderSum',
+  vDiscount: "orderDiscountValue",
   itemCount: 'itemCount',
   paymentType: 'paymentType',
   shippingFee: 'shippingFee',
@@ -53,13 +51,13 @@ router.get('/', async (req, res) => {
   let userOrders = await OrderModel.find({restaurantPlusUser: ObjectId(userId)}).sort({date: -1});
   userOrders = userOrders.map(order => {
     const {items, shippingFee, payment} = order;
-    const orderSum = (calOrderTotal(items) + calOrderModifier(items) + shippingFee).toFixed(2);
+    const orderSum = order.vSum || (calOrderTotal(items) + calOrderModifier(items) + shippingFee).toFixed(2);
     const itemCount = items.reduce((acc, cur) => acc + cur.quantity, 0);
     const paymentType = payment[0].type;
 
     return {
       ...order._doc,
-      orderSum: order.vSum || +orderSum,
+      vSum: +orderSum,
       itemCount,
       paymentType,
     }
