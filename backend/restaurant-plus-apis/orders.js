@@ -186,7 +186,12 @@ router.post('/', async (req, res) => {
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
 
   // including tablets & Restaurant Plus manager app
-  sendOrderToStoreDevices(store._id, {...newOrder.toObject(), deliveryDateTime, orderToken: newOrder._id});
+  sendOrderToStoreDevices(store._id, {
+    ...newOrder.toObject(),
+    deliveryDateTime,
+    orderToken: newOrder._id,
+    createdDate: date,
+  });
 
   UserModel.updateOne({_id: user._id}, {
     lastUsedAddress: {
@@ -279,7 +284,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
     cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
     function formatOrder(orderData) {
-      let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType,
+      let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, type: orderType, paymentType,
         items: products, shippingFee, totalPrice} = _.cloneDeep(orderData)
 
       products = products.map(({id, modifiers, name, note, originalPrice, quantity}) => {
@@ -375,6 +380,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
       ...i.vDiscount && {vDiscount: +i.vDiscount.toFixed(2)},
       id: i.id || ''
     })),
+    orderType: orderData.type
   }
   const removePersistentMsg = await getExternalSocketIoServer().emitToPersistent(deviceId, 'createOrder', [data, new Date()],
       'createOrderAck', [orderData._id]);
