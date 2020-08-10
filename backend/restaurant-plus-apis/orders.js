@@ -125,7 +125,7 @@ router.post('/', async (req, res) => {
   const {order} = req.body
   let {
     storeId, items, type, customer, payment, note, deliveryTime, date, user, voucher, shippingFee, total,
-    timeoutDate
+    timeoutDate, deliveryDateTime,
   } = jsonFn.clone(order, true);
 
   const store = await StoreModel.findById(storeId)
@@ -135,7 +135,11 @@ router.post('/', async (req, res) => {
   let orderDiscountValue = 0;
 
   if (voucher) {
-    voucher = await findVouchers(voucher._id);
+    voucher = await findVouchers({
+      voucherId: voucher._id,
+      status: VOUCHER_STATUS.UNUSED,
+      usable: true,
+    });
 
     if (voucher.length) voucher = voucher[0];
     else return respondWithError(res, 400, 'Invalid voucher');
@@ -182,7 +186,7 @@ router.post('/', async (req, res) => {
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
 
   // including tablets & Restaurant Plus manager app
-  sendOrderToStoreDevices(store._id, newOrder.toObject());
+  sendOrderToStoreDevices(store._id, {...newOrder.toObject(), deliveryDateTime});
 
   UserModel.updateOne({_id: user._id}, {
     lastUsedAddress: {
@@ -196,11 +200,13 @@ router.post('/', async (req, res) => {
 
 setTimeout(() => {
   getExternalSocketIoServer().registerAckFunction('createOrderAck', async orderToken => {
+    console.info('test1 ' + orderToken)
     await sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
   });
 
   getExternalSocketIoServer().on('connect', socket => {
     socket.on('updateOrderStatus', async (orderStatus) => {
+      console.info('test2 ' + orderStatus)
       const {onlineOrderId, status, responseMessage} = orderStatus
       await sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
     });
@@ -266,7 +272,8 @@ async function sendOrderToStoreDevices(storeId, orderData) {
     cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
     function formatOrder(orderData) {
-      let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice} = _.cloneDeep(orderData)
+      let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType,
+        items: products, shippingFee, totalPrice} = _.cloneDeep(orderData)
 
       products = products.map(({id, modifiers, name, note, originalPrice, quantity}) => {
         if (modifiers && modifiers.length) {
@@ -320,10 +327,10 @@ async function sendOrderToStoreDevices(storeId, orderData) {
 
       /** @deprecated */
       const targetClientIdOld = `${store.id}_${_id.toString()}`;
-      getExternalSocketIoServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+      getExternalSocketIoServer().emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
 
       const targetClientId = _id.toString();
-      getExternalSocketIoServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
       console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
           `2a. Online order backend: received order from frontend, sending to demo device`);
     })

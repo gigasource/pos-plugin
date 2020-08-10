@@ -204,7 +204,8 @@ function findVouchers({userId, nameSearch, storeId, status, voucherId, usable}) 
   const aggregateSteps = [];
   const now = new Date();
 
-  aggregateSteps.push({$match: {restaurantPlusUser: ObjectId(userId)}});
+  if (voucherId) aggregateSteps.push({$match: {_id: ObjectId(voucherId)}});
+  if (userId) aggregateSteps.push({$match: {restaurantPlusUser: ObjectId(userId)}});
   aggregateSteps.push({
     $lookup: {
       from: 'rppromotions',
@@ -240,7 +241,6 @@ function findVouchers({userId, nameSearch, storeId, status, voucherId, usable}) 
         }});
     }
   }
-  if (voucherId) aggregateSteps.push({$match: {_id: ObjectId(voucherId)}});
 
   return VoucherModel.aggregate(aggregateSteps);
 }
