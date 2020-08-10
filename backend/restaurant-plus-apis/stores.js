@@ -2,6 +2,8 @@ const { MAX_NEARBY_DISTANCE } = require('./constants');
 const _ = require('lodash')
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId;
 const objectMapper = require('object-mapper');
 const { getExternalSocketIoServer } = require('../socket-io-server');
 const {respondWithError} = require('./utils');
@@ -36,9 +38,29 @@ const StoreModel = cms.getModel('Store');
 
 router.get('/by-id/:storeId', async (req, res) => {
   const {storeId} = req.params;
+  const {coordinates} = req.query
   if (!storeId) return respondWithError(res, 400, 'Missing store ID in request');
 
-  const store = await StoreModel.findById(storeId);
+  let store;
+  if (coordinates) {
+    const [long, lat] = coordinates.split(',')
+
+    const stores = await StoreModel.aggregate([
+      {
+        $geoNear: {
+          near: { type: 'Point', coordinates: [+long, +lat] },
+          distanceField: 'calcDistance',
+          spherical: true,
+          query: { _id: ObjectId(storeId) }
+        }
+      }
+    ]);
+
+    store = stores[0]
+  } else {
+    store = await StoreModel.findById(storeId);
+  }
+
   res.status(200).json(objectMapper(store, mapperConfig));
 });
 
