@@ -8,6 +8,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const {extractSortQueries} = require('../utils');
 const dayjs = require('dayjs')
+const jsonFn = require('json-fn')
 
 function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
   // unread message count will be dynamic, so getting devices with an offset may result in missing some devices due to order changes
@@ -361,5 +362,59 @@ router.get('/store-locale', async (req, res) => {
     currency, currencyLong
   })
 });
+
+router.get('/get-orders', async (req, res) => {
+  const { storeId } = req.query
+  if (!storeId) res.sendStatus(400)
+
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  const orders = await cms.getModel('Order').find({
+    storeId: store._id,
+    date: { $gte: dayjs().startOf('day').toDate() }
+  }).lean()
+
+  res.status(200).json(orders.map(order => formatOrder(order, store)))
+})
+
+function formatOrder(order, store) {
+  const products = order.items.map(({id, modifiers, name, note, originalPrice, quantity}) => {
+    if (modifiers && modifiers.length) {
+      const sumOfModifiers = modifiers.reduce((sum, {price, quantity}) => sum + quantity * price, 0)
+      originalPrice = originalPrice + sumOfModifiers
+    }
+
+    return {
+      id,
+      name,
+      originalPrice,
+      note,
+      modifiers: modifiers.map(({name}) => name).join(', '),
+      quantity,
+    }
+  })
+
+  if (order.deliveryTime === 'asap') {
+    const timeToComplete = (store.gSms && store.gSms.timeToComplete) || 30;
+    order.deliveryTime = dayjs(order.date).add(timeToComplete, 'minute').toDate()
+  }
+  const deliveryTime = jsonFn.clone(order.deliveryTime)
+
+  const discounts = order.discounts.reduce((sum, discount) => sum + discount.value, 0)
+  const total = _.sumBy(products, p => p.originalPrice) - discounts
+
+  return {
+    orderToken: order.orderToken || order._id.toString(),
+    orderType: order.orderType || 'onlineOrder',
+    paymentType: order.payment[0].type,
+    customer: JSON.stringify(order.customer),
+    products: JSON.stringify(products),
+    note: order.note,
+    date: order.date,
+    shippingFee: order.shippingFee,
+    total,
+    deliveryTime,
+    discounts,
+  }
+}
 
 module.exports = router
