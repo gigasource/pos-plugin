@@ -30,6 +30,7 @@ const mapperConfig = {
   itemCount: 'itemCount',
   paymentType: 'paymentType',
   shippingFee: 'shippingFee',
+  'restaurantPlusVoucher.promotion.name': 'voucherName',
   'items[]._id': 'items[]._id',
   'items[].name': 'items[].name',
   'items[].originalPrice': 'items[].originalPrice',
