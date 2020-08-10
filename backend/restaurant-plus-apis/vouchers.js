@@ -37,37 +37,10 @@ const mapperConfig = {
 }
 
 router.get('/', async (req, res) => {
-  const {userId, storeId, nameSearch, status} = req.query;
+  const {userId, storeId, nameSearch, status, usable, voucherId} = req.query;
   if (!userId) return respondWithError(res, 400, 'Missing user ID in request');
 
-  const aggregateSteps = [];
-
-  aggregateSteps.push({$match: {restaurantPlusUser: ObjectId(userId)}});
-  aggregateSteps.push({
-    $lookup: {
-      from: 'rppromotions',
-      localField: 'promotion',
-      foreignField: '_id',
-      as: 'promotion',
-    }
-  });
-  aggregateSteps.push({$unwind: {path: '$promotion'}});
-  aggregateSteps.push({$addFields: {storeId: '$promotion.store'}});
-  aggregateSteps.push({
-    $lookup: {
-      from: 'stores',
-      localField: 'storeId',
-      foreignField: '_id',
-      as: 'store',
-    }
-  });
-  aggregateSteps.push({$unwind: {path: '$store'}});
-
-  if (nameSearch) aggregateSteps.push({$match: {promotionName: {$regex: nameSearch, $options: 'i'}}});
-  if (storeId) aggregateSteps.push({$match: {storeId: ObjectId(storeId)}});
-  if (status) aggregateSteps.push({$match: {status}});
-
-  const userVouchers = await VoucherModel.aggregate(aggregateSteps);
+  const userVouchers = await findVouchers({userId, nameSearch, storeId, status, usable: usable === 'true', voucherId});
   res.status(200).json(userVouchers.map(e => objectMapper(e, mapperConfig)));
 });
 
@@ -227,4 +200,50 @@ router.get('/store-vouchers', async (req, res) => {
   res.status(200).json({vouchers: vouchers.map(e => objectMapper(e, mapperConfig))})
 })
 
+function findVouchers({userId, nameSearch, storeId, status, voucherId, usable}) {
+  const aggregateSteps = [];
+  const now = new Date();
+
+  aggregateSteps.push({$match: {restaurantPlusUser: ObjectId(userId)}});
+  aggregateSteps.push({
+    $lookup: {
+      from: 'rppromotions',
+      localField: 'promotion',
+      foreignField: '_id',
+      as: 'promotion',
+    }
+  });
+  aggregateSteps.push({$unwind: {path: '$promotion'}});
+  aggregateSteps.push({$addFields: {storeId: '$promotion.store'}});
+  aggregateSteps.push({
+    $lookup: {
+      from: 'stores',
+      localField: 'storeId',
+      foreignField: '_id',
+      as: 'store',
+    }
+  });
+  aggregateSteps.push({$unwind: {path: '$store'}});
+
+  if (nameSearch) aggregateSteps.push({$match: {promotionName: {$regex: nameSearch, $options: 'i'}}});
+  if (storeId) aggregateSteps.push({$match: {storeId: ObjectId(storeId)}});
+  if (status) {
+    aggregateSteps.push({$match: {status}});
+
+    if (status === VOUCHER_STATUS.UNUSED && usable) {
+      aggregateSteps.push({$match: {
+          'promotion.enabled': true,
+          $and: [
+            {$or: [{'startDate': {$exists: false}}, {'startDate': {$lte: now}}]},
+            {$or: [{'endDate': {$exists: false}}, {'endDate': {$gte: now}}]}
+          ],
+        }});
+    }
+  }
+  if (voucherId) aggregateSteps.push({$match: {_id: ObjectId(voucherId)}});
+
+  return VoucherModel.aggregate(aggregateSteps);
+}
+
 module.exports = router
+module.exports.findVouchers = findVouchers;

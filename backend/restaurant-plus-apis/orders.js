@@ -6,14 +6,16 @@ const StoreModel = cms.getModel("Store");
 const OrderModel = cms.getModel("Order");
 const DeviceModel = cms.getModel("Device");
 const UserModel = cms.getModel("RPUser");
+const VoucherModel = cms.getModel("RPVoucher");
 const ObjectId = require('mongoose').Types.ObjectId;
 const objectMapper = require('object-mapper');
 const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
 const _ = require('lodash');
 const {firebaseAdminInstance} = require('../firebase-messaging/admin');
-const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE} = require('./constants');
+const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
+const {findVouchers} = require('./vouchers');
 
 const mapperConfig = {
   _id: '_id',
@@ -23,7 +25,10 @@ const mapperConfig = {
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.storeId.name
   },
   date: 'date',
-  orderSum: 'orderSum',
+  orderSum: {
+    key: 'vSum',
+    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.orderSum
+  },
   itemCount: 'itemCount',
   paymentType: 'paymentType',
   shippingFee: 'shippingFee',
@@ -54,7 +59,7 @@ router.get('/', async (req, res) => {
 
     return {
       ...order._doc,
-      orderSum: +orderSum,
+      orderSum: order.vSum || +orderSum,
       itemCount,
       paymentType,
     }
@@ -116,20 +121,36 @@ router.post('/calculate-shipping-fee', async (req, res) => {
   }
 });
 
+// TODO: use transaction
 router.post('/', async (req, res) => {
   const {order} = req.body
   let {
     storeId, items, type, customer, payment, note, deliveryTime, date, user, voucher, shippingFee, total,
-    discountValue, timeoutDate
+    timeoutDate
   } = jsonFn.clone(order, true);
 
   const store = await StoreModel.findById(storeId)
   if (!store) return respondWithError(res, 400, 'Invalid store ID!');
 
+  let orderSum = (calOrderTotal(items) + calOrderModifier(items) + +shippingFee);
+  let orderDiscountValue = 0;
 
+  if (voucher) {
+    voucher = await findVouchers(voucher._id);
 
-  if (discountValue > 0) {
-    items = applyDiscountForOrder(items, {difference: discountValue, value: (total - discountValue)})
+    if (voucher.length) voucher = voucher[0];
+    else return respondWithError(res, 400, 'Invalid voucher');
+
+    if (voucher.promotion.discountType === PROMOTION_DISCOUNT_TYPE.FLAT) {
+      orderDiscountValue = orderSum >= voucher.promotion.discountValue ? voucher.promotion.discountValue : orderSum;
+    } else if (voucher.promotion.discountType === PROMOTION_DISCOUNT_TYPE.PERCENT) {
+      orderDiscountValue = (orderSum * voucher.promotion.discountValue / 100);
+    }
+
+    orderSum = orderSum - orderDiscountValue;
+    if (orderSum < 0) orderSum = 0;
+
+    await VoucherModel.updateOne({_id: voucher._id}, {status: VOUCHER_STATUS.USED});
   }
 
   const newOrder = await OrderModel.create({
@@ -153,6 +174,8 @@ router.post('/', async (req, res) => {
     shippingFee,
     note,
     online: true,
+    vSum: orderSum,
+    vDiscount: orderDiscountValue,
     restaurantPlusUser: user && user._id,
     ...voucher && {restaurantPlusVoucher: voucher._id},
   });
@@ -162,7 +185,12 @@ router.post('/', async (req, res) => {
   // including tablets & Restaurant Plus manager app
   sendOrderToStoreDevices(store._id, newOrder.toObject());
 
-  UserModel.updateOne({_id: user._id}, {lastUsedAddress: {address: customer.address, zipCode: customer.zipCode}}).exec();
+  UserModel.updateOne({_id: user._id}, {
+    lastUsedAddress: {
+      address: customer.address,
+      zipCode: customer.zipCode
+    }
+  }).exec();
 
   res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
