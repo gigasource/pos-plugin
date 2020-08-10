@@ -152,9 +152,7 @@ setTimeout(() => {
                   axios.post(`${host}/cms-files/files?folderPath=/images`, formData, { headers: formData.getHeaders() }).then(async res => {
                     if (res.data[0].uploadSuccess) {
                       const file = res.data[0].createdFile
-                      const downloadFilePath = `${host}/cms-files/files/download${file.folderPath}${file.fileName}`
-                      console.log("aied: ", downloadFilePath)
-                      await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { processedImage: downloadFilePath })
+                      await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: `/cms-files/files/view${file.folderPath}${file.fileName}` })
                     }
                   })
                 })
