@@ -26,6 +26,11 @@ const mapperConfig = {
   orderSum: 'orderSum',
   itemCount: 'itemCount',
   paymentType: 'paymentType',
+  shippingFee: 'shippingFee',
+  'items[]._id': 'items[]._id',
+  'items[].name': 'items[].name',
+  'items[].originalPrice': 'items[].originalPrice',
+  'items[].quantity': 'items[].quantity',
 }
 
 function calOrderTotal(items) {
@@ -60,7 +65,7 @@ router.get('/', async (req, res) => {
 
 router.get('/by-id/:orderId', async (req, res) => {
   const {orderId} = req.params;
-  if (!order) return respondWithError(res, 400, 'Missing property in request');
+  if (!orderId) return respondWithError(res, 400, 'Missing property in request');
 
   const order = await OrderModel.findById(orderId);
   if (!order) respondWithError(res, 400, 'Invalid order ID');
@@ -119,7 +124,9 @@ router.post('/', async (req, res) => {
   } = jsonFn.clone(order, true);
 
   const store = await StoreModel.findById(storeId)
-  if (!store) return respondWithError(res, 400, 'Invalid store ID!')
+  if (!store) return respondWithError(res, 400, 'Invalid store ID!');
+
+
 
   if (discountValue > 0) {
     items = applyDiscountForOrder(items, {difference: discountValue, value: (total - discountValue)})
@@ -147,7 +154,7 @@ router.post('/', async (req, res) => {
     note,
     online: true,
     restaurantPlusUser: user && user._id,
-    restaurantPlusVoucher: voucher && voucher._id,
+    ...voucher && {restaurantPlusVoucher: voucher._id},
   });
 
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
@@ -160,16 +167,18 @@ router.post('/', async (req, res) => {
   res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
 
-getExternalSocketIoServer().registerAckFunction('createOrderAck', async orderToken => {
-  await sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
-});
-
-externalSocketIOServer.on('connect', socket => {
-  socket.on('updateOrderStatus', async (orderStatus) => {
-    const {onlineOrderId, status, responseMessage} = orderStatus
-    await sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
+setTimeout(() => {
+  getExternalSocketIoServer().registerAckFunction('createOrderAck', async orderToken => {
+    await sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
   });
-});
+
+  getExternalSocketIoServer().on('connect', socket => {
+    socket.on('updateOrderStatus', async (orderStatus) => {
+      const {onlineOrderId, status, responseMessage} = orderStatus
+      await sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
+    });
+  });
+}, 5000);
 
 async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   const order = await OrderModel.findById(orderId);
