@@ -186,7 +186,7 @@ router.post('/', async (req, res) => {
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
 
   // including tablets & Restaurant Plus manager app
-  sendOrderToStoreDevices(store._id, {...newOrder.toObject(), deliveryDateTime});
+  sendOrderToStoreDevices(store._id, {...newOrder.toObject(), deliveryDateTime, orderToken: newOrder._id});
 
   UserModel.updateOne({_id: user._id}, {
     lastUsedAddress: {
@@ -198,28 +198,35 @@ router.post('/', async (req, res) => {
   res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
 
-setTimeout(() => {
-  getExternalSocketIoServer().registerAckFunction('createOrderAck', async orderToken => {
-    console.info('test1 ' + orderToken)
-    await sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
-  });
+// TODO: fix this
+const interval = setInterval(() => {
+  const externalSocketServer = getExternalSocketIoServer();
 
-  getExternalSocketIoServer().on('connect', socket => {
-    socket.on('updateOrderStatus', async (orderStatus) => {
-      console.info('test2 ' + orderStatus)
-      const {onlineOrderId, status, responseMessage} = orderStatus
-      await sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
+  if (externalSocketServer) {
+    externalSocketServer.registerAckFunction('createOrderAck', orderToken => {
+      console.info('test1 ' + orderToken)
+      sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
     });
-  });
-}, 5000);
+
+    externalSocketServer.on('connect', socket => {
+      socket.on('updateOrderStatus', (orderStatus) => {
+        console.info('test2 ' + orderStatus)
+        const {onlineOrderId, status, responseMessage} = orderStatus;
+        sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
+      });
+    });
+
+    clearInterval(interval);
+  }
+}, 50);
 
 async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   const order = await OrderModel.findById(orderId);
   if (!order) return;
 
   const admin = firebaseAdminInstance();
-  const storeName = order.settingName || order.name;
-  const firebaseToken = rpUser.firebaseToken;
+  const storeName = order.storeId.settingName || order.storeId.name;
+  const firebaseToken = order.restaurantPlusUser.firebaseToken;
 
   let notification;
 
@@ -249,7 +256,7 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   const message = {
     notification,
     data: {
-      orderId,
+      orderId: orderId.toString(),
       status,
       actionType: NOTIFICATION_ACTION_TYPE.ORDER_STATUS,
       ...orderMessage && {orderMessage},
@@ -331,8 +338,6 @@ async function sendOrderToStoreDevices(storeId, orderData) {
 
       const targetClientId = _id.toString();
       getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-      console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
-          `2a. Online order backend: received order from frontend, sending to demo device`);
     })
   }
 
@@ -352,7 +357,6 @@ async function sendOrderToStoreDevices(storeId, orderData) {
         }
       }
 
-      socket.join(orderData.orderToken);
       return;
     }
 
@@ -373,7 +377,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
     })),
   }
   const removePersistentMsg = await getExternalSocketIoServer().emitToPersistent(deviceId, 'createOrder', [data, new Date()],
-      'createOrderAck', [orderData.orderToken, storeName, storeAlias, deviceId]);
+      'createOrderAck', [orderData._id]);
 
   /*sendOrderTimeouts[orderData.orderToken] = setTimeout(async () => {
     updateOrderStatus(orderData.orderToken, {onlineOrderId: orderData.orderToken, status: 'failedToSend'})
