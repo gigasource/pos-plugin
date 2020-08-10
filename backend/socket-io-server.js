@@ -784,8 +784,8 @@ module.exports = async function (cms) {
         }
 
         const demoDevices = store.gSms.devices
+        const formattedOrder = formatOrder(orderData);
         demoDevices.filter(i => i.registered).forEach(({_id}) => {
-          const formattedOrder = formatOrder(orderData);
 
           /** @deprecated */
           const targetClientIdOld = `${store.id}_${_id.toString()}`;
