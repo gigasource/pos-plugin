@@ -85,6 +85,7 @@ router.post('/reservation', async (req, res) => {
   const store = await StoreModel.findById(storeId)
 
   if (store.gSms && store.gSms.enabled) {
+    cms.emit('sendReservationMessage', storeId, reservation)
     const demoDevices = store.gSms.devices
     demoDevices.filter(i => i.registered).forEach(({_id}) => {
       const targetClientId = _id;
