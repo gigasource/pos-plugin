@@ -12,6 +12,8 @@ const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
 const _ = require('lodash');
 const {firebaseAdminInstance} = require('../firebase-messaging/admin');
+const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE} = require('./constants');
+const jsonFn = require('json-fn');
 
 const mapperConfig = {
   _id: '_id',
@@ -54,6 +56,16 @@ router.get('/', async (req, res) => {
   });
 
   res.status(200).json(userOrders.map(e => objectMapper(e, mapperConfig)));
+});
+
+router.get('/by-id/:orderId', async (req, res) => {
+  const {orderId} = req.params;
+  if (!order) return respondWithError(res, 400, 'Missing property in request');
+
+  const order = await OrderModel.findById(orderId);
+  if (!order) respondWithError(res, 400, 'Invalid order ID');
+
+  res.status(200).json(objectMapper(order, mapperConfig));
 });
 
 router.post('/calculate-shipping-fee', async (req, res) => {
@@ -104,7 +116,7 @@ router.post('/', async (req, res) => {
   let {
     storeId, items, type, customer, payment, note, deliveryTime, date, user, voucher, shippingFee, total,
     discountValue, timeoutDate
-  } = order
+  } = jsonFn.clone(order, true);
 
   const store = await StoreModel.findById(storeId)
   if (!store) return respondWithError(res, 400, 'Invalid store ID!')
@@ -113,7 +125,7 @@ router.post('/', async (req, res) => {
     items = applyDiscountForOrder(items, {difference: discountValue, value: (total - discountValue)})
   }
 
-  const newOrder = await cms.getModel('Order').create({
+  const newOrder = await OrderModel.create({
     storeId,
     items: items.map(item => ({
       ..._.omit(item, ['_id', 'groupPrinters']),
@@ -135,34 +147,70 @@ router.post('/', async (req, res) => {
     note,
     online: true,
     restaurantPlusUser: user && user._id,
-    restaurantPlusVoucher: voucher && voucher._id
+    restaurantPlusVoucher: voucher && voucher._id,
   });
 
-  const rpUser = await UserModel.findById(user._id);
+  await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
 
+  // including tablets & Restaurant Plus manager app
   sendOrderToStoreDevices(store._id, newOrder.toObject());
-  sendNotificationToDevice({
-    firebaseToken: rpUser.firebaseToken,
-    storeName: store.name || store.settingName,
-    orderId: newOrder._id.toString(),
-  });
 
   UserModel.updateOne({_id: user._id}, {lastUsedAddress: {address: customer.address, zipCode: customer.zipCode}}).exec();
 
-  res.status(201).send();
+  res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
 
-function sendNotificationToDevice({firebaseToken, storeName, orderId, status = 'confirmed'}) {
+getExternalSocketIoServer().registerAckFunction('createOrderAck', async orderToken => {
+  await sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
+});
+
+externalSocketIOServer.on('connect', socket => {
+  socket.on('updateOrderStatus', async (orderStatus) => {
+    const {onlineOrderId, status, responseMessage} = orderStatus
+    await sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
+  });
+});
+
+async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
+  const order = await OrderModel.findById(orderId);
+  if (!order) return;
+
   const admin = firebaseAdminInstance();
+  const storeName = order.settingName || order.name;
+  const firebaseToken = rpUser.firebaseToken;
+
+  let notification;
+
+  switch (status) {
+    case ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS: {
+      notification = {
+        title: 'Order Sent',
+        body: `[${storeName}] Your order has been sent, awaiting confirmation form restaurant`,
+      }
+      break;
+    }
+    case ORDER_RESPONSE_STATUS.ORDER_CONFIRMED: {
+      notification = {
+        title: 'Order Confirmed',
+        body: `[${storeName}] Your order has been confirmed`,
+      }
+      break;
+    }
+    case ORDER_RESPONSE_STATUS.ORDER_CANCELLED: {
+      notification = {
+        title: 'Order Declined',
+        body: `[${storeName}] Your order has been declined`,
+      }
+    }
+  }
 
   const message = {
-    notification: {
-      title: 'Order confirmed',
-      body: `[${storeName}] Your order has been confirmed`,
-    },
+    notification,
     data: {
       orderId,
       status,
+      actionType: NOTIFICATION_ACTION_TYPE.ORDER_STATUS,
+      ...orderMessage && {orderMessage},
     },
     token: firebaseToken,
   }

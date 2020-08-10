@@ -24,11 +24,21 @@ const POINT_HISTORY_TRANSACTION_TYPE = Object.freeze({
   VALUE_ARRAY: ['storeRewardPoint', 'userBuyVoucher']
 });
 
+const ORDER_RESPONSE_STATUS = Object.freeze({
+  ORDER_CONFIRMED: 'kitchen',
+  ORDER_CANCELLED: 'declined',
+  ORDER_IN_PROGRESS: 'inProgress',
+});
+
+const NOTIFICATION_ACTION_TYPE = Object.freeze({
+  ORDER_STATUS: 'orderStatus',
+});
+
 const MAX_NEARBY_DISTANCE = 5000; //5km
 const DEFAULT_PROMOTION_BACKGROUND = 'https://online-order.gigasource.io/cms-files/files/view/Restaurant%20Plus%20images/default-restaurant-plus-promo-background.png';
 const PELIAS_HOST = 'https://pelias.gigasource.io'
 
 module.exports = {
   VOUCHER_STATUS, MAX_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, POINT_HISTORY_TRANSACTION_TYPE,
-  DEFAULT_PROMOTION_BACKGROUND, PELIAS_HOST,
+  DEFAULT_PROMOTION_BACKGROUND, PELIAS_HOST, ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE
 }
