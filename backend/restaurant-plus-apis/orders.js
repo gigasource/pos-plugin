@@ -209,13 +209,11 @@ const interval = setInterval(() => {
 
   if (externalSocketServer) {
     externalSocketServer.registerAckFunction('createOrderAck', orderToken => {
-      console.info('test1 ' + orderToken)
       sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
     });
 
     externalSocketServer.on('connect', socket => {
       socket.on('updateOrderStatus', (orderStatus) => {
-        console.info('test2 ' + orderStatus)
         const {onlineOrderId, status, responseMessage} = orderStatus;
         sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
       });
