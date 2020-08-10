@@ -11,8 +11,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const axios = require('axios')
 const http = require('http')
 const https = require('https')
-const fs = require('fs')
 const FormData = require('form-data')
+const path = require('path')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -120,50 +120,44 @@ setTimeout(() => {
         const result = _id
           ? await cms.getModel(collection).findOneAndUpdate({ _id }, value, { new: true })
           : await cms.getModel(collection).create({ store: device.storeId, ...value })
-
         cb({ success: true, _id: result._id, result })
 
-        // TODO: topaz ai -- change to true to run topaz ai
-        const useTopazAI = false
+        const useTopazAI = process.env.USE_TOPAZ_SERVICE === "true"
         if (value.image && useTopazAI) {
-          const host = 'http://192.168.10.69:8888' // TODO: get host value
-          const topazServiceUrl = 'http://192.168.10.21:12345'
-          // TODO: TopAzLabs Support passing image url instead of image file
+          let host = socket.request.headers.host
+          if (!host) {
+            host = 'https://pos.gigasource.io'
+          } else if (!host.startsWith('http')) { // raw ip - localhost
+            host = `http://${host}`
+          }
+          const topazServiceUrl = process.env.TOPAZ_SERVICE_ENDPOINT
           const { taskId } = (await axios.post(`${topazServiceUrl}/task`, { imageUrls: [ `${host}${value.image}` ] })).data
           const checkInterval = 1000
           let timeout = 60 // seconds
           const intervalId = setInterval(async () => {
-            // console.log(`check progress ${taskId}`)
-            const data = (await axios.get(`${topazServiceUrl}/task/${taskId}`)).data;
-            // console.log('check progress response: ', data)
             timeout--;
+            const data = (await axios.get(`${topazServiceUrl}/task/${taskId}`)).data;
             if (timeout <= 0) {
               clearInterval(intervalId);
-
             } else if (data.status === 'completed') {
               clearInterval(intervalId)
               try {
                 const protocol = topazServiceUrl.startsWith("https") ? https : http
-                protocol.get(`${topazServiceUrl}${data.path}`, response => {
+                protocol.get(`${topazServiceUrl}${data.path}`, async response => {
                   const formData = new FormData()
-                  formData.append("file", response) // something like that
-                  const formHeaders = formData.getHeaders();
-                  axios.post(`http://localhost:8888/cms-files/files?folderPath=/images`, formData, {
-                    headers: {
-                      ...formHeaders,
-                    },
-                  }).then(async res => {
-                    // TODO: Add processedImage field to store processed image by adjust AI.
-                    // TODO: What to do after that?
+                  formData.append("file", response, {
+                    filename: path.basename(data.path),
+                    contentType: 'image/jpeg'
+                  })
+                  axios.post(`${host}/cms-files/files?folderPath=/images`, formData, { headers: formData.getHeaders() }).then(async res => {
                     if (res.data[0].uploadSuccess) {
                       const file = res.data[0].createdFile
-                      const downloadFilePath = `${host}/files/download${file.folderPath}${file.fileName}`
+                      const downloadFilePath = `${host}/cms-files/files/download${file.folderPath}${file.fileName}`
+                      console.log("aied: ", downloadFilePath)
                       await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { processedImage: downloadFilePath })
                     }
-                  }).catch(e => {
-                    console.log(e)
                   })
-                });
+                })
               } catch (e) {
                 console.log('failed: ', e.message)
               }
