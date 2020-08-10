@@ -120,4 +120,25 @@ router.post('/reservation', async (req, res) => {
   res.sendStatus(200)
 })
 
+router.get('/reservations', async (req, res) => {
+  const { userId } = req.query
+  if (!userId) res.sendStatus(400)
+
+  const reservations = await cms.getModel('Reservation').aggregate([
+    { $match: { userId: ObjectId(userId) }},
+    {
+      $lookup: {
+        from: 'stores',
+        localField: 'store',
+        foreignField: '_id',
+        as: 'store',
+      }
+    },
+    { $unwind: { path: '$store', preserveNullAndEmptyArrays: true }},
+    { $set: { logoImageSrc: '$store.logoImageSrc', storeName: '$store.name' }},
+    { $unset: 'store' }
+  ])
+  res.status(200).json(reservations)
+})
+
 module.exports = router
