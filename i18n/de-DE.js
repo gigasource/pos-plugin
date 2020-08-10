@@ -79,14 +79,15 @@ module.exports = {
       mustard: 'Senf',
       soya: 'Soja',
       sulphur: 'Schwefeldioxid',
-      messageConfirm: 'Your order will be sent to the restaurant.',
+      messageConfirm: 'Ihre Bestellung wird an das Restaurant gesendet',
       next: 'Weiter',
       deliveryIn: 'Lieferung in {0} Minuten.',
       pickUpIn: 'Abholung in {0} Minuten.',
       payByCash: 'Barzahlung',
       paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
       notAvailable: 'Nicht Verfügbar',
-      zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.'
+      zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.',
+      orderConfirmation: 'Bestellbestätigung'
     },
 
     common: {

@@ -372,7 +372,8 @@ module.exports = {
       payByCash: 'Pay By Cash',
       paymentOption: 'PAYMENT OPTIONS',
       notAvailable: 'Not Available',
-      zipCodeMinOrder: 'The minimum order value in your area is {0}{1}.'
+      zipCodeMinOrder: 'The minimum order value in your area is {0}{1}.',
+      orderConfirmation: 'Order Confirmation'
     },
 
     paymentProviders: {
