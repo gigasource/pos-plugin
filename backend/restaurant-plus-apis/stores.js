@@ -77,7 +77,7 @@ router.get('/nearby', async (req, res) => {
         spherical: true
       }
     },
-    ...limit && {$limit: +limit},
+    {...limit && {$limit: +limit}},
   ])
 
   const mappedStores = nearbyStores.map(store => {
