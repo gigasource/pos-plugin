@@ -170,7 +170,8 @@ module.exports = cms => {
 
     try {
       const response = await admin.messaging().send(message)
-      console.log('sent reservation update notification', response)
+      console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},reservationId=${reservationId}`,
+        `5. Online order backend: sent reservation notification to end user: ${response}`)
     } catch (e) {
       console.log('failed to send reservation update notification')
     }
