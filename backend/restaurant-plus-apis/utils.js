@@ -4,6 +4,7 @@ const _ = require('lodash')
 
 function respondWithError(res, status, msg) {
   res.status(status);
+  console.error(msg);
 
   if (msg) res.json({error: msg});
   else res.send();

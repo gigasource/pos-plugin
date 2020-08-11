@@ -16,6 +16,7 @@ const {firebaseAdminInstance} = require('../firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
 const {findVouchers} = require('./vouchers');
+const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 
 const mapperConfig = {
   _id: '_id',
@@ -281,59 +282,8 @@ async function sendOrderToStoreDevices(storeId, orderData) {
   if (store.gSms && store.gSms.enabled) {
     cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
-    function formatOrder(orderData) {
-      let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, type: orderType, paymentType,
-        items: products, shippingFee, totalPrice} = _.cloneDeep(orderData)
-
-      products = products.map(({id, modifiers, name, note, originalPrice, quantity}) => {
-        if (modifiers && modifiers.length) {
-          const sumOfModifiers = modifiers.reduce((sum, {price, quantity}) => sum + quantity * price, 0)
-          originalPrice = originalPrice + sumOfModifiers
-        }
-
-        return {
-          id,
-          name,
-          originalPrice,
-          note,
-          modifiers: modifiers.map(({name}) => name).join(', '),
-          quantity,
-        }
-      })
-
-      discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
-
-      if (deliveryDateTime === 'asap') {
-        const timeToComplete = store.gSms.timeToComplete || 30;
-        deliveryDateTime = dayjs().add(timeToComplete, 'minute').toDate()
-      }
-      deliveryDateTime = jsonFn.clone(deliveryDateTime) //stringify
-
-      customer = {
-        name: customer.name,
-        phoneNumber: customer.phoneNumber,
-        zipCode: customer.zipCode,
-        address: customer.address
-      }
-
-      return {
-        orderToken,
-        orderType,
-        paymentType,
-        customer: JSON.stringify(customer),
-        products: JSON.stringify(products),
-        note,
-        date: createdDate,
-        shippingFee,
-        total: totalPrice,
-        deliveryTime: deliveryDateTime,
-        discounts
-      }
-    }
-
-    const demoDevices = store.gSms.devices
-    demoDevices.filter(i => i.registered).forEach(({_id}) => {
-      const formattedOrder = formatOrder(orderData);
+    store.gSms.devices.filter(i => i.registered).forEach(({_id}) => {
+      const formattedOrder = formatOrderForRpManager(orderData);
 
       /** @deprecated */
       const targetClientIdOld = `${store.id}_${_id.toString()}`;
@@ -381,7 +331,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
     orderType: orderData.type
   }
   const removePersistentMsg = await getExternalSocketIoServer().emitToPersistent(deviceId, 'createOrder', [data, new Date()],
-      'createOrderAck', [orderData._id]);
+    'createOrderAck', [orderData._id]);
 
   /*sendOrderTimeouts[orderData.orderToken] = setTimeout(async () => {
     updateOrderStatus(orderData.orderToken, {onlineOrderId: orderData.orderToken, status: 'failedToSend'})

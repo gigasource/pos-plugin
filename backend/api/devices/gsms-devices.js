@@ -418,3 +418,6 @@ function formatOrder(order, store) {
 }
 
 module.exports = router
+
+// RpManager is Restaurant Plus Manager app, this function formats order data to match format used in the app
+module.exports.formatOrderForRpManager = formatOrder;
