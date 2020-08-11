@@ -68,7 +68,7 @@ router.get('/nearby', async (req, res) => {
   const { coordinates, maxDistance, limit } = req.query
   const [long, lat] = coordinates.split(',')
 
-  const nearbyStores = await StoreModel.aggregate([
+  const aggregateSteps = [
     {
       $geoNear: {
         near: {  type: 'Point', coordinates: [+long, +lat] },
@@ -77,8 +77,11 @@ router.get('/nearby', async (req, res) => {
         spherical: true
       }
     },
-    {...limit && {$limit: +limit}},
-  ])
+  ];
+
+  if (limit) aggregateSteps.push({$limit: +limit});
+
+  const nearbyStores = await StoreModel.aggregate(aggregateSteps);
 
   const mappedStores = nearbyStores.map(store => {
     return _.pick(store, ['_id', 'id', 'name', 'address', 'settingName', 'settingAddress', 'townCity', 'country',
