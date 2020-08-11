@@ -102,9 +102,10 @@ router.post('/reservation', async (req, res) => {
   const { storeId, reservation } = req.body
   if (!storeId || !reservation) res.sendStatus(400)
 
-  const newReservation = await cms.getModel('Reservation').create({...reservation, store: storeId})
-  // todo emit to manager app
   const store = await StoreModel.findById(storeId)
+  const newReservation = await cms.getModel('Reservation').create({...reservation, store: storeId})
+  console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId},reservationId=${newReservation._id}`,
+    `1. Online order backend: received new reservation from end user`)
 
   if (store.gSms && store.gSms.enabled) {
     cms.emit('sendReservationMessage', storeId, reservation)
@@ -112,8 +113,8 @@ router.post('/reservation', async (req, res) => {
     demoDevices.filter(i => i.registered).forEach(({_id}) => {
       const targetClientId = _id;
       getExternalSocketIoServer().emitToPersistent(targetClientId, 'createReservation', [newReservation._doc])
-      console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
-        `2. Online order backend: sent reservation to demo device`)
+      console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId},reservationId=${newReservation._id}`,
+        `2. Online order backend: sent reservation to manager app device`)
     })
   }
 

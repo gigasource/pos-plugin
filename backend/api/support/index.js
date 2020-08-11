@@ -212,11 +212,11 @@ setTimeout(() => {
     })
 
     socket.on('updateReservationStatus', async (reservationId, status, cb) => {
-      console.log('updateReservationStatus', reservationId, status)
-
       try {
         await cms.getModel('Reservation').findOneAndUpdate({ _id: ObjectId(reservationId) }, { status })
         cb({ success: true })
+        console.debug(`sentry:eventType=reservation,reservationId=${reservationId}`,
+          `4. Online order backend: received reservation status update: ${status}`)
         cms.emit('sendClientReservationStatus', reservationId)
       } catch (error) {
         cb({ error })
