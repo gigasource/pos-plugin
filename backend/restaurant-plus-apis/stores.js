@@ -65,7 +65,7 @@ router.get('/by-id/:storeId', async (req, res) => {
 });
 
 router.get('/nearby', async (req, res) => {
-  const { coordinates, maxDistance } = req.query
+  const { coordinates, maxDistance, limit } = req.query
   const [long, lat] = coordinates.split(',')
 
   const nearbyStores = await StoreModel.aggregate([
@@ -76,7 +76,8 @@ router.get('/nearby', async (req, res) => {
         distanceField: 'calcDistance',
         spherical: true
       }
-    }
+    },
+    ...limit && {$limit: +limit},
   ])
 
   const mappedStores = nearbyStores.map(store => {
