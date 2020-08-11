@@ -187,7 +187,7 @@ router.post('/', async (req, res) => {
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
 
   // including tablets & Restaurant Plus manager app
-  sendOrderToStoreDevices(store._id, {
+  sendOrderToStoreDevices(store, {
     ...newOrder.toObject(),
     deliveryDateTime,
     orderToken: newOrder._id,
@@ -271,10 +271,9 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   return admin.messaging().send(message);
 }
 
-async function sendOrderToStoreDevices(storeId, orderData) {
-  storeId = ObjectId(storeId);
+async function sendOrderToStoreDevices(store, orderData) {
+  const storeId = ObjectId(store._id);
   const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
-  const store = await StoreModel.findById(storeId);
 
   const storeName = store.name || store.settingName;
   const storeAlias = store.alias;
@@ -283,7 +282,7 @@ async function sendOrderToStoreDevices(storeId, orderData) {
     cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
 
     store.gSms.devices.filter(i => i.registered).forEach(({_id}) => {
-      const formattedOrder = formatOrderForRpManager(orderData);
+      const formattedOrder = formatOrderForRpManager(orderData, store);
 
       /** @deprecated */
       const targetClientIdOld = `${store.id}_${_id.toString()}`;
