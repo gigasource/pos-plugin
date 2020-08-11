@@ -54,10 +54,12 @@ router.get('/rp-points/:userId', async (req, res) => {
   const stores = await StoreModel.find({_id: {$in: storeIds}});
   storeIds.forEach(storeId => {
     const pointValue = rpPoints[storeId];
+    const latestTransaction = transactions.find(({_id}) => _id.toString() === storeId);
+
     rpPoints[storeId] = {
       value: pointValue,
       store: objectMapper(stores.find(({_id}) => _id.toString() === storeId)._doc, storeMapperConfig),
-      lastTransactionDate: transactions.find(({_id}) => _id.toString() === storeId).createdAt,
+      lastTransactionDate: latestTransaction && latestTransaction.createdAt,
     }
   });
 
