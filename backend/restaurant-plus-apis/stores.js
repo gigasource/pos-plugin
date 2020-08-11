@@ -1,4 +1,4 @@
-const { MAX_NEARBY_DISTANCE } = require('./constants');
+const { DEFAULT_NEARBY_DISTANCE } = require('./constants');
 const _ = require('lodash')
 const express = require('express')
 const router = express.Router()
@@ -43,14 +43,14 @@ router.get('/by-id/:storeId', async (req, res) => {
 });
 
 router.get('/nearby', async (req, res) => {
-  const { coordinates } = req.query
+  const { coordinates, maxDistance } = req.query
   const [long, lat] = coordinates.split(',')
 
   const nearbyStores = await StoreModel.aggregate([
     {
       $geoNear: {
         near: {  type: 'Point', coordinates: [+long, +lat] },
-        maxDistance: MAX_NEARBY_DISTANCE,
+        maxDistance: +maxDistance || DEFAULT_NEARBY_DISTANCE,
         distanceField: 'calcDistance',
         spherical: true
       }

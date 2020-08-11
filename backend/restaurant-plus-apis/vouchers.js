@@ -10,7 +10,7 @@ const PromotionModel = cms.getModel('RPPromotion');
 const UserModel = cms.getModel('RPUser');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
-const { MAX_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE } = require('./constants');
+const { DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE } = require('./constants');
 const {respondWithError} = require('./utils');
 
 const mapperConfig = {
@@ -141,7 +141,7 @@ router.get('/nearby', async (req, res) => {
     location: {
       $near: {
         $geometry: { type: 'Point', coordinates: [long, lat] },
-        $maxDistance: MAX_NEARBY_DISTANCE //5km from point
+        $maxDistance: DEFAULT_NEARBY_DISTANCE //5km from point
       }
     }
   }).lean()
