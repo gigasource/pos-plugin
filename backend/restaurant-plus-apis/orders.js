@@ -129,6 +129,9 @@ router.post('/', async (req, res) => {
     timeoutDate, deliveryDateTime,
   } = jsonFn.clone(order, true);
 
+  customer.phone = customer.phoneNumber;
+  delete customer.phoneNumber;
+
   const store = await StoreModel.findById(storeId)
   if (!store) return respondWithError(res, 400, 'Invalid store ID!');
 
@@ -272,24 +275,25 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
 }
 
 async function sendOrderToStoreDevices(store, orderData) {
-  const storeId = ObjectId(store._id);
-  const device = await DeviceModel.findOne({storeId, 'features.onlineOrdering': true});
+  const device = await DeviceModel.findOne({storeId: store._id, 'features.onlineOrdering': true});
 
   const storeName = store.name || store.settingName;
   const storeAlias = store.alias;
 
   if (store.gSms && store.gSms.enabled) {
-    cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+    cms.emit('sendOrderMessage', store._id, orderData) // send fcm message
 
     store.gSms.devices.filter(i => i.registered).forEach(({_id}) => {
-      const formattedOrder = formatOrderForRpManager(orderData, store);
+      const formattedOrder = formatOrderForRpManager(_.cloneDeep(orderData), store);
 
       /** @deprecated */
       const targetClientIdOld = `${store.id}_${_id.toString()}`;
-      getExternalSocketIoServer().emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+      getExternalSocketIoServer().emitToPersistent(targetClientIdOld, 'createOrder',
+        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
 
       const targetClientId = _id.toString();
-      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder',
+        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
     })
   }
 
@@ -329,6 +333,7 @@ async function sendOrderToStoreDevices(store, orderData) {
     })),
     orderType: orderData.type
   }
+
   const removePersistentMsg = await getExternalSocketIoServer().emitToPersistent(deviceId, 'createOrder', [data, new Date()],
     'createOrderAck', [orderData._id]);
 
