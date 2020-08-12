@@ -94,7 +94,7 @@ router.put('/:userId', async (req, res) => {
 });
 
 router.post('/authenticate', async (req, res) => {
-  let {idToken, firebaseToken, phoneNumber, name, signInType} = req.body;
+  let {idToken, firebaseToken, phoneNumber, name, signInType, email, avatar} = req.body;
   if (!idToken) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
@@ -108,18 +108,28 @@ router.post('/authenticate', async (req, res) => {
   }
 
   if (decodedIdToken) {
-    name = name || decodedIdToken.name || '';
     const firebaseUid = decodedIdToken.uid;
     let user = await UserModel.findOne({firebaseUid});
+
+    name = name || decodedIdToken.name;
+    email = email || decodedIdToken.email;
+    avatar = avatar || decodedIdToken.picture;
 
     if (user) {
       res.status(200).json(objectMapper(user, mapperConfig));
       // update firebaseToken whenever login success
-      if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {firebaseToken});
+      if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {
+        firebaseToken,
+        ...!user.name && {name},
+        ...!user.email && {email},
+        ...!user.avatar && {avatar},
+      });
     } else {
       user = await UserModel.create({
         name: name || '',
         ...phoneNumber && {phoneNumber},
+        ...email && {email},
+        ...avatar && {avatar},
         addresses: [],
         createdAt: new Date(),
         rpPoints: {},
