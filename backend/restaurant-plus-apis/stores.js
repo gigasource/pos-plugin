@@ -108,7 +108,7 @@ router.post('/reservation', async (req, res) => {
 
   const store = await StoreModel.findById(storeId)
   const newReservation = await cms.getModel('Reservation').create({...reservation, store: storeId})
-  console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId},reservationId=${newReservation._id}`,
+  console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},reservationId=${newReservation._id}`,
     `1. Online order backend: received new reservation from end user`)
 
   if (store.gSms && store.gSms.enabled) {
