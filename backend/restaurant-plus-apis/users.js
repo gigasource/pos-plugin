@@ -210,7 +210,7 @@ router.post('/unfollow-store', async (req, res) => {
 
   let {followedStores = []} = user;
   if (followedStores.length) {
-    followedStores = followedStores.filter(e => e !== storeId);
+    followedStores = followedStores.filter(e => e._id.toString() !== storeId);
     await UserModel.updateOne({_id: user._id}, {followedStores});
   }
 
