@@ -610,7 +610,6 @@
       openDialogImage(src, desc) {
         this.dialog.image.src = getCdnUrl(src)
         this.dialog.image.desc = desc
-        document.documentElement.style.overflow = 'hidden'
         this.dialog.image.active = true
       },
       addBounceAction() {
@@ -625,7 +624,6 @@
         }, 1000)
       },
       closeDialogImage() {
-        document.documentElement.style.overflow = ''
         this.dialog.image.active = false
       }
     },
@@ -644,6 +642,10 @@
             autoResizeTextarea('.po-order-table__item__note textarea');
           })
         }
+      },
+      'dialog.image.active': (val) => {
+        if (val) return document.documentElement.style.overflow = 'hidden'
+        document.documentElement.style.overflow = ''
       }
     }
   }

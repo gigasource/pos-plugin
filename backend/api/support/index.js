@@ -112,8 +112,8 @@ setTimeout(() => {
       const device = await cms.getModel('Device').findById(clientId)
       if (!device.storeId) return
       const store = await cms.getModel('Store').findById(device.storeId)
-      console.debug(`sentry:store=${store.name || store.settingName},alias=${store.alias},eventType=updateMenu,deviceId=${device._id}`,
-        _id ? `Updating ${collection} item ${_id}` : `Adding ${collection} item`, value)
+      const TAG = `sentry:store=${store.name || store.settingName},alias=${store.alias},eventType=updateMenu,deviceId=${device._id}`
+      console.debug(TAG, _id ? `Updating ${collection} item ${_id}` : `Adding ${collection} item`, value)
 
       // insert/update product or category
       try {
@@ -124,22 +124,26 @@ setTimeout(() => {
 
         const useTopazAI = process.env.USE_TOPAZ_SERVICE === "true"
         if (value.image && useTopazAI) {
+          const topazServiceUrl = process.env.TOPAZ_SERVICE_ENDPOINT
           let host = socket.request.headers.host
           if (!host) {
             host = 'https://pos.gigasource.io'
           } else if (!host.startsWith('http')) { // raw ip - localhost
             host = `http://${host}`
           }
-          const topazServiceUrl = process.env.TOPAZ_SERVICE_ENDPOINT
+          console.debug(TAG, `TopazAI: service endpoint = "${topazServiceUrl}", host="${host}"`)
           const { taskId } = (await axios.post(`${topazServiceUrl}/task`, { imageUrls: [ `${host}${value.image}` ] })).data
+          console.debug(TAG, `TopazAI: Adjust image with taskId="${taskId}"`)
           const checkInterval = 1000
           let timeout = 60 // seconds
           const intervalId = setInterval(async () => {
             timeout--;
             const data = (await axios.get(`${topazServiceUrl}/task/${taskId}`)).data;
             if (timeout <= 0) {
+              console.debug(TAG, `TopazAI: Task "${taskId}" timeout!`)
               clearInterval(intervalId);
             } else if (data.status === 'completed') {
+              console.debug(TAG, `TopazAI: Task "${taskId}" completed!` )
               clearInterval(intervalId)
               try {
                 const protocol = topazServiceUrl.startsWith("https") ? https : http
@@ -151,13 +155,24 @@ setTimeout(() => {
                   })
                   axios.post(`${host}/cms-files/files?folderPath=/images`, formData, { headers: formData.getHeaders() }).then(async res => {
                     if (res.data[0].uploadSuccess) {
-                      const file = res.data[0].createdFile
-                      await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: `/cms-files/files/view${file.folderPath}${file.fileName}` })
+                      try {
+                        console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload completed.`)
+                        const file = res.data[0].createdFile
+                        const newImagePath = `/cms-files/files/view${file.folderPath}${file.fileName}`
+                        await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: newImagePath })
+                        console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" to "${newImagePath}" completed!`)
+                      } catch (ie) {
+                        console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" failed with error "${ie}"!`)
+                      }
+                    } else {
+                      console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload failed.`)
                     }
+                  }).catch((ex) => {
+                    console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload failed with error: ${ex}`)
                   })
                 })
               } catch (e) {
-                console.log('failed: ', e.message)
+                console.debug(TAG, `TopazAI: Task "${taskId}" failed with un-expected exception ${e}`)
               }
 
             } else if (data.status === 'failed') {
