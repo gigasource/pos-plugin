@@ -8,6 +8,7 @@ const PointHistoryModel = cms.getModel('RPPointHistory');
 const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin'); // admin is initialized in another file
 const objectMapper = require('object-mapper');
+const {storeMapperConfig} = require('./stores');
 
 const mapperConfig = {
   _id: '_id',
@@ -20,14 +21,14 @@ const mapperConfig = {
   email: 'email',
   avatar: 'avatar',
   lastUsedAddress: 'lastUsedAddress',
-}
-
-const storeMapperConfig = {
-  _id: '_id',
-  logoImageSrc: 'logoImageSrc',
-  settingName: {
-    key: 'name',
-    transform: (sourceValue, sourceObject) => sourceValue || sourceObject.name
+  followedStores: {
+    key: 'followedStores',
+    transform(sourceValue) {
+      return Object.keys(sourceValue).reduce((acc, key) => {
+        if (key !== 'length') acc.push(objectMapper(sourceValue[key]._doc, storeMapperConfig));
+        return acc;
+      }, []);
+    },
   },
 }
 
@@ -80,7 +81,9 @@ router.put('/:userId', async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
-  const {name, email, addresses, firebaseToken, avatar, lastUsedAddress} = req.body;
+  const {name, email, addresses, firebaseToken, avatar, lastUsedAddress, location} = req.body;
+  const {long, lat} = location || {};
+
   const newUser = await UserModel.findOneAndUpdate({_id: ObjectId(userId)}, {
     ...name && {name},
     ...addresses && {addresses},
@@ -88,6 +91,12 @@ router.put('/:userId', async (req, res) => {
     ...firebaseToken && {firebaseToken},
     ...avatar && {avatar},
     ...lastUsedAddress && {lastUsedAddress},
+    ...(long && lat) && {
+      location: {
+        type: 'Point',
+        coordinates: [long, lat]
+      }
+    },
   }, {new: true});
 
   res.status(200).json(objectMapper(newUser, mapperConfig));
@@ -116,7 +125,6 @@ router.post('/authenticate', async (req, res) => {
     avatar = avatar || decodedIdToken.picture;
 
     if (user) {
-      res.status(200).json(objectMapper(user, mapperConfig));
       // update firebaseToken whenever login success
       if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {
         firebaseToken,
@@ -124,6 +132,8 @@ router.post('/authenticate', async (req, res) => {
         ...!user.email && {email},
         ...!user.avatar && {avatar},
       });
+
+      res.status(200).json(objectMapper(user, mapperConfig));
     } else {
       user = await UserModel.create({
         name: name || '',
@@ -136,6 +146,7 @@ router.post('/authenticate', async (req, res) => {
         firebaseUid,
         initialSignInType: signInType,
       });
+
       res.status(201).json(objectMapper(user, mapperConfig));
     }
   } else {
@@ -166,6 +177,44 @@ router.post('/check-id-token', async (req, res) => {
   }
 
   respondWithError(res, 400, 'Invalid token');
+});
+
+router.post('/follow-store', async (req, res) => {
+  const {userId, storeId} = req.body;
+  if (!userId || !storeId) return respondWithError(res, 400, 'Missing property in request');
+
+  const user = await UserModel.findById(userId);
+  if (!user) return respondWithError(res, 400, 'Invalid user ID');
+
+  const store = await StoreModel.findById(storeId);
+  if (!store) return respondWithError(res, 400, 'Invalid store ID');
+
+  const {followedStores = []} = user;
+  if (!followedStores.includes(storeId)) {
+    followedStores.push(storeId);
+    await UserModel.updateOne({_id: user._id}, {followedStores});
+  }
+
+  res.status(204).send();
+});
+
+router.post('/unfollow-store', async (req, res) => {
+  const {userId, storeId} = req.body;
+  if (!userId || !storeId) return respondWithError(res, 400, 'Missing property in request');
+
+  const user = await UserModel.findById(userId);
+  if (!user) return respondWithError(res, 400, 'Invalid user ID');
+
+  const store = await StoreModel.findById(storeId);
+  if (!store) return respondWithError(res, 400, 'Invalid store ID');
+
+  let {followedStores = []} = user;
+  if (followedStores.length) {
+    followedStores = followedStores.filter(e => e !== storeId);
+    await UserModel.updateOne({_id: user._id}, {followedStores});
+  }
+
+  res.status(204).send();
 });
 
 module.exports = router;

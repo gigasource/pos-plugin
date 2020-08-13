@@ -95,6 +95,19 @@
       "schemaType": "mixed",
       "key": "lastUsedAddress",
       "mixed": true
+    },
+    {
+      "_id": "5f33b6363ca20d3aff3d1e3d",
+      "schemaType": "array",
+      "key": "followedStores",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "",
+          "ref": "Store",
+          "autopopulate": true
+        }
+      ]
     }
   ],
   "name": "RPUser",
