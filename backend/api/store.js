@@ -230,6 +230,7 @@ router.get('/sign-in-requests', async (req, res) => {
   const requests = await getRequestsFromDb({...status && {status}});
 
   res.status(200).json(requests.map(({device, store, storeFromGoogleMap, ...e}) => {
+    if (!device) return null;
     if (!store) store = storeFromGoogleMap
 
     return {
@@ -239,7 +240,7 @@ router.get('/sign-in-requests', async (req, res) => {
       ...store && {storeName: store.settingName || store.name, storeId: store._id},
       ...e,
     }
-  }));
+  }).filter(e => !!e));
 });
 
 router.get('/sign-in-requests/:requestId', async (req, res) => {
