@@ -7,6 +7,7 @@ const objectMapper = require('object-mapper');
 const {getExternalSocketIoServer} = require('../socket-io-server');
 const {respondWithError} = require('./utils');
 const UserModel = cms.getModel('RPUser');
+const {jwtValidator} = require('./api-security');
 
 const mapperConfig = {
   _id: '_id',
@@ -64,7 +65,7 @@ router.get('/by-id/:storeId', async (req, res) => {
   res.status(200).json(objectMapper(store, mapperConfig));
 });
 
-router.get('/followed-by-user/:userId', async (req, res) => {
+router.get('/followed-by-user/:userId', jwtValidator, async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing property in request');
 
@@ -130,7 +131,7 @@ router.get('/:id/menu', async (req, res) => {
   res.status(200).json({products, categories})
 })
 
-router.post('/reservation', async (req, res) => {
+router.post('/reservation', jwtValidator, async (req, res) => {
   const {storeId, reservation} = req.body
   if (!storeId || !reservation) res.sendStatus(400)
 
@@ -153,7 +154,7 @@ router.post('/reservation', async (req, res) => {
   res.sendStatus(200)
 })
 
-router.get('/reservations', async (req, res) => {
+router.get('/reservations', jwtValidator, async (req, res) => {
   const {userId} = req.query
   if (!userId) res.sendStatus(400)
 

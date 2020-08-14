@@ -10,8 +10,9 @@ const PromotionModel = cms.getModel('RPPromotion');
 const UserModel = cms.getModel('RPUser');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
-const { DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE } = require('./constants');
+const {DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
 const {respondWithError} = require('./utils');
+const {jwtValidator} = require('./api-security');
 
 const mapperConfig = {
   _id: '_id',
@@ -36,7 +37,7 @@ const mapperConfig = {
   'promotion.descriptionImageUrl': 'promotion.descriptionImageUrl',
 }
 
-router.get('/', async (req, res) => {
+router.get('/', jwtValidator, async (req, res) => {
   const {userId, storeId, nameSearch, status, usable, voucherId} = req.query;
   if (!userId) return respondWithError(res, 400, 'Missing user ID in request');
 
@@ -44,7 +45,7 @@ router.get('/', async (req, res) => {
   res.status(200).json(userVouchers.map(e => objectMapper(e, mapperConfig)));
 });
 
-router.get('/by-id/:voucherId', async (req, res) => {
+router.get('/by-id/:voucherId', jwtValidator, async (req, res) => {
   const {voucherId} = req.params;
   if (!voucherId) return respondWithError(res, 400, 'Missing voucher ID in request');
 
@@ -52,34 +53,34 @@ router.get('/by-id/:voucherId', async (req, res) => {
   res.status(200).json(objectMapper(voucher, mapperConfig));
 });
 
-router.put('/use-voucher/:voucherId', async (req, res) => {
+router.put('/use-voucher/:voucherId', jwtValidator, async (req, res) => {
   const {voucherId} = req.params;
   const {storeId} = req.query;
-  if (!voucherId) return respondWithError(res, 400,'Missing voucher ID in request');
-  if (!storeId) return respondWithError(res, 400,'Missing store ID in request');
+  if (!voucherId) return respondWithError(res, 400, 'Missing voucher ID in request');
+  if (!storeId) return respondWithError(res, 400, 'Missing store ID in request');
 
   const voucher = await VoucherModel.findById(voucherId);
-  if (!voucher) return respondWithError(res, 400,'Voucher not found');
+  if (!voucher) return respondWithError(res, 400, 'Voucher not found');
 
   const nowInMs = new Date().getTime();
-  if (voucher.status === VOUCHER_STATUS.USED) return respondWithError(res, 400,'This voucher has already been used');
-  if (voucher.startDate && nowInMs < voucher.startDate.getTime()) return respondWithError(res, 400,'This voucher can not be used yet');
-  if (voucher.endDate && nowInMs > voucher.endDate.getTime()) return respondWithError(res, 400,'This voucher has expired');
-  if (voucher.promotion.store._id.toString() !== storeId) return respondWithError(res, 400,`This voucher can not be used with store ${storeId}`);
+  if (voucher.status === VOUCHER_STATUS.USED) return respondWithError(res, 400, 'This voucher has already been used');
+  if (voucher.startDate && nowInMs < voucher.startDate.getTime()) return respondWithError(res, 400, 'This voucher can not be used yet');
+  if (voucher.endDate && nowInMs > voucher.endDate.getTime()) return respondWithError(res, 400, 'This voucher has expired');
+  if (voucher.promotion.store._id.toString() !== storeId) return respondWithError(res, 400, `This voucher can not be used with store ${storeId}`);
 
   await VoucherModel.updateOne({_id: voucher._id}, {status: VOUCHER_STATUS.UNUSED});
   res.status(204).send();
 });
 
-router.post('/', async (req, res) => {
+router.post('/', jwtValidator, async (req, res) => {
   const {promotionId, userId, quantity} = req.body;
-  if (!promotionId || !userId || !quantity) return respondWithError(res, 400,'Missing property in request body');
+  if (!promotionId || !userId || !quantity) return respondWithError(res, 400, 'Missing property in request body');
 
   const promotion = await PromotionModel.findById(promotionId);
-  if (!promotion) return respondWithError(res, 400,'Selected promotion campaign not found');
+  if (!promotion) return respondWithError(res, 400, 'Selected promotion campaign not found');
 
   const user = await UserModel.findById(userId);
-  if (!user) return respondWithError(res, 400,'Selected user not found');
+  if (!user) return respondWithError(res, 400, 'Selected user not found');
 
   const promoLimitForUser = promotion.limitForUser;
   const issuedVoucherForUserCount = await VoucherModel.countDocuments({
@@ -131,8 +132,8 @@ router.post('/', async (req, res) => {
   res.status(201).json(objectMapper(newVoucher, mapperConfig));
 });
 
-router.get('/nearby', async (req, res) => {
-  const { userId, coordinates } = req.query
+router.get('/nearby', jwtValidator, async (req, res) => {
+  const {userId, coordinates} = req.query
   if (!userId || !coordinates) return res.sendStatus(400)
 
   const [long, lat] = coordinates.split(',')
@@ -140,31 +141,31 @@ router.get('/nearby', async (req, res) => {
   const nearbyStores = await cms.getModel('Store').find({
     location: {
       $near: {
-        $geometry: { type: 'Point', coordinates: [long, lat] },
+        $geometry: {type: 'Point', coordinates: [long, lat]},
         $maxDistance: DEFAULT_NEARBY_DISTANCE //5km from point
       }
     }
   }).lean()
 
   const nearbyStorePromos = await cms.getModel('RPPromotion').find({
-    store: { $in: nearbyStores.map(s => s._id) }
+    store: {$in: nearbyStores.map(s => s._id)}
   }).lean()
 
   const nearbyVouchers = await VoucherModel.find({
-    promotion: { $in: nearbyStorePromos.map(p => p._id) },
+    promotion: {$in: nearbyStorePromos.map(p => p._id)},
     restaurantPlusUser: userId,
     status: VOUCHER_STATUS.UNUSED
   })
 
   const sortedVouchers = [].concat(...nearbyStores.map(store =>
     nearbyVouchers
-    .filter(voucher => voucher.promotion.store._id.toString() === store._id.toString())));
+      .filter(voucher => voucher.promotion.store._id.toString() === store._id.toString())));
 
   res.status(200).json(sortedVouchers.map(e => objectMapper(e, mapperConfig)));
 })
 
-router.get('/store-vouchers', async (req, res) => {
-  const { userId, storeId } = req.query
+router.get('/store-vouchers', jwtValidator, async (req, res) => {
+  const {userId, storeId} = req.query
   if (!userId || !storeId) return res.sendStatus(400)
 
   const vouchers = await voucherModel.aggregate([
@@ -232,13 +233,15 @@ function findVouchers({userId, nameSearch, storeId, status, voucherId, usable}) 
     aggregateSteps.push({$match: {status}});
 
     if (status === VOUCHER_STATUS.UNUSED && usable) {
-      aggregateSteps.push({$match: {
+      aggregateSteps.push({
+        $match: {
           'promotion.enabled': true,
           $and: [
             {$or: [{'startDate': {$exists: false}}, {'startDate': {$lte: now}}]},
             {$or: [{'endDate': {$exists: false}}, {'endDate': {$gte: now}}]}
           ],
-        }});
+        }
+      });
     }
   }
 

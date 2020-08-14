@@ -5,10 +5,15 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const UserModel = cms.getModel('RPUser');
 const StoreModel = cms.getModel('Store');
 const PointHistoryModel = cms.getModel('RPPointHistory');
+const DeviceModel = cms.getModel('Device');
 const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin'); // admin is initialized in another file
 const objectMapper = require('object-mapper');
 const {storeMapperConfig} = require('./stores');
+const {generateUserJwtToken} = require('./api-security');
+const {jwtValidator} = require('./api-security');
+const JWT_EXPIRE_IN = '7d';
+const {RESTAURANT_PLUS_ROLES} = require('./constants');
 
 const mapperConfig = {
   _id: '_id',
@@ -30,13 +35,14 @@ const mapperConfig = {
       }, []);
     },
   },
+  apiToken: 'apiToken',
 }
 
 function verifyIdToken(idToken) {
   return admin.auth().verifyIdToken(idToken);
 }
 
-router.get('/rp-points/:userId', async (req, res) => {
+router.get('/rp-points/:userId', jwtValidator, async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
@@ -67,7 +73,7 @@ router.get('/rp-points/:userId', async (req, res) => {
   res.status(200).json(rpPoints);
 })
 
-router.get('/by-id/:userId', async (req, res) => {
+router.get('/by-id/:userId', jwtValidator, async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
@@ -77,7 +83,7 @@ router.get('/by-id/:userId', async (req, res) => {
   res.status(200).json(objectMapper(user, mapperConfig));
 });
 
-router.put('/:userId', async (req, res) => {
+router.put('/:userId', jwtValidator, async (req, res) => {
   const {userId} = req.params;
   if (!userId) return respondWithError(res, 400, 'Missing user id in request');
 
@@ -125,6 +131,11 @@ router.post('/authenticate', async (req, res) => {
     avatar = avatar || decodedIdToken.picture;
 
     if (user) {
+      const jwtToken = generateUserJwtToken({
+        userId: user._id.toString(),
+        role: RESTAURANT_PLUS_ROLES.RP_CLIENT,
+      }, JWT_EXPIRE_IN);
+
       // update firebaseToken whenever login success
       if (firebaseToken) await UserModel.findOneAndUpdate({firebaseUid}, {
         firebaseToken,
@@ -133,7 +144,7 @@ router.post('/authenticate', async (req, res) => {
         ...!user.avatar && {avatar},
       });
 
-      res.status(200).json(objectMapper(user, mapperConfig));
+      res.status(200).json(objectMapper({...user._doc, apiToken: jwtToken}, mapperConfig));
     } else {
       user = await UserModel.create({
         name: name || '',
@@ -147,7 +158,12 @@ router.post('/authenticate', async (req, res) => {
         initialSignInType: signInType,
       });
 
-      res.status(201).json(objectMapper(user, mapperConfig));
+      const jwtToken = generateUserJwtToken({
+        userId: user._id.toString(),
+        role: RESTAURANT_PLUS_ROLES.RP_CLIENT,
+      }, JWT_EXPIRE_IN);
+
+      res.status(201).json(objectMapper({...user._doc, apiToken: jwtToken}, mapperConfig));
     }
   } else {
     respondWithError(res, 400, 'Invalid token');
@@ -170,16 +186,20 @@ router.post('/check-id-token', async (req, res) => {
 
   if (decodedIdToken) {
     const user = await UserModel.findById(userId);
+    const jwtToken = generateUserJwtToken({
+      userId: user._id.toString(),
+      role: RESTAURANT_PLUS_ROLES.RP_CLIENT,
+    }, JWT_EXPIRE_IN);
 
     if (user.firebaseUid === uid && decodedIdToken.uid === uid) {
-      return res.status(200).json(objectMapper(user, mapperConfig));
+      return res.status(200).json(objectMapper({...user._doc, apiToken: jwtToken}, mapperConfig));
     }
   }
 
   respondWithError(res, 400, 'Invalid token');
 });
 
-router.post('/follow-store', async (req, res) => {
+router.post('/follow-store', jwtValidator, async (req, res) => {
   const {userId, storeId} = req.body;
   if (!userId || !storeId) return respondWithError(res, 400, 'Missing property in request');
 
@@ -198,7 +218,7 @@ router.post('/follow-store', async (req, res) => {
   res.status(204).send();
 });
 
-router.post('/unfollow-store', async (req, res) => {
+router.post('/unfollow-store', jwtValidator, async (req, res) => {
   const {userId, storeId} = req.body;
   if (!userId || !storeId) return respondWithError(res, 400, 'Missing property in request');
 
@@ -215,6 +235,19 @@ router.post('/unfollow-store', async (req, res) => {
   }
 
   res.status(204).send();
+});
+
+router.post('/manager-app-authenticate', async (req, res) => {
+  const {hardwareId, deviceId} = req.body;
+
+  if (!hardwareId || !deviceId) return respondWithError(res, 400, 'Missing property in request');
+
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return respondWithError(res, 400, 'Invalid device ID');
+  if (device.hardwareId !== hardwareId) return respondWithError(res, 400, 'Device credentials do not match');
+
+  const jwtToken = generateUserJwtToken({deviceId: device._id, role: RESTAURANT_PLUS_ROLES.RP_MANAGER}, JWT_EXPIRE_IN);
+  res.status(200).json({apiToken: jwtToken});
 });
 
 module.exports = router;

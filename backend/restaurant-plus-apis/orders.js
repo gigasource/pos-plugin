@@ -17,6 +17,7 @@ const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE,
 const jsonFn = require('json-fn');
 const {findVouchers} = require('./vouchers');
 const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
+const {jwtValidator} = require('./api-security');
 
 const mapperConfig = {
   _id: '_id',
@@ -46,7 +47,7 @@ function calOrderModifier(items) {
   return sumBy(items, item => item.modifiers ? sum(item.modifiers.map(i => i.price)) * item.quantity : 0);
 }
 
-router.get('/', async (req, res) => {
+router.get('/', jwtValidator, async (req, res) => {
   const {userId} = req.query;
   if (!userId) return respondWithError(res, 400, 'Missing property in request');
 
@@ -68,12 +69,12 @@ router.get('/', async (req, res) => {
   res.status(200).json(userOrders.map(e => objectMapper(e, mapperConfig)));
 });
 
-router.get('/by-id/:orderId', async (req, res) => {
+router.get('/by-id/:orderId', jwtValidator, async (req, res) => {
   const {orderId} = req.params;
   if (!orderId) return respondWithError(res, 400, 'Missing property in request');
 
   const order = await OrderModel.findById(orderId);
-  if (!order) respondWithError(res, 400, 'Invalid order ID');
+  if (!order) return respondWithError(res, 400, 'Invalid order ID');
 
   res.status(200).json(objectMapper(order, mapperConfig));
 });
@@ -122,7 +123,7 @@ router.post('/calculate-shipping-fee', async (req, res) => {
 });
 
 // TODO: use transaction
-router.post('/', async (req, res) => {
+router.post('/', jwtValidator, async (req, res) => {
   const {order} = req.body
   let {
     storeId, items, type, customer, payment, note, deliveryTime, date, user, voucher, shippingFee, total,
@@ -241,7 +242,7 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
     case ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS: {
       notification = {
         title: 'Order Sent',
-        body: `[${storeName}] Your order has been sent, awaiting confirmation form restaurant`,
+        body: `[${storeName}] Your order has been sent, awaiting confirmation from restaurant`,
       }
       break;
     }

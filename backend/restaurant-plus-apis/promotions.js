@@ -7,6 +7,7 @@ const {PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, DEFAULT_PROMOTION_BACKGROU
 
 const {respondWithError} = require('./utils');
 const PromotionModel = cms.getModel('RPPromotion');
+const {jwtValidator} = require('./api-security');
 
 const mapperConfig = {
   _id: '_id',
@@ -75,7 +76,7 @@ router.get('/', async (req, res) => {
   res.status(200).json(promotions.map(e => objectMapper(e, mapperConfig)));
 });
 
-router.post('/', async (req, res) => {
+router.post('/', jwtValidator, async (req, res) => {
   const {
     name, quantity, startDate, endDate, storeId, price, discountType, discountValue, description, orderType, limitForUser,
     duration, descriptionImageUrl, enabled
@@ -110,7 +111,7 @@ router.post('/', async (req, res) => {
   res.status(201).json(newPromotion);
 });
 
-router.put('/:promotionId', async (req, res) => {
+router.put('/:promotionId', jwtValidator, async (req, res) => {
   const {promotionId} = req.params;
   const {
     name, quantity, startDate, endDate, storeId, price, discountType, discountValue, description, orderType, limitForUser,

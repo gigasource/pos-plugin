@@ -11,7 +11,7 @@ const StoreModel = cms.getModel('Store');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
 const {POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
-
+const {jwtValidator} = require('./api-security');
 
 const mapperConfig = {
   _id: '_id',
@@ -43,7 +43,7 @@ async function notifyToClient(type = "", title = "", message = "", token = "") {
   )
 }
 
-router.get('/', async (req, res) => {
+router.get('/', jwtValidator, async (req, res) => {
   const {storeId, userId} = req.query;
   if (!userId) return respondWithError(res, 400, 'Missing property in request');
 
@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
   res.status(200).json(transactions.map(e => objectMapper(e, mapperConfig)));
 });
 
-router.post('/', async (req, res) => {
+router.post('/', jwtValidator, async (req, res) => {
   const {storeId, userId, value, transactionType} = req.body;
   if (!userId || !value) return respondWithError(res, 400, 'Missing property in request body');
   if (typeof value !== 'number') return respondWithError(res, 400, "Property 'value' must be number");
@@ -89,20 +89,20 @@ router.post('/', async (req, res) => {
       }
       break;
     }
-/*    case POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER: {
-      if (!voucherId) return respondWithError(res, 400, 'Missing voucher id in request');
+    /*    case POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER: {
+          if (!voucherId) return respondWithError(res, 400, 'Missing voucher id in request');
 
-      const transaction = await PointHistoryModel.create({
-        voucher: voucherId,
-        user: userId,
-        value,
-        transactionType,
-        createdAt: new Date(),
-      });
+          const transaction = await PointHistoryModel.create({
+            voucher: voucherId,
+            user: userId,
+            value,
+            transactionType,
+            createdAt: new Date(),
+          });
 
-      res.status(201).json(transaction);
-      break;
-    }*/
+          res.status(201).json(transaction);
+          break;
+        }*/
   }
 });
 

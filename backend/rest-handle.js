@@ -16,6 +16,7 @@ const rpPromotionApi = require('./restaurant-plus-apis/promotions');
 const rpUserApi = require('./restaurant-plus-apis/users');
 const rpPointHistoryApi = require('./restaurant-plus-apis/point-histories');
 const rpOrderApi = require('./restaurant-plus-apis/orders');
+const {authMiddleware} = require('./restaurant-plus-apis/api-security');
 
 module.exports = async cms => {
 /*  let stores = await cms.getModel('Store').find();
@@ -80,6 +81,11 @@ module.exports = async cms => {
   cms.app.use('/api/v1/restaurant-plus/users', rpUserApi);
   cms.app.use('/api/v1/restaurant-plus/point-histories', rpPointHistoryApi);
   cms.app.use('/api/v1/restaurant-plus/orders', rpOrderApi);
+
+  cms.app.use('/api/v1/restaurant-plus', function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') res.status(401).send('Authentication required');
+    else next();
+  });
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
   cms.app.get('/health-check', (req, res) => res.status(200).send('OK'));
