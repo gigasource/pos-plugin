@@ -218,6 +218,10 @@
       choosePhoto() {
         this.openUploadFileDialog(file => this.file = file)
       },
+      updateImageUrl(url) {
+        console.log('update url:', url)
+        this.$emit('url', url)
+      },
       async _uploadImage() {
         this.dialog.uploading = true
         const options = {
@@ -248,9 +252,9 @@
                 default:
                   mimeType = 'image/*'
               }
-              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }))
+              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }), this.updateImageUrl)
             } else if (this.tab === 'upload') {
-              uploadedUrl = await this.uploadImage(new File([blob], this.file.name, { type: this.file.type }))
+              uploadedUrl = await this.uploadImage(new File([blob], this.file.name, { type: this.file.type }), this.updateImageUrl)
             } else {
               const fileName = this.image.viewUrl.substr(this.image.viewUrl.lastIndexOf('/') + 1)
               const fileExt = fileName.substr(fileName.lastIndexOf('.') + 1)
@@ -272,9 +276,9 @@
                 default:
                   mimeType = 'image/*'
               }
-              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }))
+              uploadedUrl = await this.uploadImage(new File([blob], fileName, { type: mimeType }), this.updateImageUrl)
             }
-            this.$emit('url', uploadedUrl)
+            this.updateImageUrl(uploadedUrl)
             this.dialog.uploading = false
             setTimeout(() => {
               this.showFileUploadProgressDialog = false
