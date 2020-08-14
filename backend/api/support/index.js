@@ -161,6 +161,9 @@ setTimeout(() => {
                         const newImagePath = `/cms-files/files/view${file.folderPath}${file.fileName}`
                         await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: newImagePath })
                         console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" to "${newImagePath}" completed!`)
+                        // re-send to force client update product image
+                        result.image = newImagePath
+                        cb({ success: true, _id: result._id, result, updateProductImage: true })
                       } catch (ie) {
                         console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" failed with error "${ie}"!`)
                       }
