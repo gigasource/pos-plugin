@@ -6,6 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const objectMapper = require('object-mapper');
 const {getExternalSocketIoServer} = require('../socket-io-server');
 const {respondWithError} = require('./utils');
+const {firebaseAdminInstance} = require('../firebase-messaging/admin')
 const UserModel = cms.getModel('RPUser');
 const {jwtValidator} = require('./api-security');
 
@@ -174,6 +175,112 @@ router.get('/reservations', jwtValidator, async (req, res) => {
   ])
   res.status(200).json(reservations)
 })
+
+router.post('/table-request', async (req, res) => {
+  const { request } = req.body
+  if (!request) return res.sendStatus(400)
+
+  const newRequest = await cms.getModel('RPTableRequest').create({ ...request, status: 'pending' })
+
+  res.status(200).json(newRequest)
+
+  // todo send to manager app
+  const devices = await getManagerDevices(request.storeId)
+  if (!devices.length) return
+  await sendNotification(
+    {
+      title: 'New Table',
+      body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
+    },
+    { type: 'tableRequest', request },
+    devices.map(d => d.firebaseToken)
+  )
+})
+
+router.put('/table-request/:requestId', async (req, res) => {
+  const { requestId } = req.params
+  if (!requestId) res.sendStatus(400)
+
+  const { status } = req.body
+
+  console.log('update table request ', requestId, status)
+
+  const request = await cms.getModel('RPTableRequest').findById(requestId)
+  const user = await cms.getModel('RPUser').findById(ObjectId(request.rpUserId))
+  const managerDevices = await getManagerDevices(request.storeId)
+  const store = await StoreModel.findById(ObjectId(request.storeId))
+
+  if (request.status !== 'cancelled') {
+    // notify cancelled
+    if (managerDevices.length) await sendNotification(
+      {
+        title: 'Table request cancelled',
+        body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
+      },
+      { type: 'tableRequest', request: JSON.stringify(request) },
+      managerDevices.map(d => d.firebaseToken)
+    )
+    return
+  }
+
+  const newRequest = await cms.getModel('RPTableRequest').findOneAndUpdate({ _id: ObjectId(requestId) }, { status }, { new: true })
+
+
+  switch (status) {
+    case 'approved':
+      // notify end user
+      await sendNotification(
+        {
+          title: 'Table Request approved',
+          body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been approved.`
+        },
+        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+        [user.firebaseToken]
+      )
+      break
+    case 'cancelled':
+      // notify manager
+      if (managerDevices.length) await sendNotification(
+        {
+          title: 'Table request cancelled',
+          body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
+        },
+        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+         managerDevices.map(d => d.firebaseToken)
+      )
+      break
+    case 'declined':
+      // notify end user
+      await sendNotification(
+        {
+          title: 'Table Request declined',
+          body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been declined.`
+        },
+        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+        [user.firebaseToken]
+      )
+      break
+    default:
+      break
+  }
+  res.status(200).json({ success: true })
+})
+
+async function getManagerDevices(storeId) {
+  return await cms.getModel('Device').find({ storeId: storeId.toString(), firebaseToken: { $exists: true } })
+}
+
+async function sendNotification(notification, data, tokens) {
+  const admin = firebaseAdminInstance()
+
+  const message = {
+    notification,
+    data,
+    tokens
+  }
+
+  await admin.messaging().sendMulticast(message)
+}
 
 module.exports = router
 module.exports.storeMapperConfig = mapperConfig;
