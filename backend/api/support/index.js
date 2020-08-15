@@ -129,9 +129,8 @@ setTimeout(() => {
             const newImagePath = topazResponse.data
             // update db
             await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: newImagePath })
-            // TODO: tell device update image - below method doesn't work
             result.image = newImagePath
-            cb({ success: true, _id: result._id, result, updateProductImage: true })
+            externalSocketIoServer.emitTo(clientId, 'updateProductImage', { result })
           } else {
             console.log()
           }
