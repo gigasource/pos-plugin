@@ -17,7 +17,8 @@
         <div class="flex-equal">Restaurant</div>
         <div style="flex: 0 0 100px">Action</div>
         <div class="w-10">Type</div>
-        <div>Role</div>
+        <!--<div>Role</div>-->
+        <!--<div>Name</div>-->
         <div class="assigned-store">Assigned</div>
         <div class="w-12">Device</div>
         <div class="col-2">Location</div>
@@ -41,7 +42,8 @@
               <g-icon v-if="request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeId ? 'Sign in' : 'New restaurant'}}</div>
-            <div>{{request.role}}</div>
+            <!-- <div>{{request.role}}</div>-->
+            <!-- <div>{{request.name}}</div>-->
             <div class="assigned-store pr-2">
               <g-autocomplete text-field-component="GTextFieldBs" class="flex-equal"
                               solo

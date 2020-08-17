@@ -195,7 +195,9 @@ router.post('/new-feedback', async (req, res) => {
 })
 
 router.post('/sign-in-requests', async (req, res) => {
-  const {storeName, googleMapPlaceId, deviceId, role} = req.body;
+  // name: device owner's name enter by device owner
+  // role: 'staff' | 'manager'
+  const {storeName, googleMapPlaceId, deviceId, role, name} = req.body;
   if (!storeName || !googleMapPlaceId || !deviceId || !role) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
@@ -212,7 +214,8 @@ router.post('/sign-in-requests', async (req, res) => {
     googleMapPlaceId,
     createdAt: new Date(),
     ...store && {store: store._id},
-    role
+    role,
+    name
   });
 
   const device = await cms.getModel('Device').findById(deviceId);
@@ -234,7 +237,7 @@ router.get('/sign-in-requests', async (req, res) => {
 
   const requests = await getRequestsFromDb({...status && {status}});
 
-  res.status(200).json(requests.map(({device, store, storeFromGoogleMap, ...e}) => {
+  res.status(200).json(requests.map(({device, store, storeFromGoogleMap, role, name, ...e}) => {
     if (!device) return null;
     if (!store) store = storeFromGoogleMap
 
@@ -255,7 +258,7 @@ router.get('/sign-in-requests/:requestId', async (req, res) => {
   const requests = await getRequestsFromDb({_id: new mongoose.Types.ObjectId(requestId)});
 
   if (requests && requests.length) {
-    let {device, store, storeFromGoogleMap, ...e} = requests[0];
+    let {device, store, storeFromGoogleMap, role, name, ...e} = requests[0];
     if (!store) store = storeFromGoogleMap;
 
     res.status(200).json({request: {
