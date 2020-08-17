@@ -185,7 +185,6 @@ router.post('/table-request', async (req, res) => {
 
   res.status(200).json(newRequest)
 
-  // todo send to manager app
   const devices = await getManagerDevices(request.storeId)
   if (!devices.length) return
   await sendNotification(
@@ -193,7 +192,7 @@ router.post('/table-request', async (req, res) => {
       title: 'New Table',
       body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
     },
-    { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request },
+    { type: 'tableRequest', request: JSON.stringify(newRequest) },
     devices.map(d => d.firebaseToken)
   )
 })
@@ -211,7 +210,7 @@ router.put('/table-request/:requestId', async (req, res) => {
   const managerDevices = await getManagerDevices(request.storeId)
   const store = await StoreModel.findById(ObjectId(request.storeId))
 
-  if (request.status !== 'cancelled') {
+  if (request.status === 'cancelled') {
     // notify cancelled
     if (managerDevices.length) await sendNotification(
       {

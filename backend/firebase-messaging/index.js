@@ -18,6 +18,7 @@ module.exports = cms => {
         body: 'You have a new order!'
       },
       data: {
+        type: 'order',
         orderToken,
         storeName,
         storeAlias
