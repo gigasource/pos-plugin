@@ -80,7 +80,7 @@
           <div style="text-align: center; background: #EFEFEF; ">
             <div v-if="loadingImage">Loading image...</div>
             <div v-if="initializingCropper">Preparing cropper...</div>
-            <img :src="imageSrc" style="height: 281px" ref="previewImage" @load="imageLoaded">
+            <img :src="imageSrc" :style="`height: ${cropBoxHeight}px`" ref="previewImage" @load="imageLoaded">
           </div>
           <div style="display: flex; justify-content: flex-end; padding: 35px;">
             <g-btn-bs width="90" height="44" @click="moveToSrcView">Back</g-btn-bs>
@@ -121,6 +121,7 @@
         // cropper
         cropper: null,
         initializingCropper: false,
+        cropBoxHeight: 281,
         
         //
         dialog: {
@@ -203,9 +204,13 @@
         this.$nextTick(async () => {
           const image = this.$refs.previewImage
           if (!image) return
+          const { width, height } = image
+          const minCropBoxHeight = width >= height ? this.cropBoxHeight : Math.floor(this.cropBoxHeight * width / height)
           const cropperCtor = (await Cropper()).default
           const cropper = new cropperCtor(image, {
-            aspectRatio: this.aspectRatio
+            aspectRatio: this.aspectRatio,
+            responsive: true,
+            minCropBoxHeight: minCropBoxHeight,
           });
           this.$set(this, 'cropper', cropper)
           this.initializingCropper = false
