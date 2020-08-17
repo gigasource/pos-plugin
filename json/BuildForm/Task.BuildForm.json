@@ -1,0 +1,70 @@
+{
+  "_id": "5f3a57cb08550518372a57a0",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f3a584c08550518372a57a3",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a4",
+      "schemaType": "string",
+      "key": "deadline",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a5",
+      "schemaType": "string",
+      "key": "status",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a6",
+      "schemaType": "string",
+      "key": "note",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a7",
+      "schemaType": "array",
+      "key": "participants",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "participant",
+          "ref": "Staff",
+          "type": "ref-select",
+          "label": "Staff",
+          "labelProp": "name"
+        }
+      ],
+      "type": "array"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a8",
+      "schemaType": "boolean",
+      "key": "repeat",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f3a584c08550518372a57a9",
+      "schemaType": "string",
+      "key": "location",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a584c08550518372a57aa",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select",
+      "label": "Store",
+      "labelProp": "settingName"
+    }
+  ],
+  "name": "Task",
+  "tabs": [],
+  "type": "Collection"
+}

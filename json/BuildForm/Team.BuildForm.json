@@ -1,0 +1,40 @@
+{
+  "_id": "5f3a56dd08550518372a577d",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f3a574708550518372a5780",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a574708550518372a5781",
+      "schemaType": "array",
+      "key": "members",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "member",
+          "ref": "Staff",
+          "type": "ref-select",
+          "label": "Staff",
+          "labelProp": "name"
+        }
+      ],
+      "type": "array"
+    },
+    {
+      "_id": "5f3a574708550518372a5782",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select",
+      "label": "Store",
+      "labelProp": "settingName"
+    }
+  ],
+  "name": "Team",
+  "tabs": [],
+  "type": "Collection"
+}

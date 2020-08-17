@@ -1,0 +1,52 @@
+{
+  "_id": "5f3a55dc08550518372a576f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f3a56d508550518372a5772",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a56d508550518372a5773",
+      "schemaType": "string",
+      "key": "role",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a56d508550518372a5774",
+      "schemaType": "string",
+      "key": "avatarUrl",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a56d508550518372a5775",
+      "schemaType": "boolean",
+      "key": "active",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f3a56d508550518372a5776",
+      "schemaType": "objectId",
+      "key": "device",
+      "ref": "Device",
+      "autopopulate": null,
+      "type": "ref-select",
+      "label": "Device",
+      "labelProp": "_id"
+    },
+    {
+      "_id": "5f3a56d508550518372a5777",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select",
+      "label": "Store",
+      "labelProp": "settingName"
+    }
+  ],
+  "name": "Staff",
+  "tabs": [],
+  "type": "Collection"
+}

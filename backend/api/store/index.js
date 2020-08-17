@@ -6,8 +6,11 @@ const https = require('https');
 const http = require('http');
 const axios = require('axios');
 const mongoose = require('mongoose');
-const {getExternalSocketIoServer} = require('../socket-io-server');
-const {assignDevice} = require('../api/support');
+const {getExternalSocketIoServer} = require('../../socket-io-server');
+const {assignDevice} = require('../../api/support');
+const teamRoute = require('./team')
+const taskRoute = require('./task')
+const staffRoute = require('./staff')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -378,5 +381,9 @@ async function getGooglePlaceByText(placeName) {
     return null;
   }
 }
+
+router.use('/staff', staffRoute)
+router.use('/team', teamRoute)
+router.use('/task', taskRoute)
 
 module.exports = router
