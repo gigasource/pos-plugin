@@ -158,7 +158,7 @@ router.post('/reservation', jwtValidator, async (req, res) => {
 
 router.get('/reservations', jwtValidator, async (req, res) => {
   const {userId} = req.query
-  if (!userId) res.sendStatus(400)
+  if (!userId) return res.sendStatus(400)
 
   const reservations = await cms.getModel('Reservation').aggregate([
     {$match: {userId: ObjectId(userId)}},
@@ -177,11 +177,30 @@ router.get('/reservations', jwtValidator, async (req, res) => {
   res.status(200).json(reservations)
 })
 
+router.get('/reservations/time-slots/', async (req, res) => {
+  const { date } = req.query
+  if (!date) return res.sendStatus(400)
+
+
+})
+
+router.get('/table-request/:requestId', async (req, res) => {
+  const { requestId } = req.params
+  if (!requestId) return res.sendStatus(400)
+
+  const request = await cms.getModel('RPTableRequest').findById(requestId).lean()
+  res.status(200).json(request)
+})
+
 router.post('/table-request', async (req, res) => {
   const { request } = req.body
   if (!request) return res.sendStatus(400)
 
-  const newRequest = await cms.getModel('RPTableRequest').create({ ...request, status: 'pending' })
+  const newRequest = await cms.getModel('RPTableRequest').create({
+    ...request,
+    status: 'pending',
+    createdDate: new Date()
+  })
 
   res.status(200).json(newRequest)
 
@@ -199,7 +218,7 @@ router.post('/table-request', async (req, res) => {
 
 router.put('/table-request/:requestId', async (req, res) => {
   const { requestId } = req.params
-  if (!requestId) res.sendStatus(400)
+  if (!requestId) return res.sendStatus(400)
 
   const { status } = req.body
 
