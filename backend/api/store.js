@@ -192,8 +192,8 @@ router.post('/new-feedback', async (req, res) => {
 })
 
 router.post('/sign-in-requests', async (req, res) => {
-  const {storeName, googleMapPlaceId, deviceId} = req.body;
-  if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
+  const {storeName, googleMapPlaceId, deviceId, role} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId || !role) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
   const StoreModel = cms.getModel('Store');
@@ -209,6 +209,7 @@ router.post('/sign-in-requests', async (req, res) => {
     googleMapPlaceId,
     createdAt: new Date(),
     ...store && {store: store._id},
+    role
   });
 
   const device = await cms.getModel('Device').findById(deviceId);
@@ -218,6 +219,7 @@ router.post('/sign-in-requests', async (req, res) => {
     deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
     ...store && {storeName: store.settingName || store.name, storeId: store._id},
     ...request._doc,
+    role
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
