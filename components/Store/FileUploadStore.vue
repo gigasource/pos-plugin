@@ -44,7 +44,7 @@
               const viewUrl = this.gridFsHandler.insertViewUrl(files)[0].viewUrl
               resolve(viewUrl)
               // continue async run
-              if (cms.sharedConfig.USE_TOPAZ_SERVICE === "true") {
+              if (cms.sharedConfig.TOPAZ_SERVICE_ENDPOINT) {
                 console.log('use topaz service')
                 const host = location.origin // Note: location.origin won't work in localhost -> change to your ip when dev. E.g: 'http://192.168.10.69:8888'
                 const topazResponse = (await axios.post(`${host}/topaz`, { url: `${host}${viewUrl}` })).data

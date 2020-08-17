@@ -22,7 +22,7 @@ function createResponder(taskId, res) {
 }
 
 router.post('/', async (req, _res) => {
-  if (process.env.USE_TOPAZ_SERVICE !== "true") {
+  if (!process.env.TOPAZ_SERVICE_ENDPOINT) {
     _res.json({success: false, error: 'Topaz AI Service is not enabled'})
     return
   }

@@ -121,7 +121,7 @@ setTimeout(() => {
           ? await cms.getModel(collection).findOneAndUpdate({ _id }, value, { new: true })
           : await cms.getModel(collection).create({ store: device.storeId, ...value })
         cb({ success: true, _id: result._id, result })
-        if (process.env.USE_TOPAZ_SERVICE === "true") {
+        if (process.env.TOPAZ_SERVICE_ENDPOINT) {
           const host = getHost(socket.request)
           const url = `${host}${result.image}`
           const topazResponse = (await axios.post(`${host}/topaz`, { url })).data
