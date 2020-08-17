@@ -9,6 +9,7 @@ const payment = require('./api/payment');
 const supportApi = require('./api/support');
 // const restaurantDataBackupApi = require('./api/restaurant-data-backup');
 const userApi = require('./api/users');
+const topaz = require('./api/topazAI')
 
 module.exports = cms => {
   cms.data['loginUrl'] = '/sign-in';
@@ -22,6 +23,7 @@ module.exports = cms => {
   cms.app.use('/demo', demoApi);
   cms.app.use('/support', supportApi);
   cms.app.use('/users', userApi);
+  cms.app.use('/topaz', topaz)
   // cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
 
   // NOTE: If health-check API URL is changed, the URL used on frontend must be changed accordingly
