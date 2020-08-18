@@ -210,7 +210,7 @@
           const cropper = new cropperCtor(image, {
             aspectRatio: this.aspectRatio,
             responsive: true,
-            minCropBoxHeight: minCropBoxHeight,
+            // minCropBoxHeight: minCropBoxHeight,
           });
           this.$set(this, 'cropper', cropper)
           this.initializingCropper = false
