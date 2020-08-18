@@ -1,5 +1,6 @@
 const {firebaseAdminInstance} = require('./admin')
 const dayjs = require('dayjs')
+const {NOTIFICATION_ACTION_TYPE} = require('../restaurant-plus-apis/constants');
 
 module.exports = cms => {
   const admin = firebaseAdminInstance()
@@ -162,7 +163,7 @@ module.exports = cms => {
         body: `Your reservation at ${storeName} at ${reservation.time}, ${reservationDate} is ${reservation.status}`,
       },
       data: {
-        type: 'reservation',
+        actionType: NOTIFICATION_ACTION_TYPE.TABLE_RESERVATION,
         reservation: JSON.stringify({ ...reservation, storeName, storePhone: store.phone })
       },
       token: user.firebaseToken

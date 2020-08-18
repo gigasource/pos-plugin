@@ -109,7 +109,7 @@ router.put('/:userId', jwtValidator, async (req, res) => {
 });
 
 router.post('/authenticate', async (req, res) => {
-  let {idToken, firebaseToken, phoneNumber, name, signInType, email, avatar} = req.body;
+  let {idToken, firebaseToken, phoneNumber, name = '', signInType, email, avatar} = req.body;
   if (!idToken) return respondWithError(res, 400, 'Missing property in request body');
   if (!jwt.decode(idToken)) return respondWithError(res, 400, 'Invalid token');
 
@@ -126,7 +126,7 @@ router.post('/authenticate', async (req, res) => {
     const firebaseUid = decodedIdToken.uid;
     let user = await UserModel.findOne({firebaseUid});
 
-    name = name || decodedIdToken.name;
+    name = (name || decodedIdToken.name || '').trim();
     email = email || decodedIdToken.email;
     avatar = avatar || decodedIdToken.picture;
 
@@ -147,7 +147,7 @@ router.post('/authenticate', async (req, res) => {
       res.status(200).json(objectMapper({...user._doc, apiToken: jwtToken}, mapperConfig));
     } else {
       user = await UserModel.create({
-        name: name || '',
+        name,
         ...phoneNumber && {phoneNumber},
         ...email && {email},
         ...avatar && {avatar},

@@ -265,6 +265,13 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
 
   const message = {
     notification,
+    apns: {
+      payload: {
+        aps: {
+          'mutable-content': 1
+        }
+      }
+    },
     data: {
       orderId: orderId.toString(),
       status,

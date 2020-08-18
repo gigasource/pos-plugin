@@ -9,6 +9,7 @@ const {respondWithError} = require('./utils');
 const {firebaseAdminInstance} = require('../firebase-messaging/admin')
 const UserModel = cms.getModel('RPUser');
 const {jwtValidator} = require('./api-security');
+const {NOTIFICATION_ACTION_TYPE} = require('./constants');
 
 const mapperConfig = {
   _id: '_id',
@@ -192,7 +193,7 @@ router.post('/table-request', async (req, res) => {
       title: 'New Table',
       body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
     },
-    { type: 'tableRequest', request },
+    { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request },
     devices.map(d => d.firebaseToken)
   )
 })
@@ -217,7 +218,7 @@ router.put('/table-request/:requestId', async (req, res) => {
         title: 'Table request cancelled',
         body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
       },
-      { type: 'tableRequest', request: JSON.stringify(request) },
+      { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(request) },
       managerDevices.map(d => d.firebaseToken)
     )
     return
@@ -234,7 +235,7 @@ router.put('/table-request/:requestId', async (req, res) => {
           title: 'Table Request approved',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been approved.`
         },
-        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
         [user.firebaseToken]
       )
       break
@@ -245,7 +246,7 @@ router.put('/table-request/:requestId', async (req, res) => {
           title: 'Table request cancelled',
           body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
         },
-        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
          managerDevices.map(d => d.firebaseToken)
       )
       break
@@ -256,7 +257,7 @@ router.put('/table-request/:requestId', async (req, res) => {
           title: 'Table Request declined',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been declined.`
         },
-        { type: 'tableRequest', request: JSON.stringify(newRequest) },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
         [user.firebaseToken]
       )
       break
