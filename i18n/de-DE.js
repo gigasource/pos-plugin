@@ -108,6 +108,10 @@ module.exports = {
       price: 'E.P',
       total: 'Summe',
       shippingFee: 'Liefergebühr',
+    },
+    settings: {
+      noInternet: 'keine Internetverbindung',
+      noOnlineOrder: 'nicht mit Online Bestellserver verbinden!'
     }
   }
 }

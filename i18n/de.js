@@ -297,7 +297,9 @@ module.exports = {
       paymentIcon: 'Symbol',
       //tax:
       noteLetter: 'Invoice Note Letter',
-      createTax: 'Create New Tax'
+      createTax: 'Create New Tax',
+      noInternet: 'keine Internetverbindung',
+      noOnlineOrder: 'nicht mit Online Bestellserver verbinden!'
     },
 
     //dates

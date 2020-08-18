@@ -297,11 +297,11 @@
           console.error(e)
         }
       },
-      showOfflineSnackbar() {
+      showOfflineSnackbar(message) {
         const contentFn = () => (
           <div style="margin: 0 auto" class="row-flex align-items-center">
             <g-icon svg size="20">icon-wlan-disconnected-white</g-icon>
-            <span class="ml-2">No Internet</span>
+            <span class="ml-2">{message}</span>
           </div>);
 
         this.showSnackbar(contentFn, '#E57373', 0)
@@ -389,7 +389,14 @@
         if (val) {
           this.closeSnackbar()
         } else {
-          this.showOfflineSnackbar()
+          this.showOfflineSnackbar(this.$t('settings.noInternet'))
+        }
+      },
+      webShopConnected(val) {
+        if (val) {
+          this.closeSnackbar()
+        } else {
+          this.showOfflineSnackbar(this.$t('settings.noOnlineOrder'))
         }
       },
     },
