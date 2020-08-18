@@ -11,6 +11,7 @@ const {assignDevice} = require('../../api/support');
 const teamRoute = require('./team')
 const taskRoute = require('./task')
 const staffRoute = require('./staff')
+const { createStaff } = require('./staff/staff')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -300,8 +301,9 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
 
   if (status === 'approved') {
+    const newStaff = await createStaff({ name: request.name, role: request.role, storeId, deviceId: request.device._id })
     await assignDevice(request.device._id, request.store);
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, newStaff]);
   } else if (status === 'notApproved') {
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
   }
