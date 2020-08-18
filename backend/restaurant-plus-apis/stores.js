@@ -198,10 +198,10 @@ router.post('/table-request', async (req, res) => {
 
   const newRequest = await cms.getModel('RPTableRequest').create({
     ...request,
-    status: 'pending',
-    createdDate: new Date()
+    status: 'pending'
   })
 
+  console.log(newRequest)
   res.status(200).json(newRequest)
 
   const devices = await getManagerDevices(request.storeId)
@@ -211,7 +211,7 @@ router.post('/table-request', async (req, res) => {
       title: 'New Table',
       body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
     },
-    { type: 'tableRequest', request: JSON.stringify(newRequest) },
+    { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
     devices.map(d => d.firebaseToken)
   )
 })
@@ -243,7 +243,6 @@ router.put('/table-request/:requestId', async (req, res) => {
   }
 
   const newRequest = await cms.getModel('RPTableRequest').findOneAndUpdate({ _id: ObjectId(requestId) }, { status }, { new: true })
-
 
   switch (status) {
     case 'approved':
@@ -279,6 +278,25 @@ router.put('/table-request/:requestId', async (req, res) => {
         [user.firebaseToken]
       )
       break
+    case 'expired':
+      await sendNotification(
+        {
+          title: 'Table Request expired',
+          body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has expired.`
+        },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
+        [user.firebaseToken]
+      )
+
+      if (managerDevices.length) await sendNotification(
+        {
+          title: 'Table request expired',
+          body: `Table request at ${dayjs(request.date).format('HH:mm')} has expired`
+        },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
+        managerDevices.map(d => d.firebaseToken)
+      )
+      break
     default:
       break
   }
@@ -295,7 +313,14 @@ async function sendNotification(notification, data, tokens) {
   const message = {
     notification,
     data,
-    tokens
+    tokens,
+    apns: {
+      payload: {
+        aps: {
+          'mutable-content': 1
+        }
+      }
+    },
   }
 
   await admin.messaging().sendMulticast(message)
