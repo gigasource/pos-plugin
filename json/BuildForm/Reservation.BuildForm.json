@@ -60,6 +60,21 @@
       "schemaType": "string",
       "key": "note",
       "type": "input"
+    },
+    {
+      "_id": "5f2a7654763e177cf1de927c",
+      "schemaType": "string",
+      "key": "status",
+      "type": "input",
+      "optionsType": null
+    },
+    {
+      "_id": "5f2a96db4b195df8f955563e",
+      "schemaType": "objectId",
+      "key": "userId",
+      "ref": "RPUser",
+      "type": "ref-select",
+      "labelProp": "name"
     }
   ],
   "name": "Reservation",

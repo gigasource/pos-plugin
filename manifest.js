@@ -60,7 +60,20 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/firebase-messaging/admin.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/rest-handle.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api-before-init-model'
+      },
+      path: 'backend/apply-schema-hooks.js',
       type: 'backend'
     },
     {

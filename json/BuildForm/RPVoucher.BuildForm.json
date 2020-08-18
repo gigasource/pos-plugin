@@ -1,0 +1,55 @@
+{
+  "_id": "5f1ff698bf8dea79c6862139",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ff757bf8dea79c686213b",
+      "schemaType": "objectId",
+      "key": "promotion",
+      "ref": "RPPromotion",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ff757bf8dea79c686213c",
+      "schemaType": "objectId",
+      "key": "restaurantPlusUser",
+      "ref": "RPUser",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ff757bf8dea79c686213d",
+      "schemaType": "objectId",
+      "key": "order",
+      "ref": "Order",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f1ff757bf8dea79c686213e",
+      "schemaType": "string",
+      "key": "status"
+    },
+    {
+      "_id": "5f1ff757bf8dea79c686213f",
+      "schemaType": "date",
+      "key": "startDate"
+    },
+    {
+      "_id": "5f1ff757bf8dea79c6862140",
+      "schemaType": "date",
+      "key": "endDate"
+    },
+    {
+      "_id": "5f1ff757bf8dea79c6862141",
+      "schemaType": "date",
+      "key": "usedAt"
+    },
+    {
+      "_id": "5f1ff757bf8dea79c6862142",
+      "schemaType": "date",
+      "key": "createdAt"
+    }
+  ],
+  "name": "RPVoucher",
+  "tabs": [],
+  "type": "Collection"
+}

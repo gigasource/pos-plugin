@@ -1,12 +1,9 @@
-const admin = require('firebase-admin')
+const {firebaseAdminInstance} = require('./admin')
 const dayjs = require('dayjs')
+const {NOTIFICATION_ACTION_TYPE} = require('../restaurant-plus-apis/constants');
 
 module.exports = cms => {
-  const config = APP_CONFIG.firebaseAdminConfig
-  admin.initializeApp({
-    credential: admin.credential.cert(config)
-  })
-
+  const admin = firebaseAdminInstance()
   cms.on('sendOrderMessage', async (storeId, orderData) => {
     const store = await cms.getModel('Store').findById(storeId)
     /** @deprecated */
@@ -149,6 +146,35 @@ module.exports = cms => {
       console.debug(sentryTags, `Online order backend: Sent support message notification`, sentryPayload);
     } catch (e) {
       console.debug(sentryTags, `Online order backend: Error sending support message notification`, sentryPayload);
+    }
+  })
+
+  cms.on('sendClientReservationStatus', async reservationId => {
+    const reservation = await cms.getModel('Reservation').findById(reservationId).lean()
+    if (!reservation.userId) return
+    const user = await cms.getModel('RPUser').findById(reservation.userId)
+    const store = await cms.getModel('Store').findById(reservation.store)
+    const reservationDate = dayjs(reservation.date, 'YYYY-MM-DD').format('MMM DD')
+
+    const storeName = store.name || store.settingName;
+    const message = {
+      notification: {
+        title: `Reservation ${reservation.status}`,
+        body: `Your reservation at ${storeName} at ${reservation.time}, ${reservationDate} is ${reservation.status}`,
+      },
+      data: {
+        actionType: NOTIFICATION_ACTION_TYPE.TABLE_RESERVATION,
+        reservation: JSON.stringify({ ...reservation, storeName, storePhone: store.phone })
+      },
+      token: user.firebaseToken
+    }
+
+    try {
+      const response = await admin.messaging().send(message)
+      console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},reservationId=${reservationId}`,
+        `5. Online order backend: sent reservation notification to end user: ${response}`)
+    } catch (e) {
+      console.log('failed to send reservation update notification')
     }
   })
 }

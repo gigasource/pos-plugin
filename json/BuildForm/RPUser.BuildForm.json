@@ -1,0 +1,116 @@
+{
+  "_id": "5f1ff65cbf8dea79c686212f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ff690bf8dea79c6862131",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff690bf8dea79c6862132",
+      "schemaType": "string",
+      "key": "phoneNumber",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff690bf8dea79c6862133",
+      "schemaType": "array",
+      "key": "addresses",
+      "type": null,
+      "fields": [
+        {
+          "schemaType": "string"
+        }
+      ]
+    },
+    {
+      "_id": "5f1ff775bf8dea79c6862179",
+      "schemaType": "date",
+      "key": "createdAt",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f200ee7877152840647eb6d",
+      "schemaType": "object",
+      "key": "location",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "type",
+          "default": "Point"
+        },
+        {
+          "schemaType": "array",
+          "key": "coordinates",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "_id": "5f227f6c7f0f3e21cada09aa",
+      "schemaType": "string",
+      "key": "firebaseUid",
+      "type": "input"
+    },
+    {
+      "_id": "5f290ab9735d6193b4fe5a8e",
+      "schemaType": "mixed",
+      "key": "rpPoints",
+      "mixed": true
+    },
+    {
+      "_id": "5f291972efb0379d70c579b6",
+      "schemaType": "string",
+      "key": "email"
+    },
+    {
+      "_id": "5f2a3c0550f58db79db2800d",
+      "schemaType": "string",
+      "key": "firebaseToken",
+      "type": "input"
+    },
+    {
+      "_id": "5f2a88b94ad262b2ae412130",
+      "schemaType": "string",
+      "key": "initialSignInType",
+      "type": "input"
+    },
+    {
+      "_id": "5f2bc38d20b6875e653def7d",
+      "schemaType": "string",
+      "key": "avatar",
+      "type": "input"
+    },
+    {
+      "_id": "5f2d3f0638dc9a020fccc505",
+      "schemaType": "mixed",
+      "key": "lastUsedAddress",
+      "mixed": true
+    },
+    {
+      "_id": "5f33b6363ca20d3aff3d1e3d",
+      "schemaType": "array",
+      "key": "followedStores",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "",
+          "ref": "Store",
+          "autopopulate": true
+        }
+      ]
+    }
+  ],
+  "name": "RPUser",
+  "tabs": [],
+  "type": "Collection"
+}

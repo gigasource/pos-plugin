@@ -1250,6 +1250,20 @@
           "type": null
         }
       ]
+    },
+    {
+      "_id": "5f2bc70f0121f4cc185ac1bc",
+      "schemaType": "objectId",
+      "key": "restaurantPlusUser",
+      "ref": "RPUser",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f2be3788a778ad65f7dad7d",
+      "schemaType": "objectId",
+      "key": "restaurantPlusVoucher",
+      "ref": "RPVoucher",
+      "autopopulate": true
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

@@ -15,7 +15,12 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
   const limit = sort.unreadMessages ? n + offset : n;
   const skip = sort.unreadMessages ? null : offset;
 
-  const steps = [{$match: {deleted: {$ne: true}}}];
+  const steps = [{
+    $match: {
+      deleted: {$ne: true},
+      deviceType: 'gsms',
+    }
+  }];
 
   if (nameSearch) {
     steps.push({
@@ -419,3 +424,6 @@ function formatOrder(order, store) {
 }
 
 module.exports = router
+
+// RpManager is Restaurant Plus Manager app, this function formats order data to match format used in the app
+module.exports.formatOrderForRpManager = formatOrder;
