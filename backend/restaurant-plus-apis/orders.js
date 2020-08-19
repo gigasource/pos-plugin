@@ -29,6 +29,7 @@ const mapperConfig = {
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.storeId.name
   },
   date: 'date',
+  timeoutDate: 'timeoutDate',
   vSum: 'orderSum',
   vDiscount: "orderDiscountValue",
   itemCount: 'itemCount',
