@@ -288,6 +288,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
       cms.emit('chatMessage', chatData)
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -359,10 +360,30 @@ router.get('/chat/messages/not-replied', async (req, res) => {
 })
 
 router.get('/chat/messages', async (req, res) => {
-  const {n = 0, offset = 0, clientId} = req.query;
+  const {n = 0, offset = 0, clientId, before, after} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  let query;
+  if (before || after) {
+    let dBefore = new Date();
+    let dAfter = new Date(0);
+    if (before) {
+      dBefore = new Date(before);
+      if (isNaN(dBefore.getTime())) {
+        return res.status(400).json({error: `'before' is not a valid date'`});
+      }
+    }
+    if (after) {
+      dAfter = new Date(after);
+      if (isNaN(dAfter.getTime())) {
+        return res.status(400).json({error: `'after' is not a valid date'`});
+      }
+    }
+    query = ChatMessageModel.find({clientId, createdAt: {$lt: dBefore, $gt: dAfter}}).sort({createdAt: -1});
+  } else {
+    query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  }
+
   if (offset) query = query.skip(+offset);
   if (n) query = query.limit(+n);
 
