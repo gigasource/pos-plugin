@@ -6,7 +6,8 @@ function respondWithError(res, status, msg) {
   res.status(status);
   console.error(msg);
 
-  if (msg) res.json({error: msg});
+  if (msg && typeof msg === 'string') res.json({error: msg});
+  else if (msg && typeof msg === 'object') res.json(msg);
   else res.send();
 }
 

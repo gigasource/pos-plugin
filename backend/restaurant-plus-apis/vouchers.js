@@ -10,7 +10,7 @@ const PromotionModel = cms.getModel('RPPromotion');
 const UserModel = cms.getModel('RPUser');
 const PointHistoryModel = cms.getModel('RPPointHistory');
 
-const {DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE} = require('./constants');
+const {DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE, RESPONSE_ERROR_CODE} = require('./constants');
 const {respondWithError} = require('./utils');
 const {jwtValidator} = require('./api-security');
 
@@ -82,13 +82,27 @@ router.post('/', jwtValidator, async (req, res) => {
   const user = await UserModel.findById(userId);
   if (!user) return respondWithError(res, 400, 'Selected user not found');
 
+  const storeId = promotion.store._id;
+  const userRpPoints = user.rpPoints || {};
+  if (promotion.price > 0 && (userRpPoints[storeId] || 0) < promotion.price) {
+    return respondWithError(res, 400, {
+      error: 'User\'s reward points for this promotion is insufficient',
+      errorCode: RESPONSE_ERROR_CODE.VOUCHERS.USER_INSUFFICIENT_COIN,
+    });
+  }
+
   const promoLimitForUser = promotion.limitForUser;
   const issuedVoucherForUserCount = await VoucherModel.countDocuments({
     promotion: promotion._id,
     restaurantPlusUser: ObjectId(userId),
   });
 
-  if (issuedVoucherForUserCount >= promoLimitForUser) return respondWithError(res, 400, 'Promotion campaign issue limit has been reached for this user');
+  if (promoLimitForUser && issuedVoucherForUserCount >= promoLimitForUser) {
+    return respondWithError(res, 400, {
+      error: 'Promotion campaign issue limit has been reached for this user',
+      errorCode: RESPONSE_ERROR_CODE.VOUCHERS.LIMIT_FOR_USER_REACHED,
+    });
+  }
 
   const promoLimit = promotion.quantity;
   const issuedVoucherCount = await VoucherModel.countDocuments({
@@ -96,7 +110,12 @@ router.post('/', jwtValidator, async (req, res) => {
     status: {$in: [VOUCHER_STATUS.UNUSED, VOUCHER_STATUS.USED]},
   });
 
-  if (issuedVoucherCount >= promoLimit) return respondWithError(res, 400, 'Promotion campaign issue limit has been reached');
+  if (promoLimit && issuedVoucherCount >= promoLimit) {
+    return respondWithError(res, 400, {
+      error: 'Promotion campaign issue limit has been reached',
+      errorCode: RESPONSE_ERROR_CODE.VOUCHERS.LIMIT_FOR_PROMOTION_REACHED,
+    });
+  }
 
   const now = new Date();
   let voucherStartDate, voucherEndDate;
@@ -109,6 +128,7 @@ router.post('/', jwtValidator, async (req, res) => {
     voucherEndDate = promotion.endDate;
   }
 
+  //TODO: use transaction
   const newVoucher = await VoucherModel.create({
     promotion: promotion._id,
     restaurantPlusUser: user._id,
@@ -119,12 +139,18 @@ router.post('/', jwtValidator, async (req, res) => {
   });
 
   await PointHistoryModel.create({
+    store: promotion.store._id,
     voucher: newVoucher._id,
     restaurantPlusUser: user._id,
     value: promotion.price,
     transactionType: POINT_HISTORY_TRANSACTION_TYPE.USER_BUY_VOUCHER,
     createdAt: new Date(),
   });
+
+  if (promotion.price) {
+    user.rpPoints[storeId] -= promotion.price;
+    await UserModel.updateOne({_id: user._id}, {rpPoints: user.rpPoints});
+  }
 
   newVoucher.promotion = promotion;
   newVoucher.restaurantPlusUser = user;

@@ -41,6 +41,14 @@ const RESTAURANT_PLUS_ROLES = Object.freeze({
   RP_MANAGER: 'RP_MANAGER',
 });
 
+const RESPONSE_ERROR_CODE = Object.freeze({
+  VOUCHERS: {
+    LIMIT_FOR_USER_REACHED: 'voucher/user-limit-reached',
+    LIMIT_FOR_PROMOTION_REACHED: 'voucher/promotion-limit-reached',
+    USER_INSUFFICIENT_COIN: 'voucher/user-insufficient-coin',
+  }
+});
+
 const DEFAULT_NEARBY_DISTANCE = 5000; //5km
 const DEFAULT_PROMOTION_BACKGROUND = 'https://online-order.gigasource.io/cms-files/files/view/Restaurant%20Plus%20images/default-restaurant-plus-promo-background.png';
 const PELIAS_HOST = 'https://pelias.gigasource.io'
@@ -48,4 +56,5 @@ const PELIAS_HOST = 'https://pelias.gigasource.io'
 module.exports = {
   VOUCHER_STATUS, DEFAULT_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, POINT_HISTORY_TRANSACTION_TYPE,
   DEFAULT_PROMOTION_BACKGROUND, PELIAS_HOST, ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, RESTAURANT_PLUS_ROLES,
+  RESPONSE_ERROR_CODE,
 }
