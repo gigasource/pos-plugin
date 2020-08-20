@@ -8,7 +8,8 @@
       "key": "device",
       "ref": "Device",
       "type": "ref-select",
-      "autopopulate": true
+      "autopopulate": true,
+      "labelProp": "name"
     },
     {
       "_id": "5f1ac78fd956765083019fb1",
@@ -40,6 +41,13 @@
       "_id": "5f1e5c074a81b865c59fdf61",
       "schemaType": "date",
       "key": "createdAt"
+    },
+    {
+      "_id": "5f3a2d3ab41dce046f028b40",
+      "schemaType": "string",
+      "key": "role",
+      "default": "",
+      "type": "input"
     }
   ],
   "name": "SignInRequest",

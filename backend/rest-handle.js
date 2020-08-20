@@ -9,6 +9,7 @@ const payment = require('./api/payment');
 const supportApi = require('./api/support');
 // const restaurantDataBackupApi = require('./api/restaurant-data-backup');
 const userApi = require('./api/users');
+const ticketApi = require('./api/tickets');
 
 const rpStoreApi = require('./restaurant-plus-apis/stores')
 const rpVoucherApi = require('./restaurant-plus-apis/vouchers');
@@ -17,6 +18,7 @@ const rpUserApi = require('./restaurant-plus-apis/users');
 const rpPointHistoryApi = require('./restaurant-plus-apis/point-histories');
 const rpOrderApi = require('./restaurant-plus-apis/orders');
 const {authMiddleware} = require('./restaurant-plus-apis/api-security');
+const topaz = require('./api/topazAI')
 
 module.exports = async cms => {
 /*  let stores = await cms.getModel('Store').find();
@@ -73,6 +75,8 @@ module.exports = async cms => {
   cms.app.use('/demo', demoApi);
   cms.app.use('/support', supportApi);
   cms.app.use('/users', userApi);
+  cms.app.use('/topaz', topaz)
+  cms.app.use('/tickets', ticketApi);
   // cms.app.use('/restaurant-data-backup', restaurantDataBackupApi);
 
   cms.app.use('/api/v1/restaurant-plus/stores', rpStoreApi);

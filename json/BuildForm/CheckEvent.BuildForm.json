@@ -1,0 +1,39 @@
+{
+  "_id": "5f3a574908550518372a5785",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f3a57a108550518372a5788",
+      "schemaType": "date",
+      "key": "datetime",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f3a57a108550518372a5789",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5f3a57a108550518372a578a",
+      "schemaType": "objectId",
+      "key": "staff",
+      "ref": "Staff",
+      "type": "ref-select",
+      "label": "Staff",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f3a57a108550518372a578b",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "type": "ref-select",
+      "label": "Store",
+      "labelProp": "settingName"
+    }
+  ],
+  "name": "CheckEvent",
+  "tabs": [],
+  "type": "Collection"
+}

@@ -116,9 +116,7 @@ router.get('/devices', async (req, res) => {
   let devices = await getAndSortDevices(+n, +offset, sort, nameSearch);
   devices = await Promise.all(devices.map(async device => {
     const latestUnreadMsg = await ChatMessageModel.findOne({
-      clientId: device._id,
-      read: false,
-      fromServer: false
+      clientId: device._id
     }).sort({createdAt: -1});
 
     return {

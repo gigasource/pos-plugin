@@ -13,6 +13,7 @@ const http = require('http')
 const https = require('https')
 const FormData = require('form-data')
 const path = require('path')
+const {getHost} = require('../utils')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -114,72 +115,25 @@ setTimeout(() => {
       const store = await cms.getModel('Store').findById(device.storeId)
       const TAG = `sentry:store=${store.name || store.settingName},alias=${store.alias},eventType=updateMenu,deviceId=${device._id}`
       console.debug(TAG, _id ? `Updating ${collection} item ${_id}` : `Adding ${collection} item`, value)
-
       // insert/update product or category
       try {
         const result = _id
           ? await cms.getModel(collection).findOneAndUpdate({ _id }, value, { new: true })
           : await cms.getModel(collection).create({ store: device.storeId, ...value })
         cb({ success: true, _id: result._id, result })
-
-        const useTopazAI = process.env.USE_TOPAZ_SERVICE === "true"
-        if (value.image && useTopazAI) {
-          const topazServiceUrl = process.env.TOPAZ_SERVICE_ENDPOINT
-          let host = socket.request.headers.host
-          if (!host) {
-            host = 'https://pos.gigasource.io'
-          } else if (!host.startsWith('http')) { // raw ip - localhost
-            host = `http://${host}`
+        if (process.env.TOPAZ_SERVICE_ENDPOINT) {
+          const host = getHost(socket.request)
+          const url = `${host}${result.image}`
+          const topazResponse = (await axios.post(`${host}/topaz`, { url })).data
+          if (topazResponse.success) {
+            const newImagePath = topazResponse.data
+            // update db
+            await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: newImagePath })
+            result.image = newImagePath
+            externalSocketIoServer.emitTo(clientId, 'updateProductImage', { result })
+          } else {
+            console.log()
           }
-          console.debug(TAG, `TopazAI: service endpoint = "${topazServiceUrl}", host="${host}"`)
-          const { taskId } = (await axios.post(`${topazServiceUrl}/task`, { imageUrls: [ `${host}${value.image}` ] })).data
-          console.debug(TAG, `TopazAI: Adjust image with taskId="${taskId}"`)
-          const checkInterval = 1000
-          let timeout = 60 // seconds
-          const intervalId = setInterval(async () => {
-            timeout--;
-            const data = (await axios.get(`${topazServiceUrl}/task/${taskId}`)).data;
-            if (timeout <= 0) {
-              console.debug(TAG, `TopazAI: Task "${taskId}" timeout!`)
-              clearInterval(intervalId);
-            } else if (data.status === 'completed') {
-              console.debug(TAG, `TopazAI: Task "${taskId}" completed!` )
-              clearInterval(intervalId)
-              try {
-                const protocol = topazServiceUrl.startsWith("https") ? https : http
-                protocol.get(`${topazServiceUrl}${data.path}`, async response => {
-                  const formData = new FormData()
-                  formData.append("file", response, {
-                    filename: path.basename(data.path),
-                    contentType: 'image/jpeg'
-                  })
-                  axios.post(`${host}/cms-files/files?folderPath=/images`, formData, { headers: formData.getHeaders() }).then(async res => {
-                    if (res.data[0].uploadSuccess) {
-                      try {
-                        console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload completed.`)
-                        const file = res.data[0].createdFile
-                        const newImagePath = `/cms-files/files/view${file.folderPath}${file.fileName}`
-                        await cms.getModel(collection).findOneAndUpdate({ _id: result._id}, { image: newImagePath })
-                        console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" to "${newImagePath}" completed!`)
-                      } catch (ie) {
-                        console.debug(TAG, `TopazAI: Task "${taskId}", update image for product "${result._id}" failed with error "${ie}"!`)
-                      }
-                    } else {
-                      console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload failed.`)
-                    }
-                  }).catch((ex) => {
-                    console.debug(TAG, `TopazAI: Task "${taskId}" adjusted image upload failed with error: ${ex}`)
-                  })
-                })
-              } catch (e) {
-                console.debug(TAG, `TopazAI: Task "${taskId}" failed with un-expected exception ${e}`)
-              }
-
-            } else if (data.status === 'failed') {
-              clearInterval(intervalId)
-              console.log('failed: ', result.error)
-            }
-          }, checkInterval)
         }
       } catch (error) {
         cb({ error })
@@ -288,6 +242,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
       cms.emit('chatMessage', chatData)
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -359,10 +314,30 @@ router.get('/chat/messages/not-replied', async (req, res) => {
 })
 
 router.get('/chat/messages', async (req, res) => {
-  const {n = 0, offset = 0, clientId} = req.query;
+  const {n = 0, offset = 0, clientId, before, after} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  let query;
+  if (before || after) {
+    let dBefore = new Date();
+    let dAfter = new Date(0);
+    if (before) {
+      dBefore = new Date(before);
+      if (isNaN(dBefore.getTime())) {
+        return res.status(400).json({error: `'before' is not a valid date'`});
+      }
+    }
+    if (after) {
+      dAfter = new Date(after);
+      if (isNaN(dAfter.getTime())) {
+        return res.status(400).json({error: `'after' is not a valid date'`});
+      }
+    }
+    query = ChatMessageModel.find({clientId, createdAt: {$lt: dBefore, $gt: dAfter}}).sort({createdAt: -1});
+  } else {
+    query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  }
+
   if (offset) query = query.skip(+offset);
   if (n) query = query.limit(+n);
 

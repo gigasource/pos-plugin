@@ -35,13 +35,25 @@
       openUploadFileDialog(callback) {
         openUploadFileDialog({ multiple: false, mimeType: 'image/*' }, files => callback(files[0]))
       },
-      uploadImage(file, path = '/images') {
+      uploadImage(file, onTopaz, path = '/images') {
         return new Promise((resolve, reject) => {
           this.showFileUploadProgressDialog = true
-          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, path, response => {
+          this.uploadingItems.push(this.gridFsHandler.uploadFile(file, path, async response => {
             if (response.data[0].uploadSuccess) {
               const files = [response.data[0].createdFile]
-              resolve(this.gridFsHandler.insertViewUrl(files)[0].viewUrl)
+              const viewUrl = this.gridFsHandler.insertViewUrl(files)[0].viewUrl
+              resolve(viewUrl)
+              // continue async run
+              if (cms.sharedConfig.TOPAZ_SERVICE_ENDPOINT) {
+                console.log('use topaz service')
+                const host = location.origin // Note: location.origin won't work in localhost -> change to your ip when dev. E.g: 'http://192.168.10.69:8888'
+                const topazResponse = (await axios.post(`${host}/topaz`, { url: `${host}${viewUrl}` })).data
+                if (topazResponse.success) {
+                  onTopaz && onTopaz(topazResponse.data)
+                } else {
+                  console.log('topaz service failed')
+                }
+              }
             } else {
               reject(response)
             }

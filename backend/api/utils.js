@@ -12,6 +12,18 @@ function extractSortQueries(sorts) {
   return sorts;
 }
 
+function getHost(request) {
+  let host = request.headers.host
+  if (!host) {
+    host = 'https://pos.gigasource.io'
+  } else if (!host.startsWith('http')) { // raw ip - localhost
+    host = `http://${host}`
+  }
+  return host
+}
+
 module.exports = {
   extractSortQueries,
+  getHost
 }
+
