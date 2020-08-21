@@ -232,6 +232,11 @@ router.post('/register', async (req, res) => {
     online: true,
     unreadMessages: 0,
   });
+  cms.emit('newGsmsDevice', {
+    ...newDevice._doc,
+    online: true,
+    unreadMessages: 0,
+  });
   res.status(201).json({clientId: newDevice._id});
 });
 

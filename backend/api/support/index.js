@@ -54,7 +54,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Received chat msg from gsms client`, sentryPayload);
 
-      if (!userId) userId = (await UserModel.findOne({name: 'admin'}))._id
+      if (!userId) userId = (await UserModel.findOne({username: 'admin'}))._id
 
       const savedMsg = await ChatMessageModel.create({
         clientId,
@@ -67,7 +67,8 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
-      internalSocketIOServer.emit('chatMessageNotification')
+      internalSocketIOServer.emit('chatMessageNotification');
+      cms.emit('chatMessage', {chatData, fromServer: false});
 
       cb && cb(savedMsg._doc);
     });
@@ -241,7 +242,7 @@ setTimeout(() => {
       });
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
-      cms.emit('chatMessage', chatData)
+      cms.emit('chatMessage', {chatData, fromServer: true});
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 

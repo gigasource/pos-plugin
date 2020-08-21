@@ -21,4 +21,16 @@ router.get('/supporter', async (req, res) => {
                           .map(u => ({_id: u._id, name: u.name}));
   res.status(200).json(supporters);
 });
+
+router.put('/update-token/:id', async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+  if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
+  try {
+    await UserModel.findByIdAndUpdate(id, {firebaseToken: token});
+    res.status(200).json({token: token});
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device token'});
+  }
+});
 module.exports = router;

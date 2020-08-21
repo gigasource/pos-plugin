@@ -170,7 +170,7 @@
           name: `${store.id}. ${store.name || store.settingName} (${store.alias})`,
         }
       }).sort((s1, s2) => +s1.id - +s2.id)
-      
+
       await this.getGsmsDevices()
 
       cms.socket.on('chatMessage', this.receiveChatMessage)
@@ -255,7 +255,7 @@
             break;
           }
         }
-        
+
         if (!this.loadingMoreDevices && this.moreDevicesAvailable && devices.length < this.devicesPerLoad) {
           this.$nextTick(this.getGsmsDevices)
         }
@@ -388,7 +388,7 @@
 
         this.devices = uniqBy([...this.devices, ...gsmsDevices], '_id')
         this.devices = this.devices.map(device => this.convertDevice(device))
-        
+
         const deviceIds = gsmsDevices.map(({_id}) => _id)
         this.getChatMessageCount(deviceIds).then(messageCountMap => {
           Object.keys(messageCountMap).forEach(deviceId => {
@@ -401,7 +401,7 @@
         })
 
         this.loadingMoreDevices = false
-        
+
         if (this.appReviewerPerm) {
           if (this.demoStore) {
             this.$set(this, 'devices', _.filter(this.devices, device => device.storeId === this.demoStore._id))
@@ -528,7 +528,7 @@
           alert("Warning: add note in review mode is not allowed")
           return
         }
-        
+
         const apiUrl = '/support/notes'
         const {data} = await axios.post(apiUrl, note)
         this.selectedDevice.notes = this.selectedDevice.notes || []
@@ -597,7 +597,7 @@
           alert("Warning: update username in review mode is not allowed")
           return
         }
-        
+
         const apiUrl = `/gsms-device/device-metadata`
         const payload = {clientId: this.selectedDeviceId, metadata: {customerName: username}}
         await axios.put(apiUrl, payload)
