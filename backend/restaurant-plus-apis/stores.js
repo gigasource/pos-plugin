@@ -10,6 +10,13 @@ const {firebaseAdminInstance} = require('../firebase-messaging/admin')
 const UserModel = cms.getModel('RPUser');
 const {jwtValidator} = require('./api-security');
 const {NOTIFICATION_ACTION_TYPE} = require('./constants');
+const dayjs = require('dayjs')
+const isBetween = require('dayjs/plugin/isBetween')
+const isSameOrAfter = require('dayjs/plugin/isSameOrAfter')
+const customParseFormat = require('dayjs/plugin/customParseFormat')
+dayjs.extend(isBetween)
+dayjs.extend(isSameOrAfter)
+dayjs.extend(customParseFormat)
 
 const mapperConfig = {
   _id: '_id',
@@ -178,10 +185,80 @@ router.get('/reservations', jwtValidator, async (req, res) => {
 })
 
 router.get('/reservations/time-slots/', async (req, res) => {
-  const { date } = req.query
-  if (!date) return res.sendStatus(400)
+  const { storeId, date } = req.query
+  if (!storeId || !date) return res.sendStatus(400)
 
+  const inputDate = dayjs(date)
+  let startTime = inputDate.startOf('day')
+  let endTime = inputDate.endOf('day')
+  const store = await StoreModel.findById(storeId)
 
+  const timeSlots = []
+
+  // has open/close time
+  if (store.openHours) {
+    for (const settings of store.openHours) {
+      if (settings.dayInWeeks[inputDate.day()]) {
+        const [startHour, startMinute] = settings.openTime.split(':')
+        startTime = startTime.hour(+startHour).minute(+startMinute)
+        const [endHour, endMinute] = settings.closeTime.split(':')
+        endTime = endTime.hour(+endHour).minute(+endMinute)
+      }
+    }
+  }
+
+  if (inputDate.isSame(dayjs(), 'day')) {
+    startTime = dayjs().add(2, 'hour').minute(0)
+    if (startTime.isBefore(dayjs().add(2, 'hour'))) startTime = startTime.add(30, 'minute')
+  }
+  timeSlots.push(...getTimeSlots(startTime, endTime))
+
+  // has seat limit settings
+  if (store.reservationSetting.seatLimit && store.reservationSetting.seatLimit.length) {
+    const daysInWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const day = daysInWeek[inputDate.day()]
+    const seatLimits = store.reservationSetting.seatLimit
+
+    const reservations = await cms.getModel('Reservation').find({
+      store: storeId,
+      date: inputDate.format('YYYY-MM-DD')
+    }).lean()
+
+    for (const seatLimit of seatLimits) {
+      if (seatLimit.days.includes(day)) {
+        const startTime = dayjs(`${inputDate.format('YYYY-MM-DD')} ${seatLimit.startTime}`, 'YYYY-MM-DD HH:mm')
+        const endTime = dayjs(`${inputDate.format('YYYY-MM-DD')} ${seatLimit.endTime}`, 'YYYY-MM-DD HH:mm')
+
+        const reservationsInSlot = reservations.filter(r => {
+          return dayjs(`${r.date} ${r.time}`, 'YYYY-MM-DD HH:mm').isBetween(startTime, endTime, '[]')
+        })
+
+        const guestsInSlot = _.sumBy(reservationsInSlot, 'noOfGuests')
+        if (guestsInSlot >= seatLimit.seat) _.pullAll(timeSlots, getTimeSlots(startTime, endTime))
+      }
+    }
+
+  }
+
+  const sortedSlots = timeSlots.sort((cur, next) => cur.localeCompare(next))
+  res.status(200).json(sortedSlots)
+
+  function getTimeSlots(start, end) {
+    let startTime = dayjs(start)
+    startTime = startTime.minute(30).isBefore(startTime)
+      ? startTime.add(1, 'hour').minute(0)
+      : startTime.minute(30)
+
+    const endTime = dayjs(end)
+    if (startTime.isSameOrAfter(endTime)) return []
+
+    const list = [];
+    while (!startTime.isAfter(endTime)) {
+      list.push(startTime.format('HH:mm'))
+      startTime = startTime.add(30, 'minute')
+    }
+    return list
+  }
 })
 
 router.get('/table-request/:requestId', async (req, res) => {
