@@ -1,6 +1,6 @@
 const {firebaseAdminInstance} = require('./admin')
 const dayjs = require('dayjs')
-const {NOTIFICATION_ACTION_TYPE} = require('../restaurant-plus-apis/constants');
+const {NOTIFICATION_ACTION_TYPE} = require('../../restaurant-plus-apis/constants');
 
 module.exports = cms => {
   const admin = firebaseAdminInstance()

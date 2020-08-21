@@ -239,6 +239,24 @@
       "key": "firebaseToken",
       "type": "input",
       "flex": "md6"
+    },
+    {
+      "_id": "5f3dff8bad3fc2e00592c482",
+      "schemaType": "string",
+      "key": "apnToken",
+      "type": "input"
+    },
+    {
+      "_id": "5f3e304be31bd91e67dfab23",
+      "schemaType": "string",
+      "key": "osName",
+      "type": "input"
+    },
+    {
+      "_id": "5f3e304be31bd91e67dfab24",
+      "schemaType": "string",
+      "key": "osVersion",
+      "type": "input"
     }
   ],
   "name": "Device",
@@ -247,7 +265,10 @@
       "fields": [
         "storeId",
         "hardwareId",
-        "firebaseToken"
+        "firebaseToken",
+        "apnToken",
+        "osName",
+        "osVersion"
       ],
       "_id": "5f0d2f7908fc232407e22049",
       "name": "gsms"
