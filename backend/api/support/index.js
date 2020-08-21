@@ -53,7 +53,7 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Received chat msg from gsms client`, sentryPayload);
 
-      if (!userId) userId = (await UserModel.findOne({name: 'admin'}))._id
+      if (!userId) userId = (await UserModel.findOne({username: 'admin'}))._id
 
       const savedMsg = await ChatMessageModel.create({
         clientId,
