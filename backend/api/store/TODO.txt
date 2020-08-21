@@ -1,0 +1,6 @@
+- Sign in request -> send to manager device
+- Manager create new task -> send notify to employee devices
+- Manager add employee to task -> send notify to employee device
+- Manager remove employee from task -> send notify to employee device
+- Manager add/remove employee to/from team -> send notify to employee device
+- Who can mask task as completed? What happend after a task has been mask as completed?

@@ -6,8 +6,11 @@ const https = require('https');
 const http = require('http');
 const axios = require('axios');
 const mongoose = require('mongoose');
-const {getExternalSocketIoServer} = require('../socket-io-server');
-const {assignDevice} = require('../api/support');
+const {getExternalSocketIoServer} = require('../../socket-io-server');
+const {assignDevice} = require('../../api/support');
+const teamRoute = require('./team')
+const taskRoute = require('./task')
+const staffRoute = require('./staff')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -192,8 +195,10 @@ router.post('/new-feedback', async (req, res) => {
 })
 
 router.post('/sign-in-requests', async (req, res) => {
-  const {storeName, googleMapPlaceId, deviceId} = req.body;
-  if (!storeName || !googleMapPlaceId || !deviceId) return res.status(400).json({error: 'Missing property in request body'});
+  // name: device owner's name enter by device owner
+  // role: 'staff' | 'manager'
+  const {storeName, googleMapPlaceId, deviceId, role, name} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId || !role) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
   const StoreModel = cms.getModel('Store');
@@ -209,6 +214,8 @@ router.post('/sign-in-requests', async (req, res) => {
     googleMapPlaceId,
     createdAt: new Date(),
     ...store && {store: store._id},
+    role,
+    name
   });
 
   const device = await cms.getModel('Device').findById(deviceId);
@@ -218,6 +225,7 @@ router.post('/sign-in-requests', async (req, res) => {
     deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
     ...store && {storeName: store.settingName || store.name, storeId: store._id},
     ...request._doc,
+    role
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
@@ -229,7 +237,7 @@ router.get('/sign-in-requests', async (req, res) => {
 
   const requests = await getRequestsFromDb({...status && {status}});
 
-  res.status(200).json(requests.map(({device, store, storeFromGoogleMap, ...e}) => {
+  res.status(200).json(requests.map(({device, store, storeFromGoogleMap, role, name, ...e}) => {
     if (!device) return null;
     if (!store) store = storeFromGoogleMap
 
@@ -250,7 +258,7 @@ router.get('/sign-in-requests/:requestId', async (req, res) => {
   const requests = await getRequestsFromDb({_id: new mongoose.Types.ObjectId(requestId)});
 
   if (requests && requests.length) {
-    let {device, store, storeFromGoogleMap, ...e} = requests[0];
+    let {device, store, storeFromGoogleMap, role, name, ...e} = requests[0];
     if (!store) store = storeFromGoogleMap;
 
     res.status(200).json({request: {
@@ -376,5 +384,9 @@ async function getGooglePlaceByText(placeName) {
     return null;
   }
 }
+
+router.use('/staff', staffRoute)
+router.use('/team', teamRoute)
+router.use('/task', taskRoute)
 
 module.exports = router
