@@ -404,7 +404,7 @@ function formatOrder(order, store) {
   const total = _.sumBy(products, p => p.originalPrice) - discounts
 
   return {
-    orderToken: order.orderToken || order._id.toString(),
+    orderToken: order.onlineOrderId || order._id.toString(),
     orderType: order.orderType || 'onlineOrder',
     paymentType: order.payment[0].type,
     customer: JSON.stringify(order.customer),
