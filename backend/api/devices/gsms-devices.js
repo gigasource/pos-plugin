@@ -405,7 +405,7 @@ function formatOrder(order, store) {
 
   return {
     orderToken: order.onlineOrderId || order._id.toString(),
-    orderType: order.orderType || 'onlineOrder',
+    orderType: order.type,
     paymentType: order.payment[0].type,
     customer: JSON.stringify(order.customer),
     products: JSON.stringify(products),
