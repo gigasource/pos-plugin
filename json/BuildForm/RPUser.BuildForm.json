@@ -79,6 +79,12 @@
       "type": "input"
     },
     {
+      "_id": "5f3e2990e31bd91e67dfab01",
+      "schemaType": "string",
+      "key": "apnToken",
+      "type": "input"
+    },
+    {
       "_id": "5f2a88b94ad262b2ae412130",
       "schemaType": "string",
       "key": "initialSignInType",
@@ -108,6 +114,24 @@
           "autopopulate": true
         }
       ]
+    },
+    {
+      "_id": "5f3e2990e31bd91e67dfab06",
+      "schemaType": "string",
+      "key": "appVersion",
+      "type": "input"
+    },
+    {
+      "_id": "5f3e2990e31bd91e67dfab07",
+      "schemaType": "string",
+      "key": "osName",
+      "type": "input"
+    },
+    {
+      "_id": "5f3e2990e31bd91e67dfab08",
+      "schemaType": "string",
+      "key": "osVersion",
+      "type": "input"
     }
   ],
   "name": "RPUser",

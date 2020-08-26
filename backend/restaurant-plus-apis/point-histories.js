@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {respondWithError} = require('./utils');
 const objectMapper = require('object-mapper');
-const {firebaseAdminInstance} = require('../firebase-messaging/admin');
+const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const admin = firebaseAdminInstance();
 const ObjectId = require('mongoose').Types.ObjectId;
 

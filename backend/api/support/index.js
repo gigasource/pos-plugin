@@ -533,5 +533,36 @@ router.put('/update-token/:id', async (req, res) => {
     res.status(500).json({error: 'Error updating device token'})
   }
 })
+
+router.put('/update-apn-token/:id', async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  if (!id || !token) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { apnToken: token })
+
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device apn token'})
+  }
+})
+
+router.put('/update-os-info/:id', async (req, res) => {
+  const { id } = req.params;
+  const { osName, osVersion } = req.body;
+
+  if (!id || !osName || !osVersion) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { osName, osVersion })
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device os info'})
+  }
+})
 module.exports = router;
 module.exports.assignDevice = assignDevice;

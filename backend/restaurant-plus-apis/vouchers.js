@@ -68,7 +68,7 @@ router.put('/use-voucher/:voucherId', jwtValidator, async (req, res) => {
   if (voucher.endDate && nowInMs > voucher.endDate.getTime()) return respondWithError(res, 400, 'This voucher has expired');
   if (voucher.promotion.store._id.toString() !== storeId) return respondWithError(res, 400, `This voucher can not be used with store ${storeId}`);
 
-  await VoucherModel.updateOne({_id: voucher._id}, {status: VOUCHER_STATUS.UNUSED});
+  await VoucherModel.updateOne({_id: voucher._id}, {status: VOUCHER_STATUS.USED});
   res.status(204).send();
 });
 
