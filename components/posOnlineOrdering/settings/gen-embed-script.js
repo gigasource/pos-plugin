@@ -77,8 +77,16 @@ export function genIframe(type, link, alias) {
         ${type === 'webshop' && `if(!mobileCheck()) {
           var closeBtn = document.createElement('button')
           closeBtn.setAttribute('id', 'iframe-close-btn')
-          closeBtn.innerText = 'CLOSE'
-          closeBtn.setAttribute('style', 'position: absolute;top: 10px;right: 50%;transform: translateX(650px);height: 32px;width: 64px;font-size: 14px;')
+          closeBtn.setAttribute('style', 'position: absolute;top: 10px;right: 50%;transform: translateX(650px);padding: 16px;font-size: 14px;')
+          var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+          icon.setAttribute('width', '20px')
+          icon.setAttribute('height', '20px')
+          icon.setAttribute('viewBox', '0 0 20 20')
+          var polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
+          polygon.setAttribute('fill', 'black')
+          polygon.setAttribute('points', '19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4 6.4 5 12 10.6 17.6 5 19 6.4 13.4 12')
+          icon.appendChild(polygon)
+          closeBtn.appendChild(icon)
           closeBtn.onclick = function () {
             container.style.visibility = 'hidden'
             document.body.style.overflow = 'auto'
