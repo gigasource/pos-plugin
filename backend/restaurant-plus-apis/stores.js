@@ -286,16 +286,16 @@ router.post('/table-request', async (req, res) => {
   const devices = await getManagerDevices(request.storeId)
   if (!devices.length) return
   await sendNotification(
+    devices,
     {
       title: 'New Table',
       body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
     },
     { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-    devices.map(d => d.firebaseToken)
   )
 })
 
-router.put('/table-request/:requestId', async (req, res) => {
+router.put('/table-request/:requestId', jwtValidator, async (req, res) => {
   const { requestId } = req.params
   if (!requestId) return res.sendStatus(400)
 
@@ -311,12 +311,12 @@ router.put('/table-request/:requestId', async (req, res) => {
   if (request.status === 'cancelled') {
     // notify cancelled
     if (managerDevices.length) await sendNotification(
+      managerDevices,
       {
         title: 'Table request cancelled',
         body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
       },
       { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(request) },
-      managerDevices.map(d => d.firebaseToken)
     )
     return
   }
@@ -327,53 +327,53 @@ router.put('/table-request/:requestId', async (req, res) => {
     case 'approved':
       // notify end user
       await sendNotification(
+        [user],
         {
           title: 'Table Request approved',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been approved.`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        [user.firebaseToken]
       )
       break
     case 'cancelled':
       // notify manager
       if (managerDevices.length) await sendNotification(
+        managerDevices,
         {
           title: 'Table request cancelled',
           body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-         managerDevices.map(d => d.firebaseToken)
       )
       break
     case 'declined':
       // notify end user
       await sendNotification(
+        [user],
         {
           title: 'Table Request declined',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been declined.`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        [user.firebaseToken]
       )
       break
     case 'expired':
       await sendNotification(
+        [user],
         {
           title: 'Table Request expired',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has expired.`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        [user.firebaseToken]
       )
 
       if (managerDevices.length) await sendNotification(
+        managerDevices,
         {
           title: 'Table request expired',
           body: `Table request at ${dayjs(request.date).format('HH:mm')} has expired`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        managerDevices.map(d => d.firebaseToken)
       )
       break
     default:
@@ -386,23 +386,64 @@ async function getManagerDevices(storeId) {
   return await cms.getModel('Device').find({ storeId: storeId.toString(), firebaseToken: { $exists: true } })
 }
 
-async function sendNotification(notification, data, tokens) {
-  const admin = firebaseAdminInstance()
+async function sendNotification(devices, notification, payload) {
+  const tokens = devices.reduce((acc, cur) => {
+    if (cur.osName === 'ios' && cur.osVersion) {
+      const [majorVersion] = cur.osVersion.split('.')
+      if (+majorVersion < 13) {
+        acc.apnTokens = [...acc.apnTokens, cur.apnToken]
+        return acc
+      }
+    }
+    acc.firebaseTokens = [...acc.firebaseTokens, cur.firebaseToken]
+    return acc
+  }, { apnTokens: [], firebaseTokens: [] })
 
+  sendApn(notification, payload, tokens.apnTokens)
+  sendFirebaseNotification(notification, payload, tokens.firebaseTokens)
+}
+
+async function sendFirebaseNotification(notification, data, tokens) {
+  const admin = firebaseAdminInstance()
+  const formattedData = {
+    ...data,
+    notification: JSON.stringify(notification)
+  }
   const message = {
-    notification,
-    data,
+    data: formattedData,
     tokens,
     apns: {
       payload: {
         aps: {
-          'mutable-content': 1
+          'mutable-content': 1,
+          'content-available': 1
         }
       }
     },
+    android: {
+      priority: 'high'
+    },
   }
 
-  await admin.messaging().sendMulticast(message)
+  const result = await admin.messaging().sendMulticast(message)
+  if (result.successCount) {
+    console.debug('sentry:eventType=notification', 'Error sending notification', result.responses.filter(r => !r.success))
+  }
+}
+
+function sendApn(notification, payload, tokens) {
+  const apnProvider = getApnProvider()
+
+  const note = new apn.Notification();
+
+  note.alert = notification.title
+  note.body = notification.body
+  note.payload = { ...payload, ...notification }
+  note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+  note.topic = 'io.gigasource.gsms.voip';
+  note.mutableContent = 1;
+  note.category = 'GSMSNoti'
+  return apnProvider.send(note, tokens)
 }
 
 module.exports = router
