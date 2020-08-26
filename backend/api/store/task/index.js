@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getTask, getTasks, createNewTask, updateTask } = require('./task')
+const { getTask, getTasks, createNewTask, updateTask, removeTask } = require('./task')
 
 /**
  * Return all tasks of specified store if storeId is passing in query
@@ -51,6 +51,17 @@ router.put('/', async (req, res) => {
     res.json(updateResult)
   } catch (e) {
     res.json({error: e.message})
+  }
+})
+
+//Remove task
+router.post('/remove', async (req, res) => {
+  try {
+    const { taskId } = req.body
+    const response = await removeTask(taskId)
+    res.json(response)
+  } catch (e) {
+    res.json({ error: e.message })
   }
 })
 

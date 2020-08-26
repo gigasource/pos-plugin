@@ -130,14 +130,24 @@ async function updateTask({ taskId, name, deadline, status, note, pariticipants,
         await cms.getModel(TASK_COL).deleteOne({_id: task.base})
       }
     }
+    if(task.base && repeat !== 'none') {
+      await cms.getModel(TASK_COL).findOneAndUpdate({ _id: task.base }, changes)
+    }
   }
   const response = await cms.getModel(TASK_COL).findOneAndUpdate({ _id: taskId }, changes,  { "new": true })
   return response._doc
+}
+
+async function removeTask(taskId) {
+  if(!taskId)
+    throw "Missing task's id";
+  return await cms.getModel(TASK_COL).deleteOne({_id: taskId})
 }
 
 module.exports = {
   getTasks,
   getTask,
   createNewTask,
-  updateTask
+  updateTask,
+  removeTask
 }
