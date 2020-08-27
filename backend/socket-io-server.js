@@ -154,26 +154,35 @@ module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
   const {io, socket: internalSocketIOServer} = cms;
+  if (global.APP_CONFIG.redis) {
+    const {hosts, password} = global.APP_CONFIG.redis;
+    const Redis = require("ioredis");
+    const startupRedisNodes = hosts.split(',').map(host => {
+      const hostInfoArr = host.split(':');
+      return {
+        host: hostInfoArr[0],
+        port: hostInfoArr[1],
+      }
+    });
 
-    if (global.APP_CONFIG.redis) {
-      const {hosts, password} = global.APP_CONFIG.redis;
-      const Redis = require("ioredis");
-      const startupRedisNodes = hosts.split(',').map(host => {
-        const hostInfoArr = host.split(':');
-        return {
-          host: hostInfoArr[0],
-          port: hostInfoArr[1],
-        }
-      });
-      const ioredisOpt = {
-        redisOptions: {password}
-      };
+    const ioredisOpt = {
+      redisOptions: {password}
+    };
 
-      io.adapter(redisAdapter({
-        pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-        subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-      })); //internalSocketIOServer will use adapter too, just need to call this once
-    }
+    io.adapter(redisAdapter({
+      pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+      subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+    })); //internalSocketIOServer will use adapter too, just need to call this once
+  }
+
+  // cms.socket = p2pServerPlugin(cms.socket, {
+  //   clientOverwrite: true,
+  //   redisClusterEnabled: true,
+  //   saveMessage,
+  //   loadMessages,
+  //   deleteMessage,
+  //   updateMessage,
+  // })
 
   async function updateOrderStatus(orderToken, status) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
@@ -1065,6 +1074,7 @@ module.exports = async function (cms) {
     });
   });
 }
+
 module.exports.getExternalSocketIoServer = function () {
   return externalSocketIOServer;
 }

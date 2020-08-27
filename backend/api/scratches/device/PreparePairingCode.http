@@ -1,5 +1,0 @@
-GET http://localhost:8888/device/pairing-code?storeId=5e955b0c3efd4747223fba8c&name=WebShop
-Content-Type: application/x-www-form-urlencoded
-
-### BanhMiHoiAnId = 5e955b0c3efd4747223fba8c
-### name = default name of device, if not define name will be set to null

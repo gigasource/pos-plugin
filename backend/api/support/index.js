@@ -14,6 +14,7 @@ const https = require('https')
 const FormData = require('form-data')
 const path = require('path')
 const {getHost} = require('../utils')
+const registerVoIP = require('./voip')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -54,22 +55,28 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Received chat msg from gsms client`, sentryPayload);
 
-      if (!userId) userId = (await UserModel.findOne({name: 'admin'}))._id
+      if (!userId) {
+        try {
+          userId = (await UserModel.findOne({name: 'admin'}))._id
 
-      const savedMsg = await ChatMessageModel.create({
-        clientId,
-        userId,
-        createdAt,
-        text,
-        read: false,
-        fromServer: false
-      });
+          const savedMsg = await ChatMessageModel.create({
+            clientId,
+            userId,
+            createdAt,
+            text,
+            read: false,
+            fromServer: false
+          });
 
-      console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
-      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
-      internalSocketIOServer.emit('chatMessageNotification')
+          console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
+          internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
+          internalSocketIOServer.emit('chatMessageNotification')
 
-      cb && cb(savedMsg._doc);
+          cb && cb(savedMsg._doc);
+        } catch (e) {
+
+        }
+      }
     });
 
     // for devices with assigned store
@@ -193,29 +200,10 @@ setTimeout(() => {
     })
   });
 
-  externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
-    console.log('makeAPhoneCallAck', clientId, agentId, callAccepted)
-    internalSocketIOServer.in(`makeAPhoneCallAck-from-client-${clientId}`).emit('makeAPhoneCallAck', { clientId, agentId, callAccepted })
-  })
-
-  externalSocketIoServer.registerAckFunction('cancelCallAck', async (clientId, agentId) => {
-    console.log('cancelCallAck', clientId, agentId)
-    internalSocketIOServer.in(`cancelCallAck-from-client-${clientId}`).emit('cancelCallAck', { clientId, agentId })
-  })
-
-  externalSocketIoServer.registerAckFunction('endCallAck', async (clientId, agentId) => {
-    console.log('endCallAck', clientId, agentId)
-    internalSocketIOServer.in(`endCallAck-from-client-${clientId}`).emit('endCallAck', { clientId, agentId })
-  })
-
   internalSocketIOServer.on('connect', socket => {
     socket.on('watch-chat-message', clientIds => {
       clientIds.forEach(clientId => {
         socket.join(`chatMessage-from-client-${clientId}`)
-        socket.join(`makeAPhoneCallAck-from-client-${clientId}`)
-        socket.join(`cancelCallAck-from-client-${clientId}`)
-        socket.join(`endCallAck-from-client-${clientId}`)
-        socket.join(`endCallFromUser-${clientId}`)
       });
     });
 
@@ -259,30 +247,12 @@ setTimeout(() => {
         console.log(`sent new menu to ${clientId}`)
       })
     })
-
-    socket.on('makeAPhoneCall', async (args, ack) => {
-      let { clientId, agentId } = args;
-      console.log('send makeAPhoneCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'makeAPhoneCall', [ {
-        version: '0.0.1',
-        clientId: `device_${clientId}`,
-        agentId: agentId
-      } ], 'makeAPhoneCallAck', [clientId, agentId])
-    })
-
-    socket.on('cancelCall', async (args, ack) => {
-      let { clientId, agentId } = args;
-      console.log('send cancelCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'cancelCall', [{}], 'cancelCallAck', [clientId, agentId])
-    })
-
-    socket.on('endCall', async (args, ack) => {
-      let { clientId, agentId } = args;
-      console.log('send endCall to ' + clientId)
-      await getExternalSocketIoServer().emitToPersistent(clientId, 'endCall', [{}], 'endCallAck', [clientId, agentId])
-    })
   });
+
+  registerVoIP(externalSocketIoServer)
 }, 5000);
+
+
 
 router.get('/chat/messages/not-replied', async (req, res) => {
   const lastMessages = await ChatMessageModel.aggregate([
