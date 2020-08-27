@@ -230,6 +230,7 @@ router.post('/sign-in-requests', async (req, res) => {
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
+  cms.emit('newSignInRequest', result);
   res.status(201).json(request._doc);
 });
 
@@ -385,6 +386,11 @@ async function getGooglePlaceByText(placeName) {
     return null;
   }
 }
+
+router.get('/basic-info', async (req, res) => {
+  const stores = await StoreModel.find({}, {id: 1, name: 1, alias: 1, logoImageSrc: 1, groups: 1});
+  res.json(stores);
+})
 
 router.use('/staff', staffRoute)
 router.use('/team', teamRoute)

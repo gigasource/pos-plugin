@@ -240,10 +240,12 @@ setTimeout(() => {
         read: false,
         fromServer: true
       });
+      const sender = await UserModel.findOne({_id: userId});
+      const username = sender ? sender.name : '';
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
       cms.emit('chatMessage', {chatData, fromServer: true});
-      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', {...savedMsg._doc, username});
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -315,38 +317,54 @@ router.get('/chat/messages/not-replied', async (req, res) => {
 })
 
 router.get('/chat/messages', async (req, res) => {
-  const {n = 0, offset = 0, clientId, before, after} = req.query;
+  const {n = 0, offset = 0, clientId} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  let query;
-  if (before || after) {
-    let dBefore = new Date();
-    let dAfter = new Date(0);
-    if (before) {
-      dBefore = new Date(before);
-      if (isNaN(dBefore.getTime())) {
-        return res.status(400).json({error: `'before' is not a valid date'`});
+  const aggregationSteps = [
+    {$sort: {createdAt: -1}},
+    {$match: {clientId: clientId}}
+  ];
+  if (offset) aggregationSteps.push({$skip: +offset});
+  if (n) aggregationSteps.push({$limit: +n});
+  aggregationSteps.push(...[
+    {
+      $lookup: {
+        from: 'users',
+        let: {userId: {$toObjectId: '$userId'}, falseVal: false},
+        pipeline: [
+          {
+            $match: {
+                $expr: {$eq: ['$_id', '$$userId']}
+            },
+          },
+          {$project: { "name": 1, "_id": 0 }}
+        ],
+        as: 'user',
       }
-    }
-    if (after) {
-      dAfter = new Date(after);
-      if (isNaN(dAfter.getTime())) {
-        return res.status(400).json({error: `'after' is not a valid date'`});
-      }
-    }
-    query = ChatMessageModel.find({clientId, createdAt: {$lt: dBefore, $gt: dAfter}}).sort({createdAt: -1});
-  } else {
-    query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+    },
+    {$unwind: {path: '$user'}},
+    {$addFields: { "username": "$user.name" }},
+    {$unset: "user"}
+  ]);
+
+  try {
+    const docs = await ChatMessageModel.aggregate(aggregationSteps);
+    return res.status(200).json(docs);
+  } catch (error) {
+    return res.status(500).json({error});
   }
 
-  if (offset) query = query.skip(+offset);
-  if (n) query = query.limit(+n);
+  // let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  // if (offset) query = query.skip(+offset);
+  // if (n) query = query.limit(+n);
 
-  query.exec((error, docs) => {
-    if (error) return res.status(500).json({error});
+  // try {
+  //   const docs = await query.exec();
 
-    res.status(200).json(docs.map(({_doc}) => _doc));
-  });
+  //   return res.status(200).json(docs.map(({_doc}) => _doc));
+  // } catch (error) {
+  //   return res.status(500).json({error});
+  // }
 });
 
 router.get('/chat/messages-count', async (req, res) => {

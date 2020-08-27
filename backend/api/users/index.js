@@ -1,3 +1,5 @@
+const { route } = require('../store');
+
 const UserModel = cms.getModel('User');
 const router = require('express').Router();
 
@@ -31,6 +33,22 @@ router.put('/update-token/:id', async (req, res) => {
     res.status(200).json({token: token});
   } catch (e) {
     res.status(500).json({error: 'Error updating device token'});
+  }
+});
+
+router.get('/:username', async (req, res) => {
+  const { username } = req.params;
+  const user = await UserModel.findOne({username, active: true});
+  if (user) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      role: user.role,
+      permissions: user.permissions,
+      storeGroups: user.storeGroups
+    });
+  } else {
+    res.status(404).json({error: 'User not found'});
   }
 });
 module.exports = router;
