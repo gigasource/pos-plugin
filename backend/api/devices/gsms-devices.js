@@ -401,7 +401,7 @@ function formatOrder(order, store) {
   const deliveryTime = jsonFn.clone(order.deliveryTime)
 
   const discounts = order.discounts.reduce((sum, discount) => sum + discount.value, 0)
-  const total = _.sumBy(products, p => p.originalPrice) - discounts
+  const total = _.sumBy(products, p => p.originalPrice * p.quantity)
 
   return {
     orderToken: order.onlineOrderId || order._id.toString(),
