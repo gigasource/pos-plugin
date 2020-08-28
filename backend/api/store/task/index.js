@@ -8,12 +8,12 @@ const { getTask, getTasks, createNewTask, updateTask, removeTask } = require('./
  * If both storeId and TaskId are passing in query, taskId will be prefer.
  */
 router.get('/', async (req, res) => {
-  const { storeId, statuses,  startDate, endDate, taskId } = req.query
+  const { storeId, statuses,  startDate, endDate, staffId, taskId } = req.query
   try {
     if (taskId) {
       res.json(await getTask({taskId}))
     } else if (storeId) {
-      res.json(await getTasks({storeId, statuses, startDate, endDate}))
+      res.json(await getTasks({storeId, statuses, startDate, endDate, staffId}))
     }  else {
       res.json({error: "Missing both store's id and task's id" })
     }

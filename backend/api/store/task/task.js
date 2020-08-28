@@ -6,9 +6,10 @@ const TASK_COL = 'Task';
  * @param statuses
  * @param startDate
  * @param endDate
+ * @param staffId
  * @returns {Promise<*>}
  */
-async function getTasks({storeId, statuses, startDate, endDate}) {
+async function getTasks({storeId, statuses, startDate, endDate, staffId}) {
   if (!storeId)
     throw "Missing store's id"
   const qryCondition = { store: storeId }
@@ -24,6 +25,15 @@ async function getTasks({storeId, statuses, startDate, endDate}) {
         { $and: [{ cancelledTime: { $gte: startDate }}, { cancelledTime: { $lte: endDate }}]},
         { cancelledTime: { $exists: false }, completedTime: { $exists: false }},
       ]
+    })
+  }
+  if(staffId) {
+    Object.assign(qryCondition, {
+      participants: {
+        $elemMatch: {
+          $eq: staffId
+        }
+      }
     })
   }
   return await cms.getModel(TASK_COL).find(qryCondition)
