@@ -8,7 +8,8 @@ const {
   getWorkTimeReport,
   processCheckInCheckOut,
   removeStaff,
-  updateStaff
+  updateStaff,
+  getStaffsWithTask
 } = require('./staff');
 
 /**
@@ -17,6 +18,18 @@ const {
 router.get('/:storeId', async (req, res) => {
   try {
     res.json(await getStaff({ storeId: req.params.storeId }))
+  } catch (e) {
+    res.json({error: e.message})
+  }
+})
+
+/*
+ * get all staff of a store with all current task
+ */
+router.get('/with-task/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  try {
+    res.json(await getStaffsWithTask(storeId))
   } catch (e) {
     res.json({error: e.message})
   }

@@ -66,6 +66,25 @@ function getTimeSheetDetail({staffId, startDate, endDate}) {
   }
 }
 
+async function getStaffsWithTask(storeId) {
+  if (!storeId) {
+    throw 'Missing storeId!'
+  }
+  const staffs = await cms.getModel('Staff').find({store: storeId}).lean()
+  const tasks = await cms.getModel('Task').aggregate([
+    {
+      $match: {status: 'inprogress'}
+    },
+    {
+      $unwind: {path: '$participants'}
+    }
+  ])
+  return staffs.map(s => ({
+    ...s,
+    tasks: tasks.filter(t => t.participants.toString() === s._id.toString()).length
+  }))
+}
+
 module.exports = {
   getStaff,
   createStaff,
@@ -73,5 +92,6 @@ module.exports = {
   removeStaff,
   processCheckInCheckOut,
   getWorkTimeReport,
-  getTimeSheetDetail
+  getTimeSheetDetail,
+  getStaffsWithTask
 }

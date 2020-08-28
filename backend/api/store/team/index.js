@@ -17,8 +17,9 @@ router.get('/:storeId', async (req, res) => {
  * Create team
  */
 router.post('/', async (req, res) => {
+  const { team } = req.body
   try {
-    res.json(await createTeam({...req.body}))
+    res.json(await createTeam(team))
   } catch (e) {
     res.json({error: e.message})
   }
@@ -28,16 +29,18 @@ router.post('/', async (req, res) => {
  * Update team
  */
 router.put('/', async(req, res) => {
+  const { team } = req.body
   try {
-    res.json(await updateTeam({...req.body}))
+    res.json(await updateTeam(team))
   } catch (e) {
     res.json({error: e.message})
   }
 })
 
-router.delete('/:teamId', async (req, res) => {
+router.post('/remove', async (req, res) => {
+  const { teamId } = req.body
   try {
-    res.json(await removeTeam({...req.params}))
+    res.json(await removeTeam(teamId))
   } catch (e) {
     res.json({error: e.message})
   }

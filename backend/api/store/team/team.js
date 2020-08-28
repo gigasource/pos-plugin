@@ -25,11 +25,11 @@ async function updateTeam({teamId, name, members = []}) {
   return await cms.getModel('Team').updateOne({ _id: teamId }, changes)
 }
 
-async function removeTeam({teamId}) {
+async function removeTeam(teamId) {
   if (!teamId)
     throw "Missing team's id"
   // TODO: Adding permission check to prevent malicious remove request
-  return await cms.getModel('Team').delete({_id: teamId})
+  return await cms.getModel('Team').deleteOne({_id: teamId})
 }
 
 module.exports = {
