@@ -110,19 +110,19 @@
       return {
         view: 'src', // src | crop
         tab: 'url', // url | upload
-        
+
         // via link
         loadingImage: false,
         photoUrl: '',
-        
+
         // via file
         file: null,
-        
+
         // cropper
         cropper: null,
         initializingCropper: false,
         cropBoxHeight: 281,
-        
+
         //
         dialog: {
           upload: false,
@@ -211,6 +211,7 @@
             aspectRatio: this.aspectRatio,
             responsive: true,
             // minCropBoxHeight: minCropBoxHeight,
+            autoCropArea: 1
           });
           this.$set(this, 'cropper', cropper)
           this.initializingCropper = false
@@ -324,13 +325,13 @@
       max-width: 100%;
       max-height: 100%;
     }
-    
+
     .edit-image-btn {
       position: absolute;
       right: 20px;
       bottom: 20px;
     }
-    
+
     &__subtext {
       font-size: 12px;
       line-height: 11px;

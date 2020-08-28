@@ -1,6 +1,6 @@
 const {firebaseAdminInstance} = require('./admin')
 const dayjs = require('dayjs')
-const {NOTIFICATION_ACTION_TYPE} = require('../restaurant-plus-apis/constants');
+const {NOTIFICATION_ACTION_TYPE} = require('../../restaurant-plus-apis/constants');
 
 module.exports = cms => {
   const admin = firebaseAdminInstance()
@@ -18,6 +18,7 @@ module.exports = cms => {
         body: 'You have a new order!'
       },
       data: {
+        type: 'order',
         orderToken,
         storeName,
         storeAlias
@@ -109,11 +110,22 @@ module.exports = cms => {
     }
   })
 
-  cms.on('chatMessage', async chatData => {
+  cms.on('chatMessage', async ({chatData, fromServer = true}) => {
     const {clientId, userId, text} = chatData
 
-    const device = await cms.getModel('Device').findById(clientId)
-    if (!device.firebaseToken) return
+    const tokens = [];
+
+    if (fromServer) {
+      const device = await cms.getModel('Device').findById(clientId)
+      if (device.firebaseToken) tokens.push(device.firebaseToken)
+    }
+
+    const relatedUsers = await cms.getModel('ChatMessage').aggregate([
+      {"$match": {"clientId": clientId}},
+      {"$group": { _id: "$userId"}},
+    ]);
+    const usersToken = (await cms.getModel('User').find({_id: relatedUsers.map(u => u._id)}, {firebaseToken: 1})).map(u => u.firebaseToken).filter(token => token);
+    tokens.push(...usersToken);
 
     const message = {
       notification: {
@@ -135,17 +147,120 @@ module.exports = cms => {
           },
         }
       },
-      token: device.firebaseToken
     }
 
     const sentryTags = `sentry:eventType=gsmsChat,clientId=${clientId},userId=${userId}`;
     const sentryPayload = JSON.stringify(chatData, null, 2);
 
     try {
-      const response = await admin.messaging().send(message)
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
       console.debug(sentryTags, `Online order backend: Sent support message notification`, sentryPayload);
     } catch (e) {
       console.debug(sentryTags, `Online order backend: Error sending support message notification`, sentryPayload);
+    }
+  })
+
+  cms.on('newGsmsDevice', async newDevice => {
+    const tokens = (await cms.getModel('User').find({}, {firebaseToken: 1})).map(u => u.firebaseToken).filter(token => token);
+    const message = {
+      notification: {
+        title: 'New device',
+        body: newDevice.name + ((newDevice.metadata && newDevice.metadata.deviceLocation)||""),
+      },
+      android: {
+        notification: {
+          sound: 'pristine',
+          channel_id: 'GSMS_Support'
+        },
+        priority: 'high'
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'pristine.aiff',
+            contentAvailable: true
+          },
+        }
+      },
+    }
+    try {
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
+      console.log(`Online order backend: Sent new device notification`);
+    } catch (e) {
+      console.log(`Online order backend: Error sending new device notification`, e);
+    }
+  });
+
+  cms.on('newSignInRequest', async request => {
+    const tokens = (await cms.getModel('User').find({}, {firebaseToken: 1})).map(u => u.firebaseToken).filter(token => token);
+    const message = {
+      notification: {
+        title: 'New sign in request',
+        body: request.deviceName + " - " + (request.storeName ? request.storeName : request.deviceLocation),
+      },
+      android: {
+        notification: {
+          sound: 'pristine',
+          channel_id: 'GSMS_Support'
+        },
+        priority: 'high'
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'pristine.aiff',
+            contentAvailable: true
+          },
+        }
+      },
+    }
+    try {
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
+      console.log(`Online order backend: Sent new sign in request notification`);
+    } catch (e) {
+      console.log(`Online order backend: Error sending new sign in request notification`, e);
+    }
+  })
+
+  cms.on('sendTicket', async ({title, body, tokens}) => {
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      android: {
+        notification: {
+          sound: 'pristine',
+          channel_id: 'GSMS_Support'
+        },
+        priority: 'high'
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'pristine.aiff',
+            contentAvailable: true
+          },
+        }
+      },
+    }
+    try {
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
+      console.log(`Online order backend: Sent ticket notification`);
+    } catch (e) {
+      console.log(`Online order backend: Error sending ticket notification`, e);
     }
   })
 

@@ -14,7 +14,7 @@ const objectMapper = require('object-mapper');
 const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
 const _ = require('lodash');
-const {firebaseAdminInstance} = require('../firebase-messaging/admin');
+const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
 const {findVouchers} = require('./vouchers');
@@ -29,6 +29,7 @@ const mapperConfig = {
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.storeId.name
   },
   date: 'date',
+  timeoutDate: 'timeoutDate',
   vSum: 'orderSum',
   vDiscount: "orderDiscountValue",
   itemCount: 'itemCount',

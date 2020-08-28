@@ -73,6 +73,7 @@
         },
         set(val) {
           this.orderHistoryPagination.limit = val;
+          this.getOrderHistory();
         }
       },
       currentPage: {
@@ -81,17 +82,18 @@
         },
         set(val) {
           this.orderHistoryPagination.currentPage = val;
+          this.getOrderHistory();
         }
       }
     },
-    watch: {
+/*    watch: {
       async limit() {
         await this.getOrderHistory();
       },
       async currentPage() {
         await this.getOrderHistory();
       }
-    },
+    },*/
     methods: {
       openAmountFilter() {
         this.$getService('orderHistoryAmountFilter:setActive')(true)

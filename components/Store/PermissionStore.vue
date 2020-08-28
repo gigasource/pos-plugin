@@ -69,7 +69,7 @@
         userPermissions: [],
         allPermissions: [ "manageGroup", "settings", "manageStore", "manageStorePayment", "updateApp", "remoteControl",
           "configOnlineOrdering", "featureControl" , "viewMonthlyRevenue", "deleteStore", "importExportMenu",
-          "appReview", 'chatSupport', 'signInRequest']
+          "appReview", 'chatSupport', 'signInRequest', 'ticket']
       }
     },
     async created() {

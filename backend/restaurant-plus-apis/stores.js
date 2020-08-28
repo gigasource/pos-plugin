@@ -6,10 +6,19 @@ const ObjectId = mongoose.Types.ObjectId;
 const objectMapper = require('object-mapper');
 const {getExternalSocketIoServer} = require('../socket-io-server');
 const {respondWithError} = require('./utils');
-const {firebaseAdminInstance} = require('../firebase-messaging/admin')
+const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin')
+const apn = require('apn')
+const { getApnProvider } = require('../app-notification/apn-provider/provider');
 const UserModel = cms.getModel('RPUser');
 const {jwtValidator} = require('./api-security');
 const {NOTIFICATION_ACTION_TYPE} = require('./constants');
+const dayjs = require('dayjs')
+const isBetween = require('dayjs/plugin/isBetween')
+const isSameOrAfter = require('dayjs/plugin/isSameOrAfter')
+const customParseFormat = require('dayjs/plugin/customParseFormat')
+dayjs.extend(isBetween)
+dayjs.extend(isSameOrAfter)
+dayjs.extend(customParseFormat)
 
 const mapperConfig = {
   _id: '_id',
@@ -158,7 +167,7 @@ router.post('/reservation', jwtValidator, async (req, res) => {
 
 router.get('/reservations', jwtValidator, async (req, res) => {
   const {userId} = req.query
-  if (!userId) res.sendStatus(400)
+  if (!userId) return res.sendStatus(400)
 
   const reservations = await cms.getModel('Reservation').aggregate([
     {$match: {userId: ObjectId(userId)}},
@@ -177,30 +186,118 @@ router.get('/reservations', jwtValidator, async (req, res) => {
   res.status(200).json(reservations)
 })
 
+router.get('/reservations/time-slots/', async (req, res) => {
+  const { storeId, date } = req.query
+  if (!storeId || !date) return res.sendStatus(400)
+
+  const inputDate = dayjs(date)
+  let startTime = inputDate.startOf('day')
+  let endTime = inputDate.endOf('day')
+  const store = await StoreModel.findById(storeId)
+
+  const timeSlots = []
+
+  // has open/close time
+  if (store.openHours) {
+    for (const settings of store.openHours) {
+      if (settings.dayInWeeks[inputDate.day()]) {
+        const [startHour, startMinute] = settings.openTime.split(':')
+        startTime = startTime.hour(+startHour).minute(+startMinute)
+        const [endHour, endMinute] = settings.closeTime.split(':')
+        endTime = endTime.hour(+endHour).minute(+endMinute)
+      }
+    }
+  }
+
+  if (inputDate.isSame(dayjs(), 'day')) {
+    startTime = dayjs().add(2, 'hour').minute(0)
+    if (startTime.isBefore(dayjs().add(2, 'hour'))) startTime = startTime.add(30, 'minute')
+  }
+  timeSlots.push(...getTimeSlots(startTime, endTime))
+
+  // has seat limit settings
+  if (store.reservationSetting.seatLimit && store.reservationSetting.seatLimit.length) {
+    const daysInWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const day = daysInWeek[inputDate.day()]
+    const seatLimits = store.reservationSetting.seatLimit
+
+    const reservations = await cms.getModel('Reservation').find({
+      store: storeId,
+      date: inputDate.format('YYYY-MM-DD')
+    }).lean()
+
+    for (const seatLimit of seatLimits) {
+      if (seatLimit.days.includes(day)) {
+        const startTime = dayjs(`${inputDate.format('YYYY-MM-DD')} ${seatLimit.startTime}`, 'YYYY-MM-DD HH:mm')
+        const endTime = dayjs(`${inputDate.format('YYYY-MM-DD')} ${seatLimit.endTime}`, 'YYYY-MM-DD HH:mm')
+
+        const reservationsInSlot = reservations.filter(r => {
+          return dayjs(`${r.date} ${r.time}`, 'YYYY-MM-DD HH:mm').isBetween(startTime, endTime, '[]')
+        })
+
+        const guestsInSlot = _.sumBy(reservationsInSlot, 'noOfGuests')
+        if (guestsInSlot >= seatLimit.seat) _.pullAll(timeSlots, getTimeSlots(startTime, endTime))
+      }
+    }
+
+  }
+
+  const sortedSlots = timeSlots.sort((cur, next) => cur.localeCompare(next))
+  res.status(200).json(sortedSlots)
+
+  function getTimeSlots(start, end) {
+    let startTime = dayjs(start)
+    startTime = startTime.minute(30).isBefore(startTime)
+      ? startTime.add(1, 'hour').minute(0)
+      : startTime.minute(30)
+
+    const endTime = dayjs(end)
+    if (startTime.isSameOrAfter(endTime)) return []
+
+    const list = [];
+    while (!startTime.isAfter(endTime)) {
+      list.push(startTime.format('HH:mm'))
+      startTime = startTime.add(30, 'minute')
+    }
+    return list
+  }
+})
+
+router.get('/table-request/:requestId', async (req, res) => {
+  const { requestId } = req.params
+  if (!requestId) return res.sendStatus(400)
+
+  const request = await cms.getModel('RPTableRequest').findById(requestId).lean()
+  res.status(200).json(request)
+})
+
 router.post('/table-request', async (req, res) => {
   const { request } = req.body
   if (!request) return res.sendStatus(400)
 
-  const newRequest = await cms.getModel('RPTableRequest').create({ ...request, status: 'pending' })
+  const newRequest = await cms.getModel('RPTableRequest').create({
+    ...request,
+    status: 'pending'
+  })
 
+  console.log(newRequest)
   res.status(200).json(newRequest)
 
-  // todo send to manager app
   const devices = await getManagerDevices(request.storeId)
   if (!devices.length) return
   await sendNotification(
+    devices,
     {
       title: 'New Table',
       body: `New table request at ${dayjs(request.date).format('HH:mm')} for ${request.noOfGuests}`
     },
-    { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request },
-    devices.map(d => d.firebaseToken)
+    { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
   )
 })
 
-router.put('/table-request/:requestId', async (req, res) => {
+router.put('/table-request/:requestId', jwtValidator, async (req, res) => {
   const { requestId } = req.params
-  if (!requestId) res.sendStatus(400)
+  if (!requestId) return res.sendStatus(400)
 
   const { status } = req.body
 
@@ -211,54 +308,72 @@ router.put('/table-request/:requestId', async (req, res) => {
   const managerDevices = await getManagerDevices(request.storeId)
   const store = await StoreModel.findById(ObjectId(request.storeId))
 
-  if (request.status !== 'cancelled') {
+  if (request.status === 'cancelled') {
     // notify cancelled
     if (managerDevices.length) await sendNotification(
+      managerDevices,
       {
         title: 'Table request cancelled',
         body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
       },
       { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(request) },
-      managerDevices.map(d => d.firebaseToken)
     )
     return
   }
 
   const newRequest = await cms.getModel('RPTableRequest').findOneAndUpdate({ _id: ObjectId(requestId) }, { status }, { new: true })
 
-
   switch (status) {
     case 'approved':
       // notify end user
       await sendNotification(
+        [user],
         {
           title: 'Table Request approved',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been approved.`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        [user.firebaseToken]
       )
       break
     case 'cancelled':
       // notify manager
       if (managerDevices.length) await sendNotification(
+        managerDevices,
         {
           title: 'Table request cancelled',
           body: `Table request at ${dayjs(request.date).format('HH:mm')} cancelled by user`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-         managerDevices.map(d => d.firebaseToken)
       )
       break
     case 'declined':
       // notify end user
       await sendNotification(
+        [user],
         {
           title: 'Table Request declined',
           body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has been declined.`
         },
         { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
-        [user.firebaseToken]
+      )
+      break
+    case 'expired':
+      await sendNotification(
+        [user],
+        {
+          title: 'Table Request expired',
+          body: `Your table request at ${store.name || store.settingName} at ${dayjs(request.date).format('HH:mm')} has expired.`
+        },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
+      )
+
+      if (managerDevices.length) await sendNotification(
+        managerDevices,
+        {
+          title: 'Table request expired',
+          body: `Table request at ${dayjs(request.date).format('HH:mm')} has expired`
+        },
+        { actionType: NOTIFICATION_ACTION_TYPE.TABLE_REQUEST, request: JSON.stringify(newRequest) },
       )
       break
     default:
@@ -271,16 +386,64 @@ async function getManagerDevices(storeId) {
   return await cms.getModel('Device').find({ storeId: storeId.toString(), firebaseToken: { $exists: true } })
 }
 
-async function sendNotification(notification, data, tokens) {
-  const admin = firebaseAdminInstance()
+async function sendNotification(devices, notification, payload) {
+  const tokens = devices.reduce((acc, cur) => {
+    if (cur.osName === 'ios' && cur.osVersion) {
+      const [majorVersion] = cur.osVersion.split('.')
+      if (+majorVersion < 13) {
+        acc.apnTokens = [...acc.apnTokens, cur.apnToken]
+        return acc
+      }
+    }
+    acc.firebaseTokens = [...acc.firebaseTokens, cur.firebaseToken]
+    return acc
+  }, { apnTokens: [], firebaseTokens: [] })
 
+  sendApn(notification, payload, tokens.apnTokens)
+  sendFirebaseNotification(notification, payload, tokens.firebaseTokens)
+}
+
+async function sendFirebaseNotification(notification, data, tokens) {
+  const admin = firebaseAdminInstance()
+  const formattedData = {
+    ...data,
+    notification: JSON.stringify(notification)
+  }
   const message = {
-    notification,
-    data,
-    tokens
+    data: formattedData,
+    tokens,
+    apns: {
+      payload: {
+        aps: {
+          'mutable-content': 1,
+          'content-available': 1
+        }
+      }
+    },
+    android: {
+      priority: 'high'
+    },
   }
 
-  await admin.messaging().sendMulticast(message)
+  const result = await admin.messaging().sendMulticast(message)
+  if (result.successCount) {
+    console.debug('sentry:eventType=notification', 'Error sending notification', result.responses.filter(r => !r.success))
+  }
+}
+
+function sendApn(notification, payload, tokens) {
+  const apnProvider = getApnProvider()
+
+  const note = new apn.Notification();
+
+  note.alert = notification.title
+  note.body = notification.body
+  note.payload = { ...payload, ...notification }
+  note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+  note.topic = 'io.gigasource.gsms.voip';
+  note.mutableContent = 1;
+  note.category = 'GSMSNoti'
+  return apnProvider.send(note, tokens)
 }
 
 module.exports = router

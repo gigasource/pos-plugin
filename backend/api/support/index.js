@@ -55,28 +55,23 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Received chat msg from gsms client`, sentryPayload);
 
-      if (!userId) {
-        try {
-          userId = (await UserModel.findOne({name: 'admin'}))._id
+      if (!userId) userId = (await UserModel.findOne({username: 'admin'}))._id
 
-          const savedMsg = await ChatMessageModel.create({
-            clientId,
-            userId,
-            createdAt,
-            text,
-            read: false,
-            fromServer: false
-          });
+      const savedMsg = await ChatMessageModel.create({
+        clientId,
+        userId,
+        createdAt,
+        text,
+        read: false,
+        fromServer: false
+      });
 
-          console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
-          internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
-          internalSocketIOServer.emit('chatMessageNotification')
+      console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
+      internalSocketIOServer.emit('chatMessageNotification');
+      cms.emit('chatMessage', {chatData, fromServer: false});
 
-          cb && cb(savedMsg._doc);
-        } catch (e) {
-
-        }
-      }
+      cb && cb(savedMsg._doc);
     });
 
     // for devices with assigned store
@@ -227,9 +222,12 @@ setTimeout(() => {
         read: false,
         fromServer: true
       });
+      const sender = await UserModel.findOne({_id: userId});
+      const username = sender ? sender.name : '';
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
-      cms.emit('chatMessage', chatData)
+      cms.emit('chatMessage', {chatData, fromServer: true});
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', {...savedMsg._doc, username});
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -286,15 +284,51 @@ router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
-  if (offset) query = query.skip(+offset);
-  if (n) query = query.limit(+n);
+  const aggregationSteps = [
+    {$sort: {createdAt: -1}},
+    {$match: {clientId: clientId}}
+  ];
+  if (offset) aggregationSteps.push({$skip: +offset});
+  if (n) aggregationSteps.push({$limit: +n});
+  aggregationSteps.push(...[
+    {
+      $lookup: {
+        from: 'users',
+        let: {userId: {$toObjectId: '$userId'}, falseVal: false},
+        pipeline: [
+          {
+            $match: {
+                $expr: {$eq: ['$_id', '$$userId']}
+            },
+          },
+          {$project: { "name": 1, "_id": 0 }}
+        ],
+        as: 'user',
+      }
+    },
+    {$unwind: {path: '$user'}},
+    {$addFields: { "username": "$user.name" }},
+    {$unset: "user"}
+  ]);
 
-  query.exec((error, docs) => {
-    if (error) return res.status(500).json({error});
+  try {
+    const docs = await ChatMessageModel.aggregate(aggregationSteps);
+    return res.status(200).json(docs);
+  } catch (error) {
+    return res.status(500).json({error});
+  }
 
-    res.status(200).json(docs.map(({_doc}) => _doc));
-  });
+  // let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  // if (offset) query = query.skip(+offset);
+  // if (n) query = query.limit(+n);
+
+  // try {
+  //   const docs = await query.exec();
+
+  //   return res.status(200).json(docs.map(({_doc}) => _doc));
+  // } catch (error) {
+  //   return res.status(500).json({error});
+  // }
 });
 
 router.get('/chat/messages-count', async (req, res) => {
@@ -479,6 +513,37 @@ router.put('/update-token/:id', async (req, res) => {
     res.status(204).send()
   } catch (e) {
     res.status(500).json({error: 'Error updating device token'})
+  }
+})
+
+router.put('/update-apn-token/:id', async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  if (!id || !token) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { apnToken: token })
+
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device apn token'})
+  }
+})
+
+router.put('/update-os-info/:id', async (req, res) => {
+  const { id } = req.params;
+  const { osName, osVersion } = req.body;
+
+  if (!id || !osName || !osVersion) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { osName, osVersion })
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device os info'})
   }
 })
 module.exports = router;

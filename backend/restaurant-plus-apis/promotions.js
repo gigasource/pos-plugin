@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
   },
     {
       $addFields: {
-        limitNotReached: {$lte: [{$size: '$issuedVouchers'}, '$quantity']},
+        limitNotReached: {$or: [{$eq: ['$quantity', 0]}, {$lt: [{$size: '$issuedVouchers'}, '$quantity']}]},
         issuedVoucherCount: {$size: '$issuedVouchers'},
       }
     },
@@ -106,6 +106,7 @@ router.post('/', jwtValidator, async (req, res) => {
     limitForUser: +limitForUser || 0,
     duration: +duration || 0,
     descriptionImageUrl,
+    createdAt: new Date(),
   });
 
   res.status(201).json(newPromotion);

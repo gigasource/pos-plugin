@@ -116,14 +116,13 @@ router.get('/devices', async (req, res) => {
   let devices = await getAndSortDevices(+n, +offset, sort, nameSearch);
   devices = await Promise.all(devices.map(async device => {
     const latestUnreadMsg = await ChatMessageModel.findOne({
-      clientId: device._id,
-      read: false,
-      fromServer: false
+      clientId: device._id
     }).sort({createdAt: -1});
 
     return {
       ...device,
       latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
+      latestChatMessage: latestUnreadMsg,
       online: clusterClientList.includes(device._id),
     }
   }));
@@ -230,6 +229,11 @@ router.post('/register', async (req, res) => {
       'New GSMS device registered');
 
   cms.socket.emit('newGsmsDevice', {
+    ...newDevice._doc,
+    online: true,
+    unreadMessages: 0,
+  });
+  cms.emit('newGsmsDevice', {
     ...newDevice._doc,
     online: true,
     unreadMessages: 0,
@@ -409,8 +413,8 @@ function formatOrder(order, store) {
   const total = _.sumBy(products, p => p.originalPrice) - discounts
 
   return {
-    orderToken: order.orderToken || order._id.toString(),
-    orderType: order.orderType || 'onlineOrder',
+    orderToken: order.onlineOrderId || order._id.toString(),
+    orderType: order.type,
     paymentType: order.payment[0].type,
     customer: JSON.stringify(order.customer),
     products: JSON.stringify(products),

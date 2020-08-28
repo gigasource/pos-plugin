@@ -9,6 +9,12 @@
       "type": "input@number"
     },
     {
+      "_id": "5f3a060a22267b3cbfb3e8d5",
+      "schemaType": "date",
+      "key": "createdDate",
+      "type": "input@datetime-local"
+    },
+    {
       "_id": "5f350beb17b76df4d4946636",
       "schemaType": "date",
       "key": "date",
