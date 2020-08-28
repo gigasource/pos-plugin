@@ -122,6 +122,7 @@ router.get('/devices', async (req, res) => {
     return {
       ...device,
       latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
+      latestChatMessage: latestUnreadMsg,
       online: clusterClientList.includes(device._id),
     }
   }));
