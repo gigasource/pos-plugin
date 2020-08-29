@@ -400,7 +400,7 @@ function formatOrder(order, store) {
   }
   const deliveryTime = jsonFn.clone(order.deliveryTime)
 
-  const discounts = order.discounts.reduce((sum, discount) => sum + discount.value, 0)
+  const discounts = order.discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
   const total = _.sumBy(products, p => p.originalPrice * p.quantity)
 
   return {

@@ -753,7 +753,7 @@ module.exports = async function (cms) {
             }
           })
 
-          discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
+          discounts = discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
 
           if (deliveryDateTime === 'asap') {
             const timeToComplete = store.gSms.timeToComplete || 30;
