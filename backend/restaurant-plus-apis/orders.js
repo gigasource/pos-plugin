@@ -211,6 +211,45 @@ router.post('/', jwtValidator, async (req, res) => {
   res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
 
+router.put('/', jwtValidator, async (req, res) => {
+  //todo schedule auto-cancel order after timeout
+  const { orderId, status, timeToComplete, declineReason } = req.body
+  if (!orderId || !status) res.sendStatus(400)
+
+  // update order
+  const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
+    { ...orderId.includes('-')
+        ? { onlineOrderId: orderId }
+        : { _id: ObjectId(orderId) }},
+    {
+      status,
+      ...status === 'kitchen' && { timeToComplete },
+      ...status === 'declined' && { declineReason }
+    },
+    { new: true })
+  res.status(204).json(updatedOrder)
+
+  // send to frontend
+  if (updatedOrder.onlineOrderId) {
+    const store = await StoreModel.findById(updatedOrder.storeId)
+    const responseMessage = getOrderStatusResponseMessage(updatedOrder, store, timeToComplete)
+    const orderStatus = {
+      orderId: updatedOrder._id,
+      onlineOrderId: updatedOrder.onlineOrderId,
+      status,
+      responseMessage,
+      total: updatedOrder.vSum,
+      storeAlias: store.alias
+    }
+
+    cms.socket.to(updatedOrder.onlineOrderId).emit('updateOrderStatus', orderStatus)
+  }
+  // send to client app
+  if (updatedOrder.restaurantPlusUser) {
+    sendOrderNotificationToDevice(order,_id, status)
+  }
+})
+
 // TODO: fix this
 const interval = setInterval(() => {
   const externalSocketServer = getExternalSocketIoServer();
@@ -356,6 +395,32 @@ async function sendOrderToStoreDevices(store, orderData) {
 
     await updateStoreReport(storeId, { orderTimeouts: 1 })
   }, SEND_TIMEOUT);*/
+}
+
+function getOrderStatusResponseMessage(order, store, timeToComplete) {
+  switch (order.status) {
+    case 'kitchen':
+      const deliveryDateTime = order.deliveryTime === 'asap'
+        ? dayjs().add(timeToComplete, 'minute')
+        : dayjs(order.deliveryTime, 'HH:mm')
+      const diff = deliveryDateTime.diff(dayjs(order.date), 'minute')
+      const storeLocale = store.country.locale || 'en'
+
+      const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
+      const localeFilePath = path.join(pluginPath, 'i18n', `${storeLocale}.js`);
+
+      if (fs.existsSync(localeFilePath)) {
+        const {[storeLocale]: {store}} = require(localeFilePath)
+        if (store && store.deliveryIn && store.pickUpIn) {
+          return (order.type === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', diff)
+        }
+      }
+      return ''
+    case 'declined':
+      return order.declineReason || ''
+    default:
+      return ''
+  }
 }
 
 module.exports = router;
