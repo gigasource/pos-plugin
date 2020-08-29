@@ -17,6 +17,7 @@ const _ = require('lodash');
 const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
+const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
 const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
@@ -189,6 +190,7 @@ router.post('/', jwtValidator, async (req, res) => {
     vDiscount: orderDiscountValue,
     restaurantPlusUser: user && user._id,
     ...voucher && {restaurantPlusVoucher: voucher._id},
+    status: ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS
   });
 
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
@@ -246,7 +248,7 @@ router.put('/', jwtValidator, async (req, res) => {
   }
   // send to client app
   if (updatedOrder.restaurantPlusUser) {
-    sendOrderNotificationToDevice(order,_id, status)
+    sendOrderNotificationToDevice(updatedOrder._id, status)
   }
 })
 
@@ -331,41 +333,19 @@ async function sendOrderToStoreDevices(store, orderData) {
   const storeAlias = store.alias;
 
   if (store.gSms && store.gSms.enabled) {
-    cms.emit('sendOrderMessage', store._id, orderData) // send fcm message
-
-    store.gSms.devices.filter(i => i.registered).forEach(({_id}) => {
-      const formattedOrder = formatOrderForRpManager(_.cloneDeep(orderData), store);
-
-      /** @deprecated */
-      const targetClientIdOld = `${store.id}_${_id.toString()}`;
-      getExternalSocketIoServer().emitToPersistent(targetClientIdOld, 'createOrder',
-        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-
-      const targetClientId = _id.toString();
-      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder',
-        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-    })
+    const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    await sendNotification(
+      gSmsDevices,
+      {
+        title: store.name || store.settingName,
+        body: `You have a new order!`
+      },
+      { actionType: NOTIFICATION_ACTION_TYPE.ORDER, orderId: orderData._id.toString() },
+    )
   }
 
   if (!device) {
-    if (store.gSms && store.gSms.enabled) {
-      // accept order on front-end
-      const timeToComplete = store.gSms.timeToComplete || 30
-      const locale = store.country.locale || 'en'
-      const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
-      const localeFilePath = path.join(pluginPath, 'i18n', `${locale}.js`);
-      let responseMessage = ''
-
-      if (fs.existsSync(localeFilePath)) {
-        const {[locale]: {store}} = require(localeFilePath)
-        if (store && store.deliveryIn && store.pickUpIn) {
-          responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
-        }
-      }
-
-      return;
-    }
-
+    if (store.gSms && store.gSms.enabled) return;
     return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
   }
 
