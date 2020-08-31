@@ -1,0 +1,21 @@
+{
+  "_id": "5f4c82f6e4f533e343212b58",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f4c8340e4f533e343212b5a",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f4c8340e4f533e343212b5b",
+      "schemaType": "boolean",
+      "key": "isGlobal",
+      "type": "input@switch"
+    }
+  ],
+  "name": "PosModifierGroup",
+  "tabs": [],
+  "type": "Collection"
+}

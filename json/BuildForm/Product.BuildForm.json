@@ -233,11 +233,19 @@
       "schemaType": "boolean",
       "key": "isDivArticle",
       "type": "input@switch"
+    },
+    {
+      "_id": "5f4cb3e5c6a8fc264c003222",
+      "schemaType": "objectId",
+      "key": "activePopupModifierGroup",
+      "ref": "PosModifierGroup",
+      "type": "ref-select",
+      "labelProp": "name"
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",
   "name": "Product",
   "tabs": [],
-  "type": "Collection",
-  "title": "name"
+  "title": "name",
+  "type": "Collection"
 }
