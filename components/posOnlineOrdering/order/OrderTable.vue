@@ -254,12 +254,13 @@
       merchantMessage: String,
       orderItems: Array,
       totalPrice: Number,
-      totalItems: Number
+      totalItems: Number,
+      type: String,
     },
     data() {
       return {
         view: 'order',
-        orderType: this.store.delivery ? 'delivery' : 'pickup', // delivery || pick-up
+        orderType: this.type || (this.store.delivery ? 'delivery' : 'pickup'), // delivery || pick-up
         paymentType: 'cash', // cash || paypal
         customer: {
           name: '',

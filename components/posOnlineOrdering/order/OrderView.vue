@@ -113,11 +113,11 @@
             </div>
             <div class="pos-order__tab--content-footer"></div>
           </div>
-          <order-table v-if="showOrder" :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening"
+          <order-table v-if="showOrder" :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening" :type="orderType"
                        @back="showOrder = false" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
         <div class="pos-order__right">
-          <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening" :merchant-message="merchantMessage"
+          <order-table :store="store" :order-items="orderItems" :total-price="totalPrice" :total-items="totalItems" :is-opening="isStoreOpening" :merchant-message="merchantMessage" :type="orderType"
                        @disable-menu="menuItemDisabled = $event" @increase="increaseOrAddNewItems" @decrease="decreaseOrRemoveItems" @clear="clearOrder"/>
         </div>
 
@@ -186,6 +186,11 @@
           </div>
         </g-dialog>
       </template>
+
+      <!-- close iframe btn when open in iframe -->
+      <div class="close-iframe-btn" v-if="orderType" @click="closeIframe">
+        <g-icon>close</g-icon>
+      </div>
     </div>
 </template>
 <script>
@@ -239,6 +244,7 @@
         dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         scrolling: 0,
         dayOff: false,
+        orderType: null
       }
     },
     filters: {
@@ -250,6 +256,8 @@
     },
     async created() {
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
+      const type = this.$route.query.type
+      this.$set(this, 'orderType', type)
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
         this.$set(this, 'store', store)
@@ -625,6 +633,9 @@
       },
       closeDialogImage() {
         this.dialog.image.active = false
+      },
+      closeIframe() {
+        window.parent.postMessage('close-iframe', '*')
       }
     },
     watch: {
@@ -1051,5 +1062,18 @@
     animation-name: zoom;
     animation-duration: 1s;
     animation-timing-function: ease-in-out;
+  }
+
+  .close-iframe-btn {
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 600px);
+    border: 2px solid #212121;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
   }
 </style>
