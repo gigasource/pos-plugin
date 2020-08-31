@@ -344,6 +344,8 @@ module.exports = {
       minimumOrder: 'Minimum order',
       deliveryFee: 'Delivery fee',
       notice: 'Notice',
+      productInfo: 'Product Information',
+      productInfoWarning: 'Printing errors, mistakes and changes reserved.',
       allergic: 'Allergic',
       allergicNotice: 'This item may contain food allergens:',
       spicy: 'Spicy',

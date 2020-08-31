@@ -787,3 +787,45 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-flat {
+  background-image: url("../assets/flat.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-call {
+  background-image: url("../assets/call.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-place_color {
+  background-image: url("../assets/place_color.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-take-away {
+  background-image: url("../assets/take-away.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-delivery-scooter {
+  background-image: url("../assets/delivery-scooter.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-table-reservation {
+  background-image: url("../assets/table-reservation.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

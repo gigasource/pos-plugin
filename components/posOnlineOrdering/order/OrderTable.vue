@@ -254,12 +254,13 @@
       merchantMessage: String,
       orderItems: Array,
       totalPrice: Number,
-      totalItems: Number
+      totalItems: Number,
+      type: String,
     },
     data() {
       return {
         view: 'order',
-        orderType: this.store.delivery ? 'delivery' : 'pickup', // delivery || pick-up
+        orderType: this.type || (this.store.delivery ? 'delivery' : 'pickup'), // delivery || pick-up
         paymentType: 'cash', // cash || paypal
         customer: {
           name: '',
@@ -465,7 +466,7 @@
         return 0
       },
       unavailableConfirm() {
-        const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone)
+        const check = !this.customer.name || !this.customer.phone || isNaN(this.customer.phone) || !this.deliveryTime
         for (const fn of this.validatePhone) {
           if (typeof fn === 'function' && typeof fn(this.customer.phone) === 'string') {
             return true
@@ -479,7 +480,7 @@
             }
           }
           if(this.errorZipcode || (this.store.deliveryFee.type === 'distance' && this.customer.distance === null)) return true
-          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || !this.deliveryTime || this.distanceExceedingRadius
+          return check || !this.customer.address || !this.customer.zipCode || this.customer.zipCode.length < 5 || this.distanceExceedingRadius
         }
         return check
       },

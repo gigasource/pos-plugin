@@ -1,41 +1,56 @@
 <template>
-  <section class="franchise-view r">
-    <div @click="close" class="abs" style="top: 20px; right: 20px; width: 20px; height: 20px; cursor: pointer">
-      <img src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
-    </div>
-    <div class="header">Select your nearest restaurants</div>
-    <div class="store-cards">
-      <store-card v-for="store in stores" :key="store._id" :store="store" class="store-card"/>
-    </div>
-  </section>
+  <div class="background">
+    <section class="franchise-view r">
+      <div v-if="mainStore && mainStore.logoImageSrc" class="logo">
+        <img alt :src="cdnStoreLogoImage"/>
+      </div>
+      <div @click="close" class="abs" style="top: 20px; right: 20px; width: 20px; height: 20px; cursor: pointer">
+        <img alt src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
+      </div>
+      <div class="tilte">Please select a restaurant</div>
+      <div class="store-cards">
+        <store-card v-for="store in stores" :key="store._id" :store="store" class="store-card"/>
+      </div>
+    </section>
+  </div>
 </template>
+
 <script>
   import StoreCard from './StoreCard';
+  import { getCdnUrl } from '../../Store/utils';
+
   export default {
     name: 'FranchiseView',
     components: { StoreCard },
     props: {},
     data: function () {
       return {
-        stores: []
+        stores: [],
+        mainStore: null
       }
     },
     async created() {
-      const storeGroupId = this.$route.params.id
-      if (!storeGroupId) {
+      const storeId = this.$route.params.id
+      if (!storeId) {
         alert('Invalid store!')
         return;
       }
-      
-      const storeGroup = await cms.getModel('StoreGroup').findOne({_id: storeGroupId})
-      if (storeGroup) {
-        const stores = await cms.getModel('Store').find({ groups: { $elemMatch: { $eq: storeGroup } } })
+
+      this.mainStore = await cms.getModel('Store').findOne({
+        $or: [ { alias: storeId }, { _id: storeId } ]
+      })
+      if (this.mainStore) {
+        const stores = await cms.getModel('Store').find({ clientDomain: this.mainStore.clientDomain })
         this.stores.splice(0, 0, ...stores)
       } else {
         alert('Invalid store');
       }
     },
-    computed: {},
+    computed: {
+      cdnStoreLogoImage() {
+        return this.mainStore.logoImageSrc && getCdnUrl(this.mainStore.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png')
+      }
+    },
     methods: {
       close() {
         window.parent.postMessage('close-iframe', '*')
@@ -44,60 +59,40 @@
   }
 </script>
 <style scoped lang="scss">
+  .background {
+    background: white url("../../../assets/images/franchise-bg.png");
+    background-size: cover;
+    min-height: 100vh;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & > img {
+      max-width: 150px;
+    }
+  }
+
   .franchise-view {
     width: 100%;
     max-width: 1032px;
-    background-color: #FFF;
-    margin: 30px auto;
-    padding: 60px;
-    border-radius: 10px;
-  }
-  
-  .header {
-    font-weight: bold;
-    font-size: 25px;
-    margin-bottom: 100px;
-    text-align: center;
-  }
-  
-  .store-cards {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-row-gap: 20px;
+    margin: 36px auto;
+    padding: 0 36px;
   }
 
-  @media screen and (max-width: 1080px) {
-    .store-cards {
-      grid-template-columns: 1fr 1fr !important;
-    }
+  .tilte {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 32px;
+    margin-bottom: 20px;
   }
-  
+
   @media screen and (max-width: 640px) {
     .franchise-view {
-      padding: 20px;
-      padding-top: 40px;
+      padding: 36px 8px;
       margin-top: 0;
-    }
-    
-    .header {
-      margin-bottom: 50px;
-    }
-    
-    .store-cards {
-      grid-template-columns: 1fr !important;
-    }
-  }
-  
-  @media screen and (max-width: 359px) {
-    .franchise-view {
-      padding: 5px;
-      padding-top: 40px;
-      margin-top: 0;
-    }
-    
-    .store-card {
-      padding: 10px 0 !important;
     }
   }
 </style>
