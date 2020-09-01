@@ -12,7 +12,7 @@
       <g-text-field-bs large label="Address" v-model="computedSettingAddress"/>
       <g-text-field-bs large label="Country" :value="countryName" readonly/>
     </div>
-    
+
     <!-- ONLINE ORDER STORE -->
     <div class="pos-management-setting__order">
       <div class="pos-management-setting__title">Online Ordering</div>
@@ -39,7 +39,7 @@
         <div v-if="clientDomainErrMessage" class="error-message">{{clientDomainErrMessage}}</div>
       </div>
     </div>
-    
+
     <!-- DEVICES -->
     <div class="pos-management-setting__device">
       <div class="pos-management-setting__title">Device status</div>
@@ -87,7 +87,7 @@
 
 <script>
   import _ from 'lodash'
-  
+
   export default {
     name: "PosManagementSetting",
     props: {
@@ -191,11 +191,12 @@
           this.clientDomainErrMessage = 'Client Domain must not have space in it!'
           return false
         }
-        const res = (await axios.post('/store/validate-client-domain', { store: this._id, clientDomain })).data
-        if (!res.ok) {
-          this.clientDomainErrMessage = res.message
-          return false
-        }
+        // allow dupplicate client domain to create franchise
+        // const res = (await axios.post('/store/validate-client-domain', { store: this._id, clientDomain })).data
+        // if (!res.ok) {
+        //   this.clientDomainErrMessage = res.message
+        //   return false
+        // }
         return true
       },
       async updateClientDomain(value) {

@@ -13,7 +13,7 @@ const topaz = require('./api/topazAI')
 
 module.exports = cms => {
   cms.data['loginUrl'] = '/sign-in';
-  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise', '/menu', '/qrcode'];
+  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/franchise', '/menu', '/qrcode', '/overview'];
 
   cms.app.use('/device', deviceApi);
   cms.app.use('/gsms-device', gsmsDeviceApi);

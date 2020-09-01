@@ -1,5 +1,5 @@
 <template>
-  <div class="reservation elevation-2 r">
+  <div class="reservation r">
     <div @click="close" class="abs" style="top: 10px; right: 10px; width: 20px; height: 20px; cursor: pointer; z-index: 10">
       <img src="/plugins/pos-plugin/assets/close.svg" draggable="false"/>
     </div>

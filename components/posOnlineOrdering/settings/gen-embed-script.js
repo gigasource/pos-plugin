@@ -1,5 +1,5 @@
 export function genIframe(type, link, alias) {
-  return `var url${type} = ['http://localhost:8888', '${link}', '${alias}'].join('/')
+  return `var url${type} = ['https://restaurantplus.net', '${link}', '${alias}'].join('/')
   
   function openIframe${type} () {
     window.location = '#'

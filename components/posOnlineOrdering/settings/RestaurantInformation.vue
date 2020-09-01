@@ -103,10 +103,11 @@
         <div style="font-weight: 600; font-size: 22px; margin-bottom: 16px">Generate Embed Code</div>
         <div>
           <p>Choose type</p>
-          <div class="row-flex flex-wrap justify-between">
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'store', order: 1}" label="Online Order"/>
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 2}" label="Reservation"/>
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'franchise', link: 'franchise', order: 3}" label="Franchise"/>
+          <div class="row-flex flex-wrap">
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'store', order: 1}" label="Online Order"/>
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 2}" label="Reservation"/>
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'franchise', link: 'franchise', order: 3}" label="Franchise"/>
+            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'overview', link: 'overview', order: 4}" label="Store Overview"/>
           </div>
           <p>Choose position</p>
           <g-radio-group v-model="position" name="position" row>

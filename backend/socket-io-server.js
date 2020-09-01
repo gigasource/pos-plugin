@@ -928,6 +928,17 @@ module.exports = async function (cms) {
       callback({long: longitude, lat: latitude})
     })
 
+    async function getReviewInGoogleMap(placeId) {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${global.APP_CONFIG.mapsApiKey}`)
+      const { result } = response.data
+      return result
+    }
+
+    socket.on('getReviewInGoogleMap', async (placeId, callback) => {
+      const result = await getReviewInGoogleMap(placeId)
+      callback(result)
+    })
+
     socket.on('createReservation', async (storeId, reservationData, callback) => {
       storeId = ObjectId(storeId);
       const store = await cms.getModel('Store').findById(storeId);

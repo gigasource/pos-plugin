@@ -39,7 +39,7 @@
       <div class="row-flex align-items-center" style="margin-bottom: -8px">
         <div class="digital-menu-item__price">{{ itemPrice }}</div>
         <g-spacer/>
-        <g-btn-bs rounded @click="addToOrder">
+        <g-btn-bs v-if="!readonly" rounded @click="addToOrder">
           <g-icon size="28" color="#1271FF">add_circle</g-icon>
         </g-btn-bs>
       </div>
@@ -87,6 +87,7 @@
       scrolling: Number,
       displayImage: Boolean,
       storeCountryLocale: String,
+      readonly: Boolean
     },
     filters: {
       currency(val, locale) {
