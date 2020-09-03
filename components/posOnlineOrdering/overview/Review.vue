@@ -1,6 +1,6 @@
 <template>
   <div class="review">
-    <img class="review-avatar" alt :src="profile_photo_url"/>
+    <img class="review-avatar" alt :src="imgSrc" @error="changeToDefault"/>
     <div class="review-content">
       <p>{{author_name}}</p>
       <div class="row-flex align-items-center">
@@ -32,7 +32,8 @@
     data() {
       return {
         showmore: false,
-        expandComment: false
+        expandComment: false,
+        imgSrc: this.profile_photo_url || ''
       }
     },
     mounted() {
@@ -46,6 +47,9 @@
     methods: {
       toggleShowmore() {
         this.showmore = !this.showmore
+      },
+      changeToDefault() {
+        this.imgSrc = '/plugins/pos-plugin/assets/avatar.svg'
       }
     }
   }
@@ -59,7 +63,6 @@
       width: 36px;
       height: 36px;
       margin-right: 16px;
-      border-radius: 50%;
       min-width: 36px;
     }
 
