@@ -929,7 +929,7 @@ module.exports = async function (cms) {
     })
 
     async function getReviewInGoogleMap(placeId) {
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${global.APP_CONFIG.mapsApiKey}`)
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=rating,review,user_ratings_total&key=${global.APP_CONFIG.mapsApiKey}`)
       const { result } = response.data
       return result
     }
