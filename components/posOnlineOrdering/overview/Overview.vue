@@ -32,17 +32,7 @@
          <span class="fs-small-2 text-grey">({{googleMapInfo.user_ratings_total}})</span>
          <g-icon color="#757575">{{showReview ? 'expand_less' : 'expand_more'}}</g-icon>
        </div>
-       <div v-if="showReview" class="overview-side__review--item" v-for="(item, i) in googleMapInfo.reviews.slice(0, 3)" :key="i">
-         <img alt :src="item.profile_photo_url"/>
-         <div class="flex-auto">
-           <p style="color: #212121">{{item.author_name}}</p>
-           <div class="row-flex align-items-center">
-             <rating color="#FFC700" icon-size="16" :value="item.rating"/>
-             <span class="fw-700 fs-small-2 text-grey-darken-1"> - {{item.relative_time_description}}</span>
-           </div>
-           <pre class="overview-side__review--item-desc" v-html="item.text"/>
-         </div>
-       </div>
+       <review v-if="showReview" v-for="(item, i) in googleMapInfo.reviews.slice(0, 3)" v-bind="item" :index="`${i}--mobile`" :key="i"/>
      </div>
      <div class="overview-main__menu">
        <p class="fw-700 mb-2">Menu</p>
@@ -103,17 +93,7 @@
          <span class="fs-small-2 text-grey">({{googleMapInfo.user_ratings_total}})</span>
          <g-icon color="#757575">{{showReview ? 'expand_less' : 'expand_more'}}</g-icon>
        </div>
-       <div v-if="showReview" class="overview-side__review--item" v-for="(item, i) in googleMapInfo.reviews.slice(0, 3)" :key="i">
-         <img alt :src="item.profile_photo_url"/>
-         <div class="flex-auto">
-           <p style="color: #212121">{{item.author_name}}</p>
-           <div class="row-flex align-items-center">
-             <rating color="#FFC700" icon-size="16" :value="item.rating"/>
-             <span class="fw-700 fs-small-2 text-grey-darken-1"> - {{item.relative_time_description}}</span>
-           </div>
-           <pre class="overview-side__review--item-desc" v-html="item.text"/>
-         </div>
-       </div>
+       <review v-if="showReview" v-for="(item, i) in googleMapInfo.reviews" v-bind="item" :index="i" :key="i"/>
      </div>
    </div>
 
@@ -138,10 +118,11 @@
   import {smoothScrolling} from "../../../../../backoffice/pos-vue-framework";
   import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
   import Rating from "./Rating";
+  import Review from "./Review";
 
   export default {
     name: "Overview",
-    components: {Rating},
+    components: {Review, Rating},
     data() {
       return {
         store: {},
@@ -276,7 +257,7 @@
         const wrapper = window
         const content = document.getElementById(`category_content_${id}`)
         if(wrapper && content) {
-          wrapper.scroll({top: content.offsetTop - 80, left: 0, behavior: "smooth"})
+          wrapper.scroll({top: content.offsetTop - 64, left: 0, behavior: "smooth"})
           this.selectedCategoryId = id
           setTimeout(() => {
             this.choosing--
@@ -375,11 +356,10 @@
 
         .tab-wrapper {
           position: sticky;
-          top: 0;
+          top: -1px;
           z-index: 2;
           background: white;
           max-width: 800px;
-          padding-bottom: 16px;
           display: flex;
         }
 
@@ -487,33 +467,6 @@
           display: flex;
           align-items: center;
           margin-bottom: 16px;
-        }
-
-        &--item {
-          display: flex;
-
-          & > img {
-            width: 36px;
-            height: 36px;
-            margin-right: 16px;
-          }
-
-          &-desc {
-            font-size: 13px;
-            font-weight: bold;
-            word-break: break-word;
-            white-space: pre-wrap;
-            margin-bottom: 16px;
-            flex: 1;
-
-            &--collapse {
-              display: -webkit-box;
-              -webkit-box-orient: vertical;
-              user-select: auto;
-              overflow: hidden;
-              -webkit-line-clamp: 2;
-            }
-          }
         }
       }
     }
