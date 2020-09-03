@@ -138,10 +138,11 @@
       <div>
         <g-grid-select v-model="selectedProduct.activePopupModifierGroup" item-text="name" item-value="_id" :items="popupModifierGroups" itemCols="auto">
           <template #default="{ toggleSelect, item, index }">
-            <div class="prop-option" @click="e => { toggleSelect(item) }">{{item.name}}</div>
+            <div v-if="item.isGlobal" class="prop-option prop-option--disabled">{{item.name}}</div>
+            <div v-else class="prop-option" @click="() => { toggleSelect(item); changePopupModifierGroup(item) }">{{item.name}}</div>
           </template>
-          <template #selected="{ toggleSelect, item, index }">
-            <div class="prop-option prop-option--1" @click="e => { toggleSelect(item) } ">{{item.name}}</div>
+          <template #selected="{ item, index }">
+            <div class="prop-option prop-option--1">{{item.name}}</div>
           </template>
         </g-grid-select>
       </div>
@@ -281,7 +282,7 @@
         this.printers = await cms.getModel('GroupPrinter').find({ type: 'kitchen' })
       },
       async loadPopupModifierGroups() {
-        this.popupModifierGroups = await cms.getModel('PosModifierGroup').find()
+        this.popupModifierGroups = (await cms.getModel('PosModifierGroup').find())
       },
       getPrinterClass(printer) {
         return {
@@ -343,6 +344,9 @@
         }
 
         await this.updateProductLayout({type})
+      },
+      changePopupModifierGroup(group) {
+        return this.updateProduct({ activePopupModifierGroup: group._id })
       },
 
       // update color, update text
@@ -485,6 +489,10 @@
       border-radius: 2px;
       padding: 0 8px;
       font-size: 13px;
+    }
+
+    &--disabled {
+      opacity: 0.5;
     }
   }
 </style>

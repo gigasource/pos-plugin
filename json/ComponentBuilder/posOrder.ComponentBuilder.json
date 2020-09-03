@@ -178,6 +178,11 @@
               "service": "SettingsStore:getKeyboardSetting",
               "local": "getKeyboardSetting",
               "type": "event"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
             }
           ]
         },
@@ -236,6 +241,11 @@
               "service": "OrderStore:updateOrderItems",
               "local": "updateOrderItems",
               "type": "event"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
             }
           ]
         },

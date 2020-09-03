@@ -18,7 +18,7 @@
             <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
-              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">€ {{item.price | convertMoney }}</span>
+              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
               <span :class="['item-detail__option', item.takeout ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
             </p>
           </div>
@@ -31,7 +31,7 @@
         <div v-if="item.modifiers">
           <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
                   label small text-color="#616161" close @close="removeModifier(item, index)">
-            {{modifier.name}} | {{$t('common.currency')}}{{modifier.price | convertMoney}}
+            {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
           </g-chip>
         </div>
       </div>
@@ -53,6 +53,7 @@
       total: Number,
       items: Array,
       user: Object,
+      storeLocale: String,
     },
     filters: {
       convertMoney(value) {

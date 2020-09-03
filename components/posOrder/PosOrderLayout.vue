@@ -28,6 +28,7 @@
       </div>
     </div>
     <dialog-text-filter v-model="dialog.value" @submit="changeKeyboardExtension($event)"/>
+    <dialog-choose-popup-modifier v-model="popupModifierDialog.value" :product="popupModifierDialog.product" @save="addProductWithModifier"/>
   </div>
 </template>
 <script>
@@ -47,6 +48,7 @@
       selectedProductLayout: null,
       productDblClicked: null,
       keyboardConfig: null,
+      storeLocale: null,
     },
     data() {
       return {
@@ -58,6 +60,10 @@
         dialog: {
           value: false,
           position: {}
+        },
+        popupModifierDialog: {
+          value: false,
+          product: {}
         }
       }
     },
@@ -153,7 +159,7 @@
               this.$emit('update:selectedCategoryLayout', topLeftCategory)
             else
               this.$emit('update:selectedCategoryLayout', _.first(this.orderLayout.categories))
-            
+
             if (this.editable && (!this.view || this.view.name !== 'CategoryEditor'))
               this.$emit('update:view', { name: 'CategoryEditor' })
           }
@@ -345,6 +351,29 @@
         }
       },
 
+      async showPopupModifierDialog({ product }) {
+        const globalModifierGroups = await cms.getModel('PosModifierGroup').find({ isGlobal: true })
+        if (!globalModifierGroups.length && !product.activePopupModifierGroup) {
+          return this.addProductToOrder({ product })
+        }
+
+        this.popupModifierDialog = {
+          value: true,
+          product
+        }
+      },
+
+      addProductWithModifier(product, modifiers) {
+        this.$emit('addProductToOrder', product)
+        modifiers.forEach(({ name, price }) => {
+          this.$emit('addModifierToProduct', {
+            name: name,
+            price: price,
+            quantity: 1
+          })
+        })
+      },
+
       onClick(productLayout) {
         if (!this.isTouchEventHandled) {
           this.onProductSelect(productLayout)
@@ -359,7 +388,11 @@
       getProductListeners(productLayout) {
         return this.editable
           ? { click: () => this.onClick(productLayout), touchstart: () => this.onTouchStart(productLayout)}
-          : { click: () => this.addProductToOrder(productLayout) }
+          : { click: () => {
+              // this.addProductToOrder(productLayout);
+              this.showPopupModifierDialog(productLayout)
+            }
+          }
       },
 
       opendDialogEdit(position) {
