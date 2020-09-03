@@ -161,11 +161,12 @@
         if (this.categories.length)
           this.selectedCategoryId = this.categories[0]._id
 
-        if(this.store.googleMapPlaceId) {
-          cms.socket.emit('getReviewInGoogleMap', this.store.googleMapPlaceId, info => {
-            this.googleMapInfo = info
-          })
-        }
+        // google api charging fee
+        // if(this.store.googleMapPlaceId) {
+        //   cms.socket.emit('getReviewInGoogleMap', this.store.googleMapPlaceId, info => {
+        //     this.googleMapInfo = info
+        //   })
+        // }
       }
     },
     mounted() {
