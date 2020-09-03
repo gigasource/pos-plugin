@@ -60,6 +60,7 @@
       height: 36px;
       margin-right: 16px;
       border-radius: 50%;
+      min-width: 36px;
     }
 
     &-comment {
