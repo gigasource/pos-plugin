@@ -1,18 +1,18 @@
 {
   "events": [],
-  "_id": "5f4dc8186512338e7b3c5ceb",
+  "_id": "5f51bf1d01aeb9afce90df07",
   "isProduction": true,
   "items": [
     {
       "choice": "view",
-      "component": "Overview",
+      "component": "DigitalMenu",
       "binding": [],
       "slotScopeBinding": []
     }
   ],
+  "name": "digitalMenu2",
   "props": {
     "fields": []
   },
-  "renderToRoute": "store/:id",
-  "name": "StoreOverview"
+  "renderToRoute": "store/:storeIdOrAlias/menu"
 }
