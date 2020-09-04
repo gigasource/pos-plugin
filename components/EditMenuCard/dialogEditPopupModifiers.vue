@@ -9,18 +9,21 @@
           {{group.name}}
         </g-btn>
       </template>
-      <g-btn flat background-color="#1271ff" text-color="#fff" v-show="!newGroup" @click="addGroup">New</g-btn>
+      <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" v-show="!newGroup" @click="addGroup">
+        <g-icon color="#fff" size="18" class="mr-2">add</g-icon>
+        <span>Group</span>
+      </g-btn>
     </div>
     <div class="content row-flex">
       <div class="content--main col-flex align-items-start">
         <template v-for="category in allCategories">
           <g-btn flat :uppercase="false" :key="category._id"
-                 :class="[activeCategory === category && 'active-btn', activeEditItem && activeEditItem._id === category._id && 'edit-btn']"
+                 :class="['mb-2', activeCategory === category && 'active-btn', activeEditItem && activeEditItem._id === category._id && 'edit-btn']"
                  @click="setActiveCategory(category)">
             {{category.name}}
           </g-btn>
-          <div>
-            <span> > </span>
+          <div class="mb-3">
+            <g-icon>keyboard_arrow_right</g-icon>
             <template v-for="mod in modifiersByCategory[category._id]">
               <g-btn flat :uppercase="false" :key="mod._id"
                      :class="[activeModifier === mod && 'active-btn', activeEditItem && activeEditItem._id === mod._id && 'edit-btn']"
@@ -28,12 +31,18 @@
                 {{mod.name}}
               </g-btn>
             </template>
-            <g-btn flat background-color="#1271ff" text-color="#fff"
-                   @click="addMod(category)" v-show="!newModifier">+</g-btn>
+            <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false"
+                   @click="addMod(category)" v-show="!newModifier">
+              <g-icon color="#fff" size="18" class="mr-2">add</g-icon>
+              <span>Item</span>
+            </g-btn>
           </div>
         </template>
-        <g-btn flat background-color="#1271ff" text-color="#fff"
-               @click="addCategory" v-show="activeGroup && !newCategory">New Category</g-btn>
+        <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false"
+               @click="addCategory" v-show="activeGroup && !newCategory">
+          <g-icon color="#fff" size="18" class="mr-2">add</g-icon>
+          <span>Category</span>
+        </g-btn>
       </div>
       <div class="content--sidebar col-flex">
         <div class="pa-2 col-flex">
@@ -48,12 +57,14 @@
             <g-btn :uppercase="false" flat background-color="#4FC3F7" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="duplicate" >
-              Duplicate this modifier
+              <g-icon color="#fff" size="18" class="mr-2">file_copy</g-icon>
+              <span>Duplicate this modifier</span>
             </g-btn>
             <g-btn :uppercase="false" flat background-color="#FF4452" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="deleteItem('group')">
-              Delete this modifier
+              <g-icon color="#fff" size="18" class="mr-2">delete</g-icon>
+              <span>Delete this modifier</span>
             </g-btn>
           </template>
 
@@ -175,7 +186,7 @@
       async getGroupPrinters() {
         return await cms.getModel('GroupPrinter').find()
       },
-      addCategory() {
+      async addCategory() {
         this.newCategory = {
           name: 'New Category',
           mandatory: false,
@@ -183,18 +194,18 @@
           modifierGroup: this.activeGroup._id,
           ...!this.activeGroup.isGlobal && { product: this.product._id }
         }
-
-        this.setActiveCategory(this.newCategory)
+        const newItem = await this.save()
+        this.setActiveCategory(newItem)
       },
-      addGroup() {
+      async addGroup() {
         this.newGroup = {
           name: 'New Group',
           isGlobal: false,
         }
-
-        this.setActiveGroup(this.newGroup)
+        const newItem = await this.save()
+        this.setActiveGroup(newItem)
       },
-      addMod(category) {
+      async addMod(category) {
         this.newModifier = {
           name: 'New modifider',
           price: 0,
@@ -202,8 +213,8 @@
           modifierGroup: this.activeGroup._id,
           ...!this.activeGroup.isGlobal && { product: this.product._id }
         }
-
-        this.setActiveModifier(this.newModifier)
+        const newItem = await this.save()
+        this.setActiveModifier(newItem)
       },
       setActiveGroup(group) {
         this.activeGroup = group
@@ -244,11 +255,11 @@
       async save() {
         const type = this.activeEditItem.type
         const item = _.omit({ ...this.activeEditItem }, 'type')
-
+        let newItem
         switch (type) {
           case 'group':
             if (item._id) {
-              await cms.getModel('PosModifierGroup').findOneAndUpdate({ _id: item._id }, item)
+              newItem = await cms.getModel('PosModifierGroup').findOneAndUpdate({ _id: item._id }, item, { new: true })
               if (item.isGlobal !== this.activeGroup.isGlobal) {
                 // update categories & modifiers
                 const categoryIds = this.categories.map(c => c._id)
@@ -264,24 +275,24 @@
                 }
               }
             } else {
-              await cms.getModel('PosModifierGroup').create(item)
+              newItem = await cms.getModel('PosModifierGroup').create(item)
               this.newGroup = null
             }
             break
           case 'category':
             if (item._id) {
-              await cms.getModel('PosModifierCategory').findOneAndUpdate({ _id: item._id }, item)
+              await cms.getModel('PosModifierCategory').findOneAndUpdate({ _id: item._id }, item, { new: true })
             } else {
-              await cms.getModel('PosModifierCategory').create(item)
+              newItem = await cms.getModel('PosModifierCategory').create(item)
               this.newCategory = null
             }
             this.newCategory = null
             break
           case 'modifier':
             if (item._id) {
-              await cms.getModel('PosPopupModifier').findOneAndUpdate({ _id: item._id }, item)
+              await cms.getModel('PosPopupModifier').findOneAndUpdate({ _id: item._id }, item, { new: true })
             } else {
-              await cms.getModel('PosPopupModifier').create(item)
+              newItem = await cms.getModel('PosPopupModifier').create(item)
               this.newModifier = null
             }
             break
@@ -291,6 +302,7 @@
 
         await this.reload()
         this.activeGroup = this.modifierGroups.find(g => g._id === this.activeGroup._id)
+        return newItem
       },
       async deleteItem(type) {
         const _id = this.activeEditItem._id
@@ -400,7 +412,6 @@
 
   .g-btn {
     margin-right: 16px;
-    margin-bottom: 8px;
     border: 1px solid #D0D0D0;
     border-radius: 2px;
     font-weight: bold;
