@@ -48,9 +48,13 @@
         <div class="pa-2 col-flex">
           <!-- Group -->
           <template v-if="activeEditItem && activeEditItem.type === 'group'">
-            <pos-text-field label="Name" v-model="activeEditItem.name"/>
+            <g-text-field-bs label="Name" v-model="activeEditItem.name" required>
+              <template #append-inner>
+                <g-icon style="cursor: pointer">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
             <g-switch label="Global modifier" v-model="activeEditItem.isGlobal"/>
-            <div class="fs-small-2 i">
+            <div class="fs-small-2 i mr-1 ml-1">
               <span class="fw-700">Note: </span>
               <span>Global modifiers can be selected in all dishes.</span>
             </div>
@@ -72,23 +76,25 @@
           <template v-if="activeEditItem && activeEditItem.type === 'category'">
             <g-switch label="Mandatory" v-model="activeEditItem.mandatory"/>
             <g-switch label="Select one only" v-model="activeEditItem.selectOne"/>
-            <pos-text-field label="Name" v-model="activeEditItem.name"/>
-            <pos-text-field label="No. of free items" v-model="activeEditItem.freeItems"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
+            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems"/>
             <g-btn :uppercase="false" flat background-color="#FF4452" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="deleteItem('category')">
-              Delete this category
+              <g-icon color="#fff" size="18" class="mr-2">delete</g-icon>
+              <span>Delete this category</span>
             </g-btn>
           </template>
 
           <!-- Modifier -->
           <template v-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <pos-text-field label="Name" v-model="activeEditItem.name"/>
-            <pos-text-field label="Price" v-model="activeEditItem.price"/>
-            <pos-text-field label="Max items" v-model="activeEditItem.max"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
+            <g-text-field-bs label="Price" v-model="activeEditItem.price"/>
+            <g-text-field-bs label="Max items" v-model="activeEditItem.max"/>
             <div>
               <div style="font-size: 13px; margin: 12px 4px 2px 4px;">Group printer</div>
-              <g-grid-select v-model="activeEditItem.printer" item-text="name" item-value="_id" :items="groupPrinters" itemCols="auto">
+              <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer"
+                             item-text="name" item-value="_id" :items="groupPrinters" itemCols="auto">
                 <template #default="{ toggleSelect, item, index }">
                   <div class="prop-option" @click="e => { toggleSelect(item) }">{{item.name}}</div>
                 </template>
@@ -100,7 +106,8 @@
             <g-btn :uppercase="false" flat background-color="#FF4452" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="deleteItem('modifier')">
-              Delete this item
+              <g-icon color="#fff" size="18" class="mr-2">delete</g-icon>
+              <span>Delete this item</span>
             </g-btn>
           </template>
         </div>
@@ -109,11 +116,9 @@
 
         <div class="row-flex flex-grow-1 align-items-end">
           <g-btn flat background-color="#ff4452" text-color="#fff" border-radius="0"
-                 @click="close" style="flex: 1; margin: 0">Close
+                 @click="close" style="flex: 1; margin: 0">
+            Close
           </g-btn>
-<!--          <g-btn flat background-color="#2979FF" text-color="#fff" border-radius="0" v-if="activeEditItem"-->
-<!--                 @click="save" style="flex: 1; margin: 0">Save-->
-<!--          </g-btn>-->
         </div>
       </div>
     </div>
