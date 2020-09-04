@@ -178,6 +178,11 @@ module.exports = async function (cms) {
   }
 
   async function updateOrderStatus(orderToken, status) {
+    if (sendOrderTimeouts[orderToken]) {
+      clearTimeout(sendOrderTimeouts[orderToken]);
+      delete sendOrderTimeouts[orderToken]
+    }
+
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
 
     if (status.status === 'kitchen') {
