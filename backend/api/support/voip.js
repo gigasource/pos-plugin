@@ -111,9 +111,13 @@ router.get('/supporters/:storeId', async (req, res) => {
 
   // select first user which is not an admin, and also in idle state
   const sgIds = store.groups.map(sg => sg._id)
-  const users = await cms.getModel('User').find({ username: { $ne: 'admin' },  storeGroups: { $elemMatch: { $in: sgIds } } }, { _id: 1, username: 1 })
+  // TODO: check firebaseToken condition
+  const users = await cms.getModel('User').find({
+    username: { $ne: 'admin' },
+    firebaseToken: { $ne: '' },
+    storeGroups: { $elemMatch: { $in: sgIds } } }, { _id: 1, username: 1, firebaseToken: 1 }
+  )
   const selectedUser = _.find(users, u => callMgr.getStatus(u._id) !== CallStatus.Busy)
-
   res.json({
     ok: selectedUser !== null,
     supporter: selectedUser._id
