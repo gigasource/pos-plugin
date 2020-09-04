@@ -239,11 +239,11 @@
         location.href = `${location.origin}/store/${this.store.alias}/reservation`
       },
       viewMap() {
-        if (this.store.googleMapPlaceId) {
-          window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
-        } else {
+        if(this.store.coordinates) {
           window.open(`https://www.google.com/maps/search/?api=1&query=${this.store.coordinates.lat},${this.store.coordinates.long}`, "_blank")
-        }
+        } else if (this.store.googleMapPlaceId) {
+          window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
+        } else {}
       }
     }
   }
