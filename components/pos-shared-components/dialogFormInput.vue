@@ -1,7 +1,7 @@
 <template>
   <g-dialog v-model="internalValue" width="90%" eager>
     <div class="dialog-input">
-      <g-icon v-if="close" @click="internalValue = false"class="close-icon">icon-close@20</g-icon>
+      <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
       <slot name="input">
         <div class="textfield">
           <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
@@ -15,7 +15,7 @@
       </slot>
       <slot name="keyboard">
         <div class="keyboard">
-          <pos-keyboard-full/>
+          <pos-keyboard-full @enter-pressed="$emit('save')"/>
         </div>
       </slot>
     </div>

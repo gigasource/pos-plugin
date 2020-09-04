@@ -50,7 +50,7 @@
           <template v-if="activeEditItem && activeEditItem.type === 'group'">
             <g-text-field-bs label="Name" v-model="activeEditItem.name" required>
               <template #append-inner>
-                <g-icon style="cursor: pointer">icon-keyboard</g-icon>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
             <g-switch label="Global modifier" v-model="activeEditItem.isGlobal"/>
@@ -76,8 +76,16 @@
           <template v-if="activeEditItem && activeEditItem.type === 'category'">
             <g-switch label="Mandatory" v-model="activeEditItem.mandatory"/>
             <g-switch label="Select one only" v-model="activeEditItem.selectOne"/>
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
-            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name">
+              <template #append-inner>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
+            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems">
+              <template #append-inner>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
             <g-btn :uppercase="false" flat background-color="#FF4452" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="deleteItem('category')">
@@ -88,9 +96,21 @@
 
           <!-- Modifier -->
           <template v-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
-            <g-text-field-bs label="Price" v-model="activeEditItem.price"/>
-            <g-text-field-bs label="Max items" v-model="activeEditItem.max"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name">
+              <template #append-inner>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
+            <g-text-field-bs label="Price" v-model="activeEditItem.price">
+              <template #append-inner>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
+            <g-text-field-bs label="Max items" v-model="activeEditItem.max">
+              <template #append-inner>
+                <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
+              </template>
+            </g-text-field-bs>
             <div>
               <div style="font-size: 13px; margin: 12px 4px 2px 4px;">Group printer</div>
               <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer"
@@ -122,15 +142,35 @@
         </div>
       </div>
     </div>
+
+    <dialog-form-input v-model="showDialog" :show-buttons="false" @save="showDialog = false">
+      <template #input>
+        <div class="mb-4">
+          <template v-if="activeEditItem && activeEditItem.type === 'group'">
+            <g-text-field-bs label="Name" v-model="activeEditItem.name" required/>
+          </template>
+          <template v-else-if="activeEditItem && activeEditItem.type === 'category'">
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
+            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems"/>
+          </template>
+          <template v-else-if="activeEditItem && activeEditItem.type === 'modifier'">
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
+            <g-text-field-bs label="Price" v-model="activeEditItem.price"/>
+            <g-text-field-bs label="Max items" v-model="activeEditItem.max"/>
+          </template>
+        </div>
+      </template>
+    </dialog-form-input>
   </div>
 </template>
 
 <script>
   import PosTextField from '../pos-shared-components/POSInput/PosTextField';
+  import DialogFormInput from '../pos-shared-components/dialogFormInput';
 
   export default {
     name: 'dialogEditPopupModifiers',
-    components: { PosTextField },
+    components: { DialogFormInput, PosTextField },
     props: {
       value: Boolean,
       product: null
@@ -147,7 +187,8 @@
         newCategory: null,
         newGroup: null,
         newModifier: null,
-        modifiers: []
+        modifiers: [],
+        showDialog: false,
       }
     },
     computed: {
@@ -392,7 +433,7 @@
     left: 0;
     height: 100vh;
     width: 100vw;
-    z-index: 999999;
+    z-index: 99;
     background: #fff;
   }
 

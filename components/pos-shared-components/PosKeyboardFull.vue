@@ -9,7 +9,6 @@
     data() {
       return {
         keyboardEnglish: [
-          { content: ['Tab'], img: '', style: 'grid-area: tab; background-color: #e0e0e0; font-size: 14px', action: caret => caret.insert('    ') },
           { content: ['q', 'Q'], img: '', style: 'grid-area: q' },
           { content: ['w', 'W'], img: '', style: 'grid-area: w' },
           { content: ['e', 'E'], img: '', style: 'grid-area: e' },
@@ -26,7 +25,6 @@
             style: 'grid-area: del; background-color: #e0e0e0',
             action: 'delete'
           },
-          { content: ['Caps lock'], img: '', style: 'grid-area: caps; background-color: #e0e0e0; font-size: 14px', action: 'shift' },
           { content: ['a', 'A'], img: '', style: 'grid-area: a' },
           { content: ['s', 'S'], img: '', style: 'grid-area: s' },
           { content: ['d', 'D'], img: '', style: 'grid-area: d' },
@@ -36,7 +34,7 @@
           { content: ['j', 'J'], img: '', style: 'grid-area: j' },
           { content: ['k', 'K'], img: '', style: 'grid-area: k' },
           { content: ['l', 'L'], img: '', style: 'grid-area: l' },
-          { content: [], img: 'delivery/key_enter', style: 'grid-area: enter; background-color: #e0e0e0', type: 'enter', action: 'enter' },
+          { content: ['Save'],  style: 'grid-area: enter; background: #2979FF; color: #fff', type: 'enter', action: 'enter' },
           { content: [], img: 'delivery/key_shift', style: 'grid-area: shift1; background-color: #e0e0e0', type: 'shift', action: 'shift' },
           { content: ['z', 'Z'], img: '', style: 'grid-area: z' },
           { content: ['x', 'X'], img: '', style: 'grid-area: x' },
@@ -47,17 +45,9 @@
           { content: ['m', 'M'], img: '', style: 'grid-area: m' },
           { content: [','], img: '', style: 'grid-area: comma' },
           { content: ['.'], img: '', style: 'grid-area: dot' },
-          { content: ['/'], img: '', style: 'grid-area: splash' },
-          { content: [], img: 'delivery/key_shift', style: 'grid-area: shift2; background-color: #e0e0e0', type: 'shift', action: 'shift' },
           { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => null },
-          { content: ['&'], img: '', style: 'grid-area: amp' },
-          { content: ['%'], img: '', style: 'grid-area: pct' },
-          { content: ['€'], img: '', style: 'grid-area: pnd' },
           { style: 'grid-area: space', action: caret => caret.insert(' ') },
-          { content: ['@'], img: '', style: 'grid-area: at' },
           { content: ['EN'], img: '', style: 'grid-area: lang; background-color: #e0e0e0; font-size: 14px', action: () => null },
-          { content: ['&rarr;'], img: '', style: 'grid-area: rarr; background-color: #e0e0e0', action: () => null },
-          { content: ['&larr;'], img: '', style: 'grid-area: larr; background-color: #e0e0e0', action: () => null },
           { content: ['7'], style: 'grid-area: key7' },
           { content: ['8'], style: 'grid-area: key8' },
           { content: ['9'], style: 'grid-area: key9' },
@@ -70,10 +60,10 @@
           { content: ['0'], style: 'grid-area: key0' },
           { content: ['.'], style: 'grid-area: keyDot' },
         ],
-        templateEnglish: 'grid-template-areas: "tab tab q q w w e e r r t t y y u u i i o o p p del del del del key7 key7 key8 key8 key9 key9" ' +
-          '"caps caps caps a a s s d d f f g g h h j j k k l l enter enter enter enter enter key4 key4 key5 key5 key6 key6" ' +
-          '"shift1 shift1 shift1 shift1 z z x x c c v v b b n n m m comma comma dot dot splash splash shift2 shift2 key1 key1 key2 key2 key3 key3" ' +
-          '"sym sym amp amp pct pct pnd pnd space space space space space space space space space space at at lang lang larr larr rarr rarr key0 key0 key0 key0 keyDot keyDot";' +
+        templateEnglish: 'grid-template-areas: " q q w w e e r r t t y y u u i i o o p p key7 key8 key9" ' +
+          '". a a s s d d f f g g h h j j k k l l . key4 key5 key6" ' +
+          '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del key1 key2 key3" ' +
+          '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter key0 key0 keyDot";' +
           'grid-auto-columns: 1fr; grid-gap: 10px',
         keyboardGerman: [
           { content: ['Tab'], img: '', style: 'grid-area: tab; background-color: #e0e0e0; font-size: 14px', action: caret => caret.insert('    ') },
