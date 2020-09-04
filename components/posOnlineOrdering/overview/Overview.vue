@@ -54,7 +54,7 @@
        <div class="overview-main__menu--content" @touchstart="touch">
          <div v-for="(category, i) in listItem" :id="`category_content_${category._id}`" :key="`category_${i}`" :class="[i > 0 && 'mt-4']">
            <div class="overview-main__menu--content-title">
-             {{ category && category.name }} ({{category.items.length}})
+             {{ category && category.name }}
            </div>
            <digital-menu-item
                v-for="(item, index) in category.items" :key="index"
