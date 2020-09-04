@@ -1,31 +1,29 @@
+const express = require('express')
+const router = express.Router()
 const {firebaseAdminInstance} = require('../../app-notification/firebase-messaging/admin')
-const fireBaseMessagingAdapter = {
-  emitToPersistent: async (deviceId, eventName, args, eventAckName, ackArgs) => {
-    const json = JSON.stringify({
-      useAsSocketIoAdapter: true,
-      eventName,
-      args,
-      eventAckName,
-      ackArgs
-    })
 
-    // TODO: Cache
-    let firebaseToken = null
+const fcm = {
+  getFirebaseToken: async function(deviceId) {
+    // manager app
     const device = await cms.getModel('Device').findOne({_id: deviceId})
     if (device) {
-      firebaseToken = device.firebaseToken
-      console.log('Get firebase token from device info', firebaseToken)
-    } else {
-      const user = await cms.getModel('User').findOne({_id: deviceId})
-      if (user) {
-        firebaseToken = user.firebaseToken
-        console.log('Get firebase token from user info', firebaseToken)
-      } else {
-        console.log('ERROR: device id is not existed in both device and user collection')
-        return
-      }
+      console.log('Get firebase token from device info: ', device.firebaseToken)
+      return device.firebaseToken
     }
 
+    // support app
+    const user = await cms.getModel('User').findOne({_id: deviceId}, { firebaseToken: 1, storeGroups: 0, role: 0, createdBy: 0 })
+    if (user) {
+      // work - around
+      console.log('Get firebase token from user info')
+      console.log('user', user.firebaseToken)
+      // return "eL2EEt_7QluvUvGXLBt49i:APA91bFywRA-yDrHydI2eyWBmpHAR3N2I_adhqpd_Rsumkk96UOYrGH0pOyQOCiFbQp9S7Fx_z6o-O0L2MY4t9GbTffZRliVzcotCRE0xf11UysKLuj4_5YZUtZwgS5yiEkUaZeQKWNp"
+      return user.firebaseToken
+    }
+
+    throw 'ERROR: device id is not existed in both device and user collection'
+  },
+  sendMessage: async function(json, firebaseToken) {
     const message = {
       data: { json },
       token: firebaseToken,
@@ -41,8 +39,9 @@ const fireBaseMessagingAdapter = {
         priority: 'high'
       },
     }
+
     console.log(`VoIP: Send ${json} to ${firebaseToken}`)
-    // NOTE: Assume that firebase always send message successfully!
+
     try {
       const result = await firebaseAdminInstance().messaging().send(message)
       console.log("result", result)
@@ -50,84 +49,51 @@ const fireBaseMessagingAdapter = {
       console.log("ex", e)
     }
   },
-  emit: async() => {
-
-  }
+  send: async function(receiver, eventName, args) {
+    const firebaseToken = await this.getFirebaseToken(receiver)
+    await this.sendMessage(JSON.stringify({ eventName, args }), firebaseToken)
+  },
 }
 
-module.exports = (sockServer, useFirebaseAdapter = true) => {
-  sockServer.vAckFn = sockServer.registerAckFunction
+// make call
+router.post('/make-call', async (req, res) => {
 
-  const makeCallAck = async (sender, receiver, callAccepted) => {
-    console.log(`VoIP: Firebase? ${useFirebaseAdapter}:  makeCallAck from ${sender} to ${receiver}`, callAccepted)
-    sockServer.in(`makeCallAck-${receiver}`).emit('makeCallAck', { sender, receiver, callAccepted })
-  }
-  const cancelCallAck = async (sender, receiver) => {
-    console.log(`VoIP: Firebase? ${useFirebaseAdapter} cancelCallAck from ${sender} to ${receiver}`)
-    sockServer.in(`cancelCallAck-${receiver}`).emit('cancelCallAck', { sender, receiver })
-  }
-  const endCallAck = async (sender, receiver) => {
-    console.log(`VoIP: Firebase? ${useFirebaseAdapter} endCallAck from ${sender} to ${receiver}`)
-    sockServer.in(`endCallAck-${receiver}`).emit('endCallAck', { sender, receiver })
-  }
-  const underlyingTransporter = useFirebaseAdapter ? fireBaseMessagingAdapter : sockServer
+  const { sender, receiver } = req.body
+  console.log(`make-call from ${sender} to ${receiver}`)
+  fcm.send(receiver, 'makeCall', {sender})
+  res.json({ok:true})
+})
 
-  if (!useFirebaseAdapter) {
-    sockServer.vAckFn('makeCallAck', makeCallAck)
-    sockServer.vAckFn('cancelCallAck', cancelCallAck)
-    sockServer.vAckFn('endCallAck', endCallAck)
-  }
+// answer/declined
+router.post('/make-call-ack', async (req, res) => {
+  const { sender, receiver, callAccepted } = req.body
+  console.log(`make-call-ack from ${sender} to ${receiver}`)
+  fcm.send(receiver, 'makeCallAck', {sender, callAccepted})
+  res.json({ok:true})
+})
 
-  sockServer.on('connect', socket => {
-    if (useFirebaseAdapter) {
-      socket.on('makeCallAck', makeCallAck)
-      socket.on('cancelCallAck', cancelCallAck)
-      socket.on('endCallAck', endCallAck)
-    }
+router.post('/cancel-call', async (req, res) => {
+  const { sender, receiver } = req.body
+  console.log(`cancel-call from ${sender} to ${receiver}`)
+  fcm.send(receiver, 'cancelCall', {sender})
+  res.json({ok:true})
+})
 
-    let _deviceId;
-    // socket need emit 'register-voip' event to talk with server that i want to join voip groups
-    socket.on('register-voip', (deviceId, role) => {
-      console.log(`${deviceId} register-voip with role ${role}`)
-      socket.__voip = true
-      socket.__role = role
-      _deviceId = deviceId;
-      // TODO: re-connect atempt will not register makeCallAck -> unstable
-      socket.join(`makeCallAck-${deviceId}`)
-      socket.join(`cancelCallAck-${deviceId}`)
-      socket.join(`endCallAck-${deviceId}`)
-    })
+// end call
+router.post('/end-call', async (req, res) => {
+  const { sender, receiver } = req.body
+  console.log(`end-call from ${sender} to ${receiver}`)
+  fcm.send(receiver, 'endCall', {sender})
+  res.json({ok:true})
+})
 
-    socket.on('disconnect', () => {
-      console.log('disconnect', _deviceId)
-    })
-
-    socket.on('makeCall', async (args) => {
-      let { sender, receiver } = args;
-      console.log(`VoIP: send makeCall from  ${sender} to ${receiver}`)
-      underlyingTransporter.emitToPersistent(receiver, 'makeCall', [{ sender, receiver }], 'makeCallAck', [receiver, sender]) // in ack, receiver will become sender
-    })
-    socket.on('cancelCall', async (args) => {
-      let { sender, receiver } = args;
-      console.log(`VoIP: send cancelCall from ${sender} to ${receiver}`)
-      underlyingTransporter.emitToPersistent(receiver, 'cancelCall', [{ sender, receiver }], 'cancelCallAck', [receiver, sender])  // in ack, receiver will become sender
-    })
-
-    socket.on('endCall', async (args) => {
-      let { sender, receiver } = args;
-      console.log(`VoIP: send endCall from ${sender} to ${receiver}`)
-      underlyingTransporter.emitToPersistent(receiver, 'endCall', [{ sender, receiver }], 'endCallAck', [receiver, sender])  // in ack, receiver will become sender
-    })
-
-    socket.on('getAvailableSupporterDeviceId', async (ack) => {
-      // Testing purpose
-      const sockets = sockServer.sockets.sockets
-      const socketIds = Object.keys(sockets)
-      for(let socketId of socketIds) {
-        const sock = sockets[socketId]
-        if (sock.__role === "supporter")
-          ack(sock.clientId)
-      }
-    })
+// get device id of supporters
+router.get('/get-supporters', async (req, res) => {
+  res.json({
+    ok: true,
+    supporter: '5e96bdee046a735999b167eb'
   })
-}
+})
+
+
+module.exports = router
