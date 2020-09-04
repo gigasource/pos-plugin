@@ -105,13 +105,18 @@ router.post('/new-store', async (req, res) => {
 
   // Get Google Map Place ID of store if it's not present
   if (!googleMapPlaceId) {
-    const { place_id, geometry: {location: {lat, lng}} } = await getGooglePlaceByText(`${settingName} ${settingAddress}`);
-    googleMapPlaceId = place_id
+    let restaurantPlace = await getGooglePlaceByText(`${settingName} ${settingAddress}`);
+    if (!restaurantPlace) restaurantPlace = await getGooglePlaceByText(settingAddress)
 
-    coordinates = {long: lng, lat}
-    location = {
-      type: 'Point',
-      coordinates: [lng, lat]
+    if (restaurantPlace) {
+      const { place_id, geometry: {location: {lat, lng}} } = restaurantPlace
+      googleMapPlaceId = place_id
+
+      coordinates = {long: lng, lat}
+      location = {
+        type: 'Point',
+        coordinates: [lng, lat]
+      }
     }
   }
 
