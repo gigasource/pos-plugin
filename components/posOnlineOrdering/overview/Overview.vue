@@ -2,16 +2,11 @@
  <div class="overview">
    <div class="overview-main">
      <img alt class="overview-main__banner" :src="cdnStoreBanner"/>
-     <div class="overview-main__action">
-       <p class="fw-700 mb-2">Please select an option</p>
-       <div class="row-flex align-items-center">
-         <g-btn-bs style="margin-right: 2%" v-if="store && store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
-         <g-btn-bs style="margin-right: 2%" v-if="store && store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
-         <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
-                   icon="icon-table-reservation" @click="openReservation">Reservation</g-btn-bs>
-       </div>
-     </div>
      <div class="overview-main__info">
+       <div class="row-flex align-items-center mb-1">
+         <g-icon size="18" class="mr-3">icon-store</g-icon>
+         <span class="fs-small fw-700 mr-3">{{store.name || store.settingName}}</span>
+       </div>
        <div class="row-flex align-items-center mb-1">
          <g-icon size="18" class="mr-3">icon-call</g-icon>
          <span class="fs-small fw-700 mr-3">Phone</span>
@@ -23,6 +18,15 @@
        </div>
        <div style="margin-left: 34px; font-size: 14px; margin-top: 4px" v-for="(day, i) in storeWorkingDay" :key="`day_${i}`">
          {{day.wdayString}}: {{day.open}} - {{day.close}}
+       </div>
+     </div>
+     <div class="overview-main__action">
+       <p class="fw-700 mb-2">Please select an option</p>
+       <div class="row-flex align-items-center">
+         <g-btn-bs style="margin-right: 2%" v-if="store && store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" v-if="store && store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
+         <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
+                   icon="icon-table-reservation" @click="openReservation">Reservation</g-btn-bs>
        </div>
      </div>
      <div v-if="reviewAvailable" class="overview-main__review">
@@ -76,6 +80,10 @@
                    background-color="#2979FF" text-color="white">
            Get direcrtion
          </g-btn-bs>
+       </div>
+       <div class="row-flex align-items-center px-2 pt-2">
+         <g-icon size="18" class="mr-2">icon-store</g-icon>
+         <span class="fs-small fw-700">{{store.name || store.settingName}}</span>
        </div>
        <div class="overview-side__info--phone">
          <g-icon class="mr-2" size="18">icon-call</g-icon>
@@ -339,6 +347,7 @@
           border-radius: 8px;
           border: none;
           font-weight: 700;
+          padding: 12px;
         }
       }
 
