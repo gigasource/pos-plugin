@@ -1,7 +1,0 @@
-POST http://localhost:8888/device/register
-Content-Type: application/x-www-form-urlencoded
-
-pairingCode=X4mwy5&hardware=Sunmi&appName=Pos-Germany.apk&appVersion=1.51&features[]=onlineOrder&features[]=proxy
-
-### pairingCode: result returned by running PreparePairingCode.http
-### feature: onlineOrder | remoteControl | updatable | proxy

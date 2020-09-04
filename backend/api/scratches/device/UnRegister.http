@@ -1,6 +1,0 @@
-POST http://localhost:8888/device/un-register
-Content-Type: application/x-www-form-urlencoded
-
-_id=5e96fb24a28f4f64aaccf773
-
-###
