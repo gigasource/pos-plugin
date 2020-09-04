@@ -177,15 +177,6 @@ module.exports = async function (cms) {
     })); //internalSocketIOServer will use adapter too, just need to call this once
   }
 
-  // cms.socket = p2pServerPlugin(cms.socket, {
-  //   clientOverwrite: true,
-  //   redisClusterEnabled: true,
-  //   saveMessage,
-  //   loadMessages,
-  //   deleteMessage,
-  //   updateMessage,
-  // })
-
   async function updateOrderStatus(orderToken, status) {
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
 
@@ -1094,7 +1085,6 @@ module.exports = async function (cms) {
     });
   });
 }
-
 module.exports.getExternalSocketIoServer = function () {
   return externalSocketIOServer;
 }
