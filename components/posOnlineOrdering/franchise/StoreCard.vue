@@ -233,10 +233,10 @@
         return openHours
       },
       openStore(type) {
-        location.href = `${location.origin}/store/${this.store.alias}/order/?type=${type}`
+        location.href = `${location.origin}/store/${this.store.alias}/?type=${type}`
       },
       openReservation() {
-        location.href = `${location.origin}/store/${this.store.alias}/reservation`
+        location.href = `${location.origin}/reservation/${this.store.alias}`
       },
       viewMap() {
         if (this.store.googleMapPlaceId) {

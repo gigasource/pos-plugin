@@ -206,7 +206,6 @@
       margin-right: 18px;
       width: 120px;
       height: 120px;
-      min-width: 120px;
 
       & ~ .po-menu-item__content {
         max-width: calc(100% - 270px);

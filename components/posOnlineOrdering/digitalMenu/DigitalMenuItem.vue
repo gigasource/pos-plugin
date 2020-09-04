@@ -178,7 +178,6 @@
       margin-right: 6px;
       width: 140px;
       height: 140px;
-      min-width: 140px;
 
       &--default {
         border-radius: 6px;

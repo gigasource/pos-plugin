@@ -30,14 +30,21 @@
       }
     },
     async created() {
-      const clientDomain = this.$route.params.id
-      if (!clientDomain) {
-        alert('Invalid franchise!')
+      const storeId = this.$route.params.id
+      if (!storeId) {
+        alert('Invalid store!')
         return;
       }
 
-      const stores = await cms.getModel('Store').find({ clientDomain })
-      this.stores.splice(0, 0, ...stores)
+      this.mainStore = await cms.getModel('Store').findOne({
+        $or: [ { alias: storeId }, { _id: storeId } ]
+      })
+      if (this.mainStore) {
+        const stores = await cms.getModel('Store').find({ clientDomain: this.mainStore.clientDomain })
+        this.stores.splice(0, 0, ...stores)
+      } else {
+        alert('Invalid store');
+      }
     },
     computed: {
       cdnStoreLogoImage() {

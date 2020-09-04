@@ -13,6 +13,6 @@
   "props": {
     "fields": []
   },
-  "renderToRoute": "store/:id",
+  "renderToRoute": "overview/:id",
   "name": "StoreOverview"
 }

@@ -1,5 +1,5 @@
 export function genIframe(type, link, alias) {
-  return `var url${type} = ['https://restaurantplus.net, '${type === 'franchise' ? type : 'store'}', '${alias}', '${link || ''}'].join('/')
+  return `var url${type} = ['https://restaurantplus.net', '${link}', '${alias}'].join('/')
   
   function openIframe${type} () {
     window.location = '#'
@@ -127,27 +127,17 @@ export function genIframe(type, link, alias) {
 }
 
 export function getEmbedBtn(types, alias) {
-  if(Array.isArray(types)) {
-    let typeIframeScript = ''
-    for(const type of types) {
-      typeIframeScript += genIframe(type.type, type.link, alias)
-    }
-    return `function getEmbedBtn() {
+  let typeIframeScript = ''
+  for(const type of types) {
+    typeIframeScript += genIframe(type.type, type.link, alias)
+  }
+  return `function getEmbedBtn() {
       var el = document.getElementById('restaurant-plus-embed-btn');
       getStyleSheet();
       var isOldIOs = checkIOs12AndLess();
       ${typeIframeScript}
       el.onclick = openFn${types[0].type}
-    }`
-  } else {
-    return `function getEmbedBtn() {
-       var el = document.getElementById('${types.id}');
-      getStyleSheet();
-      var isOldIOs = checkIOs12AndLess();
-      ${genIframe(types.type, types.link, alias)}
-      el.onclick = openFn${types.type}
-    }`
-  }
+  }`
 }
 
 export function genReadyState() {
@@ -167,8 +157,8 @@ export function genScriptFooter() {
 }
 
 
-export function genStyleSheet(position, size, hidden, c = 'restaurant-plus-embed-btn') {
-  let style = `.${c} { position: fixed; z-index: 1000000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
+export function genStyleSheet(position, size, hidden) {
+  let style = `.restaurant-plus-embed-btn { position: fixed; z-index: 1000000; cursor: pointer; -webkit-tap-highlight-color: transparent;`
 
   const directions = position.split('-')
   style += directions[1] + ': 8px;'
@@ -243,13 +233,13 @@ export function mobileCheck() {
   };`
 }
 
-export function genIcon(alias, mimeType, ext, location, id = 'restaurant-plus-embed-btn') {
+export function genIcon(alias, mimeType, ext, location) {
   return `(function () {
-    var el = document.getElementById('${id}')
+    var el = document.getElementById('restaurant-plus-embed-btn')
     if(!el) {
       el = document.createElement('div')
-      el.id = '${id}'
-      el.classList.add('${id}')
+      el.id = 'restaurant-plus-embed-btn'
+      el.classList.add('restaurant-plus-embed-btn')
       document.body.appendChild(el)
     }
     if(el && !el.hasChildNodes()) {
