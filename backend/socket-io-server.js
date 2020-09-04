@@ -11,6 +11,8 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer = require('nodemailer')
+const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
+const { sendNotification } = require('./app-notification');
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
@@ -711,7 +713,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products,
+        orderType: type, paymentType, customer, products, totalPrice,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
       } = orderData
 
@@ -736,12 +738,14 @@ module.exports = async function (cms) {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
-        paypalOrderDetail
+        paypalOrderDetail,
+        vSum: totalPrice
       }
-      await cms.getModel('Order').create(order)
+      const newOrder = await cms.getModel('Order').create(order)
 
       if (store.gSms && store.gSms.enabled) {
-        cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+        //cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+
 
         function formatOrder(orderData) {
           let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice} = _.cloneDeep(orderData)
@@ -762,13 +766,7 @@ module.exports = async function (cms) {
             }
           })
 
-          discounts = discounts.reduce((sum, discount) => sum + discount.value, 0)
-
-          if (deliveryDateTime === 'asap') {
-            const timeToComplete = store.gSms.timeToComplete || 30;
-            deliveryDateTime = dayjs().add(timeToComplete, 'minute').toDate()
-          }
-          deliveryDateTime = jsonFn.clone(deliveryDateTime) //stringify
+          discounts = discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
 
           customer = {
             name: customer.name,
@@ -788,23 +786,34 @@ module.exports = async function (cms) {
             shippingFee,
             total: totalPrice,
             deliveryTime: deliveryDateTime,
-            discounts
+            discounts,
+            status: 'inProgress'
           }
         }
 
-        const demoDevices = store.gSms.devices
-        const formattedOrder = formatOrder(orderData);
-        demoDevices.filter(i => i.registered).forEach(({_id}) => {
+        // const demoDevices = store.gSms.devices
+        // const formattedOrder = formatOrder(orderData);
+        const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+        await sendNotification(
+          gSmsDevices,
+          {
+            title: store.name || store.settingName,
+            body: `You have a new order!`
+          },
+          { actionType: NOTIFICATION_ACTION_TYPE.ORDER, orderId: newOrder._id.toString() },
+        )
 
-          /** @deprecated */
-          const targetClientIdOld = `${store.id}_${_id.toString()}`;
-          externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-
-          const targetClientId = _id.toString();
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-          console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
-              `2a. Online order backend: received order from frontend, sending to demo device`);
-        })
+        // demoDevices.filter(i => i.registered).forEach(({_id}) => {
+        //
+        //   /** @deprecated */
+        //   const targetClientIdOld = `${store.id}_${_id.toString()}`;
+        //   externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+        //
+        //   const targetClientId = _id.toString();
+        //   externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+        //   console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
+        //       `2a. Online order backend: received order from frontend, sending to demo device`);
+        // })
       }
 
       if (!device) {
@@ -826,7 +835,7 @@ module.exports = async function (cms) {
           socket.join(orderData.orderToken);
           return updateOrderStatus(orderData.orderToken,
               {
-                storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
+                storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',
                 responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
               })
         }
@@ -935,6 +944,17 @@ module.exports = async function (cms) {
       if (!result) return callback()
       const {latitude, longitude} = result
       callback({long: longitude, lat: latitude})
+    })
+
+    async function getReviewInGoogleMap(placeId) {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=rating,review,user_ratings_total&key=${global.APP_CONFIG.mapsApiKey}`)
+      const { result } = response.data
+      return result
+    }
+
+    socket.on('getReviewInGoogleMap', async (placeId, callback) => {
+      const result = await getReviewInGoogleMap(placeId)
+      callback(result)
     })
 
     socket.on('createReservation', async (storeId, reservationData, callback) => {

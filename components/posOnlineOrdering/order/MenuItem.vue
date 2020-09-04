@@ -20,13 +20,14 @@
                   </div>
                 </template>
                 <div class="pa-2 bg-white br-2">
-                  <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                  <p class="fw-700 mb-1">{{$t('store.productInfo')}}:</p>
                   <p class="fs-small text-grey-darken-3">
                     {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
-                    <template v-if="type === 'allergic'">
-                      {{getAllergicType(value.types)}}
-                    </template>
                   </p>
+                  <p class="fs-small text-grey-darken-3" v-if="type === 'allergic'">
+                    {{getAllergicType(value.types)}}
+                  </p>
+                  <p class="fs-small-2 text-grey-darken-3 mt-2">{{$t('store.productInfoWarning')}}</p>
                 </div>
               </g-menu>
             </template>
@@ -42,13 +43,14 @@
                 </div>
               </template>
               <div class="pa-2 bg-white br-2">
-                <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                <p class="fw-700 mb-1">{{$t('store.productInfo')}}:</p>
                 <p class="fs-small text-grey-darken-3">
                   {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
-                  <template v-if="type === 'allergic'">
-                    {{getAllergicType(value.types)}}
-                  </template>
                 </p>
+                <p class="fs-small text-grey-darken-3" v-if="type === 'allergic'">
+                  {{getAllergicType(value.types)}}
+                </p>
+                <p class="fs-small-2 text-grey-darken-3 mt-2">{{$t('store.productInfoWarning')}}</p>
               </div>
             </g-menu>
           </template>

@@ -39,7 +39,8 @@
           <div class="dialog-content__choice-option">
             <template v-if="choice.select === 'one' && choice.mandatory">
               <g-radio-group v-model="modifiers[index]">
-                <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option" :label="`${option.name} (${$t('common.currency', storeCountryLocale)}${option.price})`"/>
+                <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option"
+                         :label="`${option.name} (${$t('common.currency', storeCountryLocale)}${formatMoney(option.price)})`"/>
               </g-radio-group>
             </template>
             <template v-else>
@@ -130,7 +131,7 @@
         for (const modifier of _.flatten(this.modifiers)) {
           price += modifier ? modifier.price : 0
         }
-        return price && price.toFixed(2)
+        return this.formatMoney(price)
       },
       validateRequiredModifier() {
         if(!this.choices || this.choices.length === 0) return true
@@ -184,7 +185,10 @@
       getCheckboxLabel(option) {
         if(!option.price)
           return option.name
-        return `${option.name} (${$t('common.currency', this.storeCountryLocale)}${option.price})`
+        return `${option.name} (${$t('common.currency', this.storeCountryLocale)}${this.formatMoney(option.price)})`
+      },
+      formatMoney(value) {
+        return !isNaN(value) && value > 0 ? value.toFixed(2) : value
       }
     }
   }

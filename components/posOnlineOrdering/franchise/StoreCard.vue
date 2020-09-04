@@ -1,54 +1,73 @@
 <template>
-  <section class="pa-3 col-flex">
-    <div style="font-weight: bold; font-size: 20px; line-height: 20px; margin-bottom: 10px">{{ store.name }}</div>
-    <div style="display: flex; align-items: center; white-space: nowrap;" @click="dialog.hour = true">
-      <!-- context menu -->
-      <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
-        <!-- context menu activator -->
-        <template v-slot:activator="{on}">
-          <div @mouseenter="on.mouseenter"
-               @mouseleave="on.mouseleave"
-               :style="storeOpenStatusStyle"
-               class="row-flex align-items-center mr-1">
-            {{ storeOpenStatus }}
-            <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
-          </div>
-        </template>
-      
-        <!-- context menu content -->
-        <div class="menu-hour">
-          <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
-          <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
-            <div class="mr-2">{{day.wdayString}}</div>
-            <div class="ta-right">{{day.open}} - {{day.close}}</div>
-          </div>
-          <template v-if="deliveryInfo && deliveryInfo.length > 0">
-            <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
-            <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
-              <div class="mr-2">{{info.title}}</div>
-              <div class="ta-right">{{info.value}}</div>
-            </div>
-          </template>
-        </div>
-      </g-menu>
+  <div class="store-card">
+    <div class="store-card--logo">
+      <img v-if="store && store.logoImageSrc" alt :src="cdnStoreLogoImage"/>
+      <div v-else></div>
     </div>
-    <p>{{ store.address }}</p>
-    <p>Pickup service: {{ pickupServiceStatus }}</p>
-    <p>Delivery service: {{ deliveryServiceStatus }}</p>
-    <g-spacer/>
-    <p class="mt-2" v-if="store.phone">TEL: {{ store.phone }} </p>
-    <div class="mt-2 row-flex">
-      <g-btn-bs background-color="#000" text-color="#FFF" border-radius="20px" width="128" class="ml-0 mr-0" @click="openStore">Order now</g-btn-bs>
-      <g-btn-bs background-color="#FFF" text-color="#000" border-radius="20px" width="128" border-color="#000"  @click="openReservation">Reservation</g-btn-bs>
-      <div v-if="viewMapAvailable" class="row-flex justify-center align-items-center br-100" style="border: 1px solid #000; height: 36px; width: 36px; cursor: pointer">
-        <img src="/plugins/pos-plugin/assets/map.svg" draggable="false" @click="viewMap"/>
+    <div class="store-card--detail">
+      <div class="store-card--name">
+        <p>{{ store.name }}</p>
+        <g-spacer/>
+        <div v-if="viewMapAvailable" class="store-card--map">
+          <g-icon @click="viewMap" size="18">icon-place_color</g-icon>
+        </div>
+        <div style="display: flex; align-items: center; white-space: nowrap;" @click="dialog.hour = true">
+          <!-- context menu -->
+          <g-menu v-model="menuHour" open-on-hover close-on-content-click nudge-left="100">
+            <!-- context menu activator -->
+            <template v-slot:activator="{on}">
+              <div @mouseenter="on.mouseenter"
+                   @mouseleave="on.mouseleave"
+                   :style="storeOpenStatusStyle"
+                   class="row-flex align-items-center mr-1">
+                {{ storeOpenStatus }}
+                <g-icon size="16" :style="storeOpenStatusStyle" class="ml-1">info</g-icon>
+              </div>
+            </template>
+
+            <!-- context menu content -->
+            <div class="menu-hour">
+              <div class="fw-700 mb-2">{{$t('store.openHours')}}:</div>
+              <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="day in storeWorkingDay">
+                <div class="mr-2">{{day.wdayString}}</div>
+                <div class="ta-right">{{day.open}} - {{day.close}}</div>
+              </div>
+              <template v-if="deliveryInfo && deliveryInfo.length > 0">
+                <div class="fw-700 my-2">{{$t('store.delivery')}}:</div>
+                <div class="row-flex align-items-center justify-between my-1 fs-small" v-for="info in deliveryInfo">
+                  <div class="mr-2">{{info.title}}</div>
+                  <div class="ta-right">{{info.value}}</div>
+                </div>
+              </template>
+            </div>
+          </g-menu>
+        </div>
+      </div>
+      <div class="store-card--address">
+        <g-icon size="16" class="mr-2">icon-flat</g-icon>
+        {{ store.address }}
+      </div>
+      <div class="store-card--phone">
+        <g-icon size="16" class="mr-2">icon-call</g-icon>
+        {{ store.phone }}
+      </div>
+      <div class="store-card--action">
+        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">Take away</g-btn-bs>
+        <g-btn-bs v-if="store && store.delivery" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">Delivery</g-btn-bs>
+        <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
+                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">Reservation</g-btn-bs>
+        <g-spacer/>
+        <div v-if="viewMapAvailable" class="store-card--action__map">
+          <g-icon @click="viewMap" size="18">icon-place_color</g-icon>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 <script>
   import { get12HourValue, get24HourValue } from '../../logic/timeUtil';
   import _ from 'lodash';
+  import {getCdnUrl} from "../../Store/utils";
 
   export default {
     name: 'StoreCard',
@@ -59,7 +78,7 @@
       let weekday = new Date().getUTCDay() - 1
       if (weekday === -1)
         weekday = 6
-      
+
       return {
         weekday,
         now: dayjs().format('HH:mm'),
@@ -131,12 +150,6 @@
           return { wdayString, open: formatTime(oh.openTime), close: formatTime(oh.closeTime) }
         })
       },
-      deliveryServiceStatus() {
-        return this.store.delivery ? 'Available': 'Not-available'
-      },
-      pickupServiceStatus() {
-        return this.store.pickup ? 'Available': 'Not-available'
-      },
       deliveryInfo() {
         let info = []
         if (!this.store.delivery) return [{title: 'Not Available'}]
@@ -202,7 +215,10 @@
         return info
       },
       viewMapAvailable() {
-        return this.store.coordinates && this.store.coordinates.lat && this.store.coordinates.long
+        return this.store.googleMapPlaceId || (this.store.coordinates && this.store.coordinates.lat && this.store.coordinates.long)
+      },
+      cdnStoreLogoImage() {
+        return this.store.logoImageSrc && getCdnUrl(this.store.logoImageSrc || '/plugins/pos-plugin/assets/images/logo.png')
       }
     },
     methods: {
@@ -216,23 +232,152 @@
         })
         return openHours
       },
-      openStore() {
-        location.href = `${location.origin}/store/${this.store.alias}`
+      openStore(type) {
+        location.href = `${location.origin}/store/${this.store.alias}/?type=${type}`
       },
       openReservation() {
         location.href = `${location.origin}/reservation/${this.store.alias}`
       },
       viewMap() {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${this.store.coordinates.lat},${this.store.coordinates.long}`, "_blank")
+        if (this.store.googleMapPlaceId) {
+          window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
+        } else {
+          window.open(`https://www.google.com/maps/search/?api=1&query=${this.store.coordinates.lat},${this.store.coordinates.long}`, "_blank")
+        }
       }
     }
   }
 </script>
 <style lang="scss" scoped>
+  .store-card {
+    background: white;
+    border: 0.5px solid #EFEFEF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    padding: 12px;
+    display: flex;
+
+    &--detail {
+      flex: 1;
+    }
+
+    &--logo {
+      margin-right: 24px;
+      display: flex;
+      align-items: center;
+
+      & > img {
+        border-radius: 4px;
+        max-width: 100px;
+      }
+
+      & > div {
+        background-color: #c4c4c4;
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    &--name {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+
+      & > p {
+        font-weight: bold;
+        font-size: 16px;
+      }
+    }
+
+    &--address,
+    &--phone {
+      display: flex;
+      align-items: center;
+      margin: 2px 0;
+      font-size: 14px;
+      color: #757575;
+    }
+
+    &--action {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+
+      .g-btn-bs {
+        font-weight: bold;
+        margin: 0 4px 0 0;
+        padding: 6px;
+        font-size: 12px;
+        line-height: 16px;
+        border-radius: 8px;
+      }
+
+      &__map {
+        background-color: #EDF0F5;
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &--map {
+      display: none;
+      background-color: #EDF0F5;
+      border-radius: 50%;
+      height: 30px;
+      width: 30px;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   .menu-hour {
     padding: 16px;
     background: white;
     border-radius: 2px;
     min-width: 280px;
   }
+
+  @media screen and (max-width: 640px) {
+    .store-card {
+      padding: 8px;
+      border-radius: 8px;
+
+      &--logo {
+        display: none;
+      }
+    }
+  }
+
+  @media screen and (max-width: 374px) {
+    .store-card {
+      padding: 4px;
+      margin-bottom: 8px;
+
+      &--map {
+        display: flex;
+        margin-right: 8px;
+      }
+
+      &--action {
+
+        .g-btn-bs {
+          padding: 4px;
+
+          .g-icon {
+            margin-right: 4px;
+          }
+        }
+
+        &__map {
+          display: none;
+        }
+      }
+    }
+  }
+
 </style>

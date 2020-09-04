@@ -1,5 +1,5 @@
 export function genIframe(type, link, alias) {
-  return `var url${type} = ['https://restaurantplus.net', '${link}', '${alias}'].join('/')
+  return `var url${type} = ['https://online-order.gigasource.io', '${link}', '${alias}'].join('/')
   
   function openIframe${type} () {
     window.location = '#'
@@ -71,8 +71,7 @@ export function genIframe(type, link, alias) {
       container.appendChild(iframe)
       iframe.addEventListener('load', function () {
         document.body.style.overflow = 'hidden'
-
-        container.removeChild(loading)
+        if(loading && '${type}' !== 'franchise') container.removeChild(loading)
         
         ${type === 'webshop' && `if(!mobileCheck()) {
           var closeBtn = document.createElement('button')

@@ -19,13 +19,14 @@
                 </div>
               </template>
               <div class="pa-2 bg-white br-2">
-                <p class="fw-700 mb-1">{{$t('store.notice')}}:</p>
+                <p class="fw-700 mb-1">{{$t('store.productInfo')}}:</p>
                 <p class="fs-small text-grey-darken-3">
                   {{value.notice ? value.notice : $t(`store.${type}Notice`)}}
-                  <template v-if="type === 'allergic'">
-                    {{getAllergicType(value.types)}}
-                  </template>
                 </p>
+                <p v-if="type === 'allergic'">
+                  {{getAllergicType(value.types)}}
+                </p>
+                <p class="fs-small-2 text-grey-darken-3 mt-2">{{$t('store.productInfoWarning')}}</p>
               </div>
             </g-menu>
           </template>
@@ -38,7 +39,7 @@
       <div class="row-flex align-items-center" style="margin-bottom: -8px">
         <div class="digital-menu-item__price">{{ itemPrice }}</div>
         <g-spacer/>
-        <g-btn-bs rounded @click="addToOrder">
+        <g-btn-bs v-if="!readonly" rounded @click="addToOrder">
           <g-icon size="28" color="#1271FF">add_circle</g-icon>
         </g-btn-bs>
       </div>
@@ -86,6 +87,7 @@
       scrolling: Number,
       displayImage: Boolean,
       storeCountryLocale: String,
+      readonly: Boolean
     },
     filters: {
       currency(val, locale) {

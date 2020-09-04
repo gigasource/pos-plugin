@@ -373,6 +373,17 @@ router.get('/store-locale', async (req, res) => {
   })
 });
 
+router.get('/store-settings', async (req, res) => {
+  const storeId = req.query.storeId
+  if (!storeId) return res.sendStatus(400)
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  if (!store) return res.sendStatus(400)
+
+  res.status(200).json({
+    orderTimeout: store.orderTimeOut
+  })
+})
+
 router.get('/get-orders', async (req, res) => {
   const { storeId } = req.query
   if (!storeId) res.sendStatus(400)
@@ -384,6 +395,16 @@ router.get('/get-orders', async (req, res) => {
   }).lean()
 
   res.status(200).json(orders.map(order => formatOrder(order, store)))
+})
+
+router.get('/order/:id', async (req, res) => {
+  const { id } = req.params
+  if (!id) res.sendStatus(400)
+
+  const order = await cms.getModel('Order').findById(id).lean()
+  if (!order) return res.status(400).send('No order found!')
+
+  res.status(200).json(formatOrder(order))
 })
 
 function formatOrder(order, store) {
@@ -403,14 +424,12 @@ function formatOrder(order, store) {
     }
   })
 
-  if (order.deliveryTime === 'asap') {
-    const timeToComplete = (store.gSms && store.gSms.timeToComplete) || 30;
-    order.deliveryTime = dayjs(order.date).add(timeToComplete, 'minute').toDate()
-  }
-  const deliveryTime = jsonFn.clone(order.deliveryTime)
-
-  const discounts = order.discounts.reduce((sum, discount) => sum + discount.value, 0)
-  const total = _.sumBy(products, p => p.originalPrice) - discounts
+  const discounts = order.discounts
+  .filter(d => d.type !== 'freeShipping')
+  .reduce((sum, discount) => sum + discount.value, 0)
+  const total = order.vSum
+    ? order.vSum
+    : _.sumBy(products, p => p.originalPrice * p.quantity) - discounts + order.shippingFee
 
   return {
     orderToken: order.onlineOrderId || order._id.toString(),
@@ -422,8 +441,9 @@ function formatOrder(order, store) {
     date: order.date,
     shippingFee: order.shippingFee,
     total,
-    deliveryTime,
+    deliveryTime: order.deliveryTime,
     discounts,
+    status: order.status
   }
 }
 

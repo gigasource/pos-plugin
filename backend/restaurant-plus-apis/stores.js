@@ -16,6 +16,7 @@ const dayjs = require('dayjs')
 const isBetween = require('dayjs/plugin/isBetween')
 const isSameOrAfter = require('dayjs/plugin/isSameOrAfter')
 const customParseFormat = require('dayjs/plugin/customParseFormat')
+const { sendNotification } = require('../app-notification');
 dayjs.extend(isBetween)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(customParseFormat)
@@ -383,67 +384,7 @@ router.put('/table-request/:requestId', jwtValidator, async (req, res) => {
 })
 
 async function getManagerDevices(storeId) {
-  return await cms.getModel('Device').find({ storeId: storeId.toString(), firebaseToken: { $exists: true } })
-}
-
-async function sendNotification(devices, notification, payload) {
-  const tokens = devices.reduce((acc, cur) => {
-    if (cur.osName === 'ios' && cur.osVersion) {
-      const [majorVersion] = cur.osVersion.split('.')
-      if (+majorVersion < 13) {
-        acc.apnTokens = [...acc.apnTokens, cur.apnToken]
-        return acc
-      }
-    }
-    acc.firebaseTokens = [...acc.firebaseTokens, cur.firebaseToken]
-    return acc
-  }, { apnTokens: [], firebaseTokens: [] })
-
-  sendApn(notification, payload, tokens.apnTokens)
-  sendFirebaseNotification(notification, payload, tokens.firebaseTokens)
-}
-
-async function sendFirebaseNotification(notification, data, tokens) {
-  const admin = firebaseAdminInstance()
-  const formattedData = {
-    ...data,
-    notification: JSON.stringify(notification)
-  }
-  const message = {
-    data: formattedData,
-    tokens,
-    apns: {
-      payload: {
-        aps: {
-          'mutable-content': 1,
-          'content-available': 1
-        }
-      }
-    },
-    android: {
-      priority: 'high'
-    },
-  }
-
-  const result = await admin.messaging().sendMulticast(message)
-  if (result.successCount) {
-    console.debug('sentry:eventType=notification', 'Error sending notification', result.responses.filter(r => !r.success))
-  }
-}
-
-function sendApn(notification, payload, tokens) {
-  const apnProvider = getApnProvider()
-
-  const note = new apn.Notification();
-
-  note.alert = notification.title
-  note.body = notification.body
-  note.payload = { ...payload, ...notification }
-  note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-  note.topic = 'io.gigasource.gsms.voip';
-  note.mutableContent = 1;
-  note.category = 'GSMSNoti'
-  return apnProvider.send(note, tokens)
+  return await cms.getModel('Device').find({ storeId: storeId.toString(), deviceType: 'gsms' })
 }
 
 module.exports = router

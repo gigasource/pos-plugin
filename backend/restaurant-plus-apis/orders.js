@@ -17,6 +17,7 @@ const _ = require('lodash');
 const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
+const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
 const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
@@ -189,6 +190,7 @@ router.post('/', jwtValidator, async (req, res) => {
     vDiscount: orderDiscountValue,
     restaurantPlusUser: user && user._id,
     ...voucher && {restaurantPlusVoucher: voucher._id},
+    status: ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS
   });
 
   await OrderModel.updateOne({_id: newOrder._id}, {onlineOrderId: newOrder._id});
@@ -210,6 +212,45 @@ router.post('/', jwtValidator, async (req, res) => {
 
   res.status(201).json(objectMapper(newOrder, mapperConfig));
 });
+
+router.put('/', jwtValidator, async (req, res) => {
+  //todo schedule auto-cancel order after timeout
+  const { orderId, status, timeToComplete, declineReason } = req.body
+  if (!orderId || !status) res.sendStatus(400)
+
+  // update order
+  const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
+    { ...orderId.includes('-')
+        ? { onlineOrderId: orderId }
+        : { _id: ObjectId(orderId) }},
+    {
+      status,
+      ...status === 'kitchen' && { timeToComplete },
+      ...status === 'declined' && { declineReason }
+    },
+    { new: true })
+  res.status(204).json(updatedOrder)
+
+  // send to frontend
+  if (updatedOrder.onlineOrderId) {
+    const store = await StoreModel.findById(updatedOrder.storeId)
+    const responseMessage = getOrderStatusResponseMessage(updatedOrder, store, timeToComplete)
+    const orderStatus = {
+      orderId: updatedOrder._id,
+      onlineOrderId: updatedOrder.onlineOrderId,
+      status,
+      responseMessage,
+      total: updatedOrder.vSum,
+      storeAlias: store.alias
+    }
+
+    cms.socket.to(updatedOrder.onlineOrderId).emit('updateOrderStatus', orderStatus)
+  }
+  // send to client app
+  if (updatedOrder.restaurantPlusUser) {
+    sendOrderNotificationToDevice(updatedOrder._id, status)
+  }
+})
 
 // TODO: fix this
 const interval = setInterval(() => {
@@ -292,41 +333,19 @@ async function sendOrderToStoreDevices(store, orderData) {
   const storeAlias = store.alias;
 
   if (store.gSms && store.gSms.enabled) {
-    cms.emit('sendOrderMessage', store._id, orderData) // send fcm message
-
-    store.gSms.devices.filter(i => i.registered).forEach(({_id}) => {
-      const formattedOrder = formatOrderForRpManager(_.cloneDeep(orderData), store);
-
-      /** @deprecated */
-      const targetClientIdOld = `${store.id}_${_id.toString()}`;
-      getExternalSocketIoServer().emitToPersistent(targetClientIdOld, 'createOrder',
-        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-
-      const targetClientId = _id.toString();
-      getExternalSocketIoServer().emitToPersistent(targetClientId, 'createOrder',
-        [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-    })
+    const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    await sendNotification(
+      gSmsDevices,
+      {
+        title: store.name || store.settingName,
+        body: `You have a new order!`
+      },
+      { actionType: NOTIFICATION_ACTION_TYPE.ORDER, orderId: orderData._id.toString() },
+    )
   }
 
   if (!device) {
-    if (store.gSms && store.gSms.enabled) {
-      // accept order on front-end
-      const timeToComplete = store.gSms.timeToComplete || 30
-      const locale = store.country.locale || 'en'
-      const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
-      const localeFilePath = path.join(pluginPath, 'i18n', `${locale}.js`);
-      let responseMessage = ''
-
-      if (fs.existsSync(localeFilePath)) {
-        const {[locale]: {store}} = require(localeFilePath)
-        if (store && store.deliveryIn && store.pickUpIn) {
-          responseMessage = (orderData.orderType === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', timeToComplete)
-        }
-      }
-
-      return;
-    }
-
+    if (store.gSms && store.gSms.enabled) return;
     return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
   }
 
@@ -356,6 +375,32 @@ async function sendOrderToStoreDevices(store, orderData) {
 
     await updateStoreReport(storeId, { orderTimeouts: 1 })
   }, SEND_TIMEOUT);*/
+}
+
+function getOrderStatusResponseMessage(order, store, timeToComplete) {
+  switch (order.status) {
+    case 'kitchen':
+      const deliveryDateTime = order.deliveryTime === 'asap'
+        ? dayjs().add(timeToComplete, 'minute')
+        : dayjs(order.deliveryTime, 'HH:mm')
+      const diff = deliveryDateTime.diff(dayjs(order.date), 'minute')
+      const storeLocale = store.country.locale || 'en'
+
+      const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
+      const localeFilePath = path.join(pluginPath, 'i18n', `${storeLocale}.js`);
+
+      if (fs.existsSync(localeFilePath)) {
+        const {[storeLocale]: {store}} = require(localeFilePath)
+        if (store && store.deliveryIn && store.pickUpIn) {
+          return (order.type === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', diff)
+        }
+      }
+      return ''
+    case 'declined':
+      return order.declineReason || ''
+    default:
+      return ''
+  }
 }
 
 module.exports = router;
