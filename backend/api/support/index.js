@@ -248,8 +248,6 @@ setTimeout(() => {
   });
 }, 5000);
 
-
-
 router.get('/chat/messages/not-replied', async (req, res) => {
   const lastMessages = await ChatMessageModel.aggregate([
     {$sort: {createdAt: -1}},

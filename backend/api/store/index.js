@@ -11,7 +11,6 @@ const {assignDevice} = require('../../api/support');
 const teamRoute = require('./team')
 const taskRoute = require('./task')
 const staffRoute = require('./staff')
-const { createStaff } = require('./staff/staff')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
