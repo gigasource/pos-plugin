@@ -4,9 +4,9 @@
      <img alt class="overview-main__banner" :src="cdnStoreBanner"/>
      <div class="overview-main__action">
        <p class="fw-700 mb-2">Please select an option</p>
-       <div class="row-flex align-items-center justify-between">
-         <g-btn-bs v-if="store && store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
-         <g-btn-bs v-if="store && store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
+       <div class="row-flex align-items-center">
+         <g-btn-bs style="margin-right: 2%" v-if="store && store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" v-if="store && store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
          <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
                    icon="icon-table-reservation" @click="openReservation">Reservation</g-btn-bs>
        </div>
@@ -71,14 +71,18 @@
      <div class="overview-side__info">
        <div class="overview-side__info--address">
          <p>{{store.address}}</p>
-         <g-btn-bs @click="viewMap" small icon="icon-direction_white" background-color="#2979FF" text-color="white">Get direcrtion</g-btn-bs>
+         <g-btn-bs min-width="130" style="align-self: flex-start; margin-right: 0"
+                   @click="viewMap" small icon="icon-direction_white"
+                   background-color="#2979FF" text-color="white">
+           Get direcrtion
+         </g-btn-bs>
        </div>
        <div class="overview-side__info--phone">
          <g-icon class="mr-2" size="18">icon-call</g-icon>
          <span class="fw-700 fs-small mr-3">Phone</span>
          <span style="font-size: 14px; color: #1271FF; text-decoration: underline">{{store.phone}}</span>
        </div>
-       <div class="row-flex px-3 py-1">
+       <div class="row-flex px-2 py-1">
          <g-icon class="mr-2" size="18">icon-clock</g-icon>
          <span class="fw-700 fs-small">Open hours</span>
        </div>
@@ -233,10 +237,10 @@
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))
       },
       openStore(type) {
-        location.href = `${location.origin}/store/${this.store.alias}/?type=${type}`
+        location.href = `${location.origin}/store/${this.store.alias}/order/?type=${type}`
       },
       openReservation() {
-        location.href = `${location.origin}/reservation/${this.store.alias}`
+        location.href = `${location.origin}/store/${this.store.alias}/reservation`
       },
       handleScroll() {
         if(this.choosing > 0) return
@@ -333,7 +337,7 @@
           background: #EDF0F5;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           border-radius: 8px;
-          justify-content: space-evenly;
+          border: none;
           font-weight: 700;
         }
       }
@@ -410,6 +414,7 @@
         &--content {
 
           &-title {
+            margin-top: 8px;
             font-weight: 600;
             font-size: 14px;
             color: #424242;
@@ -446,17 +451,17 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 8px 16px;
+          padding: 8px;
           border-bottom: 1px solid #CDCDCD;
         }
 
         &--phone {
-          padding: 8px 16px;
+          padding: 8px;
         }
 
         &--hour {
           margin-left: 26px;
-          padding: 2px 16px;
+          padding: 2px 8px;
           font-size: 14px;
         }
       }
@@ -558,7 +563,7 @@
             }
           }
 
-          &--content {
+          &--content-title {
             margin-right: 16px;
             margin-left: 16px;
           }

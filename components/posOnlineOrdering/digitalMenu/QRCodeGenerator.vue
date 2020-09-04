@@ -75,7 +75,7 @@
       async createQRcode() {
         this.loading = true
         const store = await cms.getModel('Store').findOne({id: this.storeId})
-        const url = ['https://restaurantplus.net', 'menu', store.alias].join('/')
+        const url = ['https://restaurantplus.net', 'store', store.alias, 'menu'].join('/')
         const el = document.getElementById('canvas')
         const el1 = document.getElementById('canvas1')
         const el2 = document.getElementById('canvas2')
