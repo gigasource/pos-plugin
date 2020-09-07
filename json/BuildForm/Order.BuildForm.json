@@ -1241,6 +1241,12 @@
           "type": null
         }
       ]
+    },
+    {
+      "_id": "5f55e9f4764c2aa5f810f178",
+      "schemaType": "string",
+      "key": "forwardedStore",
+      "type": "input"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

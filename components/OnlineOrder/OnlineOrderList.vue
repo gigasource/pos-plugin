@@ -21,7 +21,15 @@
         <tbody>
         <tr v-for="(item, i) in computedItems" :key="i">
           <td class="fw-700">
-            #{{item.id}}
+            <p>#{{item.id}}</p>
+            <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" speech-bubble remove-content-on-close>
+              <span><b>From:</b> {{item.forwardedStore}}</span>
+              <template v-slot:activator="{on}">
+                <div v-on="on" v-if="item.forwardedStore">
+                  <g-icon size="16">icon-double-arrow-right_blue</g-icon>
+                </div>
+              </template>
+            </g-tooltip>
           </td>
           <td>
             <p>{{item.customer.name}}</p>

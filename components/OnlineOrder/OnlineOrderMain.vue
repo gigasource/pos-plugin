@@ -100,6 +100,9 @@
                 <span>{{$t('common.currency', storeLocale)}}{{order.payment.value | formatMoney(decimals)}}</span>
               </g-btn-bs>
             </g-card-actions>
+            <g-card-actions v-if="order.forwardedStore" class="pending-orders--forward-store">
+              <b class="mr-1">From:</b> {{order.forwardedStore}}
+            </g-card-actions>
           </g-card>
         </template>
       </div>
@@ -157,6 +160,12 @@
                     </span>
                   </span>
                 </div>
+              </div>
+              <div class="row-flex" v-if="order.forwardedStore">
+                <div class="col-1">
+                  <g-icon color="#9E9E9E" size="20">icon-double-arrow-right</g-icon>
+                </div>
+                <div>{{order.forwardedStore}}</div>
               </div>
             </g-card-text>
           </g-card>
@@ -409,6 +418,17 @@
         color: #9E9E9E;
         margin-top: 8px;
       }
+    }
+
+    &--forward-store {
+      display: flex;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 2px !important;
+      margin: -8px 16px 12px;
+      text-align: center;
+      background-color: #E1F5FE;
+      border-radius: 12px !important;
     }
   }
 

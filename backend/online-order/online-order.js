@@ -270,7 +270,7 @@ module.exports = async cms => {
 
       let {
         orderType: type, paymentType, customer, products: items,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`,
@@ -314,7 +314,8 @@ module.exports = async cms => {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
-        paypalOrderDetail
+        paypalOrderDetail,
+        forwardedStore: forwardedStore && (forwardedStore.name || forwardedStore.settingName)
       }
 
       const result = await cms.getModel('Order').create(order)
