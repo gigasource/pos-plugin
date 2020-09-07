@@ -144,19 +144,19 @@
     </div>
 
     <dialog-form-input v-model="showDialog" :show-buttons="false" @save="showDialog = false">
-      <template #input>
+      <template #input="{ changeKeyboard }">
         <div class="mb-4">
           <template v-if="activeEditItem && activeEditItem.type === 'group'">
             <g-text-field-bs label="Name" v-model="activeEditItem.name" required/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'category'">
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
-            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name"  @click.native.stop="changeKeyboard('alpha')"/>
+            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name"/>
-            <g-text-field-bs label="Price" v-model="activeEditItem.price"/>
-            <g-text-field-bs label="Max items" v-model="activeEditItem.max"/>
+            <g-text-field-bs label="Name" required v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
+            <g-text-field-bs label="Price" v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
+            <g-text-field-bs label="Max items" v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
           </template>
         </div>
       </template>
@@ -240,6 +240,7 @@
           modifierGroup: this.activeGroup._id,
           ...!this.activeGroup.isGlobal && { product: this.product._id }
         }
+        this.setActiveCategory(this.newCategory)
         const newItem = await this.save()
         this.setActiveCategory(newItem)
       },
@@ -248,6 +249,7 @@
           name: 'New Group',
           isGlobal: false,
         }
+        this.setActiveGroup(this.newGroup)
         const newItem = await this.save()
         this.setActiveGroup(newItem)
       },
@@ -259,6 +261,7 @@
           modifierGroup: this.activeGroup._id,
           ...!this.activeGroup.isGlobal && { product: this.product._id }
         }
+        this.setActiveModifier(this.newModifier)
         const newItem = await this.save()
         this.setActiveModifier(newItem)
       },
