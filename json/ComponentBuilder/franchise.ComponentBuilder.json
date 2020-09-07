@@ -1,0 +1,21 @@
+{
+  "events": [],
+  "_id": "5ee87a7aa7c39b1584a5c184",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "FranchiseView",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/posOnlineOrdering/franchise/FranchiseView.vue",
+      "path": "components/posOnlineOrdering/franchise/FranchiseView.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "franchise",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "f/:id"
+}
