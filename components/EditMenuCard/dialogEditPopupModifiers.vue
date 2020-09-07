@@ -131,8 +131,6 @@
             </g-btn>
           </template>
         </div>
-        <!-- Group -->
-
 
         <div class="row-flex flex-grow-1 align-items-end">
           <g-btn flat background-color="#ff4452" text-color="#fff" border-radius="0"
@@ -284,17 +282,18 @@
       },
       async duplicate() {
         const newGroup = await cms.getModel('PosModifierGroup').create({
-          name: `${this.activeEditItem.name} (1)`,
+          name: `${this.activeEditItem.name} (copy)`,
           isGlobal: this.activeEditItem.isGlobal,
         })
+        const product = newGroup.isGlobal ? null : this.product._id
 
         await Promise.all(
           _.map(this.modifiersByCategory, (async (mods, catId) => {
             const { freeItems, mandatory, name, selectOne } = this.categories.find(cat => cat._id === catId)
             const newCategory = await cms.getModel('PosModifierCategory').create(
-              { modifierGroup: newGroup._id, name, mandatory, selectOne, freeItems, })
+              { modifierGroup: newGroup._id, name, mandatory, selectOne, freeItems, product})
             const newMods = mods.map(({ name, price, max, printer }) => ({
-              modifierGroup: newGroup._id, category: newCategory._id, name, price, max, printer
+              modifierGroup: newGroup._id, category: newCategory._id, name, price, max, printer, product
             }))
             await cms.getModel('PosPopupModifier').create(newMods)
           })))
@@ -359,6 +358,8 @@
         switch (type) {
           case 'group':
             if (_id) {
+              await cms.getModel('PosModifierCategory').deleteMany({ modifierGroup: _id })
+              await cms.getModel('PosPopupModifier').deleteMany({ modifierGroup: _id })
               await cms.getModel('PosModifierGroup').deleteOne({ _id })
             } else {
               this.newGroup = null
@@ -367,6 +368,7 @@
             break
           case 'category':
             if (_id) {
+              await cms.getModel('PosPopupModifier').deleteMany({ category: _id })
               await cms.getModel('PosModifierCategory').deleteOne({ _id })
             } else {
               this.newCategory = null
