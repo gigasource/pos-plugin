@@ -127,31 +127,24 @@
           ...Object.values(keys.mods),
           { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = 'symbol-numeric' },
         ],
-        templateEnglish: 'grid-template-areas: " q q w w e e r r t t y y u u i i o o p p key7 key8 key9" ' +
-          '". a a s s d d f f g g h h j j k k l l . key4 key5 key6" ' +
-          '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del key1 key2 key3" ' +
-          '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter key0 key0 keyDot";' +
-          'grid-auto-columns: 1fr; grid-gap: 10px',
-        keyboardGerman: [ // todo WIP
+        templateEnglish: 'grid-template-areas: " q q w w e e r r t t y y u u i i o o p p key7 key7 key8 key8 key9 key9" ' +
+          '". a a s s d d f f g g h h j j k k l l . key4 key4 key5 key5 key6 key6" ' +
+          '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del key1 key1 key2 key2 key3 key3" ' +
+          '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
+          'grid-auto-columns: 1fr; grid-gap: 8px',
+        keyboardGerman: [
           ...Object.values(keys.baseEN),
           ...Object.values(keys.baseDE),
           ...Object.values(keys.mods),
           ...Object.values(keys.numpad),
-          { content: ['Caps lock'], img: '', style: 'grid-area: caps; background-color: #e0e0e0; font-size: 14px', action: 'shift' },
-          { content: ['/'], img: '', style: 'grid-area: splash' },
-          { content: [], img: 'delivery/key_shift', style: 'grid-area: shift2; background-color: #e0e0e0', type: 'shift', action: 'shift' },
-          { content: ['&'], img: '', style: 'grid-area: amp' },
-          { content: ['%'], img: '', style: 'grid-area: pct' },
-          { content: ['€'], img: '', style: 'grid-area: pnd' },
-          { content: ['@'], img: '', style: 'grid-area: at' },
-          { content: ['EN'], img: '', style: 'grid-area: lang; background-color: #e0e0e0; font-size: 14px', action: () => null },
-          { content: ['&rarr;'], img: '', style: 'grid-area: rarr; background-color: #e0e0e0', action: () => null },
-          { content: ['&larr;'], img: '', style: 'grid-area: larr; background-color: #e0e0e0', action: () => null },
-        ],
-        templateGerman: 'grid-template-areas: "tab tab q q w w e e r r t t y y u u i i o o p p ue ue ss ss del del key7 key7 key8 key8 key9 key9 key0 key0" ' +
-          '"caps caps caps a a s s d d f f g g h h j j k k l l oe oe ae ae enter enter enter key4 key4 key5 key5 key6 key6" ' +
-          '"shift1 shift1 shift1 shift1 z z x x c c v v b b n n m m comma comma dot dot splash splash shift2 shift2 shift2 shift2 key1 key1 key2 key2 key3 key3" ' +
-          '"sym sym amp amp pct pct pnd pnd space space space space space space space space space space space space at at lang lang larr larr rarr rarr key0 key0 key0 key0 keyDot keyDot";' +
+          { content: ['DE'], img: '', style: 'grid-area: lang; background-color: #e0e0e0; font-size: 14px', action: () => null },
+          { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = 'symbol-numeric' },
+          { content: ['Speichern'], style: 'grid-area: enter; background: #2979FF; color: #fff; font-size: 20px', type: 'enter', action: 'enter' },
+    ],
+        templateGerman: 'grid-template-areas: "q q w w e e r r t t z z u u i i o o p p ue ue ss ss key7 key7 key8 key8 key9 key9 " ' +
+          '". a a s s d d f f g g h h j j k k l l oe oe ae ae . key4 key4 key5 key5 key6 key6" ' +
+          '"shift1 shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del del key1 key1 key2 key2 key3 key3" ' +
+          '"sym sym sym comma comma lang lang space space space space space space space space space space dot dot enter enter enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
           'grid-auto-columns: 1fr; grid-gap: 5px',
         keyboardNumeric: [
           ...Object.values(keys.numpad),
@@ -163,16 +156,29 @@
           '"key1 key1 key2 key2 key3 key3" ' +
           '"keyDot keyDot key0 key0 del enter";' +
           'grid-auto-columns: 1fr; grid-gap: 10px',
-        keyboardAlpha: [
+        keyboardAlphaEN: [
           ...Object.values(keys.baseEN),
           ...Object.values(keys.mods),
           { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = 'symbol' },
         ],
-        templateAlpha: 'grid-template-areas: " q q w w e e r r t t y y u u i i o o p p " ' +
+        templateAlphaEN: 'grid-template-areas: " q q w w e e r r t t y y u u i i o o p p " ' +
           '". a a s s d d f f g g h h j j k k l l . " ' +
           '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del " ' +
           '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter ";' +
           'grid-auto-columns: 1fr; grid-gap: 10px',
+        keyboardAlphaDE: [
+          ...Object.values(keys.baseEN),
+          ...Object.values(keys.baseDE),
+          ...Object.values(keys.mods),
+          { content: ['DE'], img: '', style: 'grid-area: lang; background-color: #e0e0e0; font-size: 14px', action: () => null },
+          { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = 'symbol' },
+          { content: ['Speichern'], style: 'grid-area: enter; background: #2979FF; color: #fff; font-size: 20px', type: 'enter', action: 'enter' },
+        ],
+        templateAlphaDE: 'grid-template-areas: "q q w w e e r r t t z z u u i i o o p p ue ue ss ss key7 key7 key8 key8 key9 key9 " ' +
+          '". a a s s d d f f g g h h j j k k l l oe oe ae ae . key4 key4 key5 key5 key6 key6" ' +
+          '"shift1 shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del del key1 key1 key2 key2 key3 key3" ' +
+          '"sym sym sym comma comma lang lang space space space space space space space space space space dot dot enter enter enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
+          'grid-auto-columns: 1fr; grid-gap: 5px',
         keyboardSymbol: [
           ...Object.values(keys.symbols),
           { content: ['ABC'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = this.computedType === 'symbol' ? 'alpha' : 'alphanumeric' },
@@ -182,6 +188,7 @@
           '"shift1 shift1 shift1 ast ast quot quot apos apos colon colon semicolon semicolon quotmk quotmk qnmk qnmk del del del " ' +
           '"sym sym sym comma comma percent percent space space space space space space space space dot dot enter enter enter ";' +
           'grid-auto-columns: 1fr; grid-gap: 10px',
+        internalType: 'alphanumeric'
       }
     },
     props: {
@@ -202,16 +209,17 @@
       },
       computedType: {
         get() {
-          return this.type
+          return this.internalType
         },
         set(val) {
+          this.internalType = val
           this.$emit('change-type', val)
         }
       },
       keyboard() {
         switch (this.computedType) {
           case 'alpha':
-            return this.keyboardAlpha
+            return this.locale === 'de' ? this.keyboardAlphaDE : this.keyboardAlphaEN
           case 'numeric':
             return this.keyboardNumeric
           case 'symbol':
@@ -219,13 +227,13 @@
           case 'symbol-numeric':
             return this.keyboardSymbol
           default:
-            return this.keyboardEnglish
+            return this.locale === 'de' ? this.keyboardGerman :this.keyboardEnglish
         }
       },
       template() {
         switch (this.computedType) {
           case 'alpha':
-            return this.templateAlpha
+            return this.locale === 'de' ? this.templateAlphaDE : this.templateAlphaEN
           case 'numeric':
             return this.templateNumeric
           case 'symbol':
@@ -233,13 +241,21 @@
           case 'symbol-numeric':
             return this.templateSymbol
           default:
-            return this.templateEnglish
+            return this.locale === 'de' ? this.templateGerman : this.templateEnglish
         }
       }
     },
     methods: {
       enterPressed(val) {
         this.$emit('enter-pressed', val)
+      }
+    },
+    watch: {
+      type: {
+        handler(val) {
+          if (val) this.internalType = val
+        },
+        immediate: true
       }
     }
   }
