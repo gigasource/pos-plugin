@@ -49,7 +49,7 @@
 
       return {
         btnUp: [
-          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-3')},
+          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-2')},
           {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-delivery')}
         ],
         btnDown: [
