@@ -413,7 +413,7 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
+    overflow: auto;
 
     &__cate {
       border-radius: 4px;
@@ -442,6 +442,7 @@
       overflow: hidden;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      min-height: 40px;
 
       & > div {
         max-height: 100%;

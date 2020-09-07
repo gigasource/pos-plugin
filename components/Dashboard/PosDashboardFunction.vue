@@ -17,7 +17,7 @@
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
-    
+
     <template>
       <g-dnd-dialog v-model="showIframe" :width="iframeWidth" :height="iframeHeight" lazy
                     :show-minimize="false"
