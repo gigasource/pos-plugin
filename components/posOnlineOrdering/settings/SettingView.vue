@@ -151,7 +151,7 @@
           }
 
           items.push(
-              { title: 'Other', key: 'Other', icon: 'menu', onClick: () => this.changeView('setting-other')}
+              { title: 'Other', key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
           )
           return items
         }

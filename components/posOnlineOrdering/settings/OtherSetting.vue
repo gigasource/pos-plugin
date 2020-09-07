@@ -9,6 +9,21 @@
           <g-btn-bs background-color="#1271ff" @click="uploadScript">Upload</g-btn-bs>
         </div>
       </div>
+      <div class="other__main--right">
+        <p>Delivery Forwarding</p>
+        <div class="row-flex align-items-center">
+          <span class="fs-small fw-700 mr-3">Delivery order forwarding</span>
+          <g-switch/>
+        </div>
+        <div class="row-flex align-items-center my-3">
+          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">Forward order to restaurant ID </span>
+          <g-text-field-bs style="margin: 0" large/>
+        </div>
+        <span>
+          <b>Note: </b>
+          <span>Forwarded orders will only appear in the destination device. The system only forwards delivery orders.</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -48,11 +63,16 @@
         border-radius: 5px;
         padding: 24px;
         margin-bottom: 24px;
+
+        & > p {
+          font-size: 16px;
+          font-weight: bold;
+        }
       }
 
       &--left {
-        flex: 0 0 calc(80% - 12px);
-        margin-right: 12px;
+        flex: 0 0 calc(50% - 6px);
+        margin-right: 6px;
 
         .g-textarea {
           margin-right: 4px;
@@ -86,6 +106,11 @@
             }
           }
         }
+      }
+
+      &--right {
+        flex: 0 0 calc(50% - 6px);
+        margin-left: 6px;
       }
     }
   }
