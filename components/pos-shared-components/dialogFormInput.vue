@@ -1,8 +1,8 @@
 <template>
   <g-dialog v-model="internalValue" width="90%" eager>
     <div class="dialog-input">
-      <g-icon v-if="close" @click="internalValue = false"class="close-icon">icon-close@20</g-icon>
-      <slot name="input">
+      <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
+      <slot name="input" :changeKeyboard="changeKeyboardType">
         <div class="textfield">
           <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
         </div>
@@ -15,7 +15,7 @@
       </slot>
       <slot name="keyboard">
         <div class="keyboard">
-          <pos-keyboard-full/>
+          <pos-keyboard-full @enter-pressed="$emit('save')" @change-type="changeKeyboardType" :type="keyboardType"/>
         </div>
       </slot>
     </div>
@@ -44,7 +44,8 @@
     },
     data() {
       return {
-        text: ''
+        text: '',
+        keyboardType: 'alphanumeric'
       }
     },
     computed: {
@@ -55,6 +56,16 @@
         set(val) {
           this.$emit('input', val)
         }
+      }
+    },
+    methods: {
+      changeKeyboardType(val) {
+        this.keyboardType = val
+      }
+    },
+    watch: {
+      value(val) {
+        if (!val) this.keyboardType = 'alphanumeric'
       }
     }
   }

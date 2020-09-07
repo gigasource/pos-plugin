@@ -1,0 +1,51 @@
+{
+  "_id": "5f4ccef1c6a8fc264c0034da",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f4ccf65c6a8fc264c0034df",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f4ccf65c6a8fc264c0034e0",
+      "schemaType": "number",
+      "key": "freeItems",
+      "unique": null,
+      "type": "input@number"
+    },
+    {
+      "_id": "5f4ccf65c6a8fc264c0034e1",
+      "schemaType": "objectId",
+      "key": "modifierGroup",
+      "ref": "PosModifierGroup",
+      "type": "ref-select",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f4ccfc8c6a8fc264c00353c",
+      "schemaType": "objectId",
+      "key": "product",
+      "ref": "Product",
+      "type": "ref-select",
+      "labelProp": "name",
+      "addable": true
+    },
+    {
+      "_id": "5f4ccf65c6a8fc264c0034e2",
+      "schemaType": "boolean",
+      "key": "mandatory",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f4ccf65c6a8fc264c0034e3",
+      "schemaType": "boolean",
+      "key": "selectOne",
+      "type": "input@switch"
+    }
+  ],
+  "name": "PosModifierCategory",
+  "tabs": [],
+  "type": "Collection"
+}

@@ -572,9 +572,22 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
-
 .icon-reservation_modify {
   background-image: url("../assets/reservation_modify.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-edit_modifiers {
+  background-image: url("../assets/edit-modifiers.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-globe {
+  background-image: url("../assets/globe.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

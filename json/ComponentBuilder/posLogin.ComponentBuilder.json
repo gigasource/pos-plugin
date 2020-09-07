@@ -489,6 +489,30 @@
                     "flexShrink": "",
                     "flexBasis": "",
                     "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "quit-btn",
+                    "top": 1,
+                    "left": 3,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(181, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
                   }
                 ]
               }
@@ -498,8 +522,7 @@
           "style": {
             "height": "100%"
           }
-        },
-        "events": {}
+        }
       },
       "binding": [],
       "slotScopeBinding": [],
@@ -747,6 +770,23 @@
           "url": "plugins/pos-plugin/components/Login/ConnectionStatusBtn.vue",
           "path": "components/Login/ConnectionStatusBtn.vue",
           "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "GBtn",
+          "content": {
+            "props": {
+              "html": "Quit",
+              "flat": true,
+              "style": {
+                "_code_": "module.exports = {\n  width: '50%',\n  justifySelf: 'flex-end'\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          },
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "quit-btn"
         }
       ],
       "slot": null
