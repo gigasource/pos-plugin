@@ -29,14 +29,6 @@
       "labelProp": "name"
     },
     {
-      "_id": "5f4cc5dec6a8fc264c0032f7",
-      "schemaType": "objectId",
-      "key": "product",
-      "ref": "Product",
-      "type": "ref-select",
-      "labelProp": "name"
-    },
-    {
       "_id": "5f4cc5dec6a8fc264c0032f8",
       "schemaType": "objectId",
       "key": "modifierGroup",

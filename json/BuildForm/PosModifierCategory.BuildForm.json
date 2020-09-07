@@ -24,15 +24,6 @@
       "labelProp": "name"
     },
     {
-      "_id": "5f4ccfc8c6a8fc264c00353c",
-      "schemaType": "objectId",
-      "key": "product",
-      "ref": "Product",
-      "type": "ref-select",
-      "labelProp": "name",
-      "addable": true
-    },
-    {
       "_id": "5f4ccf65c6a8fc264c0034e2",
       "schemaType": "boolean",
       "key": "mandatory",

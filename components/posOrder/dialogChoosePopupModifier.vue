@@ -166,18 +166,11 @@
     },
     watch: {
       product: {
-        async handler(newVal, oldVal) {
-          if (newVal && newVal !== oldVal) {
-            this.modifierGroups = await cms.getModel('PosModifierGroup').find({ isGlobal: true }).lean()
-
-            if (this.product.activePopupModifierGroup) {
-              const productSpecificGroup = await cms.getModel('PosModifierGroup').findOne({ _id: this.product.activePopupModifierGroup })
-              if (productSpecificGroup) this.modifierGroups.push(productSpecificGroup)
-            }
-
-            if (this.modifierGroups.length) {
-              this.selectModifierGroup(this.modifierGroups[0])
-            }
+        async handler(val) {
+          if (val) {
+            if (!this.product.activePopupModifierGroup) return
+            this.modifierGroups = await cms.getModel('PosModifierGroup').find({ _id: this.product.activePopupModifierGroup })
+            this.selectModifierGroup(this.modifierGroups[0])
           }
         },
         immediate: true
@@ -185,9 +178,7 @@
       activeModifierGroup: {
         async handler(val) {
           if (!val || !this.product._id) return
-          const filter = val.isGlobal
-            ? { modifierGroup: val._id }
-            : { modifierGroup: val._id, product: this.product._id }
+          const filter = { modifierGroup: val._id }
           this.categories = await cms.getModel('PosModifierCategory').find(filter).lean()
           const modifiers = await cms.getModel('PosPopupModifier').find(filter).lean()
           this.modifiers = _.groupBy(modifiers, 'category')
@@ -199,10 +190,10 @@
         }
       },
       internalValue(val) {
-        if (!val) {
-          this.selectedModifiers = {}
-          this.listModifiers2 = []
-        }
+        if (!val) return this.selectModifierGroup({})
+        this.selectedModifiers = {}
+        this.listModifiers2 = []
+        this.selectModifierGroup(this.modifierGroups[0])
       }
     }
   }

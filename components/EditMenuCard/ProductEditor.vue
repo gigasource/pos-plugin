@@ -138,8 +138,7 @@
       <div>
         <g-grid-select v-model="selectedProduct.activePopupModifierGroup" item-text="name" item-value="_id" :items="popupModifierGroups" itemCols="auto">
           <template #default="{ toggleSelect, item, index }">
-            <div v-if="item.isGlobal" class="prop-option prop-option--disabled">{{item.name}}</div>
-            <div v-else class="prop-option" @click="() => { toggleSelect(item); changePopupModifierGroup(item) }">{{item.name}}</div>
+            <div class="prop-option" @click="() => { toggleSelect(item); changePopupModifierGroup(item) }">{{item.name}}</div>
           </template>
           <template #selected="{ item, index }">
             <div class="prop-option prop-option--1">{{item.name}}</div>

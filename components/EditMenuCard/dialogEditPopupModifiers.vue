@@ -5,7 +5,6 @@
         <g-btn outlined :uppercase="false" background-color="#F0F0F0" :key="group._id"
                :class="[activeGroup === group && 'active-btn', activeEditItem && activeEditItem._id === group._id && 'edit-btn']"
                @click="setActiveGroup(group)">
-          <g-icon size="12" style="margin-right: 8px;" v-if="group.isGlobal">icon-globe</g-icon>
           {{group.name}}
         </g-btn>
       </template>
@@ -53,7 +52,6 @@
                 <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
-            <g-switch label="Global modifier" v-model="activeEditItem.isGlobal"/>
             <div class="fs-small-2 i mr-1 ml-1">
               <span class="fw-700">Note: </span>
               <span>Global modifiers can be selected in all dishes.</span>
@@ -218,13 +216,11 @@
       async getCategories(group) {
         if (!group._id) return []
         const filter = { modifierGroup: group._id }
-        if (!group.isGlobal) filter.product = this.product._id
         return await cms.getModel('PosModifierCategory').find(filter).lean()
       },
       async getModifiers(group) {
         if (!group._id) return []
         const filter = { modifierGroup: group._id }
-        if (!group.isGlobal) filter.product = this.product._id
         return await cms.getModel('PosPopupModifier').find(filter).lean()
       },
       async getGroupPrinters() {
@@ -236,7 +232,7 @@
           mandatory: false,
           selectOne: false,
           modifierGroup: this.activeGroup._id,
-          ...!this.activeGroup.isGlobal && { product: this.product._id }
+          freeItems: 0
         }
         this.setActiveCategory(this.newCategory)
         const newItem = await this.save()
@@ -244,8 +240,7 @@
       },
       async addGroup() {
         this.newGroup = {
-          name: 'New Group',
-          isGlobal: false,
+          name: 'New Group'
         }
         this.setActiveGroup(this.newGroup)
         const newItem = await this.save()
@@ -257,7 +252,7 @@
           price: 0,
           category: category._id,
           modifierGroup: this.activeGroup._id,
-          ...!this.activeGroup.isGlobal && { product: this.product._id }
+          max: 1
         }
         this.setActiveModifier(this.newModifier)
         const newItem = await this.save()
@@ -282,18 +277,15 @@
       },
       async duplicate() {
         const newGroup = await cms.getModel('PosModifierGroup').create({
-          name: `${this.activeEditItem.name} (copy)`,
-          isGlobal: this.activeEditItem.isGlobal,
+          name: `${this.activeEditItem.name} (copy)`
         })
-        const product = newGroup.isGlobal ? null : this.product._id
-
         await Promise.all(
           _.map(this.modifiersByCategory, (async (mods, catId) => {
             const { freeItems, mandatory, name, selectOne } = this.categories.find(cat => cat._id === catId)
             const newCategory = await cms.getModel('PosModifierCategory').create(
-              { modifierGroup: newGroup._id, name, mandatory, selectOne, freeItems, product})
+              { modifierGroup: newGroup._id, name, mandatory, selectOne, freeItems})
             const newMods = mods.map(({ name, price, max, printer }) => ({
-              modifierGroup: newGroup._id, category: newCategory._id, name, price, max, printer, product
+              modifierGroup: newGroup._id, category: newCategory._id, name, price, max, printer
             }))
             await cms.getModel('PosPopupModifier').create(newMods)
           })))
@@ -308,20 +300,6 @@
           case 'group':
             if (item._id) {
               newItem = await cms.getModel('PosModifierGroup').findOneAndUpdate({ _id: item._id }, item, { new: true })
-              if (item.isGlobal !== this.activeGroup.isGlobal) {
-                // update categories & modifiers
-                const categoryIds = this.categories.map(c => c._id)
-                const modifierIds = this.modifiers.map(m => m._id)
-                if (item.isGlobal) {
-                  const updateValue = { product: null }
-                  await cms.getModel('PosModifierCategory').updateMany({ _id: { $in: categoryIds } }, updateValue)
-                  await cms.getModel('PosPopupModifier').updateMany({ _id: { $in: modifierIds } }, updateValue)
-                } else {
-                  const updateValue = { product: this.product._id }
-                  await cms.getModel('PosModifierCategory').updateMany({ _id: { $in: categoryIds } }, updateValue)
-                  await cms.getModel('PosPopupModifier').updateMany({ _id: { $in: modifierIds } }, updateValue)
-                }
-              }
             } else {
               newItem = await cms.getModel('PosModifierGroup').create(item)
               this.newGroup = null
@@ -436,8 +414,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    height: 100vh;
-    width: 100vw;
+    bottom: 0;
+    right: 0;
     z-index: 99;
     background: #fff;
   }

@@ -389,8 +389,9 @@
         return this.editable
           ? { click: () => this.onClick(productLayout), touchstart: () => this.onTouchStart(productLayout)}
           : { click: () => {
-              // this.addProductToOrder(productLayout);
-              this.showPopupModifierDialog(productLayout)
+              const { product } = productLayout
+              if (product.activePopupModifierGroup) return this.showPopupModifierDialog(productLayout)
+              this.addProductToOrder(productLayout);
             }
           }
       },
