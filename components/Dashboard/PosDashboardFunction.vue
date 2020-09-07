@@ -17,7 +17,7 @@
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
-    
+
     <template>
       <g-dnd-dialog v-model="showIframe" :width="iframeWidth" :height="iframeHeight" lazy
                     :show-minimize="false"
@@ -49,7 +49,7 @@
 
       return {
         btnUp: [
-          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-2')},
+          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-3')},
           {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-delivery')}
         ],
         btnDown: [
