@@ -68,7 +68,7 @@
             v-if="view === 'transaction'"
             :store="store"/>
         <reservation-setting v-if="view === 'setting-reservation'" :store="store" @update="updateStore"/>
-        <other-setting v-if="view === 'setting-other'" @update="updateStore"/>
+        <other-setting v-if="view === 'setting-other'" :store="store" @update="updateStore"/>
       </div>
     </template>
   </div>

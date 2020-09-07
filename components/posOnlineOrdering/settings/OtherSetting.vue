@@ -13,11 +13,11 @@
         <p>Delivery Forwarding</p>
         <div class="row-flex align-items-center">
           <span class="fs-small fw-700 mr-3">Delivery order forwarding</span>
-          <g-switch/>
+          <g-switch v-model="active"/>
         </div>
         <div class="row-flex align-items-center my-3">
           <span class="fs-small fw-700 mr-3" style="white-space: nowrap">Forward order to restaurant ID </span>
-          <g-text-field-bs style="margin: 0" large/>
+          <g-text-field-bs style="margin: 0" large type="number" v-model="storeId"/>
         </div>
         <span>
           <b>Note: </b>
@@ -29,17 +29,58 @@
 </template>
 
 <script>
+  import _ from 'lodash'
+
   export default {
     name: "OtherSetting",
-    props: {},
+    props: {
+      store: Object
+    },
     data() {
       return {
-        script: ''
+        script: (this.store && this.store.digitalMenuScript) || '',
+        deliveryForward: (this.store && this.store.deliveryForward) || {},
+      }
+    },
+    created() {
+      this.updateStoreIdDebounce = _.debounce(this.updateStoreId, 1000)
+    },
+    computed: {
+      active: {
+        get() {
+          if(this.deliveryForward)
+            return this.deliveryForward.active
+          else
+            return false
+        },
+        set(val) {
+          this.$set(this.deliveryForward, 'active', val)
+          this.updateDeliveryForward()
+        }
+      },
+      storeId: {
+        get() {
+          if(this.deliveryForward)
+            return this.deliveryForward.storeId
+          else
+            return ''
+        },
+        set(val) {
+          this.updateStoreIdDebounce(val)
+        }
       }
     },
     methods: {
       uploadScript() {
         this.$emit('update', {digitalMenuScript: this.script})
+      },
+      updateDeliveryForward() {
+        this.$emit('update', { deliveryForward: this.deliveryForward })
+      },
+      updateStoreId(value) {
+        if (!value || isNaN(value)) return
+        this.$set(this.deliveryForward, 'storeId', value)
+        this.updateDeliveryForward()
       }
     }
   }
