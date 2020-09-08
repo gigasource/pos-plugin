@@ -389,8 +389,9 @@
         return this.editable
           ? { click: () => this.onClick(productLayout), touchstart: () => this.onTouchStart(productLayout)}
           : { click: () => {
-              // this.addProductToOrder(productLayout);
-              this.showPopupModifierDialog(productLayout)
+              const { product } = productLayout
+              if (product.activePopupModifierGroup) return this.showPopupModifierDialog(productLayout)
+              this.addProductToOrder(productLayout);
             }
           }
       },
@@ -413,7 +414,7 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
+    overflow: auto;
 
     &__cate {
       border-radius: 4px;
@@ -442,6 +443,7 @@
       overflow: hidden;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      min-height: 40px;
 
       & > div {
         max-height: 100%;

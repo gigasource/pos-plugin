@@ -1,12 +1,29 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-avatar size="36">
-        <img alt :src="avatar">
-      </g-avatar>
-      <span class="order-detail__header-username">{{username}}</span>
-      <span class="order-detail__header-title" v-if="table">Table</span>
-      <span class="order-detail__header-value" v-if="table">{{table}}</span>
+      <g-menu v-model="menu">
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <g-avatar size="36">
+              <img alt :src="avatar">
+            </g-avatar>
+          </div>
+        </template>
+        <div class="order-detail__menu">
+          <g-btn-bs icon="icon-split_check_2">Split check</g-btn-bs>
+          <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
+          <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
+          <g-btn-bs icon="icon-print" @click="pay">Send</g-btn-bs>
+        </div>
+      </g-menu>
+      <div>
+        <p class="order-detail__header-username">{{username}}</p>
+        <span class="order-detail__header-title" v-if="table">Table</span>
+        <span class="order-detail__header-value" v-if="table">{{table}}</span>
+      </div>
+      <g-btn-bs class="elevation-1" style="width: 37px; height: 37px; border-radius: 50%; margin: 0" @click="back">
+        <g-icon style="min-width: 24px">icon-back</g-icon>
+      </g-btn-bs>
       <span class="order-detail__header-title">{{$t('common.total')}}</span>
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
@@ -68,7 +85,8 @@
           product: null,
           originalPrice: 0,
           price: 0
-        }
+        },
+        menu: false
       }
     },
     computed: {
@@ -149,6 +167,17 @@
         if (separate) return
         if (takeout) return 'Take-away'
         if (course && course > 1) return `Course: ${course}`
+      },
+      back() {
+        this.$emit('resetOrderData')
+        this.$router.push({path: '/pos-dashboard'})
+      },
+      pay() {
+        this.$router.push({path: '/pos-payment'})
+      },
+      quickCash(isTakeout = false) {
+        this.currentOrder.takeOut = isTakeout
+        this.$emit('quickCash')
       }
     },
     mounted() {
@@ -178,25 +207,23 @@
     background: white;
     color: #1d1d26;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
-    height: calc(100vh - 64px);
     display: flex;
     flex-direction: column;
 
     &__header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 8px 0;
 
       &-username {
         font-weight: 700;
         font-size: 13px;
-        margin-left: 8px;
         flex-grow: 1;
       }
 
       &-title {
         opacity: 0.5;
-        margin-left: 16px;
         font-size: 11px;
         font-weight: 600;
       }
@@ -204,7 +231,7 @@
       &-value {
         font-size: 18px;
         font-weight: 600;
-        margin-left: 4px;
+        margin-left: 2px;
       }
     }
 
@@ -265,6 +292,16 @@
             -webkit-tap-highlight-color: transparent;
           }
         }
+      }
+    }
+
+    &__menu {
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+
+      .g-btn-bs {
+        justify-content: flex-start;
       }
     }
   }

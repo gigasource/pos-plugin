@@ -14,7 +14,7 @@
         </div>
       </slot>
       <slot name="keyboard">
-        <div class="keyboard">
+        <div class="keyboard" v-if="showKeyboard">
           <pos-keyboard-full @enter-pressed="$emit('save')" @change-type="changeKeyboardType" :type="keyboardType"/>
         </div>
       </slot>
@@ -28,6 +28,10 @@
     props: {
       value: null,
       showButtons: {
+        type: Boolean,
+        default: true
+      },
+      showKeyboard: {
         type: Boolean,
         default: true
       },

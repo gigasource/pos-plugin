@@ -652,11 +652,15 @@ module.exports = async cms => {
     });
 
     socket.on('updateOrderStatus', async (orderStatus, cb) => {
-      const posSetting = await cms.getModel('PosSetting').findOne()
-      const {onlineDevice: {store: {name, alias}}} = posSetting
       const {orderId, onlineOrderId, status, responseMessage} = orderStatus
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
-          `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
+        `8.1 Restaurant backend: received update order status message from frontend`)
+
+      const posSetting = await cms.getModel('PosSetting').findOne()
+      const {onlineDevice: {store: {name, alias}}} = posSetting
+
+      console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
+        `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
       onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias}, ({result, error, responseData}) => {
         cb && cb({ result, error, responseData }) //result === responseData.status
       })
