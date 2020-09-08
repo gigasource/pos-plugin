@@ -31,7 +31,7 @@
                     <g-btn :uppercase="false" border-radius="2" outlined class="mr-3" background-color="#F0F0F0"
                            style="border: 1px solid #C9C9C9"
                            @click="onClickModifier(item, category, toggleSelect)">
-                      {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
+                      <span class="fw-700">{{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}</span>
                     </g-btn>
 
                   </template>
@@ -43,13 +43,13 @@
                       </template>
                       <g-btn :uppercase="false" border-radius="2" flat background-color="#2979FF" text-color="#fff"
                              @click="onClickModifier(item, category, toggleSelect)">
-                        {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
+                        <span class="fw-700">{{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}</span>
                       </g-btn>
                     </g-badge>
 
                     <g-btn v-else :uppercase="false" border-radius="2" flat class="mr-3" background-color="#2979FF" text-color="#fff"
                            @click="onClickModifier(item, category, toggleSelect)">
-                      {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
+                      <span class="fw-700">{{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}</span>
                     </g-btn>
 
                   </template>
@@ -214,7 +214,7 @@
         group.categories = categories
         group.modifiers = modifiers
       }
-      this.modifierGroups = modifierGroups
+      this.modifierGroups = modifierGroups.filter(g => g.modifiers.length > 0)
     },
     watch: {
       tab(val) {
