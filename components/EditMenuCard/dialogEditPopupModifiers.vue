@@ -143,16 +143,16 @@
       <template #input="{ changeKeyboard }">
         <div class="mb-4">
           <template v-if="activeEditItem && activeEditItem.type === 'group'">
-            <g-text-field-bs label="Name" v-model="activeEditItem.name" required/>
+            <g-text-field-bs label="Name" v-model="activeEditItem.name" required clearable/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'category'">
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name"  @click.native.stop="changeKeyboard('alpha')"/>
-            <g-text-field-bs label="No. of free items" v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
+            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name"  @click.native.stop="changeKeyboard('alpha')"/>
+            <g-text-field-bs label="No. of free items" clearable v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <g-text-field-bs label="Name" required v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
-            <g-text-field-bs label="Price" v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
-            <g-text-field-bs label="Max items" v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
+            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
+            <g-text-field-bs label="Price" clearable v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
+            <g-text-field-bs label="Max items" clearable v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
           </template>
         </div>
       </template>
@@ -248,7 +248,7 @@
       },
       async addMod(category) {
         this.newModifier = {
-          name: 'New modifider',
+          name: 'New modifier',
           price: 0,
           category: category._id,
           modifierGroup: this.activeGroup._id,
