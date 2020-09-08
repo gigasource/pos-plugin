@@ -44,7 +44,9 @@
           </td>
           <td>
             <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
-            <p>{{item.payment[0].type}}</p>
+            <p>
+              <img alt :src="getImagePayment(item.payment[0].type)">
+            </p>
           </td>
           <td>{{item.date | formatDate}}</td>
           <td>{{item.deliveryTime}}</td>
@@ -171,6 +173,23 @@
     methods: {
       changeFilter(range) {
         this.filter = range
+      },
+      getImagePayment(type) {
+        let src = '/plugins/pos-plugin/assets/'
+        switch (type.toLowerCase()) {
+          case 'cash':
+            src += 'cash.svg';
+            break;
+          case 'card':
+            src += 'credit_card.svg';
+            break;
+          case 'paypal':
+            src += 'paypal2.svg';
+            break;
+          default:
+            break;
+        }
+        return src
       }
     }
   }

@@ -5,8 +5,8 @@
       <g-card-text class="fs-small">
         <div class="row-flex mb-2">
           <div style="flex: 0 0 30px">
-            <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-            <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+            <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
+            <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
           </div>
           <p>
             <span class="text-indigo-accent-2 fw-600">#{{order.id}}</span>

@@ -606,3 +606,24 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-paypal2 {
+  background-image: url("../assets/paypal2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-delivery-scooter {
+  background-image: url("../assets/delivery-scooter.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-take-away {
+  background-image: url("../assets/take-away.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
