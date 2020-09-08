@@ -507,7 +507,7 @@
         if(this.store.deliveryFee && this.store.deliveryFee.type === 'zipCode' && this.store.deliveryFee.requireMinOrder) {
           const minOrders = _.mapValues(_.mapKeys(this.storeZipCodes, c => c.zipCode), c => c.minOrder)
           const orderTotal = this.totalPrice
-          rules.push(val => val.length < 5 || minOrders[val] < orderTotal || this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': minOrders[val]}))
+          rules.push(val => val.length < 5 || !minOrders[val] || minOrders[val] < orderTotal || this.$t('store.zipCodeMinOrder', {'0': this.$t('common.currency'), '1': minOrders[val]}))
         }
         return rules
       },
