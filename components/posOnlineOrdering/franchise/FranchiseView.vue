@@ -88,7 +88,7 @@
   .franchise-view {
     width: 100%;
     margin: 36px auto;
-    padding: 0 36px;
+    padding: 0 12%;
   }
 
   .tilte {
