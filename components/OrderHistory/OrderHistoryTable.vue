@@ -21,9 +21,6 @@
         <th class="ta-center" @click="dialog.payment = true">Payment
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th class="ta-left" @click="dialog.forward = true">Forward
-          <g-icon size="12">mdi-magnify</g-icon>
-        </th>
         <th class="ta-left" @click="openStaffFilter">{{$t('orderHistory.staff')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
@@ -49,7 +46,19 @@
         </td>
       </tr>
       <tr v-for="(order, i) in orderHistoryOrders" :key="i" :class="[order._id === orderHistoryCurrentOrder._id && 'tr__active']" @click="chooseOrder(order)">
-        <td class="ta-center" style="white-space: nowrap">{{order.id}}</td>
+        <td>
+          <div class="ta-center" style="white-space: nowrap; position: relative">
+            {{order.id}}
+            <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" bottom speech-bubble remove-content-on-close>
+              <span><b>From:</b> {{order.forwardedStore}}</span>
+              <template v-slot:activator="{on}">
+                <div v-on="on" v-if="order.forwardedStore" style="position: absolute; left: 0; top: -2px">
+                  <g-icon size="16">icon-double-arrow-right_blue</g-icon>
+                </div>
+              </template>
+            </g-tooltip>
+          </div>
+        </td>
         <td class="ta-center">{{order.dateTime}}</td>
         <td class="ta-center" style="white-space: nowrap; text-transform: capitalize">
           <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
@@ -61,9 +70,6 @@
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
         <td class="ta-center">
           <img alt v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" style="height: 16px;" class="mr-2"/>
-        </td>
-        <td>
-          <p class="ta-left">{{order.forwardedStore}}</p>
         </td>
         <td>
           <p class="staff-name">{{getStaffName(order.staff)}}</p>

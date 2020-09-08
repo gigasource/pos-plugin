@@ -148,10 +148,10 @@
                 <div class="col-11 text-grey-darken-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div class="row-flex" v-if="order.items">
-                <div class="col-1">
+                <div class="col-1" style="line-height: 20px">
                   <g-icon color="#9E9E9E" size="20">icon-food</g-icon>
                 </div>
-                <div>
+                <div style="padding-top: 2px">
                   <span v-for="item in order.items">
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
