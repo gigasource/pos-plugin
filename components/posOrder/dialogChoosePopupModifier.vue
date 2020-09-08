@@ -142,8 +142,9 @@
 
         const length = this.listModifiers2.filter(mod => mod._id === modifier._id).length;
         if (length >= 1) {
+          const maxItems = modifier.max || 1
           // selected, at max qty
-          if (length >= modifier.max) {
+          if (length >= maxItems) {
             if (category.mandatory) {
               if (!category.selectOne && this.selectedModifiers[category._id].length > 1) {
                 this.listModifiers2 = this.listModifiers2.filter(mod => mod._id !== modifier._id)

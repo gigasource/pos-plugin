@@ -174,10 +174,10 @@
           { content: ['*#$'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.computedType = 'symbol' },
           { content: ['Speichern'], style: 'grid-area: enter; background: #2979FF; color: #fff; font-size: 20px', type: 'enter', action: 'enter' },
         ],
-        templateAlphaDE: 'grid-template-areas: "q q w w e e r r t t z z u u i i o o p p ue ue ss ss key7 key7 key8 key8 key9 key9 " ' +
-          '". a a s s d d f f g g h h j j k k l l oe oe ae ae . key4 key4 key5 key5 key6 key6" ' +
-          '"shift1 shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del del key1 key1 key2 key2 key3 key3" ' +
-          '"sym sym sym comma comma lang lang space space space space space space space space space space dot dot enter enter enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
+        templateAlphaDE: 'grid-template-areas: "q q w w e e r r t t z z u u i i o o p p ue ue ss ss " ' +
+          '". a a s s d d f f g g h h j j k k l l oe oe ae ae ." ' +
+          '"shift1 shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del del " ' +
+          '"sym sym sym comma comma lang lang space space space space space space space space space space dot dot enter enter enter enter enter ";' +
           'grid-auto-columns: 1fr; grid-gap: 5px',
         keyboardSymbol: [
           ...Object.values(keys.symbols),
