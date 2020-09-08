@@ -423,4 +423,23 @@ router.use('/staff', staffRoute)
 router.use('/team', teamRoute)
 router.use('/task', taskRoute)
 
+router.get('/delivery-forward', async (req, res) => {
+  const { id } = req.query
+  if(!id) {
+    res.json({
+      ok: false
+    })
+  }
+  const store = await cms.getModel('Store').findOne({ id })
+  if(!store) {
+    res.json({
+      ok: false
+    })
+  }
+  res.json({
+    ok: true,
+    store
+  })
+})
+
 module.exports = router
