@@ -54,6 +54,7 @@
       </div>
     </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
+                              :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
   </div>
 </template>

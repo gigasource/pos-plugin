@@ -72,7 +72,8 @@
     components: { ChangeValue },
     props: {
       value: null,
-      originalValue: Number,
+      product: null,
+      originalValue: Number
     },
     data() {
       return {
@@ -123,6 +124,12 @@
         });
         return [...this.tabItems, ...mods]
       },
+      existingModifiers() {
+        if (!this.product || !this.product.modifiers) return {}
+        const modifiersByCategory = _.groupBy(this.product.modifiers.filter(mod => mod.modifierGroup), 'category')
+        console.log(modifiersByCategory)
+        return _.mapValues(modifiersByCategory, item => item.length)
+      },
       listModifiersWithFreeItems() {
         let list = []
         const modifiersByCategories = _.groupBy(this.listModifiers, 'category')
@@ -130,9 +137,11 @@
         _.forEach(modifiersByCategories, (mods, catId) => {
           const { freeItems } = this.tab.categories.find(c => c._id === catId)
 
-          const sortedModsByPrice = mods.sort((cur, next) => cur.price - next.price)
+          const sortedModsByPrice = mods.sort((cur, next) => next.price - cur.price)
 
           let indexOffset = 0
+          if (this.existingModifiers[catId]) indexOffset -= this.existingModifiers[catId]
+          console.log('indexOffset', indexOffset)
           const modsWithFreeItems = sortedModsByPrice.map((item, index) => {
             if (item.price === 0 || index >= freeItems + indexOffset) {
               if (index < freeItems + indexOffset) indexOffset += 1
@@ -196,9 +205,7 @@
       submit() {
         if (this.tab) {
           if (this.listModifiersWithFreeItems.length) {
-            this.listModifiersWithFreeItems.forEach(mod => {
-              this.$emit('addModifier', {name: mod.name, price: mod.price})
-            })
+            this.listModifiersWithFreeItems.forEach(mod => this.$emit('addModifier', mod))
             return this.dialogConfigOrderItem = false
           }
 
@@ -229,10 +236,20 @@
           }
         }
       },
-      dialogConfigOrderItem(val) {
+      async dialogConfigOrderItem(val) {
         if (val) {
+          const modifierGroups = await cms.getModel('PosModifierGroup').find()
+          for (const group of modifierGroups) {
+            const categories = await cms.getModel('PosModifierCategory').find({ modifierGroup: group._id })
+            const modifiers = await cms.getModel('PosPopupModifier').find({ modifierGroup: group._id })
+            group.categories = categories
+            group.modifiers = modifiers
+          }
+          this.modifierGroups = modifierGroups.filter(g => g.modifiers.length > 0)
+
           this.selectedModifiers = {}
           this.listModifiers = []
+          this.tab = this.tabs && this.tabs[0]
         }
       }
     }
