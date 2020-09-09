@@ -1250,6 +1250,27 @@
           "type": null
         }
       ]
+    },
+    {
+      "_id": "5f2bc70f0121f4cc185ac1bc",
+      "schemaType": "objectId",
+      "key": "restaurantPlusUser",
+      "ref": "RPUser",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f2be3788a778ad65f7dad7d",
+      "schemaType": "objectId",
+      "key": "restaurantPlusVoucher",
+      "ref": "RPVoucher",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f55e57c074b71f392c7902f",
+      "schemaType": "objectId",
+      "key": "forwardedStore",
+      "ref": "Store",
+      "type": "ref-select"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
