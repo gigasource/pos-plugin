@@ -11,3 +11,24 @@ module.exports = cms => {
 module.exports.firebaseAdminInstance = function () {
   return firebaseAdminInstance
 }
+
+module.exports.notifyToClient = async function (type = "", title = "", message = "", token = "") {
+  const firebaseMsg = {
+    notification: {
+      title,
+      body: message
+    },
+    data: {
+      type,
+      message
+    }
+  }
+  return firebaseAdminInstance.messaging().sendToDevice(
+      [token],
+      {...firebaseMsg},
+      {
+        contentAvailable: true,
+        priority: 'high',
+      }
+  )
+}
