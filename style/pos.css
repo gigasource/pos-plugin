@@ -627,3 +627,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-delivery-forward {
+  background-image: url("../assets/delivery-forward.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

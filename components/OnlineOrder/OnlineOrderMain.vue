@@ -162,8 +162,8 @@
                 </div>
               </div>
               <div class="row-flex" v-if="order.forwardedStore">
-                <div class="col-1">
-                  <g-icon color="#9E9E9E" size="20">icon-double-arrow-right</g-icon>
+                <div class="col-1 row-flex align-items-center">
+                  <g-icon color="#9E9E9E" size="17">icon-double-arrow-right</g-icon>
                 </div>
                 <div>{{order.forwardedStore}}</div>
               </div>

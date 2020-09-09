@@ -26,7 +26,7 @@
               <span><b>From:</b> {{item.forwardedStore}}</span>
               <template v-slot:activator="{on}">
                 <div v-on="on" v-if="item.forwardedStore">
-                  <g-icon size="16">icon-double-arrow-right_blue</g-icon>
+                  <g-icon size="16">icon-delivery-forward</g-icon>
                 </div>
               </template>
             </g-tooltip>
