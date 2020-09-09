@@ -6,6 +6,7 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule')
+const createPosCommandReceiver = require('./pos-command-receiver');
 
 let webshopUrl;
 let storeName;
@@ -488,6 +489,8 @@ module.exports = async cms => {
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
       }
+
+      createPosCommandReceiver(onlineOrderSocket);
     });
   }
 
