@@ -67,6 +67,6 @@
 
   .g-snack {
     bottom: 2rem;
-    left: calc(220px);
+    left: 0;
   }
 </style>
