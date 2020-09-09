@@ -639,6 +639,19 @@ module.exports = async function (cms) {
             break
         }
       })
+
+      socket.on('getReservationSetting', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback(null)
+
+        const store = await cms.getModel('Store').findById(device.storeId)
+        if (!store) return callback(null)
+
+        callback({
+          ...store.reservationSetting,
+          openHours: store.openHours
+        })
+      })
     }
 
     /** @deprecated */
