@@ -142,13 +142,17 @@
             <g-text-field-bs label="Name" v-model="activeEditItem.name" required clearable/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'category'">
-            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name"  @click.native.stop="changeKeyboard('alpha')"/>
-            <g-text-field-bs label="No. of free items" clearable v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
+            <div class="row-flex flex-wrap justify-between">
+              <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alpha')"/>
+              <g-text-field-bs label="No. of free items" clearable v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
+            </div>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
-            <g-text-field-bs label="Price" clearable v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
-            <g-text-field-bs label="Max items" clearable v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
+            <div class="row-flex flex-wrap justify-between">
+              <g-text-field-bs class="col-5" label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
+              <g-text-field-bs class="col-5" label="Price" clearable v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
+              <g-text-field-bs class="col-5" label="Max items" clearable v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
+            </div>
           </template>
         </div>
       </template>

@@ -2,7 +2,7 @@
   <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
     <div class="dialog-input col-flex">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
-      <div class="flex-shrink-1 overflow-y">
+      <div class="flex-grow-1 overflow-y">
         <slot name="input" :changeKeyboard="changeKeyboardType">
           <div class="textfield">
             <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
@@ -15,7 +15,7 @@
           </div>
         </slot>
       </div>
-      <div class="flex-grow-1">
+      <div>
         <slot name="keyboard">
           <div class="keyboard" v-if="showKeyboard">
             <pos-keyboard-full @enter-pressed="$emit('submit')" @change-type="changeKeyboardType" :type="keyboardType"/>
