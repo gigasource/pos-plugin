@@ -1060,6 +1060,12 @@
           ]
         }
       ]
+    },
+    {
+      "_id": "5eff12e0dc46a3439d405637",
+      "schemaType": "mixed",
+      "key": "backupDbCredentials",
+      "mixed": true
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",

@@ -1,0 +1,20 @@
+{
+  "_id": "5ef057c9d6f047354a4de7e8",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5ef057dfd6f047354a4de7ea",
+      "schemaType": "string",
+      "key": "taskId"
+    },
+    {
+      "_id": "5ef057dfd6f047354a4de7eb",
+      "schemaType": "mixed",
+      "key": "syncData",
+      "mixed": true
+    }
+  ],
+  "name": "MongooseSyncTask",
+  "tabs": [],
+  "type": "Collection"
+}

@@ -105,6 +105,12 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api-before-init-model'
+      },
+      path: 'backend/mongoose-sync/apply-hooks.js'
+    },
+    {
+      loader: {
         type: 'ssr'
       },
       path: 'components/Report/MonthReport.vue'
