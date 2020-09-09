@@ -156,28 +156,33 @@ module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
   const {io, socket: internalSocketIOServer} = cms;
+  if (global.APP_CONFIG.redis) {
+    const {hosts, password} = global.APP_CONFIG.redis;
+    const Redis = require("ioredis");
+    const startupRedisNodes = hosts.split(',').map(host => {
+      const hostInfoArr = host.split(':');
+      return {
+        host: hostInfoArr[0],
+        port: hostInfoArr[1],
+      }
+    });
 
-    if (global.APP_CONFIG.redis) {
-      const {hosts, password} = global.APP_CONFIG.redis;
-      const Redis = require("ioredis");
-      const startupRedisNodes = hosts.split(',').map(host => {
-        const hostInfoArr = host.split(':');
-        return {
-          host: hostInfoArr[0],
-          port: hostInfoArr[1],
-        }
-      });
-      const ioredisOpt = {
-        redisOptions: {password}
-      };
+    const ioredisOpt = {
+      redisOptions: {password}
+    };
 
-      io.adapter(redisAdapter({
-        pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-        subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-      })); //internalSocketIOServer will use adapter too, just need to call this once
-    }
+    io.adapter(redisAdapter({
+      pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+      subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+    })); //internalSocketIOServer will use adapter too, just need to call this once
+  }
 
   async function updateOrderStatus(orderToken, status) {
+    if (sendOrderTimeouts[orderToken]) {
+      clearTimeout(sendOrderTimeouts[orderToken]);
+      delete sendOrderTimeouts[orderToken]
+    }
+
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
 
     if (status.status === 'kitchen') {
@@ -705,7 +710,7 @@ module.exports = async function (cms) {
 
       let {
         orderType: type, paymentType, customer, products, totalPrice,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
       const order = {
@@ -730,9 +735,15 @@ module.exports = async function (cms) {
         discounts,
         deliveryTime,
         paypalOrderDetail,
+        forwardedStore,
         vSum: totalPrice
       }
       const newOrder = await cms.getModel('Order').create(order)
+
+      if(forwardedStore) {
+        const s = await cms.getModel('Store').findById(forwardedStore)
+        Object.assign(orderData, { forwardedStore: s })
+      }
 
       if (store.gSms && store.gSms.enabled) {
         //cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
@@ -935,6 +946,17 @@ module.exports = async function (cms) {
       if (!result) return callback()
       const {latitude, longitude} = result
       callback({long: longitude, lat: latitude})
+    })
+
+    async function getReviewInGoogleMap(placeId) {
+      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=rating,review,user_ratings_total&key=${global.APP_CONFIG.mapsApiKey}`)
+      const { result } = response.data
+      return result
+    }
+
+    socket.on('getReviewInGoogleMap', async (placeId, callback) => {
+      const result = await getReviewInGoogleMap(placeId)
+      callback(result)
     })
 
     socket.on('createReservation', async (storeId, reservationData, callback) => {

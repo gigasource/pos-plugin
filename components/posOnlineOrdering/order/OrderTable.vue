@@ -215,7 +215,7 @@
 
     <!-- Order created -->
     <order-created v-if="dialog.value" v-model="dialog.value" :order-extra-info="dialog.extraInfo"
-                   :order="dialog.order" :phone="store.phone" :timeout="store.orderTimeOut"
+                   :order="dialog.order" :phone="phone" :timeout="store.orderTimeOut"
                    :store-country-locale="storeCountryLocale"
                    :get-item-modifier="getItemModifiers" :get-item-price="getItemPrice"
                    @close="closeOrderCreatedDialog"/>
@@ -299,7 +299,9 @@
         calculatingShippingFee: false,
         calculatingText: '',
         errorZipcode: '',
-        paypalOrderDetail: {}
+        paypalOrderDetail: {},
+        phone: this.store.phone,
+        forwardedStore: null
       }
     },
     filters: {
@@ -344,6 +346,18 @@
               }
             }
         })
+      }
+      if(this.store.deliveryForward && this.store.deliveryForward.active) {
+        const response = await axios.get(`${location.origin}/store/delivery-forward`, {
+          params: {
+            id: this.store.deliveryForward.storeId
+          }
+        })
+        if(response.data.ok) {
+          this.forwardedStore = response.data.store
+        } else {
+          this.forwardedStore = this.store
+        }
       }
     },
     mounted() {
@@ -708,6 +722,11 @@
           this.deliveryTime = ''
       },
       orderType(val) {
+        if(val === 'delivery' && this.store.deliveryForward && this.store.deliveryForward.active) {
+          this.phone = this.forwardedStore.phone
+        } else {
+          this.phone = this.store.phone
+        }
         if (_.includes(this.deliveryTimeList, this.deliveryTime)) return
         if (this.satisfyDeliveryTime || val === 'pickup')
           this.deliveryTime = this.asap
@@ -836,7 +855,12 @@
 
         console.debug(`sentry:orderToken=${orderToken},store=${this.store.name},alias=${this.store.alias},eventType=orderStatus`,
             `1. Online Order frontend: send order to backend`, JSON.stringify(products));
-        window.cms.socket.emit('createOrder', this.store._id, orderData)
+        let storeId = this.store._id
+        if (this.orderType === 'delivery' && this.store.deliveryForward && this.store.deliveryForward.active) {
+          storeId = this.forwardedStore._id
+          Object.assign(orderData, { forwardedStore: this.store._id })
+        }
+        window.cms.socket.emit('createOrder', storeId, orderData)
 
         this.dialog.order = {
           orderToken: orderToken,

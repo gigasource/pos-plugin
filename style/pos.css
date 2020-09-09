@@ -829,3 +829,24 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-direction_white {
+  background-image: url("../assets/direction_white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-clock {
+  background-image: url("../assets/clock.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-store {
+  background-image: url("../assets/store.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

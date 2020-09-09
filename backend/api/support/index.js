@@ -14,6 +14,7 @@ const https = require('https')
 const FormData = require('form-data')
 const path = require('path')
 const {getHost} = require('../utils')
+const voipApi = require('./voip')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -582,5 +583,8 @@ router.put('/update-os-info/:id', async (req, res) => {
     res.status(500).json({error: 'Error updating device os info'})
   }
 })
+
+router.use('/voip', voipApi)
+
 module.exports = router;
 module.exports.assignDevice = assignDevice;

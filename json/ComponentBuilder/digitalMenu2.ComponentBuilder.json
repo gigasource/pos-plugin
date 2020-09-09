@@ -1,0 +1,18 @@
+{
+  "events": [],
+  "_id": "5f51bf1d01aeb9afce90df07",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "DigitalMenu",
+      "binding": [],
+      "slotScopeBinding": []
+    }
+  ],
+  "name": "digitalMenu2",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "store/:storeIdOrAlias/menu"
+}

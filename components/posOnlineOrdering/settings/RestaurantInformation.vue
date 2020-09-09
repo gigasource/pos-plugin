@@ -103,10 +103,10 @@
         <div style="font-weight: 600; font-size: 22px; margin-bottom: 16px">Generate Embed Code</div>
         <div>
           <p>Choose type</p>
-          <div class="row-flex flex-wrap justify-between">
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'store', order: 1}" label="Online Order"/>
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 2}" label="Reservation"/>
-            <g-checkbox color="#1271ff" v-model="type" :value="{type: 'franchise', link: 'franchise', order: 3}" label="Franchise"/>
+          <div class="row-flex flex-wrap">
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'order', order: 2}" label="Online Order"/>
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 3}" label="Reservation"/>
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'overview', link: '', order: 1}" label="Store Overview"/>
           </div>
           <p>Choose position</p>
           <g-radio-group v-model="position" name="position" row>
@@ -337,7 +337,7 @@
             triggerBtn = getEmbedBtn(_.orderBy(this.type, 'order'), this.store.alias),
             checkIOs = checkIOs12AndLess(),
             mobile = mobileCheck(),
-            icon = genIcon(this.store.alias, this.image.mimeType, this.image.fileName.split('.')[1], 'https://cdn.restaurantplus.net')
+            icon = genIcon(this.store.alias, this.image.mimeType, this.image.fileName.split('.')[1], 'https://cdn.online-order.gigasource.io')
         const fnString = header + checkIOs + mobile + genStyleSheet(this.position, this.size, this.hidden) + icon + triggerBtn + genReadyState() + footer
         const minifyString = terser.minify(fnString).code
         const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
