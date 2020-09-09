@@ -58,7 +58,6 @@ async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}
   if (type !== 'in' && type !== 'out')
     throw "Invalid check type"
   // validate time??
-  // TODO: check gps, add note for check event
   async function getCoordsFromGooglePlaceId(id) {
     try {
       const {data} = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${global.APP_CONFIG.mapsApiKey}`)
@@ -80,7 +79,7 @@ async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}
       throw "Error coordinates"
     }
     console.log(distance)
-    if (distance < 50) { // default 50m
+    if (distance < 100) { // default 50m
       note = 'success'
     } else {
       note = 'gps-error'
