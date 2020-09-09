@@ -4,11 +4,13 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const objectMapper = require('object-mapper');
+const {notifyToClient} = require("../app-notification/firebase-messaging/admin");
 
 const VoucherModel = cms.getModel('RPVoucher');
 const PromotionModel = cms.getModel('RPPromotion');
 const UserModel = cms.getModel('RPUser');
 const PointHistoryModel = cms.getModel('RPPointHistory');
+const StoreModel = cms.getModel('Store');
 
 const {DEFAULT_NEARBY_DISTANCE, VOUCHER_STATUS, POINT_HISTORY_TRANSACTION_TYPE, RESPONSE_ERROR_CODE} = require('./constants');
 const {respondWithError} = require('./utils');
@@ -70,6 +72,13 @@ router.put('/use-voucher/:voucherId', jwtValidator, async (req, res) => {
 
   await VoucherModel.updateOne({_id: voucher._id}, {status: VOUCHER_STATUS.USED});
   res.status(204).send();
+
+  const fbToken = voucher.restaurantPlusUser.firebaseToken;
+  if (fbToken) {
+    const store = await StoreModel.findOne({_id: storeId});
+    await notifyToClient('redeem_voucher', 'Voucher redeemed',
+        `You have redeemed voucher ${voucher.promotion.name} from ${store.name}`, fbToken);
+  }
 });
 
 router.post('/', jwtValidator, async (req, res) => {
