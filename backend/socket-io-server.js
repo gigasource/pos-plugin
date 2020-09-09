@@ -722,7 +722,7 @@ module.exports = async function (cms) {
 
       let {
         orderType: type, paymentType, customer, products,
-        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail
+        createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
       const order = {
@@ -746,9 +746,15 @@ module.exports = async function (cms) {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
-        paypalOrderDetail
+        paypalOrderDetail,
+        forwardedStore,
       }
       await cms.getModel('Order').create(order)
+
+      if(forwardedStore) {
+        const s = await cms.getModel('Store').findById(forwardedStore)
+        Object.assign(orderData, { forwardedStore: s })
+      }
 
       if (store.gSms && store.gSms.enabled) {
         cms.emit('sendOrderMessage', storeId, orderData) // send fcm message

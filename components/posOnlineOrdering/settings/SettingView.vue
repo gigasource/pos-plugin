@@ -68,7 +68,7 @@
             v-if="view === 'transaction'"
             :store="store"/>
         <reservation-setting v-if="view === 'setting-reservation'" :store="store" @update="updateStore"/>
-        <other-setting v-if="view === 'setting-other'" @update="updateStore"/>
+        <other-setting v-if="view === 'setting-other'" :store="store" @update="updateStore"/>
       </div>
     </template>
   </div>
@@ -151,7 +151,7 @@
           }
 
           items.push(
-              { title: 'Other', key: 'Other', icon: 'menu', onClick: () => this.changeView('setting-other')}
+              { title: 'Other', key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
           )
           return items
         }
