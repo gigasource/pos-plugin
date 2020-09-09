@@ -824,6 +824,8 @@ module.exports = async function (cms) {
       }
 
       if (!device) {
+        socket.join(orderData.orderToken);
+
         if (store.gSms && store.gSms.enabled) {
           // accept order on front-end
           const timeToComplete = store.gSms.timeToComplete || 30
@@ -839,7 +841,6 @@ module.exports = async function (cms) {
             }
           }
 
-          socket.join(orderData.orderToken);
           return updateOrderStatus(orderData.orderToken,
               {
                 storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
