@@ -628,6 +628,10 @@ module.exports = async cms => {
             socket.emit('updateAppFeature')
           })
 
+          onlineOrderSocket.emit('getReservationSetting', deviceId, async setting => {
+            await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
+          });
+
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
           console.error(e);
