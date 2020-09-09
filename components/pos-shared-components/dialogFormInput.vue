@@ -9,10 +9,10 @@
           </div>
         </slot>
         <slot name="buttons">
-<!--          <div class="button" v-if="showButtons">-->
-<!--            <g-btn-bs width="120" border-color="#979797" text-color="#1d1d26" @click="internalValue = false">{{$t('ui.cancel')}}</g-btn-bs>-->
-<!--            <g-btn-bs width="120" background-color="#2979FF" :disabled="!valid" @click="$emit('submit')">{{$t('ui.ok')}}</g-btn-bs>-->
-<!--          </div>-->
+          <div class="button" v-if="showButtons">
+            <g-btn-bs width="120" border-color="#979797" text-color="#1d1d26" @click="internalValue = false">{{$t('ui.cancel')}}</g-btn-bs>
+            <g-btn-bs width="120" background-color="#2979FF" :disabled="!valid" @click="$emit('submit')">{{$t('ui.ok')}}</g-btn-bs>
+          </div>
         </slot>
       </div>
       <div class="flex-grow-1">
@@ -32,10 +32,6 @@
     injectService: ['PosStore:isMobile'],
     props: {
       value: null,
-      showButtons: {
-        type: Boolean,
-        default: true
-      },
       showKeyboard: {
         type: Boolean,
         default: true
@@ -65,6 +61,9 @@
         set(val) {
           this.$emit('input', val)
         }
+      },
+      showButtons() {
+        return !this.showKeyboard
       }
     },
     methods: {
