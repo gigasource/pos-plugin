@@ -4,7 +4,7 @@
 
 <script>
   import customParseFormat from 'dayjs/plugin/customParseFormat'
-  import { getProvided } from '../logic/commonUtils';
+  import { getProvided, mobileCheck } from '../logic/commonUtils';
 
   dayjs.extend(customParseFormat)
 
@@ -145,7 +145,8 @@
           }
         ],
         pendingReservationsLength: 0,
-        reservationBell: null
+        reservationBell: null,
+        isMobile: false
       }
     },
     computed: {
@@ -351,6 +352,7 @@
         }
       })
 
+      this.isMobile = mobileCheck()
       this.initSocket()
       this.getStoreId()
       this.setDateInterval = setInterval(() => this.systemDate = new Date(), 10000)
