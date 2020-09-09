@@ -61,6 +61,7 @@
                 @open:editDeviceFeatureDialog="showFeatureControlDialog"
                 @open:editDeviceNameDialog="showEditDeviceNameDialog"
                 @open:deleteDeviceDialog="showDeleteDeviceDialog"
+                @open:commandDialog="showCommandDialog"
                 @view:settings="viewStoreSetting($event)"
                 @open:pairDeviceDialog="showPairDeviceDialog"
                 @open:deleteStoreConfirm="showDeleteStoreDialog"
@@ -125,13 +126,20 @@
         v-if="dialog.html"
         v-model="dialog.html"
         :stores="stores"/>
+    <dialog-command
+        v-if="dialog.command"
+        v-model="dialog.command"
+        :commands="posCommands"
+        @sendCommand="sendCommand"/>
   </div>
 </template>
 <script>
   import supportedCountries from '../../../Store/supportedCountries';
+  import DialogCommand from "./dialogCommand";
 
   export default {
     name: 'StoreManagement',
+    components: {DialogCommand},
     props: {},
     data: function () {
       return {
@@ -151,9 +159,11 @@
           pairNewDevice: false,
           pairNewDeviceSuccess: false,
           editDeviceName: false,
-          editGSmsDeviceName: false
+          editGSmsDeviceName: false,
+          command: false,
         },
         countries: supportedCountries,
+        posCommands: [],
       }
     },
     injectService: [
@@ -232,6 +242,22 @@
       showDeleteDeviceDialog(device) {
         this.dialog.deleteDevice = true
         this.setSelectedDevice(device)
+      },
+      showCommandDialog(device) {
+        this.dialog.command = true
+        this.setSelectedDevice(device)
+      },
+      sendCommand(command) {
+        // null check is unnecessary, selectedDevice MUST NOT be null
+        const clientId = this.selectedDevice._id.toString();
+
+        this.posCommands.push({isCommand: true, text: command});
+
+        cms.socket.emit('posCommand:send', {clientId, command}, result => {
+          if (typeof result !== 'string') result = JSON.stringify(result, null, 2);
+
+          this.posCommands.push({isCommand: false, text: result});
+        });
       },
       async deleteDevice() {
         await this.removeDevice(this.selectedDevice._id)

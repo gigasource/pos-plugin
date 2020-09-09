@@ -1092,6 +1092,10 @@ module.exports = async function (cms) {
       }
     })
 
+    socket.on('posCommand:send', ({clientId, command}, ack) => {
+      externalSocketIOServer.emitTo(clientId, 'posCommand:send', command, ack);
+    });
+
     socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 

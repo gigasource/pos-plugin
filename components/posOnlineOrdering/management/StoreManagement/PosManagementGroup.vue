@@ -139,6 +139,9 @@
                         <div v-if="featureControlPerm" class="menu-action__option"
                              @click="startRemoteControl(device)">Proxy Remote Control
                         </div>
+                        <div v-if="settingsPerm" class="menu-action__option"
+                             @click="$emit('open:commandDialog', device)">Command dialog
+                        </div>
                       </div>
                     </g-menu>
                   </div>
