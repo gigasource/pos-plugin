@@ -110,6 +110,18 @@
             ],
           },
           {
+            icon: 'icon-reservation',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'Reservation',
+                params: ''
+              })
+            },
+            title: this.$t('sidebar.reservation'),
+            feature: 'reservation',
+            key: 'Reservation'
+          },
+          {
             icon: 'icon-functions',
             onClick() {
               this.$emit('update:view', {
@@ -130,18 +142,6 @@
             title: this.$t('sidebar.services'),
             feature: 'onlineOrdering',
             key: 'Service'
-          },
-          {
-            icon: 'icon-reservation',
-            onClick() {
-              this.$emit('update:view', {
-                name: 'Reservation',
-                params: ''
-              })
-            },
-            title: this.$t('sidebar.reservation'),
-            feature: 'reservation',
-            key: 'Reservation'
           }
         ],
         pendingReservationsLength: 0,
