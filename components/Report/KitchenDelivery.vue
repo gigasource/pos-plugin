@@ -78,7 +78,7 @@
       </div>
     </div>
     <div class="divider-dashed"/>
-<!--    <div class="footer text-center">{{date}}</div>-->
+    <div v-if="forwardedStore" class="footer text-center">{{forwardedStore}}</div>
   </div>
 </template>
 
@@ -101,6 +101,7 @@
       deliveryTime: String,
       locale: null,
       type: String,
+      forwardedStore: String
     },
     filters: {
       convertMoney(value) {
