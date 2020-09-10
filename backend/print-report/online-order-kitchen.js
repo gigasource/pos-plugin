@@ -142,6 +142,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
 
   if (forwardedStore) {
     escPrinter.setTextNormal();
+    escPrinter.setTextDoubleHeight();
     escPrinter.bold(true);
     escPrinter.alignCenter();
     escPrinter.println(forwardedStore)
