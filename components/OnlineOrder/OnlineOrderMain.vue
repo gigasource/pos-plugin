@@ -20,8 +20,8 @@
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
             <g-card-title style="align-items: flex-start; flex-wrap: nowrap">
               <div class="row-flex align-items-center flex-grow-1">
-                <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-                <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+                <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
+                <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
                 <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
                   <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
                   {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
@@ -100,6 +100,9 @@
                 <span>{{$t('common.currency', storeLocale)}}{{order.payment.value | formatMoney(decimals)}}</span>
               </g-btn-bs>
             </g-card-actions>
+            <g-card-actions v-if="order.forwardedStore" class="pending-orders--forward-store">
+              <b class="mr-1">From:</b> {{order.forwardedStore}}
+            </g-card-actions>
           </g-card>
         </template>
       </div>
@@ -129,8 +132,8 @@
               </div>
               <g-spacer/>
               <div class="kitchen-orders__timer" @click.stop="openDialog(order)">
-                <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-                <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+                <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
+                <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
                 <span class="fw-700 fs-small ml-2">{{order.deliveryTime}}</span>
               </div>
             </g-card-title>
@@ -145,10 +148,10 @@
                 <div class="col-11 text-grey-darken-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
               </div>
               <div class="row-flex" v-if="order.items">
-                <div class="col-1">
+                <div class="col-1" style="line-height: 20px">
                   <g-icon color="#9E9E9E" size="20">icon-food</g-icon>
                 </div>
-                <div>
+                <div style="padding-top: 2px">
                   <span v-for="item in order.items">
                     <span class="fw-700">{{item.quantity}}x </span>
                     <span class="mr-3">
@@ -157,6 +160,12 @@
                     </span>
                   </span>
                 </div>
+              </div>
+              <div class="row-flex" v-if="order.forwardedStore">
+                <div class="col-1 row-flex align-items-center">
+                  <g-icon color="#9E9E9E" size="17">icon-double-arrow-right</g-icon>
+                </div>
+                <div>{{order.forwardedStore}}</div>
               </div>
             </g-card-text>
           </g-card>
@@ -409,6 +418,17 @@
         color: #9E9E9E;
         margin-top: 8px;
       }
+    }
+
+    &--forward-store {
+      display: flex;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 2px !important;
+      margin: -8px 16px 12px;
+      text-align: center;
+      background-color: #E1F5FE;
+      border-radius: 12px !important;
     }
   }
 

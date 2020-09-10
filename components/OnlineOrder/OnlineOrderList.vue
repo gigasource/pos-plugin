@@ -21,7 +21,15 @@
         <tbody>
         <tr v-for="(item, i) in computedItems" :key="i">
           <td class="fw-700">
-            #{{item.id}}
+            <p>#{{item.id}}</p>
+            <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" speech-bubble remove-content-on-close>
+              <span><b>From:</b> {{item.forwardedStore}}</span>
+              <template v-slot:activator="{on}">
+                <div v-on="on" v-if="item.forwardedStore">
+                  <g-icon size="16">icon-delivery-forward</g-icon>
+                </div>
+              </template>
+            </g-tooltip>
           </td>
           <td>
             <p>{{item.customer.name}}</p>
@@ -36,7 +44,9 @@
           </td>
           <td>
             <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
-            <p>{{item.payment[0].type}}</p>
+            <p>
+              <img alt :src="getImagePayment(item.payment[0].type)">
+            </p>
           </td>
           <td>{{item.date | formatDate}}</td>
           <td>{{item.deliveryTime}}</td>
@@ -163,6 +173,23 @@
     methods: {
       changeFilter(range) {
         this.filter = range
+      },
+      getImagePayment(type) {
+        let src = '/plugins/pos-plugin/assets/'
+        switch (type.toLowerCase()) {
+          case 'cash':
+            src += 'cash.svg';
+            break;
+          case 'card':
+            src += 'credit_card.svg';
+            break;
+          case 'paypal':
+            src += 'paypal2.svg';
+            break;
+          default:
+            break;
+        }
+        return src
       }
     }
   }

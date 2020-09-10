@@ -18,7 +18,7 @@
         <th class="ta-right" @click="openAmountFilter">{{$t('orderHistory.amount')}}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th class="ta-left" @click="dialog.payment = true">Payment
+        <th class="ta-center" @click="dialog.payment = true">Payment
           <g-icon size="12">mdi-filter</g-icon>
         </th>
         <th class="ta-left" @click="openStaffFilter">{{$t('orderHistory.staff')}}
@@ -27,7 +27,7 @@
       </tr>
       </thead>
       <tr v-if="orderHistoryFilters && orderHistoryFilters.length > 0">
-        <td colspan="6" class="td__sticky">
+        <td colspan="8" class="td__sticky">
           <div class="filter-list">
             <span class="ml-1">{{$t('orderHistory.filter')}}</span>
             <div class="group-chip">
@@ -46,19 +46,30 @@
         </td>
       </tr>
       <tr v-for="(order, i) in orderHistoryOrders" :key="i" :class="[order._id === orderHistoryCurrentOrder._id && 'tr__active']" @click="chooseOrder(order)">
-        <td class="ta-center" style="white-space: nowrap">{{order.id}}</td>
+        <td>
+          <div class="ta-center" style="white-space: nowrap; position: relative">
+            {{order.id}}
+            <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" bottom speech-bubble remove-content-on-close>
+              <span><b>From:</b> {{order.forwardedStore}}</span>
+              <template v-slot:activator="{on}">
+                <div v-on="on" v-if="order.forwardedStore" style="position: absolute; left: 0; top: -2px">
+                  <g-icon size="16">icon-delivery-forward</g-icon>
+                </div>
+              </template>
+            </g-tooltip>
+          </div>
+        </td>
         <td class="ta-center">{{order.dateTime}}</td>
         <td class="ta-center" style="white-space: nowrap; text-transform: capitalize">
-          <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-          <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+          <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
+          <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
           <g-icon v-if="!order.type">icon-cutlery</g-icon>
           <span> {{order.type || 'Dine-in'}}</span>
         </td>
         <td class="ta-left">{{order.table || ''}}</td>
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
-        <td class="ta-left" style="text-transform: capitalize">
-          <img v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" style="height: 16px;" class="mr-2"/>
-          <span style="vertical-align: middle">{{getOrderPayment(order).type}}</span>
+        <td class="ta-center">
+          <img alt v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" style="height: 16px;" class="mr-2"/>
         </td>
         <td>
           <p class="staff-name">{{getStaffName(order.staff)}}</p>
@@ -72,6 +83,7 @@
     <dialog-selection-filter v-model="dialog.type" :label="$t('orderHistory.type')" :items="orderTypes" @submit="setTypeFilter"/>
     <dialog-selection-filter v-model="dialog.payment" label="Payment Method" :items="paymentMethods" @submit="setPaymentFilter"/>
     <dialog-number-filter v-model="dialog.table" :label="$t('orderHistory.tableNo')" @submit="setTableFilter"/>
+    <dialog-text-filter v-model="dialog.forward" label="Forward Store" @submit="setForwardFilter"/>
   </div>
 </template>
 <script>
@@ -88,7 +100,8 @@
         dialog: {
           type: false,
           table: false,
-          payment: false
+          payment: false,
+          forward: false
         },
         orderTypes: [
           {text: 'Delivery', value: 'delivery'},
@@ -101,7 +114,9 @@
     computed: {
       limit: {
         get() {
-          return this.orderHistoryPagination.limit;
+          if(this.orderHistoryPagination)
+            return this.orderHistoryPagination.limit;
+          return 15
         },
         set(val) {
           this.orderHistoryPagination.limit = val;
@@ -109,7 +124,9 @@
       },
       currentPage: {
         get() {
-          return this.orderHistoryPagination.currentPage;
+          if(this.orderHistoryPagination)
+            return this.orderHistoryPagination.currentPage;
+          return 1
         },
         set(val) {
           this.orderHistoryPagination.currentPage = val;
@@ -196,6 +213,16 @@
         const { value, type } = payment[0];
         let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
         return Object.assign(paymentMethod || {}, { value, type })
+      },
+      async setForwardFilter(value) {
+        const filter = {
+          title: 'Forward',
+          text: value,
+          condition: {'forwardedStore': { '$regex': value, $options: 'i'}}
+        }
+        this.updateOrderHistoryFilter(filter);
+        await this.getOrderHistory();
+        await this.getTotalOrders();
       }
     },
     async created() {
@@ -271,7 +298,7 @@
     }
 
     tr th:nth-child(1) {
-      width: 13%;
+      width: 10%;
     }
 
     tr th:nth-child(2) {
@@ -279,15 +306,15 @@
     }
 
     tr th:nth-child(3) {
-      width: 18%;
+      width: 14%;
     }
 
     tr th:nth-child(4) {
-      width: 13%;
+      width: 10%;
     }
 
     tr th:nth-child(5) {
-      width: 18%;
+      width: 12%;
     }
   }
 

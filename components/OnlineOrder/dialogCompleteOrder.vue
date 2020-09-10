@@ -5,8 +5,8 @@
       <g-card-text class="fs-small">
         <div class="row-flex mb-2">
           <div style="flex: 0 0 30px">
-            <g-icon v-if="order.type === 'delivery'">icon-delivery-man</g-icon>
-            <g-icon v-if="order.type === 'pickup'">icon-pickup</g-icon>
+            <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
+            <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
           </div>
           <p>
             <span class="text-indigo-accent-2 fw-600">#{{order.id}}</span>
@@ -66,6 +66,9 @@
       <g-card-actions>
         <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">{{$t('onlineOrder.cancelOrder')}}</g-btn-bs>
         <g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" @click.stop="completeOrder(order)">{{$t('onlineOrder.completeOrder')}}</g-btn-bs>
+      </g-card-actions>
+      <g-card-actions v-if="order.forwardedStore" class="forward-store">
+        <b class="mr-1">From:</b> {{order.forwardedStore}}
       </g-card-actions>
     </g-card>
   </g-dialog>
@@ -162,4 +165,15 @@
     background-image: linear-gradient(to right, #9E9E9E 50%, transparent 50%);
     background-size: 20px 1px;
   }
+
+  .forward-store {
+     display: flex;
+     justify-content: center !important;
+     align-items: center !important;
+     padding: 2px !important;
+     margin: 8px 16px 12px;
+     text-align: center;
+     background-color: #E1F5FE;
+     border-radius: 12px !important;
+   }
 </style>
