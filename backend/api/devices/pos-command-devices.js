@@ -14,6 +14,7 @@ router.post('/register', async (req, res) => {
   if (!store) return res.status(400).json({error: 'Invalid store ID'});
 
   const newPosCommandDevice = await DeviceModel.create({
+    name: 'POS command client',
     deviceType: 'posCommandDevice',
     storeId: ObjectId(storeId),
     paired: true,
