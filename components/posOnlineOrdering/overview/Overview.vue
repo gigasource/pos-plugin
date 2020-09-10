@@ -21,12 +21,12 @@
        </div>
      </div>
      <div class="overview-main__action">
-       <p class="fw-700 mb-2">Our services</p>
+       <p class="fw-700 mb-2">{{$t('setting.ourService')}}</p>
        <div class="row-flex align-items-center">
-         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
-         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
          <g-btn-bs :disabled="!store || !store.reservationSetting || !store.reservationSetting.activeReservation"
-                   icon="icon-table-reservation" @click="openReservation">Reservation</g-btn-bs>
+                   icon="icon-table-reservation" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
        </div>
      </div>
      <div v-if="reviewAvailable" class="overview-main__review">
@@ -39,7 +39,7 @@
        <review v-if="showReview" v-for="(item, i) in googleMapInfo.reviews.slice(0, 3)" v-bind="item" :index="`${i}--mobile`" :key="i"/>
      </div>
      <div class="overview-main__menu">
-       <p class="fw-700 mb-2">Our menu</p>
+       <p class="fw-700 mb-2">{{$t('setting.ourMenu')}}</p>
        <div class="tab-wrapper">
          <div class="overview-main__menu--category-icon">
            <g-icon>icon-fork</g-icon>
