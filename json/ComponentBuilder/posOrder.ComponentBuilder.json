@@ -230,9 +230,7 @@
               "type": "prop"
             }
           ]
-        }
-      ]
-    },
+        },
     {
       "choice": "view",
       "component": "dialogProductSearchResult",

@@ -2,7 +2,7 @@
   <div class="online-order-setting">
     <div class="online-order-setting__title">{{$t('onlineOrder.settings.onlineOrderSettings')}}</div>
     <div class="online-order-setting__content">
-      <div class="row-flex" v-if="computedDevice">
+      <div class="row-flex" style="flex-wrap: wrap" v-if="computedDevice">
         <div class="col-6">
           <div>{{$t('onlineOrder.settings.status')}}</div>
           <div style="font-style: italic">
@@ -20,6 +20,13 @@
             <span style="font-style: italic; color: #536DFE">{{computedDevice.url}}</span>
             <span v-if="!webshopAvailable" style="font-style: italic; color: #F44336"> - {{$t('onlineOrder.settings.notAvailable')}}</span>
           </div>
+        </div>
+
+        <div class="col-6 mt-3">
+          <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false"
+                 @click="dialog = true">
+            Reset Online Orders
+          </g-btn>
         </div>
       </div>
       <g-divider style="margin-top: 20px"/>
@@ -81,7 +88,11 @@
         </template>
       </g-grid-select>
     </div>
-
+    <dialog-form-input v-model="dialog" @submit="checkClearOrderPasswd">
+      <template #input>
+        <g-text-field-bs label="Enter your passcode" v-model="passcode" clearable/>
+      </template>
+    </dialog-form-input>
   </div>
 </template>
 
@@ -92,7 +103,8 @@
 
   export default {
     name: "OnlineOrderSetting",
-    components: {GGridItemSelector, ValuePicker},
+    components: { GGridItemSelector, ValuePicker},
+    injectService: ['PosStore:(showErrorSnackbar,showInfoSnackbar)'],
     props: {
       onlineDevice: null,
       defaultPrepareTime: Number,
@@ -116,6 +128,9 @@
         webshopAvailable: true,
         pairError: null,
         pairing: false,
+        dialog: false,
+        passcode: '',
+        disableResetBtn: false
       }
     },
     computed: {
@@ -156,6 +171,9 @@
         this.internalDevice = val
 
         if (this.internalDevice && this.internalDevice.id) this.connected = true;
+      },
+      dialog(val) {
+        if (val) this.passcode = ''
       }
     },
     methods: {
@@ -164,6 +182,14 @@
       },
       updateSoundMode(value) {
         this.computedDevice = Object.assign({}, this.computedDevice, {soundLoop: value})
+      },
+      async checkClearOrderPasswd() {
+        if (this.passcode !== '9999') {
+          return this.showErrorSnackbar('Wrong Passcode!')
+        }
+        this.dialog = false
+        await cms.getModel('Order').deleteMany({ online: true })
+        this.showInfoSnackbar('Deleted all online orders!')
       }
     },
     mounted() {

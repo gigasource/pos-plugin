@@ -3,7 +3,7 @@
     <div class="header">
       <template v-for="group in allGroups">
         <g-btn outlined :uppercase="false" background-color="#F0F0F0" :key="group._id"
-               :class="[activeGroup === group && 'active-btn', activeEditItem && activeEditItem._id === group._id && 'edit-btn']"
+               :class="[...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
                @click="setActiveGroup(group)">
           {{group.name}}
         </g-btn>
@@ -17,7 +17,7 @@
       <div class="content--main col-flex align-items-start">
         <template v-for="category in allCategories">
           <g-btn flat :uppercase="false" :key="category._id"
-                 :class="['mb-2', activeCategory === category && 'active-btn', activeEditItem && activeEditItem._id === category._id && 'edit-btn']"
+                 :class="['mb-2', ...activeEditItem && activeEditItem._id === category._id && ['active-btn', 'edit-btn']]"
                  @click="setActiveCategory(category)">
             {{category.name}}
           </g-btn>
@@ -25,7 +25,7 @@
             <g-icon>keyboard_arrow_right</g-icon>
             <template v-for="mod in modifiersByCategory[category._id]">
               <g-btn flat :uppercase="false" :key="mod._id"
-                     :class="[activeModifier === mod && 'active-btn', activeEditItem && activeEditItem._id === mod._id && 'edit-btn']"
+                     :class="[...activeEditItem && activeEditItem._id === mod._id && ['active-btn', 'edit-btn']]"
                      @click="setActiveModifier(mod)">
                 {{mod.name}}
               </g-btn>
@@ -52,10 +52,6 @@
                 <g-icon style="cursor: pointer" @click.stop="showDialog = true">icon-keyboard</g-icon>
               </template>
             </g-text-field-bs>
-            <div class="fs-small-2 i mr-1 ml-1">
-              <span class="fw-700">Note: </span>
-              <span>Global modifiers can be selected in all dishes.</span>
-            </div>
             <g-btn :uppercase="false" flat background-color="#4FC3F7" text-color="#fff"
                    style="margin: 8px 4px 0 4px"
                    @click="duplicate" >
@@ -139,20 +135,24 @@
       </div>
     </div>
 
-    <dialog-form-input v-model="showDialog" :show-buttons="false" @save="showDialog = false">
+    <dialog-form-input v-model="showDialog" @save="showDialog = false">
       <template #input="{ changeKeyboard }">
         <div class="mb-4">
           <template v-if="activeEditItem && activeEditItem.type === 'group'">
             <g-text-field-bs label="Name" v-model="activeEditItem.name" required clearable/>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'category'">
-            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name"  @click.native.stop="changeKeyboard('alpha')"/>
-            <g-text-field-bs label="No. of free items" clearable v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
+            <div class="row-flex flex-wrap justify-between">
+              <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alpha')"/>
+              <g-text-field-bs label="No. of free items" clearable v-model="activeEditItem.freeItems" @click.native.stop="changeKeyboard('numeric')"/>
+            </div>
           </template>
           <template v-else-if="activeEditItem && activeEditItem.type === 'modifier'">
-            <g-text-field-bs label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
-            <g-text-field-bs label="Price" clearable v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
-            <g-text-field-bs label="Max items" clearable v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
+            <div class="row-flex flex-wrap justify-between">
+              <g-text-field-bs class="col-5" label="Name" required clearable v-model="activeEditItem.name" @click.native.stop="changeKeyboard('alphanumeric')"/>
+              <g-text-field-bs class="col-5" label="Price" clearable v-model="activeEditItem.price" @click.native.stop="changeKeyboard('numeric')"/>
+              <g-text-field-bs class="col-5" label="Max items" clearable v-model="activeEditItem.max" @click.native.stop="changeKeyboard('numeric')"/>
+            </div>
           </template>
         </div>
       </template>

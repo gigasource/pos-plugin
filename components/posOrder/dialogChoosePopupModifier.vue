@@ -8,15 +8,6 @@
         </div>
       </g-card-title>
       <g-card-text>
-        <div class="row-flex">
-          <template v-for="(group, index) in modifierGroups">
-            <g-divider vertical v-if="index > 0" color="#000" class="ml-2 mr-2"/>
-            <div :class="['pt-2', 'pb-2', 'modifier-group', group._id === activeModifierGroup._id && 'modifier-group__active']"
-                 @click="selectModifierGroup(group)">
-              {{group.name}}
-            </div>
-          </template>
-        </div>
         <template v-for="category in categories">
           <div>
             <span>{{category.name}}</span>
@@ -97,7 +88,7 @@
         _.forEach(modifiersByCategories, (mods, catId) => {
           const { freeItems } = this.categories.find(c => c._id === catId)
 
-          const sortedModsByPrice = mods.sort((cur, next) => cur.price - next.price)
+          const sortedModsByPrice = mods.sort((cur, next) => next.price - cur.price)
 
           let indexOffset = 0
           const modsWithFreeItems = sortedModsByPrice.map((item, index) => {

@@ -40,7 +40,7 @@
                 <span class="fw-700 fs-small ml-1">{{reservation.noOfGuests}}</span>
               </div>
               <div class="reservation-info__action">
-                <g-btn-bs min-width="90" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
+                <g-btn-bs min-width="100" :background-color="reservation.status === 'pending' ? '#757575' : '#4CAF50'" :icon="reservation.status === 'completed' && 'check'" @click="confirm(reservation)">
                   {{$t('onlineOrder.arrived')}}
                 </g-btn-bs>
                 <g-btn-bs background-color="#F9A825" :style="reservation.status === 'completed' && {opacity: 0.5}" @click="modify(reservation)">
@@ -196,6 +196,7 @@
     methods: {
       genReservations(date = this.date, status = this.status) {
         this.$emit('getReservations', date, status)
+        this.$emit('getPendingReservationsLength')
       },
       async genWeek(date) {
         let week = []
@@ -223,6 +224,7 @@
       confirm(reservation) {
         if (reservation.status === 'completed') return
         this.$emit('completeReservation', reservation._id)
+        this.$emit('getPendingReservationsLength')
       },
       modify(reservation) {
         if(reservation.status === 'completed') {
