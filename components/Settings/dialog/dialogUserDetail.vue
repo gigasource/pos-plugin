@@ -3,8 +3,8 @@
     <div class="dialog-user w-100">
       <div class="form">
         <div class="input">
-          <pos-text-field ref="username" @click="check = 'username'" large :label="$t('settings.userName')" v-model="name"/>
-          <pos-text-field ref="passcode" @click="check = 'passcode'" large :label="$t('settings.passcode')" v-model="passcode"/>
+          <pos-textfield-new ref="username" @click="check = 'username'" :label="$t('settings.userName')" v-model="name"/>
+          <pos-textfield-new ref="passcode" @click="check = 'passcode'" :label="$t('settings.passcode')" v-model="passcode"/>
         </div>
         <div class="action">
           <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogUserDetail = false">{{$t('ui.cancel')}}</g-btn>
@@ -82,7 +82,8 @@
       value: function(val) {
         setTimeout(() => {
           const textfield = this.$refs[this.focusInput];
-          if (textfield) textfield.$refs.input.focus();
+          if (textfield && textfield.$refs && textfield.$refs.textfield)
+            textfield.$refs.textfield.$refs.input.focus();
         }, 200);
         this.name = this.add ? '' : this.selectedUser.name;
         this.passcode = this.add ? '' : this.selectedUser.passcode;
