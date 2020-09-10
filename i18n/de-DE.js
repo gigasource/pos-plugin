@@ -240,7 +240,15 @@ module.exports = {
       requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
       ourService: 'Unsere Dienstleistungen',
       ourMenu: 'Unser Menü',
-      takeAway: 'Mitnehmen'
+      takeAway: 'Mitnehmen',
+      other: 'Andere',
+      otherSetting: 'andere Einstellung',
+      deliveryForwarding: 'Lieferung weiterleiten',
+      deliveryOrderForwarding: 'Lieferaufträge weiterleiten',
+      forwardToRestaurant: 'Bestellung an Restaurant-ID weiterleiten',
+      forwardNote: 'Weitergeleitete Bestellungen werden nur auf dem Zielgerät angezeigt. Das System leitet nur Lieferaufträge weiter.',
+      digitalMenuScript: 'Digitales Menü bettet Skript ein',
+      upload: 'Hochladen',
     },
 
     paymentProviders: {

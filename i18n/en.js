@@ -524,6 +524,14 @@ module.exports = {
       ourService: 'Our services',
       ourMenu: 'Our menu',
       takeAway: 'Take away',
+      other: 'Other',
+      otherSetting: 'Other Setting',
+      deliveryForwarding: 'Delivery Forwarding',
+      deliveryOrderForwarding: 'Delivery order forwarding',
+      forwardToRestaurant: 'Forward order to restaurant ID',
+      forwardNote: 'Forwarded orders will only appear in the destination device. The System only forwards delivery orders.',
+      digitalMenuScript: 'Digital menu embed script',
+      upload: 'Upload',
     },
 
 
