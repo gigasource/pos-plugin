@@ -237,7 +237,15 @@ module.exports = {
       minOrder: 'Mindestbestell',
       requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern',
       distanceNote: 'Notiz: Versand-Service ist nicht verfügbar für außerhalb Standorte des konfigurierten Radius.',
-      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius'
+      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
+      other: 'Andere',
+      otherSetting: 'andere Einstellung',
+      deliveryForwarding: 'Lieferung weiterleiten',
+      deliveryOrderForwarding: 'Lieferaufträge weiterleiten',
+      forwardToRestaurant: 'Bestellung an Restaurant-ID weiterleiten',
+      forwardNote: 'Weitergeleitete Bestellungen werden nur auf dem Zielgerät angezeigt. Das System leitet nur Lieferaufträge weiter.',
+      digitalMenuScript: 'Digitales Menü bettet Skript ein',
+      upload: 'Hochladen',
     },
 
     paymentProviders: {
