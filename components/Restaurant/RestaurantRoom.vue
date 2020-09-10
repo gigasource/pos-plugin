@@ -14,9 +14,10 @@
 </template>
 <script>
   import _ from 'lodash'
-  
+
   export default {
     name: 'RestaurantRoom',
+    injectService:['PosStore:isMobile'],
     components: { },
     props: {
       id: String
@@ -86,7 +87,11 @@
       selectRoomObj(roomObj) {
         if (!this.isTableBusy(roomObj)) {
           this.roomObj = roomObj;
-          this.$router.push(`/pos-order-2/${roomObj.name}`)
+          if (this.isMobile) {
+            this.$router.push(`/pos-order-3/${roomObj.name}`)
+          } else {
+            this.$router.push(`/pos-order-2/${roomObj.name}`)
+          }
         }
       },
     }

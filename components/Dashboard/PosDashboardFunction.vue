@@ -39,6 +39,7 @@
 <script>
   export default {
     name: "PosDashboardFunction",
+    injectService:['PosStore:isMobile'],
     props: {
       enabledFeatures: Array,
       user: null
@@ -49,7 +50,7 @@
 
       return {
         btnUp: [
-          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath('/pos-order-2')},
+          {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-3' : '/pos-order-2')},
           {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-delivery')}
         ],
         btnDown: [

@@ -37,6 +37,7 @@
 
   export default {
     name: 'PosOrderLayout',
+    injectService:['PosStore:isMobile'],
     props: {
       editable: {
         type: Boolean,
@@ -255,6 +256,9 @@
         if (product.product && product.product.isModifier) {
           style.fontStyle = 'italic'
         }
+        if (this.isMobile) {
+          style.minHeight = '40px'
+        }
         return style;
       },
       getGridTemplateFromNumber(num) {
@@ -443,7 +447,6 @@
       overflow: hidden;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-      min-height: 40px;
 
       & > div {
         max-height: 100%;

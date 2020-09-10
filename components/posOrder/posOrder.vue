@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-menu v-model="menu">
+      <g-menu v-if="isMobile" v-model="menu">
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <g-avatar size="36">
@@ -16,14 +16,19 @@
           <g-btn-bs icon="icon-print" @click="pay">Send</g-btn-bs>
         </div>
       </g-menu>
-      <div>
+      <g-avatar v-else size="36">
+        <img alt :src="avatar">
+      </g-avatar>
+      <div :style="{'display': isMobile ? 'block' : 'flex', 'flex': 2}" class="ml-1 align-items-baseline">
         <p class="order-detail__header-username">{{username}}</p>
         <span class="order-detail__header-title" v-if="table">Table</span>
         <span class="order-detail__header-value" v-if="table">{{table}}</span>
       </div>
-      <g-btn-bs class="elevation-1" style="width: 37px; height: 37px; border-radius: 50%; margin: 0" @click="back">
+      <g-spacer v-if="isMobile"/>
+      <g-btn-bs v-if="isMobile" class="elevation-1" style="width: 37px; height: 37px; border-radius: 50%; margin: 0" @click="back">
         <g-icon style="min-width: 24px">icon-back</g-icon>
       </g-btn-bs>
+      <g-spacer/>
       <span class="order-detail__header-title">{{$t('common.total')}}</span>
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
@@ -67,6 +72,7 @@
     directives: {
       Touch
     },
+    injectService:['PosStore:isMobile'],
     props: {
       total: Number,
       items: Array,
@@ -214,7 +220,6 @@
     &__header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 8px 0;
 
       &-username {
@@ -227,10 +232,11 @@
         opacity: 0.5;
         font-size: 11px;
         font-weight: 600;
+        margin-right: 4px;
       }
 
       &-value {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
         margin-left: 2px;
       }

@@ -1,6 +1,6 @@
 {
   "events": [],
-  "_id": "5f59cb535882f47445d1fd4a",
+  "_id": "5e7983deefd5f205955ba034",
   "data": {
     "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n  }\n}",
     "_code_type_": "commonJs"
@@ -40,12 +40,11 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "75%",
-              "25%"
+              "70%",
+              "30%"
             ],
             "rows": [
-              "1fr",
-              "64px"
+              "1fr"
             ],
             "columnGap": 0,
             "rowGap": 0,
@@ -83,30 +82,6 @@
                 "margin": "",
                 "padding": "",
                 "bgColor": "hsl(139, 100%, 50%, 50%)",
-                "alignSelf": "",
-                "justifySelf": "",
-                "wrapInDiv": false,
-                "displayFlex": false,
-                "flexDirection": "row",
-                "flexWrap": false,
-                "flexJustifyContent": "",
-                "flexAlignItems": "",
-                "flexAlignContent": "",
-                "flexOrder": "",
-                "flexGrow": "",
-                "flexShrink": "",
-                "flexBasis": "",
-                "flexAlignSelf": ""
-              },
-              {
-                "name": "toolbar",
-                "top": 2,
-                "left": 1,
-                "width": 2,
-                "height": 1,
-                "margin": "",
-                "padding": "",
-                "bgColor": "hsl(271, 100%, 50%, 50%)",
                 "alignSelf": "",
                 "justifySelf": "",
                 "wrapInDiv": false,
@@ -248,38 +223,6 @@
               "type": "prop"
             }
           ]
-        },
-        {
-          "choice": "view",
-          "component": "PosQuickOrderToolbar",
-          "binding": [],
-          "slotScopeBinding": [],
-          "slot": "toolbar",
-          "url": "plugins/pos-plugin/components/posOrder/PosQuickOrderToolbar.vue",
-          "path": "components/posOrder/PosQuickOrderToolbar.vue",
-          "pluginName": "pos-plugin",
-          "inject": [
-            {
-              "service": "OrderStore:quickCashRestaurant",
-              "local": "quickCash",
-              "type": "event"
-            },
-            {
-              "service": "OrderStore:currentOrder",
-              "local": "currentOrder",
-              "type": "prop"
-            },
-            {
-              "service": "OrderStore:resetOrderData",
-              "local": "resetOrderData",
-              "type": "event"
-            },
-            {
-              "service": "OrderStore:printKitchen",
-              "local": "printKitchen",
-              "type": "event"
-            }
-          ]
         }
       ]
     },
@@ -299,9 +242,9 @@
       }
     }
   ],
-  "name": "posOrder",
+  "name": "posOrderMobile",
   "props": {
     "fields": []
   },
-  "renderToRoute": "pos-order-2/:name?"
+  "renderToRoute": "pos-order-3/:name?"
 }
