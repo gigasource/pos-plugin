@@ -11,14 +11,14 @@
         <slot name="buttons">
           <div class="button" v-if="showButtons">
             <g-btn-bs width="120" border-color="#979797" text-color="#1d1d26" @click="internalValue = false">{{$t('ui.cancel')}}</g-btn-bs>
-            <g-btn-bs width="120" background-color="#2979FF" :disabled="!valid" @click="$emit('submit')">{{$t('ui.ok')}}</g-btn-bs>
+            <g-btn-bs width="120" background-color="#2979FF" :disabled="!valid" @click="submit">{{$t('ui.ok')}}</g-btn-bs>
           </div>
         </slot>
       </div>
       <div>
         <slot name="keyboard">
           <div class="keyboard" v-if="showKeyboard">
-            <pos-keyboard-full @enter-pressed="$emit('submit')" @change-type="changeKeyboardType" :type="keyboardType"/>
+            <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="keyboardType"/>
           </div>
         </slot>
       </div>
@@ -69,6 +69,9 @@
     methods: {
       changeKeyboardType(val) {
         this.keyboardType = val
+      },
+      submit() {
+        this.$emit('submit')
       }
     },
     watch: {

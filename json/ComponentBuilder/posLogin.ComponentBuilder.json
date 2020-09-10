@@ -770,23 +770,6 @@
           "url": "plugins/pos-plugin/components/Login/ConnectionStatusBtn.vue",
           "path": "components/Login/ConnectionStatusBtn.vue",
           "pluginName": "pos-plugin"
-        },
-        {
-          "choice": "view",
-          "component": "GBtn",
-          "content": {
-            "props": {
-              "html": "Quit",
-              "flat": true,
-              "style": {
-                "_code_": "module.exports = {\n  width: '50%',\n  justifySelf: 'flex-end'\n}",
-                "_code_type_": "commonJs"
-              }
-            }
-          },
-          "binding": [],
-          "slotScopeBinding": [],
-          "slot": "quit-btn"
         }
       ],
       "slot": null

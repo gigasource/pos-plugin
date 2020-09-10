@@ -125,7 +125,8 @@
             ]
           },
           "style": {
-            "height": "100%"
+            "_code_": "module.exports = {\n  height: '100%'\n}",
+            "_code_type_": "commonJs"
           }
         }
       },

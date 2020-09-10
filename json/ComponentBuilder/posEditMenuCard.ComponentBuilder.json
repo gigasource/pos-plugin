@@ -1,6 +1,10 @@
 {
   "events": [],
   "_id": "5e731c29be94c10a2f2a8a98",
+  "data": {
+    "_code_": "module.exports = {\n  data: {\n    productDblClicked: null,\n    view: null,\n    orderLayout: null,\n    selectedCategoryLayout: null,\n    selectedProductLayout: null,\n    keyboardConfig: null,\n  }\n}",
+    "_code_type_": "commonJs"
+  },
   "isProduction": true,
   "items": [
     {
@@ -121,6 +125,10 @@
                 "flexAlignSelf": ""
               }
             ]
+          },
+          "style": {
+            "_code_": "module.exports = {\n  height: '100%'\n}",
+            "_code_type_": "commonJs"
           }
         }
       },
@@ -292,11 +300,7 @@
               "isScopedSlot": true,
               "url": "plugins/pos-plugin/components/EditMenuCard/KeyboardEditor.vue",
               "path": "components/EditMenuCard/KeyboardEditor.vue",
-              "pluginName": "pos-plugin",
-              "content": {
-                "props": {},
-                "events": {}
-              }
+              "pluginName": "pos-plugin"
             }
           ],
           "url": "plugins/pos-plugin/components/common/ContentRender.vue",
@@ -310,10 +314,6 @@
   "props": {
     "fields": []
   },
-  "renderToRoute": "pos-edit-menu-card",
   "renderInAdminPage": true,
-  "data": {
-    "_code_": "module.exports = {\n  data: {\n    productDblClicked: null,\n    view: null,\n    orderLayout: null,\n    selectedCategoryLayout: null,\n    selectedProductLayout: null,\n    keyboardConfig: null,\n  }\n}",
-    "_code_type_": "commonJs"
-  }
+  "renderToRoute": "pos-edit-menu-card"
 }

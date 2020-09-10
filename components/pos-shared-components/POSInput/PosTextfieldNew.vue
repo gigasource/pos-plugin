@@ -3,14 +3,18 @@
     name: "PosTextfieldNew",
     injectService: ['PosStore:isMobile'],
     props: {
-      value: String,
+      value: null,
       label: String,
       placeholder: String,
+      clearable: Boolean,
+      required: Boolean,
+      validateOnBlur: Boolean,
+      rules: Array
     },
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return '' + this.value
         },
         set(val) {
           this.$emit('input', val)
@@ -18,12 +22,27 @@
       }
     },
     render() {
+      const props = {
+        label: this.label,
+        placeholder: this.placeholder,
+        clearable: this.clearable,
+        required: this.required,
+        rules: this.rules,
+        value: this.internalValue
+      }
+
       if (this.isMobile) {
         return (
-            <g-text-field ref="textfield" outlined={true} vModel={this.internalValue} label={this.label} placeholder={this.placeholder}/>
+            <g-text-field ref="textfield" {...{
+              props: { outlined: true, ...props},
+              on: { input: (val) => this.internalValue = val }
+            }} />
         )
       }
-      return <g-text-field-bs ref="textfield" large={true} class="bs-tf__pos" vModel={this.internalValue} label={this.label} placeholder={this.placeholder}/>
+      return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
+        props: { large: true, ...props},
+        on: { input: (val) => this.internalValue = val }
+      }} />
     }
   }
 </script>
@@ -33,6 +52,7 @@
     width: calc(100% - 8px);
     margin-right: 4px;
     margin-left: 4px;
+    margin-bottom: 8px;
 
     ::v-deep {
       fieldset {
