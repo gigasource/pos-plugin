@@ -237,7 +237,10 @@ module.exports = {
       minOrder: 'Mindestbestell',
       requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern',
       distanceNote: 'Notiz: Versand-Service ist nicht verfügbar für außerhalb Standorte des konfigurierten Radius.',
-      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius'
+      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
+      ourService: 'Unsere Dienstleistungen',
+      ourMenu: 'Unser Menü',
+      takeAway: 'Mitnehmen'
     },
 
     paymentProviders: {

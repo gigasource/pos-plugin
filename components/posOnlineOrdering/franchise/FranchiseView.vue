@@ -2,8 +2,8 @@
   <div class="background">
     <g-icon size="20" @click="close" class="icon-close">icon-close</g-icon>
     <section class="franchise-view r">
-      <div v-if="stores && logos && logos.length > 0" class="logo">
-        <g-slideshow style="background-color: transparent" v-model="logos" />
+      <div v-if="stores && banners && banners.length > 0" class="banner">
+        <g-slideshow style="background-color: transparent" v-model="banners" />
       </div>
       <div class="tilte">Please select a restaurant</div>
       <div class="store-cards">
@@ -25,7 +25,7 @@
     data: function () {
       return {
         stores: [],
-        logos: []
+        banners: []
       }
     },
     async created() {
@@ -37,12 +37,12 @@
 
       const stores = await cms.getModel('Store').find({ clientDomain })
       this.stores.splice(0, 0, ...stores)
-      this.logos = stores.map(store => ({
-        src: getCdnUrl(store.logoImageSrc),
+      this.banners = stores.map(store => ({
+        src: getCdnUrl(store.orderHeaderImageSrc),
         type: 'image',
         transition: 'slideRightToLeft',
         duration: 5000
-      })).filter(logo => !!logo.src)
+      })).filter(banner => !!banner.src)
     },
     computed: {
 
@@ -71,7 +71,7 @@
     right: 20px;
   }
 
-  .logo {
+  .banner {
     position: relative;
     width: 100%;
     height: 150px;
@@ -88,7 +88,7 @@
   .franchise-view {
     width: 100%;
     margin: 36px auto;
-    padding: 0 36px;
+    padding: 0 12%;
   }
 
   .tilte {

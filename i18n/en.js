@@ -520,7 +520,10 @@ module.exports = {
       minOrder: 'Min order',
       requireMinOrder: 'Require minimum order value for each zipcode',
       distanceNote: 'Note: Shipping service is not available for locations outside of the configured radius.',
-      requireMinOrderDistance: 'Require minimum order value for each radius'
+      requireMinOrderDistance: 'Require minimum order value for each radius',
+      ourService: 'Our services',
+      ourMenu: 'Our menu',
+      takeAway: 'Take away',
     },
 
 

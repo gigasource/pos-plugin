@@ -4,7 +4,7 @@
      <img alt class="overview-main__banner" :src="cdnStoreBanner"/>
      <div class="overview-main__info">
        <div class="row-flex align-items-center mb-1">
-         <g-icon size="18" class="mr-3">icon-store</g-icon>
+         <g-icon size="18" class="mr-3">icon-restaurant</g-icon>
          <span class="fs-small fw-700 mr-3">{{store.name || store.settingName}}</span>
        </div>
        <div class="row-flex align-items-center mb-1">
@@ -21,12 +21,12 @@
        </div>
      </div>
      <div class="overview-main__action">
-       <p class="fw-700 mb-2">Please select an option</p>
+       <p class="fw-700 mb-2">{{$t('setting.ourService')}}</p>
        <div class="row-flex align-items-center">
-         <g-btn-bs style="margin-right: 2%" v-if="store && store.pickup" icon="icon-take-away" @click="openStore('pickup')">Take away</g-btn-bs>
-         <g-btn-bs style="margin-right: 2%" v-if="store && store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">Delivery</g-btn-bs>
-         <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
-                   icon="icon-table-reservation" @click="openReservation">Reservation</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
+         <g-btn-bs :disabled="!store || !store.reservationSetting || !store.reservationSetting.activeReservation"
+                   icon="icon-table-reservation" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
        </div>
      </div>
      <div v-if="reviewAvailable" class="overview-main__review">
@@ -39,7 +39,7 @@
        <review v-if="showReview" v-for="(item, i) in googleMapInfo.reviews.slice(0, 3)" v-bind="item" :index="`${i}--mobile`" :key="i"/>
      </div>
      <div class="overview-main__menu">
-       <p class="fw-700 mb-2">Menu</p>
+       <p class="fw-700 mb-2">{{$t('setting.ourMenu')}}</p>
        <div class="tab-wrapper">
          <div class="overview-main__menu--category-icon">
            <g-icon>icon-fork</g-icon>
@@ -82,7 +82,7 @@
          </g-btn-bs>
        </div>
        <div class="row-flex align-items-center px-2 pt-2">
-         <g-icon size="18" class="mr-2">icon-store</g-icon>
+         <g-icon size="18" class="mr-2">icon-restaurant</g-icon>
          <span class="fs-small fw-700">{{store.name || store.settingName}}</span>
        </div>
        <div class="overview-side__info--phone">
@@ -120,6 +120,10 @@
 
    <div class="close-iframe-btn" @click="closeIframe">
      <g-icon>close</g-icon>
+   </div>
+
+   <div class="scroll-top-btn" @click="scrollTop">
+     <g-icon color="#1976D2">fas fa-angle-double-up</g-icon>
    </div>
  </div>
 </template>
@@ -297,6 +301,9 @@
         } else if (this.store.googleMapPlaceId) {
           window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
         } else {}
+      },
+      scrollTop() {
+        window.scroll({top: 0, left: 0, behavior: 'smooth'})
       }
     },
     watch: {
@@ -427,6 +434,7 @@
             font-weight: 600;
             font-size: 14px;
             color: #424242;
+            word-break: break-all;
           }
         }
       }
@@ -498,6 +506,21 @@
     &:hover {
       background-color: rgba(255, 255, 255, 0.4);
     }
+  }
+
+  .scroll-top-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background-color: white;
+    box-shadow: 0 1px 10px 1px rgba(21, 113, 191, 0.3);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 
   @media screen and (max-width: 1139px) {
@@ -582,6 +605,10 @@
       &-side {
         display: none;
       }
+    }
+
+    .scroll-top-btn {
+      display: flex;
     }
   }
 </style>
