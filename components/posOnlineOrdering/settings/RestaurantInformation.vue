@@ -77,7 +77,7 @@
               <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
                 Upload an icon for your online ordering website
               </div>
-              <g-btn-bs style="margin-left: auto; margin-right: auto" @click="choosePhoto" icon="icon-upload_white" background-color="#536DFE" text-color="white">Upload</g-btn-bs>
+              <g-btn-bs style="margin-left: auto; margin-right: auto" @click="choosePhoto" icon="icon-upload_white" background-color="#536DFE" text-color="white">{{$t('setting.upload')}}</g-btn-bs>
             </div>
           </div>
           <div v-else class="row-flex align-items-center">

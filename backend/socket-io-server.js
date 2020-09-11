@@ -178,11 +178,22 @@ module.exports = async function (cms) {
   }
 
   async function updateOrderStatus(orderToken, status) {
+    const storeName = status ? status.storeName : '';
+    const storeAlias = status ? status.storeAlias : '';
+
+    console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},eventType=orderStatus`,
+        `10.1. Online order backend: update order status, status = ${status.status}`, JSON.stringify(sendOrderTimeouts));
+
     if (sendOrderTimeouts[orderToken]) {
+      console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},eventType=orderStatus`,
+          `10.2. Online order backend: clear timeout, status = ${status.status}`);
+
       clearTimeout(sendOrderTimeouts[orderToken]);
       delete sendOrderTimeouts[orderToken]
     }
 
+    console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},eventType=orderStatus`,
+        `10.3. Online order backend: emit status to frontend, status = ${status.status}`, JSON.stringify(sendOrderTimeouts));
     internalSocketIOServer.to(orderToken).emit('updateOrderStatus', status)
 
     if (status.status === 'kitchen') {
@@ -193,6 +204,8 @@ module.exports = async function (cms) {
       await updateStoreReport(store._id, { orders: 1, total })
     }
 
+    console.debug(`sentry:orderToken=${orderToken},store=${storeName},alias=${storeAlias},eventType=orderStatus`,
+        `10.4. Online order backend: update db, status = ${status.status}`);
     await cms.getModel('Order').findOneAndUpdate({ onlineOrderId: orderToken }, { status: status.status })
   }
 
@@ -471,8 +484,9 @@ module.exports = async function (cms) {
         if (status === "completed")
           return
 
-        if (isCashPayment)
+        if (isCashPayment) {
           return updateOrderStatus(onlineOrderId, orderStatus)
+        }
 
         switch (status) {
           case 'declined':
@@ -626,6 +640,19 @@ module.exports = async function (cms) {
           default:
             break
         }
+      })
+
+      socket.on('getReservationSetting', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback(null)
+
+        const store = await cms.getModel('Store').findById(device.storeId)
+        if (!store) return callback(null)
+
+        callback({
+          ...store.reservationSetting,
+          openHours: store.openHours
+        })
       })
     }
 
@@ -819,6 +846,8 @@ module.exports = async function (cms) {
       }
 
       if (!device) {
+        socket.join(orderData.orderToken);
+
         if (store.gSms && store.gSms.enabled) {
           // accept order on front-end
           const timeToComplete = store.gSms.timeToComplete || 30
@@ -834,7 +863,6 @@ module.exports = async function (cms) {
             }
           }
 
-          socket.join(orderData.orderToken);
           return updateOrderStatus(orderData.orderToken,
               {
                 storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',

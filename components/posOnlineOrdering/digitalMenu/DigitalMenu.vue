@@ -131,6 +131,7 @@
 <script>
   import { getCdnUrl } from '../../Store/utils';
   import { smoothScrolling } from 'pos-vue-framework';
+  import {checkCategoryAvailability} from "../../logic/productUtils";
 
   export default {
     name: "DigitalMenu",
@@ -212,7 +213,11 @@
     methods: {
       async loadCategories() {
         const categories = await cms.getModel('Category').find({ store: this.store._id }, { store: 0 })
-        this.$set(this, 'categories', _.orderBy(categories, 'position', 'asc'))
+        const availableCategories = categories.filter(c => {
+          if(!c.availability) return true
+          return checkCategoryAvailability(c.availability)
+        })
+        this.$set(this, 'categories', _.orderBy(availableCategories, 'position', 'asc'))
       },
       async loadProducts() {
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))

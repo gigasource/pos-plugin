@@ -653,6 +653,24 @@
       "schemaType": "string",
       "key": "digitalMenuScript",
       "type": "input"
+    },
+    {
+      "_id": "5f55d4b3ca0c3bf20d2a54cc",
+      "schemaType": "object",
+      "key": "deliveryForward",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "storeId",
+          "type": "input"
+        }
+      ]
     }
   ],
   "name": "Store",

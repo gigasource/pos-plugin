@@ -71,6 +71,10 @@
                   {{$t('setting.groupPicture')}}
                 </g-btn-bs>
               </template>
+              <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0" style="margin-right: 0"
+                        @click.prevent.stop="openAvailabilityDialog(cate)">
+                <g-icon color="#535962" size="20" style="margin: 2px">icon-cog2</g-icon>
+              </g-btn-bs>
               <g-btn-bs background-color="#F4F9FF" border-color="#B5BAC0"
                         @click.prevent.stop="openDeleteCategoryDialog(cate)">
                 <g-icon color="#535962">mdi-trash-can-outline</g-icon>
@@ -140,6 +144,7 @@
         </div>
       </g-dialog>
       <dialog-import-menu-item v-model="dialog.importMenuItem" @submit="importMenuItemFromExcel"/>
+      <dialog-availability-setting v-model="dialog.availability" :availability="selectedAvailability" @submit="updateCategoryAvailability"/>
     </template>
   </div>
 </template>
@@ -150,10 +155,11 @@
   import XLSX from 'xlsx'
   import { imexportMenuItem, exportMenuItem } from '../../Store/imexportMenuItem';
   import DialogImportMenuItem from './dialogImportMenuItem';
-  
+  import DialogAvailabilitySetting from "./dialogAvailabilitySetting";
+
   export default {
     name: 'SettingMenu',
-    components: { DialogImportMenuItem, DialogDeleteCategory, DialogNewCategory },
+    components: {DialogAvailabilitySetting, DialogImportMenuItem, DialogDeleteCategory, DialogNewCategory },
     props: {
       store: Object,
       categories: Array,
@@ -177,10 +183,12 @@
           deleteProduct: false,
           setting: false,
           importMenuItem: false,
+          availability: false,
         },
         editBtn: [],
         editingProduct: false,
         edittingItems: [],
+        selectedAvailability: null
       }
     },
     created() {
@@ -341,7 +349,7 @@
       setCategoryImage(image, categoryId) {
         this.$emit('change-category-image', image, categoryId)
       },
-      
+
       // import file
       openImportMenuItemDialog() {
         this.dialog.importMenuItem = true
@@ -367,6 +375,16 @@
       },
       exportProductMenuItem() {
         exportMenuItem({ storeId: this.store._id })
+      },
+      openAvailabilityDialog(cate) {
+        this.selectedAvailability = cate.availability
+        this.selectedCategoryId = cate._id
+        this.dialog.availability = true
+      },
+      updateCategoryAvailability(availability) {
+        this.$emit('change-category-availability', availability, this.selectedCategoryId)
+        this.selectedAvailability = null
+        this.dialog.availability = false
       }
     }
   }
