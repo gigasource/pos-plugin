@@ -292,5 +292,53 @@ module.exports = cms => {
       console.log('failed to send reservation update notification')
     }
   })
+
+  cms.on('notifyAssignedStaffs', async task => {
+    const participants = task.participants.map(p => typeof p === 'string' ? p : p._id);
+    try {
+      const devices = (await cms.getModel('Staff').find({_id: {$in: participants}})).map(p => p.device).filter(d => d);
+      const tokens = (await cms.getModel('Device').find({_id: {$in: devices}}, 'firebaseToken')).map(d => d.firebaseToken).filter(t => t);
+      const message = {
+        notification: {
+          title: `Task assignment`,
+          body: `You have been assigned to task ${task.name}`,
+        },
+        data: {
+          type: 'task_assignment'
+        },
+      }
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
+      console.log(`Online order backend: Sent task assignment notification`);
+    } catch (e) {
+      console.log(`Online order backend: Error sending task assignment notification`, e);
+    }
+  })
+
+  cms.on('updateTask', async ({task, type}) => {
+    const participants = task.participants.map(p => typeof p === 'string' ? p : p._id);
+    try {
+      const devices = (await cms.getModel('Staff').find({_id: {$in: participants}})).map(p => p.device).filter(d => d);
+      const tokens = (await cms.getModel('Device').find({_id: {$in: devices}}, 'firebaseToken')).map(d => d.firebaseToken).filter(t => t);
+      const message = {
+        notification: {
+          title: `Task ${type}`,
+          body: `Task ${task.name} has been ${type}`,
+        },
+        data: {
+          type: 'task_update'
+        },
+      }
+      await admin.messaging().sendAll(tokens.map(t => ({
+        ...message,
+        token: t
+      })))
+      console.log(`Online order backend: Sent task update notification`);
+    } catch (e) {
+      console.log(`Online order backend: Error sending task update notification`, e);
+    }
+  })
 }
 

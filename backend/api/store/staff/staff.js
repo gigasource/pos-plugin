@@ -33,7 +33,7 @@ async function createStaff({ name, role, avatarUrl, active = true, storeId, devi
   })
 }
 
-async function updateStaff({ staffId, name, role, active, avatarUrl }) {
+async function updateStaff({ staffId, name, role, active, avatar }) {
   if (!staffId)
     throw "Missing staff's id"
 
@@ -41,7 +41,7 @@ async function updateStaff({ staffId, name, role, active, avatarUrl }) {
   if (name) changes.name = name
   if (role) changes.role = role
   if (active != null && active !== changes.active) changes.active = active
-  if (avatarUrl !== changes.avatarUrl) changes.avatarUrl = avatarUrl // allow to remove avatar
+  if (avatar !== changes.avatar) changes.avatar = avatar // allow to remove avatar
 
   return await cms.getModel('Staff').update({_id: staffId}, changes, { new: true })
 }
@@ -79,7 +79,7 @@ async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}
       throw "Error coordinates"
     }
     console.log(distance)
-    if (distance < 100) { // default 50m
+    if (distance < 100) { // default 100m
       note = 'success'
     } else {
       note = 'gps-error'
