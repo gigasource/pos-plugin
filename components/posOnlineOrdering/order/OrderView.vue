@@ -203,6 +203,7 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogAddToOrder from "./dialogAddToOrder";
   import isBetween from 'dayjs/plugin/isBetween'
+  import {checkCategoryAvailability} from "../../logic/productUtils";
   dayjs.extend(isBetween)
 
   export default {
@@ -550,7 +551,11 @@
       },
       async loadCategories() {
         const categories = await cms.getModel('Category').find({ store: this.store._id }, { store: 0 })
-        this.$set(this, 'categories', _.orderBy(categories, 'position', 'asc'))
+        const availableCategories = categories.filter(c => {
+          if(!c.availability) return true
+          return checkCategoryAvailability(c.availability)
+        })
+        this.$set(this, 'categories', _.orderBy(availableCategories, 'position', 'asc'))
       },
       async loadProducts() {
         this.$set(this, 'products', await cms.getModel('Product').find({ store: this.store._id }, { store: 0 }))
