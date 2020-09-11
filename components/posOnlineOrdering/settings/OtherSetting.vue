@@ -1,27 +1,27 @@
 <template>
   <div class="other">
-    <div class="other__title">{{$t('setting.otherSetting')}}</div>
+    <div class="other__title">Other Setting</div>
     <div class="other__main">
       <div class="other__main--left">
-        <p>{{$t('setting.digitalMenuScript')}}</p>
+        <p>Digital menu embed script</p>
         <g-textarea rows="8" outlined no-resize v-model="script"/>
         <div class="row-flex justify-end">
-          <g-btn-bs background-color="#1271ff" @click="uploadScript">{{$t('setting.upload')}}</g-btn-bs>
+          <g-btn-bs background-color="#1271ff" @click="uploadScript">Upload</g-btn-bs>
         </div>
       </div>
       <div class="other__main--right">
-        <p>{{$t('setting.deliveryForwarding')}}</p>
+        <p>Delivery Forwarding</p>
         <div class="row-flex align-items-center">
-          <span class="fs-small fw-700 mr-3">{{$t('setting.deliveryOrderForwarding')}}</span>
+          <span class="fs-small fw-700 mr-3">Delivery order forwarding</span>
           <g-switch v-model="active"/>
         </div>
         <div class="row-flex align-items-center my-3">
-          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">{{$t('setting.forwardToRestaurant')}}</span>
+          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">Forward order to restaurant ID </span>
           <g-text-field-bs style="margin: 0" large type="number" v-model="storeId"/>
         </div>
         <span>
-          <b>{{$t('store.note')}}: </b>
-          <span>{{$t('setting.forwardNote')}}</span>
+          <b>Note: </b>
+          <span>Forwarded orders will only appear in the destination device. The system only forwards delivery orders.</span>
         </span>
       </div>
     </div>

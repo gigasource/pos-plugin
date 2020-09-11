@@ -641,6 +641,19 @@ module.exports = async function (cms) {
             break
         }
       })
+
+      socket.on('getReservationSetting', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback(null)
+
+        const store = await cms.getModel('Store').findById(device.storeId)
+        if (!store) return callback(null)
+
+        callback({
+          ...store.reservationSetting,
+          openHours: store.openHours
+        })
+      })
     }
 
     /** @deprecated */
@@ -833,6 +846,8 @@ module.exports = async function (cms) {
       }
 
       if (!device) {
+        socket.join(orderData.orderToken);
+
         if (store.gSms && store.gSms.enabled) {
           // accept order on front-end
           const timeToComplete = store.gSms.timeToComplete || 30
@@ -848,7 +863,6 @@ module.exports = async function (cms) {
             }
           }
 
-          socket.join(orderData.orderToken);
           return updateOrderStatus(orderData.orderToken,
               {
                 storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',

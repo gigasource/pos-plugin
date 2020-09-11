@@ -46,6 +46,7 @@
             @swap-category="swapCategory"
             @change-category-image="changeCategoryImage"
             @import-categories-completed="reloadCategoriesAndProducts"
+            @change-category-availability="changeCategoryAvailability"
         />
         <delivery-fee
             v-if="view === 'setting-delivery-fee'"
@@ -151,7 +152,7 @@
           }
 
           items.push(
-              { title: this.setting.other , key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
+              { title: 'Other' , key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
           )
           return items
         }
@@ -354,6 +355,12 @@
           }
         }
         cate.image = image
+        cms.socket.emit('send-menu', this.store._id)
+      },
+      async changeCategoryAvailability(availability, _id) {
+        await cms.getModel('Category').findOneAndUpdate({_id}, {availability})
+        const cate = this.categories.find(c => c._id === _id)
+        cate.availability = availability
         cms.socket.emit('send-menu', this.store._id)
       },
 
