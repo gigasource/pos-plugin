@@ -98,10 +98,6 @@
                 "flexAlignSelf": ""
               }
             ]
-          },
-          "style": {
-            "_code_": "module.exports = {\n  height: '100%'\n}",
-            "_code_type_": "commonJs"
           }
         }
       },
@@ -400,6 +396,11 @@
                 {
                   "service": "OrderStore:completeReservation",
                   "local": "completeReservation",
+                  "type": "event"
+                },
+                {
+                  "service": "PosStore:getPendingReservationsLength",
+                  "local": "getPendingReservationsLength",
                   "type": "event"
                 }
               ]
