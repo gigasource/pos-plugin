@@ -1,0 +1,117 @@
+{
+  "_id": "5f3b5ae957493d79fb999072",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f3f716ffab5bc1c3de25db4",
+      "schemaType": "number",
+      "key": "id",
+      "unique": true,
+      "type": "input@number"
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999092",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999093",
+      "schemaType": "array",
+      "key": "participants",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "userId",
+          "ref": "User",
+          "type": "ref-select",
+          "autopopulate": true,
+          "populateSelect": [
+            "name"
+          ]
+        }
+      ],
+      "addable": null
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999094",
+      "schemaType": "array",
+      "key": "tasks",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "checked",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "content",
+          "type": "input"
+        }
+      ],
+      "type": "array",
+      "addable": null
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999095",
+      "schemaType": "array",
+      "key": "notes",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "user",
+          "ref": "User",
+          "type": "ref-select",
+          "autopopulate": true,
+          "populateSelect": [
+            "name"
+          ]
+        },
+        {
+          "schemaType": "date",
+          "key": "createdAt",
+          "type": "input@datetime-local"
+        },
+        {
+          "schemaType": "string",
+          "key": "text",
+          "type": "input"
+        }
+      ]
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999096",
+      "schemaType": "boolean",
+      "key": "completed",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999097",
+      "schemaType": "date",
+      "key": "createdAt",
+      "type": "input@datetime-local"
+    },
+    {
+      "_id": "5f3b5dc357493d79fb999098",
+      "schemaType": "date",
+      "key": "updatedAt",
+      "type": "input@datetime-local"
+    },
+    {
+      "_id": "5f3b9b8eebc5fe8f5233e039",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "autopopulate": true,
+      "populateSelect": [
+        "name"
+      ],
+      "type": "ref-select"
+    }
+  ],
+  "name": "Ticket",
+  "tabs": [],
+  "type": "Collection"
+}
