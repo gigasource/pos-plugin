@@ -24,7 +24,7 @@ module.exports = {
     _calls[receiver] = CallStatus.Idle
   },
   getStatus(id) {
-    return _calls[id]
+    return _calls[id] || 'idle'
   },
   CallStatus
 }
