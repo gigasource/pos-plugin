@@ -2,30 +2,58 @@
   <fragment>
     <div class="main">
       <div class="main__item">
-        <g-text-field-bs :label="$t('settings.companyName')" v-model="name">
+        <g-text-field-bs :label="$t('settings.companyName')" v-model="name" required>
           <template v-slot:append-inner>
-            <g-icon style="cursor: pointer" @click="dialogCompanyName = true">icon-keyboard</g-icon>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
       </div>
       <div class="main__item">
-        <g-text-field-bs :label="$t('settings.address')" v-model="address">
+        <g-text-field-bs :label="$t('settings.address')" v-model="address" required>
           <template v-slot:append-inner>
-            <g-icon style="cursor: pointer" @click="dialogCompanyAddress = true">icon-keyboard</g-icon>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
       </div>
       <div class="main__item">
-        <g-text-field-bs :label="$t('settings.tel')" v-model="telephone">
+        <g-text-field-bs :label="$t('settings.address2')" v-model="address2">
           <template v-slot:append-inner>
-            <g-icon style="cursor: pointer" @click="dialogCompanyTelephone = true">icon-keyboard</g-icon>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
       </div>
       <div class="main__item">
-        <g-text-field-bs :label="$t('settings.taxNo')" v-model="taxNumber">
+        <g-text-field-bs :label="$t('settings.zipCode')" v-model="zipCode" required>
           <template v-slot:append-inner>
-            <g-icon style="cursor: pointer" @click="dialogCompanyTaxNumber = true">icon-keyboard</g-icon>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
+      </div>
+      <div class="main__item">
+        <g-text-field-bs :label="$t('settings.city')" v-model="city" required>
+          <template v-slot:append-inner>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
+      </div>
+      <div class="main__item">
+        <g-text-field-bs :label="$t('settings.tel')" v-model="telephone" required>
+          <template v-slot:append-inner>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
+      </div>
+      <div class="main__item">
+        <g-text-field-bs :label="$t('settings.taxNo')" v-model="taxNumber" required>
+          <template v-slot:append-inner>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
+      </div>
+      <div class="main__item">
+        <g-text-field-bs :label="$t('settings.ustId')" v-model="ustId">
+          <template v-slot:append-inner>
+            <g-icon style="cursor: pointer" @click.stop="dialog = true">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
       </div>
@@ -48,10 +76,20 @@
         </div>
       </div>
     </div>
-    <dialog-text-filter :label="$t('settings.companyName')" :default-value="name" v-model="dialogCompanyName" @submit="changeName($event)"/>
-    <dialog-text-filter :label="$t('settings.address')" :default-value="address" v-model="dialogCompanyAddress" @submit="changeAddress($event)"/>
-    <dialog-text-filter :label="$t('settings.tel')" :default-value="telephone" v-model="dialogCompanyTelephone" @submit="changeTelephone($event)"/>
-    <dialog-text-filter :label="$t('settings.taxNo')" :default-value="taxNumber" v-model="dialogCompanyTaxNumber" @submit="changeTaxNumber($event)"/>
+    <dialog-form-input v-model="dialog" @submit="update">
+      <template #input>
+        <div class="row-flex flex-wrap justify-around">
+          <pos-textfield-new style="width: 48%" :label="$t('settings.companyName')" v-model="name" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.address')" v-model="address" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.address2')" v-model="address2"/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.zipCode')" v-model="zipCode" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.city')" v-model="city" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.tel')" v-model="telephone" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.taxNo')" v-model="taxNumber" required/>
+          <pos-textfield-new style="width: 48%" :label="$t('settings.ustId')" v-model="ustId"/>
+        </div>
+      </template>
+    </dialog-form-input>
   </fragment>
 </template>
 
@@ -66,18 +104,14 @@
     data() {
       return {
         file: null,
-        dialogCompanyName: false,
-        dialogCompanyAddress: false,
-        dialogCompanyTelephone: false,
-        dialogCompanyTaxNumber: false,
+        dialog: false,
       }
     },
     computed: {
       name: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.name;
-          }
+          if (this.companyInfo) return this.companyInfo.name || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'name', val)
@@ -85,19 +119,44 @@
       },
       address: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.address;
-          }
+          if (this.companyInfo) return this.companyInfo.address || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'address', val)
         }
       },
+      address2: {
+        get() {
+          if (this.companyInfo) return this.companyInfo.address2 || '';
+          return ''
+        },
+        set(val) {
+          this.$set(this.companyInfo, 'address2', val)
+        }
+      },
+      zipCode: {
+        get() {
+          if (this.companyInfo) return this.companyInfo.zipCode || '';
+          return ''
+        },
+        set(val) {
+          this.$set(this.companyInfo, 'zipCode', val)
+        }
+      },
+      city: {
+        get() {
+          if (this.companyInfo) return this.companyInfo.city || '';
+          return ''
+        },
+        set(val) {
+          this.$set(this.companyInfo, 'city', val)
+        }
+      },
       telephone: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.telephone;
-          }
+          if (this.companyInfo) return this.companyInfo.telephone || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'telephone', val)
@@ -105,19 +164,26 @@
       },
       taxNumber: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.taxNumber;
-          }
+          if (this.companyInfo) return this.companyInfo.taxNumber || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'taxNumber', val)
         }
       },
+      ustId: {
+        get() {
+          if (this.companyInfo) return this.companyInfo.ustId || '';
+          return ''
+        },
+        set(val) {
+          this.$set(this.companyInfo, 'ustId', val)
+        }
+      },
       logo: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.logo;
-          }
+          if (this.companyInfo) return this.companyInfo.logo || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'logo', val)
@@ -125,9 +191,8 @@
       },
       logoSize: {
         get() {
-          if (this.companyInfo) {
-            return this.companyInfo.logoSize;
-          }
+          if (this.companyInfo) return this.companyInfo.logoSize || '';
+          return ''
         },
         set(val) {
           this.$set(this.companyInfo, 'logoSize', val)
@@ -155,21 +220,9 @@
           reader.readAsDataURL(this.file);
         }
       },
-      async changeName(name) {
-        this.name = name;
-        await this.updateCompanyInfo();
-      },
-      async changeAddress(address) {
-        this.address = address;
-        await this.updateCompanyInfo();
-      },
-      async changeTelephone(telephone) {
-        this.telephone = telephone;
-        await this.updateCompanyInfo();
-      },
-      async changeTaxNumber(taxNumber) {
-        this.taxNumber = taxNumber;
-        await this.updateCompanyInfo();
+      async update() {
+        this.dialog = false
+        await this.updateCompanyInfo()
       },
       async changeLogoSize(size) {
         this.logoSize = size;
@@ -182,14 +235,20 @@
 <style scoped lang="scss">
   .main {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-auto-columns: 1fr 1fr;
     grid-auto-flow: column;
     grid-gap: 12px 24px;
     padding: 32px 52px;
+    height: 100%;
+    overflow-y: scroll;
   }
 
   .bs-tf-wrapper ::v-deep {
+    .bs-tf-label {
+      font-size: 13px;
+    }
+
     .bs-tf-inner-input-group {
       border-radius: 2px;
 
@@ -200,18 +259,6 @@
 
     .g-icon.icon-keyboard {
       cursor: pointer;
-    }
-  }
-
-  .g-tf-wrapper {
-    margin: 8px 0 0 4px;
-
-    ::v-deep .g-tf .g-tf-input {
-      padding: 4px 6px;
-    }
-
-    ::v-deep .g-tf-append__inner {
-      margin-right: 8px;
     }
   }
 
