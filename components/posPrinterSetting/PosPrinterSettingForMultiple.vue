@@ -58,7 +58,7 @@
     },
     methods: {
       async addNewSetting() {
-        await this.updatePrinterHardwares(null, [], this.id)
+        await this.updatePrinter(null, {}, this.id)
         await this.genTabs()
       },
       async deletePrinterSetting() {
