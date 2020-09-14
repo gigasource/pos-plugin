@@ -1093,7 +1093,15 @@ module.exports = async function (cms) {
     })
 
     socket.on('posCommand:send', ({clientId, command}, ack) => {
-      externalSocketIOServer.emitTo(clientId, 'posCommand:send', command, ack);
+      const commandArray = command.split(' ');
+      let commandArgs = [];
+
+      if (commandArray.length > 1) {
+        command = commandArray.shift();
+        commandArgs = commandArray;
+      }
+
+      externalSocketIOServer.emitTo(clientId, command, commandArgs, ack);
     });
 
     socket.once('disconnect', async () => {
