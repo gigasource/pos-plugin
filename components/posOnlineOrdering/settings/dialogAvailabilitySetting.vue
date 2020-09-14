@@ -33,11 +33,21 @@
             <g-time-picker-input use24Hours v-model="endTime"/>
           </div>
         </div>
-        <p>Start date</p>
+        <div style="align-self: center; display: flex; align-items: center">
+          Start date
+          <g-menu v-model="menu.startDate" open-on-hover nudge-left="150" nudge-top="10">
+            <template v-slot:activator="{on}">
+              <g-icon v-on="on" color="#536DFE" size="20" class="ml-1">info</g-icon>
+            </template>
+            <div class="menu-info">
+              • Start date should be chosen on Monday.
+            </div>
+          </g-menu>
+        </div>
         <g-date-picker-input class="date-picker" v-model="startDate"/>
         <div style="align-self: center; display: flex; align-items: center">
           Repeat* <i class="fs-small-2 ml-1">(after week)</i>
-          <g-menu v-model="menuRepeat" open-on-hover nudge-left="150" nudge-top="10">
+          <g-menu v-model="menu.repeat" open-on-hover nudge-left="150" nudge-top="10">
             <template v-slot:activator="{on}">
               <g-icon v-on="on" color="#536DFE" size="20" class="ml-1">info</g-icon>
             </template>
@@ -83,7 +93,10 @@
         endTime: '',
         startDate: '',
         repeat: '',
-        menuRepeat: false
+        menu: {
+          repeat: false,
+          startDate: false
+        }
       }
     },
     watch: {
