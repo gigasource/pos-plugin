@@ -542,11 +542,13 @@ router.put('/update-token/:id', async (req, res) => {
 
   if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
   if (!token) return res.status(400).json({ error: `You must provide token` });
-
   try {
     const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { firebaseToken: token })
-
-    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    if (!updatedDevice) {
+      const updatedUser = await cms.getModel('User').findOneAndUpdate({_id: id}, { firebaseToken: token })
+      if (!updatedUser)
+        return res.status(400).json({ error: `Device ${id} not found` })
+    }
     res.status(204).send()
   } catch (e) {
     res.status(500).json({error: 'Error updating device token'})
@@ -561,8 +563,11 @@ router.put('/update-apn-token/:id', async (req, res) => {
 
   try {
     const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { apnToken: token })
-
-    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    if (!updatedDevice) {
+      const updateUser = await cms.getModel('User').findOneAndUpdate({ _id: id }, { apnToken: token })
+      if (!updateUser)
+        return res.status(400).json({ error: `Device or user with "${id}" not found` })
+    }
     res.status(204).send()
   } catch (e) {
     res.status(500).json({error: 'Error updating device apn token'})
