@@ -31,6 +31,17 @@
       "type": "ref-select",
       "label": "Store",
       "labelProp": "settingName"
+    },
+    {
+      "_id": "5f5b052c36b503001a9db0a2",
+      "schemaType": "string",
+      "key": "note",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "gps-error",
+        "success"
+      ]
     }
   ],
   "name": "CheckEvent",

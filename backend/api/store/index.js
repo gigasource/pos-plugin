@@ -205,7 +205,7 @@ router.post('/sign-in-requests', async (req, res) => {
   // name: device owner's name enter by device owner
   // role: 'staff' | 'manager'
   const {storeName, googleMapPlaceId, deviceId, role, name} = req.body;
-  if (!storeName || !googleMapPlaceId || !deviceId || !role) return res.status(400).json({error: 'Missing property in request body'});
+  if (!storeName || !googleMapPlaceId || !deviceId || !role || !name) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
 
@@ -422,5 +422,24 @@ router.get('/basic-info', async (req, res) => {
 router.use('/staff', staffRoute)
 router.use('/team', teamRoute)
 router.use('/task', taskRoute)
+
+router.get('/delivery-forward', async (req, res) => {
+  const { id } = req.query
+  if(!id) {
+    res.json({
+      ok: false
+    })
+  }
+  const store = await cms.getModel('Store').findOne({ id })
+  if(!store) {
+    res.json({
+      ok: false
+    })
+  }
+  res.json({
+    ok: true,
+    store
+  })
+})
 
 module.exports = router

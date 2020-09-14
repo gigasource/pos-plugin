@@ -32,6 +32,51 @@
       "schemaType": "string",
       "key": "image",
       "type": "input"
+    },
+    {
+      "_id": "5f59ec582d98ab744ce33061",
+      "schemaType": "object",
+      "key": "availability",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "array",
+          "key": "dayInWeek",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "",
+              "type": null
+            }
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "startTime",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "endTime",
+          "type": "input"
+        },
+        {
+          "schemaType": "date",
+          "key": "startDate",
+          "type": "input@date"
+        },
+        {
+          "schemaType": "number",
+          "key": "repeat",
+          "type": "input@number"
+        }
+      ]
     }
   ],
   "id": "5c46e2b15889c52fe001ab83",

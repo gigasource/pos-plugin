@@ -9,22 +9,78 @@
           <g-btn-bs background-color="#1271ff" @click="uploadScript">Upload</g-btn-bs>
         </div>
       </div>
+      <div class="other__main--right">
+        <p>Delivery Forwarding</p>
+        <div class="row-flex align-items-center">
+          <span class="fs-small fw-700 mr-3">Delivery order forwarding</span>
+          <g-switch v-model="active"/>
+        </div>
+        <div class="row-flex align-items-center my-3">
+          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">Forward order to restaurant ID </span>
+          <g-text-field-bs style="margin: 0" large type="number" v-model="storeId"/>
+        </div>
+        <span>
+          <b>Note: </b>
+          <span>Forwarded orders will only appear in the destination device. The system only forwards delivery orders.</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+  import _ from 'lodash'
+
   export default {
     name: "OtherSetting",
-    props: {},
+    props: {
+      store: Object
+    },
     data() {
       return {
-        script: ''
+        script: (this.store && this.store.digitalMenuScript) || '',
+        deliveryForward: (this.store && this.store.deliveryForward) || {},
+      }
+    },
+    created() {
+      this.updateStoreIdDebounce = _.debounce(this.updateStoreId, 1000)
+    },
+    computed: {
+      active: {
+        get() {
+          if(this.deliveryForward)
+            return this.deliveryForward.active
+          else
+            return false
+        },
+        set(val) {
+          this.$set(this.deliveryForward, 'active', val)
+          this.updateDeliveryForward()
+        }
+      },
+      storeId: {
+        get() {
+          if(this.deliveryForward)
+            return this.deliveryForward.storeId
+          else
+            return ''
+        },
+        set(val) {
+          this.updateStoreIdDebounce(val)
+        }
       }
     },
     methods: {
       uploadScript() {
         this.$emit('update', {digitalMenuScript: this.script})
+      },
+      updateDeliveryForward() {
+        this.$emit('update', { deliveryForward: this.deliveryForward })
+      },
+      updateStoreId(value) {
+        if (!value || isNaN(value)) return
+        this.$set(this.deliveryForward, 'storeId', value)
+        this.updateDeliveryForward()
       }
     }
   }
@@ -48,11 +104,16 @@
         border-radius: 5px;
         padding: 24px;
         margin-bottom: 24px;
+
+        & > p {
+          font-size: 16px;
+          font-weight: bold;
+        }
       }
 
       &--left {
-        flex: 0 0 calc(80% - 12px);
-        margin-right: 12px;
+        flex: 0 0 calc(50% - 6px);
+        margin-right: 6px;
 
         .g-textarea {
           margin-right: 4px;
@@ -86,6 +147,11 @@
             }
           }
         }
+      }
+
+      &--right {
+        flex: 0 0 calc(50% - 6px);
+        margin-left: 6px;
       }
     }
   }

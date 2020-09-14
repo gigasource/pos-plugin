@@ -1,5 +1,5 @@
 export function genIframe(type, link, alias) {
-  return `var url${type} = ['https://online-order.gigasource.io, '${type === 'franchise' ? type : 'store'}', '${alias}', '${link || ''}'].join('/')
+  return `var url${type} = ['https://online-order.gigasource.io', '${type === 'franchise' ? 'f' : 'store'}', '${alias}', '${link || ''}'].join('/')
   
   function openIframe${type} () {
     window.location = '#'

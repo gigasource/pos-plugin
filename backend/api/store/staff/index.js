@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
     const staff = await getStaff({storeId, deviceId})
     res.json(staff)
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -35,7 +35,7 @@ router.get('/all-staffs/:storeId', async (req, res) => {
   try {
     res.json(await getStaffs({ storeId: req.params.storeId }))
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -47,7 +47,7 @@ router.get('/with-task/:storeId', async (req, res) => {
   try {
     res.json(await getStaffsWithTask(storeId))
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
     const insertResult = await createStaff({...req.body})
     res.json(insertResult)
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -71,7 +71,7 @@ router.put('/', async (req, res) => {
     const updateResult = await updateStaff({...req.body})
     res.json(updateResult)
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -80,7 +80,7 @@ router.delete('/:staffId', async (req, res) => {
     const removeResult = await removeStaff({staffId: req.params.staffId})
     res.json(removeResult)
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -91,7 +91,7 @@ router.post('/check-in-out', async (req, res) => {
   try {
     res.json(await processCheckInCheckOut({...req.body}))
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -102,7 +102,7 @@ router.get('/latest-check-event', async (req, res) => {
   try {
     res.json(await getLastCheckInCheckOut(req.query.staffId))
   } catch(e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -113,7 +113,7 @@ router.get('/work-time-report', async (req, res) => {
   try {
     res.json(await getWorkTimeReport({...req.query}))
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -124,7 +124,7 @@ router.get('/time-sheet-detail', async (req, res) => {
   try {
     res.json(await getTimeSheetDetail({...req.query}))
   } catch (e) {
-    res.status(404).json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 

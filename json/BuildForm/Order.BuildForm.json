@@ -1264,6 +1264,13 @@
       "key": "restaurantPlusVoucher",
       "ref": "RPVoucher",
       "autopopulate": true
+    },
+    {
+      "_id": "5f55e57c074b71f392c7902f",
+      "schemaType": "objectId",
+      "key": "forwardedStore",
+      "ref": "Store",
+      "type": "ref-select"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

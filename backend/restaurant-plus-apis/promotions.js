@@ -25,6 +25,7 @@ const mapperConfig = {
     key: 'store.settingName',
     transform: (sourceValue, sourceObject) => sourceValue || sourceObject.store.name
   },
+  'store.logoImageSrc': 'store.logoImageSrc',
   descriptionImageUrl: {
     key: 'descriptionImageUrl',
     transform: sourceValue => sourceValue || DEFAULT_PROMOTION_BACKGROUND
@@ -75,6 +76,16 @@ router.get('/', async (req, res) => {
   const promotions = await PromotionModel.aggregate(aggregateSteps);
   res.status(200).json(promotions.map(e => objectMapper(e, mapperConfig)));
 });
+
+router.get('/by-id/:promotionId', async (req, res) => {
+  const {promotionId} = req.params;
+  if (!promotionId) return respondWithError(res, 400, 'Missing promotion id in request');
+
+  const promotion = await PromotionModel.findById(promotionId);
+  if (!promotion) return respondWithError(res, 400, 'Invalid promoition id');
+
+  res.status(200).json(objectMapper(promotion, mapperConfig));
+})
 
 router.post('/', jwtValidator, async (req, res) => {
   const {

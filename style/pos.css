@@ -843,3 +843,10 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-restaurant {
+  background-image: url("../assets/store.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

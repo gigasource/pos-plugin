@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {respondWithError} = require('./utils');
 const objectMapper = require('object-mapper');
+const {notifyToClient} = require("../app-notification/firebase-messaging/admin");
 const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const admin = firebaseAdminInstance();
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -20,27 +21,6 @@ const mapperConfig = {
   value: 'value',
   transactionType: 'transactionType',
   createdAt: 'createdAt',
-}
-
-async function notifyToClient(type = "", title = "", message = "", token = "") {
-  const firebaseMsg = {
-    notification: {
-      title,
-      body: message
-    },
-    data: {
-      type,
-      message
-    }
-  }
-  return admin.messaging().sendToDevice(
-    [token],
-    {...firebaseMsg},
-    {
-      contentAvailable: true,
-      priority: 'high',
-    }
-  )
 }
 
 router.get('/', jwtValidator, async (req, res) => {
@@ -74,7 +54,7 @@ router.post('/', jwtValidator, async (req, res) => {
       });
 
       const user = await UserModel.findById(userId);
-      const currentUserPoints = user.rpPoints;
+      const currentUserPoints = {...user.rpPoints};
 
       currentUserPoints[storeId] = (currentUserPoints[storeId] || 0) + value
 
