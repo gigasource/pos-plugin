@@ -1,8 +1,9 @@
 async function getTeam({storeId}) {
   if (!storeId)
-    throw "Misisng store's id"
+    throw "Missing store's id"
 
-  return await cms.getModel('Team').find({store: storeId})
+  const teams = await cms.getModel('Team').find({store: storeId})
+  return teams.map(t => ({...t._doc, members: t._doc.members.filter(m => m.active)}))
 }
 
 async function createTeam({name, members = [], storeId}) {

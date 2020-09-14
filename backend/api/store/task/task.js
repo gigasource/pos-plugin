@@ -41,7 +41,8 @@ async function getTasks({storeId, statuses, startDate, endDate, staffId}) {
     })
   }
   const tasks = await cms.getModel(TASK_COL).find(qryCondition)
-  return tasks
+  return tasks.map(t => ({...t._doc, participants: t._doc.participants.filter(p => p.active)}))
+  // return tasks
 }
 
 /**

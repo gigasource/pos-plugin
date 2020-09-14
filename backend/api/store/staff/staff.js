@@ -13,7 +13,7 @@ async function getStaff({storeId, deviceId}) {
 async function getStaffs({storeId}) {
   if (!storeId)
     throw "Missing store's id"
-  return await cms.getModel('Staff').find({store: storeId})
+  return await cms.getModel('Staff').find({store: storeId, active: true})
 }
 
 async function createStaff({ name, role, avatarUrl, active = true, storeId, deviceId }) {
