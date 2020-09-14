@@ -53,17 +53,17 @@ export async function getHighestFavouriteProductOrder() {
   return (result[0] && result[0].maxOrder) || 0
 }
 
-export function checkCategoryAvailability(availability) {
+export function checkCategoryAvailability(availability, checkTime = false) {
   const { active, dayInWeek, startTime, endTime, startDate, repeat } = availability
   if(!active) return true
   const weekday = dayjs().day() - 1
-  if(!dayInWeek.map((d, i) => d && i).filter(d => !!d).includes(weekday)) return false
-  if(startTime) {
+  if(!dayInWeek[weekday]) return false
+  if(checkTime && startTime) {
     const [hour, minute] = startTime.split(':')
     const start = dayjs().hour(hour).minute(minute).second(0)
     if(dayjs().isBefore(start)) return false
   }
-  if(endTime) {
+  if(checkTime && endTime) {
     const [hour, minute] = endTime.split(':')
     const end = dayjs().hour(hour).minute(minute).second(0)
     if(dayjs().isAfter(end)) return false
@@ -75,6 +75,20 @@ export function checkCategoryAvailability(availability) {
       const diff = dayjs().diff(start, 'week')
       if(diff % (+repeat + 1) !== 0) return false
     }
+  }
+  return true
+}
+
+export function checkCategoryInTime(startTime, endTime) {
+  if(startTime) {
+    const [hour, minute] = startTime.split(':')
+    const start = dayjs().hour(hour).minute(minute).second(0)
+    if(dayjs().isBefore(start)) return false
+  }
+  if(endTime) {
+    const [hour, minute] = endTime.split(':')
+    const end = dayjs().hour(hour).minute(minute).second(0)
+    if (dayjs().isAfter(end)) return false
   }
   return true
 }

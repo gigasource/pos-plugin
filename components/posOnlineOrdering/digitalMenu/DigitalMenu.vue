@@ -50,6 +50,7 @@
               :scrolling="scrolling"
               :display-image="store.displayImage"
               :store-country-locale="storeCountryLocale"
+              :readonly="!category.inTime"
               @image="openDialogImage"/>
         </div>
         <div v-if="script" v-html="script"/>
@@ -131,7 +132,7 @@
 <script>
   import { getCdnUrl } from '../../Store/utils';
   import { smoothScrolling } from 'pos-vue-framework';
-  import {checkCategoryAvailability} from "../../logic/productUtils";
+  import {checkCategoryAvailability, checkCategoryInTime} from "../../logic/productUtils";
 
   export default {
     name: "DigitalMenu",
@@ -216,7 +217,10 @@
         const availableCategories = categories.filter(c => {
           if(!c.availability) return true
           return checkCategoryAvailability(c.availability)
-        })
+        }).map(c => ({
+          ...c,
+          inTime: c.availability && checkCategoryInTime(c.availability.startTime, c.availability.endTime)
+        }))
         this.$set(this, 'categories', _.orderBy(availableCategories, 'position', 'asc'))
       },
       async loadProducts() {

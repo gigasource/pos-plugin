@@ -96,7 +96,7 @@
                 <menu-item
                     v-for="(item, index) in category.items" :key="index"
                     v-bind="item"
-                    :is-opening="isStoreOpening"
+                    :is-opening="isStoreOpening && category.inTime"
                     :currency-unit="store.currency"
                     :quantity="getQuantityInOrder(item)"
                     :disabled="menuItemDisabled"
@@ -203,7 +203,7 @@
   import { getCdnUrl } from '../../Store/utils';
   import DialogAddToOrder from "./dialogAddToOrder";
   import isBetween from 'dayjs/plugin/isBetween'
-  import {checkCategoryAvailability} from "../../logic/productUtils";
+  import {checkCategoryAvailability, checkCategoryInTime} from "../../logic/productUtils";
   dayjs.extend(isBetween)
 
   export default {
@@ -553,8 +553,11 @@
         const categories = await cms.getModel('Category').find({ store: this.store._id }, { store: 0 })
         const availableCategories = categories.filter(c => {
           if(!c.availability) return true
-          return checkCategoryAvailability(c.availability)
-        })
+          return checkCategoryAvailability(c.availability, false)
+        }).map(c => ({
+          ...c,
+          inTime: c.availability && checkCategoryInTime(c.availability.startTime, c.availability.endTime)
+        }))
         this.$set(this, 'categories', _.orderBy(availableCategories, 'position', 'asc'))
       },
       async loadProducts() {
