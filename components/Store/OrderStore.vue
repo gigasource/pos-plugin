@@ -184,39 +184,71 @@
         this.scrollWindowProducts = products
         return products
       },
-      addProductToOrder(product) {
-        if (this.currentOrder && product) {
-          if (!Array.isArray(this.currentOrder.items)) this.currentOrder.items = []
+      mapProduct(p) {
+        const product = {
+          ...p,
+          ...!p.originalPrice && { originalPrice: p.price },
+          ...!p.quantity && { quantity: 1 },
+          ...!p.course && { course: 1 },
+          product: p._id
+        }
+        return _.omit(product, '_id')
+      },
+      async addProductToOrder(product) {
+        if (!this.currentOrder || !product) return
+        const latestProduct = _.last(this.currentOrder.items);
 
-          const latestProduct = _.last(this.currentOrder.items);
+        if (!latestProduct) {
+          // create order with product
+          const { _id, items, table } = await cms.getModel('Order').create({
+            table: this.currentOrder.table,
+            items: [this.mapProduct(product)],
+            status: 'inProgress'
+          })
 
-          if (_.isEqual(_.omit(latestProduct, 'quantity', 'originalPrice', 'course'), _.omit(product, 'quantity'))) {
-            if (latestProduct.course === 1) latestProduct.quantity = latestProduct.quantity + (product.quantity || 1);
-          } else {
-            // this.currentOrder.items.push(Object.assign({}, { quantity: 1 }, product))
-            // replace (instead of mutate) to get old value in watcher for scrolling in order table
-            this.currentOrder.items = [...this.currentOrder.items, Object.assign({}, product, {
-              originalPrice: product.price,
-              quantity: product.quantity || 1,
-              course: 1
-            })]
-          }
+          this.$set(this.currentOrder, '_id', _id)
+          this.$set(this.currentOrder, 'table', table)
+          this.$set(this.currentOrder, 'items', items)
         } else {
-          this.currentOrder = { items: [Object.assign({}, { originalPrice: product.price, quantity: 1, course: 1 }, product)] }
+          const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
+            return latestProduct.product === product._id &&
+              product.price === latestProduct.price &&
+              (!product.modifiers || product.modifiers.length === 0)
+          } )
+
+          console.log('isSameItem', isSameItem)
+          if (isSameItem) return this.addItemQuantity(latestProduct)
+          // else add product to arr
+          const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
+            { _id: this.currentOrder._id },
+            { $push: { 'items': this.mapProduct(product) } },
+            { new: true }
+          )
+
+          console.log('updatedOrder', updatedOrder)
+          this.$set(this.currentOrder, '_id', updatedOrder._id)
+          this.$set(this.currentOrder, 'table', updatedOrder.table)
+          this.$set(this.currentOrder, 'items', updatedOrder.items)
         }
       },
-      addItemQuantity(item) {
+      async addItemQuantity(item) {
+        // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
+        await cms.getModel('Order').updateOne(
+          { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
+          { $set: { 'items.$.quantity': itemToUpdate.quantity + 1 } }
+        )
         itemToUpdate.quantity++
       },
-      removeItemQuantity(item, all = false) {
+      async removeItemQuantity(item) {
+        // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
-        if (all || itemToUpdate.quantity - 1 === 0) {
-          this.currentOrder.items.splice(this.currentOrder.items.indexOf(itemToUpdate), 1)
-          this.activeTableProduct = null
-        } else {
-          itemToUpdate.quantity--
-        }
+        if (itemToUpdate.quantity === 0) return
+        await cms.getModel('Order').updateOne(
+          { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
+          { $set: { 'items.$.quantity': itemToUpdate.quantity - 1 } }
+        )
+        itemToUpdate.quantity--
       },
       calculateNewPrice(changeType, amount, update = false) {
         if (this.activeProduct) {
@@ -915,7 +947,19 @@
           }
         },
         immediate: true
-      }
+      },
+      'currentOrder.table': {
+        async handler(val) {
+          if (val) {
+            const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
+            if (existingOrder) {
+              this.$set(this.currentOrder, '_id', existingOrder._id)
+              this.$set(this.currentOrder, 'user', existingOrder.user)
+              this.$set(this.currentOrder, 'items', existingOrder.items)
+            }
+          }
+        }
+      },
     },
     provide() {
       return {

@@ -33,7 +33,8 @@
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
     <div class="order-detail__content">
-      <div v-for="(item, i) in items" :key="i" class="item" :style="[item.separate && {borderBottom: '2px solid red'}]"
+      <div v-for="(item, i) in itemsWithQty" :key="i" class="item"
+           :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
           <div>
@@ -110,6 +111,10 @@
         set(value) {
           this.$emit('updateOrderItems', value)
         }
+      },
+      itemsWithQty() {
+        if (this.items) return this.items.filter(i => i.quantity > 0)
+        return []
       }
     },
     methods: {
@@ -192,8 +197,9 @@
 
       orderStore.$watch('currentOrder.items', (items, oldItems) => {
         if (this.$el) {
+          if (!items) return
           const tableEl = this.$el.querySelector('.order-detail__content')
-          if (items && items.length > oldItems.length) {
+          if (items.filter(i => i.quantity).length > oldItems.filter(i => i.quantity).length) {
             tableEl.scrollTop = tableEl.scrollHeight
           }
         }
