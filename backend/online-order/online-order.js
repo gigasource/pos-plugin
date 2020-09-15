@@ -656,6 +656,7 @@ module.exports = async cms => {
     });
 
     socket.on('updateOrderStatus', async (orderStatus, cb) => {
+      typeof cb === 'function' && cb()
       const {orderId, onlineOrderId, status, responseMessage} = orderStatus
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
         `8.1 Restaurant backend: received update order status message from frontend`)
@@ -665,8 +666,30 @@ module.exports = async cms => {
 
       console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
         `9. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
-      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias}, ({result, error, responseData}) => {
-        cb && cb({ result, error, responseData }) //result === responseData.status
+      onlineOrderSocket.emit('updateOrderStatus', {...orderStatus, storeName: name, storeAlias: alias}, async ({result, error, responseData}) => {
+        // TODO: Check result response in another language
+        //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
+        //  + transaction info stored in paypalOrderDetail object
+        if (isPrepaidOrder) {
+          this.dialog.capturing.show = false
+        }
+
+        if (error || result !== 'COMPLETED') {
+          this.dialog.captureFailed.show = true
+          this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+        } else {
+          if (isPrepaidOrder) {
+            // store response data for later use
+            updateOrderInfo.paypalOrderDetail = {
+              ...updateOrderInfo.paypalOrderDetail,
+              captureResponses: responseData
+            }
+            await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+            this.printOnlineOrderKitchen(order._id)
+            this.printOnlineOrderReport(order._id)
+            await this.updateOnlineOrders()
+          }
+        }
       })
     })
 

@@ -50,6 +50,7 @@
   import orderUtil from '../logic/orderUtil';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
+  const socketIntervals = {}
 
   export default {
     name: 'OrderStore',
@@ -619,6 +620,17 @@
       //<!--</editor-fold>-->
 
       // online ordering
+      emitWithRetry(eventName, id, data, cb) {
+        if (!socketIntervals[id])
+          socketIntervals[id] = setTimeout(() => this.emitWithRetry(eventName, id, data, cb), 5000)
+        console.log(`emit event ${eventName}`, socketIntervals[id])
+
+        cms.socket.emit(eventName, ...data, () => {
+          console.log(`clear interval ${id}`)
+          clearInterval(socketIntervals[id])
+          delete socketIntervals[id]
+        })
+      },
       printOnlineOrderReport(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
@@ -671,7 +683,7 @@
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
 
-        window.cms.socket.emit('updateOrderStatus', orderStatus)
+        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
       },
       async acceptPendingOrder(order) {
         try {
@@ -719,31 +731,7 @@
             this.dialog.capturing.show = true
           }
 
-          window.cms.socket.emit('updateOrderStatus', orderStatus, async ({result, error, responseData}) => {
-            // TODO: Check result response in another language
-            //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
-            //  + transaction info stored in paypalOrderDetail object
-            if (isPrepaidOrder) {
-              this.dialog.capturing.show = false
-            }
-
-            if (error || result !== 'COMPLETED') {
-              this.dialog.captureFailed.show = true
-              this.dialog.captureFailed.error = error || `Transaction status: ${result}`
-            } else {
-              if (isPrepaidOrder) {
-                // store response data for later use
-                updateOrderInfo.paypalOrderDetail = {
-                  ...updateOrderInfo.paypalOrderDetail,
-                  captureResponses: responseData
-                }
-                await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
-                this.printOnlineOrderKitchen(order._id)
-                this.printOnlineOrderReport(order._id)
-                await this.updateOnlineOrders()
-              }
-            }
-          })
+          this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
         } catch (e) {
           // TODO: Show an error dialog to the user
           console.error(e)
@@ -766,7 +754,7 @@
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-        window.cms.socket.emit('updateOrderStatus', orderStatus)
+        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
       },
       isCaptureRefundExpired(captureResponses) {
         // find final capture
