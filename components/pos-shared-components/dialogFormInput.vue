@@ -15,7 +15,7 @@
           </div>
         </slot>
       </div>
-      <div>
+      <div style="max-height: 50%">
         <slot name="keyboard">
           <div class="keyboard" v-if="showKeyboard">
             <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="keyboardType"/>
@@ -92,6 +92,7 @@
       position: absolute;
       right: 10px;
       top: 10px;
+      z-index: 1;
     }
 
     .textfield {
@@ -106,7 +107,7 @@
 
     .keyboard {
       background-color: #bdbdbd;
-      padding: 16px;
+      padding: 0.5rem;
       margin: 0 -16px -16px -16px;
     }
   }
