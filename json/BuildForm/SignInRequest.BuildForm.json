@@ -54,6 +54,12 @@
       "schemaType": "string",
       "key": "name",
       "type": "input"
+    },
+    {
+      "_id": "5f6072fe7788d3055bbeb4ec",
+      "schemaType": "string",
+      "key": "avatar",
+      "type": "input"
     }
   ],
   "name": "SignInRequest",
