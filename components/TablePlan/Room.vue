@@ -78,9 +78,9 @@
 
             const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
             const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
-            console.log(zoomVerticalRatio)
+            console.log(zoomVerticalRatio, zoomHorizontalRatio)
 
-            if (zoomHorizontalRatio >= 1 && zoomVerticalRatio >= 1) return
+            if (zoomHorizontalRatio >= 1 || zoomVerticalRatio >= 1) return
             roomEl.style.zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
           })
         },

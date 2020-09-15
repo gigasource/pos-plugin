@@ -263,15 +263,7 @@
   }
 
   .g-tf-wrapper {
-    margin: 4px 0 0 4px;
-
-    ::v-deep .g-tf .g-tf-input {
-      padding: 4px 6px;
-    }
-
-    ::v-deep .g-tf-append__inner {
-      margin-right: 8px;
-    }
+    margin-bottom: 0;
   }
 
   .g-file-input {
