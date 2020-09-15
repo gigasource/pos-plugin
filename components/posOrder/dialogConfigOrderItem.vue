@@ -5,9 +5,9 @@
               slider-color="#1471ff" slider-size="3">
         <g-tab-item v-for="(tabItem, index) in tabs" :item="tabItem">
           <template v-if="index === 0">
-            <div class="modifier-content">
-              <g-text-field-bs large v-model="modifier" label="Modifier" placeholder="Name"/>
-              <g-text-field-bs :rules="rules" large v-model="price" label="Price" placeholder="Price"/>
+            <div class="modifier-content row-flex flex-wrap justify-around mb-2">
+              <pos-textfield-new style="width: 48%;" v-model="modifier" label="Modifier" placeholder="Name"/>
+              <pos-textfield-new style="width: 48%;" :rules="rules" v-model="price" label="Price" placeholder="Price"/>
             </div>
           </template>
 
@@ -65,11 +65,12 @@
 
 <script>
   import ChangeValue from '../pos-shared-components/ChangeValue';
+  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
 
   export default {
     name: "dialogConfigOrderItem",
     injectService: ['PosStore:storeLocale'],
-    components: { ChangeValue },
+    components: { PosTextfieldNew, ChangeValue },
     props: {
       value: null,
       product: null,

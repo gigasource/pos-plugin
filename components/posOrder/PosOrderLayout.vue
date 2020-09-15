@@ -1,7 +1,7 @@
 <template>
   <div class="pol" v-if="orderLayout">
     <!-- Categories -->
-    <div style="padding: 4px; background-color: #E0E0E0">
+    <div style="padding: 4px; background-color: #E0E0E0; position: sticky; top: 0; z-index: 1">
       <div :style="categoryContainerStyle">
         <div v-for="(category, index) in categories"
              class="pol__cate darken-effect"
