@@ -262,6 +262,18 @@
     }
   }
 
+  .g-tf-wrapper {
+    margin: 4px 0 0 4px;
+
+    ::v-deep .g-tf .g-tf-input {
+      padding: 4px 6px;
+    }
+
+    ::v-deep .g-tf-append__inner {
+      margin-right: 8px;
+    }
+  }
+
   .g-file-input {
     &.g-tf-wrapper.g-tf__filled.g-tf__outlined ::v-deep .g-file-input--text {
       padding: 8px;
@@ -306,7 +318,7 @@
       font-size: 13px;
       line-height: 16px;
       margin-left: 4px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     &.item__big {
@@ -337,7 +349,7 @@
       box-sizing: border-box;
       border-radius: 2px;
       padding: 12px 16px;
-      margin: 8px 8px 0 0;
+      margin: 4px 8px 0 0;
       font-size: 13px;
       line-height: 16px;
 
@@ -347,5 +359,15 @@
       }
     }
 
+  }
+
+  @media screen and (max-width: 1023px) {
+    .main {
+      padding: 16px;
+
+      &__item {
+        padding-right: 8px;
+      }
+    }
   }
 </style>

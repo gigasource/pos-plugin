@@ -87,7 +87,7 @@
 <style scoped lang="scss">
   .report-wrapper {
     background: #d8d8d8;
-    padding: 0 150px;
+    padding: 0 15%;
     z-index: -1;
 
     .report-content {

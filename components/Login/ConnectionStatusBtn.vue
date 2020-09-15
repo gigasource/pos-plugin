@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <g-btn-bs icon="icon-wlan@20" text-color="#2979FF" v-if="online && webShopConnected">Internet</g-btn-bs>
-    <g-btn-bs icon="icon-wlan-error@20" text-color="#FF4452" v-else-if="online && !webShopConnected">Error</g-btn-bs>
-    <g-btn-bs class="no-internet" icon="icon-wlan-disconnected@20" text-color="#FF4452" height="100%" v-else>No Internet</g-btn-bs>
+  <div class="connection-status" :style="{color: online && webShopConnected ? '#2979FF' : '#FF4452'}">
+    <g-icon size="20" class="mr-2">{{icon}}</g-icon>
+    {{status}}
   </div>
 </template>
 
@@ -13,20 +12,41 @@
     injectService: ['PosStore:(webShopConnected,online)'],
     mounted() {
       this.online = navigator.onLine
+    },
+    computed: {
+      icon() {
+        if(this.online && this.webShopConnected) {
+          return 'icon-wlan'
+        } else if (this.online && !this.webShopConnected) {
+          return 'icon-wlan-error'
+        } else {
+          return 'no-internet'
+        }
+      },
+      status() {
+        if(this.online && this.webShopConnected) {
+          return 'Internet'
+        } else if (this.online && !this.webShopConnected) {
+          return 'Error'
+        } else {
+          return 'No Internet'
+        }
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
- .g-btn-bs {
-   font-size: 14px;
-   padding: 0 8px;
-   height: 100%;
- }
+  .connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
 
-  .no-internet {
-    white-space: nowrap;
-    margin: 0;
-    padding: 0;
+  @media screen and (max-width: 1023px) {
+    .connection-status {
+      font-size: 12px;
+    }
   }
 </style>

@@ -57,7 +57,7 @@
       />
 
       <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.playNotificationSound')}}</b></div>
-      <g-grid-select :grid="false" :items="soundModes" mandatory :value="computedDevice.soundLoop" @input="updateSoundMode">
+      <g-grid-select :grid="false" item-cols="4" :items="soundModes" mandatory :value="computedDevice.soundLoop" @input="updateSoundMode">
         <template #default="{item, toggleSelect}">
           <g-btn-bs border-color="#e0e0e0" text-color="black" height="30"
                     style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
@@ -273,8 +273,13 @@
 
       .g-btn-bs {
         margin-left: 0;
-        width: 25%;
       }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .online-order-setting {
+      padding: 16px 24px;
     }
   }
 </style>

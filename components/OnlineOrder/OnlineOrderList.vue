@@ -5,10 +5,16 @@
         {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
       </div>
       <g-spacer/>
-      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
-      <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
-      <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
-      <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
+      <div class="online-order-list__info">
+        <p>
+          <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
+          <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
+        </p>
+        <p>
+          <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
+          <span class="fw-700 fs-large">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
+        </p>
+      </div>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
     <div class="online-order-list__table">
@@ -43,13 +49,13 @@
             <div v-else>--</div>
           </td>
           <td>
-            <p class="fw-700">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
+            <p class="fw-700" style="white-space: nowrap">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
             <p>
               <img alt :src="getImagePayment(item.payment[0].type)">
             </p>
           </td>
-          <td>{{item.date | formatDate}}</td>
-          <td>{{item.deliveryTime}}</td>
+          <td style="white-space: nowrap">{{item.date | formatDate}}</td>
+          <td style="white-space: nowrap">{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
           <td :class="statusClass">
             <div>{{$t(`onlineOrder.${item.status}`)}}</div>
@@ -224,6 +230,12 @@
       }
     }
 
+    &__info {
+      display: flex;
+      align-items: center;
+      margin-right: 16px;
+    }
+
     &__table {
       height: calc(100% - 40px);
       width: 100%;
@@ -288,6 +300,12 @@
       .bs-tf-label {
         margin-bottom: 0;
       }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .online-order-list__info {
+      display: block;
     }
   }
 </style>

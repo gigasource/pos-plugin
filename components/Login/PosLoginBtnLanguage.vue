@@ -2,10 +2,9 @@
   <div class="row-flex align-items-center">
     <g-menu v-model="menu" close-on-content-click top content-class="menu-language">
       <template v-slot:activator="{on}">
-        <g-btn flat :uppercase="false" icon-after="arrow_drop_down" text-color="#3B3B3B" @click="on.click" height="100%">
+        <g-btn-bs flat :uppercase="false" icon-after="arrow_drop_down" text-color="#3B3B3B" @click="on.click" height="100%">
           {{currentLang.title}}
-          <g-icon>arrow_drop_down</g-icon>
-        </g-btn>
+        </g-btn-bs>
       </template>
       <div class="menu">
         <g-btn-bs v-for="(lang, i) in languages" :key="i"
@@ -50,10 +49,17 @@
 <style scoped lang="scss">
   .g-btn-bs {
     display: flex;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
     margin: 0;
     justify-content: flex-start;
+    font-size: 14px;
+  }
+
+
+  @media screen and (max-width: 1023px) {
+    .g-btn-bs {
+      font-size: 12px;
+    }
   }
 </style>
 

@@ -106,6 +106,18 @@
                   })
                 },
                 title: this.$t('onlineOrder.declinedOrders')
+              },
+              {
+                icon: 'icon-services',
+                onClick() {
+                  this.$emit('update:view', {
+                    name: 'Services',
+                    params: ''
+                  })
+                },
+                title: this.$t('sidebar.services'),
+                feature: 'onlineOrdering',
+                key: 'Service'
               }
             ],
           },
@@ -130,18 +142,6 @@
               })
             },
             title: this.$t('sidebar.functions')
-          },
-          {
-            icon: 'icon-services',
-            onClick() {
-              this.$emit('update:view', {
-                name: 'Services',
-                params: ''
-              })
-            },
-            title: this.$t('sidebar.services'),
-            feature: 'onlineOrdering',
-            key: 'Service'
           }
         ],
         pendingReservationsLength: 0,

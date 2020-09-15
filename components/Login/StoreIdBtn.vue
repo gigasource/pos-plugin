@@ -1,7 +1,6 @@
 <template>
-  <g-btn flat :uppercase="false" height="100%" v-if="storeId">ID: {{storeId}}</g-btn>
-  <g-btn flat :uppercase="false" height="100%" v-else-if="!storeId && skipPairing" @click.stop="pair">Pair</g-btn>
-  <g-btn flat :uppercase="false" height="100%" v-else></g-btn>
+  <g-btn-bs v-if="storeId">ID: {{storeId}}</g-btn-bs>
+  <g-btn-bs v-else-if="!storeId && skipPairing" @click.stop="pair">Pair</g-btn-bs>
 </template>
 
 <script>
@@ -30,3 +29,16 @@
     }
   }
 </script>
+
+<style scoped lang="scss">
+  .g-btn-bs {
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-btn-bs {
+      font-size: 12px;
+      padding: 0;
+    }
+  }
+</style>

@@ -36,7 +36,7 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "1fr",
+              "40%",
               "1fr"
             ],
             "rows": [
@@ -192,17 +192,17 @@
                 "columns": [
                   "1fr",
                   "4px",
-                  "20%",
+                  "1fr",
                   "4px",
-                  "20%",
+                  "auto",
                   "4px",
-                  "15%",
+                  "auto",
                   "4px",
-                  "20%"
+                  "auto"
                 ],
                 "rows": [
                   "1fr",
-                  "30%",
+                  "auto",
                   "7%"
                 ],
                 "columnGap": 0,
@@ -613,7 +613,7 @@
         },
         {
           "choice": "view",
-          "component": "GBtn",
+          "component": "SupportBtn",
           "binding": [],
           "slotScopeBinding": [],
           "slot": "support-button",
@@ -626,62 +626,14 @@
             },
             "props": {
               "flat": true,
-              "style": {
-                "height": "100%"
-              },
               "html": "",
               "uppercase": null
             }
           },
           "pluginName": "pos-plugin",
-          "items": [
-            {
-              "choice": "view",
-              "component": "VTag",
-              "content": {
-                "props": {
-                  "tag": "div",
-                  "style": {
-                    "display": "flex",
-                    "alignItems": "center"
-                  }
-                }
-              },
-              "binding": [],
-              "slotScopeBinding": [],
-              "items": [
-                {
-                  "choice": "view",
-                  "component": "GIcon",
-                  "content": {
-                    "props": {
-                      "html": "icon-support",
-                      "svg": true,
-                      "size": 20
-                    }
-                  },
-                  "binding": [],
-                  "slotScopeBinding": [],
-                  "slot": null
-                },
-                {
-                  "choice": "view",
-                  "component": "VTag",
-                  "content": {
-                    "props": {
-                      "html": "Support",
-                      "tag": "div",
-                      "style": {
-                        "marginLeft": "8px"
-                      }
-                    }
-                  },
-                  "binding": [],
-                  "slotScopeBinding": []
-                }
-              ]
-            }
-          ]
+          "items": [],
+          "url": "plugins/pos-plugin/components/Login/SupportBtn.vue",
+          "path": "components/Login/SupportBtn.vue"
         },
         {
           "choice": "view",

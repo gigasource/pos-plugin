@@ -12,7 +12,7 @@
     <div class="g-pagination-text">
       {{$t('ui.tblPage')}}:
     </div>
-    <div class="g-pagination-input" style="margin-right: 16px">
+    <div class="g-pagination-input">
       <g-combobox
           v-model="comboPage"
           :items="listPageNumber"
@@ -164,6 +164,13 @@
           height: 0;
         }
       }
+
+
+      & + .g-btn {
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px;
+        margin-left: 16px;
+      }
     }
 
     .g-pagination-text {
@@ -183,16 +190,41 @@
       padding: 0 !important;
       margin: 12px 0;
 
-      &:first-child {
-        border-top-left-radius: 2px;
-        border-bottom-left-radius: 2px;
-      }
-
       &:last-child {
         border-top-right-radius: 2px;
         border-bottom-right-radius: 2px;
         border-right: 1px solid #979797;
         margin-right: 16px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-pagination-wrapper {
+      font-size: 11px;
+
+      .g-pagination-text {
+        margin-left: 8px;
+        margin-right: 4px;
+      }
+
+      .g-pagination-input {
+        width: 52px;
+
+        & + .g-btn {
+          margin-left: 8px;
+        }
+      }
+
+      .g-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        margin: 6px 0;
+
+        &:last-child {
+          margin-right: 8px;
+        }
       }
     }
   }

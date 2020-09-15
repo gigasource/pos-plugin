@@ -1,12 +1,13 @@
 <template>
   <g-dialog v-model="dialogUserDetail" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager>
     <div class="dialog-user w-100">
+      <g-icon @click="dialogUserDetail = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
         <div class="input">
           <pos-textfield-new ref="username" @click="check = 'username'" :label="$t('settings.userName')" v-model="name"/>
           <pos-textfield-new ref="passcode" @click="check = 'passcode'" :label="$t('settings.passcode')" v-model="passcode"/>
         </div>
-        <div class="action">
+        <div v-if="!isMobile" class="action">
           <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogUserDetail = false">{{$t('ui.cancel')}}</g-btn>
           <g-btn :uppercase="false" flat background-color="blue accent 3" text-color="white" width="120" @click="submit">{{$t('ui.ok')}}</g-btn>
         </div>
@@ -37,6 +38,7 @@
 			'SettingsStore:selectedUser',
 			'SettingsStore:updateUser',
 			'SettingsStore:listUsers',
+      'PosStore:isMobile'
 		],
     computed: {
       dialogUserDetail: {
@@ -95,6 +97,7 @@
 <style scoped lang="scss">
   .dialog-user {
     background-color: white;
+    position: relative;
 
     .form {
       padding: 16px;
@@ -114,6 +117,12 @@
       height: 174px;
       width: 40%;
       margin: auto;
+    }
+
+    .icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
     }
   }
 </style>

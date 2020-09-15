@@ -421,6 +421,8 @@
   .product-editor {
     padding-left: 20px;
     padding-right: 20px;
+    height: 100%;
+    overflow: auto;
 
     &__prop-grid {
       display: grid;
@@ -466,6 +468,7 @@
     display: inline-block;
     padding: 0 6px;
     margin-right: 4px;
+    margin-bottom: 2px;
     cursor: pointer;
     border: 1px solid #E0E0E0;
     box-sizing: border-box;
@@ -492,6 +495,13 @@
 
     &--disabled {
       opacity: 0.5;
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .product-editor {
+      padding-left: 8px;
+      padding-right: 8px;
     }
   }
 </style>

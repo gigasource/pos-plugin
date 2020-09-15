@@ -1,6 +1,6 @@
 <template>
   <div class="online-order-services">
-    <div class="row-flex" style="width: 500px;">
+    <div class="row-flex">
       <div class="online-order-services__item">
         <div class="online-order-services__title">{{$t('onlineOrder.delivery')}}</div>
         <div class="online-order-services__content row-flex align-items-center">
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="row-flex" style="width: 500px">
+    <div class="row-flex">
       <g-spacer/>
       <g-btn-bs background-color="#536DFE" style="margin: 0; width: 96px;" text-color="white" @click.stop="save">{{$t('onlineOrder.save')}}</g-btn-bs>
     </div>
@@ -138,7 +138,7 @@
   .online-order-services {
     background-image: url('/plugins/pos-plugin/assets/out.png');
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     padding: 48px 36px;
 
     &__item {
@@ -173,7 +173,6 @@
       }
 
       .g-textarea {
-        width: 500px;
         margin: 8px 0;
 
         ::v-deep fieldset {
@@ -186,6 +185,12 @@
           }
         }
       }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .online-order-services {
+      padding: 24px 18px;
     }
   }
 </style>

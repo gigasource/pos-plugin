@@ -1,18 +1,19 @@
 <template>
   <g-dialog v-model="dialogNewTaxCategory" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager>
     <div class="dialog-new-tax w-100">
+      <g-icon @click="dialogNewTaxCategory = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
         <div class="input">
-          <pos-text-field @click="check = 'tax'" large :label="$t('common.tax')" v-model="tax" :rules="[rules.number, rules.range]" suffix="%"/>
-          <pos-text-field @click="check = 'letter'" large :label="$t('settings.invoiceLetter')" v-model="computedLetter"/>
+          <pos-textfield-new @click="check = 'tax'" large :label="$t('common.tax')" v-model="tax" :rules="[rules.number, rules.range]" suffix="%"/>
+          <pos-textfield-new @click="check = 'letter'" large :label="$t('settings.invoiceLetter')" v-model="computedLetter"/>
         </div>
-        <div class="action">
+        <div v-if="!isMobile" class="action">
           <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogNewTaxCategory = false">{{$t('ui.cancel')}}</g-btn>
           <g-btn :uppercase="false" flat background-color="blue accent 3" text-color="white" width="120" @click="submit" :disabled="!valid">{{$t('ui.ok')}}</g-btn>
         </div>
       </div>
       <div class="bg-grey-lighten-1 pa-2">
-        <pos-keyboard-full v-model="keyboard"/>
+        <pos-keyboard-full v-model="keyboard" @enter-pressed="submit"/>
       </div>
     </div>
   </g-dialog>
@@ -27,6 +28,7 @@
     injectService: [
       'SettingsStore:selectedTaxCategory',
       'SettingsStore:updateTaxCategory',
+      'PosStore:isMobile'
     ],
     data() {
       return {
@@ -113,6 +115,7 @@
 <style scoped lang="scss">
   .dialog-new-tax {
     background-color: white;
+    position: relative;
 
     .form {
       padding: 16px;
@@ -126,6 +129,12 @@
         justify-content: flex-end;
         padding-top: 24px;
       }
+    }
+
+    .icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
     }
   }
 </style>

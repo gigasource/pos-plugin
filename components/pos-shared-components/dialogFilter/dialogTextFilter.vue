@@ -4,7 +4,7 @@
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
 				<pos-text-field v-model="screenValue" large :label="label" readOnly ref="textfield"/>
-				<div class="buttons">
+				<div v-if="!isMobile" class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
 					</g-btn>
@@ -14,7 +14,7 @@
 				</div>
 			</div>
 			<div class="keyboard">
-				<pos-keyboard-full v-model="screenValue"/>
+				<pos-keyboard-full v-model="screenValue" @enter-pressed="submit"/>
 			</div>
 		</div>
 	</g-dialog>
@@ -31,6 +31,7 @@
 				default: ''
 			},
     },
+		injectService: ['PosStore:isMobile'],
     data() {
       return {
         screenValue: ''
@@ -105,7 +106,6 @@
 	}
 
 	.keyboard {
-		height: 236px;
 		background-color: #BDBDBD;
 		padding: 16px;
 		margin: 0 -16px -16px -16px;

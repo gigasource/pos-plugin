@@ -25,8 +25,8 @@
         <span class="order-detail__header-value" v-if="table">{{table}}</span>
       </div>
       <g-spacer v-if="isMobile"/>
-      <g-btn-bs v-if="isMobile" class="elevation-1" style="width: 37px; height: 37px; border-radius: 50%; margin: 0" @click="back">
-        <g-icon style="min-width: 24px">icon-back</g-icon>
+      <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
+        <g-icon>icon-back</g-icon>
       </g-btn-bs>
       <g-spacer/>
       <span class="order-detail__header-title">{{$t('common.total')}}</span>
@@ -246,6 +246,17 @@
         font-weight: 600;
         margin-left: 2px;
       }
+
+      .btn-back {
+        width: 37px;
+        height: 37px;
+        border-radius: 50%;
+        margin: 0;
+
+        & > .g-icon {
+          min-width: 24px;
+        }
+      }
     }
 
     &__content {
@@ -315,6 +326,41 @@
 
       .g-btn-bs {
         justify-content: flex-start;
+      }
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .order-detail__header {
+      padding: 4px 0;
+
+      .g-avatar {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+      }
+
+      &-username {
+        font-size: 11px;
+      }
+
+      .btn-back {
+        width: 28px;
+        height: 28px;
+
+        & > .g-icon {
+          width: 16px !important;
+          height: 16px !important;
+          min-width: 16px !important;
+        }
+      }
+
+      &-title {
+        font-size: 9px;
+      }
+
+      &-value {
+        font-size: 14px;
       }
     }
   }

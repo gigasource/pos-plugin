@@ -116,4 +116,32 @@
       }
     }
   }
+
+  @media screen and (max-width: 1023px) {
+    .setting-wrapper {
+      padding: 8px;
+      height: 100%;
+      overflow: auto;
+
+      & > div {
+        margin: 16px 0 0 !important;
+
+        ::v-deep .g-tf-wrapper {
+          margin-bottom: 4px;
+        }
+
+        ::v-deep .g-switch-container {
+          display: block;
+        }
+      }
+    }
+  }
+</style>
+
+<style lang="scss">
+  @media screen and (max-height: 375px) {
+    .g-picker .g-picker__title {
+      display: none;
+    }
+  }
 </style>

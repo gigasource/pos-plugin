@@ -309,7 +309,7 @@
           flex: 1;
           align-items: center;
           justify-content: center;
-          padding: 6px 12px;
+          padding: 6px 9px;
           color: #424242;
         }
 

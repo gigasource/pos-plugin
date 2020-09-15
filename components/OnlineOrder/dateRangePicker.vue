@@ -199,6 +199,7 @@
       background: white;
       font-size: 15px;
       color: #616161;
+      white-space: nowrap;
 
       &--active {
         background: #E3F2FD;

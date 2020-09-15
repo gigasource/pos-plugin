@@ -42,8 +42,8 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "calc(100% - 300px)",
-              "300px"
+              "70%",
+              "30%"
             ],
             "rows": [
               "1fr",

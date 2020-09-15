@@ -28,14 +28,13 @@
               <g-icon style="cursor: pointer" @click="dialog.showRoomNameKbd = true">icon-keyboard</g-icon>
             </template>
           </pos-text-field>
-          <div style="display: flex; margin-left: 5px; margin-right: 5px">
+          <div style="display: flex; margin-left: 5px; margin-right: 5px; justify-content: space-between">
             <g-btn @click="moveRoomUp" style="width: 20px; min-width: 20px !important">
               <g-icon small>icon-arrow-up</g-icon>
             </g-btn>
             <g-btn @click="moveRoomDown" style="width: 20px; min-width: 20px !important">
               <g-icon small>icon-arrow-down</g-icon>
             </g-btn>
-            <g-spacer/>
             <g-btn @click="removeRoom" background-color="#FF4452" text-color="#FFF"><g-icon>delete</g-icon>{{$t('ui.delete')}}</g-btn>
           </div>
         </div>
@@ -389,5 +388,11 @@
     width: 100%;
     box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.15);
     z-index: 1;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-btn {
+      padding: 0 8px !important;
+    }
   }
 </style>

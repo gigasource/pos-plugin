@@ -8,7 +8,7 @@
       <g-spacer/>
       <g-btn-bs elevation="2" icon="fas fa-calculator" @click="showKeyboardEditor">{{$t('restaurant.menuEdit.editKeyboard')}}</g-btn-bs>
     </g-toolbar>
-    
+
     <dialog-confirm-delete
         v-model="dialog.confirmDeleteProductLayout"
         :type="deleteProductLayoutMessage"
@@ -286,22 +286,31 @@
     background-color: white;
     font-size: 14px;
   }
-  
+
   .delete_product_title {
     height: 25px;
-  
+
     font-family: Muli;
     font-style: normal;
     font-weight: bold;
     font-size: 20px;
     line-height: 25px;
     /* identical to box height */
-  
+
     display: flex;
     align-items: center;
     text-align: center;
-  
+
     color: #1D1D26;
   }
-  
+
+  @media screen and (max-width: 1023px) {
+    .g-btn-bs {
+      font-size: 0;
+
+      ::v-deep .g-icon {
+        margin-right: 0 !important;
+      }
+    }
+  }
 </style>

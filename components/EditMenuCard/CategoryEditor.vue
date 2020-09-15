@@ -119,6 +119,8 @@
   .category-editor {
     padding-left: 20px;
     padding-right: 20px;
+    height: 100%;
+    overflow: auto;
 
     &__label {
       color: #000;
@@ -133,6 +135,19 @@
 
       ::v-deep .bs-tf-input {
         color: #000;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .category-editor {
+      padding-left: 8px;
+      padding-right: 8px;
+
+      &__label {
+        font-size: 13px;
+        margin-top: 8px;
+        margin-bottom: 4px;
       }
     }
   }

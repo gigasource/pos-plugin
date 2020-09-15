@@ -1,6 +1,6 @@
 <template>
   <g-dialog v-model="dialogLoginSupport" width="100%" eager>
-    <g-card width="100%" height="585px">
+    <g-card width="100%">
       <g-grid-layout :layout="layout" style="height: 100%; width: 100%">
         <p area="version" class="support-item"><b>{{ $t("login.version") }}: </b>{{this.version}}</p>
         <p area="network" class="support-item"><b>{{ $t("login.network") }}: </b>{{this.network}}</p>
@@ -8,9 +8,9 @@
         <p area="ssid" class="support-item"><b>SSID: </b>{{this.ssID}}</p>
         <p area="ip" class="support-item"><b>IP: </b>{{this.ip}}</p>
 
-        <div area="keyboard_input" class="text-field-section" style="position: relative;height: 70px;">
+        <div area="keyboard_input" class="text-field-section">
           <g-text-field clear-icon="cancel" clearable outlined style="color: #1d1d26; width: 85%; margin-right: 10px;" v-model="supportMessage"></g-text-field>
-          <g-btn :uppercase="false" background-color="blue" class="send-btn" elevation="0" style="height: calc(100% + 1px)" text-color="white" width="15%">SEND</g-btn>
+          <g-btn-bs width="15%" background-color="blue" text-color="white">SEND</g-btn-bs>
         </div>
 
         <div area="keyboard" class="keyboard-wrapper">
@@ -58,13 +58,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .send-btn {
-    height: 100%;
-  }
-
   .support-item {
-    margin-top: 34px;
-    margin-left: 17px;
+    margin-top: 24px;
+    margin-left: 16px;
+    margin-bottom: 12px;
     font-size: 20px;
     line-height: 25px;
   }
@@ -91,7 +88,6 @@
   ::v-deep .keyboard-wrapper {
     padding: 16px;
     background-color: #BDBDBD;
-    height: 263px;
 
     .key {
       border-radius: 0;
@@ -103,5 +99,23 @@
     width: 100%;
     height: 100%;
     position: relative;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .support-item {
+      margin-top: 16px;
+      margin-left: 12px;
+      font-size: 14px;
+    }
+
+    ::v-deep .keyboard-wrapper {
+      padding: 8px;
+      height: 100%;
+
+      .key {
+        border-radius: 0;
+        font-size: 16px;
+      }
+    }
   }
 </style>

@@ -88,7 +88,7 @@
       <g-divider inset class="mt-2 mb-2"/>
       <div class="title" style="margin-left: 12px">Default tax</div>
       <div class="row-flex" style="margin-left: 12px">
-        <div class="col-2">{{$t('restaurant.product.dineInTax')}}</div>
+        <div class="col-3">{{$t('restaurant.product.dineInTax')}}</div>
         <g-grid-select mandatory return-object item-cols="auto" :items="listTaxCategories" v-model="dineInTax" style="margin-left: 12px">
           <template v-slot:default="{ toggleSelect, item }">
             <div class="option" @click="toggleSelect(item)">
@@ -104,7 +104,7 @@
       </div>
 
     <div class="row-flex" style="margin-left: 12px; margin-top: 8px;">
-      <div class="col-2">{{$t('restaurant.product.takeAwayTax')}}</div>
+      <div class="col-3">{{$t('restaurant.product.takeAwayTax')}}</div>
       <g-grid-select mandatory return-object item-cols="auto" :items="listTaxCategories" v-model="takeAwayTax" style="margin-left: 12px">
         <template v-slot:default="{ toggleSelect, item }">
           <div class="option" @click="toggleSelect(item)">
@@ -537,5 +537,11 @@
       }
     }
 
+  }
+
+  @media screen and (max-width: 1023px){
+    .configuration {
+      padding-left: 16px;
+    }
   }
 </style>

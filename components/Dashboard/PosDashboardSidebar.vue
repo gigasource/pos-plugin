@@ -174,4 +174,15 @@
   .g-treeview-wrapper ::v-deep .g-badge-wrapper {
     margin-right: 16px !important;
   }
+
+  @media screen and (max-width: 1023px) {
+    .g-sidebar-wrapper ::v-deep .g-sidebar {
+      width: 180px;
+      max-width: 180px;
+
+      .g-treeview-wrapper .g-treeview-title {
+        font-size: 14px;
+      }
+    }
+  }
 </style>

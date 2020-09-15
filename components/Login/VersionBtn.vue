@@ -1,5 +1,5 @@
 <template>
-  <g-btn flat :uppercase="false" height="100%">{{$t('login.version')}}: {{version}}</g-btn>
+  <div class="version-status">v {{version}}</div>
 </template>
 
 <script>
@@ -10,3 +10,18 @@
     }
   }
 </script>
+
+<style lang="scss">
+  .version-status {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .version-status {
+      font-size: 12px;
+    }
+  }
+</style>

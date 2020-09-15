@@ -121,7 +121,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     background-image: url("/plugins/pos-plugin/assets/out.png");
     padding: 24px;
 
@@ -148,6 +148,7 @@
     &-btn {
       width: 100%;
       height: 100%;
+      min-height: 136px;
       background: white;
       display: flex;
       flex-direction: column;
@@ -159,6 +160,26 @@
 
       & > span {
         word-break: break-word;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .function {
+
+      &-btn {
+        padding-top: 8px;
+
+        & > .g-icon {
+          width: 40px !important;
+          height: 40px !important;
+          min-width: 40px !important;
+          min-height: 40px !important;
+        }
+
+        & > span {
+          font-size: 12px;
+        }
       }
     }
   }

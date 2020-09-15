@@ -52,7 +52,7 @@
             <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" bottom speech-bubble remove-content-on-close>
               <span><b>From:</b> {{order.forwardedStore}}</span>
               <template v-slot:activator="{on}">
-                <div v-on="on" v-if="order.forwardedStore" style="position: absolute; left: 0; top: -2px">
+                <div v-on="on" v-if="order.forwardedStore" class="tooltip-forward">
                   <g-icon size="16">icon-delivery-forward</g-icon>
                 </div>
               </template>
@@ -251,8 +251,8 @@
       table-layout: fixed;
     }
 
-    thead tr th {
-      color: #1271ff;
+    tr th {
+      color: #1271ff !important;
       cursor: pointer;
       padding: 0 8px;
       background-color: white;
@@ -296,26 +296,6 @@
         border-right: 2px solid #1271FF;
       }
     }
-
-    tr th:nth-child(1) {
-      width: 10%;
-    }
-
-    tr th:nth-child(2) {
-      width: 14%;
-    }
-
-    tr th:nth-child(3) {
-      width: 14%;
-    }
-
-    tr th:nth-child(4) {
-      width: 10%;
-    }
-
-    tr th:nth-child(5) {
-      width: 12%;
-    }
   }
 
   .filter-list {
@@ -351,6 +331,34 @@
         font-weight: 700;
         font-size: 12px;
       }
+    }
+  }
+
+  .tooltip-forward {
+    position: absolute;
+    left: 0;
+    top: -2px
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-table {
+      height: calc(100% - 52px);
+
+      tr {
+        th {
+          font-size: 10px;
+          white-space: unset;
+          padding: 0 4px;
+        }
+
+        td {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .tooltip-forward {
+      position: static;
     }
   }
 </style>

@@ -1,15 +1,15 @@
 <template>
 	<g-dialog v-model="dialogNewPayment" fullscreen eager>
 		<div class="dialog-payment w-100">
-			<div class="form">
+			<div class="form" @click="showKeyboard = false">
 				<p class="ml-1 mb-3">{{ isEditPayment && selectedPayment
 					? $t('settings.editPayment')
 					: $t('settings.createPayment')  }}
 				</p>
-				<pos-text-field style="width: 268px" label="Name" placeholder="Payment name" v-model="name"/>
+				<pos-text-field style="width: 268px" label="Name" placeholder="Payment name" @click.stop="showKeyboard = !showKeyboard" v-model="name"/>
 				<pos-file-input-image label="Icon" v-model="src"/>
 			</div>
-			<div class="keyboard-wrapper">
+			<div v-if="showKeyboard" class="keyboard-wrapper">
 				<pos-keyboard-full v-model="name"/>
 			</div>
 			<g-toolbar bottom color="grey lighten 3">
@@ -41,6 +41,7 @@
 				src: null,
 				isEditPayment: false,
 				internalValue: false,
+				showKeyboard: false
       }
     },
     props: {
@@ -99,6 +100,8 @@
 		background-color: white;
 		display: flex;
 		flex-direction: column;
+		height: calc(100% - 64px);
+		overflow: auto;
 
 		.form {
 			padding: 32px 32px 0;
@@ -120,7 +123,7 @@
 		::v-deep .keyboard-wrapper {
 			position: absolute;
 			bottom: 64px;
-			height: 30%;
+			min-height: 30%;
 			width: 100%;
 			padding: 16px;
 			background-color: #BDBDBD;

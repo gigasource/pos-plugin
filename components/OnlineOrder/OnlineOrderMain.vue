@@ -18,7 +18,7 @@
         </template>
         <template v-else>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
-            <g-card-title style="align-items: flex-start; flex-wrap: nowrap">
+            <g-card-title class="pending-orders--title">
               <div class="row-flex align-items-center flex-grow-1">
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
@@ -27,7 +27,7 @@
                   {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
                 </div>
               </div>
-              <div class="row-flex justify-end align-items-center" style="flex: 0 0 auto">
+              <div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
                 <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">{{order.deliveryTime}}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
@@ -48,7 +48,7 @@
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
                   <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
-                  <div class="flex-equal fs-small-2 pl-1">
+                  <div class="flex-equal fs-small-2 pl-1" style="word-break: break-all">
                     {{item.id && `${item.id}.`}} {{item.name}}
                     <span class="i text-grey">{{getExtraInfo(item)}}</span>
                   </div>
@@ -94,7 +94,7 @@
               <g-btn-bs v-if="order.declineStep2" height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click="declineOrder(order)">
                 Confirm
               </g-btn-bs>
-              <g-btn-bs v-else height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
+              <g-btn-bs v-else height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
                 <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" style="height: 16px" class="mr-2"/>
                 <span v-else class="mr-2">{{order.payment.type}}</span>
                 <span>{{$t('common.currency', storeLocale)}}{{order.payment.value | formatMoney(decimals)}}</span>
@@ -154,7 +154,7 @@
                 <div style="padding-top: 2px">
                   <span v-for="item in order.items">
                     <span class="fw-700">{{item.quantity}}x </span>
-                    <span class="mr-3">
+                    <span class="mr-3" style="word-break: break-all">
                       {{item.id && `${item.id}.`}} {{item.name}}
                       <span class="i text-grey fs-small-2">{{getExtraInfo(item)}}</span>
                     </span>
@@ -430,6 +430,11 @@
       background-color: #E1F5FE;
       border-radius: 12px !important;
     }
+
+    &--title {
+      align-items: flex-start !important;
+      flex-wrap: nowrap !important;
+    }
   }
 
   .kitchen-orders {
@@ -490,10 +495,48 @@
   .progress-remaining {
     color: #E57373;
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 3px;
+    right: 3px;
     font-size: 15px;
     width: 32px;
     text-align: center;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .main {
+      .g-card {
+        .g-card-title{
+          padding: 8px;
+        }
+
+        .g-card-text, .g-card-actions {
+          padding: 0 8px 8px;
+
+          & > .g-btn-bs {
+            margin: 0 4px;
+          }
+        }
+      }
+
+
+      .pending-orders--empty > p {
+        text-align: center;
+      }
+
+      .pending-orders--title {
+        flex-wrap: wrap !important;
+      }
+
+      .pending-orders--btn-price {
+        flex-direction: column;
+        align-items: center;
+
+        & > img {
+          margin-right: 0 !important;
+        }
+      }
+    }
+
+
   }
 </style>
