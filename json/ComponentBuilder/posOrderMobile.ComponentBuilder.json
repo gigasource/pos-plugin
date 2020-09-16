@@ -221,6 +221,11 @@
               "service": "PosStore:storeLocale",
               "local": "storeLocale",
               "type": "prop"
+            },
+            {
+              "service": "OrderStore:removeProductModifier",
+              "local": "removeProductModifier",
+              "type": "event"
             }
           ]
         }

@@ -195,7 +195,7 @@
         }
         return _.omit(product, '_id')
       },
-      async addProductToOrder(product) {
+      async addProductToOrder(product, cb = () => null) {
         if (!this.currentOrder || !product) return
         const latestProduct = _.last(this.currentOrder.items);
 
@@ -230,6 +230,8 @@
           this.$set(this.currentOrder, '_id', updatedOrder._id)
           this.$set(this.currentOrder, 'table', updatedOrder.table)
           this.$set(this.currentOrder, 'items', updatedOrder.items)
+
+          cb()
         }
       },
       async addItemQuantity(item) {
@@ -536,7 +538,7 @@
       //<!--</editor-fold>-->
 
       //<!--<editor-fold desc="Restaurant functions">-->
-      addModifierToProduct(modifier, product) {
+      async addModifierToProduct(modifier, product) {
         if (!this.currentOrder || !this.currentOrder.items || !this.currentOrder.items.length) return
         product = product
           ? _.find(this.currentOrder.items, item => item === product)
@@ -544,11 +546,24 @@
 
         if (!product) return
 
+        await cms.getModel('Order').findOneAndUpdate(
+          { _id: this.currentOrder._id, 'items._id': product._id  },
+          { $push: { 'items.$.modifiers': modifier } }
+        )
+
         if (product.modifiers) {
           product.modifiers.push(modifier)
         } else {
           this.$set(product, 'modifiers', [modifier])
         }
+      },
+      async removeProductModifier(product, modIndex) {
+        const modifier = product.modifiers[modIndex]
+        await cms.getModel('Order').findOneAndUpdate(
+          { _id: this.currentOrder._id, 'items._id': product._id  },
+          { $pull: { 'items.$.modifiers': { _id: modifier._id } } }
+        )
+        product.modifiers.splice(modIndex, 1)
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)

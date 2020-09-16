@@ -128,7 +128,7 @@
         this.$emit('removeItemQuantity', item)
       },
       removeModifier(item, index) {
-        item.modifiers.splice(index, 1)
+        this.$emit('removeProductModifier', item, index)
       },
       openConfigDialog(item) {
         this.dialogConfigOrderItem = Object.assign({} , this.dialogConfigOrderItem, {
