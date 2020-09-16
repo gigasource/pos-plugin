@@ -195,60 +195,71 @@
         }
         return _.omit(product, '_id')
       },
-      async addProductToOrder(product) {
+      async addProductToOrder(product, cb = () => null) {
         if (!this.currentOrder || !product) return
         const latestProduct = _.last(this.currentOrder.items);
 
+        const mappedProduct = this.mapProduct(product);
         if (!latestProduct) {
           // create order with product
-          const { _id, items, table } = await cms.getModel('Order').create({
-            table: this.currentOrder.table,
-            items: [this.mapProduct(product)],
-            status: 'inProgress'
-          })
+          if (this.currentOrder.table) {
+            const { _id, items } = await cms.getModel('Order').create({
+              table: this.currentOrder.table,
+              items: [mappedProduct],
+              status: 'inProgress'
+            })
 
-          this.$set(this.currentOrder, '_id', _id)
-          this.$set(this.currentOrder, 'table', table)
-          this.$set(this.currentOrder, 'items', items)
+            this.$set(this.currentOrder, '_id', _id)
+            this.$set(this.currentOrder, 'items', items)
+          } else {
+            this.$set(this.currentOrder, 'items', [mappedProduct])
+          }
         } else {
           const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
             return latestProduct.product === product._id &&
               product.price === latestProduct.price &&
-              (!product.modifiers || product.modifiers.length === 0)
+              (!latestProduct.modifiers || latestProduct.modifiers.length === 0)
           } )
 
           console.log('isSameItem', isSameItem)
           if (isSameItem) return this.addItemQuantity(latestProduct)
           // else add product to arr
-          const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
-            { _id: this.currentOrder._id },
-            { $push: { 'items': this.mapProduct(product) } },
-            { new: true }
-          )
+          if (this.currentOrder._id) {
+            const { items } = await cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id },
+              { $push: { 'items': mappedProduct } },
+              { new: true }
+            )
 
-          console.log('updatedOrder', updatedOrder)
-          this.$set(this.currentOrder, '_id', updatedOrder._id)
-          this.$set(this.currentOrder, 'table', updatedOrder.table)
-          this.$set(this.currentOrder, 'items', updatedOrder.items)
+            this.$set(this.currentOrder, 'items', items)
+          } else {
+            this.currentOrder.items.push(mappedProduct)
+          }
+
+          cb()
         }
       },
       async addItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
-        await cms.getModel('Order').updateOne(
-          { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
-          { $set: { 'items.$.quantity': itemToUpdate.quantity + 1 } }
-        )
+        if (this.currentOrder._id) {
+          await cms.getModel('Order').updateOne(
+            { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
+            { $set: { 'items.$.quantity': itemToUpdate.quantity + 1 } }
+          )
+        }
         itemToUpdate.quantity++
       },
       async removeItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         if (itemToUpdate.quantity === 0) return
-        await cms.getModel('Order').updateOne(
-          { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
-          { $set: { 'items.$.quantity': itemToUpdate.quantity - 1 } }
-        )
+        if (this.currentOrder._id) {
+          await cms.getModel('Order').updateOne(
+            { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
+            { $set: { 'items.$.quantity': itemToUpdate.quantity - 1 } }
+          )
+        }
         itemToUpdate.quantity--
       },
       calculateNewPrice(changeType, amount, update = false) {
@@ -536,7 +547,7 @@
       //<!--</editor-fold>-->
 
       //<!--<editor-fold desc="Restaurant functions">-->
-      addModifierToProduct(modifier, product) {
+      async addModifierToProduct(modifier, product) {
         if (!this.currentOrder || !this.currentOrder.items || !this.currentOrder.items.length) return
         product = product
           ? _.find(this.currentOrder.items, item => item === product)
@@ -544,11 +555,28 @@
 
         if (!product) return
 
+        if (this.currentOrder._id) {
+          await cms.getModel('Order').findOneAndUpdate(
+            { _id: this.currentOrder._id, 'items._id': product._id },
+            { $push: { 'items.$.modifiers': modifier } }
+          )
+        }
+
         if (product.modifiers) {
           product.modifiers.push(modifier)
         } else {
           this.$set(product, 'modifiers', [modifier])
         }
+      },
+      async removeProductModifier(product, modIndex) {
+        if (this.currentOrder._id) {
+          const modifier = product.modifiers[modIndex]
+          await cms.getModel('Order').findOneAndUpdate(
+            { _id: this.currentOrder._id, 'items._id': product._id },
+            { $pull: { 'items.$.modifiers': { _id: modifier._id } } }
+          )
+        }
+        product.modifiers.splice(modIndex, 1)
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
