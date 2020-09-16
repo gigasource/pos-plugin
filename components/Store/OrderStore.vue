@@ -1009,6 +1009,8 @@
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
+            } else {
+              this.currentOrder = { items: [], hasOrderWideDiscount: false }
             }
           }
         }
