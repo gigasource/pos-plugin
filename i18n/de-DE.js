@@ -59,7 +59,7 @@ module.exports = {
       deliveryFee: 'Liefergebühr',
       notice: 'Notice',
       productInfo: 'Produktinformationen',
-      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vobehalten.',
+      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vorbehalten.',
       allergic: 'Allergien',
       allergicNotice: 'LMIV - Allergene:',
       spicy: 'Scharf',
