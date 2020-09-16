@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="internalValue" width="900px" eager>
+  <g-dialog v-model="internalValue" width="900px" eager :fullscreen="isMobile">
     <div class="wrapper">
       <div class="dialog-title">
         <span>{{$t('orderHistory.dateTimeSelection')}}</span>
@@ -26,6 +26,7 @@
     },
     injectService: [
       'OrderStore:(orderHistoryFilters, getOrderHistory, getTotalOrders)',
+      'PosStore:isMobile'
     ],
     data: () => ({
       selectedDatetime: []
@@ -84,6 +85,100 @@
       .g-btn__outlined {
         border: 1px solid #979797;
         color: #1d1d26;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .wrapper {
+      height: 100%;
+      overflow: auto;
+
+      .dialog-title {
+        padding: 8px 8px 4px;
+      }
+
+      .g-date-range-picker {
+        width: 100%;
+
+        ::v-deep {
+          .action-btns {
+            padding: 0 8px 8px;
+
+            & > .g-btn {
+              height: 32px !important;
+              margin-right: 8px;
+              padding: 0 8px !important;
+              font-size: 12px;
+              margin-top: 4px;
+            }
+
+            & ~ div:not(.g-divider) {
+              padding: 0 8px !important;
+            }
+
+            & ~ div.pa-3 {
+              padding-bottom: 8px !important;
+
+              label {
+                margin-bottom: 0;
+              }
+
+              select {
+                height: auto;
+                padding: 4px 32px 4px 8px;
+                margin-top: 4px;
+              }
+            }
+          }
+
+          .g-date-range-picker {
+            &__header {
+              padding: 4px
+            }
+
+            &__date {
+              padding: 4px;
+
+              table {
+                tr {
+                  height: 24px;
+
+                  th {
+                    padding: 4px 0;
+                    font-size: 13px;
+                  }
+
+                  td {
+                    .g-table-item {
+                      font-size: 12px;
+                      height: 20px;
+                      width: 20px;
+                      top: 2px;
+                      padding: 0 2px;
+
+                      &__background {
+                        height: 20px;
+                        top: 2px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .action {
+        padding: 8px 0;
+
+        .g-btn {
+          height: 32px !important;
+          margin-right: 8px;
+          padding: 0 8px !important;
+          font-size: 12px;
+        }
       }
     }
   }

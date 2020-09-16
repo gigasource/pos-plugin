@@ -329,6 +329,18 @@
         background-color: #f0f0f0;
       }
     }
+
+    .g-tf-wrapper {
+      margin: 4px 0 0 4px;
+
+      ::v-deep .g-tf .g-tf-input {
+        padding: 4px 6px;
+      }
+
+      ::v-deep .g-tf-append__inner {
+        margin-right: 8px;
+      }
+    }
   }
 
   .logo {
@@ -359,6 +371,16 @@
 
       &__item {
         padding-right: 8px;
+
+        .bs-tf-wrapper ::v-deep {
+          .bs-tf-inner-input-group {
+            padding: 0 4px 0 0;
+
+            .bs-tf-input {
+              padding: 8px 4px;
+            }
+          }
+        }
       }
     }
   }

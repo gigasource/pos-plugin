@@ -1,11 +1,11 @@
 <template>
-  <g-dialog v-model="internalValue" width="90%" eager>
+  <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
     <div class="wrapper">
       <g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="screen">
         <g-combobox :multiple="multiple" :items="items" v-model="screenValue" :label="label"
                     text-field-component="GTextFieldBs"class="bs-tf__pos" large  ref="combobox"/>
-        <div class="buttons">
+        <div v-if="!isMobile" class="buttons">
           <g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
             {{$t('ui.cancel')}}
           </g-btn>
@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="keyboard">
-        <pos-keyboard-full v-model="screenValue"/>
+        <pos-keyboard-full v-model="screenValue" @enter-pressed="submit"/>
       </div>
     </div>
   </g-dialog>
@@ -30,6 +30,7 @@
       items: Array,
       label: String,
     },
+    injectService: ['PosStore:isMobile'],
     data() {
       return {
         screenValue: null
@@ -60,9 +61,18 @@
     padding: 16px;
     width: 100%;
     overflow: scroll;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 
     .icon {
-      float: right;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .screen {
+      flex: 1;
     }
   }
 
@@ -95,9 +105,14 @@
   }
 
   .keyboard {
-    height: 236px;
     background-color: #BDBDBD;
     padding: 16px;
     margin: 0 -16px -16px -16px;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-combobox ::v-deep .bs-tf-wrapper {
+      width: 100%;
+    }
   }
 </style>

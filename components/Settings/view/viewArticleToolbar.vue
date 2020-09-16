@@ -71,6 +71,12 @@
   }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+  @media screen and (max-width: 1023px) {
+    .g-btn {
+      ::v-deep .g-btn__content {
+        font-size: 12px;
+      }
+    }
+  }
 </style>

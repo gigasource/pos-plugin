@@ -1,15 +1,18 @@
 <template>
-	<g-dialog v-model="internalValue" width="70%" eager>
+	<g-dialog v-model="internalValue" width="70%" eager :fullscreen="isMobile">
 		<div class="wrapper">
 			<div class="header">
 				<span>{{label}}</span>
 				<g-icon @click="internalValue = false" size="20" svg>icon-close</g-icon>
 			</div>
-			<pos-range-slider :min="min" :max="max" v-model="filter"/>
-			<div class="range-value">
-				<span>{{min === 0 ? min : '€ ' + min}}</span>
-				<span>{{$t('common.currency', storeLocale)}} {{max}}</span>
+			<div>
+				<pos-range-slider :min="min" :max="max" v-model="filter"/>
+				<div class="range-value">
+					<span>{{min === 0 ? min : '€ ' + min}}</span>
+					<span>{{$t('common.currency', storeLocale)}} {{max}}</span>
+				</div>
 			</div>
+			<g-spacer/>
 			<div class="buttons">
 				<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" style="margin-right: 8px">{{$t('ui.cancel')}}</g-btn>
 				<g-btn :uppercase="false" text @click="submit" backgroundColor="#2979FF" text-color="#FFFFFF" width="120">{{$t('ui.ok')}}</g-btn>
@@ -22,7 +25,7 @@
 
   export default {
     name: 'dialogRangeFilter',
-		injectService: ['PosStore:storeLocale'],
+		injectService: ['PosStore:(storeLocale, isMobile)'],
     props: {
       label: null,
       min: {
@@ -68,6 +71,8 @@
 	.wrapper {
 		width: 100%;
 		background-color: #FFFFFF;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.header {

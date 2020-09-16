@@ -1,5 +1,5 @@
 <template>
-	<g-dialog v-model="internalValue" width="50%" eager>
+	<g-dialog v-model="internalValue" width="50%" eager :fullscreen="isMobile">
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
@@ -29,6 +29,7 @@
       value: null,
 			rules: Array,
     },
+		injectService: ['PosStore:isMobile'],
     data() {
       return {
         screenValue: ''
@@ -64,9 +65,18 @@
 		background-color: #FFFFFF;
 		padding: 16px;
 		overflow: scroll;
+		position: relative;
+		display: flex;
+		flex-direction: column;
 
 		.icon {
-			float: right;
+			position: absolute;
+			top: 16px;
+			right: 16px;
+		}
+
+		.screen {
+			flex: 1;
 		}
 	}
 
@@ -81,7 +91,7 @@
 	}
 
 	.buttons {
-		height: 96px;
+		margin-top: 24px;
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
@@ -94,7 +104,6 @@
 	}
 
 	.keyboard {
-		height: 236px;
 		background-color: #BDBDBD;
 		padding: 20px 125px;
 		margin: 0 -16px -16px -16px;

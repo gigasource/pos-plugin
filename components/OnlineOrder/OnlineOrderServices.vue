@@ -14,8 +14,6 @@
           <!--        </div>-->
         </div>
       </div>
-
-      <g-spacer/>
       <div class="online-order-services__item">
         <div class="online-order-services__title">{{$t('onlineOrder.pickup')}}</div>
         <div class="online-order-services__content row-flex align-items-center">
@@ -143,6 +141,7 @@
 
     &__item {
       margin-bottom: 36px;
+      flex: 0 0 50%;
     }
 
     &__title {

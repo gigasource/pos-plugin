@@ -2,7 +2,7 @@
   <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
     <div class="dialog-input col-flex">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
-      <div class="flex-grow-1 overflow-y">
+      <div class="flex-grow-1 overflow-y pb-3">
         <slot name="input" :changeKeyboard="changeKeyboardType">
           <div class="textfield">
             <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
@@ -87,6 +87,7 @@
     background-color: #FFFFFF;
     padding: 16px;
     width: 100%;
+    position: relative;
 
     .close-icon {
       position: absolute;

@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="dialogUserDetail" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager>
+  <g-dialog v-model="dialogUserDetail" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager :fullscreen="isMobile">
     <div class="dialog-user w-100">
       <g-icon @click="dialogUserDetail = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
@@ -98,11 +98,15 @@
   .dialog-user {
     background-color: white;
     position: relative;
+    display: flex;
+    flex-direction: column;
 
     .form {
       padding: 16px;
+      flex: 1;
 
       .input {
+        margin-top: 16px;
         display: flex;
       }
 

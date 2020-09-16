@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="dialogNewTaxCategory" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager>
+  <g-dialog v-model="dialogNewTaxCategory" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager :fullscreen="isMobile">
     <div class="dialog-new-tax w-100">
       <g-icon @click="dialogNewTaxCategory = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
@@ -116,9 +116,13 @@
   .dialog-new-tax {
     background-color: white;
     position: relative;
+    display: flex;
+    flex-direction: column;
 
     .form {
+      margin-top: 16px;
       padding: 16px;
+      flex: 1;
 
       .input {
         display: flex;

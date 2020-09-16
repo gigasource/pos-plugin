@@ -1,5 +1,5 @@
 <template>
-	<g-dialog v-model="internalValue" width="90%" eager>
+	<g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
@@ -74,9 +74,17 @@
 		padding: 16px;
 		width: 100%;
 		overflow: scroll;
+		display: flex;
+		flex-direction: column;
 
 		.icon {
-			float: right;
+			position: absolute;
+			top: 16px;
+			right: 16px;
+		}
+
+		.screen {
+			flex: 1;
 		}
 	}
 
@@ -109,5 +117,11 @@
 		background-color: #BDBDBD;
 		padding: 16px;
 		margin: 0 -16px -16px -16px;
+	}
+
+	@media screen and (max-width: 1023px) {
+		.bs-tf-wrapper {
+			width: 100%;
+		}
 	}
 </style>
