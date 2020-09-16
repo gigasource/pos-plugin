@@ -66,6 +66,7 @@
         productIdQueryResults: [],
         productNameQuery: '',
         productNameQueryResults: [],
+        actionList: [],
         //payment screen variables
         paymentAmountTendered: '',
         paymentTip: 0,
@@ -186,34 +187,25 @@
         return products
       },
       mapProduct(p) {
-        const product = {
+        return {
           ...p,
           ...!p.originalPrice && { originalPrice: p.price },
           ...!p.quantity && { quantity: 1 },
           ...!p.course && { course: 1 },
-          product: p._id
+          product: p._id,
+          _id: this.genObjectId()
         }
-        return _.omit(product, '_id')
       },
-      async addProductToOrder(product, cb = () => null) {
+      addProductToOrder(product) {
         if (!this.currentOrder || !product) return
+        if (!this.currentOrder._id && !this.actionList.some(i => i.action === 'createOrder')) this.actionList.push({ action: 'createOrder' })
+
         const latestProduct = _.last(this.currentOrder.items);
 
         const mappedProduct = this.mapProduct(product);
         if (!latestProduct) {
           // create order with product
-          if (this.currentOrder.table) {
-            const { _id, items } = await cms.getModel('Order').create({
-              table: this.currentOrder.table,
-              items: [mappedProduct],
-              status: 'inProgress'
-            })
-
-            this.$set(this.currentOrder, '_id', _id)
-            this.$set(this.currentOrder, 'items', items)
-          } else {
-            this.$set(this.currentOrder, 'items', [mappedProduct])
-          }
+          this.$set(this.currentOrder, 'items', [mappedProduct])
         } else {
           const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
             return latestProduct.product === product._id &&
@@ -224,41 +216,27 @@
           console.log('isSameItem', isSameItem)
           if (isSameItem) return this.addItemQuantity(latestProduct)
           // else add product to arr
-          if (this.currentOrder._id) {
-            const { items } = await cms.getModel('Order').findOneAndUpdate(
-              { _id: this.currentOrder._id },
-              { $push: { 'items': mappedProduct } },
-              { new: true }
-            )
-
-            this.$set(this.currentOrder, 'items', items)
-          } else {
-            this.currentOrder.items.push(mappedProduct)
-          }
-
-          cb()
+          this.actionList.push({
+            action: 'addProduct',
+            value: { ...mappedProduct }
+          })
+          this.currentOrder.items.push(mappedProduct)
         }
       },
-      async addItemQuantity(item) {
+      addItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         if (this.currentOrder._id) {
-          await cms.getModel('Order').updateOne(
-            { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
-            { $set: { 'items.$.quantity': itemToUpdate.quantity + 1 } }
-          )
+          this.actionList.push({ action: 'addQty', value: { product: item._id, inc: 1 } })
         }
         itemToUpdate.quantity++
       },
-      async removeItemQuantity(item) {
+      removeItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         if (itemToUpdate.quantity === 0) return
         if (this.currentOrder._id) {
-          await cms.getModel('Order').updateOne(
-            { _id: this.currentOrder._id, 'items._id': itemToUpdate._id },
-            { $set: { 'items.$.quantity': itemToUpdate.quantity - 1 } }
-          )
+          this.actionList.push({ action: 'addQty', value: { product: item._id, inc: -1 } })
         }
         itemToUpdate.quantity--
       },
@@ -556,10 +534,13 @@
         if (!product) return
 
         if (this.currentOrder._id) {
-          await cms.getModel('Order').findOneAndUpdate(
-            { _id: this.currentOrder._id, 'items._id': product._id },
-            { $push: { 'items.$.modifiers': modifier } }
-          )
+          this.actionList.push({
+            action: 'addMod',
+            value: {
+              product: product._id,
+              modifier
+            }
+          })
         }
 
         if (product.modifiers) {
@@ -571,12 +552,63 @@
       async removeProductModifier(product, modIndex) {
         if (this.currentOrder._id) {
           const modifier = product.modifiers[modIndex]
-          await cms.getModel('Order').findOneAndUpdate(
-            { _id: this.currentOrder._id, 'items._id': product._id },
-            { $pull: { 'items.$.modifiers': { _id: modifier._id } } }
-          )
+          this.actionList.push({
+            action: 'removeMod',
+            value: {
+              product: product._id,
+              modifier
+            }
+          })
         }
         product.modifiers.splice(modIndex, 1)
+      },
+      async saveTableOrder() { //todo move to backend
+        for (const { action, value } of this.actionList) {
+          if (action === 'createOrder') {
+            const { _id, items } = await cms.getModel('Order').create({
+              table: this.currentOrder.table,
+              items: this.currentOrder.items,
+              status: 'inProgress'
+            })
+
+            this.$set(this.currentOrder, '_id', _id)
+            this.$set(this.currentOrder, 'items', items)
+            break
+          } else if (action === 'addProduct') {
+            const { items } = await cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id },
+              { $push: { 'items': value } },
+              { new: true }
+            )
+
+            this.$set(this.currentOrder, 'items', items)
+          } else if (action === 'addQty') {
+            const { product, inc } = value
+            const { items } = await cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id, 'items._id': product },
+              { $inc: { 'items.$.quantity': inc } },
+              { new: true }
+            )
+
+            this.$set(this.currentOrder, 'items', items)
+          } else if (action === 'addMod') {
+            const { product, modifier } = value
+            const { items } = await cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id, 'items._id': product },
+              { $push: { 'items.$.modifiers': modifier } },
+              { new: true }
+            )
+
+            this.$set(this.currentOrder, 'items', items)
+          } else if (action === 'removeMod') {
+            const { product, modifier } = value
+            await cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id, 'items._id': product._id },
+              { $pull: { 'items.$.modifiers': { _id: modifier._id } } }
+            )
+          }
+        }
+        this.actionList = []
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
@@ -929,6 +961,10 @@
             dateFrom = dayjs(date).startOf('day').toDate()
         const reservations = await cms.getModel('Reservation').find({date: { $gte: dateFrom, $lte: dateTo }, status: {$ne: 'declined'}})
         return reservations && reservations.length > 0
+      },
+      genObjectId() {
+        const mongoose = require('mongoose')
+        return mongoose.Types.ObjectId().toString()
       }
     },
     async created() {
@@ -966,6 +1002,7 @@
       },
       'currentOrder.table': {
         async handler(val) {
+          this.actionList = []
           if (val) {
             const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
             if (existingOrder) {

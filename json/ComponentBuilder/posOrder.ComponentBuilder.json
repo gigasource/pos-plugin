@@ -284,6 +284,16 @@
               "service": "OrderStore:printKitchen",
               "local": "printKitchen",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:saveTableOrder",
+              "local": "saveTableOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:actionList",
+              "local": "actionList",
+              "type": "prop"
             }
           ]
         }

@@ -14,6 +14,11 @@
     </g-menu>
     <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
     <g-spacer/>
+    <g-btn-bs class="col-2" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
+              :disabled="disablePrintBtn"
+              @click.stop="$emit('saveTableOrder')">
+      Print
+    </g-btn-bs>
     <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
               @click.stop="quickCash(false)">
       {{$t('restaurant.cashAndDineIn')}}
@@ -32,7 +37,8 @@
   export default {
     name: "PosQuickOrderToolbar",
     props: {
-      currentOrder: null
+      currentOrder: null,
+      actionList: Array
     },
     data() {
       return {
@@ -42,6 +48,9 @@
     computed: {
       enablePayBtn() {
         if (this.currentOrder && this.currentOrder.items) return this.currentOrder.items.length > 0
+      },
+      disablePrintBtn() {
+        return this.actionList.length === 0
       }
     },
     methods: {

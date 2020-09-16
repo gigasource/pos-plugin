@@ -27,7 +27,9 @@
         room: null,
         roomObj: null,
         //
-        inProgressTable: []
+        inProgressTable: [],
+        transferMode: false,
+        transferTable: ''
       }
     },
     async created() {
@@ -81,6 +83,12 @@
       },
       getTableStyle(roomObj) {
         if (this.isTableBusy(roomObj)) {
+          if (this.transferMode) {
+            return {
+              background: '#FF8A80',
+              opacity: 0.5
+            }
+          }
           return { color: '#FF8A80' }
         }
       },
