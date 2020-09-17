@@ -1020,6 +1020,13 @@
       genObjectId() {
         const mongoose = require('mongoose')
         return mongoose.Types.ObjectId();
+      },
+      async getTempOrder() {
+        return new Promise(resolve => {
+          cms.socket.emit('buildTempOrder', this.currentOrder.table, (order) => {
+            resolve(order);
+          })
+        })
       }
     },
     async created() {
@@ -1040,7 +1047,14 @@
         await this.updateOnlineOrders()
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-
+      cms.socket.on('updateOrderItems', async (table) => {
+        if (table === this.currentOrder.table) {
+          const order = await this.getTempOrder();
+          this.$set(this.currentOrder, '_id', order._id)
+          this.$set(this.currentOrder, 'user', order.user)
+          this.$set(this.currentOrder, 'items', order.items)
+        }
+      })
       await this.getReservations()
     },
     watch: {
@@ -1059,11 +1073,7 @@
         async handler(val) {
           this.actionList = []
           if (val) {
-            const existingOrder = await new Promise(resolve => {
-              cms.socket.emit('buildTempOrder', this.currentOrder.table, (order) => {
-                resolve(order);
-              })
-            })
+            const existingOrder = await this.getTempOrder();
             // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
             if (existingOrder) {
               this.$set(this.currentOrder, '_id', existingOrder._id)

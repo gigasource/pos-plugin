@@ -54,7 +54,7 @@ class Master {
 		await initQueue(this);
 		const _this = this;
 		const _model = cms.Types['OrderCommit'].Model;
-
+		await _this.getStoreId();
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
 				if (key != 'create') {

@@ -35,7 +35,7 @@ async function buildTempOrder(table) {
 	if (table == null) return null;
 	const commitsList = await orderCommitModel.find({table: table, temp: true}).lean();
 
-	const result = activeOrders[table] ? _.clone(activeOrders[table]) : { items: [] };
+	const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : { items: [] };
 	commitsList.forEach(commit => {
 		// only accept item commit
 		if (commit.type == 'item') {
@@ -44,7 +44,7 @@ async function buildTempOrder(table) {
 				currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
 			}
 			if (commit.update.push) {
-				if (commit.update.push.key.include('items')) {
+				if (commit.update.push.key.includes('items')) {
 					result['items'].push(commit.update.push.value);
 				} else { // modifier
 					if (currentItem) currentItem.modifier.push(commit.update.push.value);
@@ -182,6 +182,7 @@ async function initQueue(handler) {
 		const { commits } = data;
 		let newCommits = [];
 		let groupTempId;
+		let lastTable;
 		for (let id in commits) {
 			const commit = commits[id];
 			commit.temp = false;
@@ -200,12 +201,16 @@ async function initQueue(handler) {
 			if (result) {
 				newCommits.push(commit);
 			}
+			if (!commit.table && lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
+			lastTable = commit.table;
 		}
-		if (global.APP_CONFIG.isMaster) {
+		if (lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
+		if (global.APP_CONFIG.isMaster && groupTempId) { // add a commit to delete temp commit
 			const commit = {
 				type: 'removeTemp',
 				groupTempId,
-				temp: false
+				temp: false,
+				commitId: highestCommitId++
 			}
 			newCommits.push(commit);
 			await orderCommitModel.create(commit);

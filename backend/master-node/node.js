@@ -3,7 +3,7 @@ const express = require('express');
 const socketClient = require('socket.io-client');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
-const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId } = require('./updateCommit');
+const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit } = require('./updateCommit');
 
 class Node {
 	constructor(cms) {
@@ -43,13 +43,16 @@ class Node {
 		})
 		_this.socket.on('nodeSync', (commits) => {
 			const highestCommitId = checkHighestCommitId();
-			commits.forEach(commit => {
-				if (commit.commitId >= highestCommitId) {
-					pushTaskToQueue(commit);
-					setHighestCommitId(commit.commitId + 1);
-				}
-			})
+			pushTaskToQueue(commits);
+			if (commits && commits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
 		})
+
+		this.cms.socket.on('connect', socket => {
+			socket.on('buildTempOrder', async (table, fn) => {
+				const order = await buildTempOrder(table);
+				fn(order);
+			})
+		});
 	}
 
 	async init() {
@@ -63,10 +66,20 @@ class Node {
 					return target[key];
 				}
 				return async function (commits) {
-					// commits.storeId = await _this.getStoreId();
-					// commits.timeStamp = (new Date()).getTime();
 					const timeStamp = (new Date()).getTime();
-					_this.socket.emit("emitToMasterDevice", commits, await _this.getStoreId(), timeStamp); // TODO: emit to master
+					const groupTempId = mongoose.Types.ObjectId().toString();
+					const _storeId = await _this.getStoreId();
+					let table;
+					commits.forEach(commit => {
+						commit.groupTempId = groupTempId;
+						commit.temp = true;
+						commit.storeId = _storeId;
+						commit.timeStamp = timeStamp;
+						table = commit.table;
+					})
+					_this.socket.emit("emitToMasterDevice", commits, _storeId); // TODO: emit to master
+					await updateTempCommit(commits);
+					return await buildTempOrder(table);
 				}
 			}
 		})
