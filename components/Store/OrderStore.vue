@@ -59,7 +59,7 @@
     data() {
       return {
         activeTableProduct: null,
-        currentOrder: { items: [], hasOrderWideDiscount: false },
+        currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         savedOrders: [],
         scrollWindowProducts: null,
         productIdQuery: '',
@@ -198,13 +198,38 @@
       },
       addProductToOrder(product) {
         if (!this.currentOrder || !product) return
-        if (!this.currentOrder._id && !this.actionList.some(i => i.action === 'createOrder')) this.actionList.push({ action: 'createOrder' })
+        if (!this.currentOrder._id && !this.actionList.some(i => i.action === 'createOrder')) {
+          this.$set(this.currentOrder, 'firstInit', true);
+          this.actionList.push({
+            type: 'order',
+            where: null,
+            table: this.currentOrder.table,
+            update: {
+              create: {
+                table: this.currentOrder.table,
+                items: [],
+                status: 'inProgress'
+              }
+            }
+          })
+        }
 
         const latestProduct = _.last(this.currentOrder.items);
 
         const mappedProduct = this.mapProduct(product);
         if (!latestProduct) {
           // create order with product
+          this.actionList.push({
+            type: 'item',
+            where: { _id: this.currentOrder.firstInit ? this.currentOrder._id : null },
+            table: this.currentOrder.table,
+            update: {
+              push: {
+                key: 'items',
+                value: mappedProduct
+              }
+            }
+          })
           this.$set(this.currentOrder, 'items', [mappedProduct])
         } else {
           const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
@@ -217,27 +242,64 @@
           if (isSameItem) return this.addItemQuantity(latestProduct)
           // else add product to arr
           this.actionList.push({
-            action: 'addProduct',
-            value: { ...mappedProduct }
+            type: 'item',
+            where: {
+              _id: this.currentOrder.firstInit ? this.currentOrder._id : null
+            },
+            table: this.currentOrder.table,
+            update: {
+              push: {
+                key: 'items',
+                value: mappedProduct
+              }
+            }
           })
           this.currentOrder.items.push(mappedProduct)
         }
       },
-      addItemQuantity(item) {
+      addItemQuantity(item) { // remove action
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
-        if (this.currentOrder._id) {
-          this.actionList.push({ action: 'addQty', value: { product: item._id, inc: 1 } })
-        }
+        this.actionList.push({
+          type: 'item',
+          where: {
+            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            pairedObject: {
+              key: ['items._id'],
+              value: [itemToUpdate._id]
+            }
+          },
+          table: this.currentOrder.table,
+          update: {
+            inc: {
+              key: 'item.&.quantity',
+              value: 1
+            }
+          }
+        })
         itemToUpdate.quantity++
       },
       removeItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         if (itemToUpdate.quantity === 0) return
-        if (this.currentOrder._id) {
-          this.actionList.push({ action: 'addQty', value: { product: item._id, inc: -1 } })
-        }
+        this.actionList.push({
+          type: 'item',
+          where: {
+            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            pairedObject: {
+              key: ['items._id'],
+              value: [itemToUpdate._id]
+            }
+          },
+          table: this.currentOrder.table,
+          update: {
+            inc: {
+              key: 'item.&.quantity',
+              value: -1
+            }
+          }
+        })
         itemToUpdate.quantity--
       },
       calculateNewPrice(changeType, amount, update = false) {
@@ -532,16 +594,24 @@
           : _.last(this.currentOrder.items)
 
         if (!product) return
-
-        if (this.currentOrder._id) {
-          this.actionList.push({
-            action: 'addMod',
-            value: {
-              product: product._id,
-              modifier
+        modifier._id = this.genObjectId();
+        this.actionList.push({
+          type: 'item',
+          where: {
+            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            pairedObject: {
+              key: ['items._id'],
+              value: [product._id]
             }
-          })
-        }
+          },
+          table: this.currentOrder.table,
+          update: {
+            push: {
+              key: 'items.$.modifiers',
+              value: modifier
+            }
+          }
+        })
 
         if (product.modifiers) {
           product.modifiers.push(modifier)
@@ -550,65 +620,33 @@
         }
       },
       async removeProductModifier(product, modIndex) {
-        if (this.currentOrder._id) {
-          const modifier = product.modifiers[modIndex]
-          this.actionList.push({
-            action: 'removeMod',
-            value: {
-              product: product._id,
-              modifier
+        const modifier = product.modifiers[modIndex]
+        this.actionList.push({
+          type: 'item',
+          where: {
+            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            pairedObject: {
+              key: ['items._id'],
+              value: [product._id]
             }
-          })
-        }
+          },
+          table: this.currentOrder.table,
+          update: {
+            pull: {
+              key: 'items.$.modifiers',
+              value: {
+                _id: modifier._id
+              }
+            }
+          }
+        })
         product.modifiers.splice(modIndex, 1)
       },
       async saveTableOrder() { //todo move to backend
-        for (const { action, value } of this.actionList) {
-          if (action === 'createOrder') {
-            const { _id, items } = await cms.getModel('Order').create({
-              table: this.currentOrder.table,
-              items: this.currentOrder.items,
-              status: 'inProgress'
-            })
-
-            this.$set(this.currentOrder, '_id', _id)
-            this.$set(this.currentOrder, 'items', items)
-            break
-          } else if (action === 'addProduct') {
-            const { items } = await cms.getModel('Order').findOneAndUpdate(
-              { _id: this.currentOrder._id },
-              { $push: { 'items': value } },
-              { new: true }
-            )
-
-            this.$set(this.currentOrder, 'items', items)
-          } else if (action === 'addQty') {
-            const { product, inc } = value
-            const { items } = await cms.getModel('Order').findOneAndUpdate(
-              { _id: this.currentOrder._id, 'items._id': product },
-              { $inc: { 'items.$.quantity': inc } },
-              { new: true }
-            )
-
-            this.$set(this.currentOrder, 'items', items)
-          } else if (action === 'addMod') {
-            const { product, modifier } = value
-            const { items } = await cms.getModel('Order').findOneAndUpdate(
-              { _id: this.currentOrder._id, 'items._id': product },
-              { $push: { 'items.$.modifiers': modifier } },
-              { new: true }
-            )
-
-            this.$set(this.currentOrder, 'items', items)
-          } else if (action === 'removeMod') {
-            const { product, modifier } = value
-            await cms.getModel('Order').findOneAndUpdate(
-              { _id: this.currentOrder._id, 'items._id': product._id },
-              { $pull: { 'items.$.modifiers': { _id: modifier._id } } }
-            )
-          }
-        }
-        this.actionList = []
+        const { _id, items } = await cms.getModel('OrderCommit').create(this.actionList);
+        this.$set(this.currentOrder, '_id', _id);
+        this.$set(this.currentOrder, 'items', items);
+        this.actionList = [];
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
@@ -964,7 +1002,7 @@
       },
       genObjectId() {
         const mongoose = require('mongoose')
-        return mongoose.Types.ObjectId().toString()
+        return mongoose.Types.ObjectId();
       }
     },
     async created() {
@@ -1004,7 +1042,12 @@
         async handler(val) {
           this.actionList = []
           if (val) {
-            const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
+            const existingOrder = await new Promise(resolve => {
+              cms.socket.emit('buildTempOrder', this.currentOrder.table, (order) => {
+                resolve(order);
+              })
+            })
+            // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
             if (existingOrder) {
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)

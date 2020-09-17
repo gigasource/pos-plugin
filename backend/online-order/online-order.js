@@ -5,7 +5,8 @@ const io = require('socket.io-client');
 const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
-const schedule = require('node-schedule')
+const schedule = require('node-schedule');
+const { initSocket } = require('../master-node');
 
 let webshopUrl;
 let storeName;
@@ -483,11 +484,13 @@ module.exports = async cms => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
+          initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
+        initSocket(onlineOrderSocket);
       }
     });
   }
