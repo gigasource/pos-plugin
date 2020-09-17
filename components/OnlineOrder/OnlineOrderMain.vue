@@ -388,7 +388,7 @@
         return orderUtil.getExtraInfo(item)
       },
       async getCustomerInfo(phone) {
-        const customer = await cms.getModel('Customer').find({phone})
+        const customer = await cms.getModel('Customer').findOne({phone})
         if (!customer) {
           return {
             phone,
