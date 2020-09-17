@@ -642,7 +642,7 @@
         })
         product.modifiers.splice(modIndex, 1)
       },
-      async saveTableOrder() { //todo move to backend
+      async saveTableOrder() {
         const { _id, items } = await cms.getModel('OrderCommit').create(this.actionList);
         this.$set(this.currentOrder, '_id', _id);
         this.$set(this.currentOrder, 'items', items);
@@ -650,6 +650,23 @@
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
+        this.actionList.push({
+          type: 'item',
+          where: {
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
+            pairedObject: {
+              key: ['items._id'],
+              value: [product._id]
+            }
+          },
+          table: this.currentOrder.table,
+          update: {
+            set: {
+              key: 'price',
+              value: price
+            }
+          }
+        })
       },
       setOrderDiscount() {
         if (this.currentOrder.items.some(i => i.price !== i.originalPrice) && !this.currentOrder.hasOrderWideDiscount) {
