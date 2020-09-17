@@ -33,7 +33,7 @@ function deserializeObj(obj) {
 
 async function buildTempOrder(table) {
 	if (table == null) return null;
-	const commitsList = await orderCommitModel.find({table: table, temp: true});
+	const commitsList = await orderCommitModel.find({table: table, temp: true}).lean();
 
 	const result = activeOrders[table] ? _.clone(activeOrders[table]) : { items: [] };
 	commitsList.forEach(commit => {
@@ -41,7 +41,7 @@ async function buildTempOrder(table) {
 		if (commit.type == 'item') {
 			let currentItem;
 			if (commit.where.pairedObject) {
-				currentItem = result['items'].find(item => item === commit.where.pairedObject.value[0]);
+				currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
 			}
 			if (commit.update.push) {
 				if (commit.update.push.key.include('items')) {
@@ -50,7 +50,10 @@ async function buildTempOrder(table) {
 					if (currentItem) currentItem.modifier.push(commit.update.push.value);
 				}
 			} else if (commit.update.inc && currentItem.quantity > 0) {
-				if (currentItem) currentItem.quantity--;
+				if (currentItem) {
+					currentItem.quantity += commit.update.inc.value;
+					if (currentItem.quantity < 0) currentItem.quantity = 0;
+				}
 			} else if (commit.update.pull) {
 				// TODO add pull here
 			}
@@ -104,8 +107,13 @@ async function handleOrderCommit(commit) {
 }
 
 async function handleItemCommit(commit) {
-	if (!commit.orderId && activeOrders[commit.table] && (!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-		commit.orderId = activeOrders[commit.table].id;
+	if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
+		if (!commit.orderId && activeOrders[commit.table]) {
+			commit.orderId = activeOrders[commit.table].id;
+		}
+		if (commit.where && !commit.where._id) {
+			commit.where._id = activeOrders[commit.table]._id;
+		}
 	}
 	if (!activeOrders[commit.table]) {
 		console.error("Order is closed or not created");
@@ -127,9 +135,9 @@ async function handleItemCommit(commit) {
 		})
 		if (checker) {
 			const targetItem = activeOrders[commit.table].items.find(item => {
-				return item._doc._id.toString() == condition['items._id'];
+				return item._id.toString() == condition['items._id'];
 			})
-			if (targetItem._doc.quantity == 0) {
+			if (targetItem.quantity == 0) {
 				console.error('Can not reduce quantity to neg');
 				return null;
 			}

@@ -198,7 +198,7 @@
       },
       addProductToOrder(product) {
         if (!this.currentOrder || !product) return
-        if (!this.currentOrder._id && !this.actionList.some(i => i.action === 'createOrder')) {
+        if (!this.currentOrder._id && !this.actionList.some(i => i.type === 'order')) {
           this.$set(this.currentOrder, 'firstInit', true);
           this.actionList.push({
             type: 'order',
@@ -221,12 +221,12 @@
           // create order with product
           this.actionList.push({
             type: 'item',
-            where: { _id: this.currentOrder.firstInit ? this.currentOrder._id : null },
+            where: { _id: !this.currentOrder.firstInit ? this.currentOrder._id : null },
             table: this.currentOrder.table,
             update: {
               push: {
                 key: 'items',
-                value: mappedProduct
+                value: { ...mappedProduct }
               }
             }
           })
@@ -244,13 +244,13 @@
           this.actionList.push({
             type: 'item',
             where: {
-              _id: this.currentOrder.firstInit ? this.currentOrder._id : null
+              _id: !this.currentOrder.firstInit ? this.currentOrder._id : null
             },
             table: this.currentOrder.table,
             update: {
               push: {
                 key: 'items',
-                value: mappedProduct
+                value: { ...mappedProduct }
               }
             }
           })
@@ -263,7 +263,7 @@
         this.actionList.push({
           type: 'item',
           where: {
-            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             pairedObject: {
               key: ['items._id'],
               value: [itemToUpdate._id]
@@ -272,7 +272,7 @@
           table: this.currentOrder.table,
           update: {
             inc: {
-              key: 'item.&.quantity',
+              key: 'items.$.quantity',
               value: 1
             }
           }
@@ -286,7 +286,7 @@
         this.actionList.push({
           type: 'item',
           where: {
-            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : nul,
             pairedObject: {
               key: ['items._id'],
               value: [itemToUpdate._id]
@@ -295,7 +295,7 @@
           table: this.currentOrder.table,
           update: {
             inc: {
-              key: 'item.&.quantity',
+              key: 'items.$.quantity',
               value: -1
             }
           }
@@ -598,7 +598,7 @@
         this.actionList.push({
           type: 'item',
           where: {
-            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             pairedObject: {
               key: ['items._id'],
               value: [product._id]
@@ -608,7 +608,7 @@
           update: {
             push: {
               key: 'items.$.modifiers',
-              value: modifier
+              value: { ...modifier }
             }
           }
         })
@@ -624,7 +624,7 @@
         this.actionList.push({
           type: 'item',
           where: {
-            _id: this.currentOrder.firstInit ? null : this.currentOrder._id,
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             pairedObject: {
               key: ['items._id'],
               value: [product._id]

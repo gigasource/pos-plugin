@@ -41,6 +41,11 @@
       "_id": "5f62d060bc60af0946032e1a",
       "schemaType": "string",
       "key": "groupTempId"
+    },
+    {
+      "_id": "5f62e2aa9b6aca0b923cd2cc",
+      "schemaType": "string",
+      "key": "table"
     }
   ],
   "name": "OrderCommit",
