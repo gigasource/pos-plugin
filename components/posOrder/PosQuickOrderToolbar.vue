@@ -14,7 +14,7 @@
     </g-menu>
     <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
     <g-spacer/>
-    <g-btn-bs class="col-2" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
+    <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
               :disabled="disablePrintBtn"
               @click.stop="$emit('saveTableOrder')">
       Print

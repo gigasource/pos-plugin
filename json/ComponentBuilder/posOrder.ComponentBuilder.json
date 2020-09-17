@@ -224,7 +224,7 @@
               "type": "event"
             },
             {
-              "service": "OrderStore:setNewPrice",
+              "service": "OrderStore:",
               "local": "changePrice",
               "type": "event"
             },

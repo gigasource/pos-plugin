@@ -10,6 +10,10 @@
           </div>
         </template>
         <div class="order-detail__menu">
+          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-printer-setting"
+                    @click.stop="$emit('saveTableOrder')">
+            Print
+          </g-btn-bs>
           <g-btn-bs icon="icon-split_check_2">Split check</g-btn-bs>
           <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
           <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
@@ -79,6 +83,7 @@
       items: Array,
       user: Object,
       storeLocale: String,
+      actionList: Array
     },
     filters: {
       convertMoney(value) {
@@ -115,6 +120,9 @@
       itemsWithQty() {
         if (this.items) return this.items.filter(i => i.quantity > 0)
         return []
+      },
+      disablePrintBtn() {
+        return this.actionList.length === 0
       }
     },
     methods: {
@@ -134,7 +142,7 @@
         this.dialogConfigOrderItem = Object.assign({} , this.dialogConfigOrderItem, {
           product: item,
           value: true,
-          originalPrice: item.price,
+          originalPrice: item.originalPrice,
           price: 0
         })
       },

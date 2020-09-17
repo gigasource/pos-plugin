@@ -2,12 +2,14 @@
   <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
     <div class="dialog-input col-flex">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
-      <div class="flex-grow-1 overflow-y pb-3">
-        <slot name="input" :changeKeyboard="changeKeyboardType">
-          <div class="textfield">
-            <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
-          </div>
-        </slot>
+      <div class=" col-flex flex-grow-1 overflow-y pb-3">
+        <div class="flex-grow-1">
+          <slot name="input" :changeKeyboard="changeKeyboardType">
+            <div class="textfield">
+              <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
+            </div>
+          </slot>
+        </div>
         <slot name="buttons">
           <div class="button" v-if="showButtons">
             <g-btn-bs width="120" border-color="#979797" text-color="#1d1d26" @click="internalValue = false">{{$t('ui.cancel')}}</g-btn-bs>
