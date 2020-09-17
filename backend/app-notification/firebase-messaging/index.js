@@ -168,7 +168,7 @@ module.exports = cms => {
     const message = {
       notification: {
         title: 'New device',
-        body: newDevice.name + ((newDevice.metadata && newDevice.metadata.deviceLocation)||""),
+        body: newDevice.name + ((newDevice.metadata && " - " + newDevice.metadata.deviceLocation)||""),
       },
       android: {
         notification: {
