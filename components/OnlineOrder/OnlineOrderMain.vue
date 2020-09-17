@@ -10,13 +10,59 @@
         </g-badge>
       </div>
       <div class="content">
-        <template v-if="!internalOrders || !internalOrders.length">
+        <template v-if="(!internalOrders || !internalOrders.length) && calls.length === 0">
           <div class="pending-orders--empty">
             <img alt src="/plugins/pos-plugin/assets/pending_order.svg"/>
             <p>{{$t('onlineOrder.noPending')}}</p>
           </div>
         </template>
+        <template v-else-if="(!internalOrders || !internalOrders.length) && calls.length > 0">
+          <div class="pending-orders--call" v-for="(call, i) in calls" :key="`call_${i}`">
+            <div class="pending-orders--call-title">
+              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <g-spacer/>
+              <g-icon size="20">icon-call</g-icon>
+            </div>
+            <p class="fs-small-2 text-grey-darken-1">Incomming call</p>
+            <div class="pending-orders--call-buttons">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
+                <g-icon size="16">icon-cross-red</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+                <g-icon size="16">icon-table-reservation</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
+                <g-icon size="16">icon-take-away</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
+                <g-icon size="16">icon-delivery-scooter</g-icon>
+              </g-btn-bs>
+            </div>
+          </div>
+        </template>
         <template v-else>
+          <div class="pending-orders--call" v-for="(call, i) in calls" :key="`call_${i}`">
+            <div class="pending-orders--call-title">
+              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <g-spacer/>
+              <g-icon>icon-call</g-icon>
+            </div>
+            <p class="fs-small-2 text-grey-darken-1">Incomming call</p>
+            <div class="pending-orders--call-buttons">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
+                <g-icon size="16">icon-cross-red</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+                <g-icon size="16">icon-table-reservation</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
+                <g-icon size="16">icon-take-away</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
+                <g-icon size="16">icon-delivery-scooter</g-icon>
+              </g-btn-bs>
+            </div>
+          </div>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
             <g-card-title class="pending-orders--title">
               <div class="row-flex align-items-center flex-grow-1">
@@ -176,19 +222,17 @@
                            @completeOrder="completeOrder"
                            @declineOrder="declineOrder"/>
     <dialog-text-filter v-model="dialog.reason" label="Reason" :default-value="dialog.order.declineReason" @submit="submitReason"/>
+    <new-reservation-dialog v-model="dialog.reservation" :received-phone="customer ? customer.phone : ''" @submit="getPendingReservationsLength"/>
+    <dialog-order v-model="dialog.createOrder" :customer="customer" :type="orderType"/>
   </div>
 </template>
 
 <script>
-  import ValuePicker from './ValuePicker';
-  import DialogCompleteOrder from './dialogCompleteOrder';
-  import DialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
   import orderUtil from '../logic/orderUtil'
 
   export default {
     name: 'OnlineOrderMain',
-    components: { DialogTextFilter, DialogCompleteOrder, ValuePicker },
-    injectService: ['PosStore:storeLocale'],
+    injectService: ['PosStore:(storeLocale, getPendingReservationsLength)'],
     props: {
       pendingOrders: Array,
       kitchenOrders: Array,
@@ -212,10 +256,20 @@
         dialog: {
           order: {},
           reason: false,
+          reservation: false,
+          createOrder: false
         },
         timeoutInterval: {},
-        timeoutProgress: {}
+        timeoutProgress: {},
+        calls: [],
+        customer: {}
       }
+    },
+    created() {
+      cms.socket.on('receiving-call', async (phone, date) => {
+        const customer = await this.getCustomerInfo(phone)
+        this.calls.unshift({customer, date})
+      })
     },
     watch: {
       pendingOrders(val, oldVal) {
@@ -331,6 +385,29 @@
       },
       getExtraInfo(item) {
         return orderUtil.getExtraInfo(item)
+      },
+      async getCustomerInfo(phone) {
+        const customer = await cms.getModel('Customer').find({phone})
+        if (!customer) {
+          return {
+            phone,
+            name: 'New customer',
+            addresses: []
+          }
+        }
+        return customer
+      },
+      deleteCall(index) {
+        this.calls.splice(index, 1)
+      },
+      openReservationDialog(customer) {
+        this.customer = customer
+        this.dialog.reservation = true
+      },
+      openOrderDialog(customer, type) {
+        this.customer = customer
+        this.orderType = type
+        this.dialog.createOrder = true
       }
     },
     mounted() {
@@ -435,6 +512,33 @@
       align-items: flex-start !important;
       flex-wrap: nowrap !important;
     }
+
+    &--call {
+      width: 100%;
+      background-color: white;
+      border: 1px solid #9e9e9e;
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 8px;
+
+      &-title {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      &-buttons {
+        display: flex;
+        align-items: center;
+        margin-top: 4px;
+
+        .g-btn-bs {
+          margin: 0;
+          padding: 18px;
+        }
+      }
+    }
   }
 
   .kitchen-orders {
@@ -518,7 +622,6 @@
         }
       }
 
-
       .pending-orders--empty > p {
         text-align: center;
       }
@@ -535,8 +638,19 @@
           margin-right: 0 !important;
         }
       }
-    }
 
+      .pending-orders--call-title {
+        line-height: 1.2;
+
+        div span {
+          display: none;
+        }
+      }
+
+      .pending-orders--call-buttons .g-btn-bs{
+        padding: 4px;
+      }
+    }
 
   }
 </style>

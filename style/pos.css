@@ -634,3 +634,31 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-call {
+  background-image: url("../assets/call.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-table-reservation {
+  background-image: url("../assets/table-reservation.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-delete2 {
+  background-image: url("../assets/delete2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-note2 {
+  background-image: url("../assets/note2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

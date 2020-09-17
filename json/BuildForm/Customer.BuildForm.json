@@ -1,0 +1,55 @@
+{
+  "_id": "5f63196aa0556535c04e706e",
+  "alwaysLoad": true,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f631a0ea0556535c04e70b2",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f631a0ea0556535c04e70b3",
+      "schemaType": "string",
+      "key": "phone",
+      "type": "input"
+    },
+    {
+      "_id": "5f631a0ea0556535c04e70b4",
+      "schemaType": "array",
+      "key": "addresses",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "address",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "street",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "house",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "zipcode",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "city",
+          "type": "input"
+        }
+      ]
+    }
+  ],
+  "name": "Customer",
+  "tabs": [],
+  "type": "Collection"
+}
