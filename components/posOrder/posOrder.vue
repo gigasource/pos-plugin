@@ -222,6 +222,7 @@
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
+    max-height: 100vh;
 
     &__header {
       display: flex;
