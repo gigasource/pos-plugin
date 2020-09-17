@@ -262,7 +262,8 @@
         timeoutInterval: {},
         timeoutProgress: {},
         calls: [],
-        customer: {}
+        customer: {},
+        orderType: null
       }
     },
     created() {
