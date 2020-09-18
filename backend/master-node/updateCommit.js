@@ -62,6 +62,9 @@ async function buildTempOrder(table) {
 				if (commit.update.set.key.includes('price')) {
 					currentItem.price = commit.update.set.value;
 				}
+				if (commit.update.set.key.includes('printed')) {
+					currentItem.printed = commit.update.set.value;
+				}
 			}
 		}
 	})

@@ -60,6 +60,7 @@
       return {
         activeTableProduct: null,
         currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
+        printedOrder: null,
         savedOrders: [],
         scrollWindowProducts: null,
         productIdQuery: '',
@@ -235,7 +236,8 @@
           const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
             return latestProduct.product === product._id &&
               product.price === latestProduct.price &&
-              (!latestProduct.modifiers || latestProduct.modifiers.length === 0)
+              (!latestProduct.modifiers || latestProduct.modifiers.length === 0) &&
+              !latestProduct.printed
           } )
 
           console.log('isSameItem', isSameItem)
@@ -286,7 +288,7 @@
         this.actionList.push({
           type: 'item',
           where: {
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : nul,
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             pairedObject: {
               key: ['items._id'],
               value: [itemToUpdate._id]
@@ -646,10 +648,70 @@
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
+
+        this.actionList.map(action => {
+          if (action.type === 'item' && action.update && action.update.push) {
+            action.update.push.value.printed = true
+          }
+
+          return action
+        })
+        await this.printOrderUpdate()
         const { _id, items } = await cms.getModel('OrderCommit').create(this.actionList);
         this.$set(this.currentOrder, '_id', _id);
         this.$set(this.currentOrder, 'items', items);
         this.actionList = [];
+      },
+      async printOrderUpdate() {
+        if (this.printedOrder && this.printedOrder.items) {
+          const diff = _.differenceWith(this.currentOrder.items, this.printedOrder.items, _.isEqual);
+          const printLists = diff.reduce((lists, current) => {
+            if (!this.printedOrder.items.some(i => i._id === current._id)) {
+              if (current.quantity > 0) lists.addList.push(current)
+            } else {
+              const product = this.printedOrder.items.find(i => i._id === current._id)
+
+              if (product) {
+                const qtyChange = current.quantity - product.quantity
+                if (qtyChange < 0) {
+                  const items = Array.from({ length: -qtyChange }).map(() => current);
+                  lists.cancelList = lists.cancelList.concat(items)
+                }
+                else lists.addList.push({ ...current, quantity: qtyChange })
+              }
+            }
+            return lists
+          }, {
+            cancelList: [],
+            addList: []
+          })
+          console.log(diff)
+          if (printLists.addList.length) {
+            const addedList = Object.assign({}, this.currentOrder,
+              { items: await this.mapGroupPrinter(printLists.addList) });
+            cms.socket.emit('printKitchen', { order: addedList, device: this.device })
+          }
+          if (printLists.cancelList.length) {
+            const cancelledList = Object.assign({}, this.currentOrder,
+              ({ items: await this.mapGroupPrinter(printLists.cancelList) }));
+            cms.socket.emit('printKitchenCancel', { order: cancelledList, device: this.device })
+          }
+        }
+      },
+      mapGroupPrinter(items) {
+        async function getGroupPrinterName(gp) {
+          if (typeof gp === 'object') {
+            return gp.name
+          }
+          const printer = await cms.getModel('GroupPrinter').findById(gp)
+          if (printer) return printer.name
+        }
+
+        return Promise.all(items.map(async item => {
+          if (item.groupPrinter) item.groupPrinter = await getGroupPrinterName(item.groupPrinter)
+          if (item.groupPrinter2) item.groupPrinter2 = await getGroupPrinterName(item.groupPrinter2)
+          return item
+        }))
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
@@ -1059,6 +1121,7 @@
           this.$set(this.currentOrder, '_id', order._id)
           this.$set(this.currentOrder, 'user', order.user)
           this.$set(this.currentOrder, 'items', order.items)
+          this.printedOrder = _.cloneDeep(this.currentOrder)
         }
       })
       await this.getReservations()
@@ -1085,8 +1148,9 @@
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
+              this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
-              this.currentOrder = { items: [], hasOrderWideDiscount: false }
+              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
             }
           }
         }
