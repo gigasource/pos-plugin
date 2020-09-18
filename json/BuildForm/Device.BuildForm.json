@@ -239,6 +239,12 @@
       "key": "firebaseToken",
       "type": "input",
       "flex": "md6"
+    },
+    {
+      "_id": "5f5f3099b2796bc40aa05541",
+      "schemaType": "boolean",
+      "key": "master",
+      "type": "input@switch"
     }
   ],
   "name": "Device",
