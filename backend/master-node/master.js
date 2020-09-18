@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
-const { initQueue, pushTaskToQueue, resumeQueue, updateTempCommit, buildTempOrder } = require('./updateCommit');
+const { initQueue, pushTaskToQueue, resumeQueue, updateTempCommit, buildTempOrder, checkGroupTempId } = require('./updateCommit');
 const axios = require('axios');
+const internalIp = require('internal-ip');
 
 const remoteServer = 'http://localhost:8088';
 
 class Master {
 	constructor(cms) {
 		this.cms = cms;
+		this.onlineOrderSocket = null;
 		this.socket = null;
 		this.storeId = null;
 		this.highestCommitId = 0;
+		this.connection = {};
 	}
 
 	async getStoreId() {
@@ -28,20 +31,36 @@ class Master {
 
 	initSocket(socket) {
 		const _this = this;
-		_this.socket = p2pClientPlugin(socket, socket.clientId);
-		_this.socket.on('updateCommitMaster', (commits) => {
-			pushTaskToQueue(commits);
-		});
-		_this.socket.on('syncCommit', (clientId, oldHighestCommitId) => {
-			const commit = {
-				type: 'sync',
-				clientId,
-				oldHighestCommitId
-			}
-			pushTaskToQueue([commit]);
+		_this.socket = _this.cms.io.of('/masterNode');
+		_this.socket.on('connection', socket => {
+			const clientId = socket.request._query.clientId;
+			_this.connection[clientId] = socket;
+			socket.on('disconnect', () => {
+				delete _this.connection[clientId];
+			})
+			socket.on('updateCommits', async (commits) => {
+				const newCommits = [];
+				for (let id in commits) {
+					const commit = commits[id];
+					if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
+				}
+				if (newCommits.length) pushTaskToQueue(newCommits);
+			})
+			socket.on('requireSync', (oldHighestCommitId) => {
+				const commit = {
+					type: 'sync',
+					clientId,
+					oldHighestCommitId
+				}
+				pushTaskToQueue([commit]);
+			})
 		})
-		_this.socket.emit('registerMasterDevice');
 
+		// online order socket
+		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
+		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync()}:${global.APP_CONFIG.port}`));
+
+		// front-end socket
 		this.cms.socket.on('connect', socket => {
 			socket.on('buildTempOrder', async (table, fn) => {
 				const order = await buildTempOrder(table);
@@ -94,6 +113,12 @@ class Master {
 				console.error(err);
 			}
 		});
+	}
+
+	emitToAll(commits) {
+		for (let clientId in this.connection) {
+			this.connection[clientId].emit('updateCommitNode', commits);
+		}
 	}
 }
 

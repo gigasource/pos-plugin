@@ -1084,6 +1084,11 @@
           ]
         }
       ]
+    },
+    {
+      "_id": "5f647eccbb607e1722b432d1",
+      "schemaType": "string",
+      "key": "masterIp"
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",

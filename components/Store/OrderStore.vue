@@ -213,7 +213,7 @@
               }
             }
           })
-        }
+        } else this.$set(this.currentOrder, 'firstInit', false);
 
         const latestProduct = _.last(this.currentOrder.items);
 
@@ -224,6 +224,7 @@
             type: 'item',
             where: { _id: !this.currentOrder.firstInit ? this.currentOrder._id : null },
             table: this.currentOrder.table,
+            orderId: this.currentOrder.id,
             update: {
               push: {
                 key: 'items',
@@ -248,6 +249,7 @@
             where: {
               _id: !this.currentOrder.firstInit ? this.currentOrder._id : null
             },
+            orderId: this.currentOrder.id,
             table: this.currentOrder.table,
             update: {
               push: {
@@ -271,6 +273,7 @@
               value: [itemToUpdate._id]
             }
           },
+          orderId: this.currentOrder.id,
           table: this.currentOrder.table,
           update: {
             inc: {
@@ -608,6 +611,7 @@
               value: [product._id]
             }
           },
+          orderId: this.currentOrder.id,
           table: this.currentOrder.table,
           update: {
             push: {
@@ -634,6 +638,7 @@
               value: [product._id]
             }
           },
+          orderId: this.currentOrder.id,
           table: this.currentOrder.table,
           update: {
             pull: {
@@ -657,7 +662,8 @@
           return action
         })
         await this.printOrderUpdate()
-        const { _id, items } = await cms.getModel('OrderCommit').create(this.actionList);
+        const { _id, items, id } = await cms.getModel('OrderCommit').create(this.actionList);
+        this.$set(this.currentOrder, 'id', id);
         this.$set(this.currentOrder, '_id', _id);
         this.$set(this.currentOrder, 'items', items);
         this.actionList = [];
@@ -724,6 +730,7 @@
               value: [product._id]
             }
           },
+          orderId: this.currentOrder.id,
           table: this.currentOrder.table,
           update: {
             set: {

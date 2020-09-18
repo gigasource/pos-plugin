@@ -7,6 +7,8 @@ let orderCommitModel;
 let highestOrderId;
 let highestCommitId;
 let activeOrders = {};
+let groupTempIdExists = {};
+let nodeHighestCommitIdUpdating;
 
 const COMMIT_TIME_OUT = 5 * 60 * 1000;
 const COMMIT_CLOSE_TIME_OUT = 30 * 1000;
@@ -41,7 +43,7 @@ async function buildTempOrder(table) {
 		// only accept item commit
 		if (commit.type == 'item') {
 			let currentItem;
-			if (commit.where.pairedObject) {
+			if (commit.where && commit.where.pairedObject) {
 				currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
 			}
 			if (commit.update.push) {
@@ -234,6 +236,7 @@ async function initQueue(handler) {
 					commit.where._id = activeOrders[commit.table]._id;
 				}
 			} else continue;
+			if (commit.commitId && commit.commitId < highestCommitId) continue;
 			// handle commit
 			if (commit.type === 'order') {
 				result = await handleOrderCommit(commit);
@@ -241,11 +244,13 @@ async function initQueue(handler) {
 				result = await handleItemCommit(commit);
 			} else if (commit.type === 'sync') { // type sync
 				const commits = await handleSyncCommit(commit.oldHighestCommitId);
-				handler.socket.emitTo(commit.clientId, 'nodeSync', commits);
+				handler.connection[commit.clientId].emit('nodeSync', commits);
 			} else if (commit.type === 'removeTemp') {
+				result = true;
 				await deleteTempCommit(commit.groupTempId);
 			}
 			if (result) {
+				if (commit.commitId) highestCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
 			if (!commit.table && lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
@@ -255,7 +260,7 @@ async function initQueue(handler) {
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
 			const deleteCommit = await deleteTempCommit(lastTempId);
 			newCommits.push(deleteCommit);
-			handler.socket.emit('emitToAllDevices', newCommits, handler.storeId);
+			handler.emitToAll(newCommits);
 		}
 		cb(null);
 	})
@@ -272,20 +277,35 @@ function resumeQueue() {
 	queue.resume();
 }
 
+/*
+ nodeHighestOrderIdUpdating is for the case when node check master's
+ highestCommitId and send requireSync, the next time node check with
+ master's highestCommitId, the value must be updated but highestCommitId
+ of node may not be updated fast enough.
+ */
 function checkHighestCommitId(id) {
-	if (!id) return highestCommitId;
+	nodeHighestCommitIdUpdating = Math.max(nodeHighestCommitIdUpdating, highestOrderId);
+	if (!id) return nodeHighestCommitIdUpdating;
 	// node highest commit id must be equal to master
-	return id == highestCommitId ? null : highestCommitId;
+	return id == nodeHighestCommitIdUpdating ? null : nodeHighestCommitIdUpdating;
 }
 
 function setHighestCommitId(id) {
-	highestCommitId = id;
+	nodeHighestCommitIdUpdating = id;
 }
 
 async function updateTempCommit(commits) {
 	for (let i in commits) {
 		await orderCommitModel.create(commits[i]);
 	}
+}
+
+async function checkGroupTempId(groupTempId) {
+	if (!groupTempIdExists[groupTempId]) {
+		const existsCommit = await orderCommitModel.findOne({groupTempId});
+		groupTempIdExists[groupTempId] = existsCommit ? true : false;
+	}
+	return groupTempIdExists[groupTempId];
 }
 
 module.exports = {
@@ -295,5 +315,6 @@ module.exports = {
 	checkHighestCommitId,
 	setHighestCommitId,
 	updateTempCommit,
-	buildTempOrder
+	buildTempOrder,
+	checkGroupTempId
 };
