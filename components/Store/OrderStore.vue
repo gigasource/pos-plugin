@@ -377,7 +377,9 @@
       },
       async resetOrderData() {
         this.activeTableProduct = null
-        this.currentOrder = { items: [], hasOrderWideDiscount: false }
+        this.currentOrder = this.currentOrder.table
+          ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table }
+          : { items: [], hasOrderWideDiscount: false };
         this.paymentAmountTendered = ''
         this.productIdQuery = ''
         await this.getSavedOrders()
