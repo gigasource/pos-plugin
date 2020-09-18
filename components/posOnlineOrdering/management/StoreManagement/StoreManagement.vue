@@ -332,7 +332,7 @@
             const fnString = header + checkIOs + mobile + genStyleSheet('bottom-right', 'normal', false) + icon + triggerBtn + genReadyState() + footer
             const minifyString = terser.minify(fnString).code
             const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
-            await gridFsHandler.uploadFile(file, `/store/${store.alias}`, () => {})
+            await gridFsHandler.uploadFile(file, `/store/${store.alias}`, () => {}, false, true)
           }
         }))
       }
