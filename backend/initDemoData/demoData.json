@@ -1110,7 +1110,8 @@
         }
       ],
       "columns": 5,
-      "rows": 2
+      "rows": 2,
+      "type": "default"
     }
   ],
   "GroupPrinter": [

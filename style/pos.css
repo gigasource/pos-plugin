@@ -662,3 +662,24 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-menu1 {
+  background-image: url("../assets/menu1.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-menu2 {
+  background-image: url("../assets/menu2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-customer-info {
+  background-image: url("../assets/customer-info.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

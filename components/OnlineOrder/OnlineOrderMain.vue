@@ -222,8 +222,7 @@
                            @completeOrder="completeOrder"
                            @declineOrder="declineOrder"/>
     <dialog-text-filter v-model="dialog.reason" label="Reason" :default-value="dialog.order.declineReason" @submit="submitReason"/>
-    <new-reservation-dialog v-model="dialog.reservation" :received-phone="customer ? customer.phone : ''" @submit="getPendingReservationsLength"/>
-    <dialog-order v-model="dialog.createOrder" :customer="customer" :type="orderType"/>
+    <new-reservation-dialog v-model="dialog.reservation" :received-phone="selectedCustomer ? selectedCustomer.phone : ''" @submit="getPendingReservationsLength"/>
   </div>
 </template>
 
@@ -232,7 +231,10 @@
 
   export default {
     name: 'OnlineOrderMain',
-    injectService: ['PosStore:(storeLocale, getPendingReservationsLength)'],
+    injectService: [
+        'PosStore:(storeLocale, getPendingReservationsLength, isMobile)',
+        'OrderStore:(calls, selectedCustomer, orderType, getCustomerInfo)'
+    ],
     props: {
       pendingOrders: Array,
       kitchenOrders: Array,
@@ -261,16 +263,7 @@
         },
         timeoutInterval: {},
         timeoutProgress: {},
-        calls: [],
-        customer: {},
-        orderType: null
       }
-    },
-    created() {
-      cms.socket.on('receiving-call', async (phone, date) => {
-        const customer = await this.getCustomerInfo(phone)
-        this.calls.unshift({customer, date})
-      })
     },
     watch: {
       pendingOrders(val, oldVal) {
@@ -387,28 +380,19 @@
       getExtraInfo(item) {
         return orderUtil.getExtraInfo(item)
       },
-      async getCustomerInfo(phone) {
-        const customer = await cms.getModel('Customer').findOne({phone})
-        if (!customer) {
-          return {
-            phone,
-            name: 'New customer',
-            addresses: []
-          }
-        }
-        return customer
-      },
       deleteCall(index) {
         this.calls.splice(index, 1)
       },
       openReservationDialog(customer) {
-        this.customer = customer
+        this.selectedCustomer = customer
         this.dialog.reservation = true
       },
       openOrderDialog(customer, type) {
-        this.customer = customer
+        this.selectedCustomer = customer
         this.orderType = type
-        this.dialog.createOrder = true
+        this.$router.push(
+            { path : this.isMobile ? '/pos-order-3/?type=delivery' : '/pos-order-2/?type=delivery' }
+        )
       }
     },
     mounted() {

@@ -16,11 +16,12 @@
           <p style="color: #9e9e9e">{{item.zipcode}}</p>
           <p style="color: #9e9e9e">{{item.city}}</p>
           <div class="row-flex mt-2">
-            <g-btn-bs width="120" background-color="#F9A825" text-color="white" icon="icon-reservation_modify@18">Edit
+            <g-btn-bs width="120" background-color="#F9A825" text-color="white" icon="icon-reservation_modify@18" @click="changeMode('input', false, true)">Edit
             </g-btn-bs>
             <g-btn-bs width="120" background-color="#FF4452" text-color="white" icon="icon-delete2@18">Delete</g-btn-bs>
           </div>
         </div>
+        <g-icon color="#1271ff" size="60" @click="addNewAddress">add_circle</g-icon>
       </div>
       <div class="dialog-title">Time to complete (minute)</div>
       <div class="dialog-list__time">
@@ -35,31 +36,31 @@
       </div>
       <g-spacer/>
       <div class="dialog-buttons">
-        <g-btn-bs icon="icon-note2" background-color="#2979FF" text-color="white" @click="changeMode('input')">Add note</g-btn-bs>
-        <g-btn-bs icon="check@18" background-color="#388E3C" text-color="white">Complete</g-btn-bs>
+        <g-btn-bs icon="icon-note2" background-color="#2979FF" text-color="white" @click="changeMode('input', true)">Add note</g-btn-bs>
+        <g-btn-bs icon="check@18" background-color="#388E3C" text-color="white" @click="complete">Complete</g-btn-bs>
       </div>
     </div>
-    <div class="dialog">
-      <g-icon @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
+    <div v-if="mode === 'input'" class="dialog">
+      <g-icon @click="internalValue = false" class="dialog-icon--close">icon-close@20</g-icon>
       <div class="flex-grow-1 overflow-y pb-3">
         <div class="row-flex flex-wrap justify-around mt-3">
-          <pos-textfield-new style="width: 48%" label="Name" placeholder="Name" v-model="name" required/>
-          <pos-textfield-new style="width: 48%" label="Phone" placeholder="Phone" v-model="phone" required/>
-          <pos-textfield-new style="width: 98%" label="Look up address" placeholder="Delivery address"
+          <pos-textfield-new :disabled="isEditingNote" style="width: 48%" label="Name" placeholder="Name" v-model="name" required/>
+          <pos-textfield-new :disabled="isEditingNote" style="width: 48%" label="Phone" placeholder="Phone" v-model="phone" required/>
+          <pos-textfield-new :disabled="isEditingNote" style="width: 98%" label="Look up address" placeholder="Delivery address"
                              v-model="address" required/>
-          <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
+          <pos-textfield-new :disabled="isEditingNote" style="width: 23%" label="Street" placeholder="Street name (Autofill)"
                              v-model="street"/>
-          <pos-textfield-new style="width: 23%" label="House no." placeholder="House number (Autofill)"
+          <pos-textfield-new :disabled="isEditingNote" style="width: 23%" label="House no." placeholder="House number (Autofill)"
                              v-model="house"/>
-          <pos-textfield-new style="width: 23%" label="Zipcode" placeholder="Zipcode (Autofill)"
+          <pos-textfield-new :disabled="isEditingNote" style="width: 23%" label="Zipcode" placeholder="Zipcode (Autofill)"
                              v-model="zipcode"/>
-          <pos-textfield-new style="width: 23%" label="City" placeholder="City (Autofill)" v-model="city"/>
+          <pos-textfield-new :disabled="isEditingNote" style="width: 23%" label="City" placeholder="City (Autofill)" v-model="city"/>
           <pos-textfield-new style="width: 98%" label="Delivery note" placeholder="Delivery note"
                              v-model="note"/>
         </div>
       </div>
       <div style="max-height: 50%">
-        <pos-keyboard-full @enter-pressed="changeMode('select')" @change-type="changeKeyboardType" :type="keyboardType"/>
+        <pos-keyboard-full @enter-pressed="updateAddress" @change-type="changeKeyboardType" :type="keyboardType"/>
       </div>
     </div>
   </g-dialog>
@@ -75,12 +76,13 @@
       value: Boolean,
       defaultMode: String,
     },
+    injectService: ['OrderStore:(createCallInOrder, createCustomer, updateCustomer)'],
     data() {
       return {
         time: 30,
         selectedItem: 0,
         addresses: [],
-        mode: '',
+        mode: 'input',
         name: '',
         phone: '',
         address: '',
@@ -90,6 +92,8 @@
         city: '',
         note: '',
         keyboardType: 'alphanumeric',
+        isEditingNote: false,
+        isEditingAddress: false
       }
     },
     computed: {
@@ -103,31 +107,36 @@
       }
     },
     watch: {
-      internalValue: function (val) {
-        this.resetData();
-        if(val) {
-          const customer = _.cloneDeep(this.customer)
-          if(customer) {
-            this.name = customer.name === 'New customer' ? '' : customer.name
-            this.phone = customer.phone
-            this.addresses = customer.addresses
-            if(customer.addresses && customer.addresses.length > 0) {
-              this.address = customer.addresses[0].address
-              this.street = customer.addresses[0].street
-              this.house = customer.addresses[0].house
-              this.zipcode = customer.addresses[0].zipcode
-              this.city = customer.addresses[0].city
-              this.mode = 'select'
-            } else {
-              this.mode = 'input'
+      internalValue: {
+        handler: function (val) {
+          this.resetData();
+          if(val) {
+            const customer = _.cloneDeep(this.customer)
+            if(customer) {
+              this.name = customer.name === 'New customer' ? '' : customer.name
+              this.phone = customer.phone
+              this.addresses = customer.addresses
+              if(customer.addresses && customer.addresses.length > 0) {
+                this.address = customer.addresses[0].address
+                this.street = customer.addresses[0].street
+                this.house = customer.addresses[0].house
+                this.zipcode = customer.addresses[0].zipcode
+                this.city = customer.addresses[0].city
+                this.mode = 'select'
+              } else {
+                this.mode = 'input'
+              }
             }
           }
-        }
+        },
+        immediate: true
       }
     },
     methods: {
-      changeMode(mode) {
+      changeMode(mode, isEditingNote = false, isEditingAddress = false) {
         this.mode = mode
+        this.isEditingNote = isEditingNote
+        this.isEditingAddress = isEditingAddress
       },
       changeKeyboardType(val) {
         this.keyboardType = val
@@ -150,6 +159,57 @@
         this.zipcode = item.zipcode
         this.city = item.city
         this.selectedItem = index
+      },
+      updateAddress() {
+        if(this.isEditingNote) {
+          this.changeMode('select')
+          return
+        }
+        const newAddress = {
+          address: this.address,
+          street: this.street,
+          house: this.house,
+          zipcode: this.zipcode,
+          city: this.city
+        }
+        if(this.isEditingAddress) {
+          this.addresses.splice(this.selectedItem, 1, newAddress)
+        } else {
+          this.addresses.push(newAddress)
+        }
+        this.changeMode('select')
+      },
+      addNewAddress() {
+        this.address = ''
+        this.street = ''
+        this.house = ''
+        this.zipcode = ''
+        this.city = ''
+        this.changeMode('input')
+      },
+      async complete() {
+        if(this.customer.name === 'New customer') {
+          await this.createCustomer({
+            name: this.name,
+            addresses: this.addresses,
+            phone: this.phone,
+          })
+        } else {
+          await this.updateCustomer(this.customer._id, {
+            name: this.name,
+            addresses: this.addresses,
+            phone: this.phone,
+          })
+        }
+        const customer = {
+          name: this.name,
+          address: this.address,
+          phone: this.phone,
+          zipCode: this.zipcode
+        }
+        await this.createCallInOrder(customer, this.time, this.note)
+        this.internalValue = false
+        this.$router.push({path: '/pos-dashboard'})
       }
     }
   }

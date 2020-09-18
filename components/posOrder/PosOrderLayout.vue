@@ -127,11 +127,19 @@
     },
     async created() {
       await this.loadKeyboardConfig();
-      await this.loadOrderLayout();
+      let type = 'default'
+      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
+        type = this.$router.currentRoute.query.type
+      }
+      await this.loadOrderLayout(type);
     },
     async activated() {
       await this.loadKeyboardConfig();
-      await this.loadOrderLayout();
+      let type = 'default'
+      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
+        type = this.$router.currentRoute.query.type
+      }
+      await this.loadOrderLayout(type);
     },
     watch: {
       orderLayout() {
@@ -168,8 +176,8 @@
       }
     },
     methods: {
-      async loadOrderLayout() {
-        this.$emit('update:orderLayout', await cms.getModel('OrderLayout').findOne({}))
+      async loadOrderLayout(type = 'default') {
+        this.$emit('update:orderLayout', await cms.getModel('OrderLayout').findOne({type}))
       },
       async loadKeyboardConfig() {
         const setting = await cms.getModel('PosSetting').findOne()
@@ -241,7 +249,7 @@
           color: '#000',
           borderRadius: '2px',
         };
-        if (!product.name && !product.text && !product.product.id) {
+        if (!product.name && !product.text && !product.product) {
           style.border = '1px dashed #bdbdbd'
         }
         if (isProductSelected && this.highlightSelectedProduct) {

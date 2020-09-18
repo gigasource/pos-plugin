@@ -51,7 +51,7 @@
       return {
         btnUp: [
           {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-3' : '/pos-order-2')},
-          {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-delivery')}
+          {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath(this.isMobile ? '/pos-order-3/?type=delivery' : '/pos-order-2/?type=delivery')}
         ],
         btnDown: [
           {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},
@@ -61,8 +61,10 @@
           {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
           {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
           {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
-          {title: editMenuCard, feature: 'editMenuCard', icon: 'icon-edit-menu-card',  click: () => this.changePath('/pos-edit-menu-card')},
+          {title: 'Dine-in Menu', feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
+          {title: 'Delivery Menu', feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.changePath('/pos-edit-menu-card/?type=delivery')},
           {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting',  click: () => this.changePath('/pos-printer-setting')},
+          {title: 'Customer', feature: 'customerInfo', icon: 'icon-customer-info',  click: () => this.changePath('/pos-customer')},
           {title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: this.openStoreSetting },
         ],
         showIframe: false,
@@ -89,7 +91,7 @@
           if (!this.user) return false
           if (!item.feature) return true
           if (this.user.role === 'admin')
-            if (item.feature === 'settings' || item.feature === 'printerSettings') return true
+            if (item.feature === 'settings' || item.feature === 'printerSettings' || item.feature === 'customerInfo') return true
           if (item.feature === 'orderHistory')
             return this.user.role === 'admin' || this.user.viewOrderHistory
           if (item.feature === 'onlineOrdering')
@@ -140,7 +142,7 @@
     }
 
     &--down {
-      grid-template-rows: repeat(2, calc(50% - 20px));
+      grid-template-rows: repeat(2, 1fr);
       margin-top: 40px;
       flex: 0 0 calc(66.67% - 40px)
     }
