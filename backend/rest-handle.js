@@ -5,6 +5,7 @@ const posCommandDeviceApi = require('./api/devices/pos-command-devices');
 const gsmsDeviceApi = require('./api/devices/gsms-devices');
 const demoApi = require('./api/demoDevice');
 const storeApi = require('./api/store');
+const storeGroupApi = require('./api/store-group');
 const appManagementApi = require('./api/appManagement');
 const payment = require('./api/payment');
 const supportApi = require('./api/support');
@@ -20,6 +21,7 @@ module.exports = cms => {
   cms.app.use('/pos-command-device', posCommandDeviceApi);
   cms.app.use('/gsms-device', gsmsDeviceApi);
   cms.app.use('/store', storeApi);
+  cms.app.use('/store-group', storeGroupApi);
   cms.app.use('/app', appManagementApi);
   cms.app.use('/payment', payment);
   cms.app.use('/demo', demoApi);

@@ -20,6 +20,10 @@ router.post('/register', async (req, res) => {
     paired: true,
   });
 
+  store.devices = store.devices || [];
+  store.devices.push(newPosCommandDevice._id);
+  await StoreModel.updateOne({_id: store._id}, {devices: store.devices});
+
   res.status(200).json({clientId: newPosCommandDevice._id.toString()});
 });
 

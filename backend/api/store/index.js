@@ -6,6 +6,7 @@ const https = require('https');
 const http = require('http');
 const axios = require('axios');
 const mongoose = require('mongoose');
+const {requestBodyHasProps} = require('../utils');
 const {getExternalSocketIoServer} = require('../../socket-io-server');
 const {assignDevice} = require('../../api/support');
 const teamRoute = require('./team')
@@ -81,8 +82,36 @@ router.post('/new-store', async (req, res) => {
     return
   }
 
-  let {settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location} = req.body
+  const {
+    createdStore,
+    storeOwner,
+  } = await createStore(req.body);
 
+  res.json({
+    ok: true,
+    store: createdStore,
+    owner: storeOwner
+  });
+});
+
+router.post('/pos-germany-store', async (req, res) => {
+  if (requestBodyHasProps(req, res, ['storeName', 'storeAddress', 'storeGroupId', 'country'])) {
+    const {
+      storeName: settingName,
+      storeAddress: settingAddress,
+      storeGroupId: groups,
+      country,
+    } = req.body;
+
+    const {createdStore} = await createStore({settingName, settingAddress, groups, country});
+
+    res.status(201).json({
+      _id: createdStore._id.toString(),
+    });
+  }
+});
+
+async function createStore({settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location}) {
   const stores = await cms.getModel('Store').find({}, { id: 1, alias: 1 })
 
   // generate unique store id
@@ -173,18 +202,16 @@ router.post('/new-store', async (req, res) => {
     username: `${alias}__owner__${new Date().getTime()}`,
     password: new Date().getTime(),
     store: createdStore._id,
-    createBy: req.session.user._id,
     role: deviceRole._id,
     active: true,
     permissions: [{ permission: 'manageStore', value: true }]
   })
 
-  res.json({
-    ok: true,
-    store: createdStore,
-    owner: storeOwner
-  })
-})
+  return {
+    createdStore,
+    storeOwner,
+  }
+}
 
 router.post('/new-feedback', async (req, res) => {
   const { storeId, type, feedback } = req.body

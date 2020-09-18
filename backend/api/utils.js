@@ -22,8 +22,54 @@ function getHost(request) {
   return host
 }
 
+function requestPathVarHasProps(req, res, props) {
+  for (const prop of props) {
+    if (!req.params || !req.params[prop]) {
+      res.status(400).send('Missing properties in request');
+      return false
+    }
+  }
+
+  return true;
+}
+
+function requestQueryHasProps(req, res, props) {
+  for (const prop of props) {
+    if (!req.query || !req.query[prop]) {
+      res.status(400).send('Missing properties in request');
+      return false
+    }
+  }
+
+  return true;
+}
+
+function requestBodyHasProps(req, res, props) {
+  for (const prop of props) {
+    if (!req.body || !req.body[prop]) {
+      res.status(400).send('Missing properties in request');
+      return false
+    }
+  }
+
+  return true;
+}
+
+function respondWithError(res, status, msg) {
+  res.status(status);
+  console.error(msg);
+
+  if (msg && typeof msg === 'string') res.send(msg);
+  else if (msg && typeof msg === 'object') res.json(msg);
+  else res.send();
+}
+
 module.exports = {
   extractSortQueries,
-  getHost
+  getHost,
+  requestQueryHasProps,
+  requestBodyHasProps,
+  requestPathVarHasProps,
+  respondWithError,
 }
 
