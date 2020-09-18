@@ -9,6 +9,7 @@ let highestCommitId;
 let activeOrders = {};
 
 const COMMIT_TIME_OUT = 5 * 60 * 1000;
+const COMMIT_CLOSE_TIME_OUT = 30 * 1000;
 
 function deserializeObj(obj) {
 	const result = {};
@@ -44,10 +45,10 @@ async function buildTempOrder(table) {
 				currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
 			}
 			if (commit.update.push) {
-				if (commit.update.push.key.includes('items')) {
+				if (!commit.update.push.key.includes('modifiers')) {
 					result['items'].push(commit.update.push.value);
 				} else { // modifier
-					if (currentItem) currentItem.modifier.push(commit.update.push.value);
+					if (currentItem) currentItem.modifiers.push(commit.update.push.value);
 				}
 			} else if (commit.update.inc && currentItem.quantity > 0) {
 				if (currentItem) {
@@ -55,26 +56,51 @@ async function buildTempOrder(table) {
 					if (currentItem.quantity < 0) currentItem.quantity = 0;
 				}
 			} else if (commit.update.pull) {
-				// TODO add pull here
+				const pullId = currentItem.modifiers.findIndex(modifier => modifier._id.toString() === commit.update.pull.value._id);
+				if (pullId >= 0) currentItem.modifiers.splice(pullId, 1);
+			} else if (commit.update.set) {
+				if (commit.update.set.key.includes('price')) {
+					currentItem.price = commit.update.set.value;
+				}
 			}
 		}
 	})
 	return result;
 }
-
+/*
+ Case set is not actually set command of mongoose, there are 2 cases of set:
+ -  Case master: master receives normal set command of mongoose, update commit and
+ set value of set to order object, which is use in node case
+ -  Case node: node will findOneAndUpdate order with the final value of order in
+ master
+*/
 async function handleOrderCommit(commit) {
 	let result;
-	if (commit.update['close']) {  // close order
+	if (commit.update.set) {  // close order
+		if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp < COMMIT_CLOSE_TIME_OUT) return null; // timeout close order must be small
 		if (activeOrders[commit.table]) {
+			if (commit.where && !commit.where._id) {
+				commit.where._id = activeOrders[commit.table]._id;
+			}
 			// delete all commit with this orderid and create new close commit
-			delete activeOrders[commit.table];
+			activeOrders[commit.table].status = commit.update['set'].value;
 			if (!commit.commitId) {
 				commit.commitId = highestCommitId;
 				highestCommitId++;
 			}
+			let query;
+			if (global.APP_CONFIG.isMaster) {
+				query = {};
+				query[commit.update.set.key] = commit.update.set.value
+			} else {
+				query = commit.update.set;
+			}
+			commit.update.set = activeOrders[commit.table];
+			await orderModel.findOneAndUpdate(commit.where, query);
 			await orderCommitModel.create(commit);
-			await orderCommitModel.deleteMany({orderId: commit.orderId, commitId: {$ne: highestCommitId}});
+			await orderCommitModel.deleteMany({type: 'item', orderId: commit.orderId});
 			result = true;
+			delete activeOrders[commit.table];
 			//TODO: consider when closed add commit
 		} else {
 			console.error('Order has been closed');
@@ -107,15 +133,7 @@ async function handleOrderCommit(commit) {
 }
 
 async function handleItemCommit(commit) {
-	if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-		if (!commit.orderId && activeOrders[commit.table]) {
-			commit.orderId = activeOrders[commit.table].id;
-		}
-		if (commit.where && !commit.where._id) {
-			commit.where._id = activeOrders[commit.table]._id;
-		}
-	}
-	if (!activeOrders[commit.table]) {
+	if (!activeOrders[commit.table] || activeOrders[commit.table].id != commit.orderId) {
 		console.error("Order is closed or not created");
 		return null;
 	}
@@ -150,7 +168,7 @@ async function handleItemCommit(commit) {
 		highestCommitId++;
 	}
 	// set _id for new added item
-	if (commit.update.push) {
+	if (commit.update.push && !commit.update.push.key.includes('modifiers')) {
 		const pushKey = commit.update.push.key;
 		commit.update.push['value']._id = result._doc[pushKey][result._doc[pushKey].length - 1]._doc._id;
 	}
@@ -164,7 +182,15 @@ async function handleSyncCommit(oldHighestCommitId) {
 }
 
 async function deleteTempCommit(groupTempId) {
+	const commit = {
+		type: 'removeTemp',
+		groupTempId,
+		temp: false,
+		commitId: highestCommitId++
+	}
+	await orderCommitModel.create(commit);
 	await orderCommitModel.deleteMany({groupTempId, temp: true});
+	return commit;
 }
 
 async function initQueue(handler) {
@@ -181,13 +207,28 @@ async function initQueue(handler) {
 	queue = new Queue(async (data, cb) => {
 		const { commits } = data;
 		let newCommits = [];
-		let groupTempId;
+		let lastTempId;
 		let lastTable;
 		for (let id in commits) {
+			// preset value
 			const commit = commits[id];
 			commit.temp = false;
 			let result;
-			groupTempId = commit.groupTempId;
+			if (lastTempId && lastTempId != commit.groupTempId) {
+				const deleteCommit = await deleteTempCommit(lastTempId);
+				newCommits.push(deleteCommit);
+			}
+			lastTempId = commit.groupTempId;
+			// Accept commit in the last COMMIT_TIME_OUT
+			if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
+				if (!commit.orderId && activeOrders[commit.table]) {
+					commit.orderId = activeOrders[commit.table].id;
+				}
+				if (commit.where && !commit.where._id) {
+					commit.where._id = activeOrders[commit.table]._id;
+				}
+			} else continue;
+			// handle commit
 			if (commit.type === 'order') {
 				result = await handleOrderCommit(commit);
 			} else if (commit.type === 'item') { // type === 'item'
@@ -205,16 +246,9 @@ async function initQueue(handler) {
 			lastTable = commit.table;
 		}
 		if (lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
-		if (global.APP_CONFIG.isMaster && groupTempId) { // add a commit to delete temp commit
-			const commit = {
-				type: 'removeTemp',
-				groupTempId,
-				temp: false,
-				commitId: highestCommitId++
-			}
-			newCommits.push(commit);
-			await orderCommitModel.create(commit);
-			await deleteTempCommit(groupTempId);
+		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
+			const deleteCommit = await deleteTempCommit(lastTempId);
+			newCommits.push(deleteCommit);
 			handler.socket.emit('emitToAllDevices', newCommits, handler.storeId);
 		}
 		cb(null);

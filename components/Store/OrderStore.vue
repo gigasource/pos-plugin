@@ -643,6 +643,7 @@
         product.modifiers.splice(modIndex, 1)
       },
       async saveTableOrder() {
+        if (!this.actionList.length) return;
         const { _id, items } = await cms.getModel('OrderCommit').create(this.actionList);
         this.$set(this.currentOrder, '_id', _id);
         this.$set(this.currentOrder, 'items', items);
@@ -662,7 +663,7 @@
           table: this.currentOrder.table,
           update: {
             set: {
-              key: 'price',
+              key: 'items.$.price',
               value: price
             }
           }
@@ -712,15 +713,18 @@
       async saveRestaurantOrder(paymentMethod) {
         try {
           if (!this.currentOrder || !this.currentOrder.items.length) return
-          const orderModel = cms.getModel('Order')
-          const order = await this.getMappedOrder(paymentMethod, false)
-          const newOrder =  await orderModel.create(order);
-
-          if (newOrder) {
-            this.printKitchen(order)
-            this.printEntireReceipt(order)
-            this.printOrderReport(newOrder._id)
-          }
+          await this.saveTableOrder();
+          await cms.getModel('OrderCommit').create([{
+            type: 'order',
+            where: { _id : this.currentOrder._id },
+            table: this.currentOrder.table,
+            update: {
+              set: {
+                key: 'status',
+                value: 'paid'
+              }
+            }
+          }]);
 
           await this.resetOrderData();
         } catch (e) {
