@@ -182,13 +182,16 @@ async function handleSyncCommit(oldHighestCommitId) {
 }
 
 async function deleteTempCommit(groupTempId) {
-	const commit = {
-		type: 'removeTemp',
-		groupTempId,
-		temp: false,
-		commitId: highestCommitId++
+	let commit = null;
+	if (global.APP_CONFIG.isMaster) { // Only master can create remove temp commit
+		commit = {
+			type: 'removeTemp',
+			groupTempId,
+			temp: false,
+			commitId: highestCommitId++
+		}
+		await orderCommitModel.create(commit);
 	}
-	await orderCommitModel.create(commit);
 	await orderCommitModel.deleteMany({groupTempId, temp: true});
 	return commit;
 }
