@@ -216,7 +216,7 @@ export function genStyleSheet(position, size, hidden, c = 'restaurant-plus-embed
     var stylesheet = styleEl.sheet
     stylesheet.insertRule('${style}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
-    stylesheet.insertRule('.restaurant-plus-embed-btn object { pointer-events: none; max-width: ${width} }')
+    stylesheet.insertRule('.${c} object { pointer-events: none; max-width: ${width} }')
   }`
 }
 
