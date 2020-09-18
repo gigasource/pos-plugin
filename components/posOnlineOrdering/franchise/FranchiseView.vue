@@ -37,6 +37,10 @@
 
       const stores = await cms.getModel('Store').find({ clientDomain })
       this.stores.splice(0, 0, ...stores)
+      if(stores.length > 0) {
+        const store = stores[0]
+        root.$i18n.locale = (store && store.country && store.country.locale) || 'en'
+      }
       this.banners = stores.map(store => ({
         src: getCdnUrl(store.orderHeaderImageSrc),
         type: 'image',
