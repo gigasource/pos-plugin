@@ -234,8 +234,8 @@ router.post('/register', async (req, res) => {
       newDevice.lastSeen = now;
       newDevice.appName = appName;
       newDevice.deleted = false;
-      newDevice.message = newDevice.metadata || {}
-      Object.assign(newDevice.message, metadata);
+      newDevice.metadata = newDevice.metadata || {}
+      Object.assign(newDevice.metadata, metadata);
 
       await DeviceModel.updateOne({hardwareId}, newDevice);
     }
