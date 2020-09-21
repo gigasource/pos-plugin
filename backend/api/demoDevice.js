@@ -25,11 +25,12 @@ router.post('/register', async (req, res) => {
   if (!storeId) return res.sendStatus(400)
 
   try {
+    // TODO: ??? device code
     const deviceCode = await getNewDeviceCode(storeId)
     const store = await storeModel.findOne({ id: storeId })
     const accept = (store.gSms && store.gSms.autoAccept)
 
-    await storeModel.findOneAndUpdate({ id: storeId }, {
+    const updatedStore = await storeModel.findOneAndUpdate({ id: storeId }, {
       $push: {
         'gSms.devices': {
           name: name,
@@ -40,9 +41,8 @@ router.post('/register', async (req, res) => {
           lastSeen: null
         }
       }
-    })
+    }, { new: true })
 
-    const updatedStore = await storeModel.findOne({ id: storeId })
     const { _id, code } = updatedStore.gSms.devices.find(i => i.code === deviceCode + '')
 
     res.status(200).json({

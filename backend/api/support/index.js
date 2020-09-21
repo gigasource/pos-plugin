@@ -9,10 +9,6 @@ const {socket: internalSocketIOServer} = cms;
 const {getNewDeviceCode} = require('../demoDevice');
 const ObjectId = require('mongoose').Types.ObjectId;
 const axios = require('axios')
-const http = require('http')
-const https = require('https')
-const FormData = require('form-data')
-const path = require('path')
 const {getHost} = require('../utils')
 const voipApi = require('./voip')
 
@@ -415,16 +411,16 @@ router.post('/notes', async (req, res) => {
   res.status(201).json(dataToInsert);
 });
 
-router.put('/assign-device/:id', async (req, res) => {
-  const { id } = req.params;
+router.put('/assign-device/:deviceId', async (req, res) => {
+  const { deviceId } = req.params;
   const {
     storeId,
     /** @deprecated */
     customStoreId
   } = req.body;
-  if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
+  if (!deviceId) return res.status(400).json({ error: `Id can not be ${deviceId}` });
   if (!storeId && !customStoreId) return res.status(400).json({ error: `You must provide either storeId or customStoreId` });
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
 
   try {
     const store = storeId
@@ -432,18 +428,18 @@ router.put('/assign-device/:id', async (req, res) => {
       : await StoreModel.findOne({id: customStoreId});
     if (!store) return res.status(400).json({error: `Store with ID ${storeId || customStoreId} not found`});
 
-    const error = await assignDevice(id, store)
+    const error = await assignDevice(deviceId, store)
     if (error) res.status(400).json(error)
 
-    getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then();
+    getExternalSocketIoServer().emitToPersistent(deviceId, 'updateStoreName', [store.name || store.settingName || store.alias]);
 
-    getExternalSocketIoServer().emitToPersistent(id, 'storeAssigned', [store.id, store.name || store.settingName, store.alias, store._id]).then();
+    getExternalSocketIoServer().emitToPersistent(deviceId, 'storeAssigned', [store.id, store.name || store.settingName, store.alias, store._id]);
 
-    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`,
+    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId || customStoreId}`,
       `Successfully assigned GSMS device to store with id ${storeId || customStoreId}`);
     res.status(204).send();
   } catch (e) {
-    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`,
+    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId || customStoreId}`,
       `Error assigning GSMS device to store with id ${storeId || customStoreId}`, e);
     res.status(500).send('Encountered an error while assigning store')
   }
@@ -511,8 +507,10 @@ async function assignDevice(deviceId, store) {
   const device = await DeviceModel.findById(deviceId);
   if (!device) return { error: `Device with ID ${deviceId} not found` };
 
+  // TODO: [Multi-store] this logic is obsolete..
   await removeDeviceFromOldStore(device)
 
+  // TODO: [Multi-store] assign to store array.
   device.storeId = store._id;
   device.metadata = device.metadata || {};
   await DeviceModel.updateOne({ _id: deviceId }, device);

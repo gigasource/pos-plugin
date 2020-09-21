@@ -22,6 +22,7 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
     }
   }];
 
+  // TODO: impact???
   if (nameSearch) {
     steps.push({
       $lookup: {
@@ -95,6 +96,7 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
 }
 
 router.get('/devices/:clientId', async (req, res) => {
+  console.log('getting device with id', clientId)
   const {clientId} = req.params;
   if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
 
@@ -105,6 +107,7 @@ router.get('/devices/:clientId', async (req, res) => {
 });
 
 router.get('/devices', async (req, res) => {
+  console.log('getting devices')
   let {n = 0, offset = 0, sort = 'createdAt.desc', nameSearch} = req.query;
 
   sort = extractSortQueries(sort);
@@ -130,38 +133,57 @@ router.get('/devices', async (req, res) => {
   res.status(200).json(devices);
 });
 
-router.delete('/devices/:clientId', async (req, res) => {
-  const {clientId} = req.params;
-  if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
+router.delete('/devices/:deviceId', async (req, res) => {
+  console.log('gsms-devices/devices/:deviceId')
+  const {deviceId} = req.params;
+  if (!deviceId) return res.status(400).json({error: `deviceId param can not be ${deviceId}`});
 
-  const device = await DeviceModel.findById(clientId);
-  if (!device) return res.status(400).json({error: `Device with ID ${clientId} not found`});
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return res.status(400).json({error: `Device with ID ${deviceId} not found`});
 
   if (device.storeId) {
     const deviceStore = await StoreModel.findById(device.storeId);
     if (deviceStore.gSms && deviceStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
           {_id: deviceStore._id},
-          {$pull: {'gSms.devices': {_id: deviceStore._id}}}
+          {$pull: {'gSms.devices': {_id: deviceId}}}
       )
     }
   }
+
+  // if (device.storeIds && device.storeIds.length) {
+  //   _.each(device.storeIds, async storeId => {
+  //     const store = await StoreModel.findById(storeId);
+  //     if (store.gSms && store.gSms.devices) {
+  //       await StoreModel.findOneAndUpdate(
+  //           {_id: store._id},
+  //           {$pull: {'gSms.devices': {_id: deviceId}}}
+  //       )
+  //     }
+  //   })
+  // }
 
   await DeviceModel.updateOne({_id: device._id}, {deleted: true});
   res.status(204).send();
 });
 
-router.get('/device-assigned-store/:clientId', async (req, res) => {
-  const {clientId} = req.params;
-  if (!clientId) return res.status(400).json({error: `clientId can not be ${clientId}`});
+router.get('/device-assigned-store/:deviceId', async (req, res) => {
+  console.log('gsms-devices/device-assigned-store/:deviceId')
+  const {deviceId} = req.params;
+  if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
-  const device = await DeviceModel.findById(clientId);
-  if (!device) return res.status(400).json({error: `No device found with ID ${clientId}`});
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return res.status(400).json({error: `No device found with ID ${deviceId}`});
 
+  // TODO: Check .storeIds
   const store = await StoreModel.findById(device.storeId || '');
   if (!store) return res.status(200).json({assignedStore: null});
 
-  res.status(200).json({_id: store._id.toString(), storeId: store.id, assignedStore: store.name || store.alias});
+  res.status(200).json({
+    _id: store._id.toString(),
+    storeId: store.id,
+    assignedStore: store.name || store.alias
+  });
 });
 
 router.get('/device-online-status', async (req, res) => {
