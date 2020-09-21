@@ -193,7 +193,8 @@
     {
       "_id": "5efc5ba35cd8091e1acbdb74",
       "schemaType": "string",
-      "key": "deviceType"
+      "key": "deviceType",
+      "type": "input"
     },
     {
       "_id": "5f003d448329ef735ee61a46",
@@ -257,6 +258,34 @@
       "schemaType": "string",
       "key": "osVersion",
       "type": "input"
+    },
+    {
+      "_id": "5f5f3099b2796bc40aa05541",
+      "schemaType": "boolean",
+      "key": "master",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f69c5de6c89781761328e0d",
+      "schemaType": "array",
+      "key": "storeIds",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "storeId",
+          "ref": "Store",
+          "unique": null,
+          "type": "ref-select"
+        }
+      ],
+      "type": "array"
+    },
+    {
+      "_id": "5f69c5de6c89781761328e0e",
+      "schemaType": "boolean",
+      "key": "enableMultiStore",
+      "default": "false",
+      "type": "input@switch"
     }
   ],
   "name": "Device",
@@ -268,7 +297,9 @@
         "firebaseToken",
         "apnToken",
         "osName",
-        "osVersion"
+        "osVersion",
+        "storeIds",
+        "enableMultiStore"
       ],
       "_id": "5f0d2f7908fc232407e22049",
       "name": "gsms"

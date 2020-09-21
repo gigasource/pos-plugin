@@ -53,9 +53,11 @@ const RESPONSE_ERROR_CODE = Object.freeze({
 const DEFAULT_NEARBY_DISTANCE = 5000; //5km
 const DEFAULT_PROMOTION_BACKGROUND = 'https://online-order.gigasource.io/cms-files/files/view/Restaurant%20Plus%20images/default-restaurant-plus-promo-background.png';
 const PELIAS_HOST = 'https://pelias.gigasource.io'
+const DEMO_STORE_ID = '21' // Enjoy sushi
+
 
 module.exports = {
   VOUCHER_STATUS, DEFAULT_NEARBY_DISTANCE, PROMOTION_ORDER_TYPE, PROMOTION_DISCOUNT_TYPE, POINT_HISTORY_TRANSACTION_TYPE,
   DEFAULT_PROMOTION_BACKGROUND, PELIAS_HOST, ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, RESTAURANT_PLUS_ROLES,
-  RESPONSE_ERROR_CODE,
+  RESPONSE_ERROR_CODE, DEMO_STORE_ID
 }

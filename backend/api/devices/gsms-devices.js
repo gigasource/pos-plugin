@@ -151,17 +151,18 @@ router.delete('/devices/:deviceId', async (req, res) => {
     }
   }
 
-  // if (device.storeIds && device.storeIds.length) {
-  //   _.each(device.storeIds, async storeId => {
-  //     const store = await StoreModel.findById(storeId);
-  //     if (store.gSms && store.gSms.devices) {
-  //       await StoreModel.findOneAndUpdate(
-  //           {_id: store._id},
-  //           {$pull: {'gSms.devices': {_id: deviceId}}}
-  //       )
-  //     }
-  //   })
-  // }
+  // multi store
+  if (device.enableMultiStore) {
+    const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
+    _.each(stores, s => {
+      if (s.gSms && s.gSms.devices) {
+        StoreModel.findOneAndUpdate(
+            {_id: s._id},
+            {$pull: {'gSms.devices': { _id: deviceId }} }
+        )
+      }
+    })
+  }
 
   await DeviceModel.updateOne({_id: device._id}, {deleted: true});
   res.status(204).send();
@@ -175,7 +176,20 @@ router.get('/device-assigned-store/:deviceId', async (req, res) => {
   const device = await DeviceModel.findById(deviceId);
   if (!device) return res.status(400).json({error: `No device found with ID ${deviceId}`});
 
-  // TODO: Check .storeIds
+  // multi store
+  if (device.enableMultiStore) {
+    const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
+    return res.json({
+      stores: stores.map(s => ({
+        _id: s._id.toString(),
+        id: s.id,
+        name: s.name || s.alias,
+        alias: s.alias,
+        googleMyBusinessId: s.googleMyBusinessId
+      })),
+    })
+  }
+
   const store = await StoreModel.findById(device.storeId || '');
   if (!store) return res.status(200).json({assignedStore: null});
 

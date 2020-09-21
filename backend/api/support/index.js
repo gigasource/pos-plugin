@@ -11,6 +11,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const axios = require('axios')
 const {getHost} = require('../utils')
 const voipApi = require('./voip')
+const { DEMO_STORE_ID } = require('../../restaurant-plus-apis/constants')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -445,8 +446,10 @@ router.put('/assign-device/:deviceId', async (req, res) => {
   }
 });
 
+// IMPORTANT: I GUESS that this endpoint is only be used from R+ app.
+// If it also request from another app, side effect may occur
 router.put('/remove-device-store/:deviceId', async (req, res) => {
-  const {deviceId} = req.params;
+  const {deviceId, storeId} = req.params;
   if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
   const device = await DeviceModel.findById(deviceId);
@@ -454,7 +457,23 @@ router.put('/remove-device-store/:deviceId', async (req, res) => {
 
   if (device.storeId) {
     await removeDeviceFromOldStore(device);
-    await DeviceModel.updateOne({_id: device._id}, {storeId: null});
+    if (device.enableMultiStore) {
+      let newStoreId = device.storeId
+      let currentStores = _.filter(device.storeIds, id => id !== storeId)
+      let enableMultiStore = true
+      if (currentStores.length === 1) {
+        newStoreId = currentStores[0]
+        currentStores = null
+        enableMultiStore = false
+      }
+      await DeviceModel.updateOne({_id: device._id}, {
+        storeIds: currentStores,
+        storeId: newStoreId,
+        enableMultiStore: enableMultiStore,
+      })
+    } else {
+      await DeviceModel.updateOne({_id: device._id}, {storeId: null});
+    }
   }
 
   res.status(204).send();
@@ -506,15 +525,43 @@ async function removeDeviceFromOldStore(device) {
 async function assignDevice(deviceId, store) {
   const device = await DeviceModel.findById(deviceId);
   if (!device) return { error: `Device with ID ${deviceId} not found` };
+  if (!device.storeId) {
+    device.storeId = store._id;
+  } else {
+    let deviceLinkToDemoStore = false
+    if (device.storeId) {
+      const linkedStore = await cms.getModel('Store').findOne({ _id: device.storeId })
+      if (linkedStore && linkedStore.id === DEMO_STORE_ID) {
+        await removeDeviceFromOldStore(device)
+        deviceLinkToDemoStore = true
+      }
+    }
 
-  // TODO: [Multi-store] this logic is obsolete..
-  await removeDeviceFromOldStore(device)
+    let currentStores;
+    if (Array.isArray(device.storeIds) && device.storeIds.length) {
+      currentStores = device.storeIds
+    } else {
+      currentStores = deviceLinkToDemoStore ? [] : [device.storeId]
+    }
 
-  // TODO: [Multi-store] assign to store array.
-  device.storeId = store._id;
+    if (currentStores.indexOf(store._id) >= 0) {
+      return
+    }
+
+    currentStores.push(store._id)
+    if (currentStores.length > 1) {
+      device.storeIds = currentStores
+      device.enableMultiStore = true
+    } else {
+      device.storeId = currentStores[0]
+      device.enableMultiStore = false
+    }
+  }
+
   device.metadata = device.metadata || {};
   await DeviceModel.updateOne({ _id: deviceId }, device);
 
+  // add device info to specified store
   store.gSms = store.gSms || {};
   store.gSms.enabled = store.gSms.enabled || true;
   store.gSms.timeToComplete = store.gSms.timeToComplete || 30;
