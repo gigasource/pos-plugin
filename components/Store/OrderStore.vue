@@ -785,6 +785,21 @@
         try {
           if (!this.currentOrder || !this.currentOrder.items.length) return
           await this.saveTableOrder();
+
+          if (this.currentOrder.payment) {
+            await cms.getModel('OrderCommit').create([{
+              type: 'order',
+              where: { _id : this.currentOrder._id },
+              table: this.currentOrder.table,
+              update: {
+                set: {
+                  key: 'payment',
+                  value: this.currentOrder.payment
+                }
+              }
+            }]);
+          }
+
           await cms.getModel('OrderCommit').create([{
             type: 'order',
             where: { _id : this.currentOrder._id },
@@ -1098,6 +1113,7 @@
       },
       async getTempOrder() {
         return new Promise(resolve => {
+          console.log('emit buildTempOrder')
           cms.socket.emit('buildTempOrder', this.currentOrder.table, (order) => {
             resolve(order);
           })

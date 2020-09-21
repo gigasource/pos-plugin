@@ -1,23 +1,20 @@
 <template>
-  <div>
-    <g-grid-select return-object :grid="false" :items="listPayments" v-model="activePaymentMethod" mandatory>
-      <template #default="{toggleSelect, item, index}">
-        <g-btn :uppercase="false" x-large outlined text-color="#1271ff"
-               @click.stop="toggleSelect(item)"
-               style="flex-basis: 30%; margin: 0 0 12px 12px">
-          <img :src="item.icon" style="width: 20px; height: 20px"/>
-          <span class="ml-2 text-black" style="text-transform: capitalize">{{item.name}}</span>
-        </g-btn>
-      </template>
-      <template #selected="{toggleSelect, item, index}">
-        <g-btn :uppercase="false" x-large flat background-color="blue accent 3" text-color="white"
-               @click.stop="toggleSelect(item)"
-               style="flex-basis: 30%; margin: 0 0 12px 12px">
-          <img :src="item.icon" style="width: 20px; height: 20px"/>
-          <span class="ml-2" style="text-transform: capitalize">{{item.name}}</span>
-        </g-btn>
-      </template>
-    </g-grid-select>
+  <div class="row-flex flex-wrap align-items-center">
+    <template v-for="item in listPayments">
+      <g-btn :uppercase="false" x-large outlined text-color="#1271ff"
+             @click.stop="addPaymentMethod(item)"
+             style="flex-basis: 30%; margin: 0 0 12px 12px">
+        <img :src="item.icon" style="width: 20px; height: 20px"/>
+        <span class="ml-2 text-black" style="text-transform: capitalize">{{item.name}}</span>
+      </g-btn>
+    </template>
+    <template v-for="item in extraPaymentItems">
+      <g-btn :uppercase="false" x-large outlined text-color="#1271ff"
+             @click.stop="addPaymentMethod(item)"
+             style="flex-basis: 30%; margin: 0 0 12px 12px">
+        <span class="ml-2 text-black" style="text-transform: capitalize">{{item.name}}</span>
+      </g-btn>
+    </template>
   </div>
 </template>
 
@@ -26,31 +23,41 @@
     name: 'PosPaymentScreenPaymentMethods',
     injectService: [
       'OrderStore:currentOrder',
+      'OrderStore:paymentTotal',
       'SettingsStore:listPayments',
       'SettingsStore:getListPayments',
       'SettingsStore:selectedPayment',
     ],
     data() {
       return {
+        extraPaymentItems: [
+          //todo add TIP
+          { name: 'WC', value: -0.5 },
+          { name: 'Sodexo', value: 6 },
+        ]
+      }
+    },
+    computed: {
+      paidValue() {
+        return _.sumBy(this.currentOrder.payment, i => i.value || 0) || 0
       }
     },
     async created() {
       await this.getListPayments();
-      this.activePaymentMethod = this.listPayments[0]
     },
     async activated(){
-      this.activePaymentMethod = this.listPayments[0]
+      await this.getListPayments();
     },
-    computed: {
-      activePaymentMethod: {
-        get() {
-          return this.selectedPayment
-        },
-        set(val) {
-          this.selectedPayment = val
-          if(this.selectedPayment)
-            this.currentOrder.payment = { type: this.selectedPayment.name }
-        }
+    methods: {
+      addPaymentMethod(item) {
+        const payments = this.currentOrder.payment
+        const newItem = {name: item.name, value: item.value || this.getRemainingValue()}
+        if (payments && payments.some(i => i.name === item.name)) return
+        if (!payments) return this.$set(this.currentOrder, 'payment', [newItem])
+        payments.push(newItem)
+      },
+      getRemainingValue() {
+        return this.paymentTotal - this.paidValue
       }
     }
   }

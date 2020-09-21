@@ -1,6 +1,7 @@
 {
   "events": [],
   "_id": "5ddb9759b7744b22a49b5afa",
+  "isProduction": true,
   "items": [
     {
       "choice": "view",
@@ -79,15 +80,14 @@
                 ],
                 "rows": [
                   "1fr",
-                  "1fr",
-                  "3fr"
+                  "1fr"
                 ],
                 "columnGap": 0,
                 "rowGap": 0,
                 "subAreas": [
                   {
                     "name": "method",
-                    "top": 2,
+                    "top": 1,
                     "left": 1,
                     "width": 1,
                     "height": 1,
@@ -110,48 +110,8 @@
                     "flexAlignSelf": ""
                   },
                   {
-                    "name": "screen",
-                    "top": 1,
-                    "left": 1,
-                    "width": 1,
-                    "height": 1,
-                    "margin": "",
-                    "padding": "",
-                    "bgColor": "hsl(66, 100%, 50%, 50%)",
-                    "alignSelf": "",
-                    "justifySelf": "",
-                    "wrapInDiv": false,
-                    "displayFlex": false,
-                    "flexDirection": "row",
-                    "flexWrap": false,
-                    "flexJustifyContent": "",
-                    "flexAlignItems": "",
-                    "flexAlignContent": "",
-                    "flexOrder": "",
-                    "flexGrow": "",
-                    "flexShrink": "",
-                    "flexBasis": "",
-                    "flexAlignSelf": "",
-                    "alignItems": "",
-                    "alignContent": "",
-                    "justifyItems": "",
-                    "justifyContent": "",
-                    "columns": [
-                      "2fr",
-                      "1fr"
-                    ],
-                    "rows": [
-                      "1fr",
-                      "4fr",
-                      "1fr"
-                    ],
-                    "columnGap": 6,
-                    "rowGap": 6,
-                    "subAreas": []
-                  },
-                  {
                     "name": "controller",
-                    "top": 3,
+                    "top": 2,
                     "left": 1,
                     "width": 1,
                     "height": 1,
@@ -473,7 +433,6 @@
   "props": {
     "fields": []
   },
-  "renderToRoute": "pos-payment",
-  "isProduction": true,
-  "renderInIframe": false
+  "renderInIframe": false,
+  "renderToRoute": "pos-payment"
 }

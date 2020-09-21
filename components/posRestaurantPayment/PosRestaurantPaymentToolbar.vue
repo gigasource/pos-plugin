@@ -8,7 +8,7 @@
     <g-btn-bs icon="icon-red_bill">{{$t('fnBtn.paymentFunctions.redBill')}}</g-btn-bs>
     <g-btn-bs icon="icon-print2">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>
     <g-spacer/>
-    <g-btn-bs class="col-2" background-color="#2979FF" :disabled="isPayBtnDisabled" @click.stop="pay">
+    <g-btn-bs class="col-2" background-color="#2979FF" @click.stop="pay">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
   </g-toolbar>

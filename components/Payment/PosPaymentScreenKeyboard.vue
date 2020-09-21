@@ -5,21 +5,32 @@
         <div></div>
       </template>
     </g-number-keyboard>
-    <g-btn :uppercase="false" height="100%" elevation="0"
-           v-for="(btn, i) in listBtn" :key="i"
-           :style="{
-              fontSize: '20px',
-              gridRow: btn.rows[0] + '/' + btn.rows[1],
-              gridColumn: btn.cols[0] + '/' + btn.cols[1],
-              backgroundColor: btn.backgroundColor,
-              color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
-              border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797'
-            }"
-           :disabled="!isActiveBtn(btn)"
-           @click="onClickBtn(btn)">
-      <g-icon v-if="btn.buttonFunction === 'cashDrawer'" class="mr-2" svg size="36">icon-cashier</g-icon>
-      {{btn.text}}
-    </g-btn>
+    <div class="col-flex" style="grid-area: 1 / 4 / 5 / 6">
+      <g-table striped class="flex-grow-1">
+        <thead>
+          <tr>
+            <th>Total</th>
+            <th>{{paymentTotal}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(payment, index) in paymentList">
+            <td style="text-transform: capitalize">{{payment.name}}</td>
+            <td>
+              <pos-textfield-new v-model="payment.value" @click.stop="changeKeyboardFocus(payment.value)"/>
+            </td>
+            <td>
+              <g-btn flat text-color="red" @click="removePaymentItem(index)">x</g-btn>
+            </td>
+          </tr>
+        </tbody>
+      </g-table>
+      <div class="row-flex">
+        <div class="flex-grow-1">Change</div>
+        <div v-if="!isNaN(change)">{{change}}</div>
+        <div v-else>0</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -53,20 +64,26 @@
           { img: 'delivery/key_delete', style: 'grid-area: keyD', action: keyboardFunction.delete },
         ],
         template: 'grid-template-areas: "key7 key8 key9" "key4 key5 key6" "key1 key2 key3" "key0 keyC keyD"; grid-auto-rows: 1fr; grid-auto-columns: 1fr; grid-gap: 6px',
-        listBtn: []
+        listBtn: [],
+        paymentList: [],
+        keyboardValue: null,
+        change: null
       }
     },
     computed: {
-      keyboardValue: {
-        get() {
-          return this.paymentAmountTendered
-        },
-        set(value) {
-          this.paymentAmountTendered = value.includes('.') ? value : parseFloat('0' + value).toString()
-        }
-      },
+      // keyboardValue: {
+      //   get() {
+      //     return this.paymentAmountTendered
+      //   },
+      //   set(value) {
+      //     this.paymentAmountTendered = value.includes('.') ? value : parseFloat('0' + value).toString()
+      //   }
+      // },
     },
     methods: {
+      changeKeyboardFocus(item) {
+        this.keyboardValue = item
+      },
       isActiveBtn(btn) {
         if (btn.buttonFunction === 'pay') {
           return this.paymentAmountTendered >= this.paymentTotal
@@ -106,6 +123,9 @@
             this.listBtn.push(btn);
           }
         }
+      },
+      removePaymentItem(index) {
+        this.currentOrder.payment.splice(index, 1)
       }
     },
     async mounted() {
@@ -113,6 +133,26 @@
     },
     async activated() {
       await this.generateTemplate();
+    },
+    created() {
+      const orderStore = this.$getService('OrderStore')
+      orderStore.$watch('currentOrder.payment', val => {
+        if (val && val.length) {
+          this.paymentList = val
+
+          const paid = _.sumBy(val, i => +i.value || 0)
+          this.change = paid - this.paymentTotal
+        }
+      }, { deep: true, immediate: true })
+
+      // this.$watch('paymentList', val => {
+      //   if (val && val.length) {
+      //     this.$nextTick(() => {
+      //       const latestItem = _.last(val)
+      //       this.$refs[latestItem.name] && console.log(this.$refs[latestItem.name])
+      //     })
+      //   }
+      // }, { deep: true })
     }
   }
 </script>
