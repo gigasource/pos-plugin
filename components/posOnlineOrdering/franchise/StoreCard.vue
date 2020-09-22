@@ -1,12 +1,12 @@
 <template>
   <div class="store-card">
-    <div class="store-card--logo">
+    <div class="store-card--logo" @click="openStoreOverview">
       <img v-if="store && store.logoImageSrc" alt :src="cdnStoreLogoImage"/>
       <div v-else></div>
     </div>
     <div class="store-card--detail">
       <div class="store-card--name">
-        <p>{{ store.name }}</p>
+        <p @click="openStoreOverview" style="cursor: pointer">{{ store.name }}</p>
         <g-spacer/>
         <div v-if="viewMapAvailable" class="store-card--map">
           <g-icon @click="viewMap" size="18">icon-place_color</g-icon>
@@ -52,10 +52,10 @@
         {{ store.phone }}
       </div>
       <div class="store-card--action">
-        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">Take away</g-btn-bs>
-        <g-btn-bs v-if="store && store.delivery" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">Delivery</g-btn-bs>
+        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
+        <g-btn-bs v-if="store && store.delivery" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
         <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
-                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">Reservation</g-btn-bs>
+                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
         <g-spacer/>
         <div v-if="viewMapAvailable" class="store-card--action__map">
           <g-icon @click="viewMap" size="18">icon-place_color</g-icon>
@@ -233,17 +233,20 @@
         return openHours
       },
       openStore(type) {
-        location.href = `${location.origin}/store/${this.store.alias}/?type=${type}`
+        location.href = `${location.origin}/store/${this.store.alias}/order/?type=${type}`
       },
       openReservation() {
-        location.href = `${location.origin}/reservation/${this.store.alias}`
+        location.href = `${location.origin}/store/${this.store.alias}/reservation`
       },
       viewMap() {
-        if (this.store.googleMapPlaceId) {
-          window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
-        } else {
+        if(this.store.coordinates) {
           window.open(`https://www.google.com/maps/search/?api=1&query=${this.store.coordinates.lat},${this.store.coordinates.long}`, "_blank")
-        }
+        } else if (this.store.googleMapPlaceId) {
+          window.open(`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${this.store.googleMapPlaceId}`)
+        } else {}
+      },
+      openStoreOverview() {
+        location.href = `${location.origin}/store/${this.store.alias}`
       }
     }
   }
@@ -266,6 +269,7 @@
       margin-right: 24px;
       display: flex;
       align-items: center;
+      cursor: pointer;
 
       & > img {
         border-radius: 4px;

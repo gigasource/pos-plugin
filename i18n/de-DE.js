@@ -59,7 +59,7 @@ module.exports = {
       deliveryFee: 'Liefergebühr',
       notice: 'Notice',
       productInfo: 'Produktinformationen',
-      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vobehalten.',
+      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vorbehalten.',
       allergic: 'Allergien',
       allergicNotice: 'LMIV - Allergene:',
       spicy: 'Scharf',
@@ -237,7 +237,18 @@ module.exports = {
       minOrder: 'Mindestbestell',
       requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern',
       distanceNote: 'Notiz: Versand-Service ist nicht verfügbar für außerhalb Standorte des konfigurierten Radius.',
-      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius'
+      requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
+      other: 'Andere',
+      otherSetting: 'andere Einstellung',
+      deliveryForwarding: 'Lieferung weiterleiten',
+      deliveryOrderForwarding: 'Lieferaufträge weiterleiten',
+      forwardToRestaurant: 'Bestellung an Restaurant-ID weiterleiten',
+      forwardNote: 'Weitergeleitete Bestellungen werden nur auf dem Zielgerät angezeigt. Das System leitet nur Lieferaufträge weiter.',
+      digitalMenuScript: 'Digitales Menü bettet Skript ein',
+      upload: 'Hochladen',
+      ourService: 'Unsere Dienstleistungen',
+      ourMenu: 'Unser Menü',
+      takeAway: 'Abholung'
     },
 
     paymentProviders: {
@@ -256,7 +267,7 @@ module.exports = {
     },
 
     menu: {
-      feedback: 'Rückmeldung',
+      feedback: 'Bewertung',
       question: 'Sind Sie mit unseren Gerichte und Dienstleistungen zufrieden?',
       positive: 'Ja, gern',
       negative: 'Nein, danke',

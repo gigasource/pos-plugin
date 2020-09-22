@@ -652,6 +652,20 @@ module.exports = async function (cms) {
           openHours: store.openHours
         })
       })
+
+      socket.on('registerMasterDevice', async () => {
+        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true })
+      })
+
+      socket.on('emitToAllDevices', async (data, storeId) => {
+        const devices = await cms.getModel('Device').find({ storeId, paired: true })
+        devices.forEach(({ _id }) => socket.emit('eventName', _id, data))
+      })
+
+      socket.on('emitToMasterDevice', async (data, storeId) => {
+        const device = await cms.getModel('Device').findOne({ storeId, paired: true, master: true })
+        socket.emit('eventName', device._id, data)
+      })
     }
 
     /** @deprecated */

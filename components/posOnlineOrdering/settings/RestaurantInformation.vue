@@ -63,7 +63,7 @@
           <div class="mb-3 fw-700">{{$t('setting.uploadPhoto')}}</div>
           <div class="mb-5">
             <div class="mb-2">{{$t('setting.storePhoto')}}</div>
-            <upload-zone :url="store.orderHeaderImageSrc" @url="update({ orderHeaderImageSrc: $event })" :option="{maxWidth: 500, maxHeight: 500}" :aspect-ratio="2"/>
+            <upload-zone :url="store.orderHeaderImageSrc" @url="update({ orderHeaderImageSrc: $event })" :option="{maxWidth: 1000, maxHeight: 1000}" :aspect-ratio="2"/>
           </div>
           <div>
             <div class="mb-2">{{$t('setting.storeLogo')}}</div>
@@ -77,7 +77,7 @@
               <div style="font-size: 15px; font-weight: 300; font-style: italic; color: #757575">
                 Upload an icon for your online ordering website
               </div>
-              <g-btn-bs style="margin-left: auto; margin-right: auto" @click="choosePhoto" icon="icon-upload_white" background-color="#536DFE" text-color="white">Upload</g-btn-bs>
+              <g-btn-bs style="margin-left: auto; margin-right: auto" @click="choosePhoto" icon="icon-upload_white" background-color="#536DFE" text-color="white">{{$t('setting.upload')}}</g-btn-bs>
             </div>
           </div>
           <div v-else class="row-flex align-items-center">
@@ -104,10 +104,9 @@
         <div>
           <p>Choose type</p>
           <div class="row-flex flex-wrap">
-            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'store', order: 1}" label="Online Order"/>
-            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 2}" label="Reservation"/>
-            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'franchise', link: 'franchise', order: 3}" label="Franchise"/>
-            <g-checkbox class="col-4" color="#1271ff" v-model="type" :value="{type: 'overview', link: 'overview', order: 4}" label="Store Overview"/>
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'webshop', link: 'order', order: 2}" label="Online Order"/>
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'reservation', link: 'reservation', order: 3}" label="Reservation"/>
+            <g-checkbox class="flex-equal" color="#1271ff" v-model="type" :value="{type: 'overview', link: '', order: 1}" label="Store Overview"/>
           </div>
           <p>Choose position</p>
           <g-radio-group v-model="position" name="position" row>

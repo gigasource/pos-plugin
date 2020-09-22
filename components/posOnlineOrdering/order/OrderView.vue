@@ -1084,4 +1084,10 @@
       background-color: rgba(255, 255, 255, 0.4);
     }
   }
+
+  @media screen and (max-width: 1140px) {
+    .close-iframe-btn {
+      display: none;
+    }
+  }
 </style>
