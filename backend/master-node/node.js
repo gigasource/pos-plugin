@@ -5,6 +5,36 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
 const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkGroupTempId } = require('./updateCommit');
 
+const connectToMaster = (_this, masterIp) => {
+	const clientId = uuid.v4();
+	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
+	_this.socket.on('updateCommitNode', (commits) => {
+		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
+		if (!oldHighestCommitId) {
+			pushTaskToQueue(commits);
+			setHighestCommitId(commits[commits.length - 1].commitId + 1);
+		} else {
+			_this.socket.emit('requireSync', oldHighestCommitId);
+		}
+	})
+	_this.socket.on('connect', async () => {
+		_this.isConnect = true;
+		// wait for initQueue finish
+		setTimeout(() => {
+			_this.socket.emit('requireSync', checkHighestCommitId());
+		}, 200)
+	})
+	_this.socket.on('nodeSync', async (commits) => {
+		const newCommits = [];
+		for (let id in commits) {
+			const commit = commits[id];
+			if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
+		}
+		if (newCommits.length) pushTaskToQueue(newCommits);
+		if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
+	})
+}
+
 class Node {
 	constructor(cms) {
 		this.cms = cms;
@@ -13,6 +43,18 @@ class Node {
 		this.storeId = null;
 		this.highestCommitId = 0;
 		this.isConnect = false;
+		setTimeout(async () => {
+			const posSettings = await cms.getModel("PosSetting").findOne({});
+			const { masterIp } = posSettings;
+			if (masterIp) connectToMaster(this, masterIp);
+
+			this.cms.socket.on('connect', socket => {
+				socket.on('buildTempOrder', async (table, fn) => {
+					const order = await buildTempOrder(table);
+					fn(order);
+				})
+			});
+		}, 0)
 	}
 
 	async getStoreId() {
@@ -26,58 +68,19 @@ class Node {
 		}
 		return _this.storeId;
 	}
-
+	// init online order socket
 	async initSocket(socket) {
 		const _this = this;
-		await _this.getStoreId();
-		const connectToMaster = (masterIp) => {
-			_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${socket.clientId}`);
-			_this.socket.on('updateCommitNode', (commits) => {
-				const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[commits.length - 1].commitId) : null;
-				if (!oldHighestCommitId) {
-					pushTaskToQueue(commits);
-					setHighestCommitId(commits[commits.length - 1].commitId + 1);
-				} else {
-					_this.socket.emit('requireSync', oldHighestCommitId);
-				}
-			})
-			_this.socket.on('connect', async () => {
-				_this.isConnect = true;
-				const storeId = await _this.getStoreId();
-				_this.socket.emit('requireSync', checkHighestCommitId());
-			})
-			_this.socket.on('nodeSync', async (commits) => {
-				const newCommits = [];
-				for (let id in commits) {
-					const commit = commits[id];
-					if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
-				}
-				if (newCommits.length) pushTaskToQueue(newCommits);
-				if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
-			})
-		}
-
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
 		_this.onlineOrderSocket.emit('getMasterIp', await _this.getStoreId(), async (masterIp) => {
 			if (_this.socket && !_this.isConnect) {
 				_this.socket.disconnect(); // safer better
 				setTimeout(() => {
-					connectToMaster(masterIp);
+					connectToMaster(_this, masterIp);
 				}, 2000);
 			}
 			await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp });
 		})
-
-		const posSettings = await cms.getModel("PosSetting").findOne({});
-		const { masterIp } = posSettings;
-		if (masterIp) connectToMaster(masterIp);
-
-		this.cms.socket.on('connect', socket => {
-			socket.on('buildTempOrder', async (table, fn) => {
-				const order = await buildTempOrder(table);
-				fn(order);
-			})
-		});
 	}
 
 	async init() {

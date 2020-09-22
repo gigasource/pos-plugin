@@ -15,21 +15,8 @@ class Master {
 		this.storeId = null;
 		this.highestCommitId = 0;
 		this.connection = {};
-	}
 
-	async getStoreId() {
-		const _this = this;
-		if (!_this.storeId) {
-			const posSettings = await cms.getModel("PosSetting").findOne({});
-			const { onlineDevice } = posSettings;
-			if (onlineDevice && onlineDevice.store) {
-				_this.storeId = onlineDevice.store.alias;
-			}
-		}
-		return _this.storeId;
-	}
-
-	initSocket(socket) {
+		// p2p socket
 		const _this = this;
 		_this.socket = _this.cms.io.of('/masterNode');
 		_this.socket.on('connection', socket => {
@@ -55,11 +42,6 @@ class Master {
 				pushTaskToQueue([commit]);
 			})
 		})
-
-		// online order socket
-		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync()}:${global.APP_CONFIG.port}`));
-
 		// front-end socket
 		this.cms.socket.on('connect', socket => {
 			socket.on('buildTempOrder', async (table, fn) => {
@@ -67,6 +49,24 @@ class Master {
 				fn(order);
 			})
 		});
+	}
+
+	async getStoreId() {
+		const _this = this;
+		if (!_this.storeId) {
+			const posSettings = await cms.getModel("PosSetting").findOne({});
+			const { onlineDevice } = posSettings;
+			if (onlineDevice && onlineDevice.store) {
+				_this.storeId = onlineDevice.store.alias;
+			}
+		}
+		return _this.storeId;
+	}
+	// init online order socket
+	initSocket(socket) {
+		// online order socket
+		this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
+		this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync()}:${global.APP_CONFIG.port}`));
 	}
 
 	async init() {

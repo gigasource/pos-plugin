@@ -211,6 +211,7 @@ async function initQueue(handler) {
 	const orderDoc = await orderModel.findOne({}).sort('-id');
 	highestOrderId = orderDoc ? orderDoc._doc.id + 1 : 1;
 	const commitDoc = await orderCommitModel.findOne({}).sort('-commitId');
+	nodeHighestCommitIdUpdating = 0;
 	highestCommitId = commitDoc ? commitDoc._doc.commitId + 1 : 1;
 	queue = new Queue(async (data, cb) => {
 		const { commits } = data;
@@ -253,10 +254,19 @@ async function initQueue(handler) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
-			if (!commit.table && lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
+			if (!commit.table && lastTable) {
+				// wait for db update
+				let _lastTable = lastTable; // lastTable can be null in the nextTick run
+				setTimeout(() => {
+					handler.cms.socket.emit('updateOrderItems', _lastTable);
+				}, 200);
+			}
 			lastTable = commit.table;
 		}
-		if (lastTable) handler.cms.socket.emit('updateOrderItems', lastTable);
+		// wait for db update
+		setTimeout(() => {
+			handler.cms.socket.emit('updateOrderItems', lastTable);
+		}, 200);
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
 			const deleteCommit = await deleteTempCommit(lastTempId);
 			newCommits.push(deleteCommit);
@@ -284,7 +294,7 @@ function resumeQueue() {
  of node may not be updated fast enough.
  */
 function checkHighestCommitId(id) {
-	nodeHighestCommitIdUpdating = Math.max(nodeHighestCommitIdUpdating, highestOrderId);
+	nodeHighestCommitIdUpdating = Math.max(nodeHighestCommitIdUpdating, highestCommitId);
 	if (!id) return nodeHighestCommitIdUpdating;
 	// node highest commit id must be equal to master
 	return id == nodeHighestCommitIdUpdating ? null : nodeHighestCommitIdUpdating;
@@ -302,7 +312,7 @@ async function updateTempCommit(commits) {
 
 async function checkGroupTempId(groupTempId) {
 	if (!groupTempIdExists[groupTempId]) {
-		const existsCommit = await orderCommitModel.findOne({groupTempId});
+		const existsCommit = await orderCommitModel.findOne({groupTempId, temp: false});
 		groupTempIdExists[groupTempId] = existsCommit ? true : false;
 	}
 	return groupTempIdExists[groupTempId];
