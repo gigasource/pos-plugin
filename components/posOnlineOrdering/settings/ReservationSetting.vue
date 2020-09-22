@@ -107,7 +107,7 @@
       return {
         reservationSetting: this.store.reservationSetting || {},
         removeOverdueAfterList: [15, 30, 45, 60, $t('setting.dontDelete')],
-        guestAllowances: [20, 30, 50, 100],
+        guestAllowances: [10, 15, 20, 30, 50],
         dayAllowances: [2, 7, 14, 30],
         dialog: {
           seat: false,
