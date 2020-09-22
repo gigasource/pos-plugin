@@ -220,9 +220,6 @@
         this.table = this.$router.currentRoute.params.name
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
-    },
-    deactivated() {
-      this.$emit('updateOrderTable', null)
     }
   }
 </script>

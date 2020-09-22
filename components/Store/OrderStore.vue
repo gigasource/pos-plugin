@@ -1141,10 +1141,11 @@
       cms.socket.on('updateOrderItems', async (table) => {
         if (table === this.currentOrder.table) {
           const order = await this.getTempOrder();
+          const tempItems = this.currentOrder.items.filter(i => !i.printed)
           this.$set(this.currentOrder, '_id', order._id)
           this.$set(this.currentOrder, 'user', order.user)
-          this.$set(this.currentOrder, 'items', order.items)
-          this.printedOrder = _.cloneDeep(this.currentOrder)
+          this.$set(this.currentOrder, 'items', [...order.items, ...tempItems])
+          this.printedOrder = _.cloneDeep(order.items)
         }
       })
       await this.getReservations()

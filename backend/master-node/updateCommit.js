@@ -81,36 +81,37 @@ async function buildTempOrder(table) {
 */
 async function handleOrderCommit(commit) {
 	let result;
-	if (commit.update.set) {  // close order
-		if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp < COMMIT_CLOSE_TIME_OUT) return null; // timeout close order must be small
-		if (activeOrders[commit.table]) {
-			if (commit.where && !commit.where._id) {
-				commit.where._id = activeOrders[commit.table]._id;
-			}
-			// delete all commit with this orderid and create new close commit
-			activeOrders[commit.table].status = commit.update['set'].value;
-			if (!commit.commitId) {
-				commit.commitId = highestCommitId;
-				highestCommitId++;
-			}
-			let query;
-			if (global.APP_CONFIG.isMaster) {
-				query = {};
-				query[commit.update.set.key] = commit.update.set.value
-			} else {
-				query = commit.update.set;
-			}
-			commit.update.set = activeOrders[commit.table];
-			await orderModel.findOneAndUpdate(commit.where, query);
-			await orderCommitModel.create(commit);
-			await orderCommitModel.deleteMany({type: 'item', orderId: commit.orderId});
-			result = true;
-			delete activeOrders[commit.table];
-			//TODO: consider when closed add commit
-		} else {
-			console.error('Order has been closed');
-			return null;
+	if (commit.update.set) {
+		if (commit.where && !commit.where._id) {
+			commit.where._id = activeOrders[commit.table]._id;
 		}
+		if (commit.update.set.key === 'status') { // close order
+			if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp < COMMIT_CLOSE_TIME_OUT) return null; // timeout close order must be small
+			if (!activeOrders[commit.table]) {
+				console.error('Order has been closed');
+				return null;
+			}
+			activeOrders[commit.table][commit.update.set.key] = commit.update.set.value;
+			commit.update.set = activeOrders[commit.table];
+			delete activeOrders[commit.table];
+		}
+		// delete all commit with this orderid and create new close commit
+		if (!commit.commitId) {
+			commit.commitId = highestCommitId;
+			highestCommitId++;
+		}
+		let query;
+		if (commit.update.set.key) {
+			query = {};
+			query[commit.update.set.key] = commit.update.set.value
+		} else {
+			query = commit.update.set;
+		}
+		await orderModel.findOneAndUpdate(commit.where, query);
+		await orderCommitModel.create(commit);
+		if (activeOrders[commit.table]) activeOrders[commit.table][commit.update.set.key] = commit.update.set.value;
+		else await orderCommitModel.deleteMany({type: 'item', orderId: commit.orderId});
+		result = true;
 	} else {  // open order
 		if (activeOrders[commit.table]) {
 			console.error('Order has been created');
@@ -233,7 +234,7 @@ async function initQueue(handler) {
 				if (!commit.orderId && activeOrders[commit.table]) {
 					commit.orderId = activeOrders[commit.table].id;
 				}
-				if (commit.where && !commit.where._id) {
+				if (commit.where && !commit.where._id && activeOrders[commit.table]) {
 					commit.where._id = activeOrders[commit.table]._id;
 				}
 			} else continue;
