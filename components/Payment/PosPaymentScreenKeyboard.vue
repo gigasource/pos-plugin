@@ -1,10 +1,11 @@
 <template>
   <div class="pos-payment-keyboard">
-    <g-number-keyboard area="keyboard" :items="keyboard" :template="template" v-model="keyboardValue">
-      <template v-slot:screen>
-        <div></div>
-      </template>
-    </g-number-keyboard>
+    <pos-keyboard-full
+        type="numeric"
+        width="100%"
+        style="grid-area: 1 / 1 / 5 / 4"
+        :template="keyboardTemplate"
+        :items="keyboardItems"/>
     <div class="col-flex" style="grid-area: 1 / 4 / 5 / 6">
       <g-table class="payment-table flex-grow-1" striped>
         <thead>
@@ -61,21 +62,32 @@
     ],
     data() {
       return {
-        keyboard: [
-          { content: ['7'], style: 'grid-area: key7', action: keyboardFunction.number },
-          { content: ['8'], style: 'grid-area: key8', action: keyboardFunction.number },
-          { content: ['9'], style: 'grid-area: key9', action: keyboardFunction.number },
-          { content: ['4'], style: 'grid-area: key4', action: keyboardFunction.number },
-          { content: ['5'], style: 'grid-area: key5', action: keyboardFunction.number },
-          { content: ['6'], style: 'grid-area: key6', action: keyboardFunction.number },
-          { content: ['1'], style: 'grid-area: key1', action: keyboardFunction.number },
-          { content: ['2'], style: 'grid-area: key2', action: keyboardFunction.number },
-          { content: ['3'], style: 'grid-area: key3', action: keyboardFunction.number },
-          { content: ['0'], style: 'grid-area: key0', action: keyboardFunction.number },
-          { content: [','], style: 'grid-area: keyC', action: keyboardFunction.dot },
-          { img: 'delivery/key_delete', style: 'grid-area: keyD', action: keyboardFunction.delete },
+        keyboardTemplate: 'grid-template-areas: " key7 key7 key8 key8 key9 key9" ' +
+            '"key4 key4 key5 key5 key6 key6" ' +
+            '"key1 key1 key2 key2 key3 key3" ' +
+            '"keyDot keyDot key0 key0 del del";' +
+            'grid-auto-columns: 1fr; grid-gap: 10px',
+        keyboardItems: [
+          ...Object.values({
+            key7: {content: ['7'], style: 'grid-area: key7'},
+            key8: {content: ['8'], style: 'grid-area: key8'},
+            key9: {content: ['9'], style: 'grid-area: key9'},
+            key4: {content: ['4'], style: 'grid-area: key4'},
+            key5: {content: ['5'], style: 'grid-area: key5'},
+            key6: {content: ['6'], style: 'grid-area: key6'},
+            key1: {content: ['1'], style: 'grid-area: key1'},
+            key2: {content: ['2'], style: 'grid-area: key2'},
+            key3: {content: ['3'], style: 'grid-area: key3'},
+            key0: {content: ['0'], style: 'grid-area: key0'},
+            keyDot: {content: ['.'], style: 'grid-area: keyDot'},
+          }),
+          {
+            content: [''],
+            img: 'delivery/key_delete',
+            style: 'grid-area: del; background-color: #e0e0e0',
+            action: 'delete'
+          },
         ],
-        template: 'grid-template-areas: "key7 key8 key9" "key4 key5 key6" "key1 key2 key3" "key0 keyC keyD"; grid-auto-rows: 1fr; grid-auto-columns: 1fr; grid-gap: 6px',
         listBtn: [],
         paymentList: [],
         keyboardValue: null,
