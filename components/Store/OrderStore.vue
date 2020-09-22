@@ -794,7 +794,7 @@
               update: {
                 set: {
                   key: 'payment',
-                  value: this.currentOrder.payment
+                  value: this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }))
                 }
               }
             }]);
