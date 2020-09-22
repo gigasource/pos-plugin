@@ -56,6 +56,7 @@
     methods: {
       back() {
         this.$emit('resetOrderData')
+        this.$emit('updateOrderTable', null)
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
