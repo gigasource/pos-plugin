@@ -634,3 +634,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-tip {
+  background-image: url("../assets/tip.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

@@ -1,35 +1,47 @@
 <template>
-  <div>
+  <div class="pos-payment-keyboard">
     <g-number-keyboard area="keyboard" :items="keyboard" :template="template" v-model="keyboardValue">
       <template v-slot:screen>
         <div></div>
       </template>
     </g-number-keyboard>
     <div class="col-flex" style="grid-area: 1 / 4 / 5 / 6">
-      <g-table striped class="flex-grow-1">
+      <g-table class="payment-table flex-grow-1" striped>
         <thead>
           <tr>
-            <th>Total</th>
-            <th>{{paymentTotal}}</th>
+            <th class="payment-table__row">
+              <span>Total</span>
+              <g-spacer />
+              <span class="total-value">{{paymentTotal}}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(payment, index) in paymentList">
-            <td style="text-transform: capitalize">{{payment.name}}</td>
-            <td>
-              <pos-textfield-new v-model="payment.value" @click.stop="changeKeyboardFocus(payment.value)"/>
-            </td>
-            <td>
-              <g-btn flat text-color="red" @click="removePaymentItem(index)">x</g-btn>
-            </td>
+            <div class="payment-table__row" style="padding: 0 16px">
+              <span style="text-transform: capitalize">{{ payment.name }}</span>
+              <g-btn class="ml-2" flat text-color="red" @click="removePaymentItem(index)">x</g-btn>
+              <g-spacer/>
+              <div class="value-input">
+                <pos-textfield-new v-model="payment.value" @click.stop="changeKeyboardFocus(payment.value)"/>
+              </div>
+            </div>
+          </tr>
+
+          <tr>
+            <div class="payment-change" style="padding: 0 16px">
+              <div class="payment-change__description mb-2">Please enter tendered cash</div>
+              <g-divider class="mb-2"/>
+              <div class="row-flex payment-change__value">
+                <div class="flex-grow-1">Change</div>
+                <g-spacer/>
+                <div v-if="!isNaN(change)" class="payment-change__value__number">{{ (+change || 0).toFixed(2)}}</div>
+                <div v-else class="payment-change__value__number">{{(0).toFixed(2)}}</div>
+              </div>
+            </div>
           </tr>
         </tbody>
       </g-table>
-      <div class="row-flex">
-        <div class="flex-grow-1">Change</div>
-        <div v-if="!isNaN(change)">{{change}}</div>
-        <div v-else>0</div>
-      </div>
     </div>
   </div>
 </template>
@@ -140,8 +152,18 @@
         if (val && val.length) {
           this.paymentList = val
 
-          const paid = _.sumBy(val, i => +i.value || 0)
-          this.change = paid - this.paymentTotal
+          const paid = _.sumBy(val, i => {
+            if (i.name === 'WC' || i.name === 'Tip') {
+              return (+i.value || 0) * -1
+            }
+
+            return +i.value || 0
+          })
+
+          const change = paid - this.paymentTotal
+          this.$set(this.currentOrder, 'customerPaidEnough', change >= 0)
+
+          this.change = change >= 0 ? change : 0
         }
       }, { deep: true, immediate: true })
 
@@ -159,7 +181,7 @@
 
 <style scoped lang="scss">
   .controller {
-    padding: 12px;
+    padding: 4px;
 
     .keyboard {
       ::v-deep .key {
@@ -171,6 +193,72 @@
         font-size: 20px;
         font-weight: 700;
         font-family: "Muli", sans-serif;
+      }
+    }
+  }
+
+  .pos-payment-keyboard {
+    background-image: url('../../assets/pos-payment-method-screen-bg.png');
+    background-repeat: repeat;
+    padding: 8px !important;
+  }
+
+  ::v-deep .payment-table {
+    .g-table__wrapper {
+      position: relative;
+    }
+  }
+
+  .payment-table {
+    thead {
+      font-weight: bold;
+    }
+
+    &__row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      font-size: 16px !important;
+
+      ::v-deep .value-input {
+        height: calc(100% - 16px);
+
+        .bs-tf-wrapper {
+          width: 100%;
+          margin: 8px 0;
+        }
+
+        .bs-tf-inner-input-group, .bs-tf-input {
+          background-color: white;
+        }
+      }
+    }
+  }
+
+  .total-value {
+    font-size: 18px;
+  }
+
+  .payment-change {
+    position: absolute;
+    bottom: 0;
+    font-weight: bold;
+    width: 100%;
+    font-size: 16px !important;
+
+    &__description {
+      font-size: 13px;
+      color: #1D1D26;
+      font-weight: normal;
+    }
+
+    &__value {
+      height: initial;
+
+      &__number {
+        font-size: 20px !important;
+        color: #1271ff;
       }
     }
   }
