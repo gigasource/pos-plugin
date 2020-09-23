@@ -641,3 +641,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-multi_payment {
+  background-image: url("../assets/multi_payment.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

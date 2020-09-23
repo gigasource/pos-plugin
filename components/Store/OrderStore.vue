@@ -754,6 +754,9 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
+      updateCurrentOrder(key, val) {
+        this.$set(this.currentOrder, key, val)
+      },
       printKitchen(order) {
         return new Promise((resolve, reject) => {
           cms.socket.emit('printKitchen', {
@@ -781,37 +784,54 @@
             })
         })
       },
+      async createOrderCommits(commits) {
+        if (commits instanceof Array)
+          return Promise.all(commits.map(this.createOrderCommit))
+      },
+      async createOrderCommit(commit) { // key-value pair
+        return await cms.getModel('OrderCommit').create([{
+          type: 'order',
+          where: { _id: this.currentOrder._id },
+          table: this.currentOrder.table,
+          update: {
+            set: commit
+          }
+        }]);
+      },
       async saveRestaurantOrder(paymentMethod) {
         try {
           if (!this.currentOrder || !this.currentOrder.items.length) return
           await this.saveTableOrder();
-
-          if (this.currentOrder.payment) {
-            await cms.getModel('OrderCommit').create([{
-              type: 'order',
-              where: { _id : this.currentOrder._id },
-              table: this.currentOrder.table,
-              update: {
-                set: {
-                  key: 'payment',
-                  value: this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }))
-                }
-              }
-            }]);
-          }
-
-          await cms.getModel('OrderCommit').create([{
-            type: 'order',
-            where: { _id : this.currentOrder._id },
-            table: this.currentOrder.table,
-            update: {
-              set: {
-                key: 'status',
-                value: 'paid'
-              }
+          const orderDateTime = new Date()
+          const taxGroups = _.groupBy(this.currentOrder.items, 'tax')
+          const vTaxGroups = _.map(taxGroups, (val, key) => ({
+            taxType: key,
+            tax: orderUtil.calOrderTax(val),
+            sum: orderUtil.calOrderTotal(val)
+          }))
+          const updates =
+            {
+              payment: this.currentOrder.payment.map(({ name, value }) => ({ type: name, value })),
+              ...this.currentOrder.change && { cashback: this.currentOrder.change },
+              ...this.currentOrder.tips && { tip: this.currentOrder.tip },
+              takeOut: this.currentOrder.takeOut,
+              user: this.currentOrder.user
+                ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
+                : [{ name: this.user.name, date: orderDateTime }],
+              date: orderDateTime,
+              vDate: await getVDate(orderDateTime),
+              bookingNumber: getBookingNumber(orderDateTime),
+              vSum: this.paymentTotal.toFixed(2),
+              vTax: this.paymentTax.toFixed(2),
+              vTaxGroups,
+              vDiscount: this.paymentDiscount.toFixed(2),
+              receive: _.sumBy(this.currentOrder.payment, 'value'),
+              status: 'paid'
             }
-          }]);
 
+          const commits = _.map(updates, (value, key) => ({key, value}));
+          console.log(commits)
+          await this.createOrderCommits(commits)
           await this.resetOrderData();
         } catch (e) {
           console.error(e)

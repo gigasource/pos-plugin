@@ -11,6 +11,14 @@
       validateOnBlur: Boolean,
       rules: Array
     },
+    data() {
+      return {
+        listeners: {
+          click: (e) => this.$emit('click', e),
+          focus: (e) => this.$emit('focus', e),
+        }
+      }
+    },
     computed: {
       internalValue: {
         get() {
@@ -35,13 +43,13 @@
         return (
             <g-text-field ref="textfield" {...{
               props: { outlined: true, ...props},
-              on: { input: (val) => this.internalValue = val }
+              on: { input: (val) => this.internalValue = val, ...this.listeners }
             }} />
         )
       }
       return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
         props: { large: true, ...props},
-        on: { input: (val) => this.internalValue = val }
+        on: { input: (val) => this.internalValue = val, ...this.listeners }
       }} />
     }
   }
