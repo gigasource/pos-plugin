@@ -18,7 +18,13 @@ const {
  * get staff by device id and store id
  */
 router.get('/', async (req, res) => {
-  const {storeId, deviceId} = req.query
+  let {storeId, deviceId, storeUfId /* user-friendly id*/ } = req.query
+
+  if (!storeId && storeUfId) {
+    const store = await cms.getModel('Store').findOne({ id: storeUfId })
+    if (store)
+      storeId = store._id
+  }
 
   try {
     const staff = await getStaff({storeId, deviceId})
