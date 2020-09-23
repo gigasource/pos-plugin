@@ -48,11 +48,15 @@
         type: Boolean,
         default: true
       },
+      keyboardType: {
+        type: String,
+        default: 'alphanumeric'
+      }
     },
     data() {
       return {
         text: '',
-        keyboardType: 'alphanumeric',
+        internalKeyboardType: 'alphanumeric',
       }
     },
     computed: {
@@ -66,11 +70,20 @@
       },
       showButtons() {
         return !this.showKeyboard
+      },
+      keyboard: {
+        get() {
+          return this.internalKeyboardType
+        },
+        set(val) {
+          this.internalKeyboardType = val
+          this.$emit('change-keyboard-type', val)
+        }
       }
     },
     methods: {
       changeKeyboardType(val) {
-        this.keyboardType = val
+        this.internalKeyboardType = val
       },
       submit() {
         this.$emit('submit')
@@ -78,7 +91,10 @@
     },
     watch: {
       value(val) {
-        if (!val) this.keyboardType = 'alphanumeric'
+        if (!val) this.internalKeyboardType = 'alphanumeric'
+      },
+      keyboardType(val) {
+        this.internalKeyboardType = val
       }
     }
   }
