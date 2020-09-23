@@ -285,7 +285,7 @@ async function reverseGeocodePelias(lat, long) {
   const {features} = req.data
 
   if (features && features.length) {
-    const {country, label, region, name} = features[0];
+    const {country, label, region, name} = features[0].properties;
     return label || `${name}, ${region}, ${country}`
   }
 
