@@ -1,3 +1,5 @@
+const {reverseGeocodePelias} = require("../../devices/gsms-devices");
+
 const dayjs = require('dayjs')
 const _ = require('lodash')
 const axios = require('axios')
@@ -55,41 +57,57 @@ async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}
     throw "Missing store's id"
   if (!staffId)
     throw "Missing staff's id"
-  if (type !== 'in' && type !== 'out')
+  if (type !== 'in' && type !== 'mark' && type !== 'out')
     throw "Invalid check type"
   // validate time??
-  async function getCoordsFromGooglePlaceId(id) {
-    try {
-      const {data} = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${global.APP_CONFIG.mapsApiKey}`)
-      const location = data.result.geometry.location
-      return {lat: location.lat, long: location.lng}
-    } catch (e) {
-      console.log(e)
-      return null
-    }
-  }
 
   let note;
-  try {
-    const store = await cms.getModel('Store').findOne({_id: storeId}).lean()
-    const srcCoords = store.coordinates || await getCoordsFromGooglePlaceId(store.googleMapPlaceId)
-    const geolib = require('geolib')
-    const distance = geolib.getPreciseDistance({latitude: srcCoords.lat, longitude: srcCoords.long}, coords)
-    if (isNaN(distance)) {
-      throw "Error coordinates"
+  if (type === 'mark') {
+    note = 'success'
+  } else {
+    const distanceThreshold = 500; // default 500m
+    async function getCoordsFromGooglePlaceId(id) {
+      try {
+        const {data} = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${global.APP_CONFIG.mapsApiKey}`)
+        const location = data.result.geometry.location
+        return {lat: location.lat, long: location.lng}
+      } catch (e) {
+        console.log(e)
+        return null
+      }
     }
-    console.log(distance)
-    if (distance < 100) { // default 100m
-      note = 'success'
-    } else {
+
+    try {
+      const store = await cms.getModel('Store').findOne({_id: storeId}).lean()
+      const srcCoords = store.coordinates || await getCoordsFromGooglePlaceId(store.googleMapPlaceId)
+      const geolib = require('geolib')
+      const distance = geolib.getPreciseDistance({latitude: srcCoords.lat, longitude: srcCoords.long}, coords)
+      if (isNaN(distance)) {
+        throw "Error coordinates"
+      }
+      console.log(distance)
+      if (distance < distanceThreshold) {
+        note = 'success'
+      } else {
+        note = 'gps-error'
+      }
+    } catch (e) {
+      console.log('Error when calculating check event distance', e);
       note = 'gps-error'
     }
-  } catch (e) {
-    console.log('Error when calculating check event distance', e);
-    note = 'gps-error'
   }
 
-  return await cms.getModel('CheckEvent').create({ staff: staffId, store: storeId, type, datetime: new Date(datetime), note })
+  const formattedLocation = await reverseGeocodePelias(coords.latitude, coords.longitude);
+
+  return await cms.getModel('CheckEvent').create({
+    staff: staffId,
+    store: storeId,
+    type,
+    datetime: new Date(datetime),
+    note,
+    coords: {lat: coords.latitude, long: coords.longitude},
+    location: formattedLocation
+  })
 }
 
 async function getLastCheckInCheckOut(staffId) {
@@ -108,27 +126,39 @@ async function calculateWorkTimeReport(staffId, startDate, endDate) {
   }
 
   const allEvents = await cms.getModel('CheckEvent').find({staff: staffId, datetime: {$gte: startDate, $lte: endDate}}).sort({datetime: 1})
-  const report = allEvents.reduce((acc, e) => {
+  const report = allEvents.reduce((acc, e, idx) => {
     // cal gps error times
     if (e.note === 'gps-error') {
       acc.gpsError += 1
     }
 
     // cal missing attendance
-    if (acc.lastEvent && acc.lastEvent.type !== e.type) {
-      acc.missingClock += 1
+    if (acc.lastEvent
+        && (acc.lastEvent.type === e.type
+            || dayjs(acc.lastEvent.datetime).date() !== dayjs(e.datetime).date())
+            || (e.type === 'in' && idx === allEvents.length - 1)) {
+      if (dayjs(acc.lastEvent.datetime).date() !== dayjs(e.datetime).date()) {
+        acc.missingClock += 2
+      } else {
+        acc.missingClock += 1
+      }
     }
 
     // cal total attendance hours
-    if (acc.lastEvent && acc.lastEvent.type === 'in' && e.type === 'out') {
+    if (acc.lastEvent
+        && acc.lastEvent.type === 'in' && e.type === 'out'
+        && dayjs(acc.lastEvent.datetime).date() === dayjs(e.datetime).date()) {
       acc.total += getHourDiff(acc.lastEvent.datetime.getTime(), e.datetime.getTime())
     }
 
-    if (e.type === 'in') {
+    // every clock-in = 1 attendance
+    if (e.type === 'in' || dayjs(acc.lastEvent.datetime).date() !== dayjs(e.datetime).date()) {
       acc.attendance += 1
     }
 
-    acc.lastEvent = e
+    if (e.type === 'in' || e.type === 'out') {
+      acc.lastEvent = e
+    }
     return acc
   }, {total: 0, gpsError: 0, missingClock: 0, attendance: 0, lastEvent: null})
   return {totalHours: report.total, missingClock: report.missingClock, gpsError: report.gpsError, totalAttendance: report.attendance};
@@ -173,9 +203,9 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
     checkEventsOfStaff = _.orderBy(checkEventsOfStaff, ['datetime'], ['asc'])
     // check event before (new in)
     const ceBefore = _.filter(checkEventsOfStaff, ce => dayjs(ce.datetime).isBefore(theDayDateIn, 'date'))
-    // check event between (new in-our)
+    // check event between (new in-out)
     const ceIn = _.filter(checkEventsOfStaff, ce => dayjs(ce.datetime).isBetween(theDayDateIn, theDayDateOut, 'date','[]'))
-    // check event after (new our)
+    // check event after (new out)
     const ceAfter = _.filter(checkEventsOfStaff, ce => dayjs(ce.datetime).isAfter(theDayDateOut, 'date'))
 
     // add last item in previous day if staff work over time
@@ -187,7 +217,7 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
       ceIn.push(_.first(ceAfter))
     }
 
-    let inOutPair = {}
+    let inOutPair = {marks: []}
     const checkEventDates = {}
     let lastDate;
 
@@ -205,7 +235,7 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
         if (inOutPair.in) {
           inOutPair.hours = null
           checkEventDates[lastDate].push(inOutPair)
-          inOutPair = {}
+          inOutPair = {marks: []}
         }
 
         // add in info to current inOutPair
@@ -216,7 +246,9 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
           store: checkEvent.store,
           value: checkIn,
           formattedValue: dayjs(checkIn).format('HH:mm'),
-          note: checkEvent.note
+          note: checkEvent.note,
+          coords: checkEvent.coords,
+          location: checkEvent.location,
         }
         // at this point, lastDate will be the date of this check in event
         // this is to fix the bug when clock out miss punch happens, the check in will be unexpectedly merged to next day
@@ -226,10 +258,39 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
         if (index === ceIn.length - 1) {
           inOutPair.hours = null
           checkEventDates[date].push(inOutPair)
-          inOutPair = {}
+          inOutPair = {marks: []}
+        }
+      } else if (checkEvent.type === 'mark') {
+        // add mark events (continuous check-in in new place) between an in-out pair
+        const mark = checkEvent.datetime
+        inOutPair.marks.push({
+          _id: checkEvent._id,
+          staff: checkEvent.staff,
+          store: checkEvent.store,
+          value: mark,
+          formattedValue: dayjs(mark).format('HH:mm'),
+          note: checkEvent.note,
+          coords: checkEvent.coords,
+          location: checkEvent.location,
+        })
+        // at this point, lastDate will be the date of this check in event
+        // this is to fix the bug when clock out miss punch happens, the check in will be unexpectedly merged to next day
+        lastDate = date
+
+        // is last and found check in, add inOutPair missing out checkEventDate map for current date.
+        if (index === ceIn.length - 1) {
+          inOutPair.hours = null
+          checkEventDates[date].push(inOutPair)
+          inOutPair = {marks: []}
         }
       } else if (checkEvent.type === 'out') {
-        // found out -> complete inOut pair
+        // found out
+        // if last date != current date (different day)
+        // add inOutPair in to dateOut. Missing dateIn in this case.
+        if (lastDate !== date) {
+          checkEventDates[lastDate].push(inOutPair)
+          inOutPair = {marks: []}
+        }
         const checkOut = checkEvent.datetime
         inOutPair.out = {
           _id: checkEvent._id,
@@ -237,7 +298,9 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
           store: checkEvent.store,
           value: checkOut,
           formattedValue: dayjs(checkOut).format('HH:mm'),
-          note: checkEvent.note
+          note: checkEvent.note,
+          coords: checkEvent.coords,
+          location: checkEvent.location,
         }
 
         let hours = null
@@ -253,7 +316,7 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
         }
         // then init empty pair if check event is not last
         if (index !== checkEvent.length - 1) {
-          inOutPair = {}
+          inOutPair = {marks: []}
         }
       }
     })
@@ -261,7 +324,7 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
     const dates = _.keys(checkEventDates)
     const inOutPairs = _.map(dates, date => ({
       date: date,
-      inOuts: checkEventDates[date]
+      inOuts: checkEventDates[date],
     }))
     return _.filter(inOutPairs, inOutPair => inOutPair.inOuts.length > 0)
   }
@@ -305,7 +368,7 @@ async function getTimeSheetDetail({staffId, startDate, endDate}) {
     // Step3: Convert step 2 to build final data structure which will be used by view
     timeSheetItem.checkEvents = inOutPairs
     timeSheetItem.containInvalidCheckEvents = containInvalidCheckEvents
-    timeSheetItem.totalAttendance = checkEvents.reduce((acc, c) => c.type === 'in' ? acc + 1 : acc, 0)
+    timeSheetItem.totalAttendance = inOutPairs.reduce((acc, pair) => acc + pair.inOuts.length, 0)
     timeSheetItem.totalHours = _.sum(_.map(timeSheetItem.checkEvents, checkEvent => _.sumBy(checkEvent.inOuts, (inOutPair) => inOutPair.hours)))
 
     return timeSheetItem
