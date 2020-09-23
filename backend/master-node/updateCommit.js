@@ -81,7 +81,7 @@ async function buildTempOrder(table) {
 */
 async function handleOrderCommit(commit) {
 	let result;
-	if (commit.update.set) {
+	if (commit.update && commit.update.set) {
 		if (commit.where && !commit.where._id) {
 			commit.where._id = activeOrders[commit.table]._id;
 		}
@@ -215,7 +215,7 @@ async function initQueue(handler) {
 	nodeHighestCommitIdUpdating = 0;
 	highestCommitId = commitDoc ? commitDoc._doc.commitId + 1 : 1;
 	queue = new Queue(async (data, cb) => {
-		const { commits } = data;
+		const { commits, ack } = data;
 		let newCommits = [];
 		let lastTempId;
 		let lastTable;
@@ -246,7 +246,7 @@ async function initQueue(handler) {
 				result = await handleItemCommit(commit);
 			} else if (commit.type === 'sync') { // type sync
 				const commits = await handleSyncCommit(commit.oldHighestCommitId);
-				handler.connection[commit.clientId].emit('nodeSync', commits);
+				if (ack) ack(commits);
 			} else if (commit.type === 'removeTemp') {
 				result = true;
 				await deleteTempCommit(commit.groupTempId);
@@ -265,9 +265,11 @@ async function initQueue(handler) {
 			lastTable = commit.table;
 		}
 		// wait for db update
-		setTimeout(() => {
-			handler.cms.socket.emit('updateOrderItems', lastTable);
-		}, 200);
+		if (lastTable) {
+			setTimeout(() => {
+				handler.cms.socket.emit('updateOrderItems', lastTable);
+			}, 200);
+		}
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
 			const deleteCommit = await deleteTempCommit(lastTempId);
 			newCommits.push(deleteCommit);
@@ -278,9 +280,10 @@ async function initQueue(handler) {
 	queue.pause();
 }
 
-function pushTaskToQueue(commits) {
+function pushTaskToQueue(commits, ack) {
 	queue.push({
-		commits
+		commits,
+		ack
 	});
 }
 

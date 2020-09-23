@@ -33,13 +33,12 @@ class Master {
 				}
 				if (newCommits.length) pushTaskToQueue(newCommits);
 			})
-			socket.on('requireSync', (oldHighestCommitId) => {
+			socket.on('requireSync', (oldHighestCommitId, ack) => {
 				const commit = {
 					type: 'sync',
-					clientId,
 					oldHighestCommitId
 				}
-				pushTaskToQueue([commit]);
+				pushTaskToQueue([commit], ack);
 			})
 		})
 		// front-end socket

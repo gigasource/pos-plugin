@@ -5,6 +5,16 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
 const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkGroupTempId } = require('./updateCommit');
 
+const nodeSync = async function (commits) {
+	const newCommits = [];
+	for (let id in commits) {
+		const commit = commits[id];
+		if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
+	}
+	if (newCommits.length) pushTaskToQueue(newCommits);
+	if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
+}
+
 const connectToMaster = (_this, masterIp) => {
 	const clientId = uuid.v4();
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
@@ -14,24 +24,15 @@ const connectToMaster = (_this, masterIp) => {
 			pushTaskToQueue(commits);
 			setHighestCommitId(commits[commits.length - 1].commitId + 1);
 		} else {
-			_this.socket.emit('requireSync', oldHighestCommitId);
+			_this.socket.emit('requireSync', oldHighestCommitId, nodeSync);
 		}
 	})
 	_this.socket.on('connect', async () => {
 		_this.isConnect = true;
 		// wait for initQueue finish
 		setTimeout(() => {
-			_this.socket.emit('requireSync', checkHighestCommitId());
+			_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
 		}, 200)
-	})
-	_this.socket.on('nodeSync', async (commits) => {
-		const newCommits = [];
-		for (let id in commits) {
-			const commit = commits[id];
-			if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
-		}
-		if (newCommits.length) pushTaskToQueue(newCommits);
-		if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
 	})
 }
 
