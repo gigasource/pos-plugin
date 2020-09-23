@@ -297,34 +297,35 @@ router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
 
 router.put('/sign-in-requests/:requestId', async (req, res) => {
   const {requestId} = req.params;
-  if (!requestId) return res.status(400).json({error: 'Missing requestId in URL'});
+  if (!requestId)
+    return res.status(400).json({error: 'Missing requestId in URL'});
 
   let {status, storeId} = req.body;
   const update = {
     ...status && {status},
-    ...storeId && {store: new mongoose.Types.ObjectId(storeId)},
+    ...storeId && {store: storeId},
   }
 
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
 
   if (status === 'approved') {
     let staff = await cms.getModel('Staff').findOne({
-      device: new mongoose.Types.ObjectId(request.device._id),
-      store: new mongoose.Types.ObjectId(storeId),
+      device: request.device._id,
+      store: storeId,
     })
     if(!staff) {
-      staff = await cms.getModel('Staff').create({
+      await cms.getModel('Staff').create({
         name: request.name,
         role: request.role,
-        device: new mongoose.Types.ObjectId(request.device._id),
-        store: new mongoose.Types.ObjectId(storeId),
+        device: request.device._id,
+        store: storeId,
         active: true,
         avatar: request.avatar || ''
       })
     }
 
     await assignDevice(request.device._id, request.store);
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
   } else if (status === 'notApproved') {
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
   }
