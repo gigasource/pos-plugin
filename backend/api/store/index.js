@@ -307,20 +307,28 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
   }
 
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
+  const StaffModel = cms.getModel('Staff')
 
   if (status === 'approved') {
-    let staff = await cms.getModel('Staff').findOne({
+    let staff = await StaffModel.findOne({
       device: request.device._id,
       store: storeId,
     })
     if(!staff) {
-      await cms.getModel('Staff').create({
+      await StaffModel.create({
         name: request.name,
         role: request.role,
         device: request.device._id,
         store: storeId,
         active: true,
         avatar: request.avatar || ''
+      })
+    } else {
+      await StaffModel.updateOne({ _id: staff._id }, {
+        name: request.name,
+        role: request.role,
+        active: true,
+        avatar: request.avatar || staff.avatar || ''
       })
     }
 
