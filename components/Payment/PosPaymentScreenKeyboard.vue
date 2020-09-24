@@ -150,6 +150,10 @@
       },
       'currentOrder.payment': {
         handler(val) {
+          val.forEach(e => {
+            if (e.value < 0) e.value = 0;
+          });
+
           if (val && val.some(i => i.name === 'cash')) {
             setTimeout(() => {
               this.$nextTick(() => {
