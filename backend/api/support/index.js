@@ -467,16 +467,14 @@ router.put('/remove-device-store/:deviceId', async (req, res) => {
       if (currentStores.length > 0)
         newStoreId = currentStores[0]
 
-      let enableMultiStore = true
       if (currentStores.length === 1) {
         currentStores = null
-        enableMultiStore = false
       }
 
       await DeviceModel.updateOne({_id: device._id}, {
         storeIds: currentStores,
         storeId: newStoreId,
-        enableMultiStore: enableMultiStore,
+        enableMultiStore: currentStores && currentStores.length > 1,
       })
     }
   } else {
