@@ -12,6 +12,7 @@ const axios = require('axios')
 const {getHost} = require('../utils')
 const voipApi = require('./voip')
 const { DEMO_STORE_ID } = require('../../restaurant-plus-apis/constants')
+const _ = require('lodash')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -449,31 +450,39 @@ router.put('/assign-device/:deviceId', async (req, res) => {
 // IMPORTANT: I GUESS that this endpoint is only be used from R+ app.
 // If it also request from another app, side effect may occur
 router.put('/remove-device-store/:deviceId', async (req, res) => {
-  const {deviceId, storeId} = req.params;
+  const { deviceId } = req.params;
   if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
   const device = await DeviceModel.findById(deviceId);
   if (!device) return {error: `Device with ID ${deviceId} not found`};
 
-  if (device.storeId) {
-    await removeDeviceFromOldStore(device);
-    if (device.enableMultiStore) {
+  if (device.enableMultiStore) {
+    const { storeId } = req.body;
+    const store = await cms.getModel('Store').findOne({id: storeId})
+    if (store) {
+      await removeDeviceFromStore(device, store._id)
+      let currentStores = _.filter(device.storeIds, _id => _id.toString() !== store._id.toString())
+
       let newStoreId = device.storeId
-      let currentStores = _.filter(device.storeIds, id => id !== storeId)
+      if (currentStores.length > 0)
+        newStoreId = currentStores[0]
+
       let enableMultiStore = true
       if (currentStores.length === 1) {
-        newStoreId = currentStores[0]
         currentStores = null
         enableMultiStore = false
       }
+
       await DeviceModel.updateOne({_id: device._id}, {
         storeIds: currentStores,
         storeId: newStoreId,
         enableMultiStore: enableMultiStore,
       })
-    } else {
-      await DeviceModel.updateOne({_id: device._id}, {storeId: null});
     }
+  } else {
+    if (device.storeId)
+      await removeDeviceFromStore(device, device.storeId);
+    await DeviceModel.updateOne({_id: device._id}, {storeId: null});
   }
 
   res.status(204).send();
@@ -510,15 +519,13 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
   }
 })
 
-async function removeDeviceFromOldStore(device) {
-  if (device.storeId) {
-    const oldStore = await StoreModel.findById(device.storeId);
-    if (oldStore && oldStore.gSms && oldStore.gSms.devices) {
-      await StoreModel.findOneAndUpdate(
-          { _id: oldStore._id },
-          { $pull: { 'gSms.devices': { _id: device._id } } }
-      )
-    }
+async function removeDeviceFromStore(device, storeId) {
+  const oldStore = await StoreModel.findById(storeId);
+  if (oldStore && oldStore.gSms && oldStore.gSms.devices) {
+    await StoreModel.findOneAndUpdate(
+        { _id: oldStore._id },
+        { $pull: { 'gSms.devices': { _id: device._id } } }
+    )
   }
 }
 
@@ -532,7 +539,7 @@ async function assignDevice(deviceId, store) {
     if (device.storeId) {
       const linkedStore = await cms.getModel('Store').findOne({ _id: device.storeId })
       if (linkedStore && linkedStore.id === DEMO_STORE_ID) {
-        await removeDeviceFromOldStore(device)
+        await removeDeviceFromStore(device, linkedStore._id)
         deviceLinkToDemoStore = true
       }
     }

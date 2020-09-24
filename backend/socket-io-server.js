@@ -1023,10 +1023,10 @@ module.exports = async function (cms) {
 
             /** @deprecated */
             const targetClientIdOld = `${store.id}_${_id}`;
-            externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+            externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createReservation', [{ ...reservationData, _id: reservation._id, storeId: reservation.store }])
 
             const targetClientId = _id;
-            externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+            externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id, storeId: reservation.store }])
             console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
                 `2a. Online order backend: sent reservation to demo device`)
           })
@@ -1066,7 +1066,8 @@ module.exports = async function (cms) {
         })
 
         const targetClientId = `${storeId}_${deviceId}`;
-        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister')
+        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister') // fallback
+        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister_v2', [{storeId}])
         console.debug(`sentry:clientId=${targetClientId},store=${name || settingName},alias=${alias},eventType=pair`,
             `Online order: Emit event: unpair demo client ${targetClientId}, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)

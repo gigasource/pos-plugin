@@ -173,25 +173,41 @@ router.get('/device-assigned-store/:deviceId', async (req, res) => {
   const {deviceId} = req.params;
   if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
-  const device = await DeviceModel.findById(deviceId);
+  let device = await DeviceModel.findById(deviceId);
   if (!device) return res.status(400).json({error: `No device found with ID ${deviceId}`});
 
   // multi store
   if (device.enableMultiStore) {
     const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
-    return res.json({
-      stores: stores.map(s => ({
-        _id: s._id.toString(),
-        id: s.id,
-        name: s.name || s.alias,
-        alias: s.alias,
-        googleMyBusinessId: s.googleMyBusinessId
-      })),
-    })
+    if (stores && stores.length) {
+      if (stores.length === 1) {
+        device = await DeviceModel.updateOne({_id: device._id}, {
+          storeId: stores[0]._id,
+          enableMultiStore: false,
+          stores: null
+        }, { new: true })
+      } else {
+        return res.json({
+          stores: stores.map(s => ({
+            _id: s._id.toString(),
+            id: s.id,
+            name: s.name || s.alias,
+            alias: s.alias,
+            googleMyBusinessId: s.googleMyBusinessId
+          })),
+        })
+      }
+    } else {
+      await DeviceModel.updateOne({_id: device._id}, {
+        enableMultiStore: false,
+        stores: null
+      })
+    }
   }
 
   const store = await StoreModel.findById(device.storeId || '');
-  if (!store) return res.status(200).json({assignedStore: null});
+  if (!store)
+    return res.status(200).json({assignedStore: null});
 
   res.status(200).json({
     _id: store._id.toString(),
@@ -480,7 +496,8 @@ function formatOrder(order, store) {
     total,
     deliveryTime: order.deliveryTime,
     discounts,
-    status: order.status
+    status: order.status,
+    storeId: order.storeId.toString(),
   }
 }
 
