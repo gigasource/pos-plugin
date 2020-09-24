@@ -7,7 +7,6 @@ let orderCommitModel;
 let highestOrderId;
 let highestCommitId;
 let activeOrders = {};
-let groupTempIdExists = {};
 let nodeHighestCommitIdUpdating;
 
 const COMMIT_TIME_OUT = 5 * 60 * 1000;
@@ -314,12 +313,8 @@ async function updateTempCommit(commits) {
 	}
 }
 
-async function checkGroupTempId(groupTempId) {
-	if (!groupTempIdExists[groupTempId]) {
-		const existsCommit = await orderCommitModel.findOne({groupTempId, temp: false});
-		groupTempIdExists[groupTempId] = existsCommit ? true : false;
-	}
-	return groupTempIdExists[groupTempId];
+async function checkCommitExist(commitId) {
+	return highestCommitId > commitId;
 }
 
 module.exports = {
@@ -330,5 +325,5 @@ module.exports = {
 	setHighestCommitId,
 	updateTempCommit,
 	buildTempOrder,
-	checkGroupTempId
+	checkCommitExist
 };

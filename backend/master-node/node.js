@@ -3,20 +3,28 @@ const express = require('express');
 const socketClient = require('socket.io-client');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
-const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkGroupTempId } = require('./updateCommit');
+const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkCommitExist } = require('./updateCommit');
 
 const nodeSync = async function (commits) {
+	/*
+	Online order will return null if master's
+	socket is disconnect
+	 */
+	if (!commits) {
+		throw new Error('Can not connect to master');
+	}
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await checkGroupTempId(commit.groupTempId))) newCommits.push(commit);
+		if (!(await checkCommitExist(commit.commitId))) newCommits.push(commit);
 	}
 	if (newCommits.length) pushTaskToQueue(newCommits);
 	if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
 }
 
-const connectToMaster = (_this, masterIp) => {
-	const clientId = uuid.v4();
+const connectToMaster = async (_this, masterIp) => {
+	const posSettings = await cms.getModel("PosSetting").findOne({});
+	const clientId = posSettings.onlineDevice.id;
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
 	_this.socket.on('updateCommitNode', (commits) => {
 		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
@@ -38,16 +46,19 @@ const connectToMaster = (_this, masterIp) => {
 
 class Node {
 	constructor(cms) {
+		console.log('Starting node');
 		this.cms = cms;
 		this.onlineOrderSocket = null;
 		this.socket = null;
 		this.storeId = null;
 		this.highestCommitId = 0;
 		this.isConnect = false;
+		this.masterClientId = null;
 		setTimeout(async () => {
 			const posSettings = await cms.getModel("PosSetting").findOne({});
-			const { masterIp } = posSettings;
-			if (masterIp) connectToMaster(this, masterIp);
+			const { masterIp, masterClientId } = posSettings;
+			this.masterClientId = masterClientId;
+			if (masterIp) await connectToMaster(this, masterIp);
 
 			this.cms.socket.on('connect', socket => {
 				socket.on('buildTempOrder', async (table, fn) => {
@@ -73,14 +84,25 @@ class Node {
 	async initSocket(socket) {
 		const _this = this;
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('getMasterIp', await _this.getStoreId(), async (masterIp) => {
-			if (_this.socket && !_this.isConnect) {
-				_this.socket.disconnect(); // safer better
+		_this.onlineOrderSocket.emit('getMasterIp', await _this.getStoreId(), async (masterIp, masterClientId) => {
+			_this.masterClientId = masterClientId;
+			if ((!_this.socket || (_this.socket && !_this.isConnect)) && masterIp) {
+				if (_this.socket) _this.socket.disconnect(); // safer better
 				setTimeout(() => {
 					connectToMaster(_this, masterIp);
+					_this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 				}, 2000);
 			}
-			await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp });
+			await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp, masterClientId });
+		})
+		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
+			const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
+			if (!oldHighestCommitId) {
+				pushTaskToQueue(commits);
+				setHighestCommitId(commits[commits.length - 1].commitId + 1);
+			} else {
+				_this.onlineOrderSocket.emit('requireSync', oldHighestCommitId, nodeSync);
+			}
 		})
 	}
 
@@ -106,13 +128,24 @@ class Node {
 						commit.timeStamp = timeStamp;
 						table = commit.table;
 					})
-					_this.socket.emit("updateCommits", commits); // TODO: emit to master
+					if (_this.socket && _this.socket.connected) {
+						_this.socket.emit('updateCommits', commits);
+					} else if (_this.masterClientId) {
+						_this.onlineOrderSocket.emitTo(_this.masterClientId, 'updateCommits', commits);
+					} else {
+						throw new Error('Can not connect to master');
+					}
 					await updateTempCommit(commits);
 					return await buildTempOrder(table);
 				}
 			}
 		})
 		resumeQueue();
+	}
+
+	turnOff() {
+		if (this.onlineOrderSocket) this.onlineOrderSocket.off('updateCommitNode');
+		if (this.socket) this.socket.disconnect();
 	}
 }
 
