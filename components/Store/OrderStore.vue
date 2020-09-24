@@ -407,7 +407,7 @@
           id,
           status: 'paid',
           takeOut: this.currentOrder.takeOut,
-          items: orderUtil.getComputedOrderItems(items, orderDateTime),
+          items: await orderUtil.getComputedOrderItems(items, orderDateTime),
           user: this.currentOrder.user
             ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
             : [{ name: this.user.name, date: orderDateTime }],
@@ -439,7 +439,13 @@
           console.error(e)
         }
       },
-      async saveSplitOrder(items, payment, isLast = false) {
+      async saveSplitOrder(items, payment, isLast, callback = () => null) {
+        if (isLast) {
+          await this.saveRestaurantOrder(payment)
+          return callback()
+        }
+
+        console.log('items', items)
         // create order
         const date = new Date()
         const id = await orderUtil.getLatestOrderId()
@@ -449,30 +455,33 @@
           tax: orderUtil.calOrderTax(val),
           sum: orderUtil.calOrderTotal(val)
         }))
-        const vSum = orderUtil.calOrderTax(items) + orderUtil.calOrderModifier(items);
+        const vSum = orderUtil.calOrderTotal(items) + orderUtil.calOrderModifier(items);
         const receive = _.sumBy(payment, 'value');
 
         const order = {
-          _id: isLast ? this.currentOrder._id : this.genObjectId(),
+          _id: this.genObjectId(),
           id,
-          items: orderUtil.getComputedOrderItems(this.compactOrder(items), date),
+          items: await orderUtil.getComputedOrderItems(this.compactOrder(items), date),
           user: this.currentOrder.user
-            ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
-            : [{ name: this.user.name, date: orderDateTime }],
+            ? [...this.currentOrder.user, { name: this.user.name, date }]
+            : [{ name: this.user.name, date }],
           payment,
           date,
           vDate: await getVDate(date),
           status: 'paid',
-          bookingNumber: getBookingNumber(orderDateTime),
+          bookingNumber: getBookingNumber(date),
           vSum,
           vTax: orderUtil.calOrderTax(items),
           vTaxGroups,
           vDiscount: orderUtil.calOrderDiscount(items),
           receive,
-          cashback: receive - vSum
+          cashback: receive - vSum,
+          table: this.currentOrder.table,
         }
 
-        console.log(order)
+        console.log('order', order)
+        const newOrder = await cms.getModel('Order').create(order)
+        callback(newOrder)
       },
       compactOrder(products) {
         let resultArr = [];
@@ -596,7 +605,7 @@
 
         const order = Object.assign({}, this.currentOrder, {
           status: 'inProgress',
-          items: orderUtil.getComputedOrderItems(this.compactOrder(this.currentOrder.items), date),
+          items: await orderUtil.getComputedOrderItems(this.compactOrder(this.currentOrder.items), date),
           date,
           vDate: getVDate(date),
           user: [{ name: this.user.name || '', date }],
@@ -850,7 +859,7 @@
           }))
           const updates =
             {
-              payment: this.currentOrder.payment.map(({ name, value }) => ({ type: name, value })),
+              payment: paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value })),
               ...this.currentOrder.change && { cashback: this.currentOrder.change },
               ...this.currentOrder.tips && { tip: this.currentOrder.tip },
               takeOut: this.currentOrder.takeOut,
@@ -865,7 +874,8 @@
               vTaxGroups,
               vDiscount: this.paymentDiscount.toFixed(2),
               receive: _.sumBy(this.currentOrder.payment, 'value'),
-              status: 'paid'
+              status: 'paid',
+              items: await orderUtil.getComputedOrderItems(this.compactOrder(this.currentOrder.items), orderDateTime),
             }
 
           const commits = _.map(updates, (value, key) => ({key, value}));

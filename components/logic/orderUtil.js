@@ -58,17 +58,29 @@ const orderUtil = {
       console.error(e)
     }
   },
-  getComputedOrderItems(orderItems, date) {
-    return orderItems.map(item => {
-      return {
+  async getComputedOrderItems(orderItems, date) {
+    const items = []
+
+    for (const item of orderItems) {
+      if (item.groupPrinter && typeof item.groupPrinter === 'string') {
+        item.groupPrinter = await cms.getModel('GroupPrinter').findOne({ _id: item.groupPrinter })
+      }
+
+      if (item.groupPrinter2 && typeof item.groupPrinter2 === 'string') {
+        item.groupPrinter2 = await cms.getModel('GroupPrinter').findOne({ _id: item.groupPrinter })
+      }
+
+      items.push({
         ..._.omit(item, 'category'),
         product: item._id,
         category: item.category && item.category.name ? item.category.name : '', // saved order then pay have a string category
         date,
         ...item.groupPrinter && { groupPrinter: item.groupPrinter.name },
         ...item.groupPrinter2 && { groupPrinter2: item.groupPrinter2.name },
-      };
-    })
+      });
+    }
+
+    return items
   },
   formatOrderItems(items) {
     return items.map(i => Object.assign({}, i, {

@@ -38,7 +38,8 @@
         <div class="splitter__actions">
           <g-btn-bs class="flex-grow-1 w-50 row-flex align-items-center justify-center splitter__actions-btn ma-0"
                     style="background: #046EFF; color: #fff; border-radius: 0 0 0 6px"
-                    :disabled="!getTotal(currentSplitOrder)" @click="">
+                    :disabled="!getTotal(currentSplitOrder)"
+                    @click.stop="createOrder([{ type: 'cash', value: +getTotal(currentSplitOrder) }])">
             <g-icon size="36" class="mr-2">icon-cash</g-icon>
             <span>Cash</span>
           </g-btn-bs>
@@ -169,7 +170,7 @@
         return []
       },
       totalLeft() {
-        const sum =  orderUtil.calOrderTotal(this.remainingItems) + orderUtil.calOrderModifier(this.remainingItems)
+        const sum = orderUtil.calOrderTotal(this.remainingItems) + orderUtil.calOrderModifier(this.remainingItems)
         return sum > 0 ? sum.toFixed(2) : sum
       }
     },
@@ -185,27 +186,39 @@
       addToSplitOrder(item) {
         if (item.quantity > 1) {
           const existingItem = this.currentSplitOrder.find(i => i._id === item._id)
-          if (existingItem) existingItem.quantity++
-          else this.currentSplitOrder.push({ ...item, quantity: 1 })
+          if (existingItem) {
+            existingItem.quantity++
+          } else {
+            this.currentSplitOrder.push({ ...item, quantity: 1 })
+          }
           item.quantity--
           return
         }
         const existingItem = this.currentSplitOrder.find(i => i._id === item._id)
-        if (existingItem) existingItem.quantity++
-        else this.currentSplitOrder.push({ ...item, quantity: 1 })
+        if (existingItem) {
+          existingItem.quantity++
+        } else {
+          this.currentSplitOrder.push({ ...item, quantity: 1 })
+        }
         this.remainingItems.splice(this.remainingItems.indexOf(item), 1)
       },
       returnItem(item) {
         if (item.quantity > 1) {
           const existingItem = this.remainingItems.find(i => i._id === item._id)
-          if (existingItem) existingItem.quantity++
-          else this.remainingItems.push({ ...item, quantity: 1 })
+          if (existingItem) {
+            existingItem.quantity++
+          } else {
+            this.remainingItems.push({ ...item, quantity: 1 })
+          }
           item.quantity--
           return
         }
         const existingItem = this.remainingItems.find(i => i._id === item._id)
-        if (existingItem) existingItem.quantity++
-        else this.remainingItems.push({ ...item, quantity: 1 })
+        if (existingItem) {
+          existingItem.quantity++
+        } else {
+          this.remainingItems.push({ ...item, quantity: 1 })
+        }
         this.currentSplitOrder.splice(this.currentSplitOrder.indexOf(item), 1)
       },
       getTotal(items) {
@@ -214,9 +227,19 @@
         return sum > 0 ? sum.toFixed(2) : sum
       },
       createOrder(paymentMethod) {
-        // emit -> saveSplitOrder
-        this.$emit('saveSplitOrder', this.currentSplitOrder, paymentMethod, !!this.remainingItems.length)
-        // update current order items -> remainingItems
+        const isLastSplit = this.remainingItems.length === 0;
+        this.$emit('saveSplitOrder', this.currentSplitOrder, paymentMethod, isLastSplit,
+          order => {
+            this.currentSplitOrder = []
+            if (isLastSplit) this.internalValue = false
+
+            if (order) {
+              this.splitOrders.push(order)
+              const newItems = _.cloneDeep(this.remainingItems)
+              this.$emit('updateCurrentOrder', 'items', newItems)
+              this.$emit('createOrderCommit', { key: 'items', value: newItems })
+            }
+          })
       }
     },
     watch: {
@@ -229,8 +252,9 @@
             this.splitId = uuidv4()
             this.$emit('updateCurrentOrder', 'splitId', this.splitId)
             this.$emit('createOrderCommit', { key: 'splitId', value: this.splitId })
+          } else {
+            this.splitId = this.currentOrder.splitId
           }
-          else this.splitId = this.currentOrder.splitId
         }
       },
       value(val) {
