@@ -240,7 +240,7 @@ router.post('/register', async (req, res) => {
   if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
   if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
 
-  if (metadata && metadata.deviceLatLong) {
+  if (metadata && metadata.deviceLatLong && !metadata.deviceLocation) {
     const {latitude, longitude} = metadata.deviceLatLong
 
     try {
@@ -337,7 +337,7 @@ async function reverseGeocodePelias(lat, long) {
   const {features} = req.data
 
   if (features && features.length) {
-    const {country, label, region, name} = features[0];
+    const {country, label, region, name} = features[0].properties;
     return label || `${name}, ${region}, ${country}`
   }
 
@@ -355,6 +355,17 @@ async function reverseGeocodeGoogle(lat, long) { //fallback
     return results[0]['formatted_address']
   }
 }
+
+router.get('/reverse-geocoder', async (req, res) => {
+  const {lat, long} = req.query;
+  if (!lat || !long) res.status(400).json({error: 'Missing lat or long value'});
+  try {
+    const formattedAddress = await reverseGeocodePelias(lat, long);
+    res.json({address: formattedAddress})
+  } catch (e) {
+    res.status(500).json({error: e.message})
+  }
+});
 
 router.get('/google-my-business-id', async (req, res) => {
   const storeId = req.query.storeId
@@ -505,3 +516,4 @@ module.exports = router
 
 // RpManager is Restaurant Plus Manager app, this function formats order data to match format used in the app
 module.exports.formatOrderForRpManager = formatOrder;
+module.exports.reverseGeocodePelias = reverseGeocodePelias;
