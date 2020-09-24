@@ -469,7 +469,9 @@ module.exports = async cms => {
       cb && cb()
     });
 
-    socket.on('updateProducts', async (products) => {
+    socket.on('updateProducts', async (data) => {
+      const { products } = data
+      if(!products || !Array.isArray(products)) return
       const ProductModel = cms.getModel('Product')
       await ProductModel.deleteMany({
         type: 'delivery'
@@ -682,22 +684,6 @@ module.exports = async cms => {
           onlineOrderSocket.emit('getReservationSetting', deviceId, async setting => {
             await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
           });
-
-          onlineOrderSocket.emit('getProducts', deviceId, async products => {
-            const ProductModel = cms.getModel('Product')
-            await ProductModel.deleteMany({
-              type: 'delivery'
-            })
-            await ProductModel.create(products.map(p => ({
-              ...p,
-              type: 'delivery',
-              option: {
-                favorite: !!p.mark.favorite
-              },
-              groupPrinter: p.groupPrinters[0],
-              groupPrinter2: p.groupPrinters[1],
-            })))
-          })
 
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
