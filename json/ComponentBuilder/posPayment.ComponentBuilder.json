@@ -42,7 +42,7 @@
               "30%"
             ],
             "rows": [
-              "1fr",
+              "calc(100% - 64px)",
               "64px"
             ],
             "columnGap": 0,
@@ -137,17 +137,11 @@
                     "justifyItems": "",
                     "justifyContent": "",
                     "columns": [
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "2fr"
+                      "50%",
+                      "50%"
                     ],
                     "rows": [
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "1fr"
+                      "100%"
                     ],
                     "columnGap": 6,
                     "rowGap": 6,
@@ -156,11 +150,11 @@
                         "name": "keyboard",
                         "top": 1,
                         "left": 1,
-                        "width": 3,
-                        "height": 4,
+                        "width": 1,
+                        "height": 1,
                         "margin": "",
                         "padding": "",
-                        "bgColor": "hsl(176, 100%, 50%, 50%)",
+                        "bgColor": "hsl(166, 100%, 50%, 50%)",
                         "alignSelf": "",
                         "justifySelf": "",
                         "wrapInDiv": false,
@@ -232,7 +226,8 @@
           },
           "displayPreviewColor": null,
           "style": {
-            "height": "100%"
+            "_code_": "module.exports = { \n  height: '100%'\n}",
+            "_code_type_": "commonJs"
           }
         }
       },

@@ -1,10 +1,10 @@
 <template>
   <div class="pos-payment-keyboard">
-    <div style="grid-area: 1 / 1 / 5 / 4; position: relative">
+    <div style="position: relative">
       <pos-keyboard-full :template="keyboardTemplate" :items="keyboardItems" style="height: 100%"/>
       <div class="keyboard-overlay" v-if="disableKeyboard" />
     </div>
-    <div class="col-flex" style="grid-area: 1 / 4 / 5 / 6; height: 100%">
+    <div class="col-flex" style="height: 100%">
       <div class="payment-table__header">
         <span>Total</span>
         <g-spacer/>
@@ -24,8 +24,7 @@
             <div class="value-input w-20">
               <pos-textfield-new
                   v-if="payment.name === 'cash'"
-                  :value="payment.value"
-                  @input="(val) => setCashPaymentValue(val, payment)"
+                  v-model="payment.value"
                   ref="cash-textfield"/>
               <span v-else>{{ payment.value }}</span>
             </div>
@@ -108,16 +107,6 @@
       removePaymentItem(index) {
         this.currentOrder.payment.splice(index, 1)
       },
-      setCashPaymentValue(val, payment) {
-        if (payment.replaceMode) {
-          const newVal = val.length ? +val.substring(val.length - 1) : payment.value;
-
-          payment.value = isNaN(newVal) ? 0 : newVal;
-          payment.replaceMode = false;
-        } else {
-          payment.value = +val;
-        }
-      },
     },
     computed: {
       paid() {
@@ -150,20 +139,25 @@
       },
       'currentOrder.payment': {
         handler(val) {
-          val.forEach(e => {
-            if (e.value < 0) e.value = 0;
-          });
+          if (val) {
+            val.forEach(e => {
+              if (e.value < 0) e.value = 0;
+            });
 
-          if (val && val.some(i => i.name === 'cash')) {
-            setTimeout(() => {
-              this.$nextTick(() => {
-                this.$refs['cash-textfield'] && this.$refs['cash-textfield'][0].$el.click()
-              })
-            }, 500)
+            if (val.some(i => i.name === 'cash')) {
+              setTimeout(() => {
+                this.$nextTick(() => {
+                  if (this.$refs['cash-textfield']) {
+                    this.$refs['cash-textfield'][0].$el.click()
+                    const input = this.$refs['cash-textfield'][0].$el.querySelector('input')
+                    input && input.select()
+                  }
+                })
+              }, 500)
+            }
           }
         },
-        immediate: true,
-        deep: true
+        immediate: true
       },
     }
   }

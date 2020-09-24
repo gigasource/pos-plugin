@@ -89,9 +89,9 @@
       </g-card>
     </g-dialog>
 
-    <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip">
+    <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%">
       <template #input>
-        <pos-textfield-new ref="tip-textfield" label="Tip" v-model="tipEditValue"/>
+        <pos-textfield-new ref="tip-textfield" label="Card Payment" v-model="tipEditValue"/>
       </template>
     </dialog-form-input>
   </div>
@@ -210,10 +210,16 @@
         if (payment) {
           const cardPayment = payment.find(i => i.name === 'card')
           const cashPayment = payment.find(i => i.name === 'cash')
-          if (cardPayment && !cashPayment) {
-            const filtered = payment.filter(i => i.name !== 'card')
+          if (cardPayment || cashPayment) {
+            const filtered = cashPayment ? payment.filter(i => i.name !== 'cash') : payment.filter(i => i.name !== 'card')
             return this.$emit('updateCurrentOrder', 'payment',
-              [{ name: 'card', value: cardPayment.value - item.value }, ...filtered, item])
+              [
+                {
+                  name: cashPayment ? 'cash' : 'card',
+                  value: (cashPayment ? cashPayment.value : cardPayment.value) - item.value
+                },
+                ...filtered, item
+              ])
           }
           return this.$emit('updateCurrentOrder', 'payment', [...payment, item])
         }
@@ -237,9 +243,15 @@
           ? this.currentOrder.payment.filter(i => i.name !== 'cash' && i.name !== 'card')
           : []
 
-        this.$emit('updateCurrentOrder', 'tip', +this.tipEditValue)
+        const tip = (+this.tipEditValue) - _.sumBy(filtered, i => i.value) - this.paymentTotal;
+
+        if (tip <= 0) {
+          return
+        }
+
+        this.$emit('updateCurrentOrder', 'tip', tip)
         this.$emit('updateCurrentOrder', 'payment',
-          [{ name: 'card', value: this.paymentTotal + (+this.tipEditValue) - _.sumBy(filtered, i => i.value) }, ...filtered,])
+          [{ name: 'card', value: +this.tipEditValue }, ...filtered,])
 
         this.showAddTipDialog = false
         this.tipEditValue = ''
@@ -265,7 +277,7 @@
       showAddTipDialog(val) {
         if (val) {
           setTimeout(() => {
-            if (!this.currentOrder.tip) this.tipEditValue = ''
+            if (!this.currentOrder.tip) this.tipEditValue = '' + this.paymentTotal
             this.$nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
           }, 500)
         }

@@ -19,14 +19,22 @@
               @click.stop="$emit('saveTableOrder')">
       Print
     </g-btn-bs>
-    <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
-              @click.stop="quickCash(false)">
-      {{$t('restaurant.cashAndDineIn')}}
-    </g-btn-bs>
-    <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
-              @click.stop="quickCash(true)">
-      {{$t('restaurant.cashAndTakeAway')}}
-    </g-btn-bs>
+    <template v-if="currentOrder.table">
+      <g-btn-bs class="col-2" :disabled="!enablePayBtn"
+                @click.stop="splitOrder">
+        Split order
+      </g-btn-bs>
+    </template>
+    <template v-else>
+      <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
+                @click.stop="quickCash(false)">
+        {{$t('restaurant.cashAndDineIn')}}
+      </g-btn-bs>
+      <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
+                @click.stop="quickCash(true)">
+        {{$t('restaurant.cashAndTakeAway')}}
+      </g-btn-bs>
+    </template>
     <g-btn-bs class="col-2" icon="icon-pay" :disabled="!enablePayBtn" @click="pay">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
@@ -38,7 +46,7 @@
     name: "PosQuickOrderToolbar",
     props: {
       currentOrder: null,
-      actionList: Array
+      actionList: Array,
     },
     data() {
       return {
@@ -66,6 +74,9 @@
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
         this.$emit('quickCash')
+      },
+      splitOrder() {
+        this.$getService('PosOrderSplitOrder:setActive')(true)
       }
     }
   }

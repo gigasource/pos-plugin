@@ -439,6 +439,41 @@
           console.error(e)
         }
       },
+      async saveSplitOrder(items, payment, isLast = false) {
+        // create order
+        const date = new Date()
+        const id = await orderUtil.getLatestOrderId()
+        const taxGroups = _.groupBy(items, 'tax')
+        const vTaxGroups = _.map(taxGroups, (val, key) => ({
+          taxType: key,
+          tax: orderUtil.calOrderTax(val),
+          sum: orderUtil.calOrderTotal(val)
+        }))
+        const vSum = orderUtil.calOrderTax(items) + orderUtil.calOrderModifier(items);
+        const receive = _.sumBy(payment, 'value');
+
+        const order = {
+          _id: isLast ? this.currentOrder._id : this.genObjectId(),
+          id,
+          items: orderUtil.getComputedOrderItems(this.compactOrder(items), date),
+          user: this.currentOrder.user
+            ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
+            : [{ name: this.user.name, date: orderDateTime }],
+          payment,
+          date,
+          vDate: await getVDate(date),
+          status: 'paid',
+          bookingNumber: getBookingNumber(orderDateTime),
+          vSum,
+          vTax: orderUtil.calOrderTax(items),
+          vTaxGroups,
+          vDiscount: orderUtil.calOrderDiscount(items),
+          receive,
+          cashback: receive - vSum
+        }
+
+        console.log(order)
+      },
       compactOrder(products) {
         let resultArr = [];
         products.forEach(product => {
@@ -652,21 +687,25 @@
         product.modifiers.splice(modIndex, 1)
       },
       async saveTableOrder() {
-        if (!this.actionList.length) return;
+        try {
+          if (!this.actionList.length) return;
 
-        this.actionList.map(action => {
-          if (action.type === 'item' && action.update && action.update.push) {
-            action.update.push.value.printed = true
-          }
+          this.actionList.map(action => {
+            if (action.type === 'item' && action.update && action.update.push) {
+              action.update.push.value.printed = true
+            }
 
-          return action
-        })
-        await this.printOrderUpdate()
-        const { _id, items, id } = await cms.getModel('OrderCommit').create(this.actionList);
-        this.$set(this.currentOrder, 'id', id);
-        this.$set(this.currentOrder, '_id', _id);
-        this.$set(this.currentOrder, 'items', items);
-        this.actionList = [];
+            return action
+          })
+          await this.printOrderUpdate()
+          const { _id, items, id } = await cms.getModel('OrderCommit').create(this.actionList);
+          this.$set(this.currentOrder, 'id', id);
+          this.$set(this.currentOrder, '_id', _id);
+          this.$set(this.currentOrder, 'items', items);
+          this.actionList = [];
+        } catch (e) {
+          console.log('error', e)
+        }
       },
       async printOrderUpdate() {
         if (this.printedOrder && this.printedOrder.items) {
@@ -1192,6 +1231,7 @@
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
+              this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
               this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
               this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }

@@ -296,6 +296,11 @@
               "type": "prop"
             },
             {
+              "service": "PosOrderSplitOrder:show",
+              "local": "showSplitOrder",
+              "type": "event"
+            },
+            {
               "service": "OrderStore:updateOrderTable",
               "local": "updateOrderTable",
               "type": "event"
@@ -321,6 +326,41 @@
       "url": "plugins/pos-plugin/components/Order/components/dialogProductSearchResult.vue",
       "path": "components/Order/components/dialogProductSearchResult.vue",
       "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderSplitOrder",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderSplitOrder",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",
+      "path": "components/posOrder/PosOrderSplitOrder.vue",
+      "pluginName": "pos-plugin",
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        }
+      ]
     }
   ],
   "name": "posOrder",
@@ -329,3 +369,4 @@
   },
   "renderToRoute": "pos-order-2/:name?"
 }
+
