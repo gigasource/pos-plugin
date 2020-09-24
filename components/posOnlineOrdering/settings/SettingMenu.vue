@@ -104,7 +104,8 @@
                           @save="updateProduct(product._id, $event)"
                           @delete="openDeleteProductDialog(product._id)"
                           :store-country-locale="storeCountryLocale"
-                          @swap="(oldIndex, newIndex) => swapProduct(cate, oldIndex, newIndex)"/>
+                          @swap="(oldIndex, newIndex) => swapProduct(cate, oldIndex, newIndex)"
+                          :total="totalFavorite"/>
                     </template>
                     <div v-else-if="!showAddNewProductPanel[cate._id]" style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #fff;">
                       <img src="/plugins/pos-plugin/assets/no-items.svg" class="mb-2"/>
@@ -117,7 +118,8 @@
                           :use-multiple-printers="store.useMultiplePrinters"
                           @cancel="hideAddNewProductPanelForCategory(cate)"
                           @save="addNewProduct({...$event, category: cate._id, order: cate.products.length})"
-                          :store-country-locale="storeCountryLocale"/>
+                          :store-country-locale="storeCountryLocale"
+                          :total="totalFavorite"/>
                     </div>
                   </div>
                 </div>
@@ -167,7 +169,7 @@
       collapseText: Boolean,
       displayId: Boolean,
       displayImage: Boolean,
-      imexportable: Boolean
+      imexportable: Boolean,
     },
     data: function () {
       return {
@@ -188,7 +190,7 @@
         editBtn: [],
         editingProduct: false,
         edittingItems: [],
-        selectedAvailability: null
+        selectedAvailability: null,
       }
     },
     created() {
@@ -236,7 +238,10 @@
         set(val) {
           this.$emit('update-store', {displayImage: val})
         }
-      }
+      },
+      totalFavorite() {
+        return _.countBy(this.products, p => p.mark.favorite)['true'] || 0
+      },
     },
     watch: {
       categoriesViewModel(val) {

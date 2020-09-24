@@ -89,7 +89,8 @@ module.exports = {
       paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
       notAvailable: 'Nicht Verfügbar',
       zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.',
-      orderConfirmation: 'Bestellbestätigung'
+      orderConfirmation: 'Bestellbestätigung',
+      unavaibleArea: 'Lieferservice für Ihren Bereich ist nicht verfügbar.'
     },
 
     common: {

@@ -149,7 +149,7 @@
         </g-card-text>
       </g-card>
     </g-dialog>
-    <dialog-add-extra-info v-model="dialog.markItem" :mark="internalMark" @save="internalMark = $event"/>
+    <dialog-add-extra-info v-model="dialog.markItem" :mark="internalMark" @save="internalMark = $event" :total="total"/>
   </div>
 </template>
 <script>
@@ -187,6 +187,7 @@
       },
       mark: Object,
       storeCountryLocale: String,
+      total: Number,
     },
     data: function () {
       let internalPrinter
