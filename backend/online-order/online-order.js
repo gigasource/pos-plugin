@@ -6,7 +6,7 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
-const { initSocket } = require('../master-node');
+const { initSocket, handlerNewMasterId } = require('../master-node');
 
 let webshopUrl;
 let storeName;
@@ -469,6 +469,11 @@ module.exports = async cms => {
 
       cb && cb()
     });
+    socket.on('updateMasterDevice', async newMasterClientId => {
+      // set masterClientId
+      // newMasterClientId is always different from the old one
+      await handlerNewMasterId(newMasterClientId, socket);
+    })
   }
 
   function createOnlineOrderSocket(deviceId) {
