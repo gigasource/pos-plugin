@@ -284,7 +284,7 @@
         this.placeId = ''
       },
       getRandomColor(i) {
-        const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#B2FF59', '#FFAB91', '#B39DDB', '#BCAAA4']
+        const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
         return 'background-color: ' + colors[i]
       },
       selectAddress(index) {
