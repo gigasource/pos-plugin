@@ -388,6 +388,8 @@
         this.$emit('addProductToOrder', product)
         this.selectedProduct = null
         this.modifiers = []
+        //focus product autocomplete
+        document.querySelector('.g-autocomplete input').click()
       },
       openDialog(mode, address, zipcode, index) {
         if (mode === 'add') {
