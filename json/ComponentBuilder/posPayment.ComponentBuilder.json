@@ -79,8 +79,8 @@
                   "1fr"
                 ],
                 "rows": [
-                  "1fr",
-                  "1fr"
+                  "50%",
+                  "50%"
                 ],
                 "columnGap": 0,
                 "rowGap": 0,
@@ -255,7 +255,29 @@
           "slot": "method",
           "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenPaymentMethods.vue",
           "path": "components/Payment/PosPaymentScreenPaymentMethods.vue",
-          "pluginName": "pos-plugin"
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
+            }
+          ]
         },
         {
           "choice": "view",
@@ -265,7 +287,29 @@
           "slot": "controller",
           "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenKeyboard.vue",
           "path": "components/Payment/PosPaymentScreenKeyboard.vue",
-          "pluginName": "pos-plugin"
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:savePaidOrder",
+              "local": "savePaidOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            }
+          ]
         },
         {
           "choice": "view",
