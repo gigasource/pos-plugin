@@ -333,9 +333,13 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
     }
 
     await assignDevice(request.device._id, request.store);
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
-  } else if (status === 'notApproved') {
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
+  }
+
+  if (status === 'approved' || status === 'notApproved') {
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, status === 'approved' ? 'approveSignIn' : 'denySignIn', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
   }
 
   res.status(200).json(request._doc);
