@@ -52,7 +52,7 @@ function removeStaff({ staffId }) {
   // not impl
 }
 
-async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}) {
+async function processCheckInCheckOut({staffId, type, storeId, coords}) {
   if (!storeId)
     throw "Missing store's id"
   if (!staffId)
@@ -103,7 +103,7 @@ async function processCheckInCheckOut({staffId, type, datetime, storeId, coords}
     staff: staffId,
     store: storeId,
     type,
-    datetime: new Date(datetime),
+    datetime: new Date(),
     note,
     coords: {lat: coords.latitude, long: coords.longitude},
     location: formattedLocation
