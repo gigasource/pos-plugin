@@ -89,7 +89,7 @@
       </g-card>
     </g-dialog>
 
-    <dialog-form-input v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip">
+    <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip">
       <template #input>
         <pos-textfield-new ref="tip-textfield" label="Tip" v-model="tipEditValue"/>
       </template>
@@ -180,18 +180,24 @@
         this.$emit('updateCurrentOrder', 'tip', 0)
         this.$emit('updateCurrentOrder', 'change', 0)
         this.$emit('updateCurrentOrder', 'payment', [])
+
         if (item.name === 'multi') {
           this.openMultiPaymentDialog((payments) => {
             this.$emit('updateCurrentOrder', 'payment', payments)
           })
           return
         }
+
         this.$emit('updateCurrentOrder', 'payment', [])
         const newItem = {
           name: item.name,
           value: isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
-            : item.value
+            : item.value,
+
+          // replaceMode is used for overwriting instead of appending to payment value
+          // after the first character is entered, replaceMode will be set to false
+          replaceMode: item.name === 'cash',
         }
         this.$emit('updateCurrentOrder', 'payment', [newItem])
       },
@@ -241,8 +247,11 @@
       },
       saveMulti() {
         this.$emit('updateCurrentOrder', 'payment', [
-          { name: 'card', value: +this.cardEditValue },
-          { name: 'cash', value: +this.cashEditValue },
+          { name: 'card', value: +this.cardEditValue, replaceMode: false },
+
+          // replaceMode is used for overwriting instead of appending to payment value
+          // after the first character is entered, replaceMode will be set to false
+          { name: 'cash', value: +this.cashEditValue, replaceMode: true },
         ])
         this.showMultiPaymentDialog = false
       },

@@ -22,8 +22,12 @@
               </div>
             </div>
             <div class="value-input w-20">
-              <pos-textfield-new v-if="payment.name === 'cash'" v-model="payment.value" ref="cash-textfield"/>
-              <span v-else>{{payment.value}}</span>
+              <pos-textfield-new
+                  v-if="payment.name === 'cash'"
+                  :value="payment.value"
+                  @input="(val) => setCashPaymentValue(val, payment)"
+                  ref="cash-textfield"/>
+              <span v-else>{{ payment.value }}</span>
             </div>
           </div>
         </tr>
@@ -103,7 +107,15 @@
       },
       removePaymentItem(index) {
         this.currentOrder.payment.splice(index, 1)
-      }
+      },
+      setCashPaymentValue(val, payment) {
+        if (payment.replaceMode) {
+          payment.value = val.length ? +val.substring(val.length - 1) : payment.value;
+          payment.replaceMode = false;
+        } else {
+          payment.value = +val;
+        }
+      },
     },
     computed: {
       paid() {
@@ -141,7 +153,7 @@
         },
         immediate: true,
         deep: true
-      }
+      },
     }
   }
 </script>

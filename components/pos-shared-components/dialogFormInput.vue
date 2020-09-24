@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
+  <g-dialog v-model="internalValue" :width="width || '90%'" eager :fullscreen="isMobile">
     <div class="dialog-input col-flex">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
       <div class=" col-flex flex-grow-1 overflow-y pb-3">
@@ -51,7 +51,8 @@
       keyboardType: {
         type: String,
         default: 'alphanumeric'
-      }
+      },
+      width: String,
     },
     data() {
       return {
