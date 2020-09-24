@@ -728,6 +728,13 @@ module.exports = async function (cms) {
       try {
         externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
 
+        //sent products info if delivery features is on
+        if(features && features.delivery) {
+          const products = await cms.getModel('Product').find({ store: store._id })
+          const data = { products }
+          externalSocketIOServer.emitTo(deviceId, 'updateProducts', data)
+        }
+
         console.debug(sentryTags, `2. Online Order backend: Sending feature update to client with id ${deviceId}`, JSON.stringify(features));
         cb(`Awaiting device feature update for ${device.name}(${device.hardware})`);
       } catch (e) {
