@@ -653,18 +653,22 @@ module.exports = async function (cms) {
         })
       })
 
-      socket.on('registerMasterDevice', async () => {
-        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true })
+      socket.on('registerMasterDevice', async (ip) => {
+        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
       })
 
-      socket.on('emitToAllDevices', async (data, storeId) => {
-        const devices = await cms.getModel('Device').find({ storeId, paired: true })
-        devices.forEach(({ _id }) => socket.emit('eventName', _id, data))
+      socket.on('emitToAllDevices', async (commits, storeAlias) => {
+        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
+        const devices = await cms.getModel('Device').find({ storeId: storeId._doc._id, paired: true });
+        devices.forEach((device) => {
+          externalSocketIOServer.emitTo(device._id.toString(), 'updateCommitNode', commits)
+        });
       })
 
-      socket.on('emitToMasterDevice', async (data, storeId) => {
-        const device = await cms.getModel('Device').findOne({ storeId, paired: true, master: true })
-        socket.emit('eventName', device._id, data)
+      socket.on('getMasterIp', async (storeAlias, fn) => {
+        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
+        const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
+        fn(device.metadata.ip, device._id.toString());
       })
     }
 
@@ -718,6 +722,11 @@ module.exports = async function (cms) {
 
     socket.on('watchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.join(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
     socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
+
+    socket.on('updateMasterDevice', async (storeId, masterDeviceId) => {
+      const master = await cms.getModel('Device').findOne({ storeId, deviceType: { $ne: 'gsms' }, master: true}).lean()
+      externalSocketIOServer.emitToPersistent(master._id.toString(), 'updateMasterDevice');
+    })
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       const device = await cms.getModel('Device').findById(deviceId).lean();

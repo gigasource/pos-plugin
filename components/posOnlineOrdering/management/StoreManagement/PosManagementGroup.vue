@@ -394,6 +394,7 @@
         await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
         await cms.getModel('Device').findOneAndUpdate({ _id: device._id }, { master: true })
         this.$emit('updateStores')
+        cms.socket.emit('updateMasterDevice', device.storeId, device._id)
       },
       handleWebRTCMessage(e) {
         try {
