@@ -309,13 +309,15 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
   const StaffModel = cms.getModel('Staff')
 
+  let staff;
   if (status === 'approved') {
-    let staff = await StaffModel.findOne({
+    staff = await StaffModel.findOne({
       device: request.device._id,
       store: storeId,
     })
+
     if(!staff) {
-      await StaffModel.create({
+      staff = await StaffModel.create({
         name: request.name,
         role: request.role,
         device: request.device._id,
@@ -324,12 +326,12 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
         avatar: request.avatar || ''
       })
     } else {
-      await StaffModel.updateOne({ _id: staff._id }, {
+      staff = await StaffModel.updateOne({ _id: staff._id }, {
         name: request.name,
         role: request.role,
         active: true,
         avatar: request.avatar || staff.avatar || ''
-      })
+      }, { new: true })
     }
 
     await assignDevice(request.device._id, request.store);
@@ -337,6 +339,24 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
 
   if (status === 'approved' || status === 'notApproved') {
     await getExternalSocketIoServer().emitToPersistent(request.device._id, status === 'approved' ? 'approveSignIn' : 'denySignIn', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
+  }
+
+  if (status === 'approved') {
+    // R+ v1.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
+    // R+ v2.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
+  } else if (status === 'notApproved') {
+    // R+ v1.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
+    // R+ v2.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn_v2', [{
       clientId: request.device._id,
       requestId: request._id
     }]);
