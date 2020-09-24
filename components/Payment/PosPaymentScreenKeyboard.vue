@@ -110,7 +110,9 @@
       },
       setCashPaymentValue(val, payment) {
         if (payment.replaceMode) {
-          payment.value = val.length ? +val.substring(val.length - 1) : payment.value;
+          const newVal = val.length ? +val.substring(val.length - 1) : payment.value;
+
+          payment.value = isNaN(newVal) ? 0 : newVal;
           payment.replaceMode = false;
         } else {
           payment.value = +val;
@@ -127,8 +129,13 @@
         return this.currentOrder && this.currentOrder.payment || []
       },
       change() {
-        const change = this.paid - this.paymentTotal - this.tip;
-        return change >= 0 ? change : 0
+        const cashPayment = this.paymentList.find(e => e.name === 'cash');
+        const cashPaymentValue = (cashPayment && cashPayment.value) || 0;
+
+        let change = this.paid - this.paymentTotal - this.tip;
+        if (change < 0) change = 0;
+        if (change > cashPaymentValue) change = cashPaymentValue;
+        return change;
       },
       tip() {
         return this.currentOrder && this.currentOrder.tip || 0
