@@ -683,3 +683,24 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-kitchen {
+  background-image: url("../assets/kitchen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-missed-call {
+  background-image: url("../assets/missed-call.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-telephone {
+  background-image: url("../assets/telephone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

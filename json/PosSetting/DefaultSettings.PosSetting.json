@@ -902,5 +902,10 @@
   },
   "defaultPrepareTime": 30,
   "onlineOrderSorting": "order",
-  "hardwares": []
+  "hardwares": [],
+  "call": {
+    "active": false,
+    "ip": "",
+    "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU"
+  }
 }

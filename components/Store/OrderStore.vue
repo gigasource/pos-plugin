@@ -113,7 +113,8 @@
         //call in order
         calls: [],
         selectedCustomer: {},
-        orderType: ''
+        orderType: '',
+        missedCalls: []
       }
     },
     computed: {
@@ -981,7 +982,7 @@
           cashback: 0,
           customer,
           deliveryDate: new Date(),
-          type: this.orderType,
+          type: this.orderType || 'delivery',
           deliveryTime: dayjs().add(time, 'minute').format('HH:mm'),
           shippingFee: 0,
           note,
@@ -1036,6 +1037,11 @@
       cms.socket.on('receiving-call', async (phone, date) => {
         const customer = await this.getCustomerInfo(phone)
         this.calls.unshift({customer, date})
+      })
+
+      cms.socket.on('missed-call', async (phone, date) => {
+        const customer = await this.getCustomerInfo(phone)
+        this.missedCalls.unshift({customer, date})
       })
     },
     watch: {

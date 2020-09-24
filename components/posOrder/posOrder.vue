@@ -63,7 +63,6 @@
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
-    <dialog-order v-model="dialog.createOrder" :customer="selectedCustomer" :type="orderType"/>
   </div>
 </template>
 
@@ -77,7 +76,6 @@
     },
     injectService:[
       'PosStore:isMobile',
-      'OrderStore:( selectedCustomer, orderType)'
     ],
     props: {
       total: Number,
@@ -219,11 +217,6 @@
         this.table = this.$router.currentRoute.params.name
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
-
-      this.type = 'default'
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        this.type = this.$router.currentRoute.query.type
-      }
     }
   }
 </script>

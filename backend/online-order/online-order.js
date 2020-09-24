@@ -468,6 +468,22 @@ module.exports = async cms => {
 
       cb && cb()
     });
+
+    socket.on('updateProducts', async (products) => {
+      const ProductModel = cms.getModel('Product')
+      await ProductModel.deleteMany({
+        type: 'delivery'
+      })
+      await ProductModel.create(products.map(p => ({
+        ...p,
+        type: 'delivery',
+        option: {
+          favorite: !!p.mark.favorite
+        },
+        groupPrinter: p.groupPrinters[0],
+        groupPrinter2: p.groupPrinters[1],
+      })))
+    })
   }
 
   function createOnlineOrderSocket(deviceId) {
@@ -569,6 +585,40 @@ module.exports = async cms => {
     })
   }
 
+  async function searchForPlace(text, token, apiKey, language = 'en', country = 'DE') {
+    let searchResult = []
+    const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
+    const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
+      params: {
+        key: apiKey,
+        input: text,
+        language,
+        sessiontoken: token
+      }
+    })
+
+    if (autocompleteResult.predictions && autocompleteResult.predictions.length) {
+      searchResult = autocompleteResult.predictions
+    }
+
+    return searchResult
+  }
+
+  async function getPlaceDetail(placeId, token, apiKey, language = 'en') {
+    const url = 'https://maps.googleapis.com/maps/api/place/details/json'
+    const { data } = await axios.get(url, {
+      params: {
+        key: apiKey,
+        place_id: placeId,
+        language,
+        ...token && { sessiontoken: token }
+      }
+    })
+
+    const { result } = data
+    return result
+  }
+
   cms.socket.on('connect', async socket => {
     await waitInitOnlineOrderSocket();
 
@@ -632,6 +682,22 @@ module.exports = async cms => {
           onlineOrderSocket.emit('getReservationSetting', deviceId, async setting => {
             await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
           });
+
+          onlineOrderSocket.emit('getProducts', deviceId, async products => {
+            const ProductModel = cms.getModel('Product')
+            await ProductModel.deleteMany({
+              type: 'delivery'
+            })
+            await ProductModel.create(products.map(p => ({
+              ...p,
+              type: 'delivery',
+              option: {
+                favorite: !!p.mark.favorite
+              },
+              groupPrinter: p.groupPrinters[0],
+              groupPrinter2: p.groupPrinters[1],
+            })))
+          })
 
           if (typeof callback === 'function') callback(null, deviceId)
         } catch (e) {
@@ -791,6 +857,16 @@ module.exports = async cms => {
       onlineOrderSocket.emit('updateOnlineReservation', reservation, tag, deviceId, async (onlineReservationId) => {
         await cms.getModel('Reservation').findOneAndUpdate({_id}, {onlineReservationId})
       })
+    })
+
+    socket.on('searchPlace', async (text, token, apiKey, cb) => {
+      const places = await searchForPlace(text, token, apiKey)
+      cb && cb(places)
+    })
+
+    socket.on('getPlaceDetail', async (place_id, token, apiKey, cb) => {
+      const place = await getPlaceDetail(place_id, token, apiKey)
+      cb && cb(place)
     })
   })
 }

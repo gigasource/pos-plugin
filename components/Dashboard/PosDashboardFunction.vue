@@ -51,7 +51,7 @@
       return {
         btnUp: [
           {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-3' : '/pos-order-2')},
-          {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath(this.isMobile ? '/pos-order-3/?type=delivery' : '/pos-order-2/?type=delivery')}
+          {title: delivery, feature: 'delivery', icon: 'icon-delivery', click: () => this.changePath('/pos-order-delivery')}
         ],
         btnDown: [
           {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},

@@ -10,7 +10,7 @@
         </g-badge>
       </div>
       <div class="content">
-        <template v-if="(!internalOrders || !internalOrders.length) && calls.length === 0">
+        <template v-if="(!internalOrders || !internalOrders.length) && calls.length === 0 && missedCalls.length === 0">
           <div class="pending-orders--empty">
             <img alt src="/plugins/pos-plugin/assets/pending_order.svg"/>
             <p>{{$t('onlineOrder.noPending')}}</p>
@@ -40,6 +40,21 @@
             </div>
           </div>
         </template>
+        <template v-else-if="(!internalOrders || !internalOrders.length) && missedCalls.length > 0">
+          <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`call_${i}`"
+              v-touch="getTouchHandlers(i)">
+            <div class="pending-orders--call-title">
+              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <g-spacer/>
+              <g-icon size="20">icon-missed-call</g-icon>
+            </div>
+            <p class="fs-small-2 text-grey-darken-1">Missed call - {{calcDiffTime(call.date)}}</p>
+            <p class="mt-2 text-grey-darken-1 fw-700">
+              Swipe right to dismiss
+              <g-icon color="grey darken-1">double_arrow</g-icon>
+            </p>
+          </div>
+        </template>
         <template v-else>
           <div class="pending-orders--call" v-for="(call, i) in calls" :key="`call_${i}`">
             <div class="pending-orders--call-title">
@@ -62,6 +77,19 @@
                 <g-icon size="16">icon-delivery-scooter</g-icon>
               </g-btn-bs>
             </div>
+          </div>
+          <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`call_${i}`"
+               v-touch="getTouchHandlers(i)">
+            <div class="pending-orders--call-title">
+              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <g-spacer/>
+              <g-icon size="20">icon-missed-call</g-icon>
+            </div>
+            <p class="fs-small-2 text-grey-darken-1">Missed call - {{calcDiffTime(call.date)}}</p>
+            <p class="mt-1 fs-small text-grey-darken-1 fw-700">
+              Swipe right to dismiss
+              <g-icon color="grey darken-1" size="16">double_arrow</g-icon>
+            </p>
           </div>
           <g-card elevation="0" v-for="(order, index) in internalOrders" :key="index">
             <g-card-title class="pending-orders--title">
@@ -228,12 +256,16 @@
 
 <script>
   import orderUtil from '../logic/orderUtil'
+  import { Touch } from 'pos-vue-framework'
 
   export default {
     name: 'OnlineOrderMain',
+    directives: {
+      Touch
+    },
     injectService: [
         'PosStore:(storeLocale, getPendingReservationsLength, isMobile)',
-        'OrderStore:(calls, selectedCustomer, orderType, getCustomerInfo)'
+        'OrderStore:(calls, selectedCustomer, orderType, getCustomerInfo, missedCalls)'
     ],
     props: {
       pendingOrders: Array,
@@ -391,8 +423,18 @@
         this.selectedCustomer = customer
         this.orderType = type
         this.$router.push(
-            { path : this.isMobile ? '/pos-order-3/?type=delivery' : '/pos-order-2/?type=delivery' }
+            { path : '/pos-order-delivery' }
         )
+      },
+      calcDiffTime(date) {
+        return `${dayjs().diff(dayjs(date), 'minute')} minute(s) ago`
+      },
+      getTouchHandlers(index) {
+        return {
+          right: () => {
+            this.missedCalls.splice(index, 1)
+          }
+        }
       }
     },
     mounted() {

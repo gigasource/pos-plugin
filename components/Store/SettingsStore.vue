@@ -26,7 +26,8 @@
               { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax' },
             ]
           },
-          { title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings' }
+          { title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings' },
+          { title: 'Call system', icon: 'icon-telephone', isView: true, key: 'callSystem' }
         ],
         printerSidebarDefault: [
           {
@@ -88,6 +89,8 @@
         webshopName: '',
         //reservation
         reservationSetting: null,
+        //call system
+        callSystem: null,
       }
     },
     async created() {

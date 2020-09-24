@@ -478,24 +478,6 @@
         },
         {
           "schemaType": "string",
-          "key": "address2",
-          "type": "input",
-          "flex": "md6"
-        },
-        {
-          "schemaType": "string",
-          "key": "zipCode",
-          "type": "input",
-          "flex": "md6"
-        },
-        {
-          "schemaType": "string",
-          "key": "city",
-          "type": "input",
-          "flex": "md6"
-        },
-        {
-          "schemaType": "string",
           "key": "telephone",
           "type": "input",
           "flex": "md6"
@@ -503,12 +485,6 @@
         {
           "schemaType": "string",
           "key": "taxNumber",
-          "type": "input",
-          "flex": "md6"
-        },
-        {
-          "schemaType": "string",
-          "key": "ustId",
           "type": "input",
           "flex": "md6"
         },
@@ -1082,6 +1058,29 @@
               "type": "input@number"
             }
           ]
+        }
+      ]
+    },
+    {
+      "_id": "5f6c0e485039c3860e5ad429",
+      "schemaType": "object",
+      "key": "call",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "ip",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "googleMapApiKey",
+          "type": "input"
         }
       ]
     }
