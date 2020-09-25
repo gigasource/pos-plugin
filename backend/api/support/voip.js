@@ -41,7 +41,7 @@ const messenger = {
   },
   sendFirebase: async function(json, firebaseToken) {
     const message = {
-      data: { json },
+      data: { json, actionType: 'VoIP' },
       token: firebaseToken,
       apns: {
         payload: {
@@ -77,7 +77,7 @@ const messenger = {
       return
     const apnProvider = getApnProvider()
     const note = new apn.Notification();
-    note.payload = { ...payload }
+    note.payload = { ...payload, actionType: 'VoIP' }
     note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
     note.topic = topic;
     console.log(`send ${JSON.stringify(payload)} to token "${token}" in topic "${topic}" via apn`)
