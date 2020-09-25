@@ -905,7 +905,7 @@
   "hardwares": [],
   "call": {
     "active": false,
-    "ip": "",
+    "ip": "192.168.178.1",
     "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU"
   }
 }
