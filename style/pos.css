@@ -669,3 +669,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-wallet {
+  background-image: url("../assets/wallet.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

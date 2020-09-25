@@ -10,14 +10,14 @@
           </div>
         </template>
         <div class="order-detail__menu">
-          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-printer-setting"
+          <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
+          <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
+          <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
+          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
                     @click.stop="$emit('saveTableOrder')">
             Print
           </g-btn-bs>
-          <g-btn-bs icon="icon-split_check_2">Split check</g-btn-bs>
-          <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
-          <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
-          <g-btn-bs icon="icon-print" @click="pay">Send</g-btn-bs>
+          <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
         </div>
       </g-menu>
       <g-avatar v-else size="36">
@@ -200,6 +200,9 @@
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
         this.$emit('quickCash')
+      },
+      splitOrder() {
+        this.$getService('PosOrderSplitOrder:setActive')(true)
       }
     },
     mounted() {
