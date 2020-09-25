@@ -671,6 +671,39 @@
           "type": "input"
         }
       ]
+    },
+    {
+      "_id": "5f6d6551f7460bc9d94eba8b",
+      "schemaType": "object",
+      "key": "affiliateDelivery",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "url",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "lastMonthCounter",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "currentMonthCounter",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "date",
+          "key": "lastSync",
+          "type": "input@date"
+        }
+      ]
     }
   ],
   "name": "Store",

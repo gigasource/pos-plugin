@@ -52,10 +52,10 @@
         {{ store.phone }}
       </div>
       <div class="store-card--action">
-        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">Take away</g-btn-bs>
-        <g-btn-bs v-if="store && store.delivery" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">Delivery</g-btn-bs>
+        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
+        <g-btn-bs v-if="store && store.delivery" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
         <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
-                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">Reservation</g-btn-bs>
+                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
         <g-spacer/>
         <div v-if="viewMapAvailable" class="store-card--action__map">
           <g-icon @click="viewMap" size="18">icon-place_color</g-icon>

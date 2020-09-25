@@ -152,7 +152,7 @@
           }
 
           items.push(
-              { title: 'Other' , key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
+              { title: this.setting.other , key: 'Other', icon: 'mdi-dots-horizontal-circle-outline', onClick: () => this.changeView('setting-other')}
           )
           return items
         }

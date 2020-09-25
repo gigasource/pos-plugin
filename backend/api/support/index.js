@@ -257,11 +257,21 @@ setTimeout(() => {
       const categories = await cms.getModel('Category').find({ store: store._id }).lean()
       const products = await cms.getModel('Product').find({ store: store._id }).lean()
       const gSmsDevices = store.gSms.devices
+      const devices = await cms.getModel('Device').find({ storeId: store._id }).lean()
 
       gSmsDevices.forEach(device => {
         const clientId = device._id.toString();
         getExternalSocketIoServer().emitTo(clientId, 'getNewMenu', categories, products)
         console.log(`sent new menu to ${clientId}`)
+      })
+
+      devices.forEach(device => {
+        if(device.features && device.features.delivery) { //only update products if feature delivery is on
+          const clientId = device._id.toString();
+          getExternalSocketIoServer().emitTo(clientId, 'updateProducts', { products })
+
+          console.log(`sent products to ${clientId}`)
+        }
       })
     })
 

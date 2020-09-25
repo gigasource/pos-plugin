@@ -1,5 +1,5 @@
 export function genIframe(type, link, alias) {
-  return `var url${type} = ['https://online-order.gigasource.io', '${type === 'franchise' ? 'f' : 'store'}', '${alias}', '${link || ''}'].join('/')
+  return `var url${type} = ['https://restaurantplus.net', '${type === 'franchise' ? 'f' : 'store'}', '${alias}', '${link || ''}'].join('/')
   
   function openIframe${type} () {
     window.location = '#'
@@ -216,7 +216,7 @@ export function genStyleSheet(position, size, hidden, c = 'restaurant-plus-embed
     var stylesheet = styleEl.sheet
     stylesheet.insertRule('${style}')
     stylesheet.insertRule('@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }')
-    stylesheet.insertRule('.restaurant-plus-embed-btn object { pointer-events: none; max-width: ${width} }')
+    stylesheet.insertRule('.${c} object { pointer-events: none; max-width: ${width} }')
   }`
 }
 

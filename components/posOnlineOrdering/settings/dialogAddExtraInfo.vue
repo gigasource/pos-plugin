@@ -22,6 +22,7 @@
         </div>
         <g-checkbox color="#536DFE" v-model="spicy" :label="$t('store.spicy')"/>
         <g-checkbox color="#536DFE" v-model="vegeterian" :label="$t('store.vegeterian')"/>
+        <g-checkbox color="#536DFE" v-model="favorite" :label="`Favorite (${totalFavorite}/10)`"/>
       </div>
       <div class="dialog-action">
         <g-btn-bs text-color="#424242" @click="internalValue = false">{{$t('setting.cancel')}}</g-btn-bs>
@@ -37,17 +38,20 @@
     props: {
       value: Boolean,
       mark: Object,
+      total: Number,
     },
     data() {
       let allergic = this.mark.allergic.active || false,
           types = this.mark.allergic.types || [],
           spicy = this.mark.spicy.active || false,
-          vegeterian = this.mark.vegeterian.active || false
+          vegeterian = this.mark.vegeterian.active || false,
+          favorite = this.mark.favorite || false
       return {
         allergic,
         types,
         spicy,
-        vegeterian
+        vegeterian,
+        favorite,
       }
     },
     computed: {
@@ -58,6 +62,15 @@
         set(val) {
           this.$emit('input', val)
         }
+      },
+      totalFavorite() {
+        if(this.mark.favorite && !this.favorite) {
+          return this.total - 1
+        }
+        if(!this.mark.favorite && this.favorite) {
+          return this.total + 1
+        }
+        return this.total
       }
     },
     methods: {
@@ -75,7 +88,8 @@
           vegeterian: {
             active: !!this.vegeterian,
             notice: ''
-          }
+          },
+          favorite: !!this.favorite
         }
         this.$emit('save', mark)
         this.internalValue = false

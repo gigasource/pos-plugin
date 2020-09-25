@@ -59,7 +59,7 @@ module.exports = {
       deliveryFee: 'Liefergebühr',
       notice: 'Notice',
       productInfo: 'Produktinformationen',
-      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vobehalten.',
+      productInfoWarning: 'Druckfehler, Irrtürmer und Änderungen vorbehalten.',
       allergic: 'Allergien',
       allergicNotice: 'LMIV - Allergene:',
       spicy: 'Scharf',
@@ -89,7 +89,8 @@ module.exports = {
       paymentOption: 'ZAHLUNGSMÖGLICHKEITEN',
       notAvailable: 'Nicht Verfügbar',
       zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.',
-      orderConfirmation: 'Bestellbestätigung'
+      orderConfirmation: 'Bestellbestätigung',
+      unavaibleArea: 'Lieferservice für Ihren Bereich ist nicht verfügbar.'
     },
 
     common: {
@@ -267,7 +268,7 @@ module.exports = {
     },
 
     menu: {
-      feedback: 'Rückmeldung',
+      feedback: 'Bewertung',
       question: 'Sind Sie mit unseren Gerichte und Dienstleistungen zufrieden?',
       positive: 'Ja, gern',
       negative: 'Nein, danke',
