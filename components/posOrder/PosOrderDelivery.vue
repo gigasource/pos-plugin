@@ -190,13 +190,13 @@
         return !isNaN(value) ? value.toFixed(2) : value
       }
     },
-    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer )'],
+    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer )', 'PosStore:(isMobile)'],
     data() {
       return {
         favorites: [],
         selectedAddress: 0,
         name: '',
-        phone: '0123456789',
+        phone: '',
         address: '',
         zipcode: '',
         street: '',
@@ -394,6 +394,7 @@
       openDialog(mode, address, zipcode, index) {
         if (mode === 'add') {
           this.name = this.selectedCustomer.name || ''
+          this.phone = this.selectedCustomer.phone || ''
           this.address = ''
           this.zipcode = ''
           this.house = ''
