@@ -226,6 +226,16 @@
               "service": "OrderStore:removeProductModifier",
               "local": "removeProductModifier",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:actionList",
+              "local": "actionList",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:saveTableOrder",
+              "local": "saveTableOrder",
+              "type": "event"
             }
           ]
         }

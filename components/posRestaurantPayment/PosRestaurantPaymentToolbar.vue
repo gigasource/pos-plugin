@@ -1,14 +1,14 @@
 <template>
   <g-toolbar color="#eee" height="100%" elevation="0">
     <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
-    <g-btn-bs icon="icon-menu">{{$t('ui.more')}}</g-btn-bs>
+<!--    <g-btn-bs icon="icon-menu">{{$t('ui.more')}}</g-btn-bs>-->
     <g-btn-bs icon="icon-promotion" @click.stop="promotion">{{$t('fnBtn.paymentFunctions.promotion')}}</g-btn-bs>
-    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
-    <g-btn-bs icon="icon-split_check_2">{{$t('fnBtn.paymentFunctions.splitCheck')}}</g-btn-bs>
-    <g-btn-bs icon="icon-red_bill">{{$t('fnBtn.paymentFunctions.redBill')}}</g-btn-bs>
-    <g-btn-bs icon="icon-print2">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>
+<!--    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>-->
+<!--    <g-btn-bs icon="icon-split_check_2">{{$t('fnBtn.paymentFunctions.splitCheck')}}</g-btn-bs>-->
+<!--    <g-btn-bs icon="icon-red_bill">{{$t('fnBtn.paymentFunctions.redBill')}}</g-btn-bs>-->
+<!--    <g-btn-bs icon="icon-print2">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>-->
     <g-spacer/>
-    <g-btn-bs class="col-2" background-color="#2979FF" :disabled="isPayBtnDisabled" @click.stop="pay">
+    <g-btn-bs class="col-2" background-color="#2979FF" @click.stop="pay" :disabled="isPayBtnDisabled">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
   </g-toolbar>
@@ -24,7 +24,9 @@
     },
     computed: {
       isPayBtnDisabled() {
-        return +this.paymentAmountTendered < this.paymentTotal
+        if (!this.currentOrder.payment) return true
+        const paid = _.sumBy(this.currentOrder.payment, i => +i.value)
+        return paid < this.paymentTotal
       }
     },
     methods: {

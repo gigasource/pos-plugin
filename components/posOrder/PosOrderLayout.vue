@@ -368,14 +368,10 @@
       },
 
       addProductWithModifier(product, modifiers) {
-        this.$emit('addProductToOrder', product, () =>
-          modifiers.forEach(({ name, price }) => {
-            this.$emit('addModifierToProduct', {
-              name: name,
-              price: price,
-              quantity: 1
-            })
-          }))
+        this.$emit('addProductToOrder', {
+          ...product,
+          modifiers: modifiers.map(({ name, price }) => ({ name, price, quantity: 1 }))
+        })
       },
 
       onClick(productLayout) {

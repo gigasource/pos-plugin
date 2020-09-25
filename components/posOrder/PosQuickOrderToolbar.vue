@@ -14,14 +14,27 @@
     </g-menu>
     <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
     <g-spacer/>
-    <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
-              @click.stop="quickCash(false)">
-      {{$t('restaurant.cashAndDineIn')}}
+    <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
+              :disabled="disablePrintBtn"
+              @click.stop="$emit('saveTableOrder')">
+      Print
     </g-btn-bs>
-    <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
-              @click.stop="quickCash(true)">
-      {{$t('restaurant.cashAndTakeAway')}}
-    </g-btn-bs>
+    <template v-if="currentOrder.table">
+      <g-btn-bs class="col-2" :disabled="!enablePayBtn"
+                @click.stop="splitOrder">
+        Split order
+      </g-btn-bs>
+    </template>
+    <template v-else>
+      <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
+                @click.stop="quickCash(false)">
+        {{$t('restaurant.cashAndDineIn')}}
+      </g-btn-bs>
+      <g-btn-bs class="col-2" background-color="#4CAF50" :disabled="!enablePayBtn"
+                @click.stop="quickCash(true)">
+        {{$t('restaurant.cashAndTakeAway')}}
+      </g-btn-bs>
+    </template>
     <g-btn-bs class="col-2" icon="icon-pay" :disabled="!enablePayBtn" @click="pay">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
@@ -32,7 +45,8 @@
   export default {
     name: "PosQuickOrderToolbar",
     props: {
-      currentOrder: null
+      currentOrder: null,
+      actionList: Array,
     },
     data() {
       return {
@@ -42,11 +56,16 @@
     computed: {
       enablePayBtn() {
         if (this.currentOrder && this.currentOrder.items) return this.currentOrder.items.length > 0
+      },
+      disablePrintBtn() {
+        return this.actionList.length === 0
       }
     },
     methods: {
       back() {
+        this.$emit('updateOrderTable', null)
         this.$emit('resetOrderData')
+        this.$emit('updateOrderTable', null)
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
@@ -55,6 +74,9 @@
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
         this.$emit('quickCash')
+      },
+      splitOrder() {
+        this.$getService('PosOrderSplitOrder:setActive')(true)
       }
     }
   }

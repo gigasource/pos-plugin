@@ -3,9 +3,13 @@
     <room v-if="room"
           :name="room.name"
           :room-objects="room.roomObjects"
-          @selectRoomObject="selectRoomObj">
+          :in-progress-table="inProgressTable"
+          :transfer-table-from="transferTableFrom"
+          @selectRoomObject="selectRoomObj"
+          @setTransferTableFrom="setTransferTableFrom"
+          @setTransferTableTo="setTransferTableTo">
       <template #room-object="{roomObject}">
-        <div v-if="isTable(roomObject) || !isWall(roomObject)" :style="getTableStyle(roomObject)">
+        <div v-if="isTable(roomObject) || !isWall(roomObject)">
           <div>{{ roomObject.name }}</div>
         </div>
       </template>
@@ -27,7 +31,8 @@
         room: null,
         roomObj: null,
         //
-        inProgressTable: []
+        inProgressTable: [],
+        transferTableFrom: null,
       }
     },
     async created() {
@@ -46,6 +51,9 @@
           }
         }
       })
+    },
+    activated() {
+      this.loadTableStatus()
     },
     destroyed() {
       cms.socket.off('update-table-status')
@@ -66,9 +74,7 @@
       },
       async loadTableStatus() {
         const inProgressOrders = await cms.getModel('Order').find({ table: { $in: this.tableNames }, status: 'inProgress' })
-        _.each(inProgressOrders, order => {
-          this.inProgressTable.push(order.table)
-        })
+        this.inProgressTable = inProgressOrders.map(o => o.table)
       },
       isTable(roomObj) {
         return roomObj.type === 'table'
@@ -77,12 +83,7 @@
         return roomObj.type === 'wall'
       },
       isTableBusy(roomObj) {
-        return _.includes(this.inProgressTable, roomObj.name)
-      },
-      getTableStyle(roomObj) {
-        if (this.isTableBusy(roomObj)) {
-          return { color: '#FF8A80' }
-        }
+        return this.inProgressTable.includes(roomObj.name)
       },
       selectRoomObj(roomObj) {
         // if (!this.isTableBusy(roomObj)) {
@@ -94,6 +95,22 @@
           }
         // }
       },
+      setTransferTableFrom(roomObj) {
+        if (this.transferTableFrom && roomObj.name === this.transferTableFrom.name) return this.transferTableFrom = null
+        if (this.isTable(roomObj) && this.isTableBusy(roomObj)) this.transferTableFrom = roomObj
+      },
+      async setTransferTableTo(roomObj) {
+        if (!roomObj || !this.isTable(roomObj) || this.isTableBusy(roomObj)) return
+        const result = await cms.getModel('Order').findOneAndUpdate(
+          { table: this.transferTableFrom.name, status: 'inProgress' },
+          { table: roomObj.name },
+          { new: true }
+        )
+        console.log('setTransferTableTo', result)
+        await this.loadRoom()
+        await this.loadTableStatus()
+        this.transferTableFrom = null
+      }
     }
   }
 </script>

@@ -10,6 +10,10 @@
           </div>
         </template>
         <div class="order-detail__menu">
+          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-printer-setting"
+                    @click.stop="$emit('saveTableOrder')">
+            Print
+          </g-btn-bs>
           <g-btn-bs icon="icon-split_check_2">Split check</g-btn-bs>
           <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
           <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
@@ -37,7 +41,7 @@
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
-          <div>
+          <div :style="[item.printed && { opacity: 0.55 }]">
             <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
@@ -46,9 +50,9 @@
             </p>
           </div>
           <div class="item-action">
-            <g-icon @click.stop="removeItem(item)">remove_circle_outline</g-icon>
-            <span>{{item.quantity}}</span>
-            <g-icon @click.stop="addItem(item)">add_circle_outline</g-icon>
+            <g-icon @click.stop="removeItem(item)" :color="item.printed ? '#FF4452' : '#000'">remove_circle_outline</g-icon>
+            <span class="ml-1 mr-1">{{item.quantity}}</span>
+            <g-icon @click.stop="addItem(item)" :style="[item.printed && { opacity: 0.5 }]">add_circle_outline</g-icon>
           </div>
         </div>
         <div v-if="item.modifiers">
@@ -79,6 +83,7 @@
       items: Array,
       user: Object,
       storeLocale: String,
+      actionList: Array
     },
     filters: {
       convertMoney(value) {
@@ -113,8 +118,11 @@
         }
       },
       itemsWithQty() {
-        if (this.items) return this.items.filter(i => i.quantity > 0)
+        if (this.items) return this.items.filter(i => i.printed ? i : i.quantity > 0)
         return []
+      },
+      disablePrintBtn() {
+        return this.actionList.length === 0
       }
     },
     methods: {
@@ -122,6 +130,7 @@
         return item.originalPrice !== item.price
       },
       addItem(item) {
+        if (item.printed) return
         this.$emit('addItemQuantity', item)
       },
       removeItem(item) {
@@ -131,10 +140,11 @@
         this.$emit('removeProductModifier', item, index)
       },
       openConfigDialog(item) {
+        if (item.printed) return
         this.dialogConfigOrderItem = Object.assign({} , this.dialogConfigOrderItem, {
           product: item,
           value: true,
-          originalPrice: item.price,
+          originalPrice: item.originalPrice,
           price: 0
         })
       },
@@ -222,6 +232,7 @@
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
+    max-height: 100vh;
 
     &__header {
       display: flex;

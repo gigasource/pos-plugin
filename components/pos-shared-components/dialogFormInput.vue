@@ -1,13 +1,15 @@
 <template>
-  <g-dialog v-model="internalValue" width="90%" eager :fullscreen="isMobile">
+  <g-dialog v-model="internalValue" :width="width || '90%'" eager :fullscreen="isMobile">
     <div class="dialog-input col-flex">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
-      <div class="flex-grow-1 overflow-y pb-3">
-        <slot name="input" :changeKeyboard="changeKeyboardType">
-          <div class="textfield">
-            <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
-          </div>
-        </slot>
+      <div class=" col-flex flex-grow-1 overflow-y pb-3">
+        <div class="flex-grow-1">
+          <slot name="input" :changeKeyboard="changeKeyboardType">
+            <div class="textfield">
+              <g-text-field-bs v-model="text" :label="title" :placeholder="placeholder"/>
+            </div>
+          </slot>
+        </div>
         <slot name="buttons">
           <div class="button" v-if="showButtons">
             <g-btn-bs width="120" border-color="#979797" text-color="#1d1d26" @click="internalValue = false">{{$t('ui.cancel')}}</g-btn-bs>
@@ -18,7 +20,7 @@
       <div style="max-height: 50%">
         <slot name="keyboard">
           <div class="keyboard" v-if="showKeyboard">
-            <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="keyboardType"/>
+            <pos-keyboard-full @enter-pressed="submit" @change-type="changeKeyboardType" :type="keyboardType" :width="keyboardWidth"/>
           </div>
         </slot>
       </div>
@@ -46,11 +48,17 @@
         type: Boolean,
         default: true
       },
+      keyboardType: {
+        type: String,
+        default: 'alphanumeric'
+      },
+      keyboardWidth: String,
+      width: String,
     },
     data() {
       return {
         text: '',
-        keyboardType: 'alphanumeric',
+        internalKeyboardType: 'alphanumeric',
       }
     },
     computed: {
@@ -64,11 +72,20 @@
       },
       showButtons() {
         return !this.showKeyboard
+      },
+      keyboard: {
+        get() {
+          return this.internalKeyboardType
+        },
+        set(val) {
+          this.internalKeyboardType = val
+          this.$emit('change-keyboard-type', val)
+        }
       }
     },
     methods: {
       changeKeyboardType(val) {
-        this.keyboardType = val
+        this.internalKeyboardType = val
       },
       submit() {
         this.$emit('submit')
@@ -76,7 +93,10 @@
     },
     watch: {
       value(val) {
-        if (!val) this.keyboardType = 'alphanumeric'
+        if (!val) this.internalKeyboardType = 'alphanumeric'
+      },
+      keyboardType(val) {
+        this.internalKeyboardType = val
       }
     }
   }
