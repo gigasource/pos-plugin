@@ -55,6 +55,7 @@
         },
         action: null, // current action -- see list of available action above
         lastPos: null, // store last mouse clientX, Y position which already handled by "applyChange throttle"
+        swiping: false
       }
     },
     computed: {
@@ -183,8 +184,10 @@
           }
         }
 
-        if (this.editable || (!this.editable && roomObject.type !== 'wall'))
+        if (this.editable || (!this.editable && roomObject.type !== 'wall')) {
+          console.log('click handler emit')
           this.$emit('selectRoomObject', roomObject)
+        }
       },
       onMouseMove(e) {
         if (this.action) {
@@ -206,6 +209,9 @@
           right: () => {
             this.$emit('setTransferTableFrom', item)
           },
+          move: () => {
+            if (!this.transferTableFrom) this.swiping = true
+          },
           end: () => {
             if (this.transferringTable) {
               if (!this.isTableBusy(item) && item !== this.transferTableFrom) {
@@ -214,8 +220,13 @@
               return
             }
 
-            if (this.editable || (!this.editable && item.type !== 'wall'))
-              this.$emit('selectRoomObject', item)
+            if (this.editable || (!this.editable && item.type !== 'wall')) {
+              if (this.swiping) {
+                this.swiping = false
+              } else {
+                this.$emit('selectRoomObject', item)
+              }
+            }
           }
         }
       },

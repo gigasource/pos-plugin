@@ -61,6 +61,11 @@
     watch: {
       id() {
         this.loadRoom();
+      },
+      room(val) {
+        if (val) {
+          this.loadTableStatus()
+        }
       }
     },
     computed: {
