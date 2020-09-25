@@ -49,7 +49,10 @@ async function buildTempOrder(table) {
 				if (!commit.update.push.key.includes('modifiers')) {
 					result['items'].push(commit.update.push.value);
 				} else { // modifier
-					if (currentItem) currentItem.modifiers.push(commit.update.push.value);
+					if (currentItem) {
+						if (currentItem.modifiers) currentItem.modifiers.push(commit.update.push.value);
+						else currentItem.modifiers = [commit.update.push.value];
+					}
 				}
 			} else if (commit.update.inc && currentItem.quantity > 0) {
 				if (currentItem) {

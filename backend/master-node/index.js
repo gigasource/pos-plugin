@@ -17,8 +17,8 @@ module.exports = async function (cms) {
 	await handler.init();
 }
 
-module.exports.initSocket = function (socket) {
-	handler.initSocket(socket);
+module.exports.initSocket = async function (socket) {
+	await handler.initSocket(socket);
 }
 
 async function startMaster(socket) {
@@ -27,24 +27,11 @@ async function startMaster(socket) {
 	await handler.initSocket(socket)
 }
 
-async function startNode(socket) {
-	handler.turnOff();
-	handler = new Node(handler.cms);
-	await handler.initSocket(socket);
-}
-
-async function connectToOtherMaster(socket) {
-	handler.turnOff();
-	await handler.initSocket(socket);
-}
-
-module.exports.handlerNewMasterId = async function (newMasterClientId, socket) {
-	const { masterClientId, onlineDevice } = await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId: newMasterClientId }).lean();
-	if (onlineDevice.id !== newMasterClientId && masterClientId === onlineDevice.id) { // case master -> node
-		await startNode(socket);
-	} else if (onlineDevice.id === newMasterClientId) { // case node -> master
-		await startMaster(socket);
-	} else {
-		await connectToOtherMaster(socket);
-	}
+/*
+	Because master is set only once so this
+	function always change state from node
+	to master
+ */
+module.exports.handlerNewMasterId = async (socket) => {
+	await startMaster(socket);
 }

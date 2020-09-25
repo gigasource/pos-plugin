@@ -469,33 +469,33 @@ module.exports = async cms => {
 
       cb && cb()
     });
-    socket.on('updateMasterDevice', async newMasterClientId => {
+    socket.on('updateMasterDevice', async ack => {
       // set masterClientId
       // newMasterClientId is always different from the old one
-      await handlerNewMasterId(newMasterClientId, socket);
+      ack();
+      await handlerNewMasterId(socket);
     })
   }
 
   function createOnlineOrderSocket(deviceId) {
     return new Promise(async resolve => {
       const webshopUrl = await getWebShopUrl();
-
       if (onlineOrderSocket) {
         onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
         onlineOrderSocket = null;
 
         // delay a little for old socket to disconnect first
-        setTimeout(() => {
+        setTimeout(async () => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
-          initSocket(onlineOrderSocket);
+          await initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
-        initSocket(onlineOrderSocket);
+        await initSocket(onlineOrderSocket);
       }
     });
   }

@@ -36,6 +36,7 @@ const connectToMaster = async (_this, masterIp) => {
 		}
 	})
 	_this.socket.on('connect', async () => {
+		console.log('Node connected to master');
 		_this.isConnect = true;
 		// wait for initQueue finish
 		setTimeout(() => {
@@ -84,15 +85,17 @@ class Node {
 	async initSocket(socket) {
 		const _this = this;
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('getMasterIp', await _this.getStoreId(), async (masterIp, masterClientId) => {
+		const storeId = await _this.getStoreId();
+		_this.onlineOrderSocket.emit('getMasterIp', storeId, async (masterIp, masterClientId) => {
 			_this.masterClientId = masterClientId;
+			console.log(`Master ip is ${masterIp}`);
 			if ((!_this.socket || (_this.socket && !_this.isConnect)) && masterIp) {
 				if (_this.socket) _this.socket.disconnect(); // safer better
 				setTimeout(() => {
 					connectToMaster(_this, masterIp);
-					_this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 				}, 2000);
 			}
+			if (masterClientId) _this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 			await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp, masterClientId });
 		})
 		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
@@ -101,7 +104,7 @@ class Node {
 				pushTaskToQueue(commits);
 				setHighestCommitId(commits[commits.length - 1].commitId + 1);
 			} else {
-				_this.onlineOrderSocket.emit('requireSync', oldHighestCommitId, nodeSync);
+				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 			}
 		})
 	}

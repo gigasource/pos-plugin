@@ -1177,8 +1177,9 @@
         return reservations && reservations.length > 0
       },
       genObjectId() {
-        const mongoose = require('mongoose')
-        return mongoose.Types.ObjectId();
+        const BSON = require('bson');
+        console.log(new BSON.ObjectID());
+        return new BSON.ObjectID();
       },
       async getTempOrder() {
         return new Promise(resolve => {

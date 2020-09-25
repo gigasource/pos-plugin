@@ -19,6 +19,7 @@
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
     "better-queue": "^3.8.10",
+    "bson": "^4.1.0",
     "clone-buffer": "^1.0.0",
     "dayjs": "^1.8.17",
     "form-data": "^3.0.0",
