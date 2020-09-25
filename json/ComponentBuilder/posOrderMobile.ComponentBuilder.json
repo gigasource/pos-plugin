@@ -255,6 +255,61 @@
           }
         ]
       }
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderSplitOrder",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderSplitOrder",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:createOrderCommit",
+          "local": "createOrderCommit",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveSplitOrder",
+          "local": "saveSplitOrder",
+          "type": "event"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",
+      "path": "components/posOrder/PosOrderSplitOrder.vue",
+      "pluginName": "pos-plugin"
     }
   ],
   "name": "posOrderMobile",

@@ -938,6 +938,12 @@
           "schemaType": "string",
           "key": "note",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "sent",
+          "type": "input@switch",
+          "addable": true
         }
       ],
       "default": null,

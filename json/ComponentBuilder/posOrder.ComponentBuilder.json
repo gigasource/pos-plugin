@@ -359,6 +359,26 @@
           "service": "PosStore:storeLocale",
           "local": "storeLocale",
           "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:createOrderCommit",
+          "local": "createOrderCommit",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveSplitOrder",
+          "local": "saveSplitOrder",
+          "type": "event"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
         }
       ]
     }
@@ -369,4 +389,3 @@
   },
   "renderToRoute": "pos-order-2/:name?"
 }
-
