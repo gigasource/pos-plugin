@@ -528,7 +528,7 @@ async function removeDeviceFromStore(device, storeId) {
 }
 
 async function assignDevice(deviceId, store) {
-  const device = await DeviceModel.findById(deviceId);
+  let device = await DeviceModel.findById(deviceId);
   if (!device) return { error: `Device with ID ${deviceId} not found` };
   if (!device.storeId) {
     device.storeId = store._id;
@@ -564,7 +564,7 @@ async function assignDevice(deviceId, store) {
   }
 
   device.metadata = device.metadata || {};
-  await DeviceModel.updateOne({ _id: deviceId }, device);
+  device = await DeviceModel.updateOne({ _id: deviceId }, device, { new: true });
 
   // add device info to specified store
   store.gSms = store.gSms || {};

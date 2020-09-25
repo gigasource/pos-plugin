@@ -171,10 +171,12 @@ router.delete('/devices/:deviceId', async (req, res) => {
 router.get('/device-assigned-store/:deviceId', async (req, res) => {
   console.log('gsms-devices/device-assigned-store/:deviceId')
   const {deviceId} = req.params;
-  if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
+  if (!deviceId)
+    return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
   let device = await DeviceModel.findById(deviceId);
-  if (!device) return res.status(400).json({error: `No device found with ID ${deviceId}`});
+  if (!device)
+    return res.status(400).json({error: `No device found with ID ${deviceId}`});
 
   // multi store
   if (device.enableMultiStore) {
@@ -188,13 +190,7 @@ router.get('/device-assigned-store/:deviceId', async (req, res) => {
         }, { new: true })
       } else {
         return res.json({
-          stores: stores.map(s => ({
-            _id: s._id.toString(),
-            id: s.id,
-            name: s.name || s.alias,
-            alias: s.alias,
-            googleMyBusinessId: s.googleMyBusinessId
-          })),
+          stores: stores.map(convertToGsmsStoreModel),
         })
       }
     } else {
@@ -206,15 +202,33 @@ router.get('/device-assigned-store/:deviceId', async (req, res) => {
   }
 
   const store = await StoreModel.findById(device.storeId || '');
-  if (!store)
-    return res.status(200).json({assignedStore: null});
+  if (!store) {
+    return res.status(200).json({
+      error: `No store found with id ${device.storeId}`,
+      assignedStore: null
+    });
+  }
 
   res.status(200).json({
+    // fallback for older version
     _id: store._id.toString(),
     storeId: store.id,
-    assignedStore: store.name || store.alias
+    assignedStore: store.name || store.alias,
+    // for newer version
+    store: convertToGsmsStoreModel(store)
   });
 });
+
+function convertToGsmsStoreModel(s) {
+  return {
+    _id: s._id.toString(),
+    id: s.id,
+    name: s.name || s.alias,
+    alias: s.alias,
+    googleMyBusinessId: s.googleMyBusinessId,
+    orderTimeOut: s.orderTimeOut
+  }
+}
 
 router.get('/device-online-status', async (req, res) => {
   let {clientIds} = req.query;
