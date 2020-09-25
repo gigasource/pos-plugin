@@ -634,3 +634,24 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-printer {
+  background-image: url("../assets/printer.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-receipt2 {
+  background-image: url("../assets/receipt2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-complete {
+  background-image: url("../assets/complete.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
