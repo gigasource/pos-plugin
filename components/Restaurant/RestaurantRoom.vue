@@ -52,8 +52,8 @@
         }
       })
     },
-    activated() {
-      this.loadTableStatus()
+    async activated() {
+      await this.loadTableStatus()
     },
     destroyed() {
       cms.socket.off('update-table-status')
@@ -106,12 +106,12 @@
       },
       async setTransferTableTo(roomObj) {
         if (!roomObj || !this.isTable(roomObj) || this.isTableBusy(roomObj)) return
-        const result = await cms.getModel('Order').findOneAndUpdate(
-          { table: this.transferTableFrom.name, status: 'inProgress' },
-          { table: roomObj.name },
-          { new: true }
-        )
-        console.log('setTransferTableTo', result)
+        const order = await cms.getModel('Order').findOne({ table: this.transferTableFrom.name, status: 'inProgress' })
+
+        // todo transfer table:
+        // create $set table commit
+        // update current order commits -> new table
+        // update current order -> new table
         await this.loadRoom()
         await this.loadTableStatus()
         this.transferTableFrom = null

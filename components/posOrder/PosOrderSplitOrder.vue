@@ -2,7 +2,7 @@
   <div>
     <g-dialog v-model="internalValue" :transition="false" content-class="split-order-dialog">
       <div class="row-flex justify-end">
-        <div class="splitter">
+        <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
           <div class="splitter__header">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
             <span style="font-size: 15px">Total:</span>
@@ -72,15 +72,20 @@
 
         <g-icon class="mr-4 ml-4" size="40" color="#fff" style="height: calc(100% - 64px)">keyboard_backspace</g-icon>
 
-        <div class="order-detail">
+        <div class="order-detail" :style="isMobile ? {height: '100%'} : { height: 'calc(100% - 64px)' } ">
           <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-          <div class="order-detail__header row-flex justify-between">
+          <div class="order-detail__header row-flex">
             <div>
               <g-avatar size="36">
                 <img alt :src="avatar">
               </g-avatar>
               <span class="ml-1 fw-700" style="font-size: 13px">{{username}}</span>
             </div>
+            <g-spacer v-if="isMobile"/>
+            <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
+              <g-icon>icon-back</g-icon>
+            </g-btn-bs>
+            <g-spacer/>
             <div>
               <div style="font-size: 11px; color: #1D1D26">Total Left</div>
               <div style="font-size: 18px; color: #ff4452">{{ totalLeft | convertMoney}}</div>
@@ -118,7 +123,7 @@
       </div>
 
       <g-toolbar elevation="0" color="#eee" class="toolbar">
-        <g-btn-bs icon="icon-back" @click="internalValue = false">{{$t('ui.back')}}</g-btn-bs>
+        <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
         <g-spacer/>
         <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{splitOrders.length}}</span>
         <g-btn-bs :uppercase="false" background-color="#1271ff">View receipt</g-btn-bs>
@@ -144,6 +149,7 @@
       currentOrder: null,
       user: null,
       storeLocale: String,
+      isMobile: Boolean
     },
     filters: {
       convertMoney(value) {
@@ -187,6 +193,9 @@
       }
     },
     methods: {
+      back() {
+        this.internalValue = false
+      },
       isItemDiscounted(item) {
         return item.originalPrice > item.price
       },
@@ -292,7 +301,6 @@
   .splitter {
     background: #fff;
     flex-basis: 30%;
-    height: calc(100% - 84px);
     padding-top: 8px;
     display: flex;
     flex-direction: column;
@@ -302,6 +310,17 @@
     &__header {
       padding: 0 8px;
       position: relative;
+
+      .btn-back {
+        width: 37px;
+        height: 37px;
+        border-radius: 50%;
+        margin: 0;
+
+        & > .g-icon {
+          min-width: 24px;
+        }
+      }
     }
 
     &__content {
@@ -328,7 +347,6 @@
   .order-detail {
     background: #fff;
     flex-basis: 30%;
-    height: calc(100% - 64px);
     padding: 0 8px;
     position: relative;
 
@@ -406,7 +424,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.7);
-    z-index: 1;
+    z-index: 2;
   }
 </style>
 

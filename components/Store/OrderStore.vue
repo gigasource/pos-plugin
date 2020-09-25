@@ -241,7 +241,6 @@
               !latestProduct.printed
           } )
 
-          console.log('isSameItem', isSameItem)
           if (isSameItem) return this.addItemQuantity(latestProduct)
           // else add product to arr
           this.actionList.push({
@@ -701,6 +700,7 @@
 
           this.actionList.map(action => {
             if (action.type === 'item' && action.update && action.update.push) {
+              action.update.push.value.sent = true
               action.update.push.value.printed = true
             }
 
@@ -739,7 +739,7 @@
             cancelList: [],
             addList: []
           })
-          console.log(diff)
+
           if (printLists.addList.length) {
             const addedList = Object.assign({}, this.currentOrder,
               { items: await this.mapGroupPrinter(printLists.addList) });
@@ -750,6 +750,8 @@
               ({ items: await this.mapGroupPrinter(printLists.cancelList) }));
             cms.socket.emit('printKitchenCancel', { order: cancelledList, device: this.device })
           }
+
+          this.$router.go(-1)
         }
       },
       mapGroupPrinter(items) {
@@ -1178,7 +1180,6 @@
       },
       genObjectId() {
         const BSON = require('bson');
-        console.log(new BSON.ObjectID());
         return new BSON.ObjectID();
       },
       async getTempOrder() {
@@ -1214,7 +1215,8 @@
           const tempItems = this.currentOrder.items.filter(i => !i.printed)
           this.$set(this.currentOrder, '_id', order._id)
           this.$set(this.currentOrder, 'user', order.user)
-          this.$set(this.currentOrder, 'items', [...order.items, ...tempItems])
+          const newItems = [...order.items, ...tempItems];
+          this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
           this.printedOrder = _.cloneDeep(order.items)
         }
       })
@@ -1247,6 +1249,8 @@
             } else {
               this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
             }
+          } else {
+            this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
           }
         }
       },

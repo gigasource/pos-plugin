@@ -148,8 +148,8 @@
 
         if (this.isTableBusy(roomObj)) {
           const addStyle = this.transferringTable && roomObj.name !== this.transferTableFrom.name
-            ? { background: '#FF8A80', color: '#fff', opacity: 0.2 }
-            : { background: '#FF8A80', color: '#fff' }
+            ? { background: '#fec8c8', opacity: 0.2 }
+            : { background: '#fec8c8', border: '1px solid #d2691e' }
           Object.assign(style, addStyle)
         } else {
           Object.assign(style, { background: roomObj.bgColor })

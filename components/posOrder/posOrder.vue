@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-menu v-if="isMobile" v-model="menu">
+      <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <g-avatar size="36">
@@ -37,7 +37,7 @@
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
     <div class="order-detail__content">
-      <div v-for="(item, i) in itemsWithQty" :key="i" class="item"
+      <div v-for="(item, i) in itemsWithQty" :key="item._id.toString()" class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
@@ -63,6 +63,7 @@
         </div>
       </div>
     </div>
+    <div class="blur-overlay" v-show="menu"/>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
@@ -192,6 +193,7 @@
       },
       back() {
         this.$emit('resetOrderData')
+        this.$emit('updateOrderTable', null)
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
@@ -223,11 +225,20 @@
         this.table = this.$router.currentRoute.params.name
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
-    }
+    },
   }
 </script>
 
 <style scoped lang="scss">
+  .blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
   .order-detail {
     padding: 0 8px;
     background: white;
@@ -236,6 +247,7 @@
     display: flex;
     flex-direction: column;
     max-height: 100vh;
+    position: relative;
 
     &__header {
       display: flex;
