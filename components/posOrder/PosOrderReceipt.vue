@@ -30,10 +30,41 @@
       <div class="receipt-main__title">Table: {{order.table}}</div>
       <div class="receipt-main__item" v-for="(seat, i) in order.seats" :key="i">
         <div class="row-flex align-items-center">
-          <div class="receipt-main__item-seat">Seat {{seat.no}}</div>
+          <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{seat.no}}</div>
+            </template>
+            <div class="row-flex pa-2 bg-white align-items-start">
+              <g-btn-bs icon="icon-printer" class="elevation-2">
+                Print
+              </g-btn-bs>
+              <g-btn-bs class="elevation-2">
+                Bewirtung
+              </g-btn-bs>
+              <div>
+                <g-btn-bs width="90" block icon="icon-credit_card" :background-color="getPaymentColor(seat.payment, 'card')" class="elevation-2">
+                  Card
+                </g-btn-bs>
+                <g-btn-bs width="90" block icon="icon-cash" :background-color="getPaymentColor(seat.payment, 'cash')" class="elevation-2 my-2">
+                  Cash
+                </g-btn-bs>
+                <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(seat.payment, 'multi')" @click="openMultiDialog(seat)" class="elevation-2">
+                  Multi
+                </g-btn-bs>
+              </div>
+              <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
+                Email
+              </g-btn-bs>
+              <g-btn-bs block icon="icon-coin-box" class="elevation-2">
+                Trinkgeld
+              </g-btn-bs>
+            </div>
+          </g-menu>
           <g-spacer/>
-          <g-icon>{{getIcon(seat.payment.type)}}</g-icon>
-          <div class="receipt-main__item-total">${{seat.payment.value}}</div>
+          <div class="receipt-main__item-total" v-for="(p, iP) in seat.payment" :key="`payment_${i}_${iP}`">
+            <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
+            <span>${{p.value}}</span>
+          </div>
         </div>
         <div class="receipt-main__item-header">
           <div class="col-1">Q.ty</div>
@@ -47,6 +78,7 @@
         </div>
       </div>
     </div>
+    <dialog-multi-payment rotate v-model="dialog.multi"/>
   </div>
 </template>
 
@@ -72,10 +104,10 @@
           seats: [
             {
               no: '1',
-              payment: {
+              payment: [{
                 type: 'cash',
                 value: 196.62
-              },
+              }],
               items: [
                 {name: 'Vodka', quantity: 1, price: 10.00},
                 {name: 'Peperoni pizza', quantity: 1, price: 10.00},
@@ -86,10 +118,10 @@
             },
             {
               no: '2',
-              payment: {
+              payment: [{
                 type: 'card',
                 value: 196.62
-              },
+              }],
               items: [
                 {name: 'Vodka', quantity: 1, price: 10.00},
                 {name: 'Peperoni pizza', quantity: 1, price: 10.00},
@@ -99,14 +131,31 @@
               ]
             },
           ]
-        }
+        },
+        menu: [],
+        dialog: {
+          multi: false,
+        },
+        tempSeat: null
       }
+    },
+    created() {
+      this.menu = this.order.seats.map(() => false)
     },
     methods: {
       getIcon(type) {
-        if(type === 'card') return 'icon-creadit_card'
+        if(type === 'card') return 'icon-credit_card'
         return 'icon-cash'
-      }
+      },
+      getPaymentColor(payment, type) {
+        if((payment.length > 1 && type === 'mutli') || (payment.length === 1 && type === payment[0].type))
+          return '#1271ff'
+        return 'white'
+      },
+      openMultiDialog(seat) {
+        this.tempSeat = seat
+        this.dialog.multi = true
+      },
     }
   }
 </script>
@@ -119,11 +168,6 @@
     position: absolute;
     top: 100%;
     left: 0;
-
-    .g-btn-bs {
-      font-size: 14px;
-      background-color: white;
-    }
 
     &-main {
       padding: 32px;
@@ -162,11 +206,21 @@
           border: 1px solid #D0D0D0;
           border-radius: 2px;
           text-align: center;
+
+          &--selected {
+            border-color: #1271FF;
+            background: #E3F2FD;
+          }
         }
 
         &-total {
           font-weight: 700;
           margin-left: 4px;
+          padding: 0 4px;
+
+          & + .receipt-main__item-total {
+            border-left: 1px solid black;
+          }
         }
 
         &-header {
@@ -186,5 +240,17 @@
         }
       }
     }
+  }
+
+  .g-btn-bs {
+    font-size: 14px;
+    background-color: white;
+  }
+</style>
+
+<style lang="scss">
+  .menu-receipt-action {
+    transform: rotate(-90deg) translateX(calc(-100% + 16px)) translateY(40px);
+    transform-origin: left top;
   }
 </style>

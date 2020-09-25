@@ -1,6 +1,6 @@
 <template>
   <g-dialog v-model="internalValue" width="50%">
-    <g-card class="dialog-multi-payment col-flex pa-3">
+    <g-card :class="['dialog-multi-payment', 'col-flex', 'pa-3', rotate && 'rotate']">
       <div class="row-flex align-items-center">
         <span class="fw-700 mb-2" style="font-size: 20px">Multi Payment</span>
         <g-spacer/>
@@ -46,7 +46,8 @@
       total: [Number, String],
       storeLocale: String,
       cardValue: Number,
-      cashValue: Number
+      cashValue: Number,
+      rotate: Boolean,
     },
     data() {
       return {
@@ -163,6 +164,13 @@
     .bs-tf-inner-input-group {
       border-radius: 2px;
     }
+  }
+
+  .rotate {
+    width: 400px;
+    height: 580px !important;
+    transform: rotate(-90deg) translateX(-100%);
+    transform-origin: left top;
   }
 </style>
 
