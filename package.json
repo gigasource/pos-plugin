@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.1.40",
+  "version": "1.1.41",
   "release": "Stable",
   "description": "",
   "main": "index.js",
@@ -21,6 +21,7 @@
     "clone-buffer": "^1.0.0",
     "dayjs": "^1.8.17",
     "form-data": "^3.0.0",
+    "fritz-callmonitor": "^3.1.8",
     "node-schedule": "^1.3.2",
     "node-thermal-printer": "^1.0.3",
     "phantom": "^6.3.0",

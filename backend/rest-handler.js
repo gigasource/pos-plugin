@@ -1,10 +1,9 @@
 module.exports = cms => {
-  // TODO: modify later, when installed on customer's tablet proxy server won't be used
-  const fritzboxHandlers = require('./fritzbox-call-handler/express')(cms);
-  cms.app.use('/fritzbox-events', fritzboxHandlers);
+  // TODO: delete this after testing with Fritzbox is done
+  /*const fritzboxHandlers = require('./fritzbox-call-handler/express')(cms);
+  cms.app.use('/fritzbox-events', fritzboxHandlers);*/
 
-  cms.app.use(/^\/$/, async (req, res, next) => {
+  cms.app.use(/^\/$/, async (req, res) => {
     return res.redirect('/pos-login');
-    next();
   });
 }
