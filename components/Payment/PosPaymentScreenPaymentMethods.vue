@@ -91,7 +91,7 @@
 
     <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%">
       <template #input>
-        <pos-textfield-new ref="tip-textfield" label="Card Payment" v-model="tipEditValue"/>
+        <pos-textfield-new ref="tip-textfield" label="Card Payment" v-model="tipEditValue" clearable/>
       </template>
     </dialog-form-input>
   </div>
@@ -342,9 +342,7 @@
     background-image: url('../../assets/pos-payment-method-screen-bg.png');
     background-repeat: repeat;
   }
-</style>
 
-<style lang="scss">
   .dialog {
     .g-btn-bs {
       margin: 0;
@@ -360,6 +358,12 @@
       .bs-tf-inner-input-group {
         border-radius: 2px;
       }
+    }
+
+    .g-tf-wrapper {
+      margin-bottom: 0;
+      margin-top: 0;
+      margin-right: 0;
     }
   }
 </style>
