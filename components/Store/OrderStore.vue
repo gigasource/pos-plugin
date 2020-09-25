@@ -1034,14 +1034,17 @@
 
       await this.getReservations()
 
-      cms.socket.on('receiving-call', async (phone, date) => {
-        const customer = await this.getCustomerInfo(phone)
-        this.calls.unshift({customer, date})
+      cms.socket.on('new-phone-call', async (phoneNumber, date) => {
+        const customer = await this.getCustomerInfo(phoneNumber);
+        this.calls.unshift({customer, date, phoneNumber});
       })
 
-      cms.socket.on('missed-call', async (phone, date) => {
-        const customer = await this.getCustomerInfo(phone)
-        this.missedCalls.unshift({customer, date})
+      cms.socket.on('new-missed-phone-call', async (phoneNumber, date) => {
+        const customer = await this.getCustomerInfo(phoneNumber);
+
+        const callIndex = this.calls.findIndex(e => e.phoneNumber === phoneNumber);
+        if (callIndex > -1) this.calls.splice(callIndex, 1);
+        this.missedCalls.unshift({customer, date});
       })
     },
     watch: {

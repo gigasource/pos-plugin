@@ -81,6 +81,13 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/fritzbox-call-handler/localhost-handler.js',
+      type: 'backend'
+    },
+    {
+      loader: {
         type: 'css-loader'
       },
       path: 'style/pos.css'

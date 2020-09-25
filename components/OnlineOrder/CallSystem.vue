@@ -54,6 +54,7 @@
           googleMapApiKey: this.apiKey
         }
         await cms.getModel('PosSetting').findOneAndUpdate({}, { call })
+        cms.socket.emit('refresh-fritzbox-config')
       },
       changeIp(value) {
         this.ip = value
