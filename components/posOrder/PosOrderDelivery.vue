@@ -125,7 +125,8 @@
       <template #input>
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
-          <g-combobox style="width: 48%" label="Address" v-model="placeId"
+          <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
+          <g-combobox style="width: 98%" label="Address" v-model="placeId"
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
