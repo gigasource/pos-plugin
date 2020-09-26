@@ -37,6 +37,7 @@ RUN export PATH=/root/.nvm/versions/node/v12.16.2/bin:/usr/local/sbin:/usr/local
     npm install --unsafe-perm && \
     cd plugins/pos-plugin && \
     git pull && \
+    git checkout pos-restaurant-socket-hotfix && \
     npm install --unsafe-perm && \
     cd ../core-plugin && \
     git pull && \
