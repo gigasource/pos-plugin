@@ -735,10 +735,22 @@
       //<!--</editor-fold>-->
 
       // online ordering
-      emitWithRetry(eventName, id, data, cb) {
+      emitWithRetry(eventName, id, data, cb, attempt = 1) {
         if (!socketIntervals[id])
-          socketIntervals[id] = setTimeout(() => this.emitWithRetry(eventName, id, data, cb), 5000)
+          socketIntervals[id] = setInterval(() => {
+            attempt+= 1
+            this.emitWithRetry(eventName, id, data, cb, attempt);
+          }, 5000)
         console.log(`emit event ${eventName}`, socketIntervals[id])
+
+        if (attempt === 2) {
+          axios.post('http://localhost:8888/api/order/update-status', data).then(res => {
+            console.log('REST update-status result', res)
+            console.log(`clear interval ${id}`)
+            clearInterval(socketIntervals[id])
+            delete socketIntervals[id]
+          })
+        }
 
         cms.socket.emit(eventName, ...data, () => {
           console.log(`clear interval ${id}`)
@@ -869,7 +881,31 @@
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
             `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
+        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus], async ({result, error, responseData}) => {
+          // TODO: Check result response in another language
+          //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
+          //  + transaction info stored in paypalOrderDetail object
+          if (isPrepaidOrder) {
+            this.dialog.capturing.show = false
+          }
+
+          if (error || result !== 'COMPLETED') {
+            this.dialog.captureFailed.show = true
+            this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+          } else {
+            if (isPrepaidOrder) {
+              // store response data for later use
+              updateOrderInfo.paypalOrderDetail = {
+                ...updateOrderInfo.paypalOrderDetail,
+                captureResponses: responseData
+              }
+              await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+              this.printOnlineOrderKitchen(order._id)
+              this.printOnlineOrderReport(order._id)
+              await this.updateOnlineOrders()
+            }
+          }
+        })
       },
       isCaptureRefundExpired(captureResponses) {
         // find final capture
