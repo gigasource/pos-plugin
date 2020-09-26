@@ -164,7 +164,9 @@
         return this.selectingObj && this.selectingObj._id === roomObj._id
       },
       isTableBusy(roomObj) {
-        return this.inProgressTable.includes(roomObj.name)
+        if(!this.editable)
+          return this.inProgressTable.includes(roomObj.name)
+        return false
       },
 
       // action trigger
