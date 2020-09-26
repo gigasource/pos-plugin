@@ -114,6 +114,12 @@
           "type": "tableArray"
         }
       ]
+    },
+    {
+      "_id": "5f633b55a0556535c04e71db",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
     }
   ],
   "name": "OrderLayout",
