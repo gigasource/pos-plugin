@@ -341,6 +341,11 @@
       }
     },
     async created() {
+      if (!this.user) {
+        const posSettings = await cms.getModel('PosSetting').findOne()
+        this.user = posSettings.user.find(u => u.name === 'admin')
+      }
+
       window.addEventListener('offline', () => this.online = false)
       window.addEventListener('online', () => this.online = true)
 

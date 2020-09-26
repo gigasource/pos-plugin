@@ -635,6 +635,69 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-printer {
+  background-image: url("../assets/printer.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-receipt2 {
+  background-image: url("../assets/receipt2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-complete {
+  background-image: url("../assets/complete.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-tip {
+  background-image: url("../assets/tip.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-multi_payment {
+  background-image: url("../assets/multi_payment.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-email {
+  background-image: url("../assets/email.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-coin-box {
+  background-image: url("../assets/coin-box.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-coin {
+  background-image: url("../assets/coin.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-wallet {
+  background-image: url("../assets/wallet.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 .icon-call {
   background-image: url("../assets/call.svg");
   background-repeat: no-repeat;

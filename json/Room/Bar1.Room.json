@@ -14,7 +14,7 @@
       },
       "_id": "5e7ca8e45eb24b13bf72f1e1",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "3",
       "takeAway": false
     },
@@ -29,7 +29,7 @@
       },
       "_id": "5e7d72d776400806c419744e",
       "type": "table",
-      "bgColor": "#B3E5FC",
+      "bgColor": "#FFF9C4",
       "name": "16",
       "takeAway": false
     },
@@ -44,7 +44,7 @@
       },
       "_id": "5e7d72d976400806c4197452",
       "type": "table",
-      "bgColor": "#B3E5FC",
+      "bgColor": "#FFF9C4",
       "name": "17",
       "takeAway": false
     },
@@ -59,7 +59,7 @@
       },
       "_id": "5e7d72db76400806c4197456",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "18",
       "takeAway": false
     },
@@ -74,7 +74,7 @@
       },
       "_id": "5e7d72de76400806c419745a",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "19",
       "takeAway": false
     },
@@ -89,7 +89,7 @@
       },
       "_id": "5e7d72e076400806c419745e",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "20",
       "takeAway": false
     },
@@ -104,7 +104,7 @@
       },
       "_id": "5e7d72e376400806c4197462",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "21",
       "takeAway": false
     },
@@ -119,7 +119,7 @@
       },
       "_id": "5e7d72e676400806c4197466",
       "type": "table",
-      "bgColor": "#B3E5FC",
+      "bgColor": "#FFF9C4",
       "name": "22",
       "takeAway": false
     },
@@ -134,7 +134,7 @@
       },
       "_id": "5e7d72e876400806c419746a",
       "type": "table",
-      "bgColor": "#B3E5FC",
+      "bgColor": "#FFF9C4",
       "name": "23",
       "takeAway": false
     },
@@ -149,7 +149,7 @@
       },
       "_id": "5e7d72ec76400806c419746e",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "24",
       "takeAway": false
     },
@@ -164,7 +164,7 @@
       },
       "_id": "5e7dbb962526c64008ced9fa",
       "type": "table",
-      "bgColor": "#D7CCC8",
+      "bgColor": "#FFF9C4",
       "name": "2",
       "takeAway": false
     }

@@ -938,6 +938,12 @@
           "schemaType": "string",
           "key": "note",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "sent",
+          "type": "input@switch",
+          "addable": true
         }
       ],
       "default": null,
@@ -1247,6 +1253,12 @@
       "schemaType": "string",
       "key": "forwardedStore",
       "type": "input"
+    },
+    {
+      "_id": "5f6c628b8e0b4bb45fbc3dce",
+      "schemaType": "string",
+      "key": "splitId",
+      "type": "input"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
@@ -1278,7 +1290,6 @@
         "note",
         "table",
         "cancellationReason",
-        "tipp",
         "cashback",
         "receive",
         "cancellationDate",
@@ -1291,7 +1302,9 @@
         "type",
         "deliveryDate",
         "declineReason",
-        "prepareTime"
+        "prepareTime",
+        "change",
+        "tip"
       ],
       "_id": "5c5fea4caaa95a1fd4011659",
       "name": "info"

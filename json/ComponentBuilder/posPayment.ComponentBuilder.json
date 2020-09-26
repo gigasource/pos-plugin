@@ -1,6 +1,7 @@
 {
   "events": [],
   "_id": "5ddb9759b7744b22a49b5afa",
+  "isProduction": true,
   "items": [
     {
       "choice": "view",
@@ -41,7 +42,7 @@
               "30%"
             ],
             "rows": [
-              "1fr",
+              "calc(100% - 64px)",
               "64px"
             ],
             "columnGap": 0,
@@ -78,16 +79,15 @@
                   "1fr"
                 ],
                 "rows": [
-                  "1fr",
-                  "1fr",
-                  "3fr"
+                  "50%",
+                  "50%"
                 ],
                 "columnGap": 0,
                 "rowGap": 0,
                 "subAreas": [
                   {
                     "name": "method",
-                    "top": 2,
+                    "top": 1,
                     "left": 1,
                     "width": 1,
                     "height": 1,
@@ -110,48 +110,8 @@
                     "flexAlignSelf": ""
                   },
                   {
-                    "name": "screen",
-                    "top": 1,
-                    "left": 1,
-                    "width": 1,
-                    "height": 1,
-                    "margin": "",
-                    "padding": "",
-                    "bgColor": "hsl(66, 100%, 50%, 50%)",
-                    "alignSelf": "",
-                    "justifySelf": "",
-                    "wrapInDiv": false,
-                    "displayFlex": false,
-                    "flexDirection": "row",
-                    "flexWrap": false,
-                    "flexJustifyContent": "",
-                    "flexAlignItems": "",
-                    "flexAlignContent": "",
-                    "flexOrder": "",
-                    "flexGrow": "",
-                    "flexShrink": "",
-                    "flexBasis": "",
-                    "flexAlignSelf": "",
-                    "alignItems": "",
-                    "alignContent": "",
-                    "justifyItems": "",
-                    "justifyContent": "",
-                    "columns": [
-                      "2fr",
-                      "1fr"
-                    ],
-                    "rows": [
-                      "1fr",
-                      "4fr",
-                      "1fr"
-                    ],
-                    "columnGap": 6,
-                    "rowGap": 6,
-                    "subAreas": []
-                  },
-                  {
                     "name": "controller",
-                    "top": 3,
+                    "top": 2,
                     "left": 1,
                     "width": 1,
                     "height": 1,
@@ -177,17 +137,11 @@
                     "justifyItems": "",
                     "justifyContent": "",
                     "columns": [
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "2fr"
+                      "50%",
+                      "50%"
                     ],
                     "rows": [
-                      "1fr",
-                      "1fr",
-                      "1fr",
-                      "1fr"
+                      "100%"
                     ],
                     "columnGap": 6,
                     "rowGap": 6,
@@ -196,11 +150,11 @@
                         "name": "keyboard",
                         "top": 1,
                         "left": 1,
-                        "width": 3,
-                        "height": 4,
+                        "width": 1,
+                        "height": 1,
                         "margin": "",
                         "padding": "",
-                        "bgColor": "hsl(176, 100%, 50%, 50%)",
+                        "bgColor": "hsl(166, 100%, 50%, 50%)",
                         "alignSelf": "",
                         "justifySelf": "",
                         "wrapInDiv": false,
@@ -272,7 +226,8 @@
           },
           "displayPreviewColor": null,
           "style": {
-            "height": "100%"
+            "_code_": "module.exports = { \n  height: '100%'\n}",
+            "_code_type_": "commonJs"
           }
         }
       },
@@ -295,7 +250,29 @@
           "slot": "method",
           "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenPaymentMethods.vue",
           "path": "components/Payment/PosPaymentScreenPaymentMethods.vue",
-          "pluginName": "pos-plugin"
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "PosStore:storeLocale",
+              "local": "storeLocale",
+              "type": "prop"
+            }
+          ]
         },
         {
           "choice": "view",
@@ -305,7 +282,29 @@
           "slot": "controller",
           "url": "plugins/pos-plugin/components/Payment/PosPaymentScreenKeyboard.vue",
           "path": "components/Payment/PosPaymentScreenKeyboard.vue",
-          "pluginName": "pos-plugin"
+          "pluginName": "pos-plugin",
+          "inject": [
+            {
+              "service": "OrderStore:savePaidOrder",
+              "local": "savePaidOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:paymentTotal",
+              "local": "paymentTotal",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:currentOrder",
+              "local": "currentOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
+            }
+          ]
         },
         {
           "choice": "view",
@@ -473,7 +472,6 @@
   "props": {
     "fields": []
   },
-  "renderToRoute": "pos-payment",
-  "isProduction": true,
-  "renderInIframe": false
+  "renderInIframe": false,
+  "renderToRoute": "pos-payment"
 }

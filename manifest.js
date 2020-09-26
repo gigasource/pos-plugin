@@ -112,6 +112,18 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/rn-bridge/rn-bridge.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/master-node/index.js'
+    },
+    {
+      loader: {
         type: 'ssr'
       },
       path: 'components/Report/MonthReport.vue'

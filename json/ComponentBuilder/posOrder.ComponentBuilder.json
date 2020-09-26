@@ -40,8 +40,8 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "75%",
-              "25%"
+              "70%",
+              "30%"
             ],
             "rows": [
               "1fr",
@@ -284,6 +284,26 @@
               "service": "OrderStore:printKitchen",
               "local": "printKitchen",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:saveTableOrder",
+              "local": "saveTableOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:actionList",
+              "local": "actionList",
+              "type": "prop"
+            },
+            {
+              "service": "PosOrderSplitOrder:show",
+              "local": "showSplitOrder",
+              "type": "event"
+            },
+            {
+              "service": "OrderStore:updateOrderTable",
+              "local": "updateOrderTable",
+              "type": "event"
             }
           ]
         }
@@ -302,7 +322,65 @@
             "serviceName": "active"
           }
         ]
-      }
+      },
+      "url": "plugins/pos-plugin/components/Order/components/dialogProductSearchResult.vue",
+      "path": "components/Order/components/dialogProductSearchResult.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderSplitOrder",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderSplitOrder",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",
+      "path": "components/posOrder/PosOrderSplitOrder.vue",
+      "pluginName": "pos-plugin",
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:createOrderCommit",
+          "local": "createOrderCommit",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveSplitOrder",
+          "local": "saveSplitOrder",
+          "type": "event"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
+        }
+      ]
     }
   ],
   "name": "posOrder",

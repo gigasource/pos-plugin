@@ -13,7 +13,7 @@
       </div>
     </div>
     <!-- Products -->
-    <div style="padding: 4px; background-color: #FFF; flex: 1" v-if="selectedCategoryLayout">
+    <div style="padding: 4px; background: url('/plugins/pos-plugin/assets/background.png'); background-size: contain; flex: 1" v-if="selectedCategoryLayout">
       <div :style="productContainerStyle">
         <div v-for="(productLayout, index) in products"
              :class="['pol__prod', !editable && 'darken-effect']"
@@ -376,14 +376,10 @@
       },
 
       addProductWithModifier(product, modifiers) {
-        this.$emit('addProductToOrder', product, () =>
-          modifiers.forEach(({ name, price }) => {
-            this.$emit('addModifierToProduct', {
-              name: name,
-              price: price,
-              quantity: 1
-            })
-          }))
+        this.$emit('addProductToOrder', {
+          ...product,
+          modifiers: modifiers.map(({ name, price }) => ({ name, price, quantity: 1 }))
+        })
       },
 
       onClick(productLayout) {

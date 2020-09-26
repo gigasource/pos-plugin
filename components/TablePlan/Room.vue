@@ -7,9 +7,11 @@
        ref="room">
     <div v-for="(roomObject, index) in roomObjects"
          :key="index"
-         @mousedown.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
-         @touchstart.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
-         :style="getRoomObjectContainerStyle(roomObject)">
+         @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
+         :style="getRoomObjectContainerStyle(roomObject)"
+         v-touch="getTouchHandlers(roomObject)"
+         :class="['waves-effect', 'waves-red', ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
+    >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
       </div>
@@ -25,9 +27,13 @@
 <script>
   import _ from 'lodash'
   import * as mouseEventUtil from '../../utils/mouseEventUtil'
+  import {Touch} from 'pos-vue-framework';
 
   export default {
     name: 'Room',
+    directives: {
+      Touch
+    },
     props: {
       name: String,
       editable: Boolean,
@@ -36,6 +42,8 @@
         default: 6
       },
       roomObjects: Array, // table and wall
+      transferTableFrom: null,
+      inProgressTable: Array
     },
     data: function () {
       return {
@@ -47,12 +55,16 @@
         },
         action: null, // current action -- see list of available action above
         lastPos: null, // store last mouse clientX, Y position which already handled by "applyChange throttle"
+        swiping: false
       }
     },
     computed: {
       selectingObj() {
         if (this.selectedObjectId)
           return _.find(this.roomObjects, ro => ro._id === this.selectedObjectId)
+      },
+      transferringTable() {
+        return !!this.transferTableFrom
       }
     },
     created() {
@@ -115,11 +127,19 @@
           style.boxShadow = '0px 2px 4px rgba(131, 146, 167, 0.2)';
         }
 
+        if (this.isTableBusy(roomObj)) {
+          const addStyle = this.transferringTable && roomObj.name !== this.transferTableFrom.name
+              ? { background: '#fec8c8', opacity: 0.2 }
+              : { background: '#fec8c8', border: '1px solid #d2691e' }
+          Object.assign(style, addStyle)
+        } else {
+          Object.assign(style, { background: roomObj.bgColor })
+        }
+
         return style
       },
       getRoomObjectStyle(roomObj) {
         const style = {
-          backgroundColor: roomObj.bgColor,
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -143,6 +163,11 @@
       isSelected(roomObj) {
         return this.selectingObj && this.selectingObj._id === roomObj._id
       },
+      isTableBusy(roomObj) {
+        if(!this.editable)
+          return this.inProgressTable.includes(roomObj.name)
+        return false
+      },
 
       // action trigger
       onMouseDown(e, roomObject, action) {
@@ -153,8 +178,18 @@
           this.lastPos = { x: e.clientX, y: e.clientY };
         }
 
-        if (this.editable || (!this.editable && roomObject.type !== 'wall'))
+        if (this.transferringTable) {
+          console.log('setTransferTableTo1')
+          if (!this.isTableBusy(roomObject) && roomObject !== this.transferTableFrom) {
+            console.log('setTransferTableTo2')
+            this.$emit('setTransferTableTo', roomObject)
+          }
+        }
+
+        if (this.editable || (!this.editable && roomObject.type !== 'wall')) {
+          console.log('click handler emit')
           this.$emit('selectRoomObject', roomObject)
+        }
       },
       onMouseMove(e) {
         if (this.action) {
@@ -167,6 +202,34 @@
         if (this.action) {
           this.$emit('roomObjectChanged', this.selectingObj);
           this.action = null
+        }
+      },
+      getTouchHandlers(item) {
+        if (!this.isTable(item)) return {}
+
+        return {
+          right: () => {
+            this.$emit('setTransferTableFrom', item)
+          },
+          move: () => {
+            if (!this.transferTableFrom) this.swiping = true
+          },
+          end: () => {
+            if (this.transferringTable) {
+              if (!this.isTableBusy(item) && item !== this.transferTableFrom) {
+                this.$emit('setTransferTableTo', item)
+              }
+              return
+            }
+
+            if (this.editable || (!this.editable && item.type !== 'wall')) {
+              if (this.swiping) {
+                this.swiping = false
+              } else {
+                this.$emit('selectRoomObject', item)
+              }
+            }
+          }
         }
       },
       // actions

@@ -1,9 +1,9 @@
 <template>
   <div class="row-flex justify-center">
-    <g-keyboard-auto :items="keyboard" :template="template" @submit="enterPressed"
-                     :style="[{ width: '80%' },
-                      computedType === 'numeric' && { width: '50%' },
-                      computedType === 'alphanumeric' && { width: '100%' }
+    <g-keyboard-auto :items="internalKeyboard" :template="internalTemplate" @submit="enterPressed"
+                     :style="[{ width: width || '80%' },
+                      computedType === 'numeric' && { width:  width || '50%' },
+                      computedType === 'alphanumeric' && { width:  width || '100%' }
                       ]"/>
   </div>
 </template>
@@ -197,6 +197,9 @@
         type: String,
         default: 'alphanumeric' //numeric, alpha, alphanumeric, symbol
       },
+      width: String,
+      template: String,
+      items: Array,
     },
     computed: {
       internalValue: {
@@ -216,7 +219,9 @@
           this.$emit('change-type', val)
         }
       },
-      keyboard() {
+      internalKeyboard() {
+        if (this.items) return this.items
+
         switch (this.computedType) {
           case 'alpha':
             return this.locale === 'de' ? this.keyboardAlphaDE : this.keyboardAlphaEN
@@ -230,7 +235,9 @@
             return this.locale === 'de' ? this.keyboardGerman :this.keyboardEnglish
         }
       },
-      template() {
+      internalTemplate() {
+        if (this.template) return this.template
+
         switch (this.computedType) {
           case 'alpha':
             return this.locale === 'de' ? this.templateAlphaDE : this.templateAlphaEN

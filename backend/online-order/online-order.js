@@ -5,7 +5,8 @@ const io = require('socket.io-client');
 const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
-const schedule = require('node-schedule')
+const schedule = require('node-schedule');
+const { initSocket, handlerNewMasterId } = require('../master-node');
 
 let webshopUrl;
 let storeName;
@@ -468,6 +469,12 @@ module.exports = async cms => {
 
       cb && cb()
     });
+    socket.on('updateMasterDevice', async ack => {
+      // set masterClientId
+      // newMasterClientId is always different from the old one
+      ack();
+      await handlerNewMasterId(socket);
+    })
 
     socket.on('updateProducts', async (data) => {
       const { products } = data
@@ -491,21 +498,22 @@ module.exports = async cms => {
   function createOnlineOrderSocket(deviceId) {
     return new Promise(async resolve => {
       const webshopUrl = await getWebShopUrl();
-
       if (onlineOrderSocket) {
         onlineOrderSocket.disconnect(); // disconnect old socket to prevent server from keeping too many sockets
         onlineOrderSocket = null;
 
         // delay a little for old socket to disconnect first
-        setTimeout(() => {
+        setTimeout(async () => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
+          await initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
+        await initSocket(onlineOrderSocket);
       }
     });
   }

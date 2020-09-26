@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-menu v-if="isMobile && type === 'default'" v-model="menu">
+      <g-menu v-if="isMobile && type === 'default'" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <g-avatar size="36">
@@ -10,10 +10,14 @@
           </div>
         </template>
         <div class="order-detail__menu">
-          <g-btn-bs icon="icon-split_check_2">Split check</g-btn-bs>
+          <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
           <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
           <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
-          <g-btn-bs icon="icon-print" @click="pay">Send</g-btn-bs>
+          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
+                    @click.stop="$emit('saveTableOrder')">
+            Print
+          </g-btn-bs>
+          <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
         </div>
       </g-menu>
       <g-avatar v-else size="36">
@@ -33,11 +37,11 @@
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
     <div class="order-detail__content">
-      <div v-for="(item, i) in itemsWithQty" :key="i" class="item"
+      <div v-for="(item, i) in itemsWithQty" :key="item._id.toString()" class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
-          <div>
+          <div :style="[item.printed && { opacity: 0.55 }]">
             <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
@@ -46,9 +50,9 @@
             </p>
           </div>
           <div class="item-action">
-            <g-icon @click.stop="removeItem(item)">remove_circle_outline</g-icon>
-            <span>{{item.quantity}}</span>
-            <g-icon @click.stop="addItem(item)">add_circle_outline</g-icon>
+            <g-icon @click.stop="removeItem(item)" :color="item.printed ? '#FF4452' : '#000'">remove_circle_outline</g-icon>
+            <span class="ml-1 mr-1">{{item.quantity}}</span>
+            <g-icon @click.stop="addItem(item)" :style="[item.printed && { opacity: 0.5 }]">add_circle_outline</g-icon>
           </div>
         </div>
         <div v-if="item.modifiers">
@@ -59,6 +63,7 @@
         </div>
       </div>
     </div>
+    <div class="blur-overlay" v-show="menu"/>
     <div @click="dialog.createOrder = true">Next</div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
@@ -74,14 +79,13 @@
     directives: {
       Touch
     },
-    injectService:[
-      'PosStore:isMobile',
-    ],
+    injectService:['PosStore:isMobile'],
     props: {
       total: Number,
       items: Array,
       user: Object,
       storeLocale: String,
+      actionList: Array
     },
     filters: {
       convertMoney(value) {
@@ -120,8 +124,11 @@
         }
       },
       itemsWithQty() {
-        if (this.items) return this.items.filter(i => i.quantity > 0)
+        if (this.items) return this.items.filter(i => i.printed ? i : i.quantity > 0)
         return []
+      },
+      disablePrintBtn() {
+        return this.actionList.length === 0
       }
     },
     methods: {
@@ -129,6 +136,7 @@
         return item.originalPrice !== item.price
       },
       addItem(item) {
+        if (item.printed) return
         this.$emit('addItemQuantity', item)
       },
       removeItem(item) {
@@ -138,10 +146,11 @@
         this.$emit('removeProductModifier', item, index)
       },
       openConfigDialog(item) {
+        if (item.printed) return
         this.dialogConfigOrderItem = Object.assign({} , this.dialogConfigOrderItem, {
           product: item,
           value: true,
-          originalPrice: item.price,
+          originalPrice: item.originalPrice,
           price: 0
         })
       },
@@ -189,6 +198,7 @@
       },
       back() {
         this.$emit('resetOrderData')
+        this.$emit('updateOrderTable', null)
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
@@ -197,6 +207,9 @@
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
         this.$emit('quickCash')
+      },
+      splitOrder() {
+        this.$getService('PosOrderSplitOrder:setActive')(true)
       }
     },
     mounted() {
@@ -217,11 +230,20 @@
         this.table = this.$router.currentRoute.params.name
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
-    }
+    },
   }
 </script>
 
 <style scoped lang="scss">
+  .blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
   .order-detail {
     padding: 0 8px;
     background: white;
@@ -230,6 +252,8 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    max-height: 100vh;
+    position: relative;
 
     &__header {
       display: flex;

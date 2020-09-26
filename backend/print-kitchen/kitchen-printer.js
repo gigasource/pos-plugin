@@ -4,7 +4,7 @@ const {renderer, print, getEscPrinter, getGroupPrinterInfo} = require('../print-
 
 module.exports = async function (cms) {
   cms.socket.on('connect', socket => {
-    socket.on('printKitchen', async ({order, device}, callback) => {
+    socket.on('printKitchen', async ({order, device}, callback = () => null) => {
       let results = []
 
       try {
@@ -29,6 +29,32 @@ module.exports = async function (cms) {
         callbackWithError(callback, e);
       }
     });
+
+    socket.on('printKitchenCancel', async ({order, device}, callback = () => null) => {
+      let results = []
+
+      try {
+        const groupPrinters = await getGroupPrinterInfo(cms, device, 'kitchen');
+        const printerInfos = groupPrinters.map(e => {
+          return {name: e.name, ...e.printers}
+        })
+        const receipts = getReceiptsFromOrder(order);
+
+        for (const printerInfo of printerInfos) {
+          const {escPOS} = printerInfo
+          const receiptsForPrinter = await getReceiptsForPrinter(receipts, printerInfo);
+          const printData = await getPrintData(receiptsForPrinter, order, printerInfo);
+
+          if (escPOS) results.push(await printEscPos(printData, printerInfo, true));
+          // else results.push(await printSsr(printData, printerInfo));
+        }
+
+        callback({success: true, results});
+      } catch (e) {
+        console.error(e);
+        callbackWithError(callback, e);
+      }
+    })
   });
 
   function getReceiptsFromOrder(order) {
@@ -105,7 +131,7 @@ module.exports = async function (cms) {
     });
   }
 
-  async function printEscPos(printData, printerInfo) {
+  async function printEscPos(printData, printerInfo, cancel = false) {
     const results = [];
 
     await Promise.all(printData.map(props => {
@@ -115,6 +141,13 @@ module.exports = async function (cms) {
 
         function convertMoney(value) {
           return !isNaN(value) ? value.toFixed(2) : value
+        }
+
+        if (cancel) {
+          printer.alignCenter()
+          printer.setTextQuadArea()
+          printer.bold(true);
+          printer.println('** CANCEL **')
         }
 
         printer.alignLeft();
@@ -132,15 +165,20 @@ module.exports = async function (cms) {
         printer.alignLeft();
         items.forEach((item, index) => {
           printer.bold(false);
+          printer.setTextQuadArea();
           const quantityColumnWidth = item.quantity.toString().length * 0.05;
           const itemsColumnWidth = 0.92 - item.quantity.toString().length * 0.05;
 
-          printer.setTextQuadArea();
-          printer.tableCustom([
-            {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
-            {text: 'x', align: 'LEFT', width: 0.05, bold: true},
-            {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
-          ], {textDoubleWith: true});
+          if (cancel) {
+            printer.alignLeft()
+            printer.println(`- ${item.name}`)
+          } else {
+            printer.tableCustom([
+              {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
+              {text: 'x', align: 'LEFT', width: 0.05, bold: true},
+              {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
+            ], {textDoubleWith: true});
+          }
 
           if (item.modifiers) {
             printer.setTextDoubleWidth();
