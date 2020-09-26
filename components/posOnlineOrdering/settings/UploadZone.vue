@@ -32,8 +32,8 @@
         <div class="dialog-upload__title">Upload Photo</div>
         <template v-if="view === 'src'">
           <div style="margin-bottom: -1px;">
-            <span @click="tab = 'url'" :class="['dialog-upload__tab', tab === 'url' && 'dialog-upload__tab--selected']" style="marginLeft: 35px">Paste Photo Url</span>
-            <span @click="tab = 'upload'" :class="['dialog-upload__tab', tab === 'upload' && 'dialog-upload__tab--selected']">Upload a photo</span>
+            <span @click="tab = 'upload'" :class="['dialog-upload__tab', tab === 'upload' && 'dialog-upload__tab--selected']" style="marginLeft: 35px">Upload a photo</span>
+            <span @click="tab = 'url'" :class="['dialog-upload__tab', tab === 'url' && 'dialog-upload__tab--selected']">Paste Photo Url</span>
             <span @click="tab = 'library'" :class="['dialog-upload__tab', tab === 'library' && 'dialog-upload__tab--selected']">Select from library</span>
           </div>
           <div style="border: 1px solid #9E9E9E; background-color: #EFEFEF; padding: 36px; border-radius: 0 0 5px 5px">
@@ -109,7 +109,7 @@
     data: function () {
       return {
         view: 'src', // src | crop
-        tab: 'url', // url | upload
+        tab: 'upload', // url | upload
 
         // via link
         loadingImage: false,
@@ -185,7 +185,7 @@
       showUploadDialog(view = 'src') {
         this.dialog.upload = true
         this.view = view
-        this.tab = 'url'
+        this.tab = 'upload'
         this.photoUrl = ''
         this.file = null
       },

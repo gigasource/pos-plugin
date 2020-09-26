@@ -183,6 +183,7 @@
       "type": "input@switch"
     },
     {
+      "_id": "5f5f2cf9cbabcf001b0451b6",
       "schemaType": "object",
       "key": "mark",
       "type": "object",
@@ -248,6 +249,11 @@
               "type": "input"
             }
           ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "favorite",
+          "type": "input@switch"
         }
       ]
     }

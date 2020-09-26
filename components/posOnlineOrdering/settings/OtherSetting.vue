@@ -1,28 +1,41 @@
 <template>
   <div class="other">
-    <div class="other__title">Other Setting</div>
+    <div class="other__title">{{$t('setting.otherSetting')}}</div>
     <div class="other__main">
-      <div class="other__main--left">
-        <p>Digital menu embed script</p>
+      <div class="other__main--article">
+        <p>{{$t('setting.digitalMenuScript')}}</p>
         <g-textarea rows="8" outlined no-resize v-model="script"/>
         <div class="row-flex justify-end">
-          <g-btn-bs background-color="#1271ff" @click="uploadScript">Upload</g-btn-bs>
+          <g-btn-bs background-color="#1271ff" @click="uploadScript">{{$t('setting.upload')}}</g-btn-bs>
         </div>
       </div>
-      <div class="other__main--right">
-        <p>Delivery Forwarding</p>
+      <div class="other__main--article">
+        <p>{{$t('setting.deliveryForwarding')}}</p>
         <div class="row-flex align-items-center">
-          <span class="fs-small fw-700 mr-3">Delivery order forwarding</span>
-          <g-switch v-model="active"/>
+          <span class="fs-small fw-700 mr-3">{{$t('setting.deliveryOrderForwarding')}}</span>
+          <g-switch v-model="activeForward"/>
         </div>
         <div class="row-flex align-items-center my-3">
-          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">Forward order to restaurant ID </span>
+          <span class="fs-small fw-700 mr-3" style="white-space: nowrap">{{$t('setting.forwardToRestaurant')}}</span>
           <g-text-field-bs style="margin: 0" large type="number" v-model="storeId"/>
         </div>
         <span>
-          <b>Note: </b>
-          <span>Forwarded orders will only appear in the destination device. The system only forwards delivery orders.</span>
+          <b>{{$t('store.note')}}: </b>
+          <span>{{$t('setting.forwardNote')}}</span>
         </span>
+      </div>
+      <div v-if="!store.delivery" class="other__main--article">
+        <p>Affiliate Delivery</p>
+        <div class="row-flex align-items-center">
+          <span class="fs-small fw-700 mr-3 col-3">Active</span>
+          <g-switch v-model="activeAffiliate"/>
+        </div>
+        <div class="row-flex align-items-center my-3">
+          <span class="fs-small fw-700 mr-3 col-3">Affiliate URL</span>
+          <g-text-field-bs style="margin: 0" large v-model="url"/>
+        </div>
+        <div class="fs-small"><b>Current month:</b> {{affiliateDelivery.currentMonthCounter || 0}}</div>
+        <div class="fs-small"><b>Last month:</b> {{affiliateDelivery.lastMonthCounter || 0}}</div>
       </div>
     </div>
   </div>
@@ -40,13 +53,15 @@
       return {
         script: (this.store && this.store.digitalMenuScript) || '',
         deliveryForward: (this.store && this.store.deliveryForward) || {},
+        affiliateDelivery: (this.store && this.store.affiliateDelivery) || {},
       }
     },
     created() {
       this.updateStoreIdDebounce = _.debounce(this.updateStoreId, 1000)
+      this.updateAffiliateUrlDebounce = _.debounce(this.updateAffiliateUrl, 1000)
     },
     computed: {
-      active: {
+      activeForward: {
         get() {
           if(this.deliveryForward)
             return this.deliveryForward.active
@@ -68,7 +83,30 @@
         set(val) {
           this.updateStoreIdDebounce(val)
         }
-      }
+      },
+      activeAffiliate: {
+        get() {
+          if(this.affiliateDelivery)
+            return this.affiliateDelivery.active
+          else
+            return false
+        },
+        set(val) {
+          this.$set(this.affiliateDelivery, 'active', val)
+          this.updateAffiliateDelivery()
+        }
+      },
+      url: {
+        get() {
+          if(this.affiliateDelivery)
+            return this.affiliateDelivery.url
+          else
+            return ''
+        },
+        set(val) {
+          this.updateAffiliateUrlDebounce(val)
+        }
+      },
     },
     methods: {
       uploadScript() {
@@ -81,6 +119,14 @@
         if (!value || isNaN(value)) return
         this.$set(this.deliveryForward, 'storeId', value)
         this.updateDeliveryForward()
+      },
+      updateAffiliateDelivery() {
+        this.$emit('update', { affiliateDelivery: this.affiliateDelivery })
+      },
+      updateAffiliateUrl(value) {
+        if(!value) return
+        this.$set(this.affiliateDelivery, 'url', value)
+        this.updateAffiliateDelivery()
       }
     }
   }
@@ -96,24 +142,21 @@
     }
 
     &__main {
-      display: flex;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 24px;
 
-      &--left,
-      &--right {
+      &--article {
         background-color: #FFF;
         border-radius: 5px;
         padding: 24px;
-        margin-bottom: 24px;
 
         & > p {
           font-size: 16px;
           font-weight: bold;
+          margin-bottom: 12px;
         }
-      }
-
-      &--left {
-        flex: 0 0 calc(50% - 6px);
-        margin-right: 6px;
 
         .g-textarea {
           margin-right: 4px;
@@ -147,11 +190,6 @@
             }
           }
         }
-      }
-
-      &--right {
-        flex: 0 0 calc(50% - 6px);
-        margin-left: 6px;
       }
     }
   }

@@ -242,6 +242,12 @@
       "flex": "md6"
     },
     {
+      "_id": "5f5f3099b2796bc40aa05541",
+      "schemaType": "boolean",
+      "key": "master",
+      "type": "input@switch"
+    },
+    {
       "_id": "5f3dff8bad3fc2e00592c482",
       "schemaType": "string",
       "key": "apnToken",

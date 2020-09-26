@@ -654,6 +654,24 @@ module.exports = async function (cms) {
           openHours: store.openHours
         })
       })
+
+      socket.on('registerMasterDevice', async (ip) => {
+        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+      })
+
+      socket.on('emitToAllDevices', async (commits, storeAlias) => {
+        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
+        const devices = await cms.getModel('Device').find({ storeId: storeId._doc._id, paired: true });
+        devices.forEach((device) => {
+          externalSocketIOServer.emitTo(device._id.toString(), 'updateCommitNode', commits)
+        });
+      })
+
+      socket.on('getMasterIp', async (storeAlias, fn) => {
+        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
+        const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
+        fn(device.metadata.ip, device._id.toString());
+      })
     }
 
     /** @deprecated */
@@ -707,6 +725,11 @@ module.exports = async function (cms) {
     socket.on('watchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.join(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
     socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
+    socket.on('updateMasterDevice', async (storeId, masterDeviceId) => {
+      const master = await cms.getModel('Device').findOne({ storeId, deviceType: { $ne: 'gsms' }, master: true}).lean()
+      externalSocketIOServer.emitToPersistent(master._id.toString(), 'updateMasterDevice');
+    })
+
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       const device = await cms.getModel('Device').findById(deviceId).lean();
       const store = await cms.getModel('Store').findById(device.storeId);
@@ -715,6 +738,13 @@ module.exports = async function (cms) {
 
       try {
         externalSocketIOServer.emitToPersistent(deviceId, 'updateAppFeature', features, 'updateAppFeatureAck', [device, features]);
+
+        //sent products info if delivery features is on
+        if(features && features.delivery) {
+          const products = await cms.getModel('Product').find({ store: store._id })
+          const data = { products }
+          externalSocketIOServer.emitTo(deviceId, 'updateProducts', data)
+        }
 
         console.debug(sentryTags, `2. Online Order backend: Sending feature update to client with id ${deviceId}`, JSON.stringify(features));
         cb(`Awaiting device feature update for ${device.name}(${device.hardware})`);

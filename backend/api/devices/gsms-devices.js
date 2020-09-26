@@ -22,7 +22,6 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
     }
   }];
 
-  // TODO: impact???
   if (nameSearch) {
     steps.push({
       $lookup: {
@@ -96,7 +95,6 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
 }
 
 router.get('/devices/:clientId', async (req, res) => {
-  console.log('getting device with id', clientId)
   const {clientId} = req.params;
   if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
 
@@ -107,7 +105,6 @@ router.get('/devices/:clientId', async (req, res) => {
 });
 
 router.get('/devices', async (req, res) => {
-  console.log('getting devices')
   let {n = 0, offset = 0, sort = 'createdAt.desc', nameSearch} = req.query;
 
   sort = extractSortQueries(sort);

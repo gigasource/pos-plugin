@@ -6,7 +6,10 @@
           <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(true)">fas fa-caret-square-up</g-icon>
           </p>
-          <p>{{ index + 1 }}</p>
+          <p>
+            {{ index + 1 }}
+            <g-icon v-if="mark.favorite" size="16" color="#FFCB3A">star</g-icon>
+          </p>
           <p v-if="positioning && !editing">
             <g-icon style="cursor: pointer" @click="changePosition(false)">fas fa-caret-square-down</g-icon>
           </p>
@@ -121,6 +124,7 @@
           :choices="choices"
           :available="available"
           :mark="mark"
+          :total="total"
           :display-image="displayImage"
           :store-country-locale="storeCountryLocale"
           @cancel="cancelEdit"
@@ -138,7 +142,7 @@
     components: { SettingNewMenuItem },
     props: [ '_id', 'index', 'id', 'image', 'name', 'desc', 'price', 'groupPrinters', 'tax', 'availablePrinters',
       'useMultiplePrinters', 'maxIndex', 'collapseText', 'showImage', 'choices', 'available', 'displayId',
-      'editing', 'mark', 'displayImage', 'storeCountryLocale'],
+      'editing', 'mark', 'displayImage', 'storeCountryLocale', 'total'],
     data: function () {
       return {
         mode: 'view',

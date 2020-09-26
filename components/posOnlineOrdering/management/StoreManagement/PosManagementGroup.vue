@@ -75,7 +75,10 @@
                      :key="`device_${store.id}_${index}`">
                   <div class="row-flex col-4 align-items-center">
                     <g-icon style="min-width: 24px">{{getDeviceIcon(device)}}</g-icon>
-                    <span class="ml-1">{{device.name}}</span>
+                    <div class="ml-1">
+                      <div>{{device.name}}</div>
+                      <div v-if="device.master" style="font-style: italic; font-size: 12px">(master)</div>
+                    </div>
                     <g-tooltip :open-on-hover="true" speech-bubble color="#000" transition="0.3" remove-content-on-close>
                       <span>Online ordering</span>
                       <template v-slot:activator="{on}">
@@ -129,6 +132,9 @@
                       <div class="menu-action">
                         <div v-if="featureControlPerm" class="menu-action__option"
                              @click="$emit('open:editDeviceFeatureDialog', store, device)">Feature control
+                        </div>
+                        <div v-if="featureControlPerm" class="menu-action__option"
+                             @click="toggleMasterDevice(device)">Toggle master device
                         </div>
                         <div v-if="settingsPerm" class="menu-action__option"
                              @click="$emit('open:editDeviceNameDialog', device)">Edit name
@@ -267,7 +273,7 @@
             <template v-if="dialog.webRTC.show" #title>WebRTC remote control ({{ dialog.webRTC.device._id }})</template>
             <div v-if="dialog.webRTC.show && dialog.webRTC.dragging"
                  style="height: 100%; width: 100%; position: absolute; background: transparent"/>
-            <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" width="100%" height="100%" @load="handleWebRtcIframeLoad"/>
+            <iframe v-if="dialog.webRTC.show" :src="dialog.webRTC.src" allow="autoplay" width="100%" height="100%" @load="handleWebRtcIframeLoad"/>
           </g-dnd-dialog>
         </div>
       </template>
@@ -382,6 +388,13 @@
       },
       openWebShopStore(store) {
         window.open(`${location.origin}/store/${store.alias || store._id}`)
+      },
+      async toggleMasterDevice(device) {
+        const storeDevices = await cms.getModel('Device').find({ storeId: device.storeId })
+        await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
+        await cms.getModel('Device').findOneAndUpdate({ _id: device._id }, { master: true })
+        this.$emit('updateStores')
+        cms.socket.emit('updateMasterDevice', device.storeId, device._id)
       },
       handleWebRTCMessage(e) {
         try {

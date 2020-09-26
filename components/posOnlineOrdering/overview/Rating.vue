@@ -1,8 +1,8 @@
 <template>
  <div class="rating">
-   <g-icon class="rating-icon" :size="iconSize" v-for="i in full" :color="color">{{iconFull}}</g-icon>
+   <g-icon class="rating-icon" :size="iconSize" v-for="i in full" :key="i" :color="color">{{iconFull}}</g-icon>
    <g-icon class="rating-icon" :size="iconSize" v-if="half" :color="color">{{iconHalf}}</g-icon>
-   <g-icon class="rating-icon" :size="iconSize" v-for="i in empty" :color="color">{{iconEmtpy}}</g-icon>
+   <g-icon class="rating-icon" :size="iconSize" v-for="i in empty" :key="i" :color="color">{{iconEmpty}}</g-icon>
  </div>
 </template>
 
@@ -18,7 +18,7 @@
         type: String,
         default: 'star_half'
       },
-      iconEmtpy: {
+      iconEmpty: {
         type: String,
         default: 'star_outline'
       },

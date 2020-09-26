@@ -17,6 +17,7 @@
           </div>
         </g-menu>
         <g-spacer/>
+        <g-btn-bs v-if="isUpdatable" border-color="#e3e5f0" @click="updateScriptAll">Update</g-btn-bs>
         <g-btn-bs v-if="manageStorePerm" border-color="#536DFE" icon="add@16" :disabled="storeGroups.length === 0" @click="dialog.newStore = true">Add New Store</g-btn-bs>
         <g-btn-bs v-if="manageGroupPerm" background-color="#536DFE" text-color="white" icon="add@16" @click="dialog.newGroup = true">Add New Group</g-btn-bs>
       </div>
@@ -129,6 +130,18 @@
 </template>
 <script>
   import supportedCountries from '../../../Store/supportedCountries';
+  import createGridFsHandlers from '@gigasource/vue-file-explorer/api-handlers/grid-fs'
+  import {
+    genReadyState,
+    genScriptHeader,
+    genScriptFooter,
+    genStyleSheet,
+    checkIOs12AndLess,
+    getEmbedBtn,
+    mobileCheck,
+    genIcon
+  } from '../../settings/gen-embed-script';
+  const terser = require('terser')
 
   export default {
     name: 'StoreManagement',
@@ -200,6 +213,11 @@
       //   if (this.selectedStoreId)
       //     return _.find(this.stores, store => store._id === this.selectedStoreId)
       // },
+      isUpdatable() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
+        return false
+      }
     },
     methods: {
       setSelectedStore(store) {
@@ -290,6 +308,33 @@
       },
       approveGmsDevice(storeId, deviceId) {
         this.updateGSmsDevice(storeId, deviceId, { registered: true })
+      },
+      async updateScriptAll() {
+        const stores = await cms.getModel('Store').find().lean()
+        const gridFsHandler = createGridFsHandlers({
+          apiBaseUrl: '/cms-files',
+          imageThumbnailSize: {}
+        })
+        const type = [
+          {type: 'overview', link: ''},
+          {type: 'webshop', link: 'order'},
+          {type: 'reservation', link: 'reservation'}
+        ]
+        await Promise.all(stores.map(async store => {
+          const folderExisted = await gridFsHandler.checkFileExisted('/store/', store.alias);
+          if (folderExisted) {
+            const header = genScriptHeader(),
+                footer = genScriptFooter(),
+                triggerBtn = getEmbedBtn(type, store.alias),
+                checkIOs = checkIOs12AndLess(),
+                mobile = mobileCheck(),
+                icon = genIcon(store.alias, 'image/png', 'png', 'https://cdn.restaurantplus.net')
+            const fnString = header + checkIOs + mobile + genStyleSheet('bottom-right', 'normal', false) + icon + triggerBtn + genReadyState() + footer
+            const minifyString = terser.minify(fnString).code
+            const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
+            await gridFsHandler.uploadFile(file, `/store/${store.alias}`, () => {}, false, true)
+          }
+        }))
       }
     }
   }
