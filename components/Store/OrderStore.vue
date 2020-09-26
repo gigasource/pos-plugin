@@ -756,6 +756,7 @@
           console.log(`clear interval ${id}`)
           clearInterval(socketIntervals[id])
           delete socketIntervals[id]
+          typeof cb === 'function' && cb()
         })
       },
       printOnlineOrderReport(orderId) {
