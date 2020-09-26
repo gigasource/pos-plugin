@@ -669,6 +669,7 @@ module.exports = async function (cms) {
 
       socket.on('getMasterIp', async (storeAlias, fn) => {
         const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
+        if (!storeId) return fn(null, null);
         const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
         fn(device.metadata.ip, device._id.toString());
       })
@@ -727,7 +728,12 @@ module.exports = async function (cms) {
 
     socket.on('updateMasterDevice', async (storeId, masterDeviceId) => {
       const master = await cms.getModel('Device').findOne({ storeId, deviceType: { $ne: 'gsms' }, master: true}).lean()
+      const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
       externalSocketIOServer.emitToPersistent(master._id.toString(), 'updateMasterDevice');
+      devices.forEach(device => {
+        console.log(`Sending master ip to ${device._id.toString()}`);
+        externalSocketIOServer.emitToPersistent(device._id.toString(), 'newMasterClientId', [master._id.toString()]);
+      })
     })
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
