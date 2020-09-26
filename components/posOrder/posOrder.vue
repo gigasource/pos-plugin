@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-menu v-if="isMobile && type === 'default'" v-model="menu" close-on-content-click>
+      <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <g-avatar size="36">
@@ -14,7 +14,7 @@
           <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
           <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
           <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
-                    @click.stop="$emit('saveTableOrder')">
+                    @click.stop="printOrder">
             Print
           </g-btn-bs>
           <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
@@ -64,7 +64,6 @@
       </div>
     </div>
     <div class="blur-overlay" v-show="menu"/>
-    <div @click="dialog.createOrder = true">Next</div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
@@ -101,11 +100,7 @@
           originalPrice: 0,
           price: 0,
         },
-        dialog: {
-          createOrder: false
-        },
         menu: false,
-        type: ''
       }
     },
     computed: {
@@ -210,6 +205,10 @@
       },
       splitOrder() {
         this.$getService('PosOrderSplitOrder:setActive')(true)
+      },
+      printOrder() {
+        this.menu = false
+        this.$emit('saveTableOrder')
       }
     },
     mounted() {
