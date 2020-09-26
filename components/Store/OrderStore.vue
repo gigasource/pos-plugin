@@ -735,21 +735,21 @@
       //<!--</editor-fold>-->
 
       // online ordering
-      emitWithRetry(eventName, id, data, cb, attempt = 1) {
+      async emitWithRetry(eventName, id, data, cb, attempt = 1) {
+        console.log(`emitWithRetry event ${eventName}, attempt ${attempt}`)
         if (!socketIntervals[id])
           socketIntervals[id] = setInterval(() => {
-            attempt+= 1
+            attempt += 1
             this.emitWithRetry(eventName, id, data, cb, attempt);
           }, 5000)
         console.log(`emit event ${eventName}`, socketIntervals[id])
 
-        if (attempt === 2) {
-          axios.post('http://localhost:8888/api/order/update-status', data).then(res => {
-            console.log('REST update-status result', res)
-            console.log(`clear interval ${id}`)
-            clearInterval(socketIntervals[id])
-            delete socketIntervals[id]
-          })
+        if (attempt >= 2) {
+          const result = await axios.post('http://localhost:8888/api/order/update-status', data)
+          console.log('REST update-status result', result)
+          console.log(`clear interval ${id}`)
+          clearInterval(socketIntervals[id])
+          delete socketIntervals[id]
         }
 
         cms.socket.emit(eventName, ...data, () => {

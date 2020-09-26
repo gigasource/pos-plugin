@@ -15,7 +15,7 @@ router.post('/update-status', async (req, res) => {
 
   getOnlineOrderSocket().emit('updateOrderStatus', { orderId, onlineOrderId, status, responseMessage, storeName: name, storeAlias: alias}, )
 
-  res.status(200)
+  res.sendStatus(200)
 })
 
 module.exports = router
