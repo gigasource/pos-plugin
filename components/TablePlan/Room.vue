@@ -10,7 +10,7 @@
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          :style="getRoomObjectContainerStyle(roomObject)"
          v-touch="getTouchHandlers(roomObject)"
-         :class="[...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
+         :class="['waves-effect', 'waves-red', ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
@@ -127,6 +127,15 @@
           style.boxShadow = '0px 2px 4px rgba(131, 146, 167, 0.2)';
         }
 
+        if (this.isTableBusy(roomObj)) {
+          const addStyle = this.transferringTable && roomObj.name !== this.transferTableFrom.name
+              ? { background: '#fec8c8', opacity: 0.2 }
+              : { background: '#fec8c8', border: '1px solid #d2691e' }
+          Object.assign(style, addStyle)
+        } else {
+          Object.assign(style, { background: roomObj.bgColor })
+        }
+
         return style
       },
       getRoomObjectStyle(roomObj) {
@@ -144,15 +153,6 @@
 
         if (this.isTable(roomObj)) {
           style.borderRadius = `4px`;
-        }
-
-        if (this.isTableBusy(roomObj)) {
-          const addStyle = this.transferringTable && roomObj.name !== this.transferTableFrom.name
-            ? { background: '#fec8c8', opacity: 0.2 }
-            : { background: '#fec8c8', border: '1px solid #d2691e' }
-          Object.assign(style, addStyle)
-        } else {
-          Object.assign(style, { background: roomObj.bgColor })
         }
 
         return style

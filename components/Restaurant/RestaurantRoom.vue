@@ -93,11 +93,13 @@
       selectRoomObj(roomObj) {
         // if (!this.isTableBusy(roomObj)) {
           this.roomObj = roomObj;
-          if (this.isMobile) {
-            this.$router.push(`/pos-order-3/${roomObj.name}`)
-          } else {
-            this.$router.push(`/pos-order-2/${roomObj.name}`)
-          }
+          setTimeout(() => {
+            if (this.isMobile) {
+              this.$router.push(`/pos-order-3/${roomObj.name}`)
+            } else {
+              this.$router.push(`/pos-order-2/${roomObj.name}`)
+            }
+          }, 300)
         // }
       },
       setTransferTableFrom(roomObj) {
