@@ -241,6 +241,52 @@
       "ref": "PosModifierGroup",
       "type": "ref-select",
       "labelProp": "name"
+    },
+    {
+      "_id": "5f69a70c2041162d7a206e2e",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5f69a70c2041162d7a206e2f",
+      "schemaType": "array",
+      "key": "choices",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "mandatory",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "select",
+          "type": "input"
+        },
+        {
+          "schemaType": "array",
+          "key": "options",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number"
+            }
+          ]
+        }
+      ]
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

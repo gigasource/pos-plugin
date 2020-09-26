@@ -151,6 +151,11 @@
                          :product="selectedProduct"
                          :focus="dialog.focus"
                          @submit="updateProduct($event, $event.name)"/>
+    <dialog-text-filter
+        label="Text"
+        :default-value="selectedProductLayout.text"
+        v-model="dialog.showTextKbd"
+        @submit="updateProductLayout({ text: $event, type: 'Text' }, $event)"/>
     <dialog-edit-popup-modifiers v-model="dialog.popupModifiers" :product="selectedProduct" />
     <g-snackbar v-model="showSnackbar" top right color="#1976d2" time-out="2000">{{notifyContent}}</g-snackbar>
 
@@ -191,11 +196,13 @@
         dialog: {
           productInfo: false,
           popupModifiers: false,
-          focus: 'id'
+          focus: 'id',
+          showTextKbd: false,
         },
         showSnackbar: false,
         notifyContent: null,
-        popupModifierGroups: []
+        popupModifierGroups: [],
+        layoutType: ''
       }
     },
     computed: {
@@ -258,6 +265,19 @@
       await this.loadCategories()
       await this.loadTaxes()
       await this.loadPopupModifierGroups()
+
+      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
+        this.layoutType = this.$router.currentRoute.query.type
+      } else {
+        this.layoutType = 'default'
+      }
+    },
+    activated() {
+      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
+        this.layoutType = this.$router.currentRoute.query.type
+      } else {
+        this.layoutType = 'default'
+      }
     },
     methods: {
       // categories
@@ -356,7 +376,10 @@
         if (this.selectedProductLayout._id) {
           console.log('UpdateProductLayout', change)
           console.log('Update product layout with id', this.selectedProductLayout._id)
-          const qry = { 'categories.products._id': this.selectedProductLayout._id }
+          const qry = {
+            type: this.layoutType,
+            'categories.products._id': this.selectedProductLayout._id
+          }
           const set =  { $set: _.reduce(change, (result, value, key) => {
               result[`categories.$[cate].products.$[product].${key}`] = value
               return result
@@ -404,7 +427,10 @@
         }
 
         const result = await cms.getModel('OrderLayout').findOneAndUpdate(
-            { 'categories._id' : this.selectedCategoryLayout._id },
+            {
+              type: this.layoutType,
+              'categories._id' : this.selectedCategoryLayout._id
+            },
             { $push: { 'categories.$.products' : productLayout } },
             { new: true });
 

@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail">
     <div class="order-detail__header">
-      <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
+      <g-menu v-if="isMobile && type === 'default'" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
           <div v-on="on">
             <g-avatar size="36">
@@ -64,6 +64,7 @@
       </div>
     </div>
     <div class="blur-overlay" v-show="menu"/>
+    <div @click="dialog.createOrder = true">Next</div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
@@ -98,9 +99,13 @@
           value: false,
           product: null,
           originalPrice: 0,
-          price: 0
+          price: 0,
         },
-        menu: false
+        dialog: {
+          createOrder: false
+        },
+        menu: false,
+        type: ''
       }
     },
     computed: {
@@ -246,6 +251,7 @@
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
+    height: 100vh;
     max-height: 100vh;
     position: relative;
 
@@ -290,6 +296,7 @@
       border: 1px solid #e8e8e8;
       overflow: scroll;
       margin-bottom: 3px;
+      flex: 1;
 
       .item {
         padding: 8px;

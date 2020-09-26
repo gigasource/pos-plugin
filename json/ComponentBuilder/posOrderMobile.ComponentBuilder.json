@@ -236,6 +236,8 @@
               "service": "OrderStore:saveTableOrder",
               "local": "saveTableOrder",
               "type": "event"
+              "service": "OrderStore:resetOrderData",
+              "local": "resetOrderData"
             }
           ]
         }

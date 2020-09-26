@@ -36,7 +36,7 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "23.44%",
+              "25%",
               "1fr",
               "1fr",
               "1fr"
@@ -534,6 +534,16 @@
                   "type": "prop"
                 }
               ]
+            },
+            {
+              "choice": "view",
+              "component": "CallSystem",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "callSystem",
+              "url": "plugins/pos-plugin/components/OnlineOrder/CallSystem.vue",
+              "path": "components/OnlineOrder/CallSystem.vue",
+              "pluginName": "pos-plugin"
             }
           ],
           "inject": [

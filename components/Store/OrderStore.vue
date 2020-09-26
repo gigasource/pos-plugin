@@ -112,6 +112,11 @@
             show: false,
           },
         },
+        //call in order
+        calls: [],
+        selectedCustomer: {},
+        orderType: '',
+        missedCalls: []
       }
     },
     computed: {
@@ -1189,6 +1194,83 @@
             resolve(order);
           })
         })
+      },
+
+      // call in order
+      async getCustomerInfo(phone) {
+        const customer = await cms.getModel('Customer').findOne({phone})
+        if (!customer) {
+          return {
+            phone,
+            name: 'New customer',
+            addresses: []
+          }
+        }
+        return customer
+      },
+      async createCallInOrder(customer, time, note) {
+        let order = {}
+        const orderDateTime = new Date()
+        const id = await orderUtil.getLatestOrderId()
+        const taxGroups = _.groupBy(this.currentOrder.items, 'tax')
+        const vTaxGroups = _.map(taxGroups, (val, key) => ({
+          taxType: key,
+          tax: orderUtil.calOrderTax(val),
+          sum: orderUtil.calOrderTotal(val)
+        }))
+
+        const items = this.compactOrder(this.currentOrder.items)
+
+        Object.assign(order, this.currentOrder, {
+          id,
+          status: 'kitchen',
+          online: true,
+          takeOut: this.currentOrder.takeOut,
+          items: orderUtil.getComputedOrderItems(items, orderDateTime),
+          user: this.currentOrder.user
+              ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
+              : [{ name: this.user.name, date: orderDateTime }],
+          date: orderDateTime,
+          vDate: await getVDate(orderDateTime),
+          bookingNumber: getBookingNumber(orderDateTime),
+          payment: [{ type: 'cash', value: this.paymentTotal }],
+          vSum: this.paymentTotal.toFixed(2),
+          vTax: this.paymentTax.toFixed(2),
+          vTaxGroups,
+          vDiscount: this.paymentDiscount.toFixed(2),
+          receive: 0,
+          cashback: 0,
+          customer,
+          deliveryDate: new Date(),
+          type: this.orderType || 'delivery',
+          deliveryTime: dayjs().add(time, 'minute').format('HH:mm'),
+          shippingFee: 0,
+          note,
+        });
+
+        const newOrder = await cms.getModel('Order').create(order)
+
+        this.printOnlineOrderKitchen(newOrder._id)
+        this.printOnlineOrderReport(newOrder._id)
+
+        this.resetOrderData()
+        const callIndex = this.calls.findIndex(c => c.customer.phone === this.selectedCustomer.phone)
+        this.calls.splice(callIndex, 1)
+        this.orderType = ''
+        this.selectedCustomer = {}
+      },
+      // customer
+      async createCustomer(customer) {
+        await cms.getModel('Customer').create(customer)
+      },
+      async getCustomers() {
+        return await cms.getModel('Customer').find()
+      },
+      async updateCustomer(_id, change) {
+        await cms.getModel('Customer').findOneAndUpdate({_id}, {...change})
+      },
+      async deleteCustomer(_id) {
+        await cms.getModel('Customer').deleteOne({_id})
       }
     },
     async created() {
@@ -1221,6 +1303,19 @@
         }
       })
       await this.getReservations()
+
+      cms.socket.on('new-phone-call', async (phoneNumber, date) => {
+        const customer = await this.getCustomerInfo(phoneNumber);
+        this.calls.unshift({customer, date, phoneNumber});
+      })
+
+      cms.socket.on('new-missed-phone-call', async (phoneNumber, date) => {
+        const customer = await this.getCustomerInfo(phoneNumber);
+
+        const callIndex = this.calls.findIndex(e => e.phoneNumber === phoneNumber);
+        if (callIndex > -1) this.calls.splice(callIndex, 1);
+        this.missedCalls.unshift({customer, date});
+      })
     },
     watch: {
       'orderHistoryPagination.limit'(newVal) {

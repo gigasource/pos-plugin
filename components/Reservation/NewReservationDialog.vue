@@ -39,6 +39,7 @@
       value: Boolean,
       reservation: Object,
       edit: Boolean,
+      receivedPhone: [Number, String]
     },
     injectService: ['SettingsStore:(reservationSetting, getReservationSetting)', 'OrderStore:(createReservation, updateReservation)'],
     data() {
@@ -166,6 +167,9 @@
             } else {
               this.date = day.format('DD MMM')
             }
+          }
+          if(this.receivedPhone) {
+            this.phone = this.receivedPhone.toString()
           }
           const interval = setInterval(() => {
             if (!_.isEmpty(this.$refs)) {

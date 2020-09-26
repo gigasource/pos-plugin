@@ -697,3 +697,73 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-call {
+  background-image: url("../assets/call.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-table-reservation {
+  background-image: url("../assets/table-reservation.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-delete2 {
+  background-image: url("../assets/delete2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-note2 {
+  background-image: url("../assets/note2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-menu1 {
+  background-image: url("../assets/menu1.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-menu2 {
+  background-image: url("../assets/menu2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-customer-info {
+  background-image: url("../assets/customer-info.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-kitchen {
+  background-image: url("../assets/kitchen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-missed-call {
+  background-image: url("../assets/missed-call.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-telephone {
+  background-image: url("../assets/telephone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

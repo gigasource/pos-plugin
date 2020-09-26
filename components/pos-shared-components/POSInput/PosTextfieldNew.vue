@@ -9,7 +9,8 @@
       clearable: Boolean,
       required: Boolean,
       validateOnBlur: Boolean,
-      rules: Array
+      rules: Array,
+      disabled: Boolean
     },
     data() {
       return {
@@ -36,7 +37,8 @@
         clearable: this.clearable,
         required: this.required,
         rules: this.rules,
-        value: this.internalValue
+        value: this.internalValue,
+        disabled: this.disabled
       }
 
       if (this.isMobile) {

@@ -1094,6 +1094,29 @@
       "_id": "5f6acb0e77ebcf0ca67e4740",
       "schemaType": "string",
       "key": "masterClientId"
+    },
+    {
+      "_id": "5f6c0e485039c3860e5ad429",
+      "schemaType": "object",
+      "key": "call",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "ip",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "googleMapApiKey",
+          "type": "input"
+        }
+      ]
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",

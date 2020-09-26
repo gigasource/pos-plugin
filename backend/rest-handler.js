@@ -1,6 +1,9 @@
 module.exports = cms => {
-  cms.app.use(/^\/$/, async (req, res, next) => {
-    return res.redirect('/pos-login')
-    next()
-  })
+  // TODO: delete this after testing with Fritzbox is done
+  /*const fritzboxHandlers = require('./fritzbox-call-handler/express')(cms);
+  cms.app.use('/fritzbox-events', fritzboxHandlers);*/
+
+  cms.app.use(/^\/$/, async (req, res) => {
+    return res.redirect('/pos-login');
+  });
 }
