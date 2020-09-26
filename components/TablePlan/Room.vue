@@ -5,12 +5,12 @@
        @touchmove.prevent.stop="onMouseMove"
        @touchend.prevent.stop="e => onMouseUp(e)"
        ref="room">
-    <div v-for="(roomObject, index) in roomObjects"
+    <div v-for="(roomObject, index) in rooms"
          :key="index"
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          :style="getRoomObjectContainerStyle(roomObject)"
          v-touch="getTouchHandlers(roomObject)"
-         :class="['waves-effect', 'waves-red', ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
+         :class="[...!editable && ['waves-effect', 'waves-red'], ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
@@ -55,16 +55,34 @@
         },
         action: null, // current action -- see list of available action above
         lastPos: null, // store last mouse clientX, Y position which already handled by "applyChange throttle"
-        swiping: false
+        swiping: false,
+        zoom: 0
       }
     },
     computed: {
       selectingObj() {
         if (this.selectedObjectId)
-          return _.find(this.roomObjects, ro => ro._id === this.selectedObjectId)
+          return _.find(this.rooms, ro => ro._id === this.selectedObjectId)
       },
       transferringTable() {
         return !!this.transferTableFrom
+      },
+      rooms() {
+        if(this.editable || this.zoom === 0) {
+          return this.roomObjects
+        } else {
+          return this.roomObjects.map(obj => ({
+            ...obj,
+            location: {
+              x: obj.location.x * this.zoom,
+              y: obj.location.y * this.zoom,
+            },
+            size: {
+              width: obj.size.width * this.zoom,
+              height: obj.size.height * this.zoom
+            }
+          }))
+        }
       }
     },
     created() {
@@ -93,7 +111,11 @@
             console.log(zoomVerticalRatio, zoomHorizontalRatio)
 
             if (zoomHorizontalRatio >= 1 || zoomVerticalRatio >= 1) return
-            roomEl.style.zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
+            const zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
+            if(this.editable)
+              roomEl.style.zoom = zoom
+            else
+              this.zoom = zoom
           })
         },
         immediate: true
@@ -111,7 +133,7 @@
           transform: `rotate(${roomObj.rotate}deg)`,
           transformOrigin: '50% 50%',
           border: '1px solid transparent',
-          fontSize: '20px',
+          fontSize: `${this.zoom ? this.zoom * 20 : 20}px`,
           fontWeight: '700'
         };
 
@@ -205,6 +227,14 @@
         }
       },
       getTouchHandlers(item) {
+        if (this.editable) {
+          const action = this.actions.move
+          return {
+            start: e => this.onMouseDown(e, item, action),
+            move: e => this.onMouseMove(e),
+            end: e => this.onMouseUp(e)
+          }
+        }
         if (!this.isTable(item)) return {}
 
         return {
