@@ -209,6 +209,7 @@
       printOrder() {
         this.menu = false
         this.$emit('saveTableOrder')
+        this.$router.go(-1)
       }
     },
     mounted() {

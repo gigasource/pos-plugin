@@ -1,91 +1,112 @@
 <template>
-  <div class="receipt">
-    <g-toolbar color="#EFEFEF">
-      <g-btn-bs width="120" icon="icon-back" class="elevation-2">
-        Back
-      </g-btn-bs>
-      <g-btn-bs width="120" icon="icon-printer" class="elevation-2">
-        Print
-      </g-btn-bs>
-      <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
-        <div style="line-height: 0.9">
-          <p>Company</p>
-          <p>Receipt</p>
-        </div>
-      </g-btn-bs>
-      <g-spacer/>
-      <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2">
-        Complete
-      </g-btn-bs>
-    </g-toolbar>
-    <div class="receipt-main">
-      <div class="receipt-main__header">
-        <div class="receipt-main__header-title">{{store.name}}</div>
-        <div class="receipt-main__header-subtitle">{{store.address}}</div>
-        <div class="receipt-main__header-subtitle">
-          <span class="mr-3">Tel: {{store.phone}}</span>
-          <span>VAT Reg No: {{store.vat}}</span>
-        </div>
-      </div>
-      <div class="receipt-main__title">Table: {{order.table}}</div>
-      <div class="receipt-main__item" v-for="(seat, i) in order.seats" :key="i">
-        <div class="row-flex align-items-center">
-          <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
-            <template v-slot:activator="{ on }">
-              <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{seat.no}}</div>
-            </template>
-            <div class="row-flex pa-2 bg-white align-items-start">
-              <g-btn-bs icon="icon-printer" class="elevation-2">
-                Print
-              </g-btn-bs>
-              <g-btn-bs class="elevation-2">
-                Bewirtung
-              </g-btn-bs>
-              <div>
-                <g-btn-bs width="90" block icon="icon-credit_card" :background-color="getPaymentColor(seat.payment, 'card')" class="elevation-2">
-                  Card
-                </g-btn-bs>
-                <g-btn-bs width="90" block icon="icon-cash" :background-color="getPaymentColor(seat.payment, 'cash')" class="elevation-2 my-2">
-                  Cash
-                </g-btn-bs>
-                <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(seat.payment, 'multi')" @click="openMultiDialog(seat)" class="elevation-2">
-                  Multi
-                </g-btn-bs>
-              </div>
-              <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
-                Email
-              </g-btn-bs>
-              <g-btn-bs block icon="icon-coin-box" class="elevation-2">
-                Trinkgeld
-              </g-btn-bs>
-            </div>
-          </g-menu>
-          <g-spacer/>
-          <div class="receipt-main__item-total" v-for="(p, iP) in seat.payment" :key="`payment_${i}_${iP}`">
-            <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
-            <span>${{p.value}}</span>
+  <g-dialog fullscreen v-model="internalValue">
+    <div class="receipt">
+      <g-toolbar color="#EFEFEF">
+        <g-btn-bs width="120" icon="icon-back" class="elevation-2" @click="internalValue = false">
+          Back
+        </g-btn-bs>
+        <g-btn-bs width="120" icon="icon-printer" class="elevation-2">
+          Print
+        </g-btn-bs>
+        <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
+          <div style="line-height: 0.9">
+            <p>Company</p>
+            <p>Receipt</p>
+          </div>
+        </g-btn-bs>
+        <g-spacer/>
+        <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
+                  @click.stop="$emit('complete')">
+          Complete
+        </g-btn-bs>
+      </g-toolbar>
+      <div class="receipt-main">
+        <div class="receipt-main__header">
+          <div class="receipt-main__header-title">{{store.name}}</div>
+          <div class="receipt-main__header-subtitle">{{store.address}}</div>
+          <div class="receipt-main__header-subtitle">
+            <span class="mr-3">Tel: {{store.phone}}</span>
+            <span>VAT Reg No: {{store.vat}}</span>
           </div>
         </div>
-        <div class="receipt-main__item-header">
-          <div class="col-1">Q.ty</div>
-          <div class="col-9">Item name</div>
-          <div class="col-2 ta-right">Total</div>
-        </div>
-        <div class="receipt-main__item-row" v-for="(item, j) in seat.items" :key="`item_${i}_${j}`">
-          <div class="col-1">{{item.quantity}}</div>
-          <div class="col-9">{{item.name}}</div>
-          <div class="col-2 ta-right">{{(item.price * item.quantity) | formatMoney}}</div>
+        <div class="receipt-main__title">Table: {{order.table}}</div>
+        <div class="receipt-main__item" v-for="(split, i) in order.splits" :key="split._id">
+          <div class="row-flex align-items-center">
+            <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
+              <template v-slot:activator="{ on }">
+                <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
+              </template>
+              <div class="row-flex pa-2 bg-white align-items-start">
+                <g-btn-bs icon="icon-printer" class="elevation-2">
+                  Print
+                </g-btn-bs>
+                <g-btn-bs class="elevation-2">
+                  Bewirtung
+                </g-btn-bs>
+                <div>
+                  <g-btn-bs width="90" block icon="icon-credit_card"
+                            :background-color="getPaymentColor(split.payment, 'card')"
+                            class="elevation-2" @click.stop="savePayment(split, 'card')">
+                    Card
+                  </g-btn-bs>
+                  <g-btn-bs width="90" block icon="icon-cash"
+                            :background-color="getPaymentColor(split.payment, 'cash')"
+                            class="elevation-2 my-2" @click.stop="savePayment(split, 'cash')">
+                    Cash
+                  </g-btn-bs>
+                  <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
+                            class="elevation-2" @click.stop="openMultiDialog(split)">
+                    Multi
+                  </g-btn-bs>
+                </div>
+                <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
+                  Email
+                </g-btn-bs>
+                <g-btn-bs block icon="icon-coin-box" class="elevation-2">
+                  Trinkgeld
+                </g-btn-bs>
+              </div>
+            </g-menu>
+            <g-spacer/>
+            <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
+              <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
+              <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
+            </div>
+          </div>
+          <div class="receipt-main__item-header">
+            <div class="col-1">Q.ty</div>
+            <div class="col-9">Item name</div>
+            <div class="col-2 ta-right">Total</div>
+          </div>
+          <div class="receipt-main__item-row" v-for="(item, j) in split.items" :key="`item_${i}_${j}`">
+            <div class="col-1">{{item.quantity}}</div>
+            <div class="col-9">
+              <div>{{item.name}}</div>
+              <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
+                {{formatModifiers(item)}}
+              </div>
+            </div>
+            <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+          </div>
         </div>
       </div>
+      <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="tempSplit.vSum"
+                            @submit="saveMultiPayment"/>
     </div>
-    <dialog-multi-payment rotate v-model="dialog.multi"/>
-  </div>
+    <div class="blur-overlay" v-show="blurReceipt"/>
+  </g-dialog>
 </template>
 
 <script>
+  import * as orderUtil from '../logic/orderUtil';
+
   export default {
-    name: "PosOrderReceipt",
-    props: {},
+    name: 'PosOrderReceipt',
+    props: {
+      value: Boolean,
+      order: null,
+      storeLocale: String
+    },
     filters: {
       formatMoney(value) {
         return !isNaN(value) ? value.toFixed(2) : value
@@ -99,79 +120,95 @@
           phone: '0462.813.977',
           vat: '123456789'
         },
-        order: {
-          table: 5,
-          seats: [
-            {
-              no: '1',
-              payment: [{
-                type: 'cash',
-                value: 196.62
-              }],
-              items: [
-                {name: 'Vodka', quantity: 1, price: 10.00},
-                {name: 'Peperoni pizza', quantity: 1, price: 10.00},
-                {name: 'Weed', quantity: 1, price: 10.00},
-                {name: 'Coca cola', quantity: 1, price: 10.00},
-                {name: 'Marlboro', quantity: 1, price: 10.00},
-              ]
-            },
-            {
-              no: '2',
-              payment: [{
-                type: 'card',
-                value: 196.62
-              }],
-              items: [
-                {name: 'Vodka', quantity: 1, price: 10.00},
-                {name: 'Peperoni pizza', quantity: 1, price: 10.00},
-                {name: 'Weed', quantity: 1, price: 10.00},
-                {name: 'Coca cola', quantity: 1, price: 10.00},
-                {name: 'Marlboro', quantity: 1, price: 10.00},
-              ]
-            },
-          ]
-        },
         menu: [],
         dialog: {
           multi: false,
         },
-        tempSeat: null
+        tempSplit: {},
+      }
+    },
+    computed: {
+      internalValue: {
+        get() {
+          return this.value
+        },
+        set(val) {
+          this.$emit('input', val)
+        }
+      },
+      blurReceipt() {
+        return this.menu.some(i => i === true)
       }
     },
     created() {
-      this.menu = this.order.seats.map(() => false)
+      this.menu = this.order.splits.map(() => false)
     },
     methods: {
       getIcon(type) {
-        if(type === 'card') return 'icon-credit_card'
-        return 'icon-cash'
+        if (!this.order) return
+        if (type === 'card') return 'icon-credit_card'
+        if (type === 'cash') return 'icon-cash'
+        return 'icon-multi_payment'
       },
       getPaymentColor(payment, type) {
-        if((payment.length > 1 && type === 'mutli') || (payment.length === 1 && type === payment[0].type))
-          return '#1271ff'
-        return 'white'
+        if (!this.order) return
+        if (payment.length > 1 && type === 'multi') return '#1271ff'
+        if (payment.length === 1 && type === payment[0].type) return '#1271ff'
+        return '#fff'
       },
       openMultiDialog(seat) {
-        this.tempSeat = seat
+        this.tempSplit = seat
         this.dialog.multi = true
       },
+      formatModifiers(product) {
+        return `(${product.modifiers.map(i => i.name).join(', ')})`
+      },
+      getProductTotal(product) {
+        return orderUtil.calItemTotal(product) + orderUtil.calItemModifier(product)
+      },
+      saveMultiPayment(payment) {
+        const formattedPayment = _.map(payment, (value, type) => ({ type, value }))
+        this.$emit('updatePayment', this.tempSplit._id, formattedPayment)
+        this.tempSplit = {}
+        this.dialog.multi = false
+      },
+      savePayment(split, payment) {
+        this.$emit('updatePayment', split._id, [{ type: payment, value: split.vSum }])
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
+  .blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
   .receipt {
     transform: rotate(-90deg);
     transform-origin: left top;
     width: 100vh;
+    height: 100vw !important;
     position: absolute;
     top: 100%;
     left: 0;
+    display: flex;
+    flex-direction: column;
+
+    .g-toolbar {
+      flex: 0 0 64px !important;
+    }
 
     &-main {
       padding: 32px;
       background-color: white;
+      flex: 1;
+      overflow: scroll;
 
       &__header {
         margin-bottom: 32px;
@@ -237,6 +274,11 @@
           display: flex;
           align-items: center;
           padding: 4px 0;
+
+          &__modifier {
+            font-style: italic;
+            font-size: 12px;
+          }
         }
       }
     }

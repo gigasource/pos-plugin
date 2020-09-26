@@ -310,6 +310,11 @@
           "service": "PosStore:isMobile",
           "local": "isMobile",
           "type": "prop"
+        },
+        {
+          "service": "OrderStore:resetOrderData",
+          "local": "resetOrderData",
+          "type": "event"
         }
       ],
       "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",

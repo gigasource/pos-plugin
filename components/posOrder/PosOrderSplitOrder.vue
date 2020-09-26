@@ -3,7 +3,26 @@
     <g-dialog v-model="internalValue" :transition="false" content-class="split-order-dialog">
       <div class="row-flex justify-end">
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
-          <div class="splitter__header">
+          <div class="splitter__header row-flex" v-if="isMobile">
+            <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
+            <div>
+              <div style="font-weight: 700; font-size: 15px">Total</div>
+              <div style="font-weight: 600; font-size: 18px; color: #ff4452">
+                {{$t('common.currency', storeLocale)}} {{ totalCurrent | convertMoney }}
+              </div>
+            </div>
+            <g-spacer v-if="splitOrders.length"/>
+            <div v-if="splitOrders.length">
+              <div style="font-weight: 700; font-size: 15px">Split</div>
+              <div style="font-weight: 600; font-size: 18px; color: #ff4452">{{splitOrders.length}}</div>
+            </div>
+            <g-spacer/>
+            <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">
+              <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
+              <span>View receipt</span>
+            </g-btn-bs>
+          </div>
+          <div class="splitter__header" v-else>
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
             <span style="font-size: 15px">Total:</span>
             <span style="font-size: 18px; color: #ff4452"> {{ totalCurrent | convertMoney }}</span>
@@ -16,7 +35,7 @@
                   <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
-                      €{{item.originalPrice | convertMoney}}
+                      {{$t('common.currency', storeLocale)}} {{item.originalPrice | convertMoney}}
                     </span>
                     <span class="item-detail__price--new" v-if="isItemDiscounted(item)">
                       {{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}
@@ -122,11 +141,11 @@
         </div>
       </div>
 
-      <g-toolbar elevation="0" color="#eee" class="toolbar">
+      <g-toolbar elevation="0" color="#eee" class="toolbar" v-if="!isMobile">
         <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
         <g-spacer/>
         <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{splitOrders.length}}</span>
-        <g-btn-bs :uppercase="false" background-color="#1271ff">View receipt</g-btn-bs>
+        <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">View receipt</g-btn-bs>
       </g-toolbar>
     </g-dialog>
 
@@ -135,6 +154,10 @@
                           :store-locale="storeLocale"
                           @submit="saveMultiPayment"
     />
+
+    <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale"
+                       @updatePayment="updateSplitPayment"
+                       @complete="complete"/>
   </div>
 </template>
 
@@ -163,6 +186,7 @@
         currentSplitOrder: [],
         showPaymentMethodsMenu: false,
         showMultiPaymentdialog: false,
+        showReceipt: false,
         splitId: null
       }
     },
@@ -190,7 +214,10 @@
       },
       totalCurrent() {
         return this.getTotal(this.currentSplitOrder)
-      }
+      },
+      orderWithSplits() {
+        return Object.assign({}, this.currentOrder, { splits: this.splitOrders })
+      },
     },
     methods: {
       back() {
@@ -262,7 +289,6 @@
         this.$emit('saveSplitOrder', this.currentSplitOrder, paymentMethod, isLastSplit,
           order => {
             this.currentSplitOrder = []
-            if (isLastSplit) this.internalValue = false
 
             if (order) {
               this.splitOrders.push(order)
@@ -271,6 +297,23 @@
               this.$emit('createOrderCommit', { key: 'items', value: newItems })
             }
           })
+
+        if (isLastSplit) this.showReceipt = true
+      },
+      updateSplitPayment(_id, payment) {
+        cms.socket.emit('update-split-payment', _id, payment, ({ order, error }) => {
+          if (error) return console.log(error)
+          const split = this.splitOrders.find(i => i._id === _id)
+          split.payment = payment
+        })
+      },
+      complete() {
+        this.showReceipt = false
+        if (this.remainingItems.length > 0) return
+
+        this.$emit('resetOrderData')
+        this.$emit('updateCurrentOrder', 'table', null)
+        this.$router.push({path: '/pos-dashboard'})
       }
     },
     watch: {
@@ -292,6 +335,7 @@
       },
       value() {
         this.currentSplitOrder = []
+        this.remainingItems = _.cloneDeep(this.currentOrder.items)
       }
     }
   }
@@ -311,15 +355,8 @@
       padding: 0 8px;
       position: relative;
 
-      .btn-back {
-        width: 37px;
-        height: 37px;
-        border-radius: 50%;
+      .g-btn-bs {
         margin: 0;
-
-        & > .g-icon {
-          min-width: 24px;
-        }
       }
     }
 
@@ -354,6 +391,17 @@
       padding: 8px 0;
       display: flex;
       align-items: center;
+
+      .btn-back {
+        width: 37px;
+        height: 37px;
+        border-radius: 50%;
+        margin: 0;
+
+        & > .g-icon {
+          min-width: 24px;
+        }
+      }
     }
 
     &__content {

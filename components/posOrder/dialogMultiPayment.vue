@@ -126,7 +126,7 @@
 
           setTimeout(() => {
             this.$nextTick(() => this.click('cash-textfield'))
-          }, 500)
+          }, 1000)
         }
       }
     }
