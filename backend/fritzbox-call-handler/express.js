@@ -6,21 +6,37 @@ module.exports = cms => {
 
   const PORT = global.APP_CONFIG.port || 8888;
 
-  router.post('/phone-call', (req, res) => {
+  const callMap = {};
+
+  router.post('/ring', (req, res) => {
     const callInfo = req.body;
+    const {connectionId, caller} = callInfo;
+    callMap[connectionId] = {pickedUp: false, caller};
+
     cms.socket.emit('new-phone-call', callInfo.caller, new Date());
-
     res.status(204).send();
   });
 
-  router.post('/missed-call', (req, res) => {
+  router.post('/pickup', (req, res) => {
     const callInfo = req.body;
-    cms.socket.emit('new-missed-phone-call', callInfo.caller, new Date());
+    const {connectionId} = callInfo;
+    if (callMap[connectionId]) callMap[connectionId].pickedUp = true;
 
     res.status(204).send();
   });
 
-  router.get('/test', (req, res) => res.status(200).send('ok'));
+  router.post('/hangup', (req, res) => {
+    const callInfo = req.body;
+    const {connectionId} = callInfo;
+    const callSession = callMap[connectionId];
+
+    if (callSession && !callSession.pickedUp) {
+      cms.socket.emit('new-missed-phone-call', callSession.caller, new Date());
+      delete callMap[connectionId];
+    }
+
+    res.status(204).send();
+  });
 
   new ProxyClient({
     clientId: `fritzbox-event-handler`,
