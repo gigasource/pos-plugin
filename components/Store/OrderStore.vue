@@ -678,7 +678,10 @@
             return action
           })
           await this.printOrderUpdate()
-          cms.socket.emit('save-order', this.actionList, () => this.actionList = [])
+          cms.socket.emit('save-order', this.actionList, () => {
+            this.$set(this.currentOrder, 'items', [])
+            this.actionList = [];
+          })
         } catch (e) {
           console.log('error', e)
         }
