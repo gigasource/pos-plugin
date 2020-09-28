@@ -384,6 +384,11 @@
           "service": "OrderStore:resetOrderData",
           "local": "resetOrderData",
           "type": "event"
+        },
+        {
+          "service": "OrderStore:printOrderReport",
+          "local": "printOrderReport",
+          "type": "event"
         }
       ]
     }

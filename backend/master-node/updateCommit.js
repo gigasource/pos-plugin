@@ -313,6 +313,11 @@ async function checkCommitExist(commitId) {
 	return highestCommitId > commitId;
 }
 
+function getNewOrderId() {
+	highestOrderId++
+	return highestOrderId
+}
+
 module.exports = {
 	initQueue,
 	pushTaskToQueue,
@@ -321,5 +326,6 @@ module.exports = {
 	setHighestCommitId,
 	updateTempCommit,
 	buildTempOrder,
-	checkCommitExist
+	checkCommitExist,
+	getNewOrderId
 };

@@ -5,7 +5,7 @@
         <g-btn-bs width="120" icon="icon-back" class="elevation-2" @click="internalValue = false">
           Back
         </g-btn-bs>
-        <g-btn-bs width="120" icon="icon-printer" class="elevation-2">
+        <g-btn-bs width="120" icon="icon-printer" class="elevation-2" @click.stop="print(null)">
           Print
         </g-btn-bs>
         <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
@@ -37,7 +37,7 @@
                 <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
               </template>
               <div class="row-flex pa-2 bg-white align-items-start">
-                <g-btn-bs icon="icon-printer" class="elevation-2">
+                <g-btn-bs icon="icon-printer" class="elevation-2" @click.stop="print(split._id)">
                   Print
                 </g-btn-bs>
                 <g-btn-bs class="elevation-2">
@@ -174,6 +174,9 @@
       },
       savePayment(split, payment) {
         this.$emit('updatePayment', split._id, [{ type: payment, value: split.vSum }])
+      },
+      print(orderId) {
+        this.$emit('print', orderId)
       }
     }
   }

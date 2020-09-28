@@ -1,4 +1,5 @@
 const orderUtil = require('../../components/logic/orderUtil')
+const { getNewOrderId } = require('../master-node/updateCommit');
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const _ = require('lodash')
 
@@ -30,8 +31,8 @@ module.exports = (cms) => {
     })
 
     socket.on('save-order', async (actionList, cb = () => null) => {
-      await createOrderCommits(actionList);
-      cb()
+      const newOrder = await createOrderCommits(actionList);
+      cb(newOrder)
     })
 
     socket.on('pay-order', async (order, user, commit = false, cb = () => null) => {
@@ -50,9 +51,13 @@ module.exports = (cms) => {
             }
           })).value()
 
-          await createOrderCommits(updates)
+          const newOrder = await createOrderCommits(updates)
+          cb(newOrder)
         } else {
-          const newOrder = await cms.getModel('Order').findOneAndUpdate({ _id: mappedOrder._id }, mappedOrder, {
+          const newOrder = await cms.getModel('Order').findOneAndUpdate({ _id: mappedOrder._id }, {
+            ...mappedOrder,
+            id: getNewOrderId()
+          }, {
             upsert: true,
             new: true
           })

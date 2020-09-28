@@ -41,7 +41,8 @@ async function makePrintData(cms, {orderId}) {
     orderCashback,
     orderPaymentType,
     orderBookingNumber,
-    discount
+    discount,
+    payment
   }
 }
 
@@ -62,7 +63,8 @@ async function printEscPos(escPrinter, printData) {
     orderCashback,
     orderPaymentType,
     orderBookingNumber,
-    discount
+    discount,
+    payment
   } = printData;
 
   function convertMoney(value) {
@@ -124,14 +126,17 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.bold(true);
   escPrinter.leftRight('Total', `${convertMoney(orderSum)}`);
   escPrinter.bold(false);
-  if (orderCashReceived || orderCashReceived === 0) escPrinter.leftRight('Cash tend', `${convertMoney(orderCashReceived)}`);
+  if (orderCashReceived || orderCashReceived === 0) escPrinter.leftRight('Amount tend', `${convertMoney(orderCashReceived)}`);
   escPrinter.drawLine();
 
   escPrinter.bold(true);
   if (orderCashback || orderCashback === 0) escPrinter.leftRight('Change due', `${convertMoney(orderCashback)}`);
   escPrinter.alignLeft();
   escPrinter.bold(false);
-  escPrinter.println(`Payment method: ${orderPaymentType.charAt(0).toUpperCase() + orderPaymentType.slice(1)}`);
+  escPrinter.println(`Payment method:`);
+  payment.map(({ type, value }) => {
+    escPrinter.leftRight(capitalize(type), `${convertMoney(value)}`)
+  })
   escPrinter.newLine();
 
   escPrinter.alignCenter();
@@ -160,6 +165,10 @@ async function printSsr(printer, printData) {
     printer.printPng(reportImage);
     await printer.print();
   });
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1) //capitalize
 }
 
 module.exports = {
