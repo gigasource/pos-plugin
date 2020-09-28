@@ -205,6 +205,10 @@ router.post('/sign-in-requests', async (req, res) => {
   // name: device owner's name enter by device owner
   // role: 'staff' | 'manager'
   const {storeName, googleMapPlaceId, deviceId, role, name, avatar} = req.body;
+  // compatible with old version (without name & role)
+  // TODO: remove later
+  role = role || 'staff';
+  name = name || 'No name';
   if (!storeName || !googleMapPlaceId || !deviceId || !role || !name) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
