@@ -6,8 +6,7 @@
        @touchend.prevent.stop="e => onMouseUp(e)"
        ref="room">
     <div v-for="(roomObject, index) in rooms"
-         :key="index"
-         @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
+         :key="roomObject._id"
          :style="getRoomObjectContainerStyle(roomObject)"
          v-touch="getTouchHandlers(roomObject)"
          :class="[...!editable && ['waves-effect', 'waves-red'], ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
@@ -108,7 +107,6 @@
 
             const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
             const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
-            console.log(zoomVerticalRatio, zoomHorizontalRatio)
 
             if (zoomHorizontalRatio >= 1 || zoomVerticalRatio >= 1) return
             const zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
@@ -251,7 +249,7 @@
               }
               return
             }
-
+            console.log('end', item)
             if (this.editable || (!this.editable && item.type !== 'wall')) {
               if (this.swiping) {
                 this.swiping = false
