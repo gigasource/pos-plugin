@@ -679,8 +679,8 @@
           })
           await this.printOrderUpdate()
           cms.socket.emit('save-order', this.actionList, () => {
-            this.$set(this.currentOrder, 'items', [])
             this.actionList = [];
+            this.currentOrder = { items: [], hasOrderWideDiscount: false }
           })
         } catch (e) {
           console.log('error', e)
@@ -828,7 +828,7 @@
             }
 
             cms.socket.emit('pay-order', order, this.user, true, async newOrder => {
-              if (resetOrder) await this.resetOrderData();
+              if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               resolve(newOrder)
             })
           } catch (e) {
