@@ -16,7 +16,7 @@
     <g-spacer/>
     <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
               :disabled="disablePrintBtn"
-              @click.stop="$emit('saveTableOrder')">
+              @click.stop="print">
       Print
     </g-btn-bs>
     <template v-if="currentOrder.table">
@@ -77,6 +77,10 @@
       },
       splitOrder() {
         this.$getService('PosOrderSplitOrder:setActive')(true)
+      },
+      print() {
+        this.$emit('saveTableOrder')
+        this.$router.go(-1)
       }
     }
   }
