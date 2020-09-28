@@ -1,5 +1,5 @@
 module.exports = async (cms) => {
-  let fritzboxMonitor = await setupFritzboxMonitor(cms);
+  /*let fritzboxMonitor = await setupFritzboxMonitor(cms);
 
   cms.socket.on('connect', socket => {
     socket.on('refresh-fritzbox-config', async () => {
@@ -10,7 +10,7 @@ module.exports = async (cms) => {
 
       fritzboxMonitor = await setupFritzboxMonitor(cms);
     });
-  });
+  });*/
 }
 
 async function setupFritzboxMonitor(cms) {
