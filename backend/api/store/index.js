@@ -204,7 +204,7 @@ router.post('/new-feedback', async (req, res) => {
 router.post('/sign-in-requests', async (req, res) => {
   // name: device owner's name enter by device owner
   // role: 'staff' | 'manager'
-  const {storeName, googleMapPlaceId, deviceId, role, name, avatar} = req.body;
+  let {storeName, googleMapPlaceId, deviceId, role, name, avatar} = req.body;
   // compatible with old version (without name & role)
   // TODO: remove later
   role = role || 'staff';
