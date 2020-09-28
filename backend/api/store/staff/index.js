@@ -4,21 +4,56 @@ const router = express.Router()
 const {
   createStaff,
   getStaff,
+  getStaffs,
   getTimeSheetDetail,
   getWorkTimeReport,
   processCheckInCheckOut,
+  getLastCheckInCheckOut,
   removeStaff,
-  updateStaff
+  updateStaff,
+  getStaffsWithTask
 } = require('./staff');
+
+/**
+ * get staff by device id and store id
+ */
+router.get('/', async (req, res) => {
+  let {storeId, deviceId, storeUfId /* user-friendly id*/ } = req.query
+
+  if (!storeId && storeUfId) {
+    const store = await cms.getModel('Store').findOne({ id: storeUfId })
+    if (store)
+      storeId = store._id
+  }
+
+  try {
+    const staff = await getStaff({storeId, deviceId})
+    res.json(staff)
+  } catch (e) {
+    res.status(400).json({error: e.message})
+  }
+})
 
 /**
  * get all staff of specified store
  */
-router.get('/:storeId', async (req, res) => {
+router.get('/all-staffs/:storeId', async (req, res) => {
   try {
-    res.json(await getStaff({ storeId: req.params.storeId }))
+    res.json(await getStaffs({ storeId: req.params.storeId }))
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
+  }
+})
+
+/*
+ * get all staff of a store with all current task
+ */
+router.get('/with-task/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  try {
+    res.json(await getStaffsWithTask(storeId))
+  } catch (e) {
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -30,7 +65,7 @@ router.post('/', async (req, res) => {
     const insertResult = await createStaff({...req.body})
     res.json(insertResult)
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -42,7 +77,7 @@ router.put('/', async (req, res) => {
     const updateResult = await updateStaff({...req.body})
     res.json(updateResult)
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -51,7 +86,7 @@ router.delete('/:staffId', async (req, res) => {
     const removeResult = await removeStaff({staffId: req.params.staffId})
     res.json(removeResult)
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -62,7 +97,18 @@ router.post('/check-in-out', async (req, res) => {
   try {
     res.json(await processCheckInCheckOut({...req.body}))
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
+  }
+})
+
+/**
+ * Get staff's last check in & check out
+ */
+router.get('/latest-check-event', async (req, res) => {
+  try {
+    res.json(await getLastCheckInCheckOut(req.query.staffId))
+  } catch(e) {
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -71,9 +117,9 @@ router.post('/check-in-out', async (req, res) => {
  */
 router.get('/work-time-report', async (req, res) => {
   try {
-    res.json(await getWorkTimeReport({...req.body}))
+    res.json(await getWorkTimeReport({...req.query}))
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 
@@ -82,9 +128,9 @@ router.get('/work-time-report', async (req, res) => {
  */
 router.get('/time-sheet-detail', async (req, res) => {
   try {
-    res.json(await getTimeSheetDetail({...req.body}))
+    res.json(await getTimeSheetDetail({...req.query}))
   } catch (e) {
-    res.json({error: e.message})
+    res.status(400).json({error: e.message})
   }
 })
 

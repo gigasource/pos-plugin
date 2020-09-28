@@ -157,6 +157,18 @@
       "autopopulate": true,
       "type": "ref-select",
       "labelProp": "name"
+    },
+    {
+      "_id": "5f5897ce4c791b0e7a91bfbb",
+      "schemaType": "string",
+      "key": "firebaseToken",
+      "type": "input"
+    },
+    {
+      "_id": "5f5897ce4c791b0e7a91bfbc",
+      "schemaType": "string",
+      "key": "apnToken",
+      "type": "input"
     }
   ],
   "name": "User",

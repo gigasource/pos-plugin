@@ -9,11 +9,10 @@ const {socket: internalSocketIOServer} = cms;
 const {getNewDeviceCode} = require('../demoDevice');
 const ObjectId = require('mongoose').Types.ObjectId;
 const axios = require('axios')
-const http = require('http')
-const https = require('https')
-const FormData = require('form-data')
-const path = require('path')
 const {getHost} = require('../utils')
+const voipApi = require('./voip')
+const { DEMO_STORE_ID } = require('../../restaurant-plus-apis/constants')
+const _ = require('lodash')
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -67,7 +66,8 @@ setTimeout(() => {
 
       console.debug(sentryTags, `Saved chat msg from gsms client, emit to online-order frontend`, sentryPayload);
       internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', savedMsg._doc);
-      internalSocketIOServer.emit('chatMessageNotification')
+      internalSocketIOServer.emit('chatMessageNotification');
+      cms.emit('chatMessage', {chatData, fromServer: false});
 
       cb && cb(savedMsg._doc);
     });
@@ -179,6 +179,18 @@ setTimeout(() => {
       clientId = clientId.replace("device_", "")
       internalSocketIOServer.in(`endCallFromUser-${clientId}`).emit('endCallFromUser', { clientId, agentId })
     })
+
+    socket.on('updateReservationStatus', async (reservationId, status, cb) => {
+      try {
+        await cms.getModel('Reservation').findOneAndUpdate({ _id: ObjectId(reservationId) }, { status })
+        cb({ success: true })
+        console.debug(`sentry:eventType=reservation,reservationId=${reservationId}`,
+          `4. Online order backend: received reservation status update: ${status}`)
+        cms.emit('sendClientReservationStatus', reservationId)
+      } catch (error) {
+        cb({ error })
+      }
+    })
   });
 
   externalSocketIoServer.registerAckFunction('makeAPhoneCallAck', async (clientId, agentId, callAccepted) => {
@@ -227,9 +239,12 @@ setTimeout(() => {
         read: false,
         fromServer: true
       });
+      const sender = await UserModel.findOne({_id: userId});
+      const username = sender ? sender.name : '';
 
       console.debug(sentryTags, `Saved chat msg from online-order frontend, emit to gsms client`, sentryPayload);
-      cms.emit('chatMessage', chatData)
+      cms.emit('chatMessage', {chatData, fromServer: true});
+      internalSocketIOServer.in(`chatMessage-from-client-${clientId}`).emit('chatMessage', {...savedMsg._doc, username});
       await getExternalSocketIoServer().emitToPersistent(clientId, 'chatMessage', [savedMsg._doc]);
 
       cb && cb(savedMsg._doc);
@@ -314,15 +329,51 @@ router.get('/chat/messages', async (req, res) => {
   const {n = 0, offset = 0, clientId} = req.query;
   if (!clientId) return res.status(400).json({error: `'clientId' query can not be '${clientId}'`});
 
-  let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
-  if (offset) query = query.skip(+offset);
-  if (n) query = query.limit(+n);
+  const aggregationSteps = [
+    {$sort: {createdAt: -1}},
+    {$match: {clientId: clientId}}
+  ];
+  if (offset) aggregationSteps.push({$skip: +offset});
+  if (n) aggregationSteps.push({$limit: +n});
+  aggregationSteps.push(...[
+    {
+      $lookup: {
+        from: 'users',
+        let: {userId: {$toObjectId: '$userId'}, falseVal: false},
+        pipeline: [
+          {
+            $match: {
+                $expr: {$eq: ['$_id', '$$userId']}
+            },
+          },
+          {$project: { "name": 1, "_id": 0 }}
+        ],
+        as: 'user',
+      }
+    },
+    {$unwind: {path: '$user'}},
+    {$addFields: { "username": "$user.name" }},
+    {$unset: "user"}
+  ]);
 
-  query.exec((error, docs) => {
-    if (error) return res.status(500).json({error});
+  try {
+    const docs = await ChatMessageModel.aggregate(aggregationSteps);
+    return res.status(200).json(docs);
+  } catch (error) {
+    return res.status(500).json({error});
+  }
 
-    res.status(200).json(docs.map(({_doc}) => _doc));
-  });
+  // let query = ChatMessageModel.find({clientId}).sort({createdAt: -1});
+  // if (offset) query = query.skip(+offset);
+  // if (n) query = query.limit(+n);
+
+  // try {
+  //   const docs = await query.exec();
+
+  //   return res.status(200).json(docs.map(({_doc}) => _doc));
+  // } catch (error) {
+  //   return res.status(500).json({error});
+  // }
 });
 
 router.get('/chat/messages-count', async (req, res) => {
@@ -372,16 +423,16 @@ router.post('/notes', async (req, res) => {
   res.status(201).json(dataToInsert);
 });
 
-router.put('/assign-device/:id', async (req, res) => {
-  const { id } = req.params;
+router.put('/assign-device/:deviceId', async (req, res) => {
+  const { deviceId } = req.params;
   const {
     storeId,
     /** @deprecated */
     customStoreId
   } = req.body;
-  if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
+  if (!deviceId) return res.status(400).json({ error: `Id can not be ${deviceId}` });
   if (!storeId && !customStoreId) return res.status(400).json({ error: `You must provide either storeId or customStoreId` });
-  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
+  console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId}`, `Assigning GSMS device to store with id ${storeId || customStoreId}`);
 
   try {
     const store = storeId
@@ -389,32 +440,56 @@ router.put('/assign-device/:id', async (req, res) => {
       : await StoreModel.findOne({id: customStoreId});
     if (!store) return res.status(400).json({error: `Store with ID ${storeId || customStoreId} not found`});
 
-    const error = await assignDevice(id, store)
+    const error = await assignDevice(deviceId, store)
     if (error) res.status(400).json(error)
 
-    getExternalSocketIoServer().emitToPersistent(id, 'updateStoreName', [store.name || store.settingName || store.alias]).then();
+    getExternalSocketIoServer().emitToPersistent(deviceId, 'updateStoreName', [store.name || store.settingName || store.alias]);
 
-    getExternalSocketIoServer().emitToPersistent(id, 'storeAssigned', [store.id, store.name || store.settingName, store.alias, store._id]).then();
+    getExternalSocketIoServer().emitToPersistent(deviceId, 'storeAssigned', [store.id, store.name || store.settingName, store.alias, store._id]);
 
-    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`,
+    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId || customStoreId}`,
       `Successfully assigned GSMS device to store with id ${storeId || customStoreId}`);
     res.status(204).send();
   } catch (e) {
-    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${id},storeId=${storeId || customStoreId}`,
+    console.debug(`sentry:eventType=gsmsDeviceAssign,clientId=${deviceId},storeId=${storeId || customStoreId}`,
       `Error assigning GSMS device to store with id ${storeId || customStoreId}`, e);
     res.status(500).send('Encountered an error while assigning store')
   }
 });
 
+// IMPORTANT: I GUESS that this endpoint is only be used from R+ app.
+// If it also request from another app, side effect may occur
 router.put('/remove-device-store/:deviceId', async (req, res) => {
-  const {deviceId} = req.params;
+  const { deviceId } = req.params;
   if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
   const device = await DeviceModel.findById(deviceId);
   if (!device) return {error: `Device with ID ${deviceId} not found`};
 
-  if (device.storeId) {
-    await removeDeviceFromOldStore(device);
+  if (device.enableMultiStore) {
+    const { storeId } = req.body;
+    const store = await cms.getModel('Store').findOne({id: storeId})
+    if (store) {
+      await removeDeviceFromStore(device, store._id)
+      let currentStores = _.filter(device.storeIds, _id => _id.toString() !== store._id.toString())
+
+      let newStoreId = device.storeId
+      if (currentStores.length > 0)
+        newStoreId = currentStores[0]
+
+      if (currentStores.length === 1) {
+        currentStores = null
+      }
+
+      await DeviceModel.updateOne({_id: device._id}, {
+        storeIds: currentStores,
+        storeId: newStoreId,
+        enableMultiStore: currentStores && currentStores.length > 1,
+      })
+    }
+  } else {
+    if (device.storeId)
+      await removeDeviceFromStore(device, device.storeId);
     await DeviceModel.updateOne({_id: device._id}, {storeId: null});
   }
 
@@ -452,28 +527,56 @@ router.put('/assign-device-to-store/:id', async (req, res) => {
   }
 })
 
-async function removeDeviceFromOldStore(device) {
-  if (device.storeId) {
-    const oldStore = await StoreModel.findById(device.storeId);
-    if (oldStore && oldStore.gSms && oldStore.gSms.devices) {
-      await StoreModel.findOneAndUpdate(
-          { _id: oldStore._id },
-          { $pull: { 'gSms.devices': { _id: device._id } } }
-      )
-    }
+async function removeDeviceFromStore(device, storeId) {
+  const oldStore = await StoreModel.findById(storeId);
+  if (oldStore && oldStore.gSms && oldStore.gSms.devices) {
+    await StoreModel.findOneAndUpdate(
+        { _id: oldStore._id },
+        { $pull: { 'gSms.devices': { _id: device._id } } }
+    )
   }
 }
 
 async function assignDevice(deviceId, store) {
-  const device = await DeviceModel.findById(deviceId);
+  let device = await DeviceModel.findById(deviceId);
   if (!device) return { error: `Device with ID ${deviceId} not found` };
+  if (!device.storeId) {
+    device.storeId = store._id;
+  } else {
+    let deviceLinkToDemoStore = false
+    if (device.storeId) {
+      const linkedStore = await cms.getModel('Store').findOne({ _id: device.storeId })
+      if (linkedStore && linkedStore.id === DEMO_STORE_ID) {
+        await removeDeviceFromStore(device, linkedStore._id)
+        deviceLinkToDemoStore = true
+      }
+    }
 
-  await removeDeviceFromOldStore(device)
+    let currentStores;
+    if (Array.isArray(device.storeIds) && device.storeIds.length) {
+      currentStores = device.storeIds
+    } else {
+      currentStores = deviceLinkToDemoStore ? [] : [device.storeId]
+    }
 
-  device.storeId = store._id;
+    if (currentStores.indexOf(store._id) >= 0) {
+      return
+    }
+
+    currentStores.push(store._id)
+    if (currentStores.length > 1) {
+      device.storeIds = currentStores
+      device.enableMultiStore = true
+    } else {
+      device.storeId = currentStores[0]
+      device.enableMultiStore = false
+    }
+  }
+
   device.metadata = device.metadata || {};
-  await DeviceModel.updateOne({ _id: deviceId }, device);
+  device = await DeviceModel.updateOne({ _id: deviceId }, device, { new: true });
 
+  // add device info to specified store
   store.gSms = store.gSms || {};
   store.gSms.enabled = store.gSms.enabled || true;
   store.gSms.timeToComplete = store.gSms.timeToComplete || 30;
@@ -499,15 +602,54 @@ router.put('/update-token/:id', async (req, res) => {
 
   if (!id) return res.status(400).json({ error: `Id can not be ${id}` });
   if (!token) return res.status(400).json({ error: `You must provide token` });
-
   try {
     const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { firebaseToken: token })
-
-    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    if (!updatedDevice) {
+      const updatedUser = await cms.getModel('User').findOneAndUpdate({_id: id}, { firebaseToken: token })
+      if (!updatedUser)
+        return res.status(400).json({ error: `Device ${id} not found` })
+    }
     res.status(204).send()
   } catch (e) {
     res.status(500).json({error: 'Error updating device token'})
   }
 })
+
+router.put('/update-apn-token/:id', async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  if (!id || !token) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { apnToken: token })
+    if (!updatedDevice) {
+      const updateUser = await cms.getModel('User').findOneAndUpdate({ _id: id }, { apnToken: token })
+      if (!updateUser)
+        return res.status(400).json({ error: `Device or user with "${id}" not found` })
+    }
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device apn token'})
+  }
+})
+
+router.put('/update-os-info/:id', async (req, res) => {
+  const { id } = req.params;
+  const { osName, osVersion } = req.body;
+
+  if (!id || !osName || !osVersion) return res.sendStatus(400)
+
+  try {
+    const updatedDevice = await DeviceModel.findOneAndUpdate({ _id: id }, { osName, osVersion })
+    if (!updatedDevice) return res.status(400).json({ error: `Device ${id} not found` })
+    res.status(204).send()
+  } catch (e) {
+    res.status(500).json({error: 'Error updating device os info'})
+  }
+})
+
+router.use('/voip', voipApi)
+
 module.exports = router;
 module.exports.assignDevice = assignDevice;

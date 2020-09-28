@@ -60,7 +60,26 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/app-notification/firebase-messaging/admin.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/app-notification/apn-provider/provider.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/rest-handle.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api-before-init-model'
+      },
+      path: 'backend/apply-schema-hooks.js',
       type: 'backend'
     },
     {
@@ -92,7 +111,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/firebase-messaging/index.js'
+      path: 'backend/app-notification/firebase-messaging/index.js'
     },
     {
       loader: {

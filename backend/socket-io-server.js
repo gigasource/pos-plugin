@@ -11,6 +11,8 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer = require('nodemailer')
+const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
+const { sendNotification } = require('./app-notification');
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
@@ -154,26 +156,26 @@ module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
   const {io, socket: internalSocketIOServer} = cms;
+  if (global.APP_CONFIG.redis) {
+    const {hosts, password} = global.APP_CONFIG.redis;
+    const Redis = require("ioredis");
+    const startupRedisNodes = hosts.split(',').map(host => {
+      const hostInfoArr = host.split(':');
+      return {
+        host: hostInfoArr[0],
+        port: hostInfoArr[1],
+      }
+    });
 
-    if (global.APP_CONFIG.redis) {
-      const {hosts, password} = global.APP_CONFIG.redis;
-      const Redis = require("ioredis");
-      const startupRedisNodes = hosts.split(',').map(host => {
-        const hostInfoArr = host.split(':');
-        return {
-          host: hostInfoArr[0],
-          port: hostInfoArr[1],
-        }
-      });
-      const ioredisOpt = {
-        redisOptions: {password}
-      };
+    const ioredisOpt = {
+      redisOptions: {password}
+    };
 
-      io.adapter(redisAdapter({
-        pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-        subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
-      })); //internalSocketIOServer will use adapter too, just need to call this once
-    }
+    io.adapter(redisAdapter({
+      pubClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+      subClient: new Redis.Cluster(startupRedisNodes, ioredisOpt),
+    })); //internalSocketIOServer will use adapter too, just need to call this once
+  }
 
   async function updateOrderStatus(orderToken, status) {
     const storeName = status ? status.storeName : '';
@@ -770,7 +772,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products,
+        orderType: type, paymentType, customer, products, totalPrice,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
@@ -797,8 +799,9 @@ module.exports = async function (cms) {
         deliveryTime,
         paypalOrderDetail,
         forwardedStore,
+        vSum: totalPrice
       }
-      await cms.getModel('Order').create(order)
+      const newOrder = await cms.getModel('Order').create(order)
 
       if(forwardedStore) {
         const s = await cms.getModel('Store').findById(forwardedStore)
@@ -806,7 +809,8 @@ module.exports = async function (cms) {
       }
 
       if (store.gSms && store.gSms.enabled) {
-        cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+        //cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
+
 
         function formatOrder(orderData) {
           let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice} = _.cloneDeep(orderData)
@@ -829,12 +833,6 @@ module.exports = async function (cms) {
 
           discounts = discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
 
-          if (deliveryDateTime === 'asap') {
-            const timeToComplete = store.gSms.timeToComplete || 30;
-            deliveryDateTime = dayjs().add(timeToComplete, 'minute').toDate()
-          }
-          deliveryDateTime = jsonFn.clone(deliveryDateTime) //stringify
-
           customer = {
             name: customer.name,
             phone: customer.phone,
@@ -853,23 +851,34 @@ module.exports = async function (cms) {
             shippingFee,
             total: totalPrice,
             deliveryTime: deliveryDateTime,
-            discounts
+            discounts,
+            status: 'inProgress'
           }
         }
 
-        const demoDevices = store.gSms.devices
-        const formattedOrder = formatOrder(orderData);
-        demoDevices.filter(i => i.registered).forEach(({_id}) => {
+        // const demoDevices = store.gSms.devices
+        // const formattedOrder = formatOrder(orderData);
+        const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+        await sendNotification(
+          gSmsDevices,
+          {
+            title: store.name || store.settingName,
+            body: `You have a new order!`
+          },
+          { actionType: NOTIFICATION_ACTION_TYPE.ORDER, orderId: newOrder._id.toString() },
+        )
 
-          /** @deprecated */
-          const targetClientIdOld = `${store.id}_${_id.toString()}`;
-          externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-
-          const targetClientId = _id.toString();
-          externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-          console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
-              `2a. Online order backend: received order from frontend, sending to demo device`);
-        })
+        // demoDevices.filter(i => i.registered).forEach(({_id}) => {
+        //
+        //   /** @deprecated */
+        //   const targetClientIdOld = `${store.id}_${_id.toString()}`;
+        //   externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+        //
+        //   const targetClientId = _id.toString();
+        //   externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
+        //   console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
+        //       `2a. Online order backend: received order from frontend, sending to demo device`);
+        // })
       }
 
       if (!device) {
@@ -892,7 +901,7 @@ module.exports = async function (cms) {
 
           return updateOrderStatus(orderData.orderToken,
               {
-                storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'kitchen',
+                storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',
                 responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
               })
         }
@@ -1050,10 +1059,10 @@ module.exports = async function (cms) {
 
             /** @deprecated */
             const targetClientIdOld = `${store.id}_${_id}`;
-            externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+            externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createReservation', [{ ...reservationData, _id: reservation._id, storeId: reservation.store }])
 
             const targetClientId = _id;
-            externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id }])
+            externalSocketIOServer.emitToPersistent(targetClientId, 'createReservation', [{ ...reservationData, _id: reservation._id, storeId: reservation.store }])
             console.debug(`sentry:eventType=reservation,store=${store.name},alias=${store.alias},deviceId=${targetClientId}`,
                 `2a. Online order backend: sent reservation to demo device`)
           })
@@ -1093,7 +1102,8 @@ module.exports = async function (cms) {
         })
 
         const targetClientId = `${storeId}_${deviceId}`;
-        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister')
+        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister') // fallback
+        externalSocketIOServer.emitToPersistent(targetClientId, 'unregister_v2', [{storeId}])
         console.debug(`sentry:clientId=${targetClientId},store=${name || settingName},alias=${alias},eventType=pair`,
             `Online order: Emit event: unpair demo client ${targetClientId}, socket id = ${socket.id}`)
         cms.socket.emit('loadStore', storeId)

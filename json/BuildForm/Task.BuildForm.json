@@ -9,16 +9,11 @@
       "type": "input"
     },
     {
-      "_id": "5f3a584c08550518372a57a4",
-      "schemaType": "string",
-      "key": "deadline",
-      "type": "input"
-    },
-    {
       "_id": "5f3a584c08550518372a57a5",
       "schemaType": "string",
       "key": "status",
-      "type": "input"
+      "type": "input",
+      "fields": []
     },
     {
       "_id": "5f3a584c08550518372a57a6",
@@ -37,16 +32,11 @@
           "ref": "Staff",
           "type": "ref-select",
           "label": "Staff",
-          "labelProp": "name"
+          "labelProp": "name",
+          "autopopulate": true
         }
       ],
       "type": "array"
-    },
-    {
-      "_id": "5f3a584c08550518372a57a8",
-      "schemaType": "boolean",
-      "key": "repeat",
-      "type": "input@switch"
     },
     {
       "_id": "5f3a584c08550518372a57a9",
@@ -62,6 +52,80 @@
       "type": "ref-select",
       "label": "Store",
       "labelProp": "settingName"
+    },
+    {
+      "_id": "5f3fa4335d7d812e26390cdf",
+      "schemaType": "date",
+      "key": "deadline",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f3fa4335d7d812e26390ce0",
+      "schemaType": "date",
+      "key": "completedTime",
+      "type": "input@date",
+      "flex": "md6"
+    },
+    {
+      "_id": "5f3fa4335d7d812e26390ce1",
+      "schemaType": "objectId",
+      "key": "completedBy",
+      "ref": "Staff",
+      "type": "ref-select",
+      "label": "",
+      "flex": "md6",
+      "labelProp": "name",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f3fa4335d7d812e26390ce2",
+      "schemaType": "date",
+      "key": "cancelledTime",
+      "type": "input@date",
+      "flex": "md6"
+    },
+    {
+      "_id": "5f3fa4335d7d812e26390ce3",
+      "schemaType": "objectId",
+      "key": "cancelledBy",
+      "ref": "Staff",
+      "autopopulate": true,
+      "type": "ref-select",
+      "label": "",
+      "flex": "md6",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f3fa5155d7d812e26390d3a",
+      "schemaType": "string",
+      "key": "repeat",
+      "type": "input@select",
+      "optionsType": "textValue",
+      "options": [
+        {
+          "value": "none",
+          "text": "One Time"
+        },
+        {
+          "value": "opd",
+          "text": "Daily"
+        },
+        {
+          "value": "opw",
+          "text": "Weekly"
+        },
+        {
+          "value": "opm ",
+          "text": "Monthly"
+        }
+      ]
+    },
+    {
+      "_id": "5f44df814c81a87712b3d266",
+      "schemaType": "objectId",
+      "key": "base",
+      "ref": "Task",
+      "type": "ref-select"
     }
   ],
   "name": "Task",

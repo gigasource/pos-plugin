@@ -17,7 +17,7 @@
     {
       "_id": "5f3a56d508550518372a5774",
       "schemaType": "string",
-      "key": "avatarUrl",
+      "key": "avatar",
       "type": "input"
     },
     {

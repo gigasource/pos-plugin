@@ -31,6 +31,42 @@
       "type": "ref-select",
       "label": "Store",
       "labelProp": "settingName"
+    },
+    {
+      "_id": "5f5b052c36b503001a9db0a2",
+      "schemaType": "string",
+      "key": "note",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "gps-error",
+        "success"
+      ]
+    },
+    {
+      "_id": "5f6980a0a356c30bbe867323",
+      "schemaType": "object",
+      "key": "coords",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "lat",
+          "type": "input@number",
+          "fields": []
+        },
+        {
+          "schemaType": "number",
+          "key": "long",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5f6980a0a356c30bbe867324",
+      "schemaType": "string",
+      "key": "location",
+      "type": "input"
     }
   ],
   "name": "CheckEvent",

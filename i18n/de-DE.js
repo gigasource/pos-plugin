@@ -239,6 +239,9 @@ module.exports = {
       requireMinOrder: 'Mindestbestellwert für jeden zipcode erfordern',
       distanceNote: 'Notiz: Versand-Service ist nicht verfügbar für außerhalb Standorte des konfigurierten Radius.',
       requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
+      ourService: 'Unsere Dienstleistungen',
+      ourMenu: 'Unser Menü',
+      takeAway: 'Mitnehmen',
       other: 'Andere',
       otherSetting: 'andere Einstellung',
       deliveryForwarding: 'Lieferung weiterleiten',
@@ -247,9 +250,6 @@ module.exports = {
       forwardNote: 'Weitergeleitete Bestellungen werden nur auf dem Zielgerät angezeigt. Das System leitet nur Lieferaufträge weiter.',
       digitalMenuScript: 'Digitales Menü bettet Skript ein',
       upload: 'Hochladen',
-      ourService: 'Unsere Dienstleistungen',
-      ourMenu: 'Unser Menü',
-      takeAway: 'Abholung'
     },
 
     paymentProviders: {

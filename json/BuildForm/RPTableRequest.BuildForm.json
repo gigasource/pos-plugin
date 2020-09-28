@@ -1,0 +1,69 @@
+{
+  "_id": "5f350b4e17b76df4d494662f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f350beb17b76df4d4946635",
+      "schemaType": "number",
+      "key": "noOfGuests",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f3a060a22267b3cbfb3e8d5",
+      "schemaType": "date",
+      "key": "createdDate",
+      "type": "input@datetime-local"
+    },
+    {
+      "_id": "5f350beb17b76df4d4946636",
+      "schemaType": "date",
+      "key": "date",
+      "type": "input@datetime-local"
+    },
+    {
+      "_id": "5f350beb17b76df4d4946637",
+      "schemaType": "string",
+      "key": "customerName",
+      "type": "input"
+    },
+    {
+      "_id": "5f350beb17b76df4d4946638",
+      "schemaType": "string",
+      "key": "customerPhone",
+      "type": "input"
+    },
+    {
+      "_id": "5f350beb17b76df4d4946639",
+      "schemaType": "objectId",
+      "key": "rpUserId",
+      "ref": "RPUser",
+      "type": "ref-select",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f350beb17b76df4d494663a",
+      "schemaType": "objectId",
+      "key": "storeId",
+      "ref": "Store",
+      "type": "ref-select",
+      "labelProp": "alias"
+    },
+    {
+      "_id": "5f3512b517b76df4d4946654",
+      "schemaType": "string",
+      "key": "status",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "pending",
+        "approved",
+        "cancelled",
+        "declined",
+        "expired"
+      ]
+    }
+  ],
+  "name": "RPTableRequest",
+  "tabs": [],
+  "type": "Collection"
+}

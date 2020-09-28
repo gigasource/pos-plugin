@@ -1,8 +1,9 @@
 async function getTeam({storeId}) {
   if (!storeId)
-    throw "Misisng store's id"
+    throw "Missing store's id"
 
-  return await cms.getModel('Team').find({store: storeId})
+  const teams = await cms.getModel('Team').find({store: storeId})
+  return teams.map(t => ({...t._doc, members: t._doc.members.filter(m => m.active)}))
 }
 
 async function createTeam({name, members = [], storeId}) {
@@ -25,11 +26,11 @@ async function updateTeam({teamId, name, members = []}) {
   return await cms.getModel('Team').updateOne({ _id: teamId }, changes)
 }
 
-async function removeTeam({teamId}) {
+async function removeTeam(teamId) {
   if (!teamId)
     throw "Missing team's id"
   // TODO: Adding permission check to prevent malicious remove request
-  return await cms.getModel('Team').delete({_id: teamId})
+  return await cms.getModel('Team').deleteOne({_id: teamId})
 }
 
 module.exports = {

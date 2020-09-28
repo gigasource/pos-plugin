@@ -1,8 +1,10 @@
 const CronJob = require('cron').CronJob
 const updateStoreRevenue = require('./update-monthly-revenue')
+const cloneTask = require('./clone-task-management')
 
 module.exports = async cms => {
   createCronJob('0 0 * * *', updateStoreRevenue)
+  createCronJob('0 0 * * *', cloneTask)
 }
 
 function createCronJob(cronSchedule, fn) {

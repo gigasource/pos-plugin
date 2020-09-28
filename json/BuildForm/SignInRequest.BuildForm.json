@@ -48,6 +48,18 @@
       "key": "role",
       "default": "",
       "type": "input"
+    },
+    {
+      "_id": "5f5b467767cd9c658e8d66f7",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f6072fe7788d3055bbeb4ec",
+      "schemaType": "string",
+      "key": "avatar",
+      "type": "input"
     }
   ],
   "name": "SignInRequest",

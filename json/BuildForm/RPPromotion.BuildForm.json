@@ -1,0 +1,111 @@
+{
+  "_id": "5f1ff455bf8dea79c6862107",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f1ff549bf8dea79c6862109",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210a",
+      "schemaType": "number",
+      "key": "quantity",
+      "default": "0",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210b",
+      "schemaType": "date",
+      "key": "startDate",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210c",
+      "schemaType": "date",
+      "key": "endDate",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210d",
+      "schemaType": "boolean",
+      "key": "enabled",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210e",
+      "schemaType": "objectId",
+      "key": "store",
+      "ref": "Store",
+      "autopopulate": true,
+      "type": "ref-select",
+      "labelProp": "settingName"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c686210f",
+      "schemaType": "number",
+      "key": "price",
+      "default": "0",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862110",
+      "schemaType": "string",
+      "key": "discountType",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862111",
+      "schemaType": "number",
+      "key": "discountValue",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862112",
+      "schemaType": "string",
+      "key": "description",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862113",
+      "schemaType": "number",
+      "key": "duration",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862114",
+      "schemaType": "mixed",
+      "key": "conditions",
+      "mixed": true
+    },
+    {
+      "_id": "5f1ff549bf8dea79c6862115",
+      "schemaType": "string",
+      "key": "orderType",
+      "type": "input"
+    },
+    {
+      "_id": "5f1ff769bf8dea79c6862168",
+      "schemaType": "date",
+      "key": "createdAt",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f213568700e50026fb15956",
+      "schemaType": "number",
+      "key": "limitForUser",
+      "default": "0",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f21392d700e50026fb15970",
+      "schemaType": "string",
+      "key": "descriptionImageUrl",
+      "type": "input"
+    }
+  ],
+  "name": "RPPromotion",
+  "tabs": [],
+  "type": "Collection"
+}

@@ -15,7 +15,12 @@ function getAndSortDevices(n = 0, offset = 0, sort, nameSearch) {
   const limit = sort.unreadMessages ? n + offset : n;
   const skip = sort.unreadMessages ? null : offset;
 
-  const steps = [{$match: {deleted: {$ne: true}}}];
+  const steps = [{
+    $match: {
+      deleted: {$ne: true},
+      deviceType: 'gsms',
+    }
+  }];
 
   if (nameSearch) {
     steps.push({
@@ -111,14 +116,13 @@ router.get('/devices', async (req, res) => {
   let devices = await getAndSortDevices(+n, +offset, sort, nameSearch);
   devices = await Promise.all(devices.map(async device => {
     const latestUnreadMsg = await ChatMessageModel.findOne({
-      clientId: device._id,
-      read: false,
-      fromServer: false
+      clientId: device._id
     }).sort({createdAt: -1});
 
     return {
       ...device,
       latestChatMessageDate: latestUnreadMsg ? latestUnreadMsg.createdAt : new Date(0),
+      latestChatMessage: latestUnreadMsg,
       online: clusterClientList.includes(device._id),
     }
   }));
@@ -126,39 +130,102 @@ router.get('/devices', async (req, res) => {
   res.status(200).json(devices);
 });
 
-router.delete('/devices/:clientId', async (req, res) => {
-  const {clientId} = req.params;
-  if (!clientId) return res.status(400).json({error: `clientId param can not be ${clientId}`});
+router.delete('/devices/:deviceId', async (req, res) => {
+  console.log('gsms-devices/devices/:deviceId')
+  const {deviceId} = req.params;
+  if (!deviceId) return res.status(400).json({error: `deviceId param can not be ${deviceId}`});
 
-  const device = await DeviceModel.findById(clientId);
-  if (!device) return res.status(400).json({error: `Device with ID ${clientId} not found`});
+  const device = await DeviceModel.findById(deviceId);
+  if (!device) return res.status(400).json({error: `Device with ID ${deviceId} not found`});
 
   if (device.storeId) {
     const deviceStore = await StoreModel.findById(device.storeId);
     if (deviceStore.gSms && deviceStore.gSms.devices) {
       await StoreModel.findOneAndUpdate(
           {_id: deviceStore._id},
-          {$pull: {'gSms.devices': {_id: device._id}}}
+          {$pull: {'gSms.devices': {_id: deviceId}}}
       )
     }
+  }
+
+  // multi store
+  if (device.enableMultiStore) {
+    const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
+    _.each(stores, s => {
+      if (s.gSms && s.gSms.devices) {
+        StoreModel.findOneAndUpdate(
+            {_id: s._id},
+            {$pull: {'gSms.devices': { _id: deviceId }} }
+        )
+      }
+    })
   }
 
   await DeviceModel.updateOne({_id: device._id}, {deleted: true});
   res.status(204).send();
 });
 
-router.get('/device-assigned-store/:clientId', async (req, res) => {
-  const {clientId} = req.params;
-  if (!clientId) return res.status(400).json({error: `clientId can not be ${clientId}`});
+router.get('/device-assigned-store/:deviceId', async (req, res) => {
+  console.log('gsms-devices/device-assigned-store/:deviceId')
+  const {deviceId} = req.params;
+  if (!deviceId)
+    return res.status(400).json({error: `deviceId can not be ${deviceId}`});
 
-  const device = await DeviceModel.findById(clientId);
-  if (!device) return res.status(400).json({error: `No device found with ID ${clientId}`});
+  let device = await DeviceModel.findById(deviceId);
+  if (!device)
+    return res.status(400).json({error: `No device found with ID ${deviceId}`});
+
+  // multi store
+  if (device.enableMultiStore) {
+    const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
+    if (stores && stores.length) {
+      if (stores.length === 1) {
+        device = await DeviceModel.updateOne({_id: device._id}, {
+          storeId: stores[0]._id,
+          enableMultiStore: false,
+          stores: null
+        }, { new: true })
+      } else {
+        return res.json({
+          stores: stores.map(convertToGsmsStoreModel),
+        })
+      }
+    } else {
+      await DeviceModel.updateOne({_id: device._id}, {
+        enableMultiStore: false,
+        stores: null
+      })
+    }
+  }
 
   const store = await StoreModel.findById(device.storeId || '');
-  if (!store) return res.status(200).json({assignedStore: null});
+  if (!store) {
+    return res.status(200).json({
+      error: `No store found with id ${device.storeId}`,
+      assignedStore: null
+    });
+  }
 
-  res.status(200).json({_id: store._id.toString(), storeId: store.id, assignedStore: store.name || store.alias});
+  res.status(200).json({
+    // fallback for older version
+    _id: store._id.toString(),
+    storeId: store.id,
+    assignedStore: store.name || store.alias,
+    // for newer version
+    store: convertToGsmsStoreModel(store)
+  });
 });
+
+function convertToGsmsStoreModel(s) {
+  return {
+    _id: s._id.toString(),
+    id: s.id,
+    name: s.name || s.alias,
+    alias: s.alias,
+    googleMyBusinessId: s.googleMyBusinessId,
+    orderTimeOut: s.orderTimeOut
+  }
+}
 
 router.get('/device-online-status', async (req, res) => {
   let {clientIds} = req.query;
@@ -184,7 +251,7 @@ router.post('/register', async (req, res) => {
   if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
   if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
 
-  if (metadata && metadata.deviceLatLong) {
+  if (metadata && metadata.deviceLatLong && !metadata.deviceLocation) {
     const {latitude, longitude} = metadata.deviceLatLong
 
     try {
@@ -208,6 +275,7 @@ router.post('/register', async (req, res) => {
       newDevice.lastSeen = now;
       newDevice.appName = appName;
       newDevice.deleted = false;
+      newDevice.metadata = newDevice.metadata || {}
       Object.assign(newDevice.metadata, metadata);
 
       await DeviceModel.updateOne({hardwareId}, newDevice);
@@ -225,6 +293,11 @@ router.post('/register', async (req, res) => {
       'New GSMS device registered');
 
   cms.socket.emit('newGsmsDevice', {
+    ...newDevice._doc,
+    online: true,
+    unreadMessages: 0,
+  });
+  cms.emit('newGsmsDevice', {
     ...newDevice._doc,
     online: true,
     unreadMessages: 0,
@@ -275,7 +348,7 @@ async function reverseGeocodePelias(lat, long) {
   const {features} = req.data
 
   if (features && features.length) {
-    const {country, label, region, name} = features[0];
+    const {country, label, region, name} = features[0].properties;
     return label || `${name}, ${region}, ${country}`
   }
 
@@ -293,6 +366,17 @@ async function reverseGeocodeGoogle(lat, long) { //fallback
     return results[0]['formatted_address']
   }
 }
+
+router.get('/reverse-geocoder', async (req, res) => {
+  const {lat, long} = req.query;
+  if (!lat || !long) res.status(400).json({error: 'Missing lat or long value'});
+  try {
+    const formattedAddress = await reverseGeocodePelias(lat, long);
+    res.json({address: formattedAddress})
+  } catch (e) {
+    res.status(500).json({error: e.message})
+  }
+});
 
 router.get('/google-my-business-id', async (req, res) => {
   const storeId = req.query.storeId
@@ -364,6 +448,17 @@ router.get('/store-locale', async (req, res) => {
   })
 });
 
+router.get('/store-settings', async (req, res) => {
+  const storeId = req.query.storeId
+  if (!storeId) return res.sendStatus(400)
+  const store = await cms.getModel('Store').findOne({ id: storeId })
+  if (!store) return res.sendStatus(400)
+
+  res.status(200).json({
+    orderTimeout: store.orderTimeOut
+  })
+})
+
 router.get('/get-orders', async (req, res) => {
   const { storeId } = req.query
   if (!storeId) res.sendStatus(400)
@@ -375,6 +470,16 @@ router.get('/get-orders', async (req, res) => {
   }).lean()
 
   res.status(200).json(orders.map(order => formatOrder(order, store)))
+})
+
+router.get('/order/:id', async (req, res) => {
+  const { id } = req.params
+  if (!id) res.sendStatus(400)
+
+  const order = await cms.getModel('Order').findById(id).lean()
+  if (!order) return res.status(400).send('No order found!')
+
+  res.status(200).json(formatOrder(order))
 })
 
 function formatOrder(order, store) {
@@ -394,14 +499,12 @@ function formatOrder(order, store) {
     }
   })
 
-  if (order.deliveryTime === 'asap') {
-    const timeToComplete = (store.gSms && store.gSms.timeToComplete) || 30;
-    order.deliveryTime = dayjs(order.date).add(timeToComplete, 'minute').toDate()
-  }
-  const deliveryTime = jsonFn.clone(order.deliveryTime)
-
-  const discounts = order.discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
-  const total = _.sumBy(products, p => p.originalPrice * p.quantity)
+  const discounts = order.discounts
+  .filter(d => d.type !== 'freeShipping')
+  .reduce((sum, discount) => sum + discount.value, 0)
+  const total = order.vSum
+    ? order.vSum
+    : _.sumBy(products, p => p.originalPrice * p.quantity) - discounts + order.shippingFee
 
   return {
     orderToken: order.onlineOrderId || order._id.toString(),
@@ -413,9 +516,15 @@ function formatOrder(order, store) {
     date: order.date,
     shippingFee: order.shippingFee,
     total,
-    deliveryTime,
+    deliveryTime: order.deliveryTime,
     discounts,
+    status: order.status,
+    storeId: order.storeId.toString(),
   }
 }
 
 module.exports = router
+
+// RpManager is Restaurant Plus Manager app, this function formats order data to match format used in the app
+module.exports.formatOrderForRpManager = formatOrder;
+module.exports.reverseGeocodePelias = reverseGeocodePelias;

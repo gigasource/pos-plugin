@@ -521,6 +521,9 @@ module.exports = {
       requireMinOrder: 'Require minimum order value for each zipcode',
       distanceNote: 'Note: Shipping service is not available for locations outside of the configured radius.',
       requireMinOrderDistance: 'Require minimum order value for each radius',
+      ourService: 'Our services',
+      ourMenu: 'Our menu',
+      takeAway: 'Take away',
       other: 'Other',
       otherSetting: 'Other Setting',
       deliveryForwarding: 'Delivery Forwarding',
@@ -529,9 +532,6 @@ module.exports = {
       forwardNote: 'Forwarded orders will only appear in the destination device. The System only forwards delivery orders.',
       digitalMenuScript: 'Digital menu embed script',
       upload: 'Upload',
-      ourService: 'Our services',
-      ourMenu: 'Our menu',
-      takeAway: 'Take away',
     },
 
 

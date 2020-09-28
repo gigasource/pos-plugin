@@ -15,6 +15,8 @@ const staffRoute = require('./staff')
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
 
+const StoreModel = cms.getModel('Store');
+
 // upload-zone
 router.get('/upload-zone/prepare', async (req, res) => {
   try {
@@ -47,7 +49,7 @@ router.post('/validate-alias', async (req, res) => {
     res.json({ ok: false, message: 'Valid characters are a-z, A-Z, 0-9 and \'-\' character!'})
     return
   }
-  const storeWithAlias = await cms.getModel('Store').findOne({ alias: _.toLower(alias) })
+  const storeWithAlias = await StoreModel.findOne({ alias: _.toLower(alias) })
   const urlTaken = (storeWithAlias && storeWithAlias._id.toString() !== store)
   res.json(urlTaken ? {message: 'WebShop URL has been taken!'} : {ok: true})
 })
@@ -57,7 +59,7 @@ router.post('/validate-alias', async (req, res) => {
  */
 router.post('/validate-client-domain', async (req, res) => {
   const { store, clientDomain } = req.body
-  const storeWithClientDomain = await cms.getModel('Store').findOne({ clientDomain })
+  const storeWithClientDomain = await StoreModel.findOne({ clientDomain })
   const urlTaken = (storeWithClientDomain && storeWithClientDomain._id.toString() !== store)
   res.json(urlTaken ? {message: 'Client domain has been taken!'} : {ok: true})
 })
@@ -83,7 +85,7 @@ router.post('/new-store', async (req, res) => {
 
   let {settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location} = req.body
 
-  const stores = await cms.getModel('Store').find({}, { id: 1, alias: 1 })
+  const stores = await StoreModel.find({}, { id: 1, alias: 1 })
 
   // generate unique store id
   const ids = _.map(stores, s => s.id)
@@ -119,7 +121,7 @@ router.post('/new-store', async (req, res) => {
   }
 
   // create store
-  const createdStore = await cms.getModel('Store').create({
+  const createdStore = await StoreModel.create({
     id, settingName, settingAddress, alias, groups, country,
     addedDate: new Date(),
     openHours: [
@@ -202,11 +204,10 @@ router.post('/new-feedback', async (req, res) => {
 router.post('/sign-in-requests', async (req, res) => {
   // name: device owner's name enter by device owner
   // role: 'staff' | 'manager'
-  const {storeName, googleMapPlaceId, deviceId, role, name} = req.body;
-  if (!storeName || !googleMapPlaceId || !deviceId || !role) return res.status(400).json({error: 'Missing property in request body'});
+  const {storeName, googleMapPlaceId, deviceId, role, name, avatar} = req.body;
+  if (!storeName || !googleMapPlaceId || !deviceId || !role || !name) return res.status(400).json({error: 'Missing property in request body'});
 
   const SignInRequestModel = cms.getModel('SignInRequest');
-  const StoreModel = cms.getModel('Store');
 
   const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
   if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});
@@ -220,7 +221,8 @@ router.post('/sign-in-requests', async (req, res) => {
     createdAt: new Date(),
     ...store && {store: store._id},
     role,
-    name
+    name,
+    ...avatar && {avatar}
   });
 
   const device = await cms.getModel('Device').findById(deviceId);
@@ -234,6 +236,7 @@ router.post('/sign-in-requests', async (req, res) => {
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
+  cms.emit('newSignInRequest', result);
   res.status(201).json(request._doc);
 });
 
@@ -294,25 +297,84 @@ router.get('/sign-in-requests/device-pending/:deviceId', async (req, res) => {
 
 router.put('/sign-in-requests/:requestId', async (req, res) => {
   const {requestId} = req.params;
-  if (!requestId) return res.status(400).json({error: 'Missing requestId in URL'});
+  if (!requestId)
+    return res.status(400).json({error: 'Missing requestId in URL'});
 
   let {status, storeId} = req.body;
   const update = {
     ...status && {status},
-    ...storeId && {store: new mongoose.Types.ObjectId(storeId)},
+    ...storeId && {store: storeId},
   }
 
   const request = await cms.getModel('SignInRequest').findOneAndUpdate({_id: requestId}, update, {new: true});
+  const StaffModel = cms.getModel('Staff')
+
+  let staff;
+  if (status === 'approved') {
+    staff = await StaffModel.findOne({
+      device: request.device._id,
+      store: storeId,
+    })
+
+    if(!staff) {
+      staff = await StaffModel.create({
+        name: request.name,
+        role: request.role,
+        device: request.device._id,
+        store: storeId,
+        active: true,
+        avatar: request.avatar || ''
+      })
+    } else {
+      staff = await StaffModel.updateOne({ _id: staff._id }, {
+        name: request.name,
+        role: request.role,
+        active: true,
+        avatar: request.avatar || staff.avatar || ''
+      }, { new: true })
+    }
+
+    await assignDevice(request.device._id, request.store);
+  }
+
+  if (status === 'approved' || status === 'notApproved') {
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, status === 'approved' ? 'approveSignIn' : 'denySignIn', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
+  }
 
   if (status === 'approved') {
-    await assignDevice(request.device._id, request.store);
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id]);
+    // R+ v1.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
+    // R+ v2.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
   } else if (status === 'notApproved') {
+    // R+ v1.0.0 // TODO: correct version
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
+    // R+ v2.0.0 // TODO: correct version
+    await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn_v2', [{
+      clientId: request.device._id,
+      requestId: request._id
+    }]);
   }
 
   res.status(200).json(request._doc);
 });
+
+router.get('/sign-in-requests/by-store/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  if (!storeId) return res.status(400).json({error: 'Missing storeId!'})
+
+  const requests = await cms.getModel('SignInRequest').find({
+    store: new mongoose.Types.ObjectId(storeId),
+    status: 'pending'
+  })
+  res.status(200).json(requests.map(r => _.pick(r, ['_id', 'name', 'role'])))
+})
 
 function getRequestsFromDb(conditions) {
   const aggregateSteps = [];
@@ -389,6 +451,11 @@ async function getGooglePlaceByText(placeName) {
     return null;
   }
 }
+
+router.get('/basic-info', async (req, res) => {
+  const stores = await StoreModel.find({}, {id: 1, name: 1, alias: 1, logoImageSrc: 1, groups: 1});
+  res.json(stores);
+})
 
 router.use('/staff', staffRoute)
 router.use('/team', teamRoute)

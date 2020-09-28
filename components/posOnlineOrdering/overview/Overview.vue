@@ -24,7 +24,8 @@
        <p class="fw-700 mb-2">{{$t('setting.ourService')}}</p>
        <div class="row-flex align-items-center">
          <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
-         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.delivery" icon="icon-delivery-scooter" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || (!store.delivery && (!store.affiliateDelivery || !store.affiliateDelivery.active))"
+                   icon="icon-delivery-scooter" @click="openDelivery">{{$t('store.delivery')}}</g-btn-bs>
          <g-btn-bs :disabled="!store || !store.reservationSetting || !store.reservationSetting.activeReservation"
                    icon="icon-table-reservation" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
        </div>
@@ -304,6 +305,34 @@
       },
       scrollTop() {
         window.scroll({top: 0, left: 0, behavior: 'smooth'})
+      },
+      async openDelivery() {
+        if (this.store.delivery) {
+          this.openStore('delivery')
+        } else {
+          const { active, url, lastMonthCounter, currentMonthCounter, lastSync } = this.store.affiliateDelivery
+          const date = new Date()
+          let tempCurrent, tempLast
+          if(!lastSync || dayjs(date).diff(dayjs(lastSync), 'month') === 1) {
+            tempCurrent = 1
+            tempLast = currentMonthCounter || 0
+          } else {
+            tempCurrent = currentMonthCounter + 1
+            tempLast = lastMonthCounter || 0
+          }
+          await cms.getModel('Store').findOneAndUpdate({
+            _id: this.store._id
+          }, {
+            affiliateDelivery: {
+              active,
+              url,
+              lastMonthCounter: tempLast,
+              currentMonthCounter: tempCurrent,
+              lastSync: date
+            }
+          })
+          window.open(url, "_blank")
+        }
       }
     },
     watch: {
@@ -521,6 +550,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
   @media screen and (max-width: 1139px) {

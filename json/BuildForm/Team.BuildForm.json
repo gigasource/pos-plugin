@@ -19,7 +19,8 @@
           "ref": "Staff",
           "type": "ref-select",
           "label": "Staff",
-          "labelProp": "name"
+          "labelProp": "name",
+          "autopopulate": true
         }
       ],
       "type": "array"
