@@ -1173,7 +1173,7 @@
           status: 'kitchen',
           online: true,
           takeOut: this.currentOrder.takeOut,
-          items: orderUtil.getComputedOrderItems(items, orderDateTime),
+          items: await orderUtil.getComputedOrderItems(items, orderDateTime),
           user: this.currentOrder.user
               ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
               : [{ name: this.user.name, date: orderDateTime }],

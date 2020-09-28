@@ -164,7 +164,7 @@
           <g-btn-bs class="elevation-1" :background-color="time === 60 ? '#BBDEFB' : 'white'" @click="time = 60">60
           </g-btn-bs>
         </div>
-        <g-btn-bs block large background-color="#2979FF" @click="confirmOrder">Confirm - {{$t('common.currency', storeLocale)}}{{total | convertMoney}}</g-btn-bs>
+        <g-btn-bs :disabled="disabledConfirm" block large background-color="#2979FF" @click="confirmOrder">Confirm - {{$t('common.currency', storeLocale)}}{{total | convertMoney}}</g-btn-bs>
       </g-card>
     </g-dialog>
   </div>
@@ -260,6 +260,9 @@
           }
         }
         return false
+      },
+      disabledConfirm() {
+        return !this.selectedCustomer || _.isEmpty(this.selectedCustomer) || !this.selectedCustomer.name || !this.selectedCustomer.phone || !this.selectedCustomer.addresses || this.selectedCustomer.addresses.length === 0
       }
     },
     methods: {
