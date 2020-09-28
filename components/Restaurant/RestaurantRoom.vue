@@ -101,7 +101,7 @@
             } else {
               this.$router.push(`/pos-order-2/${roomObj.name}`)
             }
-          }, 300)
+          }, 200)
         // }
       },
       setTransferTableFrom(roomObj) {

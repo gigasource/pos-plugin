@@ -4,7 +4,7 @@
       <p class="delivery-info__title">Favorite</p>
       <div class="delivery-info__favorite">
         <div :style="getRandomColor(i)" class="delivery-info__favorite-item" v-for="(f, i) in favorites"
-             @click="selectedProduct = f"
+             @click="selectFavoriteProduct(f)"
              :key="`favorite_${i}`">
           {{f.name}}
         </div>
@@ -32,17 +32,17 @@
           <g-icon size="40" color="#1271FF" @click="openDialog('add')">add_circle</g-icon>
         </template>
         <template v-else>
-          <g-text-field-bs class="bs-tf__pos" label="Name" v-model="name">
+          <g-text-field-bs class="bs-tf__pos" label="Name" v-model="name" @click="openDialog('add')">
             <template v-slot:append-inner>
               <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
             </template>
           </g-text-field-bs>
-          <g-text-field-bs class="bs-tf__pos" label="Address" v-model="address">
+          <g-text-field-bs class="bs-tf__pos" label="Address" v-model="address" @click="openDialog('add')">
             <template v-slot:append-inner>
               <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
             </template>
           </g-text-field-bs>
-          <g-text-field-bs class="bs-tf__pos" label="Zipcode" v-model="zipcode">
+          <g-text-field-bs class="bs-tf__pos" label="Zipcode" v-model="zipcode" @click="openDialog('add')">
             <template v-slot:append-inner>
               <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
             </template>
@@ -57,7 +57,7 @@
                           return itemText.toLowerCase().includes(text.toLowerCase())
                         }"
                         return-object/>
-        <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" v-model="quantity" label="Quantity"/>
+        <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos quantity" v-model="quantity" label="Quantity"/>
         <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :value="selectedProduct.price" label="Price" @input="debouceUpdatePrice"/>
         <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" v-model="selectedProduct.note" label="Note"/>
         <template v-if="selectedProduct && selectedProduct.choices && selectedProduct.choices.length > 0">
@@ -454,6 +454,8 @@
         }
         if (event.key === 'Enter') {
           if (this.enterPressed === 0) {
+            const tf = document.querySelector('.quantity input')
+            tf && tf.focus()
             this.enterPressed++
             return
           }
@@ -475,6 +477,7 @@
       },
       async selectAutocompleteAddress(place_id) {
         cms.socket.emit('getPlaceDetail', place_id, this.token, this.apiKey, data => {
+          if(!data && _.isEmpty(data)) return
           for(const component of data.address_components) {
             if (component.types.includes('street_number')) {
               this.house = component.long_name
@@ -501,11 +504,20 @@
         })
         await this.loadProduct()
         this.selectedProduct = this.products[index]
+      },
+      selectFavoriteProduct(product) {
+        this.$emit('addProductToOrder', {
+          ...product,
+          modifiers: [],
+          quantity: 1,
+        })
       }
     },
     async activated() {
       await this.loadProduct()
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
+      this.name = this.selectedCustomer.name
+      this.phone = this.selectedCustomer.phone
       this.type = 'default'
       if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
         this.type = this.$router.currentRoute.query.type

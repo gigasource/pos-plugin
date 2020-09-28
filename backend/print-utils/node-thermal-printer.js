@@ -663,9 +663,9 @@ module.exports = class EscPrinter {
         json: {data: this.buffer.toString('base64')}
       }, (err, res, body) => {
         if (err) {
-          console.log('Integrate server is died !!!');
-          console.warn(error);
-          return reject(error);
+          console.log('Integrate server is dead !!!');
+          console.warn(err);
+          return reject(err);
         }
         if (!body) return reject(err)
         console.log("Print Finished !!!".red);

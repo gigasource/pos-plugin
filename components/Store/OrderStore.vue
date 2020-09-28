@@ -1193,8 +1193,12 @@
 
         const newOrder = await cms.getModel('Order').create(order)
 
-        this.printOnlineOrderKitchen(newOrder._id)
-        this.printOnlineOrderReport(newOrder._id)
+        try {
+          this.printOnlineOrderKitchen(newOrder._id)
+          this.printOnlineOrderReport(newOrder._id)
+        } catch(e) {
+          console.log(e)
+        }
 
         this.resetOrderData()
         const callIndex = this.calls.findIndex(c => c.customer.phone === this.selectedCustomer.phone)
