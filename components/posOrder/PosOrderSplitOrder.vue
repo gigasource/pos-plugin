@@ -29,7 +29,7 @@
           </div>
           <div class="splitter__content">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <div v-for="item in currentSplitOrder" :key="item._id" class="item">
+            <div v-for="item in currentSplitOrder" :key="item._id.toString()" class="item">
               <div class="item-detail" @click.stop="returnItem(item)">
                 <div>
                   <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
@@ -157,7 +157,8 @@
 
     <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale"
                        @updatePayment="updateSplitPayment"
-                       @complete="complete"/>
+                       @complete="complete"
+                       @print="printReceipt"/>
   </div>
 </template>
 
@@ -314,6 +315,10 @@
         this.$emit('resetOrderData')
         this.$emit('updateCurrentOrder', 'table', null)
         this.$router.push({path: '/pos-dashboard'})
+      },
+      printReceipt(orderId) {
+        if (orderId) return this.$emit('printOrderReport', orderId)
+        this.splitOrders.forEach(order => this.$emit('printOrderReport', order._id))
       }
     },
     watch: {

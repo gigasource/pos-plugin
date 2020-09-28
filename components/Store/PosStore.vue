@@ -298,7 +298,10 @@
           console.error(e)
         }
       },
-      showOfflineSnackbar(message) {
+      async showOfflineSnackbar(message) {
+        const feature = await cms.getModel('Feature').findOne({ name: 'onlineOrdering' })
+        if (!feature || !feature.enabled) return
+
         const contentFn = () => (
           <div style="margin: 0 auto" class="row-flex align-items-center">
             <g-icon svg size="20">icon-wlan-disconnected-white</g-icon>

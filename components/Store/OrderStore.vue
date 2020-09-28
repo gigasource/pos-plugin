@@ -445,13 +445,15 @@
       },
       async saveSplitOrder(items, payment, isLast, callback = () => null) {
         if (isLast) {
-          const order = await this.saveRestaurantOrder(payment, false)
+          const order = await this.saveRestaurantOrder(payment, false, false)
           return callback(order)
         }
 
         // create order
         const order = { ...this.currentOrder, items, payment, _id: this.genObjectId() }
-        cms.socket.emit('pay-order', order, this.user, false, newOrder => callback(newOrder))
+        cms.socket.emit('pay-order', order, this.user, false, async newOrder => {
+          callback(newOrder);
+        })
       },
       compactOrder(products) {
         let resultArr = [];
@@ -714,6 +716,7 @@
             const addedList = Object.assign({}, this.currentOrder,
               { items: await this.mapGroupPrinter(printLists.addList) });
             cms.socket.emit('printKitchen', { order: addedList, device: this.device })
+            await this.printEntireReceipt(addedList)
           }
           if (printLists.cancelList.length) {
             const cancelledList = Object.assign({}, this.currentOrder,
@@ -816,7 +819,7 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, printReceipt = true) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
@@ -829,6 +832,7 @@
 
             cms.socket.emit('pay-order', order, this.user, true, async newOrder => {
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
+              if (printReceipt) await this.printOrderReport(newOrder._id)
               resolve(newOrder)
             })
           } catch (e) {
@@ -1287,9 +1291,11 @@
               this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
               this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+              this.printedOrder = _.cloneDeep(this.currentOrder)
             }
           } else {
             this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+            this.printedOrder = _.cloneDeep(this.currentOrder)
           }
         }
       },
