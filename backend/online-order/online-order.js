@@ -863,5 +863,23 @@ module.exports = async cms => {
       const place = await getPlaceDetail(place_id, token, apiKey)
       cb && cb(place)
     })
+
+    socket.on('getDeliveryProducts', async () => {
+      const deviceId = await getDeviceId()
+      onlineOrderSocket.emit('getDeliveryProducts', deviceId, async products => {
+        await cms.getModel('Product').deleteMany({
+          type: 'delivery'
+        })
+        await cms.getModel('Product').create(products.map(p => ({
+          ...p,
+          type: 'delivery',
+          option: {
+            favorite: !!p.mark.favorite
+          },
+          groupPrinter: p.groupPrinters[0],
+          groupPrinter2: p.groupPrinters[1],
+        })))
+      })
+    })
   })
 }

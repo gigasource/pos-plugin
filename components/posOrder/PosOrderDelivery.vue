@@ -503,7 +503,9 @@
         this.selectedProduct = this.products[index]
       }
     },
-    activated() {
+    async activated() {
+      await this.loadProduct()
+      this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
       this.type = 'default'
       if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
         this.type = this.$router.currentRoute.query.type

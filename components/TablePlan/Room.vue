@@ -133,7 +133,8 @@
           transformOrigin: '50% 50%',
           border: '1px solid transparent',
           fontSize: `${this.zoom ? this.zoom * 20 : 20}px`,
-          fontWeight: '700'
+          fontWeight: '700',
+          transition: 'none'
         };
 
         if (this.editable || (!this.editable && roomObj.type !== 'wall'))
