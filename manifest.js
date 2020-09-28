@@ -120,7 +120,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/rn-bridge/rn-bridge.js'
+      path: 'backend/rn-bridge/app-rn-bridge.js'
     },
     {
       loader: {

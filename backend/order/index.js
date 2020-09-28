@@ -92,7 +92,6 @@ module.exports = (cms) => {
   }
 
   async function createOrderCommit(order, key, value) {
-    console.log('orderId', order._id)
     return await cms.getModel('OrderCommit').create([{
       type: 'order',
       where: { _id: order._id },

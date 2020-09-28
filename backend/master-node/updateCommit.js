@@ -34,7 +34,7 @@ function deserializeObj(obj) {
 }
 
 async function buildTempOrder(table) {
-	if (table == null) return null;
+	if (table == null || !activeOrders[table]) return null;
 	const commitsList = await orderCommitModel.find({table: table, temp: true}).lean();
 
 	const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : { items: [] };
@@ -126,7 +126,7 @@ async function handleOrderCommit(commit) {
 			if (!commit.orderId) {
 				commit.orderId = highestOrderId;
 				highestOrderId++;
-			}
+			} else highestOrderId = commit.orderId;
 			const key = 'create';
 			commit.update[key].id = commit.orderId;
 			commit.update[key].date = new Date();
@@ -257,19 +257,12 @@ async function initQueue(handler) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
-			if (!commit.table && lastTable) {
-				// wait for db update
-				let _lastTable = lastTable; // lastTable can be null in the nextTick run
-				setTimeout(() => {
-					handler.cms.socket.emit('updateOrderItems', _lastTable);
-				}, 200);
-			}
 			lastTable = commit.table;
 		}
 		// wait for db update
 		if (lastTable) {
 			setTimeout(() => {
-				handler.cms.socket.emit('updateOrderItems', lastTable);
+				handler.cms.socket.emit('updateOrderItems');
 			}, 200);
 		}
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit

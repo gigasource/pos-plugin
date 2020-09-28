@@ -60,13 +60,6 @@ class Node {
 			const { masterIp, masterClientId } = posSettings;
 			this.masterClientId = masterClientId;
 			if (masterIp) await connectToMaster(this, masterIp);
-
-			this.cms.socket.on('connect', socket => {
-				socket.on('buildTempOrder', async (table, fn) => {
-					const order = await buildTempOrder(table);
-					fn(order);
-				})
-			});
 		}, 0)
 	}
 
@@ -82,31 +75,21 @@ class Node {
 		return _this.storeId;
 	}
 	// init online order socket
-	async initSocket(socket) {
+	async initSocket(socket, masterClientId) {
 		const _this = this;
+		_this.masterClientId = masterClientId;
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
 		const storeId = await _this.getStoreId();
-		_this.onlineOrderSocket.emit('getMasterIp', storeId, async (masterIp, masterClientId) => {
-			_this.masterClientId = masterClientId;
-			console.log(`Master ip is ${masterIp}`);
-			if ((!_this.socket || (_this.socket && !_this.isConnect)) && masterIp) {
-				if (_this.socket) _this.socket.disconnect(); // safer better
-				setTimeout(() => {
-					connectToMaster(_this, masterIp);
-				}, 2000);
-			}
-			if (masterClientId) _this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
-			await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp, masterClientId });
-		})
 		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
 			const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
 			if (!oldHighestCommitId) {
 				pushTaskToQueue(commits);
 				setHighestCommitId(commits[commits.length - 1].commitId + 1);
 			} else {
-				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 			}
 		})
+		if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
 	}
 
 	async init() {

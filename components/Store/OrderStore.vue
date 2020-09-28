@@ -1234,16 +1234,17 @@
         await this.updateOnlineOrders()
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-      cms.socket.on('updateOrderItems', async (table) => {
-        if (table === this.currentOrder.table) {
-          const order = await this.getTempOrder();
-          const tempItems = this.currentOrder.items.filter(i => !i.printed)
-          this.$set(this.currentOrder, '_id', order._id)
-          this.$set(this.currentOrder, 'user', order.user)
-          const newItems = [...order.items, ...tempItems];
-          this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
-          this.printedOrder = _.cloneDeep(order.items)
-        }
+      cms.socket.on('updateOrderItems', async () => {
+        const table = this.currentOrder.table
+        const order = await this.getTempOrder();
+        if (!order) return;
+        const tempItems = this.currentOrder.items.filter(i => !i.printed)
+        this.$set(this.currentOrder, '_id', order._id)
+        this.$set(this.currentOrder, 'user', order.user)
+        this.$set(this.currentOrder, 'id', order.id)
+        const newItems = [...order.items, ...tempItems];
+        this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
+        this.printedOrder = _.cloneDeep(order.items)
       })
       await this.getReservations()
 
