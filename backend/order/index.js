@@ -22,8 +22,8 @@ module.exports = (cms) => {
     })
 
     socket.on('save-order', async (actionList, cb = () => null) => {
-      const order = await cms.getModel('OrderCommit').create(actionList);
-      cb(order)
+      await createOrderCommits(actionList);
+      cb()
     })
 
     socket.on('pay-order', async (order, user, commit = false, cb = () => null) => {
@@ -31,11 +31,18 @@ module.exports = (cms) => {
         const mappedOrder = await mapOrder(order, user)
 
         if (commit) {
-          await Promise.all(_.map(mappedOrder, (value, key) => {
-            const excludes = ['_id', 'table', ]
-            if (excludes.includes(key)) return
-            return createOrderCommit(mappedOrder, key, value)
-          }))
+          const excludes = ['_id', 'table', 'id']
+
+          const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
+            type: 'order',
+            where: { _id: mappedOrder._id },
+            table: mappedOrder.table,
+            update: {
+              set: { key, value }
+            }
+          })).value()
+
+          await createOrderCommits(updates)
         } else {
           const newOrder = await cms.getModel('Order').findOneAndUpdate({ _id: mappedOrder._id }, mappedOrder, {
             upsert: true,
@@ -45,14 +52,13 @@ module.exports = (cms) => {
         }
 
       } catch (e) {
-        debugger
+        console.log(e)
       }
     })
   })
 
   async function mapOrder(order, user) {
     const date = new Date()
-    const id = await orderUtil.getLatestOrderId()
     const taxGroups = _.groupBy(order.items, 'tax')
     const vTaxGroups = _.map(taxGroups, (val, key) => ({
       taxType: key,
@@ -66,7 +72,7 @@ module.exports = (cms) => {
     const cashback = receive - vSum;
     return {
       _id: order._id,
-      id,
+      id: order.id,
       items: await orderUtil.getComputedOrderItems(compactOrder(order.items), date),
       user: [{ name: user.name, date }],
       payment,
@@ -95,6 +101,10 @@ module.exports = (cms) => {
         set: { key, value }
       }
     }]);
+  }
+
+  async function createOrderCommits(commits) {
+    return cms.getModel('OrderCommit').create(commits);
   }
 
   function genObjectId() {
