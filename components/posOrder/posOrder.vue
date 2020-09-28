@@ -1,5 +1,5 @@
 <template>
-  <div class="order-detail">
+  <div class="order-detail" :style="getHeight">
     <div class="order-detail__header">
       <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
@@ -210,6 +210,19 @@
         this.menu = false
         this.$emit('saveTableOrder')
         this.$router.go(-1)
+      },
+      getHeight() {
+        if(this.isMobile) {
+          return {
+            height: '100vh',
+            maxHeight: '100vh'
+          }
+        } else {
+          return {
+            height: '100%',
+            maxHeight: '100%'
+          }
+        }
       }
     },
     mounted() {
@@ -251,8 +264,6 @@
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    max-height: 100vh;
     position: relative;
 
     &__header {

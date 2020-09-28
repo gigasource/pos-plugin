@@ -8,6 +8,7 @@
     <div v-for="(roomObject, index) in rooms"
          :key="roomObject._id"
          :style="getRoomObjectContainerStyle(roomObject)"
+         @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          v-touch="getTouchHandlers(roomObject)"
          :class="[...!editable && ['waves-effect', 'waves-red'], ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
     >
