@@ -52,8 +52,10 @@
         }
       })
     },
-    async activated() {
-      await this.loadTableStatus()
+    activated() {
+      setTimeout(async () => {
+        await this.loadTableStatus()
+      }, 500)
     },
     destroyed() {
       cms.socket.off('update-table-status')

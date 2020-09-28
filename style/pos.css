@@ -767,3 +767,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-receipt3 {
+  background-image: url("../assets/receipt3.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

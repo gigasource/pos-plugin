@@ -4,7 +4,7 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const { initQueue, pushTaskToQueue, resumeQueue, updateTempCommit, buildTempOrder, checkCommitExist } = require('./updateCommit');
 const axios = require('axios');
 const internalIp = require('internal-ip');
-const { handlerNewMasterId } = require('./index');
+const { handlerNewMasterId, ip } = require('./index');
 
 const remoteServer = 'http://localhost:8088';
 
@@ -36,24 +36,20 @@ class Master {
 		this.connection = {};
 
 		// p2p socket
-		const _this = this;
-		_this.socket = _this.cms.io.of('/masterNode');
-		_this.socket.on('connection', socket => {
-			const clientId = socket.request._query.clientId;
-			_this.connection[clientId] = socket;
-			socket.on('disconnect', () => {
-				delete _this.connection[clientId];
+		cms.post('load:masterSocket', () => {
+			const _this = this;
+
+			_this.socket = _this.cms.io.of('/masterNode');
+			_this.socket.on('connection', socket => {
+				const clientId = socket.request._query.clientId;
+				_this.connection[clientId] = socket;
+				socket.on('disconnect', () => {
+					delete _this.connection[clientId];
+				})
+				socket.on('updateCommits', updateCommits);
+				socket.on('requireSync', requireSync);
 			})
-			socket.on('updateCommits', updateCommits);
-			socket.on('requireSync', requireSync);
 		})
-		// front-end socket
-		this.cms.socket.on('connect', socket => {
-			socket.on('buildTempOrder', async (table, fn) => {
-				const order = await buildTempOrder(table);
-				fn(order);
-			})
-		});
 	}
 
 	async getStoreId() {
@@ -72,23 +68,19 @@ class Master {
 		// online order socket
 		const _this = this;
 	  _this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync()}:${global.APP_CONFIG.port}`));
-		setTimeout(async () => {
-			_this.onlineOrderSocket.emit('getMasterIp', await _this.getStoreId(), async (masterIp, masterClientId) => {
-				_this.masterClientId = masterClientId;
-				const { onlineDevice } = await cms.getModel("PosSetting").findOne({});
-				if (_this.masterClientId != onlineDevice.id) {
-					await handlerNewMasterId(_this.masterClientId);
-				}
-				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
-			})
-		})
+		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : ip}:${global.APP_CONFIG.port}`));
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
 	}
 
 	async init() {
 		await initQueue(this);
+		/*
+		Load master must be called after initQueue finish
+		because socket event might be triggered before
+		queue is initialized
+		 */
+		this.cms.execPostSync('load:masterSocket');
 		const _this = this;
 		const _model = cms.Types['OrderCommit'].Model;
 		await _this.getStoreId();

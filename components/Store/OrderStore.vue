@@ -445,47 +445,13 @@
       },
       async saveSplitOrder(items, payment, isLast, callback = () => null) {
         if (isLast) {
-          await this.saveRestaurantOrder(payment)
-          return callback()
+          const order = await this.saveRestaurantOrder(payment, false)
+          return callback(order)
         }
 
-        console.log('items', items)
         // create order
-        const date = new Date()
-        const id = await orderUtil.getLatestOrderId()
-        const taxGroups = _.groupBy(items, 'tax')
-        const vTaxGroups = _.map(taxGroups, (val, key) => ({
-          taxType: key,
-          tax: orderUtil.calOrderTax(val),
-          sum: orderUtil.calOrderTotal(val)
-        }))
-        const vSum = orderUtil.calOrderTotal(items) + orderUtil.calOrderModifier(items);
-        const receive = _.sumBy(payment, 'value');
-
-        const order = {
-          _id: this.genObjectId(),
-          id,
-          items: await orderUtil.getComputedOrderItems(this.compactOrder(items), date),
-          user: this.currentOrder.user
-            ? [...this.currentOrder.user, { name: this.user.name, date }]
-            : [{ name: this.user.name, date }],
-          payment,
-          date,
-          vDate: await getVDate(date),
-          status: 'paid',
-          bookingNumber: getBookingNumber(date),
-          vSum,
-          vTax: orderUtil.calOrderTax(items),
-          vTaxGroups,
-          vDiscount: orderUtil.calOrderDiscount(items),
-          receive,
-          cashback: receive - vSum,
-          table: this.currentOrder.table,
-        }
-
-        console.log('order', order)
-        const newOrder = await cms.getModel('Order').create(order)
-        callback(newOrder)
+        const order = { ...this.currentOrder, items, payment, _id: this.genObjectId() }
+        cms.socket.emit('pay-order', order, this.user, false, newOrder => callback(newOrder))
       },
       compactOrder(products) {
         let resultArr = [];
@@ -703,7 +669,7 @@
         try {
           if (!this.actionList.length) return;
 
-          this.actionList.map(action => {
+          this.actionList = this.actionList.map(action => {
             if (action.type === 'item' && action.update && action.update.push) {
               action.update.push.value.sent = true
               action.update.push.value.printed = true
@@ -712,11 +678,10 @@
             return action
           })
           await this.printOrderUpdate()
-          const { _id, items, id } = await cms.getModel('OrderCommit').create(this.actionList);
-          this.$set(this.currentOrder, 'id', id);
-          this.$set(this.currentOrder, '_id', _id);
-          this.$set(this.currentOrder, 'items', items);
-          this.actionList = [];
+          cms.socket.emit('save-order', this.actionList, () => {
+            this.actionList = [];
+            this.currentOrder = { items: [], hasOrderWideDiscount: false }
+          })
         } catch (e) {
           console.log('error', e)
         }
@@ -755,8 +720,6 @@
               ({ items: await this.mapGroupPrinter(printLists.cancelList) }));
             cms.socket.emit('printKitchenCancel', { order: cancelledList, device: this.device })
           }
-
-          this.$router.go(-1)
         }
       },
       mapGroupPrinter(items) {
@@ -853,45 +816,25 @@
           }
         }]);
       },
-      async saveRestaurantOrder(paymentMethod) {
-        try {
-          if (!this.currentOrder || !this.currentOrder.items.length) return
-          await this.saveTableOrder();
-          const orderDateTime = new Date()
-          const taxGroups = _.groupBy(this.currentOrder.items, 'tax')
-          const vTaxGroups = _.map(taxGroups, (val, key) => ({
-            taxType: key,
-            tax: orderUtil.calOrderTax(val),
-            sum: orderUtil.calOrderTotal(val)
-          }))
-          const updates =
-            {
+      saveRestaurantOrder(paymentMethod, resetOrder = true) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            if (!this.currentOrder || !this.currentOrder.items.length) return
+            await this.saveTableOrder();
+
+            const order = {
+              ...this.currentOrder,
               payment: paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value })),
-              ...this.currentOrder.change && { cashback: this.currentOrder.change },
-              ...this.currentOrder.tips && { tip: this.currentOrder.tip },
-              takeOut: this.currentOrder.takeOut,
-              user: this.currentOrder.user
-                ? [...this.currentOrder.user, { name: this.user.name, date: orderDateTime }]
-                : [{ name: this.user.name, date: orderDateTime }],
-              date: orderDateTime,
-              vDate: await getVDate(orderDateTime),
-              bookingNumber: getBookingNumber(orderDateTime),
-              vSum: this.paymentTotal.toFixed(2),
-              vTax: this.paymentTax.toFixed(2),
-              vTaxGroups,
-              vDiscount: this.paymentDiscount.toFixed(2),
-              receive: _.sumBy(this.currentOrder.payment, 'value'),
-              status: 'paid',
-              items: await orderUtil.getComputedOrderItems(this.compactOrder(this.currentOrder.items), orderDateTime),
             }
 
-          const commits = _.map(updates, (value, key) => ({key, value}));
-          console.log(commits)
-          await this.createOrderCommits(commits)
-          await this.resetOrderData();
-        } catch (e) {
-          console.error(e)
-        }
+            cms.socket.emit('pay-order', order, this.user, true, async newOrder => {
+              if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
+              resolve(newOrder)
+            })
+          } catch (e) {
+            reject(e)
+          }
+        })
       },
       async quickCashRestaurant() {
         this.lastPayment = +this.paymentTotal
@@ -1291,16 +1234,17 @@
         await this.updateOnlineOrders()
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-      cms.socket.on('updateOrderItems', async (table) => {
-        if (table === this.currentOrder.table) {
-          const order = await this.getTempOrder();
-          const tempItems = this.currentOrder.items.filter(i => !i.printed)
-          this.$set(this.currentOrder, '_id', order._id)
-          this.$set(this.currentOrder, 'user', order.user)
-          const newItems = [...order.items, ...tempItems];
-          this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
-          this.printedOrder = _.cloneDeep(order.items)
-        }
+      cms.socket.on('updateOrderItems', async () => {
+        const table = this.currentOrder.table
+        const order = await this.getTempOrder();
+        if (!order) return;
+        const tempItems = this.currentOrder.items.filter(i => !i.printed)
+        this.$set(this.currentOrder, '_id', order._id)
+        this.$set(this.currentOrder, 'user', order.user)
+        this.$set(this.currentOrder, 'id', order.id)
+        const newItems = [...order.items, ...tempItems];
+        this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
+        this.printedOrder = _.cloneDeep(order.items)
       })
       await this.getReservations()
 

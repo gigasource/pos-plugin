@@ -469,10 +469,11 @@ module.exports = async cms => {
 
       cb && cb()
     });
-    socket.on('updateMasterDevice', async ack => {
+    socket.on('updateMasterDevice', async (masterClientId, ack) => {
       // set masterClientId
       // newMasterClientId is always different from the old one
-      ack();
+      await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId });
+      if (ack) ack();
       await handlerNewMasterId(socket);
     })
 

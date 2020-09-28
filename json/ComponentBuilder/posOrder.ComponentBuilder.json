@@ -379,6 +379,11 @@
           "service": "PosStore:isMobile",
           "local": "isMobile",
           "type": "prop"
+        },
+        {
+          "service": "OrderStore:resetOrderData",
+          "local": "resetOrderData",
+          "type": "event"
         }
       ]
     }
