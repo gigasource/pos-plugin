@@ -655,6 +655,15 @@ module.exports = async function (cms) {
         })
       })
 
+      socket.on('getDeliveryProducts', async (deviceId, callback) => {
+        const device = await cms.getModel('Device').findById(deviceId)
+        if (!device) return callback(null)
+
+        const products = await cms.getModel('Product').find({store: device.storeId}).lean()
+
+        callback(products)
+      })
+
       socket.on('registerMasterDevice', async (ip) => {
         await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
       })
