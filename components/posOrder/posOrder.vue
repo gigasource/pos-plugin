@@ -48,7 +48,7 @@
       </template>
     </div>
     <div v-if="!editMode" class="order-detail__content">
-      <div v-for="(item, i) in itemsWithQty" :key="item._id.toString()" class="item"
+      <div v-for="item in itemsWithQty" :key="item._id.toString()" class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
@@ -160,7 +160,7 @@
         }
       },
       itemsWithQty() {
-        if (this.items) return this.items.filter(i => i.printed ? i : i.quantity > 0)
+        if (this.items) return this.items.filter(i => i.quantity > 0)
         return []
       },
       disablePrintBtn() {

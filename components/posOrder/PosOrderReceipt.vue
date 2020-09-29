@@ -2,7 +2,7 @@
   <g-dialog fullscreen v-model="internalValue">
     <div class="receipt">
       <g-toolbar color="#EFEFEF">
-        <g-btn-bs width="120" icon="icon-back" class="elevation-2" @click="internalValue = false">
+        <g-btn-bs width="120" icon="icon-back" class="elevation-2" @click="back">
           Back
         </g-btn-bs>
         <g-btn-bs width="120" icon="icon-printer" class="elevation-2" @click.stop="print(null)">
@@ -177,6 +177,11 @@
       },
       print(orderId) {
         this.$emit('print', orderId)
+      },
+      back() {
+        const isComplete = !this.order.items || this.order.items.length === 0
+        this.internalValue = false
+        if (isComplete) return this.$emit('complete')
       }
     }
   }

@@ -324,7 +324,7 @@ async function checkCommitExist(commitId) {
 
 function getNewOrderId() {
 	highestOrderId++
-	return highestOrderId
+	return highestOrderId - 1
 }
 
 module.exports = {

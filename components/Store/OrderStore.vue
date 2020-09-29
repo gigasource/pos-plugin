@@ -689,56 +689,7 @@
         }
       },
       async printOrderUpdate() {
-        if (this.printedOrder && this.printedOrder.items) {
-          const diff = _.differenceWith(this.currentOrder.items, this.printedOrder.items, _.isEqual);
-          const printLists = diff.reduce((lists, current) => {
-            if (!this.printedOrder.items.some(i => i._id === current._id)) {
-              if (current.quantity > 0) lists.addList.push(current)
-            } else {
-              const product = this.printedOrder.items.find(i => i._id === current._id)
-
-              if (product) {
-                const qtyChange = current.quantity - product.quantity
-                if (qtyChange < 0) {
-                  const items = Array.from({ length: -qtyChange }).map(() => current);
-                  lists.cancelList = lists.cancelList.concat(items)
-                }
-                else lists.addList.push({ ...current, quantity: qtyChange })
-              }
-            }
-            return lists
-          }, {
-            cancelList: [],
-            addList: []
-          })
-
-          if (printLists.addList.length) {
-            const addedList = Object.assign({}, this.currentOrder,
-              { items: await this.mapGroupPrinter(printLists.addList) });
-            cms.socket.emit('printKitchen', { order: addedList, device: this.device })
-            await this.printEntireReceipt(addedList)
-          }
-          if (printLists.cancelList.length) {
-            const cancelledList = Object.assign({}, this.currentOrder,
-              ({ items: await this.mapGroupPrinter(printLists.cancelList) }));
-            cms.socket.emit('printKitchenCancel', { order: cancelledList, device: this.device })
-          }
-        }
-      },
-      mapGroupPrinter(items) {
-        async function getGroupPrinterName(gp) {
-          if (typeof gp === 'object') {
-            return gp.name
-          }
-          const printer = await cms.getModel('GroupPrinter').findById(gp)
-          if (printer) return printer.name
-        }
-
-        return Promise.all(items.map(async item => {
-          if (item.groupPrinter) item.groupPrinter = await getGroupPrinterName(item.groupPrinter)
-          if (item.groupPrinter2) item.groupPrinter2 = await getGroupPrinterName(item.groupPrinter2)
-          return item
-        }))
+        cms.socket.emit('print-order-kitchen', this.device, this.currentOrder, this.printedOrder)
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
