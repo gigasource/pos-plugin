@@ -327,9 +327,10 @@
         await this.getListPayments();
       },
       //general setting screen
-      getGeneralSettings() {
-        const setting = cms.getList('PosSetting')[0];
+      async getGeneralSettings() {
+        const setting = cms.getModel('PosSetting').findOne();
         this.generalSettings = setting.generalSetting || {};
+        console.log('generalSettings', setting.generalSetting)
       },
       async updateSettings() {
         const settingModel = cms.getModel('PosSetting');

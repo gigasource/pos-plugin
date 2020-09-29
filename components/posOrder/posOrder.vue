@@ -34,7 +34,18 @@
         <g-icon>icon-back</g-icon>
       </g-btn-bs>
       <g-spacer/>
-      <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
+      <template v-if="showQuickBtn">
+        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-if="showPrintBtn" icon="icon-print" @click.stop="printOrder">
+          {{$t('common.currency', storeLocale)}} {{total | convertMoney}}
+        </g-btn-bs>
+        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-else icon="icon-wallet" @click.stop="pay">
+          {{$t('common.currency', storeLocale)}} {{total | convertMoney}}
+        </g-btn-bs>
+      </template>
+      <template v-else>
+        <span class="order-detail__header-title">{{$t('common.total')}}</span>
+        <span class="order-detail__header-value text-red">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</span>
+      </template>
     </div>
     <div v-if="!editMode" class="order-detail__content">
       <div v-for="(item, i) in itemsWithQty" :key="item._id.toString()" class="item"
@@ -129,6 +140,7 @@
           price: 0,
         },
         menu: false,
+        showQuickBtn: false,
         edit: false
       }
     },
@@ -152,7 +164,10 @@
         return []
       },
       disablePrintBtn() {
-        return this.actionList.length === 0
+        return this.items.filter(i => i.quantity > 0).length === 0
+      },
+      showPrintBtn() {
+        return this.items.filter(i => !i.printed && i.quantity > 0).length > 0
       },
       editMode() {
         if(!this.isMobile) {
@@ -327,11 +342,14 @@
         }
       }, { deep: true })
     },
-    activated() {
+    async activated() {
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
         this.table = this.$router.currentRoute.params.name
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
+
+      const posSettings = await cms.getModel('PosSetting').findOne()
+      if (posSettings) this.showQuickBtn = posSettings.generalSetting.quickBtn
     },
   }
 </script>
@@ -379,11 +397,14 @@
         margin-left: 2px;
       }
 
+      .g-btn-bs {
+        margin: 0;
+      }
+
       .btn-back {
         width: 37px;
         height: 37px;
         border-radius: 50%;
-        margin: 0;
 
         & > .g-icon {
           min-width: 24px;
