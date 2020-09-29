@@ -3,7 +3,6 @@ const Node = require('./node');
 const { buildTempOrder } = require('./updateCommit');
 
 let handler;
-let ip = null;
 
 module.exports = function (cms) {
 	// init frontend socket beforehand
@@ -21,25 +20,46 @@ module.exports = function (cms) {
 		}
 		await handler.init();
 	})
-	cms.post('load:masterIp', (masterIp) => {
-		ip = masterIp;
+	cms.post('load:masterIp', (deviceIp) => {
+		console.log(`ip of this device is ${deviceIp}`)
+		global.APP_CONFIG.deviceIp = deviceIp;
 	})
 }
 
 async function initSocket(socket) {
 	const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
-	const { onlineDevice, masterClientId } = posSettings;
-	socket.emit('getMasterIp', posSettings.onlineDevice.store.alias, async (masterIp, masterClientId) => {
-		console.log(`Master ip is ${masterIp}`);
-		await cms.getModel("PosSetting").findOneAndUpdate({}, { masterIp, masterClientId });
-		if (!masterClientId) return;
+	const { masterClientId, onlineDevice } = posSettings;
+	if (!masterClientId) {
+		let retryTime = 0;
+		const getMasterFromOnlineOrder = async () => {
+			const { onlineDevice } = await cms.getModel("PosSetting").findOne({}).lean();
+			socket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
+				console.log(`Master ip is ${masterIp}`);
+				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
+				if (!masterClientId) {
+					if (retryTime < 5) setTimeout(async () => {
+						await getMasterFromOnlineOrder();
+					}, 5000)
+					retryTime += 1;
+					return;
+				}
+				if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
+					global.APP_CONFIG.isMaster = true;
+				}
+				cms.execPostSync('load:handler');
+				await handler.initSocket(socket, masterClientId);
+			})
+		}
+		setTimeout(async () => {
+			await getMasterFromOnlineOrder();
+		}, 3000);
+	} else {
 		if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 			global.APP_CONFIG.isMaster = true;
 		}
-		console.debug("Is Master", global.global.APP_CONFIG.isMaster);
 		cms.execPostSync('load:handler');
 		await handler.initSocket(socket, masterClientId);
-	})
+	}
 }
 
 /*
@@ -53,4 +73,3 @@ async function handlerNewMasterId(socket) {
 
 module.exports.initSocket = initSocket;
 module.exports.handlerNewMasterId = handlerNewMasterId;
-module.exports.ip = ip;

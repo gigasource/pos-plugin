@@ -38,20 +38,10 @@
     async created() {
       await this.loadRoom()
       await this.loadTableStatus()
-      cms.socket.emit('join-room')
-      cms.socket.on('update-table-status', ({ table, status }) => {
-        if (_.includes(this.tableNames, table)) {
-          if (status === 'inProgress') {
-            if (!_.includes(this.inProgressTable, table)) {
-              this.inProgressTable.push(table)
-            }
-          } else {
-            let indexOfTable = _.findIndex(this.inProgressTable, table)
-            if (indexOfTable >= 0) {
-              this.inProgressTable.splice(indexOfTable, 1)
-            }
-          }
-        }
+      cms.socket.on('update-table-status', () => {
+        setTimeout(async () => {
+          await this.loadTableStatus()
+        }, 500)
       })
     },
     activated() {
