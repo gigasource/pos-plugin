@@ -18,6 +18,7 @@
             Print
           </g-btn-bs>
           <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
+          <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
         </div>
       </g-menu>
       <g-avatar v-else size="36">
@@ -33,10 +34,9 @@
         <g-icon>icon-back</g-icon>
       </g-btn-bs>
       <g-spacer/>
-      <span class="order-detail__header-title">{{$t('common.total')}}</span>
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
-    <div class="order-detail__content">
+    <div v-if="!editMode" class="order-detail__content">
       <div v-for="(item, i) in itemsWithQty" :key="item._id.toString()" class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
@@ -64,6 +64,29 @@
       </div>
     </div>
     <div class="blur-overlay" v-show="menu"/>
+    <div v-if="editMode">
+      <div class="row-flex align-items-center">
+        <span class="mr-2">Font size:</span>
+        <g-icon @click="changeSize(-0.5)">remove_circle</g-icon>
+        <span>{{fontSize}}</span>
+        <g-icon @click="changeSize(0.5)">add_circle</g-icon>
+      </div>
+      <g-btn-bs small style="margin-left: 0" class="elevation-1" @click="changeCategory">Change category mode</g-btn-bs>
+      <div style="text-transform: capitalize">Mode: {{category.type}}</div>
+      <g-checkbox :disabled="category.type !== 'horizontal'" :input-value="category.singleRow" label="Single Row Category" @change="v => changeCategoryStyle('singleRow', v)"/>
+      <g-checkbox :disabled="!((category.type === 'vertical') || (category.type === 'horizontal' && category.singleRow))" :input-value="category.differentSize"
+                  :label="`Different ${category.type === 'vertical' ? 'Height' : 'Width'}`" @change="v => changeCategoryStyle('differentSize', v)"/>
+      <div class="row-flex align-items-center">
+        <span class="mr-2">Category size</span>
+        <g-icon @click="changeCategorySize(-4)">remove_circle</g-icon>
+        <span>{{category.size}}</span>
+        <g-icon @click="changeCategorySize(4)">add_circle</g-icon>
+      </div>
+      <g-checkbox :input-value="minimumTextRow" label="Minimize only text row" @change="changeTextRow"/>
+      <g-checkbox :input-value="collapseBlankColumn" label="Narrow empty column" @change="changeBlankCol"/>
+      <g-checkbox :input-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
+      <g-btn-bs width="100" small style="margin-left: calc(100% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
+    </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
@@ -84,7 +107,12 @@
       items: Array,
       user: Object,
       storeLocale: String,
-      actionList: Array
+      actionList: Array,
+      fontSize: String,
+      category: Object,
+      minimumTextRow: Boolean,
+      collapseBlankColumn: Boolean,
+      collapseText: Boolean,
     },
     filters: {
       convertMoney(value) {
@@ -101,6 +129,7 @@
           price: 0,
         },
         menu: false,
+        edit: false
       }
     },
     computed: {
@@ -124,6 +153,12 @@
       },
       disablePrintBtn() {
         return this.actionList.length === 0
+      },
+      editMode() {
+        if(!this.isMobile) {
+          return false
+        }
+        return this.edit
       }
     },
     methods: {
@@ -223,6 +258,60 @@
             maxHeight: '100%'
           }
         }
+      },
+      changeSize(num) {
+        const size = +this.fontSize.slice(0, this.fontSize.length - 2)
+        if (size + num > 0) {
+          this.$emit('update:fontSize', `${size+num}px`)
+        }
+      },
+      changeCategory() {
+        if(this.category.type === 'horizontal')
+          this.$emit('update:category', Object.assign({}, this.category, { type: 'vertical'}))
+        else
+          this.$emit('update:category', Object.assign({}, this.category, { type: 'horizontal'}))
+      },
+      changeCategorySize(change) {
+        const size = +this.category.size.slice(0, this.category.size.length - 2)
+        if(size + change > 0) {
+          this.$emit('update:category', Object.assign({}, this.category, { size: `${size + change}px`}))
+        }
+      },
+      changeTextRow(value) {
+        this.$emit('update:minimumTextRow', !!value)
+      },
+      changeBlankCol(value) {
+        this.$emit('update:collapseBlankColumn', !!value)
+      },
+      changeCollapseText(value) {
+        this.$emit('update:collapseText', !!value)
+      },
+      changeCategoryStyle(key, value) {
+        let change = {}
+        change[key] = value
+        this.$emit('update:category', Object.assign({}, this.category, change))
+      },
+      saveSetting() {
+        const setting = {
+          fontSize: this.fontSize,
+          category: this.category,
+          minimumTextRow: this.minimumTextRow,
+          collapseBlankColumn: this.collapseBlankColumn,
+          collapseText: this.collapseText
+        }
+        localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
+        this.edit = false
+      }
+    },
+    created() {
+      const setting = localStorage.getItem('OrderScreenSetting')
+      if(setting) {
+        const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText} = JSON.parse(setting)
+        this.$emit('update:fontSize', fontSize)
+        this.$emit('update:category', category)
+        this.$emit('update:minimumTextRow', minimumTextRow)
+        this.$emit('update:collapseBlankColumn', collapseBlankColumn)
+        this.$emit('update:collapseText', collapseText)
       }
     },
     mounted() {

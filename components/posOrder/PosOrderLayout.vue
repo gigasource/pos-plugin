@@ -1,7 +1,9 @@
 <template>
-  <div class="pol" v-if="orderLayout">
+  <div class="pol" v-if="orderLayout" :style="{'flex-direction':category && category.type === 'vertival' ? 'row': 'column',
+                                                'background': 'url(\'/plugins/pos-plugin/assets/out.png\')',
+                                                'background-size': 'contain' }">
     <!-- Categories -->
-    <div style="padding: 4px; background-color: #E0E0E0; position: sticky; top: 0; z-index: 1">
+    <div style="padding: 4px; background-color: #E0E0E060; position: sticky; top: 0; z-index: 1">
       <div :style="categoryContainerStyle">
         <div v-for="(category, index) in categories"
              class="pol__cate darken-effect"
@@ -13,10 +15,10 @@
       </div>
     </div>
     <!-- Products -->
-    <div style="padding: 4px; background: url('/plugins/pos-plugin/assets/background.png'); background-size: contain; flex: 1" v-if="selectedCategoryLayout">
+    <div style="padding: 4px; flex: 1" v-if="selectedCategoryLayout">
       <div :style="productContainerStyle">
         <div v-for="(productLayout, index) in products"
-             :class="['pol__prod', !editable && 'darken-effect']"
+             :class="['pol__prod', !editable && 'darken-effect', collapseText && 'collapsed']"
              :key="index"
              :style="[getAreaStyle(productLayout), getProductItemStyle(productLayout)]"
              v-on="getProductListeners(productLayout)">
@@ -50,6 +52,11 @@
       productDblClicked: null,
       keyboardConfig: null,
       storeLocale: null,
+      fontSize: String,
+      category: Object,
+      minimumTextRow: Boolean,
+      collapseBlankColumn: Boolean,
+      collapseText: Boolean,
     },
     data() {
       return {
@@ -70,22 +77,86 @@
     },
     computed: {
       categoryContainerStyle() {
+        if(this.category && this.category.type === 'vertical') {
+          if(this.category.differentSize) {
+            return {
+              display: 'block',
+              width: this.category.size
+            }
+          }
+          return {
+            display: 'grid',
+            'grid-template-rows': `repeat(8, calc(12,5% - ${5 * 8 / 7}px))`,
+            'grid-template-columns': '100%',
+            "grid-gap": '5px',
+            width: this.category.size
+          }
+        }
+        if (this.category && this.category.type === 'horizontal' && this.category.singleRow) {
+          if(this.category.differentSize) {
+            return {
+              display: 'flex',
+              maxWidth: '100%',
+              overflow: 'auto',
+              height: this.category.size
+            }
+          }
+          return {
+            display: 'grid',
+            'grid-template-rows': `repeat(8, calc(12,5% - ${5 * 8 / 7}px))`,
+            'grid-template-columns': '100%',
+            "grid-gap": '5px',
+            width: this.category.size
+          }
+        }
         return {
           display: 'grid',
           'grid-template-columns': this.getGridTemplateFromNumber(this.orderLayout.columns),
           'grid-template-rows': this.getGridTemplateFromNumber(this.orderLayout.rows),
           'grid-gap': '5px',
-          height: '90px',
+          height: this.category ? this.category.size : '90px'
         }
       },
       productContainerStyle() {
-        return {
+        const style = {
           display: 'grid',
           'grid-template-columns': this.getGridTemplateFromNumber(this.selectedCategoryLayout.columns),
-          'grid-template-rows': this.getGridTemplateFromNumber(this.selectedCategoryLayout.rows),
+          'grid-template-rows': `repeat(${this.selectedCategoryLayout.rows}, 1fr)`,
           'grid-gap': '5px',
           height: '100%'
         }
+        if (this.minimumTextRow) {
+          let rows = []
+          const texts = this.products.filter(p => p.type === 'Text')
+          for(const text of texts) {
+            let flag = true
+            const row = text.top
+            const rowItems = this.products.filter(p => p.top === row)
+            for(const item of rowItems) {
+              if(item.type !== 'Text') {
+                  flag = false;
+                  break;
+              }
+            }
+            if(flag) rows.push(row)
+          }
+          style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : '1fr').join(' ')
+        }
+        if (this.collapseBlankColumn) {
+          let columns = [], col = 0
+          while (col < this.selectedCategoryLayout.columns) {
+            const colItems = this.products.filter(p => p.left === col)
+            if(colItems.length === 0) {
+              columns.push(col)
+            }
+            col++
+          }
+          const cols = 2 * this.selectedCategoryLayout.columns - columns.length
+          style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
+                                          .map(i => columns.includes(i) ? `calc(${100/cols}% - ${5 * (cols - 1) / cols}px)` : `calc(${200/cols}% - ${5 * (cols - 1) / cols}px)`)
+                                          .join(' ')
+        }
+        return style
       },
       showCalculator() {
         if (!this.selectedCategoryLayout || !this.keyboardConfig)
@@ -112,6 +183,7 @@
               this.orderLayout.rows,
               true);
         }
+        const temp  = [{name: 'Snack', color: '#124422'}, {name: 'Vegetable', color: '#215dea'}, {name: ''}]
         return this.orderLayout.categories
       },
       products() {
@@ -260,12 +332,13 @@
           style.backgroundColor = 'transparent'
           style.fontWeight = '400'
           style.color = '#212121'
+          style.lineHeight = 1.2
         }
         if (product.product && product.product.isModifier) {
           style.fontStyle = 'italic'
         }
         if (this.isMobile) {
-          style.minHeight = '40px'
+          style.fontSize = this.fontSize
         }
         return style;
       },
@@ -454,6 +527,14 @@
 
       & > div {
         max-height: 100%;
+      }
+
+      &.collapsed div {
+        word-break: break-all;
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
     }
   }

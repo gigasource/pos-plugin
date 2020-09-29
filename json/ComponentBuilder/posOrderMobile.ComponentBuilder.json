@@ -2,7 +2,7 @@
   "events": [],
   "_id": "5e7983deefd5f205955ba034",
   "data": {
-    "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n  }\n}",
+    "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n      fontSize: '14px',\n      category: {\n        type: 'horizontal',\n        size: '64px',\n        singleRow: false,\n        differentSize: false,\n      },\n      minimumTextRow: true,\n      collapseBlankColumn: true,\n      collapseText: true,\n  }\n}",
     "_code_type_": "commonJs"
   },
   "isProduction": true,
@@ -130,6 +130,31 @@
               "type": ".sync",
               "root": "data.keyboardConfig",
               "local": "keyboardConfig"
+            },
+            {
+              "type": ".sync",
+              "root": "data.fontSize",
+              "local": "fontSize"
+            },
+            {
+              "type": ".sync",
+              "root": "data.category",
+              "local": "category"
+            },
+            {
+              "type": ".sync",
+              "root": "data.minimumTextRow",
+              "local": "minimumTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseBlankColumn",
+              "local": "collapseBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseText",
+              "local": "collapseText"
             }
           ],
           "slotScopeBinding": [],
@@ -163,7 +188,33 @@
         },
         {
           "choice": "view",
-          "binding": [],
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.fontSize",
+              "local": "fontSize"
+            },
+            {
+              "type": ".sync",
+              "root": "data.category",
+              "local": "category"
+            },
+            {
+              "type": ".sync",
+              "root": "data.minimumTextRow",
+              "local": "minimumTextRow"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseBlankColumn",
+              "local": "collapseBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.collapseText",
+              "local": "collapseText"
+            }
+          ],
           "slotScopeBinding": [],
           "slot": "order",
           "isScopedSlot": true,
@@ -314,11 +365,6 @@
         {
           "service": "OrderStore:resetOrderData",
           "local": "resetOrderData",
-          "type": "event"
-        },
-        {
-          "service": "OrderStore:printOrderReport",
-          "local": "printOrderReport",
           "type": "event"
         }
       ],
