@@ -1,7 +1,7 @@
 <template>
   <div>
     <g-dialog v-model="internalValue" :transition="false" content-class="split-order-dialog">
-      <div class="row-flex justify-end">
+      <div class="row-flex justify-end w-100">
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
           <div class="splitter__header row-flex" v-if="isMobile">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
@@ -286,6 +286,7 @@
         this.showMultiPaymentdialog = false
       },
       createOrder(paymentMethod) {
+        this.showPaymentMethodsMenu = false
         const isLastSplit = this.remainingItems.length === 0;
         this.$emit('saveSplitOrder', this.currentSplitOrder, paymentMethod, isLastSplit,
           order => {

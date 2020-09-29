@@ -270,11 +270,10 @@ async function initQueue(handler) {
 			lastTable = commit.table;
 		}
 		// wait for db update
-		if (lastTable) {
-			setTimeout(() => {
-				handler.cms.socket.emit('updateOrderItems');
-			}, 200);
-		}
+		setTimeout(() => {
+			handler.cms.socket.emit('updateOrderItems');
+			handler.cms.socket.emit('update-table-status');
+		}, 200);
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
 			const deleteCommit = await deleteTempCommit(lastTempId);
 			newCommits.push(deleteCommit);
@@ -325,7 +324,7 @@ async function checkCommitExist(commitId) {
 
 function getNewOrderId() {
 	highestOrderId++
-	return highestOrderId
+	return highestOrderId - 1
 }
 
 module.exports = {

@@ -4,7 +4,6 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const { initQueue, pushTaskToQueue, resumeQueue, updateTempCommit, buildTempOrder, checkCommitExist } = require('./updateCommit');
 const axios = require('axios');
 const internalIp = require('internal-ip');
-const { handlerNewMasterId, ip } = require('./index');
 
 const remoteServer = 'http://localhost:8088';
 
@@ -68,7 +67,7 @@ class Master {
 		// online order socket
 		const _this = this;
 	  _this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : ip}:${global.APP_CONFIG.port}`));
+		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : global.APP_CONFIG.deviceIp}:${global.APP_CONFIG.port}`));
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
 	}
