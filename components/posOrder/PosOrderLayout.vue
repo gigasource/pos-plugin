@@ -1,5 +1,5 @@
 <template>
-  <div class="pol" v-if="orderLayout" :style="{'flex-direction':category && category.type === 'vertival' ? 'row': 'column',
+  <div class="pol" v-if="orderLayout" :style="{'flex-direction':category && category.type === 'vertical' ? 'row': 'column',
                                                 'background': 'url(\'/plugins/pos-plugin/assets/out.png\')',
                                                 'background-size': 'contain' }">
     <!-- Categories -->
