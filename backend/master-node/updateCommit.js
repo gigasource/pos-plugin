@@ -93,8 +93,6 @@ async function handleOrderCommit(commit) {
 				console.error('Order has been closed');
 				return null;
 			}
-			activeOrders[commit.table][commit.update.set.key] = commit.update.set.value;
-			commit.update.set = activeOrders[commit.table];
 			delete activeOrders[commit.table];
 		}
 		// delete all commit with this orderid and create new close commit
@@ -109,10 +107,11 @@ async function handleOrderCommit(commit) {
 		} else {
 			query = commit.update.set;
 		}
-		await orderModel.findOneAndUpdate(commit.where, query);
+		const newActiveOrders = await orderModel.findOneAndUpdate(commit.where, query, { new: true }).lean();
 		await orderCommitModel.create(commit);
-		if (activeOrders[commit.table]) activeOrders[commit.table][commit.update.set.key] = commit.update.set.value;
-		else await orderCommitModel.deleteMany({type: 'item', orderId: commit.orderId});
+		if (activeOrders[commit.table]) {
+			activeOrders[commit.table] = newActiveOrders;
+		}
 		result = true;
 	} else {  // open order
 		if (activeOrders[commit.table]) {
@@ -189,6 +188,15 @@ async function handleSyncCommit(oldHighestCommitId) {
 	return await orderCommitModel.find({commitId: {$gt: oldHighestCommitId - 1}});
 }
 
+async function handleChangeTable(commit) {
+	const result = await orderCommitModel.updateMany({ orderId: commit.orderId }, { table: commit.update.set.value }, { new : true });
+	if (result) {
+		activeOrders[commit.update.set.value] = activeOrders[commit.table];
+		delete activeOrders[commit.table];
+	}
+	return result;
+}
+
 async function deleteTempCommit(groupTempId) {
 	let commit = null;
 	if (global.APP_CONFIG.isMaster) { // Only master can create remove temp commit
@@ -252,6 +260,8 @@ async function initQueue(handler) {
 			} else if (commit.type === 'removeTemp') {
 				result = true;
 				await deleteTempCommit(commit.groupTempId);
+			} else if (commit.type === 'changeTable') {
+				result = await handleChangeTable(commit);
 			}
 			if (result) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;

@@ -118,19 +118,20 @@
         // create $set table commit
         const currentCommits = await cms.getModel('OrderCommit').find({ orderId: order.id })
         const table = roomObj.name;
-        await cms.getModel('OrderCommit').create({
-          type: 'order',
-          where: { _id: order._id },
-          table: order.table,
-          update: {
-            set: {
-              key: 'table',
-              value: table
+        await cms.getModel('OrderCommit').create(['order', 'changeTable'].map(type => {
+          return {
+            type,
+            where: { _id: order._id },
+            table: order.table,
+            update: {
+              set: {
+                key: 'table',
+                value: table
+              }
             }
           }
-        })
+        }))
         // update current order -> new table
-        await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, { table })
         await this.loadRoom()
         await this.loadTableStatus()
         this.transferTableFrom = null

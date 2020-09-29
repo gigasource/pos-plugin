@@ -1243,7 +1243,6 @@
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
       cms.socket.on('updateOrderItems', async () => {
-        const table = this.currentOrder.table
         const order = await this.getTempOrder();
         if (!order) return;
         const tempItems = this.currentOrder.items.filter(i => !i.printed)
