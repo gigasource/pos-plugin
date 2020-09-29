@@ -1,42 +1,47 @@
 <template>
-	<div class="row-flex pa-5" style="font-size: 13px; line-height: 16px">
-		<div class="col-5 px-3">
-			<div class="row-flex align-items-center justify-between">
-				<span>{{$t('settings.companyBarcode')}}</span>
-				<g-switch v-model="barcode" @change="changeSetting"/>
-			</div>
-			<div class="row-flex align-items-center justify-between">
-				<span>{{$t('settings.showFav')}}</span>
-				<g-switch v-model="favoriteArticle" @change="changeSetting"/>
-			</div>
-			<div class="row-flex align-items-center justify-between">
-				<span>{{$t('settings.autoCashdrawer')}}</span>
-				<g-switch v-model="automaticCashdrawer" @change="changeSetting"/>
-			</div>
-		</div>
-		<div class="col-5 offset-1">
-			<div class="row-flex align-items-center justify-center">
-				<pos-time-picker :label="$t('settings.beginHour')" :value="beginHour" @input="beginHour = $event; changeSetting()">
-					<template v-slot:append>
-						<g-icon>access_time</g-icon>
-					</template>
-				</pos-time-picker>
-			</div>
-		</div>
-	</div>
+  <div class="row-flex pa-5" style="font-size: 13px; line-height: 16px">
+    <div class="col-5 px-3">
+      <div class="row-flex align-items-center justify-between">
+        <span>{{$t('settings.companyBarcode')}}</span>
+        <g-switch v-model="barcode"/>
+      </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>{{$t('settings.showFav')}}</span>
+        <g-switch v-model="favoriteArticle"/>
+      </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>{{$t('settings.autoCashdrawer')}}</span>
+        <g-switch v-model="automaticCashdrawer"/>
+      </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>Quick pay/print button</span>
+        <g-switch v-model="quickBtn"/>
+      </div>
+
+    </div>
+    <div class="col-5 offset-1">
+      <div class="row-flex align-items-center justify-center">
+        <pos-time-picker :label="$t('settings.beginHour')" :value="beginHour" @input="beginHour = $event">
+          <template v-slot:append>
+            <g-icon>access_time</g-icon>
+          </template>
+        </pos-time-picker>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
   import PosTimePicker from '../../pos-shared-components/POSInput/PosTimePicker';
-	export default {
+
+  export default {
     name: 'viewGeneral',
-		components: { PosTimePicker },
-		injectService: [
-      'SettingsStore:generalSettings',
-      'SettingsStore:getGeneralSettings',
-      'SettingsStore:updateSettings',
-      'SettingsStore:resetLayoutFnBtn',
-    ],
+    components: { PosTimePicker },
+    data() {
+      return {
+        generalSettings: {},
+      };
+    },
     computed: {
       barcode: {
         get() {
@@ -45,7 +50,7 @@
           }
         },
         set(val) {
-					this.$set(this.generalSettings, 'barcode', val)
+          this.$set(this.generalSettings, 'barcode', val)
         }
       },
       favoriteArticle: {
@@ -55,7 +60,7 @@
           }
         },
         set(val) {
-					this.$set(this.generalSettings, 'favoriteArticle', val)
+          this.$set(this.generalSettings, 'favoriteArticle', val)
         }
       },
       virtualKeyboard: {
@@ -65,8 +70,8 @@
           }
         },
         set(val) {
-					this.$set(this.generalSettings, 'virtualKeyboard', val)
-				}
+          this.$set(this.generalSettings, 'virtualKeyboard', val)
+        }
       },
       automaticCashdrawer: {
         get() {
@@ -75,69 +80,79 @@
           }
         },
         set(val) {
-					this.$set(this.generalSettings, 'automaticCashdrawer', val)
-				}
+          this.$set(this.generalSettings, 'automaticCashdrawer', val)
+        }
       },
-			quickFnRows: {
-      	get() {
-      		if (this.generalSettings) {
-      			return this.generalSettings.quickFnRows;
-					}
-				},
-				set(val) {
-					this.$set(this.generalSettings, 'quickFnRows', val)
-				}
-			},
-			beginHour: {
-      	get() {
-      		return (this.generalSettings && this.generalSettings.beginHour) || '00:00'
-				},
-				set(val) {
-      		this.$set(this.generalSettings, 'beginHour', val)
-				}
-			}
-    },
-    methods: {
-      async changeSetting() {
-        await this.updateSettings()
+      quickFnRows: {
+        get() {
+          if (this.generalSettings) {
+            return this.generalSettings.quickFnRows;
+          }
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'quickFnRows', val)
+        }
       },
-			async updateFnRows(number) {
-				this.quickFnRows = number;
-				await this.updateSettings();
-				await this.resetLayoutFnBtn('leftFunctionButtons');
-			}
+      beginHour: {
+        get() {
+          return (this.generalSettings && this.generalSettings.beginHour) || '00:00'
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'beginHour', val)
+        }
+      },
+      quickBtn: {
+        get() {
+          return (this.generalSettings && this.generalSettings.quickBtn)
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'quickBtn', val)
+        }
+      }
     },
-    created() {
-      this.getGeneralSettings();
+    async created() {
+      const setting = await cms.getModel('PosSetting').findOne();
+      this.generalSettings = setting.generalSetting || {};
+    },
+    watch: {
+      generalSettings: {
+        async handler(val) {
+          if (val) {
+            const settingModel = cms.getModel('PosSetting');
+            await settingModel.findOneAndUpdate({}, { generalSetting: val })
+          }
+        },
+        deep: true
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
-	.btn-fn-row {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px;
-		height: 40px;
-		background: #F0F0F0;
-		border: 1px solid #C9C9C9;
-		border-radius: 2px;
-		font-size: 13px;
-		line-height: 16px;
-		color: #1D1D26;
-		margin-left: 8px;
+  .btn-fn-row {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: #F0F0F0;
+    border: 1px solid #C9C9C9;
+    border-radius: 2px;
+    font-size: 13px;
+    line-height: 16px;
+    color: #1D1D26;
+    margin-left: 8px;
 
-		&.selected {
-			border-color: #1271FF;
-		}
-	}
+    &.selected {
+      border-color: #1271FF;
+    }
+  }
 
-	.btn-fn-row:first-of-type {
-		margin-left: 4px;
-	}
+  .btn-fn-row:first-of-type {
+    margin-left: 4px;
+  }
 
-	span {
-		max-width: 150px;
-	}
+  span {
+    max-width: 150px;
+  }
 </style>
