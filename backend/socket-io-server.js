@@ -1159,6 +1159,10 @@ module.exports = async function (cms) {
       }
     })
 
+    socket.on('updateAffiliateDelivery', async (_id, affiliateDelivery) => {
+      await cms.getModel('Store').findOneAndUpdate({ _id }, { affiliateDelivery })
+    })
+
     socket.once('disconnect', async () => {
       if (!remoteControlDeviceId) return
 

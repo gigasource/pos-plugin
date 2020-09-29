@@ -320,18 +320,14 @@
             tempCurrent = currentMonthCounter + 1
             tempLast = lastMonthCounter || 0
           }
-          await cms.getModel('Store').findOneAndUpdate({
-            _id: this.store._id
-          }, {
-            affiliateDelivery: {
-              active,
-              url,
-              lastMonthCounter: tempLast,
-              currentMonthCounter: tempCurrent,
-              lastSync: date
-            }
+          cms.socket.emit('updateAffiliateDelivery', this.store._id, {
+            active,
+            url,
+            lastMonthCounter: tempLast,
+            currentMonthCounter: tempCurrent,
+            lastSync: date
           })
-          window.open(url, "_blank")
+          window.open(url)
         }
       }
     },
