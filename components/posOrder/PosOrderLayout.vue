@@ -6,7 +6,7 @@
     <div style="padding: 4px; background-color: #E0E0E060; position: sticky; top: 0; z-index: 1">
       <div :style="categoryContainerStyle">
         <div v-for="(category, index) in categories"
-             class="pol__cate darken-effect"
+             :class="['pol__cate', 'darken-effect']"
              :key="index"
              :style="[getCategoryStyle(category), getAreaStyle(category)]"
              @click="selectCategory(category)">
@@ -18,7 +18,7 @@
     <div style="padding: 4px; flex: 1" v-if="selectedCategoryLayout">
       <div :style="productContainerStyle">
         <div v-for="(productLayout, index) in products"
-             :class="['pol__prod', !editable && 'darken-effect', collapseText && 'collapsed']"
+             :class="['pol__prod', !editable && 'darken-effect', isMobile && collapseText && 'collapsed']"
              :key="index"
              :style="[getAreaStyle(productLayout), getProductItemStyle(productLayout)]"
              v-on="getProductListeners(productLayout)">
@@ -57,6 +57,8 @@
       minimumTextRow: Boolean,
       collapseBlankColumn: Boolean,
       collapseText: Boolean,
+      hideTextRow: Boolean,
+      hideBlankColumn: Boolean,
     },
     data() {
       return {
@@ -86,8 +88,9 @@
           }
           return {
             display: 'grid',
-            'grid-template-rows': `repeat(8, calc(12,5% - ${5 * 8 / 7}px))`,
+            'grid-template-rows': `repeat(8, calc(12.5% - ${5 * 8 / 7}px))`,
             'grid-template-columns': '100%',
+            'height': '100%',
             "grid-gap": '5px',
             width: this.category.size
           }
@@ -103,10 +106,10 @@
           }
           return {
             display: 'grid',
-            'grid-template-rows': `repeat(8, calc(12,5% - ${5 * 8 / 7}px))`,
-            'grid-template-columns': '100%',
+            'grid-template-columns': `repeat(8, calc(12.5% - ${5 * 8 / 7}px))`,
+            'grid-template-rows': '100%',
             "grid-gap": '5px',
-            width: this.category.size
+            height: this.category.size
           }
         }
         return {
@@ -125,7 +128,7 @@
           'grid-gap': '5px',
           height: '100%'
         }
-        if (this.minimumTextRow) {
+        if (this.minimumTextRow || this.hideTextRow) {
           let rows = []
           const texts = this.products.filter(p => p.type === 'Text')
           for(const text of texts) {
@@ -140,9 +143,13 @@
             }
             if(flag) rows.push(row)
           }
-          style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : '1fr').join(' ')
+          if(this.hideTextRow) {
+            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? '0' : '1fr').join(' ')
+          } else {
+            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : '1fr').join(' ')
+          }
         }
-        if (this.collapseBlankColumn) {
+        if (this.collapseBlankColumn || this.hideBlankColumn) {
           let columns = [], col = 0
           while (col < this.selectedCategoryLayout.columns) {
             const colItems = this.products.filter(p => p.left === col)
@@ -151,10 +158,17 @@
             }
             col++
           }
-          const cols = 2 * this.selectedCategoryLayout.columns - columns.length
-          style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
-                                          .map(i => columns.includes(i) ? `calc(${100/cols}% - ${5 * (cols - 1) / cols}px)` : `calc(${200/cols}% - ${5 * (cols - 1) / cols}px)`)
-                                          .join(' ')
+          if(this.hideBlankColumn) {
+            const cols = this.selectedCategoryLayout.columns - columns.length
+            style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
+                .map(i => columns.includes(i) ? '0' : `calc(${100/cols}% - 5px)`)
+                .join(' ')
+          } else {
+            const cols = 4 * this.selectedCategoryLayout.columns - 3 * columns.length
+            style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
+                .map(i => columns.includes(i) ? `calc(${100/cols}% - ${5 * (cols - 1) / cols}px)` : `calc(${400/cols}% - ${5 * (cols - 1) / cols}px)`)
+                .join(' ')
+          }
         }
         return style
       },
@@ -183,8 +197,8 @@
               this.orderLayout.rows,
               true);
         }
-        const temp  = [{name: 'Snack', color: '#124422'}, {name: 'Vegetable', color: '#215dea'}, {name: ''}]
-        return this.orderLayout.categories
+        const temp  = [{name: 'Snack', color: '#124422'}, {name: 'Vegetable', color: '#215dea'}, {name: 'Computing Machine', color: '#fde423'}]
+        return [...this.orderLayout.categories, ...temp]
       },
       products() {
         if (this.editable) {
@@ -301,6 +315,9 @@
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
       getAreaStyle(item) {
+        if(!item.top) {
+          return
+        }
         return {
           'grid-area': `${item.top + 1} / ${item.left + 1} / ${item.top + 2} / ${item.left + 2}`
         }
@@ -311,7 +328,9 @@
           backgroundColor: category.color,
           color: '#000',
           border: `1px solid ${isCategorySelected ? '#757575' : 'transparent'}`,
-          boxShadow: isCategorySelected ? '1px 0px 3px rgba(0, 0, 0, 0.36)' : 'none'
+          boxShadow: isCategorySelected ? '1px 0px 3px rgba(0, 0, 0, 0.36)' : 'none',
+          ... this.category && this.category.differentSize && (this.category.type === 'horizontal' ? { marginRight: "5px" } : { marginBottom: "5px"}),
+          ... this.category && this.category.fontSize && { fontSize: this.category.fontSize }
         }
       },
       getProductItemStyle(product) {
@@ -508,6 +527,7 @@
       font-weight: 700;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
     }
 
     &__prod {
@@ -516,7 +536,7 @@
       text-align: center;
       align-items: center;
       font-size: 14px;
-      line-height: 0.9;
+      line-height: 1.2;
       font-weight: 700;
       color: #1d1d26;
       padding: 0 8px;
@@ -530,7 +550,7 @@
       }
 
       &.collapsed div {
-        word-break: break-all;
+        word-break: break-word;
         -webkit-line-clamp: 2;
         display: -webkit-box;
         -webkit-box-orient: vertical;

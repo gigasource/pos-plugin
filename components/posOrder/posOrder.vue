@@ -1,5 +1,5 @@
 <template>
-  <div class="order-detail" :style="getHeight">
+  <div class="order-detail" :style="getHeight()">
     <div class="order-detail__header">
       <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
         <template v-slot:activator="{ on }">
@@ -35,15 +35,32 @@
       </g-btn-bs>
       <g-spacer/>
       <template v-if="showQuickBtn">
-        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-if="showPrintBtn" icon="icon-print" @click.stop="printOrder">
-          {{$t('common.currency', storeLocale)}} {{total | convertMoney}}
+        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
+          <transition name="front">
+            <div v-if="actionMode === 'none'" class="animation-wrapper">
+              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            </div>
+          </transition>
+          <transition name="back">
+            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-light-green-accent-2">
+              <g-icon>icon-wallet</g-icon>
+            </div>
+          </transition>
         </g-btn-bs>
-        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-else icon="icon-wallet" @click.stop="pay">
-          {{$t('common.currency', storeLocale)}} {{total | convertMoney}}
+        <g-btn-bs width="70" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else icon="" @click.stop="printOrder">
+          <transition name="front">
+            <div v-if="actionMode === 'none'" class="animation-wrapper">
+              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            </div>
+          </transition>
+          <transition name="back">
+            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-pink-accent-2">
+              <g-icon>icon-print</g-icon>
+            </div>
+          </transition>
         </g-btn-bs>
       </template>
       <template v-else>
-        <span class="order-detail__header-title">{{$t('common.total')}}</span>
         <span class="order-detail__header-value text-red">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</span>
       </template>
     </div>
@@ -75,9 +92,9 @@
       </div>
     </div>
     <div class="blur-overlay" v-show="menu"/>
-    <div v-if="editMode">
+    <div v-if="editMode" class="order-detail__setting">
       <div class="row-flex align-items-center">
-        <span class="mr-2">Font size:</span>
+        <span class="mr-1">Product font size:</span>
         <g-icon @click="changeSize(-0.5)">remove_circle</g-icon>
         <span>{{fontSize}}</span>
         <g-icon @click="changeSize(0.5)">add_circle</g-icon>
@@ -88,15 +105,23 @@
       <g-checkbox :disabled="!((category.type === 'vertical') || (category.type === 'horizontal' && category.singleRow))" :input-value="category.differentSize"
                   :label="`Different ${category.type === 'vertical' ? 'Height' : 'Width'}`" @change="v => changeCategoryStyle('differentSize', v)"/>
       <div class="row-flex align-items-center">
-        <span class="mr-2">Category size</span>
+        <span class="mr-1">Category size</span>
         <g-icon @click="changeCategorySize(-4)">remove_circle</g-icon>
         <span>{{category.size}}</span>
         <g-icon @click="changeCategorySize(4)">add_circle</g-icon>
       </div>
+      <div class="row-flex align-items-center">
+        <span class="mr-1">Category font size</span>
+        <g-icon @click="changeCategoryFontSize(-0.5)">remove_circle</g-icon>
+        <span>{{category.fontSize}}</span>
+        <g-icon @click="changeCategoryFontSize(0.5)">add_circle</g-icon>
+      </div>
       <g-checkbox :input-value="minimumTextRow" label="Minimize only text row" @change="changeTextRow"/>
+      <g-checkbox :input-value="hideTextRow" label="Hide text row" @change="hideText"/>
       <g-checkbox :input-value="collapseBlankColumn" label="Narrow empty column" @change="changeBlankCol"/>
+      <g-checkbox :input-value="hideBlankColumn" label="Hide empty column" @change="hideCol"/>
       <g-checkbox :input-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
-      <g-btn-bs width="100" small style="margin-left: calc(100% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
+      <g-btn-bs width="100" small style="margin-left: calc(90% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
     </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
@@ -124,6 +149,8 @@
       minimumTextRow: Boolean,
       collapseBlankColumn: Boolean,
       collapseText: Boolean,
+      hideTextRow: Boolean,
+      hideBlankColumn: Boolean,
     },
     filters: {
       convertMoney(value) {
@@ -141,7 +168,9 @@
         },
         menu: false,
         showQuickBtn: false,
-        edit: false
+        edit: false,
+        actionMode: 'none',
+        actionTimeout: null,
       }
     },
     computed: {
@@ -166,8 +195,8 @@
       disablePrintBtn() {
         return this.items.filter(i => i.quantity > 0).length === 0
       },
-      showPrintBtn() {
-        return this.items.filter(i => !i.printed && i.quantity > 0).length > 0
+      showPay() {
+        return this.items.length > 0 && this.items.filter(i => i.printed && i.quantity > 0).length === 0
       },
       editMode() {
         if(!this.isMobile) {
@@ -244,10 +273,20 @@
       back() {
         this.$emit('resetOrderData')
         this.$emit('updateOrderTable', null)
+        this.saveSetting()
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
+        if(this.actionMode === 'none') {
+          this.actionMode = 'confirm';
+          this.actionTimeout = setTimeout(() => {
+            this.actionMode = 'none'
+          }, 3000)
+          return
+        }
         this.$router.push({path: '/pos-payment'})
+        this.actionMode = 'none'
+        if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
@@ -257,9 +296,18 @@
         this.$getService('PosOrderSplitOrder:setActive')(true)
       },
       printOrder() {
+        if(this.actionMode === 'none') {
+          this.actionMode = 'confirm';
+          this.actionTimeout = setTimeout(() => {
+            this.actionMode = 'none';
+          }, 3000)
+          return
+        }
         this.menu = false
         this.$emit('saveTableOrder')
         this.$router.go(-1)
+        this.actionMode = 'none'
+        if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
       getHeight() {
         if(this.isMobile) {
@@ -292,11 +340,23 @@
           this.$emit('update:category', Object.assign({}, this.category, { size: `${size + change}px`}))
         }
       },
+      changeCategoryFontSize(change) {
+        const size = +this.category.fontSize.slice(0, this.category.fontSize.length - 2)
+        if(size + change > 0) {
+          this.$emit('update:category', Object.assign({}, this.category, { fontSize: `${size + change}px`}))
+        }
+      },
       changeTextRow(value) {
         this.$emit('update:minimumTextRow', !!value)
       },
       changeBlankCol(value) {
         this.$emit('update:collapseBlankColumn', !!value)
+      },
+      hideText(value) {
+        this.$emit('update:hideTextRow', !!value)
+      },
+      hideCol(value) {
+        this.$emit('update:hideBlankColumn', !!value)
       },
       changeCollapseText(value) {
         this.$emit('update:collapseText', !!value)
@@ -316,18 +376,22 @@
         }
         localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
         this.edit = false
+      },
+      loadSetting() {
+        const setting = localStorage.getItem('OrderScreenSetting')
+        if(setting) {
+          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText} = JSON.parse(setting)
+          if(!category.fontSize) category.fontSize = '13px'
+          this.$emit('update:fontSize', fontSize)
+          this.$emit('update:category', category)
+          this.$emit('update:minimumTextRow', minimumTextRow)
+          this.$emit('update:collapseBlankColumn', collapseBlankColumn)
+          this.$emit('update:collapseText', collapseText)
+        }
       }
     },
     created() {
-      const setting = localStorage.getItem('OrderScreenSetting')
-      if(setting) {
-        const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText} = JSON.parse(setting)
-        this.$emit('update:fontSize', fontSize)
-        this.$emit('update:category', category)
-        this.$emit('update:minimumTextRow', minimumTextRow)
-        this.$emit('update:collapseBlankColumn', collapseBlankColumn)
-        this.$emit('update:collapseText', collapseText)
-      }
+      this.loadSetting()
     },
     mounted() {
       const orderStore = this.$getService('OrderStore')
@@ -350,6 +414,8 @@
 
       const posSettings = await cms.getModel('PosSetting').findOne()
       if (posSettings) this.showQuickBtn = posSettings.generalSetting.quickBtn
+
+      this.loadSetting()
     },
   }
 </script>
@@ -480,6 +546,76 @@
 
       .g-btn-bs {
         justify-content: flex-start;
+      }
+    }
+
+    &__setting {
+      flex: 1;
+      overflow: auto;
+      font-size: 14px;
+
+      ::v-deep .g-checkbox-wrapper {
+        margin: 4px 0;
+
+        .g-checkbox-label {
+          font-size: 14px
+        }
+      }
+    }
+
+    .animation-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      perspective: 1000px;
+      backface-visibility: hidden;
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+    }
+
+    .front {
+      &-enter-active,
+      &-leave-active {
+        transition-property: opacity, transform;
+        transition-duration: 0.6s;
+      }
+
+      &-leave-active {
+        position: absolute;
+      }
+
+      &-enter {
+        transform: rotateY(180deg);
+        opacity: 0;
+      }
+
+      &-leave-to {
+        transform: rotateY(180deg);
+        opacity: 0;
+      }
+    }
+
+    .back {
+      &-enter-active,
+      &-leave-active {
+        transition-property: opacity, transform;
+        transition-duration: 0.6s;
+      }
+
+      &-leave-active {
+        position: absolute;
+      }
+
+      &-enter {
+        transform: rotateY(-180deg);
+        opacity: 0;
+      }
+
+      &-leave-to {
+        transform: rotateY(-180deg);
+        opacity: 0;
       }
     }
   }
