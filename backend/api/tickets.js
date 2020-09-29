@@ -68,8 +68,8 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:ticketId', async (req, res) => {
-  const tickets = await TicketModel.find(req.params.ticketId);
-  if (tickets) res.json(tickets);
+  const ticket = await TicketModel.findById(req.params.ticketId);
+  if (ticket) res.json(ticket);
   else res.status(404).json({error: 'Ticket not found'});
 });
 
