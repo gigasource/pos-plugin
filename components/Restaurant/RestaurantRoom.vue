@@ -21,8 +21,8 @@
 
   export default {
     name: 'RestaurantRoom',
-    injectService:['PosStore:isMobile'],
-    components: { },
+    injectService: ['PosStore:isMobile'],
+    components: {},
     props: {
       id: String
     },
@@ -39,15 +39,17 @@
       await this.loadRoom()
       await this.loadTableStatus()
       cms.socket.emit('join-room')
-      cms.socket.on('update-table-status', ({table, status}) => {
+      cms.socket.on('update-table-status', ({ table, status }) => {
         if (_.includes(this.tableNames, table)) {
           if (status === 'inProgress') {
-            if (!_.includes(this.inProgressTable, table))
+            if (!_.includes(this.inProgressTable, table)) {
               this.inProgressTable.push(table)
+            }
           } else {
             let indexOfTable = _.findIndex(this.inProgressTable, table)
-            if (indexOfTable >= 0)
+            if (indexOfTable >= 0) {
               this.inProgressTable.splice(indexOfTable, 1)
+            }
           }
         }
       })
@@ -77,7 +79,7 @@
     },
     methods: {
       async loadRoom() {
-        this.$set(this, 'room', await cms.getModel('Room').findOne({_id: this.id}))
+        this.$set(this, 'room', await cms.getModel('Room').findOne({ _id: this.id }))
       },
       async loadTableStatus() {
         const inProgressOrders = await cms.getModel('Order').find({ table: { $in: this.tableNames }, status: 'inProgress' })
@@ -94,14 +96,14 @@
       },
       selectRoomObj(roomObj) {
         // if (!this.isTableBusy(roomObj)) {
-          this.roomObj = roomObj;
-          setTimeout(() => {
-            if (this.isMobile) {
-              this.$router.push(`/pos-order-3/${roomObj.name}`)
-            } else {
-              this.$router.push(`/pos-order-2/${roomObj.name}`)
-            }
-          }, 200)
+        this.roomObj = roomObj;
+        setTimeout(() => {
+          if (this.isMobile) {
+            this.$router.push(`/pos-order-3/${roomObj.name}`)
+          } else {
+            this.$router.push(`/pos-order-2/${roomObj.name}`)
+          }
+        }, 200)
         // }
       },
       setTransferTableFrom(roomObj) {
@@ -114,7 +116,21 @@
 
         // todo transfer table:
         // create $set table commit
-        // update current order commits -> new table
+        const currentCommits = await cms.getModel('OrderCommit').find({ orderId: order.id })
+        const table = roomObj.name;
+        await cms.getModel('OrderCommit').create(['order', 'changeTable'].map(type => {
+          return {
+            type,
+            where: { _id: order._id },
+            table: order.table,
+            update: {
+              set: {
+                key: 'table',
+                value: table
+              }
+            }
+          }
+        }))
         // update current order -> new table
         await this.loadRoom()
         await this.loadTableStatus()
