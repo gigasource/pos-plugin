@@ -741,10 +741,10 @@
           socketIntervals[id] = setInterval(() => {
             attempt += 1
             this.emitWithRetry(eventName, id, data, cb, attempt);
-          }, 5000)
+          }, 2000)
         console.log(`emit event ${eventName}`, socketIntervals[id])
 
-        if (attempt >= 2) {
+        if (attempt >= 5) {
           const result = await axios.post('http://localhost:8888/api/order/update-status', data)
           console.log('REST update-status result', result)
           console.log(`clear interval ${id}`)
@@ -752,11 +752,11 @@
           delete socketIntervals[id]
         }
 
-        cms.socket.emit(eventName, ...data, () => {
+        cms.socket.emit(eventName, data, async (res) => {
           console.log(`clear interval ${id}`)
           clearInterval(socketIntervals[id])
           delete socketIntervals[id]
-          typeof cb === 'function' && cb()
+          typeof cb === 'function' && cb(res)
         })
       },
       printOnlineOrderReport(orderId) {
@@ -809,9 +809,9 @@
 
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
-            `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
+          `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
 
-        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
+        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, orderStatus)
       },
       async acceptPendingOrder(order) {
         try {
@@ -852,14 +852,49 @@
 
           const clientId = await this.getOnlineOrderDeviceId();
           console.debug(
-              `sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
-              `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
+            `sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
+            `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
 
           if (isPrepaidOrder) {
             this.dialog.capturing.show = true
           }
 
-          this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus])
+          this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, orderStatus, async ({result, error, responseData}) => {
+            // TODO: Check result response in another language
+            //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
+            //  + transaction info stored in paypalOrderDetail object
+            const refreshedOrder = await cms.getModel('Order').findOne({ _id: order._id })
+            if (refreshedOrder.status !== 'inProgress') return // order already processed
+
+            if (isPrepaidOrder) {
+              this.dialog.capturing.show = false
+            }
+
+            if (error || result !== 'COMPLETED') {
+              if (error) {
+                const errObj = JSON.parse(error)
+                if (errObj.details[0].issue !== 'ORDER_ALREADY_CAPTURED') {
+                  this.dialog.captureFailed.show = true
+                  this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+                }
+              } else {
+                this.dialog.captureFailed.show = true
+                this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+              }
+            } else {
+              if (isPrepaidOrder) {
+                // store response data for later use
+                updateOrderInfo.paypalOrderDetail = {
+                  ...updateOrderInfo.paypalOrderDetail,
+                  captureResponses: responseData
+                }
+                await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+                this.printOnlineOrderKitchen(order._id)
+                this.printOnlineOrderReport(order._id)
+                await this.updateOnlineOrders()
+              }
+            }
+          })
         } catch (e) {
           // TODO: Show an error dialog to the user
           console.error(e)
@@ -868,9 +903,9 @@
       async completeOrder(order) {
         const status = 'completed'
         const updatedOrder = await cms.getModel('Order').findOneAndUpdate({_id: order._id},
-            Object.assign({}, order, {
-              status
-            }))
+          Object.assign({}, order, {
+            status
+          }))
         await this.updateOnlineOrders()
         const orderStatus = {
           orderId: updatedOrder.id,
@@ -881,32 +916,8 @@
 
         const clientId = await this.getOnlineOrderDeviceId();
         console.debug(`sentry:orderToken=${updatedOrder.onlineOrderId},orderId=${updatedOrder.id},eventType=orderStatus,clientId=${clientId}`,
-            `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
-        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, [orderStatus], async ({result, error, responseData}) => {
-          // TODO: Check result response in another language
-          //  + result is status returned by PayPal when we send CAPTURE request to capture money in a transaction
-          //  + transaction info stored in paypalOrderDetail object
-          if (isPrepaidOrder) {
-            this.dialog.capturing.show = false
-          }
-
-          if (error || result !== 'COMPLETED') {
-            this.dialog.captureFailed.show = true
-            this.dialog.captureFailed.error = error || `Transaction status: ${result}`
-          } else {
-            if (isPrepaidOrder) {
-              // store response data for later use
-              updateOrderInfo.paypalOrderDetail = {
-                ...updateOrderInfo.paypalOrderDetail,
-                captureResponses: responseData
-              }
-              await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
-              this.printOnlineOrderKitchen(order._id)
-              this.printOnlineOrderReport(order._id)
-              await this.updateOnlineOrders()
-            }
-          }
-        })
+          `8. Restaurant frontend: Order id ${updatedOrder.id}: send status to backend: ${status}`)
+        this.emitWithRetry('updateOrderStatus', updatedOrder.onlineOrderId, orderStatus)
       },
       isCaptureRefundExpired(captureResponses) {
         // find final capture

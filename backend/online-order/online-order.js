@@ -660,7 +660,6 @@ module.exports = async cms => {
 
     socket.on('updateOrderStatus', async (orderStatus, cb) => {
       try {
-        typeof cb === 'function' && cb()
         const { orderId, onlineOrderId, status, responseMessage } = orderStatus
         console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
           `8.1 Restaurant backend: received update order status message from frontend`)
