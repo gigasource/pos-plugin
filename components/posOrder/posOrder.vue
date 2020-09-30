@@ -1,60 +1,71 @@
 <template>
   <div class="order-detail" :style="getHeight()">
     <div class="order-detail__header">
-      <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
-        <template v-slot:activator="{ on }">
-          <div v-on="on">
-            <g-avatar size="36">
-              <img alt :src="avatar">
-            </g-avatar>
-          </div>
-        </template>
-        <div class="order-detail__menu">
-          <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
-          <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
-          <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
-          <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
-                    @click.stop="printOrder">
-            Print
-          </g-btn-bs>
-          <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
-          <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
-        </div>
-      </g-menu>
-      <g-avatar v-else size="36">
-        <img alt :src="avatar">
-      </g-avatar>
-      <div :style="{'display': isMobile ? 'block' : 'flex', 'flex': 2}" class="ml-1 align-items-baseline">
-        <p class="order-detail__header-username">{{username}}</p>
-        <span class="order-detail__header-title" v-if="table">Table</span>
-        <span class="order-detail__header-value" v-if="table">{{table}}</span>
-      </div>
-      <g-spacer v-if="isMobile"/>
-      <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
-        <g-icon>icon-back</g-icon>
+      <g-spacer style="flex: 4 0 0" v-if="isMobile && showSplitBtn && actionMode === 'pay'"/>
+      <g-btn-bs v-show="isMobile && showSplitBtn && actionMode === 'pay'" background-color="#FFF59D" border-color="#f0f0f0" width="75"
+                  style="transition-delay: 0.6s; padding: 4px" @click="splitOrder">
+        <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>
+      <transition name="fade">
+        <div class="row-flex align-items-center flex-grow-1" v-if="!(isMobile && showSplitBtn && actionMode === 'pay')">
+          <g-menu v-if="isMobile" v-model="menu" close-on-content-click>
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="waves-effect br-100">
+                <g-avatar size="36">
+                  <img alt :src="avatar">
+                </g-avatar>
+              </div>
+            </template>
+            <g-expand-x-transition>
+              <div class="order-detail__menu">
+                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
+                <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
+                <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
+                <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
+                          @click.stop="printOrder">
+                  Print
+                </g-btn-bs>
+                <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
+                <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
+              </div>
+            </g-expand-x-transition>
+          </g-menu>
+          <g-avatar v-else size="36">
+            <img alt :src="avatar">
+          </g-avatar>
+          <div :style="{'display': isMobile ? 'block' : 'flex', 'flex': 2}" class="ml-1 align-items-baseline">
+            <p class="order-detail__header-username">{{username}}</p>
+            <span class="order-detail__header-title" v-if="table">Table</span>
+            <span class="order-detail__header-value" v-if="table">{{table}}</span>
+          </div>
+          <g-spacer v-if="isMobile"/>
+          <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
+            <g-icon>icon-back</g-icon>
+          </g-btn-bs>
+        </div>
+      </transition>
       <g-spacer/>
       <template v-if="showQuickBtn">
-        <g-btn-bs width="70" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
+        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
           <transition name="front">
             <div v-if="actionMode === 'none'" class="animation-wrapper">
               <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
             </div>
           </transition>
           <transition name="back">
-            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-pink-accent-2">
+            <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
               <g-icon>icon-wallet</g-icon>
             </div>
           </transition>
         </g-btn-bs>
-        <g-btn-bs width="70" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else icon="" @click.stop="printOrder">
+        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else icon="" @click.stop="printOrderToggle">
           <transition name="front">
             <div v-if="actionMode === 'none'" class="animation-wrapper">
               <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
             </div>
           </transition>
           <transition name="back">
-            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-light-green-accent-2">
+            <div v-if="actionMode === 'print'" class="animation-wrapper bg-light-green-accent-2">
               <g-icon>icon-print</g-icon>
             </div>
           </transition>
@@ -121,6 +132,8 @@
       <g-checkbox :input-value="collapseBlankColumn" label="Narrow empty column" @change="changeBlankCol"/>
       <g-checkbox :input-value="hideBlankColumn" label="Hide empty column" @change="hideCol"/>
       <g-checkbox :input-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
+      <g-checkbox :input-value="showOverlay" label="Show overlay in action" @change="toggleOverlay"/>
+      <g-checkbox :input-value="showSplitBtn" label="Show split button in action" @change="toggleSplitBtn"/>
       <g-btn-bs width="100" small style="margin-left: calc(90% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
     </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
@@ -151,6 +164,8 @@
       collapseText: Boolean,
       hideTextRow: Boolean,
       hideBlankColumn: Boolean,
+      actionMode: String,
+      showOverlay: Boolean,
     },
     filters: {
       convertMoney(value) {
@@ -169,8 +184,8 @@
         menu: false,
         showQuickBtn: false,
         edit: false,
-        actionMode: 'none',
         actionTimeout: null,
+        showSplitBtn: true,
       }
     },
     computed: {
@@ -278,14 +293,14 @@
       },
       pay() {
         if(this.actionMode === 'none') {
-          this.actionMode = 'confirm';
+          this.$emit('update:actionMode', 'pay');
           this.actionTimeout = setTimeout(() => {
-            this.actionMode = 'none'
-          }, 3000)
+            this.$emit('update:actionMode', 'none');
+          }, 5000)
           return
         }
         this.$router.push({path: '/pos-payment'})
-        this.actionMode = 'none'
+        this.$emit('update:actionMode', 'none');
         if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
       quickCash(isTakeout = false) {
@@ -296,17 +311,20 @@
         this.$getService('PosOrderSplitOrder:setActive')(true)
       },
       printOrder() {
-        if(this.actionMode === 'none') {
-          this.actionMode = 'confirm';
-          this.actionTimeout = setTimeout(() => {
-            this.actionMode = 'none';
-          }, 3000)
-          return
-        }
         this.menu = false
         this.$emit('saveTableOrder')
         this.$router.go(-1)
-        this.actionMode = 'none'
+      },
+      printOrderToggle() {
+        if(this.actionMode === 'none') {
+          this.$emit('update:actionMode', 'print');
+          this.actionTimeout = setTimeout(() => {
+            this.$emit('update:actionMode', 'none');
+          }, 5000)
+          return
+        }
+        this.printOrder()
+        this.$emit('update:actionMode', 'none');
         if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
       getHeight() {
@@ -361,6 +379,12 @@
       changeCollapseText(value) {
         this.$emit('update:collapseText', !!value)
       },
+      toggleOverlay(value) {
+        this.$emit('update:showOverlay', !!value)
+      },
+      toggleSplitBtn(value) {
+        this.$set(this, 'showSplitBtn', !!value)
+      },
       changeCategoryStyle(key, value) {
         let change = {}
         change[key] = value
@@ -372,7 +396,9 @@
           category: this.category,
           minimumTextRow: this.minimumTextRow,
           collapseBlankColumn: this.collapseBlankColumn,
-          collapseText: this.collapseText
+          collapseText: this.collapseText,
+          showOverlay: this.showOverlay,
+          showSplitBtn: this.showSplitBtn
         }
         localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
         this.edit = false
@@ -380,13 +406,15 @@
       loadSetting() {
         const setting = localStorage.getItem('OrderScreenSetting')
         if(setting) {
-          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText} = JSON.parse(setting)
+          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn} = JSON.parse(setting)
           if(!category.fontSize) category.fontSize = '13px'
           this.$emit('update:fontSize', fontSize)
           this.$emit('update:category', category)
           this.$emit('update:minimumTextRow', minimumTextRow)
           this.$emit('update:collapseBlankColumn', collapseBlankColumn)
           this.$emit('update:collapseText', collapseText)
+          this.$emit('update:showOverlay', showOverlay)
+          this.$set(this, 'showSplitBtn', showSplitBtn)
         }
       }
     },
@@ -586,12 +614,7 @@
         position: absolute;
       }
 
-      &-enter {
-        transform: rotateY(180deg);
-        opacity: 0;
-      }
-
-      &-leave-to {
+      &-enter, &-leave-to {
         transform: rotateY(180deg);
         opacity: 0;
       }
@@ -608,15 +631,27 @@
         position: absolute;
       }
 
-      &-enter {
+      &-enter, &-leave-to {
         transform: rotateY(-180deg);
+        opacity: 0;
+      }
+    }
+
+    .fade {
+      &-enter-active,
+      &-leave-active {
+        transition-property: opacity;
+        transition-duration: 0.36s;
+      }
+
+      &-leave-active {
+        position: absolute;
+      }
+
+      &-enter, &-leave-to {
         opacity: 0;
       }
 
-      &-leave-to {
-        transform: rotateY(-180deg);
-        opacity: 0;
-      }
     }
   }
 

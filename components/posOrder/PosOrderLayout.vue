@@ -1,7 +1,7 @@
 <template>
   <div class="pol" v-if="orderLayout" :style="{'flex-direction':category && category.type === 'vertical' ? 'row': 'column',
                                                 'background': 'url(\'/plugins/pos-plugin/assets/out.png\')',
-                                                'background-size': 'contain' }">
+                                                'background-size': 'contain', 'overflow': displayOverlay ? 'hidden' : 'auto'}">
     <!-- Categories -->
     <div style="padding: 4px; background-color: #E0E0E060; position: sticky; top: 0; z-index: 1">
       <div :style="categoryContainerStyle">
@@ -29,6 +29,9 @@
         <pos-order-keyboard v-if="showCalculator" :keyboard-config="keyboardConfig" :mode="editable ? 'edit' : 'active'" @edit:keyboard="opendDialogEdit($event)"/>
       </div>
     </div>
+    <g-overlay :value="displayOverlay" absolute opacity="0.25" color="rgb(150, 150, 150)">
+      <g-icon size="120">{{actionMode === 'print' ? 'icon-print' : 'icon-wallet'}}</g-icon>
+    </g-overlay>
     <dialog-text-filter v-model="dialog.value" @submit="changeKeyboardExtension($event)"/>
     <dialog-choose-popup-modifier v-model="popupModifierDialog.value" :product="popupModifierDialog.product" @save="addProductWithModifier"/>
   </div>
@@ -59,6 +62,8 @@
       collapseText: Boolean,
       hideTextRow: Boolean,
       hideBlankColumn: Boolean,
+      actionMode: String,
+      showOverlay: Boolean,
     },
     data() {
       return {
@@ -74,7 +79,7 @@
         popupModifierDialog: {
           value: false,
           product: {}
-        }
+        },
       }
     },
     computed: {
@@ -210,6 +215,9 @@
         // remove product layout which is not text but doesn't link to any product
         return _.filter(this.selectedCategoryLayout.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
       },
+      displayOverlay() {
+        return this.showOverlay && this.actionMode !== 'none'
+      }
     },
     async created() {
       await this.loadKeyboardConfig();
@@ -489,7 +497,8 @@
         return this.editable
           ? { click: () => this.onClick(productLayout), touchstart: () => this.onTouchStart(productLayout)}
           : { click: () => {
-              const { product } = productLayout
+              if(productLayout.type === 'Text') return
+              const { product } = productLayout;
               if (product.activePopupModifierGroup) return this.showPopupModifierDialog(productLayout)
               this.addProductToOrder(productLayout);
             }
@@ -511,6 +520,7 @@
 </script>
 <style scoped lang="scss">
   .pol {
+    position: relative;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
@@ -557,5 +567,9 @@
         overflow: hidden;
       }
     }
+  }
+
+  .overlay ::v-deep .overlay-scrim {
+    backdrop-filter: blur(5px);
   }
 </style>
