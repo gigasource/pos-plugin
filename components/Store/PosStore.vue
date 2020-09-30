@@ -88,6 +88,19 @@
                   this.$emit('update:view', {
                     name: 'Order',
                     params: {
+                      status: 'delivery'
+                    }
+                  })
+                },
+                title: this.$t('onlineOrder.delivery')
+              },
+              {
+                icon: 'radio_button_unchecked',
+                iconType: 'small',
+                onClick() {
+                  this.$emit('update:view', {
+                    name: 'Order',
+                    params: {
                       status: 'completed'
                     }
                   })
