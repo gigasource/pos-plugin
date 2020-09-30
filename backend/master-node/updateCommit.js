@@ -82,6 +82,10 @@ async function buildTempOrder(table) {
  master
 */
 async function handleOrderCommit(commit) {
+	if (commit.orderId && activeOrders[commit.table] && commit.orderId != activeOrders[commit.table].id) {
+		console.error('This commit is for old order');
+		return;
+	}
 	let result;
 	if (commit.update && commit.update.set) {
 		if (commit.where && !commit.where._id) {
