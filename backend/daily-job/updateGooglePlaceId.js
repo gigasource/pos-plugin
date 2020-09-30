@@ -24,7 +24,7 @@ function pushStoreUpdateFnToQueue(store) {
       // https://developers.google.com/places/web-service/details#PlaceDetailsStatusCodes
       switch (response.status) {
         case 'OK':
-          if (response.result && response.result.place_id) {
+          if (response.result && response.result.place_id && googleMapPlaceId !== response.result.place_id) {
             storeGoogleMapPlaceIdMap[_id] = response.result.place_id
           }
           break;
@@ -85,7 +85,9 @@ async function saveNewGoogleMapPlaceId() {
         upsert: false,
       }
     }))
-    await cms.getModel('Store').bulkWrite(bulkWriteData)
+    if (bulkWriteData.length) {
+      await cms.getModel('Store').bulkWrite(bulkWriteData)
+    }
   } catch (e) {
     console.log('save new google map place id failed', e)
   }
