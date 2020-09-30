@@ -741,10 +741,10 @@
           socketIntervals[id] = setInterval(() => {
             attempt += 1
             this.emitWithRetry(eventName, id, data, cb, attempt);
-          }, 2000)
+          }, 10000)
         console.log(`emit event ${eventName}`, socketIntervals[id])
 
-        if (attempt >= 5) {
+        if (attempt >= 2) {
           const result = await axios.post('http://localhost:8888/api/order/update-status', data)
           console.log('REST update-status result', result)
           console.log(`clear interval ${id}`)
@@ -1093,6 +1093,40 @@
       cms.socket.on('updateOnlineOrders', async sentryTagString => {
         console.debug(sentryTagString, '7. Restaurant frontend: received updateOnlineOrders signal')
         await this.updateOnlineOrders()
+      })
+      // paypal order status fallback
+      cms.socket.on('updatePaypalOrderStatus', async ({result, error, responseData, onlineOrderId, status}) => {
+        const order = await cms.getModel('Order').findOne({ onlineOrderId })
+        let isPrepaidOrder = this.isPrepaidOrder(order);
+
+        if (isPrepaidOrder) {
+          this.dialog.capturing.show = false
+        }
+
+        if (error || result !== 'COMPLETED') {
+          if (error) {
+            const errObj = JSON.parse(error)
+            if (errObj.details[0].issue !== 'ORDER_ALREADY_CAPTURED') {
+              this.dialog.captureFailed.show = true
+              this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+            }
+          } else {
+            this.dialog.captureFailed.show = true
+            this.dialog.captureFailed.error = error || `Transaction status: ${result}`
+          }
+        } else {
+          if (isPrepaidOrder) {
+            // store response data for later use
+            const paypalOrderDetail = {
+              ...order.paypalOrderDetail,
+              captureResponses: responseData
+            }
+            await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, { paypalOrderDetail, status })
+            this.printOnlineOrderKitchen(order._id)
+            this.printOnlineOrderReport(order._id)
+            await this.updateOnlineOrders()
+          }
+        }
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
       cms.socket.on('updateOrderItems', async (table) => {

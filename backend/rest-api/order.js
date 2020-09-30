@@ -1,19 +1,21 @@
 const express = require('express')
 const router = express.Router()
-const getOnlineOrderSocket = require('../online-order/online-order').getOnlineOrderSocket
+const { getOnlineOrderSocket } = require('../online-order/online-order')
 
 router.post('/update-status', async (req, res) => {
-  const { orderId, onlineOrderId, status, responseMessage } = req.body[0]
+  const { orderId, onlineOrderId, status, paypalOrderDetail, responseMessage } = req.body
   console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId}`,
-    `8A. Restaurant backend: received update order status message by REST API`)
+    `8A. Restaurant backend: received update order status message by REST API`, req.body)
 
   const posSetting = await cms.getModel('PosSetting').findOne()
-  const {onlineDevice: {store: {name, alias}}} = posSetting
+  const { onlineDevice: { store: { name, alias } } } = posSetting
 
   console.debug(getBaseSentryTags('orderStatus') + `,orderToken=${onlineOrderId},orderId=${orderId},store=${name},alias=${alias}`,
     `9A. Restaurant backend: Order id ${orderId}: send order status to online-order: status: ${status}, message: ${responseMessage}`)
 
-  getOnlineOrderSocket().emit('updateOrderStatus', { orderId, onlineOrderId, status, responseMessage, storeName: name, storeAlias: alias}, )
+  getOnlineOrderSocket().emit('updateOrderStatus',
+    { orderId, onlineOrderId, paypalOrderDetail, status, responseMessage, storeName: name, storeAlias: alias },
+    res => cms.socket.emit('updatePaypalOrderStatus', { ...res, onlineOrderId, status }))
 
   res.sendStatus(200)
 })
