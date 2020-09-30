@@ -2,7 +2,7 @@
   "events": [],
   "_id": "5e7983deefd5f205955ba034",
   "data": {
-    "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n      fontSize: '14px',\n      category: {\n        type: 'horizontal',\n        size: '64px',\n        singleRow: false,\n        differentSize: false,\n        fontSize: '13px'\n      },\n      minimumTextRow: true,\n      collapseBlankColumn: true,\n      hideTextRow: false,\n      hideBlankColumn: false,\n      collapseText: true,\n  }\n}",
+    "_code_": "module.exports = {\n  data: {\n      orderLayout: null,\n      selectedCategoryLayout: null,\n      selectedProductLayout: null,\n      productDblClicked: null,\n      keyboardConfig: null,\n      fontSize: '14px',\n      category: {\n        type: 'horizontal',\n        size: '64px',\n        singleRow: false,\n        differentSize: false,\n        fontSize: '13px'\n      },\n      minimumTextRow: true,\n      collapseBlankColumn: true,\n      hideTextRow: false,\n      hideBlankColumn: false,\n      collapseText: true,\n      actionMode: 'none',\n      showOverlay: true,\n      scrollabeLayout: true,\n  }\n}",
     "_code_type_": "commonJs"
   },
   "isProduction": true,
@@ -40,8 +40,8 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "70%",
-              "30%"
+              "1fr",
+              "auto"
             ],
             "rows": [
               "1fr"
@@ -165,6 +165,21 @@
               "type": ".sync",
               "root": "data.hideBlankColumn",
               "local": "hideBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.actionMode",
+              "local": "actionMode"
+            },
+            {
+              "type": ".sync",
+              "root": "data.showOverlay",
+              "local": "showOverlay"
+            },
+            {
+              "type": ".sync",
+              "root": "data.scrollabeLayout",
+              "local": "scrollabeLayout"
             }
           ],
           "slotScopeBinding": [],
@@ -233,6 +248,21 @@
               "type": ".sync",
               "root": "data.hideBlankColumn",
               "local": "hideBlankColumn"
+            },
+            {
+              "type": ".sync",
+              "root": "data.actionMode",
+              "local": "actionMode"
+            },
+            {
+              "type": ".sync",
+              "root": "data.showOverlay",
+              "local": "showOverlay"
+            },
+            {
+              "type": ".sync",
+              "root": "data.scrollabeLayout",
+              "local": "scrollabeLayout"
             }
           ],
           "slotScopeBinding": [],
