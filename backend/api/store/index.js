@@ -456,6 +456,49 @@ async function getGooglePlaceByText(placeName) {
   }
 }
 
+async function placeAutocomplete(placeName){
+  const {mapsApiKey} = global.APP_CONFIG;
+  if (!mapsApiKey)
+    return [];
+
+  try {
+    const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
+    const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
+      params: {
+        key: mapsApiKey,
+        input: placeName,
+        language: 'en',
+        types: 'establishment'
+      }
+    })
+
+    if (autocompleteResult && autocompleteResult.predictions && autocompleteResult.predictions.length) {
+      return autocompleteResult.predictions.map(prediction => ({
+        name: prediction.description,
+        placeId: prediction.place_id
+      }))
+    }
+  } catch (e) {
+    console.log('error:', e)
+  }
+
+  return []
+}
+
+router.get('/google-places', async (req, res) => {
+  try {
+    const { searchPlace } = req.query
+    if (searchPlace) {
+      const places = await placeAutocomplete(searchPlace) || {}
+      res.json(places)
+    } else {
+      res.json([])
+    }
+  } catch (e) {
+    res.status(400).end()
+  }
+})
+
 router.get('/basic-info', async (req, res) => {
   const stores = await StoreModel.find({}, {id: 1, name: 1, settingName: 1, alias: 1, logoImageSrc: 1, groups: 1});
   res.json(stores);

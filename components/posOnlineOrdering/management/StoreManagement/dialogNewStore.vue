@@ -4,8 +4,18 @@
       <div class="dialog-title">Add New Store</div>
       <g-text-field-bs large label="Name" v-model="name"/>
       <g-select v-if="groups" deletable-chips multiple text-field-component="GTextFieldBs" label="Group" :items="listGroups" v-model="group"/>
-      <g-text-field-bs large label="Address" v-model="address"/>
-      <g-text-field-bs v-if="googleMapPlaceId" large label="Google Place ID" readonly :value="googleMapPlaceId"/>
+      <g-autocomplete
+          class="address"
+          text-field-component="GTextFieldBs"
+          label="Address"
+          item-text="name"
+          return-object
+          large
+          :value="address"
+          :items="googlePlaces"
+          @update:searchText="fetchPlaces"
+          @input="updateAddress"/>
+      <g-text-field-bs v-if="placeId" large label="Google Place ID" readonly :value="placeId"/>
       <g-select returnObject item-text="name" text-field-component="GTextFieldBs" label="Country" :items="countries" v-model="country"/>
       <div class="dialog-buttons">
         <g-btn-bs large width="100" text-color="#424242" @click="internalValue = false">Cancel</g-btn-bs>
@@ -30,6 +40,8 @@
         group: null,
         address: '',
         country: null,
+        placeId: this.googleMapPlaceId,
+        googlePlaces: []
       }
     },
     computed: {
@@ -57,14 +69,33 @@
         return false
       }
     },
+    created() {
+      this.fetchPlacesDebounce = _.debounce(async (searchPlace) => {
+        const { data: googlePlaces }  = await axios.get(`/store/google-places`, { params: { searchPlace }})
+        console.log('googlePlaces', googlePlaces)
+        this.$set(this, 'googlePlaces', googlePlaces)
+      }, 500)
+    },
     methods: {
+      updateAddress(newVal) {
+        console.log('update address', newVal)
+        const { name, placeId } = newVal
+        if (name)
+          this.address = name
+        if (placeId)
+          this.placeId = placeId
+      },
+      async fetchPlaces(searchPlace) {
+        this.address = searchPlace
+        this.fetchPlacesDebounce(searchPlace)
+      },
       submit() {
         const store = {
           groups: this.group,
           settingName: this.name,
           settingAddress: this.address,
           country: this.country,
-          googleMapPlaceId: this.googleMapPlaceId,
+          googleMapPlaceId: this.placeId,
         }
         this.$emit('submit', store)
         this.internalValue = false
@@ -93,6 +124,18 @@
       align-self: flex-end;
       margin-top: 24px;
       margin-right: -8px;
+    }
+    
+    .address {
+      ::v-deep {
+        .bs-tf-wrapper {
+          margin-left: 0;
+          
+          .bs-tf-inner-input-group {
+            height: 46px;
+          }
+        }
+      }
     }
   }
 </style>
