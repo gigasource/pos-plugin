@@ -130,7 +130,7 @@
         const style = {
           display: 'grid',
           'grid-template-columns': this.getGridTemplateFromNumber(this.selectedCategoryLayout.columns),
-          'grid-template-rows': `repeat(${this.selectedCategoryLayout.rows}, 1fr)`,
+          'grid-template-rows': this.scrollabeLayout ? `repeat(${this.selectedCategoryLayout.rows}, 1fr)` : this.getGridTemplateFromNumber(this.selectedCategoryLayout.rows),
           'grid-gap': '5px',
           height: '100%'
         }
@@ -156,7 +156,7 @@
           } else {
             const rowNo = this.selectedCategoryLayout.rows
             const rowItem = this.scrollabeLayout ? '1fr' : `calc(${100/rowNo}% - ${5 * (rowNo - 1) / rowNo}px)`
-            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : rowItem).join(' ')
+            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'min-content' : rowItem).join(' ')
           }
         }
         if (this.collapseBlankColumn || this.hideBlankColumn) {
@@ -171,7 +171,7 @@
           if(this.hideBlankColumn) {
             const cols = this.selectedCategoryLayout.columns - columns.length
             style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
-                .map(i => columns.includes(i) ? '0' : `calc(${100/cols}% - ${5 * (this.selectedCategoryLayout.column - 1) / cols}px)`)
+                .map(i => columns.includes(i) ? '0' : `calc(${100/cols}% - ${5 * (this.selectedCategoryLayout.columns - 1) / cols}px)`)
                 .join(' ')
           } else {
             const cols = 4 * this.selectedCategoryLayout.columns - 3 * columns.length
