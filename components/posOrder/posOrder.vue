@@ -35,14 +35,14 @@
       </g-btn-bs>
       <g-spacer/>
       <template v-if="showQuickBtn">
-        <g-btn-bs background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
+        <g-btn-bs width="70" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
           <transition name="front">
             <div v-if="actionMode === 'none'" class="animation-wrapper">
               <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
             </div>
           </transition>
           <transition name="back">
-            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-light-green-accent-2">
+            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-pink-accent-2">
               <g-icon>icon-wallet</g-icon>
             </div>
           </transition>
@@ -54,7 +54,7 @@
             </div>
           </transition>
           <transition name="back">
-            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-pink-accent-2">
+            <div v-if="actionMode === 'confirm'" class="animation-wrapper bg-light-green-accent-2">
               <g-icon>icon-print</g-icon>
             </div>
           </transition>
