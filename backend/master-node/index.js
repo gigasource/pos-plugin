@@ -1,6 +1,7 @@
 const Master = require('./master');
 const Node = require('./node');
 const { buildTempOrder } = require('./updateCommit');
+const _ = require('lodash')
 
 let handler;
 
@@ -12,14 +13,14 @@ module.exports = function (cms) {
 			fn(order);
 		})
 	});
-	cms.post('load:handler', async () => {
+	cms.post('load:handler', _.once(async () => {
 		if (global.APP_CONFIG.isMaster) {
 			handler = new Master(cms);
 		} else {
 			handler = new Node(cms);
 		}
 		await handler.init();
-	})
+	}))
 	cms.post('load:masterIp', (deviceIp) => {
 		console.log(`ip of this device is ${deviceIp}`)
 		global.APP_CONFIG.deviceIp = deviceIp;

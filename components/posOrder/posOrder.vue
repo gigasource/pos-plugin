@@ -46,19 +46,7 @@
       </transition>
       <g-spacer/>
       <template v-if="showQuickBtn">
-        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPay" @click.stop="pay">
-          <transition name="front">
-            <div v-if="actionMode === 'none'" class="animation-wrapper">
-              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
-            </div>
-          </transition>
-          <transition name="back">
-            <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
-              <g-icon>icon-wallet</g-icon>
-            </div>
-          </transition>
-        </g-btn-bs>
-        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else icon="" @click.stop="printOrderToggle">
+        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPrint" @click.stop="printOrderToggle">
           <transition name="front">
             <div v-if="actionMode === 'none'" class="animation-wrapper">
               <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
@@ -67,6 +55,18 @@
           <transition name="back">
             <div v-if="actionMode === 'print'" class="animation-wrapper bg-light-green-accent-2">
               <g-icon>icon-print</g-icon>
+            </div>
+          </transition>
+        </g-btn-bs>
+        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else @click.stop="pay">
+          <transition name="front">
+            <div v-if="actionMode === 'none'" class="animation-wrapper">
+              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            </div>
+          </transition>
+          <transition name="back">
+            <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
+              <g-icon>icon-wallet</g-icon>
             </div>
           </transition>
         </g-btn-bs>
@@ -210,8 +210,8 @@
       disablePrintBtn() {
         return this.items.filter(i => i.quantity > 0).length === 0
       },
-      showPay() {
-        return this.items.length > 0 && this.items.filter(i => i.printed && i.quantity > 0).length === 0
+      showPrint() {
+        return this.items.filter(i => !i.sent).length > 0
       },
       editMode() {
         if(!this.isMobile) {
