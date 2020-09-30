@@ -2,6 +2,7 @@ const _ = require('lodash');
 const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils');
 const fs = require('fs');
 const path = require('path');
+const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
 
 module.exports = async function (cms) {
   async function getLocale() {
@@ -67,9 +68,17 @@ module.exports = async function (cms) {
 
         for (const printerInfo of printers) {
           const escPrinter = await getEscPrinter(printerInfo);
+          const CanvasPrinter = await initCanvaskit();
+          const canvasPrinter = new CanvasPrinter(560, 15000, {
+            printFunctions: {
+              printPng: escPrinter.printPng.bind(escPrinter),
+              print: escPrinter.print.bind(escPrinter),
+            }
+          });
+
           const {escPOS} = printerInfo
 
-          if (escPOS) await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter);
+          if (escPOS) await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter);
           else await report.printSsr(escPrinter, printData, printerInfo.groupPrinter);
         }
 

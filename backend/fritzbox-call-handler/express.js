@@ -1,4 +1,6 @@
 // TODO: delete this after testing with Fritzbox is done
+const uuidv4 = require('uuid/v4');
+
 module.exports = cms => {
   const express = require('express');
   const router = express.Router();
@@ -39,7 +41,7 @@ module.exports = cms => {
   });
 
   new ProxyClient({
-    clientId: `fritzbox-event-handler`,
+    clientId: `fritzbox-event-handler-${uuidv4()}`,
     proxyServerHost: 'https://fritzbox-proxy.gigasource.io',
     socketIOPort: 443,
     remoteHost: 'localhost',
