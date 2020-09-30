@@ -1,5 +1,5 @@
 <template>
-  <div class="order-detail" :style="getHeight()">
+  <div class="order-detail" :style="getStyle()">
     <div class="order-detail__header">
       <g-spacer style="flex: 4 0 0" v-if="isMobile && showSplitBtn && actionMode === 'pay'"/>
       <g-btn-bs v-show="isMobile && showSplitBtn && actionMode === 'pay'" background-color="#FFF59D" border-color="#f0f0f0" width="75"
@@ -35,8 +35,10 @@
           </g-avatar>
           <div :style="{'display': isMobile ? 'block' : 'flex', 'flex': 2}" class="ml-1 align-items-baseline">
             <p class="order-detail__header-username">{{username}}</p>
-            <span class="order-detail__header-title" v-if="table">Table</span>
-            <span class="order-detail__header-value" v-if="table">{{table}}</span>
+            <p v-if="table" style="line-height: 19px">
+              <span class="order-detail__header-title">Table</span>
+              <span class="order-detail__header-value">{{table}}</span>
+            </p>
           </div>
           <g-spacer v-if="isMobile"/>
           <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
@@ -46,30 +48,40 @@
       </transition>
       <g-spacer/>
       <template v-if="showQuickBtn">
-        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPrint" @click.stop="printOrderToggle">
-          <transition name="front">
-            <div v-if="actionMode === 'none'" class="animation-wrapper">
-              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
-            </div>
-          </transition>
-          <transition name="back">
-            <div v-if="actionMode === 'print'" class="animation-wrapper bg-light-green-accent-2">
-              <g-icon>icon-print</g-icon>
-            </div>
-          </transition>
-        </g-btn-bs>
-        <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else @click.stop="pay">
-          <transition name="front">
-            <div v-if="actionMode === 'none'" class="animation-wrapper">
-              <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
-            </div>
-          </transition>
-          <transition name="back">
-            <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
-              <g-icon>icon-wallet</g-icon>
-            </div>
-          </transition>
-        </g-btn-bs>
+        <template v-if="smallSidebar">
+          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPrint" @click.stop="printOrderToggle">
+            <transition name="front">
+              <div v-if="actionMode === 'none'" class="animation-wrapper">
+                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+              </div>
+            </transition>
+            <transition name="back">
+              <div v-if="actionMode === 'print'" class="animation-wrapper bg-light-green-accent-2">
+                <g-icon>icon-print</g-icon>
+              </div>
+            </transition>
+          </g-btn-bs>
+          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else @click.stop="payToggle">
+            <transition name="front">
+              <div v-if="actionMode === 'none'" class="animation-wrapper">
+                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+              </div>
+            </transition>
+            <transition name="back">
+              <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
+                <g-icon>icon-wallet</g-icon>
+              </div>
+            </transition>
+          </g-btn-bs>
+        </template>
+        <template v-else>
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" @click.stop="print">
+            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+          </g-btn-bs>
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="pay">
+            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+          </g-btn-bs>
+        </template>
       </template>
       <template v-else>
         <span class="order-detail__header-value text-red">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</span>
@@ -134,6 +146,8 @@
       <g-checkbox :input-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
       <g-checkbox :input-value="showOverlay" label="Show overlay in action" @change="toggleOverlay"/>
       <g-checkbox :input-value="showSplitBtn" label="Show split button in action" @change="toggleSplitBtn"/>
+      <g-checkbox :input-value="smallSidebar" label="Small sidebar" @change="toggleSmallSidebar"/>
+      <g-checkbox :input-value="scrollabeLayout" label="Scrollable layout" @change="toggleScrollabeLayout"/>
       <g-btn-bs width="100" small style="margin-left: calc(90% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
     </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
@@ -166,6 +180,7 @@
       hideBlankColumn: Boolean,
       actionMode: String,
       showOverlay: Boolean,
+      scrollabeLayout: Boolean,
     },
     filters: {
       convertMoney(value) {
@@ -186,6 +201,7 @@
         edit: false,
         actionTimeout: null,
         showSplitBtn: true,
+        smallSidebar: true
       }
     },
     computed: {
@@ -292,6 +308,9 @@
         this.$router.push({path: '/pos-dashboard'})
       },
       pay() {
+        this.$router.push({path: '/pos-payment'})
+      },
+      payToggle() {
         if(this.actionMode === 'none') {
           this.$emit('update:actionMode', 'pay');
           this.actionTimeout = setTimeout(() => {
@@ -299,7 +318,7 @@
           }, 5000)
           return
         }
-        this.$router.push({path: '/pos-payment'})
+        this.pay()
         this.$emit('update:actionMode', 'none');
         if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
@@ -327,18 +346,19 @@
         this.$emit('update:actionMode', 'none');
         if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
-      getHeight() {
-        if(this.isMobile) {
-          return {
-            height: '100vh',
-            maxHeight: '100vh'
-          }
-        } else {
-          return {
-            height: '100%',
-            maxHeight: '100%'
-          }
+      getStyle() {
+        const style = {
+          height: '100%',
+          maxHeight: '100%',
+          width: '256px'
         }
+        if(this.isMobile) {
+          Object.assign(style, { height: '100vh', maxHeight: '100vh', padding: '0 4px' })
+        }
+        if(this.smallSidebar) {
+          Object.assign(style, { width: '225px' })
+        }
+        return style
       },
       changeSize(num) {
         const size = +this.fontSize.slice(0, this.fontSize.length - 2)
@@ -385,6 +405,12 @@
       toggleSplitBtn(value) {
         this.$set(this, 'showSplitBtn', !!value)
       },
+      toggleSmallSidebar(value) {
+        this.$set(this, 'smallSidebar', !!value)
+      },
+      toggleScrollabeLayout(value) {
+        this.$emit('update:scrollabeLayout', !!value)
+      },
       changeCategoryStyle(key, value) {
         let change = {}
         change[key] = value
@@ -398,7 +424,9 @@
           collapseBlankColumn: this.collapseBlankColumn,
           collapseText: this.collapseText,
           showOverlay: this.showOverlay,
-          showSplitBtn: this.showSplitBtn
+          showSplitBtn: this.showSplitBtn,
+          smallSidebar: this.smallSidebar,
+          scrollabeLayout: this.scrollabeLayout
         }
         localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
         this.edit = false
@@ -406,7 +434,7 @@
       loadSetting() {
         const setting = localStorage.getItem('OrderScreenSetting')
         if(setting) {
-          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn} = JSON.parse(setting)
+          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn, smallSidebar, scrollabeLayout} = JSON.parse(setting)
           if(!category.fontSize) category.fontSize = '13px'
           this.$emit('update:fontSize', fontSize)
           this.$emit('update:category', category)
@@ -414,7 +442,9 @@
           this.$emit('update:collapseBlankColumn', collapseBlankColumn)
           this.$emit('update:collapseText', collapseText)
           this.$emit('update:showOverlay', showOverlay)
+          this.$emit('update:scrollabeLayout', scrollabeLayout)
           this.$set(this, 'showSplitBtn', showSplitBtn)
+          this.$set(this, 'smallSidebar', smallSidebar)
         }
       }
     },
@@ -476,6 +506,7 @@
         font-weight: 700;
         font-size: 13px;
         flex-grow: 1;
+        line-height: 16px;
       }
 
       &-title {

@@ -64,6 +64,7 @@
       hideBlankColumn: Boolean,
       actionMode: String,
       showOverlay: Boolean,
+      scrollabeLayout: Boolean,
     },
     data() {
       return {
@@ -149,9 +150,13 @@
             if(flag) rows.push(row)
           }
           if(this.hideTextRow) {
-            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? '0' : '1fr').join(' ')
+            const rowNo = this.selectedCategoryLayout.rows - _.uniq(rows).length
+            const rowItem = this.scrollabeLayout ? '1fr' : `calc(${100/rowNo}% - ${5 * (this.selectedCategoryLayout.rows - 1) / rowNo}px)`
+            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? '0' : rowItem).join(' ')
           } else {
-            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : '1fr').join(' ')
+            const rowNo = this.selectedCategoryLayout.rows
+            const rowItem = this.scrollabeLayout ? '1fr' : `calc(${100/rowNo}% - ${5 * (rowNo - 1) / rowNo}px)`
+            style['grid-template-rows'] = _.range(0, this.selectedCategoryLayout.rows).map(i => rows.includes(i) ? 'auto' : rowItem).join(' ')
           }
         }
         if (this.collapseBlankColumn || this.hideBlankColumn) {
@@ -166,7 +171,7 @@
           if(this.hideBlankColumn) {
             const cols = this.selectedCategoryLayout.columns - columns.length
             style['grid-template-columns'] = _.range(0, this.selectedCategoryLayout.columns)
-                .map(i => columns.includes(i) ? '0' : `calc(${100/cols}% - 5px)`)
+                .map(i => columns.includes(i) ? '0' : `calc(${100/cols}% - ${5 * (this.selectedCategoryLayout.column - 1) / cols}px)`)
                 .join(' ')
           } else {
             const cols = 4 * this.selectedCategoryLayout.columns - 3 * columns.length
