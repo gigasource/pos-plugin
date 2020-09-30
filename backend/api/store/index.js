@@ -500,7 +500,7 @@ router.get('/google-places', async (req, res) => {
 })
 
 router.get('/basic-info', async (req, res) => {
-  const stores = await StoreModel.find({}, {id: 1, name: 1, alias: 1, logoImageSrc: 1, groups: 1});
+  const stores = await StoreModel.find({}, {id: 1, name: 1, settingName: 1, alias: 1, logoImageSrc: 1, groups: 1});
   res.json(stores);
 })
 
