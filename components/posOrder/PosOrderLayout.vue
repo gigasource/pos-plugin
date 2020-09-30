@@ -202,8 +202,7 @@
               this.orderLayout.rows,
               true);
         }
-        const temp  = [{name: 'Snack', color: '#124422'}, {name: 'Vegetable', color: '#215dea'}, {name: 'Computing Machine', color: '#fde423'}]
-        return [...this.orderLayout.categories, ...temp]
+        return [...this.orderLayout.categories]
       },
       products() {
         if (this.editable) {
