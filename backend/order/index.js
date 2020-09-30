@@ -73,7 +73,7 @@ module.exports = (cms) => {
         const mappedOrder = await mapOrder(order, user)
 
         if (commit) {
-          const excludes = ['_id', 'table', 'id']
+          const excludes = ['_id', 'table', 'id', 'splitId', 'payment']
 
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
@@ -103,7 +103,7 @@ module.exports = (cms) => {
     })
   })
 
-  async function mapOrder(order) {
+  async function mapOrder(order, user) {
     const date = new Date()
     const taxGroups = _.groupBy(order.items, 'tax')
     const vTaxGroups = _.map(taxGroups, (val, key) => ({
@@ -120,7 +120,9 @@ module.exports = (cms) => {
       _id: order._id,
       id: order.id,
       items: await orderUtil.getComputedOrderItems(compactOrder(order.items), date),
-      user: order.user,
+      ...order.user && order.user.length
+        ? { user: order.user }
+        : { user: [{ name: user.name, date }] },
       payment,
       date,
       vDate: await getVDate(date),

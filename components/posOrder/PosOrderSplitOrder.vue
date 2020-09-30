@@ -296,7 +296,7 @@
               this.splitOrders.push(order)
               const newItems = _.cloneDeep(this.remainingItems)
               this.$emit('updateCurrentOrder', 'items', newItems)
-              this.$emit('createOrderCommit', { key: 'items', value: newItems })
+              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: newItems })
             }
           })
 
@@ -311,11 +311,12 @@
       },
       complete() {
         this.showReceipt = false
+        this.internalValue = false
         if (this.remainingItems.length > 0) return
 
         this.$emit('resetOrderData')
         this.$emit('updateCurrentOrder', 'table', null)
-        this.$router.push({path: '/pos-dashboard'})
+        this.$router.push({ path: '/pos-dashboard' })
       },
       printReceipt(orderId) {
         if (orderId) return this.$emit('printOrderReport', orderId)
@@ -323,25 +324,25 @@
       }
     },
     watch: {
-      'currentOrder._id'(val) {
-        if (val && this.currentOrder.items) {
-          this.splitOrders = []
-
-          if (!this.currentOrder.splitId) {
-            this.splitId = uuidv4()
-            this.$emit('updateCurrentOrder', 'splitId', this.splitId)
-            this.$emit('createOrderCommit', { key: 'splitId', value: this.splitId })
-          } else {
-            this.splitId = this.currentOrder.splitId
-          }
-        }
-      },
       'currentOrder.items'(val) {
         if (val) this.remainingItems = _.cloneDeep(val)
       },
-      value() {
+      value(val) {
         this.currentSplitOrder = []
+        this.splitOrders = []
         this.remainingItems = _.cloneDeep(this.currentOrder.items)
+
+        if (val) {
+          if (this.currentOrder.splitId) {
+            this.splitId = this.currentOrder.splitId
+          } else {
+            this.splitId = uuidv4()
+            this.$emit('updateCurrentOrder', 'splitId', this.splitId)
+            if (this.currentOrder._id) {
+              this.$emit('createOrderCommit', { key: 'splitId', value: this.splitId })
+            }
+          }
+        }
       }
     }
   }

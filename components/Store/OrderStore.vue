@@ -444,7 +444,7 @@
         }
       },
       async saveSplitOrder(items, payment, isLast, callback = () => null) {
-        if (isLast) {
+        if (isLast && this.currentOrder._id) {
           const order = await this.saveRestaurantOrder(payment, false, false)
           return callback(order)
         }
@@ -774,11 +774,26 @@
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
+
+            const payment = paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }));
+
+            this.actionList.push({
+              type: 'order',
+              where: { _id: this.currentOrder._id },
+              table: this.currentOrder.table,
+              update: {
+                set: {
+                  key: 'payment',
+                  value: payment,
+                }
+              }
+            })
+
             await this.saveTableOrder();
 
             const order = {
               ...this.currentOrder,
-              payment: paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value })),
+              payment,
             }
 
             cms.socket.emit('pay-order', order, this.user, true, async newOrder => {
