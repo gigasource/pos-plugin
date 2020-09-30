@@ -118,6 +118,17 @@ router.post('/new-store', async (req, res) => {
         coordinates: [lng, lat]
       }
     }
+  } else {
+    try {
+      const { result: { geometry: {location: {lat, lng}} } } = await getPlaceDetail(googleMapPlaceId);
+      coordinates = {long: lng, lat}
+      location = {
+        type: 'Point',
+        coordinates: [lng, lat]
+      }
+    } catch (e) {
+      console.log('Cannot get geometry information')
+    }
   }
 
   // create store
@@ -452,6 +463,25 @@ async function getGooglePlaceByText(placeName) {
   if (searchResult.candidates && searchResult.candidates.length) {
     return searchResult.candidates[0];
   } else {
+    return null;
+  }
+}
+
+async function getPlaceDetail(googlePlaceId) {
+  const {mapsApiKey} = global.APP_CONFIG;
+  if (!mapsApiKey)
+    return null;
+  try {
+    const placeDetailUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
+    const { data } = await axios.get(placeDetailUrl, {
+      params: {
+        key: mapsApiKey,
+        place_id: googlePlaceId,
+        fields: 'geometry'
+      }
+    })
+    return data;
+  } catch (e) {
     return null;
   }
 }

@@ -314,8 +314,8 @@
           })
         })
       },
-      async addStore({ settingName, settingAddress, groups, country }) {
-        await axios.post('/store/new-store', { settingName, settingAddress, groups, country })
+      async addStore({ settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location }) {
+        await axios.post('/store/new-store', { settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location })
         await this.loadStores()
       },
 
