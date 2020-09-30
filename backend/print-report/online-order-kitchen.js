@@ -44,7 +44,7 @@ async function makePrintData(cms, { orderId }, locale) {
   };
 }
 
-async function printEscPos(escPrinter, printData, groupPrinter) {
+async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
   const {
     orderNumber,
     customerName,
@@ -64,12 +64,19 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
   let filteredItems = items.filter(item => item.groupPrinter === groupPrinter || item.groupPrinter2 === groupPrinter)
   if (!filteredItems.length) return
 
+  const tableWidthPercentTotal = printerType === 'escpos' ? 0.97 : 1;
+
   escPrinter.setTextDoubleHeight();
   escPrinter.bold(true);
 
   const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
   if (deliveryTime) {
-    escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
+    printerType === 'escpos'
+      ? escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
+      : escPrinter.tableCustom([
+        {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
+        {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
+      ]);
   } else {
     escPrinter.alignCenter();
     escPrinter.println(`${orderType} #${orderNumber}`);
@@ -98,7 +105,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
   filteredItems.forEach((item, index) => {
     escPrinter.bold(false);
     const quantityColumnWidth = item.quantity.toString().length * 0.05;
-    const itemsColumnWidth = 0.92 - item.quantity.toString().length * 0.05;
+    const itemsColumnWidth = tableWidthPercentTotal - 0.05 - item.quantity.toString().length * 0.05;
 
     escPrinter.setTextQuadArea();
     escPrinter.tableCustom([

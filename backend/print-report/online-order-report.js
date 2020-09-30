@@ -57,7 +57,7 @@ async function makePrintData(cms, { orderId }, locale) {
   };
 }
 
-async function printEscPos(escPrinter, printData) {
+async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
   let {
     orderNumber,
     customerName,
@@ -82,7 +82,12 @@ async function printEscPos(escPrinter, printData) {
 
   const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
   if (deliveryTime) {
-    escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime);
+    printerType === 'escpos'
+      ? escPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
+      : escPrinter.tableCustom([
+        {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
+        {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
+      ]);
   } else {
     escPrinter.alignCenter();
     escPrinter.println(`${orderType} #${orderNumber}`);
@@ -108,8 +113,10 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.drawLine()
   escPrinter.bold(true)
+
+  const itemColumnWidth = printerType === 'escpos' ? 0.4 : 0.44;
   escPrinter.tableCustom([
-    { text: locale.printing.item, align: 'LEFT', width: 0.4 },
+    { text: locale.printing.item, align: 'LEFT', width: itemColumnWidth },
     { text: locale.printing.quantity, align: 'RIGHT', width: 0.12 },
     { text: locale.printing.price, align: 'RIGHT', width: 0.22 },
     { text: locale.printing.total, align: 'RIGHT', width: 0.22 },
@@ -119,7 +126,7 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.setTextNormal()
   items.forEach(item => {
     escPrinter.tableCustom([
-      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: 0.4 },
+      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth },
       { text: `${item.quantity}`, align: 'RIGHT', width: 0.12 },
       { text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22 },
       { text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22 },
@@ -130,7 +137,7 @@ async function printEscPos(escPrinter, printData) {
         const modifierText = `* ${mod.name}`
 
         escPrinter.tableCustom([
-          { text: modifierText, align: 'LEFT', width: 0.4 },
+          { text: modifierText, align: 'LEFT', width: itemColumnWidth },
           { text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12 },
           { text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22 },
           { text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22 },

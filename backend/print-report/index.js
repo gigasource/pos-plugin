@@ -78,8 +78,12 @@ module.exports = async function (cms) {
 
           const {escPOS} = printerInfo
 
-          if (escPOS) await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter);
-          else await report.printSsr(escPrinter, printData, printerInfo.groupPrinter);
+          if (escPOS) await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
+          // else await report.printSsr(escPrinter, printData, printerInfo.groupPrinter);
+          else {
+            await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+            canvasPrinter.cleanup();
+          }
         }
 
         callback({success: true});
