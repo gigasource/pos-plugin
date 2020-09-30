@@ -2,7 +2,7 @@ const queue = require('queue');
 const q = require('q');
 const fs = require('fs');
 const PNG = require('pngjs').PNG;
-const phantom = require('phantom');
+//const phantom = require('phantom');
 let instance, page;
 
 async function initPhantom() {
