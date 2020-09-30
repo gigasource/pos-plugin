@@ -69,7 +69,7 @@ module.exports = async function (cms) {
         for (const printerInfo of printers) {
           const escPrinter = await getEscPrinter(printerInfo);
           const CanvasPrinter = await initCanvaskit();
-          const canvasPrinter = new CanvasPrinter(560, 15000, {
+          const canvasPrinter = new CanvasPrinter(560, 500, {
             printFunctions: {
               printPng: escPrinter.printPng.bind(escPrinter),
               print: escPrinter.print.bind(escPrinter),

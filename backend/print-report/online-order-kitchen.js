@@ -130,7 +130,7 @@ async function printEscPos(escPrinter, printData, groupPrinter) {
       });
     }
 
-    if (index < items.length - 1) {
+    if (index < filteredItems.length - 1) {
       escPrinter.setTextNormal();
       escPrinter.newLine();
       escPrinter.newLine();
