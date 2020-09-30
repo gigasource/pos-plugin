@@ -616,7 +616,7 @@
           ? _.find(this.currentOrder.items, item => item === product)
           : _.last(this.currentOrder.items)
 
-        if (!product) return
+        if (!product || product.sent || product.printed) return
         modifier._id = this.genObjectId();
         this.actionList.push({
           type: 'item',
