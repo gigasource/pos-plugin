@@ -337,7 +337,7 @@
             triggerBtn = getEmbedBtn(_.orderBy(this.type, 'order'), this.store.alias),
             checkIOs = checkIOs12AndLess(),
             mobile = mobileCheck(),
-            icon = genIcon(this.store.alias, this.image.mimeType, this.image.fileName.split('.')[1], 'https://cdn.online-order.gigasource.io')
+            icon = genIcon(this.store.alias, this.image.mimeType, this.image.fileName.split('.')[1], 'https://cdn.restaurantplus.net')
         const fnString = header + checkIOs + mobile + genStyleSheet(this.position, this.size, this.hidden) + icon + triggerBtn + genReadyState() + footer
         const minifyString = terser.minify(fnString).code
         const file = new File([minifyString], `embed-script.js`, {type: 'text/javascript'})
