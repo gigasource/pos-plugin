@@ -35,7 +35,7 @@ function deserializeObj(obj) {
 
 async function buildTempOrder(table) {
 	if (table == null || !activeOrders[table]) return null;
-	const commitsList = await orderCommitModel.find({table: table, temp: true}).lean();
+	const commitsList = await orderCommitModel.find({id: activeOrders[table].id, table: table, temp: true}).lean();
 
 	const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : { items: [] };
 	commitsList.forEach(commit => {
