@@ -54,7 +54,25 @@ router.put('/', async (req, res) => {
   }
 })
 
-//Remove task
+// Remove task
+router.delete('/:taskId', async (req, res) => {
+  try {
+    const { taskId } = req.params
+    if (taskId) {
+      const response = await removeTask(taskId)
+      res.json(response)
+    } else {
+      res.json({ error: 'Missing taskId' })
+    }
+  } catch (e) {
+    res.json({ error: e.message })
+  }
+})
+
+// Remove task
+/**
+ * @Obsolete
+ */
 router.post('/remove', async (req, res) => {
   try {
     const { taskId } = req.body
