@@ -35,7 +35,7 @@ function deserializeObj(obj) {
 
 async function buildTempOrder(table) {
 	if (table == null || !activeOrders[table]) return null;
-	const commitsList = await orderCommitModel.find({table: table, temp: true}).lean();
+	const commitsList = await orderCommitModel.find({id: activeOrders[table].id, table: table, temp: true}).lean();
 
 	const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : { items: [] };
 	commitsList.forEach(commit => {
@@ -82,6 +82,10 @@ async function buildTempOrder(table) {
  master
 */
 async function handleOrderCommit(commit) {
+	if (commit.orderId && activeOrders[commit.table] && commit.orderId != activeOrders[commit.table].id) {
+		console.error('This commit is for old order');
+		return;
+	}
 	let result;
 	if (commit.update && commit.update.set) {
 		if (commit.where && !commit.where._id) {
@@ -220,10 +224,10 @@ async function initQueue(handler) {
 		activeOrders[activeOrder.table] = activeOrder;
 	})
 	const orderDoc = await orderModel.findOne({}).sort('-id');
-	highestOrderId = orderDoc ? orderDoc._doc.id + 1 : 1;
+	highestOrderId = (orderDoc && orderDoc._doc.id) ? orderDoc._doc.id + 1 : 1;
 	const commitDoc = await orderCommitModel.findOne({}).sort('-commitId');
 	nodeHighestCommitIdUpdating = 0;
-	highestCommitId = commitDoc ? commitDoc._doc.commitId + 1 : 1;
+	highestCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
 	queue = new Queue(async (data, cb) => {
 		const { commits, ack } = data;
 		let newCommits = [];
