@@ -457,43 +457,52 @@ router.put('/assign-device/:deviceId', async (req, res) => {
   }
 });
 
-// IMPORTANT: I GUESS that this endpoint is only be used from R+ app.
-// If it also request from another app, side effect may occur
+// This endpoint is not only send from R+ but also from StoreManagement screen
+// If this endpoint used by R+ app, { storeId } = req.body while storeId is user-friendly id of specified store
+// If this endpoint used by Pos website, { storeId, notify } = req.body while storeId is user-friendly id, notify is boolean flag indicate that
+// the server should notify to the device about deletion
 router.put('/remove-device-store/:deviceId', async (req, res) => {
-  const { deviceId } = req.params;
-  if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
+  try {
+    const { deviceId } = req.params;
+    if (!deviceId) return res.status(400).json({error: `deviceId can not be ${deviceId}`});
+    const device = await DeviceModel.findById(deviceId);
+    if (!device) return {error: `Device with ID ${deviceId} not found`};
+    const { storeId, notify } = req.body;
+    if (device.enableMultiStore) {
+      const store = await cms.getModel('Store').findOne({id: storeId})
+      if (store) {
+        await removeDeviceFromStore(device, store._id)
+        let currentStores = _.filter(device.storeIds, _id => _id.toString() !== store._id.toString())
 
-  const device = await DeviceModel.findById(deviceId);
-  if (!device) return {error: `Device with ID ${deviceId} not found`};
+        let newStoreId = device.storeId
+        if (currentStores.length > 0)
+          newStoreId = currentStores[0]
 
-  if (device.enableMultiStore) {
-    const { storeId } = req.body;
-    const store = await cms.getModel('Store').findOne({id: storeId})
-    if (store) {
-      await removeDeviceFromStore(device, store._id)
-      let currentStores = _.filter(device.storeIds, _id => _id.toString() !== store._id.toString())
+        if (currentStores.length === 1) {
+          currentStores = null
+        }
 
-      let newStoreId = device.storeId
-      if (currentStores.length > 0)
-        newStoreId = currentStores[0]
-
-      if (currentStores.length === 1) {
-        currentStores = null
+        await DeviceModel.updateOne({_id: device._id}, {
+          storeIds: currentStores,
+          storeId: newStoreId,
+          enableMultiStore: currentStores && currentStores.length > 1,
+        })
       }
-
-      await DeviceModel.updateOne({_id: device._id}, {
-        storeIds: currentStores,
-        storeId: newStoreId,
-        enableMultiStore: currentStores && currentStores.length > 1,
-      })
+    } else {
+      if (device.storeId)
+        await removeDeviceFromStore(device, device.storeId);
+      await DeviceModel.updateOne({_id: device._id}, {storeId: null});
     }
-  } else {
-    if (device.storeId)
-      await removeDeviceFromStore(device, device.storeId);
-    await DeviceModel.updateOne({_id: device._id}, {storeId: null});
-  }
 
-  res.status(204).send();
+    // TODO: remove device from StoreManagement page, then notify should be send to device
+    if (notify) {
+
+    }
+
+    res.status(204).send();
+  } catch (e) {
+    console.debug('sentry:eventType=gsmsDeviceRemove', `support/remove-device-store/:deviceId has an exception: ${e.message}`)
+  }
 });
 
 router.put('/assign-device-to-store/:id', async (req, res) => {
@@ -574,7 +583,7 @@ async function assignDevice(deviceId, store) {
   }
 
   device.metadata = device.metadata || {};
-  device = await DeviceModel.updateOne({ _id: deviceId }, device, { new: true });
+  device = await DeviceModel.findOneAndUpdate({ _id: deviceId }, device, { new: true });
 
   // add device info to specified store
   store.gSms = store.gSms || {};
@@ -583,15 +592,17 @@ async function assignDevice(deviceId, store) {
   store.gSms.autoAccept = store.gSms.autoAccept || true;
   store.gSms.devices = store.gSms.devices || [];
 
+  const newGsmsDevice = Object.assign({}, device._doc,
+      {
+        registered: true,
+        code: await getNewDeviceCode(store.id),
+        total: 0,
+        orders: 0,
+      })
+
   await StoreModel.findOneAndUpdate({ _id: store._id }, {
     $push: {
-      'gSms.devices': Object.assign({}, device._doc,
-        {
-          registered: true,
-          code: await getNewDeviceCode(store.id),
-          total: 0,
-          orders: 0,
-        })
+      'gSms.devices': newGsmsDevice
     }
   });
 }

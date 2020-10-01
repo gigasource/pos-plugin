@@ -375,12 +375,15 @@
       },
 
       async removeGSmsDevice(storeId, deviceId) {
-        await cms.getModel('Store').findOneAndUpdate({ _id: storeId }, {
-          $pull: {
-            'gSms.devices': { _id: deviceId }
-          }
-        })
-        await this.loadStores()
+        const specifiedStore = await cms.getModel('Store').findOne({_id: storeId}, { id: 1 })
+        if (specifiedStore) {
+          console.log(`id: ${specifiedStore.id}`)
+          await axios.put(`/support/remove-device-store/${deviceId}`, {
+            storeId: specifiedStore.id,
+            notify: true // tell server send notify to specified gsms device
+          })
+          await this.loadStores()
+        }
       },
 
       async updateDeviceAppVersion(device) {

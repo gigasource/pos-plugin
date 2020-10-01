@@ -45,7 +45,7 @@ async function sendFirebaseNotification(notification, data, tokens) {
 
   const result = await admin.messaging().sendMulticast(message)
   if (result.successCount) {
-    console.debug('sentry:eventType=notification', 'Error sending notification', result.responses.filter(r => !r.success))
+    console.debug('sentry:eventType=notification', 'Success sending notification', result.responses.filter(r => !r.success))
   }
 }
 
