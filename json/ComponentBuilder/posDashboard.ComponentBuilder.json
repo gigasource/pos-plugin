@@ -176,7 +176,13 @@
             {
               "choice": "view",
               "component": "PosDashboardFunction",
-              "binding": [],
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.view",
+                  "local": "view"
+                }
+              ],
               "slotScopeBinding": [],
               "slot": "Functions",
               "url": "plugins/pos-plugin/components/Dashboard/PosDashboardFunction.vue",
@@ -408,6 +414,13 @@
                   "type": "event"
                 }
               ]
+            },
+            {
+              "choice": "view",
+              "component": "PosOrderDeliveryConfig",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "DeliveryConfig"
             }
           ]
         }

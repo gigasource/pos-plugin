@@ -1122,6 +1122,13 @@
           "type": "input"
         }
       ]
+    },
+    {
+      "_id": "5f755fd3f9e558278877147b",
+      "schemaType": "array",
+      "key": "keyboardDeliveryConfig",
+      "type": null,
+      "fields": []
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",

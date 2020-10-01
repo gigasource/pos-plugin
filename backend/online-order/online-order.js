@@ -864,7 +864,7 @@ module.exports = async cms => {
       cb && cb(place)
     })
 
-    socket.on('getDeliveryProducts', async () => {
+    socket.on('getDeliveryProducts', async (cb) => {
       const deviceId = await getDeviceId()
       onlineOrderSocket.emit('getDeliveryProducts', deviceId, async products => {
         await cms.getModel('Product').deleteMany({
@@ -879,6 +879,7 @@ module.exports = async cms => {
           groupPrinter: p.groupPrinters[0],
           groupPrinter2: p.groupPrinters[1],
         })))
+        cb && cb()
       })
     })
   })
