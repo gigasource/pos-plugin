@@ -1061,7 +1061,7 @@ module.exports = async function (cms) {
 
         if (store.gSms && store.gSms.enabled) {
           cms.emit('sendReservationMessage', storeId, reservationData)
-          const demoDevices = await cms.getModel('Device').find({ storeId, deviceType: 'gsms' })
+          const demoDevices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
           demoDevices.forEach(({_id}) => {
 
             /** @deprecated */
