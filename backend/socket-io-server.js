@@ -1061,8 +1061,8 @@ module.exports = async function (cms) {
 
         if (store.gSms && store.gSms.enabled) {
           cms.emit('sendReservationMessage', storeId, reservationData)
-          const demoDevices = store.gSms.devices
-          demoDevices.filter(i => i.registered).forEach(({_id}) => {
+          const demoDevices = await cms.getModel('Device').find({ storeId, deviceType: 'gsms' })
+          demoDevices.forEach(({_id}) => {
 
             /** @deprecated */
             const targetClientIdOld = `${store.id}_${_id}`;
