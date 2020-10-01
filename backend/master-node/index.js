@@ -48,7 +48,7 @@ async function initSocket(socket) {
 				if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 					global.APP_CONFIG.isMaster = true;
 				}
-				cms.execPostSync('load:handler');
+				await cms.execPostAsync('load:handler');
 				await handler.initSocket(socket, masterClientId);
 			})
 		}
@@ -59,7 +59,7 @@ async function initSocket(socket) {
 		if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 			global.APP_CONFIG.isMaster = true;
 		}
-		cms.execPostSync('load:handler');
+		await cms.execPostAsync('load:handler');
 		await handler.initSocket(socket, masterClientId);
 	}
 }
