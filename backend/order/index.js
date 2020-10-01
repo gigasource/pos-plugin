@@ -7,7 +7,7 @@ const _ = require('lodash')
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
 
-    socket.on('print-order-kitchen', async (device, newOrder, oldOrder = [], cb = () => null) => {
+    socket.on('print-order-kitchen', async (device, newOrder, oldOrder = {items: []}, cb = () => null) => {
       if (oldOrder && oldOrder.items) {
         const diff = _.differenceWith(newOrder.items, oldOrder.items, _.isEqual);
         const printLists = diff.reduce((lists, current) => {
@@ -152,11 +152,6 @@ module.exports = (cms) => {
 
   async function createOrderCommits(commits) {
     return cms.getModel('OrderCommit').create(commits);
-  }
-
-  function genObjectId() {
-    const BSON = require('bson');
-    return new BSON.ObjectID();
   }
 
   function compactOrder(products) {

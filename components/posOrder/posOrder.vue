@@ -89,7 +89,7 @@
           </g-btn-bs>
         </template>
         <template v-else>
-          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" @click.stop="print">
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrder">
             <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
           </g-btn-bs>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="pay">
@@ -241,7 +241,7 @@
         return []
       },
       disablePrintBtn() {
-        return this.items.filter(i => i.quantity > 0).length === 0
+        return this.items.filter(i => i.quantity > 0 && !i.printed).length === 0
       },
       showPrint() {
         // return this.items.filter(i => !i.sent).length > 0
