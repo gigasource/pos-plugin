@@ -224,10 +224,10 @@ async function initQueue(handler) {
 		activeOrders[activeOrder.table] = activeOrder;
 	})
 	const orderDoc = await orderModel.findOne({}).sort('-id');
-	highestOrderId = orderDoc ? orderDoc._doc.id + 1 : 1;
+	highestOrderId = (orderDoc && orderDoc._doc.id) ? orderDoc._doc.id + 1 : 1;
 	const commitDoc = await orderCommitModel.findOne({}).sort('-commitId');
 	nodeHighestCommitIdUpdating = 0;
-	highestCommitId = commitDoc ? commitDoc._doc.commitId + 1 : 1;
+	highestCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
 	queue = new Queue(async (data, cb) => {
 		const { commits, ack } = data;
 		let newCommits = [];

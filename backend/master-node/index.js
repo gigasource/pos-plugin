@@ -14,6 +14,7 @@ module.exports = function (cms) {
 		})
 	});
 	cms.post('load:handler', _.once(async () => {
+		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});
 		if (global.APP_CONFIG.isMaster) {
 			handler = new Master(cms);
 		} else {
