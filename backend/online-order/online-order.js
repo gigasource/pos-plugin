@@ -473,6 +473,7 @@ module.exports = async cms => {
       // set masterClientId
       // newMasterClientId is always different from the old one
       await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId });
+      cms.socket.emit('getMasterDevice', masterClientId)
       if (ack) ack();
       await handlerNewMasterId(socket);
     })
@@ -882,5 +883,20 @@ module.exports = async cms => {
         cb && cb()
       })
     })
+
+    cms.socket.on('connect', socket => {
+      socket.on('setMasterDevice', async () => {
+        console.log('setMasterDevice')
+        const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
+        const { onlineDevice } = posSettings;
+
+        if (!onlineDevice.store || !onlineDevice.store.alias) return cb(null)
+        const ip = global.APP_CONFIG.deviceIp;
+        onlineOrderSocket.emit('setMasterDevice', ip, id => {
+          console.log('setMasterDevice cb', id)
+          cms.getModel('PosSetting').findOneAndUpdate({}, { masterIp: ip, masterClientId: id })
+        })
+      })
+    });
   })
 }
