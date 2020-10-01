@@ -664,6 +664,19 @@ module.exports = async function (cms) {
         callback(products)
       })
 
+      socket.on('setMasterDevice', async (ip, cb) => {
+        const device = await cms.getModel('Device').findOne({ _id: clientId })
+        const storeId = device.storeId
+        const devices = await cms.getModel('Device').find({ storeId })
+        await cms.getModel('Device').updateMany({ storeId }, { master: false })
+        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+        cb(clientId)
+        devices.forEach(device => {
+          console.log(`Sending master ip to ${device._id.toString()}`);
+          externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateMasterDevice', [clientId]);
+        })
+      })
+
       socket.on('registerMasterDevice', async (ip) => {
         await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
       })
@@ -680,6 +693,7 @@ module.exports = async function (cms) {
         const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
         if (!storeId) return fn(null, null);
         const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
+        if (!device) return fn(null)
         fn(device.metadata ? device.metadata.ip : null, device._id.toString());
       })
     }
