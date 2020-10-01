@@ -119,6 +119,11 @@
               reject(response)
             }
           }, false, true)
+          if (cms.sharedConfig && typeof (cms.sharedConfig.getPurgeCdnData) === 'function') {
+            const purgeCdnData = cms.sharedConfig.getPurgeCdnData(`/store/${storeAlias}`);
+            if (purgeCdnData)
+              await axios.get(purgeCdnData.url, purgeCdnData.options)
+          }
         })
       },
       async changeStoreEmbedImage(image, folder, type) {
