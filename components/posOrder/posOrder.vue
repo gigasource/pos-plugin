@@ -215,10 +215,11 @@
         },
         menu: false,
         showQuickBtn: false,
+        quickBtnAction: 'pay',
         edit: false,
         actionTimeout: null,
         showSplitBtn: true,
-        smallSidebar: true
+        smallSidebar: true,
       }
     },
     computed: {
@@ -355,16 +356,22 @@
         this.$router.push({path: '/pos-payment'})
       },
       payToggle() {
-        if(this.actionMode === 'none') {
+        if (this.actionMode === 'none') {
           this.$emit('update:actionMode', 'pay');
           this.actionTimeout = setTimeout(() => {
             this.$emit('update:actionMode', 'none');
           }, 5000)
           return
         }
-        this.pay()
+
+        if (this.quickBtnAction === 'receipt') {
+          this.showOrderReceipt();
+        } else {
+          this.pay();
+        }
+
         this.$emit('update:actionMode', 'none');
-        if(this.actionTimeout) clearTimeout(this.actionTimeout)
+        if (this.actionTimeout) clearTimeout(this.actionTimeout);
       },
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
@@ -372,6 +379,9 @@
       },
       splitOrder() {
         this.$getService('PosOrderSplitOrder:setActive')(true)
+      },
+      showOrderReceipt() {
+        this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
         this.menu = false
@@ -515,7 +525,11 @@
       } else this.table = ''
 
       const posSettings = await cms.getModel('PosSetting').findOne()
-      if (posSettings) this.showQuickBtn = posSettings.generalSetting.quickBtn
+
+      if (posSettings) {
+        this.showQuickBtn = posSettings.generalSetting && posSettings.generalSetting.quickBtn;
+        this.quickBtnAction = (posSettings.generalSetting && posSettings.generalSetting.quickBtnAction) || 'pay';
+      }
 
       this.loadSetting()
     },
