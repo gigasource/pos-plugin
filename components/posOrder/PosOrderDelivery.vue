@@ -2,7 +2,6 @@
   <div class="delivery">
     <div class="delivery-info">
       <template v-if="!isMobile || !showKeyboard">
-        <p class="delivery-info__title">Favorite</p>
         <div class="delivery-info__favorite">
           <div :style="getRandomColor(i)" class="delivery-info__favorite-item" v-for="(f, i) in favorites"
                @click="selectFavoriteProduct(f)"
@@ -11,7 +10,6 @@
           </div>
         </div>
       </template>
-      <p class="delivery-info__title">Customer Infomation</p>
       <div class="delivery-info__customer">
         <template v-if="!isNewCustomer">
           <div
@@ -35,9 +33,9 @@
         </template>
         <template v-else>
           <template v-if="isMobile">
-            <g-text-field v-model="name" label="Name" @click="showKeyboard = true"/>
-            <g-text-field v-model="phone" label="Phone" @click="showKeyboard = true"/>
-            <g-combobox style="width: 98%" label="Address" v-model="placeId"
+            <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+            <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+            <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense
                         :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                         @input-click="showKeyboard = true" keep-menu-on-blur
                         @input="selectAutocompleteAddress"/>
@@ -294,7 +292,7 @@
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
       window.addEventListener('keydown', this.keyboardHanle.bind(this))
       this.apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
-      this.debouceSearchAddress = _.debounce(this.searchAddress, 1000)
+      this.debouceSearchAddress = _.debounce(this.searchAddress, 300)
       this.debouceUpdatePrice = _.debounce(this.updatePrice, 300)
     },
     computed: {
@@ -557,7 +555,7 @@
       },
       async searchAddress(text) {
         console.log('searching')
-        if(!text) return
+        if(!text || text.length < 4) return
         this.token = uuidv4()
         cms.socket.emit('searchPlace', text, this.token, this.apiKey, places => {
           this.autocompleteAddresses = places.map(p => ({
@@ -621,7 +619,7 @@
         }
       },
       submitCustomer() {
-        if(this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId)) {
+        if(this.name && this.phone && this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId)) {
           let customer = {}
           customer.name = this.name
           customer.phone = this.phone
@@ -720,6 +718,29 @@
           box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
           padding: 0 8px 8px;
           margin: 12px 0;
+        }
+      }
+
+      ::v-deep .g-tf-wrapper {
+        margin: 4px 0 8px;
+
+        fieldset {
+          border-width: 1px !important;
+          border-color: #9e9e9e;
+        }
+
+        .g-tf-input {
+          font-size: 14px;
+          padding: 4px;
+        }
+
+        .g-tf-label {
+          font-size: 14px;
+          top: 4px;
+
+          &__active {
+           transform: translateY(-13px) translateX(7px) scale(0.75) !important;
+          }
         }
       }
     }

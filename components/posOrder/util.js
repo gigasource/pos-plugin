@@ -5,8 +5,9 @@ export function createEmptyProductLayout() {
     color: '#F5F5F5',
     product: {
       type: null,
-      id: null,
-      name: null,
+      id: '',
+      name: '',
+      price: '',
       groupPrinter: null,
       groupPrinter2: null,
       isNoPrint: null,
