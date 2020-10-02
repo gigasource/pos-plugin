@@ -96,12 +96,14 @@ module.exports = cms => {
       /** @deprecated */
       const response = await admin.messaging().send({...message, topic})
 
-      const devices = await cms.getModel('Device').find({ storeId: storeId, firebaseToken: { $exists: true } })
+      const devices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms', firebaseToken: { $exists: true } })
 
-      await admin.messaging().sendAll(devices.map(d => ({
-        ...message,
-        token: d.firebaseToken
-      })))
+      if (devices.length > 0) {
+        await admin.messaging().sendAll(devices.map(d => ({
+          ...message,
+          token: d.firebaseToken
+        })))
+      }
       console.debug(`sentry:store=${storeName},alias=${storeAlias},eventType=reservation`,
         `3a. Online order backend: Sent firebase reservation notification, messageId: '${response}'`);
     } catch (e) {
