@@ -745,7 +745,7 @@ module.exports = async function (cms) {
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
       const device = await cms.getModel('Device').findById(deviceId).lean();
-      const store = await cms.getModel('Store').findById(device.storeId);
+      const store = await cms.getModel('Store').findById(device.storeId).lean();
       let sentryTags = `sentry:clientId=${deviceId},eventType=updateAppFeature`;
       if (store) sentryTags += `,store=${store.settingName},alias=${store.alias}`;
 
@@ -757,6 +757,11 @@ module.exports = async function (cms) {
           const products = await cms.getModel('Product').find({ store: store._id })
           const data = { products }
           externalSocketIOServer.emitTo(deviceId, 'updateProducts', data)
+        }
+        //sent reservation setting if reservation is on
+        if(features && features.reservation) {
+          const reservationSetting = {...store.reservationSetting, openHours: store.openHours}
+          await externalSocketIOServer.emitToPersistent(deviceId, 'updateReservationSetting', [reservationSetting]);
         }
 
         console.debug(sentryTags, `2. Online Order backend: Sending feature update to client with id ${deviceId}`, JSON.stringify(features));
