@@ -53,7 +53,8 @@
             "ip",
             "com",
             "usb",
-            "integrate"
+            "integrate",
+            "virtual"
           ]
         },
         {
