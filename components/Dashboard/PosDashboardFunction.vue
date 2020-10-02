@@ -42,7 +42,8 @@
     injectService:['PosStore:isMobile'],
     props: {
       enabledFeatures: Array,
-      user: null
+      user: null,
+      view: Object,
     },
     data() {
       const i18n = this.$i18n;
@@ -62,7 +63,7 @@
           {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
           {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
           {title: 'Dine-in Menu', feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
-          {title: 'Delivery Menu', feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.fetchMenu()},
+          {title: 'Delivery Menu', feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
           {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting',  click: () => this.changePath('/pos-printer-setting')},
           {title: 'Customer', feature: 'customerInfo', icon: 'icon-customer-info',  click: () => this.changePath('/pos-customer')},
           {title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: this.openStoreSetting },
@@ -114,8 +115,8 @@
           }
         })
       },
-      async fetchMenu() {
-        cms.socket.emit('getDeliveryProducts')
+      updateView(name) {
+        this.$emit('update:view', {name})
       }
     }
   }

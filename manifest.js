@@ -88,6 +88,13 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/fritzbox-call-handler/socketio-handler.js',
+      type: 'backend'
+    },
+    {
+      loader: {
         type: 'css-loader'
       },
       path: 'style/pos.css'

@@ -14,6 +14,7 @@ module.exports = function (cms) {
 		})
 	});
 	cms.post('load:handler', _.once(async () => {
+		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});
 		if (global.APP_CONFIG.isMaster) {
 			handler = new Master(cms);
 		} else {
@@ -47,7 +48,7 @@ async function initSocket(socket) {
 				if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 					global.APP_CONFIG.isMaster = true;
 				}
-				cms.execPostSync('load:handler');
+				await cms.execPostAsync('load:handler');
 				await handler.initSocket(socket, masterClientId);
 			})
 		}
@@ -58,7 +59,7 @@ async function initSocket(socket) {
 		if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 			global.APP_CONFIG.isMaster = true;
 		}
-		cms.execPostSync('load:handler');
+		await cms.execPostAsync('load:handler');
 		await handler.initSocket(socket, masterClientId);
 	}
 }
