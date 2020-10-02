@@ -103,7 +103,7 @@
     </div>
     <div v-if="!editMode" class="order-detail__content">
       <div v-for="item in items" :key="item._id.toString()"
-           v-if="item.quantity || item.quantityModified"
+           v-if="item.quantity || (item.quantityModified && item.printed)"
            class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
