@@ -2,52 +2,80 @@ const orderUtil = require('../../components/logic/orderUtil')
 const { getNewOrderId } = require('../master-node/updateCommit');
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
+const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
 
-    socket.on('print-order-kitchen', async (device, newOrder, oldOrder = {items: []}, cb = () => null) => {
-      if (oldOrder && oldOrder.items) {
-        const diff = _.differenceWith(newOrder.items, oldOrder.items, _.isEqual);
-        const printLists = diff.reduce((lists, current) => {
-          if (!oldOrder.items.some(i => i._id === current._id)) {
-            if (current.quantity > 0) lists.addList.push(current)
-          } else {
-            const product = oldOrder.items.find(i => i._id === current._id)
+    socket.on('print-to-kitchen', async (device, order, oldOrder = { items: [] }, actionList, cb = () => null) => {
+      const diff = _.differenceWith(order.items, oldOrder.items, _.isEqual);
+      const printLists = diff.reduce((lists, current) => {
+        if (!oldOrder.items.some(i => i._id === current._id)) {
+          if (current.quantity > 0) lists.addList.push(current)
+        } else {
+          const product = oldOrder.items.find(i => i._id === current._id)
 
-            if (product) {
-              const qtyChange = current.quantity - product.quantity
-              if (qtyChange < 0) {
-                const items = Array.from({ length: -qtyChange }).map(() => current);
-                lists.cancelList = lists.cancelList.concat(items)
-              } else {
-                lists.addList.push({ ...current, quantity: qtyChange })
-              }
+          if (product) {
+            const qtyChange = current.quantity - product.quantity
+            if (qtyChange < 0) {
+              const items = Array.from({ length: -qtyChange }).map(() => current);
+              lists.cancelList = lists.cancelList.concat(items)
+            } else {
+              lists.addList.push({ ...current, quantity: qtyChange })
             }
           }
-          return lists
-        }, {
-          cancelList: [],
-          addList: []
-        })
-
-        const results = {}
-        if (printLists.addList.length) {
-          const addedList = Object.assign({}, newOrder,
-            { items: await mapGroupPrinter(printLists.addList) });
-          results.printKitchen = await printKitchen({ order: addedList, device })
-          // cms.socket.emit('printEntireReceipt', { order: addedList, device })
         }
+        return lists
+      }, { cancelList: [], addList: [] })
 
-        if (printLists.cancelList.length) {
-          const cancelledList = Object.assign({}, newOrder,
-            ({ items: await mapGroupPrinter(printLists.cancelList) }));
-          results.printKitchenCancel = await printKitchenCancel({ order: cancelledList, device })
+      // print if master
+      // if (isMaster) {
+      //   const results = {}
+      //   if (printLists.addList.length) {
+      //     const addedList = Object.assign({}, order,
+      //       { items: await mapGroupPrinter(printLists.addList) });
+      //     results.printKitchen = await printKitchen({ order: addedList, device })
+      //     // cms.socket.emit('printEntireReceipt', { order: addedList, device })
+      //   }
+      //
+      //   if (printLists.cancelList.length) {
+      //     const cancelledList = Object.assign({}, order,
+      //       ({ items: await mapGroupPrinter(printLists.cancelList) }));
+      //     results.printKitchenCancel = await printKitchenCancel({ order: cancelledList, device })
+      //   }
+      // } else {
+      // add print commits
+      printLists.addList = Object.assign({}, order, { items: await mapGroupPrinter(printLists.addList) });
+      printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
+      const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
+        // listName: addList, cancelList
+        if (listOrder && listOrder.items && listOrder.items.length) {
+          list.push({
+            type: 'print',
+            printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
+            order: listOrder,
+            device
+          })
         }
+        return list
+        // await printKitchenCancel({ order: cancelledList, device })
+        // await printKitchen({ order: addedList, device })
+      }, [])
+      actionList.push(...printCommits)
+      // }
 
-        cb(results)
-      }
+      const mappedActionList = actionList.map(action => {
+        if (action.type === 'item' && action.update && action.update.push) {
+          action.update.push.value.sent = true
+          action.update.push.value.printed = true
+        }
+        return action
+      })
+
+      // save order | create commits
+      const newOrder = await createOrderCommits(mappedActionList)
+      cb(newOrder)
     })
 
     socket.on('print-invoice', () => {
@@ -56,24 +84,38 @@ module.exports = (cms) => {
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
       try {
-        const updatedSplit = await cms.getModel('Order').findOneAndUpdate({ _id }, { payment }, { new: true })
+        // const updatedSplit = await cms.getModel('Order').findOneAndUpdate({ _id }, { payment }, { new: true })
+        const updatedSplit = await createOrderCommits([{
+          type: 'order',
+          split: true,
+          where: { _id },
+          update: {
+            set: {
+              key: 'payment',
+              value: payment
+            }
+          }
+        }])
         cb({ order: updatedSplit })
       } catch (error) {
         cb({ error })
       }
     })
 
-    socket.on('save-order', async (actionList, cb = () => null) => {
-      const newOrder = await createOrderCommits(actionList);
-      cb(newOrder)
-    })
-
-    socket.on('pay-order', async (order, user, commit = false, cb = () => null) => {
+    socket.on('pay-order', async (order, user, device, isSplit = false, actionList, print = true, cb = () => null) => {
       try {
         const mappedOrder = await mapOrder(order, user)
-
-        if (commit) {
-          const excludes = ['_id', 'table', 'id', 'splitId', 'payment']
+        let newOrder
+        if (isSplit) {
+          newOrder = await createOrderCommits([{
+            type: 'order',
+            split: true,
+            update: {
+              create: mappedOrder
+            }
+          }])
+        } else {
+          const excludes = ['_id', 'table', 'id', 'splitId']
 
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
@@ -83,20 +125,22 @@ module.exports = (cms) => {
               set: { key, value }
             }
           })).value()
-
-          const newOrder = await createOrderCommits(updates)
-          cb(newOrder)
-        } else {
-          const newOrder = await cms.getModel('Order').findOneAndUpdate({ _id: mappedOrder._id }, {
-            ...mappedOrder,
-            id: getNewOrderId()
-          }, {
-            upsert: true,
-            new: true
-          })
-          cb(newOrder._doc)
+          actionList.push(...updates)
+          newOrder = await createOrderCommits(actionList)
         }
 
+        if (print) {
+          // todo use in master
+          // await printInvoiceHandler('OrderReport', mappedOrder, device)
+          await cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'invoice',
+            order: mappedOrder,
+            device
+          }])
+        }
+
+        cb(newOrder)
       } catch (e) {
         console.log(e)
       }
@@ -183,5 +227,15 @@ module.exports = (cms) => {
       if (item.groupPrinter2) item.groupPrinter2 = await getGroupPrinterName(item.groupPrinter2)
       return item
     }))
+  }
+
+  async function isMasterDevice() {
+    const { onlineDevice, masterClientId } = await cms.getModel('PosSetting').findOne()
+    if (!onlineDevice) return false
+    return onlineDevice.id === masterClientId
+  }
+
+  async function printToKitchen() {
+
   }
 }
