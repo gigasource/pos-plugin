@@ -49,10 +49,17 @@
       <g-spacer/>
       <template v-if="showQuickBtn">
         <template v-if="smallSidebar">
-          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPrint" @click.stop="printOrderToggle">
+          <g-btn-bs
+              v-if="showPrint"
+              :disabled="unprintedItemCount === 0"
+              width="75"
+              style="font-size: 14px; padding: 0; border: none"
+              background-color="#1271FF"
+              text-color="#FFF"
+              @click.stop="printOrderToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+                <span>{{ $t('common.currency', storeLocale) }} {{ total | convertMoney }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -61,7 +68,14 @@
               </div>
             </transition>
           </g-btn-bs>
-          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else @click.stop="payToggle">
+          <g-btn-bs
+              v-else
+              :disabled="unprintedItemCount === 0"
+              width="75"
+              style="font-size: 14px; padding: 0; border: none"
+              background-color="#1271FF"
+              text-color="#FFF"
+              @click.stop="payToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
                 <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
@@ -84,11 +98,13 @@
         </template>
       </template>
       <template v-else>
-        <span class="order-detail__header-value text-red">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</span>
+        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
       </template>
     </div>
     <div v-if="!editMode" class="order-detail__content">
-      <div v-for="item in itemsWithQty" :key="item._id.toString()" class="item"
+      <div v-for="item in items" :key="item._id.toString()"
+           v-if="item.quantity || item.quantityModified"
+           class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
@@ -168,6 +184,7 @@
     props: {
       total: Number,
       items: Array,
+      printedOrder: Object,
       user: Object,
       storeLocale: String,
       actionList: Array,
@@ -227,13 +244,37 @@
         return this.items.filter(i => i.quantity > 0).length === 0
       },
       showPrint() {
-        return this.items.filter(i => !i.sent).length > 0
+        // return this.items.filter(i => !i.sent).length > 0
+        return !this.printedOrder || this.orderHasChanges;
       },
       editMode() {
         if(!this.isMobile) {
           return false
         }
         return this.edit
+      },
+      unprintedItemCount() {
+        if (!this.items || !this.items.length) return 0;
+
+        return this.items.reduce((acc, item) => acc + item.quantity, 0);
+      },
+      orderHasChanges() {
+        const printedOrderItems = (this.printedOrder && this.printedOrder.items) || [];
+
+        // 1. Filter out unprinted items with quantity = 0
+        const currentItems = this.items.filter(e => e.quantity || e.printed);
+
+        // 2. Check if items & printedOrderItems have different lengths
+        if (currentItems.length !== printedOrderItems.length) return true;
+
+        // 3. Check if quantity of items has changed
+        return currentItems.reduce((acc, item) => {
+          const printedItem = printedOrderItems.find(e => e._id === item._id);
+
+          if (!printedItem) return true;
+          else if (item.quantity !== printedItem.quantity) return true;
+          else return acc;
+        }, false);
       }
     },
     methods: {
@@ -242,9 +283,12 @@
       },
       addItem(item) {
         if (item.printed) return
+
+        item.quantityModified = true;
         this.$emit('addItemQuantity', item)
       },
       removeItem(item) {
+        item.quantityModified = true;
         this.$emit('removeItemQuantity', item)
       },
       removeModifier(item, index) {

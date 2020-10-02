@@ -252,6 +252,11 @@
               "service": "OrderStore:removeProductModifier",
               "local": "removeProductModifier",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:printedOrder",
+              "local": "printedOrder",
+              "type": "prop"
             }
           ]
         },
