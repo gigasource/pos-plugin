@@ -1,5 +1,4 @@
-const os = require('os');
-if (os.platform() === 'android' || os.platform() === 'ios') {
+try {
 	const rn_bridge = require('rn-bridge');
 
 	module.exports = (cms) => {
@@ -23,7 +22,7 @@ if (os.platform() === 'android' || os.platform() === 'ios') {
 	module.exports.sendToRN = (msg) => {
 		rn_bridge.channel.send(msg);
 	}
-} else {
+} catch (err) {
 	module.exports = (cms) => {}
 	module.exports.sendToRN = (msg) => {}
 }
