@@ -142,6 +142,16 @@
               })
             },
             title: this.$t('sidebar.functions')
+          },
+          {
+            icon: 'icon-functions',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'VirtualPrinter',
+                params: ''
+              })
+            },
+            title: 'Virtual Printer'
           }
         ],
         pendingReservationsLength: 0,

@@ -21,7 +21,13 @@
         monthReportTo: null,
         showProductSold: true,
         showAllZNumber: false,
-        monthReport: null
+        monthReport: null,
+        virtualReports: []
+      }
+    },
+    computed: {
+      virtualReportCount () {
+        return this.virtualReports.length
       }
     },
     methods: {
@@ -214,11 +220,22 @@
         const reportWithHighestZ = cms.getList('EndOfDay').sort((cur, next) => next.z - cur.z)[0]
         return reportWithHighestZ ? reportWithHighestZ.z + 1 : 1
       },
+
+      //<!--<editor-fold desc="Virtual print report">-->
+      onVirtualReportReceived({ path }) {
+        // save to db
+        this.$set(this, 'virtualReports', [...this.virtualReports, { path, issueDate: dayjs() } ])
+      },
+      cleanOutOfDateVirtualReports() {
+        // remove from db
+      }
+      //<!--</editor-fold>-->
     },
     provide() {
       return {
         ...getProvided(this.$data, this),
         ...getProvided(this.$options.methods, this),
+        ...getProvided(this.$options.computed, this),
       }
     }
   }
