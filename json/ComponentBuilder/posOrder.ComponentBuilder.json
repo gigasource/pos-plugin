@@ -394,6 +394,11 @@
           "service": "OrderStore:printOrderReport",
           "local": "printOrderReport",
           "type": "event"
+        },
+        {
+          "service": "OrderStore:updatePrintedOrder",
+          "local": "updatePrintedOrder",
+          "type": "event"
         }
       ]
     },

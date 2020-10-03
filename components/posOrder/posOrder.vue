@@ -246,6 +246,7 @@
       },
       showPrint() {
         // return this.items.filter(i => !i.sent).length > 0
+        if (!this.table) return false
         return !this.printedOrder || this.orderHasChanges;
       },
       editMode() {

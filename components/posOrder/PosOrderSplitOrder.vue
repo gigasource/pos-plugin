@@ -290,8 +290,10 @@
             if (order) {
               this.splitOrders.push(order)
               const newItems = _.cloneDeep(this.remainingItems)
+              const printedItems = newItems.filter(i => i.printed);
               this.$emit('updateCurrentOrder', 'items', newItems)
-              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: newItems })
+              this.$emit('updatePrintedOrder', 'items', printedItems)
+              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: printedItems })
             }
           })
 

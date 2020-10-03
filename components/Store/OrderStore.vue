@@ -713,6 +713,9 @@
       updateCurrentOrder(key, val) {
         this.$set(this.currentOrder, key, val)
       },
+      updatePrintedOrder(key, val) {
+        this.$set(this.printedOrder, key, val)
+      },
       printKitchen(order) {
         return new Promise((resolve, reject) => {
           cms.socket.emit('printKitchen', {
@@ -1184,7 +1187,7 @@
         this.$set(this.currentOrder, 'id', order.id)
         const newItems = [...order.items, ...tempItems];
         this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
-        this.printedOrder = _.cloneDeep(order.items)
+        this.printedOrder = _.cloneDeep(order)
       })
       await this.getReservations()
 
