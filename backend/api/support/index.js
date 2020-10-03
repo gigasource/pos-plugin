@@ -568,7 +568,7 @@ async function assignDevice(deviceId, store) {
       currentStores = deviceLinkToDemoStore ? [] : [device.storeId]
     }
 
-    if (currentStores.indexOf(store._id) >= 0) {
+    if (currentStores.map(x => x.toString()).indexOf(store._id.toString()) >= 0) {
       return
     }
 
@@ -599,7 +599,6 @@ async function assignDevice(deviceId, store) {
         total: 0,
         orders: 0,
       })
-
   await StoreModel.findOneAndUpdate({ _id: store._id }, {
     $push: {
       'gSms.devices': newGsmsDevice
