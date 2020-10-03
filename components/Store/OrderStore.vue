@@ -451,7 +451,7 @@
         }
 
         // create order
-        const order = { ...this.currentOrder, items, payment, _id: undefined }
+        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, async newOrder => {
           callback(newOrder);
         })
