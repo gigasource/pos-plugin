@@ -352,25 +352,18 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
     await assignDevice(request.device._id, request.store);
   }
 
-  if (status === 'approved' || status === 'notApproved') {
-    await getExternalSocketIoServer().emitToPersistent(request.device._id, status === 'approved' ? 'approveSignIn' : 'denySignIn', [{
-      clientId: request.device._id,
-      requestId: request._id
-    }]);
-  }
-
   if (status === 'approved') {
-    // R+ v1.0.0 // TODO: correct version
+    // fallback
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
-    // R+ v2.0.0 // TODO: correct version
+    // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
       clientId: request.device._id,
       requestId: request._id
     }]);
   } else if (status === 'notApproved') {
-    // R+ v1.0.0 // TODO: correct version
+    // fallback
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
-    // R+ v2.0.0 // TODO: correct version
+    // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn_v2', [{
       clientId: request.device._id,
       requestId: request._id
