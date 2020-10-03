@@ -342,6 +342,11 @@
               "service": "OrderStore:resetOrderData",
               "local": "resetOrderData",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:printedOrder",
+              "local": "printedOrder",
+              "type": "prop"
             }
           ]
         }
@@ -420,6 +425,36 @@
       ],
       "url": "plugins/pos-plugin/components/posOrder/PosOrderSplitOrder.vue",
       "path": "components/posOrder/PosOrderSplitOrder.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderReceipt",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderReceipt",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "order",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderReceipt.vue",
+      "path": "components/posOrder/PosOrderReceipt.vue",
       "pluginName": "pos-plugin"
     }
   ],
