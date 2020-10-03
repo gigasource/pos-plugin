@@ -568,8 +568,12 @@ async function assignDevice(deviceId, store) {
       currentStores = deviceLinkToDemoStore ? [] : [device.storeId]
     }
 
-    if (currentStores.map(x => x.toString()).indexOf(store._id.toString()) >= 0) {
-      return
+    try {
+      if (currentStores.map(x => x.toString()).indexOf(store._id.toString()) >= 0) {
+        return
+      }
+    } catch (e) {
+      console.debug('sentry:eventType=assignDevice', e.message)
     }
 
     currentStores.push(store._id)
