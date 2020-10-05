@@ -64,61 +64,60 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       return callbackWithError(callback, new Error(`Report type ${reportType} is not supported`));
   }
 
-      const virtualPrintPng = async (png) => {
-        console.log('virtual print png')
-        // TODO:
-        //  - save to base 64, issueDate: , type: bon, receipt,
-        //  - correct font's size, padding as phantomjs
-        //  - swipe right to delete all report
-        socket.emit('virtualPrintResult', {
-          path: 'lorem ispum'
-        })
-      }
-
-      const virtualPrint = () => {
-        console.log('virtual print')
-      }
-
-      try {
-        const locale = await getLocale()
-        const printData = await report.makePrintData(cms, reportData, locale);
-        const groupPrinters = await getGroupPrinterInfo(cms, device, type);
-        const printers = _.flatten(groupPrinters.map(group => ({
-          ...group.printers,
-          groupPrinter: group.name
-        })));
-
-        for (const printerInfo of printers) {
-          const escPrinter = await getEscPrinter(printerInfo);
-          const CanvasPrinter = await initCanvaskit();
-          const canvasPrinter = new CanvasPrinter(560, 500, {
-            printFunctions: {
-              printPng: printerInfo.printerType === 'virtual' ? virtualPrintPng : escPrinter.printPng.bind(escPrinter),
-              print: printerInfo.printerType === 'virtual' ? virtualPrint : escPrinter.print.bind(escPrinter),
-            }
-          });
-
-          const {escPOS} = printerInfo
-          if (escPOS) {
-            await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
-          } else {
-            await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
-            canvasPrinter.cleanup();
-          }
-        }
-
-        callback({success: true});
-      } catch (e) {
-        console.error(e);
-        callbackWithError(callback, e);
-      }
-    })
-  });
-
-  function callbackWithError(callback, error) {
-    callback({
-      success: false,
-      message: error.toString()
+  const virtualPrintPng = async (png) => {
+    console.log('virtual print png')
+    // TODO:
+    //  - save to base 64, issueDate: , type: bon, receipt,
+    //  - correct font's size, padding as phantomjs
+    //  - swipe right to delete all report
+    socket.emit('virtualPrintResult', {
+      path: 'lorem ispum'
     })
   }
+
+  const virtualPrint = () => {
+    console.log('virtual print')
+  }
+
+  try {
+    const locale = await getLocale()
+    const printData = await report.makePrintData(cms, reportData, locale);
+    const groupPrinters = await getGroupPrinterInfo(cms, device, type);
+    const printers = _.flatten(groupPrinters.map(group => ({
+      ...group.printers,
+      groupPrinter: group.name
+    })));
+
+    for (const printerInfo of printers) {
+      const escPrinter = await getEscPrinter(printerInfo);
+      // const CanvasPrinter = await initCanvaskit();
+      // const canvasPrinter = new CanvasPrinter(560, 500, {
+      //   printFunctions: {
+      //     printPng: printerInfo.printerType === 'virtual' ? virtualPrintPng : escPrinter.printPng.bind(escPrinter),
+      //     print: printerInfo.printerType === 'virtual' ? virtualPrint : escPrinter.print.bind(escPrinter),
+      //   }
+      // });
+
+      const {escPOS} = printerInfo
+      if (escPOS) {
+        await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
+      } else {
+        await report.printSsr(escPrinter, printData);
+        // await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+        // canvasPrinter.cleanup();
+      }
+    }
+
+    callback({success: true});
+  } catch (e) {
+    console.error(e);
+    callbackWithError(callback, e);
+  }
+}
+
+function callbackWithError(callback, error) {
+  callback({
+    success: false,
+    message: error.toString()
+  })
 }
