@@ -90,21 +90,21 @@ async function printHandler(reportType, reportData, device, callback = () => nul
 
     for (const printerInfo of printers) {
       const escPrinter = await getEscPrinter(printerInfo);
-      // const CanvasPrinter = await initCanvaskit();
-      // const canvasPrinter = new CanvasPrinter(560, 500, {
-      //   printFunctions: {
-      //     printPng: printerInfo.printerType === 'virtual' ? virtualPrintPng : escPrinter.printPng.bind(escPrinter),
-      //     print: printerInfo.printerType === 'virtual' ? virtualPrint : escPrinter.print.bind(escPrinter),
-      //   }
-      // });
+      const CanvasPrinter = await initCanvaskit();
+      const canvasPrinter = new CanvasPrinter(560, 50000, {
+        printFunctions: {
+          printPng: printerInfo.printerType === 'virtual' ? virtualPrintPng : escPrinter.printPng.bind(escPrinter),
+          print: printerInfo.printerType === 'virtual' ? virtualPrint : escPrinter.print.bind(escPrinter),
+        }
+      });
 
       const {escPOS} = printerInfo
       if (escPOS) {
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
-        await report.printSsr(escPrinter, printData);
-        // await report.printEscPos(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
-        // canvasPrinter.cleanup();
+        // await report.printSsr(escPrinter, printData);
+        await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+        canvasPrinter.cleanup();
       }
     }
 

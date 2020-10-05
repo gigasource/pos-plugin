@@ -129,6 +129,71 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
+async function printCanvas(printer, printData) {
+  const {
+    companyName, companyAddress, companyTel, companyVatNumber, reportDate, firstOrderDateString, lastOrderDateString,
+    subTotal, taxTotal, sumTotal, discount, reportByPayment, reportGroups, z,
+  } = printData;
+
+  function convertMoney(value) {
+    return !isNaN(value) ? value.toFixed(2) : value
+  }
+
+  printer.alignCenter();
+  printer.bold(true);
+  printer.println(companyName);
+  printer.bold(false);
+  printer.setTextNormal();
+  printer.println(companyAddress);
+  printer.println(`Tel: ${companyTel}`);
+  printer.println(`VAT Reg No: ${companyVatNumber}`);
+
+  printer.newLine();
+  printer.setTextDoubleHeight();
+  printer.bold(true);
+  printer.println('Z-Report');
+
+  printer.newLine();
+  printer.bold(false);
+  printer.setTextNormal();
+  printer.alignLeft();
+  printer.println(`Report Date: ${reportDate}`);
+  printer.println(`Z-Number: ${z}`);
+  printer.println(`First Order: ${firstOrderDateString}`);
+  printer.println(`Last Order: ${lastOrderDateString}`);
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.println('Sales');
+  printer.bold(false);
+  printer.leftRight("Total", convertMoney(sumTotal));
+  printer.leftRight("Sub-total", convertMoney(subTotal));
+  printer.leftRight("Tax", convertMoney(taxTotal));
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.bold(false);
+  Object.keys(reportGroups).forEach(key => {
+    printer.println(`Tax (${key}%)`);
+    printer.leftRight('Total', convertMoney(reportGroups[key][`sum${key}`]));
+    printer.leftRight('Sub-total', convertMoney(reportGroups[key][`net${key}`]));
+    printer.leftRight('Tax', convertMoney(reportGroups[key][`tax${key}`]));
+    printer.newLine();
+  });
+
+  printer.bold(false);
+  printer.leftRight('Discount', `${convertMoney(discount)}`);
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.bold(false);
+  Object.keys(reportByPayment).forEach(paymentType => {
+    printer.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
+  });
+
+  await printer.print();
+}
+
 async function printSsr(printer, printData) {
   const ZReport = require('../../dist/ZReport.vue');
 
@@ -152,4 +217,5 @@ module.exports = {
   makePrintData,
   printSsr,
   printEscPos,
+  printCanvas
 }
