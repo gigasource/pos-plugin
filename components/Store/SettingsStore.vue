@@ -804,7 +804,7 @@
             this.unregisterOnlineOrder(async () => {
               const posSettings = await this.getPosSetting()
 
-              if (!posSettings.skipPairing || this.$router.currentRoute.path !== '/admin') {
+              if (!posSettings.skipPairing && this.$router.currentRoute.path !== '/admin') {
                 this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
               }
             })
@@ -845,7 +845,8 @@
               store: {}
             })
             await this.updateOnlineDevice(this.onlineDevice)
-            this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
+            if (this.$router.currentRoute.path !== '/pos-setup' && this.$router.currentRoute.path !== '/admin')
+              this.$router.push('/pos-setup')
           })
         })
       },

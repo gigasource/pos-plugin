@@ -49,10 +49,17 @@
       <g-spacer/>
       <template v-if="showQuickBtn">
         <template v-if="smallSidebar">
-          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-if="showPrint" @click.stop="printOrderToggle">
+          <g-btn-bs
+              v-if="showPrint"
+              :disabled="unprintedItemCount === 0"
+              width="75"
+              style="font-size: 14px; padding: 0; border: none"
+              background-color="#1271FF"
+              text-color="#FFF"
+              @click.stop="printOrderToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+                <span>{{ $t('common.currency', storeLocale) }} {{ total | convertMoney }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -61,7 +68,14 @@
               </div>
             </transition>
           </g-btn-bs>
-          <g-btn-bs width="75" style="font-size: 14px; padding: 0; border: none" background-color="#1271FF" text-color="#FFF" v-else @click.stop="payToggle">
+          <g-btn-bs
+              v-else
+              :disabled="unprintedItemCount === 0"
+              width="75"
+              style="font-size: 14px; padding: 0; border: none"
+              background-color="#1271FF"
+              text-color="#FFF"
+              @click.stop="payToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
                 <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
@@ -75,7 +89,7 @@
           </g-btn-bs>
         </template>
         <template v-else>
-          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" @click.stop="print">
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrder">
             <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
           </g-btn-bs>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="pay">
@@ -84,11 +98,13 @@
         </template>
       </template>
       <template v-else>
-        <span class="order-detail__header-value text-red">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</span>
+        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
       </template>
     </div>
     <div v-if="!editMode" class="order-detail__content">
-      <div v-for="item in itemsWithQty" :key="item._id.toString()" class="item"
+      <div v-for="item in items" :key="item._id.toString()"
+           v-if="item.quantity || (item.quantityModified && item.printed)"
+           class="item"
            :style="[item.separate && {borderBottom: '2px solid red'}]"
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
@@ -168,6 +184,7 @@
     props: {
       total: Number,
       items: Array,
+      printedOrder: Object,
       user: Object,
       storeLocale: String,
       actionList: Array,
@@ -198,10 +215,11 @@
         },
         menu: false,
         showQuickBtn: false,
+        quickBtnAction: 'pay',
         edit: false,
         actionTimeout: null,
         showSplitBtn: true,
-        smallSidebar: true
+        smallSidebar: true,
       }
     },
     computed: {
@@ -224,16 +242,41 @@
         return []
       },
       disablePrintBtn() {
-        return this.items.filter(i => i.quantity > 0).length === 0
+        return this.items.filter(i => i.quantity > 0 && !i.printed).length === 0
       },
       showPrint() {
-        return this.items.filter(i => !i.sent).length > 0
+        // return this.items.filter(i => !i.sent).length > 0
+        if (!this.table) return false
+        return !this.printedOrder || this.orderHasChanges;
       },
       editMode() {
         if(!this.isMobile) {
           return false
         }
         return this.edit
+      },
+      unprintedItemCount() {
+        if (!this.items || !this.items.length) return 0;
+
+        return this.items.reduce((acc, item) => acc + item.quantity, 0);
+      },
+      orderHasChanges() {
+        const printedOrderItems = (this.printedOrder && this.printedOrder.items) || [];
+
+        // 1. Filter out unprinted items with quantity = 0
+        const currentItems = this.items.filter(e => e.quantity || e.printed);
+
+        // 2. Check if items & printedOrderItems have different lengths
+        if (currentItems.length !== printedOrderItems.length) return true;
+
+        // 3. Check if quantity of items has changed
+        return currentItems.reduce((acc, item) => {
+          const printedItem = printedOrderItems.find(e => e._id === item._id);
+
+          if (!printedItem) return true;
+          else if (item.quantity !== printedItem.quantity) return true;
+          else return acc;
+        }, false);
       }
     },
     methods: {
@@ -242,9 +285,12 @@
       },
       addItem(item) {
         if (item.printed) return
+
+        item.quantityModified = true;
         this.$emit('addItemQuantity', item)
       },
       removeItem(item) {
+        item.quantityModified = true;
         this.$emit('removeItemQuantity', item)
       },
       removeModifier(item, index) {
@@ -311,16 +357,22 @@
         this.$router.push({path: '/pos-payment'})
       },
       payToggle() {
-        if(this.actionMode === 'none') {
+        if (this.actionMode === 'none') {
           this.$emit('update:actionMode', 'pay');
           this.actionTimeout = setTimeout(() => {
             this.$emit('update:actionMode', 'none');
           }, 5000)
           return
         }
-        this.pay()
+
+        if (this.quickBtnAction === 'receipt') {
+          this.showOrderReceipt();
+        } else {
+          this.pay();
+        }
+
         this.$emit('update:actionMode', 'none');
-        if(this.actionTimeout) clearTimeout(this.actionTimeout)
+        if (this.actionTimeout) clearTimeout(this.actionTimeout);
       },
       quickCash(isTakeout = false) {
         this.currentOrder.takeOut = isTakeout
@@ -328,6 +380,9 @@
       },
       splitOrder() {
         this.$getService('PosOrderSplitOrder:setActive')(true)
+      },
+      showOrderReceipt() {
+        this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
         this.menu = false
@@ -471,7 +526,11 @@
       } else this.table = ''
 
       const posSettings = await cms.getModel('PosSetting').findOne()
-      if (posSettings) this.showQuickBtn = posSettings.generalSetting.quickBtn
+
+      if (posSettings) {
+        this.showQuickBtn = posSettings.generalSetting && posSettings.generalSetting.quickBtn;
+        this.quickBtnAction = (posSettings.generalSetting && posSettings.generalSetting.quickBtnAction) || 'pay';
+      }
 
       this.loadSetting()
     },

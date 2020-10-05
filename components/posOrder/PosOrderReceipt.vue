@@ -105,7 +105,8 @@
     props: {
       value: Boolean,
       order: null,
-      storeLocale: String
+      storeLocale: String,
+      split: true,
     },
     filters: {
       formatMoney(value) {
@@ -141,7 +142,7 @@
       }
     },
     created() {
-      this.menu = this.order.splits.map(() => false)
+      this.menu = (this.order.splits && this.order.splits.map(() => false)) || [];
     },
     methods: {
       getIcon(type) {

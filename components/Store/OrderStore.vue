@@ -60,7 +60,7 @@
       return {
         activeTableProduct: null,
         currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
-        printedOrder: null,
+        printedOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         savedOrders: [],
         scrollWindowProducts: null,
         productIdQuery: '',
@@ -444,14 +444,15 @@
         }
       },
       async saveSplitOrder(items, payment, isLast, callback = () => null) {
+        // last split, pay for original order
         if (isLast && this.currentOrder._id) {
           const order = await this.saveRestaurantOrder(payment, false, false)
           return callback(order)
         }
 
         // create order
-        const order = { ...this.currentOrder, items, payment, _id: this.genObjectId() }
-        cms.socket.emit('pay-order', order, this.user, false, async newOrder => {
+        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table }
+        cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, async newOrder => {
           callback(newOrder);
         })
       },
@@ -668,28 +669,11 @@
         product.modifiers.splice(modIndex, 1)
       },
       async saveTableOrder() {
-        try {
-          if (!this.actionList.length) return;
-
-          this.actionList = this.actionList.map(action => {
-            if (action.type === 'item' && action.update && action.update.push) {
-              action.update.push.value.sent = true
-              action.update.push.value.printed = true
-            }
-
-            return action
-          })
-          await this.printOrderUpdate()
-          cms.socket.emit('save-order', this.actionList, () => {
-            this.actionList = [];
-            this.currentOrder = { items: [], hasOrderWideDiscount: false }
-          })
-        } catch (e) {
-          console.log('error', e)
-        }
-      },
-      async printOrderUpdate() {
-        cms.socket.emit('print-order-kitchen', this.device, this.currentOrder, this.printedOrder)
+        if (!this.actionList.length) return;
+        cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
+          this.actionList = [];
+          this.currentOrder = { items: [], hasOrderWideDiscount: false }
+        })
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
@@ -728,6 +712,9 @@
       },
       updateCurrentOrder(key, val) {
         this.$set(this.currentOrder, key, val)
+      },
+      updatePrintedOrder(key, val) {
+        this.$set(this.printedOrder, key, val)
       },
       printKitchen(order) {
         return new Promise((resolve, reject) => {
@@ -770,35 +757,18 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true, printReceipt = true) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
-
             const payment = paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }));
-
-            this.actionList.push({
-              type: 'order',
-              where: { _id: this.currentOrder._id },
-              table: this.currentOrder.table,
-              update: {
-                set: {
-                  key: 'payment',
-                  value: payment,
-                }
-              }
-            })
-
-            await this.saveTableOrder();
-
             const order = {
               ...this.currentOrder,
               payment,
             }
 
-            cms.socket.emit('pay-order', order, this.user, true, async newOrder => {
+            cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
-              if (printReceipt) await this.printOrderReport(newOrder._id)
               resolve(newOrder)
             })
           } catch (e) {
@@ -1217,7 +1187,7 @@
         this.$set(this.currentOrder, 'id', order.id)
         const newItems = [...order.items, ...tempItems];
         this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
-        this.printedOrder = _.cloneDeep(order.items)
+        this.printedOrder = _.cloneDeep(order)
       })
       await this.getReservations()
 

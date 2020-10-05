@@ -10,11 +10,13 @@ try {
 			}, 1000);
 		})
 
-		rn_bridge.channel.on('message', (msg) => {
+		rn_bridge.channel.on('message', async (msg) => {
 			const data = JSON.parse(msg);
 			if (data.type === 'ipAddress') {
 				console.log('Update ipAddress', data.value);
-				cms.execPostSync('load:masterIp', null, [data.value]);
+				await cms.execPostAsync('load:masterIp', null, [data.value]);
+			} else if (data.type === 'onResume') {
+				await cms.execPostAsync('run:requireSync');
 			}
 		})
 	}

@@ -89,18 +89,27 @@ class Master {
 					return target[key];
 				}
 				return async function (commits) {
-					const groupTempId = mongoose.Types.ObjectId().toString();
-					const _storeId = await _this.getStoreId();
-					let table;
-					commits.forEach(commit => {
-						commit.groupTempId = groupTempId;
-						commit.temp = true;
-						commit.storeId = _storeId;
-						table = commit.table;
-					})
-					pushTaskToQueue(commits);
-					await updateTempCommit(commits);
-					return await buildTempOrder(table);
+					try {
+						const groupTempId = mongoose.Types.ObjectId().toString();
+						const _storeId = await _this.getStoreId();
+						let table;
+						commits.forEach(commit => {
+							commit.groupTempId = groupTempId;
+							commit.temp = true;
+							commit.storeId = _storeId;
+							table = commit.table;
+							if (commit.split && commit.update.create) {
+								commit.update.create._id = mongoose.Types.ObjectId();
+							}
+						})
+						pushTaskToQueue(commits);
+						await updateTempCommit(commits);
+						if (commits.length && commits[0].split) {
+							return commits[0].update.create;
+						}
+						return await buildTempOrder(table);
+					} catch (err) {
+					}
 				}
 			}
 		})

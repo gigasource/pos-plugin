@@ -27,11 +27,13 @@ const connectToMaster = async (_this, masterIp) => {
 	const clientId = posSettings.onlineDevice.id;
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
 	_this.socket.on('updateCommitNode', (commits) => {
+		console.debug('nodeReceiveCommit', 'Receive commit from master', JSON.stringify(commits));
 		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
 		if (!oldHighestCommitId) {
 			pushTaskToQueue(commits);
 			setHighestCommitId(commits[commits.length - 1].commitId + 1);
 		} else {
+			console.debug('nodeReceiveCommit', 'Need sync');
 			_this.socket.emit('requireSync', oldHighestCommitId, nodeSync);
 		}
 	})
@@ -96,6 +98,14 @@ class Node {
 		await initQueue(this);
 		const _this = this;
 
+		_this.cms.post('run:requireSync', () => {
+			if (_this.socket.connected) {
+				_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
+			} else if (_this.masterClientId) {
+				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+			}
+		})
+
 		const _model = cms.Types['OrderCommit'].Model;
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
@@ -113,6 +123,9 @@ class Node {
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
 						table = commit.table;
+						if (commit.split && commit.update.create) {
+							commit.update.create._id = mongoose.Types.ObjectId();
+						}
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
@@ -122,6 +135,9 @@ class Node {
 						throw new Error('Can not connect to master');
 					}
 					await updateTempCommit(commits);
+					if (commits.length && commits[0].split) {
+						return commits[0].update.create;
+					}
 					return await buildTempOrder(table);
 				}
 			}

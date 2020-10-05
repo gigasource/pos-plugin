@@ -252,6 +252,11 @@
               "service": "OrderStore:removeProductModifier",
               "local": "removeProductModifier",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:printedOrder",
+              "local": "printedOrder",
+              "type": "prop"
             }
           ]
         },
@@ -389,8 +394,43 @@
           "service": "OrderStore:printOrderReport",
           "local": "printOrderReport",
           "type": "event"
+        },
+        {
+          "service": "OrderStore:updatePrintedOrder",
+          "local": "updatePrintedOrder",
+          "type": "event"
         }
       ]
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderReceipt",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderReceipt",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "order",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderReceipt.vue",
+      "path": "components/posOrder/PosOrderReceipt.vue",
+      "pluginName": "pos-plugin"
     }
   ],
   "name": "posOrder",

@@ -588,6 +588,12 @@
           "schemaType": "boolean",
           "key": "quickBtn",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "quickBtnAction",
+          "default": "pay",
+          "type": "input"
         }
       ],
       "type": "object"

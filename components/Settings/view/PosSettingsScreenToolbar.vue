@@ -1,5 +1,5 @@
 <template>
-  <g-toolbar area="toolbar" color="grey lighten 3" height="100%">
+  <g-toolbar area="toolbar" color="grey lighten 3" height="100%" style="z-index: 204">
     <g-btn :uppercase="false" background-color="white" text-color="#1d1d26" class="mr-2" @click="back">
       <g-icon class="mr-2" svg>
         icon-back

@@ -3,28 +3,24 @@
     <g-dialog v-model="internalValue" :transition="false" content-class="split-order-dialog">
       <div class="row-flex justify-end w-100">
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
-          <div class="splitter__header row-flex" v-if="isMobile">
+          <div class="splitter__header row-flex align-items-center" v-if="isMobile">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <div>
-              <div style="font-weight: 700; font-size: 15px">Total</div>
-              <div style="font-weight: 600; font-size: 18px; color: #ff4452">
-                {{$t('common.currency', storeLocale)}} {{ totalCurrent | convertMoney }}
-              </div>
-            </div>
+            <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">
+              <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
+              <span>View receipt</span>
+            </g-btn-bs>
             <g-spacer v-if="splitOrders.length"/>
             <div v-if="splitOrders.length">
               <div style="font-weight: 700; font-size: 15px">Split</div>
               <div style="font-weight: 600; font-size: 18px; color: #ff4452">{{splitOrders.length}}</div>
             </div>
             <g-spacer/>
-            <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">
-              <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
-              <span>View receipt</span>
-            </g-btn-bs>
+            <div style="font-weight: 600; font-size: 18px; color: #ff4452">
+              {{$t('common.currency', storeLocale)}} {{ totalCurrent | convertMoney }}
+            </div>
           </div>
           <div class="splitter__header" v-else>
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <span style="font-size: 15px">Total:</span>
             <span style="font-size: 18px; color: #ff4452"> {{ totalCurrent | convertMoney }}</span>
           </div>
           <div class="splitter__content">
@@ -93,7 +89,7 @@
 
         <div class="order-detail" :style="isMobile ? {height: '100%'} : { height: 'calc(100% - 64px)' } ">
           <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-          <div class="order-detail__header row-flex">
+          <div class="order-detail__header row-flex align-items-center">
             <div>
               <g-avatar size="36">
                 <img alt :src="avatar">
@@ -105,9 +101,8 @@
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
             <g-spacer/>
-            <div>
-              <div style="font-size: 11px; color: #1D1D26">Total Left</div>
-              <div style="font-size: 18px; color: #ff4452">{{ totalLeft | convertMoney}}</div>
+            <div style="font-size: 18px; color: #ff4452">
+              {{$t('common.currency', storeLocale)}} {{ totalLeft | convertMoney}}
             </div>
           </div>
           <div class="order-detail__content">
@@ -115,7 +110,7 @@
                  @click.stop="addToSplitOrder(item)">
               <div class="item-detail">
                 <div>
-                  <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
+                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id}}. {{item.name}}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
                       €{{item.originalPrice | convertMoney}}
@@ -295,8 +290,10 @@
             if (order) {
               this.splitOrders.push(order)
               const newItems = _.cloneDeep(this.remainingItems)
+              const printedItems = newItems.filter(i => i.printed);
               this.$emit('updateCurrentOrder', 'items', newItems)
-              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: newItems })
+              this.$emit('updatePrintedOrder', 'items', printedItems)
+              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: printedItems })
             }
           })
 

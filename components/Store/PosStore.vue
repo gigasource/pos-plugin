@@ -1,5 +1,12 @@
 <template>
-  <fragment/>
+  <div>
+    <g-snackbar :value="showMasterDevSnackbar" color="#E57373" absolute timeout="0" class="master-device-snackbar">
+      <div class="col-flex align-items-center mb-2 mt-2" style="margin: 0 auto">
+        <div class="mb-3" style="font-size: 16px; font-weight: 700">No master device set!</div>
+        <g-btn-bs background-color="#1271ff" @click.stop="setMasterDevice">SET THIS DEVICE AS MASTER</g-btn-bs>
+      </div>
+    </g-snackbar>
+  </div>
 </template>
 
 <script>
@@ -156,7 +163,8 @@
         ],
         pendingReservationsLength: 0,
         reservationBell: null,
-        isMobile: false
+        isMobile: false,
+        masterClientId: null
       }
     },
     computed: {
@@ -204,6 +212,14 @@
         let functions = getPath(this.computedDashboardSidebar, this.$t('sidebar.functions'), 'item');
         let orderDashboard = getPath(this.computedDashboardSidebar, this.$t('onlineOrder.dashboard'), 'item');
         return orderDashboard || functions
+      },
+      showMasterDevSnackbar() {
+        const path = this.$route.path
+        if (path === '/pos-setup' || path === '/pos-login' || path === '/admin') return false
+
+        if (this.enabledFeatures.includes('tablePlan') || this.enabledFeatures.includes('fastCheckout')) {
+          return !this.masterClientId
+        }
       }
     },
     domain: 'PosStore',
@@ -282,6 +298,16 @@
             this.storeLocale = posSettings.onlineDevice.store.locale || this.locale || 'en'
           }
         })
+
+        cms.socket.on('unpairDevice', async () => {
+          await cms.getModel('PosSetting').findOneAndUpdate({}, { masterClientId: null, masterIp: null })
+          this.masterClientId = null
+        })
+
+        cms.socket.on('getMasterDevice', id => this.masterClientId = id)
+      },
+      setMasterDevice() {
+        cms.socket.emit('setMasterDevice')
       },
       async changeLocale(locale) {
         await cms.getModel('SystemConfig').updateOne({ type: 'I18n' }, { 'content.locale': locale }, { upsert: true })
@@ -379,10 +405,11 @@
       if (i18nConfig) {
         this.locale = i18nConfig.content.locale
       }
-      const posSettings = cms.getList('PosSetting')[0]
+      const posSettings = await cms.getModel('PosSetting').findOne()
       if (posSettings && posSettings.onlineDevice && posSettings.onlineDevice.store) {
         this.storeLocale = posSettings.onlineDevice.store.locale || this.locale || 'en'
       }
+      this.masterClientId = posSettings.masterClientId
 
       if (this.$router && this.$router.currentRoute) {
         const {currentRoute} = this.$router
@@ -403,6 +430,7 @@
 
       await this.getPendingReservationsLength()
       await this.setupReservationBell()
+
     },
     watch: {
       online(val) {
@@ -439,6 +467,15 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  .master-device-snackbar {
+    top: 0;
+    right: 0;
 
+    ::v-deep .g-snack-wrapper {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+  }
 </style>

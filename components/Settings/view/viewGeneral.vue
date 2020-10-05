@@ -18,6 +18,25 @@
         <g-switch v-model="quickBtn"/>
       </div>
 
+      <div class="row-flex align-items-center justify-between">
+        Quick pay button's action
+      </div>
+      <div class="row-flex align-items-center justify-start">
+        <g-grid-select class="mt-2"
+                       :items="quickPayButtonActions"
+                       mandatory
+                       :grid="false"
+                       v-model="quickBtnAction">
+          <template #default="{ toggleSelect, item }">
+            <g-btn class="mx-1" @click="toggleSelect(item)" :disabled="item === 'auto'">{{ item }}</g-btn>
+          </template>
+          <template #selected="{ toggleSelect, item }">
+            <g-btn class="mx-1" @click="toggleSelect(item)" background-color="blue" text-color="white">
+              {{ item }}
+            </g-btn>
+          </template>
+        </g-grid-select>
+      </div>
     </div>
     <div class="col-5 offset-1">
       <div class="row-flex align-items-center justify-center">
@@ -40,6 +59,7 @@
     data() {
       return {
         generalSettings: {},
+        quickPayButtonActions: ['auto', 'pay', 'receipt'],
       };
     },
     computed: {
@@ -108,7 +128,15 @@
         set(val) {
           this.$set(this.generalSettings, 'quickBtn', val)
         }
-      }
+      },
+      quickBtnAction: {
+        get() {
+          return (this.generalSettings && this.generalSettings.quickBtnAction) || 'pay';
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'quickBtnAction', val);
+        },
+      },
     },
     async created() {
       const setting = await cms.getModel('PosSetting').findOne();

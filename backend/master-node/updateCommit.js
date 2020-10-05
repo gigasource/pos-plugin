@@ -1,5 +1,7 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
+const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
+const { printInvoiceHandler } = require('../print-report')
 
 let queue;
 let orderModel;
@@ -34,45 +36,50 @@ function deserializeObj(obj) {
 }
 
 async function buildTempOrder(table) {
-	if (table == null || !activeOrders[table]) return null;
-	const commitsList = await orderCommitModel.find({id: activeOrders[table].id, table: table, temp: true}).lean();
+	try {
+		if (table == null || !activeOrders[table]) return null;
+		const commitsList = await orderCommitModel.find({id: activeOrders[table].id, table: table, temp: true}).lean();
 
-	const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : { items: [] };
-	commitsList.forEach(commit => {
-		// only accept item commit
-		if (commit.type == 'item') {
-			let currentItem;
-			if (commit.where && commit.where.pairedObject) {
-				currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
-			}
-			if (commit.update.push) {
-				if (!commit.update.push.key.includes('modifiers')) {
-					result['items'].push(commit.update.push.value);
-				} else { // modifier
+		const result = activeOrders[table] ? _.cloneDeep(activeOrders[table]) : {items: []};
+		commitsList.forEach(commit => {
+			// only accept item commit
+			if (commit.type === 'item') {
+				let currentItem;
+				if (commit.where && commit.where.pairedObject) {
+					currentItem = result['items'].find(item => item._id.toString() === commit.where.pairedObject.value[0]);
+				}
+				if (commit.update.push) {
+					if (!commit.update.push.key.includes('modifiers')) {
+						result['items'].push(commit.update.push.value);
+					} else { // modifier
+						if (currentItem) {
+							if (currentItem.modifiers) currentItem.modifiers.push(commit.update.push.value);
+							else currentItem.modifiers = [commit.update.push.value];
+						}
+					}
+				} else if (commit.update.inc && currentItem.quantity > 0) {
 					if (currentItem) {
-						if (currentItem.modifiers) currentItem.modifiers.push(commit.update.push.value);
-						else currentItem.modifiers = [commit.update.push.value];
+						currentItem.quantity += commit.update.inc.value;
+						if (currentItem.quantity < 0) currentItem.quantity = 0;
+					}
+				} else if (commit.update.pull) {
+					const pullId = currentItem.modifiers.findIndex(modifier => modifier._id.toString() === commit.update.pull.value._id);
+					if (pullId >= 0) currentItem.modifiers.splice(pullId, 1);
+				} else if (commit.update.set) {
+					if (commit.update.set.key.includes('price')) {
+						currentItem.price = commit.update.set.value;
+					}
+					if (commit.update.set.key.includes('printed')) {
+						currentItem.printed = commit.update.set.value;
 					}
 				}
-			} else if (commit.update.inc && currentItem.quantity > 0) {
-				if (currentItem) {
-					currentItem.quantity += commit.update.inc.value;
-					if (currentItem.quantity < 0) currentItem.quantity = 0;
-				}
-			} else if (commit.update.pull) {
-				const pullId = currentItem.modifiers.findIndex(modifier => modifier._id.toString() === commit.update.pull.value._id);
-				if (pullId >= 0) currentItem.modifiers.splice(pullId, 1);
-			} else if (commit.update.set) {
-				if (commit.update.set.key.includes('price')) {
-					currentItem.price = commit.update.set.value;
-				}
-				if (commit.update.set.key.includes('printed')) {
-					currentItem.printed = commit.update.set.value;
-				}
 			}
-		}
-	})
-	return result;
+		})
+		return result;
+	} catch (err) {
+		// console.error(getBaseSentryTags('updateCommitBuildTempOrder'), 'Error', JSON.stringify(err));
+		return null;
+	}
 }
 /*
  Case set is not actually set command of mongoose, there are 2 cases of set:
@@ -82,46 +89,43 @@ async function buildTempOrder(table) {
  master
 */
 async function handleOrderCommit(commit) {
-	if (commit.orderId && activeOrders[commit.table] && commit.orderId != activeOrders[commit.table].id) {
-		console.error('This commit is for old order');
-		return;
-	}
-	let result;
-	if (commit.update && commit.update.set) {
-		if (commit.where && !commit.where._id) {
-			commit.where._id = activeOrders[commit.table]._id;
+	try {
+		if (commit.orderId && activeOrders[commit.table] && commit.orderId != activeOrders[commit.table].id) {
+			console.error('This commit is for old order');
+			return;
 		}
-		if (commit.update.set.key === 'status') { // close order
-			if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp < COMMIT_CLOSE_TIME_OUT) return null; // timeout close order must be small
-			if (!activeOrders[commit.table]) {
-				console.error('Order has been closed');
-				return null;
+		let result;
+		if (commit.update && commit.update.set) {
+			if (commit.where && !commit.where._id) {
+				commit.where._id = activeOrders[commit.table]._id;
 			}
-			delete activeOrders[commit.table];
-		}
-		// delete all commit with this orderid and create new close commit
-		if (!commit.commitId) {
-			commit.commitId = highestCommitId;
-			highestCommitId++;
-		}
-		let query;
-		if (commit.update.set.key) {
-			query = {};
-			query[commit.update.set.key] = commit.update.set.value
-		} else {
-			query = commit.update.set;
-		}
-		const newActiveOrders = await orderModel.findOneAndUpdate(commit.where, query, { new: true }).lean();
-		await orderCommitModel.create(commit);
-		if (activeOrders[commit.table]) {
-			activeOrders[commit.table] = newActiveOrders;
-		}
-		result = true;
-	} else {  // open order
-		if (activeOrders[commit.table]) {
-			console.error('Order has been created');
-			return null;
-		} else {
+			if (commit.update.set.key === 'status') { // close order
+				if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp > COMMIT_CLOSE_TIME_OUT) return null; // timeout close order must be small
+				if (!activeOrders[commit.table]) {
+					console.error('Order has been closed');
+					return null;
+				}
+				delete activeOrders[commit.table];
+			}
+			if (!commit.commitId) {
+				commit.commitId = highestCommitId;
+				highestCommitId++;
+			}
+			let query;
+			if (commit.update.set.key) {
+				query = {};
+				query[commit.update.set.key] = commit.update.set.value
+			} else {
+				query = commit.update.set;
+			}
+			const newActiveOrders = await orderModel.findOneAndUpdate(commit.where, query, {new: true}).lean();
+			await orderCommitModel.create(commit);
+			if (activeOrders[commit.table]) {
+				activeOrders[commit.table] = newActiveOrders;
+			}
+			result = true;
+		} else {  // open order
+			// handle split
 			if (!commit.commitId) {
 				commit.commitId = highestCommitId;
 				highestCommitId++;
@@ -132,60 +136,78 @@ async function handleOrderCommit(commit) {
 			} else highestOrderId = commit.orderId;
 			const key = 'create';
 			commit.update[key].id = commit.orderId;
-			commit.update[key].date = new Date();
-			commit.update[key].online = false;
-			result = await orderModel[key](commit.update[key]);
-			activeOrders[commit.table] = (await orderModel.findOne({id: commit.orderId})).toJSON();
-			commit.update[key] = result._doc;
-			await orderCommitModel.create(commit);
+			if (commit.split) {
+				result = await orderModel[key](commit.update[key]);
+				await orderCommitModel.create(commit);
+			} else {
+				if (activeOrders[commit.table]) {
+					console.error('Order has been created');
+					return null;
+				} else {
+					commit.update[key].date = new Date();
+					commit.update[key].online = false;
+					result = await orderModel[key](commit.update[key]);
+					activeOrders[commit.table] = (await orderModel.findOne({id: commit.orderId})).toJSON();
+					commit.update[key] = result._doc;
+					await orderCommitModel.create(commit);
+				}
+			}
 		}
+		return result;
+	} catch (err) {
+		// console.error(getBaseSentryTags('updateCommitHandleOrderCommit'), 'Error', JSON.stringify(err));
+		return null;
 	}
-	return result;
 }
 
 async function handleItemCommit(commit) {
-	if (!activeOrders[commit.table] || activeOrders[commit.table].id != commit.orderId) {
-		console.error("Order is closed or not created");
-		return null;
-	}
-	// findOneAndUpdate
-	let result;
-	const key = 'findOneAndUpdate';
-	const query = {};
-	Object.keys(commit.update).forEach(key => {
-		query[`$${key}`] = {};
-		query[`$${key}`][commit.update[key].key] = commit.update[key].value;
-	});
-	const condition = deserializeObj(commit.where);
-	if (query['$inc']) { // check case -1 always >= 0
-		let checker = false;
-		Object.keys(query['$inc']).forEach(key => {
-			checker |= (query['$inc'][key] == -1);
-		})
-		if (checker) {
-			const targetItem = activeOrders[commit.table].items.find(item => {
-				return item._id.toString() == condition['items._id'];
+	try {
+		if (!activeOrders[commit.table] || activeOrders[commit.table].id != commit.orderId) {
+			console.error("Order is closed or not created");
+			return null;
+		}
+		// findOneAndUpdate
+		let result;
+		const key = 'findOneAndUpdate';
+		const query = {};
+		Object.keys(commit.update).forEach(key => {
+			query[`$${key}`] = {};
+			query[`$${key}`][commit.update[key].key] = commit.update[key].value;
+		});
+		const condition = deserializeObj(commit.where);
+		if (query['$inc']) { // check case -1 always >= 0
+			let checker = false;
+			Object.keys(query['$inc']).forEach(key => {
+				checker |= (query['$inc'][key] == -1);
 			})
-			if (targetItem.quantity == 0) {
-				console.error('Can not reduce quantity to neg');
-				return null;
+			if (checker) {
+				const targetItem = activeOrders[commit.table].items.find(item => {
+					return item._id.toString() == condition['items._id'];
+				})
+				if (targetItem.quantity == 0) {
+					console.error('Can not reduce quantity to neg');
+					return null;
+				}
 			}
 		}
-	}
-	result = await orderModel[key](condition, query, {new: true});
-	activeOrders[commit.table] = result.toJSON();
-	if (!commit.commitId) {
-		commit.commitId = highestCommitId;
-		highestCommitId++;
-	}
-	// set _id for new added item
-	if (commit.update.push && !commit.update.push.key.includes('modifiers')) {
-		const pushKey = commit.update.push.key;
-		commit.update.push['value']._id = result._doc[pushKey][result._doc[pushKey].length - 1]._doc._id;
-	}
-	await orderCommitModel.create(commit);
+		result = await orderModel[key](condition, query, {new: true});
+		activeOrders[commit.table] = result.toJSON();
+		if (!commit.commitId) {
+			commit.commitId = highestCommitId;
+			highestCommitId++;
+		}
+		// set _id for new added item
+		if (commit.update.push && !commit.update.push.key.includes('modifiers')) {
+			const pushKey = commit.update.push.key;
+			commit.update.push['value']._id = result._doc[pushKey][result._doc[pushKey].length - 1]._doc._id;
+		}
+		await orderCommitModel.create(commit);
 
-	return result;
+		return result;
+	} catch (err) {
+		// console.error(getBaseSentryTags('updateCommitHandleItemCommit'), 'Error', JSON.stringify(err));
+		return null;
+	}
 }
 
 async function handleSyncCommit(oldHighestCommitId) {
@@ -193,15 +215,21 @@ async function handleSyncCommit(oldHighestCommitId) {
 }
 
 async function handleChangeTable(commit) {
-	const result = await orderCommitModel.updateMany({ orderId: commit.orderId }, { table: commit.update.set.value }, { new : true });
-	if (result) {
-		activeOrders[commit.update.set.value] = activeOrders[commit.table];
-		delete activeOrders[commit.table];
+	try {
+		const result = await orderCommitModel.updateMany({orderId: commit.orderId}, {table: commit.update.set.value}, {new: true});
+		if (result) {
+			activeOrders[commit.update.set.value] = activeOrders[commit.table];
+			delete activeOrders[commit.table];
+		}
+		return result;
+	} catch (err) {
+		// console.error(getBaseSentryTags('updateCommitHandleChangeTable'), 'Error', JSON.stringify(err));
+		return null;
 	}
-	return result;
 }
 
 async function deleteTempCommit(groupTempId) {
+	// console.debug(getBaseSentryTags('updateCommitDeleteTempCommit'), 'Delete temp commit', groupTempId);
 	let commit = null;
 	if (global.APP_CONFIG.isMaster) { // Only master can create remove temp commit
 		commit = {
@@ -214,6 +242,16 @@ async function deleteTempCommit(groupTempId) {
 	}
 	await orderCommitModel.deleteMany({groupTempId, temp: true});
 	return commit;
+}
+
+async function handlePrintOrder(commit) {
+	if (commit.printType === 'kitchenAdd') {
+		await printKitchen({ order: commit.order, device: commit.device });
+	} else if (commit.printType === 'kitchenCancel') {
+		await printKitchenCancel({ order: commit.order, device: commit.device });
+	} else if (commit.printType === 'invoice') {
+		await printInvoiceHandler('OrderReport', commit.order, commit.device);
+	}
 }
 
 async function initQueue(handler) {
@@ -230,6 +268,7 @@ async function initQueue(handler) {
 	highestCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
 	queue = new Queue(async (data, cb) => {
 		const { commits, ack } = data;
+		// console.debug(getBaseSentryTags('updateCommitQueue'), 'List commit', JSON.stringify(commits));
 		let newCommits = [];
 		let lastTempId;
 		let lastTable;
@@ -266,6 +305,8 @@ async function initQueue(handler) {
 				await deleteTempCommit(commit.groupTempId);
 			} else if (commit.type === 'changeTable') {
 				result = await handleChangeTable(commit);
+			} else if (commit.type === 'print') {
+				handlePrintOrder(commit);
 			}
 			if (result) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;
@@ -273,6 +314,7 @@ async function initQueue(handler) {
 			}
 			lastTable = commit.table;
 		}
+		// console.debug(getBaseSentryTags('updateCommitQueue'), 'After exec commits', JSON.stringify(activeOrders));
 		// wait for db update
 		setTimeout(() => {
 			handler.cms.socket.emit('updateOrderItems');
