@@ -65,7 +65,7 @@ module.exports = async cms => {
   }));*/
 
   cms.data['loginUrl'] = '/sign-in';
-  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/f', '/menu', '/qrcode', '/overview'];
+  cms.data['nonAuthenticateUrls'] = ['/login', '/store', '/reservation', '/f', '/menu', '/qrcode', '/overview', '/stores'];
 
   cms.app.use('/device', deviceApi);
   cms.app.use('/gsms-device', gsmsDeviceApi);

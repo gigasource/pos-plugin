@@ -1,0 +1,21 @@
+{
+  "events": [],
+  "_id": "5f7af46688d08b84a179f2e6",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "AffiliateStore",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/posOnlineOrdering/affiliateStore/AffiliateStore.vue",
+      "path": "components/posOnlineOrdering/affiliateStore/AffiliateStore.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "stores",
+  "name": "affiliateStore"
+}
