@@ -154,7 +154,8 @@
         pendingReservationsLength: 0,
         reservationBell: null,
         isMobile: false,
-        masterClientId: null
+        masterClientId: null,
+        isIOS: false,
       }
     },
     computed: {
@@ -387,6 +388,7 @@
       })
 
       this.isMobile = mobileCheck()
+      this.isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad')
       this.initSocket()
       this.getStoreId()
       this.setDateInterval = setInterval(() => this.systemDate = new Date(), 10000)
