@@ -41,16 +41,18 @@
         disabled: this.disabled
       }
 
+      const isIOS = (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad'))
+
       if (this.isMobile) {
         return (
             <g-text-field ref="textfield" {...{
-              props: { outlined: true, ...props},
+              props: { outlined: true, ...props, ...isIOS && { virtualEvent: true }},
               on: { input: (val) => this.internalValue = val, ...this.listeners }
             }} />
         )
       }
       return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
-        props: { large: true, ...props},
+        props: { large: true, ...props, ...isIOS && { virtualEvent: true }},
         on: { input: (val) => this.internalValue = val, ...this.listeners }
       }} />
     }
