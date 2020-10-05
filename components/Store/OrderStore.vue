@@ -521,10 +521,10 @@
           console.error(e)
         }
       },
-      printOrderReport(orderId) {
+      printOrderReport(order) {
         return new Promise((resolve, reject) => {
-          if (_.isNil(orderId)) reject()
-          cms.socket.emit('printReport', 'OrderReport', { orderId }, this.device, ({ success, message }) => {
+          if (!order) reject()
+          cms.socket.emit('printReport', 'OrderReport', order, this.device, ({ success, message }) => {
             if (success) resolve()
             else reject(message)
           });
@@ -761,7 +761,7 @@
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
-            const payment = paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }));
+            const payment = paymentMethod || this.currentOrder.payment.map(({ type, name, value }) => ({ type: name || type, value }));
             const order = {
               ...this.currentOrder,
               payment,
