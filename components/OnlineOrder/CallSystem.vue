@@ -2,6 +2,8 @@
   <div class="call">
     <p class="call-title">Call System</p>
     <g-switch label="Active" v-model="active"/>
+    <g-switch :label="demoModeLabel"
+              v-model="demoMode"/>
     <p class="call-title">Call System IP</p>
     <g-text-field-bs v-model="ip">
       <template v-slot:append-inner>
@@ -26,19 +28,37 @@
     data() {
       return {
         active: false,
+        demoMode: false,
+        demoModeStatus: '',
         ip: '',
         apiKey: '',
         dialog: {
           ip: false,
           api: false,
-        }
+        },
+        lastSavedConfig: null,
       }
     },
     async created() {
       await this.loadData()
+      cms.socket.on('update-fritzbox-demo-status', (status) => this.demoModeStatus = status);
+      cms.socket.emit('get-fritzbox-demo-status', (status) => this.demoModeStatus = status);
     },
     async activated() {
       await this.loadData()
+    },
+    computed: {
+      demoModeLabel() {
+        if (!this.demoMode) {
+          return 'Demo mode'
+        } else {
+          if (this.lastSavedConfig && !this.lastSavedConfig.demoMode && this.demoMode) {
+            return "Demo mode (press 'Update' to connect)"
+          } else {
+            return `Demo mode${this.demoModeStatus ? ` (${this.demoModeStatus})` : ''}`
+          }
+        }
+      },
     },
     methods: {
       async loadData() {
@@ -46,14 +66,18 @@
         this.active = callSystem.active
         this.ip = callSystem.ip
         this.apiKey = callSystem.googleMapApiKey
+        this.demoMode = callSystem.demoMode
+        this.lastSavedConfig = callSystem
       },
       async update() {
         const call = {
           active: this.active,
           ip: this.ip,
-          googleMapApiKey: this.apiKey
+          googleMapApiKey: this.apiKey,
+          demoMode: this.demoMode,
         }
         await cms.getModel('PosSetting').findOneAndUpdate({}, { call })
+        await this.loadData()
         cms.socket.emit('refresh-fritzbox-config')
       },
       changeIp(value) {
