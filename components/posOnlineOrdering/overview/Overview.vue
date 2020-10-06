@@ -275,7 +275,7 @@
         const wrapper = window
         const content = document.getElementById(`category_content_${id}`)
         if(wrapper && content) {
-          wrapper.scroll({top: content.offsetTop - 64, left: 0, behavior: "smooth"})
+          wrapper.scroll({top: content.offsetTop - 120, left: 0, behavior: "smooth"})
           this.selectedCategoryId = id
           setTimeout(() => {
             this.choosing--
@@ -370,6 +370,10 @@
 
       &__action {
         margin-top: 20px;
+        position: sticky;
+        top: -30px;
+        z-index: 2;
+        background-color: white;
 
         .g-btn-bs {
           flex: 0 0 32%;
@@ -402,7 +406,7 @@
 
         .tab-wrapper {
           position: sticky;
-          top: -1px;
+          top: 52px;
           z-index: 2;
           background: white;
           max-width: 800px;
@@ -561,9 +565,10 @@
         }
 
         &__action {
-          margin: 0 16px;
-          padding: 12px 0;
+          margin: 0;
+          padding: 12px 16px;
           border-bottom: 1px solid #E0E0E0;
+          top: -1px;
 
           &  > p {
             display: none;
