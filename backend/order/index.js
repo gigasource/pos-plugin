@@ -1,5 +1,7 @@
 const orderUtil = require('../../components/logic/orderUtil')
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
+const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
+const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 
 module.exports = (cms) => {
@@ -215,4 +217,14 @@ module.exports = (cms) => {
     if (!onlineDevice) return false
     return onlineDevice.id === masterClientId
   }
+
+  cms.post('run:print', async (commit) => {
+    if (commit.printType === 'kitchenAdd') {
+      await printKitchen({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'kitchenCancel') {
+      await printKitchenCancel({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'invoice') {
+      await printInvoiceHandler('OrderReport', commit.order, commit.device);
+    }
+  })
 }
