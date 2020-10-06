@@ -5,7 +5,7 @@
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
           <div class="splitter__header row-flex align-items-center" v-if="isMobile">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">
+            <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">
               <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
               <span>View receipt</span>
             </g-btn-bs>
@@ -140,7 +140,7 @@
         <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
         <g-spacer/>
         <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{splitOrders.length}}</span>
-        <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">View receipt</g-btn-bs>
+        <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">View receipt</g-btn-bs>
       </g-toolbar>
     </g-dialog>
 

@@ -75,7 +75,7 @@
                   <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
                     Email
                   </g-btn-bs>
-                  <g-btn-bs block icon="icon-coin-box" class="elevation-2">
+                  <g-btn-bs block icon="icon-coin-box" class="elevation-2" @click.stop="showTipDialog(split)">
                     Trinkgeld
                   </g-btn-bs>
                 </div>
@@ -130,10 +130,15 @@
           </div>
         </template>
       </div>
-      <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="split ? tempSplit.vSum : total"
-                            @submit="saveMultiPayment"/>
     </div>
     <div class="blur-overlay" v-show="blurReceipt"/>
+    <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="split ? tempSplit.vSum : total"
+                          @submit="saveMultiPayment"/>
+    <dialog-form-input width="40%" v-model="dialog.tip" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%" rotate>
+      <template #input>
+        <pos-textfield-new ref="tip-textfield" label="Card Payment" v-model="tipEditValue" clearable/>
+      </template>
+    </dialog-form-input>
   </g-dialog>
 </template>
 
@@ -165,6 +170,7 @@
         menu: [],
         dialog: {
           multi: false,
+          tip: false
         },
         tempSplit: {},
         paymentMethodMenu: false,
@@ -172,7 +178,8 @@
           { text: 'Cash', type: 'cash', icon: 'icon-cash' },
           { text: 'Card', type: 'card', icon: 'icon-credit_card' },
           { text: 'Multi', type: 'multi', icon: 'icon-multi_payment' },
-        ]
+        ],
+        tipEditValue: ''
       }
     },
     computed: {
@@ -263,6 +270,28 @@
           return this.openMultiDialog()
         }
         this.$emit('updateCurrentOrder', 'payment', [{ type: item.type, value: this.total }])
+      },
+      showTipDialog(split) {
+        if (split) this.tempSplit = split
+        this.dialog.tip = true
+      },
+      saveTip() {
+        const tip = this.split ? (+this.tipEditValue) - this.tempSplit.vSum : (+this.tipEditValue) - this.total
+
+        if (tip <= 0) {
+          return
+        }
+
+        if (this.split) {
+          this.tipEditValue = ''
+          this.tempSplit = {}
+          this.$emit('updatePayment', this.tempSplit._id, [{ type: payment, value: +this.tipEditValue }], tip)
+        } else {
+          this.$emit('updateCurrentOrder', 'tip', tip)
+          this.$emit('updateCurrentOrder', 'payment', [{ name: 'card', value: +this.tipEditValue }])
+        }
+
+        this.dialog.tip = false
       }
     }
   }
@@ -385,7 +414,7 @@
     transform-origin: left top;
   }
 
-  .menu-payment-option{
+  .menu-payment-option {
     transform: rotate(-90deg) translateY(40px);
     transform-origin: left top;
   }
