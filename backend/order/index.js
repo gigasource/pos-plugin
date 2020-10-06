@@ -18,8 +18,10 @@ module.exports = (cms) => {
           if (product) {
             const qtyChange = current.quantity - product.quantity
             if (qtyChange < 0) {
-              const items = Array.from({ length: -qtyChange }).map(() => current);
-              lists.cancelList = lists.cancelList.concat(items)
+              lists.cancelList.push({
+                ...current,
+                quantity: -qtyChange
+              })
             } else {
               lists.addList.push({ ...current, quantity: qtyChange })
             }
@@ -69,6 +71,8 @@ module.exports = (cms) => {
         }
         return action
       })
+
+
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
