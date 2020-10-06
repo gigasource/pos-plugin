@@ -164,7 +164,7 @@ module.exports = (cms) => {
     return {
       _id: order._id,
       id: order.id,
-      items: await orderUtil.getComputedOrderItems(compactOrder(order.items), date),
+      items: await orderUtil.getComputedOrderItems(orderUtil.compactOrder(order.items), date),
       ...order.user && order.user.length
         ? { user: order.user }
         : { user: [{ name: user.name, date }] },
@@ -197,21 +197,6 @@ module.exports = (cms) => {
 
   async function createOrderCommits(commits) {
     return cms.getModel('OrderCommit').create(commits);
-  }
-
-  function compactOrder(products) {
-    let resultArr = [];
-    products.forEach(product => {
-      const existingProduct = resultArr.find(r =>
-        _.isEqual(_.omit(r, 'quantity', '_id'), _.omit(product, 'quantity', '_id'))
-      );
-      if (existingProduct) {
-        existingProduct.quantity = existingProduct.quantity + product.quantity
-      } else {
-        resultArr.push(_.cloneDeep(product));
-      }
-    })
-    return resultArr
   }
 
   async function mapGroupPrinter(items) {

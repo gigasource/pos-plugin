@@ -757,7 +757,7 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true, cb = () => null) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
@@ -769,6 +769,7 @@
 
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
+              cb(newOrder)
               resolve(newOrder)
             })
           } catch (e) {

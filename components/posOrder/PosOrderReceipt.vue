@@ -16,7 +16,7 @@
         </g-btn-bs>
         <g-menu v-model="paymentMethodMenu" v-if="!split" content-class="menu-payment-option">
           <template #activator="{on}">
-            <g-btn-bs class="elevation-2" :icon="activeOrderPaymentItem.icon" v-on="on">
+            <g-btn-bs class="elevation-2" :icon="activeOrderPaymentItem.icon" v-on="on" :disabled="printed">
               <div>{{activeOrderPaymentItem.text}}</div>
             </g-btn-bs>
           </template>
@@ -117,7 +117,7 @@
               <div class="col-9">Item name</div>
               <div class="col-2 ta-right">Total</div>
             </div>
-            <div class="receipt-main__item-row" v-for="(item) in order.items" :key="item._id.toString()">
+            <div class="receipt-main__item-row" v-for="item in orderItems" :key="item._id.toString()">
               <div class="col-1">{{item.quantity}}</div>
               <div class="col-9">
                 <div>{{item.name}}</div>
@@ -179,7 +179,8 @@
           { text: 'Card', type: 'card', icon: 'icon-credit_card' },
           { text: 'Multi', type: 'multi', icon: 'icon-multi_payment' },
         ],
-        tipEditValue: ''
+        tipEditValue: '',
+        printed: null
       }
     },
     computed: {
@@ -201,6 +202,12 @@
       },
       paymentMethodMenuItems() {
         return this.paymentMethods.filter(i => i.type !== this.activeOrderPaymentItem.type)
+      },
+      orderItems() {
+        if (!this.split && this.order && this.order.items) {
+          return orderUtil.compactOrder(this.order.items.filter(i => i.quantity > 0))
+        }
+        return []
       }
     },
     created() {
@@ -248,20 +255,29 @@
       savePayment(split, payment) {
         this.$emit('updatePayment', split._id, [{ type: payment, value: split.vSum }])
       },
-      print(order) {
+      async print(order) {
         this.$emit('print', order)
-        if (!this.split) this.$emit('printOrderReceipt', this.order)
+        if (!this.split) {
+          if (this.printed) {
+            const order = await cms.getModel('Order').findById(this.order._id)
+            this.$emit('printOrderReport', order)
+          } else {
+            this.$emit('saveRestaurantOrder', null, false, true, () => this.printed = true)
+          }
+        }
       },
       back() {
-        const isComplete = !this.order.items || this.order.items.length === 0
+        const isComplete = this.printed || !this.order.items || this.order.items.length === 0
         this.internalValue = false
-        if (isComplete) return this.$emit('complete')
+        this.printed = false
+        if (isComplete) this.complete()
       },
       complete() {
         this.$emit('complete')
         if (!this.split) {
-          this.$emit('saveRestaurantOrder')
+          this.$emit('saveRestaurantOrder', null, true, false)
           this.internalValue = false
+          this.printed = false
           this.$router.go(-1)
         }
       },
