@@ -404,14 +404,14 @@
       getStyle() {
         const style = {
           height: '100%',
-          maxHeight: '100%',
-          width: '256px'
+          maxHeight: '100%'
         }
         if(this.isMobile) {
-          Object.assign(style, { height: '100vh', maxHeight: '100vh', padding: '0 4px' })
-        }
-        if(this.smallSidebar) {
-          Object.assign(style, { width: '225px' })
+          Object.assign(style, { height: '100vh', maxHeight: '100vh', padding: '0 4px', width: '256px' })
+
+          if(this.smallSidebar) {
+            Object.assign(style, { width: '225px' })
+          }
         }
         return style
       },
