@@ -150,7 +150,7 @@
                           @submit="saveMultiPayment"
     />
 
-    <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale"
+    <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale" split
                        @updatePayment="updateSplitPayment"
                        @complete="complete"
                        @print="printReceipt"/>
@@ -315,9 +315,9 @@
         this.$emit('updateCurrentOrder', 'table', null)
         this.$router.push({ path: '/pos-dashboard' })
       },
-      printReceipt(orderId) {
-        if (orderId) return this.$emit('printOrderReport', orderId)
-        this.splitOrders.forEach(order => this.$emit('printOrderReport', order._id))
+      printReceipt(order) {
+        if (order) return this.$emit('printOrderReport', order)
+        this.splitOrders.forEach(order => this.$emit('printOrderReport', order))
       }
     },
     watch: {

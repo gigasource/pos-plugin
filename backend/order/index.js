@@ -1,5 +1,4 @@
 const orderUtil = require('../../components/logic/orderUtil')
-const { getNewOrderId } = require('../master-node/updateCommit');
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
 const { printInvoiceHandler } = require('../print-report')
@@ -29,27 +28,10 @@ module.exports = (cms) => {
         return lists
       }, { cancelList: [], addList: [] })
 
-      // print if master
-      // if (isMaster) {
-      //   const results = {}
-      //   if (printLists.addList.length) {
-      //     const addedList = Object.assign({}, order,
-      //       { items: await mapGroupPrinter(printLists.addList) });
-      //     results.printKitchen = await printKitchen({ order: addedList, device })
-      //     // cms.socket.emit('printEntireReceipt', { order: addedList, device })
-      //   }
-      //
-      //   if (printLists.cancelList.length) {
-      //     const cancelledList = Object.assign({}, order,
-      //       ({ items: await mapGroupPrinter(printLists.cancelList) }));
-      //     results.printKitchenCancel = await printKitchenCancel({ order: cancelledList, device })
-      //   }
-      // } else {
       // add print commits
       printLists.addList = Object.assign({}, order, { items: await mapGroupPrinter(printLists.addList) });
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
-        // listName: addList, cancelList
         if (listOrder && listOrder.items && listOrder.items.length) {
           list.push({
             type: 'print',
@@ -59,11 +41,8 @@ module.exports = (cms) => {
           })
         }
         return list
-        // await printKitchenCancel({ order: cancelledList, device })
-        // await printKitchen({ order: addedList, device })
       }, [])
       actionList.push(...printCommits)
-      // }
 
       const mappedActionList = actionList.map(action => {
         if (action.type === 'item' && action.update && action.update.push) {
@@ -78,13 +57,17 @@ module.exports = (cms) => {
       cb(newOrder)
     })
 
-    socket.on('print-invoice', () => {
-
+    socket.on('print-invoice', async (order) => {
+      await cms.getModel('OrderCommit').create([{
+        type: 'print',
+        printType: 'invoice',
+        order,
+        device
+      }])
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
       try {
-        // const updatedSplit = await cms.getModel('Order').findOneAndUpdate({ _id }, { payment }, { new: true })
         const updatedSplit = await createOrderCommits([{
           type: 'order',
           split: true,
@@ -235,7 +218,13 @@ module.exports = (cms) => {
     return onlineDevice.id === masterClientId
   }
 
-  async function printToKitchen() {
-
-  }
+  cms.post('run:print', async (commit) => {
+    if (commit.printType === 'kitchenAdd') {
+      await printKitchen({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'kitchenCancel') {
+      await printKitchenCancel({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'invoice') {
+      await printInvoiceHandler('OrderReport', commit.order, commit.device);
+    }
+  })
 }

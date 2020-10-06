@@ -69,6 +69,7 @@ module.exports = async cms => {
   }
 
   async function updateAlwaysOn(enabled) {
+    if (!/^android/.test(process.platform)) return;
     console.log("Updating always on");
     try {
       await axios.post(`http://localhost:5000/update-alwayson-status`, {enabled})
@@ -78,6 +79,7 @@ module.exports = async cms => {
   }
 
   async function updateStartOnBoot(enabled) {
+    if (!/^android/.test(process.platform)) return;
     try {
       await axios.post(`http://localhost:5000/update-startonboot-status`, {enabled})
     } catch (e) {
