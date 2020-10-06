@@ -54,7 +54,7 @@
               <div class="section-header">{{$t('store.contactInfo')}}</div>
               <g-radio-group v-model="orderType" row class="radio-option">
                 <g-radio small color="#1271ff" :label="$t('store.pickup')" value="pickup" :disabled="!store.pickup"/>
-                <g-radio small color="#1271ff" :label="$t('store.delivery')" value="delivery" :disabled="!store.delivery"/>
+                <g-radio small color="#1271ff" :label="$t('store.delivery')" value="delivery" :disabled="unavailableDelivery"/>
               </g-radio-group>
               <span v-if="orderType === 'delivery' && !satisfyMinimumValue && store.minimumOrderValue && store.minimumOrderValue.active"
                     style="color: #4CAF50; font-size: 15px">
@@ -699,6 +699,9 @@
       },
       isPaymentViaPayPalEnable() {
         return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
+      },
+      unavailableDelivery() {
+        return !!(!this.store.delivery || this.orderItems.some(item => item.category.availability && item.category.availability.pickupOnly));
       }
     },
     watch: {

@@ -66,7 +66,7 @@
         <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
         <div v-if="price2"> {{ price2 | currency(storeCountryLocale) }}</div>
         <g-spacer/>
-        <g-icon @click="addToOrder" size="28" color="#1271FF">add_circle</g-icon>
+        <g-icon v-if="availableItem" @click="addToOrder" size="28" color="#1271FF">add_circle</g-icon>
       </div>
     </div>
     <g-spacer class="not-in-mobile"/>
@@ -74,7 +74,7 @@
       <div :class="price2 && 'po-menu-item__prices--discount'"> {{ itemPrice }}</div>
       <div v-if="price2">{{ price2 | currency(storeCountryLocale) }}</div>
     </div>
-    <g-icon @click="addToOrder" v-if="isOpening"
+    <g-icon @click="addToOrder" v-if="availableItem"
             size="28" color="#424242"
             :class="['po-menu-item__add', disabled && 'disabled']">
       add_circle
@@ -114,6 +114,7 @@
       scrolling: Number,
       displayImage: Boolean,
       storeCountryLocale: String,
+      category: Object
     },
     filters: {
       currency(val, locale) {
@@ -181,6 +182,10 @@
           return `${$t('common.currency', this.storeCountryLocale)}${min.toFixed(2)} - ${$t('common.currency', this.storeCountryLocale)}${max.toFixed(2)}`
         else
           return `${$t('common.currency', this.storeCountryLocale)}${min.toFixed(2)}`
+      },
+      availableItem() {
+        const type = this.$route.query.type
+        return this.isOpening && (!this.category.availability.pickupOnly || (this.category.availability.pickupOnly && type === 'pickup'));
       }
     },
     watch: {
