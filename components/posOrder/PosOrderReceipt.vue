@@ -14,9 +14,21 @@
             <p>Receipt</p>
           </div>
         </g-btn-bs>
+        <g-menu v-model="paymentMethodMenu" v-if="!split" content-class="menu-payment-option">
+          <template #activator="{on}">
+            <g-btn-bs class="elevation-2" :icon="activeOrderPaymentItem.icon" v-on="on">
+              <div>{{activeOrderPaymentItem.text}}</div>
+            </g-btn-bs>
+          </template>
+          <div class="col-flex">
+            <g-btn-bs class="ml-0 mr-0" v-for="item in paymentMethodMenuItems" :icon="item.icon" @click.stop="setOrderPaymentMethod(item)">
+              <div>{{item.text}}</div>
+            </g-btn-bs>
+          </div>
+        </g-menu>
         <g-spacer/>
         <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
-                  @click.stop="$emit('complete')">
+                  @click.stop="complete">
           Complete
         </g-btn-bs>
       </g-toolbar>
@@ -30,67 +42,95 @@
           </div>
         </div>
         <div class="receipt-main__title">Table: {{order.table}}</div>
-        <div class="receipt-main__item" v-for="(split, i) in order.splits" :key="split._id">
-          <div class="row-flex align-items-center">
-            <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
-              <template v-slot:activator="{ on }">
-                <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
-              </template>
-              <div class="row-flex pa-2 bg-white align-items-start">
-                <g-btn-bs icon="icon-printer" class="elevation-2" @click.stop="print(split._id)">
-                  Print
-                </g-btn-bs>
-                <g-btn-bs class="elevation-2">
-                  Bewirtung
-                </g-btn-bs>
-                <div>
-                  <g-btn-bs width="90" block icon="icon-credit_card"
-                            :background-color="getPaymentColor(split.payment, 'card')"
-                            class="elevation-2" @click.stop="savePayment(split, 'card')">
-                    Card
+        <template v-if="split">
+          <div class="receipt-main__item" v-for="(split, i) in order.splits" :key="split._id">
+            <div class="row-flex align-items-center">
+              <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
+                <template v-slot:activator="{ on }">
+                  <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
+                </template>
+                <div class="row-flex pa-2 bg-white align-items-start">
+                  <g-btn-bs icon="icon-printer" class="elevation-2" @click.stop="print(split)">
+                    Print
                   </g-btn-bs>
-                  <g-btn-bs width="90" block icon="icon-cash"
-                            :background-color="getPaymentColor(split.payment, 'cash')"
-                            class="elevation-2 my-2" @click.stop="savePayment(split, 'cash')">
-                    Cash
+                  <g-btn-bs class="elevation-2">
+                    Bewirtung
                   </g-btn-bs>
-                  <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
-                            class="elevation-2" @click.stop="openMultiDialog(split)">
-                    Multi
+                  <div>
+                    <g-btn-bs width="90" block icon="icon-credit_card"
+                              :background-color="getPaymentColor(split.payment, 'card')"
+                              class="elevation-2" @click.stop="savePayment(split, 'card')">
+                      Card
+                    </g-btn-bs>
+                    <g-btn-bs width="90" block icon="icon-cash"
+                              :background-color="getPaymentColor(split.payment, 'cash')"
+                              class="elevation-2 my-2" @click.stop="savePayment(split, 'cash')">
+                      Cash
+                    </g-btn-bs>
+                    <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
+                              class="elevation-2" @click.stop="openMultiDialog(split)">
+                      Multi
+                    </g-btn-bs>
+                  </div>
+                  <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
+                    Email
+                  </g-btn-bs>
+                  <g-btn-bs block icon="icon-coin-box" class="elevation-2">
+                    Trinkgeld
                   </g-btn-bs>
                 </div>
-                <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
-                  Email
-                </g-btn-bs>
-                <g-btn-bs block icon="icon-coin-box" class="elevation-2">
-                  Trinkgeld
-                </g-btn-bs>
-              </div>
-            </g-menu>
-            <g-spacer/>
-            <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
-              <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
-              <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
-            </div>
-          </div>
-          <div class="receipt-main__item-header">
-            <div class="col-1">Q.ty</div>
-            <div class="col-9">Item name</div>
-            <div class="col-2 ta-right">Total</div>
-          </div>
-          <div class="receipt-main__item-row" v-for="(item, j) in split.items" :key="`item_${i}_${j}`">
-            <div class="col-1">{{item.quantity}}</div>
-            <div class="col-9">
-              <div>{{item.name}}</div>
-              <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
-                {{formatModifiers(item)}}
+              </g-menu>
+              <g-spacer/>
+              <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
+                <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
+                <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
               </div>
             </div>
-            <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+            <div class="receipt-main__item-header">
+              <div class="col-1">Q.ty</div>
+              <div class="col-9">Item name</div>
+              <div class="col-2 ta-right">Total</div>
+            </div>
+            <div class="receipt-main__item-row" v-for="(item, j) in split.items" :key="`item_${i}_${j}`">
+              <div class="col-1">{{item.quantity}}</div>
+              <div class="col-9">
+                <div>{{item.name}}</div>
+                <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
+                  {{formatModifiers(item)}}
+                </div>
+              </div>
+              <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+            </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <div class="receipt-main__item">
+            <div class="row-flex align-items-center">
+              <g-spacer/>
+              <div class="receipt-main__item-total" v-for="(p, iP) in order.payment" :key="`payment_${iP}`">
+                <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
+                <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
+              </div>
+            </div>
+            <div class="receipt-main__item-header">
+              <div class="col-1">Q.ty</div>
+              <div class="col-9">Item name</div>
+              <div class="col-2 ta-right">Total</div>
+            </div>
+            <div class="receipt-main__item-row" v-for="(item) in order.items" :key="item._id.toString()">
+              <div class="col-1">{{item.quantity}}</div>
+              <div class="col-9">
+                <div>{{item.name}}</div>
+                <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
+                  {{formatModifiers(item)}}
+                </div>
+              </div>
+              <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+            </div>
+          </div>
+        </template>
       </div>
-      <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="tempSplit.vSum"
+      <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="split ? tempSplit.vSum : total"
                             @submit="saveMultiPayment"/>
     </div>
     <div class="blur-overlay" v-show="blurReceipt"/>
@@ -106,7 +146,8 @@
       value: Boolean,
       order: null,
       storeLocale: String,
-      split: true,
+      split: Boolean,
+      total: Number
     },
     filters: {
       formatMoney(value) {
@@ -126,6 +167,12 @@
           multi: false,
         },
         tempSplit: {},
+        paymentMethodMenu: false,
+        paymentMethods: [
+          { text: 'Cash', type: 'cash', icon: 'icon-cash' },
+          { text: 'Card', type: 'card', icon: 'icon-credit_card' },
+          { text: 'Multi', type: 'multi', icon: 'icon-multi_payment' },
+        ]
       }
     },
     computed: {
@@ -139,6 +186,14 @@
       },
       blurReceipt() {
         return this.menu.some(i => i === true)
+      },
+      activeOrderPaymentItem() {
+        if (!this.order.payment) return this.paymentMethods.find(i => i.type === 'cash')
+        if (this.order.payment.length > 1) return this.paymentMethods.find(i => i.type === 'multi')
+        return this.paymentMethods.find(i => i.type === this.order.payment[0].type)
+      },
+      paymentMethodMenuItems() {
+        return this.paymentMethods.filter(i => i.type !== this.activeOrderPaymentItem.type)
       }
     },
     created() {
@@ -150,6 +205,11 @@
         if (type === 'card') return 'icon-credit_card'
         if (type === 'cash') return 'icon-cash'
         return 'icon-multi_payment'
+      },
+      getOrderPaymentIcon() {
+        if (!this.order.payment) return this.getIcon('cash')
+        if (this.order.payment.length > 1) return this.getIcon()
+        return this.getIcon(this.order.payment[0].type)
       },
       getPaymentColor(payment, type) {
         if (!this.order) return
@@ -169,20 +229,40 @@
       },
       saveMultiPayment(payment) {
         const formattedPayment = _.map(payment, (value, type) => ({ type, value }))
-        this.$emit('updatePayment', this.tempSplit._id, formattedPayment)
-        this.tempSplit = {}
         this.dialog.multi = false
+
+        if (this.split) {
+          this.$emit('updatePayment', this.tempSplit._id, formattedPayment)
+          this.tempSplit = {}
+        } else {
+          this.$emit('updateCurrentOrder', 'payment', formattedPayment)
+        }
       },
       savePayment(split, payment) {
         this.$emit('updatePayment', split._id, [{ type: payment, value: split.vSum }])
       },
-      print(orderId) {
-        this.$emit('print', orderId)
+      print(order) {
+        this.$emit('print', order)
+        if (!this.split) this.$emit('printOrderReceipt', this.order)
       },
       back() {
         const isComplete = !this.order.items || this.order.items.length === 0
         this.internalValue = false
         if (isComplete) return this.$emit('complete')
+      },
+      complete() {
+        this.$emit('complete')
+        if (!this.split) {
+          this.$emit('saveRestaurantOrder')
+          this.internalValue = false
+          this.$router.go(-1)
+        }
+      },
+      setOrderPaymentMethod(item) {
+        if (item.type === 'multi') {
+          return this.openMultiDialog()
+        }
+        this.$emit('updateCurrentOrder', 'payment', [{ type: item.type, value: this.total }])
       }
     }
   }
@@ -302,6 +382,11 @@
 <style lang="scss">
   .menu-receipt-action {
     transform: rotate(-90deg) translateX(calc(-100% + 16px)) translateY(40px);
+    transform-origin: left top;
+  }
+
+  .menu-payment-option{
+    transform: rotate(-90deg) translateY(40px);
     transform-origin: left top;
   }
 </style>

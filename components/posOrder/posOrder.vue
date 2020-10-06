@@ -382,6 +382,7 @@
         this.$getService('PosOrderSplitOrder:setActive')(true)
       },
       showOrderReceipt() {
+        this.$getService('OrderStore:updateCurrentOrder')('payment', [{ type: 'cash', value: this.total }])
         this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
