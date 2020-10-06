@@ -1259,6 +1259,28 @@
       "schemaType": "string",
       "key": "splitId",
       "type": "input"
+    },
+    {
+      "_id": "5f7bf19e23de96a0ca76fd45",
+      "schemaType": "array",
+      "key": "cancellationItems",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "itemId",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "quantity",
+          "type": "input@number"
+        }
+      ]
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",
