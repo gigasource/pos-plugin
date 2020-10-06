@@ -89,6 +89,13 @@
                       :items="orderTimeOuts"/>
           </div>
         </div>
+        <div class="row-flex align-items-center">
+          <div class="col-lg-8 col-md-7 col-xs-6">Earliest selectable time</div>
+          <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
+            <g-select text-field-component="GTextFieldBs" v-model="computedDeliveryTimeDelay"
+                      :items="delayTimeList"/>
+          </div>
+        </div>
         <div class="row-flex mt-2">
           <div class="fw-700">{{$t('setting.daysOff')}}</div>
           <g-spacer/>
@@ -225,6 +232,7 @@
       gSms: null,
       id: String,
       dayOff: Array,
+      deliveryTimeDelay: Number
     },
     data: function () {
       return {
@@ -251,7 +259,9 @@
           selected: null,
           name: '',
           delete: false
-        }
+        },
+        delayTimeList: _.map([30, 45, 60, 75, 90], v => ({value: v, text: `${v} minutes`})),
+        delayTime: this.deliveryTimeDelay || 30
       }
     },
     computed: {
@@ -348,6 +358,15 @@
       },
       smsDevices() {
         return this.gSms && this.gSms.devices
+      },
+      computedDeliveryTimeDelay: {
+        get() {
+           return this.delayTime
+        },
+        set(val) {
+          this.$emit('update', { deliveryTimeDelay: val })
+          this.delayTime = val
+        }
       }
     },
     created() {

@@ -704,6 +704,13 @@
           "type": "input@date"
         }
       ]
+    },
+    {
+      "_id": "5f7c12789c3a9693f382f788",
+      "schemaType": "number",
+      "key": "deliveryTimeDelay",
+      "default": "30",
+      "type": "input@number"
     }
   ],
   "name": "Store",
