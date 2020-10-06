@@ -186,6 +186,22 @@ async function handleItemCommit(commit) {
 					console.error('Can not reduce quantity to neg');
 					return null;
 				}
+				if (targetItem.printed) {
+					if (!activeOrders[commit.table].cancellationItems) activeOrders[commit.table].cancellationItems = [];
+					const itemExists = activeOrders[commit.table].cancellationItems.find(item => {
+						return item.itemId === targetItem._id.toString();
+					})
+					if (!itemExists) {
+						activeOrders[commit.table].cancellationItems.push({
+							itemId: targetItem._id.toString(),
+							name: targetItem.name,
+							quantity: 1
+						})
+					} else {
+						itemExists.quantity++;
+					}
+					await orderModel[key]({ _id: activeOrders[commit.table]._id }, { $set: {cancellationItems: activeOrders[commit.table].cancellationItems} });
+				}
 			}
 		}
 		result = await orderModel[key](condition, query, {new: true});
