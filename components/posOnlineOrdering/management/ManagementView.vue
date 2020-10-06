@@ -10,6 +10,7 @@
                     :selected-device-id-prop="selectedDeviceIdForChat"
                     @all-messages-replied="checkNewMessages"/>
       <support @select-chat="supportSelectChat" v-else-if="view === 'support' && signInSupportPerm"/>
+      <affiliate-management v-else-if="view === 'affiliate' && manageAffiliatePerm"/>
     </div>
   </div>
 </template>
@@ -20,13 +21,14 @@
   import ChatSupport from "../chatSupport/ChatSupport";
   import Support from "./Support/Support";
   import axios from 'axios';
+  import AffiliateManagement from "./AffiliateManagement/AffiliateManagement";
 
   export default {
     name: 'ManagementView',
-    components: {Support, ChatSupport, StoreManagement, Account, VersionControl},
+    components: {AffiliateManagement, Support, ChatSupport, StoreManagement, Account, VersionControl},
     props: {},
     injectService: [
-      'PermissionStore:(versionControlPerm,manageAccountPerm,chatSupportPerm,signInSupportPerm,appReviewerPerm)'
+      'PermissionStore:(versionControlPerm,manageAccountPerm,chatSupportPerm,signInSupportPerm,appReviewerPerm,manageAffiliatePerm)'
     ],
     data: function () {
       return {
@@ -80,9 +82,16 @@
             onClick: () => this.changeView('chatSupport', 'Chat Support')
           })
         }
-        
+
         if (this.signInSupportPerm) {
           items.push({ title: 'Sign-in Requests', icon: 'headset_mic', onClick: () => this.changeView('support', 'Sign-in Requests') })
+        }
+        if(this.manageAffiliatePerm) {
+          if(this.view === 'affiliate') {
+            items.push({ title: 'Affiliate Management', icon: 'icon-affiliate-management_white', onClick: () => this.changeView('affiliate', 'Affiliate Management')})
+          } else {
+            items.push({ title: 'Affiliate Management', icon: 'icon-affiliate-management', onClick: () => this.changeView('affiliate', 'Affiliate Management')})
+          }
         }
         return items
       },

@@ -310,21 +310,24 @@
         if (this.store.delivery) {
           this.openStore('delivery')
         } else {
-          const { active, url, lastMonthCounter, currentMonthCounter, lastSync } = this.store.affiliateDelivery
+          const { active, url, lastMonthCounter, currentMonthCounter, oldTimeCounter, lastSync } = this.store.affiliateDelivery
           const date = new Date()
-          let tempCurrent, tempLast
+          let tempCurrent, tempLast, tempOld
           if(!lastSync || dayjs(date).diff(dayjs(lastSync), 'month') === 1) {
             tempCurrent = 1
             tempLast = currentMonthCounter || 0
+            tempOld = oldTimeCounter + lastMonthCounter
           } else {
             tempCurrent = currentMonthCounter + 1
             tempLast = lastMonthCounter || 0
+            tempOld = oldTimeCounter || 0
           }
           cms.socket.emit('updateAffiliateDelivery', this.store._id, {
             active,
             url,
             lastMonthCounter: tempLast,
             currentMonthCounter: tempCurrent,
+            oldTimeCounter: tempOld,
             lastSync: date
           })
           window.open(url)

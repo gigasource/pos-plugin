@@ -702,6 +702,11 @@
           "schemaType": "date",
           "key": "lastSync",
           "type": "input@date"
+        },
+        {
+          "schemaType": "number",
+          "key": "oldTimeCounter",
+          "type": "input@number"
         }
       ]
     },

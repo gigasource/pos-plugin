@@ -235,7 +235,27 @@
       openStore(type) {
         if(type === 'delivery' && !this.store.delivery) {
           if(this.store.affiliateDelivery && this.store.affiliateDelivery.active) {
-            window.open(this.store.affiliateDelivery.url, '_blank')
+            const { active, url, lastMonthCounter, currentMonthCounter, oldTimeCounter, lastSync } = this.store.affiliateDelivery
+            const date = new Date()
+            let tempCurrent, tempLast, tempOld
+            if(!lastSync || dayjs(date).diff(dayjs(lastSync), 'month') === 1) {
+              tempCurrent = 1
+              tempLast = currentMonthCounter || 0
+              tempOld = oldTimeCounter + lastMonthCounter
+            } else {
+              tempCurrent = currentMonthCounter + 1
+              tempLast = lastMonthCounter || 0
+              tempOld = oldTimeCounter || 0
+            }
+            cms.socket.emit('updateAffiliateDelivery', this.store._id, {
+              active,
+              url,
+              lastMonthCounter: tempLast,
+              currentMonthCounter: tempCurrent,
+              oldTimeCounter: tempOld,
+              lastSync: date
+            })
+            window.open(url)
             return
           }
         }

@@ -62,6 +62,10 @@
       // permission used for Apple's App Store and Google Play
       appReviewerPerm() {
         return _.find(this.userPermissions, perm => perm.permission === 'appReview' && perm.value === true)
+      },
+      manageAffiliatePerm() {
+        if (cms.loginUser.user)
+          return cms.loginUser.user.role.name === 'admin'
       }
     },
     data() {

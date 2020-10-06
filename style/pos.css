@@ -850,3 +850,46 @@
   background-size: contain;
   background-position: center;
 }
+
+.icon-affiliate-management {
+  background-image: url("../assets/affiliate-management.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-affiliate-management_white {
+  background-image: url("../assets/affiliate-management_white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-link {
+  background-image: url("../assets/link.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-link_blue {
+  background-image: url("../assets/link_blue.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-reset2 {
+  background-image: url("../assets/reset2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-reset2_blue {
+  background-image: url("../assets/reset2_blue.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
