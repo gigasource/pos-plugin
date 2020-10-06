@@ -1,7 +1,5 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
-const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
-const { printInvoiceHandler } = require('../print-report')
 
 let queue;
 let orderModel;
@@ -249,13 +247,7 @@ async function handlePrintOrder(commit) {
 		const order = await cms.getModel('Order').findById(commit.order._id)
 		commit.order.id = order.id
 	}
-	if (commit.printType === 'kitchenAdd') {
-		await printKitchen({ order: commit.order, device: commit.device });
-	} else if (commit.printType === 'kitchenCancel') {
-		await printKitchenCancel({ order: commit.order, device: commit.device });
-	} else if (commit.printType === 'invoice') {
-		await printInvoiceHandler('OrderReport', commit.order, commit.device);
-	}
+	await cms.execPostAsync('run:print', null, [commit]);
 }
 
 async function initQueue(handler) {
@@ -310,7 +302,7 @@ async function initQueue(handler) {
 			} else if (commit.type === 'changeTable') {
 				result = await handleChangeTable(commit);
 			} else if (commit.type === 'print') {
-				handlePrintOrder(commit);
+				await handlePrintOrder(commit);
 			}
 			if (result) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;
