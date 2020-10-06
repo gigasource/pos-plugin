@@ -260,7 +260,7 @@
     data() {
       return {
         view: 'order',
-        orderType: this.type || (this.store.delivery ? 'delivery' : 'pickup'), // delivery || pick-up
+        orderType: this.type || (this.store.pickup ? 'pickup' : 'delivery'), // delivery || pick-up
         paymentType: 'cash', // cash || paypal
         customer: {
           name: '',
