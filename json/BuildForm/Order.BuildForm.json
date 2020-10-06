@@ -1267,18 +1267,300 @@
       "fields": [
         {
           "schemaType": "string",
-          "key": "itemId",
+          "key": "id",
           "type": "input"
         },
         {
           "schemaType": "string",
+          "type": "ref-select-static",
           "key": "name",
-          "type": "input"
+          "default": null,
+          "ref": "Product",
+          "labelProp": "name",
+          "onChange": {
+            "_code_": "module.exports = function(product, rootModel, model) {\n  if (!product) return;\n  model.price = product.price;\n  model.tax = product.tax;\n  model.category = product.category.name;\n}",
+            "_code_type_": "commonJs"
+          }
+        },
+        {
+          "schemaType": "number",
+          "key": "price",
+          "type": "input@number",
+          "label": null,
+          "flex": null
+        },
+        {
+          "schemaType": "number",
+          "key": "tax",
+          "type": "input@select:number",
+          "optionsType": "textValue",
+          "options": [
+            {
+              "value": "7",
+              "text": "7%"
+            },
+            {
+              "value": "19",
+              "text": "19%"
+            },
+            {
+              "value": "0",
+              "text": "0%"
+            }
+          ],
+          "default": "19"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "showPrice",
+          "type": "input@checkbox",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "boolean",
+          "key": "printed",
+          "type": "input@checkbox",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "array",
+          "key": "taxes",
+          "type": "input@multiSelect",
+          "flex": "md6",
+          "fields": [
+            {
+              "schemaType": "number"
+            }
+          ],
+          "optionsType": "onlyValue",
+          "options": [
+            "7",
+            "19",
+            "0"
+          ]
+        },
+        {
+          "schemaType": "date",
+          "key": "date",
+          "type": "input@datetime-local",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "number",
+          "key": "course",
+          "type": "rating-select",
+          "length": 3,
+          "flex": "md6",
+          "hintPrepend": ""
+        },
+        {
+          "schemaType": "string",
+          "key": "groupPrinter",
+          "type": "ref-select-static",
+          "flex": "md6",
+          "ref": "GroupPrinter",
+          "labelProp": "name",
+          "addable": null
+        },
+        {
+          "schemaType": "string",
+          "key": "groupPrinter2",
+          "type": "ref-select-static",
+          "flex": "md6",
+          "ref": "GroupPrinter",
+          "labelProp": "name",
+          "addable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "uuid",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "number",
+          "key": "originalPrice",
+          "type": "input@number",
+          "addable": true,
+          "flex": "md6"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "takeout",
+          "type": "input@checkbox",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "array",
+          "key": "modifiers",
+          "type": "tableArray",
+          "label": null,
+          "flex": null,
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input",
+              "label": null,
+              "flex": null
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number",
+              "label": null,
+              "flex": null
+            },
+            {
+              "schemaType": "number",
+              "key": "quantity",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "type": "input@number",
+              "key": "originalPrice",
+              "addable": false
+            }
+          ],
+          "expansion": [],
+          "addable": true
         },
         {
           "schemaType": "number",
           "key": "quantity",
           "type": "input@number"
+        },
+        {
+          "schemaType": "string",
+          "key": "type",
+          "default": "normal",
+          "type": "input@select",
+          "flex": "md6",
+          "addable": true,
+          "chips": true,
+          "optionsType": "onlyValue",
+          "options": [
+            "normal",
+            "voucher"
+          ]
+        },
+        {
+          "schemaType": "number",
+          "key": "vDiscount",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "discount",
+          "type": "input@number",
+          "addable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "discountUnit",
+          "type": "input@select",
+          "flex": "md6",
+          "addable": true,
+          "optionsType": "onlyValue",
+          "options": [
+            "percent",
+            "amount"
+          ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "discountResistance",
+          "type": "input@checkbox",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "category",
+          "type": "ref-select-static",
+          "flex": "md6",
+          "ref": "Category",
+          "labelProp": "name",
+          "addable": true,
+          "autopopulate": null
+        },
+        {
+          "schemaType": "boolean",
+          "key": "excludedFromSales",
+          "type": "input@checkbox",
+          "addable": true
+        },
+        {
+          "schemaType": "number",
+          "key": "taxPart",
+          "type": "input@number",
+          "addable": true
+        },
+        {
+          "schemaType": "objectId",
+          "key": "product",
+          "ref": "Product",
+          "type": "ref-select",
+          "flex": "md4",
+          "labelProp": "name",
+          "addable": true,
+          "editable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "unit",
+          "type": "input",
+          "flex": "md6",
+          "addable": true
+        },
+        {
+          "schemaType": "array",
+          "key": "attributes",
+          "type": "tableArray",
+          "addable": true,
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "key",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "value",
+              "type": "input"
+            }
+          ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "separate",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "string",
+          "key": "image",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "desc",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "note",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "sent",
+          "type": "input@switch",
+          "addable": true
         }
       ]
     }

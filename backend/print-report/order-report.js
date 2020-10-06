@@ -11,7 +11,7 @@ async function makePrintData(cms, order) {
   const orderDate = dayjs(order.date).format('DD.MM.YYYY')
   const orderTime = dayjs(order.date).format('HH:mm:ss')
   const orderNumber = order.id
-  const orderProductList = order.items
+  const orderProductList = order.items.filter(i => i.quantity > 0)
   const {
     vSum: orderSum,
     vTax: orderTax,

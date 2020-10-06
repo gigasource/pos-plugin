@@ -44,7 +44,25 @@ module.exports = (cms) => {
       }, [])
       actionList.push(...printCommits)
 
-      const mappedActionList = actionList.map(action => {
+      const mergedActionList = actionList.reduce((list, current) => {
+        if (current.type !== 'item' || !current.update['inc'] || current.update['inc'].key !== 'items.$.quantity') {
+          list.push(current)
+          return list
+        }
+
+        const existingItem = list.find(i => i.where && i.where.pairedObject
+          && i.where.pairedObject.key[0] === 'items._id'
+          && i.where.pairedObject.value[0] === current.where.pairedObject.value[0])
+        if (existingItem) {
+          existingItem.update['inc'].value += current.update['inc'].value
+        } else {
+          list.push(current)
+        }
+
+        return list
+      }, [])
+
+      const mappedActionList = mergedActionList.map(action => {
         if (action.type === 'item' && action.update && action.update.push) {
           action.update.push.value.sent = true
           action.update.push.value.printed = true
