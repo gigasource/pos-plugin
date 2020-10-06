@@ -167,6 +167,7 @@ async function printEscPos(printData, printerInfo, cancel = false) {
         printer.setTextQuadArea()
         printer.bold(true);
         printer.println('** CANCEL **')
+        printer.newLine();
       }
 
       printer.alignLeft();
@@ -190,7 +191,7 @@ async function printEscPos(printData, printerInfo, cancel = false) {
 
         if (cancel) {
           printer.tableCustom([
-            {text: `- ${item.quantity}`, align: 'LEFT', width: quantityColumnWidth, bold: true},
+            {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
             {text: 'x', align: 'LEFT', width: 0.05, bold: true},
             {text: item.name, align: 'LEFT', width: itemsColumnWidth},
           ], {textDoubleWith: true});
