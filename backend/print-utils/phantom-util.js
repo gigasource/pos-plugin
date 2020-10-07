@@ -24,8 +24,8 @@ let renderQueue = queue({autostart: true, concurrency: 1});
 
 module.exports = class PhantomUtil {
   constructor() {
-    renderQueue.push(next => initPhantom().then(next));
-    initPhantom();
+    // renderQueue.push(next => initPhantom().then(next));
+    // initPhantom();
   }
 
   render(html) {
