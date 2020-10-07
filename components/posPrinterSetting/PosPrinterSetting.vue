@@ -151,7 +151,6 @@
         printerTypes: [
           {name: this.$t('settings.networkPrinter'), value: 'ip'},
           // {name: this.$t('settings.serialPrinter'), value: 'com'},
-          {name: 'Virtual', value: 'virtual'},
           {name: this.$t('settings.usb'), value: 'usb'},
           {name: 'Integrate', value: 'integrate'}
         ],
