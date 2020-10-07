@@ -194,8 +194,6 @@
                 params: ''
               })
             },
-            badge: (this.reportCount || 0) + '',
-            badgeColor: '#FF5252',
             title: 'Virtual Printer'
           })
         }
