@@ -2,7 +2,7 @@
   <LazyLoadContainer
         class="virtualPrinterContainer"
         :container-style="{ maxHeight: '100%' }"
-        :threshold="10"
+        :threshold="50"
         :do-load="loadMoreReports">
      <div class="virtualPrinter">
         <!-- header -->
@@ -85,7 +85,7 @@
           width: this.receiptWidth + 'px',
         }
       },
-    }
+    },
   }
 </script>
 

@@ -42,10 +42,36 @@
       }
     },
     mounted() {
+      this.loadMore = _.throttle(this.wheelHandle, 200, { trailing: false })
       const content = this.$refs.content
-      content.addEventListener('wheel', _.throttle(this.wheelHandle, 500))
+      // loop back to find anchor node (anchor node is a
+      // node which doesn't increase
+      // it's height when content height increase)
+      // if there is no element with fixed height, then body will be selected
+      // as anchor node
+      if (!this.anchorElement) {
+        let parent = this.$refs.container
+        while(!this.anchorElement) {
+          if (parent.scrollHeight !== content.scrollHeight) {
+            this.anchorElement = parent
+          } else {
+            parent = parent.parentNode
+          }
+        }
+      }
+      //
+      if (content) {
+        content.addEventListener('wheel', this.loadMore)
+        content.addEventListener('touchend', this.loadMore)
+      }
     },
     beforeDestroy() {
+      const content = this.$refs.content
+      if (content) {
+        content.removeEventListener('wheel', this.loadMore)
+        content.removeEventListener('touchend', this.loadMore)
+      }
+      
     },
     computed: {
       lazyLoadContainerStyle() {
@@ -56,43 +82,19 @@
       }
     },
     methods: {
-      async wheelHandle(e) {
-        if (this.loading)
+      wheelHandle(e) {
+        if (e.deltaY < 0 /*wheel up*/ || this.loading || !this.doLoad)
           return;
-        
-        if (!this.doLoad)
+        if (!this.$refs.content)
           return;
-
-        // wheel up
-        if (e.deltaY < 0) {
-          console.log('wheel up -> ignore')
-          return;
-        }
-        
-        // loop back to find anchor node (anchor node is a
-        // node which doesn't increase
-        // it's height when content height increase)
-        // if there is no element with fixed height, then body will be selected
-        // as anchor node
-        const content = this.$refs.content
-        if (!this.anchorElement) {
-          let parent = this.$refs.container
-          while(!this.anchorElement) {
-            if (parent.scrollHeight !== content.scrollHeight) {
-              this.anchorElement = parent
-            } else {
-              parent = parent.parentNode
-            }
-          }
-        }
         const anchorClientRect = this.anchorElement.getClientRects()[0]
-        const contentClientRect = content.getClientRects()[0]
+        const contentClientRect = this.$refs.content.getClientRects()[0]
         if (contentClientRect.bottom <= anchorClientRect.bottom + this.threshold) {
-          this.loading = true
           try {
-            await this.doLoad()
-            const t = this
-            this.$nextTick(() => t.loading = false)
+            this.loading = true
+            this.doLoad().then(() => {
+              this.loading = false
+            })
           } catch (e) {
             console.log('do-load exception', e)
           }

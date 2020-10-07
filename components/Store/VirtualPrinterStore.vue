@@ -79,9 +79,9 @@
         console.log('Stores/VirtualPrinterView:loadMoreReports')
         try {
           const vrs = await cms.getModel(VIRTUAL_REPORT_COLLECTION).find({}, {}, { skip: this.start, limit: this.take }).sort('created')
-          const newReports = [...this.reports, ...vrs]
+          if (vrs.length)
+            this.setReports([...this.reports, ...vrs])
           console.log('Stores/VirtualPrinterView:loadMoreReports completed!')
-          this.setReports(newReports)
         } catch (e) {
           console.log('Stores/VirtualPrinterView:loadMoreReports failed!', e)
         }
