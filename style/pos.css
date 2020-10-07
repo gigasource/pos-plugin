@@ -774,3 +774,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-order-food {
+  background-image: url("../assets/order-food.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
