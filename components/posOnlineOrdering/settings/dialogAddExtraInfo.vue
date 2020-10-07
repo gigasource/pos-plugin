@@ -47,7 +47,7 @@
           spicy = this.mark.spicy.active || false,
           vegeterian = this.mark.vegeterian.active || false,
           favorite = this.mark.favorite || false,
-          pickupOnly = this.mark.pickupOnly.active || false
+          pickupOnly = (this.mark.pickupOnly && this.mark.pickupOnly.active) || false
       return {
         allergic,
         types,
