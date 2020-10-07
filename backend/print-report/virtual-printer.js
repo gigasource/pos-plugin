@@ -14,15 +14,19 @@ module.exports = (cms) => {
     const canvasPrinter = new CanvasPrinter(560, 50000, {
       printFunctions: {
         printPng: async (png) => {
-          const bufferInBase64 = PNG.sync.write(png).toString('base64')
-          const vReport = await cms.getModel('VirtualReport').create({
-            imageContent: bufferInBase64,
-            created: dayjs(),
-            type: type,
-            printerId: printerInfo._id,
-            printerGroupId: printerInfo.groupPrinterId
-          })
-          cms.socket.to(VIRTUAL_REPORT_ROOM).emit('newVirtualReportCreated', { newReport: vReport })
+          try {
+            const bufferInBase64 = PNG.sync.write(png).toString('base64')
+            const vReport = await cms.getModel('VirtualReport').create({
+              imageContent: bufferInBase64,
+              created: dayjs(),
+              type: type,
+              printerId: printerInfo._id,
+              printerGroupId: printerInfo.groupPrinterId
+            })
+            cms.socket.to(VIRTUAL_REPORT_ROOM).emit('newVirtualReportCreated', { newReport: vReport })
+          } catch (e) {
+            console.log('canvasprinter: printPng exception', e)
+          }
         },
         print: () => {},
       }
