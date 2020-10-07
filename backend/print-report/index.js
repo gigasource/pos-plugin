@@ -99,17 +99,20 @@ async function printHandler(reportType, reportData, device, callback = () => nul
         canvasPrinter.cleanup();
       }
     }
-
-    callback({success: true});
+    const result = {success: true}
+    callback(result);
+    return result;
   } catch (e) {
     console.error(e);
-    callbackWithError(callback, e);
+    return callbackWithError(callback, e);
   }
 }
 
 function callbackWithError(callback, error) {
-  callback({
+  const result = {
     success: false,
     message: error.toString()
-  })
+  };
+  callback(result)
+  return result;
 }
