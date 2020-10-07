@@ -23,6 +23,7 @@
         <g-checkbox color="#536DFE" v-model="spicy" :label="$t('store.spicy')"/>
         <g-checkbox color="#536DFE" v-model="vegeterian" :label="$t('store.vegeterian')"/>
         <g-checkbox color="#536DFE" v-model="favorite" :label="`Favorite (${totalFavorite}/10)`"/>
+        <g-checkbox color="#536DFE" v-model="pickupOnly" :label="$t('store.pickupOnly')"/>
       </div>
       <div class="dialog-action">
         <g-btn-bs text-color="#424242" @click="internalValue = false">{{$t('setting.cancel')}}</g-btn-bs>
@@ -45,13 +46,15 @@
           types = this.mark.allergic.types || [],
           spicy = this.mark.spicy.active || false,
           vegeterian = this.mark.vegeterian.active || false,
-          favorite = this.mark.favorite || false
+          favorite = this.mark.favorite || false,
+          pickupOnly = this.mark.pickupOnly.active || false
       return {
         allergic,
         types,
         spicy,
         vegeterian,
         favorite,
+        pickupOnly
       }
     },
     computed: {
@@ -89,7 +92,10 @@
             active: !!this.vegeterian,
             notice: ''
           },
-          favorite: !!this.favorite
+          favorite: !!this.favorite,
+          pickupOnly: {
+            active: !!this.pickupOnly,
+          }
         }
         this.$emit('save', mark)
         this.internalValue = false

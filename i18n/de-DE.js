@@ -90,7 +90,9 @@ module.exports = {
       notAvailable: 'Nicht Verfügbar',
       zipCodeMinOrder: 'Der Mindestbestellwert in Ihrer Region ist {0}{1}.',
       orderConfirmation: 'Bestellbestätigung',
-      unavaibleArea: 'Lieferservice für Ihren Bereich ist nicht verfügbar.'
+      unavaibleArea: 'Lieferservice für Ihren Bereich ist nicht verfügbar.',
+      pickupOnly: 'Pickup only',
+      pickupOnlyNotice: 'Dieser Artikel ist nur zum Mitnehmen verfügbar.'
     },
 
     common: {

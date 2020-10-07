@@ -254,6 +254,18 @@
           "schemaType": "boolean",
           "key": "favorite",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "object",
+          "key": "pickupOnly",
+          "type": "choice",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "active",
+              "type": "input@switch"
+            }
+          ]
         }
       ]
     }

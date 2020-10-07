@@ -375,7 +375,9 @@ module.exports = {
       paymentOption: 'PAYMENT OPTIONS',
       notAvailable: 'Not Available',
       zipCodeMinOrder: 'The minimum order value in your area is {0}{1}.',
-      orderConfirmation: 'Order Confirmation'
+      orderConfirmation: 'Order Confirmation',
+      pickupOnly: 'Pickup only',
+      pickupOnlyNotice: 'This item is only available for takeaway.'
     },
 
     paymentProviders: {

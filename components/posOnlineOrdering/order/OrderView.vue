@@ -556,7 +556,7 @@
           return checkCategoryAvailability(c.availability, false)
         }).map(c => ({
           ...c,
-          inTime: c.availability && checkCategoryInTime(c.availability.startTime, c.availability.endTime)
+          inTime: c.availability && c.availability.active ? checkCategoryInTime(c.availability.startTime, c.availability.endTime) : true
         }))
         this.$set(this, 'categories', _.orderBy(availableCategories, 'position', 'asc'))
       },

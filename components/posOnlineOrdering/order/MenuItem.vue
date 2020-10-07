@@ -127,6 +127,7 @@
           allergic: false,
           spicy: false,
           vegeterian: false,
+          pickupOnly: false,
         },
         showmore: false,
         expandDesc: false
@@ -185,8 +186,11 @@
       },
       availableItem() {
         const type = this.$route.query.type
-        if(!type) return this.isOpening
-        return this.isOpening && (!this.category.availability.pickupOnly || (this.category.availability.pickupOnly && type === 'pickup'));
+        if(type === 'delivery' && this.mark && this.mark.pickupOnly && this.mark.pickupOnly.active) {
+          console.log(type)
+          return false
+        }
+        return this.isOpening;
       }
     },
     watch: {
@@ -195,6 +199,7 @@
           allergic: false,
           spicy: false,
           vegeterian: false,
+          pickupOnly: false
         }
       }
     }

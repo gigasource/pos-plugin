@@ -45,11 +45,6 @@
           "type": "input@switch"
         },
         {
-          "schemaType": "boolean",
-          "key": "pickupOnly",
-          "type": "input@switch"
-        },
-        {
           "schemaType": "array",
           "key": "dayInWeek",
           "type": "array",

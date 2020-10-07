@@ -3,10 +3,6 @@
     <div class="dialog">
       <div class="dialog-title">Availability setting</div>
       <div class="dialog-content">
-        <p>Pickup only</p>
-        <div>
-          <g-switch v-model="pickupOnly"/>
-        </div>
         <p>Limit to a set of time</p>
         <div>
           <g-switch v-model="active"/>
@@ -91,7 +87,6 @@
     },
     data() {
       return {
-        pickupOnly: false,
         active: false,
         dayInWeek: [false, false, false, false, false, false, false],
         startTime: '',
@@ -108,23 +103,13 @@
       availability: {
         handler: function (val) {
           if (val) {
-            this.pickupOnly = _.cloneDeep(val.pickupOnly)
             this.active = _.cloneDeep(val.active)
-            if (val.active) {
-              this.dayInWeek = _.cloneDeep(val.dayInWeek)
-              this.startTime = _.cloneDeep(val.startTime)
-              this.endTime = _.cloneDeep(val.endTime)
-              this.startDate = val.startDate ? dayjs(val.startDate).format('YYYY-MM-DD') : ''
-              this.repeat = _.cloneDeep(val.repeat)
-            } else {
-              this.dayInWeek = [false, false, false, false, false, false, false]
-              this.startTime = ''
-              this.endTime = ''
-              this.startDate = ''
-              this.repeat = ''
-            }
+            this.dayInWeek = _.cloneDeep(val.dayInWeek)
+            this.startTime = _.cloneDeep(val.startTime)
+            this.endTime = _.cloneDeep(val.endTime)
+            this.startDate = val.startDate ? dayjs(val.startDate).format('YYYY-MM-DD') : ''
+            this.repeat = _.cloneDeep(val.repeat)
           } else {
-            this.pickupOnly = false
             this.active = false
             this.dayInWeek = [false, false, false, false, false, false, false]
             this.startTime = ''
@@ -154,36 +139,10 @@
     },
     methods: {
       cancel() {
-        if (this.availability) {
-          this.pickupOnly = _.cloneDeep(this.availability.pickupOnly)
-          this.active = _.cloneDeep(this.availability.active)
-          if (this.availability.active) {
-            this.dayInWeek = _.cloneDeep(this.availability.dayInWeek)
-            this.startTime = _.cloneDeep(this.availability.startTime)
-            this.endTime = _.cloneDeep(this.availability.endTime)
-            this.startDate = this.availability.startDate ? dayjs(this.availability.startDate).format('YYYY-MM-DD') : ''
-            this.repeat = _.cloneDeep(this.availability.repeat)
-          } else {
-            this.dayInWeek = [false, false, false, false, false, false, false]
-            this.startTime = ''
-            this.endTime = ''
-            this.startDate = ''
-            this.repeat = ''
-          }
-        } else {
-          this.pickupOnly = false
-          this.active = false
-          this.dayInWeek = [false, false, false, false, false, false, false]
-          this.startTime = ''
-          this.endTime = ''
-          this.startDate = ''
-          this.repeat = ''
-        }
         this.internalValue = false
       },
       save() {
         const availability = {
-          pickupOnly: this.pickupOnly,
           active: this.active,
           dayInWeek: this.dayInWeek.map(day => !!day),
           startTime: this.startTime,
@@ -215,7 +174,7 @@
     &-content {
       display: grid;
       grid-template-columns: 30% calc(70% - 8px);
-      grid-template-rows: 45px 45px 108px 45px 45px 45px;
+      grid-template-rows: 45px 108px 45px 45px 45px;
       grid-gap: 8px;
 
       & > p {

@@ -893,3 +893,17 @@
   background-position: center;
 }
 
+.icon-pickupOnly {
+  background-image: url("../assets/pickup-only.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-pickupOnly_full {
+  background-image: url("../assets/pickup-only_full.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+

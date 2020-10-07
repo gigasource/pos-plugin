@@ -701,7 +701,7 @@
         return this.store.paymentProviders && this.store.paymentProviders.paypal && this.store.paymentProviders.paypal.enable
       },
       unavailableDelivery() {
-        return !!(!this.store.delivery || this.orderItems.some(item => item.category.availability && item.category.availability.pickupOnly));
+        return !!(!this.store.delivery || this.orderItems.some(item => item.mark && item.mark.pickupOnly && item.mark.pickupOnly.active));
       }
     },
     watch: {
