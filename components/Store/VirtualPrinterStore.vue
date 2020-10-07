@@ -19,7 +19,7 @@
     data: function () {
       return {
         start: 0,       // paging
-        take: 10,
+        take: 5,
         reportCount: 0, // total report
         reports: [],    // loaded reports -- lazy load
         loading: false, // loading or not
