@@ -522,7 +522,10 @@
     },
     async activated() {
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
-        this.table = this.$router.currentRoute.params.name
+        this.table = this.$route.params.name
+        const { tseMethod, numberOfCustomers } = this.$route.query
+        this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null)
+        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod)
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
 

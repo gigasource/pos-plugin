@@ -173,19 +173,22 @@ async function handleItemCommit(commit) {
 			query[`$${key}`][commit.update[key].key] = commit.update[key].value;
 		});
 		const condition = deserializeObj(commit.where);
-		if (query['$inc']) { // check case -1 always >= 0
-			let checker = false;
-			Object.keys(query['$inc']).forEach(key => {
-				checker |= (query['$inc'][key] == -1);
+		if (query['$inc'] && query['$inc']['items.$.quantity'] < 0) {
+			const targetItem = activeOrders[commit.table].items.find(item => {
+				return item._id.toString() === condition['items._id'];
 			})
-			if (checker) {
-				const targetItem = activeOrders[commit.table].items.find(item => {
-					return item._id.toString() == condition['items._id'];
+			if (targetItem.quantity + query['$inc']['items.$.quantity'] < 0) {
+				console.error('Can not reduce quantity to neg');
+				return null;
+			}
+			if (targetItem.printed) {
+				if (!activeOrders[commit.table].cancellationItems) activeOrders[commit.table].cancellationItems = [];
+				activeOrders[commit.table].cancellationItems.push({
+					...targetItem,
+					date: new Date(),
+					quantity: -commit.update['inc'].value
 				})
-				if (targetItem.quantity == 0) {
-					console.error('Can not reduce quantity to neg');
-					return null;
-				}
+				await orderModel[key]({ _id: activeOrders[commit.table]._id }, { $set: { cancellationItems: activeOrders[commit.table].cancellationItems } });
 			}
 		}
 		result = await orderModel[key](condition, query, {new: true});

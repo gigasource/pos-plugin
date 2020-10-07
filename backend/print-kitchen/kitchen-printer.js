@@ -167,6 +167,7 @@ async function printEscPos(printData, printerInfo, cancel = false) {
         printer.setTextQuadArea()
         printer.bold(true);
         printer.println('** CANCEL **')
+        printer.newLine();
       }
 
       printer.alignLeft();
@@ -189,8 +190,11 @@ async function printEscPos(printData, printerInfo, cancel = false) {
         const itemsColumnWidth = 0.92 - item.quantity.toString().length * 0.05;
 
         if (cancel) {
-          printer.alignLeft()
-          printer.println(`- ${item.name}`)
+          printer.tableCustom([
+            {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
+            {text: 'x', align: 'LEFT', width: 0.05, bold: true},
+            {text: item.name, align: 'LEFT', width: itemsColumnWidth},
+          ], {textDoubleWith: true});
         } else {
           printer.tableCustom([
             {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},

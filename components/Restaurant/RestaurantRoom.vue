@@ -14,6 +14,7 @@
         </div>
       </template>
     </room>
+    <number-of-customers-dialog v-model="showNumberOfCustomersDialog" @submit="onCustomerDialogSubmit"/>
   </div>
 </template>
 <script>
@@ -22,7 +23,6 @@
   export default {
     name: 'RestaurantRoom',
     injectService: ['PosStore:isMobile'],
-    components: {},
     props: {
       id: String
     },
@@ -33,6 +33,7 @@
         //
         inProgressTable: [],
         transferTableFrom: null,
+        showNumberOfCustomersDialog: false
       }
     },
     async created() {
@@ -84,17 +85,33 @@
       isTableBusy(roomObj) {
         return this.inProgressTable.includes(roomObj.name)
       },
-      selectRoomObj(roomObj) {
+      async selectRoomObj(roomObj) {
         // if (!this.isTableBusy(roomObj)) {
         this.roomObj = roomObj;
+        const tseConfig = await cms.getModel('TseConfig').findOne()
+        console.log('tseConfig', tseConfig)
+        if (tseConfig && tseConfig.tseEnable && tseConfig.numberOfCustomersDialog) {
+          this.showNumberOfCustomersDialog = true
+        } else {
+          setTimeout(() => {
+            if (this.isMobile) {
+              this.$router.push(`/pos-order-3/${roomObj.name}`)
+            } else {
+              this.$router.push(`/pos-order-2/${roomObj.name}`)
+            }
+          }, 200)
+        }
+        // }
+      },
+      onCustomerDialogSubmit({ numberOfCustomers, tseMethod }) {
+        this.showNumberOfCustomersDialog = false
         setTimeout(() => {
           if (this.isMobile) {
-            this.$router.push(`/pos-order-3/${roomObj.name}`)
+            this.$router.push(`/pos-order-3/${this.roomObj.name}?numberOfCustomers=${numberOfCustomers}&tseMethod=${tseMethod}`)
           } else {
-            this.$router.push(`/pos-order-2/${roomObj.name}`)
+            this.$router.push(`/pos-order-2/${this.roomObj.name}?numberOfCustomers=${numberOfCustomers}&tseMethod=${tseMethod}`)
           }
         }, 200)
-        // }
       },
       setTransferTableFrom(roomObj) {
         if (this.transferTableFrom && roomObj.name === this.transferTableFrom.name) return this.transferTableFrom = null

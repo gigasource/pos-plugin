@@ -18,8 +18,10 @@ module.exports = (cms) => {
           if (product) {
             const qtyChange = current.quantity - product.quantity
             if (qtyChange < 0) {
-              const items = Array.from({ length: -qtyChange }).map(() => current);
-              lists.cancelList = lists.cancelList.concat(items)
+              lists.cancelList.push({
+                ...current,
+                quantity: -qtyChange
+              })
             } else {
               lists.addList.push({ ...current, quantity: qtyChange })
             }
@@ -44,13 +46,33 @@ module.exports = (cms) => {
       }, [])
       actionList.push(...printCommits)
 
-      const mappedActionList = actionList.map(action => {
+      const mergedActionList = actionList.reduce((list, current) => {
+        if (current.type !== 'item' || !current.update['inc'] || current.update['inc'].key !== 'items.$.quantity') {
+          list.push(current)
+          return list
+        }
+
+        const existingItem = list.find(i => i.where && i.where.pairedObject
+          && i.where.pairedObject.key[0] === 'items._id'
+          && i.where.pairedObject.value[0] === current.where.pairedObject.value[0])
+        if (existingItem) {
+          existingItem.update['inc'].value += current.update['inc'].value
+        } else {
+          list.push(current)
+        }
+
+        return list
+      }, [])
+
+      const mappedActionList = mergedActionList.map(action => {
         if (action.type === 'item' && action.update && action.update.push) {
           action.update.push.value.sent = true
           action.update.push.value.printed = true
         }
         return action
       })
+
+
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
@@ -146,7 +168,7 @@ module.exports = (cms) => {
     return {
       _id: order._id,
       id: order.id,
-      items: await orderUtil.getComputedOrderItems(compactOrder(order.items), date),
+      items: await orderUtil.getComputedOrderItems(orderUtil.compactOrder(order.items), date),
       ...order.user && order.user.length
         ? { user: order.user }
         : { user: [{ name: user.name, date }] },
@@ -179,21 +201,6 @@ module.exports = (cms) => {
 
   async function createOrderCommits(commits) {
     return cms.getModel('OrderCommit').create(commits);
-  }
-
-  function compactOrder(products) {
-    let resultArr = [];
-    products.forEach(product => {
-      const existingProduct = resultArr.find(r =>
-        _.isEqual(_.omit(r, 'quantity', '_id'), _.omit(product, 'quantity', '_id'))
-      );
-      if (existingProduct) {
-        existingProduct.quantity = existingProduct.quantity + product.quantity
-      } else {
-        resultArr.push(_.cloneDeep(product));
-      }
-    })
-    return resultArr
   }
 
   async function mapGroupPrinter(items) {

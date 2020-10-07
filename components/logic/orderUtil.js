@@ -102,6 +102,20 @@ const orderUtil = {
     if (item.modifiers && item.modifiers.length) extrasArr.push(...item.modifiers.map(m => m.name))
     if (item.note) extrasArr.push(item.note)
     return extrasArr.length ? `(${extrasArr.join(', ')})` : ''
+  },
+  compactOrder(products) {
+    let resultArr = [];
+    products.forEach(product => {
+      const existingProduct = resultArr.find(r =>
+        _.isEqual(_.omit(r, 'quantity', '_id'), _.omit(product, 'quantity', '_id'))
+      );
+      if (existingProduct) {
+        existingProduct.quantity = existingProduct.quantity + product.quantity
+      } else {
+        resultArr.push(_.cloneDeep(product));
+      }
+    })
+    return resultArr
   }
 }
 
