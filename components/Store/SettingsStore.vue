@@ -328,7 +328,7 @@
       },
       //general setting screen
       async getGeneralSettings() {
-        const setting = cms.getModel('PosSetting').findOne();
+        const setting = await cms.getModel('PosSetting').findOne();
         this.generalSettings = setting.generalSetting || {};
         console.log('generalSettings', setting.generalSetting)
       },

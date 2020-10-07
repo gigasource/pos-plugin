@@ -594,6 +594,12 @@
           "key": "quickBtnAction",
           "default": "pay",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "useVirtualPrinter",
+          "default": "true",
+          "type": "input@switch"
         }
       ],
       "type": "object"

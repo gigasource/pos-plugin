@@ -71,6 +71,71 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
+async function printCanvas(printer, printData) {
+  const {date, salesByCategory, salesByPayment, zNumbers, total} = printData;
+
+  function convertMoney(value) {
+    return !isNaN(value) ? value.toFixed(2) : value
+  }
+
+  printer.alignCenter();
+  printer.setFontSize(36);
+  printer.bold(true);
+  printer.println(date);
+  printer.newLine();
+
+  printer.alignLeft();
+  printer.setTextNormal();
+  printer.bold(true);
+  printer.println('Sales');
+  printer.drawLine();
+
+  printer.bold(false);
+  Object.keys(salesByPayment).forEach(paymentType => {
+    const paymentAmount = salesByPayment[paymentType];
+    printer.leftRight(` ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}`,
+        `${convertMoney(paymentAmount)}`);
+  });
+
+  printer.bold(true);
+  printer.leftRight('Total', `${convertMoney(total)}`);
+  if (salesByCategory || zNumbers) printer.newLine();
+
+  if (zNumbers) {
+    printer.bold(false);
+    printer.drawLine();
+    zNumbers.forEach(z => {
+      printer.tableCustom([
+        {text: `Z-Number ${z.z}: ${convertMoney(z.sum)}`, align: 'LEFT', width: 0.48},
+        {text: `Date: ${z.date}`, align: 'LEFT', width: 0.48},
+      ]);
+    });
+    printer.bold(true);
+    printer.drawLine();
+    if (salesByCategory) printer.newLine();
+  }
+
+  if (salesByCategory) {
+    printer.bold(true);
+    printer.println('Product Sold');
+    printer.drawLine();
+
+    Object.keys(salesByCategory).forEach(category => {
+      printer.newLine();
+      const {products, sum} = salesByCategory[category];
+
+      printer.bold(true);
+      printer.println(`${category} (${convertMoney(sum)})`);
+      printer.bold(false);
+      products.forEach(({product, quantity}) => {
+        printer.println(` ${quantity} x ${product}`);
+      });
+    })
+  }
+
+  await printer.print();
+}
+
 async function printSsr(printer, printData) {
   const MonthReport = require('../../dist/MonthReport.vue');
 
@@ -94,4 +159,5 @@ module.exports = {
   makePrintData,
   printSsr,
   printEscPos,
+  printCanvas
 }

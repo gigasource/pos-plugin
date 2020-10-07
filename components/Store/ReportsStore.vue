@@ -218,7 +218,7 @@
     provide() {
       return {
         ...getProvided(this.$data, this),
-        ...getProvided(this.$options.methods, this),
+        ...getProvided(this.$options.methods, this)
       }
     }
   }
