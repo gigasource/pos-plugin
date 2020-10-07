@@ -152,6 +152,10 @@ async function sendReservationConfirmationEmail(reservation, storeId) {
   }
 }
 
+async function getGsmsDevices(storeId) {
+  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+}
+
 module.exports = async function (cms) {
   const DeviceModel = cms.getModel('Device');
 
@@ -884,7 +888,8 @@ module.exports = async function (cms) {
 
         // const demoDevices = store.gSms.devices
         // const formattedOrder = formatOrder(orderData);
-        const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+        // const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+        const gSmsDevices = await getGsmsDevices(store._id.toString())
         await sendNotification(
           gSmsDevices,
           {
@@ -1080,7 +1085,8 @@ module.exports = async function (cms) {
 
         if (store.gSms && store.gSms.enabled) {
           cms.emit('sendReservationMessage', storeId, reservationData)
-          const demoDevices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+          // const demoDevices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+          const demoDevices = await getGsmsDevices(storeId);
           demoDevices.forEach(({_id}) => {
 
             /** @deprecated */

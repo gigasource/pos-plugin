@@ -14,6 +14,7 @@ const objectMapper = require('object-mapper');
 const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
 const _ = require('lodash');
+const dayjs = require('dayjs');
 const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
@@ -226,7 +227,8 @@ router.put('/', jwtValidator, async (req, res) => {
     {
       status,
       ...status === 'kitchen' && { timeToComplete },
-      ...status === 'declined' && { declineReason }
+      ...status === 'declined' && { declineReason },
+      ...status === 'kitchen' && { deliveryTime: dayjs().add(+timeToComplete, 'minute').format('HH:mm') }
     },
     { new: true })
   res.status(204).json(updatedOrder)
@@ -250,6 +252,14 @@ router.put('/', jwtValidator, async (req, res) => {
   if (updatedOrder.restaurantPlusUser) {
     sendOrderNotificationToDevice(updatedOrder._id, status)
   }
+
+  // send notification to all store's devices
+  const gSmsDevices = await getGsmsDevices(updatedOrder.storeId);
+  await sendNotification(
+    gSmsDevices,
+    {},
+    { actionType: NOTIFICATION_ACTION_TYPE.UPDATE_ORDER, orderId: updatedOrder._id.toString() },
+  )
 })
 
 // TODO: fix this
@@ -326,6 +336,10 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   return admin.messaging().send(message);
 }
 
+async function getGsmsDevices(storeId) {
+  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+}
+
 async function sendOrderToStoreDevices(store, orderData) {
   const device = await DeviceModel.findOne({storeId: store._id, 'features.onlineOrdering': true});
 
@@ -333,7 +347,9 @@ async function sendOrderToStoreDevices(store, orderData) {
   const storeAlias = store.alias;
 
   if (store.gSms && store.gSms.enabled) {
-    const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    // const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    let storeId = store._id.toString();
+    const gSmsDevices = await getGsmsDevices(storeId);
     await sendNotification(
       gSmsDevices,
       {
