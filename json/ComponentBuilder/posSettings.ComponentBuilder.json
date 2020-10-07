@@ -552,7 +552,15 @@
               "local": "value",
               "type": "v-model"
             }
-          ]
+          ],
+          "content": {
+            "props": {
+              "style": {
+                "_code_": "module.exports = {\n  overflow: 'scroll'\n}",
+                "_code_type_": "commonJs"
+              }
+            }
+          }
         }
       ]
     },
