@@ -18,7 +18,10 @@
   export default {
     name: 'PosStore',
     props: {},
-    injectService: ['Snackbar:(showSnackbar,closeSnackbar)'],
+    injectService: [
+      'Snackbar:(showSnackbar,closeSnackbar)',
+      'VirtualPrinterStore:reportCount'
+    ],
     data() {
       return {
         systemDate: new Date(),
@@ -150,21 +153,12 @@
             },
             title: this.$t('sidebar.functions')
           },
-          {
-            icon: 'icon-functions',
-            onClick() {
-              this.$emit('update:view', {
-                name: 'VirtualPrinter',
-                params: ''
-              })
-            },
-            title: 'Virtual Printer'
-          }
         ],
         pendingReservationsLength: 0,
         reservationBell: null,
         isMobile: false,
-        masterClientId: null
+        masterClientId: null,
+        showVirtualReportInSidebar: false,
       }
     },
     computed: {
@@ -190,11 +184,31 @@
             return this.enabledFeatures.includes(item.feature)
           })
         }
+        
+        if (this.showVirtualReportInSidebar) {
+          sidebar.push({
+            icon: 'icon-functions',
+            onClick() {
+              this.$emit('update:view', {
+                name: 'VirtualPrinter',
+                params: ''
+              })
+            },
+            badge: (this.reportCount || 0) + '',
+            badgeColor: '#FF5252',
+            title: 'Virtual Printer'
+          })
+        }
+        
         return sidebar.map(item => {
-          if (item.key !== 'Reservation') return item
-          return {
-            ...item,
-            ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '', badgeColor: '#FF5252' }
+          switch (item.key) {
+            case 'Reservation':
+              return {
+                ...item,
+                ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '', badgeColor: '#FF5252' }
+              }
+            default:
+              return item;
           }
         })
       },
@@ -377,6 +391,14 @@
         } else {
           this.reservationBell = null
         }
+      },
+      showVirtualPrinterSidebarItem() {
+        console.log('PosStore:showVirtualPrinterSidebarItem')
+        this.showVirtualReportInSidebar = true
+      },
+      hideVirtualPrinterSidebarItem() {
+        console.log('PosStore:hideVirtualPrinterSidebarItem')
+        this.showVirtualReportInSidebar = false
       }
     },
     async created() {
@@ -387,7 +409,6 @@
 
       window.addEventListener('offline', () => this.online = false)
       window.addEventListener('online', () => this.online = true)
-
       window.addEventListener('keydown', (e) => {
         if (this.$route.path !== '/pos-login') return
         if (e.ctrlKey && e.code === 'KeyL') {
@@ -417,9 +438,11 @@
           this.device = currentRoute.query.device
         }
       }
-
       await this.getEnabledFeatures()
-
+      if (posSettings && posSettings.generalSetting) {
+        this.showVirtualReportInSidebar = !!posSettings.generalSetting.useVirtualPrinter
+      }
+      
       this.$router.beforeEach((to, from, next) => {
         if (to.path === '/admin' || to.path === '/plugins' || to.path === '/pos-login' || to.path === '/pos-setup') {
           next()
@@ -430,7 +453,6 @@
 
       await this.getPendingReservationsLength()
       await this.setupReservationBell()
-
     },
     watch: {
       online(val) {

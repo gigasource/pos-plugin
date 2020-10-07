@@ -3,10 +3,11 @@ const { getEscPrinter, getGroupPrinterInfo } = require('../print-utils/print-uti
 const fs = require('fs');
 const path = require('path');
 const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
+const virtualPrinter = require('./virtual-printer')
 
 module.exports = async function (cms) {
   cms.socket.on('connect', socket => {
-    socket.on('printReport', printHandler)
+    socket.on('printReport', printHandler);
   });
 }
 
@@ -64,45 +65,36 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       return callbackWithError(callback, new Error(`Report type ${reportType} is not supported`));
   }
 
-  const virtualPrintPng = async (png) => {
-    console.log('virtual print png')
-    // TODO:
-    //  - save to base 64, issueDate: , type: bon, receipt,
-    //  - correct font's size, padding as phantomjs
-    //  - swipe right to delete all report
-    socket.emit('virtualPrintResult', {
-      path: 'lorem ispum'
-    })
-  }
-
-  const virtualPrint = () => {
-    console.log('virtual print')
-  }
-
   try {
     const locale = await getLocale()
     const printData = await report.makePrintData(cms, reportData, locale);
     const groupPrinters = await getGroupPrinterInfo(cms, device, type);
     const printers = _.flatten(groupPrinters.map(group => ({
       ...group.printers,
-      groupPrinter: group.name
+      groupPrinter: group.name,
+      groupPrinterId: group._id
     })));
 
+    const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
+    const { useVirtualPrinter } = posSetting.generalSetting
+    const CanvasPrinter = await initCanvaskit();
     for (const printerInfo of printers) {
-      const escPrinter = await getEscPrinter(printerInfo);
-      const CanvasPrinter = await initCanvaskit();
-      const canvasPrinter = new CanvasPrinter(560, 50000, {
-        printFunctions: {
-          printPng: printerInfo.printerType === 'virtual' ? virtualPrintPng : escPrinter.printPng.bind(escPrinter),
-          print: printerInfo.printerType === 'virtual' ? virtualPrint : escPrinter.print.bind(escPrinter),
-        }
-      });
+      if (useVirtualPrinter) {
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{ report, printData, printerInfo, type }])
+      }
 
       const {escPOS} = printerInfo
+      const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
         // await report.printSsr(escPrinter, printData);
+        const canvasPrinter = new CanvasPrinter(560, 50000, {
+          printFunctions: {
+            printPng: escPrinter.printPng.bind(escPrinter),
+            print: escPrinter.print.bind(escPrinter),
+          }
+        });
         await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
         canvasPrinter.cleanup();
       }

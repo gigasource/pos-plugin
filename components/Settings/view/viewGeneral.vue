@@ -17,6 +17,10 @@
         <span>Quick pay/print button</span>
         <g-switch v-model="quickBtn"/>
       </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>Using virtual printer</span>
+        <g-switch v-model="useVirtualPrinter"/>
+      </div>
 
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
@@ -55,6 +59,7 @@
 
   export default {
     name: 'viewGeneral',
+    injectService: ['PosStore:(showVirtualPrinterSidebarItem,hideVirtualPrinterSidebarItem)'],
     components: { PosTimePicker },
     data() {
       return {
@@ -137,6 +142,27 @@
           this.$set(this.generalSettings, 'quickBtnAction', val);
         },
       },
+      useVirtualPrinter: {
+        get() {
+          return (this.generalSettings && !!this.generalSettings.useVirtualPrinter)
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'useVirtualPrinter', val)
+          if (val) {
+            this.showVirtualPrinterSidebarItem()
+          } else {
+            this.hideVirtualPrinterSidebarItem()
+          }
+        }
+      },
+      useVirtualPrinterAndRealPrinter: {
+        get() {
+          return (this.generalSettings && !!this.generalSettings.useVirtualPrinterAndRealPrinter)
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'useVirtualPrinterAndRealPrinter', val)
+        }
+      }
     },
     async created() {
       const setting = await cms.getModel('PosSetting').findOne();

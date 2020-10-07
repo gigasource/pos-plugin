@@ -39,6 +39,12 @@ module.exports = {
     },
     {
       loader: {
+        type: 'vue-singleton'
+      },
+      path: 'components/Store/VirtualPrinterStore.vue',
+    },
+    {
+      loader: {
         type: 'backend-api'
       },
       path: 'backend/rest-handler.js',
@@ -91,6 +97,13 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/fritzbox-call-handler/socketio-handler.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/print-report/virtual-printer.js',
       type: 'backend'
     },
     {
