@@ -154,14 +154,6 @@
             this.hideVirtualPrinterSidebarItem()
           }
         }
-      },
-      useVirtualPrinterAndRealPrinter: {
-        get() {
-          return (this.generalSettings && !!this.generalSettings.useVirtualPrinterAndRealPrinter)
-        },
-        set(val) {
-          this.$set(this.generalSettings, 'useVirtualPrinterAndRealPrinter', val)
-        }
       }
     },
     async created() {
