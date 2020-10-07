@@ -5,7 +5,7 @@
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
           <div class="splitter__header row-flex align-items-center" v-if="isMobile">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">
+            <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">
               <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
               <span>View receipt</span>
             </g-btn-bs>
@@ -140,7 +140,7 @@
         <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
         <g-spacer/>
         <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{splitOrders.length}}</span>
-        <g-btn-bs :uppercase="false" background-color="#1271ff" @click.stop="showReceipt = true">View receipt</g-btn-bs>
+        <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">View receipt</g-btn-bs>
       </g-toolbar>
     </g-dialog>
 
@@ -150,7 +150,7 @@
                           @submit="saveMultiPayment"
     />
 
-    <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale"
+    <pos-order-receipt v-model="showReceipt" :order="orderWithSplits" :store-locale="storeLocale" split
                        @updatePayment="updateSplitPayment"
                        @complete="complete"
                        @print="printReceipt"/>
@@ -299,11 +299,14 @@
 
         if (isLastSplit) this.showReceipt = true
       },
-      updateSplitPayment(_id, payment) {
+      updateSplitPayment(_id, payment, tip) {
         cms.socket.emit('update-split-payment', _id, payment, ({ order, error }) => {
           if (error) return console.log(error)
           const split = this.splitOrders.find(i => i._id === _id)
           split.payment = payment
+
+          // TODO: tip is not saved on backend yet
+          this.$set(split, 'tip', tip)
         })
       },
       complete() {
@@ -315,9 +318,9 @@
         this.$emit('updateCurrentOrder', 'table', null)
         this.$router.push({ path: '/pos-dashboard' })
       },
-      printReceipt(orderId) {
-        if (orderId) return this.$emit('printOrderReport', orderId)
-        this.splitOrders.forEach(order => this.$emit('printOrderReport', order._id))
+      printReceipt(order) {
+        if (order) return this.$emit('printOrderReport', order)
+        this.splitOrders.forEach(order => this.$emit('printOrderReport', order))
       }
     },
     watch: {

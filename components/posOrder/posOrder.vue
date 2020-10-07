@@ -382,6 +382,7 @@
         this.$getService('PosOrderSplitOrder:setActive')(true)
       },
       showOrderReceipt() {
+        this.$getService('OrderStore:updateCurrentOrder')('payment', [{ type: 'cash', value: this.total }])
         this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
@@ -404,14 +405,14 @@
       getStyle() {
         const style = {
           height: '100%',
-          maxHeight: '100%',
-          width: '256px'
+          maxHeight: '100%'
         }
         if(this.isMobile) {
-          Object.assign(style, { height: '100vh', maxHeight: '100vh', padding: '0 4px' })
-        }
-        if(this.smallSidebar) {
-          Object.assign(style, { width: '225px' })
+          Object.assign(style, { height: '100vh', maxHeight: '100vh', padding: '0 4px', width: '256px' })
+
+          if(this.smallSidebar) {
+            Object.assign(style, { width: '225px' })
+          }
         }
         return style
       },
@@ -521,7 +522,10 @@
     },
     async activated() {
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
-        this.table = this.$router.currentRoute.params.name
+        this.table = this.$route.params.name
+        const { tseMethod, numberOfCustomers } = this.$route.query
+        this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null)
+        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod)
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
 

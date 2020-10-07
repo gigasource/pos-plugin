@@ -292,7 +292,7 @@
                 },
                 "events": {
                   "click": {
-                    "_code_": "module.exports = async function() {\n  const order = this.$getService('OrderStore:orderHistoryCurrentOrder')\n  order && await this.$getService('OrderStore:printOrderReport')(order._id)\n}",
+                    "_code_": "module.exports = async function() {\n  const order = this.$getService('OrderStore:orderHistoryCurrentOrder')\n  order && await this.$getService('OrderStore:printOrderReport')(order)\n}",
                     "_code_type_": "commonJs"
                   }
                 },

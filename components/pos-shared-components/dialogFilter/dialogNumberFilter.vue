@@ -3,7 +3,7 @@
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
-				<pos-text-field v-model="screenValue" large :label="label" :rules="rules" readOnly/>
+				<pos-text-field v-model="screenValue" large :label="label" :rules="rules" readOnly :virtual-event="isIOS"/>
 				<div class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
@@ -29,7 +29,7 @@
       value: null,
 			rules: Array,
     },
-		injectService: ['PosStore:isMobile'],
+		injectService: ['PosStore:(isMobile, isIOS)'],
     data() {
       return {
         screenValue: ''

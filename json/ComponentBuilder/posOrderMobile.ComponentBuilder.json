@@ -456,6 +456,26 @@
           "service": "PosStore:storeLocale",
           "local": "storeLocale",
           "type": "prop"
+        },
+        {
+          "service": "OrderStore:paymentTotal",
+          "local": "total",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:updateCurrentOrder",
+          "local": "updateCurrentOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:saveRestaurantOrder",
+          "local": "saveRestaurantOrder",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:printOrderReport",
+          "local": "printOrderReport",
+          "type": "event"
         }
       ],
       "url": "plugins/pos-plugin/components/posOrder/PosOrderReceipt.vue",

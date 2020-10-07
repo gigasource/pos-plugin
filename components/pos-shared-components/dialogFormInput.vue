@@ -1,6 +1,6 @@
 <template>
   <g-dialog v-model="internalValue" :width="width || '90%'" eager :fullscreen="isMobile">
-    <div class="dialog-input col-flex">
+    <div :class="['dialog-input', 'col-flex', rotate && 'rotate']">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
       <div class=" col-flex flex-grow-1 overflow-y pb-3">
         <div class="flex-grow-1">
@@ -54,6 +54,7 @@
       },
       keyboardWidth: String,
       width: String,
+      rotate: Boolean
     },
     data() {
       return {
@@ -130,6 +131,13 @@
       background-color: #bdbdbd;
       padding: 0.5rem;
       margin: 0 -16px -16px -16px;
+    }
+
+    .rotate {
+      width: 400px;
+      height: 580px !important;
+      transform: rotate(-90deg) translateX(-100%);
+      transform-origin: left top;
     }
   }
 </style>

@@ -385,10 +385,12 @@
         this.currentOrder = await orderModel.findOne({ _id: order._id })
       },
       async resetOrderData() {
+        const tseConfig = await cms.getModel('TseConfig').findOne()
+        const tseEnabled = tseConfig && !!tseConfig.tseEnable
         this.activeTableProduct = null
         this.currentOrder = this.currentOrder.table
-          ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table }
-          : { items: [], hasOrderWideDiscount: false };
+          ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } }
+          : { items: [], hasOrderWideDiscount: false, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } };
         this.paymentAmountTendered = ''
         this.productIdQuery = ''
         await this.getSavedOrders()
@@ -521,10 +523,10 @@
           console.error(e)
         }
       },
-      printOrderReport(orderId) {
+      printOrderReport(order) {
         return new Promise((resolve, reject) => {
-          if (_.isNil(orderId)) reject()
-          cms.socket.emit('printReport', 'OrderReport', { orderId }, this.device, ({ success, message }) => {
+          if (!order) reject()
+          cms.socket.emit('printReport', 'OrderReport', order, this.device, ({ success, message }) => {
             if (success) resolve()
             else reject(message)
           });
@@ -757,11 +759,11 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true, cb = () => null) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
-            const payment = paymentMethod || this.currentOrder.payment.map(({ name, value }) => ({ type: name, value }));
+            const payment = paymentMethod || this.currentOrder.payment.map(({ type, name, value }) => ({ type: name || type, value }));
             const order = {
               ...this.currentOrder,
               payment,
@@ -769,6 +771,7 @@
 
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
+              cb(newOrder)
               resolve(newOrder)
             })
           } catch (e) {

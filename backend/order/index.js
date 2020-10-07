@@ -1,5 +1,4 @@
 const orderUtil = require('../../components/logic/orderUtil')
-const { getNewOrderId } = require('../master-node/updateCommit');
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
 const { printInvoiceHandler } = require('../print-report')
@@ -19,8 +18,10 @@ module.exports = (cms) => {
           if (product) {
             const qtyChange = current.quantity - product.quantity
             if (qtyChange < 0) {
-              const items = Array.from({ length: -qtyChange }).map(() => current);
-              lists.cancelList = lists.cancelList.concat(items)
+              lists.cancelList.push({
+                ...current,
+                quantity: -qtyChange
+              })
             } else {
               lists.addList.push({ ...current, quantity: qtyChange })
             }
@@ -29,27 +30,10 @@ module.exports = (cms) => {
         return lists
       }, { cancelList: [], addList: [] })
 
-      // print if master
-      // if (isMaster) {
-      //   const results = {}
-      //   if (printLists.addList.length) {
-      //     const addedList = Object.assign({}, order,
-      //       { items: await mapGroupPrinter(printLists.addList) });
-      //     results.printKitchen = await printKitchen({ order: addedList, device })
-      //     // cms.socket.emit('printEntireReceipt', { order: addedList, device })
-      //   }
-      //
-      //   if (printLists.cancelList.length) {
-      //     const cancelledList = Object.assign({}, order,
-      //       ({ items: await mapGroupPrinter(printLists.cancelList) }));
-      //     results.printKitchenCancel = await printKitchenCancel({ order: cancelledList, device })
-      //   }
-      // } else {
       // add print commits
       printLists.addList = Object.assign({}, order, { items: await mapGroupPrinter(printLists.addList) });
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
-        // listName: addList, cancelList
         if (listOrder && listOrder.items && listOrder.items.length) {
           list.push({
             type: 'print',
@@ -59,13 +43,28 @@ module.exports = (cms) => {
           })
         }
         return list
-        // await printKitchenCancel({ order: cancelledList, device })
-        // await printKitchen({ order: addedList, device })
       }, [])
       actionList.push(...printCommits)
-      // }
 
-      const mappedActionList = actionList.map(action => {
+      const mergedActionList = actionList.reduce((list, current) => {
+        if (current.type !== 'item' || !current.update['inc'] || current.update['inc'].key !== 'items.$.quantity') {
+          list.push(current)
+          return list
+        }
+
+        const existingItem = list.find(i => i.where && i.where.pairedObject
+          && i.where.pairedObject.key[0] === 'items._id'
+          && i.where.pairedObject.value[0] === current.where.pairedObject.value[0])
+        if (existingItem) {
+          existingItem.update['inc'].value += current.update['inc'].value
+        } else {
+          list.push(current)
+        }
+
+        return list
+      }, [])
+
+      const mappedActionList = mergedActionList.map(action => {
         if (action.type === 'item' && action.update && action.update.push) {
           action.update.push.value.sent = true
           action.update.push.value.printed = true
@@ -73,18 +72,24 @@ module.exports = (cms) => {
         return action
       })
 
+
+
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
       cb(newOrder)
     })
 
-    socket.on('print-invoice', () => {
-
+    socket.on('print-invoice', async (order) => {
+      await cms.getModel('OrderCommit').create([{
+        type: 'print',
+        printType: 'invoice',
+        order,
+        device
+      }])
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
       try {
-        // const updatedSplit = await cms.getModel('Order').findOneAndUpdate({ _id }, { payment }, { new: true })
         const updatedSplit = await createOrderCommits([{
           type: 'order',
           split: true,
@@ -163,7 +168,7 @@ module.exports = (cms) => {
     return {
       _id: order._id,
       id: order.id,
-      items: await orderUtil.getComputedOrderItems(compactOrder(order.items), date),
+      items: await orderUtil.getComputedOrderItems(orderUtil.compactOrder(order.items), date),
       ...order.user && order.user.length
         ? { user: order.user }
         : { user: [{ name: user.name, date }] },
@@ -198,21 +203,6 @@ module.exports = (cms) => {
     return cms.getModel('OrderCommit').create(commits);
   }
 
-  function compactOrder(products) {
-    let resultArr = [];
-    products.forEach(product => {
-      const existingProduct = resultArr.find(r =>
-        _.isEqual(_.omit(r, 'quantity', '_id'), _.omit(product, 'quantity', '_id'))
-      );
-      if (existingProduct) {
-        existingProduct.quantity = existingProduct.quantity + product.quantity
-      } else {
-        resultArr.push(_.cloneDeep(product));
-      }
-    })
-    return resultArr
-  }
-
   async function mapGroupPrinter(items) {
     async function getGroupPrinterName(gp) {
       if (typeof gp === 'object') {
@@ -235,7 +225,13 @@ module.exports = (cms) => {
     return onlineDevice.id === masterClientId
   }
 
-  async function printToKitchen() {
-
-  }
+  cms.post('run:print', async (commit) => {
+    if (commit.printType === 'kitchenAdd') {
+      await printKitchen({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'kitchenCancel') {
+      await printKitchenCancel({ order: commit.order, device: commit.device });
+    } else if (commit.printType === 'invoice') {
+      await printInvoiceHandler('OrderReport', commit.order, commit.device);
+    }
+  })
 }

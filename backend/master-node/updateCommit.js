@@ -1,7 +1,5 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
-const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
-const { printInvoiceHandler } = require('../print-report')
 
 let queue;
 let orderModel;
@@ -175,19 +173,22 @@ async function handleItemCommit(commit) {
 			query[`$${key}`][commit.update[key].key] = commit.update[key].value;
 		});
 		const condition = deserializeObj(commit.where);
-		if (query['$inc']) { // check case -1 always >= 0
-			let checker = false;
-			Object.keys(query['$inc']).forEach(key => {
-				checker |= (query['$inc'][key] == -1);
+		if (query['$inc'] && query['$inc']['items.$.quantity'] < 0) {
+			const targetItem = activeOrders[commit.table].items.find(item => {
+				return item._id.toString() === condition['items._id'];
 			})
-			if (checker) {
-				const targetItem = activeOrders[commit.table].items.find(item => {
-					return item._id.toString() == condition['items._id'];
+			if (targetItem.quantity + query['$inc']['items.$.quantity'] < 0) {
+				console.error('Can not reduce quantity to neg');
+				return null;
+			}
+			if (targetItem.printed) {
+				if (!activeOrders[commit.table].cancellationItems) activeOrders[commit.table].cancellationItems = [];
+				activeOrders[commit.table].cancellationItems.push({
+					...targetItem,
+					date: new Date(),
+					quantity: -commit.update['inc'].value
 				})
-				if (targetItem.quantity == 0) {
-					console.error('Can not reduce quantity to neg');
-					return null;
-				}
+				await orderModel[key]({ _id: activeOrders[commit.table]._id }, { $set: { cancellationItems: activeOrders[commit.table].cancellationItems } });
 			}
 		}
 		result = await orderModel[key](condition, query, {new: true});
@@ -245,13 +246,11 @@ async function deleteTempCommit(groupTempId) {
 }
 
 async function handlePrintOrder(commit) {
-	if (commit.printType === 'kitchenAdd') {
-		await printKitchen({ order: commit.order, device: commit.device });
-	} else if (commit.printType === 'kitchenCancel') {
-		await printKitchenCancel({ order: commit.order, device: commit.device });
-	} else if (commit.printType === 'invoice') {
-		await printInvoiceHandler('OrderReport', commit.order, commit.device);
+	if (commit.order._id) {
+		const order = await cms.getModel('Order').findById(commit.order._id)
+		commit.order.id = order.id
 	}
+	await cms.execPostAsync('run:print', null, [commit]);
 }
 
 async function initQueue(handler) {
@@ -306,7 +305,7 @@ async function initQueue(handler) {
 			} else if (commit.type === 'changeTable') {
 				result = await handleChangeTable(commit);
 			} else if (commit.type === 'print') {
-				handlePrintOrder(commit);
+				await handlePrintOrder(commit);
 			}
 			if (result) {
 				if (commit.commitId) highestCommitId = commit.commitId + 1;
