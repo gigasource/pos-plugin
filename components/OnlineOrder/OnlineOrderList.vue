@@ -25,9 +25,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, i) in computedItems" :key="i">
+        <tr v-for="(item, i) in computedItems" :key="i" @click="openDialogDetail(item)">
           <td class="fw-700">
-            <p>#{{item.id}}</p>
+            <p style="white-space: nowrap">#{{item.id}}</p>
             <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" speech-bubble remove-content-on-close>
               <span><b>From:</b> {{item.forwardedStore}}</span>
               <template v-slot:activator="{on}">
@@ -58,7 +58,7 @@
           <td style="white-space: nowrap">{{item.deliveryTime}}</td>
           <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
           <td :class="statusClass">
-            <div>{{$t(`onlineOrder.${item.status}`)}}</div>
+            <div style="white-space: nowrap">{{$t(`onlineOrder.${item.status}`)}}</div>
             <div style="font-size: x-small; margin-top: -5px"> {{ isRefunded(item) ? refundedStr: '' }}</div>
           </td>
           <td>
@@ -78,6 +78,7 @@
         </tbody>
       </g-table>
     </div>
+    <dialog-complete-order disabled-btn ref="dialog" v-model="dialog"/>
   </div>
 </template>
 
@@ -113,7 +114,8 @@
         filter: {
           fromDate: '',
           toDate: ''
-        }
+        },
+        dialog: false
       }
     },
     filters: {
@@ -196,6 +198,9 @@
             break;
         }
         return src
+      },
+      openDialogDetail(item) {
+        this.$refs.dialog.showDialog(item)
       }
     }
   }

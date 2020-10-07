@@ -63,7 +63,7 @@
           </div>
         </div>
       </g-card-text>
-      <g-card-actions>
+      <g-card-actions v-if="!disabledBtn">
         <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" @click.stop="declineOrder(order)">{{$t('onlineOrder.cancelOrder')}}</g-btn-bs>
         <g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" @click.stop="completeOrder(order)">{{$t('onlineOrder.completeOrder')}}</g-btn-bs>
       </g-card-actions>
@@ -80,7 +80,8 @@
   export default {
     name: 'dialogCompleteOrder',
     props: {
-      value: Boolean
+      value: Boolean,
+      disabledBtn: Boolean
     },
     injectService: ['PosStore:storeLocale'],
     data() {
