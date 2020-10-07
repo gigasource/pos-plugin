@@ -22,6 +22,7 @@ const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
 const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
+const { time } = require('console');
 
 const mapperConfig = {
   _id: '_id',
@@ -220,6 +221,10 @@ router.put('/', jwtValidator, async (req, res) => {
   if (!orderId || !status) res.sendStatus(400)
 
   // update order
+  function isValidTimeToComplete(time) {
+    const parsedTime = parseInt(time)
+    return !isNaN(parsedTime) && parsedTime > 0
+  }
   const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
     { ...orderId.includes('-')
         ? { onlineOrderId: orderId }
@@ -228,7 +233,9 @@ router.put('/', jwtValidator, async (req, res) => {
       status,
       ...status === 'kitchen' && { timeToComplete },
       ...status === 'declined' && { declineReason },
-      ...status === 'kitchen' && { deliveryTime: dayjs().add(+timeToComplete, 'minute').format('HH:mm') }
+      ...status === 'kitchen'
+        && isValidTimeToComplete(timeToComplete)
+        && { deliveryTime: dayjs().add(+timeToComplete, 'minute').toDate().toISOString() }
     },
     { new: true })
   res.status(204).json(updatedOrder)
