@@ -80,10 +80,18 @@
                   </g-btn-bs>
                 </div>
               </g-menu>
+
               <g-spacer/>
+
               <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
+                <span v-if="iP > 0"> | </span>
                 <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
                 <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
+              </div>
+
+              <div v-if="split.tip" class="receipt-main__item-total">
+                <g-icon class="mr-1">{{getIcon('tip')}}</g-icon>
+                <span>{{$t('common.currency', storeLocale)}} {{split.tip}}</span>
               </div>
             </div>
             <div class="receipt-main__item-header">
@@ -132,11 +140,27 @@
       </div>
     </div>
     <div class="blur-overlay" v-show="blurReceipt"/>
-    <dialog-multi-payment rotate v-model="dialog.multi" :store-locale="storeLocale" :total="split ? tempSplit.vSum : total"
-                          @submit="saveMultiPayment"/>
-    <dialog-form-input width="40%" v-model="dialog.tip" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%" rotate>
+
+    <dialog-multi-payment
+        rotate
+        v-model="dialog.multi"
+        :store-locale="storeLocale"
+        :total="split ? tempSplit.vSum : total"
+        @submit="saveMultiPayment"/>
+
+    <dialog-form-input
+        width="40%"
+        v-model="dialog.tip"
+        keyboard-type="numeric"
+        @submit="saveTip"
+        keyboard-width="100%"
+        rotate>
       <template #input>
-        <pos-textfield-new ref="tip-textfield" label="Card Payment" v-model="tipEditValue" clearable/>
+        <pos-textfield-new
+            ref="tip-textfield"
+            label="Card Payment"
+            v-model="tipEditValue"
+            clearable/>
       </template>
     </dialog-form-input>
   </g-dialog>
@@ -173,13 +197,13 @@
           tip: false
         },
         tempSplit: {},
+        tipEditValue: '',
         paymentMethodMenu: false,
         paymentMethods: [
           { text: 'Cash', type: 'cash', icon: 'icon-cash' },
           { text: 'Card', type: 'card', icon: 'icon-credit_card' },
           { text: 'Multi', type: 'multi', icon: 'icon-multi_payment' },
         ],
-        tipEditValue: '',
         printed: null
       }
     },
@@ -208,16 +232,27 @@
           return orderUtil.compactOrder(this.order.items.filter(i => i.quantity > 0))
         }
         return []
-      }
+      },
     },
     created() {
       this.menu = (this.order.splits && this.order.splits.map(() => false)) || [];
+    },
+    watch: {
+      ['dialog.tip'](val) {
+        if (val) {
+          setTimeout(() => {
+            if (!this.tipEditValue) this.tipEditValue = '' + this.tempSplit.vSum
+            this.$nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
+          }, 500)
+        }
+      },
     },
     methods: {
       getIcon(type) {
         if (!this.order) return
         if (type === 'card') return 'icon-credit_card'
         if (type === 'cash') return 'icon-cash'
+        if (type === 'tip') return 'icon-coin-box'
         return 'icon-multi_payment'
       },
       getOrderPaymentIcon() {
@@ -300,8 +335,8 @@
 
         if (this.split) {
           this.tipEditValue = ''
+          this.$emit('updatePayment', this.tempSplit._id, [{ type: 'card', value: this.tempSplit.vSum }], tip)
           this.tempSplit = {}
-          this.$emit('updatePayment', this.tempSplit._id, [{ type: payment, value: +this.tipEditValue }], tip)
         } else {
           this.$emit('updateCurrentOrder', 'tip', tip)
           this.$emit('updateCurrentOrder', 'payment', [{ name: 'card', value: +this.tipEditValue }])
