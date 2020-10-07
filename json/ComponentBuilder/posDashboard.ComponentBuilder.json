@@ -421,6 +421,16 @@
               "binding": [],
               "slotScopeBinding": [],
               "slot": "DeliveryConfig"
+            },
+            {
+              "choice": "view",
+              "component": "VirtualPrinterView",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "VirtualPrinter",
+              "url": "plugins/pos-plugin/components/VirtualPrinter/VirtualPrinterView.vue",
+              "path": "components/VirtualPrinter/VirtualPrinterView.vue",
+              "pluginName": "pos-plugin"
             }
           ]
         }
