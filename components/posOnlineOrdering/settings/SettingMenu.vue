@@ -58,6 +58,9 @@
                   style="white-space: nowrap">
                 + {{$t('setting.newItem')}}
               </g-btn-bs>
+              <g-btn-bs v-if="store.useMultiplePrinters" background-color="#F4F9FF" border-color="#B5BAC0" text-color="#535962" @click.stop.prevent="openDialogChoosePrinter(cate._id)">
+                Group Printer
+              </g-btn-bs>
               <template v-if="!isInDevice">
                 <upload-zone v-if="!cate.image" style="border: none;" @url="setCategoryImage($event, cate._id)" :aspect-ratio="4.2" :option="{maxWidth: 1000}">
                   <template v-slot:default="{showUploadDialog}">
@@ -147,6 +150,17 @@
       </g-dialog>
       <dialog-import-menu-item v-model="dialog.importMenuItem" @submit="importMenuItemFromExcel"/>
       <dialog-availability-setting v-model="dialog.availability" :availability="selectedAvailability" @submit="updateCategoryAvailability"/>
+      <g-dialog v-model="dialog.printer" eager width="400">
+        <div class="dialog">
+          <div class="dialog-title">Choose printer</div>
+          <g-select :key="dialog.printer" small text-field-component="GTextFieldBs" v-model="selectedPrinter" :items="store.printers"/>
+          <div class="row-flex align-items-center mt-4">
+            <g-spacer/>
+            <g-btn-bs width="100" text-color="#424242" @click="dialog.printer = false">Cancel</g-btn-bs>
+            <g-btn-bs width="100" background-color="#1271FF" @click="updatePrinters">Update</g-btn-bs>
+          </div>
+        </div>
+      </g-dialog>
     </template>
   </div>
 </template>
@@ -186,11 +200,13 @@
           setting: false,
           importMenuItem: false,
           availability: false,
+          printer: false
         },
         editBtn: [],
         editingProduct: false,
         edittingItems: [],
         selectedAvailability: null,
+        selectedPrinter: ''
       }
     },
     created() {
@@ -390,6 +406,16 @@
         this.$emit('change-category-availability', availability, this.selectedCategoryId)
         this.selectedAvailability = null
         this.dialog.availability = false
+      },
+      openDialogChoosePrinter(id) {
+        this.selectedCategoryId = id
+        this.selectedPrinter = ''
+        this.dialog.printer = true
+      },
+      updatePrinters() {
+        const ids = this.categoriesViewModel.find(c => c._id === this.selectedCategoryId).products.map(p => p._id)
+        this.$emit('update-printer', ids, this.selectedPrinter)
+        this.dialog.printer = false
       }
     }
   }
@@ -402,6 +428,7 @@
     &__title {
       font-size: 18px;
       font-weight: 700;
+      flex: 9;
     }
 
     &--empty {

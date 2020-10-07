@@ -47,6 +47,7 @@
             @change-category-image="changeCategoryImage"
             @import-categories-completed="reloadCategoriesAndProducts"
             @change-category-availability="changeCategoryAvailability"
+            @update-printer="updatePrinters"
         />
         <delivery-fee
             v-if="view === 'setting-delivery-fee'"
@@ -393,7 +394,15 @@
           cms.socket.emit('send-menu', this.store._id)
         }
       },
-
+      async updatePrinters(ids, printer) {
+        await cms.getModel('Product').updateMany({
+          _id: { $in: ids }
+        }, {
+          groupPrinters: [printer]
+        })
+        await this.loadProducts()
+        cms.socket.emit('send-menu', this.store._id)
+      },
       // Discounts
       async getDiscounts() {
         try {
