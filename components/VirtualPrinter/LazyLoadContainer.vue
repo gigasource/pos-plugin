@@ -90,6 +90,7 @@
         const anchorClientRect = this.anchorElement.getClientRects()[0]
         const contentClientRect = this.$refs.content.getClientRects()[0]
         if (contentClientRect.bottom <= anchorClientRect.bottom + this.threshold) {
+          console.log('lazyloadcontainer:doLoad')
           try {
             this.loading = true
             this.doLoad().then(() => {

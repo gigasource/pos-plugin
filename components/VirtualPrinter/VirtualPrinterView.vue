@@ -21,8 +21,11 @@
           <g-btn border-radius="4" :uppercase="false" @click="dismiss" class="virtualPrinter__header__btn">Dismiss</g-btn>
         </div>
         <div :style="previewStyle">
-          <div v-for="(imgSrc, i) in imgSrcs" :key="i" :style="imageWrapperStyle">
+          <div v-if="imgSrcs && imgSrcs.length" v-for="(imgSrc, i) in imgSrcs" :key="i" :style="imageWrapperStyle">
             <img :src="imgSrc" draggable="false" :style="imgStyle"/>
+          </div>
+          <div v-else>
+            0 report found!
           </div>
         </div>
       </div>
@@ -30,6 +33,9 @@
 </template>
 
 <script>
+  // TODO:
+  //  - lazy container reload when switch between report type
+
   import LazyLoadContainer from './LazyLoadContainer';
   export default {
     name: 'VirtualPrinterView',
