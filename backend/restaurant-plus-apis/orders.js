@@ -225,6 +225,7 @@ router.put('/', jwtValidator, async (req, res) => {
     const parsedTime = parseInt(time)
     return !isNaN(parsedTime) && parsedTime > 0
   }
+  const oldOrder = await cms.getModel('Order').findOne({ ...orderId.includes('-') ? { onlineOrderId: orderId } : { _id: ObjectId(orderId) }})
   const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
     { ...orderId.includes('-')
         ? { onlineOrderId: orderId }
@@ -235,7 +236,7 @@ router.put('/', jwtValidator, async (req, res) => {
       ...status === 'declined' && { declineReason },
       ...status === 'kitchen'
         && isValidTimeToComplete(timeToComplete)
-        && { deliveryTime: dayjs().add(+timeToComplete, 'minute').toDate().toISOString() }
+        && { deliveryTime: dayjs(oldOrder.date).add(+timeToComplete, 'minute').format('HH:mm') }
     },
     { new: true })
   res.status(204).json(updatedOrder)
