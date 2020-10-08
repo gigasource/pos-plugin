@@ -188,7 +188,7 @@
         
         if (this.showVirtualReportInSidebar) {
           sidebar.push({
-            icon: 'icon-functions',
+            icon: 'icon-printer',
             onClick() {
               this.$emit('update:view', {
                 name: 'VirtualPrinter',
