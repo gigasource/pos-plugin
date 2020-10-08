@@ -1,62 +1,124 @@
 <template>
   <div class="delivery">
     <div class="delivery-info">
-      <template v-if="!isMobile || !showKeyboard">
-        <div class="delivery-info__favorite">
-          <div :style="getRandomColor(i)" class="delivery-info__favorite-item" v-for="(f, i) in favorites"
-               @click="selectFavoriteProduct(f)"
-               :key="`favorite_${i}`">
-            {{f.name}}
-          </div>
-        </div>
-      </template>
-      <div class="delivery-info__customer">
-        <template v-if="!isNewCustomer">
-          <div
-              :class="['delivery-info__customer-address', selectedAddress === i && 'delivery-info__customer-address--selected']"
-              v-for="(item, i) in selectedCustomer.addresses" @click="selectAddress(i)">
-            <div class="row-flex align-items-center">
-              <g-radio small v-model="selectedAddress" :value="i" :label="`Address ${i+1}`" color="#536DFE"/>
-              <g-spacer/>
-              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825" @click="openDialog('edit', item.address, item.zipcode, i)">
-                <g-icon size="15">icon-reservation_modify</g-icon>
-              </g-btn-bs>
-              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452" @click="removeAddress(i)">
-                <g-icon size="15">icon-delete</g-icon>
-              </g-btn-bs>
+      <div class="delivery-info--upper">
+        <template v-if="deliveryOrderMode === 'tablet' || !showKeyboard">
+          <div class="delivery-info__favorite">
+            <div :style="getRandomColor(i)" class="delivery-info__favorite-item" v-for="(f, i) in favorites"
+                 @click="selectFavoriteProduct(f)"
+                 :key="`favorite_${i}`">
+              {{f.name}}
             </div>
-            <p>{{item.address}}</p>
-            <p class="text-grey fs-small">{{item.zipcode}}</p>
-            <p class="text-grey fs-small">{{item.city}}</p>
           </div>
-          <g-icon size="40" color="#1271FF" @click="openDialog('add')">add_circle</g-icon>
         </template>
-        <template v-else>
-          <template v-if="isMobile">
-            <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
-            <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
-            <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense
-                        :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
-                        @input-click="showKeyboard = true" keep-menu-on-blur
-                        @input="selectAutocompleteAddress"/>
+        <div class="delivery-info__customer">
+          <template v-if="!isNewCustomer">
+            <div
+                :class="['delivery-info__customer-address', selectedAddress === i && 'delivery-info__customer-address--selected']"
+                v-for="(item, i) in selectedCustomer.addresses" @click="selectAddress(i)">
+              <div class="row-flex align-items-center">
+                <g-radio small v-model="selectedAddress" :value="i" :label="`Address ${i+1}`" color="#536DFE"/>
+                <g-spacer/>
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825" @click="openDialog('edit', item.address, item.zipcode, i)">
+                  <g-icon size="15">icon-reservation_modify</g-icon>
+                </g-btn-bs>
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452" @click="removeAddress(i)">
+                  <g-icon size="15">icon-delete</g-icon>
+                </g-btn-bs>
+              </div>
+              <p>{{item.address}}</p>
+              <p class="text-grey fs-small">{{item.zipcode}}</p>
+              <p class="text-grey fs-small">{{item.city}}</p>
+            </div>
+            <g-icon size="40" color="#1271FF" @click="openDialog('add')">add_circle</g-icon>
           </template>
           <template v-else>
-            <g-text-field-bs class="bs-tf__pos" label="Name" v-model="name" @click="openDialog('add')">
-              <template v-slot:append-inner>
-                <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
-              </template>
-            </g-text-field-bs>
-            <g-text-field-bs class="bs-tf__pos" label="Address" v-model="address" @click="openDialog('add')">
-              <template v-slot:append-inner>
-                <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
-              </template>
-            </g-text-field-bs>
+            <template v-if="deliveryOrderMode === 'mobile'">
+              <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+              <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+              <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense
+                          :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
+                          @input-click="showKeyboard = true" keep-menu-on-blur
+                          @input="selectAutocompleteAddress"/>
+            </template>
+            <template v-else>
+              <g-text-field-bs class="bs-tf__pos" label="Name" v-model="name" @click="openDialog('add')">
+                <template v-slot:append-inner>
+                  <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
+                </template>
+              </g-text-field-bs>
+              <g-text-field-bs class="bs-tf__pos" label="Address" v-model="address" @click="openDialog('add')">
+                <template v-slot:append-inner>
+                  <g-icon @click="openDialog('add')">icon-keyboard</g-icon>
+                </template>
+              </g-text-field-bs>
+            </template>
           </template>
+        </div>
+      </div>
+      <div class="delivery-info--lower">
+        <div class="delivery-info__call" v-if="calls && calls.length > 0">
+          <div class="delivery-info__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon size="16" class="mr-1">icon-call</g-icon>
+              {{calls[0].customer.phone}}
+            </p>
+            <p class="fs-small text-grey-darken-1">{{calls[0].customer.name}}</p>
+          </div>
+          <div :class="['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']"
+              @click="chooseCustomer('pickup')">
+            <g-icon size="20">icon-take-away</g-icon>
+          </div>
+          <div :class="['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']"
+               @click="chooseCustomer('delivery')">
+            <g-icon size="20">icon-delivery-scooter</g-icon>
+          </div>
+          <div class="delivery-info__call-btn--cancel" @click="deleteCall()">
+            <g-icon color="white">clear</g-icon>
+          </div>
+        </div>
+        <template v-else>
+          <div class="delivery-info__call--empty">
+            <p class="fw-700">Empty</p>
+            <p class="text-grey-darken-1">No pending calls</p>
+          </div>
+          <g-menu v-model="menuMissed" v-if="missedCalls && missedCalls.length > 0" top left nudge-top="5">
+            <template v-slot:activator="{on}">
+              <div v-on="on" :class="['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']">
+                <b>Missed</b>
+                <div class="delivery-info__call--missed-num">
+                  {{missedCalls.length}}
+                </div>
+              </div>
+            </template>
+            <div class="menu-missed">
+              <div class="menu-missed__call" v-for="(call, i) in missedCalls" :key="`missed_${i}`">
+                <div class="menu-missed__call--info">
+                  <p class="fw-700 fs-small">
+                    <g-icon size="16" class="mr-1">icon-call</g-icon>
+                    {{call.customer.phone}}
+                  </p>
+                  <p class="fs-small text-grey-darken-1">{{call.customer.name}}</p>
+                </div>
+                <div :class="['delivery-info__call-btn', orderType === 'pickup' && missedIndex === i && 'delivery-info__call-btn--selected']"
+                     @click="chooseMissedCustomer(i, 'pickup')">
+                  <g-icon size="20">icon-take-away</g-icon>
+                </div>
+                <div :class="['delivery-info__call-btn', orderType === 'delivery' && missedIndex === i && 'delivery-info__call-btn--selected']"
+                     @click="chooseMissedCustomer(i, 'delivery')">
+                  <g-icon size="20">icon-delivery-scooter</g-icon>
+                </div>
+                <div class="delivery-info__call-btn--cancel" @click="deleteCall(i)">
+                  <g-icon color="white">clear</g-icon>
+                </div>
+              </div>
+            </div>
+          </g-menu>
         </template>
       </div>
     </div>
     <div class="delivery-order">
-      <template v-if="isMobile">
+      <template v-if="deliveryOrderMode === 'mobile'">
         <g-spacer/>
         <pos-order-delivery-keyboard mode="active" :keyboard-config="keyboardConfig" @submit="chooseProduct"/>
       </template>
@@ -249,7 +311,7 @@
         return !isNaN(value) ? value.toFixed(2) : value
       }
     },
-    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer )', 'PosStore:(isMobile)'],
+    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls )'],
     data() {
       return {
         favorites: [],
@@ -283,7 +345,10 @@
         debouceUpdatePrice: () => {},
         quantity: 1,
         showKeyboard: false,
-        keyboardConfig: []
+        keyboardConfig: [],
+        menuMissed: false,
+        missedIndex: null,
+        deliveryOrderMode: 'tablet'
       }
     },
     async created() {
@@ -291,9 +356,11 @@
       await this.loadKeyboard()
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
       window.addEventListener('keydown', this.keyboardHanle.bind(this))
-      this.apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
+      const setting = await cms.getModel('PosSetting').findOne()
+      this.apiKey = setting['call']['googleMapApiKey']
       this.debouceSearchAddress = _.debounce(this.searchAddress, 300)
       this.debouceUpdatePrice = _.debounce(this.updatePrice, 300)
+      this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
     },
     computed: {
       username() {
@@ -648,13 +715,36 @@
           this.isNewCustomer = false
         }
         this.showKeyboard = false
+      },
+      deleteCall(index) {
+        //index => missed call || first call
+        if(index) {
+          this.missedCalls.splice(index, 1)
+        } else {
+          this.calls.splice(0, 1)
+        }
+      },
+      chooseCustomer(type) {
+        this.orderType = type
+        this.selectedCustomer = this.calls[0].customer
+        this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
+        this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
+        this.phone = this.selectedCustomer.phone
+      },
+      chooseMissedCustomer(index, type) {
+        this.missedIndex = index
+        this.orderType = type
+        this.selectedCustomer = this.missedCalls[index].customer
+        this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
+        this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
+        this.phone = this.selectedCustomer.phone
       }
     },
     async activated() {
       await this.loadProduct()
       await this.loadKeyboard()
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
-      this.name = this.selectedCustomer.name
+      this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
       this.phone = this.selectedCustomer.phone
       this.type = 'default'
       if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
@@ -662,6 +752,9 @@
       }
       this.note = ''
       this.time = 30
+      this.missedIndex = null
+      const setting = (await cms.getModel('PosSetting').findOne())
+      this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
     }
   }
 </script>
@@ -682,7 +775,9 @@
       z-index: 2;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
       height: 100%;
-      overflow: auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
 
       &__title {
         font-size: 13px;
@@ -740,6 +835,96 @@
 
           &__active {
            transform: translateY(-13px) translateX(7px) scale(0.75) !important;
+          }
+        }
+      }
+
+      &--upper {
+        flex: 1;
+        overflow: auto;
+      }
+
+      &--lower {
+        margin-top: 8px;
+        display: flex;
+        align-items: stretch;
+      }
+
+      &__call {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        padding: 6px;
+        background: #FFFFFF;
+        border: 0.4px solid #9E9E9E;
+        border-radius: 4px;
+
+        &--info {
+          flex: 1;
+          line-height: 1.2;
+        }
+
+        &-btn {
+          padding: 7px;
+          border: 1px solid #E0E0E0;
+          border-radius: 2px;
+          cursor: pointer;
+          margin-right: 4px;
+          line-height: 1;
+
+          &--selected {
+            background-color: #E3F2FD;
+            border-color: #1271FF;
+          }
+
+          &--cancel {
+            width: 36px;
+            height: 36px;
+            padding: 6px;
+            background: #FF4552;
+            border-radius: 2px;
+            cursor: pointer;
+            line-height: 1;
+          }
+        }
+
+        &--empty {
+          padding: 6px;
+          flex: 1;
+          border-radius: 4px;
+          background: #FFFFFF;
+          border: 0.4px solid #9E9E9E;
+          margin-right: 8px;
+          line-height: 1.2;
+          font-size: 14px;
+        }
+
+        &--missed {
+          display: flex;
+          align-items: center;
+          background-color: white;
+          border: 1px solid #FF4452;
+          color: #FF4452;
+          border-radius: 4px;
+          height: 46px;
+          padding: 4px;
+
+          &--selected {
+            background-color: #FFEBEE;
+          }
+
+          &-num {
+            width: 20px;
+            height: 20px;
+            margin-left: 2px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 14px;
+            color: white;
+            background-color: #FF4552;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }
@@ -974,6 +1159,28 @@
       margin: 0 -12px -12px;
       padding: 6px;
       border-radius: 0 0 4px 4px;
+    }
+  }
+
+  .menu-missed {
+    background: #FFFFFF;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    width: calc(33vw - 16px);
+
+    &__call {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      padding: 6px;
+      background: #FFFFFF;
+      border-bottom: 0.4px solid #9E9E9E;
+
+      &--info {
+        flex: 1;
+        line-height: 1.2;
+        margin-right: 8px;
+      }
     }
   }
 </style>
