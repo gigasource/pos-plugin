@@ -79,7 +79,7 @@
          <g-btn-bs min-width="130" style="align-self: flex-start; margin-right: 0"
                    @click="viewMap" small icon="icon-direction_white"
                    background-color="#2979FF" text-color="white">
-           Get direcrtion
+           Get direction
          </g-btn-bs>
        </div>
        <div class="row-flex align-items-center px-2 pt-2">
