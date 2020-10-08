@@ -201,8 +201,8 @@ async function printCanvas(printer, printData) {
   printer.bold(true);
   printer.tableCustom([
     {text: 'Item', align: 'LEFT', width: 0.4},
-    {text: 'Q.ty', align: 'RIGHT', width: 0.1},
-    {text: 'Unit price', align: 'RIGHT', width: 0.25},
+    {text: 'Q.ty', align: 'RIGHT', width: 0.15},
+    {text: 'Unit price', align: 'RIGHT', width: 0.2},
     {text: 'Total', align: 'RIGHT', width: 0.25},
   ]);
   printer.newLine(8);
@@ -212,8 +212,8 @@ async function printCanvas(printer, printData) {
   orderProductList.forEach(product => {
     printer.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
-      {text: product.quantity, align: 'RIGHT', width: 0.1},
-      {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.25},
+      {text: product.quantity, align: 'RIGHT', width: 0.15},
+      {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.2},
       {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.25},
     ]);
     printer.newLine(4);
