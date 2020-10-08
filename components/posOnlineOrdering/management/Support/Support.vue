@@ -56,7 +56,7 @@
                               @input="val => assignStore(request, val)"
                               placeholder="No store assigned"/>
             </div>
-            <div class="w-12">{{request.deviceName}}</div>
+            <div class="w-12">{{`${request.deviceName} (${request.deviceType.toUpperCase()})`}}</div>
             <div class="col-2">{{request.deviceLocation}}</div>
             <div class="w-10 pr-2">
               <div v-if="request.status === 'approved'" class="complete">Approved</div>

@@ -20,7 +20,6 @@ const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE,
 const jsonFn = require('json-fn');
 const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
-const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
 const { time } = require('console');
 
