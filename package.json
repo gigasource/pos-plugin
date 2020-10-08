@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
-    "@gigasource/canvaskit-printer-renderer": "0.0.11",
+    "@gigasource/canvaskit-printer-renderer": "0.0.12",
     "better-queue": "^3.8.10",
     "bson": "^4.1.0",
     "clone-buffer": "^1.0.0",
