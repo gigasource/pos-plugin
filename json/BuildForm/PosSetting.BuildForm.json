@@ -591,15 +591,8 @@
         },
         {
           "schemaType": "string",
-          "key": "quickBtnAction",
-          "default": "pay",
+          "key": "deliveryOrderMode",
           "type": "input"
-        },
-        {
-          "schemaType": "boolean",
-          "key": "useVirtualPrinter",
-          "default": "true",
-          "type": "input@switch"
         }
       ],
       "type": "object"
@@ -1132,12 +1125,6 @@
           "schemaType": "string",
           "key": "googleMapApiKey",
           "type": "input"
-        },
-        {
-          "schemaType": "boolean",
-          "key": "demoMode",
-          "type": "input@switch",
-          "default": "false"
         }
       ]
     },

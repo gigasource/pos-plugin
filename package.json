@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.1.73",
+  "version": "1.1.74",
   "release": "Stable",
   "description": "",
   "main": "index.js",
