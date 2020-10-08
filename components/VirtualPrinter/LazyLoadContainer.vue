@@ -42,7 +42,23 @@
       }
     },
     mounted() {
-      this.loadMore = _.throttle(this.wheelHandle, 200, { trailing: false })
+      // throttle wheel event
+      this.wheelHandleThrottle = _.throttle(this.wheelHandle, 200, { trailing: false })
+      
+      // throttle doLoad function
+      this.doLoadThrotle = _.throttle(() => {
+        if (!this.doLoad)
+          return;
+        try {
+          // console.log('run doLoad')
+          this.loading = true;
+          this.doLoad().then(() => this.loading = false);
+        } catch (e) {
+          // console.log('do-load exception', e);
+          this.loading = true;
+        }
+      }, 2000)
+      
       const content = this.$refs.content
       // loop back to find anchor node (anchor node is a
       // node which doesn't increase
@@ -61,15 +77,15 @@
       }
       //
       if (content) {
-        content.addEventListener('wheel', this.loadMore)
-        content.addEventListener('touchend', this.loadMore)
+        content.addEventListener('wheel', this.wheelHandleThrottle)
+        content.addEventListener('touchend', this.wheelHandleThrottle)
       }
     },
     beforeDestroy() {
       const content = this.$refs.content
       if (content) {
-        content.removeEventListener('wheel', this.loadMore)
-        content.removeEventListener('touchend', this.loadMore)
+        content.removeEventListener('wheel', this.wheelHandleThrottle)
+        content.removeEventListener('touchend', this.wheelHandleThrottle)
       }
       
     },
@@ -90,15 +106,7 @@
         const anchorClientRect = this.anchorElement.getClientRects()[0]
         const contentClientRect = this.$refs.content.getClientRects()[0]
         if (contentClientRect.bottom <= anchorClientRect.bottom + this.threshold) {
-          console.log('lazyloadcontainer:doLoad')
-          try {
-            this.loading = true
-            this.doLoad().then(() => {
-              this.loading = false
-            })
-          } catch (e) {
-            console.log('do-load exception', e)
-          }
+          this.doLoadThrotle()
         }
       },
     }
