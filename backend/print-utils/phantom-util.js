@@ -1,6 +1,6 @@
 const queue = require('queue');
-const q = require('q');
 const fs = require('fs');
+const q = require('q');
 const PNG = require('pngjs').PNG;
 const phantom = require('phantom');
 let instance, page;
@@ -24,8 +24,8 @@ let renderQueue = queue({autostart: true, concurrency: 1});
 
 module.exports = class PhantomUtil {
   constructor() {
-    renderQueue.push(next => initPhantom().then(next));
-    //initPhantom();
+    // renderQueue.push(next => initPhantom().then(next));
+    // initPhantom();
   }
 
   render(html) {

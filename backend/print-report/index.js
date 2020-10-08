@@ -2,10 +2,12 @@ const _ = require('lodash');
 const { getEscPrinter, getGroupPrinterInfo } = require('../print-utils/print-utils');
 const fs = require('fs');
 const path = require('path');
+const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
+const virtualPrinter = require('./virtual-printer')
 
 module.exports = async function (cms) {
   cms.socket.on('connect', socket => {
-    socket.on('printReport', printHandler)
+    socket.on('printReport', printHandler);
   });
 }
 
@@ -69,26 +71,40 @@ async function printHandler(reportType, reportData, device, callback = () => nul
     const groupPrinters = await getGroupPrinterInfo(cms, device, type);
     const printers = _.flatten(groupPrinters.map(group => ({
       ...group.printers,
-      groupPrinter: group.name
+      groupPrinter: group.name,
+      groupPrinterId: group._id
     })));
 
+    const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
+    const { useVirtualPrinter } = posSetting.generalSetting
+    const CanvasPrinter = await initCanvaskit();
     for (const printerInfo of printers) {
-      const escPrinter = await getEscPrinter(printerInfo);
-      const { escPOS } = printerInfo
+      if (useVirtualPrinter) {
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{ report, printData, printerInfo, type }])
+      }
 
+      const {escPOS} = printerInfo
+      const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
-        await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter);
+        await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
-        await report.printSsr(escPrinter, printData, printerInfo.groupPrinter);
+        // await report.printSsr(escPrinter, printData);
+        const canvasPrinter = new CanvasPrinter(560, 50000, {
+          printFunctions: {
+            printPng: escPrinter.printPng.bind(escPrinter),
+            print: escPrinter.print.bind(escPrinter),
+          }
+        });
+        await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+        canvasPrinter.cleanup();
       }
     }
-
-    const result = { success: true };
+    const result = {success: true}
     callback(result);
-    return result
+    return result;
   } catch (e) {
     console.error(e);
-    return callbackWithError(callback, e)
+    return callbackWithError(callback, e);
   }
 }
 
@@ -98,5 +114,5 @@ function callbackWithError(callback, error) {
     message: error.toString()
   };
   callback(result)
-  return result
+  return result;
 }

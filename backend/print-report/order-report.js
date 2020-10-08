@@ -2,9 +2,8 @@ const {convertHtmlToPng} = require('../print-utils/print-utils');
 const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 
-async function makePrintData(cms, order) {
+async function makePrintData(cms, order, locale) {
   const posSetting = await cms.getModel('PosSetting').findOne({})
-
   if (!order) return null
 
   const {name: companyName, address: companyAddress, telephone: companyTel, taxNumber: companyVatNumber} = posSetting.companyInfo
@@ -147,6 +146,112 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
+async function printCanvas(printer, printData) {
+  const {
+    companyName,
+    companyAddress,
+    companyTel,
+    companyVatNumber,
+    orderDate,
+    orderTime,
+    orderNumber,
+    orderProductList,
+    orderSum,
+    orderTax,
+    orderTaxGroups,
+    orderCashReceived,
+    orderCashback,
+    orderPaymentType,
+    orderBookingNumber,
+    discount,
+    payment
+  } = printData;
+
+  function convertMoney(value) {
+    return !isNaN(value) ? value.toFixed(2) : value
+  }
+
+  printer.alignCenter();
+  printer.setFontSize(30);
+  printer.bold(true);
+  printer.println(companyName);
+  printer.newLine(4);
+  printer.bold(false);
+  printer.setFontSize(20);
+  printer.println(companyAddress);
+  printer.println(`Tel: ${companyTel}`);
+  printer.println(`VAT Reg No: ${companyVatNumber}`);
+
+  printer.newLine(10);
+  printer.bold(true);
+  printer.setFontSize(40);
+  printer.println('Invoice');
+  printer.newLine(10);
+  printer.bold(false);
+
+  printer.setFontSize(25);
+  printer.alignLeft();
+  printer.println(`Date: ${orderDate}`);
+  printer.newLine(4);
+  printer.println(`Time: ${orderTime}`);
+  printer.newLine(4);
+  printer.println(`Invoice No: ${orderNumber}`);
+
+  printer.newLine(16);
+  printer.bold(true);
+  printer.tableCustom([
+    {text: 'Item', align: 'LEFT', width: 0.4},
+    {text: 'Q.ty', align: 'RIGHT', width: 0.1},
+    {text: 'Unit price', align: 'RIGHT', width: 0.25},
+    {text: 'Total', align: 'RIGHT', width: 0.25},
+  ]);
+  printer.newLine(8);
+  printer.drawLine();
+
+  printer.bold(false);
+  orderProductList.forEach(product => {
+    printer.tableCustom([
+      {text: product.name, align: 'LEFT', width: 0.4},
+      {text: product.quantity, align: 'RIGHT', width: 0.1},
+      {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.25},
+      {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.25},
+    ]);
+    printer.newLine(4);
+  });
+  printer.drawLine();
+
+  printer.leftRight('Sub-total', convertMoney(orderSum - orderTax));
+  if (!isNaN(discount) && discount > 0) printer.leftRight('Discount', convertMoney(discount));
+  orderTaxGroups.forEach(taxGroup => {
+    printer.leftRight(`Tax (${taxGroup.taxType}%)`, convertMoney(taxGroup.tax));
+  });
+  printer.drawLine();
+
+  printer.bold(true);
+  printer.leftRight('Total', `${convertMoney(orderSum)}`);
+  printer.bold(false);
+  if (orderCashReceived || orderCashReceived === 0)
+    printer.leftRight('Cash tend', `${convertMoney(orderCashReceived)}`);
+  printer.drawLine();
+
+  printer.bold(true);
+  if (orderCashback || orderCashback === 0)
+    printer.leftRight('Change due', `${convertMoney(orderCashback)}`);
+  printer.alignLeft();
+  printer.bold(false);
+  printer.newLine();
+  printer.println(`Payment method: ${capitalize(orderPaymentType)}`);
+  printer.newLine(14);
+
+  printer.alignCenter();
+  printer.printBarcode(orderBookingNumber);
+  printer.println(`Invoice ID: ${orderBookingNumber}`);
+  printer.newLine(8);
+  printer.bold(true);
+  printer.println(`Thank you for choosing ${companyName}`);
+  await printer.print();
+}
+
 async function printSsr(printer, printData) {
   const OrderReport = require('../../dist/OrderReport.vue');
 
@@ -174,4 +279,5 @@ module.exports = {
   makePrintData,
   printSsr,
   printEscPos,
+  printCanvas
 }

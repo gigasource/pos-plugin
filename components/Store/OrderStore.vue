@@ -386,7 +386,7 @@
       },
       async resetOrderData() {
         const tseConfig = await cms.getModel('TseConfig').findOne()
-        const tseEnabled = !!tseConfig.tseEnable
+        const tseEnabled = tseConfig && !!tseConfig.tseEnable
         this.activeTableProduct = null
         this.currentOrder = this.currentOrder.table
           ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } }

@@ -299,11 +299,14 @@
 
         if (isLastSplit) this.showReceipt = true
       },
-      updateSplitPayment(_id, payment) {
+      updateSplitPayment(_id, payment, tip) {
         cms.socket.emit('update-split-payment', _id, payment, ({ order, error }) => {
           if (error) return console.log(error)
           const split = this.splitOrders.find(i => i._id === _id)
           split.payment = payment
+
+          // TODO: tip is not saved on backend yet
+          this.$set(split, 'tip', tip)
         })
       },
       complete() {

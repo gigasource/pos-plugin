@@ -113,6 +113,93 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
+async function printCanvas(printer, printData) {
+  const {
+    name, address, telephone, taxNumber, date, from, to, sum, net, tax, discount, sumByPayment,
+    sum0, net0, tax0, sum7, net7, tax7, sum19, net19, tax19
+  } = printData;
+
+  function getDateTimeString(date) {
+    return dayjs(date).format('DD.MM HH:mm')
+  }
+
+  function convertMoney(value) {
+    return !isNaN(value) ? value.toFixed(2) : value
+  }
+
+  printer.alignCenter();
+  printer.setTextDoubleHeight();
+  printer.bold(true);
+  printer.println(name);
+
+  printer.bold(false);
+  printer.setTextNormal();
+  printer.println(address);
+  printer.println(`Tel: ${telephone}`);
+  printer.println(`VAT Reg No: ${taxNumber}`);
+
+  printer.newLine();
+  printer.setTextDoubleHeight();
+  printer.bold(true);
+  printer.println('X-Report');
+
+  printer.newLine();
+  printer.setTextNormal();
+  printer.alignLeft();
+  printer.bold(true);
+  printer.println(`Report Date: ${date}`);
+  printer.bold(false);
+  printer.println(`First Order: ${getDateTimeString(from)}`);
+  printer.println(`Last Order: ${getDateTimeString(to)}`);
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.println('Sales');
+  printer.bold(false);
+  printer.leftRight('Total', convertMoney(sum));
+  printer.leftRight('Sub-total', convertMoney(net));
+  printer.leftRight('Tax', convertMoney(tax));
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.bold(false);
+
+  if (sum0) {
+    printer.println('Tax 0%:');
+    printer.leftRight('Total', convertMoney(sum0));
+    printer.leftRight('Sub-total', convertMoney(net0));
+    printer.leftRight('Total', convertMoney(tax0));
+    printer.newLine();
+  }
+
+  if (sum7) {
+    printer.println('Tax 7%:');
+    printer.leftRight('Total', convertMoney(sum7));
+    printer.leftRight('Sub-total', convertMoney(net7));
+    printer.leftRight('Total', convertMoney(tax7));
+    printer.newLine();
+  }
+
+  if (sum19) {
+    printer.println('Tax 19%:');
+    printer.leftRight('Total', convertMoney(sum19));
+    printer.leftRight('Sub-total', convertMoney(net19));
+    printer.leftRight('Total', convertMoney(tax19));
+    printer.newLine();
+  }
+
+  printer.leftRight('Discount', convertMoney(discount));
+  printer.bold(true);
+  printer.drawLine();
+
+  Object.keys(sumByPayment).forEach(paymentType => {
+    const paymentAmount = sumByPayment[paymentType];
+    printer.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
+  });
+
+  await printer.print();
+}
+
 async function printSsr(printer, printData) {
   const XReport = require('../../dist/XReport.vue');
 
@@ -136,4 +223,5 @@ module.exports = {
   makePrintData,
   printSsr,
   printEscPos,
+  printCanvas
 }
