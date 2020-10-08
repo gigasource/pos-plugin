@@ -246,7 +246,7 @@ async function deleteTempCommit(groupTempId) {
 }
 
 async function handlePrintOrder(commit) {
-	if (commit.order._id) {
+	if (commit && commit.order && commit.order._id) {
 		const order = await cms.getModel('Order').findById(commit.order._id)
 		commit.order.id = order.id
 	}
