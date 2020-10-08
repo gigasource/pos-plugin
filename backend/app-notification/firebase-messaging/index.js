@@ -96,7 +96,7 @@ module.exports = cms => {
       /** @deprecated */
       const response = await admin.messaging().send({...message, topic})
 
-      const devices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms', firebaseToken: { $exists: true } })
+      const devices = await cms.getModel('Device').find({ $or: [{storeId}, {storeIds: {$elemMatch: {$eq: storeId}}}], deviceType: 'gsms', firebaseToken: { $exists: true } })
 
       if (devices.length > 0) {
         await admin.messaging().sendAll(devices.map(d => ({

@@ -345,7 +345,7 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
 }
 
 async function getGsmsDevices(storeId) {
-  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+  return cms.getModel('Device').find({ $or: [{storeId}, {storeIds: {$elemMatch: {$eq: storeId}}}], deviceType: 'gsms' })
 }
 
 async function sendOrderToStoreDevices(store, orderData) {
