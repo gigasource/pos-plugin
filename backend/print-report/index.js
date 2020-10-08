@@ -6,9 +6,6 @@ const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
 const virtualPrinter = require('./virtual-printer')
 
 module.exports = async function (cms) {
-  cms.socket.on('connect', socket => {
-    socket.on('printReport', printHandler);
-  });
 }
 
 module.exports.printInvoiceHandler = printHandler
