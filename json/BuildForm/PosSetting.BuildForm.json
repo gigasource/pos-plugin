@@ -547,6 +547,12 @@
       "fields": [
         {
           "schemaType": "boolean",
+          "key": "useVirtualPrinter",
+          "default": "true",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
           "key": "barcode",
           "type": "input@switch"
         },
