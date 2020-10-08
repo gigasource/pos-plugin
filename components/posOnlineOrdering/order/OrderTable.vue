@@ -390,6 +390,7 @@
           this.dialog.confirm = false
           this.$set(this.dialog.order, 'status', status)
           this.dialog.extraInfo = responseMessage
+          if(status === 'kitchen' || status === 'declined') this.dialog.order.orderToken = null
         }
       })
     },
