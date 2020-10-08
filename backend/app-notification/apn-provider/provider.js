@@ -4,7 +4,7 @@ let apnProviderInstance
 module.exports = cms => {
   const apnOptions = {
     token: APP_CONFIG.apnToken,
-    production: false // todo later
+    production: true
   }
   apnProviderInstance = new apn.Provider(apnOptions)
 }

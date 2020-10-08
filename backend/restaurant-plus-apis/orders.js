@@ -14,6 +14,7 @@ const objectMapper = require('object-mapper');
 const sumBy = require('lodash/sumBy');
 const sum = require('lodash/sum');
 const _ = require('lodash');
+const dayjs = require('dayjs');
 const {firebaseAdminInstance} = require('../app-notification/firebase-messaging/admin');
 const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE, VOUCHER_STATUS} = require('./constants');
 const jsonFn = require('json-fn');
@@ -21,6 +22,7 @@ const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
 const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
+const { time } = require('console');
 
 const mapperConfig = {
   _id: '_id',
@@ -219,6 +221,10 @@ router.put('/', jwtValidator, async (req, res) => {
   if (!orderId || !status) res.sendStatus(400)
 
   // update order
+  function isValidTimeToComplete(time) {
+    const parsedTime = parseInt(time)
+    return !isNaN(parsedTime) && parsedTime > 0
+  }
   const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
     { ...orderId.includes('-')
         ? { onlineOrderId: orderId }
@@ -226,7 +232,10 @@ router.put('/', jwtValidator, async (req, res) => {
     {
       status,
       ...status === 'kitchen' && { timeToComplete },
-      ...status === 'declined' && { declineReason }
+      ...status === 'declined' && { declineReason },
+      ...status === 'kitchen'
+        && isValidTimeToComplete(timeToComplete)
+        && { deliveryTime: dayjs().add(+timeToComplete, 'minute').toDate().toISOString() }
     },
     { new: true })
   res.status(204).json(updatedOrder)
@@ -250,6 +259,14 @@ router.put('/', jwtValidator, async (req, res) => {
   if (updatedOrder.restaurantPlusUser) {
     sendOrderNotificationToDevice(updatedOrder._id, status)
   }
+
+  // send notification to all store's devices
+  const gSmsDevices = await getGsmsDevices(updatedOrder.storeId);
+  await sendNotification(
+    gSmsDevices,
+    {},
+    { actionType: NOTIFICATION_ACTION_TYPE.UPDATE_ORDER, orderId: updatedOrder._id.toString() },
+  )
 })
 
 // TODO: fix this
@@ -326,6 +343,10 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
   return admin.messaging().send(message);
 }
 
+async function getGsmsDevices(storeId) {
+  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+}
+
 async function sendOrderToStoreDevices(store, orderData) {
   const device = await DeviceModel.findOne({storeId: store._id, 'features.onlineOrdering': true});
 
@@ -333,7 +354,9 @@ async function sendOrderToStoreDevices(store, orderData) {
   const storeAlias = store.alias;
 
   if (store.gSms && store.gSms.enabled) {
-    const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    // const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
+    let storeId = store._id.toString();
+    const gSmsDevices = await getGsmsDevices(storeId);
     await sendNotification(
       gSmsDevices,
       {

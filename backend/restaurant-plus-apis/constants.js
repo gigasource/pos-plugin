@@ -33,6 +33,7 @@ const ORDER_RESPONSE_STATUS = Object.freeze({
 const NOTIFICATION_ACTION_TYPE = Object.freeze({
   ORDER: 'order',
   ORDER_STATUS: 'orderStatus',
+  UPDATE_ORDER: 'updateOrder',
   TABLE_RESERVATION: 'tableReservation',
   TABLE_REQUEST: 'tableRequest',
 });

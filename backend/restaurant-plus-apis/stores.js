@@ -384,7 +384,9 @@ router.put('/table-request/:requestId', jwtValidator, async (req, res) => {
 })
 
 async function getManagerDevices(storeId) {
-  return await cms.getModel('Device').find({ storeId: storeId.toString(), deviceType: 'gsms' })
+  // return await cms.getModel('Device').find({ storeId: storeId.toString(), deviceType: 'gsms' })
+  storeId = storeId.toString()
+  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
 }
 
 module.exports = router
