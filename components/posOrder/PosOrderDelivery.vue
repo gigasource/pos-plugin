@@ -240,7 +240,11 @@
           {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 &&
           this.selectedCustomer.addresses[this.selectedAddress].zipcode}}
         </div>
-        <g-text-field-bs label="Delivery note:" v-model="note"/>
+        <g-text-field-bs label="Delivery note:" v-model="note">
+          <template v-slot:append-inner>
+            <g-icon @click="dialog.note = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
         <div class="ma-2">Time to complete (minute)</div>
         <div class="mb-3">
           <g-btn-bs class="elevation-1" :background-color="time === 15 ? '#BBDEFB' : 'white'" @click="time = 15">15
@@ -298,6 +302,7 @@
         </div>
       </g-card>
     </g-dialog>
+    <dialog-text-filter v-model="dialog.note" label="Delivery note" @submit="e => { note = e }"/>
     <div v-if="showKeyboard" class="keyboard">
       <div class="keyboard-overlay" @click="showKeyboard = false"></div>
       <div class="keyboard-wrapper">
@@ -311,11 +316,9 @@
   import _ from 'lodash'
   import {Touch} from 'pos-vue-framework';
   import {v4 as uuidv4} from 'uuid'
-  import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
 
   export default {
     name: "PosOrderDelivery",
-    components: {PosKeyboardFull},
     directives: {
       Touch
     },
@@ -346,6 +349,7 @@
           input: false,
           order: false,
           choice: false,
+          note: false,
         },
         dialogMode: 'add',
         products: [],
