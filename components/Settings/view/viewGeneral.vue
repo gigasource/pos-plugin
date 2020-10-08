@@ -50,6 +50,7 @@
           </template>
         </pos-time-picker>
       </div>
+      <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
     </div>
   </div>
 </template>
@@ -154,6 +155,14 @@
             this.hideVirtualPrinterSidebarItem()
           }
         }
+      },
+      deliveryOrderMode: {
+        get() {
+          return (this.generalSettings && this.generalSettings.deliveryOrderMode) || 'tablet';
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'deliveryOrderMode', val);
+        },
       }
     },
     async created() {
@@ -200,5 +209,15 @@
 
   span {
     max-width: 150px;
+  }
+
+  .g-select ::v-deep {
+    .bs-tf-wrapper {
+      margin-left: 0;
+
+      .input {
+        color: #1d1d26;
+      }
+    }
   }
 </style>

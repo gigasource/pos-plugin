@@ -591,15 +591,8 @@
         },
         {
           "schemaType": "string",
-          "key": "quickBtnAction",
-          "default": "pay",
+          "key": "deliveryOrderMode",
           "type": "input"
-        },
-        {
-          "schemaType": "boolean",
-          "key": "useVirtualPrinter",
-          "default": "true",
-          "type": "input@switch"
         }
       ],
       "type": "object"
