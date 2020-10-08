@@ -877,7 +877,7 @@ module.exports = async cms => {
           ...p,
           type: 'delivery',
           option: {
-            favorite: !!p.mark.favorite
+            favorite: !!(p.mark && p.mark.favorite)
           },
           groupPrinter: p.groupPrinters[0],
           groupPrinter2: p.groupPrinters[1],
