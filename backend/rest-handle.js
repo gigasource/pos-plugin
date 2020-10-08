@@ -1,7 +1,11 @@
 require('dotenv').config();
 
+const {DEVICE_TYPE} = require('./api/devices/constants');
+
 const deviceApi = require('./api/device');
 const gsmsDeviceApi = require('./api/devices/gsms-devices');
+// const gsmsDeviceApi = require('./api/devices/router')(DEVICE_TYPE.GSMS);
+const posDeviceApi = require('./api/devices/router')(DEVICE_TYPE.POS);
 const demoApi = require('./api/demoDevice');
 const storeApi = require('./api/store');
 const appManagementApi = require('./api/appManagement');
@@ -69,6 +73,7 @@ module.exports = async cms => {
 
   cms.app.use('/device', deviceApi);
   cms.app.use('/gsms-device', gsmsDeviceApi);
+  cms.app.use('/pos-device', posDeviceApi);
   cms.app.use('/store', storeApi);
   cms.app.use('/app', appManagementApi);
   cms.app.use('/payment', payment);

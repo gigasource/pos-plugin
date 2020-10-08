@@ -11,6 +11,7 @@ const {assignDevice} = require('../../api/support');
 const teamRoute = require('./team')
 const taskRoute = require('./task')
 const staffRoute = require('./staff')
+const {DEVICE_TYPE} = require('../devices/constants')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -268,6 +269,7 @@ router.get('/sign-in-requests', async (req, res) => {
       deviceId: device._id,
       deviceName: device.name,
       deviceLocation: device.metadata && device.metadata.deviceLocation || 'N/A',
+      deviceType: device.deviceType || DEVICE_TYPE.POS,
       ...store && {storeName: store.settingName || store.name, storeId: store._id},
       ...e,
     }
@@ -358,7 +360,10 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
     // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
       clientId: request.device._id,
-      requestId: request._id
+      requestId: request._id,
+      storeId: request.store._id.toString(),
+      storeName: request.store.name || request.store.settingName,
+      storeAlias: request.store.alias,
     }]);
   } else if (status === 'notApproved') {
     // fallback
@@ -366,7 +371,7 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
     // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn_v2', [{
       clientId: request.device._id,
-      requestId: request._id
+      requestId: request._id,
     }]);
   }
 
