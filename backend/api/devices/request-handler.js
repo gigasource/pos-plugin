@@ -158,7 +158,8 @@ function createDeviceApiRequestHandlers(deviceType = DEVICE_TYPE.GSMS) {
   }
 
   async function registerDevice(req, res) {
-    let {hardwareId, hardware, appName, metadata} = req.body;
+    // NOTE: GSMS app may not have appVersion & release when register request is sent
+    let {hardwareId, hardware, appName, metadata, appVersion, release} = req.body;
 
     if (!hardware) return res.status(400).json({error: 'missing hardware property in request body'});
     if (!metadata) return res.status(400).json({error: 'missing metadata property in request body'});
@@ -196,8 +197,35 @@ function createDeviceApiRequestHandlers(deviceType = DEVICE_TYPE.GSMS) {
 
     if (!newDevice) {
       newDevice = await DeviceModel.create({
-        name: hardware || 'New Device', paired: true, lastSeen: now, createdAt: now,
-        hardware, appName, metadata, deviceType, notes: [], hardwareId,
+        name: hardware || 'New Device',
+        paired: true,
+        lastSeen: now,
+        createdAt: now,
+        hardware,
+        appName,
+        metadata,
+        deviceType,
+        notes: [],
+        hardwareId,
+        ...(!_.isNil(appVersion)) && {appVersion},
+        ...(!_.isNil(release)) && {release},
+        features: {
+          fastCheckout: false,
+          manualTable: false,
+          delivery: false,
+          editMenuCard: false,
+          tablePlan: false,
+          onlineOrdering: false,
+          editTablePlan: false,
+          staffReport: false,
+          eodReport: false,
+          monthlyReport: false,
+          remoteControl: true,
+          proxy: true,
+          alwaysOn: true,
+          reservation: false,
+          startOnBoot: false
+        }
       });
     }
 
