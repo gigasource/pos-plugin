@@ -371,10 +371,10 @@
         if (this.nextOpenHour) {
           if(this.store.preOrderTime) {
             if(this.preOrderMode) {
-              return `The merchant is temporarily closed but still accepts online orders at the momment. Your orders will be available for takeaway and delivery after ${this.nextOpenHour.hour}.`
+              return `The merchant is temporarily closed but still accepts online orders at the moment. Your orders will be available for takeaway and delivery after ${this.nextOpenHour.hour}.`
             }
             const preOrderTime = decrementTime(+this.nextOpenHour.hour.split(':')[0], +this.nextOpenHour.hour.split(':')[1], this.store.preOrderTime)
-            return `The merchant is temporarily closed an will not accept orders until ${preOrderTime.hour}:${preOrderTime.minute}. Please come back after that. We applogize for any inconvenience.`
+            return `The merchant is temporarily closed an will not accept orders until ${preOrderTime.hour}:${preOrderTime.minute < 10 && '0'}${preOrderTime.minute}. Please come back after that. We applogize for any inconvenience.`
           }
           return `${this.$t('store.merchantClose1', {
             0: this.nextOpenHour.day,
