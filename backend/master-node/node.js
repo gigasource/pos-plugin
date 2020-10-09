@@ -3,7 +3,7 @@ const express = require('express');
 const socketClient = require('socket.io-client');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
-const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkCommitExist } = require('./updateCommit');
+const updateCommit = require('./updateCommit');
 
 const nodeSync = async function (commits) {
 	/*
@@ -16,10 +16,11 @@ const nodeSync = async function (commits) {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await checkCommitExist(commit.commitId))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit.commitId))) newCommits.push(commit);
 	}
-	if (newCommits.length) pushTaskToQueue(newCommits);
-	if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
+	if (newCommits.length) updateCommit.handleCommit(newCommits);
+	updateCommit.setHighestCommitId(newCommits);
+	if (newCommits && newCommits.length) updateCommit.setHighestCommitId(commits[commits.length - 1].commitId + 1);
 }
 
 const connectToMaster = async (_this, masterIp) => {
@@ -30,8 +31,8 @@ const connectToMaster = async (_this, masterIp) => {
 		console.debug('nodeReceiveCommit', 'Receive commit from master', JSON.stringify(commits));
 		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
 		if (!oldHighestCommitId) {
-			pushTaskToQueue(commits);
-			setHighestCommitId(commits[commits.length - 1].commitId + 1);
+			updateCommit.handleCommit(commits);
+			updateCommit.setHighestCommitId(commits);
 		} else {
 			console.debug('nodeReceiveCommit', 'Need sync');
 			_this.socket.emit('requireSync', oldHighestCommitId, nodeSync);
@@ -85,24 +86,24 @@ class Node {
 		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
 			const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
 			if (!oldHighestCommitId) {
-				pushTaskToQueue(commits);
-				setHighestCommitId(commits[commits.length - 1].commitId + 1);
+				updateCommit.handleCommit(commits);
+				updateCommit.setHighestCommitId(commits);
 			} else {
-				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
 			}
 		})
-		if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+		if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
 	}
 
 	async init() {
-		await initQueue(this);
+		await updateCommit.init(this);
 		const _this = this;
 
 		_this.cms.post('run:requireSync', () => {
 			if (_this.socket.connected) {
-				_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
+				_this.socket.emit('requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
 			} else if (_this.masterClientId) {
-				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
 			}
 		})
 
@@ -134,11 +135,11 @@ class Node {
 					} else {
 						throw new Error('Can not connect to master');
 					}
-					await updateTempCommit(commits);
+					await updateCommit.methods['order'].updateTempCommit(commits);
 					if (commits.length && commits[0].split) {
 						return commits[0].update.create;
 					}
-					return await buildTempOrder(table);
+					return await updateCommit.methods['order'].buildTempOrder(table);
 				}
 			}
 		})
@@ -148,6 +149,18 @@ class Node {
 	turnOff() {
 		if (this.onlineOrderSocket) this.onlineOrderSocket.off('updateCommitNode');
 		if (this.socket) this.socket.disconnect();
+	}
+
+	async sendChangeRequest(commit) {
+		commit.storeId = await this.getStoreId();
+		if (!this.onlineOrderSocket.connected || !this.socket.connected) {
+			return console.error('Socket is not connected');
+		}
+		if (this.socket.connected) {
+			this.socket.emit('updateCommits', [commit]);
+		} else {
+			this.onlineOrderSocket.emitTo(this.masterClientId, 'updateCommits', [commit]);
+		}
 	}
 }
 
