@@ -291,7 +291,6 @@
       await this.loadKeyboard()
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
       window.addEventListener('keydown', this.keyboardHanle.bind(this))
-      this.apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
       this.debouceSearchAddress = _.debounce(this.searchAddress, 300)
       this.debouceUpdatePrice = _.debounce(this.updatePrice, 300)
     },
@@ -555,9 +554,9 @@
       },
       async searchAddress(text) {
         console.log('searching')
-        if(!text || text.length < 4) return
+        if (!text || text.length < 4) return
         this.token = uuidv4()
-        cms.socket.emit('searchPlace', text, this.token, this.apiKey, places => {
+        cms.socket.emit('searchPlace', text, this.token, places => {
           this.autocompleteAddresses = places.map(p => ({
             text: p.description,
             value: p.place_id,
@@ -565,7 +564,7 @@
         })
       },
       async selectAutocompleteAddress(place_id) {
-        if(this.autocompleteAddresses.find(item => item.value === place_id)) {
+        if (this.autocompleteAddresses.find(item => item.value === place_id)) {
           console.log('finding')
           cms.socket.emit('getPlaceDetail', place_id, this.token, this.apiKey, data => {
             if(!_.isEmpty(data)) {

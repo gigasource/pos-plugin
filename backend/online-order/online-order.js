@@ -55,6 +55,7 @@ module.exports = async cms => {
     const posSetting = await cms.getModel('PosSetting').findOne()
 
     webshopUrl = posSetting.customServerUrl ? posSetting.customServerUrl : webshopUrlFromConfig;
+    console.log('webshopUrl', webshopUrl)
     return webshopUrl
   }
 
@@ -399,7 +400,8 @@ module.exports = async cms => {
       cms.socket.emit('updateAppFeature', sentryTags, data);
       callback();
     });
-    socket.on('unpairDevice', cb => {
+    socket.on('unpairDevice', async cb => {
+      await unregisterOnlineOrderDevice()
       cms.socket.emit('unpairDevice')
       cb();
     });
@@ -497,6 +499,57 @@ module.exports = async cms => {
         groupPrinter2: p.groupPrinters[1],
       })))
     })
+
+    socket.on('approveSignIn_v2', async ({ requestId, storeId, storeAlias: alias, storeName: name }, ack) => {
+      const { signInRequest } = await cms.getModel('PosSetting').findOne()
+      // if (signInRequest._id !== requestId) return
+      console.log('approveSignIn_v2')
+      await cms.getModel('PosSetting').findOneAndUpdate({}, {
+        $set: {
+          'onlineDevice.store': {
+            id: storeId,
+            name,
+            alias
+          },
+          signInRequest: null
+        }
+      })
+
+      storeName = name
+      storeAlias = alias
+      cms.socket.emit('approveSignIn')
+      typeof ack === 'function' && ack()
+    })
+
+    socket.on('denySignIn_v2', async ({ requestId }, ack) => {
+      console.log('denySignIn_v2')
+      await cms.getModel('PosSetting').findOneAndUpdate({}, {
+        $set: {
+          'signInRequest.status': 'notApproved'
+        }
+      })
+
+      cms.socket.emit('denySignIn')
+      typeof ack === 'function' && ack()
+    })
+  }
+
+  async function unregisterOnlineOrderDevice() {
+    console.log('unregisterOnlineOrderDevice')
+    removeOnlineOrderSocket();
+    if (proxyClient) {
+      proxyClient.destroy();
+      proxyClient = null;
+    }
+
+    await cms.getModel('PosSetting').findOneAndUpdate({}, {
+      $set: {
+        'onlineDevice': {
+          id: null,
+          store: {}
+        }
+      }
+    })
   }
 
   function createOnlineOrderSocket(deviceId) {
@@ -530,35 +583,19 @@ module.exports = async cms => {
     }
   }
 
-  async function getDeviceId(pairingCode) {
+  async function getDeviceId() {
+    console.log('getDeviceId')
     const posSettings = await cms.getModel('PosSetting').findOne({});
-    const {onlineDevice} = posSettings;
+    const { onlineDevice } = posSettings;
 
     if (onlineDevice.id) {
+      console.log('deviceId', onlineDevice.id)
       return onlineDevice.id
     } else {
-      if (!pairingCode) {
-        return null
-      } else {
-        const pairingApiUrl = `${await getWebShopUrl()}/device/register`
-        const requestBody = {pairingCode}
-        requestBody.appName = 'POS_Android'
-        requestBody.appVersion = require('../../package').version
-        requestBody.hardware = global.APP_CONFIG.deviceName
-        requestBody.release = require('../../package').release
-        try {
-          const requestResponse = await axios.post(pairingApiUrl, requestBody)
-
-          const {deviceId, storeName: sName, storeAlias: sAlias} = requestResponse.data;
-
-          if (sName) storeName = sName;
-          if (sAlias) storeAlias = sAlias;
-
+        const { deviceId } = await registerDevice()
+        if (deviceId) {
+          console.log('deviceId', deviceId)
           return deviceId
-        } catch (e) {
-          console.error(e)
-          return null
-        }
       }
     }
   }
@@ -599,8 +636,9 @@ module.exports = async cms => {
     })
   }
 
-  async function searchForPlace(text, token, apiKey, language = 'en', country = 'DE') {
+  async function searchForPlace(text, token, language = 'en', country = 'DE') {
     let searchResult = []
+    const apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
     const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
     const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
       params: {
@@ -618,8 +656,9 @@ module.exports = async cms => {
     return searchResult
   }
 
-  async function getPlaceDetail(placeId, token, apiKey, language = 'en') {
+  async function getPlaceDetail(placeId, token, language = 'en') {
     const url = 'https://maps.googleapis.com/maps/api/place/details/json'
+    const apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
     const { data } = await axios.get(url, {
       params: {
         key: apiKey,
@@ -631,6 +670,42 @@ module.exports = async cms => {
 
     const { result } = data
     return result
+  }
+
+  async function getPublicIp() {
+    try {
+      const getIpReq = await axios.get('https://api.ipify.org', { responseType: 'text' });
+      return getIpReq.data
+    } catch (e) {
+      console.log('cannot get public ip', e);
+      return null
+    }
+  }
+
+  async function registerDevice(cb = () => null) {
+    const webshopUrl = await getWebShopUrl()
+
+    try {
+      const data = {
+        appName: 'POS_Android',
+        appVersion: require('../../package').version,
+        hardware: global.APP_CONFIG.deviceName || 'macbook',
+        hardwareId: 'macbook', //testing
+        release: require('../../package').release,
+        metadata: {
+          deviceIp: await getPublicIp()
+        }
+      };
+      const { data: { clientId: deviceId } } = await axios.post(`${webshopUrl}/pos-device/register`, data)
+      if (deviceId) {
+        await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { 'onlineDevice.id': deviceId } })
+        cb({ deviceId })
+        return { deviceId }
+      }
+    } catch (error) {
+      console.error('Error registering device', error)
+      cb({ error })
+    }
   }
 
   cms.socket.on('connect', async socket => {
@@ -647,17 +722,9 @@ module.exports = async cms => {
     socket.on('getWebshopName', async callback => {
       const deviceId = await getDeviceId();
       if (!onlineOrderSocket || !deviceId) return callback(null);
-
-      onlineOrderSocket.emit('getWebshopName', deviceId, async ({settingName, name, alias, locale}) => {
-        storeName = name;
-        storeAlias = alias;
-
-        const posSettings = await cms.getModel('PosSetting').findOne({});
-        if (typeof posSettings.onlineDevice === 'object') posSettings.onlineDevice.store = {name, alias, locale};
-        await cms.getModel('PosSetting').updateOne({}, posSettings);
-
-        typeof callback === 'function' && callback(settingName);
-      });
+      const posSettings = await cms.getModel('PosSetting').findOne()
+      const { onlineDevice: { store } } = posSettings
+      typeof callback === 'function' && callback(store.name);
     });
 
     socket.on('getWebshopId', async callback => {
@@ -670,7 +737,9 @@ module.exports = async cms => {
     socket.on('getPairStatus', async callback => {
       const deviceId = await getDeviceId()
       if (!onlineOrderSocket || !deviceId) return callback({error: 'Device not paired'});
-
+      const posSettings = await cms.getModel('PosSetting').findOne()
+      const { onlineDevice: { store } } = posSettings
+      if (!store || !store.id) return callback({error: 'Device not paired'})
       onlineOrderSocket.emit('getPairStatus', deviceId, callback);
     })
 
@@ -705,18 +774,6 @@ module.exports = async cms => {
       } else {
         callback(`Invalid pairing code`);
       }
-    });
-
-    socket.on('unregisterOnlineOrderDevice', async callback => {
-      removeOnlineOrderSocket();
-
-      if (proxyClient) {
-        proxyClient.destroy();
-        proxyClient = null;
-      }
-
-      await updateDeviceStatus();
-      callback();
     });
 
     socket.on('updateOrderStatus', async (orderStatus, cb) => {
@@ -857,13 +914,13 @@ module.exports = async cms => {
       })
     })
 
-    socket.on('searchPlace', async (text, token, apiKey, cb) => {
-      const places = await searchForPlace(text, token, apiKey)
+    socket.on('searchPlace', async (text, token, cb) => {
+      const places = await searchForPlace(text, token)
       cb && cb(places)
     })
 
-    socket.on('getPlaceDetail', async (place_id, token, apiKey, cb) => {
-      const place = await getPlaceDetail(place_id, token, apiKey)
+    socket.on('getPlaceDetail', async (place_id, token, cb) => {
+      const place = await getPlaceDetail(place_id, token)
       cb && cb(place)
     })
 
@@ -884,6 +941,20 @@ module.exports = async cms => {
         })))
         cb && cb()
       })
+    })
+
+    socket.on('sendSignInRequest', async (storeName, googleMapPlaceId, cb = () => null) => {
+      const webshopUrl = await getWebShopUrl()
+      const deviceId = await getDeviceId()
+      await createOnlineOrderSocket(deviceId)
+      const { data: request } = await axios.post(`${webshopUrl}/store/sign-in-requests`, { storeName, googleMapPlaceId, deviceId })
+      console.log('sign-in request', request)
+      cb(request)
+      const result = await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } }, { new: true })
+    })
+
+    socket.on('getSignInRequestStatus', () => {
+
     })
 
     cms.socket.on('connect', socket => {
