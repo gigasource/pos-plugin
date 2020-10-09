@@ -96,6 +96,13 @@
                       :items="delayTimeList"/>
           </div>
         </div>
+        <div class="row-flex align-items-center">
+          <div class="col-lg-8 col-md-7 col-xs-6">Pre order time</div>
+          <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
+            <g-select text-field-component="GTextFieldBs" v-model="computedPreOrderTime"
+                      :items="preOrderTimeList"/>
+          </div>
+        </div>
         <div class="row-flex mt-2">
           <div class="fw-700">{{$t('setting.daysOff')}}</div>
           <g-spacer/>
@@ -232,7 +239,8 @@
       gSms: null,
       id: String,
       dayOff: Array,
-      deliveryTimeDelay: Number
+      deliveryTimeDelay: Number,
+      preOrderTime: Number
     },
     data: function () {
       return {
@@ -261,7 +269,9 @@
           delete: false
         },
         delayTimeList: _.map([30, 45, 60, 75, 90], v => ({value: v, text: `${v} minutes`})),
-        delayTime: this.deliveryTimeDelay || 30
+        delayTime: this.deliveryTimeDelay || 30,
+        preOrderTimeList: _.map([0, 30, 60, 90, 120], v => ({value: v, text: v ? `${v} minutes` : 'None'})),
+        preOrder: this.preOrderTime || 0
       }
     },
     computed: {
@@ -366,6 +376,15 @@
         set(val) {
           this.$emit('update', { deliveryTimeDelay: val })
           this.delayTime = val
+        }
+      },
+      computedPreOrderTime:{
+        get() {
+          return this.preOrder
+        },
+        set(val) {
+          this.$emit('update', { preOrderTime: val })
+          this.preOrder = val
         }
       }
     },
