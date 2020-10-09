@@ -16,11 +16,10 @@ const nodeSync = async function (commits) {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await updateCommit.checkCommitExist(commit.commitId))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
 	}
 	if (newCommits.length) updateCommit.handleCommit(newCommits);
-	updateCommit.setHighestCommitId(newCommits);
-	if (newCommits && newCommits.length) updateCommit.setHighestCommitId(commits[commits.length - 1].commitId + 1);
+	updateCommit.setHighestCommitIds(newCommits);
 }
 
 const connectToMaster = async (_this, masterIp) => {
@@ -28,22 +27,27 @@ const connectToMaster = async (_this, masterIp) => {
 	const clientId = posSettings.onlineDevice.id;
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
 	_this.socket.on('updateCommitNode', (commits) => {
-		console.debug('nodeReceiveCommit', 'Receive commit from master', JSON.stringify(commits));
-		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
-		if (!oldHighestCommitId) {
-			updateCommit.handleCommit(commits);
-			updateCommit.setHighestCommitId(commits);
-		} else {
-			console.debug('nodeReceiveCommit', 'Need sync');
-			_this.socket.emit('requireSync', oldHighestCommitId, nodeSync);
-		}
+		updateCommit.commitType.forEach(type => {
+			const typeCommits = commits.filter(commit => commit.type === type);
+			if (!typeCommits.length) return;
+			const oldHighestCommitId = updateCommit.methods[type].checkHighestCommitId(typeCommits[0].commitId);
+			if (!oldHighestCommitId) {
+				updateCommit.handleCommit(typeCommits);
+				updateCommit.setHighestCommitIds(typeCommits);
+			} else {
+				console.debug('nodeReceiveCommit', 'Need sync');
+				_this.socket.emit('requireSync', type, oldHighestCommitId, nodeSync);
+			}
+		})
 	})
 	_this.socket.on('connect', async () => {
 		console.log('Node connected to master');
 		_this.isConnect = true;
 		// wait for initQueue finish
 		setTimeout(() => {
-			_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
+			updateCommit.commitType.forEach(type => {
+				_this.socket.emit('requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+			})
 		}, 200)
 	})
 }
@@ -84,15 +88,24 @@ class Node {
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
 		const storeId = await _this.getStoreId();
 		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
-			const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
-			if (!oldHighestCommitId) {
-				updateCommit.handleCommit(commits);
-				updateCommit.setHighestCommitId(commits);
-			} else {
-				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
-			}
+			updateCommit.commitType.forEach(type => {
+				const typeCommits = commits.filter(commit => commit.type === type);
+				if (!typeCommits.length) return;
+				const oldHighestCommitId = updateCommit.methods[type].checkHighestCommitId(typeCommits[0].commitId);
+				if (!oldHighestCommitId) {
+					updateCommit.handleCommit(typeCommits);
+					updateCommit.setHighestCommitIds(typeCommits);
+				} else {
+					console.debug('nodeReceiveCommit', 'Need sync');
+					_this.onlineOrderSocket.emit('requireSync', type, oldHighestCommitId, nodeSync);
+				}
+			})
 		})
-		if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
+		if (_this.masterClientId) {
+			updateCommit.commitType.forEach(type => {
+				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+			})
+		}
 	}
 
 	async init() {
@@ -100,11 +113,14 @@ class Node {
 		const _this = this;
 
 		_this.cms.post('run:requireSync', () => {
-			if (_this.socket.connected) {
-				_this.socket.emit('requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
-			} else if (_this.masterClientId) {
-				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', updateCommit.checkHighestCommitIds(), nodeSync);
-			}
+			updateCommit.commitType.forEach(type => {
+				if (_this.socket.connected) {
+					_this.socket.emit('requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+				} else if (_this.masterClientId) {
+					_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', type,
+						updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+				}
+			})
 		})
 
 		const _model = cms.Types['OrderCommit'].Model;
@@ -143,7 +159,7 @@ class Node {
 				}
 			}
 		})
-		resumeQueue();
+		updateCommit.methods['order'].resumeQueue();
 	}
 
 	turnOff() {
