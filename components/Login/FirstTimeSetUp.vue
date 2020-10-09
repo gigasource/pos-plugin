@@ -3,7 +3,7 @@
     <g-card persistent width="580">
       <div class="dialog" style="padding: 24px">
         <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
-        <g-combobox class="w-100" label="Address" v-model="placeId" text-field-component="g-text-field-bs"
+        <g-combobox class="w-100" label="Address" v-model="placeId" text-field-component="PosTextField"
                     :items="placesSearchResult" @update:searchText="debouncedSearch">
           <template v-slot:append-inner>
             <g-icon style="cursor: pointer" @click="dialog.input = true">icon-keyboard</g-icon>
@@ -210,18 +210,19 @@
     }
 
     ::v-deep .bs-tf-wrapper {
-      ::v-deep {
-        .bs-tf-label {
-          font-size: 15px;
-        }
+      .bs-tf-label {
+        font-size: 15px;
+        margin-bottom: 12px;
+      }
 
-        .bs-tf-input {
-          font-size: 34px;
-          font-weight: 700;
-          color: #000000;
-          text-align: center;
-          width: 100%;
-        }
+      .bs-tf-input {
+        padding: 20px 6px;
+        font-size: 24px;
+        line-height: 1.5;
+        font-weight: 700;
+        color: #000000;
+        text-align: center;
+        width: 100%;
       }
     }
   }
