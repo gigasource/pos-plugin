@@ -944,6 +944,11 @@
           "fields": [
             {
               "schemaType": "string",
+              "key": "id",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
               "key": "name",
               "type": "input"
             },
@@ -1141,6 +1146,13 @@
       "key": "keyboardDeliveryConfig",
       "type": null,
       "fields": []
+    },
+    {
+      "_id": "5f7ee441363c49200328e80b",
+      "schemaType": "mixed",
+      "key": "signInRequest",
+      "type": "object",
+      "mixed": true
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",
