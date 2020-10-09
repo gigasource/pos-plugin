@@ -16,7 +16,12 @@
               <span class="ml-2 fs-small">{{errorMessage}}</span>
             </div>
             <div class="dialog-message--subtext">
-              <b>Note: </b>Please contact your local provider to start using the program. An internet connection is required.
+          <b>Note: </b>
+          <span style="font-style: italic; color: #757575">
+            {{ disableSendBtn
+            ? 'Your sign-in request is pending approval.'
+            : 'Please contact your local provider to start using the program.'}}
+          </span>
             </div>
             <div class="row-flex w-100">
               <div class="dialog-message--note" v-if="deniedRequest" style="color: #ff4452">
@@ -270,14 +275,16 @@
         text-align: left;
         font-size: 12px;
         font-style: italic;
-        margin-bottom: 8px;
+        align-self: center;
+        margin-left: 5px;
       }
 
       &--subtext {
         margin-left: 5px;
         font-size: 12px;
-        font-style: italic;
         margin-bottom: 8px;
+        text-align: left;
+        align-self: flex-start;
       }
     }
 

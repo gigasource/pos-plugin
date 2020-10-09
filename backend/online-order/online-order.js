@@ -55,7 +55,6 @@ module.exports = async cms => {
     const posSetting = await cms.getModel('PosSetting').findOne()
 
     webshopUrl = posSetting.customServerUrl ? posSetting.customServerUrl : webshopUrlFromConfig;
-    console.log('webshopUrl', webshopUrl)
     return webshopUrl
   }
 
@@ -500,9 +499,7 @@ module.exports = async cms => {
       })))
     })
 
-    socket.on('approveSignIn_v2', async ({ requestId, storeId, storeAlias: alias, storeName: name }, ack) => {
-      const { signInRequest } = await cms.getModel('PosSetting').findOne()
-      // if (signInRequest._id !== requestId) return
+    socket.on('approveSignIn_v2', async ({ clientId: deviceId, requestId, storeId, storeAlias: alias, storeName: name }, ack) => {
       console.log('approveSignIn_v2')
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
@@ -517,6 +514,19 @@ module.exports = async cms => {
 
       storeName = name
       storeAlias = alias
+
+      console.log('getAppFeature')
+      onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
+        await Promise.all(_.map(data, async (enabled, name) => {
+          return await cms.getModel('Feature').updateOne({ name }, { $set: { enabled } }, { upsert: true })
+        }))
+        socket.emit('updateAppFeature')
+      })
+
+      onlineOrderSocket.emit('getReservationSetting', deviceId, async setting => {
+        await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
+      });
+
       cms.socket.emit('approveSignIn')
       typeof ack === 'function' && ack()
     })
@@ -583,19 +593,22 @@ module.exports = async cms => {
     }
   }
 
-  async function getDeviceId() {
-    console.log('getDeviceId')
+  async function getDeviceId(pairingCode) {
     const posSettings = await cms.getModel('PosSetting').findOne({});
     const { onlineDevice } = posSettings;
 
     if (onlineDevice.id) {
-      console.log('deviceId', onlineDevice.id)
       return onlineDevice.id
     } else {
+      if (pairingCode) {
+        // todo pairing code registration logic
+        // return deviceId
+      } else {
         const { deviceId } = await registerDevice()
         if (deviceId) {
           console.log('deviceId', deviceId)
           return deviceId
+        }
       }
     }
   }
