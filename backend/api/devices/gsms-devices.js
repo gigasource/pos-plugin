@@ -175,45 +175,52 @@ router.get('/device-assigned-store/:deviceId', async (req, res) => {
   if (!device)
     return res.status(400).json({error: `No device found with ID ${deviceId}`});
 
-  // multi store
+  // NOTE: in PERFECT scenario, this block of code should not exist
+  // The existence of this block of code is to fix any incorrect device document
+  // after new feature multi store is added to posoo system
   if (device.enableMultiStore) {
-    const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
-    if (stores && stores.length) {
-      if (stores.length === 1) {
-        device = await DeviceModel.updateOne({_id: device._id}, {
-          storeId: stores[0]._id,
-          enableMultiStore: false,
-          stores: null
-        }, { new: true })
-      } else {
-        return res.json({
-          stores: stores.map(convertToGsmsStoreModel),
-        })
-      }
+    // turn off multi store if storeIds is blank
+    if (!device.storeIds || device.storeIds.length === 0) {
+      await DeviceModel.updateOne({_id: device._id}, { enableMultiStore: false, storeIds: [] })
     } else {
-      await DeviceModel.updateOne({_id: device._id}, {
-        enableMultiStore: false,
-        stores: null
-      })
+      // if storeIds is exist, then validate it
+      const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
+      if (stores.length > 1) {
+        return res.json({ stores: stores.map(convertToGsmsStoreModel) })
+      } else if (stores.length === 1) {
+        // if there is only one storeId in storeIds, then turn off multi store, and update storeId too
+        // this storeId will be used later in block of code below
+        device = await DeviceModel.findOneAndUpdate({_id: device._id},
+            { storeId: stores[0]._id, enableMultiStore: false, storeIds: [] },
+            { new: true })
+      } else {
+        // occured when device have storeIds which doesn't mapping to any existed store
+        // so we need to turn off multi store
+        await DeviceModel.updateOne({_id: device._id}, { enableMultiStore: false, storeIds: [] })
+      }
     }
   }
 
-  const store = await StoreModel.findById(device.storeId || '');
-  if (!store) {
-    return res.status(200).json({
-      error: `No store found with id ${device.storeId}`,
-      assignedStore: null
-    });
+  // this block of code only occured in single store mode
+  if (device.storeId) {
+    const store = await StoreModel.findById(device.storeId);
+    if (!store) {
+      // if storeId linked to invalid store then clear it
+      await DeviceModel.updateOne({_id: device._id}, { storeId: '' })
+      res.status(200).json({ error: 'No store linked to current device', assignedStore: null });
+    } else {
+      res.status(200).json({
+        // fallback
+        _id: store._id.toString(),
+        storeId: store.id,
+        assignedStore: store.name || store.alias,
+        // for newer version
+        store: convertToGsmsStoreModel(store)
+      });
+    }
+  } else {
+    res.status(200).json({ error: 'No store linked to current device', assignedStore: null });
   }
-
-  res.status(200).json({
-    // fallback for older version
-    _id: store._id.toString(),
-    storeId: store.id,
-    assignedStore: store.name || store.alias,
-    // for newer version
-    store: convertToGsmsStoreModel(store)
-  });
 });
 
 function convertToGsmsStoreModel(s) {
