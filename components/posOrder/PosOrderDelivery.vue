@@ -36,8 +36,14 @@
           </template>
           <template v-else>
             <template v-if="deliveryOrderMode === 'mobile'">
-              <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
-              <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+              <div class="row-flex mt-3 w-100">
+                <div style="flex: 1; margin-right: 2px">
+                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+                </div>
+                <div style="flex: 1; margin-left: 2px">
+                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+                </div>
+              </div>
               <div class="row-flex">
                 <div class="col-9">
                   <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
