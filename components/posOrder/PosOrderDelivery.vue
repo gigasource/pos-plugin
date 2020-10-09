@@ -48,7 +48,7 @@
                 <div class="col-9">
                   <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
                               :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
-                              @input-click="showKeyboard = true" keep-menu-on-blur
+                              @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
                 </div>
                 <div class="flex-grow-1 ml-1">
@@ -1264,6 +1264,25 @@
 
     ::v-deep .key .waves-ripple {
       background-color: rgba(255, 190, 92, 1)
+    }
+  }
+</style>
+
+<style lang="scss">
+  .menu-autocomplete-address {
+    .g-list {
+      .g-list-item-content {
+        padding-right: 4px;
+
+        .g-list-item-text {
+          white-space: normal;
+          word-break: break-word;
+        }
+      }
+
+      & > div:not(:last-child) .g-list-item-text {
+        border-bottom: 1px solid #F0F0F0;
+      }
     }
   }
 </style>
