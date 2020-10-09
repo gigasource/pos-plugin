@@ -107,7 +107,7 @@ class Master {
 						updateCommit.handleCommit(commits);
 						await updateCommit.methods['order'].updateTempCommit(commits);
 						if (commits.length && commits[0].split) {
-							return commits[0].update.create;
+							return JSON.parse(commits[0].update.query);
 						}
 						return await updateCommit.methods['order'].buildTempOrder(table);
 					} catch (err) {
