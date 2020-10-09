@@ -14,9 +14,18 @@ export function get12HourValue(time) {
 
 export function incrementTime(hour, minute, interval = 15) {
   minute += interval
-  if (minute >= 60) {
+  while (minute >= 60) {
     hour++
     minute -= 60
   }
   return {hour, minute}
+}
+
+export function decrementTime(hour, minute, interval = 15) {
+  minute -= interval
+  while (minute < 0) {
+    hour--
+    minute += 60
+  }
+  return { hour, minute }
 }

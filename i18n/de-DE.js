@@ -55,6 +55,7 @@ module.exports = {
       merchantClose: 'Das Restaurant ist vorübergehend geschlossen',
       merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
       merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.',
+      merchantClose3: 'Der Händler ist vorübergehend geschlossen, akzeptiert jedoch in dem Augenblick noch Online-Bestellungen. Ihre Bestellungen stehen zum Mitnehmen zur Verfügung und werden nach {0} Uhr geliefert.',
       minimumOrder: 'Mindestbestellwert',
       deliveryFee: 'Liefergebühr',
       notice: 'Notice',
@@ -252,6 +253,8 @@ module.exports = {
       forwardNote: 'Weitergeleitete Bestellungen werden nur auf dem Zielgerät angezeigt. Das System leitet nur Lieferaufträge weiter.',
       digitalMenuScript: 'Digitales Menü bettet Skript ein',
       upload: 'Hochladen',
+      earliestSelectableTime: 'Früheste wählbare Zeit',
+      preOrderTime: 'vor den Öffnungszeiten bestellen',
     },
 
     paymentProviders: {
