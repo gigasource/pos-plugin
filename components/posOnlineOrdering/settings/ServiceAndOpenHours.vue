@@ -90,14 +90,14 @@
           </div>
         </div>
         <div class="row-flex align-items-center">
-          <div class="col-lg-8 col-md-7 col-xs-6">Earliest selectable time</div>
+          <div class="col-lg-8 col-md-7 col-xs-6">{{$t('setting.earliestSelectableTime')}}</div>
           <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
             <g-select text-field-component="GTextFieldBs" v-model="computedDeliveryTimeDelay"
                       :items="delayTimeList"/>
           </div>
         </div>
         <div class="row-flex align-items-center">
-          <div class="col-lg-8 col-md-7 col-xs-6">Pre order time</div>
+          <div class="col-lg-8 col-md-7 col-xs-6">{{$t('setting.preOrderTime')}}</div>
           <div class="col-lg-4 col-md-5 col-xs-6 mt-2">
             <g-select text-field-component="GTextFieldBs" v-model="computedPreOrderTime"
                       :items="preOrderTimeList"/>

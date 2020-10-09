@@ -341,6 +341,7 @@ module.exports = {
       merchantClose: 'Merchant is temporarily closed',
       merchantClose1: 'The merchant is temporarily closed and will not accept orders until {1} {0}. Please come back after that. We apologize for any inconvenience caused.',
       merchantClose2: 'The merchant is temporarily closed. We apologize for any inconvenience caused.',
+      merchantClose3: 'The merchant is temporarily closed but still accepts online orders at the moment. Your orders will be available for takeaway and delivery after {0}.',
       minimumOrder: 'Minimum order',
       deliveryFee: 'Delivery fee',
       notice: 'Notice',
@@ -534,6 +535,8 @@ module.exports = {
       forwardNote: 'Forwarded orders will only appear in the destination device. The System only forwards delivery orders.',
       digitalMenuScript: 'Digital menu embed script',
       upload: 'Upload',
+      earliestSelectableTime: 'Earliest selectable time',
+      preOrderTime: 'Order before open hours',
     },
 
 
