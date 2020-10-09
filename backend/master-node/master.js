@@ -12,17 +12,19 @@ const updateCommits = async (commits) => {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await checkCommitExist(commit.commitId))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
 	}
 	if (newCommits.length) pushTaskToQueue(newCommits);
 }
 
-const requireSync = (oldHighestCommitId, ack) => {
+const requireSync = (type, oldHighestCommitId, ack) => {
 	const commit = {
-		type: 'sync',
-		oldHighestCommitId
+		type,
+		action: 'requireSync',
+		oldHighestCommitId,
+		ack
 	}
-	pushTaskToQueue([commit], ack);
+	updateCommit.handleCommit([commit]);
 }
 
 class Master {

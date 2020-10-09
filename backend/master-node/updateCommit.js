@@ -18,34 +18,19 @@ const updateCommit = {
 			const typeCommits = commits.filter(commit => {
 				return commit.type === type;
 			})
-			updateCommit.methods[type].doTask(typeCommits);
+			if (typeCommits.length) updateCommit.methods[type].doTask(typeCommits);
 		})
-	},
-	handleSyncCommit: async function (oldHighestCommitIds) {
-		let result = [];
-		for (let id in updateCommit.commitType) {
-			const type = updateCommit.commitType[i];
-			result = result.concat(await updateCommit[type].method.requireSync(oldHighestCommitIds[type]));
-		}
-		return result;
 	},
 	checkCommitExist: async function (commit) {
 		return await updateCommit.methods[commit.type].checkCommitExist(commit);
 	},
-	setHighestCommitId: function (commits) {
+	setHighestCommitIds: function (commits) {
 		updateCommit.commitType.forEach(type => {
 			const maxCommitId = Math.max.apply(null, commits.filter(commit => {
 				return commit.type === type;
 			}).map(commit => commit.commitId));
 			updateCommit.methods[type].setHighestCommitId(maxCommitId);
 		})
-	},
-	checkHighestCommitIds: function (id) {
-		const result = {};
-		updateCommit.commitType.forEach(type => {
-			result[type] = updateCommit.methods[type].checkHighestCommitId(id);
-		})
-		return result;
 	}
 }
 
