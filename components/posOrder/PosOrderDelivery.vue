@@ -718,13 +718,12 @@
       },
       submitCustomer() {
         if (this.name && this.phone && this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId) && this.house) {
-          if (!this.zipcode) {
-            this.token = uuidv4()
-            cms.socket.emit('getZipcode', `${this.street} ${this.house} ${this.city}`, this.token, (address, zipcode) => {
+          //get exact address + zip code
+          this.token = uuidv4()
+          cms.socket.emit('getZipcode', `${this.street} ${this.house} ${this.city}`, this.token, (address, zipcode) => {
               this.address = address
               this.zipcode = zipcode
-            })
-          }
+          })
           let customer = {}
           customer.name = this.name
           customer.phone = this.phone
