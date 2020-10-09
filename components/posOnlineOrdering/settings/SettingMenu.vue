@@ -35,19 +35,21 @@
         <div class="menu-setting__category" id="menu-setting">
           <div v-for="(cate, index) in categoriesViewModel" :key="index" class="mb-1">
             <div @click="toggleCollapse(cate)" class="menu-setting__category__header" @mouseenter="toggleEditBtn(index, true)" @mouseleave="toggleEditBtn(index, false)">
-              <g-edit-view-input
-                  @click.native.stop.prevent="() => {}"
-                  :value="cate.name"
-                  class="menu-setting__title"
-                  @input="(name, cb) => changeCategoryName(cate._id, name, cb)">
-                <template v-slot:action="{mode, switchToEditMode, applyChange, resetValue}">
-                  <g-icon v-if="editBtn[index] && mode !== 'edit'" @click="switchToEditMode()" size="18" class="ml-1">mdi-pencil-outline</g-icon>
-                  <g-icon v-if="mode === 'edit'" @click="applyChange()" class="ml-1">mdi-check</g-icon>
-                  <g-icon v-if="mode === 'edit'" @click="resetValue()" class="ml-1">mdi-close</g-icon>
-                </template>
-              </g-edit-view-input>
-              <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index-1)">fas fa-caret-square-up</g-icon>
-              <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index+1)">fas fa-caret-square-down</g-icon>
+              <div style="display:flex; flex: 9">
+                <g-edit-view-input
+                    @click.native.stop.prevent="() => {}"
+                    :value="cate.name"
+                    class="menu-setting__title"
+                    @input="(name, cb) => changeCategoryName(cate._id, name, cb)">
+                  <template v-slot:action="{mode, switchToEditMode, applyChange, resetValue}">
+                    <g-icon v-if="editBtn[index] && mode !== 'edit'" @click="switchToEditMode()" size="18" class="ml-1">mdi-pencil-outline</g-icon>
+                    <g-icon v-if="mode === 'edit'" @click="applyChange()" class="ml-1">mdi-check</g-icon>
+                    <g-icon v-if="mode === 'edit'" @click="resetValue()" class="ml-1">mdi-close</g-icon>
+                  </template>
+                </g-edit-view-input>
+                <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index-1)">fas fa-caret-square-up</g-icon>
+                <g-icon v-if="editBtn[index] && !editingProduct" style="cursor: pointer; margin-left: 8px" @click.stop="swapCategory(index, index+1)">fas fa-caret-square-down</g-icon>
+              </div>
               <g-spacer/>
               <g-btn-bs
                   background-color="#E3F2FD"
@@ -428,7 +430,6 @@
     &__title {
       font-size: 18px;
       font-weight: 700;
-      flex: 9;
     }
 
     &--empty {
