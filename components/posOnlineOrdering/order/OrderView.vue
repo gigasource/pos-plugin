@@ -198,7 +198,7 @@
   import OrderTable from './OrderTable';
   import MenuItem from './MenuItem';
   import {smoothScrolling} from 'pos-vue-framework'
-  import {get12HourValue, get24HourValue} from "../../logic/timeUtil";
+  import {get12HourValue, get24HourValue, decrementTime} from "../../logic/timeUtil";
   import {autoResizeTextarea} from "../../logic/commonUtils";
   import { getCdnUrl } from '../../Store/utils';
   import DialogAddToOrder from "./dialogAddToOrder";
@@ -245,7 +245,8 @@
         dayInWeeks: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         scrolling: 0,
         dayOff: false,
-        orderType: null
+        orderType: null,
+        preOrderMode: false
       }
     },
     filters: {
@@ -290,7 +291,7 @@
         this.now = dayjs().format('HH:mm')
       }, 1000)
       if(!this.dayOff)
-        this.dialog.closed = !this.isStoreOpening
+        this.dialog.closed = !this.isStoreOpening || (this.isStoreOpening && this.preOrderMode)
       else
         this.dialog.dayOff = true
     },
@@ -367,11 +368,24 @@
         } while (dayIndex !== this.weekday)
       },
       merchantMessage() {
-        if (this.nextOpenHour)
+        if (this.nextOpenHour) {
+          if(this.store.preOrderTime) {
+            if(this.preOrderMode) {
+              return `${this.$t('store.merchantClose3', {
+                0: this.nextOpenHour.hour,
+              })}`
+            }
+            const preOrderTime = decrementTime(+this.nextOpenHour.hour.split(':')[0], +this.nextOpenHour.hour.split(':')[1], this.store.preOrderTime)
+            return `${this.$t('store.merchantClose1', {
+              0: this.nextOpenHour.day,
+              1: `${preOrderTime.hour}:${preOrderTime.minute < 10 ? '0' : ''}${preOrderTime.minute}`
+            })} `
+          }
           return `${this.$t('store.merchantClose1', {
             0: this.nextOpenHour.day,
             1: this.nextOpenHour.hour
           })} `
+        }
 
         return  `${this.$t('store.merchantClose2')}`
       },
@@ -390,7 +404,13 @@
         }
         if (this.todayOpenHour) {
           for (const {openTime, closeTime} of this.todayOpenHour) {
-            if (this.now >= get24HourValue(openTime) && this.now <= get24HourValue(closeTime)) return true
+            let open = get24HourValue(openTime), close = get24HourValue(closeTime)
+            if (this.store.preOrderTime) {
+              const newOpen = decrementTime(+open.split(':')[0], +open.split(':')[1], this.store.preOrderTime)
+              this.preOrderMode = this.now >= `${newOpen.hour}:${newOpen.minute}` && this.now < open;
+              open = `${newOpen.hour}:${newOpen.minute}`
+            }
+            if (this.now >= open && this.now <= close) return true
           }
         }
 

@@ -716,6 +716,12 @@
       "key": "deliveryTimeDelay",
       "default": "30",
       "type": "input@number"
+    },
+    {
+      "_id": "5f80059fc6906a36560c2e04",
+      "schemaType": "number",
+      "key": "preOrderTime",
+      "type": "input@number"
     }
   ],
   "name": "Store",

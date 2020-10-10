@@ -153,7 +153,7 @@ async function sendReservationConfirmationEmail(reservation, storeId) {
 }
 
 async function getGsmsDevices(storeId) {
-  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+  return cms.getModel('Device').find({ $or: [{storeId}, {storeIds: {$elemMatch: {$eq: storeId}}}], deviceType: 'gsms' })
 }
 
 module.exports = async function (cms) {
@@ -1085,7 +1085,6 @@ module.exports = async function (cms) {
 
         if (store.gSms && store.gSms.enabled) {
           cms.emit('sendReservationMessage', storeId, reservationData)
-          // const demoDevices = await cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
           const demoDevices = await getGsmsDevices(storeId);
           demoDevices.forEach(({_id}) => {
 

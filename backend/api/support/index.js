@@ -13,6 +13,7 @@ const {getHost} = require('../utils')
 const voipApi = require('./voip')
 const { DEMO_STORE_ID } = require('../../restaurant-plus-apis/constants')
 const _ = require('lodash')
+const {DEVICE_TYPE} = require('../devices/constants');
 
 /*TODO: need to refactor externalSocketIoServer so that it can be reused in different files
 This one is to make sure Socket.io server is initialized before executing the code but it's not clean*/
@@ -589,25 +590,32 @@ async function assignDevice(deviceId, store) {
   device.metadata = device.metadata || {};
   device = await DeviceModel.findOneAndUpdate({ _id: deviceId }, device, { new: true });
 
-  // add device info to specified store
-  store.gSms = store.gSms || {};
-  store.gSms.enabled = store.gSms.enabled || true;
-  store.gSms.timeToComplete = store.gSms.timeToComplete || 30;
-  store.gSms.autoAccept = store.gSms.autoAccept || true;
-  store.gSms.devices = store.gSms.devices || [];
+  if (device.deviceType === DEVICE_TYPE.GSMS) {
+    // add device info to specified store
+    store.gSms = store.gSms || {};
+    store.gSms.enabled = store.gSms.enabled || true;
+    store.gSms.timeToComplete = store.gSms.timeToComplete || 30;
+    store.gSms.autoAccept = store.gSms.autoAccept || true;
+    store.gSms.devices = store.gSms.devices || [];
 
-  const newGsmsDevice = Object.assign({}, device._doc,
+    const newGsmsDevice = Object.assign({}, device._doc,
       {
         registered: true,
         code: await getNewDeviceCode(store.id),
         total: 0,
         orders: 0,
       })
-  await StoreModel.findOneAndUpdate({ _id: store._id }, {
-    $push: {
-      'gSms.devices': newGsmsDevice
-    }
-  });
+    await StoreModel.findOneAndUpdate({ _id: store._id }, {
+      $push: {
+        'gSms.devices': newGsmsDevice
+      }
+    });
+  } else {
+    const storeDevices = store.devices || [];
+    storeDevices.push(device._id);
+
+    await StoreModel.findOneAndUpdate({ _id: store._id }, {devices: storeDevices});
+  }
 }
 
 router.put('/update-token/:id', async (req, res) => {

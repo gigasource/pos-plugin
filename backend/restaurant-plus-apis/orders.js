@@ -20,7 +20,6 @@ const {ORDER_RESPONSE_STATUS, NOTIFICATION_ACTION_TYPE, PROMOTION_DISCOUNT_TYPE,
 const jsonFn = require('json-fn');
 const { sendNotification } = require('../app-notification');
 const {findVouchers} = require('./vouchers');
-const {formatOrderForRpManager} = require('../api/devices/gsms-devices');
 const {jwtValidator} = require('./api-security');
 const { time } = require('console');
 
@@ -225,7 +224,7 @@ router.put('/', jwtValidator, async (req, res) => {
     const parsedTime = parseInt(time)
     return !isNaN(parsedTime) && parsedTime > 0
   }
-  const oldOrder = await cms.getModel('Order').findOne({ ...orderId.includes('-') ? { onlineOrderId: orderId } : { _id: ObjectId(orderId) }})
+  const oldOrder = await cms.getModel('Order').findOne({ ...orderId.includes('-') ? { onlineOrderId: orderId } : { _id: ObjectId(orderId) }});
   const updatedOrder = await cms.getModel('Order').findOneAndUpdate(
     { ...orderId.includes('-')
         ? { onlineOrderId: orderId }
@@ -236,7 +235,7 @@ router.put('/', jwtValidator, async (req, res) => {
       ...status === 'declined' && { declineReason },
       ...status === 'kitchen'
         && isValidTimeToComplete(timeToComplete)
-        && { deliveryTime: dayjs(oldOrder.date).add(+timeToComplete, 'minute').format('HH:mm') }
+        && { deliveryTime: dayjs(oldOrder.date).add(+timeToComplete, 'minute').toDate().toISOString() }
     },
     { new: true })
   res.status(204).json(updatedOrder)
@@ -345,7 +344,7 @@ async function sendOrderNotificationToDevice(orderId, status, orderMessage) {
 }
 
 async function getGsmsDevices(storeId) {
-  return cms.getModel('Device').find({ $or: [{storeId}, {$and: [{enableMultiStore: true}, {storeIds: {$elemMatch: {$eq: storeId}}}]}], deviceType: 'gsms' })
+  return cms.getModel('Device').find({ $or: [{storeId}, {storeIds: {$elemMatch: {$eq: storeId}}}], deviceType: 'gsms' })
 }
 
 async function sendOrderToStoreDevices(store, orderData) {
@@ -404,9 +403,23 @@ async function sendOrderToStoreDevices(store, orderData) {
 function getOrderStatusResponseMessage(order, store, timeToComplete) {
   switch (order.status) {
     case 'kitchen':
-      const deliveryDateTime = order.deliveryTime === 'asap'
-        ? dayjs().add(timeToComplete, 'minute')
-        : dayjs(order.deliveryTime, 'HH:mm')
+      let deliveryDateTime;
+      if (order.deliveryTime === 'asap') {
+        deliveryDateTime = dayjs().add(timeToComplete, 'minute')
+      } else {
+        const _deliveryTime = new Date(order.deliveryTime)
+        if (isNaN(_deliveryTime)) { // if not ISO format
+          const timeRegex = new RegExp(/^([01]\d|2[0-3]):?([0-5]\d)$/)
+          if (timeRegex.test(order.deliveryTime.trim())) { // if HH:mm format
+            const [hour, minute] = order.deliveryTime.split(':')
+            deliveryDateTime = dayjs(order.date).hour(hour).minute(minute)
+          } else { // fallback to current date
+            deliveryDateTime = dayjs()
+          }
+        } else { // ISO format
+          deliveryDateTime = dayjs(_deliveryTime)
+        }
+      }
       const diff = deliveryDateTime.diff(dayjs(order.date), 'minute')
       const storeLocale = store.country.locale || 'en'
 
