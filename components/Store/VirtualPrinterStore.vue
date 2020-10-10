@@ -5,8 +5,6 @@
   // TODO: Both backend and front-end use query so we need to move all collection name to constants file
   const VIRTUAL_REPORT_COLLECTION = 'VirtualReport'
   const GROUP_PRINTER_COLLECTION = 'GroupPrinter'
-  
-  const SOCKET_EVENT_NEW_VREPORT_CREATED = 'newVirtualReportCreated'
   const OUT_DATED_VREPORT_TIME_IN_DAYS = 2
   
   // NOTE: clear timer will be remove when cms core added auto clean feature
@@ -33,15 +31,6 @@
       await this.loadMoreReports()
       await this.loadPrinterGroups()
       
-      cms.socket.on(SOCKET_EVENT_NEW_VREPORT_CREATED, async ({ newReport }) => {
-        if (newReport) {
-          this.reportCount = this.reportCount + 1;
-          this.setReports([newReport, ...this.reports])
-        } else {
-          console.warn(`${SOCKET_EVENT_NEW_VREPORT_CREATED} received empty report info!`)
-        }
-      });
-      
       this.clearVirtualReportTimerId = setInterval(async () => {
         await cms.getModel(VIRTUAL_REPORT_COLLECTION).remove({
           created: {
@@ -51,7 +40,6 @@
       }, MILLISECONS_PER_DAY)
     },
     async beforeDestroy() {
-      cms.socket.off(SOCKET_EVENT_NEW_VREPORT_CREATED)
       clearInterval(this.clearVirtualReportTimerId)
     },
     computed: {
