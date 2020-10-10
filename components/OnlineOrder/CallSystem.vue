@@ -16,7 +16,7 @@
         <g-icon @click="dialog.api = true">icon-keyboard</g-icon>
       </template>
     </g-text-field-bs>
-    <g-btn-bs width="80" background-color="#2979FF" style="margin: 16px 0 0; align-self: flex-end" @click="update">Update</g-btn-bs>
+    <g-btn-bs width="80" background-color="#2979FF" style="margin: 16px 0 0; flex: 0 0 36px; align-self: flex-end" @click="update">Update</g-btn-bs>
     <dialog-text-filter v-model="dialog.ip" label="Call System IP" :default-value="ip" @submit="changeIp"/>
     <dialog-text-filter v-model="dialog.api" label="Google Map API Key" :default-value="apiKey" @submit="changeApiKey"/>
   </div>
@@ -97,6 +97,8 @@
     flex-direction: column;
     background-color: white;
     padding: 24px;
+    height: 100%;
+    overflow: auto;
 
     &-title {
       font-size: 14px;

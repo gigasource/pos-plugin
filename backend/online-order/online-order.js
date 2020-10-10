@@ -599,8 +599,10 @@ module.exports = async cms => {
     })
   }
 
-  async function searchForPlace(text, token, apiKey, language = 'en', country = 'DE') {
+  async function searchForPlace(text, token, language = 'en', country = 'DE') {
     let searchResult = []
+    const setting = await cms.getModel('PosSetting').findOne()
+    const apiKey = setting['call']['googleMapApiKey']
     const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
     const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
       params: {
@@ -618,8 +620,10 @@ module.exports = async cms => {
     return searchResult
   }
 
-  async function getPlaceDetail(placeId, token, apiKey, language = 'en') {
+  async function getPlaceDetail(placeId, token, language = 'en') {
     const url = 'https://maps.googleapis.com/maps/api/place/details/json'
+    const setting = await cms.getModel('PosSetting').findOne()
+    const apiKey = setting['call']['googleMapApiKey']
     const { data } = await axios.get(url, {
       params: {
         key: apiKey,
@@ -857,14 +861,21 @@ module.exports = async cms => {
       })
     })
 
-    socket.on('searchPlace', async (text, token, apiKey, cb) => {
-      const places = await searchForPlace(text, token, apiKey)
+    socket.on('searchPlace', async (text, token, cb) => {
+      const places = await searchForPlace(text, token)
       cb && cb(places)
     })
 
-    socket.on('getPlaceDetail', async (place_id, token, apiKey, cb) => {
-      const place = await getPlaceDetail(place_id, token, apiKey)
+    socket.on('getPlaceDetail', async (place_id, token, cb) => {
+      const place = await getPlaceDetail(place_id, token)
       cb && cb(place)
+    })
+
+    socket.on('getZipcode', async (text, token, cb) => {
+      const places = await searchForPlace(text, token)
+      const place = await getPlaceDetail(places[0].place_id, token)
+      const component = place.address_components.find(c => c.types.includes('postal_code'))
+      cb && cb(place.name, component.long_name)
     })
 
     socket.on('getDeliveryProducts', async (cb) => {

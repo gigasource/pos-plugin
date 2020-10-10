@@ -17,40 +17,51 @@
           </div>
         </template>
         <template v-else-if="(!internalOrders || !internalOrders.length) && (calls.length > 0 || missedCalls.length > 0)">
-          <div class="pending-orders--call" v-for="(call, i) in calls" :key="`call_${i}`">
-            <div class="pending-orders--call-title">
-              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
-              <g-spacer/>
-              <g-icon size="20">icon-call</g-icon>
+          <template v-for="(call, i) in calls">
+            <div :class="['pending-orders--call', call.type === 'missed' && 'b-red']" :key="`call_${i}`">
+              <div class="pending-orders--call-title">
+                <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+                <g-spacer/>
+                <g-icon size="20">icon-call</g-icon>
+              </div>
+              <p class="fs-small-2 text-grey-darken-1">{{call.type === 'missed' ? 'Missed' : 'Incomming'}} call</p>
+              <div class="pending-orders--call-buttons">
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
+                  <g-icon size="16">icon-cross-red</g-icon>
+                </g-btn-bs>
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+                  <g-icon size="16">icon-table-reservation</g-icon>
+                </g-btn-bs>
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
+                  <g-icon size="16">icon-take-away</g-icon>
+                </g-btn-bs>
+                <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
+                  <g-icon size="16">icon-delivery-scooter</g-icon>
+                </g-btn-bs>
+              </div>
             </div>
-            <p class="fs-small-2 text-grey-darken-1">Incomming call</p>
-            <div class="pending-orders--call-buttons">
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
-                <g-icon size="16">icon-cross-red</g-icon>
-              </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
-                <g-icon size="16">icon-table-reservation</g-icon>
-              </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
-                <g-icon size="16">icon-take-away</g-icon>
-              </g-btn-bs>
-              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
-                <g-icon size="16">icon-delivery-scooter</g-icon>
-              </g-btn-bs>
-            </div>
-          </div>
-          <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`call_${i}`"
-               v-touch="getTouchHandlers(i)">
+          </template>
+          <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`missed_call_${i}`">
             <div class="pending-orders--call-title">
               <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
               <g-spacer/>
               <g-icon size="20">icon-missed-call</g-icon>
             </div>
-            <p class="fs-small-2 text-grey-darken-1">Missed call - {{calcDiffTime(call.date)}}</p>
-            <p class="mt-2 text-grey-darken-1 fw-700">
-              Swipe right to dismiss
-              <g-icon color="grey darken-1">double_arrow</g-icon>
-            </p>
+            <p class="fs-small-2 text-grey-darken-1">Missed call</p>
+            <div class="pending-orders--call-buttons">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteMissedCall(i)">
+                <g-icon size="16">icon-cross-red</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+                <g-icon size="16">icon-table-reservation</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup', i)">
+                <g-icon size="16">icon-take-away</g-icon>
+              </g-btn-bs>
+              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery', i)">
+                <g-icon size="16">icon-delivery-scooter</g-icon>
+              </g-btn-bs>
+            </div>
           </div>
         </template>
         <template v-else>
@@ -417,7 +428,14 @@
         this.selectedCustomer = customer
         this.dialog.reservation = true
       },
-      openOrderDialog(customer, type) {
+      openOrderDialog(customer, type, index) {
+        if (index) {
+          this.calls.unshift({
+            ...this.missedCalls[index],
+            type: 'missed'
+          })
+          this.deleteMissedCall(index)
+        }
         this.selectedCustomer = customer
         this.orderType = type
         this.$router.push(
@@ -427,12 +445,8 @@
       calcDiffTime(date) {
         return `${dayjs().diff(dayjs(date), 'minute')} minute(s) ago`
       },
-      getTouchHandlers(index) {
-        return {
-          right: () => {
-            this.missedCalls.splice(index, 1)
-          }
-        }
+      deleteMissedCall(index) {
+        this.missedCalls.splice(index, 1)
       }
     },
     mounted() {

@@ -19,10 +19,12 @@
               <div class="row-flex align-items-center">
                 <g-radio small v-model="selectedAddress" :value="i" :label="`Address ${i+1}`" color="#536DFE"/>
                 <g-spacer/>
-                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825" @click="openDialog('edit', item.address, item.zipcode, i)">
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
+                          @click="openDialog('edit', item.address, item.zipcode, i)">
                   <g-icon size="15">icon-reservation_modify</g-icon>
                 </g-btn-bs>
-                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452" @click="removeAddress(i)">
+                <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
+                          @click="removeAddress(i)">
                   <g-icon size="15">icon-delete</g-icon>
                 </g-btn-bs>
               </div>
@@ -34,12 +36,25 @@
           </template>
           <template v-else>
             <template v-if="deliveryOrderMode === 'mobile'">
-              <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
-              <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
-              <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense
-                          :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
-                          @input-click="showKeyboard = true" keep-menu-on-blur
-                          @input="selectAutocompleteAddress"/>
+              <div class="row-flex mt-3 w-100">
+                <div style="flex: 1; margin-right: 2px">
+                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+                </div>
+                <div style="flex: 1; margin-left: 2px">
+                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+                </div>
+              </div>
+              <div class="row-flex">
+                <div class="col-9">
+                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
+                              :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
+                              @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
+                              @input="selectAutocompleteAddress"/>
+                </div>
+                <div class="flex-grow-1 ml-1">
+                  <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true"/>
+                </div>
+              </div>
             </template>
             <template v-else>
               <g-text-field-bs class="bs-tf__pos" label="Name" v-model="name" @click="openDialog('add')">
@@ -57,7 +72,8 @@
         </div>
       </div>
       <div class="delivery-info--lower">
-        <div class="delivery-info__call" v-if="calls && calls.length > 0">
+        <div :class="['delivery-info__call', calls && calls[0] && calls[0].type === 'missed' ? 'b-red' : 'b-grey']"
+             v-if="calls && calls.length > 0">
           <div class="delivery-info__call--info">
             <p class="fw-700 fs-small">
               <g-icon size="16" class="mr-1">icon-call</g-icon>
@@ -66,7 +82,7 @@
             <p class="fs-small text-grey-darken-1">{{calls[0].customer.name}}</p>
           </div>
           <div :class="['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']"
-              @click="chooseCustomer('pickup')">
+               @click="chooseCustomer('pickup')">
             <g-icon size="20">icon-take-away</g-icon>
           </div>
           <div :class="['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']"
@@ -84,7 +100,8 @@
           </div>
           <g-menu v-model="menuMissed" v-if="missedCalls && missedCalls.length > 0" top left nudge-top="5">
             <template v-slot:activator="{on}">
-              <div v-on="on" :class="['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']">
+              <div v-on="on"
+                   :class="['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']">
                 <b>Missed</b>
                 <div class="delivery-info__call--missed-num">
                   {{missedCalls.length}}
@@ -100,11 +117,11 @@
                   </p>
                   <p class="fs-small text-grey-darken-1">{{call.customer.name}}</p>
                 </div>
-                <div :class="['delivery-info__call-btn', orderType === 'pickup' && missedIndex === i && 'delivery-info__call-btn--selected']"
+                <div :class="['delivery-info__call-btn']"
                      @click="chooseMissedCustomer(i, 'pickup')">
                   <g-icon size="20">icon-take-away</g-icon>
                 </div>
-                <div :class="['delivery-info__call-btn', orderType === 'delivery' && missedIndex === i && 'delivery-info__call-btn--selected']"
+                <div :class="['delivery-info__call-btn']"
                      @click="chooseMissedCustomer(i, 'delivery')">
                   <g-icon size="20">icon-delivery-scooter</g-icon>
                 </div>
@@ -129,8 +146,9 @@
                           return itemText.toLowerCase().includes(text.toLowerCase())
                         }"
                           return-object/>
-        <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos quantity" v-model="quantity" label="Quantity"/>
-          <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :value="selectedProduct.price" label="Price" @input="debouceUpdatePrice"/>
+          <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos quantity" v-model="quantity" label="Quantity"/>
+          <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :value="selectedProduct.price" label="Price"
+                           @input="debouceUpdatePrice"/>
           <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" v-model="selectedProduct.note" label="Note"/>
           <template v-if="selectedProduct && selectedProduct.choices && selectedProduct.choices.length > 0">
             <div v-for="(choice, iC) in selectedProduct.choices" class="delivery-order__choice" :key="`choice_${iC}`">
@@ -190,7 +208,8 @@
           </div>
         </div>
       </div>
-      <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-print" background-color="#2979FF" @click="dialog.order = true">Send to
+      <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-print" background-color="#2979FF"
+                @click="dialog.order = true">Send to
         kitchen
       </g-btn-bs>
     </div>
@@ -199,7 +218,7 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" v-model="placeId"
+          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
@@ -222,10 +241,16 @@
           <b>Phone: </b> {{this.selectedCustomer.phone}}
         </div>
         <div class="mx-2">
-          <b>Address: </b> {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 && this.selectedCustomer.addresses[this.selectedAddress].address}}
-          {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 && this.selectedCustomer.addresses[this.selectedAddress].zipcode}}
+          <b>Address: </b> {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 &&
+          this.selectedCustomer.addresses[this.selectedAddress].address}}
+          {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 &&
+          this.selectedCustomer.addresses[this.selectedAddress].zipcode}}
         </div>
-        <g-text-field-bs label="Delivery note:" v-model="note"/>
+        <g-text-field-bs label="Delivery note:" v-model="note">
+          <template v-slot:append-inner>
+            <g-icon @click="dialog.note = true">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
         <div class="ma-2">Time to complete (minute)</div>
         <div class="mb-3">
           <g-btn-bs class="elevation-1" :background-color="time === 15 ? '#BBDEFB' : 'white'" @click="time = 15">15
@@ -237,7 +262,9 @@
           <g-btn-bs class="elevation-1" :background-color="time === 60 ? '#BBDEFB' : 'white'" @click="time = 60">60
           </g-btn-bs>
         </div>
-        <g-btn-bs :disabled="disabledConfirm" block large background-color="#2979FF" @click="confirmOrder">Confirm - {{$t('common.currency', storeLocale)}}{{total | convertMoney}}</g-btn-bs>
+        <g-btn-bs :disabled="disabledConfirm" block large background-color="#2979FF" @click="confirmOrder">Confirm -
+          {{$t('common.currency', storeLocale)}}{{total | convertMoney}}
+        </g-btn-bs>
       </g-card>
     </g-dialog>
     <g-dialog v-model="dialog.choice" eager width="500">
@@ -276,15 +303,18 @@
           <g-spacer/>
           <g-btn-bs min-width="80" height="100%" text-color="#424242" @click="dialog.choice = false">Cancel</g-btn-bs>
           <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
-                    :disabled="unavailableToAdd" @click="addProduct">OK</g-btn-bs>
+                    :disabled="unavailableToAdd" @click="addProduct">OK
+          </g-btn-bs>
         </div>
       </g-card>
     </g-dialog>
-    <g-overlay :value="showKeyboard" style="left: 33%">
-      <div style="position: fixed; left: 33%; bottom: 0; right: 0; background: #F0F0F0; padding: 4px">
+    <dialog-text-filter v-model="dialog.note" label="Delivery note" @submit="e => { note = e }"/>
+    <div v-if="showKeyboard" class="keyboard">
+      <div class="keyboard-overlay" @click="showKeyboard = false"></div>
+      <div class="keyboard-wrapper">
         <pos-keyboard-full @enter-pressed="submitCustomer"/>
       </div>
-    </g-overlay>
+    </div>
   </div>
 </template>
 
@@ -292,11 +322,9 @@
   import _ from 'lodash'
   import {Touch} from 'pos-vue-framework';
   import {v4 as uuidv4} from 'uuid'
-  import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
 
   export default {
     name: "PosOrderDelivery",
-    components: {PosKeyboardFull},
     directives: {
       Touch
     },
@@ -327,6 +355,7 @@
           input: false,
           order: false,
           choice: false,
+          note: false,
         },
         dialogMode: 'add',
         products: [],
@@ -337,12 +366,13 @@
         time: 30,
         isNewCustomer: false,
         enterPressed: 0,
-        apiKey: '',
         autocompleteAddresses: [],
-        debouceSearchAddress: () => {},
+        debouceSearchAddress: () => {
+        },
         token: '',
         placeId: '',
-        debouceUpdatePrice: () => {},
+        debouceUpdatePrice: () => {
+        },
         quantity: 1,
         showKeyboard: false,
         keyboardConfig: [],
@@ -355,12 +385,13 @@
       await this.loadProduct()
       await this.loadKeyboard()
       this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
-      window.addEventListener('keydown', this.keyboardHanle.bind(this))
-      const setting = await cms.getModel('PosSetting').findOne()
-      this.apiKey = setting['call']['googleMapApiKey']
       this.debouceSearchAddress = _.debounce(this.searchAddress, 300)
       this.debouceUpdatePrice = _.debounce(this.updatePrice, 300)
+      const setting = await cms.getModel('PosSetting').findOne()
       this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
+      if(this.deliveryOrderMode === 'tablet') {
+        window.addEventListener('keydown', this.keyboardHanle.bind(this))
+      }
     },
     computed: {
       username() {
@@ -445,12 +476,12 @@
             ]
           } else {
             customer.addresses = [{
-                address: this.address,
-                zipcode: this.zipcode,
-                house: this.house,
-                street: this.street,
-                city: this.city
-              }]
+              address: this.address,
+              zipcode: this.zipcode,
+              house: this.house,
+              street: this.street,
+              city: this.city
+            }]
           }
           this.$set(this, 'selectedCustomer', customer)
           this.selectedAddress = customer.addresses.length - 1
@@ -459,11 +490,11 @@
         if (this.dialogMode === 'edit') {
           this.$set(this.selectedCustomer, 'name', this.name)
           this.selectedCustomer.addresses.splice(this.selectedAddress, 1, {
-                address: this.address,
-                zipcode: this.zipcode,
-                house: this.house,
-                street: this.street,
-                city: this.city
+            address: this.address,
+            zipcode: this.zipcode,
+            house: this.house,
+            street: this.street,
+            city: this.city
           })
         }
         this.address = ''
@@ -516,7 +547,7 @@
         return index > -1
       },
       addProduct() {
-        if(!this.selectedProduct) return
+        if (!this.selectedProduct) return
         const product = {
           ...this.selectedProduct,
           modifiers: this.modifiers,
@@ -527,7 +558,7 @@
         this.modifiers = []
         this.quantity = 1
         //focus product autocomplete
-        if(!this.isMobile)
+        if (!this.isMobile)
           document.querySelector('.g-autocomplete input').click()
         this.dialog.choice = false
       },
@@ -551,7 +582,7 @@
         this.dialog.input = true
       },
       removeAddress(index) {
-        if(this.selectedCustomer.addresses.length === 1) {
+        if (this.selectedCustomer.addresses.length === 1) {
           this.isNewCustomer = true
         }
         this.selectedCustomer.addresses.splice(index, 1)
@@ -578,17 +609,19 @@
           zipCode: this.selectedCustomer.addresses[this.selectedAddress].zipcode
         }
         await this.createCallInOrder(customer, this.time, this.note)
+        this.dialog.order = false
+        this.autocompleteAddresses = []
         this.$router.push({
           path: '/pos-dashboard'
         })
       },
       chooseProduct(productString) {
         let [productId, quantity] = productString.split(' x ')
-        if(!productId) return
-        if(!quantity) quantity = 1
+        if (!productId) return
+        if (!quantity) quantity = 1
         const product = this.products.find(p => p.id.toLowerCase() === productId.toLowerCase())
-        if(product) {
-          if(product.choices && product.choices.length > 0) {
+        if (product) {
+          if (product.choices && product.choices.length > 0) {
             this.quantity = +quantity
             this.selectedProduct = product
             this.dialog.choice = true
@@ -603,7 +636,7 @@
       },
       keyboardHanle(event) {
         event.stopPropagation()
-        if(event.key === 'p') {
+        if (event.key === 'p') {
           event.preventDefault()
           document.querySelector('.g-autocomplete input').click()
         }
@@ -621,10 +654,9 @@
         }
       },
       async searchAddress(text) {
-        console.log('searching')
-        if(!text || text.length < 4) return
+        if (!text || text.length < 4) return
         this.token = uuidv4()
-        cms.socket.emit('searchPlace', text, this.token, this.apiKey, places => {
+        cms.socket.emit('searchPlace', text, this.token, places => {
           this.autocompleteAddresses = places.map(p => ({
             text: p.description,
             value: p.place_id,
@@ -632,11 +664,10 @@
         })
       },
       async selectAutocompleteAddress(place_id) {
-        if(this.autocompleteAddresses.find(item => item.value === place_id)) {
-          console.log('finding')
-          cms.socket.emit('getPlaceDetail', place_id, this.token, this.apiKey, data => {
-            if(!_.isEmpty(data)) {
-              for(const component of data.address_components) {
+        if (this.autocompleteAddresses.find(item => item.value === place_id)) {
+          cms.socket.emit('getPlaceDetail', place_id, this.token, data => {
+            if (!_.isEmpty(data)) {
+              for (const component of data.address_components) {
                 if (component.types.includes('street_number')) {
                   this.house = component.long_name
                 }
@@ -673,7 +704,7 @@
         })
       },
       getCheckboxLabel(option) {
-        if(!option.price)
+        if (!option.price)
           return option.name
         return `${option.name} (${$t('common.currency', this.storeLocale)}${this.formatMoney(option.price)})`
       },
@@ -681,12 +712,18 @@
         return !isNaN(value) && value > 0 ? value.toFixed(2) : value
       },
       changeQuantity(value) {
-        if(this.quantity + value >= 0) {
+        if (this.quantity + value >= 0) {
           this.quantity += value
         }
       },
       submitCustomer() {
-        if(this.name && this.phone && this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId)) {
+        if (this.name && this.phone && this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId) && this.house) {
+          //get exact address + zip code
+          this.token = uuidv4()
+          cms.socket.emit('getZipcode', `${this.street} ${this.house} ${this.city}`, this.token, (address, zipcode) => {
+              this.address = address
+              this.zipcode = zipcode
+          })
           let customer = {}
           customer.name = this.name
           customer.phone = this.phone
@@ -718,7 +755,7 @@
       },
       deleteCall(index) {
         //index => missed call || first call
-        if(index) {
+        if (index) {
           this.missedCalls.splice(index, 1)
         } else {
           this.calls.splice(0, 1)
@@ -732,9 +769,14 @@
         this.phone = this.selectedCustomer.phone
       },
       chooseMissedCustomer(index, type) {
-        this.missedIndex = index
         this.orderType = type
-        this.selectedCustomer = this.missedCalls[index].customer
+        const call = {
+          ...this.missedCalls[index],
+          type: 'missed'
+        }
+        this.calls.unshift(call)
+        this.missedCalls.splice(index, 1)
+        this.selectedCustomer = call.customer
         this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
         this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
         this.phone = this.selectedCustomer.phone
@@ -752,9 +794,23 @@
       }
       this.note = ''
       this.time = 30
-      this.missedIndex = null
       const setting = (await cms.getModel('PosSetting').findOne())
       this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
+      if(this.deliveryOrderMode === 'tablet') {
+        window.addEventListener('keydown', this.keyboardHanle.bind(this))
+      }
+    },
+    watch: {
+      zipcode(val) {
+        if(val && this.selectedCustomer && this.selectedCustomer.addresses) {
+          this.selectedCustomer.addresses[this.selectedAddress].zipcode = val
+        }
+      },
+      address(val) {
+        if(val && this.selectedCustomer && this.selectedCustomer.addresses) {
+          this.selectedCustomer.addresses[this.selectedAddress].address = val
+        }
+      }
     }
   }
 </script>
@@ -834,7 +890,7 @@
           top: 4px;
 
           &__active {
-           transform: translateY(-13px) translateX(7px) scale(0.75) !important;
+            transform: translateY(-13px) translateX(7px) scale(0.75) !important;
           }
         }
       }
@@ -856,7 +912,8 @@
         flex: 1;
         padding: 6px;
         background: #FFFFFF;
-        border: 0.4px solid #9E9E9E;
+        border-width: 0.4px;
+        border-style: solid;
         border-radius: 4px;
 
         &--info {
@@ -1179,7 +1236,51 @@
       &--info {
         flex: 1;
         line-height: 1.2;
-        margin-right: 8px;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .keyboard {
+    position: fixed;
+    left: 33%;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+
+    &-overlay {
+      flex: 1;
+      background: rgba(21, 21, 21, 0.42);
+    }
+
+    &-wrapper {
+      background: #F0F0F0;
+      padding: 4px;
+    }
+
+    ::v-deep .key .waves-ripple {
+      background-color: rgba(255, 190, 92, 1)
+    }
+  }
+</style>
+
+<style lang="scss">
+  .menu-autocomplete-address {
+    .g-list {
+      .g-list-item-content {
+        padding-right: 4px;
+
+        .g-list-item-text {
+          white-space: normal;
+          word-break: break-word;
+        }
+      }
+
+      & > div:not(:last-child) .g-list-item-text {
+        border-bottom: 1px solid #F0F0F0;
       }
     }
   }
