@@ -407,8 +407,8 @@
             let open = get24HourValue(openTime), close = get24HourValue(closeTime)
             if (this.store.preOrderTime) {
               const newOpen = decrementTime(+open.split(':')[0], +open.split(':')[1], this.store.preOrderTime)
-              this.preOrderMode = this.now >= `${newOpen.hour}:${newOpen.minute}` && this.now < open;
-              open = `${newOpen.hour}:${newOpen.minute}`
+              this.preOrderMode = this.now >= `${newOpen.hour < 10 ? '0': ''}${newOpen.hour}:${newOpen.minute < 10 ? '0': ''}${newOpen.minute}` && this.now < open;
+              open = `${newOpen.hour < 10 ? '0': ''}${newOpen.hour}:${newOpen.minute < 10 ? '0': ''}${newOpen.minute}`
             }
             if (this.now >= open && this.now <= close) return true
           }
