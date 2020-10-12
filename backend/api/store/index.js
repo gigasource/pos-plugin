@@ -148,7 +148,7 @@ router.post('/new-store', async (req, res) => {
     pickup: true,
     delivery: false,
     deliveryFee: {
-      acceptOrderInOtherZipCodes: true,
+      acceptOrderInOtherZipCodes: false,
       defaultFee: 0,
       type: 'zipCode',
       zipCodeFees: [],
