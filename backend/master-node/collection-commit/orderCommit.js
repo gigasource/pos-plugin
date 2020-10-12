@@ -221,6 +221,9 @@ async function orderCommit(updateCommit) {
 			if (!validateOrderId(commit)) return;
 			const condition = getCondition(commit);
 			const query = JsonFn.parse(commit.update.query);
+			if (query['$set'] && query['$set']['status'] && query['$set']['status'] === 'paid') {
+				return await updateCommit.methods['order'].closeOrder(commit);
+			}
 			updateCommit.activeOrders[commit.table] = await updateCommit.orderModel[commit.update.method](condition, query, { new : true }).lean();
 			commit.where = JsonFn.stringify(condition);
 			await updateCommit.orderCommitModel.create(commit);

@@ -14,7 +14,7 @@ const updateCommits = async (commits) => {
 		const commit = commits[id];
 		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
 	}
-	if (newCommits.length) pushTaskToQueue(newCommits);
+	if (newCommits.length) updateCommit.handleCommit(newCommits);
 }
 
 const requireSync = (type, oldHighestCommitId, ack) => {
@@ -83,7 +83,7 @@ class Master {
 		because socket event might be triggered before
 		queue is initialized
 		 */
-		this.cms.execPostSync('load:masterSocket');
+		await this.cms.execPostAsync('load:masterSocket');
 		const _this = this;
 		const _model = cms.Types['OrderCommit'].Model;
 		await _this.getStoreId();
