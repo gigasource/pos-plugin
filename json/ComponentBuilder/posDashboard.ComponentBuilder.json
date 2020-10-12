@@ -418,9 +418,18 @@
             {
               "choice": "view",
               "component": "PosOrderDeliveryConfig",
-              "binding": [],
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.view",
+                  "local": "view"
+                }
+              ],
               "slotScopeBinding": [],
-              "slot": "DeliveryConfig"
+              "slot": "DeliveryConfig",
+              "url": "plugins/pos-plugin/components/posOrder/PosOrderDeliveryConfig.vue",
+              "path": "components/posOrder/PosOrderDeliveryConfig.vue",
+              "pluginName": "pos-plugin"
             },
             {
               "choice": "view",
