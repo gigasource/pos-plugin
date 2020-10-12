@@ -966,6 +966,13 @@ module.exports = async cms => {
       cb && cb(place)
     })
 
+    socket.on('getZipcode', async (text, token, cb) => {
+      const places = await searchForPlace(text, token)
+      const place = await getPlaceDetail(places[0].place_id, token)
+      const component = place.address_components.find(c => c.types.includes('postal_code'))
+      cb && cb(place.name, component.long_name)
+    })
+
     socket.on('getDeliveryProducts', async (cb) => {
       const deviceId = await getDeviceId()
       onlineOrderSocket.emit('getDeliveryProducts', deviceId, async products => {
@@ -976,7 +983,7 @@ module.exports = async cms => {
           ...p,
           type: 'delivery',
           option: {
-            favorite: !!p.mark.favorite
+            favorite: !!(p.mark && p.mark.favorite)
           },
           groupPrinter: p.groupPrinters[0],
           groupPrinter2: p.groupPrinters[1],

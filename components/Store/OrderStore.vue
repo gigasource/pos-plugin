@@ -526,10 +526,18 @@
       printOrderReport(order) {
         return new Promise((resolve, reject) => {
           if (!order) reject()
-          cms.socket.emit('printReport', 'OrderReport', order, this.device, ({ success, message }) => {
-            if (success) resolve()
-            else reject(message)
-          });
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'print',
+              printType: 'report',
+              reportType: 'OrderReport',
+              printData: order,
+              device: this.device
+            }])
+            resolve()
+          } catch (e) {
+            reject(e.message)
+          }
         })
       },
 
@@ -801,19 +809,33 @@
       printOnlineOrderReport(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.socket.emit('printReport', 'OnlineOrderReport', { orderId }, this.device, ({ success, message }) => {
-            if (success) resolve()
-            else reject(message)
-          });
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'OnlineOrderReport',
+            printData: { orderId },
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
+          })
         })
       },
       printOnlineOrderKitchen(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.socket.emit('printReport', 'OnlineOrderKitchen', { orderId }, this.device, ({ success, message }) => {
-            if (success) resolve()
-            else reject(message)
-          });
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'OnlineOrderKitchen',
+            printData: { orderId },
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
+          })
         })
       },
       async updateOnlineOrders() {

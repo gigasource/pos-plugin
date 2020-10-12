@@ -115,11 +115,17 @@
       printZReport(z) {
         return new Promise((resolve, reject) => {
           if (_.isNil(z)) reject()
-          cms.socket.emit('printReport', 'ZReport', { z: parseInt(z) }, this.device, ({ success, message }) => {
-            if (success) resolve()
-            reject(message)
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'ZReport',
+            printData: { z: parseInt(z) },
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
           })
-
         })
       },
       async getXReport(date) {
@@ -140,11 +146,17 @@
         const to = dayjs(from).add(1, 'day').toDate()
 
         return new Promise((resolve, reject) => {
-          cms.socket.emit('printReport', 'XReport',
-            { from, to }, this.device, ({ success, message }) => {
-              if (success) resolve()
-              reject(message)
-            })
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'XReport',
+            printData: { from, to },
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
+          })
         })
       },
       //<!--</editor-fold>-->
@@ -176,12 +188,17 @@
       },
       printMonthlyReport(report) {
         return new Promise((resolve, reject) => {
-          cms.socket.emit('printReport', 'MonthlyReport',
-            report, this.device,
-            ({ success, message }) => {
-              if (success) resolve()
-              reject(message)
-            })
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'MonthlyReport',
+            printData: report,
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
+          })
         })
       },
       //<!--</editor-fold>-->
@@ -198,14 +215,17 @@
       },
       printStaffReport(report) {
         return new Promise((resolve, reject) => {
-          cms.socket.emit('printReport', 'StaffReport',
-            report, this.device,
-            ({ success, message }) => {
-              if (success) {
-                resolve()
-              }
-              reject(message)
-            })
+          cms.getModel('OrderCommit').create([{
+            type: 'print',
+            printType: 'report',
+            reportType: 'StaffReport',
+            printData: report,
+            device: this.device
+          }]).then(() => {
+            resolve()
+          }).catch((e) => {
+            reject(e.message)
+          })
         })
       },
       //<!--</editor-fold>-->
@@ -218,7 +238,7 @@
     provide() {
       return {
         ...getProvided(this.$data, this),
-        ...getProvided(this.$options.methods, this),
+        ...getProvided(this.$options.methods, this)
       }
     }
   }

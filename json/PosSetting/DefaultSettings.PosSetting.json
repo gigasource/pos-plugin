@@ -2,7 +2,8 @@
   "_id": "5e1d89db00971c2ac29fccc9",
   "generalSetting": {
     "quickFnRows": 1,
-    "quickBtn": true
+    "quickBtn": true,
+    "useVirtualPrinter": true
   },
   "leftFunctionButtons": [
     {

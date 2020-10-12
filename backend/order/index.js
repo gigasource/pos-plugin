@@ -232,6 +232,9 @@ module.exports = (cms) => {
       await printKitchenCancel({ order: commit.order, device: commit.device });
     } else if (commit.printType === 'invoice') {
       await printInvoiceHandler('OrderReport', commit.order, commit.device);
+    } else if (commit.printType === 'report') {
+      // todo: Change printInvoiceHandler to printReport
+      await printInvoiceHandler(commit.reportType, commit.printData, commit.device);
     }
   })
 }

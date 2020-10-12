@@ -418,9 +418,28 @@
             {
               "choice": "view",
               "component": "PosOrderDeliveryConfig",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.view",
+                  "local": "view"
+                }
+              ],
+              "slotScopeBinding": [],
+              "slot": "DeliveryConfig",
+              "url": "plugins/pos-plugin/components/posOrder/PosOrderDeliveryConfig.vue",
+              "path": "components/posOrder/PosOrderDeliveryConfig.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "VirtualPrinterView",
               "binding": [],
               "slotScopeBinding": [],
-              "slot": "DeliveryConfig"
+              "slot": "VirtualPrinter",
+              "url": "plugins/pos-plugin/components/VirtualPrinter/VirtualPrinterView.vue",
+              "path": "components/VirtualPrinter/VirtualPrinterView.vue",
+              "pluginName": "pos-plugin"
             }
           ]
         }

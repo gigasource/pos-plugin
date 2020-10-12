@@ -17,6 +17,10 @@
         <span>Quick pay/print button</span>
         <g-switch v-model="quickBtn"/>
       </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>Using virtual printer</span>
+        <g-switch v-model="useVirtualPrinter"/>
+      </div>
 
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
@@ -46,6 +50,7 @@
           </template>
         </pos-time-picker>
       </div>
+      <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
     </div>
   </div>
 </template>
@@ -55,6 +60,7 @@
 
   export default {
     name: 'viewGeneral',
+    injectService: ['PosStore:(showVirtualPrinterSidebarItem,hideVirtualPrinterSidebarItem)'],
     components: { PosTimePicker },
     data() {
       return {
@@ -137,6 +143,27 @@
           this.$set(this.generalSettings, 'quickBtnAction', val);
         },
       },
+      useVirtualPrinter: {
+        get() {
+          return (this.generalSettings && !!this.generalSettings.useVirtualPrinter)
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'useVirtualPrinter', val)
+          if (val) {
+            this.showVirtualPrinterSidebarItem()
+          } else {
+            this.hideVirtualPrinterSidebarItem()
+          }
+        }
+      },
+      deliveryOrderMode: {
+        get() {
+          return (this.generalSettings && this.generalSettings.deliveryOrderMode) || 'tablet';
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'deliveryOrderMode', val);
+        },
+      }
     },
     async created() {
       const setting = await cms.getModel('PosSetting').findOne();
@@ -182,5 +209,15 @@
 
   span {
     max-width: 150px;
+  }
+
+  .g-select ::v-deep {
+    .bs-tf-wrapper {
+      margin-left: 0;
+
+      .input {
+        color: #1d1d26;
+      }
+    }
   }
 </style>
