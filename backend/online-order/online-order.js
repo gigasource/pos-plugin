@@ -601,8 +601,8 @@ module.exports = async cms => {
       return onlineDevice.id
     } else {
       if (pairingCode) {
-        // todo pairing code registration logic
-        // return deviceId
+        const { deviceId } = await registerWithCode(pairingCode)
+        return deviceId
       } else {
         const { deviceId } = await registerDevice()
         if (deviceId) {
@@ -721,6 +721,37 @@ module.exports = async cms => {
     }
   }
 
+  async function registerWithCode(pairingCode) {
+    try {
+      const pairingApiUrl = `${await getWebShopUrl()}/device/register`
+      const requestBody = { pairingCode }
+      requestBody.appName = 'POS_Android'
+      requestBody.appVersion = require('../../package').version
+      requestBody.hardware = global.APP_CONFIG.deviceName
+      requestBody.release = require('../../package').release
+      const response = await axios.post(pairingApiUrl, requestBody)
+      const { deviceId, storeId, storeAlias: alias, storeName: name } = response.data
+
+      await cms.getModel('PosSetting').findOneAndUpdate({}, {
+        $set: {
+          onlineDevice: {
+            id: deviceId,
+            store: {
+              id: storeId,
+              name,
+              alias
+            }
+          },
+          signInRequest: null
+        }
+      })
+      return { deviceId }
+    } catch (error) {
+      console.error(error)
+      return { error }
+    }
+  }
+
   cms.socket.on('connect', async socket => {
     await waitInitOnlineOrderSocket();
 
@@ -761,13 +792,11 @@ module.exports = async cms => {
     })
 
     socket.on('registerOnlineOrderDevice', async (pairingCode, callback) => {
-      const deviceId = await getDeviceId(pairingCode)
+      const { deviceId } = await registerWithCode(pairingCode)
 
       if (deviceId) {
         try {
-          await createOnlineOrderSocket(deviceId);
-          await updateDeviceStatus(deviceId);
-
+          !onlineOrderSocket && await createOnlineOrderSocket(deviceId);
           onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
             await Promise.all(_.map(data, async (enabled, name) => {
               return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})
@@ -983,7 +1012,7 @@ module.exports = async cms => {
       const sentryTags = getBaseSentryTags('setMasterDevice');
 
       try {
-        console.debug(sentryTags, 'POS backend: setMasterDevice event listener', e)
+        console.debug(sentryTags, 'POS backend: setMasterDevice event listener')
         const posSettings = await cms.getModel('PosSetting').findOne({}).lean();
         const { onlineDevice } = posSettings;
 

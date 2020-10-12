@@ -810,7 +810,7 @@
       },
 
       registerOnlineOrder(pairingCode, callback) {
-        window.cms.socket.emit('registerOnlineOrderDevice', pairingCode, callback)
+        cms.socket.emit('registerOnlineOrderDevice', pairingCode, callback)
       },
 
       unregisterOnlineOrder(callback) {
