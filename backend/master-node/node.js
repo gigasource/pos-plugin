@@ -83,6 +83,8 @@ class Node {
 	}
 	// init online order socket
 	async initSocket(socket, masterClientId) {
+		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
+		const { onlineDevice } = posSettings;
 		const _this = this;
 		_this.masterClientId = masterClientId;
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
@@ -100,6 +102,12 @@ class Node {
 					_this.onlineOrderSocket.emit('requireSync', type, oldHighestCommitId, nodeSync);
 				}
 			})
+		})
+		_this.onlineOrderSocket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
+			if (masterIp != posSettings.masterIp) {
+				connectToMaster(_this, masterIp);
+				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
+			}
 		})
 		if (_this.masterClientId) {
 			updateCommit.commitType.forEach(type => {
