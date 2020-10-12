@@ -90,7 +90,8 @@ router.post('/register', async (req, res) => {
     res.status(200).json({
       deviceId: deviceInfo._id,
       storeName: store.name || store.settingName,
-      storeAlias: store.alias
+      storeAlias: store.alias,
+      storeId: store._id.toString()
     });
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
