@@ -957,32 +957,45 @@ module.exports = async cms => {
     })
 
     socket.on('sendSignInRequest', async (storeName, googleMapPlaceId, cb = () => null) => {
-      const webshopUrl = await getWebShopUrl()
-      const deviceId = await getDeviceId()
-      await createOnlineOrderSocket(deviceId)
-      const { data: request } = await axios.post(`${webshopUrl}/store/sign-in-requests`, { storeName, googleMapPlaceId, deviceId })
-      console.log('sign-in request', request)
-      cb(request)
-      const result = await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } }, { new: true })
+      const sentryTags = getBaseSentryTags('sendSignInRequest');
+      try {
+        const webshopUrl = await getWebShopUrl()
+        const deviceId = await getDeviceId()
+        await createOnlineOrderSocket(deviceId)
+        const { data: request } = await axios.post(`${webshopUrl}/store/sign-in-requests`, {
+          storeName,
+          googleMapPlaceId,
+          deviceId
+        })
+        console.debug(sentryTags, 'POS backend: sendSignInRequest success', request)
+        cb(request)
+        await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } }, { new: true })
+      } catch (e) {
+        console.debug(sentryTags, 'POS backend: sendSignInRequest error', e)
+      }
     })
 
     socket.on('getSignInRequestStatus', () => {
 
     })
 
-    cms.socket.on('connect', socket => {
-      socket.on('setMasterDevice', async () => {
-        console.log('setMasterDevice')
-        const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
+    socket.on('setMasterDevice', async () => {
+      const sentryTags = getBaseSentryTags('setMasterDevice');
+
+      try {
+        console.debug(sentryTags, 'POS backend: setMasterDevice event listener', e)
+        const posSettings = await cms.getModel('PosSetting').findOne({}).lean();
         const { onlineDevice } = posSettings;
 
         if (!onlineDevice.store || !onlineDevice.store.alias) return cb(null)
         const ip = global.APP_CONFIG.deviceIp;
         onlineOrderSocket.emit('setMasterDevice', ip, id => {
-          console.log('setMasterDevice cb', id)
+          console.debug(sentryTags, 'POS backend: setMasterDevice cb', id)
           cms.getModel('PosSetting').findOneAndUpdate({}, { masterIp: ip, masterClientId: id })
         })
-      })
-    });
+      } catch (e) {
+        console.debug(sentryTags, 'Error setting master device', e)
+      }
+    })
   })
 }
