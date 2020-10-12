@@ -47,7 +47,7 @@
               <div class="row-flex">
                 <div class="col-9">
                   <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
-                              :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
+                              :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
                               @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
                 </div>
@@ -166,7 +166,7 @@
             </div>
           </template>
         </div>
-        <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-kitchen" background-color="#0EA76F"
+        <g-btn-bs block large  class="elevation-2" icon="icon-kitchen" background-color="#0EA76F"
                   :disabled="unavailableToAdd" @click="addProduct">Add to order list
         </g-btn-bs>
       </template>
@@ -208,7 +208,7 @@
           </div>
         </div>
       </div>
-      <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-print" background-color="#2979FF"
+      <g-btn-bs block large class="elevation-2" icon="icon-print" background-color="#2979FF"
                 @click="dialog.order = true">Send to
         kitchen
       </g-btn-bs>
@@ -310,7 +310,7 @@
     </g-dialog>
     <dialog-text-filter v-model="dialog.note" label="Delivery note" @submit="e => { note = e }"/>
     <div v-if="showKeyboard" class="keyboard">
-      <div class="keyboard-overlay" @click="showKeyboard = false"></div>
+      <div class="keyboard-overlay" @click="hideKeyboard"></div>
       <div class="keyboard-wrapper">
         <pos-keyboard-full @enter-pressed="submitCustomer"/>
       </div>
@@ -751,7 +751,7 @@
           this.selectedAddress = customer.addresses.length - 1
           this.isNewCustomer = false
         }
-        this.showKeyboard = false
+        this.hideKeyboard()
       },
       deleteCall(index) {
         //index => missed call || first call
@@ -780,6 +780,16 @@
         this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
         this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
         this.phone = this.selectedCustomer.phone
+      },
+      hideKeyboard() {
+        this.showKeyboard = false
+        const autocomplete = this.$refs.autocomplete
+        if(autocomplete) {
+          const menu = autocomplete.$refs && autocomplete.$refs.menu
+          if(menu) {
+            menu.isActive = false
+          }
+        }
       }
     },
     async activated() {
