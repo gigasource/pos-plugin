@@ -49,8 +49,13 @@
           <pos-textfield-new style="width: 48%" label="Name" v-model="name" required/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone" required/>
           <template v-for="(item, i) in addresses">
-            <pos-textfield-new style="width: 48%" :label="`Address ${i+1}`" :key="`address_${i}`" v-model="item.address"/>
-            <pos-textfield-new style="width: 48%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode" required/>
+            <g-combobox style="width: 98%" :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur
+                        :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)"
+                        @input="e => selectAutocompleteAddress(e, i)"/>
+            <pos-textfield-new style="width: 24%" :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street"/>
+            <pos-textfield-new style="width: 24%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode" required/>
+            <pos-textfield-new style="width: 24%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house" required/>
+            <pos-textfield-new style="width: 24%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city" required/>
           </template>
         </div>
       </template>
@@ -60,6 +65,8 @@
 
 <script>
   import _ from 'lodash'
+  import {v4 as uuidv4} from 'uuid'
+
   export default {
     name: "PosCustomer",
     injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer)'],
@@ -75,11 +82,16 @@
         },
         name: '',
         phone: '',
-        addresses: []
+        addresses: [],
+        placeId: [],
+        autocompleteAddresses: [],
+        debouceSearchAddress: null,
+        token: null
       }
     },
     async created() {
       this.customers = await this.getCustomers()
+      this.debouceSearchAddress = _.debounce(this.searchAddress, 300)
     },
     async activated() {
       this.customers = await this.getCustomers()
@@ -112,6 +124,8 @@
         this.name = this.selectedCustomer.name
         this.phone = this.selectedCustomer.phone
         this.addresses = this.selectedCustomer.addresses
+        this.placeId = this.addresses.map(() => '')
+        this.autocompleteAddresses = this.addresses.map(() => [])
         this.dialog.edit = true
       },
       async _updateCustomer() {
@@ -124,7 +138,40 @@
         this.customers = await this.getCustomers()
         this.selectedCustomer = this.sortedCustomer.find(c => c._id === this.selectedCustomer._id)
         this.dialog.edit = false
-      }
+      },
+      async searchAddress(text, index) {
+        if (!text || text.length < 4) return
+        this.token = uuidv4()
+        cms.socket.emit('searchPlace', text, this.token, places => {
+          this.autocompleteAddresses[index] = places.map(p => ({
+            text: p.description,
+            value: p.place_id,
+          }))
+        })
+      },
+      async selectAutocompleteAddress(place_id, index) {
+        if (this.autocompleteAddresses[index].find(item => item.value === place_id)) {
+          cms.socket.emit('getPlaceDetail', place_id, this.token, data => {
+            if (!_.isEmpty(data)) {
+              for (const component of data.address_components) {
+                if (component.types.includes('street_number')) {
+                  this.addresses[index].house = component.long_name
+                }
+                if (component.types.includes('route')) {
+                  this.addresses[index].street = component.long_name
+                }
+                if (component.types.includes('postal_code')) {
+                  this.addresses[index].zipcode = component.long_name
+                }
+                if (component.types.includes('locality')) {
+                  this.addresses[index].city = component.long_name
+                }
+              }
+              this.addresses[index].address = data.name
+            }
+          })
+        }
+      },
     }
   }
 </script>
