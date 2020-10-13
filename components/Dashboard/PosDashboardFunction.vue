@@ -154,7 +154,6 @@
 
     &-btn {
       width: 100%;
-      height: 100%;
       min-height: 136px;
       background: white;
       display: flex;
