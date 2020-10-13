@@ -80,6 +80,7 @@ async function orderCommit(updateCommit) {
 			if (!validateCommit(commit)) continue;
 			const result = await updateCommit.methods['order'][commit.action](commit);
 			if (result) {
+				if (commit.data && commit.data.cb) commit.data.cb();
 				if (commit.commitId) updateCommit.highestOrderCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
@@ -338,17 +339,6 @@ async function orderCommit(updateCommit) {
 			const syncCommits = await updateCommit.orderCommitModel.find({commitId: {$gt: oldHighestCommitId - 1}});
 			ack(syncCommits);
 			return false;
-		} catch (err) {
-			console.error('Error occurred', err);
-			return null;
-		}
-	}
-
-	updateCommit.methods['order'].updateTempCommit = async function (commits) {
-		try {
-			for (let i in commits) {
-				await updateCommit.orderCommitModel.create(commits[i]);
-			}
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;

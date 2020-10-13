@@ -12,7 +12,10 @@ const updateCommits = async (commits) => {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) {
+			if (commit.data.cb) delete commit.data.cb;
+			newCommits.push(commit);
+		}
 	}
 	if (newCommits.length) updateCommit.handleCommit(newCommits);
 }

@@ -1,4 +1,5 @@
 const orderUtil = require('../../components/logic/orderUtil')
+const mongoose = require('mongoose')
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
 const { printInvoiceHandler } = require('../print-report')
@@ -9,6 +10,16 @@ module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
 
     socket.on('print-to-kitchen', async (device, order, oldOrder = { items: [] }, actionList, cb = () => null) => {
+      if (!order._id) {
+        order._id = new mongoose.Types.ObjectId();
+        actionList.forEach(action => {
+          if (action.action === 'createOrder') {
+            const query = JsonFn.parse(action.update.query);
+            query._id = order._id;
+            action.update.query = JsonFn.stringify(query);
+          }
+        })
+      }
       const diff = _.differenceWith(order.items, oldOrder.items, _.isEqual);
       const printLists = diff.reduce((lists, current) => {
         if (!oldOrder.items.some(i => i._id === current._id)) {
@@ -79,8 +90,10 @@ module.exports = (cms) => {
 
 
       // save order | create commits
-      const newOrder = await createOrderCommits(mappedActionList)
-      cb(newOrder)
+      await createOrderCommits(mappedActionList, async () => {
+        const newOrder = await cms.getModel('Order').findById(order._id);
+        cb(newOrder.toJSON());
+      })
     })
 
     socket.on('print-invoice', async (order) => {
@@ -187,7 +200,7 @@ module.exports = (cms) => {
 
     const cashback = receive - vSum;
     return {
-      _id: order._id,
+      _id: order._id || new mongoose.Types.ObjectId(),
       id: order.id,
       items: await orderUtil.getComputedOrderItems(orderUtil.compactOrder(order.items), date),
       ...order.user && order.user.length
@@ -228,7 +241,9 @@ module.exports = (cms) => {
     }]);
   }
 
-  async function createOrderCommits(commits) {
+  async function createOrderCommits(commits, cb) {
+    if (!_.last(commits).data) _.last(commits).data = {};
+    _.last(commits).data.cb = cb;
     return cms.getModel('OrderCommit').create(commits);
   }
 
