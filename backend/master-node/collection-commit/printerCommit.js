@@ -6,6 +6,7 @@ async function printerCommit(updateCommit) {
 				commit.order.id = order.id
 			}
 			await cms.execPostAsync('run:print', null, [commit]);
+			if (commit.data && commit.data.cb) commit.data.cb();
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;
