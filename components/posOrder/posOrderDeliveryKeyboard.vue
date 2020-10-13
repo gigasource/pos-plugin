@@ -154,6 +154,7 @@
 
     &__input {
       flex: 1;
+      width: calc(100% - 24px);
       background: transparent;
       color: #1d1d26;
       outline: none;
