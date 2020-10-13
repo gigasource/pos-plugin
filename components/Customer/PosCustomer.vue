@@ -35,6 +35,10 @@
         </div>
       </g-menu>
       <g-spacer/>
+      <g-btn-bs background-color="#1271FF" text-color="#FFFFFF" class="elevation-2" @click="openDialogAdd">
+        <g-icon size="20" color="white" class="mr-2">add_circle</g-icon>
+        {{$t('ui.add')}}
+      </g-btn-bs>
       <g-btn-bs :disabled="!selectedCustomer" icon="icon-cancel3@20" background-color="white" text-color="#FF4552" class="elevation-2" @click="dialog.delete = true">
         {{$t('ui.delete')}}
       </g-btn-bs>
@@ -43,20 +47,24 @@
       </g-btn-bs>
     </g-toolbar>
     <dialog-confirm-delete v-model="dialog.delete" type="Customer" :label="selectedCustomer && selectedCustomer.name" @submit="_deleteCustomer"/>
-    <dialog-form-input v-model="dialog.edit" @submit="_updateCustomer">
+    <dialog-form-input v-model="dialog.edit" @submit="submit">
       <template #input>
         <div class="row-flex flex-wrap justify-around">
-          <pos-textfield-new style="width: 48%" label="Name" v-model="name" required/>
-          <pos-textfield-new style="width: 48%" label="Phone" v-model="phone" required/>
-          <template v-for="(item, i) in addresses">
+          <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
+          <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
+          <div class="row-flex flex-wrap justify-around mt-2 r" v-for="(item, i) in addresses">
+            <div class="btn-delete" @click="removeAddress(i)">
+              <g-icon>icon-cancel3</g-icon>
+            </div>
             <g-combobox style="width: 98%" :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur
                         :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)"
                         @input="e => selectAutocompleteAddress(e, i)"/>
             <pos-textfield-new style="width: 24%" :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street"/>
-            <pos-textfield-new style="width: 24%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode" required/>
-            <pos-textfield-new style="width: 24%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house" required/>
-            <pos-textfield-new style="width: 24%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city" required/>
-          </template>
+            <pos-textfield-new style="width: 24%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode"/>
+            <pos-textfield-new style="width: 24%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house"/>
+            <pos-textfield-new style="width: 24%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city"/>
+          </div>
+          <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" @click="addAddress">add_circle</g-icon>
         </div>
       </template>
     </dialog-form-input>
@@ -69,7 +77,7 @@
 
   export default {
     name: "PosCustomer",
-    injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer)'],
+    injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer, createCustomer)'],
     data() {
       return {
         customers: [],
@@ -79,6 +87,7 @@
         dialog: {
           delete: false,
           edit: false,
+          mode: ''
         },
         name: '',
         phone: '',
@@ -121,11 +130,12 @@
         this.selectedCustomer = customer
       },
       openDialogEdit() {
-        this.name = this.selectedCustomer.name
-        this.phone = this.selectedCustomer.phone
-        this.addresses = this.selectedCustomer.addresses
+        this.name = _.cloneDeep(this.selectedCustomer.name)
+        this.phone = _.cloneDeep(this.selectedCustomer.phone)
+        this.addresses = _.cloneDeep(this.selectedCustomer.addresses)
         this.placeId = this.addresses.map(() => '')
         this.autocompleteAddresses = this.addresses.map(() => [])
+        this.dialog.mode = 'edit'
         this.dialog.edit = true
       },
       async _updateCustomer() {
@@ -143,10 +153,10 @@
         if (!text || text.length < 4) return
         this.token = uuidv4()
         cms.socket.emit('searchPlace', text, this.token, places => {
-          this.autocompleteAddresses[index] = places.map(p => ({
+          this.autocompleteAddresses.splice(index, 1, places.map(p => ({
             text: p.description,
-            value: p.place_id,
-          }))
+            value: p.place_id
+          })))
         })
       },
       async selectAutocompleteAddress(place_id, index) {
@@ -172,6 +182,58 @@
           })
         }
       },
+      openDialogAdd() {
+        this.name = ''
+        this.phone = ''
+        this.addresses = [{
+          address: '',
+          house: '',
+          zipcode: '',
+          street: '',
+          city: '',
+        }]
+        this.placeId = ['']
+        this.autocompleteAddresses = [[]]
+        this.dialog.mode = 'add'
+        this.dialog.edit = true
+      },
+      async _createCustomer() {
+        if(!this.name || !this.phone || !this.addresses || this.addresses.length === 0) return
+        await this.createCustomer({
+          name: this.name,
+          phone: this.phone,
+          addresses: this.addresses
+        })
+        this.customers = await this.getCustomers()
+        this.dialog.edit = false
+      },
+      async submit() {
+        this.addresses = this.addresses.map(a => ({
+          ...a,
+          address: a.street && a.house ? `${a.street} ${a.house}` : a.address
+        }))
+        if(this.dialog.mode === 'edit') {
+          await this._updateCustomer()
+        } else if(this.dialog.mode === 'add') {
+          await this._createCustomer()
+        }
+      },
+      removeAddress(index) {
+        this.addresses.splice(index, 1)
+        this.placeId.splice(index, 1)
+        this.autocompleteAddresses.splice(index, 1)
+      },
+      addAddress(){
+        this.addresses.push({
+          address: '',
+          house: '',
+          zipcode: '',
+          street: '',
+          city: '',
+        })
+        this.placeId.push('')
+        this.autocompleteAddresses.push([])
+      }
     }
   }
 </script>
@@ -223,5 +285,14 @@
         font-size: 14px;
       }
     }
+  }
+
+  .btn-delete {
+    position: absolute;
+    top: -8px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ff4452;
+    border-radius: 2px;
   }
 </style>
