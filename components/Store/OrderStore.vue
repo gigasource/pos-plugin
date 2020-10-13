@@ -653,7 +653,7 @@
         modifier._id = this.genObjectId();
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -682,7 +682,7 @@
         const modifier = product.modifiers[modIndex]
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -715,7 +715,7 @@
         this.$set(product, 'price', price)
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
