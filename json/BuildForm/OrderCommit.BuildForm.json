@@ -46,6 +46,11 @@
       "_id": "5f62e2aa9b6aca0b923cd2cc",
       "schemaType": "string",
       "key": "table"
+    },
+    {
+      "_id": "5f7ecd573f2cc115febb09d3",
+      "schemaType": "string",
+      "key": "action"
     }
   ],
   "name": "OrderCommit",

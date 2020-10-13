@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
-const { initQueue, pushTaskToQueue, resumeQueue, updateTempCommit, buildTempOrder, checkCommitExist } = require('./updateCommit');
+const updateCommit  = require('./updateCommit');
 const axios = require('axios');
 const internalIp = require('internal-ip');
+const syncExistingData = require('./syncData');
 
 const remoteServer = 'http://localhost:8088';
 
@@ -11,17 +12,19 @@ const updateCommits = async (commits) => {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await checkCommitExist(commit.commitId))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
 	}
-	if (newCommits.length) pushTaskToQueue(newCommits);
+	if (newCommits.length) updateCommit.handleCommit(newCommits);
 }
 
-const requireSync = (oldHighestCommitId, ack) => {
+const requireSync = (type, oldHighestCommitId, ack) => {
 	const commit = {
-		type: 'sync',
-		oldHighestCommitId
+		type,
+		action: 'requireSync',
+		oldHighestCommitId,
+		ack
 	}
-	pushTaskToQueue([commit], ack);
+	updateCommit.handleCommit([commit]);
 }
 
 class Master {
@@ -63,23 +66,24 @@ class Master {
 		return _this.storeId;
 	}
 	// init online order socket
-	initSocket(socket) {
+	async initSocket(socket) {
 		// online order socket
 		const _this = this;
 	  _this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
 		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : global.APP_CONFIG.deviceIp}:${global.APP_CONFIG.port}`));
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
+		await cms.execPostAsync('load:syncDb');
 	}
 
 	async init() {
-		await initQueue(this);
+		await updateCommit.init(this);
 		/*
 		Load master must be called after initQueue finish
 		because socket event might be triggered before
 		queue is initialized
 		 */
-		this.cms.execPostSync('load:masterSocket');
+		await this.cms.execPostAsync('load:masterSocket');
 		const _this = this;
 		const _model = cms.Types['OrderCommit'].Model;
 		await _this.getStoreId();
@@ -102,35 +106,19 @@ class Master {
 								commit.update.create._id = mongoose.Types.ObjectId();
 							}
 						})
-						pushTaskToQueue(commits);
-						await updateTempCommit(commits);
+						updateCommit.handleCommit(commits);
+						await updateCommit.methods['order'].updateTempCommit(commits);
 						if (commits.length && commits[0].split) {
-							return commits[0].update.create;
+							return JSON.parse(commits[0].update.query);
 						}
-						return await buildTempOrder(table);
+						return await updateCommit.methods['order'].buildTempOrder(table);
 					} catch (err) {
 					}
 				}
 			}
 		})
 
-		resumeQueue();
-		mongoose.set('debug', async function (coll, method, ...query) {
-			// try {
-			// 	//do your thing
-			// 	const result = await axios.post(`${remoteServer}/writeToDB`, {
-			// 		coll,
-			// 		method,
-			// 		query,
-			// 		storeId: _this.storeId
-			// 	});
-			// 	if (result) {
-			// 		console.log(result);
-			// 	}
-			// } catch (err) {
-			// 	console.error(err);
-			// }
-		});
+		updateCommit.methods['order'].resumeQueue();
 	}
 
 	emitToAll(commits) {
@@ -146,6 +134,15 @@ class Master {
 		for (let clientId in this.connection) {
 			this.connection[clientId].disconnect();
 		}
+	}
+
+	async sendChangeRequest(commit) {
+		commit.storeId = await this.getStoreId();
+		updateCommit.handleCommit([commit]);
+	}
+
+	async syncDataToOnlineOrder() {
+		await syncExistingData();
 	}
 }
 
