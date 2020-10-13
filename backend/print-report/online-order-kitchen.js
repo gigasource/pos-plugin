@@ -26,7 +26,7 @@ async function makePrintData(cms, { orderId }, locale) {
 
 
   return {
-    orderNumber: order.id,
+    orderNumber: order.dailyId ? order.dailyId : order.id,
     customerName: name,
     customerPhone: phone,
     customerAddress: address,

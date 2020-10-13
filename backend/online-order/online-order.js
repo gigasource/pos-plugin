@@ -1,4 +1,4 @@
-const {calOrderDiscount, calOrderModifier, calOrderTax, calOrderTotal, formatOrderItems, getLatestOrderId} = require('../../components/logic/orderUtil')
+const {calOrderDiscount, calOrderModifier, calOrderTax, calOrderTotal, formatOrderItems, getLatestOrderId, getLatestDailyId} = require('../../components/logic/orderUtil')
 const {getBookingNumber, getVDate} = require('../../components/logic/productUtils')
 const _ = require('lodash')
 const io = require('socket.io-client');
@@ -270,6 +270,7 @@ module.exports = async cms => {
       if (!orderData) return
 
       const newOrderId = await getLatestOrderId()
+      const dailyId = await getLatestDailyId()
 
       let {
         orderType: type, paymentType, customer, products: items,
@@ -295,6 +296,7 @@ module.exports = async cms => {
       }))
 
       const order = {
+        dailyId,
         id: newOrderId,
         status: 'inProgress',
         items: formatOrderItems(items),

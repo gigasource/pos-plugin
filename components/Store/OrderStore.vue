@@ -1120,6 +1120,7 @@
         let order = {}
         const orderDateTime = new Date()
         const id = await orderUtil.getLatestOrderId()
+        const dailyId = await orderUtil.getLatestDailyId()
         const taxGroups = _.groupBy(this.currentOrder.items, 'tax')
         const vTaxGroups = _.map(taxGroups, (val, key) => ({
           taxType: key,
@@ -1131,6 +1132,7 @@
 
         Object.assign(order, this.currentOrder, {
           id,
+          dailyId,
           status: 'kitchen',
           online: true,
           takeOut: this.currentOrder.takeOut,

@@ -9,7 +9,7 @@
             <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
           </div>
           <p>
-            <span class="text-indigo-accent-2 fw-600">#{{order.id}}</span>
+            <span class="text-indigo-accent-2 fw-600">#{{order.dailyId ? order.dailyId : order.id}}</span>
             {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
           </p>
           <g-spacer/>

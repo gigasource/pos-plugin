@@ -1563,6 +1563,12 @@
           "addable": true
         }
       ]
+    },
+    {
+      "_id": "5f851913f82189590a4803b0",
+      "schemaType": "number",
+      "key": "dailyId",
+      "type": "input@number"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

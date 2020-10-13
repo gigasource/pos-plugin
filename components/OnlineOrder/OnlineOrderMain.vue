@@ -106,7 +106,7 @@
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
                 <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
-                  <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
+                  <span class="fs-small fw-700 text-indigo-accent-2">#{{order.dailyId}}</span>
                   {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
                 </div>
               </div>
@@ -210,7 +210,7 @@
                   :style="[getPendingOrderKitchenTime(order) < 10 && {border: '1px solid #FF4452'}]">
             <g-card-title>
               <div class="fs-small-2 ml-1" style="max-width: calc(100% - 96px); line-height: 1.2">
-                <span class="fs-small fw-700 text-indigo-accent-2">#{{order.id}}</span>
+                <span class="fs-small fw-700 text-indigo-accent-2">#{{order.dailyId ? order.dailyId : order.id}}</span>
                 {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
               </div>
               <g-spacer/>

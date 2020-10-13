@@ -27,7 +27,7 @@
         <tbody>
         <tr v-for="(item, i) in computedItems" :key="i" @click="openDialogDetail(item)">
           <td class="fw-700">
-            <p style="white-space: nowrap">#{{item.id}}</p>
+            <p style="white-space: nowrap">#{{item.dailyId ? item.dailyId : item.id}}</p>
             <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" speech-bubble remove-content-on-close>
               <span><b>From:</b> {{item.forwardedStore}}</span>
               <template v-slot:activator="{on}">
