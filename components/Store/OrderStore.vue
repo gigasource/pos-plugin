@@ -549,10 +549,12 @@
           try {
             cms.getModel('OrderCommit').create([{
               type: 'print',
-              printType: 'report',
-              reportType: 'OrderReport',
-              printData: order,
-              device: this.device
+              action: 'report',
+              data: {
+                reportType: 'OrderReport',
+                printData: order,
+                device: this.device
+              }
             }])
             resolve()
           } catch (e) {
@@ -839,33 +841,39 @@
       printOnlineOrderReport(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'OnlineOrderReport',
-            printData: { orderId },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'print',
+              action: 'report',
+              data: {
+                reportType: 'OnlineOrderReport',
+                printData: { orderId },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       printOnlineOrderKitchen(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'OnlineOrderKitchen',
-            printData: { orderId },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'print',
+              action: 'report',
+              data: {
+                reportType: 'OnlineOrderKitchen',
+                printData: { orderId },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       async updateOnlineOrders() {
