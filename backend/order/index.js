@@ -4,11 +4,22 @@ const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-p
 const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
+const mongoose = require('mongoose');
 
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
 
     socket.on('print-to-kitchen', async (device, order, oldOrder = { items: [] }, actionList, cb = () => null) => {
+      if (!order._id) {
+        order._id = new mongoose.Types.ObjectId();
+        actionList.forEach(action => {
+          if (action.action === 'createOrder') {
+            const query = JsonFn.parse(action.update.query);
+            query._id = order._id;
+            action.query = JsonFn.stringify(query);
+          }
+        })
+      }
       const diff = _.differenceWith(order.items, oldOrder.items, _.isEqual);
       const printLists = diff.reduce((lists, current) => {
         if (!oldOrder.items.some(i => i._id === current._id)) {
@@ -187,7 +198,7 @@ module.exports = (cms) => {
 
     const cashback = receive - vSum;
     return {
-      _id: order._id,
+      _id: order._id || new mongoose.Types.ObjectId(),
       id: order.id,
       items: await orderUtil.getComputedOrderItems(orderUtil.compactOrder(order.items), date),
       ...order.user && order.user.length

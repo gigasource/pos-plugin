@@ -3,7 +3,7 @@ async function printerCommit(updateCommit) {
 		try {
 			if (commit.order._id) {
 				const order = await cms.getModel('Order').findById(commit.order._id)
-				commit.order.id = order.id
+				if (order) commit.order.id = order.toJSON().id
 			}
 			await cms.execPostAsync('run:print', null, [commit]);
 		} catch (err) {
