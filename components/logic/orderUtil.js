@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const dayjs = require('dayjs')
 
 const orderUtil = {
   calItemTotal(item) {
@@ -116,6 +117,17 @@ const orderUtil = {
       }
     })
     return resultArr
+  },
+  async getLatestDailyId() {
+    try {
+      const startDate = dayjs().startOf('day').toDate(), endDate = dayjs().endOf('day').toDate()
+      const orderWithHighestId = await cms.getModel('Order').findOne({
+        date: { $gte: startDate, $lte: endDate }
+      }).sort('-dailyId');
+      return ((orderWithHighestId && orderWithHighestId.dailyId) || 0) + 1
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
