@@ -651,7 +651,7 @@
         modifier._id = this.genObjectId();
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -680,7 +680,7 @@
         const modifier = product.modifiers[modIndex]
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -713,7 +713,7 @@
         this.$set(product, 'price', price)
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -1125,14 +1125,6 @@
         const BSON = require('bson');
         return new BSON.ObjectID();
       },
-      async getTempOrder() {
-        return new Promise(resolve => {
-          console.log('emit buildTempOrder')
-          cms.socket.emit('buildTempOrder', this.currentOrder.table, (order) => {
-            resolve(order);
-          })
-        })
-      },
 
       // call in order
       async getCustomerInfo(phone) {
@@ -1234,7 +1226,7 @@
       })
       // this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
       cms.socket.on('updateOrderItems', async () => {
-        const order = await this.getTempOrder();
+        const order = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' });
         if (!order) return;
         const tempItems = this.currentOrder.items.filter(i => !i.printed)
         this.$set(this.currentOrder, '_id', order._id)
@@ -1275,7 +1267,7 @@
         async handler(val) {
           this.actionList = []
           if (val) {
-            const existingOrder = await this.getTempOrder();
+            const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' });
             // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
             if (existingOrder) {
               this.$set(this.currentOrder, '_id', existingOrder._id)
