@@ -9,11 +9,11 @@ async function orderCommit(updateCommit) {
 	/* -------------- Method for this file only -------------- */
 	function validateCommit(commit) {
 		if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-			if (!commit.orderId && updateCommit.activeOrders[commit.table]) {
-				commit.orderId = updateCommit.activeOrders[commit.table].id;
+			if (!commit.data.orderId && updateCommit.activeOrders[commit.data.table]) {
+				commit.data.orderId = updateCommit.activeOrders[commit.data.table].id;
 			}
-			if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.table]) {
-				commit.where._id = updateCommit.activeOrders[commit.table]._id;
+			if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.data.table]) {
+				commit.where._id = updateCommit.activeOrders[commit.data.table]._id;
 			}
 		} else return false;
 		if (commit.commitId && commit.commitId < updateCommit.highestOrderCommitId) return false;
@@ -21,8 +21,8 @@ async function orderCommit(updateCommit) {
 	}
 
 	function validateOrderId(commit) {
-		if (commit.orderId && updateCommit.activeOrders[commit.table] &&
-			commit.orderId != updateCommit.activeOrders[commit.table].id) {
+		if (commit.data.orderId && updateCommit.activeOrders[commit.data.table] &&
+			commit.data.orderId != updateCommit.activeOrders[commit.data.table].id) {
 			console.error('This commit is for old order');
 			return false;
 		}
@@ -30,7 +30,7 @@ async function orderCommit(updateCommit) {
 	}
 
 	function checkOrderActive(commit) {
-		if (!updateCommit.activeOrders[commit.table] || updateCommit.activeOrders[commit.table].id != commit.orderId) {
+		if (!updateCommit.activeOrders[commit.data.table] || updateCommit.activeOrders[commit.data.table].id != commit.data.orderId) {
 			console.error("Order is closed or not created");
 			return false;
 		}
@@ -40,7 +40,7 @@ async function orderCommit(updateCommit) {
 	function getCondition(commit) {
 		const condition = commit.where ? JsonFn.parse(commit.where) : null;
 		if (condition && !condition._id) {
-			condition._id = updateCommit.activeOrders[commit.table]._id;
+			condition._id = updateCommit.activeOrders[commit.data.table]._id;
 		}
 		return condition;
 	}
@@ -81,7 +81,7 @@ async function orderCommit(updateCommit) {
 				if (commit.commitId) updateCommit.highestOrderCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
-			lastTable = commit.table;
+			lastTable = commit.data.table;
 		}
 		// console.debug(getBaseSentryTags('updateCommitQueue'), 'After exec commits', JSON.stringify(activeOrders));
 		// wait for db update
@@ -155,19 +155,19 @@ async function orderCommit(updateCommit) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;
 			}
-			if (!commit.orderId) {
-				commit.orderId = updateCommit.highestOrderId;
+			if (!commit.data.orderId) {
+				commit.data.orderId = updateCommit.highestOrderId;
 				updateCommit.highestOrderId++;
-			} else updateCommit.highestOrderId = commit.orderId;
+			} else updateCommit.highestOrderId = commit.data.orderId;
 			// get query
 			const query = JsonFn.parse(commit.update.query);
-			query.id = commit.orderId;
+			query.id = commit.data.orderId;
 			let result;
 			if (query.splitId) {
 				result = await updateCommit.orderModel[commit.update.method](query);
 				await updateCommit.orderCommitModel.create(commit);
 			} else {
-				if (updateCommit.activeOrders[commit.table]) {
+				if (updateCommit.activeOrders[commit.data.table]) {
 					console.error('Order has been created');
 					return null;
 				} else {
@@ -176,7 +176,7 @@ async function orderCommit(updateCommit) {
 					result = await updateCommit.orderModel[commit.update.method](query);
 					if (!result) return null;
 					query._id = result._doc._id;
-					updateCommit.activeOrders[commit.table] = (await updateCommit.orderModel.findOne({id: commit.orderId})).toJSON();
+					updateCommit.activeOrders[commit.data.table] = (await updateCommit.orderModel.findOne({id: commit.data.orderId})).toJSON();
 					commit.update.query = JSON.stringify(query);
 					await updateCommit.orderCommitModel.create(commit);
 				}
@@ -194,11 +194,11 @@ async function orderCommit(updateCommit) {
 			if (!validateOrderId(commit)) return;
 			const condition = getCondition(commit);
 			if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp > COMMIT_CLOSE_TIME_OUT) return null;
-			if (!updateCommit.activeOrders[commit.table]) {
+			if (!updateCommit.activeOrders[commit.data.table]) {
 				console.error('Order has been closed');
 				return null;
 			}
-			delete updateCommit.activeOrders[commit.table];
+			delete updateCommit.activeOrders[commit.data.table];
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;
@@ -222,7 +222,7 @@ async function orderCommit(updateCommit) {
 			if (query['$set'] && query['$set']['status'] && query['$set']['status'] === 'paid') {
 				return await updateCommit.methods['order'].closeOrder(commit);
 			}
-			updateCommit.activeOrders[commit.table] = await updateCommit.orderModel[commit.update.method](condition, query, { new : true }).lean();
+			updateCommit.activeOrders[commit.data.table] = await updateCommit.orderModel[commit.update.method](condition, query, { new : true }).lean();
 			commit.where = JsonFn.stringify(condition);
 			await updateCommit.orderCommitModel.create(commit);
 			return true;
@@ -238,7 +238,7 @@ async function orderCommit(updateCommit) {
 			const query = JsonFn.parse(commit.update.query);
 			const condition = getCondition(commit);
 			const result = await updateCommit.orderModel[commit.update.method](condition, query, { new : true });
-			updateCommit.activeOrders[commit.table] = result.toJSON();
+			updateCommit.activeOrders[commit.data.table] = result.toJSON();
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;
@@ -259,7 +259,7 @@ async function orderCommit(updateCommit) {
 			const query = JsonFn.parse(commit.update.query);
 			const condition = getCondition(commit);
 			if (query['$inc'] && query['$inc']['items.$.quantity'] < 0) {
-				const targetItem = updateCommit.activeOrders[commit.table].items.find(item => {
+				const targetItem = updateCommit.activeOrders[commit.data.table].items.find(item => {
 					return item._id.toString() === condition['items._id'];
 				})
 				if (targetItem.quantity + query['$inc']['items.$.quantity'] < 0) {
@@ -267,18 +267,18 @@ async function orderCommit(updateCommit) {
 					return;
 				}
 				if (targetItem.printed) {
-					if (!updateCommit.activeOrders[commit.table].cancellationItems) updateCommit.activeOrders[commit.table].cancellationItems = [];
-					updateCommit.activeOrders[commit.table].cancellationItems.push({
+					if (!updateCommit.activeOrders[commit.data.table].cancellationItems) updateCommit.activeOrders[commit.data.table].cancellationItems = [];
+					updateCommit.activeOrders[commit.data.table].cancellationItems.push({
 						...targetItem,
 						date: new Date(),
 						quantity: -query['$inc']['items.$.quantity']
 					})
-					await updateCommit.orderModel[key]({ _id: updateCommit.activeOrders[commit.table]._id },
-						{ $set: { cancellationItems: updateCommit.activeOrders[commit.table].cancellationItems } });
+					await updateCommit.orderModel[key]({ _id: updateCommit.activeOrders[commit.data.table]._id },
+						{ $set: { cancellationItems: updateCommit.activeOrders[commit.data.table].cancellationItems } });
 				}
 			}
 			const result = await updateCommit.orderModel[commit.update.method](condition, query, { new : true });
-			updateCommit.activeOrders[commit.table] = result.toJSON();
+			updateCommit.activeOrders[commit.data.table] = result.toJSON();
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;
@@ -297,7 +297,7 @@ async function orderCommit(updateCommit) {
 			const query = JsonFn.parse(commit.update.query);
 			const condition = getCondition(commit);
 			const result = await updateCommit.orderModel[commit.update.method](condition, query, { new : true });
-			updateCommit.activeOrders[commit.table] = result.toJSON();
+			updateCommit.activeOrders[commit.data.table] = result.toJSON();
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;
@@ -312,12 +312,12 @@ async function orderCommit(updateCommit) {
 
 	updateCommit.methods['order'].changeTable = async function (commit) {
 		try {
-			const result = await updateCommit.orderCommitModel.updateMany({orderId: commit.orderId}, {table: commit.update}, {new: true});
+			const result = await updateCommit.orderCommitModel.updateMany({orderId: commit.data.orderId}, {table: commit.update}, {new: true});
 			if (!result) return;
-			updateCommit.activeOrders[commit.update] = updateCommit.activeOrders[commit.table];
+			updateCommit.activeOrders[commit.update] = updateCommit.activeOrders[commit.data.table];
 			const condition = JsonFn.parse(commit.where);
 			await updateCommit.orderModel.findOneAndUpdate(condition, {$set: {table: commit.update}})
-			delete updateCommit.activeOrders[commit.table];
+			delete updateCommit.activeOrders[commit.data.table];
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
 				updateCommit.highestOrderCommitId++;

@@ -211,7 +211,9 @@
             type: 'order',
             action: 'createOrder',
             where: null,
-            table: this.currentOrder.table,
+            data: {
+              table: this.currentOrder.table,
+            },
             update: {
               method: 'create',
               query: jsonfn.stringify({
@@ -232,7 +234,9 @@
             type: 'order',
             action: 'addItem',
             where: jsonfn.stringify({ _id: !this.currentOrder.firstInit ? this.currentOrder._id : null }),
-            table: this.currentOrder.table,
+            data: {
+              table: this.currentOrder.table,
+            },
             orderId: this.currentOrder.id,
             update: {
               method: 'findOneAndUpdate',
@@ -260,8 +264,10 @@
             where: jsonfn.stringify({
               _id: !this.currentOrder.firstInit ? this.currentOrder._id : null
             }),
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
+            data: {
+              orderId: this.currentOrder.id,
+              table: this.currentOrder.table,
+            },
             update: {
               method: 'findOneAndUpdate',
               query: jsonfn.stringify({
@@ -284,8 +290,10 @@
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': itemToUpdate._id
           }),
-          orderId: this.currentOrder.id,
-          table: this.currentOrder.table,
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
@@ -308,7 +316,10 @@
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': itemToUpdate._id
           }),
-          table: this.currentOrder.table,
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
@@ -645,8 +656,10 @@
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
-          orderId: this.currentOrder.id,
-          table: this.currentOrder.table,
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
@@ -672,8 +685,10 @@
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
-          orderId: this.currentOrder.id,
-          table: this.currentOrder.table,
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
@@ -703,8 +718,10 @@
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
-          orderId: this.currentOrder.id,
-          table: this.currentOrder.table,
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
@@ -771,7 +788,9 @@
           type: 'order',
           action: 'setOrderProps',
           where: jsonfn.stringify({ _id: this.currentOrder._id }),
-          table: this.currentOrder.table,
+          data: {
+            table: this.currentOrder.table,
+          },
           update: {
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({$set: {[commit.key]: commit.value}})
