@@ -36,13 +36,19 @@
           </template>
           <template v-else>
             <template v-if="deliveryOrderMode === 'mobile'">
-              <g-text-field class="mt-3" outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
-              <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+              <div class="row-flex mt-3 w-100">
+                <div style="flex: 1; margin-right: 2px">
+                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+                </div>
+                <div style="flex: 1; margin-left: 2px">
+                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+                </div>
+              </div>
               <div class="row-flex">
                 <div class="col-9">
                   <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
-                              :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
-                              @input-click="showKeyboard = true" keep-menu-on-blur
+                              :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
+                              @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
                 </div>
                 <div class="flex-grow-1 ml-1">
@@ -160,7 +166,7 @@
             </div>
           </template>
         </div>
-        <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-kitchen" background-color="#0EA76F"
+        <g-btn-bs block large  class="elevation-2" icon="icon-kitchen" background-color="#0EA76F"
                   :disabled="unavailableToAdd" @click="addProduct">Add to order list
         </g-btn-bs>
       </template>
@@ -202,7 +208,7 @@
           </div>
         </div>
       </div>
-      <g-btn-bs block large style="margin: -8px; border-radius: 0" icon="icon-print" background-color="#2979FF"
+      <g-btn-bs block large class="elevation-2" icon="icon-print" background-color="#2979FF"
                 @click="dialog.order = true">Send to
         kitchen
       </g-btn-bs>
@@ -304,7 +310,7 @@
     </g-dialog>
     <dialog-text-filter v-model="dialog.note" label="Delivery note" @submit="e => { note = e }"/>
     <div v-if="showKeyboard" class="keyboard">
-      <div class="keyboard-overlay" @click="showKeyboard = false"></div>
+      <div class="keyboard-overlay" @click="hideKeyboard"></div>
       <div class="keyboard-wrapper">
         <pos-keyboard-full @enter-pressed="submitCustomer"/>
       </div>
@@ -712,13 +718,12 @@
       },
       submitCustomer() {
         if (this.name && this.phone && this.placeId && this.autocompleteAddresses.find(item => item.value === this.placeId) && this.house) {
-          if (!this.zipcode) {
-            this.token = uuidv4()
-            cms.socket.emit('getZipcode', `${this.street} ${this.house} ${this.city}`, this.token, (address, zipcode) => {
+          //get exact address + zip code
+          this.token = uuidv4()
+          cms.socket.emit('getZipcode', `${this.street} ${this.house} ${this.city}`, this.token, (address, zipcode) => {
               this.address = address
               this.zipcode = zipcode
-            })
-          }
+          })
           let customer = {}
           customer.name = this.name
           customer.phone = this.phone
@@ -746,7 +751,7 @@
           this.selectedAddress = customer.addresses.length - 1
           this.isNewCustomer = false
         }
-        this.showKeyboard = false
+        this.hideKeyboard()
       },
       deleteCall(index) {
         //index => missed call || first call
@@ -775,6 +780,16 @@
         this.isNewCustomer = !(this.selectedCustomer && this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0)
         this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
         this.phone = this.selectedCustomer.phone
+      },
+      hideKeyboard() {
+        this.showKeyboard = false
+        const autocomplete = this.$refs.autocomplete
+        if(autocomplete) {
+          const menu = autocomplete.$refs && autocomplete.$refs.menu
+          if(menu) {
+            menu.isActive = false
+          }
+        }
       }
     },
     async activated() {
@@ -1258,6 +1273,25 @@
 
     ::v-deep .key .waves-ripple {
       background-color: rgba(255, 190, 92, 1)
+    }
+  }
+</style>
+
+<style lang="scss">
+  .menu-autocomplete-address {
+    .g-list {
+      .g-list-item-content {
+        padding-right: 4px;
+
+        .g-list-item-text {
+          white-space: normal;
+          word-break: break-word;
+        }
+      }
+
+      & > div:not(:last-child) .g-list-item-text {
+        border-bottom: 1px solid #F0F0F0;
+      }
     }
   }
 </style>

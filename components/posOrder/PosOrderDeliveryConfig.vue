@@ -1,6 +1,9 @@
 <template>
   <div class="delivery-config">
-    <div class="delivery-config__title">Configuration</div>
+    <div class="delivery-config__title">
+      Configuration
+      <g-btn-bs class="elevation-2" icon="icon-back" @click="back">Back</g-btn-bs>
+    </div>
     <div class="row-flex flex-grow-1">
       <div class="col-6">
         <div class="row-flex align-items-center mb-2">
@@ -69,6 +72,11 @@
               keyboardDeliveryConfig: this.keyboardConfig
             }
         )
+      },
+      back() {
+        this.$emit('update:view', {
+          name: 'Functions'
+        })
       }
     }
   }
@@ -85,6 +93,8 @@
       font-size: 18px;
       font-weight: 700;
       margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
     }
   }
 </style>

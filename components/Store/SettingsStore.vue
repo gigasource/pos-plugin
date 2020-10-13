@@ -797,23 +797,20 @@
       },
 
       getPairStatus() {
-        cms.socket.emit('getPairStatus', ({error}) => {
+        cms.socket.emit('getPairStatus', async ({error}) => {
           if (error) {
             console.warn(`Pair status: ${error}`)
+            const posSettings = await this.getPosSetting()
 
-            this.unregisterOnlineOrder(async () => {
-              const posSettings = await this.getPosSetting()
-
-              if (!posSettings.skipPairing && this.$router.currentRoute.path !== '/admin') {
-                this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
-              }
-            })
+            if (!posSettings.skipPairing && this.$router.currentRoute.path !== '/admin') {
+              this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
+            }
           }
         })
       },
 
       registerOnlineOrder(pairingCode, callback) {
-        window.cms.socket.emit('registerOnlineOrderDevice', pairingCode, callback)
+        cms.socket.emit('registerOnlineOrderDevice', pairingCode, callback)
       },
 
       unregisterOnlineOrder(callback) {
@@ -838,16 +835,18 @@
         }
 
         // listens for unpair event
-        cms.socket.on('unpairDevice', () => {
-          this.unregisterOnlineOrder(async () => {
-            this.onlineDevice = Object.assign({}, this.onlineDevice, {
-              id: null,
-              store: {}
-            })
-            await this.updateOnlineDevice(this.onlineDevice)
-            if (this.$router.currentRoute.path !== '/pos-setup' && this.$router.currentRoute.path !== '/admin')
-              this.$router.push('/pos-setup')
+        cms.socket.on('unpairDevice', async () => {
+          this.onlineDevice = Object.assign({}, this.onlineDevice, {
+            id: null,
+            store: {}
           })
+          await this.updateOnlineDevice(this.onlineDevice)
+          if (this.$router.currentRoute.path !== '/pos-setup' && this.$router.currentRoute.path !== '/admin')
+            this.$router.push('/pos-setup')
+        })
+
+        cms.socket.on('approveSignIn', () => {
+          this.$router.push('/pos-login')
         })
       },
 

@@ -7,24 +7,32 @@
         <g-icon @click.stop="close">close</g-icon>
       </g-card-title>
       <g-card-text>
-        <div class="mb-5">
+        <div class="mb-4">
           <div class="fw-700 mb-2" style="font-size: 16px">Guest number</div>
-          <div class="row-flex">
-            <g-grid-select style="flex-grow: 0" :grid="false" :items="guestPickers" v-model="numberOfCustomers">
+          <div class="guest-number-input">
+            <g-grid-select
+                class="guest-number-input__defined-numbers"
+                :grid="false"
+                :items="guestPickers"
+                v-model="numberOfCustomers">
               <template #default="{ toggleSelect, item, index }">
-                <g-btn-bs class="picker-btn" background-color="#f6f6f6" border-color="#7d7d7d" border-radius="4px"
+                <g-btn-bs class="mb-2 picker-btn" background-color="#f6f6f6" border-color="#7d7d7d" border-radius="4px"
                           @click.stop="toggleSelect(item); submit()">
                   <span class="fw-700">{{ item.text }}</span>
                 </g-btn-bs>
               </template>
               <template #selected="{ toggleSelect, item, index }">
-                <g-btn-bs class="picker-btn" background-color="#E3F2FD" border-color="#2E81FD" border-radius="4px"
+                <g-btn-bs class="mb-2 picker-btn" background-color="#E3F2FD" border-color="#2E81FD" border-radius="4px"
                           @click.stop="toggleSelect(item); submit()">
                   <span class="fw-700">{{ item.text }}</span>
                 </g-btn-bs>
               </template>
             </g-grid-select>
-            <pos-textfield-new style="width: 20%" v-model="numberOfCustomersText" placeholder="Custom"/>
+            <pos-textfield-new
+                class="guest-number-input__custom-numbers mb-2"
+                style="width: 20%"
+                v-model="numberOfCustomersText"
+                placeholder="Custom"/>
           </div>
         </div>
         <div class="mb-5">
@@ -43,8 +51,12 @@
             </template>
           </g-grid-select>
         </div>
-        <div class="keyboard">
-          <pos-keyboard-full @enter-pressed="submit" type="numeric" width="100%"/>
+        <div class="keyboard-container">
+          <pos-keyboard-full
+              class="keyboard"
+              @enter-pressed="submit"
+              type="numeric"
+              width="100%"/>
         </div>
       </g-card-text>
     </g-card>
@@ -111,9 +123,16 @@
 </script>
 
 <style scoped lang="scss">
+  .keyboard-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
   .keyboard {
     background-color: #bdbdbd;
     padding: 0.5rem;
+    width: 450px;
   }
 
   ::v-deep .key {
@@ -142,6 +161,21 @@
       input {
         padding: 0 6px;
       }
+    }
+  }
+
+  .guest-number-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &__defined-numbers {
+      flex-grow: 0;
+    }
+
+    &__custom-numbers {
+      flex-basis: 30%;
+      flex-grow: 1;
     }
   }
 </style>
