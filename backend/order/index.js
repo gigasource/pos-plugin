@@ -3,6 +3,7 @@ const { getBookingNumber, getVDate } = require('../../components/logic/productUt
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
 const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
+const JsonFn = require('json-fn');
 
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
@@ -36,7 +37,8 @@ module.exports = (cms) => {
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
         if (listOrder && listOrder.items && listOrder.items.length) {
           list.push({
-            type: 'print',
+            type: 'order',
+            action: 'printOrder',
             printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
             order: listOrder,
             device
@@ -65,9 +67,11 @@ module.exports = (cms) => {
       }, [])
 
       const mappedActionList = mergedActionList.map(action => {
-        if (action.type === 'item' && action.update && action.update.push) {
-          action.update.push.value.sent = true
-          action.update.push.value.printed = true
+        if (action.type === 'order' && action.action === 'addItem') {
+          const query = JsonFn.parse(action.update.query)
+          query['$push']['items'].sent = true;
+          query['$push']['items'].printed = true;
+          action.update.query = JsonFn.stringify(query);
         }
         return action
       })
@@ -81,7 +85,8 @@ module.exports = (cms) => {
 
     socket.on('print-invoice', async (order) => {
       await cms.getModel('OrderCommit').create([{
-        type: 'print',
+        type: 'order',
+        action: 'printOrder',
         printType: 'invoice',
         order,
         device
@@ -92,13 +97,18 @@ module.exports = (cms) => {
       try {
         const updatedSplit = await createOrderCommits([{
           type: 'order',
-          split: true,
-          where: { _id },
+          action: 'setOrderProps',
+          data: {
+            split: true,
+          },
+          where: JSON.stringify({ _id }),
           update: {
-            set: {
-              key: 'payment',
-              value: payment
-            }
+            method: 'findOneAndUpdate',
+            query: JSON.stringify({
+              $set: {
+                'payment': payment
+              }
+            })
           }
         }])
         cb({ order: updatedSplit })
@@ -114,9 +124,13 @@ module.exports = (cms) => {
         if (isSplit) {
           newOrder = await createOrderCommits([{
             type: 'order',
-            split: true,
+            action: 'createOrder',
+            data: {
+              split: true,
+            },
             update: {
-              create: mappedOrder
+              method: 'create',
+              query: JSON.stringify(mappedOrder)
             }
           }])
         } else {
@@ -124,10 +138,16 @@ module.exports = (cms) => {
 
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
-            where: { _id: mappedOrder._id },
-            table: mappedOrder.table,
+            action: 'setOrderProps',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+            },
             update: {
-              set: { key, value }
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: {[key]: value}
+              })
             }
           })).value()
           actionList.push(...updates)
@@ -138,7 +158,8 @@ module.exports = (cms) => {
           // todo use in master
           // await printInvoiceHandler('OrderReport', mappedOrder, device)
           await cms.getModel('OrderCommit').create([{
-            type: 'print',
+            type: 'order',
+            action: 'printOrder',
             printType: 'invoice',
             order: mappedOrder,
             device
@@ -191,10 +212,18 @@ module.exports = (cms) => {
   async function createOrderCommit(order, key, value) {
     return await cms.getModel('OrderCommit').create([{
       type: 'order',
-      where: { _id: order._id },
-      table: order.table,
+      action: 'setOrderProps',
+      where: JSON.stringify({ _id: order._id }),
+      data: {
+        table: order.table,
+      },
       update: {
-        set: { key, value }
+        method: 'findOneAndUpdate',
+        query: JSON.stringify({
+          $set: {
+            [key]: value
+          }
+        })
       }
     }]);
   }

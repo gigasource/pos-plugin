@@ -23,11 +23,6 @@
       "key": "commitId"
     },
     {
-      "_id": "5f5d9d687cb20508e84b00cf",
-      "schemaType": "number",
-      "key": "orderId"
-    },
-    {
       "_id": "5f6189a779eca70a026837a7",
       "schemaType": "object",
       "key": "where"
@@ -43,9 +38,14 @@
       "key": "groupTempId"
     },
     {
-      "_id": "5f62e2aa9b6aca0b923cd2cc",
+      "_id": "5f7ecd573f2cc115febb09d3",
       "schemaType": "string",
-      "key": "table"
+      "key": "action"
+    },
+    {
+      "_id": "5f851e9586f3722a8ef7ae07",
+      "schemaType": "mixed",
+      "key": "data"
     }
   ],
   "name": "OrderCommit",

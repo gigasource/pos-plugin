@@ -3,7 +3,7 @@ const express = require('express');
 const socketClient = require('socket.io-client');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
-const { initQueue, pushTaskToQueue, resumeQueue, checkHighestCommitId, setHighestCommitId, buildTempOrder, updateTempCommit, checkCommitExist } = require('./updateCommit');
+const updateCommit = require('./updateCommit');
 
 const nodeSync = async function (commits) {
 	/*
@@ -16,33 +16,41 @@ const nodeSync = async function (commits) {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await checkCommitExist(commit.commitId))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
 	}
-	if (newCommits.length) pushTaskToQueue(newCommits);
-	if (newCommits && newCommits.length) setHighestCommitId(commits[commits.length - 1].commitId + 1);
+	if (newCommits.length) updateCommit.handleCommit(newCommits);
+	updateCommit.setHighestCommitIds(newCommits);
 }
 
 const connectToMaster = async (_this, masterIp) => {
+	if (_this.socket && _this.socket.connected) {
+		_this.socket.disconnect();
+	}
 	const posSettings = await cms.getModel("PosSetting").findOne({});
 	const clientId = posSettings.onlineDevice.id;
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
 	_this.socket.on('updateCommitNode', (commits) => {
-		console.debug('nodeReceiveCommit', 'Receive commit from master', JSON.stringify(commits));
-		const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
-		if (!oldHighestCommitId) {
-			pushTaskToQueue(commits);
-			setHighestCommitId(commits[commits.length - 1].commitId + 1);
-		} else {
-			console.debug('nodeReceiveCommit', 'Need sync');
-			_this.socket.emit('requireSync', oldHighestCommitId, nodeSync);
-		}
+		updateCommit.commitType.forEach(type => {
+			const typeCommits = commits.filter(commit => commit.type === type);
+			if (!typeCommits.length) return;
+			const oldHighestCommitId = updateCommit.methods[type].checkHighestCommitId(typeCommits[0].commitId);
+			if (!oldHighestCommitId) {
+				updateCommit.handleCommit(typeCommits);
+				updateCommit.setHighestCommitIds(typeCommits);
+			} else {
+				console.debug('nodeReceiveCommit', 'Need sync');
+				_this.socket.emit('requireSync', type, oldHighestCommitId, nodeSync);
+			}
+		})
 	})
 	_this.socket.on('connect', async () => {
 		console.log('Node connected to master');
 		_this.isConnect = true;
 		// wait for initQueue finish
 		setTimeout(() => {
-			_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
+			updateCommit.commitType.forEach(type => {
+				_this.socket.emit('requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+			})
 		}, 200)
 	})
 }
@@ -57,11 +65,14 @@ class Node {
 		this.highestCommitId = 0;
 		this.isConnect = false;
 		this.masterClientId = null;
-		setTimeout(async () => {
+		cms.post('load:masterClientId', async () => {
 			const posSettings = await cms.getModel("PosSetting").findOne({});
 			const { masterIp, masterClientId } = posSettings;
 			this.masterClientId = masterClientId;
 			if (masterIp) await connectToMaster(this, masterIp);
+		})
+		setTimeout(async () => {
+			await cms.execPostAsync('load:masterClientId');
 		}, 0)
 	}
 
@@ -78,32 +89,53 @@ class Node {
 	}
 	// init online order socket
 	async initSocket(socket, masterClientId) {
+		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
+		const { onlineDevice } = posSettings;
 		const _this = this;
 		_this.masterClientId = masterClientId;
 		_this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
 		const storeId = await _this.getStoreId();
 		_this.onlineOrderSocket.on('updateCommitNode', (commits) => {
-			const oldHighestCommitId = commits.length ? checkHighestCommitId(commits[0].commitId) : null;
-			if (!oldHighestCommitId) {
-				pushTaskToQueue(commits);
-				setHighestCommitId(commits[commits.length - 1].commitId + 1);
-			} else {
-				if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+			updateCommit.commitType.forEach(type => {
+				const typeCommits = commits.filter(commit => commit.type === type);
+				if (!typeCommits.length) return;
+				const oldHighestCommitId = updateCommit.methods[type].checkHighestCommitId(typeCommits[0].commitId);
+				if (!oldHighestCommitId) {
+					updateCommit.handleCommit(typeCommits);
+					updateCommit.setHighestCommitIds(typeCommits);
+				} else {
+					console.debug('nodeReceiveCommit', 'Need sync');
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type, oldHighestCommitId, nodeSync);
+				}
+			})
+		})
+		_this.onlineOrderSocket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
+			if (masterIp != posSettings.masterIp) {
+				await connectToMaster(_this, masterIp);
+				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
 			}
 		})
-		if (_this.masterClientId) _this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
+		if (_this.masterClientId) {
+			updateCommit.commitType.forEach(type => {
+				_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+					updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+			})
+		}
 	}
 
 	async init() {
-		await initQueue(this);
+		await updateCommit.init(this);
 		const _this = this;
 
 		_this.cms.post('run:requireSync', () => {
-			if (_this.socket.connected) {
-				_this.socket.emit('requireSync', checkHighestCommitId(), nodeSync);
-			} else if (_this.masterClientId) {
-				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', checkHighestCommitId(), nodeSync);
-			}
+			updateCommit.commitType.forEach(type => {
+				if (_this.socket.connected) {
+					_this.socket.emit('requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+				} else if (_this.masterClientId) {
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+						updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+				}
+			})
 		})
 
 		const _model = cms.Types['OrderCommit'].Model;
@@ -122,7 +154,7 @@ class Node {
 						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
-						table = commit.table;
+						table = commit.data.table;
 						if (commit.split && commit.update.create) {
 							commit.update.create._id = mongoose.Types.ObjectId();
 						}
@@ -130,24 +162,36 @@ class Node {
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
 					} else if (_this.masterClientId) {
-						_this.onlineOrderSocket.emitTo(_this.masterClientId, 'updateCommits', commits);
+						_this.onlineOrderSocket.emit('updateCommits', _this.masterClientId, commits);
 					} else {
 						throw new Error('Can not connect to master');
 					}
-					await updateTempCommit(commits);
+					await updateCommit.methods['order'].updateTempCommit(commits);
 					if (commits.length && commits[0].split) {
 						return commits[0].update.create;
 					}
-					return await buildTempOrder(table);
+					return await updateCommit.methods['order'].buildTempOrder(table);
 				}
 			}
 		})
-		resumeQueue();
+		updateCommit.methods['order'].resumeQueue();
 	}
 
 	turnOff() {
 		if (this.onlineOrderSocket) this.onlineOrderSocket.off('updateCommitNode');
 		if (this.socket) this.socket.disconnect();
+	}
+
+	async sendChangeRequest(commit) {
+		commit.storeId = await this.getStoreId();
+		if (!this.onlineOrderSocket.connected || !this.socket.connected) {
+			return console.error('Socket is not connected');
+		}
+		if (this.socket.connected) {
+			this.socket.emit('updateCommits', [commit]);
+		} else {
+			this.onlineOrderSocket.emit('updateCommits', this.masterClientId, [commit]);
+		}
 	}
 }
 

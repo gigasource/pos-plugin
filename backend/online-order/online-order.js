@@ -480,6 +480,7 @@ module.exports = async cms => {
       await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId });
       cms.socket.emit('getMasterDevice', masterClientId)
       if (ack) ack();
+      //await cms.execPostAsync('load:syncDbHook'); //todo uncomment
       await handlerNewMasterId(socket);
     })
 
