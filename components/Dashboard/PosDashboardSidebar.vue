@@ -125,6 +125,7 @@
 
 <style scoped lang="scss">
   .g-sidebar {
+
     .sidebar-header {
       padding: 12px;
       display: flex;
@@ -184,5 +185,11 @@
         font-size: 14px;
       }
     }
+  }
+</style>
+
+<style>
+  .g-sidebar {
+    overflow: auto !important;
   }
 </style>

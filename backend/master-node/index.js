@@ -9,6 +9,12 @@ let handler;
 module.exports = function (cms) {
 	// console.debug(getBaseSentryTags('initHandler'), '1. Set handler');
 	// init frontend socket beforehand
+	this.cms.socket.on('connect', socket => {
+		socket.on('buildTempOrder', async (table, fn) => {
+			const order = await updateCommit.methods['order'].buildTempOrder(table);
+			fn(order);
+		})
+	});
 	cms.post('load:handler', _.once(async () => {
 		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});
 		if (global.APP_CONFIG.isMaster) {

@@ -151,6 +151,7 @@ class Node {
 					let table;
 					commits.forEach(commit => {
 						commit.groupTempId = groupTempId;
+						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
 						table = commit.data.table;
@@ -165,7 +166,11 @@ class Node {
 					} else {
 						throw new Error('Can not connect to master');
 					}
-					return;
+					await updateCommit.methods['order'].updateTempCommit(commits);
+					if (commits.length && commits[0].split) {
+						return commits[0].update.create;
+					}
+					return await updateCommit.methods['order'].buildTempOrder(table);
 				}
 			}
 		})

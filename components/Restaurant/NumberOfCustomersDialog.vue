@@ -64,6 +64,8 @@
 </template>
 
 <script>
+  import isNil from 'lodash/isNil';
+
   export default {
     name: 'NumberOfCustomersDialog',
     props: {
@@ -109,7 +111,7 @@
     },
     watch: {
       numberOfCustomersText(val) {
-        if (val) this.numberOfCustomers = +val
+        if (!isNil(val)) this.numberOfCustomers = +val
       },
       internalValue(val) {
         if (val) {
