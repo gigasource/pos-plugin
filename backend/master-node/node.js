@@ -23,7 +23,7 @@ const nodeSync = async function (commits) {
 }
 
 const connectToMaster = async (_this, masterIp) => {
-	if (_this.socket.connected) {
+	if (_this.socket && _this.socket.connected) {
 		_this.socket.disconnect();
 	}
 	const posSettings = await cms.getModel("PosSetting").findOne({});
@@ -154,7 +154,7 @@ class Node {
 						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
-						table = commit.table;
+						table = commit.data.table;
 						if (commit.split && commit.update.create) {
 							commit.update.create._id = mongoose.Types.ObjectId();
 						}

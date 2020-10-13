@@ -98,7 +98,9 @@ module.exports = (cms) => {
         const updatedSplit = await createOrderCommits([{
           type: 'order',
           action: 'setOrderProps',
-          split: true,
+          data: {
+            split: true,
+          },
           where: JSON.stringify({ _id }),
           update: {
             method: 'findOneAndUpdate',
@@ -123,7 +125,9 @@ module.exports = (cms) => {
           newOrder = await createOrderCommits([{
             type: 'order',
             action: 'createOrder',
-            split: true,
+            data: {
+              split: true,
+            },
             update: {
               method: 'create',
               query: JSON.stringify(mappedOrder)
@@ -136,7 +140,9 @@ module.exports = (cms) => {
             type: 'order',
             action: 'setOrderProps',
             where: JSON.stringify({ _id: mappedOrder._id }),
-            table: mappedOrder.table,
+            data: {
+              table: mappedOrder.table,
+            },
             update: {
               method: 'findOneAndUpdate',
               query: JSON.stringify({
@@ -208,7 +214,9 @@ module.exports = (cms) => {
       type: 'order',
       action: 'setOrderProps',
       where: JSON.stringify({ _id: order._id }),
-      table: order.table,
+      data: {
+        table: order.table,
+      },
       update: {
         method: 'findOneAndUpdate',
         query: JSON.stringify({
