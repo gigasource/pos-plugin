@@ -133,7 +133,7 @@
         if(this.filter.fromDate && this.filter.toDate) {
           return items.filter(item => dayjs(item.date).isBetween(this.filter.fromDate, this.filter.toDate, 'day', '[]'))
         }
-        return items
+        return []
       },
       statusClass() {
         return this.status
