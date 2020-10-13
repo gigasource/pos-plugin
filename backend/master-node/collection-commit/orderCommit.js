@@ -9,11 +9,13 @@ async function orderCommit(updateCommit) {
 	/* -------------- Method for this file only -------------- */
 	function validateCommit(commit) {
 		if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-			if (!commit.data.orderId && updateCommit.activeOrders[commit.data.table]) {
-				commit.data.orderId = updateCommit.activeOrders[commit.data.table].id;
-			}
-			if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.data.table]) {
-				commit.where._id = updateCommit.activeOrders[commit.data.table]._id;
+			if (commit.data && commit.data.table) {
+				if (!commit.data.orderId && updateCommit.activeOrders[commit.data.table]) {
+					commit.data.orderId = updateCommit.activeOrders[commit.data.table].id;
+				}
+				if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.data.table]) {
+					commit.where._id = updateCommit.activeOrders[commit.data.table]._id;
+				}
 			}
 		} else return false;
 		if (commit.commitId && commit.commitId < updateCommit.highestOrderCommitId) return false;
@@ -68,16 +70,17 @@ async function orderCommit(updateCommit) {
 		for (let id in commits) {
 			// preset value
 			const commit = commits[id];
-			commit.temp = false;
-			if (lastTempId && lastTempId != commit.groupTempId) {
+			if (lastTempId && lastTempId != commit.groupTempId && global.APP_CONFIG.isMaster) {
 				const deleteCommit = await updateCommit.methods['order'].deleteTempCommit({ groupTempId: lastTempId});
 				if (deleteCommit) newCommits.push(deleteCommit);
 			}
+			if (!commit.data) commit.data = {};
 			lastTempId = commit.groupTempId;
 			// Accept commit in the last COMMIT_TIME_OUT
 			if (!validateCommit(commit)) continue;
 			const result = await updateCommit.methods['order'][commit.action](commit);
 			if (result) {
+				if (commit.data && commit.data.cb) commit.data.cb();
 				if (commit.commitId) updateCommit.highestOrderCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
@@ -291,12 +294,13 @@ async function orderCommit(updateCommit) {
 		}
 	}
 
-	updateCommit.methods['order'].handleItemProps = async function (commit) {
+	updateCommit.methods['order'].update = async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
 			const condition = getCondition(commit);
 			const result = await updateCommit.orderModel[commit.update.method](condition, query, { new : true });
+			if (!result) return null;
 			updateCommit.activeOrders[commit.data.table] = result.toJSON();
 			if (!commit.commitId) {
 				commit.commitId = updateCommit.highestOrderCommitId;
@@ -341,17 +345,6 @@ async function orderCommit(updateCommit) {
 		}
 	}
 
-	updateCommit.methods['order'].updateTempCommit = async function (commits) {
-		try {
-			for (let i in commits) {
-				await updateCommit.orderCommitModel.create(commits[i]);
-			}
-		} catch (err) {
-			console.error('Error occurred', err);
-			return null;
-		}
-	}
-
 	updateCommit.methods['order'].checkCommitExist = async function ({ commitId }) {
 		return updateCommit.highestOrderCommitId > commitId;
 	}
@@ -366,54 +359,6 @@ async function orderCommit(updateCommit) {
 			commits,
 			ack
 		});
-	}
-
-	updateCommit.methods['order'].buildTempOrder = async function (table) {
-		try {
-			if (table == null || !updateCommit.activeOrders[table]) return null;
-			const commitsList = await updateCommit.orderCommitModel.find({id: updateCommit.activeOrders[table].id, table: table, temp: true}).lean();
-			const result = updateCommit.activeOrders[table] ? _.cloneDeep(updateCommit.activeOrders[table]) : {items: []};
-			commitsList.forEach(commit => {
-				const query = (commit.update.query ? JsonFn.parse(commit.update.query) : null);
-				switch (commit.action) {
-					case 'addItem':
-						result['items'].push(JsonFn.parse(commit.update.query));
-						break;
-					case 'changeItemQuantity':
-						const condition = JsonFn.parse(commit.where);
-						const currentItem = result['items'].find(item => item._id.toString() === condition._id.toString());
-						currentItem.quantity += query['$inc']['items.$.quantity'];
-						if (currentItem.quantity < 0) currentItem.quantity = 0;
-						break;
-					case 'handleItemProps':
-						/*
-						3 types: push modifier, pull modifier, set discount
-						 */
-						if (query['$push']) {
-							if (currentItem) {
-								if (currentItem.modifiers) currentItem.modifiers.push(query['$push']);
-								else currentItem.modifiers = [query['$push']];
-							}
-						} else if (query['$pull']) {
-							if (currentItem) {
-								const pullId = currentItem.modifiers.findIndex(modifier => modifier._id.toString() === query['$pull']._id.toString());
-								if (pullId >= 0) currentItem.modifiers.splice(pullId, 1);
-							}
-						} else if (query['$set']) {
-							if (commit.update.query.includes('price')) {
-								currentItem.price = query['$set']['price'];
-							} else {
-								currentItem.printed = query['$set']['printed'];
-							}
-						}
-						break;
-				}
-			})
-			return result;
-		} catch (err) {
-			console.error('Error occurred', err);
-			return null;
-		}
 	}
 }
 

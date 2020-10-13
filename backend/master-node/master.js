@@ -12,7 +12,10 @@ const updateCommits = async (commits) => {
 	const newCommits = [];
 	for (let id in commits) {
 		const commit = commits[id];
-		if (!(await updateCommit.checkCommitExist(commit))) newCommits.push(commit);
+		if (!(await updateCommit.checkCommitExist(commit))) {
+			if (commit.data.cb) delete commit.data.cb;
+			newCommits.push(commit);
+		}
 	}
 	if (newCommits.length) updateCommit.handleCommit(newCommits);
 }
@@ -99,7 +102,6 @@ class Master {
 						let table;
 						commits.forEach(commit => {
 							commit.groupTempId = groupTempId;
-							commit.temp = true;
 							commit.storeId = _storeId;
 							table = commit.table;
 							if (commit.split && commit.update.create) {
@@ -107,11 +109,7 @@ class Master {
 							}
 						})
 						updateCommit.handleCommit(commits);
-						await updateCommit.methods['order'].updateTempCommit(commits);
-						if (commits.length && commits[0].split) {
-							return JSON.parse(commits[0].update.query);
-						}
-						return await updateCommit.methods['order'].buildTempOrder(table);
+						return;
 					} catch (err) {
 					}
 				}

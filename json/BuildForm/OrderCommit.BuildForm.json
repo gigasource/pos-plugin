@@ -28,11 +28,6 @@
       "key": "where"
     },
     {
-      "_id": "5f61e80377b20c1550173aff",
-      "schemaType": "boolean",
-      "key": "temp"
-    },
-    {
       "_id": "5f62d060bc60af0946032e1a",
       "schemaType": "string",
       "key": "groupTempId"
