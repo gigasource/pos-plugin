@@ -71,7 +71,7 @@ async function orderCommit(updateCommit) {
 			commit.temp = false;
 			if (lastTempId && lastTempId != commit.groupTempId) {
 				const deleteCommit = await updateCommit.methods['order'].deleteTempCommit({ groupTempId: lastTempId});
-				newCommits.push(deleteCommit);
+				if (deleteCommit) newCommits.push(deleteCommit);
 			}
 			lastTempId = commit.groupTempId;
 			// Accept commit in the last COMMIT_TIME_OUT
@@ -107,16 +107,14 @@ async function orderCommit(updateCommit) {
 	updateCommit.methods['order'].deleteTempCommit = async function ({ groupTempId }) {
 		let commit = null;
 		await updateCommit.orderCommitModel.deleteMany({ groupTempId, temp: true });
-		if (global.APP_CONFIG.isMaster) { // Only master can create remove temp commit
-			commit = {
-				type: 'order',
-				action: 'deleteTempCommit',
-				groupTempId,
-				temp: false,
-				commitId: updateCommit.highestOrderCommitId++
-			}
-			await updateCommit.orderCommitModel.create(commit);
+		commit = {
+			type: 'order',
+			action: 'deleteTempCommit',
+			groupTempId,
+			temp: false,
+			commitId: updateCommit.highestOrderCommitId++
 		}
+		await updateCommit.orderCommitModel.create(commit);
 		return commit;
 	}
 

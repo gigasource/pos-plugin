@@ -50,6 +50,7 @@
   import orderUtil from '../logic/orderUtil';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
+  import * as jsonfn from 'json-fn';
   const socketIntervals = {}
 
   export default {
@@ -213,7 +214,7 @@
             table: this.currentOrder.table,
             update: {
               method: 'create',
-              query: JSON.stringify({
+              query: jsonfn.stringify({
                 table: this.currentOrder.table,
                 items: [],
                 status: 'inProgress'
@@ -230,12 +231,12 @@
           this.actionList.push({
             type: 'order',
             action: 'addItem',
-            where: JSON.stringify({ _id: !this.currentOrder.firstInit ? this.currentOrder._id : null }),
+            where: jsonfn.stringify({ _id: !this.currentOrder.firstInit ? this.currentOrder._id : null }),
             table: this.currentOrder.table,
             orderId: this.currentOrder.id,
             update: {
               method: 'findOneAndUpdate',
-              query: JSON.stringify({
+              query: jsonfn.stringify({
                 $push: {
                   'items': { ...mappedProduct }
                 }
@@ -256,14 +257,14 @@
           this.actionList.push({
             type: 'order',
             action: 'addItem',
-            where: JSON.stringify({
+            where: jsonfn.stringify({
               _id: !this.currentOrder.firstInit ? this.currentOrder._id : null
             }),
             orderId: this.currentOrder.id,
             table: this.currentOrder.table,
             update: {
               method: 'findOneAndUpdate',
-              query: JSON.stringify({
+              query: jsonfn.stringify({
                 $push: {
                   'items': { ...mappedProduct }
                 }
@@ -279,7 +280,7 @@
         this.actionList.push({
           type: 'order',
           action: 'changeItemQuantity',
-          where: JSON.stringify({
+          where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': itemToUpdate._id
           }),
@@ -287,7 +288,7 @@
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: jsonfn.stringify({
               $inc: {
                 'items.$.quantity': 1
               }
@@ -303,14 +304,14 @@
         this.actionList.push({
           type: 'order',
           action: 'changeItemQuantity',
-          where: JSON.stringify({
+          where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': itemToUpdate._id
           }),
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: jsonfn.stringify({
               $inc: {
                 'items.$.quantity': -1
               }
@@ -640,7 +641,7 @@
         this.actionList.push({
           type: 'order',
           action: 'handleItemProps',
-          where: JSON.stringify({
+          where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
@@ -648,7 +649,7 @@
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: jsonfn.stringify({
               $push: {
                 'items.$.modifiers': {...modifier}
               }
@@ -667,7 +668,7 @@
         this.actionList.push({
           type: 'order',
           action: 'handleItemProps',
-          where: JSON.stringify({
+          where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
@@ -675,13 +676,13 @@
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: {
+            query: jsonfn.stringify({
               $pull: {
                 'items.$.modifiers': {
                   _id: modifier._id
                 }
               }
-            }
+            })
           }
         })
         product.modifiers.splice(modIndex, 1)
@@ -698,7 +699,7 @@
         this.actionList.push({
           type: 'order',
           action: 'handleItemProps',
-          where: JSON.stringify({
+          where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
           }),
@@ -706,7 +707,7 @@
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: jsonfn.stringify({
               $set: {
                 'items.$.price': price
               }
@@ -769,11 +770,11 @@
         return await cms.getModel('OrderCommit').create([{
           type: 'order',
           action: 'setOrderProps',
-          where: JSON.stringify({ _id: this.currentOrder._id }),
+          where: jsonfn.stringify({ _id: this.currentOrder._id }),
           table: this.currentOrder.table,
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({$set: {[commit.key]: commit.value}})
+            query: jsonfn.stringify({$set: {[commit.key]: commit.value}})
           }
         }]);
       },
@@ -1006,7 +1007,7 @@
             try {
               // known error
               // FULLY_REFUNDED error return when the user refund.
-              let errorObj = JSON.parse(error)
+              let errorObj = jsonfn.parse(error)
               this.dialog.refundFailed.error = errorObj.details[0].description
             } catch (e) {
               this.dialog.refundFailed.error = error

@@ -23,6 +23,9 @@ const nodeSync = async function (commits) {
 }
 
 const connectToMaster = async (_this, masterIp) => {
+	if (_this.socket.connected) {
+		_this.socket.disconnect();
+	}
 	const posSettings = await cms.getModel("PosSetting").findOne({});
 	const clientId = posSettings.onlineDevice.id;
 	_this.socket = socketClient.connect(`http://${masterIp}/masterNode?clientId=${clientId}`);
@@ -62,11 +65,14 @@ class Node {
 		this.highestCommitId = 0;
 		this.isConnect = false;
 		this.masterClientId = null;
-		setTimeout(async () => {
+		cms.post('load:masterClientId', async () => {
 			const posSettings = await cms.getModel("PosSetting").findOne({});
 			const { masterIp, masterClientId } = posSettings;
 			this.masterClientId = masterClientId;
 			if (masterIp) await connectToMaster(this, masterIp);
+		})
+		setTimeout(async () => {
+			await cms.execPostAsync('load:masterClientId');
 		}, 0)
 	}
 
@@ -99,19 +105,20 @@ class Node {
 					updateCommit.setHighestCommitIds(typeCommits);
 				} else {
 					console.debug('nodeReceiveCommit', 'Need sync');
-					_this.onlineOrderSocket.emit('requireSync', type, oldHighestCommitId, nodeSync);
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type, oldHighestCommitId, nodeSync);
 				}
 			})
 		})
 		_this.onlineOrderSocket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
 			if (masterIp != posSettings.masterIp) {
-				connectToMaster(_this, masterIp);
+				await connectToMaster(_this, masterIp);
 				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
 			}
 		})
 		if (_this.masterClientId) {
 			updateCommit.commitType.forEach(type => {
-				_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
+				_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+					updateCommit.methods[type].checkHighestCommitId(), nodeSync);
 			})
 		}
 	}
@@ -125,7 +132,7 @@ class Node {
 				if (_this.socket.connected) {
 					_this.socket.emit('requireSync', type, updateCommit.methods[type].checkHighestCommitId(), nodeSync);
 				} else if (_this.masterClientId) {
-					_this.onlineOrderSocket.emitTo(_this.masterClientId, 'requireSync', type,
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
 						updateCommit.methods[type].checkHighestCommitId(), nodeSync);
 				}
 			})
@@ -155,7 +162,7 @@ class Node {
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
 					} else if (_this.masterClientId) {
-						_this.onlineOrderSocket.emitTo(_this.masterClientId, 'updateCommits', commits);
+						_this.onlineOrderSocket.emit('updateCommits', _this.masterClientId, commits);
 					} else {
 						throw new Error('Can not connect to master');
 					}
@@ -183,7 +190,7 @@ class Node {
 		if (this.socket.connected) {
 			this.socket.emit('updateCommits', [commit]);
 		} else {
-			this.onlineOrderSocket.emitTo(this.masterClientId, 'updateCommits', [commit]);
+			this.onlineOrderSocket.emit('updateCommits', this.masterClientId, [commit]);
 		}
 	}
 }
