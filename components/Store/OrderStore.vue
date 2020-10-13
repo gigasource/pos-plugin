@@ -1205,7 +1205,24 @@
       },
       // customer
       async createCustomer(customer) {
-        await cms.getModel('Customer').create(customer)
+        const CustomerModel = cms.getModel('Customer')
+        const customerWithSamePhone = await CustomerModel.findOne({
+          phone: customer.phone
+        })
+        if(customerWithSamePhone) {
+          await CustomerModel.findOneAndUpdate(
+              {
+                _id: customerWithSamePhone._id
+              },
+              {
+                $push: {
+                  addresses: { $each: customer.addresses }
+                }
+              }
+          )
+        } else {
+          await cms.getModel('Customer').create(customer)
+        }
       },
       async getCustomers() {
         return await cms.getModel('Customer').find()
