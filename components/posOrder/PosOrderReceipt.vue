@@ -21,8 +21,13 @@
             </g-btn-bs>
           </template>
           <div class="col-flex">
-            <g-btn-bs class="ml-0 mr-0" v-for="item in paymentMethodMenuItems" :icon="item.icon" @click.stop="setOrderPaymentMethod(item)">
-              <div>{{item.text}}</div>
+            <g-btn-bs
+                class="ml-0 mr-0"
+                v-for="(item, index) in paymentMethodMenuItems"
+                :icon="item.icon"
+                :key="`paymentMethodMenuItems-${index}`"
+                @click.stop="setOrderPaymentMethod(item)">
+              <div>{{ item.text }}</div>
             </g-btn-bs>
           </div>
         </g-menu>

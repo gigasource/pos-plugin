@@ -1,12 +1,11 @@
-const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
+const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const {PNG} = require('pngjs')
 
 const PRINT_VIRTUAL_REPORT = 'run:printVirtualReport'
 
 module.exports = (cms) => {
   cms.post(PRINT_VIRTUAL_REPORT, async ({ report, printData, printerInfo, type }) => {
-    const CanvasPrinter = await initCanvaskit();
-    const canvasPrinter = new CanvasPrinter(560, 50000, {
+    const canvasPrinter = new PureImagePrinter(560, {
       printFunctions: {
         printPng: async (png) => {
           try {
