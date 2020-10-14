@@ -544,10 +544,12 @@
         }
       },
       printOrderReport(order) {
-        return new Promise((resolve, reject) => {
-          if (!order) reject()
+        return new Promise(async (resolve, reject) => {
+          if (!order) {
+            reject()
+          }
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -748,11 +750,33 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
-      updateCurrentOrder(key, val) {
+      updateCurrentOrder(key, val, createCommit) {
         this.$set(this.currentOrder, key, val)
+
+        if (createCommit) {
+          this.actionList.push({
+            type: 'order',
+            action: 'setOrderProps',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            table: this.currentOrder.table,
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {[key]: val}})
+            }
+          })
+        }
       },
       updatePrintedOrder(key, val) {
         this.$set(this.printedOrder, key, val)
+      },
+      async moveItems(table, newItems, currentOrderItems, cb = () => null) {
+        const clientId = await this.getOnlineOrderDeviceId()
+        const sentryTags = `sentry:eventType=moveItems,clientId=${clientId},orderId=${this.currentOrder._id}`;
+        console.debug(sentryTags, `1. POS frontend: emit moveItems to table ${table}`)
+        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, order => {
+          console.debug(sentryTags, `5. POS frontend: event ack`, order)
+          cb()
+        })
       },
       printKitchen(order) {
         return new Promise((resolve, reject) => {
@@ -839,10 +863,10 @@
         })
       },
       printOnlineOrderReport(orderId) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -858,10 +882,10 @@
         })
       },
       printOnlineOrderKitchen(orderId) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {

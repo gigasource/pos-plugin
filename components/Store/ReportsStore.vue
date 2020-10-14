@@ -113,10 +113,10 @@
         }
       },
       printZReport(z) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
           if (_.isNil(z)) reject()
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -148,9 +148,9 @@
         const from = dayjs(date).startOf('day').toDate()
         const to = dayjs(from).add(1, 'day').toDate()
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -193,9 +193,9 @@
         return { total, salesByCategory, salesByPayment, zNumbers }
       },
       printMonthlyReport(report) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -223,9 +223,9 @@
         return await cms.processData('OrderSalesByStaff', { from: fromTime, to: toTime, name: staffName })
       },
       printStaffReport(report) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {

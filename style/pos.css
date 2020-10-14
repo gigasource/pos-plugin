@@ -781,3 +781,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-move-items {
+  background-image: url("../assets/move-items.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

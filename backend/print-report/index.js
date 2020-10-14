@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { getEscPrinter, getGroupPrinterInfo } = require('../print-utils/print-utils');
 const fs = require('fs');
 const path = require('path');
-const initCanvaskit = require('@gigasource/canvaskit-printer-renderer');
+const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('./virtual-printer')
 
 module.exports = async function (cms) {
@@ -74,7 +74,7 @@ async function printHandler(reportType, reportData, device, callback = () => nul
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
     const { useVirtualPrinter } = posSetting.generalSetting
-    const CanvasPrinter = await initCanvaskit();
+
     for (const printerInfo of printers) {
       if (useVirtualPrinter) {
         await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{ report, printData, printerInfo, type }])
@@ -86,14 +86,14 @@ async function printHandler(reportType, reportData, device, callback = () => nul
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
         // await report.printSsr(escPrinter, printData);
-        const canvasPrinter = new CanvasPrinter(560, 50000, {
+        const pureImagePrinter = new PureImagePrinter(560, {
           printFunctions: {
             printPng: escPrinter.printPng.bind(escPrinter),
             print: escPrinter.print.bind(escPrinter),
           }
         });
-        await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
-        canvasPrinter.cleanup();
+        await report.printCanvas(pureImagePrinter, printData, printerInfo.groupPrinter, 'canvas');
+        pureImagePrinter.cleanup();
       }
     }
     const result = {success: true}

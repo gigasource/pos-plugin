@@ -12,11 +12,10 @@ const pkgConfig = {
 };
 
 // canvas asset
-pkgConfig.assets.push('../node_modules/@gigasource/canvaskit-printer-renderer/assets/fonts/Verdana.ttf');
-pkgConfig.assets.push('../node_modules/@gigasource/canvaskit-printer-renderer/assets/fonts/Verdana_Bold.ttf');
-pkgConfig.assets.push('../node_modules/@gigasource/canvaskit-printer-renderer/assets/fonts/Verdana_Italic.ttf');
-pkgConfig.assets.push('../node_modules/@gigasource/canvaskit-printer-renderer/assets/fonts/Verdana_Bold_Italic.ttf');
-pkgConfig.assets.push('../node_modules/canvaskit-wasm/bin/canvaskit.wasm');
+pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana.ttf');
+pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana_Bold.ttf');
+pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana_Italic.ttf');
+pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana_Bold_Italic.ttf');
 
 for (let pluginId in config.plugins) {
   const pluginPath = `${pluginsPath}/${config.plugins[pluginId].name}`

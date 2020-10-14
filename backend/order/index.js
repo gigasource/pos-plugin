@@ -183,6 +183,47 @@ module.exports = (cms) => {
         console.log(e)
       }
     })
+
+    socket.on('move-items', async (table, newItems, currentOrder, currentOrderItems, cb = () => null) => {
+      const sentryTags = await getBaseSentryTags('moveItems');
+      console.debug(sentryTags, `2. POS backend: receive event moveItems`)
+      const existingOrder = await cms.getModel('Order').findOne({ table, status: 'inProgress' })
+      let newOrder
+      if (existingOrder) {
+        const items = newItems.reduce((list, current) => {
+          const existingItem = list.find(i => JsonFn.stringify(i._id) === JsonFn.stringify(current._id));
+          if (existingItem) {
+            existingItem.quantity += current.quantity
+          } else {
+            list.push(current)
+          }
+
+          return list
+        }, existingOrder.items)
+        newOrder = await createOrderCommit(existingOrder, 'items', items);
+        console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
+      } else {
+        newOrder = await cms.getModel('OrderCommit').create([{
+          type: 'order',
+          action: 'createOrder',
+          where: null,
+          data: { table },
+          update: {
+            method: 'create',
+            query: JsonFn.stringify({
+              table,
+              items: newItems,
+              status: 'inProgress'
+            })
+          }
+        }]);
+        console.debug(sentryTags, `3. POS backend: moved items to new order at table ${table}`)
+      }
+
+      await createOrderCommit(currentOrder, 'items', currentOrderItems)
+      console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
+      cb(newOrder)
+    })
   })
 
   async function mapOrder(order, user) {
@@ -273,9 +314,25 @@ module.exports = (cms) => {
       await printKitchenCancel({ order: commit.order, device: commit.device });
     } else if (commit.printType === 'invoice') {
       await printInvoiceHandler('OrderReport', commit.order, commit.device);
-    } else if (commit.printType === 'report') {
-      // todo: Change printInvoiceHandler to printReport
-      await printInvoiceHandler(commit.reportType, commit.printData, commit.device);
+    } else if (commit.type === 'report') {
+      const { data } = commit
+      await printInvoiceHandler(data.reportType, data.printData, data.device);
     }
   })
+}
+
+async function getBaseSentryTags(eventType) {
+  const appVersion = require('../../package').version;
+  const { deviceName } = global.APP_CONFIG;
+
+  let tag = `sentry:version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
+  const posSetting = await cms.getModel('PosSetting').findOne({})
+
+  if (posSetting.onlineDevice) {
+    const { id, store } = posSetting.onlineDevice
+    if (id) tag += `,clientId=${id}`;
+    if (store && store.name) tag += `,store=${store.name}`
+    if (store && store.alias) tag += `,alias=${store.alias}`
+  }
+  return tag;
 }

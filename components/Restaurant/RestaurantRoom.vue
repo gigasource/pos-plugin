@@ -89,8 +89,7 @@
         // if (!this.isTableBusy(roomObj)) {
         this.roomObj = roomObj;
         const tseConfig = await cms.getModel('TseConfig').findOne()
-        console.log('tseConfig', tseConfig)
-        if (tseConfig && tseConfig.tseEnable && tseConfig.numberOfCustomersDialog) {
+        if (tseConfig && tseConfig.tseEnable && tseConfig.numberOfCustomersDialog && !this.isTableBusy(roomObj)) {
           this.showNumberOfCustomersDialog = true
         } else {
           setTimeout(() => {

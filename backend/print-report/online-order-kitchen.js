@@ -105,7 +105,7 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
   filteredItems.forEach((item, index) => {
     escPrinter.bold(false);
     const quantityColumnWidth = item.quantity.toString().length * 0.05;
-    const itemsColumnWidth = tableWidthPercentTotal - 0.05 - item.quantity.toString().length * 0.05;
+    const itemsColumnWidth = tableWidthPercentTotal - 0.05 - quantityColumnWidth;
 
     escPrinter.setTextQuadArea();
     escPrinter.tableCustom([
@@ -222,8 +222,8 @@ async function printCanvas(printer, printData, groupPrinter, printerType) {
   printer.drawLine()
   filteredItems.forEach((item, index) => {
     printer.bold(false);
-    const quantityColumnWidth = item.quantity.toString().length * 0.05;
-    const itemsColumnWidth = tableWidthPercentTotal - 0.05 - item.quantity.toString().length * 0.05;
+    const quantityColumnWidth = item.quantity.toString().length * 0.06;
+    const itemsColumnWidth = tableWidthPercentTotal - 0.05 - quantityColumnWidth;
 
     printer.setTextQuadArea();
     printer.tableCustom([
