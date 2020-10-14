@@ -548,8 +548,8 @@
           if (!order) reject()
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'OrderReport',
                 printData: order,
@@ -843,8 +843,8 @@
           if (_.isNil(orderId)) reject()
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'OnlineOrderReport',
                 printData: { orderId },
@@ -862,8 +862,8 @@
           if (_.isNil(orderId)) reject()
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'OnlineOrderKitchen',
                 printData: { orderId },

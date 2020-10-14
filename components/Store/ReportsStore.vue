@@ -117,8 +117,8 @@
           if (_.isNil(z)) reject()
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'ZReport',
                 printData: { z: parseInt(z) },
@@ -151,8 +151,8 @@
         return new Promise((resolve, reject) => {
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'XReport',
                 printData: { from, to },
@@ -196,8 +196,8 @@
         return new Promise((resolve, reject) => {
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'MonthlyReport',
                 printData: report,
@@ -226,8 +226,8 @@
         return new Promise((resolve, reject) => {
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              action: 'report',
+              type: 'report',
+              action: 'print',
               data: {
                 reportType: 'StaffReport',
                 printData: report,

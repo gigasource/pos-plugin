@@ -103,12 +103,10 @@ async function orderCommit(updateCommit) {
 	updateCommit.queue.pause();
 
 	/* -------------- UpdateCommit Method -------------- */
-
-	if (!updateCommit.methods['order']) updateCommit.methods['order'] = {};
 	/*
 	Delete temporary commit for order
 	 */
-	updateCommit.methods['order'].deleteTempCommit = async function ({ groupTempId }) {
+	updateCommit.registerMethod('order', 'deleteTempCommit', async function ({ groupTempId }) {
 		let commit = null;
 		await updateCommit.orderCommitModel.deleteMany({ groupTempId, temp: true });
 		commit = {
@@ -120,18 +118,18 @@ async function orderCommit(updateCommit) {
 		}
 		await updateCommit.orderCommitModel.create(commit);
 		return commit;
-	}
+	})
 
-	updateCommit.methods['order'].pushTaskToQueue = function (commits, ack) {
+	updateCommit.registerMethod('order', 'pushTaskToQueue', function (commits, ack) {
 		updateCommit.queue.push({
 			commits,
 			ack
 		});
-	}
+	})
 
-	updateCommit.methods['order'].resumeQueue = function () {
+	updateCommit.registerMethod('order', 'resumeQueue', function () {
 		updateCommit.queue.resume();
-	}
+	})
 
 	/*
   nodeHighestOrderIdUpdating is for the case when node check master's
@@ -139,19 +137,19 @@ async function orderCommit(updateCommit) {
   master's highestOrderCommitId, the value must be updated but highestOrderCommitId
   of node may not be updated fast enough.
   */
-	updateCommit.methods['order'].checkHighestCommitId = function (id) {
+	updateCommit.registerMethod('order', 'checkHighestCommitId', function (id) {
 		updateCommit.nodeHighestOrderCommitIdUpdating =
 			Math.max(updateCommit.nodeHighestOrderCommitIdUpdating, updateCommit.highestOrderCommitId);
 		if (!id) return updateCommit.nodeHighestOrderCommitIdUpdating;
 		// node highest commit id must be equal to master
 		return id == updateCommit.nodeHighestOrderCommitIdUpdating ? null : updateCommit.nodeHighestOrderCommitIdUpdating;
-	}
+	})
 
-	updateCommit.methods['order'].setHighestCommitId = function (id) {
+	updateCommit.registerMethod('order', 'setHighestCommitId', function (id) {
 		updateCommit.nodeHighestOrderCommitIdUpdating = id;
-	}
+	})
 
-	updateCommit.methods['order'].createOrder = async function (commit) {
+	updateCommit.registerMethod('order', 'createOrder', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -190,9 +188,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].closeOrder = async function (commit) {
+	updateCommit.registerMethod('order', 'closeOrder', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -216,9 +214,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].setOrderProps = async function (commit) {
+	updateCommit.registerMethod('order', 'setOrderProps', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -235,9 +233,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].addItem = async function (commit) {
+	updateCommit.registerMethod('order', 'addItem', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -256,9 +254,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].changeItemQuantity = async function (commit) {
+	updateCommit.registerMethod('order', 'changeItemQuantity', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -294,9 +292,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].update = async function (commit) {
+	updateCommit.registerMethod('order', 'update', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -313,9 +311,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].changeTable = async function (commit) {
+	updateCommit.registerMethod('order', 'changeTable', async function (commit) {
 		try {
 			const result = await updateCommit.orderCommitModel.updateMany({orderId: commit.data.orderId}, {table: commit.update}, {new: true});
 			if (!result) return;
@@ -333,9 +331,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].requireSync = async function ({ oldHighestCommitId, ack }) {
+	updateCommit.registerMethod('order', 'requireSync', async function ({ oldHighestCommitId, ack }) {
 		try {
 			const syncCommits = await updateCommit.orderCommitModel.find({commitId: {$gt: oldHighestCommitId - 1}});
 			ack(syncCommits);
@@ -344,9 +342,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].updateTempCommit = async function (commits) {
+	updateCommit.registerMethod('order', 'updateTempCommit', async function (commits) {
 		try {
 			for (let i in commits) {
 				await updateCommit.orderCommitModel.create(commits[i]);
@@ -355,25 +353,29 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].checkCommitExist = async function ({ commitId }) {
+	updateCommit.registerMethod('order', 'checkCommitExist', async function ({ commitId }) {
 		return updateCommit.highestOrderCommitId > commitId;
-	}
+	})
 
-	updateCommit.methods['order'].getNewOrderId = async function () {
+	updateCommit.registerMethod('order', 'getNewOrderId', async function () {
 		updateCommit.highestOrderId++
 		return updateCommit.highestOrderId - 1
-	}
+	})
 
-	updateCommit.methods['order'].doTask = function (commits, ack) {
+	updateCommit.registerMethod('order', 'doTask', function (commits, ack) {
 		updateCommit.queue.push({
 			commits,
 			ack
 		});
-	}
+	})
 
-	updateCommit.methods['order'].buildTempOrder = async function (table) {
+	/*
+	temporary order is build by using temporary commits, apply mongoose
+	query for them and return the final result
+	 */
+	updateCommit.registerMethod('order', 'buildTempOrder', async function (table) {
 		let _id = new mongoose.Types.ObjectId();
 		try {
 			if (table == null) return null;
@@ -401,7 +403,20 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
+
+	updateCommit.registerMethod('order', 'printOrder', async function (commit) {
+		try {
+			if (commit.order._id) {
+				const order = await cms.getModel('Order').findById(commit.order._id)
+				if (order) commit.order.id = order.toJSON().id
+			}
+			await cms.execPostAsync('run:print', null, [commit]);
+		} catch (err) {
+			console.error('Error occurred', err);
+			return null;
+		}
+	})
 }
 
 module.exports = orderCommit;
