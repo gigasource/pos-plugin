@@ -1,6 +1,7 @@
 const Queue = require('better-queue');
 const JsonFn = require('json-fn');
 const _ = require('lodash');
+const mongoose = require('mongoose');
 
 const COMMIT_TIME_OUT = 5 * 60 * 1000;
 const COMMIT_CLOSE_TIME_OUT = 30 * 1000;
@@ -9,11 +10,13 @@ async function orderCommit(updateCommit) {
 	/* -------------- Method for this file only -------------- */
 	function validateCommit(commit) {
 		if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-			if (!commit.data.orderId && updateCommit.activeOrders[commit.data.table]) {
-				commit.data.orderId = updateCommit.activeOrders[commit.data.table].id;
-			}
-			if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.data.table]) {
-				commit.where._id = updateCommit.activeOrders[commit.data.table]._id;
+			if (commit.data && commit.data.table) {
+				if (!commit.data.orderId && updateCommit.activeOrders[commit.data.table]) {
+					commit.data.orderId = updateCommit.activeOrders[commit.data.table].id;
+				}
+				if (commit.where && !commit.where._id && updateCommit.activeOrders[commit.data.table]) {
+					commit.where._id = updateCommit.activeOrders[commit.data.table]._id;
+				}
 			}
 		} else return false;
 		if (commit.commitId && commit.commitId < updateCommit.highestOrderCommitId) return false;
@@ -41,6 +44,7 @@ async function orderCommit(updateCommit) {
 		const condition = commit.where ? JsonFn.parse(commit.where) : null;
 		if (condition && !condition._id) {
 			condition._id = updateCommit.activeOrders[commit.data.table]._id;
+			commit.where = JsonFn.stringify(condition);
 		}
 		return condition;
 	}
@@ -69,7 +73,7 @@ async function orderCommit(updateCommit) {
 			// preset value
 			const commit = commits[id];
 			commit.temp = false;
-			if (lastTempId && lastTempId != commit.groupTempId) {
+			if (lastTempId && lastTempId != commit.groupTempId && global.APP_CONFIG.isMaster) {
 				const deleteCommit = await updateCommit.methods['order'].deleteTempCommit({ groupTempId: lastTempId});
 				if (deleteCommit) newCommits.push(deleteCommit);
 			}
@@ -81,7 +85,7 @@ async function orderCommit(updateCommit) {
 				if (commit.commitId) updateCommit.highestOrderCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
-			lastTable = commit.data.table;
+			if (commit.data && commit.data.table) lastTable = commit.data.table;
 		}
 		// console.debug(getBaseSentryTags('updateCommitQueue'), 'After exec commits', JSON.stringify(activeOrders));
 		// wait for db update
@@ -99,12 +103,10 @@ async function orderCommit(updateCommit) {
 	updateCommit.queue.pause();
 
 	/* -------------- UpdateCommit Method -------------- */
-
-	if (!updateCommit.methods['order']) updateCommit.methods['order'] = {};
 	/*
 	Delete temporary commit for order
 	 */
-	updateCommit.methods['order'].deleteTempCommit = async function ({ groupTempId }) {
+	updateCommit.registerMethod('order', 'deleteTempCommit', async function ({ groupTempId }) {
 		let commit = null;
 		await updateCommit.orderCommitModel.deleteMany({ groupTempId, temp: true });
 		commit = {
@@ -116,18 +118,18 @@ async function orderCommit(updateCommit) {
 		}
 		await updateCommit.orderCommitModel.create(commit);
 		return commit;
-	}
+	})
 
-	updateCommit.methods['order'].pushTaskToQueue = function (commits, ack) {
+	updateCommit.registerMethod('order', 'pushTaskToQueue', function (commits, ack) {
 		updateCommit.queue.push({
 			commits,
 			ack
 		});
-	}
+	})
 
-	updateCommit.methods['order'].resumeQueue = function () {
+	updateCommit.registerMethod('order', 'resumeQueue', function () {
 		updateCommit.queue.resume();
-	}
+	})
 
 	/*
   nodeHighestOrderIdUpdating is for the case when node check master's
@@ -135,19 +137,19 @@ async function orderCommit(updateCommit) {
   master's highestOrderCommitId, the value must be updated but highestOrderCommitId
   of node may not be updated fast enough.
   */
-	updateCommit.methods['order'].checkHighestCommitId = function (id) {
+	updateCommit.registerMethod('order', 'checkHighestCommitId', function (id) {
 		updateCommit.nodeHighestOrderCommitIdUpdating =
 			Math.max(updateCommit.nodeHighestOrderCommitIdUpdating, updateCommit.highestOrderCommitId);
 		if (!id) return updateCommit.nodeHighestOrderCommitIdUpdating;
 		// node highest commit id must be equal to master
 		return id == updateCommit.nodeHighestOrderCommitIdUpdating ? null : updateCommit.nodeHighestOrderCommitIdUpdating;
-	}
+	})
 
-	updateCommit.methods['order'].setHighestCommitId = function (id) {
+	updateCommit.registerMethod('order', 'setHighestCommitId', function (id) {
 		updateCommit.nodeHighestOrderCommitIdUpdating = id;
-	}
+	})
 
-	updateCommit.methods['order'].createOrder = async function (commit) {
+	updateCommit.registerMethod('order', 'createOrder', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -186,9 +188,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].closeOrder = async function (commit) {
+	updateCommit.registerMethod('order', 'closeOrder', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -206,14 +208,15 @@ async function orderCommit(updateCommit) {
 			const query = JsonFn.parse(commit.update.query);
 			await updateCommit.orderModel[commit.update.method](condition, query);
 			await updateCommit.orderCommitModel.create(commit);
+			await updateCommit.orderCommitModel.deleteMany({ temp: true, table: commit.data.table })
 			return true;
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].setOrderProps = async function (commit) {
+	updateCommit.registerMethod('order', 'setOrderProps', async function (commit) {
 		try {
 			// Verify id for commit and order
 			if (!validateOrderId(commit)) return;
@@ -230,9 +233,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].addItem = async function (commit) {
+	updateCommit.registerMethod('order', 'addItem', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -251,9 +254,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].changeItemQuantity = async function (commit) {
+	updateCommit.registerMethod('order', 'changeItemQuantity', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -289,9 +292,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].handleItemProps = async function (commit) {
+	updateCommit.registerMethod('order', 'update', async function (commit) {
 		try {
 			if (!checkOrderActive(commit)) return;
 			const query = JsonFn.parse(commit.update.query);
@@ -308,9 +311,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].changeTable = async function (commit) {
+	updateCommit.registerMethod('order', 'changeTable', async function (commit) {
 		try {
 			const result = await updateCommit.orderCommitModel.updateMany({orderId: commit.data.orderId}, {table: commit.update}, {new: true});
 			if (!result) return;
@@ -328,9 +331,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].requireSync = async function ({ oldHighestCommitId, ack }) {
+	updateCommit.registerMethod('order', 'requireSync', async function ({ oldHighestCommitId, ack }) {
 		try {
 			const syncCommits = await updateCommit.orderCommitModel.find({commitId: {$gt: oldHighestCommitId - 1}});
 			ack(syncCommits);
@@ -339,9 +342,9 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].updateTempCommit = async function (commits) {
+	updateCommit.registerMethod('order', 'updateTempCommit', async function (commits) {
 		try {
 			for (let i in commits) {
 				await updateCommit.orderCommitModel.create(commits[i]);
@@ -350,71 +353,70 @@ async function orderCommit(updateCommit) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 
-	updateCommit.methods['order'].checkCommitExist = async function ({ commitId }) {
+	updateCommit.registerMethod('order', 'checkCommitExist', async function ({ commitId }) {
 		return updateCommit.highestOrderCommitId > commitId;
-	}
+	})
 
-	updateCommit.methods['order'].getNewOrderId = async function () {
+	updateCommit.registerMethod('order', 'getNewOrderId', async function () {
 		updateCommit.highestOrderId++
 		return updateCommit.highestOrderId - 1
-	}
+	})
 
-	updateCommit.methods['order'].doTask = function (commits, ack) {
+	updateCommit.registerMethod('order', 'doTask', function (commits, ack) {
 		updateCommit.queue.push({
 			commits,
 			ack
 		});
-	}
+	})
 
-	updateCommit.methods['order'].buildTempOrder = async function (table) {
+	/*
+	temporary order is build by using temporary commits, apply mongoose
+	query for them and return the final result
+	 */
+	updateCommit.registerMethod('order', 'buildTempOrder', async function (table) {
+		let _id = new mongoose.Types.ObjectId();
 		try {
-			if (table == null || !updateCommit.activeOrders[table]) return null;
-			const commitsList = await updateCommit.orderCommitModel.find({id: updateCommit.activeOrders[table].id, table: table, temp: true}).lean();
-			const result = updateCommit.activeOrders[table] ? _.cloneDeep(updateCommit.activeOrders[table]) : {items: []};
+			if (table == null) return null;
+			const commitsList = await updateCommit.orderCommitModel.find({'data.table': table, temp: true}).lean();
+			const tempCommit = updateCommit.activeOrders[table] ? _.cloneDeep(updateCommit.activeOrders[table]) : {items: []};
+			tempCommit._id = _id;
+			await updateCommit.orderModel.create(tempCommit);
+			const promiseList = [];
 			commitsList.forEach(commit => {
-				const query = (commit.update.query ? JsonFn.parse(commit.update.query) : null);
-				switch (commit.action) {
-					case 'addItem':
-						result['items'].push(JsonFn.parse(commit.update.query));
-						break;
-					case 'changeItemQuantity':
-						const condition = JsonFn.parse(commit.where);
-						const currentItem = result['items'].find(item => item._id.toString() === condition._id.toString());
-						currentItem.quantity += query['$inc']['items.$.quantity'];
-						if (currentItem.quantity < 0) currentItem.quantity = 0;
-						break;
-					case 'handleItemProps':
-						/*
-						3 types: push modifier, pull modifier, set discount
-						 */
-						if (query['$push']) {
-							if (currentItem) {
-								if (currentItem.modifiers) currentItem.modifiers.push(query['$push']);
-								else currentItem.modifiers = [query['$push']];
-							}
-						} else if (query['$pull']) {
-							if (currentItem) {
-								const pullId = currentItem.modifiers.findIndex(modifier => modifier._id.toString() === query['$pull']._id.toString());
-								if (pullId >= 0) currentItem.modifiers.splice(pullId, 1);
-							}
-						} else if (query['$set']) {
-							if (commit.update.query.includes('price')) {
-								currentItem.price = query['$set']['price'];
-							} else {
-								currentItem.printed = query['$set']['printed'];
-							}
-						}
-						break;
+				if (commit.action !== 'createOrder') {
+					const query = (commit.update.query ? JsonFn.parse(commit.update.query) : null);
+					const condition = (commit.where ? JsonFn.parse(commit.where) : null);
+					if (condition && condition._id) condition._id = _id;
+					promiseList.push(updateCommit.orderModel[commit.update.method](condition, query));
 				}
 			})
+			await Promise.all(promiseList);
+			const result = await updateCommit.orderModel.findOne({ _id }).lean();
+			delete result._id;
+			if (updateCommit.activeOrders[table]) result._id = updateCommit.activeOrders[table]._id;
+			await updateCommit.orderModel.deleteMany({ _id });
 			return result;
+		} catch (err) {
+			await updateCommit.orderModel.deleteMany({ _id });
+			console.error('Error occurred', err);
+			return null;
+		}
+	})
+
+	updateCommit.registerMethod('order', 'printOrder', async function (commit) {
+		try {
+			if (commit.order._id) {
+				const order = await cms.getModel('Order').findById(commit.order._id)
+				if (order) commit.order.id = order.toJSON().id
+			}
+			await cms.execPostAsync('run:print', null, [commit]);
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;
 		}
-	}
+	})
 }
 
 module.exports = orderCommit;

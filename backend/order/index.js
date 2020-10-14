@@ -1,10 +1,10 @@
 const orderUtil = require('../../components/logic/orderUtil')
-const mongoose = require('mongoose')
 const { getBookingNumber, getVDate } = require('../../components/logic/productUtils')
 const { printKitchen, printKitchenCancel } = require('../print-kitchen/kitchen-printer');
 const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
+const mongoose = require('mongoose');
 
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
@@ -16,7 +16,7 @@ module.exports = (cms) => {
           if (action.action === 'createOrder') {
             const query = JsonFn.parse(action.update.query);
             query._id = order._id;
-            action.update.query = JsonFn.stringify(query);
+            action.query = JsonFn.stringify(query);
           }
         })
       }
@@ -90,10 +90,8 @@ module.exports = (cms) => {
 
 
       // save order | create commits
-      await createOrderCommits(mappedActionList, async () => {
-        const newOrder = await cms.getModel('Order').findById(order._id);
-        cb(newOrder.toJSON());
-      })
+      const newOrder = await createOrderCommits(mappedActionList)
+      cb(newOrder)
     })
 
     socket.on('print-invoice', async (order) => {
@@ -241,9 +239,7 @@ module.exports = (cms) => {
     }]);
   }
 
-  async function createOrderCommits(commits, cb) {
-    if (!_.last(commits).data) _.last(commits).data = {};
-    _.last(commits).data.cb = cb;
+  async function createOrderCommits(commits) {
     return cms.getModel('OrderCommit').create(commits);
   }
 

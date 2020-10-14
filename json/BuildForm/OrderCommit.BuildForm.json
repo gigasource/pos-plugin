@@ -41,6 +41,11 @@
       "_id": "5f851e9586f3722a8ef7ae07",
       "schemaType": "mixed",
       "key": "data"
+    },
+    {
+      "_id": "5f8593505e686807c210cc99",
+      "schemaType": "boolean",
+      "key": "temp"
     }
   ],
   "name": "OrderCommit",

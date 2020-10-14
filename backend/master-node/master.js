@@ -101,10 +101,7 @@ class Master {
 							commit.groupTempId = groupTempId;
 							commit.temp = true;
 							commit.storeId = _storeId;
-							table = commit.table;
-							if (commit.split && commit.update.create) {
-								commit.update.create._id = mongoose.Types.ObjectId();
-							}
+							if (commit.data) table = commit.data.table;
 						})
 						updateCommit.handleCommit(commits);
 						await updateCommit.methods['order'].updateTempCommit(commits);
@@ -113,6 +110,7 @@ class Master {
 						}
 						return await updateCommit.methods['order'].buildTempOrder(table);
 					} catch (err) {
+						console.error('Error occurred', err);
 					}
 				}
 			}

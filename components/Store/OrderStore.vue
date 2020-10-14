@@ -548,11 +548,13 @@
           if (!order) reject()
           try {
             cms.getModel('OrderCommit').create([{
-              type: 'print',
-              printType: 'report',
-              reportType: 'OrderReport',
-              printData: order,
-              device: this.device
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'OrderReport',
+                printData: order,
+                device: this.device
+              }
             }])
             resolve()
           } catch (e) {
@@ -651,7 +653,7 @@
         modifier._id = this.genObjectId();
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -680,7 +682,7 @@
         const modifier = product.modifiers[modIndex]
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -713,7 +715,7 @@
         this.$set(product, 'price', price)
         this.actionList.push({
           type: 'order',
-          action: 'handleItemProps',
+          action: 'update',
           where: jsonfn.stringify({
             _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
             'items._id': product._id
@@ -839,33 +841,39 @@
       printOnlineOrderReport(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'OnlineOrderReport',
-            printData: { orderId },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'OnlineOrderReport',
+                printData: { orderId },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       printOnlineOrderKitchen(orderId) {
         return new Promise((resolve, reject) => {
           if (_.isNil(orderId)) reject()
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'OnlineOrderKitchen',
-            printData: { orderId },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'OnlineOrderKitchen',
+                printData: { orderId },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       async updateOnlineOrders() {

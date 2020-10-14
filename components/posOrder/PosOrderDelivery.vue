@@ -890,6 +890,10 @@
           border-color: #9e9e9e;
         }
 
+        &.g-tf__focused fieldset {
+          border-color: #1271FF;
+        }
+
         .g-tf-input {
           font-size: 14px;
           padding: 4px;

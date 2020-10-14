@@ -115,17 +115,20 @@
       printZReport(z) {
         return new Promise((resolve, reject) => {
           if (_.isNil(z)) reject()
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'ZReport',
-            printData: { z: parseInt(z) },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'ZReport',
+                printData: { z: parseInt(z) },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       async getXReport(date) {
@@ -146,17 +149,20 @@
         const to = dayjs(from).add(1, 'day').toDate()
 
         return new Promise((resolve, reject) => {
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'XReport',
-            printData: { from, to },
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'XReport',
+                printData: { from, to },
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       //<!--</editor-fold>-->
@@ -188,17 +194,20 @@
       },
       printMonthlyReport(report) {
         return new Promise((resolve, reject) => {
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'MonthlyReport',
-            printData: report,
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'MonthlyReport',
+                printData: report,
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch (e) {
             reject(e.message)
-          })
+          }
         })
       },
       //<!--</editor-fold>-->
@@ -215,17 +224,20 @@
       },
       printStaffReport(report) {
         return new Promise((resolve, reject) => {
-          cms.getModel('OrderCommit').create([{
-            type: 'print',
-            printType: 'report',
-            reportType: 'StaffReport',
-            printData: report,
-            device: this.device
-          }]).then(() => {
+          try {
+            cms.getModel('OrderCommit').create([{
+              type: 'report',
+              action: 'print',
+              data: {
+                reportType: 'StaffReport',
+                printData: report,
+                device: this.device
+              }
+            }])
             resolve()
-          }).catch((e) => {
+          } catch(e) {
             reject(e.message)
-          })
+          }
         })
       },
       //<!--</editor-fold>-->

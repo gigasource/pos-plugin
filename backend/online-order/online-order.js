@@ -40,17 +40,6 @@ module.exports = async cms => {
 
   process.on('SIGINT', fn);
 
-  async function updateStoreName() {
-    const posSettings = await cms.getModel('PosSetting').findOne({});
-    if (posSettings.onlineDevice && posSettings.onlineDevice.store) {
-      const {onlineDevice: {store: {name, alias}}} = posSettings;
-      storeName = name;
-      storeAlias = alias;
-    }
-  }
-
-  await updateStoreName();
-
   async function getWebShopUrl() {
     const posSetting = await cms.getModel('PosSetting').findOne()
 
@@ -626,7 +615,10 @@ module.exports = async cms => {
   }
 
   try {
-    const deviceId = await getDeviceId();
+    const posSettings = await cms.getModel('PosSetting').findOne({});
+    const { onlineDevice } = posSettings;
+
+    const deviceId = onlineDevice.id;
     if (deviceId) await createOnlineOrderSocket(deviceId);
   } catch (e) {
     console.error(`Create online order socket error: ${e}`);

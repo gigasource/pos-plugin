@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 queue: for order commit
  */
 const updateCommit = {
-	commitType: ['order'],
+	commitType: ['order', 'report'],
 	methods: {},
 	init: async function (handler) {
 		updateCommit.handler = handler;
@@ -31,6 +31,10 @@ const updateCommit = {
 			}).map(commit => commit.commitId));
 			updateCommit.methods[type].setHighestCommitId(maxCommitId);
 		})
+	},
+	registerMethod: function (type, name, func) {
+		if (!updateCommit.methods[type]) updateCommit.methods[type] = {}
+		updateCommit.methods[type][name] = func;
 	}
 }
 
