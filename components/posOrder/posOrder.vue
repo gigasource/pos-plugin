@@ -19,6 +19,7 @@
             <g-expand-x-transition>
               <div class="order-detail__menu">
                 <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
+                <g-btn-bs icon="icon-move-items" @click="moveItems">Move Items</g-btn-bs>
                 <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
                 <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
@@ -229,14 +230,6 @@
       avatar() {
         return this.user ? this.user.avatar : ''
       },
-      computedItems: {
-        get() {
-          return this.items
-        },
-        set(value) {
-          this.$emit('updateOrderItems', value)
-        }
-      },
       itemsWithQty() {
         if (this.items) return this.items.filter(i => i.quantity > 0)
         return []
@@ -381,6 +374,9 @@
       splitOrder() {
         this.$getService('PosOrderSplitOrder:setActive')(true)
       },
+      moveItems() {
+        this.$getService('PosOrderMoveItems:setActive')(true)
+      },
       showOrderReceipt() {
         this.$getService('OrderStore:updateCurrentOrder')('payment', [{ type: 'cash', value: this.total }])
         this.$getService('PosOrderReceipt:setActive')(true)
@@ -524,8 +520,8 @@
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
         this.table = this.$route.params.name
         const { tseMethod, numberOfCustomers } = this.$route.query
-        this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null)
-        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod)
+        this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null, true)
+        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod, true)
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
 
