@@ -46,7 +46,7 @@
   export default {
     name: 'VirtualPrinterView',
     components: { LazyLoadContainer },
-    injectService: ['VirtualPrinterStore:(loading,filteredReports,dismiss,selectMode,printerGroups,selectPrinterGroup,printerGroupFilter,loadMoreReports)'],
+    injectService: ['VirtualPrinterStore:(loading,filteredReports,dismiss,selectMode,printerGroups,selectPrinterGroup,printerGroupFilter,loadReports,loadMoreReports)'],
     props: {},
     data: function () {
       return {
@@ -60,6 +60,9 @@
           ],
         },
       }
+    },
+    async created() {
+      await this.loadReports()
     },
     computed: {
       printerGroupModel() {

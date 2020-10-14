@@ -28,9 +28,7 @@
     },
     async created() {
       await this.loadReportCount()
-      await this.loadMoreReports()
       await this.loadPrinterGroups()
-      
       this.clearVirtualReportTimerId = setInterval(async () => {
         await cms.getModel(VIRTUAL_REPORT_COLLECTION).remove({
           created: {
@@ -63,10 +61,22 @@
       },
     },
     methods: {
+      async loadReports() {
+        this.start = 0;
+        console.log('Stores/VirtualPrinterView:loadReports')
+        try {
+          const vrs = await cms.getModel(VIRTUAL_REPORT_COLLECTION).find({}, {}, { skip: 0, limit: this.take }).sort([['created', -1]])
+          if (vrs.length)
+            this.setReports(vrs)
+          console.log('Stores/VirtualPrinterView:loadReports completed!')
+        } catch (e) {
+          console.log('Stores/VirtualPrinterView:loadReports failed!', e)
+        }
+      },
       async loadMoreReports() {
         console.log('Stores/VirtualPrinterView:loadMoreReports')
         try {
-          const vrs = await cms.getModel(VIRTUAL_REPORT_COLLECTION).find({}, {}, { skip: this.start, limit: this.take }).sort('created')
+          const vrs = await cms.getModel(VIRTUAL_REPORT_COLLECTION).find({}, {}, { skip: this.start, limit: this.take }).sort([['created', -1]])
           if (vrs.length)
             this.setReports([...this.reports, ...vrs])
           console.log('Stores/VirtualPrinterView:loadMoreReports completed!')
@@ -122,6 +132,7 @@
         reports: this.reports,
         printerGroups: this.printerGroups,
         filteredReports: this.filteredReports,
+        loadReports: this.loadReports,
         loadMoreReports: this.loadMoreReports,
         dismiss: this.dismiss,
         selectMode: this.selectMode,
