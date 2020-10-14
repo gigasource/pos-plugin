@@ -16,7 +16,7 @@ module.exports = (cms) => {
           if (action.action === 'createOrder') {
             const query = JsonFn.parse(action.update.query);
             query._id = order._id;
-            action.query = JsonFn.stringify(query);
+            action.update.query = JsonFn.stringify(query);
           }
         })
       }
@@ -52,6 +52,7 @@ module.exports = (cms) => {
             action: 'printOrder',
             printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
             order: listOrder,
+            oldOrder,
             device
           })
         }
