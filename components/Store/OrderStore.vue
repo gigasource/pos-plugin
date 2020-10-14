@@ -770,8 +770,11 @@
         this.$set(this.printedOrder, key, val)
       },
       async moveItems(table, newItems, currentOrderItems, cb = () => null) {
-        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, (order) => {
-          console.log('new order', order)
+        const clientId = await this.getOnlineOrderDeviceId()
+        const sentryTags = `sentry:eventType=moveItems,clientId=${clientId},orderId=${this.currentOrder._id}`;
+        console.debug(sentryTags, `1. POS frontend: emit moveItems to table ${table}`)
+        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, order => {
+          console.debug(sentryTags, `5. POS frontend: event ack`, order)
           cb()
         })
       },
