@@ -10,13 +10,19 @@
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('all')" class="virtualPrinter__header__btn">All</g-btn>
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('bon')" class="virtualPrinter__header__btn">Bon</g-btn>
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('receipt')" class="virtualPrinter__header__btn">Receipt</g-btn>
-          <g-select text-field-component="GTextFieldBs" :items="zoom.availables" v-model="zoom.current" class="virtualPrinter__header__zoom"/>
+          <g-select
+              text-field-component="GTextFieldBs"
+              :items="zoom.availables"
+              v-model="zoom.current"
+              class="virtualPrinter__header__select"
+              style="min-width: 76px"/>
           <g-select
               text-field-component="GTextFieldBs"
               :items="printerGroupModel"
               :value="printerGroupFilter"
               @input="selectPrinterGroup"
-              class="virtualPrinter__header__printer"/>
+              class="virtualPrinter__header__select"
+              style="min-width: 80px"/>
           <g-spacer/>
           <g-btn border-radius="4" :uppercase="false" @click="dismiss" class="virtualPrinter__header__btn">Dismiss</g-btn>
         </div>
@@ -118,36 +124,30 @@
         margin-right: 5px;
       }
       
-      &__zoom {
-        ::v-deep {
-          .bs-tf-wrapper {
-            margin-top: 0;
-            margin-bottom: 0;
-            background: #fff;
-            border-radius: 4px;
-            display: flex;
-          }
-          
-          .bs-tf-inner-input-group {
-            height: 36px;
-          }
-        }
+      &__select {
+        box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+        margin-right: 5px;
       }
   
-      &__printer {
-        ::v-deep {
-          .bs-tf-wrapper {
-            margin-top: 0;
-            margin-bottom: 0;
-            background: #fff;
-            border-radius: 4px;
-            display: flex;
-          }
-      
-          .bs-tf-inner-input-group {
-            height: 36px;
-            min-width: 80px;
-          }
+      ::v-deep {
+        .bs-tf-wrapper {
+          margin: 0;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+          display: flex;
+          width: 100%;
+        }
+    
+        .bs-tf-input-group {
+          width: 100%;
+        }
+        
+        .bs-tf-inner-input-group {
+          height: 36px;
+          padding-left: 8px;
+          padding-right: 0;
+          flex-wrap: nowrap;
+          border-width: 0;
         }
       }
     }
