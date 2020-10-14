@@ -748,11 +748,30 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
-      updateCurrentOrder(key, val) {
+      updateCurrentOrder(key, val, createCommit) {
         this.$set(this.currentOrder, key, val)
+
+        if (createCommit) {
+          this.actionList.push({
+            type: 'order',
+            action: 'setOrderProps',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            table: this.currentOrder.table,
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {[key]: val}})
+            }
+          })
+        }
       },
       updatePrintedOrder(key, val) {
         this.$set(this.printedOrder, key, val)
+      },
+      async moveItems(table, newItems, currentOrderItems, cb = () => null) {
+        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, (order) => {
+          console.log('new order', order)
+          cb()
+        })
       },
       printKitchen(order) {
         return new Promise((resolve, reject) => {

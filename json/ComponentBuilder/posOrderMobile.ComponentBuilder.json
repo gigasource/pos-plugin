@@ -481,6 +481,51 @@
       "url": "plugins/pos-plugin/components/posOrder/PosOrderReceipt.vue",
       "path": "components/posOrder/PosOrderReceipt.vue",
       "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderMoveItems",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderMoveItems",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:currentOrder",
+          "local": "currentOrder",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:user",
+          "local": "user",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:storeLocale",
+          "local": "storeLocale",
+          "type": "prop"
+        },
+        {
+          "service": "PosStore:isMobile",
+          "local": "isMobile",
+          "type": "prop"
+        },
+        {
+          "service": "OrderStore:moveItems",
+          "local": "moveItems",
+          "type": "event"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/posOrder/PosOrderMoveItems.vue",
+      "path": "components/posOrder/PosOrderMoveItems.vue",
+      "pluginName": "pos-plugin"
     }
   ],
   "name": "posOrderMobile",

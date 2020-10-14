@@ -182,6 +182,42 @@ module.exports = (cms) => {
         console.log(e)
       }
     })
+
+    socket.on('move-items', async (table, newItems, currentOrder, currentOrderItems, cb = () => null) => {
+      const existingOrder = await cms.getModel('Order').findOne({ table, status: 'inProgress' })
+      let newOrder
+      if (existingOrder) {
+        const items = newItems.reduce((list, current) => {
+          const existingItem = list.find(i => JsonFn.stringify(i._id) === JsonFn.stringify(current._id));
+          if (existingItem) {
+            existingItem.quantity += current.quantity
+          } else {
+            list.push(current)
+          }
+
+          return list
+        }, existingOrder.items)
+        newOrder = await createOrderCommit(existingOrder, 'items', items);
+      } else {
+        newOrder = await cms.getModel('OrderCommit').create([{
+          type: 'order',
+          action: 'createOrder',
+          where: null,
+          data: { table },
+          update: {
+            method: 'create',
+            query: JsonFn.stringify({
+              table,
+              items: newItems,
+              status: 'inProgress'
+            })
+          }
+        }]);
+      }
+
+      await createOrderCommit(currentOrder, 'items', currentOrderItems)
+      cb(newOrder)
+    })
   })
 
   async function mapOrder(order, user) {
