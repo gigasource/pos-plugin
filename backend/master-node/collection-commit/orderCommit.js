@@ -158,9 +158,9 @@ async function orderCommit(updateCommit) {
 				updateCommit['order'].highestOrderCommitId++;
 			}
 			if (!commit.data.orderId) {
-				commit.data.orderId = updateCommit.highestOrderId;
-				updateCommit.highestOrderId++;
-			} else updateCommit.highestOrderId = commit.data.orderId;
+				commit.data.orderId = updateCommit['order'].highestOrderId;
+				updateCommit['order'].highestOrderId++;
+			} else updateCommit['order'].highestOrderId = commit.data.orderId;
 			// get query
 			const query = JsonFn.parse(commit.update.query);
 			query.id = commit.data.orderId;
