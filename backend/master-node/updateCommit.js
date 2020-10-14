@@ -6,10 +6,10 @@ queue: for order commit
  */
 const updateCommit = {
 	commitType: ['order', 'report'],
-	methods: {},
 	init: async function (handler) {
 		updateCommit.handler = handler;
 		updateCommit.orderCommitModel = cms.Types['OrderCommit'].Model;
+		updateCommit.orderModel = cms.Types['Order'].Model;
 		// updateCommit.systemCommitModel = cms.Types['SystemCommit'].Model;
 		await require('./collection-commit')(updateCommit);
 	},
@@ -18,23 +18,29 @@ const updateCommit = {
 			const typeCommits = commits.filter(commit => {
 				return commit.type === type;
 			})
-			if (typeCommits.length) updateCommit.methods[type].doTask(typeCommits);
+			if (typeCommits.length) updateCommit.getMethod(type, 'doTask')(typeCommits);
 		})
 	},
 	checkCommitExist: async function (commit) {
-		return await updateCommit.methods[commit.type].checkCommitExist(commit);
+		return await updateCommit.getMethod(commit.type, 'checkCommitExist')(commit);
 	},
 	setHighestCommitIds: function (commits) {
 		updateCommit.commitType.forEach(type => {
 			const maxCommitId = Math.max.apply(null, commits.filter(commit => {
 				return commit.type === type;
 			}).map(commit => commit.commitId));
-			updateCommit.methods[type].setHighestCommitId(maxCommitId);
+			updateCommit.getMethod(type, 'setHighestCommitId')(maxCommitId);
 		})
 	},
 	registerMethod: function (type, name, func) {
-		if (!updateCommit.methods[type]) updateCommit.methods[type] = {}
-		updateCommit.methods[type][name] = func;
+		if (!updateCommit[type]) updateCommit[type] = {};
+		if (!updateCommit[type].methods) updateCommit[type].methods = {};
+		updateCommit[type].methods[name] = func;
+	},
+	getMethod: function (type, name) {
+		return updateCommit[type].methods && updateCommit[type].methods[name] ? updateCommit[type].methods[name] : function () {
+			console.warn('Method is not defined');
+		}
 	}
 }
 

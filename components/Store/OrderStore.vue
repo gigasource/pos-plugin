@@ -544,10 +544,12 @@
         }
       },
       printOrderReport(order) {
-        return new Promise((resolve, reject) => {
-          if (!order) reject()
+        return new Promise(async (resolve, reject) => {
+          if (!order) {
+            reject()
+          }
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -839,10 +841,10 @@
         })
       },
       printOnlineOrderReport(orderId) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {
@@ -858,10 +860,10 @@
         })
       },
       printOnlineOrderKitchen(orderId) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').create([{
               type: 'report',
               action: 'print',
               data: {

@@ -104,11 +104,11 @@ class Master {
 							if (commit.data) table = commit.data.table;
 						})
 						updateCommit.handleCommit(commits);
-						await updateCommit.methods['order'].updateTempCommit(commits);
+						await updateCommit.getMethod('order', 'updateTempCommit')(commits);
 						if (commits.length && commits[0].split) {
 							return JSON.parse(commits[0].update.query);
 						}
-						return await updateCommit.methods['order'].buildTempOrder(table);
+						return await updateCommit.getMethod('order', 'buildTempOrder')(table);
 					} catch (err) {
 						console.error('Error occurred', err);
 					}
@@ -116,7 +116,7 @@ class Master {
 			}
 		})
 
-		updateCommit.methods['order'].resumeQueue();
+		updateCommit.getMethod('order', 'resumeQueue')();
 	}
 
 	emitToAll(commits) {
