@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 queue: for order commit
  */
 const updateCommit = {
-	commitType: ['order'],
+	commitType: ['order', 'print'],
 	methods: {},
 	init: async function (handler) {
 		updateCommit.handler = handler;
