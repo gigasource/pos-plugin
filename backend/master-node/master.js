@@ -117,6 +117,7 @@ class Master {
 		})
 
 		updateCommit.getMethod('order', 'resumeQueue')();
+		updateCommit.getMethod('report', 'resumeQueue')();
 	}
 
 	emitToAll(commits) {

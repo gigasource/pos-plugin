@@ -36,7 +36,7 @@ async function reportCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME,'setHighestCommitId', async function(commit) {
 	})
 
-	updateCommit.registerMethod(TYPENAME, 'resumeQueue', async function() {
+	updateCommit.registerMethod(TYPENAME, 'resumeQueue', function() {
 		updateCommit[TYPENAME].queue.resume();
 	})
 }
