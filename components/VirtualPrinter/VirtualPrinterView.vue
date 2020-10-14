@@ -6,7 +6,7 @@
         :do-load="loadMoreReports">
      <div class="virtualPrinter">
         <!-- header -->
-        <div class="virtualPrinter__header">
+        <div class="virtualPrinter__header" @touchend.stop="()=>{}">
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('all')" class="virtualPrinter__header__btn">All</g-btn>
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('bon')" class="virtualPrinter__header__btn">Bon</g-btn>
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('receipt')" class="virtualPrinter__header__btn">Receipt</g-btn>
@@ -97,7 +97,7 @@
           width: this.receiptWidth + 'px',
         }
       },
-    },
+    }
   }
 </script>
 
@@ -148,6 +148,10 @@
           padding-right: 0;
           flex-wrap: nowrap;
           border-width: 0;
+  
+          .input, .bs-tf-append-inner {
+            cursor: pointer;
+          }
         }
       }
     }
