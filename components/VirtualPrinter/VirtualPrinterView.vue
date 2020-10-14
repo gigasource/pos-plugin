@@ -96,7 +96,7 @@
 </script>
 
 <style scoped lang="scss">
-  $headerHeight: 60px;
+  $headerHeight: 46px;
   
   .virtualPrinterContainer {
     background-image: url('/plugins/pos-plugin/assets/out.png');
