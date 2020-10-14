@@ -11,7 +11,7 @@ module.exports = function (cms) {
 	// init frontend socket beforehand
 	this.cms.socket.on('connect', socket => {
 		socket.on('buildTempOrder', async (table, fn) => {
-			const order = await updateCommit.methods['order'].buildTempOrder(table);
+			const order = await updateCommit.getMethod('order', 'buildTempOrder')(table);
 			fn(order);
 		})
 	});
