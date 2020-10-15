@@ -16,7 +16,7 @@ module.exports = (cms) => {
           if (action.action === 'createOrder') {
             const query = JsonFn.parse(action.update.query);
             query._id = order._id;
-            action.query = JsonFn.stringify(query);
+            action.update.query = JsonFn.stringify(query);
           }
         })
       }
@@ -52,6 +52,7 @@ module.exports = (cms) => {
             action: 'printOrder',
             printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
             order: listOrder,
+            oldOrder,
             device
           })
         }
@@ -184,6 +185,8 @@ module.exports = (cms) => {
     })
 
     socket.on('move-items', async (table, newItems, currentOrder, currentOrderItems, cb = () => null) => {
+      const sentryTags = await getBaseSentryTags('moveItems');
+      console.debug(sentryTags, `2. POS backend: receive event moveItems`)
       const existingOrder = await cms.getModel('Order').findOne({ table, status: 'inProgress' })
       let newOrder
       if (existingOrder) {
@@ -198,6 +201,7 @@ module.exports = (cms) => {
           return list
         }, existingOrder.items)
         newOrder = await createOrderCommit(existingOrder, 'items', items);
+        console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
       } else {
         newOrder = await cms.getModel('OrderCommit').create([{
           type: 'order',
@@ -213,9 +217,11 @@ module.exports = (cms) => {
             })
           }
         }]);
+        console.debug(sentryTags, `3. POS backend: moved items to new order at table ${table}`)
       }
 
       await createOrderCommit(currentOrder, 'items', currentOrderItems)
+      console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
       cb(newOrder)
     })
   })
@@ -313,4 +319,20 @@ module.exports = (cms) => {
       await printInvoiceHandler(data.reportType, data.printData, data.device);
     }
   })
+}
+
+async function getBaseSentryTags(eventType) {
+  const appVersion = require('../../package').version;
+  const { deviceName } = global.APP_CONFIG;
+
+  let tag = `sentry:version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
+  const posSetting = await cms.getModel('PosSetting').findOne({})
+
+  if (posSetting.onlineDevice) {
+    const { id, store } = posSetting.onlineDevice
+    if (id) tag += `,clientId=${id}`;
+    if (store && store.name) tag += `,store=${store.name}`
+    if (store && store.alias) tag += `,alias=${store.alias}`
+  }
+  return tag;
 }

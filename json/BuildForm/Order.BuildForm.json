@@ -944,6 +944,11 @@
           "key": "sent",
           "type": "input@switch",
           "addable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "tseMethod",
+          "type": "input"
         }
       ],
       "default": null,
@@ -1561,13 +1566,57 @@
           "key": "sent",
           "type": "input@switch",
           "addable": true
+        },
+        {
+          "schemaType": "string",
+          "key": "tseMethod",
+          "type": "input"
         }
+      ],
+      "type": "tableArray",
+      "expansion": [
+        "originalPrice",
+        "taxes",
+        "printed",
+        "showPrice",
+        "date",
+        "gang",
+        "groupPrinter",
+        "takeout",
+        "uuid",
+        "discountResistance",
+        "isVoucher",
+        "cancellationQuantity",
+        "type",
+        "category",
+        "excludedFromSales",
+        "taxPart",
+        "product",
+        "attributes",
+        "unit",
+        "discountUnit",
+        "modifiers",
+        "course",
+        "separate",
+        "groupPrinter2"
       ]
     },
     {
       "_id": "5f851913f82189590a4803b0",
       "schemaType": "number",
       "key": "dailyId",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f871b54ab8c7f1a28523e82",
+      "schemaType": "string",
+      "key": "tseMethod",
+      "type": "input"
+    },
+    {
+      "_id": "5f871b54ab8c7f1a28523e81",
+      "schemaType": "number",
+      "key": "numberOfCustomers",
       "type": "input@number"
     }
   ],

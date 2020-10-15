@@ -10,7 +10,11 @@
          :style="getRoomObjectContainerStyle(roomObject)"
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          v-touch="getTouchHandlers(roomObject)"
-         :class="[...!editable && ['waves-effect', 'waves-red'], ...transferTableFrom && transferTableFrom.name === roomObject.name && ['animated', 'bounce', 'infinite']]"
+         :class="[
+           ...!editable && !isTableDisabled(roomObject) && ['waves-effect', 'waves-red'],
+           ...transferTableFrom && transferTableFrom.name === roomObject.name &&
+           ['animated', 'bounce', 'infinite']
+         ]"
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
@@ -43,7 +47,8 @@
       },
       roomObjects: Array, // table and wall
       transferTableFrom: null,
-      inProgressTable: Array
+      inProgressTable: Array,
+      disabledTables: Array
     },
     data: function () {
       return {
@@ -158,6 +163,10 @@
           Object.assign(style, { background: roomObj.bgColor })
         }
 
+        if (this.isTableDisabled(roomObj)) {
+          Object.assign(style, { opacity: 0.2 })
+        }
+
         return style
       },
       getRoomObjectStyle(roomObj) {
@@ -190,6 +199,10 @@
           return this.inProgressTable.includes(roomObj.name)
         return false
       },
+      isTableDisabled(roomObj) {
+        if (!this.disabledTables || !this.disabledTables.length) return
+        return this.disabledTables.includes(roomObj.name)
+      },
 
       // action trigger
       onMouseDown(e, roomObject, action) {
@@ -201,15 +214,13 @@
         }
 
         if (this.transferringTable) {
-          console.log('setTransferTableTo1')
           if (!this.isTableBusy(roomObject) && roomObject !== this.transferTableFrom) {
-            console.log('setTransferTableTo2')
             this.$emit('setTransferTableTo', roomObject)
           }
         }
 
         if (this.editable || (!this.editable && roomObject.type !== 'wall')) {
-          console.log('click handler emit')
+          if (this.isTableDisabled(roomObject)) return
           this.$emit('selectRoomObject', roomObject)
         }
       },
@@ -251,8 +262,9 @@
               }
               return
             }
-            console.log('end', item)
             if (this.editable || (!this.editable && item.type !== 'wall')) {
+              if (this.isTableDisabled(item)) return
+
               if (this.swiping) {
                 this.swiping = false
               } else {

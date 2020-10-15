@@ -5,15 +5,16 @@
         <div class="splitter" :style="isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}">
           <div class="splitter__header row-flex align-items-center">
             <div v-if="itemsToMove.length">
-              <span style="font-weight: 700; font-size: 15px">Items:</span>
+              <span class="mr-2" style="font-weight: 700; font-size: 15px">Items:</span>
               <span style="font-weight: 600; font-size: 18px; color: #ff4452">{{itemsToMove.length}}</span>
             </div>
             <g-spacer/>
             <g-btn-bs :uppercase="false"
+                      :disabled="!itemsToMove.length"
                       icon="icon-move-items"
                       background-color="#1271ff"
                       @click.stop="moveItems">
-              <span>Move items</span>
+              <span>Move Items</span>
             </g-btn-bs>
           </div>
           <div class="splitter__content">
@@ -97,24 +98,15 @@
       </div>
     </g-dialog>
 
-    <g-dialog v-model="showChooseTableDialog" width="75%" content-class="choose-table-dialog">
-      <g-card>
-        <g-card-title>Choose Table</g-card-title>
-        <g-card-text class="col-flex">
-          <pos-textfield-new v-model="chooseTableInput" label="Table" class="mb-5"/>
-          <g-spacer/>
-          <div class="keyboard">
-            <pos-keyboard-full @enter-pressed="submitTable"/>
-          </div>
-        </g-card-text>
-      </g-card>
-    </g-dialog>
+    <choose-table-dialog :table="currentTable" v-model="showChooseTableDialog" @submit="submitTable" />
   </div>
 </template>
 
 <script>
+  import ChooseTableDialog from './ChooseTableDialog';
   export default {
     name: 'PosOrderMoveItems',
+    components: { ChooseTableDialog },
     props: {
       value: Boolean,
       currentOrder: null,
@@ -132,7 +124,6 @@
         remainingItems: [],
         itemsToMove: [],
         showChooseTableDialog: false,
-        chooseTableInput: ''
       }
     },
     computed: {
@@ -143,6 +134,10 @@
         set(val) {
           this.$emit('input', val)
         }
+      },
+      currentTable() {
+        if (this.currentOrder) return this.currentOrder.table
+        return ''
       },
       username() {
         return this.user ? this.user.name : ''
@@ -212,7 +207,6 @@
         if (val) {
           this.$emit('moveItems', val, this.itemsToMove, this.remainingItems, () => {
             // cleanup
-            this.chooseTableInput = ''
             this.itemsToMove = []
             this.showChooseTableDialog = false
             this.internalValue = false
@@ -227,7 +221,9 @@
       },
       value(val) {
         this.itemsToMove = []
-
+        if (val) {
+          this.remainingItems = _.cloneDeep(this.currentOrder.items)
+        }
       }
     }
   }
@@ -342,21 +338,6 @@
         font-style: italic;
         font-weight: 700;
       }
-    }
-  }
-
-  .keyboard {
-    background-color: #bdbdbd;
-    padding: 0.5rem;
-    margin: 0 -16px -16px -16px;
-    max-height: 50%;
-
-    ::v-deep .key {
-      border: 1px solid #BDBDBD;
-      border-radius: 2px;
-      box-shadow: unset;
-      padding-top: 8px;
-      padding-bottom: 8px;
     }
   }
 </style>

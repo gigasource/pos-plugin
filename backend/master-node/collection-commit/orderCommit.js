@@ -158,9 +158,9 @@ async function orderCommit(updateCommit) {
 				updateCommit['order'].highestOrderCommitId++;
 			}
 			if (!commit.data.orderId) {
-				commit.data.orderId = updateCommit.highestOrderId;
-				updateCommit.highestOrderId++;
-			} else updateCommit.highestOrderId = commit.data.orderId;
+				commit.data.orderId = updateCommit['order'].highestOrderId;
+				updateCommit['order'].highestOrderId++;
+			} else updateCommit['order'].highestOrderId = commit.data.orderId;
 			// get query
 			const query = JsonFn.parse(commit.update.query);
 			query.id = commit.data.orderId;
@@ -364,10 +364,9 @@ async function orderCommit(updateCommit) {
 		return updateCommit['order'].highestOrderId - 1
 	})
 
-	updateCommit.registerMethod('order', 'doTask', function (commits, ack) {
+	updateCommit.registerMethod('order', 'doTask', function (commits) {
 		updateCommit['order'].queue.push({
-			commits,
-			ack
+			commits
 		});
 	})
 
@@ -387,8 +386,8 @@ async function orderCommit(updateCommit) {
 			commitsList.forEach(commit => {
 				if (commit.action !== 'createOrder') {
 					const query = (commit.update.query ? JsonFn.parse(commit.update.query) : null);
-					const condition = (commit.where ? JsonFn.parse(commit.where) : null);
-					if (condition && condition._id) condition._id = _id;
+					const condition = (commit.where ? JsonFn.parse(commit.where) : {});
+					condition._id = _id;
 					promiseList.push(updateCommit.orderModel[commit.update.method](condition, query));
 				}
 			})
