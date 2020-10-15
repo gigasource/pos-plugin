@@ -51,7 +51,7 @@
             reports = this.reports.filter(r => r.type === 'kitchen')
             break;
           case 'receipt':
-            reports = this.reports.filter(r => r.type === 'invoice')
+            reports = this.reports.filter(r => r.type === 'invoice' || r.type === 'entireReceipt')
         }
         
         if (this.printerGroupFilter === 'all')
