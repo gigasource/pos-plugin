@@ -708,6 +708,37 @@
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
+
+        if (this.currentOrder.numberOfCustomers) {
+          this.actionList.push({
+            type: 'order',
+            action: 'setOrderProps',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            data: {
+              table: this.currentOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {numberOfCustomers: this.currentOrder.numberOfCustomers}})
+            }
+          })
+        }
+
+        if (this.currentOrder.tseMethod) {
+          this.actionList.push({
+            type: 'order',
+            action: 'setOrderProps',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            data: {
+              table: this.currentOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {tseMethod: this.currentOrder.tseMethod}})
+            }
+          })
+        }
+
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
           this.actionList = [];
           this.currentOrder = { items: [], hasOrderWideDiscount: false }
@@ -750,21 +781,8 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
-      updateCurrentOrder(key, val, createCommit) {
+      updateCurrentOrder(key, val) {
         this.$set(this.currentOrder, key, val)
-
-        if (createCommit) {
-          this.actionList.push({
-            type: 'order',
-            action: 'setOrderProps',
-            where: jsonfn.stringify({ _id: this.currentOrder._id }),
-            table: this.currentOrder.table,
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({$set: {[key]: val}})
-            }
-          })
-        }
       },
       updatePrintedOrder(key, val) {
         this.$set(this.printedOrder, key, val)
@@ -1324,7 +1342,6 @@
       },
       'currentOrder.table': {
         async handler(val) {
-          this.actionList = []
           if (val) {
             const existingOrder = await this.getTempOrder();
             // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
@@ -1333,12 +1350,15 @@
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
               this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
+              this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
+              this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
               this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
               this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
               this.printedOrder = _.cloneDeep(this.currentOrder)
             }
           } else {
+            this.actionList = []
             this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
             this.printedOrder = _.cloneDeep(this.currentOrder)
           }

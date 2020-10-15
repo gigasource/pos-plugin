@@ -520,8 +520,10 @@
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
         this.table = this.$route.params.name
         const { tseMethod, numberOfCustomers } = this.$route.query
-        this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null, true)
-        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod, true)
+        if (numberOfCustomers !== undefined)
+        this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod)
+        if (tseMethod !== undefined)
+          this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null)
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
 
