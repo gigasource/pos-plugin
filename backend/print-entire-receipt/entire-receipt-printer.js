@@ -1,6 +1,17 @@
 const Vue = require('vue');
 const _ = require('lodash');
 const {renderer, print, groupArticles, getEscPrinter} = require('../print-utils/print-utils');
+const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
+const virtualPrinter = require('./virtual-printer');
+
+function createPureImagePrinter(escPrinter) {
+  return new PureImagePrinter(560, {
+    printFunctions: {
+      printPng: escPrinter.printPng.bind(escPrinter),
+      print: escPrinter.print.bind(escPrinter),
+    }
+  });
+}
 
 module.exports = async function (cms) {
   cms.socket.on('connect', socket => {
@@ -19,7 +30,7 @@ module.exports.printEntireReceiptHandler = printHandler
 
 async function printHandler(order, device) {
   // get device printers
-  const { printerGeneralSetting } = await cms.getModel('PosSetting').findOne()
+  const { printerGeneralSetting, generalSetting } = await cms.getModel('PosSetting').findOne()
   const groupPrinters = printerGeneralSetting.useMultiPrinterForEntirePrinter
     ? await cms.getModel('GroupPrinter').aggregate([
       { $unwind: { path: '$printers' } },
@@ -52,6 +63,8 @@ async function printHandler(order, device) {
     return acc
   }, [])
 
+  const { useVirtualPrinter } = generalSetting
+
   let results = []
   //render report
   await Promise.all(_.map(_groupPrinters, printer => {
@@ -65,13 +78,17 @@ async function printHandler(order, device) {
         fontSize: printer.printers.fontSize,
         marginTop: printer.printers.marginTop
       }
+      const printerInfo = printer.printers
 
-      const {escPOS} = printer.printers;
+      if (useVirtualPrinter)
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_ENTIRE_RECEIPT, null, [{printCanvas, props, printerInfo }]);
 
+      const {escPOS} = printerInfo;
+      const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
-        results.push(await printEsc(props, printer));
+        results.push(await printEsc(escPrinter, props, printerInfo));
       } else {
-        results.push(await printSsr(props, printer));
+        results.push(await printCanvas(createPureImagePrinter(escPrinter), props, printerInfo));
       }
 
       resolve();
@@ -82,8 +99,82 @@ async function printHandler(order, device) {
   return results
 }
 
-async function printEsc(props, {printers: printerInfo}) {
-  const printer = await getEscPrinter(printerInfo);
+async function printEsc(printer, props, printerInfo) {
+  const {items, table, time} = props;
+
+  function convertMoney(value) {
+    return !isNaN(value) ? value.toFixed(2) : value
+  }
+
+  printer.alignLeft();
+  printer.setTextQuadArea();
+  printer.bold(true);
+  if (table) printer.println(`Table: ${table}`);
+
+  printer.alignRight();
+  printer.setTextNormal();
+  printer.bold(true);
+  printer.println(time);
+  printer.drawLine();
+
+  printer.alignLeft();
+  items.forEach((item, index) => {
+    printer.bold(false);
+    const quantityColumnWidth = item.quantity.toString().length * 0.05;
+    const itemsColumnWidth = 0.92 - item.quantity.toString().length * 0.05;
+
+    printer.setTextQuadArea();
+    printer.tableCustom([
+      {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
+      {text: 'x', align: 'LEFT', width: 0.05, bold: true},
+      {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
+    ], {textDoubleWith: true});
+
+    if (item.modifiers) {
+      printer.setTextDoubleWidth();
+
+      item.modifiers.forEach(mod => {
+        let modifierText = `* ${mod.name}`
+        if (mod.price) modifierText += ` ${convertMoney(mod.price)}`;
+
+        printer.tableCustom([
+          {text: '', align: 'LEFT', width: quantityColumnWidth},
+          {text: '', align: 'LEFT', width: 0.05},
+          {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
+        ], {textDoubleWith: true});
+      });
+    }
+
+    if (index < items.length - 1) {
+      printer.setTextNormal();
+      if (item.separate) {
+        printer.println('************************');
+      } else {
+        printer.newLine();
+        printer.newLine();
+      }
+    }
+  });
+
+  printer.setTextNormal();
+  printer.bold(true);
+  printer.drawLine();
+
+  printer.setTextNormal();
+  printer.bold(true);
+  printer.alignCenter();
+  printer.println('Entire Receipt');
+
+  await printer.print();
+
+  return {
+    items: props.items,
+    printer: printerInfo,
+    name: printerInfo.name,
+  }
+}
+
+async function printCanvas(printer, props, printerInfo) {
   const {items, table, time} = props;
 
   function convertMoney(value) {
