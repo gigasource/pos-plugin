@@ -1,17 +1,44 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
 const mongoose = require('mongoose');
-/*
-queue: for order commit
- */
+const JsonFn = require('json-fn');
+
+const updateMethodList = ['update', 'findOneAndUpdate', 'findOneAndModify', 'insertOne', 'create', 'insertMany', 'remove', 'deleteMany', 'insert'];
+
 const updateCommit = {
-	commitType: ['order', 'report'],
+	commitType: ['order', 'report', 'pos'],
 	init: async function (handler) {
 		updateCommit.handler = handler;
 		updateCommit.orderCommitModel = cms.Types['OrderCommit'].Model;
+		updateCommit.posCommitModel = cms.Types['PosCommit'].Model;
 		updateCommit.orderModel = cms.Types['Order'].Model;
 		// updateCommit.systemCommitModel = cms.Types['SystemCommit'].Model;
 		await require('./collection-commit')(updateCommit);
+		mongoose.set('debug', function (coll, method, ...query) {
+			if (updateMethodList.includes(method) && global.APP_CONFIG.whiteListCollection.filter(collection => {
+					return collection.name === coll;
+				}).length) {
+				updateCommit.handler.sendChangeRequest({
+					type: 'pos',
+					action: 'update',
+					temp: false,
+					groupTempId: mongoose.Types.ObjectId().toString(),
+					data: {
+						collection: coll
+					},
+					update: {
+						method: method,
+						query: JsonFn.stringify(query)
+					}
+				})
+			} else {
+				try {
+					const collection = mongoose.connection.db.collection(coll);
+					return collection[method].apply(collection, query);
+				} catch (err) {
+				}
+			}
+		})
 	},
 	handleCommit: function (commits) {
 		updateCommit.commitType.forEach(type => {
