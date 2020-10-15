@@ -21,7 +21,7 @@
             <div v-for="item in itemsToMove" :key="item._id.toString()" class="item">
               <div class="item-detail" @click.stop="returnItem(item)">
                 <div>
-                  <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
+                  <p :style="[item.printed && { opacity: 0.55 }]" class="item-detail__name">{{item.id}}. {{item.name}}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
                       {{$t('common.currency', storeLocale)}} {{item.originalPrice | convertMoney}}
@@ -207,10 +207,10 @@
         if (val) {
           this.$emit('moveItems', val, this.itemsToMove, this.remainingItems, () => {
             // cleanup
+            this.$router.go(-1)
             this.itemsToMove = []
             this.showChooseTableDialog = false
             this.internalValue = false
-            this.$router.go(-1)
           })
         }
       }

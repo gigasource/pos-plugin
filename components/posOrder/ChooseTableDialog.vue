@@ -8,8 +8,8 @@
       </g-card-title>
       <g-card-text class="fill-height">
         <g-tabs v-model="tab" :items="tabs" vertical class="fill-height">
-          <g-tab-item v-for="item in tabs" :item="item">
-            <template v-if="item === tabs[0]">
+          <g-tab-item v-for="item in tabs" :item="item" class="pl-2" :key="item.title">
+            <template v-if="item.title === 'Manual'">
               <pos-textfield-new v-model="chooseTableInput" label="Table" class="mb-5"/>
               <g-spacer/>
               <div class="keyboard">
@@ -72,7 +72,6 @@
       },
       selectRoomObj(room) {
         this.$emit('submit', room.name)
-        this.internalValue = false
       },
       async loadTableStatus() {
         const inProgressOrders = await cms.getModel('Order').find({ status: 'inProgress' })
@@ -83,7 +82,6 @@
       },
       submit() {
         this.$emit('submit', this.chooseTableInput)
-        this.internalValue = false
       },
       close() {
         this.internalValue = false
@@ -96,7 +94,12 @@
             this.chooseTableInput = ''
             await this.loadTableStatus()
             const rooms = await cms.getModel('Room').find().lean()
-            this.tabs = [{ title: 'Input' }, ...rooms.map(i => ({ title: i.name, room: i.roomObjects }))]
+            this.tabs = [
+              ...rooms
+                .sort((cur, next) => cur.order || 0 - next.order || 0)
+                .map(i => ({ title: i.name, room: i.roomObjects })),
+              { title: 'Manual' }
+            ]
             this.tab = this.tabs[0]
           }
         },
