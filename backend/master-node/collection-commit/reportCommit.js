@@ -39,6 +39,14 @@ async function reportCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'resumeQueue', function() {
 		updateCommit[TYPENAME].queue.resume();
 	})
+
+	updateCommit.registerMethod(TYPENAME, 'requireSync', function () {
+		return false;
+	})
+
+	updateCommit.registerMethod(TYPENAME, 'checkHighestCommitId', function () {
+		return 0;
+	})
 }
 
 module.exports = reportCommit;

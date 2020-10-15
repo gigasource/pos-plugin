@@ -116,7 +116,7 @@
         return new Promise(async(resolve, reject) => {
           if (_.isNil(z)) reject()
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -150,7 +150,7 @@
 
         return new Promise(async(resolve, reject) => {
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -195,7 +195,7 @@
       printMonthlyReport(report) {
         return new Promise(async(resolve, reject) => {
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -225,7 +225,7 @@
       printStaffReport(report) {
         return new Promise(async(resolve, reject) => {
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {

@@ -171,7 +171,9 @@ class Node {
 				}
 			}
 		})
-		updateCommit.getMethod('order', resumeQueue());
+		updateCommit.getMethod('order', 'resumeQueue')();
+		updateCommit.getMethod('report', 'resumeQueue')();
+		updateCommit.getMethod('pos', 'resumeQueue')();
 	}
 
 	turnOff() {

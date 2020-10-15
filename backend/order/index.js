@@ -96,7 +96,7 @@ module.exports = (cms) => {
     })
 
     socket.on('print-invoice', async (order) => {
-      await cms.getModel('OrderCommit').create([{
+      await cms.getModel('OrderCommit').addCommits([{
         type: 'order',
         action: 'printOrder',
         printType: 'invoice',
@@ -169,7 +169,7 @@ module.exports = (cms) => {
         if (print) {
           // todo use in master
           // await printInvoiceHandler('OrderReport', mappedOrder, device)
-          await cms.getModel('OrderCommit').create([{
+          await cms.getModel('OrderCommit').addCommits([{
             type: 'order',
             action: 'printOrder',
             printType: 'invoice',
@@ -203,7 +203,7 @@ module.exports = (cms) => {
         newOrder = await createOrderCommit(existingOrder, 'items', items);
         console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
       } else {
-        newOrder = await cms.getModel('OrderCommit').create([{
+        newOrder = await cms.getModel('OrderCommit').addCommits([{
           type: 'order',
           action: 'createOrder',
           where: null,
@@ -263,7 +263,7 @@ module.exports = (cms) => {
   }
 
   async function createOrderCommit(order, key, value) {
-    return await cms.getModel('OrderCommit').create([{
+    return await cms.getModel('OrderCommit').addCommits([{
       type: 'order',
       action: 'setOrderProps',
       where: JSON.stringify({ _id: order._id }),
@@ -282,7 +282,7 @@ module.exports = (cms) => {
   }
 
   async function createOrderCommits(commits) {
-    return cms.getModel('OrderCommit').create(commits);
+    return cms.getModel('OrderCommit').addCommits(commits);
   }
 
   async function mapGroupPrinter(items) {

@@ -11,15 +11,12 @@ async function posCommit(updateCommit) {
 
 	const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId');
 	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
+	updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating = 0;
 	updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
 		const { commits } = data;
 		const newCommits = [];
 		let lastTempId;
 		for (let commit of commits) {
-			if (lastTempId && lastTempId != commit.groupTempId && global.APP_CONFIG.isMaster) {
-				const deleteCommit = await updateCommit.getMethod(TYPENAME, 'deleteTempCommit')({ groupTempId: lastTempId});
-				if (deleteCommit) newCommits.push(deleteCommit);
-			}
 			lastTempId = commit.groupTempId;
 			const result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
 			if (result) {
@@ -27,9 +24,7 @@ async function posCommit(updateCommit) {
 				newCommits.push(commit);
 			}
 		}
-		if (global.APP_CONFIG.isMaster && lastTempId) {
-			const deleteCommit = await updateCommit.getMethod(TYPENAME, 'deleteTempCommit')({ groupTempId: lastTempId});
-			newCommits.push(deleteCommit);
+		if (global.APP_CONFIG.isMaster && lastTempId && newCommits.length) {
 			updateCommit.handler.emitToAll(newCommits);
 		}
 		cb(null);
@@ -60,6 +55,10 @@ async function posCommit(updateCommit) {
 				})
 				collection[commit.update.method].apply(collection, query);
 			})
+			if (!commit.commitId) {
+				commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
+				updateCommit[TYPENAME].highestPosCommitId++;
+			}
 			await updateCommit.posCommitModel.create(commit);
 			return true;
 		} catch (err) {
@@ -84,6 +83,14 @@ async function posCommit(updateCommit) {
 
 	updateCommit.registerMethod(TYPENAME, 'setHighestCommitId', function (id) {
 		updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating = id;
+	})
+
+	updateCommit.registerMethod(TYPENAME, 'checkHighestCommitId', function (id) {
+		updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating =
+			Math.max(updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating, updateCommit[TYPENAME].highestPosCommitId);
+		if (!id) return updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating;
+		// node highest commit id must be equal to master
+		return id == updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating ? null : updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating;
 	})
 }
 

@@ -89,7 +89,7 @@ class Master {
 		await _this.getStoreId();
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
-				if (key != 'create') {
+				if (key != 'addCommits') {
 					return target[key];
 				}
 				return async function (commits) {

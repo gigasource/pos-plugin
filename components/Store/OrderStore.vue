@@ -549,7 +549,7 @@
             reject()
           }
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -810,7 +810,7 @@
           return Promise.all(commits.map(this.createOrderCommit))
       },
       async createOrderCommit(commit) { // key-value pair
-        return await cms.getModel('OrderCommit').create([{
+        return await cms.getModel('OrderCommit').addCommits([{
           type: 'order',
           action: 'setOrderProps',
           where: jsonfn.stringify({ _id: this.currentOrder._id }),
@@ -866,7 +866,7 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -885,7 +885,7 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
