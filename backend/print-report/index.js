@@ -3,7 +3,7 @@ const { getEscPrinter, getGroupPrinterInfo } = require('../print-utils/print-uti
 const fs = require('fs');
 const path = require('path');
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
-const virtualPrinter = require('./virtual-printer')
+const virtualPrinter = require('../print-utils/virtual-printer')
 
 module.exports = async function (cms) {
 }

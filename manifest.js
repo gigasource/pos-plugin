@@ -103,7 +103,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print-report/virtual-printer.js',
+      path: 'backend/print-utils/virtual-printer.js',
       type: 'backend'
     },
     {
