@@ -38,21 +38,21 @@
             <template v-if="deliveryOrderMode === 'mobile'">
               <div class="row-flex mt-3 w-100">
                 <div style="flex: 1; margin-right: 2px">
-                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true"/>
+                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true" virtual-event/>
                 </div>
                 <div style="flex: 1; margin-left: 2px">
-                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true"/>
+                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true" virtual-event/>
                 </div>
               </div>
               <div class="row-flex">
                 <div class="col-9">
-                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable
+                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable virtual-event
                               :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
                               @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
                 </div>
                 <div class="flex-grow-1 ml-1">
-                  <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true"/>
+                  <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true" virtual-event/>
                 </div>
               </div>
             </template>
@@ -218,7 +218,7 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable
+          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable virtual-event
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"

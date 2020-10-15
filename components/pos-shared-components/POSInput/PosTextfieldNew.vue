@@ -44,13 +44,13 @@
       if (this.isMobile) {
         return (
             <g-text-field ref="textfield" {...{
-              props: { outlined: true, ...props, ...this.isIOS && { virtualEvent: true }},
+              props: { outlined: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }},
               on: { input: (val) => this.internalValue = val, ...this.listeners }
             }} />
         )
       }
       return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
-        props: { large: true, ...props, ...this.isIOS && { virtualEvent: true }},
+        props: { large: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }},
         on: { input: (val) => this.internalValue = val, ...this.listeners }
       }} />
     }

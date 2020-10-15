@@ -4,7 +4,8 @@
   export default {
     name: 'PosTextField',
     props: {
-      label: null
+      label: null,
+      virtualEvent: Boolean
     },
     mixins: [GTextFieldBs],
     mounted() {

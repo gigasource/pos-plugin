@@ -57,12 +57,12 @@
               <g-icon>icon-cancel3</g-icon>
             </div>
             <g-combobox style="width: 98%" :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur
-                        :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)"
+                        :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)" virtual-event
                         @input="e => selectAutocompleteAddress(e, i)"/>
-            <pos-textfield-new style="width: 24%" :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street"/>
-            <pos-textfield-new style="width: 24%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode"/>
-            <pos-textfield-new style="width: 24%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house"/>
-            <pos-textfield-new style="width: 24%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city"/>
+            <pos-textfield-new style="width: 23%" :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street"/>
+            <pos-textfield-new style="width: 23%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode"/>
+            <pos-textfield-new style="width: 23%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house"/>
+            <pos-textfield-new style="width: 23%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city"/>
           </div>
           <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" @click="addAddress">add_circle</g-icon>
         </div>
