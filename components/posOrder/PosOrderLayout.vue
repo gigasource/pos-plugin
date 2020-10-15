@@ -238,6 +238,12 @@
         type = this.$router.currentRoute.query.type
       }
       await this.loadOrderLayout(type);
+      cms.socket.on('updateProductProps', async () => {
+        await this.loadOrderLayout(type);
+      })
+    },
+    deactivated() {
+      cms.socket.off('updateProductProps');
     },
     watch: {
       orderLayout() {

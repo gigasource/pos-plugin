@@ -25,7 +25,7 @@ async function orderCommit(updateCommit) {
 	}
 
 	function validateOrderId(commit) {
-		if (commit.data.orderId && updateCommit[TYPENAME].activeOrders[commit.data.table] &&
+		if (commit.data && commit.data.orderId && updateCommit[TYPENAME].activeOrders[commit.data.table] &&
 			commit.data.orderId != updateCommit[TYPENAME].activeOrders[commit.data.table]._id.toString()) {
 			console.error('This commit is for old order');
 			return false;
@@ -146,7 +146,7 @@ async function orderCommit(updateCommit) {
 			Math.max(updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating, updateCommit[TYPENAME].highestOrderCommitId);
 		if (!id) return updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating;
 		// node highest commit id must be equal to master
-		return id == updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating ? null : updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating;
+		return id <= updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating ? null : updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating;
 	})
 
 	updateCommit.registerMethod(TYPENAME, 'setHighestCommitId', function (id) {

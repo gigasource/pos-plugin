@@ -15,7 +15,7 @@ const updateCommit = {
 		// updateCommit.systemCommitModel = cms.Types['SystemCommit'].Model;
 		await require('./collection-commit')(updateCommit);
 		mongoose.set('debug', function (coll, method, ...query) {
-			if (updateMethodList.includes(method) && global.APP_CONFIG.whiteListCollection.filter(collection => {
+			if (updateMethodList.includes(method) && _.filter(global.APP_CONFIG.whiteListCollection, collection => {
 					return collection.name === coll;
 				}).length) {
 				updateCommit.handler.sendChangeRequest({

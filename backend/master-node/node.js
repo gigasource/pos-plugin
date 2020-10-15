@@ -141,7 +141,7 @@ class Node {
 		const _model = cms.Types['OrderCommit'].Model;
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
-				if (key != 'create') {
+				if (key != 'addCommits') {
 					return target[key];
 				}
 				return async function (commits) {
@@ -154,7 +154,7 @@ class Node {
 						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
-						table = commit.data.table;
+						if (commit.data) table = commit.data.table;
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
@@ -163,7 +163,7 @@ class Node {
 					} else {
 						throw new Error('Can not connect to master');
 					}
-					await updateCommit.getMethod('order', updateTempCommit(commits));
+					await updateCommit.getMethod('order', 'updateTempCommit')(commits);
 					if (commits.length && commits[0].data && commits[0].data.split) {
 						return commits[0].update.create;
 					}

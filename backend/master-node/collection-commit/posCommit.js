@@ -6,6 +6,12 @@ const _ = require('lodash');
 async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
 
+	function emitToFrontend(commit) {
+		if (commit.data.collection === 'products') {
+			cms.socket.emit('updateProductProps');
+		}
+	}
+
 	if (!updateCommit[TYPENAME])
 		updateCommit[TYPENAME] = {};
 
@@ -18,6 +24,7 @@ async function posCommit(updateCommit) {
 		let lastTempId;
 		for (let commit of commits) {
 			lastTempId = commit.groupTempId;
+			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
 			const result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
 			if (result) {
 				if (commit.commitId) updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
@@ -59,6 +66,7 @@ async function posCommit(updateCommit) {
 				commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
 				updateCommit[TYPENAME].highestPosCommitId++;
 			}
+			emitToFrontend(commit);
 			await updateCommit.posCommitModel.create(commit);
 			return true;
 		} catch (err) {
@@ -90,7 +98,7 @@ async function posCommit(updateCommit) {
 			Math.max(updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating, updateCommit[TYPENAME].highestPosCommitId);
 		if (!id) return updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating;
 		// node highest commit id must be equal to master
-		return id == updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating ? null : updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating;
+		return id <= updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating ? null : updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating;
 	})
 }
 
