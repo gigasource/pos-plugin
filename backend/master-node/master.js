@@ -105,7 +105,7 @@ class Master {
 						})
 						updateCommit.handleCommit(commits);
 						await updateCommit.getMethod('order', 'updateTempCommit')(commits);
-						if (commits.length && commits[0].split) {
+						if (commits.length && commits[0].data && commits[0].data.split) {
 							return JSON.parse(commits[0].update.query);
 						}
 						return await updateCommit.getMethod('order', 'buildTempOrder')(table);
@@ -118,6 +118,7 @@ class Master {
 
 		updateCommit.getMethod('order', 'resumeQueue')();
 		updateCommit.getMethod('report', 'resumeQueue')();
+		updateCommit.getMethod('pos', 'resumeQueue')();
 	}
 
 	emitToAll(commits) {
@@ -142,6 +143,11 @@ class Master {
 
 	async syncDataToOnlineOrder() {
 		await syncExistingData();
+	}
+
+	async sendChangeRequest(commit) {
+		commit.storeId = await this.getStoreId();
+		updateCommit.handleCommit([commit]);
 	}
 }
 

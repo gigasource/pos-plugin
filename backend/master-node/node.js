@@ -155,9 +155,6 @@ class Node {
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
 						table = commit.data.table;
-						if (commit.split && commit.update.create) {
-							commit.update.create._id = mongoose.Types.ObjectId();
-						}
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
@@ -167,7 +164,7 @@ class Node {
 						throw new Error('Can not connect to master');
 					}
 					await updateCommit.getMethod('order', updateTempCommit(commits));
-					if (commits.length && commits[0].split) {
+					if (commits.length && commits[0].data && commits[0].data.split) {
 						return commits[0].update.create;
 					}
 					return await updateCommit.getMethod('order', 'buildTempOrder')(table);
