@@ -44,6 +44,9 @@
           await this.loadTableStatus()
         }, 500)
       })
+      cms.socket.on('updateRooms', async () => {
+        await this.loadRoom()
+      })
     },
     activated() {
       setTimeout(async () => {
@@ -51,6 +54,7 @@
       }, 500)
     },
     destroyed() {
+      cms.socket.off('updateRooms');
       cms.socket.off('update-table-status')
     },
     watch: {
