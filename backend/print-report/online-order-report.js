@@ -1,4 +1,4 @@
-const { convertHtmlToPng } = require('../print-utils/print-utils');
+const {convertHtmlToPng} = require('../print-utils/print-utils');
 const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 const dayjs = require('dayjs');
@@ -8,25 +8,25 @@ function convertMoney(value) {
   return !isNaN(value) ? value.toFixed(2) : value
 }
 
-function getShippingFee({ discounts, shippingFee }) {
+function getShippingFee({discounts, shippingFee}) {
   if (!discounts || !discounts.length) return shippingFee
 
   const freeShipping = discounts.find(item => item.type === 'freeShipping');
   return freeShipping ? freeShipping.value : shippingFee;
 }
 
-function getPayment({ payment }) {
-  const { type } = payment[0];
+function getPayment({payment}) {
+  const {type} = payment[0];
   return type.charAt(0).toUpperCase() + type.slice(1) //capitalize
 }
 
-async function makePrintData(cms, { orderId }, locale) {
+async function makePrintData(cms, {orderId}, locale) {
   const order = await cms.getModel('Order').findById(orderId);
 
   if (!order) return null;
 
   const {
-    customer: { name, phone, address, zipCode, company },
+    customer: {name, phone, address, zipCode, company},
     note,
     items,
     shippingFee,
@@ -116,20 +116,20 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
 
   const itemColumnWidth = printerType === 'escpos' ? 0.4 : 0.44;
   escPrinter.tableCustom([
-    { text: locale.printing.item, align: 'LEFT', width: itemColumnWidth },
-    { text: locale.printing.quantity, align: 'RIGHT', width: 0.12 },
-    { text: locale.printing.price, align: 'RIGHT', width: 0.22 },
-    { text: locale.printing.total, align: 'RIGHT', width: 0.22 },
+    {text: locale.printing.item, align: 'LEFT', width: itemColumnWidth},
+    {text: locale.printing.quantity, align: 'RIGHT', width: 0.12},
+    {text: locale.printing.price, align: 'RIGHT', width: 0.22},
+    {text: locale.printing.total, align: 'RIGHT', width: 0.22},
   ])
   escPrinter.drawLine()
 
   escPrinter.setTextNormal()
   items.forEach(item => {
     escPrinter.tableCustom([
-      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth },
-      { text: `${item.quantity}`, align: 'RIGHT', width: 0.12 },
-      { text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22 },
-      { text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22 },
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth},
+      {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
+      {text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22},
+      {text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22},
     ])
 
     if (item.modifiers && item.modifiers.length) {
@@ -137,10 +137,10 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
         const modifierText = `* ${mod.name}`
 
         escPrinter.tableCustom([
-          { text: modifierText, align: 'LEFT', width: itemColumnWidth },
-          { text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12 },
-          { text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22 },
-          { text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22 },
+          {text: modifierText, align: 'LEFT', width: itemColumnWidth},
+          {text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12},
+          {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
+          {text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22},
         ])
       })
     }
@@ -170,7 +170,7 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
   await escPrinter.print()
 }
 
-async function printCanvas(printer, printData, groupPrinter, printerType) {
+async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) {
   let {
     orderNumber,
     customerName,
@@ -190,89 +190,92 @@ async function printCanvas(printer, printData, groupPrinter, printerType) {
     payment
   } = printData;
 
-  printer.setTextDoubleHeight();
-  printer.bold(true);
+  await canvasPrinter.setTextDoubleHeight();
+  await canvasPrinter.bold(true);
 
   const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
   if (deliveryTime) {
     printerType === 'escpos'
-        ? printer.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
-        : printer.tableCustom([
-          {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
-          {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
-        ]);
+      ? await canvasPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
+      : await canvasPrinter.tableCustom([
+        {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
+        {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
+      ]);
   } else {
-    printer.alignCenter();
-    printer.println(`${orderType} #${orderNumber}`);
+    await canvasPrinter.alignCenter();
+    await canvasPrinter.println(`${orderType} #${orderNumber}`);
   }
 
   if (customerCompany) {
-    printer.invert(true);
-    printer.println(`${locale.printing.company}`);
-    printer.invert(false);
+    await canvasPrinter.invert(true);
+    await canvasPrinter.println(`${locale.printing.company}`);
+    await canvasPrinter.invert(false);
   }
 
-  printer.newLine()
+  await canvasPrinter.newLine()
 
-  printer.alignLeft()
-  printer.setTextNormal()
-  printer.println(customerName)
-  customerCompany && printer.println(customerCompany)
-  customerAddress && printer.println(customerAddress)
-  customerZipCode && printer.println(customerZipCode)
-  printer.println(customerPhone)
-  note && printer.println(note)
-  printer.newLine()
+  await canvasPrinter.alignLeft()
+  await canvasPrinter.setTextNormal()
+  await canvasPrinter.println(customerName)
+  customerCompany && await canvasPrinter.println(customerCompany)
+  customerAddress && await canvasPrinter.println(customerAddress)
+  customerZipCode && await canvasPrinter.println(customerZipCode)
+  await canvasPrinter.println(customerPhone)
+  note && await canvasPrinter.println(note)
+  await canvasPrinter.newLine()
 
-  printer.drawLine()
-  printer.bold(true)
+  await canvasPrinter.drawLine()
+  await canvasPrinter.bold(true)
 
   const itemColumnWidth = printerType === 'escpos' ? 0.4 : 0.44;
-  printer.tableCustom([
-    { text: locale.printing.item, align: 'LEFT', width: itemColumnWidth },
-    { text: locale.printing.quantity, align: 'RIGHT', width: 0.12 },
-    { text: locale.printing.price, align: 'RIGHT', width: 0.22 },
-    { text: locale.printing.total, align: 'RIGHT', width: 0.22 },
+  await canvasPrinter.tableCustom([
+    {text: locale.printing.item, align: 'LEFT', width: itemColumnWidth},
+    {text: locale.printing.quantity, align: 'RIGHT', width: 0.12},
+    {text: locale.printing.price, align: 'RIGHT', width: 0.22},
+    {text: locale.printing.total, align: 'RIGHT', width: 0.22},
   ])
-  printer.drawLine()
+  await canvasPrinter.drawLine()
 
-  printer.setTextNormal()
-  items.forEach(item => {
-    printer.tableCustom([
-      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth },
-      { text: `${item.quantity}`, align: 'RIGHT', width: 0.12 },
-      { text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22 },
-      { text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22 },
+  await canvasPrinter.setTextNormal()
+  await Promise.all(items.map(async item => {
+    await canvasPrinter.tableCustom([
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth},
+      {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
+      {text: `${convertMoney(item.originalPrice || item.price)}`, align: 'RIGHT', width: 0.22},
+      {text: `${convertMoney((item.originalPrice || item.price) * item.quantity)}`, align: 'RIGHT', width: 0.22},
     ])
 
     if (item.modifiers && item.modifiers.length) {
-      item.modifiers.forEach(mod => {
+      await Promise.all(item.modifiers.map(async mod => {
         const modifierText = `* ${mod.name}`
 
-        printer.tableCustom([
-          { text: modifierText, align: 'LEFT', width: itemColumnWidth },
-          { text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12 },
-          { text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22 },
-          { text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22 },
+        await canvasPrinter.tableCustom([
+          {text: modifierText, align: 'LEFT', width: itemColumnWidth},
+          {text: `${mod.quantity * item.quantity}`, align: 'RIGHT', width: 0.12},
+          {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
+          {text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22},
         ])
-      })
+      }));
     }
-  })
-  printer.drawLine()
-  type === 'delivery' && printer.leftRight(locale.printing.shippingFee, convertMoney(getShippingFee(printData)))
-  discounts.forEach(item => {
-    printer.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
-  })
-  printer.bold(true)
-  printer.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
-  printer.leftRight('Payment', payment)
+  }));
+
+  await canvasPrinter.drawLine()
+  type === 'delivery' && await canvasPrinter.leftRight(locale.printing.shippingFee, convertMoney(getShippingFee(printData)))
+
+  await Promise.all(discounts.map(async item => {
+    await canvasPrinter.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
+  }))
+
+  await canvasPrinter.bold(true)
+  await canvasPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)
+  await canvasPrinter.leftRight('Payment', payment)
 
   if (payment !== 'Cash') {
-    printer.newLine()
-    printer.alignCenter()
-    printer.setTextDoubleHeight()
-    printer.bold(true)
-    printer.println(locale.printing.paid)
+    await canvasPrinter.newLine()
+    await canvasPrinter.alignCenter()
+    await canvasPrinter.setTextDoubleHeight()
+    await canvasPrinter.bold(true)
+    await canvasPrinter.println(locale.printing.paid)
   }
 
   // printer.newLine()
@@ -280,14 +283,14 @@ async function printCanvas(printer, printData, groupPrinter, printerType) {
   // printer.setTextNormal()
   // printer.println(date)
 
-  await printer.print()
+  await canvasPrinter.print()
 }
 
 async function printSsr(printer, printData) {
   const OrderDelivery = require('../../dist/OrderDelivery.vue');
 
   const component = new Vue({
-    components: { OrderDelivery },
+    components: {OrderDelivery},
     render(h) {
       return h('OrderDelivery', {
         props: {

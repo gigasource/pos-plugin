@@ -1,4 +1,4 @@
-const { convertHtmlToPng } = require('../print-utils/print-utils');
+const {convertHtmlToPng} = require('../print-utils/print-utils');
 const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const Vue = require('vue');
 const dayjs = require('dayjs')
@@ -7,13 +7,13 @@ function convertMoney(value) {
   return !isNaN(value) ? value.toFixed(2) : value
 }
 
-async function makePrintData(cms, { orderId }, locale) {
+async function makePrintData(cms, {orderId}, locale) {
   const order = await cms.getModel('Order').findById(orderId).lean();
 
   if (!order) return null;
 
   const {
-    customer: { name, phone, address, zipCode, company },
+    customer: {name, phone, address, zipCode, company},
     note,
     items,
     shippingFee,
@@ -109,18 +109,18 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
 
     escPrinter.setTextQuadArea();
     escPrinter.tableCustom([
-      { text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true },
-      { text: 'x', align: 'LEFT', width: 0.05, bold: true },
-      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemsColumnWidth },
-    ], { textDoubleWith: true });
+      {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
+      {text: 'x', align: 'LEFT', width: 0.05, bold: true},
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemsColumnWidth},
+    ], {textDoubleWith: true});
 
     if (item.note) {
       escPrinter.setTextDoubleWidth();
       escPrinter.tableCustom([
-        { text: '', align: 'LEFT', width: quantityColumnWidth },
-        { text: '', align: 'LEFT', width: 0.05 },
-        { text: `* ${item.note}`, align: 'LEFT', width: itemsColumnWidth },
-      ], { textDoubleWith: true });
+        {text: '', align: 'LEFT', width: quantityColumnWidth},
+        {text: '', align: 'LEFT', width: 0.05},
+        {text: `* ${item.note}`, align: 'LEFT', width: itemsColumnWidth},
+      ], {textDoubleWith: true});
     }
 
     if (item.modifiers) {
@@ -130,10 +130,10 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
         let modifierText = `* ${mod.name} ${convertMoney(mod.price)} ${locale.printing.currency}`
 
         escPrinter.tableCustom([
-          { text: '', align: 'LEFT', width: quantityColumnWidth },
-          { text: '', align: 'LEFT', width: 0.05 },
-          { text: modifierText, align: 'LEFT', width: itemsColumnWidth },
-        ], { textDoubleWith: true });
+          {text: '', align: 'LEFT', width: quantityColumnWidth},
+          {text: '', align: 'LEFT', width: 0.05},
+          {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
+        ], {textDoubleWith: true});
       });
     }
 
@@ -162,7 +162,7 @@ async function printEscPos(escPrinter, printData, groupPrinter, printerType) {
   await escPrinter.print()
 }
 
-async function printCanvas(printer, printData, groupPrinter, printerType) {
+async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) {
   const {
     orderNumber,
     customerName,
@@ -184,100 +184,100 @@ async function printCanvas(printer, printData, groupPrinter, printerType) {
 
   const tableWidthPercentTotal = printerType === 'escpos' ? 0.97 : 1;
 
-  printer.setTextDoubleHeight();
-  printer.bold(true);
+  await canvasPrinter.setTextDoubleHeight();
+  await canvasPrinter.bold(true);
 
   const orderType = type === 'delivery' ? locale.printing.delivery : locale.printing.pickup;
   if (deliveryTime) {
     printerType === 'escpos'
-        ? printer.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
-        : printer.tableCustom([
-          {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
-          {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
-        ]);
+      ? await canvasPrinter.leftRight(`${orderType} #${orderNumber}`, deliveryTime)
+      : await canvasPrinter.tableCustom([
+        {text: `${orderType} #${orderNumber}`, align: 'LEFT', width: 0.7, bold: true},
+        {text: deliveryTime, align: 'RIGHT', width: 0.3, bold: true},
+      ]);
   } else {
-    printer.alignCenter();
-    printer.println(`${orderType} #${orderNumber}`);
+    await canvasPrinter.alignCenter();
+    await canvasPrinter.println(`${orderType} #${orderNumber}`);
   }
 
   if (customerCompany) {
-    printer.invert(true);
-    printer.println(`${locale.printing.company}`);
-    printer.invert(false);
+    await canvasPrinter.invert(true);
+    await canvasPrinter.println(`${locale.printing.company}`);
+    await canvasPrinter.invert(false);
   }
 
-  printer.newLine()
+  await canvasPrinter.newLine()
 
-  printer.alignLeft()
-  printer.setTextNormal()
-  printer.println(customerName)
-  customerCompany && printer.println(customerCompany)
-  customerAddress && printer.println(customerAddress)
-  customerZipCode && printer.println(customerZipCode)
-  printer.println(customerPhone)
-  note && printer.println(note)
-  printer.newLine()
+  await canvasPrinter.alignLeft()
+  await canvasPrinter.setTextNormal()
+  await canvasPrinter.println(customerName)
+  customerCompany && await canvasPrinter.println(customerCompany)
+  customerAddress && await canvasPrinter.println(customerAddress)
+  customerZipCode && await canvasPrinter.println(customerZipCode)
+  await canvasPrinter.println(customerPhone)
+  note && await canvasPrinter.println(note)
+  await canvasPrinter.newLine()
 
-  printer.bold(true);
-  printer.drawLine()
-  filteredItems.forEach((item, index) => {
-    printer.bold(false);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine()
+  await Promise.all(filteredItems.map(async (item, index) => {
+    await canvasPrinter.bold(false);
     const quantityColumnWidth = item.quantity.toString().length * 0.06;
     const itemsColumnWidth = tableWidthPercentTotal - 0.05 - quantityColumnWidth;
 
-    printer.setTextQuadArea();
-    printer.tableCustom([
-      { text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true },
-      { text: 'x', align: 'LEFT', width: 0.05, bold: true },
-      { text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemsColumnWidth },
-    ], { textDoubleWith: true });
+    await canvasPrinter.setTextQuadArea();
+    await canvasPrinter.tableCustom([
+      {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
+      {text: 'x', align: 'LEFT', width: 0.05, bold: true},
+      {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemsColumnWidth},
+    ], {textDoubleWith: true});
 
     if (item.note) {
-      printer.setTextDoubleWidth();
-      printer.tableCustom([
-        { text: '', align: 'LEFT', width: quantityColumnWidth },
-        { text: '', align: 'LEFT', width: 0.05 },
-        { text: `* ${item.note}`, align: 'LEFT', width: itemsColumnWidth },
-      ], { textDoubleWith: true });
+      await canvasPrinter.setTextDoubleWidth();
+      await canvasPrinter.tableCustom([
+        {text: '', align: 'LEFT', width: quantityColumnWidth},
+        {text: '', align: 'LEFT', width: 0.05},
+        {text: `* ${item.note}`, align: 'LEFT', width: itemsColumnWidth},
+      ], {textDoubleWith: true});
     }
 
     if (item.modifiers) {
-      printer.setTextDoubleWidth();
+      await canvasPrinter.setTextDoubleWidth();
 
-      item.modifiers.forEach(mod => {
+      await Promise.all(item.modifiers.map(async mod => {
         let modifierText = `* ${mod.name} ${convertMoney(mod.price)} ${locale.printing.currency}`
 
-        printer.tableCustom([
-          { text: '', align: 'LEFT', width: quantityColumnWidth },
-          { text: '', align: 'LEFT', width: 0.05 },
-          { text: modifierText, align: 'LEFT', width: itemsColumnWidth },
-        ], { textDoubleWith: true });
-      });
+        await canvasPrinter.tableCustom([
+          {text: '', align: 'LEFT', width: quantityColumnWidth},
+          {text: '', align: 'LEFT', width: 0.05},
+          {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
+        ], {textDoubleWith: true});
+      }));
     }
 
     if (index < filteredItems.length - 1) {
-      printer.setTextNormal();
-      printer.newLine();
-      printer.newLine();
+      await canvasPrinter.setTextNormal();
+      await canvasPrinter.newLine();
+      await canvasPrinter.newLine();
     }
-  })
-  printer.setTextNormal()
-  printer.bold(true);
-  printer.drawLine()
+  }))
+  await canvasPrinter.setTextNormal()
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine()
 
   if (forwardedStore) {
-    printer.setTextNormal();
-    printer.setTextDoubleHeight();
-    printer.bold(true);
-    printer.alignCenter();
-    printer.println(forwardedStore)
+    await canvasPrinter.setTextNormal();
+    await canvasPrinter.setTextDoubleHeight();
+    await canvasPrinter.bold(true);
+    await canvasPrinter.alignCenter();
+    await canvasPrinter.println(forwardedStore)
   }
-  // printer.newLine()
-  // printer.alignCenter()
-  // printer.setTextNormal()
-  // printer.println(date)
+  //await printer.newLine()
+  //await printer.alignCenter()
+  //await printer.setTextNormal()
+  //await printer.println(date)
 
-  await printer.print()
+  await canvasPrinter.print()
 }
 
 async function printSsr(printer, printData, groupPrinter) {
@@ -287,7 +287,7 @@ async function printSsr(printer, printData, groupPrinter) {
   if (!filteredItems.length) return
 
   const component = new Vue({
-    components: { KitchenDelivery },
+    components: {KitchenDelivery},
     render(h) {
       return h('KitchenDelivery', {
         props: {

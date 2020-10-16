@@ -76,7 +76,7 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(printer, printData) {
+async function printCanvas(canvasPrinter, printData) {
   const {orderSalesByStaff: {name, user, from, groupByTax, groupByPayment}} = printData;
 
   function convertMoney(value) {
@@ -87,62 +87,61 @@ async function printCanvas(printer, printData) {
     return val ? dayjs(val).format('DD/MM/YYYY') : ''
   }
 
-  printer.bold(true);
-  printer.alignLeft();
-  printer.println(`Staff name: ${name}`);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.println(`Staff name: ${name}`);
 
   if (user[name]) {
-    printer.println(`Report Date: ${formatDate(from)}`);
-    printer.bold(false);
-    printer.println(`First Order: ${formatDate(user[name].from)}`);
-    printer.println(`Last Order: ${formatDate(user[name].to)}`);
+    await canvasPrinter.println(`Report Date: ${formatDate(from)}`);
+    await canvasPrinter.bold(false);
+    await canvasPrinter.println(`First Order: ${formatDate(user[name].from)}`);
+    await canvasPrinter.println(`Last Order: ${formatDate(user[name].to)}`);
   }
 
-  printer.bold(true);
-  printer.drawLine();
-  printer.println('Sales');
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
+  await canvasPrinter.println('Sales');
 
   if (user[name]) {
-    printer.bold(false);
-    printer.leftRight('Total', convertMoney(user[name].vSum));
-    printer.leftRight('Sub-total', convertMoney(user[name].net));
-    printer.leftRight('Tax', convertMoney(user[name].tax));
+    await canvasPrinter.bold(false);
+    await canvasPrinter.leftRight('Total', convertMoney(user[name].vSum));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(user[name].net));
+    await canvasPrinter.leftRight('Tax', convertMoney(user[name].tax));
   }
 
-  printer.drawLine();
+  await canvasPrinter.drawLine();
 
   if (groupByTax) {
-    printer.bold(false);
-    Object.keys(groupByTax).forEach(taxGroup => {
+    await canvasPrinter.bold(false);
+    await Promise.all(Object.keys(groupByTax).map(async taxGroup => {
       const {gross, net, salesTax} = groupByTax[taxGroup];
 
-      printer.println(`Tax ${taxGroup}%:`);
-      printer.leftRight('Total', convertMoney(gross));
-      printer.leftRight('Sub-total', convertMoney(net));
-      printer.leftRight('Tax', convertMoney(salesTax));
-      printer.newLine();
-    });
+      await canvasPrinter.println(`Tax ${taxGroup}%:`);
+      await canvasPrinter.leftRight('Total', convertMoney(gross));
+      await canvasPrinter.leftRight('Sub-total', convertMoney(net));
+      await canvasPrinter.leftRight('Tax', convertMoney(salesTax));
+      await canvasPrinter.newLine();
+    }));
   }
 
   if (user[name]) {
-    printer.leftRight('Vouchers Sold', convertMoney(0));
-    printer.leftRight('Vouchers Used', convertMoney(0));
-    printer.leftRight('Discount', convertMoney(user[name].discount));
+    await canvasPrinter.leftRight('Vouchers Sold', convertMoney(0));
+    await canvasPrinter.leftRight('Vouchers Used', convertMoney(0));
+    await canvasPrinter.leftRight('Discount', convertMoney(user[name].discount));
   }
 
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
   if (groupByPayment) {
-    Object.keys(groupByPayment).forEach(paymentType => {
+    await Promise.all(Object.keys(groupByPayment).map(async paymentType => {
       const saleAmount = groupByPayment[paymentType];
-
-      printer.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)} Sales: ${convertMoney(saleAmount)}`);
-    });
-    printer.println(`Returned Total: ${convertMoney(0)}`);
+      await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)} Sales: ${convertMoney(saleAmount)}`);
+    }));
+    await canvasPrinter.println(`Returned Total: ${convertMoney(0)}`);
   }
 
-  await printer.print();
+  await canvasPrinter.print();
 }
 
 async function printSsr(printer, printData) {

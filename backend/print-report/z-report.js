@@ -129,7 +129,7 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(printer, printData) {
+async function printCanvas(canvasPrinter, printData) {
   const {
     companyName, companyAddress, companyTel, companyVatNumber, reportDate, firstOrderDateString, lastOrderDateString,
     subTotal, taxTotal, sumTotal, discount, reportByPayment, reportGroups, z,
@@ -139,59 +139,59 @@ async function printCanvas(printer, printData) {
     return !isNaN(value) ? value.toFixed(2) : value
   }
 
-  printer.alignCenter();
-  printer.bold(true);
-  printer.println(companyName);
-  printer.bold(false);
-  printer.setTextNormal();
-  printer.println(companyAddress);
-  printer.println(`Tel: ${companyTel}`);
-  printer.println(`VAT Reg No: ${companyVatNumber}`);
+  await canvasPrinter.alignCenter();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(companyName);
+  await canvasPrinter.bold(false);
+  await canvasPrinter.setTextNormal();
+  await canvasPrinter.println(companyAddress);
+  await canvasPrinter.println(`Tel: ${companyTel}`);
+  await canvasPrinter.println(`VAT Reg No: ${companyVatNumber}`);
 
-  printer.newLine();
-  printer.setTextDoubleHeight();
-  printer.bold(true);
-  printer.println('Z-Report');
+  await canvasPrinter.newLine();
+  await canvasPrinter.setTextDoubleHeight();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println('Z-Report');
 
-  printer.newLine();
-  printer.bold(false);
-  printer.setTextNormal();
-  printer.alignLeft();
-  printer.println(`Report Date: ${reportDate}`);
-  printer.println(`Z-Number: ${z}`);
-  printer.println(`First Order: ${firstOrderDateString}`);
-  printer.println(`Last Order: ${lastOrderDateString}`);
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.newLine();
+  await canvasPrinter.bold(false);
+  await canvasPrinter.setTextNormal();
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.println(`Report Date: ${reportDate}`);
+  await canvasPrinter.println(`Z-Number: ${z}`);
+  await canvasPrinter.println(`First Order: ${firstOrderDateString}`);
+  await canvasPrinter.println(`Last Order: ${lastOrderDateString}`);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  printer.println('Sales');
-  printer.bold(false);
-  printer.leftRight("Total", convertMoney(sumTotal));
-  printer.leftRight("Sub-total", convertMoney(subTotal));
-  printer.leftRight("Tax", convertMoney(taxTotal));
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.println('Sales');
+  await canvasPrinter.bold(false);
+  await canvasPrinter.leftRight("Total", convertMoney(sumTotal));
+  await canvasPrinter.leftRight("Sub-total", convertMoney(subTotal));
+  await canvasPrinter.leftRight("Tax", convertMoney(taxTotal));
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  printer.bold(false);
-  Object.keys(reportGroups).forEach(key => {
-    printer.println(`Tax (${key}%)`);
-    printer.leftRight('Total', convertMoney(reportGroups[key][`sum${key}`]));
-    printer.leftRight('Sub-total', convertMoney(reportGroups[key][`net${key}`]));
-    printer.leftRight('Tax', convertMoney(reportGroups[key][`tax${key}`]));
-    printer.newLine();
-  });
+  await canvasPrinter.bold(false);
+  await Promise.all(Object.keys(reportGroups).map(async key => {
+    await canvasPrinter.println(`Tax (${key}%)`);
+    await canvasPrinter.leftRight('Total', convertMoney(reportGroups[key][`sum${key}`]));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(reportGroups[key][`net${key}`]));
+    await canvasPrinter.leftRight('Tax', convertMoney(reportGroups[key][`tax${key}`]));
+    await canvasPrinter.newLine();
+  }));
 
-  printer.bold(false);
-  printer.leftRight('Discount', `${convertMoney(discount)}`);
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.bold(false);
+  await canvasPrinter.leftRight('Discount', `${convertMoney(discount)}`);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  printer.bold(false);
-  Object.keys(reportByPayment).forEach(paymentType => {
-    printer.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
-  });
+  await canvasPrinter.bold(false);
+  await Promise.all(Object.keys(reportByPayment).map(async paymentType => {
+    await canvasPrinter.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
+  }));
 
-  await printer.print();
+  await canvasPrinter.print();
 }
 
 async function printSsr(printer, printData) {

@@ -33,8 +33,8 @@ async function printKitchen({order, device}, callback = () => null) {
     })
     const receipts = getReceiptsFromOrder(order);
 
-    const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
-    const { useVirtualPrinter } = posSetting.generalSetting
+    const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
+    const {useVirtualPrinter} = posSetting.generalSetting
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo
@@ -42,17 +42,23 @@ async function printKitchen({order, device}, callback = () => null) {
       const printData = await getPrintData(receiptsForPrinter, order, printerInfo);
 
       if (useVirtualPrinter)
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{ printCanvas, printData, printerInfo }])
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{
+          printCanvas,
+          printData,
+          printerInfo
+        }])
 
       const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
         results.push(await printEscPos(escPrinter, printData, printerInfo));
       } else {
-        results.push(await printCanvas(createPureImagePrinter(escPrinter), printData, printerInfo));
+        const pureImagePrinter = createPureImagePrinter(escPrinter);
+        results.push(await printCanvas(pureImagePrinter, printData, printerInfo));
+        await pureImagePrinter.cleanup();
       }
     }
 
-    const printResults = { success: true, results };
+    const printResults = {success: true, results};
     callback(printResults);
     return printResults
   } catch (e) {
@@ -75,8 +81,8 @@ async function printKitchenCancel({order, device}, callback = () => null) {
     })
     const receipts = getReceiptsFromOrder(order);
 
-    const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
-    const { useVirtualPrinter } = posSetting.generalSetting
+    const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
+    const {useVirtualPrinter} = posSetting.generalSetting
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo
@@ -84,7 +90,11 @@ async function printKitchenCancel({order, device}, callback = () => null) {
       const printData = await getPrintData(receiptsForPrinter, order, printerInfo);
 
       if (useVirtualPrinter)
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{ printCanvas, printData, printerInfo }])
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{
+          printCanvas,
+          printData,
+          printerInfo
+        }])
 
       const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
@@ -155,11 +165,11 @@ function getReceiptsFromOrder(order) {
 
 function getReceiptsForPrinter(receipts, printer) {
   return Object.keys(receipts)
-  .filter(key => {
-    const {groupPrinter} = JSON.parse(key);
-    return printer.name === groupPrinter;
-  })
-  .map(key => receipts[key]);
+    .filter(key => {
+      const {groupPrinter} = JSON.parse(key);
+      return printer.name === groupPrinter;
+    })
+    .map(key => receipts[key]);
 }
 
 async function getPrintData(receipts, order, printer) {
@@ -284,50 +294,51 @@ async function printEscPos(printer, printData, printerInfo, cancel = false) {
   return results;
 }
 
-async function printCanvas(printer, printData, printerInfo, cancel = false) {
+async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false) {
   const results = [];
   await Promise.all(printData.map(props => {
     return new Promise(async resolve => {
       const {items, table, user, time, isKitchenReceipt, course, takeout} = props;
+
       function convertMoney(value) {
         return !isNaN(value) ? value.toFixed(2) : value
       }
 
       if (cancel) {
-        printer.alignCenter()
-        printer.setTextQuadArea()
-        printer.bold(true);
-        printer.println('** CANCEL **')
-        printer.newLine();
+        await canvasPrinter.alignCenter()
+        await canvasPrinter.setTextQuadArea()
+        await canvasPrinter.bold(true);
+        await canvasPrinter.println('** CANCEL **')
+        await canvasPrinter.newLine();
       }
 
-      printer.alignLeft();
-      printer.setTextQuadArea();
-      printer.bold(true);
-      if (takeout) printer.println('TAKE AWAY');
-      if (table) printer.println(`Table: ${table}`);
+      await canvasPrinter.alignLeft();
+      await canvasPrinter.setTextQuadArea();
+      await canvasPrinter.bold(true);
+      if (takeout) await canvasPrinter.println('TAKE AWAY');
+      if (table) await canvasPrinter.println(`Table: ${table}`);
 
-      printer.alignRight();
-      printer.setTextNormal();
-      printer.bold(true);
-      printer.println(time);
-      printer.drawLine();
+      await canvasPrinter.alignRight();
+      await canvasPrinter.setTextNormal();
+      await canvasPrinter.bold(true);
+      await canvasPrinter.println(time);
+      await canvasPrinter.drawLine();
 
-      printer.alignLeft();
-      items.forEach((item, index) => {
-        printer.bold(false);
-        printer.setTextQuadArea();
+      await canvasPrinter.alignLeft();
+      await Promise.all(items.map(async (item, index) => {
+        await canvasPrinter.bold(false);
+        await canvasPrinter.setTextQuadArea();
         const quantityColumnWidth = item.quantity.toString().length * 0.05;
         const itemsColumnWidth = 0.92 - item.quantity.toString().length * 0.05;
 
         if (cancel) {
-          printer.tableCustom([
+          await canvasPrinter.tableCustom([
             {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
             {text: 'x', align: 'LEFT', width: 0.05, bold: true},
             {text: item.name, align: 'LEFT', width: itemsColumnWidth},
           ], {textDoubleWith: true});
         } else {
-          printer.tableCustom([
+          await canvasPrinter.tableCustom([
             {text: item.quantity, align: 'LEFT', width: quantityColumnWidth, bold: true},
             {text: 'x', align: 'LEFT', width: 0.05, bold: true},
             {text: `${item.id}. ${item.name}`, align: 'LEFT', width: itemsColumnWidth},
@@ -335,44 +346,43 @@ async function printCanvas(printer, printData, printerInfo, cancel = false) {
         }
 
         if (item.modifiers) {
-          printer.setTextDoubleWidth();
+          await canvasPrinter.setTextDoubleWidth();
 
-          item.modifiers.forEach(mod => {
+          await Promise.all(item.modifiers.map(async mod => {
             let modifierText = `* ${mod.name}`
             if (mod.price) modifierText += ` ${convertMoney(mod.price)}`;
 
-            printer.tableCustom([
+            await canvasPrinter.tableCustom([
               {text: '', align: 'LEFT', width: quantityColumnWidth},
               {text: '', align: 'LEFT', width: 0.05},
               {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
             ], {textDoubleWith: true});
-          });
+          }));
         }
 
         if (index < items.length - 1) {
-          printer.setTextNormal();
+          await canvasPrinter.setTextNormal();
           if (item.separate) {
-            printer.println('************************');
+            await canvasPrinter.println('************************');
           } else {
-            printer.newLine();
-            printer.newLine();
+            await canvasPrinter.newLine();
+            await canvasPrinter.newLine();
           }
         }
-      });
+      }));
 
-      printer.setTextNormal();
-      printer.bold(true);
-      printer.drawLine();
+      await canvasPrinter.setTextNormal();
+      await canvasPrinter.bold(true);
+      await canvasPrinter.drawLine();
 
-      printer.setTextNormal();
-      printer.bold(true);
-      printer.alignCenter();
-      if (course && course > 1) printer.println(`Course ${course}`);
-      if (isKitchenReceipt) printer.println(`${printerInfo.name} Printer${user ? ` - ${user}` : ''}`);
-      else printer.println('Entire Receipt');
+      await canvasPrinter.setTextNormal();
+      await canvasPrinter.bold(true);
+      await canvasPrinter.alignCenter();
+      if (course && course > 1) await canvasPrinter.println(`Course ${course}`);
+      if (isKitchenReceipt) await canvasPrinter.println(`${printerInfo.name} Printer${user ? ` - ${user}` : ''}`);
+      else await canvasPrinter.println('Entire Receipt');
 
-      await printer.print();
-      printer.cleanup();
+      await canvasPrinter.print();
 
       results.push({
         items: props.items,

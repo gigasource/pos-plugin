@@ -113,7 +113,7 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(printer, printData) {
+async function printCanvas(canvasPrinter, printData) {
   const {
     name, address, telephone, taxNumber, date, from, to, sum, net, tax, discount, sumByPayment,
     sum0, net0, tax0, sum7, net7, tax7, sum19, net19, tax19
@@ -127,77 +127,77 @@ async function printCanvas(printer, printData) {
     return !isNaN(value) ? value.toFixed(2) : value
   }
 
-  printer.alignCenter();
-  printer.setTextDoubleHeight();
-  printer.bold(true);
-  printer.println(name);
+  await canvasPrinter.alignCenter();
+  await canvasPrinter.setTextDoubleHeight();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(name);
 
-  printer.bold(false);
-  printer.setTextNormal();
-  printer.println(address);
-  printer.println(`Tel: ${telephone}`);
-  printer.println(`VAT Reg No: ${taxNumber}`);
+  await canvasPrinter.bold(false);
+  await canvasPrinter.setTextNormal();
+  await canvasPrinter.println(address);
+  await canvasPrinter.println(`Tel: ${telephone}`);
+  await canvasPrinter.println(`VAT Reg No: ${taxNumber}`);
 
-  printer.newLine();
-  printer.setTextDoubleHeight();
-  printer.bold(true);
-  printer.println('X-Report');
+  await canvasPrinter.newLine();
+  await canvasPrinter.setTextDoubleHeight();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println('X-Report');
 
-  printer.newLine();
-  printer.setTextNormal();
-  printer.alignLeft();
-  printer.bold(true);
-  printer.println(`Report Date: ${date}`);
-  printer.bold(false);
-  printer.println(`First Order: ${getDateTimeString(from)}`);
-  printer.println(`Last Order: ${getDateTimeString(to)}`);
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.newLine();
+  await canvasPrinter.setTextNormal();
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(`Report Date: ${date}`);
+  await canvasPrinter.bold(false);
+  await canvasPrinter.println(`First Order: ${getDateTimeString(from)}`);
+  await canvasPrinter.println(`Last Order: ${getDateTimeString(to)}`);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  printer.println('Sales');
-  printer.bold(false);
-  printer.leftRight('Total', convertMoney(sum));
-  printer.leftRight('Sub-total', convertMoney(net));
-  printer.leftRight('Tax', convertMoney(tax));
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.println('Sales');
+  await canvasPrinter.bold(false);
+  await canvasPrinter.leftRight('Total', convertMoney(sum));
+  await canvasPrinter.leftRight('Sub-total', convertMoney(net));
+  await canvasPrinter.leftRight('Tax', convertMoney(tax));
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  printer.bold(false);
+  await canvasPrinter.bold(false);
 
   if (sum0) {
-    printer.println('Tax 0%:');
-    printer.leftRight('Total', convertMoney(sum0));
-    printer.leftRight('Sub-total', convertMoney(net0));
-    printer.leftRight('Total', convertMoney(tax0));
-    printer.newLine();
+    await canvasPrinter.println('Tax 0%:');
+    await canvasPrinter.leftRight('Total', convertMoney(sum0));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(net0));
+    await canvasPrinter.leftRight('Total', convertMoney(tax0));
+    await canvasPrinter.newLine();
   }
 
   if (sum7) {
-    printer.println('Tax 7%:');
-    printer.leftRight('Total', convertMoney(sum7));
-    printer.leftRight('Sub-total', convertMoney(net7));
-    printer.leftRight('Total', convertMoney(tax7));
-    printer.newLine();
+    await canvasPrinter.println('Tax 7%:');
+    await canvasPrinter.leftRight('Total', convertMoney(sum7));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(net7));
+    await canvasPrinter.leftRight('Total', convertMoney(tax7));
+    await canvasPrinter.newLine();
   }
 
   if (sum19) {
-    printer.println('Tax 19%:');
-    printer.leftRight('Total', convertMoney(sum19));
-    printer.leftRight('Sub-total', convertMoney(net19));
-    printer.leftRight('Total', convertMoney(tax19));
-    printer.newLine();
+    await canvasPrinter.println('Tax 19%:');
+    await canvasPrinter.leftRight('Total', convertMoney(sum19));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(net19));
+    await canvasPrinter.leftRight('Total', convertMoney(tax19));
+    await canvasPrinter.newLine();
   }
 
-  printer.leftRight('Discount', convertMoney(discount));
-  printer.bold(true);
-  printer.drawLine();
+  await canvasPrinter.leftRight('Discount', convertMoney(discount));
+  await canvasPrinter.bold(true);
+  await canvasPrinter.drawLine();
 
-  Object.keys(sumByPayment).forEach(paymentType => {
+  await Promise.all(Object.keys(sumByPayment).map(async paymentType => {
     const paymentAmount = sumByPayment[paymentType];
-    printer.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
-  });
+    await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
+  }));
 
-  await printer.print();
+  await canvasPrinter.print();
 }
 
 async function printSsr(printer, printData) {
