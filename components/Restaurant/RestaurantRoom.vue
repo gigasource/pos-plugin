@@ -24,7 +24,7 @@
     name: 'RestaurantRoom',
     injectService: ['PosStore:isMobile'],
     props: {
-      id: String
+      id: null
     },
     data() {
       return {

@@ -109,7 +109,7 @@ module.exports = (cms) => {
       try {
         const updatedSplit = await createOrderCommits([{
           type: 'order',
-          action: 'setOrderProps',
+          action: 'update',
           data: {
             split: true,
           },
@@ -146,11 +146,11 @@ module.exports = (cms) => {
             }
           }])
         } else {
-          const excludes = ['_id', 'table', 'id', 'splitId']
+          const excludes = ['_id', 'table', 'id', 'splitId', 'status']
 
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
-            action: 'setOrderProps',
+            action: 'update',
             where: JSON.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
@@ -163,6 +163,20 @@ module.exports = (cms) => {
             }
           })).value()
           actionList.push(...updates)
+          actionList.push({
+            type: 'order',
+            action: 'closeOrder',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: {status: 'paid'}
+              })
+            }
+          })
           newOrder = await createOrderCommits(actionList)
         }
 
@@ -265,7 +279,7 @@ module.exports = (cms) => {
   async function createOrderCommit(order, key, value) {
     return await cms.getModel('OrderCommit').addCommits([{
       type: 'order',
-      action: 'setOrderProps',
+      action: 'update',
       where: JSON.stringify({ _id: order._id }),
       data: {
         table: order.table,
