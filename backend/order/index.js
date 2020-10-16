@@ -20,12 +20,43 @@ module.exports = (cms) => {
           }
         })
       }
-      const diff = _.differenceWith(order.items, oldOrder.items, _.isEqual);
+
+      const posSettings = await cms.getModel('PosSetting').findOne().lean()
+      const { printerGeneralSetting } = posSettings
+      const shouldMerge = printerGeneralSetting && printerGeneralSetting.mergeAfterPrint
+
+      if (shouldMerge) {
+        order.items = mergeOrderItems(order.items).map(i => ({
+          ...i,
+          printed: true,
+          sent: true
+        }))
+        oldOrder.items = mergeOrderItems(oldOrder.items)
+
+        actionList.push({
+          type: 'order',
+          action: 'setOrderProps',
+          where: JSON.stringify({ _id: order._id }),
+          data: {
+            table: order.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: JSON.stringify({
+              $set: {items: order.items}
+            })
+          }
+        })
+      }
+
+      const diff = _.differenceWith(order.items, oldOrder.items, (item, otherItem) => {
+        return isSameProduct(item, otherItem, shouldMerge) && item.quantity === otherItem.quantity
+      });
       const printLists = diff.reduce((lists, current) => {
-        if (!oldOrder.items.some(i => i._id === current._id)) {
+        if (!oldOrder.items.some(i => isSameProduct(i, current, shouldMerge))) {
           if (current.quantity > 0) lists.addList.push(current)
         } else {
-          const product = oldOrder.items.find(i => i._id === current._id)
+          const product = oldOrder.items.find(i => isSameProduct(i, current, shouldMerge))
 
           if (product) {
             const qtyChange = current.quantity - product.quantity
@@ -78,17 +109,7 @@ module.exports = (cms) => {
         return list
       }, [])
 
-      const mappedActionList = mergedActionList.map(action => {
-        if (action.type === 'order' && action.action === 'addItem') {
-          const query = JsonFn.parse(action.update.query)
-          query['$push']['items'].sent = true;
-          query['$push']['items'].printed = true;
-          action.update.query = JsonFn.stringify(query);
-        }
-        return action
-      })
-
-
+      const mappedActionList = markPrintedItemCommits(mergedActionList)
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
@@ -272,7 +293,9 @@ module.exports = (cms) => {
       cashback,
       table: order.table,
       splitId: order.splitId,
-      status: 'paid',
+      numberOfCustomers: order.numberOfCustomers,
+      tseMethod: order.tseMethod,
+      status: 'paid'
     }
   }
 
@@ -297,6 +320,18 @@ module.exports = (cms) => {
 
   async function createOrderCommits(commits) {
     return cms.getModel('OrderCommit').addCommits(commits);
+  }
+
+  function markPrintedItemCommits(commits) {
+    return commits.map(action => {
+      if (action.type === 'order' && action.action === 'addItem') {
+        const query = JsonFn.parse(action.update.query)
+        query['$push']['items'].sent = true;
+        query['$push']['items'].printed = true;
+        action.update.query = JsonFn.stringify(query);
+      }
+      return action
+    })
   }
 
   async function mapGroupPrinter(items) {
@@ -349,4 +384,46 @@ async function getBaseSentryTags(eventType) {
     if (store && store.alias) tag += `,alias=${store.alias}`
   }
   return tag;
+}
+
+function isSameProduct(item, otherItem, merge) {
+  if (merge) {
+    const sameProduct = item.product === otherItem.product
+    const samePrice = item.price === otherItem.price
+    const sameCourse = item.course === otherItem.course
+
+    return sameProduct && samePrice && sameCourse && isSameModifiers(item, otherItem)
+  }
+
+  return item._id.toString() === otherItem._id.toString()
+}
+
+function isSameModifiers(item, otherItem) {
+  function mapModifier(mods) {
+    return mods.map(i => _.omit(i, '_id')).sort((cur, next) => {
+      if (cur.name === next.name) {
+        return cur.price - next.price
+      }
+      return cur.name > next.name
+    })
+  }
+
+  return _.isEqualWith(item.modifiers || [], otherItem.modifiers || [], (mods, otherMods) => {
+    const sortedMods = mapModifier(mods)
+    const sortedOtherMods = mapModifier(otherMods)
+    return _.isEqual(sortedMods, sortedOtherMods)
+  })
+}
+
+function mergeOrderItems(items) {
+  let resultArr = [];
+  items.forEach(product => {
+    const existingProduct = resultArr.find(r => isSameProduct(r, product, true))
+    if (existingProduct) {
+      existingProduct.quantity = existingProduct.quantity + product.quantity
+    } else {
+      resultArr.push(_.cloneDeep(product));
+    }
+  })
+  return resultArr
 }
