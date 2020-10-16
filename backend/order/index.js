@@ -35,7 +35,7 @@ module.exports = (cms) => {
 
         actionList.push({
           type: 'order',
-          action: 'setOrderProps',
+          action: 'update',
           where: JSON.stringify({ _id: order._id }),
           data: {
             table: order.table,
