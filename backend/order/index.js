@@ -20,7 +20,8 @@ module.exports = (cms) => {
           }
         })
       }
-      actionList.push(...getRecentItemCommits(order, oldOrder))
+      const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldOrder.items)
+      actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
       const shouldMerge = await getMergeOrderSettings()
 
       if (shouldMerge) {
@@ -76,14 +77,7 @@ module.exports = (cms) => {
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
         if (listOrder && listOrder.items && listOrder.items.length) {
-          list.push({
-            type: 'order',
-            action: 'printOrder',
-            printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
-            order: listOrder,
-            oldOrder,
-            device
-          })
+          list.push(getPrintCommit(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device))
         }
         return list
       }, [])
@@ -115,13 +109,7 @@ module.exports = (cms) => {
     })
 
     socket.on('print-invoice', async (order) => {
-      await cms.getModel('OrderCommit').addCommits([{
-        type: 'order',
-        action: 'printOrder',
-        printType: 'invoice',
-        order,
-        device
-      }])
+      await cms.getModel('OrderCommit').addCommits([getPrintCommit('invoice', order, device)])
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
@@ -152,7 +140,18 @@ module.exports = (cms) => {
       try {
         const mappedOrder = await mapOrder(order, user)
         const oldOrder = await cms.getModel('Order').findById(order._id)
-        actionList.push(...getRecentItemCommits(order, oldOrder))
+        const oldItems = (oldOrder && oldOrder.items) || []
+        const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldItems)
+        actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
+        if (recentItems.length) {
+          const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
+          actionList.push(getPrintCommit('kitchenAdd', printOrder, device))
+        }
+
+        if (recentCancellationItems.length) {
+          const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
+          actionList.push(getPrintCommit('kitchenCancel', printOrder, device))
+        }
 
         let newOrder
         if (isSplit) {
@@ -236,13 +235,8 @@ module.exports = (cms) => {
 
 
         if (print) {
-          await cms.getModel('OrderCommit').addCommits([{
-            type: 'order',
-            action: 'printOrder',
-            printType: 'invoice',
-            order: mappedOrder,
-            device
-          }])
+          await cms.getModel('OrderCommit').addCommits([
+            getPrintCommit('invoice', mappedOrder, device)])
         }
 
         cb(newOrder)
@@ -300,13 +294,9 @@ module.exports = (cms) => {
       }
       // commits: print, set sent/printed items
       if (itemsToPrint.length) {
-        await cms.getModel('OrderCommit').addCommits([{
-          type: 'order',
-          action: 'printOrder',
-          printType: 'kitchenAdd',
-          order: Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint }),
-          device
-        }])
+        const printOrder = Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint });
+        await cms.getModel('OrderCommit').addCommits([
+          getPrintCommit('kitchenAdd', printOrder, device)])
       }
       cb(newOrder)
     })
@@ -506,9 +496,7 @@ function getRecentQuantityItems(items, oldItems = []) {
   }, { recentItems: [], recentCancellationItems: [] })
 }
 
-function getRecentItemCommits(order, oldOrder) {
-  const oldItems = (oldOrder && oldOrder.items) || []
-  const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldItems)
+function getRecentItemCommits(recentItems, recentCancellationItems, order) {
   const actionList = []
 
   if (recentItems.length) {
@@ -546,4 +534,14 @@ function getRecentItemCommits(order, oldOrder) {
   }
 
   return actionList
+}
+
+function getPrintCommit(printType, order, device) {
+  return {
+    type: 'order',
+    action: 'printOrder',
+    printType: printType,
+    order,
+    device
+  }
 }
