@@ -200,21 +200,26 @@ async function orderCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'closeOrder', async function (commit) {
 		try {
 			// Verify id for commit and order
-			if (!validateOrderId(commit)) return;
-			const condition = getCondition(commit);
-			if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp > COMMIT_CLOSE_TIME_OUT) return null;
-			if (!updateCommit[TYPENAME].activeOrders[commit.data.table]) {
-				console.error('Order has been closed');
-				return null;
+			let order;
+			if (commit.data && commit.data.mutate) {
+				if (!validateOrderId(commit)) return;
+				const condition = getCondition(commit);
+				if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp > COMMIT_CLOSE_TIME_OUT) return null;
+				if (!updateCommit[TYPENAME].activeOrders[commit.data.table]) {
+					console.error('Order has been closed');
+					return null;
+				}
+				delete updateCommit[TYPENAME].activeOrders[commit.data.table];
+				setCommitId(commit);
+				const query = JsonFn.parse(commit.update.query);
+				await updateCommit.orderModel.findOneAndUpdate(condition, { $set: { id: updateCommit[TYPENAME].highestOrderId } });
+				updateCommit[TYPENAME].highestOrderId++;
+				order = await updateCommit.orderModel[commit.update.method](condition, query);
 			}
-			delete updateCommit[TYPENAME].activeOrders[commit.data.table];
-			setCommitId(commit);
-			const query = JsonFn.parse(commit.update.query);
-			await updateCommit.orderModel.findOneAndUpdate(condition, {$set: {id: updateCommit[TYPENAME].highestOrderId}});
-			updateCommit[TYPENAME].highestOrderId++;
-			const order = await updateCommit.orderModel[commit.update.method](condition, query, {new : true});
 			await updateCommit.orderCommitModel.create(commit);
-			await updateCommit.orderCommitModel.deleteMany({ temp: true, table: commit.data.table })
+			if (commit.data.table) {
+				await updateCommit.orderCommitModel.deleteMany({ temp: true, table: commit.data.table })
+			}
 			await cms.execPostAsync('run:closeOrder', null, [commit, order]);
 			return true;
 		} catch (err) {
@@ -261,7 +266,7 @@ async function orderCommit(updateCommit) {
 						date: new Date(),
 						quantity: -query['$inc']['items.$.quantity']
 					})
-					await updateCommit.orderModel[key]({ _id: updateCommit[TYPENAME].activeOrders[commit.data.table]._id },
+					await updateCommit.orderModel.updateOne({ _id: updateCommit[TYPENAME].activeOrders[commit.data.table]._id },
 						{ $set: { cancellationItems: updateCommit[TYPENAME].activeOrders[commit.data.table].cancellationItems } });
 				}
 			}
