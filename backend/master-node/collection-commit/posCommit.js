@@ -9,6 +9,8 @@ async function posCommit(updateCommit) {
 	function emitToFrontend(commit) {
 		if (commit.data.collection === 'products') {
 			cms.socket.emit('updateProductProps');
+		} else if (commit.data.collection === 'rooms') {
+			cms.socket.emit('updateRooms');
 		}
 	}
 

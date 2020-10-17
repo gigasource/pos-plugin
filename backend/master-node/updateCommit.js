@@ -31,6 +31,9 @@ const updateCommit = {
 						query: JsonFn.stringify(query)
 					}
 				})
+				if (typeof _.last(query) === 'function') {
+					_.last(query)(null, {n: 1, ok: true});
+				}
 			} else {
 				try {
 					const collection = mongoose.connection.db.collection(coll);

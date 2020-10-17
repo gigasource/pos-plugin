@@ -21,7 +21,8 @@ function createPureImageVirtualPrinter(printerInfo, type) {
           console.log('canvasprinter: printPng exception', e)
         }
       },
-      print: () => {},
+      print: () => {
+      },
     }
   });
 
@@ -29,14 +30,14 @@ function createPureImageVirtualPrinter(printerInfo, type) {
 
 module.exports = (cms) => {
 
-  cms.post(PRINT_VIRTUAL_REPORT, async ({ report, printData, printerInfo, type }) => {
-    const printer = createPureImageVirtualPrinter(printerInfo, type)
-    await report.printCanvas(printer, printData, printerInfo.groupPrinter, 'canvas');
-    printer.cleanup();
+  cms.post(PRINT_VIRTUAL_REPORT, async ({report, printData, printerInfo, type}) => {
+    const canvasPrinter = createPureImageVirtualPrinter(printerInfo, type)
+    await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+    await canvasPrinter.cleanup();
   })
 
-  cms.post(PRINT_VIRTUAL_KITCHEN, async ({ printCanvas, printData, printerInfo }) => {
-    if (typeof(printCanvas) !== "function") {
+  cms.post(PRINT_VIRTUAL_KITCHEN, async ({printCanvas, printData, printerInfo}) => {
+    if (typeof (printCanvas) !== "function") {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_KITCHEN:printCanvas is not a function')
       return;
     }
@@ -44,12 +45,14 @@ module.exports = (cms) => {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_KITCHEN:Missing required data')
       return;
     }
-    // canvasPrinter has been cleanup inside printCanvas so we don't need cleanup at here
-    printCanvas(createPureImageVirtualPrinter(printerInfo, 'kitchen'), printData, printerInfo)
+
+    const canvasPrinter = createPureImageVirtualPrinter(printerInfo, 'kitchen');
+    printCanvas(canvasPrinter, printData, printerInfo)
+    await canvasPrinter.cleanup();
   })
 
-  cms.post(PRINT_VIRTUAL_ENTIRE_RECEIPT, async ({ printCanvas, props, printerInfo}) => {
-    if (typeof(printCanvas) !== "function") {
+  cms.post(PRINT_VIRTUAL_ENTIRE_RECEIPT, async ({printCanvas, props, printerInfo}) => {
+    if (typeof (printCanvas) !== "function") {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_ENTIRE_RECEIPT:printCanvas is not a function')
       return;
     }
@@ -57,8 +60,10 @@ module.exports = (cms) => {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_ENTIRE_RECEIPT:Missing required data')
       return;
     }
-    // canvasPrinter has been cleanup inside printCanvas so we don't need cleanup at here
-    printCanvas(createPureImageVirtualPrinter(printerInfo, 'entireReceipt'), props, printerInfo)
+
+    const canvasPrinter = createPureImageVirtualPrinter(printerInfo, 'entireReceipt');
+    printCanvas(canvasPrinter, props, printerInfo);
+    await canvasPrinter.cleanup();
   })
 }
 

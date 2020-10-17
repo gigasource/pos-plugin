@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.1.83",
+  "version": "1.1.84",
   "release": "Stable",
   "description": "",
   "main": "index.js",
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
-    "@gigasource/pureimage-printer-renderer": "0.0.6",
+    "@gigasource/pureimage-printer-renderer": "0.0.12",
     "better-queue": "^3.8.10",
     "bson": "^4.1.0",
     "clone-buffer": "^1.0.0",

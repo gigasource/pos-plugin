@@ -71,69 +71,69 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(printer, printData) {
+async function printCanvas(canvasPrinter, printData) {
   const {date, salesByCategory, salesByPayment, zNumbers, total} = printData;
 
   function convertMoney(value) {
     return !isNaN(value) ? value.toFixed(2) : value
   }
 
-  printer.alignCenter();
-  printer.setFontSize(36);
-  printer.bold(true);
-  printer.println(date);
-  printer.newLine();
+  await canvasPrinter.alignCenter();
+  await canvasPrinter.setFontSize(36);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(date);
+  await canvasPrinter.newLine();
 
-  printer.alignLeft();
-  printer.setTextNormal();
-  printer.bold(true);
-  printer.println('Sales');
-  printer.drawLine();
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.setTextNormal();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println('Sales');
+  await canvasPrinter.drawLine();
 
-  printer.bold(false);
-  Object.keys(salesByPayment).forEach(paymentType => {
+  await canvasPrinter.bold(false);
+  await Promise.all(Object.keys(salesByPayment).map(async paymentType => {
     const paymentAmount = salesByPayment[paymentType];
-    printer.leftRight(` ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}`,
-        `${convertMoney(paymentAmount)}`);
-  });
+    await canvasPrinter.leftRight(` ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}`,
+      `${convertMoney(paymentAmount)}`);
+  }));
 
-  printer.bold(true);
-  printer.leftRight('Total', `${convertMoney(total)}`);
-  if (salesByCategory || zNumbers) printer.newLine();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.leftRight('Total', `${convertMoney(total)}`);
+  if (salesByCategory || zNumbers) await canvasPrinter.newLine();
 
   if (zNumbers) {
-    printer.bold(false);
-    printer.drawLine();
-    zNumbers.forEach(z => {
-      printer.tableCustom([
+    await canvasPrinter.bold(false);
+    await canvasPrinter.drawLine();
+    await Promise.all(zNumbers.map(async z => {
+      await canvasPrinter.tableCustom([
         {text: `Z-Number ${z.z}: ${convertMoney(z.sum)}`, align: 'LEFT', width: 0.48},
         {text: `Date: ${z.date}`, align: 'LEFT', width: 0.48},
       ]);
-    });
-    printer.bold(true);
-    printer.drawLine();
-    if (salesByCategory) printer.newLine();
+    }));
+    await canvasPrinter.bold(true);
+    await canvasPrinter.drawLine();
+    if (salesByCategory) await canvasPrinter.newLine();
   }
 
   if (salesByCategory) {
-    printer.bold(true);
-    printer.println('Product Sold');
-    printer.drawLine();
+    await canvasPrinter.bold(true);
+    await canvasPrinter.println('Product Sold');
+    await canvasPrinter.drawLine();
 
-    Object.keys(salesByCategory).forEach(category => {
-      printer.newLine();
+    await Promise.all(Object.keys(salesByCategory).map(async category => {
+      await canvasPrinter.newLine();
       const {products, sum} = salesByCategory[category];
 
-      printer.bold(true);
-      printer.println(`${category} (${convertMoney(sum)})`);
-      printer.bold(false);
-      products.forEach(({product, quantity}) => {
-        printer.println(` ${quantity} x ${product}`);
-      });
-    })
+      await canvasPrinter.bold(true);
+      await canvasPrinter.println(`${category} (${convertMoney(sum)})`);
+      await canvasPrinter.bold(false);
+      await Promise.all(products.map(async ({product, quantity}) => {
+        await canvasPrinter.println(` ${quantity} x ${product}`);
+      }));
+    }))
   }
 
-  await printer.print();
+  await canvasPrinter.print();
 }
 
 async function printSsr(printer, printData) {
