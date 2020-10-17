@@ -13,17 +13,17 @@
       <g-table class="payment-table flex-grow-1" striped fixed-header>
         <tbody>
         <tr v-for="(payment, index) in paymentList">
-          <div :class="['payment-table__row', payment.name !== 'card' && payment.name !== 'cash' && 'text-blue']">
+          <div :class="['payment-table__row', payment.type !== 'card' && payment.type !== 'cash' && 'text-blue']">
             <div class="flex-grow-1 row-flex align-items-center">
-              <span style="text-transform: capitalize">{{ payment.name }}</span>
+              <span style="text-transform: capitalize">{{ payment.type }}</span>
               <div class="ml-2 pa-2" @click="removePaymentItem(index)"
-                   v-if="payment.name !== 'card' && payment.name !== 'cash'" v-model="payment.value">
+                   v-if="payment.type !== 'card' && payment.type !== 'cash'" v-model="payment.value">
                 <g-icon color="#FF4452">close</g-icon>
               </div>
             </div>
             <div class="value-input w-20">
               <pos-textfield-new
-                  v-if="payment.name === 'cash'"
+                  v-if="payment.type === 'cash'"
                   v-model="payment.value"
                   ref="cash-textfield"/>
               <span v-else>{{ payment.value }}</span>
@@ -118,7 +118,7 @@
         return this.currentOrder && this.currentOrder.payment || []
       },
       change() {
-        const cashPayment = this.paymentList.find(e => e.name === 'cash');
+        const cashPayment = this.paymentList.find(e => e.type === 'cash');
         const cashPaymentValue = (cashPayment && cashPayment.value) || 0;
 
         let change = this.paid - this.paymentTotal - this.tip;
@@ -130,7 +130,7 @@
         return this.currentOrder && this.currentOrder.tip || 0
       },
       disableKeyboard() {
-        return !this.currentOrder.payment || !this.currentOrder.payment.some(i => i.name === 'cash')
+        return !this.currentOrder.payment || !this.currentOrder.payment.some(i => i.type === 'cash')
       }
     },
     watch: {
@@ -144,7 +144,7 @@
               if (e.value < 0) e.value = 0;
             });
 
-            if (val.some(i => i.name === 'cash')) {
+            if (val.some(i => i.type === 'cash')) {
               setTimeout(() => {
                 this.$nextTick(() => {
                   if (this.$refs['cash-textfield']) {
