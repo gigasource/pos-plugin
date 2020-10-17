@@ -211,9 +211,10 @@ async function orderCommit(updateCommit) {
 			const query = JsonFn.parse(commit.update.query);
 			await updateCommit.orderModel.findOneAndUpdate(condition, {$set: {id: updateCommit[TYPENAME].highestOrderId}});
 			updateCommit[TYPENAME].highestOrderId++;
-			await updateCommit.orderModel[commit.update.method](condition, query);
+			const order = await updateCommit.orderModel[commit.update.method](condition, query, {new : true});
 			await updateCommit.orderCommitModel.create(commit);
 			await updateCommit.orderCommitModel.deleteMany({ temp: true, table: commit.data.table })
+			await cms.execPostAsync('run:closeOrder', null, [commit, order]);
 			return true;
 		} catch (err) {
 			console.error('Error occurred', err);
