@@ -14,6 +14,8 @@ const nodemailer = require('nodemailer')
 const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
 const { sendNotification } = require('./app-notification');
 
+const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync } = require('./restaurant-data-backup/index');
+
 const Schema = mongoose.Schema
 let externalSocketIOServer;
 
@@ -361,6 +363,7 @@ module.exports = async function (cms) {
 
   }, SOCKET_IO_REDIS_SYNC_INTERVAL);
 
+  await initConnection(externalSocketIOServer);
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
@@ -682,23 +685,40 @@ module.exports = async function (cms) {
       })
 
       socket.on('registerMasterDevice', async (ip) => {
-        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+        const device = await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+        requireSyncWithMaster(device.storeId, socket);
+      })
+
+      socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias }).lean();
+        if (store.onlineIsMaster) {
+          requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
+        } else {
+          externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+        }
       })
 
       socket.on('emitToAllDevices', async (commits, storeAlias) => {
-        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
-        const devices = await cms.getModel('Device').find({ storeId: storeId._doc._id, paired: true });
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+        await updateCommitNode(store._doc._id, commits, socket);
+        const devices = await cms.getModel('Device').find({ storeId: store._doc._id, paired: true });
         devices.forEach((device) => {
           externalSocketIOServer.emitTo(device._id.toString(), 'updateCommitNode', commits)
         });
       })
 
       socket.on('getMasterIp', async (storeAlias, fn) => {
-        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
-        if (!storeId) return fn(null, null);
-        const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+        if (!store) return fn(null, null);
+        const device = await cms.getModel('Device').findOne({ storeId: store._doc._id, paired: true, master: true }).lean();
+        if (!device) return fn(null, null);
         if (!device) return fn(null)
         fn(device.metadata ? device.metadata.ip : null, device._id.toString());
+      })
+
+      socket.on('syncExistingDb', async (storeAlias, collectionName, docs) => {
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+        await addCollection(store._id.toString(), collectionName, docs);
       })
     }
 
