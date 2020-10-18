@@ -54,7 +54,7 @@ async function posCommit(updateCommit) {
 		try {
 			const collection = mongoose.connection.db.collection(commit.data.collection);
 			const query = JsonFn.parse(commit.update.query, null, null, (key, value) => {
-				if (key !== '_id') {
+				if (!key.endsWith('_id')) {
 					return value;
 				}
 				return (typeof value === 'string' && value.length === 24) ? mongoose.Types.ObjectId(value) : value;
