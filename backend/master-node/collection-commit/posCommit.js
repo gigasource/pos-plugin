@@ -53,7 +53,12 @@ async function posCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
 			const collection = mongoose.connection.db.collection(commit.data.collection);
-			const query = JsonFn.parse(commit.update.query);
+			const query = JsonFn.parse(commit.update.query, null, null, (key, value) => {
+				if (key !== '_id') {
+					return value;
+				}
+				return (typeof value === 'string' && value.length === 24) ? mongoose.Types.ObjectId(value) : value;
+			});
 			if (typeof _.last(query) === 'function') {
 				query.pop();
 			}
