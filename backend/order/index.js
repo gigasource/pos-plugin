@@ -201,6 +201,19 @@ module.exports = (cms) => {
           actionList.push(...updates)
           actionList.push({
             type: 'order',
+            action: 'update',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: { recentCancellationItems: [], recentItems: [] }
+              })
+            }
+          }, {
+            type: 'order',
             action: 'closeOrder',
             where: JSON.stringify({ _id: mappedOrder._id }),
             data: {
@@ -217,22 +230,6 @@ module.exports = (cms) => {
           actionList = markPrintedItemCommits(actionList)
           newOrder = await createOrderCommits(actionList)
         }
-
-        await createOrderCommits([{
-          type: 'order',
-          action: 'update',
-          where: JSON.stringify({ _id: order._id }),
-          data: {
-            table: order.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: JSON.stringify({
-              $set: { recentCancellationItems: [], recentItems: [] }
-            })
-          }
-        }])
-
 
         if (print) {
           await cms.getModel('OrderCommit').addCommits([

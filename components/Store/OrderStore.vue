@@ -473,8 +473,7 @@
         }
 
         // create order
-        order._id = this.genObjectId();
-        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table }
+        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, async newOrder => {
           callback(newOrder);
         })
@@ -707,9 +706,8 @@
         })
         product.modifiers.splice(modIndex, 1)
       },
-      async saveTableOrder() {
-        if (!this.actionList.length) return;
-
+      getExtraCommits() {
+        if (!this.actionList) this.actionList = []
         if (this.currentOrder.numberOfCustomers) {
           this.actionList.push({
             type: 'order',
@@ -739,6 +737,11 @@
             }
           })
         }
+
+      },
+      async saveTableOrder() {
+        if (!this.actionList.length) return;
+        this.getExtraCommits()
 
         if (!this.currentOrder._id) this.currentOrder._id = this.genObjectId();
         this.actionList.forEach(actionInfo => {
@@ -870,6 +873,7 @@
               ...this.currentOrder,
               payment,
             }
+            this.getExtraCommits()
             if (this.actionList.length && this.actionList[0].action === 'createOrder' && !order._id) {
               order._id = this.genObjectId();
               const query = jsonfn.parse(this.actionList[0].update.query);
@@ -1389,17 +1393,17 @@
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
-              this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
-              this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
-              this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
+              existingOrder.splitId && this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
+              existingOrder.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
+              existingOrder.tseMethod && this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
               this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
-              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
               this.printedOrder = _.cloneDeep(this.currentOrder)
             }
           } else {
             this.actionList = []
-            this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+            this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
             this.printedOrder = _.cloneDeep(this.currentOrder)
           }
         }
