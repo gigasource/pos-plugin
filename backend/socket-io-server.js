@@ -685,6 +685,10 @@ module.exports = async function (cms) {
         await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
       })
 
+      socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
+        externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+      })
+
       socket.on('emitToAllDevices', async (commits, storeAlias) => {
         const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
         const devices = await cms.getModel('Device').find({ storeId: storeId._doc._id, paired: true });
@@ -694,10 +698,10 @@ module.exports = async function (cms) {
       })
 
       socket.on('getMasterIp', async (storeAlias, fn) => {
-        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
-        if (!storeId) return fn(null, null);
-        const device = await cms.getModel('Device').findOne({ storeId: storeId._doc._id, paired: true, master: true }).lean();
-        if (!device) return fn(null)
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+        if (!store) return fn(null, null);
+        const device = await cms.getModel('Device').findOne({ storeId: store._doc._id, paired: true, master: true }).lean();
+        if (!device) return fn(null, null);
         fn(device.metadata ? device.metadata.ip : null, device._id.toString());
       })
     }
