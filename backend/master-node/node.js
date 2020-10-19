@@ -84,8 +84,8 @@ class Node {
 			if (_this.socket && _this.socket.connected) {
 				_this.socket.emit('nodeCall', eventName, ...args);
 			}
-			if (_this.onlineOrderSocket && _this.onlineOrderSocket.connected) {
-				_this.socket.emit(eventName, ...args);
+			if (_this.onlineOrderSocket && _this.onlineOrderSocket.connected && _this.masterClientId) {
+				_this.onlineOrderSocket.emit('nodeCall', _this.masterClientId, eventName, ...args);
 			}
 		}
 		setTimeout(async () => {
