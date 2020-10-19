@@ -788,3 +788,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-inventory {
+  background-image: url("../assets/inventory.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

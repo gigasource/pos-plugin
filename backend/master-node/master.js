@@ -118,6 +118,8 @@ class Master {
 
 		updateCommit.getMethod('order', 'resumeQueue')();
 		updateCommit.getMethod('report', 'resumeQueue')();
+		updateCommit.getMethod('inventory', 'resumeQueue')();
+		updateCommit.getMethod('inventoryCategory', 'resumeQueue')();
 	}
 
 	emitToAll(commits) {

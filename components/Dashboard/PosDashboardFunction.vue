@@ -67,6 +67,7 @@
           {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting',  click: () => this.changePath('/pos-printer-setting')},
           {title: 'Customer', feature: 'customerInfo', icon: 'icon-customer-info',  click: () => this.changePath('/pos-customer')},
           {title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: this.openStoreSetting },
+          {title: 'Inventory', feature: 'manageInventory', icon: 'icon-inventory', click: this.openInventory },
         ],
         showIframe: false,
         iframeWidth: window.innerWidth,
@@ -114,6 +115,9 @@
             this.showIframe = true
           }
         })
+      },
+      openInventory() {
+        console.log('open inventory')
       },
       updateView(name) {
         this.$emit('update:view', {name})

@@ -1,0 +1,41 @@
+{
+  "_id": "5f8d154b0565d380841ed51f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f8d15d80565d380841ed522",
+      "schemaType": "date",
+      "key": "timestamp"
+    },
+    {
+      "_id": "5f8d15d80565d380841ed521",
+      "schemaType": "array",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "inventory",
+          "ref": "Inventory"
+        },
+        {
+          "schemaType": "number",
+          "key": "change"
+        },
+        {
+          "schemaType": "string",
+          "key": "action",
+          "type": "input"
+        }
+      ],
+      "key": "inventories"
+    },
+    {
+      "_id": "5f8d3c88534d360923550bed",
+      "schemaType": "string",
+      "key": "by",
+      "type": "input"
+    }
+  ],
+  "name": "InventoryHistory",
+  "tabs": [],
+  "type": "Collection"
+}
