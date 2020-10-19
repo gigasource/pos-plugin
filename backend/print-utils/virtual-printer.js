@@ -47,7 +47,7 @@ module.exports = (cms) => {
     }
 
     const canvasPrinter = createPureImageVirtualPrinter(printerInfo, 'kitchen');
-    printCanvas(canvasPrinter, printData, printerInfo)
+    await printCanvas(canvasPrinter, printData, printerInfo)
     await canvasPrinter.cleanup();
   })
 
