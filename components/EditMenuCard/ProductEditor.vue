@@ -8,21 +8,21 @@
       </template>
       <template v-if="isProductLayout">
         <div>{{$t('article.id')}} </div>
-        <g-text-field-bs :value="selectedProduct.id" @input="$set(selectedProduct, 'id', $event)">
+        <g-text-field-bs :value="selectedProduct.id" @input="$set(selectedProduct, 'id', $event);debouncedUpdateProduct('id', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('id')">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
 
         <div>{{$t('article.name')}} <span style="color: #FF4452">*</span></div>
-        <g-text-field-bs :value="selectedProduct.name" @input="$set(selectedProduct, 'name', $event)">
+        <g-text-field-bs :value="selectedProduct.name" @input="$set(selectedProduct, 'name', $event);debouncedUpdateProduct('name', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('name')">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
 
         <div>{{$t('article.price')}}</div>
-        <g-text-field-bs :value="selectedProduct.price" @input="$set(selectedProduct, 'price', $event)">
+        <g-text-field-bs :value="selectedProduct.price" @input="$set(selectedProduct, 'price', $event);debouncedUpdateProduct('price', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('price')">icon-keyboard</g-icon>
           </template>
@@ -150,7 +150,7 @@
     <dialog-product-info v-model="dialog.productInfo"
                          :product="selectedProduct"
                          :focus="dialog.focus"
-                         @submit="updateProduct($event, $event.name)"/>
+                         @submit="updateProduct"/>
     <dialog-text-filter
         label="Text"
         :default-value="selectedProductLayout.text"
@@ -202,7 +202,8 @@
         showSnackbar: false,
         notifyContent: null,
         popupModifierGroups: [],
-        layoutType: ''
+        layoutType: '',
+        debouncedUpdateProduct: () => null
       }
     },
     computed: {
@@ -271,6 +272,10 @@
       } else {
         this.layoutType = 'default'
       }
+
+      this.debouncedUpdateProduct = _.debounce(function (key, val) {
+        this.updateProduct({ [key]: val }, !this.selectedProduct._id)
+      }, 300)
     },
     activated() {
       if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
@@ -434,7 +439,7 @@
             { $push: { 'categories.$.products' : productLayout } },
             { new: true });
 
-        this.$emit('update:orderLayout', result)
+        // this.$emit('update:orderLayout', result)
       },
       openDialogInfo(focus) {
         this.dialog.focus = focus

@@ -1,103 +1,83 @@
 <template>
   <div class="background row-flex align-items-center justify-center">
-    <g-card persistent width="580">
-      <div class="dialog" style="padding: 24px">
-        <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
-        <g-tabs v-model="tab" :items="items">
-          <g-tab-item :item="items[0]" style="height: 200px">
-            <div class="dialog-title--sub">Address</div>
-            <g-text-field-bs large class="bs-tf__pos text-small" v-model="place" style="margin-bottom: 12px;">
-              <template v-slot:append-inner>
-                <g-icon style="cursor: pointer" @click="dialog.combobox = true">icon-keyboard</g-icon>
-              </template>
-            </g-text-field-bs>
-            <div v-if="error" class="dialog-message--error">
-              <g-icon v-if="offline">icon-no-connection</g-icon>
-              <span class="ml-2 fs-small">{{errorMessage}}</span>
-            </div>
-            <div class="dialog-message--subtext">
-          <b>Note: </b>
-          <span style="font-style: italic; color: #757575">
+    <div :class="showKeyboard ? 'left' : 'center'">
+      <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
+      <g-tabs v-model="tab" :items="items">
+        <g-tab-item :item="items[0]" style="height: 200px; padding-top: 4px">
+          <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField"
+                      keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
+                      :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
+          </g-combobox>
+          <div v-if="error" class="dialog-message--error">
+            <g-icon v-if="offline">icon-no-connection</g-icon>
+            <span class="ml-2 fs-small">{{errorMessage}}</span>
+          </div>
+          <div class="dialog-message--subtext">
+            <b>Note: </b>
+            <span style="font-style: italic; color: #757575">
             {{ disableSendBtn
             ? 'Your sign-in request is pending approval.'
             : 'Please contact your local provider to start using the program.'}}
           </span>
+          </div>
+          <div class="row-flex w-100">
+            <div class="dialog-message--note" v-if="deniedRequest" style="color: #ff4452">
+              <b>Your last sign-in request was declined!</b>
             </div>
-            <div class="row-flex w-100">
-              <div class="dialog-message--note" v-if="deniedRequest" style="color: #ff4452">
-                <b>Your last sign-in request was declined!</b>
-              </div>
-              <g-spacer/>
-              <div>
-                <g-btn-bs :background-color="sending ? 'grey': '#2979FF'" text-color="white" width="10em" height="44px"
-                          @click="sendRequest" :disabled="disableSendBtn">
-                  <template v-if="sending">
-                    <g-progress-circular class="mr-2" indeterminate color="#fff"/>
-                  </template>
-                  <template v-else-if="disableSendBtn">Request sent</template>
-                  <template v-else>Send Request</template>
-                </g-btn-bs>
-              </div>
+            <g-spacer/>
+            <div>
+              <g-btn-bs :background-color="sending ? 'grey': '#2979FF'" text-color="white" width="10em" height="44px"
+                        @click="sendRequest" :disabled="disableSendBtn">
+                <template v-if="sending">
+                  <g-progress-circular class="mr-2" indeterminate color="#fff"/>
+                </template>
+                <template v-else-if="disableSendBtn">Request sent</template>
+                <template v-else>Send Request</template>
+              </g-btn-bs>
             </div>
-          </g-tab-item>
-          <g-tab-item :item="items[1]" style="height: 200px">
-            <div class="dialog-title--sub">Pairing Code</div>
-            <g-text-field-bs large class="bs-tf__pos" v-model="code" style="margin-bottom: 12px;">
-              <template v-slot:append-inner>
-                <g-icon style="cursor: pointer" @click="dialog.input = true">icon-keyboard</g-icon>
+          </div>
+        </g-tab-item>
+        <g-tab-item :item="items[1]" style="height: 200px; padding-top: 4px">
+          <g-text-field-bs large class="bs-tf__pos mt-1" v-model="code" style="margin-bottom: 12px;" @click="showKeyboard = true">
+          </g-text-field-bs>
+          <div v-if="error" class="dialog-message--error">
+            <g-icon v-if="offline">icon-no-connection</g-icon>
+            <span class="ml-2 fs-small">{{errorMessage}}</span>
+          </div>
+          <div class="dialog-message--subtext">
+            <b>Note: </b>
+            <span style="font-style: italic; color: #757575">Please contact your local provider to start using the program. Internet connection is required.</span>
+          </div>
+          <div class="row-flex justify-end">
+            <g-btn-bs :background-color="pairing ? 'grey': '#2979FF'" text-color="white" width="7.5em" height="44px"
+                      @click="connect" :disabled="pairing">
+              <template v-if="pairing">
+                <g-progress-circular class="mr-2" indeterminate/>
               </template>
-            </g-text-field-bs>
-            <div v-if="error" class="dialog-message--error">
-              <g-icon v-if="offline">icon-no-connection</g-icon>
-              <span class="ml-2 fs-small">{{errorMessage}}</span>
-            </div>
-            <div class="row-flex" style="margin-top: 24px;">
-              <div class="dialog-message--note">
-                <b>Note: </b>Please contact your local provider to start using the program. Internet connection is required.
-              </div>
-              <div>
-                <g-btn-bs :background-color="pairing ? 'grey': '#2979FF'" text-color="white" width="7.5em" height="44px"
-                          @click="connect" :disabled="pairing">
-                  <template v-if="pairing">
-                    <g-progress-circular class="mr-2" indeterminate/>
-                  </template>
-                  <template v-else>Connect</template>
-                </g-btn-bs>
-              </div>
-            </div>
-          </g-tab-item>
-        </g-tabs>
-      </div>
-    </g-card>
-    <dialog-number-filter v-model="dialog.input" label="Pairing Code" @submit="changeCode"/>
-    <g-dialog v-model="dialog.combobox" fullscreen>
-      <g-card style="position: relative; display: flex; flex-direction: column">
-        <g-icon size="28" style="position: absolute;top: 16px;right: 16px" @click="dialog.combobox = false">close</g-icon>
-        <div style="flex: 1; padding: 16px; margin-top: 20px">
-          <g-combobox class="w-100" label="Address" v-model="placeId" text-field-component="PosTextField"
-                      :key="dialog.combobox" keep-menu-on-blur clearable
-                      :items="placesSearchResult" @update:searchText="debouncedSearch">
-          </g-combobox>
-        </div>
-        <div class="w-100 bg-grey pa-2">
-          <pos-keyboard-full @enter-pressed="choosePlace"/>
-        </div>
-      </g-card>
-    </g-dialog>
-    <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl" @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
-    <g-btn style="position: absolute; bottom: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
+              <template v-else>Connect</template>
+            </g-btn-bs>
+          </div>
+        </g-tab-item>
+      </g-tabs>
+    </div>
+    <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl"
+                       @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
+    <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
+    <div v-if="showKeyboard" class="keyboard-wrapper">
+      <pos-keyboard-full @enter-pressed="enterPress"/>
+    </div>
   </div>
 </template>
 
 <script>
   import DialogCustomUrl from './dialogCustomUrl';
-  import { v4 as uuidv4 } from 'uuid';
+  import {v4 as uuidv4} from 'uuid';
   import _ from 'lodash';
   import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
 
   export default {
     name: 'FirstTimeSetUp',
-    components: {PosKeyboardFull, DialogCustomUrl },
+    components: {PosKeyboardFull, DialogCustomUrl},
     data() {
       return {
         dialog: {
@@ -119,7 +99,8 @@
         debouncedSearch: () => null,
         signInRequest: null,
         items: [{title: 'Address'}, {title: 'Pairing Code'}],
-        tab: null
+        tab: null,
+        showKeyboard: false,
       }
     },
     async created() {
@@ -140,7 +121,7 @@
 
       this.debouncedSearch = _.debounce(this.searchPlace, 500)
 
-      const { signInRequest } = await cms.getModel('PosSetting').findOne()
+      const {signInRequest} = await cms.getModel('PosSetting').findOne()
       if (signInRequest) this.signInRequest = signInRequest
 
       cms.socket.on('denySignIn', () => {
@@ -164,7 +145,7 @@
         this.code = code
       },
       start() {
-        this.$router.push({ path: '/pos-login' })
+        this.$router.push({path: '/pos-login'})
       },
       connect() {
         this.pairing = true
@@ -215,17 +196,18 @@
       },
       async sendRequest() {
         this.sending = true
-        const { name: storeName } = await this.getPlaceDetail()
+        const {name: storeName} = await this.getPlaceDetail()
         cms.socket.emit('sendSignInRequest', storeName, this.placeId, request => {
           this.signInRequest = request
           this.sending = false
         })
       },
-      choosePlace() {
-        if(this.placeId) {
-          this.place = this.placesSearchResult.find(p => p.value === this.placeId).text
+      async enterPress() {
+        if (this.tab.title === 'Address') {
+          await this.sendRequest()
+        } else if (this.tab.title === 'Pairing Code') {
+          await this.connect()
         }
-        this.dialog.combobox = false
       }
     }
   }
@@ -237,6 +219,42 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-image: url("/plugins/pos-plugin/assets/background-blur.png");
+
+
+    .center, .left {
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 4px;
+    }
+
+    .center {
+      padding: 24px;
+      border-radius: 4px;
+      width: 50%;
+    }
+
+    .left {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 45%;
+    }
+
+    .keyboard-wrapper {
+      position: absolute;
+      left: 45%;
+      right: 0;
+      bottom: 0;
+      background-color: #f0f0f0;
+      padding: 4px;
+
+      ::v-deep .key {
+        font-size: 18px !important;
+      }
+    }
   }
 
   .dialog {
@@ -250,7 +268,7 @@
     &-title {
       font-size: 20px;
       font-weight: 700;
-      margin: 20px 0;
+      margin: 12px 0;
 
       &--sub {
         font-size: 15px;
@@ -318,14 +336,41 @@
 
   .g-combobox ::v-deep {
     .bs-tf-label {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       margin-bottom: 8px;
     }
 
     .bs-tf-input {
       font-size: 18px;
-      padding: 16px 6px;
+      padding: 12px 6px;
+    }
+  }
+</style>
+
+<style lang="scss">
+  .menu-autocomplete-setup {
+    .g-list {
+      padding: 0;
+
+      &-item {
+        min-height: 0;
+      }
+
+      .g-list-item-content {
+        padding-right: 4px;
+
+        .g-list-item-text {
+          white-space: normal;
+          word-break: break-word;
+          line-height: 1.4;
+          padding: 2px 0;
+        }
+      }
+
+      & > div:not(:last-child) .g-list-item-text {
+        border-bottom: 1px solid #F0F0F0;
+      }
     }
   }
 </style>
