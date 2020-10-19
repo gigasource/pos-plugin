@@ -21,6 +21,10 @@
         <span>Using virtual printer</span>
         <g-switch v-model="useVirtualPrinter"/>
       </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>Pay button prints receipt</span>
+        <g-switch v-model="printReceiptWithPay"/>
+      </div>
 
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
@@ -125,6 +129,14 @@
         },
         set(val) {
           this.$set(this.generalSettings, 'beginHour', val)
+        }
+      },
+      printReceiptWithPay: {
+        get() {
+          return (this.generalSettings && this.generalSettings.printReceiptWithPay)
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'printReceiptWithPay', val)
         }
       },
       quickBtn: {

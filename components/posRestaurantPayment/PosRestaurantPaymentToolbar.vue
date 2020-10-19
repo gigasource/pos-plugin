@@ -6,9 +6,9 @@
 <!--    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>-->
 <!--    <g-btn-bs icon="icon-split_check_2">{{$t('fnBtn.paymentFunctions.splitCheck')}}</g-btn-bs>-->
 <!--    <g-btn-bs icon="icon-red_bill">{{$t('fnBtn.paymentFunctions.redBill')}}</g-btn-bs>-->
-<!--    <g-btn-bs icon="icon-print2">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>-->
     <g-spacer/>
-    <g-btn-bs class="col-2" background-color="#2979FF" @click.stop="pay" :disabled="isPayBtnDisabled">
+    <g-btn-bs icon="icon-print2" @click.stop="pay(false)">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>
+    <g-btn-bs class="col-2" background-color="#2979FF" @click.stop="pay(true)" :disabled="isPayBtnDisabled">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
   </g-toolbar>
@@ -33,10 +33,15 @@
       back() {
         this.$router.go(-1)
       },
-      pay() {
+      async pay(isPayBtn) {
+        let shouldPrint = true
+        if (isPayBtn) {
+          const generalSettings = (await cms.getModel('PosSetting').findOne()).generalSetting
+          shouldPrint = generalSettings && generalSettings.printReceiptWithPay
+        }
         const backToDashboard = !!this.currentOrder.table
-        this.$emit('pay')
-        if (backToDashboard) this.$router.push({path: '/pos-dashboard'})
+        this.$emit('pay', null, true, shouldPrint)
+        if (backToDashboard) this.$router.push({ path: '/pos-dashboard' })
         else this.$router.go(-1)
       },
       promotion() {
