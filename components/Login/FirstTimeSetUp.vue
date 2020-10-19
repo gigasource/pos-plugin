@@ -4,8 +4,8 @@
       <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 200px; padding-top: 4px">
-          <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
-                      keep-menu-on-blur clearable virtual-event menu-class="menu-autocomplete-setup"
+          <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField"
+                      keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
                       :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
           </g-combobox>
           <div v-if="error" class="dialog-message--error">
