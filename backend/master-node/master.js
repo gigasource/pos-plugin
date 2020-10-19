@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
@@ -18,6 +19,7 @@ const updateCommits = async (commits) => {
 }
 
 const requireSync = (type, oldHighestCommitId, ack) => {
+	if (!updateCommit.commitType.includes(type)) return;
 	const commit = {
 		type,
 		action: 'requireSync',
@@ -119,6 +121,8 @@ class Master {
 		updateCommit.getMethod('order', 'resumeQueue')();
 		updateCommit.getMethod('report', 'resumeQueue')();
 		updateCommit.getMethod('pos', 'resumeQueue')();
+		updateCommit.getMethod('inventory', 'resumeQueue')();
+		updateCommit.getMethod('inventoryCategory', 'resumeQueue')();
 	}
 
 	emitToAll(commits) {
@@ -143,11 +147,6 @@ class Master {
 
 	async syncDataToOnlineOrder() {
 		await syncExistingData();
-	}
-
-	async sendChangeRequest(commit) {
-		commit.storeId = await this.getStoreId();
-		updateCommit.handleCommit([commit]);
 	}
 }
 

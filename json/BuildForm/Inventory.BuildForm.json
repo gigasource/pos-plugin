@@ -1,0 +1,46 @@
+{
+  "_id": "5f8d149a0565d380841ed516",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f8d153c0565d380841ed51c",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f8d153c0565d380841ed51b",
+      "schemaType": "number",
+      "key": "stock",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f8d153c0565d380841ed51a",
+      "schemaType": "number",
+      "key": "lowStockThreshold",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f8d153c0565d380841ed519",
+      "schemaType": "objectId",
+      "key": "category",
+      "ref": "InventoryCategory",
+      "type": null
+    },
+    {
+      "_id": "5f8d153c0565d380841ed518",
+      "schemaType": "string",
+      "key": "unit",
+      "type": "input"
+    },
+    {
+      "_id": "5f8d49ea534d360923550bf7",
+      "schemaType": "date",
+      "key": "lastUpdateTimestamp",
+      "type": "input@date"
+    }
+  ],
+  "name": "Inventory",
+  "tabs": [],
+  "type": "Collection"
+}

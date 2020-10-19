@@ -1,0 +1,14 @@
+{
+  "_id": "5f8d14620565d380841ed4fa",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f8d14860565d380841ed4fc",
+      "schemaType": "string",
+      "key": "name"
+    }
+  ],
+  "name": "InventoryCategory",
+  "tabs": [],
+  "type": "Collection"
+}

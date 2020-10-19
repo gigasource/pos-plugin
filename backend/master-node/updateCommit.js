@@ -3,7 +3,7 @@ const _ = require('lodash');
 const mongoose = require('mongoose');
 const JsonFn = require('json-fn');
 
-const updateMethodList = ['update', 'findOneAndUpdate', 'findOneAndModify', 'insertOne', 'create', 'insertMany', 'remove', 'deleteMany', 'insert'];
+const updateMethodList = ['update', 'findOneAndUpdate', 'findOneAndModify', 'insertOne', 'create', 'insertMany', 'remove', 'deleteMany', 'insert', 'updateOne'];
 
 const updateCommit = {
 	commitType: ['order', 'report', 'pos'],

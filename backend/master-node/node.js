@@ -105,7 +105,8 @@ class Node {
 					updateCommit.setHighestCommitIds(typeCommits);
 				} else {
 					console.debug('nodeReceiveCommit', 'Need sync');
-					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type, oldHighestCommitId, nodeSync);
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+						oldHighestCommitId, storeId, nodeSync);
 				}
 			})
 		})
@@ -118,7 +119,7 @@ class Node {
 		if (_this.masterClientId) {
 			updateCommit.commitType.forEach(type => {
 				_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
-					updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
+					updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
 			})
 		}
 	}
@@ -127,13 +128,14 @@ class Node {
 		await updateCommit.init(this);
 		const _this = this;
 
-		_this.cms.post('run:requireSync', () => {
+		_this.cms.post('run:requireSync', async () => {
+			const storeId = await _this.getStoreId();
 			updateCommit.commitType.forEach(type => {
 				if (_this.socket.connected) {
 					_this.socket.emit('requireSync', type, updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
 				} else if (_this.masterClientId) {
 					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
-						updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
+						updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
 				}
 			})
 		})
