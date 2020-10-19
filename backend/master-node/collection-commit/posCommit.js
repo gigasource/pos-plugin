@@ -11,6 +11,8 @@ async function posCommit(updateCommit) {
 			cms.socket.emit('updateProductProps');
 		} else if (commit.data.collection === 'rooms') {
 			cms.socket.emit('updateRooms');
+		} else if (commit.data.collection === 'orderlayouts') {
+			cms.socket.emit('updateOrderLayouts');
 		}
 	}
 

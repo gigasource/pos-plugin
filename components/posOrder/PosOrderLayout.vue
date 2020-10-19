@@ -230,6 +230,10 @@
         type = this.$router.currentRoute.query.type
       }
       await this.loadOrderLayout(type);
+      cms.socket.on('updateOrderLayouts', this.loadOrderLayout)
+    },
+    beforeDestroy() {
+      cms.socket.off('updateOrderLayouts')
     },
     async activated() {
       await this.loadKeyboardConfig();

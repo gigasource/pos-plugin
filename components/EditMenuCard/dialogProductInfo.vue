@@ -78,7 +78,7 @@
           name: this.name,
           price: this.price,
         }
-        this.$emit('submit', change)
+        this.$emit('submit', change, !this.product._id)
         this.internalValue = false
       }
     }
