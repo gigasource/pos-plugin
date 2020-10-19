@@ -20,12 +20,42 @@ module.exports = (cms) => {
           }
         })
       }
-      const diff = _.differenceWith(order.items, oldOrder.items, _.isEqual);
+      const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldOrder.items)
+      actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
+      const shouldMerge = await getMergeOrderSettings()
+
+      if (shouldMerge) {
+        order.items = mergeOrderItems(order.items).map(i => ({
+          ...i,
+          printed: true,
+          sent: true
+        }))
+        oldOrder.items = mergeOrderItems(oldOrder.items)
+
+        actionList.push({
+          type: 'order',
+          action: 'update',
+          where: JSON.stringify({ _id: order._id }),
+          data: {
+            table: order.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: JSON.stringify({
+              $set: { items: order.items }
+            })
+          }
+        })
+      }
+
+      const diff = _.differenceWith(order.items, oldOrder.items, (item, otherItem) => {
+        return isSameProduct(item, otherItem, shouldMerge) && item.quantity === otherItem.quantity
+      });
       const printLists = diff.reduce((lists, current) => {
-        if (!oldOrder.items.some(i => i._id === current._id)) {
+        if (!oldOrder.items.some(i => isSameProduct(i, current, shouldMerge))) {
           if (current.quantity > 0) lists.addList.push(current)
         } else {
-          const product = oldOrder.items.find(i => i._id === current._id)
+          const product = oldOrder.items.find(i => isSameProduct(i, current, shouldMerge))
 
           if (product) {
             const qtyChange = current.quantity - product.quantity
@@ -47,14 +77,7 @@ module.exports = (cms) => {
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
         if (listOrder && listOrder.items && listOrder.items.length) {
-          list.push({
-            type: 'order',
-            action: 'printOrder',
-            printType: listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel',
-            order: listOrder,
-            oldOrder,
-            device
-          })
+          list.push(getPrintCommit(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device))
         }
         return list
       }, [])
@@ -78,17 +101,7 @@ module.exports = (cms) => {
         return list
       }, [])
 
-      const mappedActionList = mergedActionList.map(action => {
-        if (action.type === 'order' && action.action === 'addItem') {
-          const query = JsonFn.parse(action.update.query)
-          query['$push']['items'].sent = true;
-          query['$push']['items'].printed = true;
-          action.update.query = JsonFn.stringify(query);
-        }
-        return action
-      })
-
-
+      const mappedActionList = markPrintedItemCommits(mergedActionList)
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
@@ -96,20 +109,14 @@ module.exports = (cms) => {
     })
 
     socket.on('print-invoice', async (order) => {
-      await cms.getModel('OrderCommit').create([{
-        type: 'order',
-        action: 'printOrder',
-        printType: 'invoice',
-        order,
-        device
-      }])
+      await cms.getModel('OrderCommit').addCommits([getPrintCommit('invoice', order, device)])
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
       try {
         const updatedSplit = await createOrderCommits([{
           type: 'order',
-          action: 'setOrderProps',
+          action: 'update',
           data: {
             split: true,
           },
@@ -129,28 +136,57 @@ module.exports = (cms) => {
       }
     })
 
-    socket.on('pay-order', async (order, user, device, isSplit = false, actionList, print = true, cb = () => null) => {
+    socket.on('pay-order', async (order, user, device, isSplit = false, actionList = [], print = true, cb = () => null) => {
       try {
         const mappedOrder = await mapOrder(order, user)
+        const oldOrder = await cms.getModel('Order').findById(order._id)
+        const oldItems = (oldOrder && oldOrder.items) || []
+        const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldItems)
+        actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
+        if (recentItems.length) {
+          const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
+          actionList.push(getPrintCommit('kitchenAdd', printOrder, device))
+        }
+
+        if (recentCancellationItems.length) {
+          const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
+          actionList.push(getPrintCommit('kitchenCancel', printOrder, device))
+        }
+
         let newOrder
         if (isSplit) {
-          newOrder = await createOrderCommits([{
-            type: 'order',
-            action: 'createOrder',
-            data: {
-              split: true,
+          const commits = [
+            {
+              type: 'order',
+              action: 'createOrder',
+              data: {
+                split: true,
+              },
+              update: {
+                method: 'create',
+                query: JSON.stringify(mappedOrder)
+              }
             },
-            update: {
-              method: 'create',
-              query: JSON.stringify(mappedOrder)
+            ...actionList,
+            {
+              type: 'order',
+              action: 'closeOrder',
+              where: JSON.stringify({ _id: mappedOrder._id }),
+              update: {
+                method: 'findOneAndUpdate',
+                query: JSON.stringify({
+                  $set: { status: 'paid' }
+                })
+              }
             }
-          }])
+          ]
+          newOrder = await createOrderCommits(commits)
         } else {
-          const excludes = ['_id', 'table', 'id', 'splitId']
+          const excludes = ['_id', 'table', 'id', 'splitId', 'status']
 
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
-            action: 'setOrderProps',
+            action: 'update',
             where: JSON.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
@@ -158,24 +194,46 @@ module.exports = (cms) => {
             update: {
               method: 'findOneAndUpdate',
               query: JSON.stringify({
-                $set: {[key]: value}
+                $set: { [key]: value }
               })
             }
           })).value()
           actionList.push(...updates)
+          actionList.push({
+            type: 'order',
+            action: 'update',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: { recentCancellationItems: [], recentItems: [] }
+              })
+            }
+          }, {
+            type: 'order',
+            action: 'closeOrder',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+              mutate: true
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: { status: 'paid' }
+              })
+            }
+          })
+          actionList = markPrintedItemCommits(actionList)
           newOrder = await createOrderCommits(actionList)
         }
 
         if (print) {
-          // todo use in master
-          // await printInvoiceHandler('OrderReport', mappedOrder, device)
-          await cms.getModel('OrderCommit').create([{
-            type: 'order',
-            action: 'printOrder',
-            printType: 'invoice',
-            order: mappedOrder,
-            device
-          }])
+          await cms.getModel('OrderCommit').addCommits([
+            getPrintCommit('invoice', mappedOrder, device)])
         }
 
         cb(newOrder)
@@ -203,7 +261,7 @@ module.exports = (cms) => {
         newOrder = await createOrderCommit(existingOrder, 'items', items);
         console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
       } else {
-        newOrder = await cms.getModel('OrderCommit').create([{
+        newOrder = await cms.getModel('OrderCommit').addCommits([{
           type: 'order',
           action: 'createOrder',
           where: null,
@@ -222,6 +280,21 @@ module.exports = (cms) => {
 
       await createOrderCommit(currentOrder, 'items', currentOrderItems)
       console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
+
+      // print new items
+      let itemsToPrint = newItems.filter(i => !i.printed)
+      // merge if needed
+      const shouldMerge = await getMergeOrderSettings()
+      if (shouldMerge) {
+        const items = mergeOrderItems(newOrder.items)
+        await createOrderCommit(newOrder, 'items', items)
+      }
+      // commits: print, set sent/printed items
+      if (itemsToPrint.length) {
+        const printOrder = Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint });
+        await cms.getModel('OrderCommit').addCommits([
+          getPrintCommit('kitchenAdd', printOrder, device)])
+      }
       cb(newOrder)
     })
   })
@@ -237,6 +310,7 @@ module.exports = (cms) => {
     const vSum = orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items);
     const payment = order.payment
     const receive = _.sumBy(payment, 'value');
+    const immediatePay = !order.items.some(i => i.printed)
 
     const cashback = receive - vSum;
     return {
@@ -258,14 +332,17 @@ module.exports = (cms) => {
       cashback,
       table: order.table,
       splitId: order.splitId,
-      status: 'paid',
+      numberOfCustomers: order.numberOfCustomers,
+      tseMethod: order.tseMethod,
+      immediatePay,
+      status: 'paid'
     }
   }
 
   async function createOrderCommit(order, key, value) {
-    return await cms.getModel('OrderCommit').create([{
+    return await cms.getModel('OrderCommit').addCommits([{
       type: 'order',
-      action: 'setOrderProps',
+      action: 'update',
       where: JSON.stringify({ _id: order._id }),
       data: {
         table: order.table,
@@ -282,7 +359,19 @@ module.exports = (cms) => {
   }
 
   async function createOrderCommits(commits) {
-    return cms.getModel('OrderCommit').create(commits);
+    return cms.getModel('OrderCommit').addCommits(commits);
+  }
+
+  function markPrintedItemCommits(commits) {
+    return commits.map(action => {
+      if (action.type === 'order' && action.action === 'addItem') {
+        const query = JsonFn.parse(action.update.query)
+        query['$push']['items'].sent = true;
+        query['$push']['items'].printed = true;
+        action.update.query = JsonFn.stringify(query);
+      }
+      return action
+    })
   }
 
   async function mapGroupPrinter(items) {
@@ -335,4 +424,121 @@ async function getBaseSentryTags(eventType) {
     if (store && store.alias) tag += `,alias=${store.alias}`
   }
   return tag;
+}
+
+function isSameProduct(item, otherItem, merge) {
+  if (merge) {
+    const sameProduct = item.product === otherItem.product
+    const samePrice = item.price === otherItem.price
+    const sameCourse = item.course === otherItem.course
+
+    return sameProduct && samePrice && sameCourse && isSameModifiers(item, otherItem)
+  }
+
+  return item._id.toString() === otherItem._id.toString()
+}
+
+function isSameModifiers(item, otherItem) {
+  function mapModifier(mods) {
+    return mods.map(i => _.omit(i, '_id')).sort((cur, next) => {
+      if (cur.name === next.name) {
+        return cur.price - next.price
+      }
+      return cur.name > next.name
+    })
+  }
+
+  return _.isEqualWith(item.modifiers || [], otherItem.modifiers || [], (mods, otherMods) => {
+    const sortedMods = mapModifier(mods)
+    const sortedOtherMods = mapModifier(otherMods)
+    return _.isEqual(sortedMods, sortedOtherMods)
+  })
+}
+
+async function getMergeOrderSettings() {
+  const posSettings = await cms.getModel('PosSetting').findOne().lean()
+  const { printerGeneralSetting } = posSettings
+  return printerGeneralSetting && printerGeneralSetting.mergeAfterPrint
+}
+
+function mergeOrderItems(items) {
+  let resultArr = []
+  items.forEach(product => {
+    const existingProduct = resultArr.find(r => isSameProduct(r, product, true))
+    if (existingProduct) {
+      existingProduct.quantity = existingProduct.quantity + product.quantity
+    } else {
+      resultArr.push(_.cloneDeep(product));
+    }
+  })
+  return resultArr
+}
+
+function getRecentQuantityItems(items, oldItems = []) {
+  return items.reduce((list, item) => {
+    const existingItem = oldItems.find(i => i._id.toString() === item._id.toString())
+    if (existingItem) {
+      const qtyChange = item.quantity - existingItem.quantity
+      if (qtyChange > 0) {
+        list.recentItems.push({ ...item, quantity: qtyChange })
+      } else if (qtyChange < 0) {
+        list.recentCancellationItems.push({ ...item, quantity: -qtyChange })
+      }
+
+      return list
+    }
+
+    list.recentItems.push(item)
+    return list
+  }, { recentItems: [], recentCancellationItems: [] })
+}
+
+function getRecentItemCommits(recentItems, recentCancellationItems, order) {
+  const actionList = []
+
+  if (recentItems.length) {
+    actionList.push({
+      type: 'order',
+      action: 'update',
+      where: JSON.stringify({ _id: order._id }),
+      data: {
+        table: order.table,
+      },
+      update: {
+        method: 'findOneAndUpdate',
+        query: JSON.stringify({
+          $set: { recentItems }
+        })
+      }
+    })
+  }
+
+  if (recentCancellationItems.length) {
+    actionList.push({
+      type: 'order',
+      action: 'update',
+      where: JSON.stringify({ _id: order._id }),
+      data: {
+        table: order.table,
+      },
+      update: {
+        method: 'findOneAndUpdate',
+        query: JSON.stringify({
+          $set: { recentCancellationItems }
+        })
+      }
+    })
+  }
+
+  return actionList
+}
+
+function getPrintCommit(printType, order, device) {
+  return {
+    type: 'order',
+    action: 'printOrder',
+    printType: printType,
+    order,
+    device
+  }
 }

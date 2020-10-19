@@ -473,7 +473,7 @@
         }
 
         // create order
-        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table }
+        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, async newOrder => {
           callback(newOrder);
         })
@@ -549,7 +549,7 @@
             reject()
           }
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -706,8 +706,62 @@
         })
         product.modifiers.splice(modIndex, 1)
       },
+      getExtraCommits() {
+        if (!this.actionList) this.actionList = []
+        if (this.currentOrder.numberOfCustomers) {
+          this.actionList.push({
+            type: 'order',
+            action: 'update',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            data: {
+              table: this.currentOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {numberOfCustomers: this.currentOrder.numberOfCustomers}})
+            }
+          })
+        }
+
+        if (this.currentOrder.tseMethod) {
+          this.actionList.push({
+            type: 'order',
+            action: 'update',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            data: {
+              table: this.currentOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({$set: {tseMethod: this.currentOrder.tseMethod}})
+            }
+          })
+        }
+
+      },
       async saveTableOrder() {
         if (!this.actionList.length) return;
+        this.getExtraCommits()
+
+        if (!this.currentOrder._id) this.currentOrder._id = this.genObjectId();
+        this.actionList.forEach(actionInfo => {
+          if (actionInfo.action === 'createOrder') {
+            const query = jsonfn.parse(actionInfo.update.query);
+            query._id = this.currentOrder._id;
+            actionInfo.update.query = jsonfn.stringify(query);
+          }
+          if (actionInfo.where) {
+            const condition = jsonfn.parse(actionInfo.where);
+            if (!condition._id) {
+              condition._id = this.currentOrder._id;
+              actionInfo.where = jsonfn.stringify(condition);
+            } else {
+              if (condition._id != this.currentOrder._id) {
+                console.error('Different object id')
+              }
+            }
+          }
+        })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
           this.actionList = [];
           this.currentOrder = { items: [], hasOrderWideDiscount: false }
@@ -750,21 +804,8 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
-      updateCurrentOrder(key, val, createCommit) {
+      updateCurrentOrder(key, val) {
         this.$set(this.currentOrder, key, val)
-
-        if (createCommit) {
-          this.actionList.push({
-            type: 'order',
-            action: 'setOrderProps',
-            where: jsonfn.stringify({ _id: this.currentOrder._id }),
-            table: this.currentOrder.table,
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({$set: {[key]: val}})
-            }
-          })
-        }
       },
       updatePrintedOrder(key, val) {
         this.$set(this.printedOrder, key, val)
@@ -810,9 +851,9 @@
           return Promise.all(commits.map(this.createOrderCommit))
       },
       async createOrderCommit(commit) { // key-value pair
-        return await cms.getModel('OrderCommit').create([{
+        return await cms.getModel('OrderCommit').addCommits([{
           type: 'order',
-          action: 'setOrderProps',
+          action: 'update',
           where: jsonfn.stringify({ _id: this.currentOrder._id }),
           data: {
             table: this.currentOrder.table,
@@ -832,7 +873,28 @@
               ...this.currentOrder,
               payment,
             }
-
+            this.getExtraCommits()
+            if (this.actionList.length && this.actionList[0].action === 'createOrder' && !order._id) {
+              order._id = this.genObjectId();
+              const query = jsonfn.parse(this.actionList[0].update.query);
+              query._id = order._id;
+              this.actionList[0].update.query = jsonfn.stringify(query);
+            }
+            this.actionList.forEach(actionInfo => {
+              if (actionInfo.action != 'createOrder') {
+                if (actionInfo.where) {
+                  const condition = jsonfn.parse(actionInfo.where);
+                  if (!condition._id) {
+                    condition._id = order._id;
+                    actionInfo.where = jsonfn.stringify(condition);
+                  } else {
+                    if (condition._id != order._id) {
+                      console.error('Different object id');
+                    }
+                  }
+                }
+              }
+            })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
@@ -866,7 +928,7 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -885,7 +947,7 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').create([{
+            await cms.getModel('OrderCommit').addCommits([{
               type: 'report',
               action: 'print',
               data: {
@@ -1324,7 +1386,6 @@
       },
       'currentOrder.table': {
         async handler(val) {
-          this.actionList = []
           if (val) {
             const existingOrder = await this.getTempOrder();
             // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
@@ -1332,14 +1393,17 @@
               this.$set(this.currentOrder, '_id', existingOrder._id)
               this.$set(this.currentOrder, 'user', existingOrder.user)
               this.$set(this.currentOrder, 'items', existingOrder.items)
-              this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
+              existingOrder.splitId && this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
+              existingOrder.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
+              existingOrder.tseMethod && this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
               this.printedOrder = _.cloneDeep(this.currentOrder)
             } else {
-              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
               this.printedOrder = _.cloneDeep(this.currentOrder)
             }
           } else {
-            this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val }
+            this.actionList = []
+            this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
             this.printedOrder = _.cloneDeep(this.currentOrder)
           }
         }

@@ -105,7 +105,8 @@ class Node {
 					updateCommit.setHighestCommitIds(typeCommits);
 				} else {
 					console.debug('nodeReceiveCommit', 'Need sync');
-					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type, oldHighestCommitId, nodeSync);
+					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+						oldHighestCommitId, storeId, nodeSync);
 				}
 			})
 		})
@@ -118,7 +119,7 @@ class Node {
 		if (_this.masterClientId) {
 			updateCommit.commitType.forEach(type => {
 				_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
-					updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
+					updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
 			})
 		}
 	}
@@ -127,13 +128,14 @@ class Node {
 		await updateCommit.init(this);
 		const _this = this;
 
-		_this.cms.post('run:requireSync', () => {
+		_this.cms.post('run:requireSync', async () => {
+			const storeId = await _this.getStoreId();
 			updateCommit.commitType.forEach(type => {
 				if (_this.socket.connected) {
 					_this.socket.emit('requireSync', type, updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
 				} else if (_this.masterClientId) {
 					_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
-						updateCommit.getMethod(type, 'checkHighestCommitId')(), nodeSync);
+						updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
 				}
 			})
 		})
@@ -141,7 +143,7 @@ class Node {
 		const _model = cms.Types['OrderCommit'].Model;
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
-				if (key != 'create') {
+				if (key != 'addCommits') {
 					return target[key];
 				}
 				return async function (commits) {
@@ -154,10 +156,7 @@ class Node {
 						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
-						table = commit.data.table;
-						if (commit.split && commit.update.create) {
-							commit.update.create._id = mongoose.Types.ObjectId();
-						}
+						if (commit.data) table = commit.data.table;
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
@@ -166,15 +165,17 @@ class Node {
 					} else {
 						throw new Error('Can not connect to master');
 					}
-					await updateCommit.getMethod('order', updateTempCommit(commits));
-					if (commits.length && commits[0].split) {
+					await updateCommit.getMethod('order', 'updateTempCommit')(commits);
+					if (commits.length && commits[0].data && commits[0].data.split) {
 						return commits[0].update.create;
 					}
 					return await updateCommit.getMethod('order', 'buildTempOrder')(table);
 				}
 			}
 		})
-		updateCommit.getMethod('order', resumeQueue());
+		updateCommit.getMethod('order', 'resumeQueue')();
+		updateCommit.getMethod('report', 'resumeQueue')();
+		updateCommit.getMethod('pos', 'resumeQueue')();
 	}
 
 	turnOff() {

@@ -9,6 +9,8 @@
                   v-model="useMultiPrinterForEntirePrinter" @change="changeSetting"/>
       <g-checkbox color="#1271FF" :label="$t('settings.showDineInTax')"
                   v-model="showDineInTax"/>
+      <g-checkbox color="#1271FF" label="Merge items after printing to kitchen"
+                  v-model="mergeAfterPrint"/>
     </div>
     <div class="setting-title">{{$t('settings.entireReceiptNo')}}</div>
     <div class="row-flex flex-wrap">
@@ -76,6 +78,18 @@
           if (!val) this.$emit('setSinglePrinter', 'entire')
         }
       },
+      mergeAfterPrint: {
+        get() {
+          if (this.printerGeneralSetting) {
+            return this.printerGeneralSetting.mergeAfterPrint
+          }
+        },
+        set(val) {
+          this.$set(this.printerGeneralSetting, 'mergeAfterPrint', val)
+          this.updatePosSetting('printerGeneralSetting.mergeAfterPrint', val)
+        }
+      },
+
     },
     methods: {
       async changeSetting() {

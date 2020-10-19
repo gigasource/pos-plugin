@@ -132,7 +132,7 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.alignLeft();
   escPrinter.bold(false);
   escPrinter.println(`Payment method:`);
-  payment.map(({ type, value }) => {
+  payment.map(({type, value}) => {
     escPrinter.leftRight(capitalize(type), `${convertMoney(value)}`)
   })
   escPrinter.newLine();
@@ -146,7 +146,7 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(printer, printData) {
+async function printCanvas(canvasPrinter, printData) {
   const {
     companyName,
     companyAddress,
@@ -171,85 +171,83 @@ async function printCanvas(printer, printData) {
     return !isNaN(value) ? value.toFixed(2) : value
   }
 
-  printer.alignCenter();
-  printer.setFontSize(30);
-  printer.bold(true);
-  printer.println(companyName);
-  printer.newLine(4);
-  printer.bold(false);
-  printer.setFontSize(20);
-  printer.println(companyAddress);
-  printer.println(`Tel: ${companyTel}`);
-  printer.println(`VAT Reg No: ${companyVatNumber}`);
+  await canvasPrinter.alignCenter();
+  await canvasPrinter.setFontSize(30);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(companyName);
+  await canvasPrinter.newLine(4);
+  await canvasPrinter.bold(false);
+  await canvasPrinter.setFontSize(20);
+  await canvasPrinter.println(companyAddress);
+  await canvasPrinter.println(`Tel: ${companyTel}`);
+  await canvasPrinter.println(`VAT Reg No: ${companyVatNumber}`);
 
-  printer.newLine(10);
-  printer.bold(true);
-  printer.setFontSize(40);
-  printer.println('Invoice');
-  printer.newLine(10);
-  printer.bold(false);
+  await canvasPrinter.newLine(10);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.setFontSize(40);
+  await canvasPrinter.println('Invoice');
+  await canvasPrinter.newLine(10);
+  await canvasPrinter.bold(false);
 
-  printer.setFontSize(25);
-  printer.alignLeft();
-  printer.println(`Date: ${orderDate}`);
-  printer.newLine(4);
-  printer.println(`Time: ${orderTime}`);
-  printer.newLine(4);
-  printer.println(`Invoice No: ${orderNumber}`);
+  await canvasPrinter.setFontSize(25);
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.println(`Date: ${orderDate}`);
+  await canvasPrinter.newLine(4);
+  await canvasPrinter.println(`Time: ${orderTime}`);
+  await canvasPrinter.newLine(4);
+  await canvasPrinter.println(`Invoice No: ${orderNumber}`);
 
-  printer.newLine(16);
-  printer.bold(true);
-  printer.tableCustom([
+  await canvasPrinter.newLine(16);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.tableCustom([
     {text: 'Item', align: 'LEFT', width: 0.4},
     {text: 'Q.ty', align: 'RIGHT', width: 0.15},
     {text: 'Unit price', align: 'RIGHT', width: 0.2},
     {text: 'Total', align: 'RIGHT', width: 0.25},
   ]);
-  printer.newLine(8);
-  printer.drawLine();
+  await canvasPrinter.newLine(8);
+  await canvasPrinter.drawLine();
 
-  printer.bold(false);
-  orderProductList.forEach(product => {
-    printer.tableCustom([
+  await canvasPrinter.bold(false);
+  await Promise.all(orderProductList.map(async product => {
+    await canvasPrinter.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
       {text: product.quantity, align: 'RIGHT', width: 0.15},
       {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.2},
       {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.25},
     ]);
-    printer.newLine(4);
-  });
-  printer.drawLine();
+    await canvasPrinter.newLine(4);
+  }));
+  await canvasPrinter.drawLine();
 
-  printer.leftRight('Sub-total', convertMoney(orderSum - orderTax));
-  if (!isNaN(discount) && discount > 0) printer.leftRight('Discount', convertMoney(discount));
-  orderTaxGroups.forEach(taxGroup => {
-    printer.leftRight(`Tax (${taxGroup.taxType}%)`, convertMoney(taxGroup.tax));
-  });
-  printer.drawLine();
+  await canvasPrinter.leftRight('Sub-total', convertMoney(orderSum - orderTax));
+  if (!isNaN(discount) && discount > 0) await canvasPrinter.leftRight('Discount', convertMoney(discount));
+  await Promise.all(orderTaxGroups.map(async taxGroup => {
+    await canvasPrinter.leftRight(`Tax (${taxGroup.taxType}%)`, convertMoney(taxGroup.tax));
+  }));
+  await canvasPrinter.drawLine();
 
-  printer.bold(true);
-  printer.leftRight('Total', `${convertMoney(orderSum)}`);
-  printer.bold(false);
-  if (orderCashReceived || orderCashReceived === 0)
-    printer.leftRight('Cash tend', `${convertMoney(orderCashReceived)}`);
-  printer.drawLine();
+  await canvasPrinter.bold(true);
+  await canvasPrinter.leftRight('Total', `${convertMoney(orderSum)}`);
+  await canvasPrinter.bold(false);
+  if (orderCashReceived || orderCashReceived === 0) await canvasPrinter.leftRight('Cash tend', `${convertMoney(orderCashReceived)}`);
+  await canvasPrinter.drawLine();
 
-  printer.bold(true);
-  if (orderCashback || orderCashback === 0)
-    printer.leftRight('Change due', `${convertMoney(orderCashback)}`);
-  printer.alignLeft();
-  printer.bold(false);
-  printer.newLine();
-  printer.println(`Payment method: ${capitalize(orderPaymentType)}`);
-  printer.newLine(14);
+  await canvasPrinter.bold(true);
+  if (orderCashback || orderCashback === 0) await canvasPrinter.leftRight('Change due', `${convertMoney(orderCashback)}`);
+  await canvasPrinter.alignLeft();
+  await canvasPrinter.bold(false);
+  await canvasPrinter.newLine();
+  await canvasPrinter.println(`Payment method: ${capitalize(orderPaymentType)}`);
+  await canvasPrinter.newLine(14);
 
-  printer.alignCenter();
-  printer.printBarcode(orderBookingNumber);
-  printer.println(`Invoice ID: ${orderBookingNumber}`);
-  printer.newLine(8);
-  printer.bold(true);
-  printer.println(`Thank you for choosing ${companyName}`);
-  await printer.print();
+  await canvasPrinter.alignCenter();
+  await canvasPrinter.printBarcode(orderBookingNumber);
+  await canvasPrinter.println(`Invoice ID: ${orderBookingNumber}`);
+  await canvasPrinter.newLine(8);
+  await canvasPrinter.bold(true);
+  await canvasPrinter.println(`Thank you for choosing ${companyName}`);
+  await canvasPrinter.print();
 }
 
 async function printSsr(printer, printData) {

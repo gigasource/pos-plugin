@@ -1618,6 +1618,21 @@
       "schemaType": "number",
       "key": "numberOfCustomers",
       "type": "input@number"
+    },
+    {
+      "_id": "5f8aba5c958a5304801d8878",
+      "schemaType": "mixed",
+      "key": "recentItems"
+    },
+    {
+      "_id": "5f8aba5c958a5304801d8879",
+      "schemaType": "mixed",
+      "key": "recentCancellationItems"
+    },
+    {
+      "_id": "5f8ac61fbfbfab7940e30961",
+      "schemaType": "boolean",
+      "key": "immediatePay"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

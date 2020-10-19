@@ -24,7 +24,7 @@
     name: 'RestaurantRoom',
     injectService: ['PosStore:isMobile'],
     props: {
-      id: String
+      id: null
     },
     data() {
       return {
@@ -44,6 +44,9 @@
           await this.loadTableStatus()
         }, 500)
       })
+      cms.socket.on('updateRooms', async () => {
+        await this.loadRoom()
+      })
     },
     activated() {
       setTimeout(async () => {
@@ -51,6 +54,7 @@
       }, 500)
     },
     destroyed() {
+      cms.socket.off('updateRooms');
       cms.socket.off('update-table-status')
     },
     watch: {
@@ -124,7 +128,7 @@
         // create $set table commit
         const currentCommits = await cms.getModel('OrderCommit').find({ orderId: order.id })
         const table = roomObj.name;
-        await cms.getModel('OrderCommit').create(['order', 'changeTable'].map(type => {
+        await cms.getModel('OrderCommit').addCommits(['order', 'changeTable'].map(type => {
           return {
             type,
             where: { _id: order._id },

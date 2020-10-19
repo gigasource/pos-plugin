@@ -886,6 +886,11 @@
             "3",
             "4"
           ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "mergeAfterPrint",
+          "type": "input@checkbox"
         }
       ]
     },

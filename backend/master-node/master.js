@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
@@ -18,6 +19,7 @@ const updateCommits = async (commits) => {
 }
 
 const requireSync = (type, oldHighestCommitId, ack) => {
+	if (!updateCommit.commitType.includes(type)) return;
 	const commit = {
 		type,
 		action: 'requireSync',
@@ -89,7 +91,7 @@ class Master {
 		await _this.getStoreId();
 		cms.Types['OrderCommit'].Model = new Proxy(_model, {
 			get(target, key) {
-				if (key != 'create') {
+				if (key != 'addCommits') {
 					return target[key];
 				}
 				return async function (commits) {
@@ -105,7 +107,7 @@ class Master {
 						})
 						updateCommit.handleCommit(commits);
 						await updateCommit.getMethod('order', 'updateTempCommit')(commits);
-						if (commits.length && commits[0].split) {
+						if (commits.length && commits[0].data && commits[0].data.split) {
 							return JSON.parse(commits[0].update.query);
 						}
 						return await updateCommit.getMethod('order', 'buildTempOrder')(table);
@@ -118,6 +120,7 @@ class Master {
 
 		updateCommit.getMethod('order', 'resumeQueue')();
 		updateCommit.getMethod('report', 'resumeQueue')();
+		updateCommit.getMethod('pos', 'resumeQueue')();
 		updateCommit.getMethod('inventory', 'resumeQueue')();
 		updateCommit.getMethod('inventoryCategory', 'resumeQueue')();
 	}

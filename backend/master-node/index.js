@@ -7,6 +7,17 @@ const _ = require('lodash')
 let handler;
 
 module.exports = function (cms) {
+	const _model = cms.Types['OrderCommit'].Model;
+	cms.Types['OrderCommit'].Model = new Proxy(_model, {
+		get(target, key) {
+			if (key != 'addCommits') {
+				return target[key];
+			}
+			return function () {
+				console.warn('Node or Master has not started yet!');
+			}
+		}
+	})
 	// console.debug(getBaseSentryTags('initHandler'), '1. Set handler');
 	// init frontend socket beforehand
 	this.cms.socket.on('connect', socket => {

@@ -190,7 +190,7 @@
 
         this.$emit('updateCurrentOrder', 'payment', [])
         const newItem = {
-          name: item.name,
+          type: item.name,
           value: isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
             : item.value,
@@ -215,7 +215,7 @@
             return this.$emit('updateCurrentOrder', 'payment',
               [
                 {
-                  name: cashPayment ? 'cash' : 'card',
+                  type: cashPayment ? 'cash' : 'card',
                   value: (cashPayment ? cashPayment.value : cardPayment.value) - item.value
                 },
                 ...filtered, item
@@ -251,7 +251,7 @@
 
         this.$emit('updateCurrentOrder', 'tip', tip)
         this.$emit('updateCurrentOrder', 'payment',
-          [{ name: 'card', value: +this.tipEditValue }, ...filtered,])
+          [{ type: 'card', value: +this.tipEditValue }, ...filtered,])
 
         this.showAddTipDialog = false
         this.tipEditValue = ''
@@ -259,11 +259,11 @@
       },
       saveMulti() {
         this.$emit('updateCurrentOrder', 'payment', [
-          { name: 'card', value: +this.cardEditValue, replaceMode: false },
+          { type: 'card', value: +this.cardEditValue, replaceMode: false },
 
           // replaceMode is used for overwriting instead of appending to payment value
           // after the first character is entered, replaceMode will be set to false
-          { name: 'cash', value: +this.cashEditValue, replaceMode: true },
+          { type: 'cash', value: +this.cashEditValue, replaceMode: true },
         ])
         this.showMultiPaymentDialog = false
       },

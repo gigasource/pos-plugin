@@ -354,8 +354,12 @@
       await this.loadRooms()
       this.showAddNewRoomBtn = true
       this.timeInterval = setInterval(() => this.now = dayjs().format('HH:mm'), 1000)
+      cms.socket.on('updateRooms', async () => {
+        await this.loadRooms()
+      })
     },
     beforeDestroy() {
+      cms.socket.off('updateRooms');
       clearInterval(this.timeInterval)
     },
   }
