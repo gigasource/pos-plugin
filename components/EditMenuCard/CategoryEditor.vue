@@ -7,7 +7,7 @@
         @input="changeOrderLayoutColumn"/>
 
     <div class="category-editor__label">{{$t('ui.name')}}</div>
-    <g-text-field-bs border-color="#979797" :value="selectedCategoryLayout.name">
+    <g-text-field-bs border-color="#979797" :value="selectedCategoryLayout.name" @input="debouncedUpdateCategory({ name: $event })">
       <template v-slot:append-inner>
         <g-icon style="cursor: pointer" @click="dialog.showCategoryNameKbd = true">icon-keyboard</g-icon>
       </template>
@@ -57,14 +57,15 @@
       orderLayout: Object,
       selectedCategoryLayout: Object,
     },
-    data: function () {
+    data() {
       return {
         colors: ['#FFFFFF', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91'],
         dialog: {
           showCategoryNameKbd: false
         },
         showSnackbar: false,
-        notifyContent: null
+        notifyContent: null,
+        debouncedUpdateCategory: () => null
       }
     },
     computed: {
@@ -74,6 +75,9 @@
       cateCols() {
         return this.selectedCategoryLayout.columns
       },
+    },
+    created() {
+      this.debouncedUpdateCategory = _.debounce(this.updateCategory, 300)
     },
     methods: {
       async changeOrderLayoutColumn(columns) {

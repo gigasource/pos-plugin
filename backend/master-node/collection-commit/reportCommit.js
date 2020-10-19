@@ -3,17 +3,20 @@ const Queue = require('better-queue');
 async function reportCommit(updateCommit) {
 	const TYPENAME = 'report';
 
-	if (!updateCommit[TYPENAME])
+	if (!updateCommit[TYPENAME]) {
 		updateCommit[TYPENAME] = {}
-
-	updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
-		const { commits } = data;
-		for (let commit of commits) {
-			await updateCommit.getMethod(TYPENAME, commit.action)(commit);
-		}
-		cb(null);
-	});
-	updateCommit[TYPENAME].queue.pause();
+		updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
+			const { commits } = data;
+			for (let commit of commits) {
+				await updateCommit.getMethod(TYPENAME, commit.action)(commit);
+			}
+			cb(null);
+		});
+		updateCommit[TYPENAME].queue.pause();
+		updateCommit.registerMethod(TYPENAME, 'resumeQueue', function() {
+			updateCommit[TYPENAME].queue.resume();
+		})
+	}
 
 	updateCommit.registerMethod(TYPENAME, 'doTask', async function(commits) {
 		updateCommit[TYPENAME].queue.push({

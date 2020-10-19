@@ -146,7 +146,7 @@
           orderLayout = await cms.getModel('OrderLayout').findOneAndUpdate(qry, set, { new: true })
         }
         this.clearCategoryAction()
-        this.$emit('update:orderLayout', orderLayout)
+        // this.$emit('update:orderLayout', orderLayout)
       },
       clearCategoryAction() {
         console.log('clear category action')
@@ -172,7 +172,7 @@
                 this.prevCategoryLayout)
 
           this.clearProductAction()
-          this.$emit('update:orderLayout', result)
+          // this.$emit('update:orderLayout', result)
         } else {
           // switch in 2 categories
           console.log('TODO: switching products between category is not implemented')

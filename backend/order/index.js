@@ -77,7 +77,7 @@ module.exports = (cms) => {
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
       const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
         if (listOrder && listOrder.items && listOrder.items.length) {
-          list.push(getPrintCommit(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device))
+          list.push(getPrintCommit(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device, oldOrder))
         }
         return list
       }, [])
@@ -145,12 +145,12 @@ module.exports = (cms) => {
         actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
         if (recentItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
-          actionList.push(getPrintCommit('kitchenAdd', printOrder, device))
+          actionList.push(getPrintCommit('kitchenAdd', printOrder, device, oldOrder))
         }
 
         if (recentCancellationItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
-          actionList.push(getPrintCommit('kitchenCancel', printOrder, device))
+          actionList.push(getPrintCommit('kitchenCancel', printOrder, device, oldOrder))
         }
 
         let newOrder
@@ -201,19 +201,6 @@ module.exports = (cms) => {
           actionList.push(...updates)
           actionList.push({
             type: 'order',
-            action: 'update',
-            where: JSON.stringify({ _id: mappedOrder._id }),
-            data: {
-              table: mappedOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: JSON.stringify({
-                $set: { recentCancellationItems: [], recentItems: [] }
-              })
-            }
-          }, {
-            type: 'order',
             action: 'closeOrder',
             where: JSON.stringify({ _id: mappedOrder._id }),
             data: {
@@ -226,6 +213,20 @@ module.exports = (cms) => {
                 $set: { status: 'paid' }
               })
             }
+          }, {
+            type: 'order',
+            action: 'update',
+            where: JSON.stringify({ _id: mappedOrder._id }),
+            data: {
+              table: mappedOrder.table,
+              allowMutateInactiveOrder: true
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: JSON.stringify({
+                $set: { recentCancellationItems: [], recentItems: [] }
+              })
+            }
           })
           actionList = markPrintedItemCommits(actionList)
           newOrder = await createOrderCommits(actionList)
@@ -233,7 +234,7 @@ module.exports = (cms) => {
 
         if (print) {
           await cms.getModel('OrderCommit').addCommits([
-            getPrintCommit('invoice', mappedOrder, device)])
+            getPrintCommit('invoice', mappedOrder, device, oldOrder)])
         }
 
         cb(newOrder)
@@ -533,12 +534,13 @@ function getRecentItemCommits(recentItems, recentCancellationItems, order) {
   return actionList
 }
 
-function getPrintCommit(printType, order, device) {
+function getPrintCommit(printType, order, device, oldOrder) {
   return {
     type: 'order',
     action: 'printOrder',
     printType: printType,
     order,
-    device
+    device,
+    oldOrder
   }
 }
