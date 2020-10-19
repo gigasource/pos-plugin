@@ -52,8 +52,16 @@ class Master {
 				})
 				socket.on('updateCommits', updateCommits);
 				socket.on('requireSync', requireSync);
+
+				socket.on('nodeCall', (...args) => {
+					cms.bridge.emit(args[0], ...args.slice(1));
+				});
 			})
 		})
+
+		cms.bridge.emitToMaster = function (eventName, ...args) {
+			cms.bridge.emit(eventName, ...args);
+		}
 	}
 
 	async getStoreId() {
@@ -75,6 +83,9 @@ class Master {
 		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : global.APP_CONFIG.deviceIp}:${global.APP_CONFIG.port}`));
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
+		_this.onlineOrderSocket.on('nodeCall', (...args) => {
+			cms.bridge.emit(args[0], ...args.slice(1));
+		})
 		await cms.execPostAsync('load:syncDb');
 	}
 
@@ -144,12 +155,7 @@ class Master {
 	}
 
 	async syncDataToOnlineOrder() {
-		await syncExistingData();
-	}
-
-	async sendChangeRequest(commit) {
-		commit.storeId = await this.getStoreId();
-		updateCommit.handleCommit([commit]);
+		await syncExistingData(await this.getStoreId(), this.onlineOrderSocket);
 	}
 }
 

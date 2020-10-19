@@ -7,6 +7,13 @@ const _ = require('lodash')
 let handler;
 
 module.exports = function (cms) {
+	// pre define cms.bridge
+	if (!cms.bridge) cms.bridge = {
+		emitToMaster: function () {
+			console.warn('Master is not started');
+		}
+	}
+	require('event-emitter')(cms.bridge);
 	const _model = cms.Types['OrderCommit'].Model;
 	cms.Types['OrderCommit'].Model = new Proxy(_model, {
 		get(target, key) {

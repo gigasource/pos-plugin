@@ -4,6 +4,7 @@ const socketClient = require('socket.io-client');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
 const updateCommit = require('./updateCommit');
+const _ = require('lodash');
 
 const nodeSync = async function (commits) {
 	/*
@@ -53,6 +54,9 @@ const connectToMaster = async (_this, masterIp) => {
 			})
 		}, 200)
 	})
+	_this.socket.on('masterCall', (...args) => {
+		cms.bridge.emit(args[0], ...args.slice(1));
+	})
 }
 
 class Node {
@@ -71,6 +75,19 @@ class Node {
 			this.masterClientId = masterClientId;
 			if (masterIp) await connectToMaster(this, masterIp);
 		})
+		const _this = this;
+		cms.bridge.emitToMaster = function (eventName, ...args) {
+			if (typeof _.last(args) === 'function') {
+				const func = args.pop();
+				args.push(_.once(func));
+			}
+			if (_this.socket && _this.socket.connected) {
+				_this.socket.emit('nodeCall', eventName, ...args);
+			}
+			if (_this.onlineOrderSocket && _this.onlineOrderSocket.connected) {
+				_this.socket.emit(eventName, ...args);
+			}
+		}
 		setTimeout(async () => {
 			await cms.execPostAsync('load:masterClientId');
 		}, 0)
@@ -109,6 +126,9 @@ class Node {
 						oldHighestCommitId, storeId, nodeSync);
 				}
 			})
+		})
+		_this.onlineOrderSocket.on('masterCall', (...args) => {
+			cms.bridge.emit(args[0], ...args.slice(1));
 		})
 		_this.onlineOrderSocket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
 			if (masterIp != posSettings.masterIp) {
