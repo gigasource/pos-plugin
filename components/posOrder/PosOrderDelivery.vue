@@ -46,7 +46,7 @@
               </div>
               <div class="row-flex">
                 <div class="col-9">
-                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable virtual-event
+                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable virtual-event skip-search
                               :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
                               @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
@@ -218,7 +218,7 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable virtual-event
+          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable virtual-event skip-search
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
@@ -1290,6 +1290,7 @@
         .g-list-item-text {
           white-space: normal;
           word-break: break-word;
+          line-height: 1.35;
         }
       }
 
