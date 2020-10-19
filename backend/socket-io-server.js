@@ -704,6 +704,10 @@ module.exports = async function (cms) {
         if (!device) return fn(null, null);
         fn(device.metadata ? device.metadata.ip : null, device._id.toString());
       })
+
+      socket.on('nodeCall', (masterClientId, eventName, ...args) => {
+        externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
+      })
     }
 
     /** @deprecated */
