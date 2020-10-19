@@ -88,6 +88,7 @@ class Node {
 				_this.onlineOrderSocket.emit('nodeCall', _this.masterClientId, eventName, ...args);
 			}
 		}
+		cms.emit('bridge:inited');
 		setTimeout(async () => {
 			await cms.execPostAsync('load:masterClientId');
 		}, 0)

@@ -62,6 +62,7 @@ class Master {
 		cms.bridge.emitToMaster = function (eventName, ...args) {
 			cms.bridge.emit(eventName, ...args);
 		}
+		cms.emit('bridge:inited');
 	}
 
 	async getStoreId() {
