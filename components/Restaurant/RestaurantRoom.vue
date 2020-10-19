@@ -39,19 +39,8 @@
     async created() {
       await this.loadRoom()
       await this.loadTableStatus()
-      cms.socket.on('update-table-status', () => {
-        setTimeout(async () => {
-          await this.loadTableStatus()
-        }, 500)
-      })
-      cms.socket.on('updateRooms', async () => {
-        await this.loadRoom()
-      })
-    },
-    activated() {
-      setTimeout(async () => {
-        await this.loadTableStatus()
-      }, 500)
+      cms.socket.on('update-table-status', this.loadTableStatus)
+      cms.socket.on('updateRooms', this.loadRoom)
     },
     destroyed() {
       cms.socket.off('updateRooms');
