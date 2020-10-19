@@ -175,6 +175,11 @@
           "schemaType": "boolean",
           "key": "startOnBoot",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "manageInventory",
+          "type": "input@switch"
         }
       ]
     },
