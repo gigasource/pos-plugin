@@ -190,7 +190,7 @@ async function orderCommit(updateCommit) {
 					await updateCommit.orderCommitModel.create(commit);
 				}
 			}
-			return result;
+			return true;
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;
@@ -307,7 +307,7 @@ async function orderCommit(updateCommit) {
 			delete updateCommit[TYPENAME].activeOrders[commit.data.table];
 			setCommitId(commit);
 			await updateCommit.orderCommitModel.create(commit);
-			return result;
+			return true;
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;
@@ -391,7 +391,7 @@ async function orderCommit(updateCommit) {
 				const order = await cms.getModel('Order').findById(commit.order._id)
 				if (order) commit.order.id = order.toJSON().id
 			}
-			await cms.execPostAsync('run:print', null, [commit]);
+			cms.execPostAsync('run:print', null, [commit]);
 		} catch (err) {
 			console.error('Error occurred', err);
 			return null;

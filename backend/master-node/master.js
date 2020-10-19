@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
@@ -18,6 +19,7 @@ const updateCommits = async (commits) => {
 }
 
 const requireSync = (type, oldHighestCommitId, ack) => {
+	if (!updateCommit.commitType.includes(type)) return;
 	const commit = {
 		type,
 		action: 'requireSync',
