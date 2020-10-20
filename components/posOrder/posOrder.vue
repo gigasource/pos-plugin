@@ -71,7 +71,7 @@
           </g-btn-bs>
           <g-btn-bs
               v-else
-              :disabled="unprintedItemCount === 0"
+              :disabled="orderHasChanges"
               width="75"
               style="font-size: 14px; padding: 0; border: none"
               background-color="#1271FF"
