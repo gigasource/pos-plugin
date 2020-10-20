@@ -202,28 +202,8 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.print();
 }
 
-async function printSsr(printer, printData) {
-  const XReport = require('../../dist/XReport.vue');
-
-  const printComponent = new Vue({
-    components: {XReport},
-    render(h) {
-      return h('XReport', {props: printData})
-    }
-  });
-
-  vueSsrRenderer.renderToString(printComponent, {}, async (err, html) => {
-    if (err) throw err;
-
-    const reportImage = await convertHtmlToPng(html);
-    printer.printPng(reportImage);
-    await printer.print();
-  });
-}
-
 module.exports = {
   makePrintData,
-  printSsr,
   printEscPos,
   printCanvas
 }

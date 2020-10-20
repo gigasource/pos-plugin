@@ -285,39 +285,8 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
   await canvasPrinter.print()
 }
 
-async function printSsr(printer, printData, groupPrinter) {
-  const KitchenDelivery = require('../../dist/KitchenDelivery.vue');
-
-  let filteredItems = printData.items.filter(item => item.groupPrinter === groupPrinter || item.groupPrinter2 === groupPrinter)
-  if (!filteredItems.length) return
-
-  const component = new Vue({
-    components: {KitchenDelivery},
-    render(h) {
-      return h('KitchenDelivery', {
-        props: {
-          ...Object.assign({}, printData, {
-            items: filteredItems
-          }),
-          fontSize: printer.fontSize,
-          marginTop: printer.marginTop
-        }
-      })
-    }
-  })
-
-  vueSsrRenderer.renderToString(component, {}, async (err, html) => {
-    if (err) throw err
-
-    const reportPng = await convertHtmlToPng(html)
-    printer.printPng(reportPng)
-    await printer.print()
-  })
-}
-
 module.exports = {
   makePrintData,
   printEscPos,
-  printSsr,
   printCanvas
 }
