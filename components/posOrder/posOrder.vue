@@ -52,7 +52,7 @@
         <template v-if="smallSidebar">
           <g-btn-bs
               v-if="showPrint"
-              :disabled="unprintedItemCount === 0"
+              :disabled="disablePrintBtn"
               width="75"
               style="font-size: 14px; padding: 0; border: none"
               background-color="#1271FF"
@@ -235,7 +235,7 @@
         return []
       },
       disablePrintBtn() {
-        return this.items.filter(i => i.quantity > 0 && !i.printed).length === 0
+        return !this.unprintedItemCount && !this.orderHasChanges
       },
       showPrint() {
         // return this.items.filter(i => !i.sent).length > 0
@@ -251,7 +251,7 @@
       unprintedItemCount() {
         if (!this.items || !this.items.length) return 0;
 
-        return this.items.reduce((acc, item) => acc + item.quantity, 0);
+        return this.items.reduce((acc, item) => item.printed ? acc : acc + item.quantity, 0);
       },
       orderHasChanges() {
         const printedOrderItems = (this.printedOrder && this.printedOrder.items) || [];

@@ -305,6 +305,25 @@ async function orderCommit(updateCommit) {
     }
   })
 
+  updateCommit.registerMethod(TYPENAME, 'delete', async function (commit) {
+    try {
+      if (!checkOrderActive(commit)) return;
+      const query = commit.update.query ? JsonFn.parse(commit.update.query) : {};
+      const condition = getCondition(commit);
+      await updateCommit.orderModel[commit.update.method](condition, query);
+      delete updateCommit[TYPENAME].activeOrders[commit.data.table];
+      commit.where = JsonFn.stringify(condition);
+      setCommitId(commit);
+      await updateCommit.orderCommitModel.create(commit);
+      if (commit.data.table) {
+        await updateCommit.orderCommitModel.deleteMany({temp: true, table: commit.data.table})
+      }
+    } catch (err) {
+      console.error('Error occurred', err);
+      return null;
+    }
+  })
+
   updateCommit.registerMethod(TYPENAME, 'changeTable', async function (commit) {
     try {
       const result =
@@ -387,8 +406,10 @@ async function orderCommit(updateCommit) {
       })
       await Promise.all(promiseList);
       const result = await updateCommit.orderModel.findOne({_id}).lean();
-      delete result._id;
-      if (updateCommit[TYPENAME].activeOrders[table]) result._id = updateCommit[TYPENAME].activeOrders[table]._id;
+      if (result) {
+        delete result._id;
+        if (updateCommit[TYPENAME].activeOrders[table]) result._id = updateCommit[TYPENAME].activeOrders[table]._id;
+      }
       await updateCommit.orderModel.deleteMany({_id});
       return result;
     } catch (err) {

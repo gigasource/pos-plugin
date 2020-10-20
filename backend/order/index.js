@@ -105,6 +105,7 @@ module.exports = (cms) => {
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
+      if (!newOrder.items.some(i => i.quantity > 0)) await cancelOrder(newOrder)
       cb(newOrder)
     })
 
@@ -298,7 +299,25 @@ module.exports = (cms) => {
       }
       cb(newOrder)
     })
+
+    socket.on('cancel-order', cancelOrder)
   })
+
+  async function cancelOrder ({ _id, table }, cb = () => null) {
+    if (!_id) return cb()
+
+    await cms.getModel('OrderCommit').addCommits([{
+      type: 'order',
+      action: 'delete',
+      where: JSON.stringify({ _id }),
+      data: { table },
+      update: {
+        method: 'deleteOne'
+      }
+    }]);
+
+    cb()
+  }
 
   async function mapOrder(order, user) {
     const date = new Date()
