@@ -80,7 +80,6 @@
       },
       print() {
         this.$emit('saveTableOrder')
-        this.$router.go(-1)
       }
     }
   }
