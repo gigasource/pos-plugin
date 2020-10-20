@@ -105,11 +105,18 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.bold(false);
   orderProductList.forEach(product => {
+    const productUnitPrice = product.modifiers && product.modifiers.length > 0
+      ? product.modifiers.reduce((totalPrice, modifier) => {
+        const modifierPrice = modifier.price * modifier.quantity
+        return totalPrice + modifierPrice;
+      }, product.originalPrice)
+      : product.originalPrice
+
     escPrinter.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
       {text: product.quantity, align: 'RIGHT', width: 0.1},
-      {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.25},
-      {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.22},
+      {text: convertMoney(productUnitPrice), align: 'RIGHT', width: 0.25},
+      {text: convertMoney(product.quantity * productUnitPrice), align: 'RIGHT', width: 0.22},
     ]);
   });
   escPrinter.drawLine();
@@ -212,11 +219,18 @@ async function printCanvas(canvasPrinter, printData) {
 
   for (let i = 0; i < orderProductList.length; i++) {
     const product = orderProductList[i];
+    const productUnitPrice = product.modifiers && product.modifiers.length > 0
+      ? product.modifiers.reduce((totalPrice, modifier) => {
+        const modifierPrice = modifier.price * modifier.quantity
+        return totalPrice + modifierPrice;
+      }, product.originalPrice)
+      : product.originalPrice;
+
     await canvasPrinter.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
       {text: product.quantity, align: 'RIGHT', width: 0.15},
-      {text: convertMoney(product.originalPrice), align: 'RIGHT', width: 0.2},
-      {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.25},
+      {text: convertMoney(productUnitPrice), align: 'RIGHT', width: 0.2},
+      {text: convertMoney(product.quantity * productUnitPrice), align: 'RIGHT', width: 0.25},
     ]);
     await canvasPrinter.newLine(4);
   }
