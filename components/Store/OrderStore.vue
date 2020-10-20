@@ -764,7 +764,7 @@
         })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
           this.actionList = [];
-          this.currentOrder = { items: [], hasOrderWideDiscount: false }
+          // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
       },
       setNewPrice(price, product) {

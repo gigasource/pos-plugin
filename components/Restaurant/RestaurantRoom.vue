@@ -24,7 +24,8 @@
     name: 'RestaurantRoom',
     injectService: ['PosStore:isMobile'],
     props: {
-      id: null
+      id: null,
+      currentOrder: null
     },
     data() {
       return {
@@ -45,6 +46,12 @@
     destroyed() {
       cms.socket.off('updateRooms');
       cms.socket.off('update-table-status')
+    },
+    activated() {
+      if (this.currentOrder.items.length && !this.inProgressTable.includes(this.currentOrder.table)) {
+        this.inProgressTable.push(this.currentOrder.table)
+      }
+      this.$emit('resetOrderData')
     },
     watch: {
       id() {
