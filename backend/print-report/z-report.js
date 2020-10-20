@@ -173,13 +173,16 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
-  await Promise.all(Object.keys(reportGroups).map(async key => {
-    await canvasPrinter.println(`Tax (${key}%)`);
-    await canvasPrinter.leftRight('Total', convertMoney(reportGroups[key][`sum${key}`]));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(reportGroups[key][`net${key}`]));
-    await canvasPrinter.leftRight('Tax', convertMoney(reportGroups[key][`tax${key}`]));
+
+  const groupTypes = Object.keys(reportGroups);
+  for (let i = 0; i < groupTypes.length; i++) {
+    const groupType = groupTypes[i];
+    await canvasPrinter.println(`Tax (${groupType}%)`);
+    await canvasPrinter.leftRight('Total', convertMoney(reportGroups[groupType][`sum${groupType}`]));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(reportGroups[groupType][`net${groupType}`]));
+    await canvasPrinter.leftRight('Tax', convertMoney(reportGroups[groupType][`tax${groupType}`]));
     await canvasPrinter.newLine();
-  }));
+  }
 
   await canvasPrinter.bold(false);
   await canvasPrinter.leftRight('Discount', `${convertMoney(discount)}`);
@@ -187,9 +190,12 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
-  await Promise.all(Object.keys(reportByPayment).map(async paymentType => {
+
+  const paymentTypes = Object.keys(reportByPayment);
+  for (let i = 0; i < paymentTypes.length; i++) {
+    const paymentType = paymentTypes[i];
     await canvasPrinter.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
-  }));
+  }
 
   await canvasPrinter.print();
 }

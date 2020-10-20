@@ -113,7 +113,10 @@ async function printCanvas(canvasPrinter, printData) {
 
   if (groupByTax) {
     await canvasPrinter.bold(false);
-    await Promise.all(Object.keys(groupByTax).map(async taxGroup => {
+
+    const taxGroups = Object.keys(groupByTax);
+    for (let i = 0; i < taxGroups.length; i++) {
+      const taxGroup = taxGroups[i];
       const {gross, net, salesTax} = groupByTax[taxGroup];
 
       await canvasPrinter.println(`Tax ${taxGroup}%:`);
@@ -121,7 +124,7 @@ async function printCanvas(canvasPrinter, printData) {
       await canvasPrinter.leftRight('Sub-total', convertMoney(net));
       await canvasPrinter.leftRight('Tax', convertMoney(salesTax));
       await canvasPrinter.newLine();
-    }));
+    }
   }
 
   if (user[name]) {
@@ -134,10 +137,13 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   if (groupByPayment) {
-    await Promise.all(Object.keys(groupByPayment).map(async paymentType => {
+    const paymentTypes = Object.keys(groupByPayment);
+    for (let i = 0; i < paymentTypes.length; i++) {
+      const paymentType = paymentTypes[i];
       const saleAmount = groupByPayment[paymentType];
       await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)} Sales: ${convertMoney(saleAmount)}`);
-    }));
+    }
+
     await canvasPrinter.println(`Returned Total: ${convertMoney(0)}`);
   }
 

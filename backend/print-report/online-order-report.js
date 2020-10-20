@@ -237,7 +237,10 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
   await canvasPrinter.drawLine()
 
   await canvasPrinter.setTextNormal()
-  await Promise.all(items.map(async item => {
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+
     await canvasPrinter.tableCustom([
       {text: (item.id && `${item.id}.`) + item.name, align: 'LEFT', width: itemColumnWidth},
       {text: `${item.quantity}`, align: 'RIGHT', width: 0.12},
@@ -246,7 +249,8 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
     ])
 
     if (item.modifiers && item.modifiers.length) {
-      await Promise.all(item.modifiers.map(async mod => {
+      for (let j = 0; j < item.modifiers.length; j++) {
+        const mod = item.modifiers[j];
         const modifierText = `* ${mod.name}`
 
         await canvasPrinter.tableCustom([
@@ -255,16 +259,17 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
           {text: `${convertMoney(mod.price)}`, align: 'RIGHT', width: 0.22},
           {text: `${convertMoney((mod.price) * mod.quantity * item.quantity)}`, align: 'RIGHT', width: 0.22},
         ])
-      }));
+      }
     }
-  }));
+  }
 
   await canvasPrinter.drawLine()
   type === 'delivery' && await canvasPrinter.leftRight(locale.printing.shippingFee, convertMoney(getShippingFee(printData)))
 
-  await Promise.all(discounts.map(async item => {
+  for (let i = 0; i < discounts.length; i++) {
+    const item = discounts[i];
     await canvasPrinter.leftRight(item.coupon ? `Coupon (${item.coupon})` : item.name, `-${convertMoney(item.value)}`)
-  }))
+  }
 
   await canvasPrinter.bold(true)
   await canvasPrinter.leftRight(locale.printing.total, `${locale.printing.currency} ${convertMoney(orderSum)}`)

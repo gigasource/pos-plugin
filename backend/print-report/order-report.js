@@ -209,7 +209,9 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
-  await Promise.all(orderProductList.map(async product => {
+
+  for (let i = 0; i < orderProductList.length; i++) {
+    const product = orderProductList[i];
     await canvasPrinter.tableCustom([
       {text: product.name, align: 'LEFT', width: 0.4},
       {text: product.quantity, align: 'RIGHT', width: 0.15},
@@ -217,14 +219,18 @@ async function printCanvas(canvasPrinter, printData) {
       {text: convertMoney(product.quantity * product.originalPrice), align: 'RIGHT', width: 0.25},
     ]);
     await canvasPrinter.newLine(4);
-  }));
+  }
+
   await canvasPrinter.drawLine();
 
   await canvasPrinter.leftRight('Sub-total', convertMoney(orderSum - orderTax));
   if (!isNaN(discount) && discount > 0) await canvasPrinter.leftRight('Discount', convertMoney(discount));
-  await Promise.all(orderTaxGroups.map(async taxGroup => {
+
+  for (let i = 0; i < orderTaxGroups.length; i++) {
+    const taxGroup = orderTaxGroups[i];
     await canvasPrinter.leftRight(`Tax (${taxGroup.taxType}%)`, convertMoney(taxGroup.tax));
-  }));
+  }
+
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(true);

@@ -219,8 +219,11 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
   await canvasPrinter.newLine()
 
   await canvasPrinter.bold(true);
-  await canvasPrinter.drawLine()
-  await Promise.all(filteredItems.map(async (item, index) => {
+  await canvasPrinter.drawLine();
+
+  for (let i = 0; i < filteredItems.length; i++) {
+    const item = filteredItems[i];
+
     await canvasPrinter.bold(false);
     const quantityColumnWidth = item.quantity.toString().length * 0.06;
     const itemsColumnWidth = tableWidthPercentTotal - 0.05 - quantityColumnWidth;
@@ -244,23 +247,25 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
     if (item.modifiers) {
       await canvasPrinter.setTextDoubleWidth();
 
-      await Promise.all(item.modifiers.map(async mod => {
-        let modifierText = `* ${mod.name} ${convertMoney(mod.price)} ${locale.printing.currency}`
+      for (let j = 0; j < item.modifiers.length; j++) {
+        const mod = item.modifiers[j];
+        const modifierText = `* ${mod.name} ${convertMoney(mod.price)} ${locale.printing.currency}`
 
         await canvasPrinter.tableCustom([
           {text: '', align: 'LEFT', width: quantityColumnWidth},
           {text: '', align: 'LEFT', width: 0.05},
           {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
         ], {textDoubleWith: true});
-      }));
+      }
     }
 
-    if (index < filteredItems.length - 1) {
+    if (i < filteredItems.length - 1) {
       await canvasPrinter.setTextNormal();
       await canvasPrinter.newLine();
       await canvasPrinter.newLine();
     }
-  }))
+  }
+
   await canvasPrinter.setTextNormal()
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine()

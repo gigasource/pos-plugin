@@ -325,7 +325,10 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
       await canvasPrinter.drawLine();
 
       await canvasPrinter.alignLeft();
-      await Promise.all(items.map(async (item, index) => {
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+
         await canvasPrinter.bold(false);
         await canvasPrinter.setTextQuadArea();
         const quantityColumnWidth = item.quantity.toString().length * 0.05;
@@ -348,7 +351,9 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
         if (item.modifiers) {
           await canvasPrinter.setTextDoubleWidth();
 
-          await Promise.all(item.modifiers.map(async mod => {
+          for(let j = 0; j < item.modifiers.length; j++) {
+            const mod = item.modifiers[j];
+
             let modifierText = `* ${mod.name}`
             if (mod.price) modifierText += ` ${convertMoney(mod.price)}`;
 
@@ -357,10 +362,10 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
               {text: '', align: 'LEFT', width: 0.05},
               {text: modifierText, align: 'LEFT', width: itemsColumnWidth},
             ], {textDoubleWith: true});
-          }));
+          }
         }
 
-        if (index < items.length - 1) {
+        if (i < items.length - 1) {
           await canvasPrinter.setTextNormal();
           if (item.separate) {
             await canvasPrinter.println('************************');
@@ -369,7 +374,7 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
             await canvasPrinter.newLine();
           }
         }
-      }));
+      }
 
       await canvasPrinter.setTextNormal();
       await canvasPrinter.bold(true);
