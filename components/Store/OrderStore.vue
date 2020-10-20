@@ -762,8 +762,10 @@
             }
           }
         })
-        cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
+        cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
           this.actionList = [];
+          this.$set(this.currentOrder, 'status', order.status)
+          this.$router.go(-1)
           // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
       },
@@ -896,6 +898,7 @@
               }
             })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
+              this.$set(this.currentOrder, 'status', 'paid')
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
               resolve(newOrder)

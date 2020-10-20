@@ -105,7 +105,10 @@ module.exports = (cms) => {
 
       // save order | create commits
       const newOrder = await createOrderCommits(mappedActionList)
-      if (!newOrder.items.some(i => i.quantity > 0)) await cancelOrder(newOrder)
+      if (!newOrder.items.some(i => i.quantity > 0)) {
+        await cancelOrder(newOrder)
+        newOrder.status = 'cancelled'
+      }
       cb(newOrder)
     })
 

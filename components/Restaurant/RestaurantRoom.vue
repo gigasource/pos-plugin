@@ -48,8 +48,15 @@
       cms.socket.off('update-table-status')
     },
     activated() {
-      if (this.currentOrder.items.length && !this.inProgressTable.includes(this.currentOrder.table)) {
-        this.inProgressTable.push(this.currentOrder.table)
+      if (!this.currentOrder) return
+      const { items, table, status } = this.currentOrder
+      if (items.length) {
+        if (status === 'inProgress' && !this.inProgressTable.includes(table))
+          this.inProgressTable.push(this.currentOrder.table)
+        if ((status === 'cancelled' || status === 'paid') && this.inProgressTable.includes(table)) {
+          const index = this.inProgressTable.indexOf(table)
+          this.inProgressTable.splice(index, 1)
+        }
       }
       this.$emit('resetOrderData')
     },
