@@ -795,3 +795,38 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-inventory-report {
+  background-image: url("../assets/inventory-report.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-new-stock {
+  background-image: url("../assets/inventory-new-stock.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-category {
+  background-image: url("../assets/inventory-category.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-delete {
+  background-image: url("../assets/inventory-delete.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-edit {
+  background-image: url("../assets/inventory-edit.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

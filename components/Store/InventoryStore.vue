@@ -16,16 +16,27 @@
     props: {},
     data: function () {
       return {
-        // list all inventories in db
+        // inventory explore
         inventories: [],
+        inventoryCategories: [],
+        inventoryUnits: [],
+        inventoryFilters: [],
+        inventoryPagination: { limit: 15, currentPage: 1 },
+        totalInventories: null,
+        selectedInventory: null,
+        
+        // inventory import
         // to resolve update conflict if this case occured
         inventoriesLoadTimestamp: null,
-        // list all inventory categories in db
-        inventoryCategories: [],
-        // list all inventory unit
-        inventoryUnits: [],
         // list all inventory in current import
         importingInventories: [],
+        
+        // dialog
+        dialog: {
+          deleteInventory: {
+            show: false,
+          }
+        }
       }
     },
     computed: {
@@ -152,6 +163,16 @@
           }
         }]
         await cms.getModel(COMMIT_COL).commit(updateData)
+      },
+      
+      //
+      async removeFilter(filter) {
+        const index = this.inventoryFilters.findIndex(f => f.title === filter.title);
+        this.inventoryFilters.splice(index, 1);
+        await this.applyFilter()
+      },
+      updatePagination() {
+      
       }
     },
     provide() {
