@@ -147,7 +147,7 @@
             if (val.some(i => i.type === 'cash')) {
               setTimeout(() => {
                 this.$nextTick(() => {
-                  if (this.$refs['cash-textfield']) {
+                  if (this.$refs['cash-textfield'] && this.$refs['cash-textfield'][0]) {
                     this.$refs['cash-textfield'][0].$el.click()
                     const input = this.$refs['cash-textfield'][0].$el.querySelector('input')
                     input && input.select()

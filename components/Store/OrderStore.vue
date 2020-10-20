@@ -408,9 +408,7 @@
         const tseConfig = await cms.getModel('TseConfig').findOne()
         const tseEnabled = tseConfig && !!tseConfig.tseEnable
         this.activeTableProduct = null
-        this.currentOrder = this.currentOrder.table
-          ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } }
-          : { items: [], hasOrderWideDiscount: false, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } };
+        this.currentOrder = { items: [], hasOrderWideDiscount: false, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } };
         this.paymentAmountTendered = ''
         this.productIdQuery = ''
         await this.getSavedOrders()
