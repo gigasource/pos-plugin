@@ -270,32 +270,8 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.print();
 }
 
-async function printSsr(printer, printData) {
-  const OrderReport = require('../../dist/OrderReport.vue');
-
-  const printComponent = new Vue({
-    components: {OrderReport},
-    render(h) {
-      return h('OrderReport', {props: printData})
-    }
-  });
-
-  vueSsrRenderer.renderToString(printComponent, {}, async (err, html) => {
-    if (err) throw err;
-
-    const reportImage = await convertHtmlToPng(html);
-    printer.printPng(reportImage);
-    await printer.print();
-  });
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1) //capitalize
-}
-
 module.exports = {
   makePrintData,
-  printSsr,
   printEscPos,
   printCanvas
 }

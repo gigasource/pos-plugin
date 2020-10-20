@@ -85,7 +85,6 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       if (escPOS) {
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
-        // await report.printSsr(escPrinter, printData);
         const pureImagePrinter = new PureImagePrinter(560, {
           printFunctions: {
             printPng: escPrinter.printPng.bind(escPrinter),

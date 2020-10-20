@@ -1,6 +1,12 @@
 'use strict';
 const _ = require('lodash');
 
+/*
+  if a pixel has grey scale value < GREY_SCALE_LIMIT, that pixel will be turned into a black pixel
+  old value = 140, maximum is 255
+ */
+const GREY_SCALE_LIMIT = 230;
+
 function makeHeader(w, h) {
   return [0x1d, 0x76, 0x30, 48, (w >> 3) & 0xff, 0x00, h & 0xff, (h >> 8) & 0xff];
 }
@@ -50,7 +56,7 @@ function pngCompress(img, append, maxHeight = 50) {
         for (let k = 0; k < 8; k++) {
           let idx = (img.width * i + j * 8 + k) << 2;
           grayscale = 0.2126 * img.data[idx] + 0.7152 * img.data[idx + 1] + 0.0722 * img.data[idx + 2];
-          if (grayscale < 140) byte |= 1 << 7 - k;
+          if (grayscale < GREY_SCALE_LIMIT) byte |= 1 << 7 - k;
         }
         line.push(byte);
         if (byte !== 0) white = false;
@@ -145,7 +151,7 @@ function png(img, append) {
         for (let k = 0; k < 8; k++) {
           let idx = (img.width * i + j * 8 + k) << 2;
           grayscale = 0.2126 * img.data[idx] + 0.7152 * img.data[idx + 1] + 0.0722 * img.data[idx + 2];
-          if (grayscale < 140) byte |= 1 << 7 - k;
+          if (grayscale < GREY_SCALE_LIMIT) byte |= 1 << 7 - k;
         }
 
         arr.push(byte);

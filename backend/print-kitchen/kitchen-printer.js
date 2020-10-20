@@ -401,37 +401,6 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
   return results;
 }
 
-async function printSsr(printData, printerInfo) {
-  const results = [];
-
-  await Promise.all(printData.map(props => {
-    return new Promise((resolve, reject) => {
-      const KitchenReport = require('../../dist/Kitchen.vue')
-
-      const component = new Vue({
-        components: {KitchenReport},
-        render(h) {
-          return h('KitchenReport', {props})
-        }
-      })
-
-      renderer.renderToString(component, {}, async (err, html) => {
-        if (err) reject(err);
-        await print(html, printerInfo);
-
-        results.push({
-          items: props.items,
-          printer: printerInfo,
-          name: printerInfo.name,
-        });
-        resolve();
-      })
-    });
-  }));
-
-  return results;
-}
-
 function callbackWithError(callback, error) {
   callback({
     success: false,
