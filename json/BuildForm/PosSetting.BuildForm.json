@@ -599,6 +599,11 @@
           "schemaType": "string",
           "key": "deliveryOrderMode",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "printReceiptWithPay",
+          "type": "input@switch"
         }
       ],
       "type": "object"

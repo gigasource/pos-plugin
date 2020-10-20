@@ -168,6 +168,9 @@
           number < this.paymentTotal
       }
     },
+    activated() {
+      this.addPaymentMethod({ name: 'cash' })
+    },
     deactivated() {
       this.tipEditValue = ''
       this.cashEditValue = ''

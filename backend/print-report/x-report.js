@@ -192,10 +192,12 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
-  await Promise.all(Object.keys(sumByPayment).map(async paymentType => {
+  const paymentTypes = Object.keys(sumByPayment);
+  for (let i = 0; i < paymentTypes.length; i++) {
+    const paymentType = paymentTypes[i];
     const paymentAmount = sumByPayment[paymentType];
     await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
-  }));
+  }
 
   await canvasPrinter.print();
 }

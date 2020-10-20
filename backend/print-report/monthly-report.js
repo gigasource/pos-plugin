@@ -91,11 +91,13 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
-  await Promise.all(Object.keys(salesByPayment).map(async paymentType => {
+
+  const paymentTypes = Object.keys(salesByPayment);
+  for (let i = 0; i < paymentTypes.length; i++) {
+    const paymentType = paymentTypes[i];
     const paymentAmount = salesByPayment[paymentType];
-    await canvasPrinter.leftRight(` ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}`,
-      `${convertMoney(paymentAmount)}`);
-  }));
+    await canvasPrinter.leftRight(` ${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}`, `${convertMoney(paymentAmount)}`);
+  }
 
   await canvasPrinter.bold(true);
   await canvasPrinter.leftRight('Total', `${convertMoney(total)}`);
@@ -104,12 +106,15 @@ async function printCanvas(canvasPrinter, printData) {
   if (zNumbers) {
     await canvasPrinter.bold(false);
     await canvasPrinter.drawLine();
-    await Promise.all(zNumbers.map(async z => {
+
+    for (let i = 0; i < zNumbers.length; i++) {
+      const z = zNumbers[i];
       await canvasPrinter.tableCustom([
         {text: `Z-Number ${z.z}: ${convertMoney(z.sum)}`, align: 'LEFT', width: 0.48},
         {text: `Date: ${z.date}`, align: 'LEFT', width: 0.48},
       ]);
-    }));
+    }
+
     await canvasPrinter.bold(true);
     await canvasPrinter.drawLine();
     if (salesByCategory) await canvasPrinter.newLine();
@@ -120,17 +125,21 @@ async function printCanvas(canvasPrinter, printData) {
     await canvasPrinter.println('Product Sold');
     await canvasPrinter.drawLine();
 
-    await Promise.all(Object.keys(salesByCategory).map(async category => {
+    const saleCategories = Object.keys(salesByCategory);
+    for (let i = 0; i < saleCategories.length; i++) {
+      const category = saleCategories[i];
       await canvasPrinter.newLine();
       const {products, sum} = salesByCategory[category];
 
       await canvasPrinter.bold(true);
       await canvasPrinter.println(`${category} (${convertMoney(sum)})`);
       await canvasPrinter.bold(false);
-      await Promise.all(products.map(async ({product, quantity}) => {
+
+      for (let j = 0; j < products.length; j++) {
+        const {product, quantity} = products[j];
         await canvasPrinter.println(` ${quantity} x ${product}`);
-      }));
-    }))
+      }
+    }
   }
 
   await canvasPrinter.print();
