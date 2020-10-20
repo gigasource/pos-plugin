@@ -12,12 +12,24 @@ module.exports = async function (cms) {
   const EndOfDay = cms.getModel('EndOfDay');
   cms.on('bridge:inited', function () {
     cms.bridge.on('endOfDay', async function (report, cb) {
+      report = JsonFn.clone(report)
       let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
       vDateOrders = JsonFn.clone(vDateOrders, true, true);
 
       const ordersToUpdate = vDateOrders.filter(order => report.begin <= order.date && order.date <= report.end).map(i => i._id)
+      await cms.getModel('OrderCommit').addCommits([{
+        type: 'order',
+        action: 'update',
+        where: JSON.stringify({ _id: { $in: ordersToUpdate } }),
+        data: {
+          allowMutateInactiveOrder: true
+        },
+        update: {
+          method: 'updateMany',
+          query: JSON.stringify({ $set: { z: report.z } })
+        }
+      }])
 
-      await Order.updateMany({_id: {$in: ordersToUpdate}}, {$set: {z: report.z}})
       EndOfDay.create(report)
       await cms.getModel('OrderCommit').addCommits([{
         type: 'report',

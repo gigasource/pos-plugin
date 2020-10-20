@@ -292,7 +292,7 @@ async function orderCommit(updateCommit) {
       const query = JsonFn.parse(commit.update.query);
       const condition = getCondition(commit);
       const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true});
-      if (result.status !== 'paid') {
+      if (result.status !== 'paid' && result.toJSON) {
         updateCommit[TYPENAME].activeOrders[commit.data.table] = result.toJSON();
       }
       commit.where = JsonFn.stringify(condition);
