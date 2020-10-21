@@ -318,6 +318,32 @@
         })
 
         cms.socket.on('getMasterDevice', id => this.masterClientId = id)
+        
+        cms.socket.on('remoteControlInput', data => {
+          if (!document.elementFromPoint) {
+            console.log('PosStore:remoteControlInput: document.elementFromPoint is not supported')
+            return;
+          }
+          
+          const targetNode = document.elementFromPoint(inputEvent.webPosition.x, inputEvent.webPosition.y);
+          // {"type":"mouse","action":"mousedown","position":{"x":270,"y":244}, "webPosition": {"x": 380, "y": 450}}
+          // {"type":"mouse","action":"mousemove","position":{"x":270,"y":246}, "webPosition": {"x": 380, "y": 450}}
+          // {"type":"mouse","action":"mouseup","position":{"x":270,"y":246}, "webPosition": {"x": 380, "y": 450}}
+          // {"type":"keyboard","keyCode":75,"shiftKey":false,"ctrlKey":false,"altKey":false,"metaKey":false}
+          const inputEvent = JSON.parse(data);
+          switch (inputEvent.type) {
+            case 'mouse':
+              const mouseEvent = document.createEvent('MouseEvents');
+              mouseEvent.initEvent(inputEvent.type, true, true);
+              targetNode.dispatchEvent(mouseEvent)
+              break;
+            case 'keyboard':
+              console.log('receive keyboard event')
+              // const keyboardEvent = document.createEvent('KeyboardEvent');
+              // keyboardEvent.initKeyboardEvent('keypress', true, true, document.defaultView, )
+              break;
+          }
+        })
       },
       setMasterDevice() {
         cms.socket.emit('setMasterDevice')

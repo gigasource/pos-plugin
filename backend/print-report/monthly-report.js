@@ -60,7 +60,7 @@ async function printEscPos(escPrinter, printData) {
       const {products, sum} = salesByCategory[category];
 
       escPrinter.bold(true);
-      escPrinter.println(`${category} (${convertMoney(sum)})`);
+      escPrinter.println(`${category || 'No category'} (${convertMoney(sum)})`);
       escPrinter.bold(false);
       products.forEach(({product, quantity}) => {
         escPrinter.println(` ${quantity} x ${product}`);
@@ -132,7 +132,7 @@ async function printCanvas(canvasPrinter, printData) {
       const {products, sum} = salesByCategory[category];
 
       await canvasPrinter.bold(true);
-      await canvasPrinter.println(`${category} (${convertMoney(sum)})`);
+      await canvasPrinter.println(`${category || 'No category'} (${convertMoney(sum)})`);
       await canvasPrinter.bold(false);
 
       for (let j = 0; j < products.length; j++) {

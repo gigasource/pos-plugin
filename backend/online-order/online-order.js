@@ -7,6 +7,7 @@ const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
 const { initSocket, handlerNewMasterId } = require('../master-node');
+const rnBridge = require('../rn-bridge/app-rn-bridge')
 
 let webshopUrl;
 let storeName;
@@ -18,6 +19,7 @@ let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
 let webShopConnected = false;
+
 
 const RECREATE_INTERVAL = 60000; // socket.io will try to recreate client socket every 60 seconds if current socket disconnects or fails to reconnects too many times
 const NO_OF_ATTEMPT_BEFORE_RECREATE = 5; // if number of 'reconnecting' attempt > 5, recreate interval will be triggered
@@ -444,23 +446,26 @@ module.exports = async cms => {
     socket.on('startStream', async (cb) => {
       try {
         console.log('on start stream')
-        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/start-stream`, {screencastId: deviceId})).data
-        console.log(responseData)
+        rnBridge.sendToRN(JSON.stringify({
+          action: 'startStream',
+          data: {
+            screencastId: deviceId
+          }
+        }))
       } catch (e) {
         console.log('start stream error', e);
       }
-
       cb && cb()
     });
     socket.on('stopStream', async (cb) => {
       try {
         console.log('on stop stream')
-        const responseData = (await axios.post(`http://${global.APP_CONFIG.androidServerAddress || 'localhost'}:5000/stop-stream`)).data
-        console.log(responseData)
+        rnBridge.sendToRN(JSON.stringify({
+          action: 'stopStream'
+        }))
       } catch (e) {
         console.log('stop stream error', e)
       }
-
       cb && cb()
     });
     socket.on('updateMasterDevice', async (masterClientId, ack) => {

@@ -33,7 +33,7 @@
         <g-divider dashed color="black"/>
         <div v-for="({products, sum}, category) in salesByCategory" :key="`category${category}`">
           <p class="category">
-            {{category}} (€ {{sum | convertMoney}})
+            {{category || 'No category'}} (€ {{sum | convertMoney}})
           </p>
           <p class="product" v-for="{product, quantity} in products" :key="`item${product}`">
             {{quantity}} x {{product}}

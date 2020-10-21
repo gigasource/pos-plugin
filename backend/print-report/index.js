@@ -30,25 +30,35 @@ module.exports = async function (cms) {
         }
       }])
 
-      EndOfDay.create(report)
-      await cms.getModel('OrderCommit').addCommits([{
-        type: 'report',
-        action: 'print',
-        data: {
-          reportType: 'ZReport',
-          printData: {z: parseInt(report.z)},
-          device: this.device
-        }
-      }])
+      await EndOfDay.create(report)
+      await printHandler('ZReport', report)
       cb();
     });
+
+    cms.bridge.on('printReport', async (reportType, data, cb) => {
+      if (reportType === 'XReport') {
+        const from = dayjs(data).startOf('day').toDate()
+        const to = dayjs(data).add(1, 'day').toDate()
+        data = { from, to }
+      } else {
+        data = JsonFn.clone(data)
+      }
+
+      await printHandler(reportType, data)
+      cb()
+    })
   })
 
   cms.socket.on('connect', (socket) => {
     socket.on('endOfDay', async function (report, cb) {
       cms.bridge.emitToMaster('endOfDay', report, () => {
-        cb();
+        typeof cb === 'function' && cb();
       });
+    })
+    socket.on('printReport', (reportType, data, cb) => {
+      cms.bridge.emitToMaster('printReport', reportType, data, () => {
+        typeof cb === 'function' && cb()
+      })
     })
   })
 }
