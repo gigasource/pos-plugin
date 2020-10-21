@@ -446,12 +446,12 @@ module.exports = async cms => {
     socket.on('startStream', async (cb) => {
       try {
         console.log('on start stream')
-        rnBridge.sendToRN({
+        rnBridge.sendToRN(JSON.stringify({
           action: 'startStream',
           data: {
             screencastId: deviceId
           }
-        })
+        }))
       } catch (e) {
         console.log('start stream error', e);
       }
@@ -460,9 +460,9 @@ module.exports = async cms => {
     socket.on('stopStream', async (cb) => {
       try {
         console.log('on stop stream')
-        rnBridge.sendToRN({
+        rnBridge.sendToRN(JSON.stringify({
           action: 'stopStream'
-        })
+        }))
       } catch (e) {
         console.log('stop stream error', e)
       }
