@@ -64,7 +64,7 @@
                        @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
     <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
     <div v-if="showKeyboard" class="keyboard-wrapper">
-      <pos-keyboard-full @enter-pressed="enterPress"/>
+      <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
     </div>
   </div>
 </template>
@@ -240,12 +240,12 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 45%;
+      width: 40%;
     }
 
     .keyboard-wrapper {
       position: absolute;
-      left: 45%;
+      left: 40%;
       right: 0;
       bottom: 0;
       background-color: #f0f0f0;
@@ -253,6 +253,11 @@
 
       ::v-deep .key {
         font-size: 18px !important;
+        transition: none;
+
+        &.key-enter {
+          font-size: 14px !important;
+        }
       }
     }
   }
