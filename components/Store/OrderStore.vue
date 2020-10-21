@@ -472,7 +472,7 @@
 
         // create order
         const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
-        cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, async newOrder => {
+        cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, false, async newOrder => {
           callback(newOrder);
         })
       },
@@ -736,6 +736,18 @@
           })
         }
 
+        this.actionList.push({
+          type: 'order',
+          action: 'update',
+          where: jsonfn.stringify({ _id: this.currentOrder._id }),
+          data: {
+            table: this.currentOrder.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: jsonfn.stringify({$push: {user: { name: this.user.name, date: new Date() }}})
+          }
+        })
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
@@ -864,7 +876,7 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true, cb = () => null) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true, fromPayBtn, cb = () => null) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return
@@ -895,7 +907,7 @@
                 }
               }
             })
-            cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
+            cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, fromPayBtn, async newOrder => {
               this.$set(this.currentOrder, 'status', 'paid')
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)

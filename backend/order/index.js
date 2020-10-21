@@ -140,7 +140,7 @@ module.exports = (cms) => {
       }
     })
 
-    socket.on('pay-order', async (order, user, device, isSplit = false, actionList = [], print = true, cb = () => null) => {
+    socket.on('pay-order', async (order, user, device, isSplit = false, actionList = [], print = true, fromPayBtn, cb = () => null) => {
       try {
         const mappedOrder = await mapOrder(order, user)
         const oldOrder = await cms.getModel('Order').findById(order._id)
@@ -176,6 +176,9 @@ module.exports = (cms) => {
               type: 'order',
               action: 'closeOrder',
               where: JSON.stringify({ _id: mappedOrder._id }),
+              data: {
+                fromPayBtn
+              },
               update: {
                 method: 'findOneAndUpdate',
                 query: JSON.stringify({

@@ -39,7 +39,7 @@
           const generalSettings = (await cms.getModel('PosSetting').findOne()).generalSetting
           shouldPrint = generalSettings && generalSettings.printReceiptWithPay
         }
-        this.$emit('pay', null, false, shouldPrint, () => {
+        this.$emit('pay', null, false, shouldPrint, isPayBtn, () => {
           const backToDashboard = !!this.currentOrder.table
           if (backToDashboard) this.$router.push({ path: '/pos-dashboard' })
           else this.$router.go(-1)

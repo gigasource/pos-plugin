@@ -303,7 +303,7 @@
             const order = await cms.getModel('Order').findById(this.order._id)
             this.$emit('printOrderReport', order)
           } else {
-            this.$emit('saveRestaurantOrder', null, false, true, () => this.printed = true)
+            this.$emit('saveRestaurantOrder', null, false, true, false, () => this.printed = true)
           }
         }
       },
