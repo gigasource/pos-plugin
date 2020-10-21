@@ -62,6 +62,7 @@
         activeTableProduct: null,
         currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         printedOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
+        activeOrders: [],
         savedOrders: [],
         scrollWindowProducts: null,
         productIdQuery: '',
@@ -1339,6 +1340,34 @@
       },
       async deleteCustomer(_id) {
         await cms.getModel('Customer').deleteOne({_id})
+      },
+      getActiveOrders() {
+        cms.socket.emit('getActiveOrders', ordersByTable => {
+          if (!ordersByTable) return
+          console.log('getActiveOrders')
+          this.activeOrders = Object.values(ordersByTable)
+
+          const existingCurrentOrder = ordersByTable[this.currentOrder.table];
+          if (existingCurrentOrder && this.currentOrder && this.currentOrder.table) {
+            const sameItems = _.isEqual(this.currentOrder.items, existingCurrentOrder.items)
+            if (!sameItems) this.mapToCurrentOrder(existingCurrentOrder)
+          }
+        })
+      },
+      mapToCurrentOrder(order, table) {
+        if (order) {
+          this.$set(this.currentOrder, '_id', order._id)
+          this.$set(this.currentOrder, 'user', order.user)
+          this.$set(this.currentOrder, 'items', order.items)
+          order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
+          order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
+          order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)
+          this.printedOrder = _.cloneDeep(this.currentOrder)
+        } else {
+          this.currentOrder = { items: [], hasOrderWideDiscount: false, tseMethod: 'auto' }
+          if (table) this.$set(this.currentOrder, 'table', table)
+          this.printedOrder = _.cloneDeep(this.currentOrder)
+        }
       }
     },
     async created() {
@@ -1352,6 +1381,9 @@
       })
 
       await this.updateOnlineOrders()
+
+      this.getActiveOrders()
+      cms.socket.on('update-table-status', this.getActiveOrders)
 
       // add online orders: cms.socket.emit('added-online-order')
       cms.socket.on('updateOnlineOrders', async sentryTagString => {
@@ -1400,20 +1432,8 @@
       'currentOrder.table': {
         async handler(val) {
           if (val) {
-            const existingOrder = await this.getTempOrder();
-            // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
-            if (existingOrder) {
-              this.$set(this.currentOrder, '_id', existingOrder._id)
-              this.$set(this.currentOrder, 'user', existingOrder.user)
-              this.$set(this.currentOrder, 'items', existingOrder.items)
-              existingOrder.splitId && this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
-              existingOrder.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
-              existingOrder.tseMethod && this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
-              this.printedOrder = _.cloneDeep(this.currentOrder)
-            } else {
-              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
-              this.printedOrder = _.cloneDeep(this.currentOrder)
-            }
+            let existingOrder = this.activeOrders.find(order => order.table === val)
+            this.mapToCurrentOrder(existingOrder, val)
           } else {
             this.actionList = []
             this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }

@@ -419,6 +419,10 @@ async function orderCommit(updateCommit) {
     }
   })
 
+  updateCommit.registerMethod(TYPENAME, 'getActiveOrders', function () {
+    return updateCommit[TYPENAME].activeOrders
+  })
+
   updateCommit.registerMethod(TYPENAME, 'printOrder', async function (commit) {
     try {
       if (commit.order._id) {

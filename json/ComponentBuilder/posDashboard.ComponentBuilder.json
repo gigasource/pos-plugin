@@ -227,6 +227,16 @@
                   "service": "OrderStore:resetOrderData",
                   "local": "resetOrderData",
                   "type": "event"
+                },
+                {
+                  "service": "OrderStore:activeOrders",
+                  "local": "activeOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "PosStore:user",
+                  "local": "user",
+                  "type": "prop"
                 }
               ]
             },
