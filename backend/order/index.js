@@ -212,7 +212,8 @@ module.exports = (cms) => {
             where: JSON.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
-              mutate: true
+              mutate: true,
+              fromPayBtn
             },
             update: {
               method: 'findOneAndUpdate',
