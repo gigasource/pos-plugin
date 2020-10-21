@@ -61,20 +61,31 @@ const orderUtil = {
   },
   async getComputedOrderItems(orderItems, date) {
     const items = []
+    const { mongoose } = cms
+    const isValidObjectId = mongoose.Types.ObjectId.isValid;
 
     for (const item of orderItems) {
-      if (item.groupPrinter && typeof item.groupPrinter === 'string') {
+      if (item.groupPrinter && typeof item.groupPrinter === 'string' && isValidObjectId(item.groupPrinter)) {
         item.groupPrinter = await cms.getModel('GroupPrinter').findOne({ _id: item.groupPrinter })
       }
 
-      if (item.groupPrinter2 && typeof item.groupPrinter2 === 'string') {
+      if (item.groupPrinter2 && typeof item.groupPrinter2 === 'string' && isValidObjectId(item.groupPrinter2)) {
         item.groupPrinter2 = await cms.getModel('GroupPrinter').findOne({ _id: item.groupPrinter })
+      }
+
+      if (item.category ) {
+        if (typeof item.category === 'string' && isValidObjectId(item.category)) {
+          const category = await cms.getModel('Category').findById(item.category)
+          if (category) item.category = category.name
+        } else if (typeof item.category === 'object') {
+          item.category = item.category.name
+        }
       }
 
       items.push({
         ..._.omit(item, 'category'),
         product: item._id,
-        category: item.category && item.category.name ? item.category.name : '', // saved order then pay have a string category
+        category: item.category,
         date,
         ...item.groupPrinter && { groupPrinter: item.groupPrinter.name },
         ...item.groupPrinter2 && { groupPrinter2: item.groupPrinter2.name },

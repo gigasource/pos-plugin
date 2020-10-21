@@ -5,7 +5,7 @@ const _ = require('lodash');
   if a pixel has grey scale value < GREY_SCALE_LIMIT, that pixel will be turned into a black pixel
   old value = 140, maximum is 255
  */
-const GREY_SCALE_LIMIT = 230;
+const GREY_SCALE_LIMIT = 200;
 
 function makeHeader(w, h) {
   return [0x1d, 0x76, 0x30, 48, (w >> 3) & 0xff, 0x00, h & 0xff, (h >> 8) & 0xff];
