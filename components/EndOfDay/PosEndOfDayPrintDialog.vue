@@ -22,7 +22,7 @@
               <p class="section-title eod-title">{{$t('report.productSold')}}</p>
               <div class="eod-details">
                 <div v-for="(items, category) in xReport.groupItemsByCategory">
-                  <p class="eod-subtitle">{{category}} (€{{xReport.sumByCategory[category] | formatMoney}})</p>
+                  <p class="eod-subtitle">{{category || 'No category'}} (€{{xReport.sumByCategory[category] | formatMoney}})</p>
                   <div class="eod-sales-detail">
                     <p v-for="(quantity, name) in items">{{quantity}} x {{name}}</p>
                   </div>

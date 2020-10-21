@@ -100,45 +100,16 @@ export default {
       await new Promise(resolve => cms.socket.emit('endOfDay', report, function () {
         resolve();
       }))
-
-
-      /*if (!reports || !reports.length) return
-      const report = Object.assign(reports.find(i => i.pending))
-
-      try {
-        const orderModel = cms.getModel('Order')
-        let vDateOrders = await orderModel.find({ status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate() })
-        vDateOrders = jsonfn.clone(vDateOrders, true, true)
-
-        const ordersToUpdate = vDateOrders.filter(order => report.begin <= order.date && order.date <= report.end).map(i => i._id)
-
-        await orderModel.updateMany({ _id: { $in: ordersToUpdate} }, { $set: { z: report.z } })
-        await cms.getModel('EndOfDay').create(report)
-        await this.printZReport(report.z)
-      } catch (e) {
-        console.error(e)
-      }*/
     },
-    /*printZReport(z) {
-      return new Promise(async (resolve, reject) => {
+    printZReport(z) {
+      return new Promise(async resolve => {
+        console.log('print Z Report', z)
         if (_.isNil(z)) reject()
-        try {
-          debugger
-          await cms.getModel('OrderCommit').addCommits([{
-            type: 'report',
-            action: 'print',
-            data: {
-              reportType: 'ZReport',
-              printData: {z: parseInt(z)},
-              device: this.device
-            }
-          }])
+        cms.socket.emit('printReport', 'ZReport', { z: parseInt(z) }, () => {
           resolve()
-        } catch (e) {
-          reject(e.message)
-        }
+        })
       })
-    },*/
+    },
     async getXReport(date) {
       try {
         const beginHour = cms.getList('PosSetting')[0].generalSetting.beginHour || '00:00'
@@ -153,25 +124,9 @@ export default {
       }
     },
     async printXReport(date) {
-      const from = dayjs(date).startOf('day').toDate()
-      const to = dayjs(from).add(1, 'day').toDate()
-
-      return new Promise(async (resolve, reject) => {
-        try {
-          await cms.getModel('OrderCommit').addCommits([{
-            type: 'report',
-            action: 'print',
-            data: {
-              reportType: 'XReport',
-              printData: {from, to},
-              device: this.device
-            }
-          }])
-          resolve()
-        } catch (e) {
-          reject(e.message)
-        }
-      })
+      await new Promise(resolve => cms.socket.emit('printReport', 'XReport', date, function () {
+        resolve();
+      }))
     },
     //<!--</editor-fold>-->
 
@@ -201,22 +156,9 @@ export default {
       return {total, salesByCategory, salesByPayment, zNumbers}
     },
     printMonthlyReport(report) {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await cms.getModel('OrderCommit').addCommits([{
-            type: 'report',
-            action: 'print',
-            data: {
-              reportType: 'MonthlyReport',
-              printData: report,
-              device: this.device
-            }
-          }])
-          resolve()
-        } catch (e) {
-          reject(e.message)
-        }
-      })
+      return new Promise(resolve => cms.socket.emit('printReport', 'MonthlyReport', report, function () {
+        resolve();
+      }))
     },
     //<!--</editor-fold>-->
 
@@ -231,22 +173,9 @@ export default {
       return await cms.processData('OrderSalesByStaff', {from: fromTime, to: toTime, name: staffName})
     },
     printStaffReport(report) {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await cms.getModel('OrderCommit').addCommits([{
-            type: 'report',
-            action: 'print',
-            data: {
-              reportType: 'StaffReport',
-              printData: report,
-              device: this.device
-            }
-          }])
-          resolve()
-        } catch (e) {
-          reject(e.message)
-        }
-      })
+      return new Promise(resolve => cms.socket.emit('printReport', 'StaffReport', report, function () {
+        resolve();
+      }))
     },
     //<!--</editor-fold>-->
 

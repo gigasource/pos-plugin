@@ -123,7 +123,7 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.bold(false);
   Object.keys(reportByPayment).forEach(paymentType => {
-    escPrinter.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
+    escPrinter.leftRight(`${capitalize(paymentType)}`, ` ${convertMoney(reportByPayment[paymentType])}`);
   });
 
   await escPrinter.print();
@@ -194,10 +194,14 @@ async function printCanvas(canvasPrinter, printData) {
   const paymentTypes = Object.keys(reportByPayment);
   for (let i = 0; i < paymentTypes.length; i++) {
     const paymentType = paymentTypes[i];
-    await canvasPrinter.println(`${paymentType}: ${convertMoney(reportByPayment[paymentType])}`);
+    await canvasPrinter.leftRight(`${capitalize(paymentType)}`, `${convertMoney(reportByPayment[paymentType])}`);
   }
 
   await canvasPrinter.print();
+}
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 module.exports = {
