@@ -291,34 +291,8 @@ async function printCanvas(canvasPrinter, printData, groupPrinter, printerType) 
   await canvasPrinter.print()
 }
 
-async function printSsr(printer, printData) {
-  const OrderDelivery = require('../../dist/OrderDelivery.vue');
-
-  const component = new Vue({
-    components: {OrderDelivery},
-    render(h) {
-      return h('OrderDelivery', {
-        props: {
-          ...printData,
-          fontSize: printer.fontSize,
-          marginTop: printer.marginTop
-        }
-      })
-    }
-  })
-
-  vueSsrRenderer.renderToString(component, {}, async (err, html) => {
-    if (err) throw err
-
-    const reportPng = await convertHtmlToPng(html)
-    printer.printPng(reportPng)
-    await printer.print()
-  })
-}
-
 module.exports = {
   makePrintData,
   printEscPos,
-  printSsr,
   printCanvas
 }

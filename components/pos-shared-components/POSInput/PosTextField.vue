@@ -112,6 +112,11 @@
     background-clip: padding-box;
     color: #000000;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+    &--fake-caret {
+      left: 0;
+      right: 0;
+    }
   }
 
   .bs-tf-input:focus {

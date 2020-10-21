@@ -1,11 +1,56 @@
+const JsonFn = require("json-fn");
+
 const _ = require('lodash');
-const { getEscPrinter, getGroupPrinterInfo } = require('../print-utils/print-utils');
+const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils');
 const fs = require('fs');
 const path = require('path');
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer')
 
 module.exports = async function (cms) {
+  const Order = cms.getModel('Order')
+  const EndOfDay = cms.getModel('EndOfDay');
+  cms.on('bridge:inited', function () {
+    cms.bridge.on('endOfDay', async function (report, cb) {
+      report = JsonFn.clone(report)
+      let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
+      vDateOrders = JsonFn.clone(vDateOrders, true, true);
+
+      const ordersToUpdate = vDateOrders.filter(order => report.begin <= order.date && order.date <= report.end).map(i => i._id)
+      await cms.getModel('OrderCommit').addCommits([{
+        type: 'order',
+        action: 'update',
+        where: JSON.stringify({ _id: { $in: ordersToUpdate } }),
+        data: {
+          allowMutateInactiveOrder: true
+        },
+        update: {
+          method: 'updateMany',
+          query: JSON.stringify({ $set: { z: report.z } })
+        }
+      }])
+
+      EndOfDay.create(report)
+      await cms.getModel('OrderCommit').addCommits([{
+        type: 'report',
+        action: 'print',
+        data: {
+          reportType: 'ZReport',
+          printData: {z: parseInt(report.z)},
+          device: this.device
+        }
+      }])
+      cb();
+    });
+  })
+
+  cms.socket.on('connect', (socket) => {
+    socket.on('endOfDay', async function (report, cb) {
+      cms.bridge.emitToMaster('endOfDay', report, () => {
+        cb();
+      });
+    })
+  })
 }
 
 module.exports.printInvoiceHandler = printHandler
@@ -72,12 +117,12 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       groupPrinterId: group._id
     })));
 
-    const posSetting = await cms.getModel('PosSetting').findOne({}, { generalSetting: 1 })
-    const { useVirtualPrinter } = posSetting.generalSetting
+    const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
+    const {useVirtualPrinter} = posSetting.generalSetting
 
     for (const printerInfo of printers) {
       if (useVirtualPrinter) {
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{ report, printData, printerInfo, type }])
+        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{report, printData, printerInfo, type}])
       }
 
       const {escPOS} = printerInfo
@@ -85,7 +130,6 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       if (escPOS) {
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
-        // await report.printSsr(escPrinter, printData);
         const pureImagePrinter = new PureImagePrinter(560, {
           printFunctions: {
             printPng: escPrinter.printPng.bind(escPrinter),

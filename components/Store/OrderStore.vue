@@ -408,9 +408,7 @@
         const tseConfig = await cms.getModel('TseConfig').findOne()
         const tseEnabled = tseConfig && !!tseConfig.tseEnable
         this.activeTableProduct = null
-        this.currentOrder = this.currentOrder.table
-          ? { items: [], hasOrderWideDiscount: false, table: this.currentOrder.table, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } }
-          : { items: [], hasOrderWideDiscount: false, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } };
+        this.currentOrder = { items: [], hasOrderWideDiscount: false, ...tseEnabled && { tseMethod: this.currentOrder.tseMethod || 'auto' } };
         this.paymentAmountTendered = ''
         this.productIdQuery = ''
         await this.getSavedOrders()
@@ -762,9 +760,11 @@
             }
           }
         })
-        cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, () => {
+        cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
           this.actionList = [];
-          this.currentOrder = { items: [], hasOrderWideDiscount: false }
+          this.$set(this.currentOrder, 'status', order.status)
+          this.$router.go(-1)
+          // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
       },
       setNewPrice(price, product) {
@@ -896,6 +896,7 @@
               }
             })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, async newOrder => {
+              this.$set(this.currentOrder, 'status', 'paid')
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
               resolve(newOrder)

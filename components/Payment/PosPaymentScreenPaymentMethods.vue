@@ -5,11 +5,11 @@
         <g-btn elevation="3"
                :uppercase="false" x-large
                style="flex-basis: 20%"
-               :class="['payment-method-btn', selectedPayment === item.name && 'payment-method-btn--selected']"
-               :text-color="selectedPayment === item.name ? '#fff' : '#1D1D26'"
+               :class="['payment-method-btn', selectedPayment === item.type && 'payment-method-btn--selected']"
+               :text-color="selectedPayment === item.type ? '#fff' : '#1D1D26'"
                @click.stop="addPaymentMethod(item)">
           <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-          <span class="ml-2" style="text-transform: capitalize">{{ item.name }}</span>
+          <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
         </g-btn>
       </template>
       <g-btn elevation="3"
@@ -17,7 +17,7 @@
              style="flex-basis: 20%"
              :class="['payment-method-btn', selectedPayment === 'multi' && 'payment-method-btn--selected']"
              :text-color="selectedPayment === 'multi' ? '#fff' : '#1D1D26'"
-             @click.stop="addPaymentMethod({ name: 'multi' })">
+             @click.stop="addPaymentMethod({ type: 'multi' })">
         <g-icon size="20">icon-multi_payment</g-icon>
         <span class="ml-2" style="text-transform: capitalize">Multi</span>
       </g-btn>
@@ -36,7 +36,7 @@
                  @click.stop="addFixedItem(item)">
             <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
             <span class="ml-2" style="text-transform: capitalize">
-              {{`${item.name}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
+              {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
             </span>
           </g-btn>
         </g-badge>
@@ -48,7 +48,7 @@
                @click.stop="addFixedItem(item)">
           <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
           <span class="ml-2" style="text-transform: capitalize">
-            {{`${item.name}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
+            {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
           </span>
         </g-btn>
       </template>
@@ -67,9 +67,9 @@
             <div class="mt-1 mb-2 row-flex align-items-center">
               <g-btn-bs background-color="#2979ff" text-color="#fff" border-radius="2px">
                 <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-                <span class="ml-2" style="text-transform: capitalize">{{ item.name }}</span>
+                <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
               </g-btn-bs>
-              <pos-textfield-new clearable v-if="item.name === 'card'" ref="card-textfield"
+              <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
                                  v-model="cardEditValue" @click.stop="getRemainingValue"/>
               <pos-textfield-new clearable v-else ref="cash-textfield"
                                  v-model="cashEditValue" @click.stop="getRemainingValue"/>
@@ -141,15 +141,15 @@
           },
         ],
         extraPaymentItems: [
-          { name: 'tip', value: 0, icon: 'icon-tip' },
-          { name: 'WC', value: 0.5 },
-          { name: 'sodexo', value: 6 },
+          { type: 'tip', value: 0, icon: 'icon-tip' },
+          { type: 'WC', value: 0.5 },
+          { type: 'sodexo', value: 6 },
         ],
         showMultiPaymentDialog: false,
         selectedPayment: null,
         listPayments: [
-          { name: 'cash', icon: 'icon-cash' },
-          { name: 'card', icon: 'icon-credit_card' },
+          { type: 'cash', icon: 'icon-cash' },
+          { type: 'card', icon: 'icon-credit_card' },
         ],
         showAddTipDialog: false,
         tipEditValue: '',
@@ -169,7 +169,7 @@
       }
     },
     activated() {
-      this.addPaymentMethod({ name: 'cash' })
+      this.addPaymentMethod({ type: 'cash' })
     },
     deactivated() {
       this.tipEditValue = ''
@@ -179,12 +179,12 @@
     },
     methods: {
       addPaymentMethod(item) {
-        this.selectedPayment = item.name
+        this.selectedPayment = item.type
         this.$emit('updateCurrentOrder', 'tip', 0)
         this.$emit('updateCurrentOrder', 'change', 0)
         this.$emit('updateCurrentOrder', 'payment', [])
 
-        if (item.name === 'multi') {
+        if (item.type === 'multi') {
           this.openMultiPaymentDialog((payments) => {
             this.$emit('updateCurrentOrder', 'payment', payments)
           })
@@ -193,28 +193,28 @@
 
         this.$emit('updateCurrentOrder', 'payment', [])
         const newItem = {
-          type: item.name,
+          type: item.type,
           value: isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
             : item.value,
 
           // replaceMode is used for overwriting instead of appending to payment value
           // after the first character is entered, replaceMode will be set to false
-          replaceMode: item.name === 'cash',
+          replaceMode: item.type === 'cash',
         }
         this.$emit('updateCurrentOrder', 'payment', [newItem])
       },
       addFixedItem(item) {
-        if (item.name === 'tip') {
+        if (item.type === 'tip') {
           return this.openTipDialog()
         }
 
         const payment = this.currentOrder.payment;
         if (payment) {
-          const cardPayment = payment.find(i => i.name === 'card')
-          const cashPayment = payment.find(i => i.name === 'cash')
+          const cardPayment = payment.find(i => i.type === 'card')
+          const cashPayment = payment.find(i => i.type === 'cash')
           if (cardPayment || cashPayment) {
-            const filtered = cashPayment ? payment.filter(i => i.name !== 'cash') : payment.filter(i => i.name !== 'card')
+            const filtered = cashPayment ? payment.filter(i => i.type !== 'cash') : payment.filter(i => i.type !== 'card')
             return this.$emit('updateCurrentOrder', 'payment',
               [
                 {
@@ -243,7 +243,7 @@
       },
       saveTip() {
         const filtered = this.currentOrder.payment
-          ? this.currentOrder.payment.filter(i => i.name !== 'cash' && i.name !== 'card')
+          ? this.currentOrder.payment.filter(i => i.type !== 'cash' && i.type !== 'card')
           : []
 
         const tip = (+this.tipEditValue) - _.sumBy(filtered, i => i.value) - this.paymentTotal;
@@ -271,9 +271,9 @@
         this.showMultiPaymentDialog = false
       },
       getBadgeCount(item) {
-        if (item.name === 'tip') return 0
+        if (item.type === 'tip') return 0
         if (!this.currentOrder.payment) return 0
-        return this.currentOrder.payment.filter(i => i.name === item.name).length
+        return this.currentOrder.payment.filter(i => i.type === item.type).length
       }
     },
     watch: {

@@ -37,7 +37,7 @@
       <g-spacer/>
       <g-btn-bs background-color="#1271FF" text-color="#FFFFFF" class="elevation-2" @click="openDialogAdd">
         <g-icon size="20" color="white" class="mr-2">add_circle</g-icon>
-        {{$t('ui.add')}}
+        Add
       </g-btn-bs>
       <g-btn-bs :disabled="!selectedCustomer" icon="icon-cancel3@20" background-color="white" text-color="#FF4552" class="elevation-2" @click="dialog.delete = true">
         {{$t('ui.delete')}}

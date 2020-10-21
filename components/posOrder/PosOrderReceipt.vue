@@ -227,6 +227,7 @@
       activeOrderPaymentItem() {
         if (!this.order.payment) return this.paymentMethods.find(i => i.type === 'cash')
         if (this.order.payment.length > 1) return this.paymentMethods.find(i => i.type === 'multi')
+        else if (!this.order.payment.length) return {}
         return this.paymentMethods.find(i => i.type === this.order.payment[0].type)
       },
       paymentMethodMenuItems() {

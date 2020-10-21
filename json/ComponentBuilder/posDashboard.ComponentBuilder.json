@@ -216,7 +216,19 @@
               "slot": "Restaurant",
               "url": "plugins/pos-plugin/components/Restaurant/RestaurantRoom.vue",
               "path": "components/Restaurant/RestaurantRoom.vue",
-              "pluginName": "pos-plugin"
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "OrderStore:currentOrder",
+                  "local": "currentOrder",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:resetOrderData",
+                  "local": "resetOrderData",
+                  "type": "event"
+                }
+              ]
             },
             {
               "choice": "view",
