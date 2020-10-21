@@ -12,11 +12,19 @@ try {
 
 		rn_bridge.channel.on('message', async (msg) => {
 			const data = JSON.parse(msg);
-			if (data.type === 'ipAddress') {
-				console.log('Update ipAddress', data.value);
-				await cms.execPostAsync('load:masterIp', null, [data.value]);
-			} else if (data.type === 'onResume') {
-				await cms.execPostAsync('run:requireSync');
+			switch (data.type) {
+				case 'ipAddress':
+					console.log('Update ipAddress', data.value);
+					await cms.execPostAsync('load:masterIp', null, [data.value]);
+					break;
+				case 'onResume':
+					await cms.execPostAsync('run:requireSync');
+					break;
+				case 'mouse':
+				case 'keyboard':
+					console.log('app-rn-bridge:receive remote control input from RN, send to front-end')
+					cms.socket.emit('remoteControlInput', msg)
+					break;
 			}
 		})
 	}
