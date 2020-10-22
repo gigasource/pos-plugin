@@ -202,6 +202,7 @@
         return false
       },
       isUserTable(roomObj) {
+        if (!this.userTables) return
         if (!this.editable)
           return this.isTable(roomObj) && this.userTables.includes(roomObj.name)
         return false

@@ -783,7 +783,6 @@
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
           this.actionList = [];
           this.$set(this.currentOrder, 'status', order.status || 'inProgress')
-          this.$set(this.currentOrder, 'items', order.items)
           if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
           this.currentOrder.user.unshift({ name: this.user.name })
           this.$router.go(-1)
@@ -837,8 +836,11 @@
         const clientId = await this.getOnlineOrderDeviceId()
         const sentryTags = `sentry:eventType=moveItems,clientId=${clientId},orderId=${this.currentOrder._id}`;
         console.debug(sentryTags, `1. POS frontend: emit moveItems to table ${table}`)
-        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, order => {
-          console.debug(sentryTags, `5. POS frontend: event ack`, order)
+        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, this.user, updatedOrder => {
+          console.debug(sentryTags, `5. POS frontend: event ack`)
+          if (updatedOrder) {
+            this.$set(this.currentOrder, 'status', updatedOrder.status)
+          }
           cb()
         })
       },

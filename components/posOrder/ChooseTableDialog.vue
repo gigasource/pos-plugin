@@ -40,7 +40,8 @@
     name: 'ChooseTableDialog',
     props: {
       value: Boolean,
-      table: String
+      table: String,
+      activeOrders: Array
     },
     data() {
       return {
@@ -73,10 +74,6 @@
       selectRoomObj(room) {
         this.$emit('submit', room.name)
       },
-      async loadTableStatus() {
-        const inProgressOrders = await cms.getModel('Order').find({ status: 'inProgress' })
-        this.inProgressTable = inProgressOrders.map(o => o.table)
-      },
       isTableBusy(roomObj) {
         return this.inProgressTable.includes(roomObj.name)
       },
@@ -92,11 +89,10 @@
         async handler(val) {
           if (val) {
             this.chooseTableInput = ''
-            await this.loadTableStatus()
             const rooms = await cms.getModel('Room').find().lean()
             this.tabs = [
               ...rooms
-                .sort((cur, next) => cur.order || 0 - next.order || 0)
+                .sort((cur, next) => cur.order - next.order)
                 .map(i => ({ title: i.name, room: i.roomObjects })),
               { title: 'Manual' }
             ]
@@ -104,6 +100,15 @@
           }
         },
         immediate: true
+      },
+      activeOrders: {
+        handler(val) {
+          if (val) {
+            this.inProgressTable = val.map(o => o.table)
+          }
+        },
+        immediate: true,
+        deep: true
       }
     }
   }

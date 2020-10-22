@@ -6,7 +6,7 @@
         <g-btn-bs icon="icon-menu" @click="toggleContent">{{$t('ui.more')}}</g-btn-bs>
       </template>
       <div class="col-flex bg-white">
-        <g-btn-bs icon="icon-dinner_copy">{{$t('ui.moreItems')}}</g-btn-bs>
+        <g-btn-bs icon="icon-move-items" @click.stop="moveItems" :disabled="disableMoveItemsBtn">Move Items</g-btn-bs>
         <g-btn-bs icon="icon-promotion">
           {{$t('fnBtn.paymentFunctions.discount')}}
         </g-btn-bs>
@@ -59,6 +59,9 @@
       },
       disablePrintBtn() {
         return this.actionList.length === 0
+      },
+      disableMoveItemsBtn() {
+        return !this.currentOrder.items.length
       }
     },
     methods: {
@@ -80,7 +83,10 @@
       },
       print() {
         this.$emit('saveTableOrder')
-      }
+      },
+      moveItems() {
+        this.$getService('PosOrderMoveItems:setActive')(true)
+      },
     }
   }
 </script>

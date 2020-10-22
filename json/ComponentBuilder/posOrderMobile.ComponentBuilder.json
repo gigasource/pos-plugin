@@ -521,6 +521,11 @@
           "service": "OrderStore:moveItems",
           "local": "moveItems",
           "type": "event"
+        },
+        {
+          "service": "OrderStore:activeOrders",
+          "local": "activeOrders",
+          "type": "prop"
         }
       ],
       "url": "plugins/pos-plugin/components/posOrder/PosOrderMoveItems.vue",
