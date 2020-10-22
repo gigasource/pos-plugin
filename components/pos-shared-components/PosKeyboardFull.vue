@@ -290,6 +290,7 @@
         }
       },
       computedStyles() {
+        if(this.width) return { width: this.width }
         if (this.computedType === 'numeric') {
           return { width: '50%'}
         } else {

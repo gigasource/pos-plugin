@@ -38,21 +38,21 @@
             <template v-if="deliveryOrderMode === 'mobile'">
               <div class="row-flex mt-3 w-100">
                 <div style="flex: 1; margin-right: 2px">
-                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true" virtual-event/>
+                  <g-text-field outlined dense v-model="phone" label="Phone" @click="showKeyboard = true" :virtual-event="isIOS"/>
                 </div>
                 <div style="flex: 1; margin-left: 2px">
-                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true" virtual-event/>
+                  <g-text-field outlined dense v-model="name" label="Name" @click="showKeyboard = true" :virtual-event="isIOS"/>
                 </div>
               </div>
               <div class="row-flex">
                 <div class="col-9">
-                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable virtual-event skip-search
+                  <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable :virtual-event="isIOS" skip-search
                               :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
                               @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
                               @input="selectAutocompleteAddress"/>
                 </div>
                 <div class="flex-grow-1 ml-1">
-                  <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true" virtual-event/>
+                  <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true" :virtual-event="isIOS"/>
                 </div>
               </div>
             </template>
@@ -218,7 +218,7 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable virtual-event skip-search
+          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable :virtual-event="isIOS" skip-search
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
@@ -312,7 +312,7 @@
     <div v-if="showKeyboard" class="keyboard">
       <div class="keyboard-overlay" @click="hideKeyboard"></div>
       <div class="keyboard-wrapper">
-        <pos-keyboard-full @enter-pressed="submitCustomer"/>
+        <pos-keyboard-full type="alpha-number" @enter-pressed="submitCustomer"/>
       </div>
     </div>
   </div>
@@ -339,7 +339,7 @@
         return !isNaN(value) ? value.toFixed(2) : value
       }
     },
-    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls )'],
+    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls )', 'PosStore:isIOS'],
     data() {
       return {
         favorites: [],
@@ -1275,8 +1275,16 @@
       padding: 4px;
     }
 
-    ::v-deep .key .waves-ripple {
-      background-color: rgba(255, 190, 92, 1)
+    ::v-deep .key {
+      transition: none;
+
+      &.waves-ripple {
+        background-color: rgba(255, 190, 92, 1)
+      }
+
+      &.key-enter {
+        font-size: 16px !important;
+      }
     }
   }
 </style>

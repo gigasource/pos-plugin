@@ -47,27 +47,40 @@
       </g-btn-bs>
     </g-toolbar>
     <dialog-confirm-delete v-model="dialog.delete" type="Customer" :label="selectedCustomer && selectedCustomer.name" @submit="_deleteCustomer"/>
-    <dialog-form-input v-model="dialog.edit" @submit="submit">
-      <template #input>
-        <div class="row-flex flex-wrap justify-around">
-          <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
-          <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <div class="row-flex flex-wrap justify-around mt-2 r" v-for="(item, i) in addresses">
+
+    <g-dialog fullscreen v-model="dialog.edit">
+      <div class="dialog">
+        <div class="dialog-left">
+          <div class="row-flex">
+            <g-text-field :virtual-event="isIOS" outlined style="flex: 1" label="Name" v-model="name"/>
+            <g-text-field :virtual-event="isIOS" outlined style="flex: 1" label="Phone" v-model="phone"/>
+          </div>
+          <div class="row-flex flex-wrap justify-around mt-4 r" v-for="(item, i) in addresses">
             <div class="btn-delete" @click="removeAddress(i)">
-              <g-icon>icon-cancel3</g-icon>
+                <g-icon>icon-cancel3</g-icon>
             </div>
-            <g-combobox style="width: 98%" :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur
-                        :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)" virtual-event
-                        @input="e => selectAutocompleteAddress(e, i)"/>
-            <pos-textfield-new style="width: 23%" :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street"/>
-            <pos-textfield-new style="width: 23%" :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode"/>
-            <pos-textfield-new style="width: 23%" :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house"/>
-            <pos-textfield-new style="width: 23%" :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city"/>
+            <div class="row-flex">
+              <g-combobox :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur class="col-8" menu-class="menu-autocomplete-address"
+                          :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)" :virtual-event="isIOS" outlined
+                          @input="e => selectAutocompleteAddress(e, i)"/>
+              <g-text-field :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house" :virtual-event="isIOS" outlined/>
+            </div>
+            <div class="row-flex">
+              <g-text-field :label="`Street ${i+1}`" :key="`street_${i}`" v-model="item.street" :virtual-event="isIOS" outlined/>
+              <g-text-field :label="`Zipcode ${i+1}`" :key="`zipcode_${i}`" v-model="item.zipcode" :virtual-event="isIOS" outlined/>
+              <g-text-field :label="`City ${i+1}`" :key="`city_${i}`" v-model="item.city" :virtual-event="isIOS" outlined/>
+            </div>
           </div>
           <g-icon color="#1271FF" size="40" style="margin: 8px calc(50% - 20px)" @click="addAddress">add_circle</g-icon>
         </div>
-      </template>
-    </dialog-form-input>
+        <div class="dialog-keyboard">
+          <div style="flex: 1" @click="dialog.edit = false"/>
+          <div class="keyboard-wrapper">
+            <pos-keyboard-full type="alpha-number" @enter-pressed="submit"/>
+          </div>
+        </div>
+      </div>
+    </g-dialog>
   </div>
 </template>
 
@@ -77,7 +90,7 @@
 
   export default {
     name: "PosCustomer",
-    injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer, createCustomer)'],
+    injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer, createCustomer)', 'PosStore:isIOS'],
     data() {
       return {
         customers: [],
@@ -289,10 +302,61 @@
 
   .btn-delete {
     position: absolute;
-    top: -8px;
+    top: -25px;
     right: 0;
     background-color: white;
     border: 1px solid #ff4452;
     border-radius: 2px;
+  }
+
+  .dialog {
+    width: 100%;
+    background: rgba(21, 21, 21, 0.42);
+    display: flex;
+
+    &-left {
+      flex: 0 0 45%;
+      background-color: white;
+      padding: 4px;
+
+      ::v-deep .g-tf-wrapper {
+        margin: 4px 2px 4px;
+        width: auto;
+
+        fieldset {
+          border-width: 1px !important;
+          border-color: #9e9e9e;
+        }
+
+        &.g-tf__focused fieldset {
+          border-color: #1271FF;
+        }
+
+        .g-tf-input {
+          font-size: 14px;
+          padding: 4px;
+        }
+
+        .g-tf-label {
+          font-size: 14px;
+          top: 4px;
+
+          &__active {
+            transform: translateY(-13px) translateX(7px) scale(0.75) !important;
+          }
+        }
+      }
+    }
+
+    &-keyboard {
+      flex: 0 0 55%;
+      display: flex;
+      flex-direction: column;
+
+      .keyboard-wrapper {
+        padding: 4px;
+        background-color: #f0f0f0;
+      }
+    }
   }
 </style>
