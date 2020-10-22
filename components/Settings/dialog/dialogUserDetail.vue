@@ -13,8 +13,7 @@
         </div>
       </div>
       <div class="bg-grey-lighten-1 pa-2">
-        <pos-keyboard-full v-if="check === 'username'" v-model="name"/>
-        <pos-numpad class="dialog-user__numpad" v-else-if="check === 'passcode'" v-model="passcode"/>
+        <pos-keyboard-full @enter-pressed="submit"/>
       </div>
     </div>
   </g-dialog>

@@ -3,7 +3,7 @@
     <g-keyboard-auto :items="internalKeyboard"
                      :template="internalTemplate"
                      :style="computedStyles"
-                     @submit.stop.prevent="enterPressed"/>
+                     @submit="enterPressed"/>
   </div>
 </template>
 
