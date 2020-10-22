@@ -251,11 +251,10 @@ module.exports = (cms) => {
       }
     })
 
-    socket.on('move-items', async (table, newItems, currentOrder, currentOrderItems, cb = () => null) => {
+    socket.on('move-items', async (table, newItems, currentOrder, currentOrderItems, user, cb = () => null) => {
       const sentryTags = await getBaseSentryTags('moveItems');
       console.debug(sentryTags, `2. POS backend: receive event moveItems`)
       const existingOrder = await cms.getModel('Order').findOne({ table, status: 'inProgress' })
-      let newOrder
       if (existingOrder) {
         const items = newItems.reduce((list, current) => {
           const existingItem = list.find(i => JsonFn.stringify(i._id) === JsonFn.stringify(current._id));
@@ -267,10 +266,10 @@ module.exports = (cms) => {
 
           return list
         }, existingOrder.items)
-        newOrder = await createOrderCommit(existingOrder, 'items', items);
+        await createOrderCommit(existingOrder, 'items', items);
         console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
       } else {
-        newOrder = await cms.getModel('OrderCommit').addCommits([{
+        await cms.getModel('OrderCommit').addCommits([{
           type: 'order',
           action: 'createOrder',
           where: null,
@@ -278,16 +277,24 @@ module.exports = (cms) => {
           update: {
             method: 'create',
             query: JsonFn.stringify({
+              _id: new mongoose.Types.ObjectId(),
               table,
               items: newItems,
-              status: 'inProgress'
+              status: 'inProgress',
+              user: [{ name: user.name, date: new Date() }]
             })
           }
         }]);
         console.debug(sentryTags, `3. POS backend: moved items to new order at table ${table}`)
       }
 
-      await createOrderCommit(currentOrder, 'items', currentOrderItems)
+      const updatedOrder = await createOrderCommit(currentOrder, 'items', currentOrderItems)
+      updatedOrder.status = 'inProgress'
+      if (!currentOrderItems.some(i => i.quantity > 0)) {
+        console.debug(sentryTags, `3a. POS backend: no more items at table ${currentOrder.table}, cancelling order`)
+        await cancelOrder(currentOrder)
+        updatedOrder.status = 'cancelled'
+      }
       console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
 
       // print new items
@@ -304,7 +311,7 @@ module.exports = (cms) => {
         await cms.getModel('OrderCommit').addCommits([
           getPrintCommit('kitchenAdd', printOrder, device)])
       }
-      cb(newOrder)
+      cb(updatedOrder)
     })
 
     socket.on('cancel-order', cancelOrder)
@@ -335,7 +342,7 @@ module.exports = (cms) => {
       sum: orderUtil.calOrderTotal(val)
     }))
     const vSum = orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items);
-    const payment = order.payment
+    const payment = order.payment.map(i => ({ ...i, value: +i.value }))
     const receive = _.sumBy(payment, 'value');
     const immediatePay = !order.items.some(i => i.printed)
 

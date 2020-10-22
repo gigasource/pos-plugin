@@ -159,7 +159,7 @@
     },
     computed: {
       paidValue() {
-        return _.sumBy(this.currentOrder.payment, i => i.value || 0) || 0
+        return _.sumBy(this.currentOrder.payment, i => +i.value || 0) || 0
       },
       disableConfirmMulti() {
         const number = (+this.cashEditValue) + (+this.cardEditValue);
@@ -196,7 +196,7 @@
           type: item.type,
           value: isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
-            : item.value,
+            : +item.value,
 
           // replaceMode is used for overwriting instead of appending to payment value
           // after the first character is entered, replaceMode will be set to false

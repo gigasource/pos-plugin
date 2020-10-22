@@ -18,6 +18,7 @@
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
+        <g-icon v-if="isTableBusy(roomObject) && isUserTable(roomObject)" style="position: absolute; top: 0; right: 0; height: 18px; width: 21px">icon-room-border</g-icon>
       </div>
       <div v-if="editable && isSelected(roomObject)"
            @mousedown.prevent.stop="e => onMouseDown(e, roomObject, actions.resize)"
@@ -48,6 +49,7 @@
       roomObjects: Array, // table and wall
       transferTableFrom: null,
       inProgressTable: Array,
+      userTables: Array,
       disabledTables: Array
     },
     data: function () {
@@ -150,7 +152,7 @@
         }
 
         if (this.isTable(roomObj)) {
-          style.borderRadius = `4px`;
+          style.borderRadius = `5px`;
           style.boxShadow = '0px 2px 4px rgba(131, 146, 167, 0.2)';
         }
 
@@ -197,6 +199,12 @@
       isTableBusy(roomObj) {
         if(!this.editable)
           return this.inProgressTable.includes(roomObj.name)
+        return false
+      },
+      isUserTable(roomObj) {
+        if (!this.userTables) return
+        if (!this.editable)
+          return this.isTable(roomObj) && this.userTables.includes(roomObj.name)
         return false
       },
       isTableDisabled(roomObj) {

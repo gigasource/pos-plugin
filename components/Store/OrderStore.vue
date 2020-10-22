@@ -62,6 +62,7 @@
         activeTableProduct: null,
         currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         printedOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
+        activeOrders: [],
         savedOrders: [],
         scrollWindowProducts: null,
         productIdQuery: '',
@@ -745,7 +746,14 @@
           },
           update: {
             method: 'findOneAndUpdate',
-            query: jsonfn.stringify({$push: {user: { name: this.user.name, date: new Date() }}})
+            query: jsonfn.stringify({
+              $push: {
+                user: {
+                  $each: [{ name: this.user.name, date: new Date() }],
+                  $position: 0
+                }
+              }
+            })
           }
         })
       },
@@ -774,7 +782,9 @@
         })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
           this.actionList = [];
-          this.$set(this.currentOrder, 'status', order.status)
+          this.$set(this.currentOrder, 'status', order.status || 'inProgress')
+          if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+          this.currentOrder.user.unshift({ name: this.user.name })
           this.$router.go(-1)
           // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
@@ -826,8 +836,11 @@
         const clientId = await this.getOnlineOrderDeviceId()
         const sentryTags = `sentry:eventType=moveItems,clientId=${clientId},orderId=${this.currentOrder._id}`;
         console.debug(sentryTags, `1. POS frontend: emit moveItems to table ${table}`)
-        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, order => {
-          console.debug(sentryTags, `5. POS frontend: event ack`, order)
+        cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, this.user, updatedOrder => {
+          console.debug(sentryTags, `5. POS frontend: event ack`)
+          if (updatedOrder) {
+            this.$set(this.currentOrder, 'status', updatedOrder.status)
+          }
           cb()
         })
       },
@@ -909,6 +922,8 @@
             })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, fromPayBtn, async newOrder => {
               this.$set(this.currentOrder, 'status', 'paid')
+              if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+              this.currentOrder.user.unshift({ name: this.user.name })
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
               resolve(newOrder)
@@ -1339,6 +1354,29 @@
       },
       async deleteCustomer(_id) {
         await cms.getModel('Customer').deleteOne({_id})
+      },
+      getActiveOrders: _.throttle(async function () {
+        const orders = await cms.getModel('Order').find({ status: 'inProgress' })
+        this.activeOrders = orders || []
+        if (this.activeOrders.length) {
+          const existingOrder = this.activeOrders.find(o => o.table === this.currentOrder.table)
+          if (existingOrder) this.mapToCurrentOrder(existingOrder)
+        }
+      }, 1000),
+      mapToCurrentOrder(order, table) {
+        if (order) {
+          this.$set(this.currentOrder, '_id', order._id)
+          this.$set(this.currentOrder, 'user', order.user)
+          this.$set(this.currentOrder, 'items', order.items)
+          order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
+          order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
+          order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)
+          this.printedOrder = _.cloneDeep(this.currentOrder)
+        } else {
+          this.currentOrder = { items: [], hasOrderWideDiscount: false, tseMethod: 'auto' }
+          if (table) this.$set(this.currentOrder, 'table', table)
+          this.printedOrder = _.cloneDeep(this.currentOrder)
+        }
       }
     },
     async created() {
@@ -1352,6 +1390,9 @@
       })
 
       await this.updateOnlineOrders()
+
+      await this.getActiveOrders()
+      cms.socket.on('update-table-status', this.getActiveOrders)
 
       // add online orders: cms.socket.emit('added-online-order')
       cms.socket.on('updateOnlineOrders', async sentryTagString => {
@@ -1400,20 +1441,8 @@
       'currentOrder.table': {
         async handler(val) {
           if (val) {
-            const existingOrder = await this.getTempOrder();
-            // const existingOrder = await cms.getModel('Order').findOne({ table: this.currentOrder.table, status: 'inProgress' })
-            if (existingOrder) {
-              this.$set(this.currentOrder, '_id', existingOrder._id)
-              this.$set(this.currentOrder, 'user', existingOrder.user)
-              this.$set(this.currentOrder, 'items', existingOrder.items)
-              existingOrder.splitId && this.$set(this.currentOrder, 'splitId', existingOrder.splitId)
-              existingOrder.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', existingOrder.numberOfCustomers)
-              existingOrder.tseMethod && this.$set(this.currentOrder, 'tseMethod', existingOrder.tseMethod)
-              this.printedOrder = _.cloneDeep(this.currentOrder)
-            } else {
-              this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
-              this.printedOrder = _.cloneDeep(this.currentOrder)
-            }
+            let existingOrder = this.activeOrders.find(order => order.table === val)
+            this.mapToCurrentOrder(existingOrder, val)
           } else {
             this.actionList = []
             this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
@@ -1421,6 +1450,21 @@
           }
         }
       },
+      async 'currentOrder.status'(val) {
+        if (val && this.currentOrder.table) {
+          const existingActiveOrder = this.activeOrders.find(o => o.table === this.currentOrder.table)
+          if (existingActiveOrder) {
+            if (val !== 'inProgress') {
+              const index = this.activeOrders.indexOf(existingActiveOrder)
+              this.activeOrders.splice(index, 1)
+            }
+          } else if (val === 'inProgress') {
+            this.activeOrders.push(this.currentOrder)
+          }
+
+          await this.resetOrderData()
+        }
+      }
     },
     provide() {
       return {

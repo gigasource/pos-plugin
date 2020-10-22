@@ -4,6 +4,7 @@
           :name="room.name"
           :room-objects="room.roomObjects"
           :in-progress-table="inProgressTable"
+          :user-tables="userTables"
           :transfer-table-from="transferTableFrom"
           @selectRoomObject="selectRoomObj"
           @setTransferTableFrom="setTransferTableFrom"
@@ -25,7 +26,9 @@
     injectService: ['PosStore:isMobile'],
     props: {
       id: null,
-      currentOrder: null
+      user: null,
+      currentOrder: null,
+      activeOrders: Array
     },
     data() {
       return {
@@ -33,41 +36,45 @@
         roomObj: null,
         //
         inProgressTable: [],
+        userTables: [],
         transferTableFrom: null,
         showNumberOfCustomersDialog: false
       }
     },
     async created() {
       await this.loadRoom()
-      await this.loadTableStatus()
-      cms.socket.on('update-table-status', this.loadTableStatus)
       cms.socket.on('updateRooms', this.loadRoom)
     },
     destroyed() {
       cms.socket.off('updateRooms');
       cms.socket.off('update-table-status')
     },
-    activated() {
-      if (!this.currentOrder) return
-      const { items, table, status } = this.currentOrder
-      if (items.length) {
-        if (status === 'inProgress' && !this.inProgressTable.includes(table))
-          this.inProgressTable.push(this.currentOrder.table)
-        if ((status === 'cancelled' || status === 'paid') && this.inProgressTable.includes(table)) {
-          const index = this.inProgressTable.indexOf(table)
-          this.inProgressTable.splice(index, 1)
-        }
-      }
-      this.$emit('resetOrderData')
-    },
     watch: {
       id() {
         this.loadRoom();
       },
-      room(val) {
-        if (val) {
-          this.loadTableStatus()
-        }
+      activeOrders: {
+        handler(val) {
+          if (val) {
+            this.inProgressTable = val.map(order => order.table)
+            this.userTables = val.filter(order => {
+              if (order.user && order.user.length) {
+                return order.user[0].name === this.user.name
+              }
+            }).map(order => order.table)
+          }
+        },
+        deep: true,
+        immediate: true
+      },
+      user: {
+        handler(val) {
+          if (val) {
+            this.userTables = this.activeOrders.filter(order => order.user && order.user.some(u => u.name === val.name)).map(order => order.table)
+          }
+        },
+        deep: true,
+        immediate: true
       }
     },
     computed: {
@@ -78,10 +85,6 @@
     methods: {
       async loadRoom() {
         this.$set(this, 'room', await cms.getModel('Room').findOne({ _id: this.id }))
-      },
-      async loadTableStatus() {
-        const inProgressOrders = await cms.getModel('Order').find({ table: { $in: this.tableNames }, status: 'inProgress' })
-        this.inProgressTable = inProgressOrders.map(o => o.table)
       },
       isTable(roomObj) {
         return roomObj.type === 'table'
@@ -146,7 +149,6 @@
         }))
         // update current order -> new table
         await this.loadRoom()
-        await this.loadTableStatus()
         this.transferTableFrom = null
       }
     }

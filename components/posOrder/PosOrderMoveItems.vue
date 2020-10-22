@@ -98,7 +98,7 @@
       </div>
     </g-dialog>
 
-    <choose-table-dialog :table="currentTable" v-model="showChooseTableDialog" @submit="submitTable" />
+    <choose-table-dialog :table="currentTable" :active-orders="activeOrders" v-model="showChooseTableDialog" @submit="submitTable" />
   </div>
 </template>
 
@@ -112,7 +112,8 @@
       currentOrder: null,
       user: null,
       storeLocale: String,
-      isMobile: Boolean
+      isMobile: Boolean,
+      activeOrders: Array
     },
     filters: {
       convertMoney(value) {
