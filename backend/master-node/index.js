@@ -32,12 +32,6 @@ module.exports = function (cms) {
 			const order = await updateCommit.getMethod('order', 'buildTempOrder')(table);
 			fn(order);
 		})
-
-		socket.on('getActiveOrders', cb => {
-			if (!updateCommit['order']) return cb()
-			const orders = updateCommit.getMethod('order', 'getActiveOrders')();
-			cb(orders)
-		})
 	});
 	cms.post('load:handler', _.once(async () => {
 		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});

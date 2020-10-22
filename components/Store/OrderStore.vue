@@ -746,7 +746,14 @@
           },
           update: {
             method: 'findOneAndUpdate',
-            query: jsonfn.stringify({$push: {user: { name: this.user.name, date: new Date() }}})
+            query: jsonfn.stringify({
+              $push: {
+                user: {
+                  $each: [{ name: this.user.name, date: new Date() }],
+                  $position: 0
+                }
+              }
+            })
           }
         })
       },
@@ -775,7 +782,10 @@
         })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
           this.actionList = [];
-          this.$set(this.currentOrder, 'status', order.status)
+          this.$set(this.currentOrder, 'status', order.status || 'inProgress')
+          this.$set(this.currentOrder, 'items', order.items)
+          if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+          this.currentOrder.user.unshift({ name: this.user.name })
           this.$router.go(-1)
           // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
@@ -910,6 +920,8 @@
             })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, fromPayBtn, async newOrder => {
               this.$set(this.currentOrder, 'status', 'paid')
+              if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+              this.currentOrder.user.unshift({ name: this.user.name })
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
               resolve(newOrder)
@@ -1341,19 +1353,14 @@
       async deleteCustomer(_id) {
         await cms.getModel('Customer').deleteOne({_id})
       },
-      getActiveOrders() {
-        cms.socket.emit('getActiveOrders', ordersByTable => {
-          if (!ordersByTable) return
-          console.log('getActiveOrders')
-          this.activeOrders = Object.values(ordersByTable)
-
-          const existingCurrentOrder = ordersByTable[this.currentOrder.table];
-          if (existingCurrentOrder && this.currentOrder && this.currentOrder.table) {
-            const sameItems = _.isEqual(this.currentOrder.items, existingCurrentOrder.items)
-            if (!sameItems) this.mapToCurrentOrder(existingCurrentOrder)
-          }
-        })
-      },
+      getActiveOrders: _.throttle(async function () {
+        const orders = await cms.getModel('Order').find({ status: 'inProgress' })
+        this.activeOrders = orders || []
+        if (this.activeOrders.length) {
+          const existingOrder = this.activeOrders.find(o => o.table === this.currentOrder.table)
+          if (existingOrder) this.mapToCurrentOrder(existingOrder)
+        }
+      }, 1000),
       mapToCurrentOrder(order, table) {
         if (order) {
           this.$set(this.currentOrder, '_id', order._id)
@@ -1382,7 +1389,7 @@
 
       await this.updateOnlineOrders()
 
-      this.getActiveOrders()
+      await this.getActiveOrders()
       cms.socket.on('update-table-status', this.getActiveOrders)
 
       // add online orders: cms.socket.emit('added-online-order')
@@ -1441,6 +1448,21 @@
           }
         }
       },
+      async 'currentOrder.status'(val) {
+        if (val && this.currentOrder.table) {
+          const existingActiveOrder = this.activeOrders.find(o => o.table === this.currentOrder.table)
+          if (existingActiveOrder) {
+            if (val !== 'inProgress') {
+              const index = this.activeOrders.indexOf(existingActiveOrder)
+              this.activeOrders.splice(index, 1)
+            }
+          } else if (val === 'inProgress') {
+            this.activeOrders.push(this.currentOrder)
+          }
+
+          await this.resetOrderData()
+        }
+      }
     },
     provide() {
       return {

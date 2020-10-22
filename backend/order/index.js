@@ -335,7 +335,7 @@ module.exports = (cms) => {
       sum: orderUtil.calOrderTotal(val)
     }))
     const vSum = orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items);
-    const payment = order.payment
+    const payment = order.payment.map(i => ({ ...i, value: +i.value }))
     const receive = _.sumBy(payment, 'value');
     const immediatePay = !order.items.some(i => i.printed)
 

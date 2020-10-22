@@ -49,19 +49,6 @@
       cms.socket.off('updateRooms');
       cms.socket.off('update-table-status')
     },
-    activated() {
-      if (!this.currentOrder) return
-      const { items, table, status } = this.currentOrder
-      if (items.length) {
-        if (status === 'inProgress' && !this.inProgressTable.includes(table))
-          this.inProgressTable.push(this.currentOrder.table)
-        if ((status === 'cancelled' || status === 'paid') && this.inProgressTable.includes(table)) {
-          const index = this.inProgressTable.indexOf(table)
-          this.inProgressTable.splice(index, 1)
-        }
-      }
-      this.$emit('resetOrderData')
-    },
     watch: {
       id() {
         this.loadRoom();
@@ -70,7 +57,20 @@
         handler(val) {
           if (val) {
             this.inProgressTable = val.map(order => order.table)
-            this.userTables = val.filter(order => order.user && order.user.some(u => u.name === this.user.name)).map(order => order.table)
+            this.userTables = val.filter(order => {
+              if (order.user && order.user.length) {
+                return order.user[0].name === this.user.name
+              }
+            }).map(order => order.table)
+          }
+        },
+        deep: true,
+        immediate: true
+      },
+      user: {
+        handler(val) {
+          if (val) {
+            this.userTables = this.activeOrders.filter(order => order.user && order.user.some(u => u.name === val.name)).map(order => order.table)
           }
         },
         deep: true,
