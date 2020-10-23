@@ -139,6 +139,14 @@ const orderUtil = {
     } catch (e) {
       console.error(e)
     }
+  },
+  resetDiscount(items) {
+    return items.map(item => ({
+      ...item,
+      price: item.originalPrice,
+      discountUnit: '',
+      vDiscount: 0
+    }))
   }
 }
 

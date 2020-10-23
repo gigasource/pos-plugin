@@ -1,29 +1,18 @@
 <template>
-  <g-dialog v-model="dialog" overlay-color="#6b6f82" overlay-opacity="0.95" width="65%">
+  <g-dialog v-model="dialog" overlay-color="#6b6f82" overlay-opacity="0.95" fullscreen>
     <div class="dialog-change w-100" :style="[{background: 'white'}]">
-      <g-card>
-        <g-card-text><change-value :change-type.sync="changeType" :original-value="originalValue" :new-value-editable="newValueEditable"
-                                   :new-value.sync="newValue"/></g-card-text>
-        <g-card-actions>
-          <g-spacer/>
-          <div class="action">
-          <g-btn :uppercase="false" flat outlined @click="dialog = false">{{$t('ui.cancel')}}</g-btn>
-          <g-btn :uppercase="false" flat background-color="blue accent 3" text-color="white" @click="submit" :disabled="newValue < 0">{{$t('ui.ok')}}</g-btn>
-          </div>
-        </g-card-actions>
-      </g-card>
-      <div :style="[{display: showKeyboard ? 'block' : 'none'}]" class="keyboard-wrapper">
-        <pos-numpad/>
-      </div>
+      <g-icon class="dialog-change--close" @click="dialog = false">close</g-icon>
+      <discount-input :type="changeType" :value="change" @submit="submit" @remove-discount="removeDiscount"/>
     </div>
   </g-dialog>
 </template>
 
 <script>
   import ChangeValue from './ChangeValue';
+  import DiscountInput from "./DiscountInput";
   export default {
     name: 'dialogChangeValue',
-    components: { ChangeValue },
+    components: {DiscountInput, ChangeValue },
     props: {
       value: Boolean,
       newValueEditable: false,
@@ -31,10 +20,9 @@
     data() {
       return {
         changeType: null,
-        showKeyboard: false,
         showDialog: false,
         originalValue: 0,
-        newValue: 0
+        change: 0
       }
     },
     computed: {
@@ -53,31 +41,38 @@
       value: val => {
         this.showDialog = val
       },
-      dialog(val) {
-        if (!val) {
-          this.changeType = null
-          this.showKeyboard = false
-        }
-      }
     },
     methods: {
-      open(changeType, originalValue) {
-        if (changeType && typeof changeType === 'string')
-          this.changeType = changeType
-        this.originalValue = originalValue
+      open(originalValue, discount) {
+        this.originalValue = +originalValue
+        this.changeType = discount ? discount.type : 'percentage'
+        this.change = discount ? discount.change : 0
         this.dialog = true
       },
-      submit() {
+      submit(update) {
         if (this.originalValue) {
+          this.changeType = update.type
+          this.change = +update.value
+          let difference
+          if(update.type === 'percentage') {
+            difference = this.originalValue * this.change / 100
+          } else {
+            difference = this.change
+          }
           const change = {
             type: this.changeType,
-            value: this.newValue,
-            difference: (this.originalValue - this.newValue)
+            value: this.originalValue - this.change,
+            difference,
+            change: this.change
           }
           this.$emit('submit', change);
         }
         this.dialog = false;
       },
+      removeDiscount() {
+        this.$getService('OrderStore:resetOrderDiscount')()
+        this.dialog = false
+      }
     }
   }
 </script>
@@ -87,6 +82,14 @@
     border-radius: 6px;
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    &--close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 2;
+    }
 
     .action {
       display: flex;

@@ -1,18 +1,18 @@
 <template>
-  <div style="position: relative;">
+  <div class="scroll-select__wrapper">
     <div class="scroll-select" :style="{height: computedHeight}" ref="container" @scroll.stop="handleScroll">
       <div class="scroll-select__container">
         <template v-for="(item, index) in computedList">
           <slot name="item">
             <div class="scroll-select__container--item" :key="index" :id="item"
-                 :style="{height: computedItemHeight, color: value === item ? 'white' : '#1d1d26', fontWeight: value === item ? '700' : '400'}">
+                 :style="{height: computedItemHeight, ...value === item && { color: 'white', fontWeight: '700' }}">
               {{item}}
             </div>
           </slot>
         </template>
       </div>
     </div>
-    <div class="selected" :style="{height: computedHeight}">
+    <div v-if="itemSelected" class="selected" :style="{height: computedHeight}">
       <div ref="selected" class="selected--item" :style="{height: computedItemHeight, top: computedTop, background: selectedColor}"/>
     </div>
   </div>
@@ -53,6 +53,9 @@
       computedTop() {
         return isNaN(+this.itemHeight) ? 0 : `calc(50% - ${this.itemHeight/2}px)`
       },
+      itemSelected() {
+        return !!this.items.find(item => item === this.value)
+      }
     },
     mounted() {
       this.$nextTick(() => {
@@ -83,6 +86,10 @@
     scroll-snap-type: y mandatory;
     transform: translateZ(0px);
 
+    &__wrapper {
+      position: relative;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -98,6 +105,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        color: #1d1d26;
+        font-weight: 400;
 
         span {
           vertical-align: middle;

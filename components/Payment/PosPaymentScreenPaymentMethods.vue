@@ -369,4 +369,10 @@
       margin-right: 0;
     }
   }
+
+  @media screen and (max-height: 600px){
+    .payment-method-btn {
+      height: 36px !important;
+    }
+  }
 </style>

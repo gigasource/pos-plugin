@@ -8,7 +8,7 @@
       <div class="payment-table__header">
         <span>Total</span>
         <g-spacer/>
-        <span class="total-value">{{paymentTotal}}</span>
+        <span class="total-value">{{paymentTotal.toFixed(2)}}</span>
       </div>
       <g-table class="payment-table flex-grow-1" striped fixed-header>
         <tbody>
@@ -281,5 +281,11 @@
     font-size: 24px;
     font-weight: 700;
     box-shadow: unset;
+  }
+
+  @media screen and (max-height: 600px) {
+    .pos-payment-keyboard ::v-deep .key {
+      font-size: 18px;
+    }
   }
 </style>

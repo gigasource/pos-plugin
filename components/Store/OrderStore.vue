@@ -494,6 +494,12 @@
       discountCurrentOrder(change) {
         this.$set(this.currentOrder, 'items', orderUtil.applyDiscountForOrder(this.compactOrder(this.currentOrder.items), change));
         this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
+        this.$set(this.currentOrder, 'discount', change)
+      },
+      resetOrderDiscount() {
+        this.$set(this.currentOrder, 'items', orderUtil.resetDiscount(this.compactOrder(this.currentOrder.items)));
+        this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
+        this.$set(this.currentOrder, 'discount', null)
       },
       //<!--</editor-fold>-->
 
@@ -817,7 +823,7 @@
           this.$getService('alertDiscount:setActive')(true);
         } else {
           const originalTotal = this.currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-          this.$getService('dialogDiscount:open')('percentage', originalTotal);
+          this.$getService('dialogDiscount:open')(originalTotal, this.currentOrder.discount);
         }
       },
       updateOrderTable(table) {
