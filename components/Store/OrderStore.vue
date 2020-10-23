@@ -1402,8 +1402,8 @@
       mapToCurrentOrder(order, table) {
         if (order) {
           this.$set(this.currentOrder, '_id', order._id)
-          this.$set(this.currentOrder, 'user', order.user)
-          this.$set(this.currentOrder, 'items', order.items)
+          this.$set(this.currentOrder, 'user', _.cloneDeep(order.user))
+          this.$set(this.currentOrder, 'items', _.cloneDeep(order.items))
           this.$set(this.currentOrder, 'manual', order.manual)
           order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
           order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
@@ -1492,7 +1492,6 @@
           if (this.initOrderProps) {
             for (const prop in this.initOrderProps) {
               if (this.initOrderProps.hasOwnProperty(prop)) {
-                console.log(`set prop ${prop}: ${this.initOrderProps[prop]}`)
                 this.$set(this.currentOrder, prop, this.initOrderProps[prop])
               }
             }
@@ -1509,7 +1508,7 @@
               this.activeOrders.splice(index, 1)
             }
           } else if (val === 'inProgress') {
-            this.activeOrders.push(this.currentOrder)
+            this.activeOrders.push(_.cloneDeep(this.currentOrder))
           }
 
           await this.resetOrderData()
