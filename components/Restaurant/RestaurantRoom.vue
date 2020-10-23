@@ -47,7 +47,6 @@
     },
     destroyed() {
       cms.socket.off('updateRooms');
-      cms.socket.off('update-table-status')
     },
     watch: {
       id() {
@@ -114,11 +113,15 @@
       },
       onCustomerDialogSubmit({ numberOfCustomers, tseMethod }) {
         this.showNumberOfCustomersDialog = false
+        this.$emit('setInitOrderProps', {
+          ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
+          tseMethod: tseMethod || 'auto'
+        })
         setTimeout(() => {
           if (this.isMobile) {
-            this.$router.push(`/pos-order-3/${this.roomObj.name}?numberOfCustomers=${numberOfCustomers}&tseMethod=${tseMethod}`)
+            this.$router.push(`/pos-order-3/${this.roomObj.name}`)
           } else {
-            this.$router.push(`/pos-order-2/${this.roomObj.name}?numberOfCustomers=${numberOfCustomers}&tseMethod=${tseMethod}`)
+            this.$router.push(`/pos-order-2/${this.roomObj.name}`)
           }
         }, 200)
       },

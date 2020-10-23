@@ -60,6 +60,7 @@
     data() {
       return {
         activeTableProduct: null,
+        initOrderProps: {},
         currentOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         printedOrder: { items: [], hasOrderWideDiscount: false, firstInit: false },
         activeOrders: [],
@@ -737,6 +738,21 @@
           })
         }
 
+        if (this.currentOrder.manual) {
+          this.actionList.push({
+            type: 'order',
+            action: 'update',
+            where: jsonfn.stringify({ _id: this.currentOrder._id }),
+            data: {
+              table: this.currentOrder.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({ $set: { manual: true } })
+            }
+          })
+        }
+
         this.actionList.push({
           type: 'order',
           action: 'update',
@@ -1382,6 +1398,7 @@
           this.$set(this.currentOrder, '_id', order._id)
           this.$set(this.currentOrder, 'user', order.user)
           this.$set(this.currentOrder, 'items', order.items)
+          this.$set(this.currentOrder, 'manual', order.manual)
           order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
           order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
           order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)
@@ -1391,6 +1408,9 @@
           if (table) this.$set(this.currentOrder, 'table', table)
           this.printedOrder = _.cloneDeep(this.currentOrder)
         }
+      },
+      setInitOrderProps(val) {
+        this.initOrderProps = val
       }
     },
     async created() {
@@ -1461,6 +1481,16 @@
             this.actionList = []
             this.currentOrder = { items: [], hasOrderWideDiscount: false, table: val, tseMethod: 'auto' }
             this.printedOrder = _.cloneDeep(this.currentOrder)
+          }
+
+          if (this.initOrderProps) {
+            for (const prop in this.initOrderProps) {
+              if (this.initOrderProps.hasOwnProperty(prop)) {
+                console.log(`set prop ${prop}: ${this.initOrderProps[prop]}`)
+                this.$set(this.currentOrder, prop, this.initOrderProps[prop])
+              }
+            }
+            this.setInitOrderProps({})
           }
         }
       },

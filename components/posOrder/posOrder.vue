@@ -523,12 +523,6 @@
       if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
         this.table = this.$route.params.name
         this.$emit('updateOrderTable', this.table)
-
-        const { tseMethod, numberOfCustomers } = this.$route.query
-        if (tseMethod !== undefined)
-          this.$getService('OrderStore:updateCurrentOrder')('tseMethod', tseMethod)
-        if (numberOfCustomers !== undefined)
-          this.$getService('OrderStore:updateCurrentOrder')('numberOfCustomers', numberOfCustomers ? +numberOfCustomers : null)
       } else this.table = ''
 
       const posSettings = await cms.getModel('PosSetting').findOne()

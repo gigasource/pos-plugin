@@ -165,13 +165,30 @@
           "items": [
             {
               "choice": "view",
-              "component": "PosOrderScreenAction",
+              "component": "PosOrderManualTable",
               "binding": [],
               "slotScopeBinding": [],
               "slot": "ManualTable",
-              "url": "plugins/pos-plugin/components/Order/PosOrderScreenAction.vue",
-              "path": "components/Order/PosOrderScreenAction.vue",
-              "pluginName": "pos-plugin"
+              "url": "plugins/pos-plugin/components/Order/PosOrderManualTable.vue",
+              "path": "components/Order/PosOrderManualTable.vue",
+              "pluginName": "pos-plugin",
+              "inject": [
+                {
+                  "service": "PosStore:isMobile",
+                  "local": "isMobile",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:activeOrders",
+                  "local": "activeOrders",
+                  "type": "prop"
+                },
+                {
+                  "service": "OrderStore:setInitOrderProps",
+                  "local": "setInitOrderProps",
+                  "type": "event"
+                }
+              ]
             },
             {
               "choice": "view",
@@ -237,6 +254,11 @@
                   "service": "PosStore:user",
                   "local": "user",
                   "type": "prop"
+                },
+                {
+                  "service": "OrderStore:setInitOrderProps",
+                  "local": "setInitOrderProps",
+                  "type": "event"
                 }
               ]
             },
