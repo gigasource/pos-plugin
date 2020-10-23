@@ -531,6 +531,36 @@
       "url": "plugins/pos-plugin/components/posOrder/PosOrderMoveItems.vue",
       "path": "components/posOrder/PosOrderMoveItems.vue",
       "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "PosOrderVoucherDialog",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "PosOrderVoucherDialog",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "inject": [
+        {
+          "service": "OrderStore:addVoucher",
+          "local": "addVoucher",
+          "type": "event"
+        },
+        {
+          "service": "OrderStore:redeemVoucher",
+          "local": "redeemVoucher",
+          "type": "event"
+        }
+      ],
+      "url": "plugins/pos-plugin/components/Order/PosOrderVoucherDialog.vue",
+      "path": "components/Order/PosOrderVoucherDialog.vue",
+      "pluginName": "pos-plugin"
     }
   ],
   "name": "posOrderMobile",

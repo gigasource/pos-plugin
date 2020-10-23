@@ -844,6 +844,20 @@
           cb()
         })
       },
+      addVoucher(value) {
+        this.addProductToOrder({
+          name: 'Voucher',
+          price: +value,
+          isVoucher: true
+        })
+      },
+      redeemVoucher(value) {
+        this.addProductToOrder({
+          name: 'Redeemed Voucher',
+          price: -value,
+          isVoucher: true
+        })
+      },
       printKitchen(order) {
         return new Promise((resolve, reject) => {
           cms.socket.emit('printKitchen', {

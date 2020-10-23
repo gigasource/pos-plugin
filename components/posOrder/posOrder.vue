@@ -20,6 +20,7 @@
               <div class="order-detail__menu">
                 <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
                 <g-btn-bs icon="icon-move-items" @click="moveItems">Move Items</g-btn-bs>
+                <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
                 <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
                 <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
@@ -110,7 +111,7 @@
            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
         <div class="item-detail">
           <div :style="[item.printed && { opacity: 0.55 }]">
-            <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
+            <p class="item-detail__name">{{item.id && `${item.id}. `}}{{item.name}}</p>
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
               <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
@@ -484,7 +485,7 @@
       },
       loadSetting() {
         const setting = localStorage.getItem('OrderScreenSetting')
-        if(setting) {
+        if (setting) {
           const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn, smallSidebar, scrollabeLayout} = JSON.parse(setting)
           if(!category.fontSize) category.fontSize = '13px'
           this.$emit('update:fontSize', fontSize)
@@ -497,6 +498,9 @@
           this.$set(this, 'showSplitBtn', showSplitBtn)
           this.$set(this, 'smallSidebar', smallSidebar)
         }
+      },
+      showVoucherDialog() {
+        this.$getService('PosOrderVoucherDialog:setActive')(true)
       }
     },
     created() {

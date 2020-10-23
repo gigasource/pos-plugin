@@ -949,6 +949,11 @@
           "schemaType": "string",
           "key": "tseMethod",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "isVoucher",
+          "type": "input@checkbox"
         }
       ],
       "default": null,

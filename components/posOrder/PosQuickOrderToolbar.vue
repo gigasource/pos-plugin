@@ -10,6 +10,7 @@
         <g-btn-bs icon="icon-promotion">
           {{$t('fnBtn.paymentFunctions.discount')}}
         </g-btn-bs>
+        <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
       </div>
     </g-menu>
     <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
@@ -87,6 +88,9 @@
       moveItems() {
         this.$getService('PosOrderMoveItems:setActive')(true)
       },
+      showVoucherDialog() {
+        this.$getService('PosOrderVoucherDialog:setActive')(true)
+      }
     }
   }
 </script>

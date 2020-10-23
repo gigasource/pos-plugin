@@ -837,3 +837,10 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-voucher {
+  background-image: url("../assets/voucher.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
