@@ -994,14 +994,14 @@
             }
           },
           {
-            type: 'changeTable',
-            where: { _id: order._id },
+            type: 'order',
+            action: 'changeTable',
+            where: jsonfn.stringify({ _id: order._id }),
             data: {
+              table: order.table,
               orderId: order._id
             },
-            update: {
-              table: newTable
-            }
+            update: newTable
           }
         ])
         cb()
