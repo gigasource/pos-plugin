@@ -327,7 +327,7 @@ async function orderCommit(updateCommit) {
   updateCommit.registerMethod(TYPENAME, 'changeTable', async function (commit) {
     try {
       const result =
-        await updateCommit.orderCommitModel.updateMany({orderId: commit.data.orderId}, {table: commit.update}, {new: true});
+        await updateCommit.orderCommitModel.updateMany({groupTempId: commit.groupTempId}, {data: { table: commit.update, orderId: commit.data.orderId }}, {new: true});
       if (!result) return;
       updateCommit[TYPENAME].activeOrders[commit.update] = updateCommit[TYPENAME].activeOrders[commit.data.table];
       const condition = JsonFn.parse(commit.where);
@@ -401,7 +401,7 @@ async function orderCommit(updateCommit) {
           const query = (commit.update.query ? JsonFn.parse(commit.update.query) : null);
           const condition = (commit.where ? JsonFn.parse(commit.where) : {});
           condition._id = _id;
-          promiseList.push(updateCommit.orderModel[commit.update.method](condition, query));
+          commit.update.method && promiseList.push(updateCommit.orderModel[commit.update.method](condition, query));
         }
       })
       await Promise.all(promiseList);

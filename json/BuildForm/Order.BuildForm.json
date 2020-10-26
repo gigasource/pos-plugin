@@ -1638,6 +1638,12 @@
       "_id": "5f8ac61fbfbfab7940e30961",
       "schemaType": "boolean",
       "key": "immediatePay"
+    },
+    {
+      "_id": "5f9021e8d2131bb788d3f77c",
+      "schemaType": "string",
+      "key": "qrCode",
+      "type": "input"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

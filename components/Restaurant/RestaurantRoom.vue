@@ -132,27 +132,11 @@
       async setTransferTableTo(roomObj) {
         if (!roomObj || !this.isTable(roomObj) || this.isTableBusy(roomObj)) return
         const order = await cms.getModel('Order').findOne({ table: this.transferTableFrom.name, status: 'inProgress' })
-
-        // todo transfer table:
-        // create $set table commit
-        const currentCommits = await cms.getModel('OrderCommit').find({ orderId: order.id })
         const table = roomObj.name;
-        await cms.getModel('OrderCommit').addCommits(['order', 'changeTable'].map(type => {
-          return {
-            type,
-            where: { _id: order._id },
-            table: order.table,
-            update: {
-              set: {
-                key: 'table',
-                value: table
-              }
-            }
-          }
-        }))
-        // update current order -> new table
-        await this.loadRoom()
-        this.transferTableFrom = null
+        this.$emit('changeTable', order, table, async () => {
+          await this.loadRoom()
+          this.transferTableFrom = null
+        })
       }
     }
   }

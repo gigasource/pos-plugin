@@ -23,7 +23,8 @@
     data() {
       return {
         text: '',
-        showNumberOfCustomersDialog: false
+        showNumberOfCustomersDialog: false,
+        rooms: null
       }
     },
     computed: {
@@ -47,6 +48,9 @@
       this.focusTf()
     },
     methods: {
+      async loadRoom() {
+        this.rooms = await cms.getModel('Room').find()
+      },
       async addTable() {
         if (!this.text || this.tableExists) return
         if (this.isBusyTable(this.trimmedText)) {
@@ -61,12 +65,16 @@
           this.routeToOrder()
         }
       },
-      onCustomerDialogSubmit({ numberOfCustomers, tseMethod }) {
+      async onCustomerDialogSubmit({ numberOfCustomers, tseMethod }) {
         this.showNumberOfCustomersDialog = false
+        await this.loadRoom()
+        const tables = this.rooms.map(room => room.roomObjects.filter(i => i.type === 'table')).flat()
+        const includesTable = tables.includes(this.trimmedText);
+
         this.$emit('setInitOrderProps', {
           ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
           tseMethod: tseMethod || 'auto',
-          manual: true
+          manual: !includesTable
         })
         this.routeToOrder()
       },
