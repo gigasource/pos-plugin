@@ -1278,11 +1278,7 @@
     ::v-deep .key {
       transition: none;
 
-      &.waves-ripple {
-        background-color: rgba(255, 190, 92, 1)
-      }
-
-      &.key-enter {
+      .key-enter {
         font-size: 16px !important;
       }
     }

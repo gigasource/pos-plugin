@@ -330,7 +330,7 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .keyboard__template {
     height: 100%;
   }
@@ -339,5 +339,9 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.216346);
     border-radius: 2px;
     font-size: 24px;
+
+    .waves-ripple {
+      background-color: rgba(255, 190, 92, 1)
+    }
   }
 </style>

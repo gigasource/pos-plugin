@@ -234,6 +234,10 @@
 
     ::v-deep .key {
       border: 1px solid #979797;
+
+      .waves-ripple {
+        background-color: rgba(255, 190, 92, 1)
+      }
     }
   }
 </style>

@@ -61,17 +61,14 @@
 </script>
 
 <style lang="scss" scoped>
-
-  .input-section {
     .keyboard__template {
       ::v-deep .key-number {
         font-size: 20px;
         line-height: 25px;
-        font-style: normal;
-        font-weight: normal;
+
+        .waves-ripple {
+          background-color: rgba(255, 190, 92, 1)
+        }
       }
     }
-  }
-
-
 </style>
