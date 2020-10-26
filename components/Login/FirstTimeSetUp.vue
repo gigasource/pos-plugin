@@ -62,10 +62,11 @@
     </div>
     <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl"
                        @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
-    <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
+    <g-btn style="position: absolute; top: 10px; right: 10px" @click="openDialogDemo">Skip to Demo</g-btn>
     <div v-if="showKeyboard" class="keyboard-wrapper">
       <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
     </div>
+    <dialog-demo v-model="dialog.demo" :mode="demoMode"/>
   </div>
 </template>
 
@@ -83,7 +84,8 @@
         dialog: {
           pairing: true,
           input: false,
-          combobox: false
+          combobox: false,
+          demo: false,
         },
         code: '',
         error: false,
@@ -101,6 +103,7 @@
         items: [{title: 'Address'}, {title: 'Pairing Code'}],
         tab: null,
         showKeyboard: false,
+        demoMode: 'demo'
       }
     },
     async created() {
@@ -208,6 +211,10 @@
         } else if (this.tab.title === 'Pairing Code') {
           await this.connect()
         }
+      },
+      openDialogDemo() {
+        this.demoMode = 'demo'
+        this.dialog.demo = true
       }
     }
   }
