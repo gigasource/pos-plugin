@@ -17,6 +17,13 @@
         <span class="mt-3 ta-center">{{btn.title}}</span>
       </div>
     </div>
+    <div v-if="demoLicense" :class="['demo-license-warning', dayLeft < 30 ? 'bg-red-lighten-5' : 'bg-blue-lighten-5']">
+      <div style="margin: 0 32px 0 8px">
+        <p class="fw-700">You are using demo license</p>
+        <p :class="['fs-small-2', dayLeft < 30 ? 'text-red' : 'text-grey-darken-1']">{{dayLeft}} day{{dayLeft > 1 && 's'}} left</p>
+      </div>
+      <g-btn-bs class="fs-small-2" width="100" background-color="white" border-color="#1271FF" @click="viewLicense">View license</g-btn-bs>
+    </div>
 
     <template>
       <g-dnd-dialog v-model="showIframe" :width="iframeWidth" :height="iframeHeight" lazy
@@ -75,6 +82,8 @@
         iframeSrc: 'about:blank',
         iframeDragging: false,
         iframeRefreshInterval: null,
+        demoLicense: true,
+        dayLeft: 14
       }
     },
     computed: {
@@ -118,6 +127,9 @@
       },
       updateView(name) {
         this.$emit('update:view', {name})
+      },
+      viewLicense() {
+        this.dayLeft = this.dayLeft === 59 ? 14 : 59
       }
     }
   }
@@ -168,6 +180,16 @@
       & > span {
         word-break: break-word;
       }
+    }
+
+    .demo-license-warning {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      padding: 8px;
+      align-items: center;
+      border-radius: 2px;
     }
   }
 
