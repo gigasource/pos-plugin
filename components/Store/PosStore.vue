@@ -185,7 +185,7 @@
             return this.enabledFeatures.includes(item.feature)
           })
         }
-        
+
         if (this.showVirtualReportInSidebar) {
           sidebar.push({
             icon: 'icon-printer',
@@ -198,7 +198,7 @@
             title: 'Virtual Printer'
           })
         }
-        
+
         return sidebar.map(item => {
           switch (item.key) {
             case 'Reservation':
@@ -227,12 +227,13 @@
         return orderDashboard || functions
       },
       showMasterDevSnackbar() {
-        const path = this.$route.path
-        if (path === '/pos-setup' || path === '/pos-login' || path === '/admin') return false
-
-        if (this.enabledFeatures.includes('tablePlan') || this.enabledFeatures.includes('fastCheckout')) {
-          return !this.masterClientId
-        }
+        // const path = this.$route.path
+        // if (path === '/pos-setup' || path === '/pos-login' || path === '/admin') return false
+        //
+        // if (this.enabledFeatures.includes('tablePlan') || this.enabledFeatures.includes('fastCheckout')) {
+        //   return !this.masterClientId
+        // }
+        return false
       }
     },
     domain: 'PosStore',
@@ -318,13 +319,13 @@
         })
 
         cms.socket.on('getMasterDevice', id => this.masterClientId = id)
-        
+
         cms.socket.on('remoteControlInput', data => {
           if (!document.elementFromPoint) {
             console.log('PosStore:remoteControlInput: document.elementFromPoint is not supported')
             return;
           }
-          
+
           const targetNode = document.elementFromPoint(inputEvent.webPosition.x, inputEvent.webPosition.y);
           // {"type":"mouse","action":"mousedown","position":{"x":270,"y":244}, "webPosition": {"x": 380, "y": 450}}
           // {"type":"mouse","action":"mousemove","position":{"x":270,"y":246}, "webPosition": {"x": 380, "y": 450}}
@@ -468,7 +469,7 @@
       if (posSettings && posSettings.generalSetting) {
         this.showVirtualReportInSidebar = !!posSettings.generalSetting.useVirtualPrinter
       }
-      
+
       this.$router.beforeEach((to, from, next) => {
         if (to.path === '/admin' || to.path === '/plugins' || to.path === '/pos-login' || to.path === '/pos-setup') {
           next()
