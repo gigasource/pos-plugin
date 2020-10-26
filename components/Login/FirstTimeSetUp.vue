@@ -3,11 +3,12 @@
     <div :class="showKeyboard ? 'left' : 'center'">
       <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
       <g-tabs v-model="tab" :items="items">
-        <g-tab-item :item="items[0]" style="height: 200px; padding-top: 4px">
+        <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
           <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
                       keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
                       :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
           </g-combobox>
+          <pos-textfield-new class="tf-phone" label="Phone number" @click="showKeyboard = true" v-model="phone"/>
           <div v-if="error" class="dialog-message--error">
             <g-icon v-if="offline">icon-no-connection</g-icon>
             <span class="ml-2 fs-small">{{errorMessage}}</span>
@@ -66,7 +67,7 @@
     <div v-if="showKeyboard" class="keyboard-wrapper">
       <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
     </div>
-    <dialog-demo v-model="dialog.demo" :mode="demoMode"/>
+    <dialog-demo v-model="dialog.demo" :mode="demoMode" :address="place" :phone="phone"/>
   </div>
 </template>
 
@@ -75,10 +76,11 @@
   import {v4 as uuidv4} from 'uuid';
   import _ from 'lodash';
   import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
+  import PosTextfieldNew from "../pos-shared-components/POSInput/PosTextfieldNew";
 
   export default {
     name: 'FirstTimeSetUp',
-    components: {PosKeyboardFull, DialogCustomUrl},
+    components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl},
     data() {
       return {
         dialog: {
@@ -103,7 +105,8 @@
         items: [{title: 'Address'}, {title: 'Pairing Code'}],
         tab: null,
         showKeyboard: false,
-        demoMode: 'demo'
+        demoMode: 'demo',
+        phone: ''
       }
     },
     async created() {
@@ -237,7 +240,7 @@
     }
 
     .center {
-      padding: 24px;
+      padding: 0 24px;
       border-radius: 4px;
       width: 50%;
     }
@@ -356,6 +359,17 @@
     .bs-tf-input {
       font-size: 18px;
       padding: 12px 6px;
+    }
+  }
+
+  .tf-phone {
+    ::v-deep fieldset {
+      background-color: #F0F0F0;
+      border: 1px solid #ced4da;
+    }
+
+    &.g-tf__focused ::v-deep fieldset {
+      border-color: #1271FF;
     }
   }
 </style>
