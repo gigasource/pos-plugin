@@ -259,6 +259,11 @@
                   "service": "OrderStore:setInitOrderProps",
                   "local": "setInitOrderProps",
                   "type": "event"
+                },
+                {
+                  "service": "OrderStore:changeTable",
+                  "local": "changeTable",
+                  "type": "event"
                 }
               ]
             },

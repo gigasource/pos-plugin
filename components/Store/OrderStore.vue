@@ -974,6 +974,38 @@
         this.paymentAmountTendered = this.paymentTotal.toString()
         await this.saveRestaurantOrder({ type: 'cash', value: this.paymentTotal });
       },
+      async changeTable(order, newTable, cb) {
+        await cms.getModel('OrderCommit').addCommits([
+          {
+            type: 'order',
+            where: jsonfn.stringify({ _id: order._id }),
+            action: 'update',
+            data: {
+              orderId: order.id,
+              table: order.table,
+            },
+            update: {
+              method: 'findOneAndUpdate',
+              query: jsonfn.stringify({
+                $set: {
+                  table: newTable
+                }
+              })
+            }
+          },
+          {
+            type: 'changeTable',
+            where: { _id: order._id },
+            data: {
+              orderId: order._id
+            },
+            update: {
+              table: newTable
+            }
+          }
+        ])
+        cb()
+      },
       //<!--</editor-fold>-->
 
       // online ordering
