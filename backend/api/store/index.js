@@ -284,31 +284,13 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
     }
 
     await assignDevice(request.device._id, request.store);
-    if (request.pos) {
-      await cms.getModel('Device').findOneAndUpdate({ _id: request.device._id }, {
-        features: {
-          fastCheckout: true,
-          manualTable: true,
-          delivery: true,
-          editMenuCard: true,
-          tablePlan: true,
-          onlineOrdering: false,
-          editTablePlan: true,
-          staffReport: true,
-          eodReport: true,
-          monthlyReport: true,
-          remoteControl: true,
-          proxy: true,
-          alwaysOn: true,
-          reservation: false,
-          startOnBoot: true
-        }
-      })
-    }
   }
 
   if (status === 'approved') {
     // fallback
+    if (request.pos) {
+      await initApprovedDevice(request.store._id, request.device._id)
+    }
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
     // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
@@ -646,6 +628,44 @@ async function deleteStore(storeId) {
   // remove store owner user
   const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
   await cms.getModel('User').deleteOne({role: deviceRole._id, store: storeId})
+}
+
+async function initApprovedDevice(storeId, deviceId) {
+  await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, {
+    features: {
+      fastCheckout: true,
+      manualTable: true,
+      delivery: true,
+      editMenuCard: true,
+      tablePlan: true,
+      onlineOrdering: false,
+      editTablePlan: true,
+      staffReport: true,
+      eodReport: true,
+      monthlyReport: true,
+      remoteControl: true,
+      proxy: true,
+      alwaysOn: true,
+      reservation: false,
+      startOnBoot: true
+    }
+  })
+
+  const storeDevices = await cms.getModel('Device').find({ storeId }).lean()
+  if (storeDevices.length === 1) {
+    await setMasterDevice(storeId, deviceId)
+  }
+}
+
+async function setMasterDevice(storeId, deviceId) {
+  const storeDevices = await cms.getModel('Device').find({ storeId })
+  await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
+  await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { master: true })
+  const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
+  devices.forEach(device => {
+    console.log(`Sending master ip to ${device._id.toString()}`);
+    getExternalSocketIoServer().emitToPersistent(device._id.toString(), 'updateMasterDevice', [deviceId]);
+  })
 }
 
 module.exports = router
