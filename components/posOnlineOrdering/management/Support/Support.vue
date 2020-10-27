@@ -15,7 +15,7 @@
       <div class="support__table-header">
         <div class="w-10 pl-2">Date</div>
         <div class="flex-equal">Restaurant</div>
-        <div style="flex: 0 0 100px">Action</div>
+        <div style="flex: 0 0 108px">Action</div>
         <div class="w-10">Type</div>
         <!--<div>Role</div>-->
         <!--<div>Name</div>-->
@@ -35,10 +35,10 @@
           <div v-for="(request, i) in sortedRequests" :key="i" class="support__table-row">
             <div class="w-10 pl-2">{{request.createdAt | formatDate(dateFormat)}}</div>
             <div class="flex-equal">{{request.requestStoreName}}</div>
-            <div style="flex: 0 0 100px">
+            <div style="flex: 0 0 108px">
               <g-icon size="20" class="mr-2" @click="addChat(request.deviceId)">far fa-comment-alt</g-icon>
               <g-icon v-if="!request.storeId" size="20" class="mr-2" @click="addNewStore(request)">icon-add-restaurant</g-icon>
-              <g-icon v-if="request.storeId && request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
+              <g-icon v-if="request.status === 'pending'" size="20" class="mr-2" color="#388E3C" @click="openDialogApprove(request._id)">fas fa-check</g-icon>
               <g-icon v-if="request.status === 'pending'" size="20" color="#FF4452" @click="openDialogDeny(request._id)">fas fa-times</g-icon>
             </div>
             <div class="w-10">{{request.storeId ? 'Sign in' : 'New restaurant'}}</div>
@@ -262,7 +262,7 @@
       async denyRequest() {
         this.dialog.deny = false
         const requestId = this.selectedRequestId
-        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved'})
+        await axios.put(`/store/sign-in-requests/${requestId}`, {status: 'notApproved', storeId: this.selectedRequest.storeId})
         this.signInRequests.find(e => e._id === requestId).status = 'notApproved'
       },
       async assignStore(request, storeId) {

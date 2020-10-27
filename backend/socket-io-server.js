@@ -1154,26 +1154,13 @@ module.exports = async function (cms) {
     })
 
     socket.on('removeStore', async (storeId, cb) => {
-      // remove store
-      await cms.getModel('Store').deleteOne({_id: storeId})
-
+      const { deleteStore } = require('./api/store')
+      await deleteStore(storeId)
       // remove devices & unpair all
       const devices = await cms.getModel('Device').find({storeId})
       const deviceIds = devices.map(i => i._id)
       await cms.getModel('Device').deleteMany({_id: {$in: deviceIds}})
-      deviceIds.forEach(i => externalSocketIOServer.emitToPersistent(i, 'unpairDevice'))
-
-      // remove products
-      await cms.getModel('Product').deleteMany({store: storeId})
-
-      // remove discounts
-      await cms.getModel('Discount').deleteMany({store: storeId})
-
-      // remove store owner user
-      const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
-      await cms.getModel('User').deleteOne({role: deviceRole._id, store: storeId})
-
-      // run callback
+      devices.forEach(device => externalSocketIOServer.emitToPersistent(device._id, 'unpairDevice'))
       typeof cb === 'function' && cb()
     })
 

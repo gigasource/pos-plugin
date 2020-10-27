@@ -35,7 +35,14 @@
       "_id": "5f1e5c074a81b865c59fdf60",
       "schemaType": "string",
       "key": "status",
-      "default": "pending"
+      "default": "pending",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "pending",
+        "approved",
+        "notApproved"
+      ]
     },
     {
       "_id": "5f1e5c074a81b865c59fdf61",
@@ -60,6 +67,17 @@
       "schemaType": "string",
       "key": "avatar",
       "type": "input"
+    },
+    {
+      "_id": "5f7da06e4ee7bc6d0708b9a4",
+      "schemaType": "boolean",
+      "key": "pos",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f97a43a9aa82452d3814ecb",
+      "schemaType": "mixed",
+      "key": "storeData"
     }
   ],
   "name": "SignInRequest",
