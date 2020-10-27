@@ -18,7 +18,8 @@
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
-        <g-icon v-if="isTableBusy(roomObject) && isUserTable(roomObject)" style="position: absolute; top: 0; right: 0; height: 18px; width: 21px">icon-room-border</g-icon>
+        <g-icon v-if="isTableBusy(roomObject) && isUserTable(roomObject)"
+                style="position: absolute; top: 0; right: 0; height: 13px; width: 15px">icon-room-border</g-icon>
       </div>
       <div v-if="editable && isSelected(roomObject)"
            @mousedown.prevent.stop="e => onMouseDown(e, roomObject, actions.resize)"
