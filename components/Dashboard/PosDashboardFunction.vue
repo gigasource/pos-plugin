@@ -82,7 +82,7 @@
         iframeSrc: 'about:blank',
         iframeDragging: false,
         iframeRefreshInterval: null,
-        demoLicense: true,
+        demoLicense: false,
         dayLeft: 14
       }
     },

@@ -1009,7 +1009,9 @@ module.exports = async cms => {
         })
         console.debug(sentryTags, 'POS backend: sendSignInRequest success', request)
         cb(request)
-        await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } }, { new: true })
+        if (!request.message) {
+          await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } })
+        }
         if (request && request.storeData) {
           const { _id, name, alias, settingName } = storeData
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
