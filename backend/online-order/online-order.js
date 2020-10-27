@@ -532,7 +532,8 @@ module.exports = async cms => {
       console.log('denySignIn_v2')
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
-          'signInRequest.status': 'notApproved'
+          'signInRequest.status': 'notApproved',
+          'onlineDevice.store': {}
         }
       })
 
@@ -695,7 +696,7 @@ module.exports = async cms => {
     }
   }
 
-  async function registerDevice(cb = () => null) {
+  const registerDevice = _.throttle(async function (cb = () => null) {
     const webshopUrl = await getWebShopUrl()
 
     try {
@@ -703,7 +704,7 @@ module.exports = async cms => {
         appName: 'POS_Android',
         appVersion: require('../../package').version,
         hardware: global.APP_CONFIG.deviceName || 'macbook',
-        hardwareId: 'macbook', //testing
+        hardwareId: 'macbook', // todo get hwId via native bridge
         release: require('../../package').release,
         metadata: {
           deviceIp: await getPublicIp()
@@ -719,7 +720,7 @@ module.exports = async cms => {
       console.error('Error registering device', error)
       cb({ error })
     }
-  }
+  }, 5000, { leading: true, trailing: false })
 
   async function registerWithCode(pairingCode) {
     try {
@@ -992,20 +993,35 @@ module.exports = async cms => {
       })
     })
 
-    socket.on('sendSignInRequest', async (storeName, googleMapPlaceId, cb = () => null) => {
+    socket.on('sendSignInRequest', async (phoneNo, googleMapPlaceId, storeData, cb = () => null) => {
       const sentryTags = getBaseSentryTags('sendSignInRequest');
       try {
         const webshopUrl = await getWebShopUrl()
         const deviceId = await getDeviceId()
         await createOnlineOrderSocket(deviceId)
+        const { country, location, zipCode, name, address } = storeData;
         const { data: request } = await axios.post(`${webshopUrl}/store/sign-in-requests`, {
-          storeName,
+          storeName: name,
           googleMapPlaceId,
-          deviceId
+          deviceId,
+          storeData: { phoneNo, address, country, zipCode, location },
+          pos: true
         })
         console.debug(sentryTags, 'POS backend: sendSignInRequest success', request)
         cb(request)
         await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } }, { new: true })
+        if (request && request.storeData) {
+          const { _id, name, alias, settingName } = storeData
+          await cms.getModel('PosSetting').findOneAndUpdate({}, {
+            $set: {
+              'onlineDevice.store': {
+                id: _id,
+                name: name || settingName,
+                alias
+              }
+            }
+          })
+        }
       } catch (e) {
         console.debug(sentryTags, 'POS backend: sendSignInRequest error', e)
       }

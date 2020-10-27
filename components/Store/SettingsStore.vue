@@ -846,7 +846,11 @@
         })
 
         cms.socket.on('approveSignIn', () => {
-          this.$router.push('/pos-login')
+          this.$route.path === '/pos-setup' && this.$router.push('/pos-login')
+        })
+
+        cms.socket.on('denySignIn', () => {
+          this.$route.path !== '/pos-setup' && this.$router.push('/pos-setup')
         })
       },
 

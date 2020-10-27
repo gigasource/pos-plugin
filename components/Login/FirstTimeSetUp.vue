@@ -5,7 +5,7 @@
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
           <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
-                      keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
+                      keep-menu-on-blur clearable skip-search menu-class="menu-autocomplete-setup"
                       :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
           </g-combobox>
           <pos-textfield-new class="tf-phone" label="Phone number" @click="showKeyboard = true" v-model="phone"/>
@@ -126,17 +126,17 @@
       });
 
       this.debouncedSearch = _.debounce(this.searchPlace, 500)
-
-      const {signInRequest} = await cms.getModel('PosSetting').findOne()
-      if (signInRequest) this.signInRequest = signInRequest
+      await this.getRequest()
 
       cms.socket.on('denySignIn', () => {
         if (this.signInRequest) this.$set(this.signInRequest, 'status', 'notApproved')
+        else this.getRequest()
       })
     },
-    activated() {
+    async activated() {
       this.placesSearchResult = []
       this.placeId = ''
+      await this.getRequest()
     },
     computed: {
       disableSendBtn() {
@@ -180,7 +180,10 @@
       },
       searchPlace(text) {
         console.log('searching')
-        if (!text || text.length < 4) return
+        if (!text || text.length < 4) {
+          this.placesSearchResult = []
+          return
+        }
         this.token = uuidv4()
         cms.socket.emit('searchPlace', text, this.token, places => {
           this.placesSearchResult = places.map(p => {
@@ -200,10 +203,23 @@
           })
         }
       },
+      async getRequest() {
+        const {signInRequest} = await cms.getModel('PosSetting').findOne()
+        if (signInRequest) this.signInRequest = signInRequest
+      },
       async sendRequest() {
         this.sending = true
-        const {name: storeName} = await this.getPlaceDetail()
-        cms.socket.emit('sendSignInRequest', storeName, this.placeId, request => {
+        const details = await this.getPlaceDetail()
+
+        const { name, formatted_address: address, geometry: { location }, address_components } = details
+        const storeData = { name, address, location }
+        if (address_components && address_components.length) {
+          const countryComponent = address_components.find(c => c.types.includes('country'))
+          storeData.country = countryComponent && countryComponent.long_name
+          const zipCodeComponent = address_components.find(c => c.types.includes('postal_code'))
+          storeData.zipCode = zipCodeComponent && zipCodeComponent.long_name
+        }
+        cms.socket.emit('sendSignInRequest', this.phone, this.placeId, storeData, request => {
           this.signInRequest = request
           this.sending = false
         })
@@ -218,6 +234,11 @@
       openDialogDemo() {
         this.demoMode = 'demo'
         this.dialog.demo = true
+      }
+    },
+    watch: {
+      signInRequest(val) {
+        if (val && val.status !== 'notApproved') this.start()
       }
     }
   }
