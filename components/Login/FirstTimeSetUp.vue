@@ -5,7 +5,7 @@
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
           <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
-                      keep-menu-on-blur clearable skip-search menu-class="menu-autocomplete-setup"
+                      keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
                       :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
           </g-combobox>
           <pos-textfield-new class="tf-phone" label="Phone number" @click="showKeyboard = true" v-model="phone"/>
