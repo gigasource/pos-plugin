@@ -80,7 +80,7 @@ function requireSync(storeId, type, oldHighestCommitId, ack) {
 }
 
 function addCollection(storeId, collectionName, docs) {
-	connectionHandlers[storeId].db.collection(collectionName).insertMany(docs);
+	connectionHandlers[storeId].updateCommit.db.collection(collectionName).insertMany(docs);
 }
 
 module.exports = {

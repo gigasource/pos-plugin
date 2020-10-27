@@ -5,34 +5,10 @@ const mongoose = require('mongoose');
 
 const COMMIT_TIME_OUT = 5 * 60 * 1000;
 const COMMIT_CLOSE_TIME_OUT = 30 * 1000;
+const { convertResultToObject, convertToObjectId, convertMongooseQueryToMongoQuery } = require('./utils');
 
 async function orderCommit(updateCommit) {
 	const TYPENAME = 'order';
-
-	function convertMongooseQueryToMongoQuery(update) {
-		if (update.method === 'create') {
-			update.method = 'insertOne';
-		}
-		return update;
-	}
-
-	async function convertResultToObject(method, result) {
-		if (!result) return null;
-		if (method === 'find') {
-			return await result.toArray();
-		} else if (method === 'findOne') {
-			return result;
-		} else if (method === 'findOneAndUpdate') {
-			return result.value;
-		}
-		if (result.hasNext) return await result.hasNext() ? await result.next() : null;
-		if (result.value) return result.value;
-		return result;
-	}
-
-	function convertToObjectId(id) {
-		return mongoose.Types.ObjectId(id);
-	}
 
 	/* -------------- Method for this file only -------------- */
 	function validateCommit(commit) {
