@@ -27,7 +27,7 @@
       </tr>
       </thead>
       <tr v-if="orderHistoryFilters && orderHistoryFilters.length > 0">
-        <td colspan="8" class="td__sticky">
+        <td colspan="7" class="td__sticky">
           <div class="filter-list">
             <span class="ml-1">{{$t('orderHistory.filter')}}</span>
             <div class="group-chip">
@@ -200,7 +200,7 @@
       async setPaymentFilter(payment) {
         await this.applyFilter({
           title: 'Payment Method',
-          text: 'Payment Method',
+          text: payment,
           condition: { payment: { $elemMatch: { type: payment } } }
         })
       },
@@ -280,6 +280,7 @@
       position: sticky;
       top: 48px;
       background-color: #bdbdbd;
+      z-index: 2;
     }
 
     .tr__active {

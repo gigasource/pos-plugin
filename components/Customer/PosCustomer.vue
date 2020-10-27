@@ -3,9 +3,9 @@
     <div class="customer-main">
       <g-table striped fixed-header>
         <tr>
-          <th>{{$t('onlineOrder.refundDialog.name')}}</th>
-          <th>{{$t('onlineOrder.refundDialog.phone')}}</th>
-          <th>{{$t('onlineOrder.refundDialog.address')}}</th>
+          <th class="sticky">{{$t('onlineOrder.refundDialog.name')}}</th>
+          <th class="sticky">{{$t('onlineOrder.refundDialog.phone')}}</th>
+          <th class="sticky">{{$t('onlineOrder.refundDialog.address')}}</th>
         </tr>
         <tr v-for="(customer, i) in sortedCustomer" :key="i" @click="select(customer)"
             :class="[selectedCustomer && selectedCustomer._id === customer._id && 'bordered']">
@@ -298,6 +298,12 @@
         font-size: 14px;
       }
     }
+
+    .sticky {
+      position: sticky;
+      top: -1px;
+      background: white
+    }
   }
 
   .btn-delete {
@@ -318,6 +324,7 @@
       flex: 0 0 45%;
       background-color: white;
       padding: 4px;
+      overflow: auto;
 
       ::v-deep .g-tf-wrapper {
         margin: 4px 2px 4px;

@@ -5,7 +5,7 @@
     <div class="g-pagination-text">{{$t('ui.tblRow')}}:</div>
     <div class="g-pagination-input">
       <g-select :items="computedRowsPerPageItems"
-                :value="selectLimit"
+                :value="selectLimit" menu-class="menu-pagination"
                 @input="changeLimitRow($event)"
       />
     </div>
@@ -13,7 +13,7 @@
       {{$t('ui.tblPage')}}:
     </div>
     <div class="g-pagination-input">
-      <g-combobox
+      <g-combobox menu-class="menu-pagination"
           v-model="comboPage"
           :items="listPageNumber"
           @input="gotoPage($event)"
@@ -224,6 +224,25 @@
 
         &:last-child {
           margin-right: 8px;
+        }
+      }
+    }
+  }
+</style>
+
+<style lang="scss">
+  .menu-pagination {
+    .g-list {
+      .g-list-item {
+        min-height: 0;
+        padding: 4px;
+
+        .g-list-item-content {
+          margin: 0;
+
+          .g-list-item-text {
+            text-align: center;
+          }
         }
       }
     }

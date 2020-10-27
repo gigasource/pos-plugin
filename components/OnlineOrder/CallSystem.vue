@@ -1,9 +1,8 @@
 <template>
   <div class="call">
-    <p class="call-title">Call System</p>
+    <p class="call-title mb-2">Call System</p>
     <g-switch label="Active" v-model="active"/>
-    <g-switch :label="demoModeLabel"
-              v-model="demoMode"/>
+    <g-switch :label="demoModeLabel" v-model="demoMode"/>
     <p class="call-title">Call System IP</p>
     <g-text-field-bs v-model="ip">
       <template v-slot:append-inner>
@@ -96,7 +95,7 @@
     display: flex;
     flex-direction: column;
     background-color: white;
-    padding: 24px;
+    padding-left: 24px;
     height: 100%;
     overflow: auto;
 
@@ -104,16 +103,21 @@
       font-size: 14px;
       font-weight: bold;
       margin-top: 12px;
+      margin-bottom: 4px;
     }
 
     .bs-tf-wrapper {
-      margin: 8px 0 0;
+      margin: 0;
       width: 100%;
 
       ::v-deep .input {
         flex: 1;
         padding-right: 12px;
       }
+    }
+
+    .g-switch-wrapper {
+      margin: 4px;
     }
   }
 </style>

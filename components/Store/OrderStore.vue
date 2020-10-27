@@ -535,7 +535,9 @@
       },
       async getTotalOrders() {
         const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => ({ ...acc, ...filter['condition'] }), { status: 'paid' });
+        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
+            { ...acc, ...filter['condition'] }),
+            { $or: [{ status: 'paid' }, { status: 'completed' }] });
         this.totalOrders = await orderModel.count(condition);
       },
       async deleteOrder() {

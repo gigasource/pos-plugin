@@ -28,7 +28,7 @@
               <g-icon style="cursor: pointer" @click="dialog.showRoomNameKbd = true">icon-keyboard</g-icon>
             </template>
           </pos-text-field>
-          <div style="display: flex; margin-left: 5px; margin-right: 5px; justify-content: space-between">
+          <div style="display: flex; margin-left: 5px; margin-right: 5px; justify-content: space-between;">
             <g-btn @click="moveRoomUp" style="width: 20px; min-width: 20px !important">
               <g-icon small>icon-arrow-up</g-icon>
             </g-btn>
@@ -82,7 +82,7 @@
 
       <template v-slot:footer>
         <!-- Add new room object -->
-        <div style="display: flex; margin: 5px; justify-content: space-between" v-if="room">
+        <div style="display: flex; margin: 5px; justify-content: space-between; flex-shrink: 0" v-if="room">
           <g-btn outlined flat @click="addNewWall" width="48%" text-color="#2979FF">+ {{$t('restaurant.wall')}}</g-btn>
           <g-btn flat @click="addNewTable" width="48%" background-color="#2979FF" text-color="#FFF">+ {{$t('restaurant.table')}}</g-btn>
         </div>

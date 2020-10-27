@@ -213,7 +213,7 @@
         kitchen
       </g-btn-bs>
     </div>
-    <dialog-form-input v-model="dialog.input" @submit="addNewCustomer">
+    <dialog-form-input v-model="dialog.input" @submit="addNewCustomer" :eager="false">
       <template #input>
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
@@ -637,8 +637,11 @@
       keyboardHanle(event) {
         event.stopPropagation()
         if (event.key === 'p') {
-          event.preventDefault()
-          document.querySelector('.g-autocomplete input').click()
+          const autocomplete = document.querySelector('.g-autocomplete input')
+          if(autocomplete !== document.activeElement) {
+            event.preventDefault()
+            autocomplete.click()
+          }
         }
         if (event.key === 'Enter') {
           if (this.enterPressed === 0) {

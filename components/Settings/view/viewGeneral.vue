@@ -1,5 +1,5 @@
 <template>
-  <div class="row-flex pa-5" style="font-size: 13px; line-height: 16px">
+  <div class="wrapper">
     <div class="col-5 px-3">
       <div class="row-flex align-items-center justify-between">
         <span>{{$t('settings.companyBarcode')}}</span>
@@ -25,7 +25,16 @@
         <span>Pay button prints receipt</span>
         <g-switch v-model="printReceiptWithPay"/>
       </div>
-
+    </div>
+    <div class="flex-grow-1 offset-1">
+      <div class="row-flex align-items-center justify-center">
+        <pos-time-picker :label="$t('settings.beginHour')" :value="beginHour" @input="beginHour = $event">
+          <template v-slot:append>
+            <g-icon>access_time</g-icon>
+          </template>
+        </pos-time-picker>
+      </div>
+      <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
       </div>
@@ -36,25 +45,15 @@
                        :grid="false"
                        v-model="quickBtnAction">
           <template #default="{ toggleSelect, item }">
-            <g-btn class="mx-1" @click="toggleSelect(item)" :disabled="item === 'auto'">{{ item }}</g-btn>
+            <g-btn class="mx-1 mb-1" @click="toggleSelect(item)" :disabled="item === 'auto'">{{ item }}</g-btn>
           </template>
           <template #selected="{ toggleSelect, item }">
-            <g-btn class="mx-1" @click="toggleSelect(item)" background-color="blue" text-color="white">
+            <g-btn class="mx-1 mb-1" @click="toggleSelect(item)" background-color="blue" text-color="white">
               {{ item }}
             </g-btn>
           </template>
         </g-grid-select>
       </div>
-    </div>
-    <div class="col-5 offset-1">
-      <div class="row-flex align-items-center justify-center">
-        <pos-time-picker :label="$t('settings.beginHour')" :value="beginHour" @input="beginHour = $event">
-          <template v-slot:append>
-            <g-icon>access_time</g-icon>
-          </template>
-        </pos-time-picker>
-      </div>
-      <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
     </div>
   </div>
 </template>
@@ -196,6 +195,13 @@
 </script>
 
 <style scoped lang="scss">
+  .wrapper {
+    display: flex;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 16px;
+  }
+
   .btn-fn-row {
     display: inline-flex;
     align-items: center;

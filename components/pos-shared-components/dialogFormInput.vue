@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="internalValue" :width="width || '90%'" eager :fullscreen="isMobile">
+  <g-dialog v-model="internalValue" :width="width || '90%'" :eager="eager" :fullscreen="isMobile">
     <div :class="['dialog-input', 'col-flex', rotate && 'rotate']">
       <g-icon v-if="close" @click="internalValue = false" class="close-icon">icon-close@20</g-icon>
       <div class=" col-flex flex-grow-1 overflow-y pb-3">
@@ -54,7 +54,11 @@
       },
       keyboardWidth: String,
       width: String,
-      rotate: Boolean
+      rotate: Boolean,
+      eager: {
+        type: Boolean,
+        default: true
+      }
     },
     data() {
       return {
@@ -138,6 +142,20 @@
       height: 580px !important;
       transform: rotate(-90deg) translateX(-100%);
       transform-origin: left top;
+    }
+  }
+
+  @media screen and (max-height: 599px) {
+    .dialog-input {
+      padding: 8px;
+
+      .keyboard {
+        margin: 0 -8px -8px -8px;
+
+        ::v-deep .key {
+          font-size: 16px;
+        }
+      }
     }
   }
 </style>

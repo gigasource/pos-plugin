@@ -4,12 +4,12 @@
       <g-icon class="dialog-icon--close" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
         <div class="dialog-content--left">
-          <scroll-select ref="scroll-date" class="col-4" v-model="date" :items="list.date" :height="250" :item-height="50" selected-color="#1271FF"/>
-          <scroll-select ref="scroll-people" class="col-4" v-model="people" :items="list.people" :height="250" :item-height="50" selected-color="#1271FF"/>
-          <scroll-select ref="scroll-time" class="col-4" v-model="time" :items="timeList" :height="250" :item-height="50" selected-color="#1271FF"/>
+          <scroll-select ref="scroll-date" class="col-4" v-model="date" :items="list.date" :height="height" :item-height="height/5" selected-color="#1271FF"/>
+          <scroll-select ref="scroll-people" class="col-4" v-model="people" :items="list.people" :height="height" :item-height="height/5" selected-color="#1271FF"/>
+          <scroll-select ref="scroll-time" class="col-4" v-model="time" :items="timeList" :height="height" :item-height="height/5" selected-color="#1271FF"/>
         </div>
         <div class="dialog-content--right">
-          <div class="fw-700 mb-2">{{$t('onlineOrder.makeReservation')}}</div>
+          <div class="dialog-content__title">{{$t('onlineOrder.makeReservation')}}</div>
           <div class="row-flex">
             <pos-text-field v-model="name" label="Name" :placeholder="$t('onlineOrder.fillText')" required :key="`${internalValue}_name`"/>
             <pos-text-field v-model="phone" :label="$t('settings.tel')" :placeholder="$t('onlineOrder.fillNumber')" number required :key="`${internalValue}_phone`"/>
@@ -18,7 +18,7 @@
             <div class="label">{{$t('onlineOrder.note')}}</div>
             <g-textarea rows="3" outlined v-model="note" :placeholder="$t('onlineOrder.fillText')" no-resize/>
           </div>
-          <div class="row-flex align-center justify-end mt-4" style="margin-right: -4px">
+          <div class="dialog-action" style="margin-right: -4px">
             <g-btn-bs width="100" border-color="#424242" @click="internalValue = false">{{$t('onlineOrder.cancel')}}</g-btn-bs>
             <g-btn-bs width="140" background-color="#2979FF" @click="submit">{{$t('onlineOrder.submit')}}</g-btn-bs>
           </div>
@@ -26,7 +26,7 @@
       </div>
       <g-spacer/>
       <div class="dialog-keyboard">
-        <pos-keyboard-full/>
+        <pos-keyboard-full @enter-pressed="submit"/>
       </div>
     </div>
   </g-dialog>
@@ -145,6 +145,12 @@
           }
         }
         return list
+      },
+      height() {
+        if(window.innerHeight >= 600)
+          return 250
+        else
+          return 200
       }
     },
     watch: {
@@ -260,6 +266,11 @@
         padding-right: 32px;
       }
 
+      &__title {
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
       &--right {
         flex: 1;
 
@@ -306,9 +317,53 @@
       }
     }
 
+    &-action {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
     &-keyboard {
       padding: 16px;
       background: #BDBDBD;
+    }
+  }
+
+  @media screen and (max-height: 599px) {
+    .dialog {
+
+      &-content {
+        padding: 4px 8px;
+
+        .bs-tf-wrapper {
+          margin: 4px;
+
+          ::v-deep .bs-tf-label {
+            margin-bottom: 4px;
+          }
+        }
+
+        .label {
+          margin-top: 4px;
+        }
+
+        &__title {
+          margin-bottom: 4px;
+        }
+      }
+
+      &-action {
+        display: none;
+      }
+
+      &-keyboard {
+        padding: 8px;
+
+        ::v-deep .key {
+          font-size: 16px;
+        }
+      }
     }
   }
 </style>

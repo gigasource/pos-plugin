@@ -21,7 +21,7 @@
       <g-table elevation="2" fixed-header>
         <thead>
         <tr>
-          <th v-for="header in headers">{{header}}</th>
+          <th style="white-space: nowrap" v-for="header in headers">{{header}}</th>
         </tr>
         </thead>
         <tbody>
@@ -39,11 +39,11 @@
           </td>
           <td>
             <p>{{item.customer.name}}</p>
-            <p>{{item.customer.phone}}</p>
+            <p style="white-space: nowrap">{{item.customer.phone}}</p>
           </td>
           <td>
             <div v-if="item.customer.address">
-              <p>{{item.customer.address}}</p>
+              <p style="word-break: break-word">{{item.customer.address}}</p>
               <p>{{item.customer.zipCode}}</p>
             </div>
             <div v-else>--</div>
@@ -56,7 +56,10 @@
           </td>
           <td style="white-space: nowrap">{{item.date | formatDate}}</td>
           <td style="white-space: nowrap">{{item.deliveryTime}}</td>
-          <td class="fw-700">{{$t(`onlineOrder.${item.type}`)}}</td>
+          <td>
+            <g-icon v-if="item.type === 'delivery'">icon-delivery-scooter</g-icon>
+            <g-icon v-if="item.type === 'pickup'">icon-take-away</g-icon>
+          </td>
           <td :class="statusClass">
             <div style="white-space: nowrap">{{$t(`onlineOrder.${item.status}`)}}</div>
             <div style="font-size: x-small; margin-top: -5px"> {{ isRefunded(item) ? refundedStr: '' }}</div>
@@ -309,8 +312,17 @@
   }
 
   @media screen and (max-width: 1023px) {
-    .online-order-list__info {
-      display: block;
+    .online-order-list {
+      &__info {
+        display: block;
+      }
+
+      &__table {
+        .g-table td {
+          font-size: 12px;
+        }
+      }
     }
   }
+
 </style>

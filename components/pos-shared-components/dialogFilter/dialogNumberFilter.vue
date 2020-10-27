@@ -1,5 +1,5 @@
 <template>
-	<g-dialog v-model="internalValue" width="50%" eager :fullscreen="isMobile">
+	<g-dialog v-model="internalValue" width="50%" :eager="!isIOS"  :fullscreen="isMobile">
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
@@ -87,6 +87,11 @@
 			line-height: 20px;
 			font-weight: 700;
 			color: #1d1d26;
+		}
+
+		::v-deep .bs-tf-input--fake-caret {
+			left: 12px;
+			right: 12px;
 		}
 	}
 

@@ -24,7 +24,7 @@
            @mousedown.prevent.stop="e => onMouseDown(e, roomObject, actions.resize)"
            @touchstart.prevent.stop="e => onMouseDown(e, roomObject, actions.resize)"
            class="room__object__resizer" >
-        <img src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
+        <img alt style="width: 16px; height: 16px" src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
       </div>
     </div>
   </div>
@@ -312,8 +312,8 @@
     background-image: url('/plugins/pos-plugin/assets/out.png');
 
     &__object__resizer {
-      width: 16px;
-      height: 16px;
+      width: 24px;
+      height: 24px;
       border-radius: 100%;
       background-color: #2979FF;
       position: absolute;

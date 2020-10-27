@@ -1,7 +1,7 @@
 <template>
-  <div v-if="orderHistoryCurrentOrder" class="wrapper">
-    <div class="row-flex" style="padding-bottom: 14px">
-      <div class="pl-2 flex-grow-1">
+  <div v-if="orderHistoryCurrentOrder" class="order-detail">
+    <div class="order-detail__header">
+      <div class="flex-grow-1">
         <div class="order-title">{{$t('orderHistory.orderNo')}}</div>
         <div class="order-id">{{orderHistoryCurrentOrder.id}}</div>
       </div>
@@ -11,7 +11,7 @@
       </div>
     </div>
     <g-divider/>
-    <div style="font-size: 12px; padding: 6px 0">
+    <div class="order-detail__info">
       <div class="row-flex">
         <div class="flex-grow-1" style="opacity: 0.5">Created time</div>
         <div>{{orderHistoryCurrentOrder.date | formatDate}}</div>
@@ -124,13 +124,24 @@
 </script>
 
 <style scoped lang="scss">
-  .wrapper {
+  .order-detail {
     padding: 16px 7px;
     box-shadow: -1px 0px 6px rgba(0, 0, 0, 0.25);
     overflow: auto;
     z-index: 2;
     display: flex;
     flex-direction: column;
+
+    &__header {
+      display: flex;
+      flex-shrink: 0;
+      padding-bottom: 8px;
+    }
+
+    &__info {
+      font-size: 12px;
+      padding: 6px 0;
+    }
 
     &::-webkit-scrollbar {
       display: none;
@@ -180,6 +191,7 @@
 
     .order-info {
       display: flex;
+      flex-shrink: 0;
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
@@ -211,13 +223,36 @@
     .total {
       font-size: 12px;
       line-height: 15px;
-      margin: 16px 4px;
+      margin: 8px 4px;
       font-weight: 700;
 
       &__important {
         color: #1271ff;
         font-size: 18px;
         line-height: 24px;
+      }
+    }
+  }
+
+  @media screen and (max-height: 599px) {
+    .order-detail {
+      padding: 6px;
+
+      &__header {
+        padding-bottom: 4px;
+      }
+
+      &__info {
+        padding: 4px 0;
+      }
+
+      .order-info, .total {
+        margin: 4px !important;
+      }
+
+      .g-table {
+        margin-top: 4px;
+        margin-bottom: 4px;
       }
     }
   }
