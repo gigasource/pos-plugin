@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/gigasource/pos-plugin#readme",
   "dependencies": {
-    "@gigasource/pureimage-printer-renderer": "0.0.16",
+    "@gigasource/pureimage-printer-renderer": "0.0.19",
     "better-queue": "^3.8.10",
     "bson": "^4.1.0",
     "clone-buffer": "^1.0.0",
