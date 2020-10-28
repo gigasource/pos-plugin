@@ -308,6 +308,12 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
         // delete store
         await deleteStore(storeId)
       }
+      await cms.getModel('Store').findOneAndUpdate({ _id: storeId }, {
+        $pull: {
+          devices: request.device._id
+        }
+      })
+      await cms.getModel('Device').findOneAndUpdate({_id: request.device._id}, {storeId: null})
     }
     // fallback
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
