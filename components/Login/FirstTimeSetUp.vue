@@ -1,7 +1,7 @@
 <template>
   <div class="background row-flex align-items-center justify-center">
     <div :class="showKeyboard ? 'left' : 'center'">
-      <div class="dialog-title" @click.stop="secretClick">Welcome to Gigasource POS</div>
+      <div class="dialog-title" @click.stop="secretClick">Welcome to Restaurant+ POS</div>
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
           <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
