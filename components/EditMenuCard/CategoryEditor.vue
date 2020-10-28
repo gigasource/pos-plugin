@@ -77,7 +77,9 @@
       },
     },
     created() {
-      this.debouncedUpdateCategory = _.debounce(this.updateCategory, 300)
+      this.debouncedUpdateCategory = _.debounce(function (change) {
+        this.updateCategory(change, !this.selectedCategoryLayout._id)
+      }, 300)
     },
     methods: {
       async changeOrderLayoutColumn(columns) {
