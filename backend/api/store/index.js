@@ -647,11 +647,11 @@ async function initApprovedDevice(storeId, deviceId) {
       proxy: true,
       alwaysOn: true,
       reservation: false,
-      startOnBoot: true
+      startOnBoot: false
     }
   })
 
-  const storeDevices = await cms.getModel('Device').find({ storeId }).lean()
+  const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
   if (storeDevices.length === 1) {
     await setMasterDevice(storeId, deviceId)
   }
@@ -671,3 +671,4 @@ async function setMasterDevice(storeId, deviceId) {
 module.exports = router
 module.exports.createStore = createStore
 module.exports.deleteStore = deleteStore
+module.exports.setMasterDevice = setMasterDevice
