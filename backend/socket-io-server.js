@@ -708,6 +708,10 @@ module.exports = async function (cms) {
       socket.on('nodeCall', (masterClientId, eventName, ...args) => {
         externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
       })
+
+      socket.on('registerAppFromStore', async () => {
+        await cms.getModel('Device').updateOne({ _id: clientId }, { 'metadata.isFromStore': true})
+      })
     }
 
     /** @deprecated */
