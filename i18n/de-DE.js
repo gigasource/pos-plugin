@@ -159,7 +159,8 @@ module.exports = {
       deliveryHourNote: 'Hinweis: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
       settings: 'Settings',
       enabled: 'Ermöglich',
-      autoAcceptDevice: 'Automat akzeptiert neue Geräte.',
+      autoAcceptDevice: 'Automat akzeptiert neue Geräte',
+      autoAcceptOrder: 'Auto-accept orders', // temporary
       defaultTimeComplete: 'Standardzeit zum Abschließen der Bestellung',
       recommendGSMS: 'Wir empfehlen, diese Einstellung standardmäßig zu deaktivieren. Für weitere Informationen wenden Sie sich bitte an Ihren Diensteanbieter.',
       activeReservation: 'Aktive Reservierung',

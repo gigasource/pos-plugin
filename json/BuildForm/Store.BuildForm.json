@@ -538,6 +538,12 @@
             }
           ],
           "type": "array"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "autoAcceptOrder",
+          "default": "true",
+          "type": "input@switch"
         }
       ]
     },
