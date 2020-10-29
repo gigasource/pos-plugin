@@ -16,14 +16,6 @@
       "type": "input@number"
     },
     {
-      "_id": "5f4ccf65c6a8fc264c0034e1",
-      "schemaType": "objectId",
-      "key": "modifierGroup",
-      "ref": "PosModifierGroup",
-      "type": "ref-select",
-      "labelProp": "name"
-    },
-    {
       "_id": "5f4ccf65c6a8fc264c0034e2",
       "schemaType": "boolean",
       "key": "mandatory",
@@ -34,6 +26,11 @@
       "schemaType": "boolean",
       "key": "selectOne",
       "type": "input@switch"
+    },
+    {
+      "_id": "5f995f75624e38720c84f987",
+      "schemaType": "string",
+      "key": "modifierGroup"
     }
   ],
   "name": "PosModifierCategory",
