@@ -25,6 +25,19 @@ try {
 					console.log('app-rn-bridge:receive remote control input from RN, send to front-end')
 					cms.socket.emit('remoteControlInput', msg)
 					break;
+				case 'installationSource':
+					if (msg.value) {
+						await cms.execPostAsync('run:registerAppFromStore');
+					}
+					break;
+				case 'deviceInfo':
+					global.APP_CONFIG.osName = data.deviceOS;
+					global.APP_CONFIG.deviceName = data.deviceName;
+					if (data.hardwareID && !global.APP_CONFIG.hardwareID) {
+						global.APP_CONFIG.hardwareID = data.hardwareID;
+						await cms.getModel("PosSetting").findOneAndUpdate({}, {hardwareID: data.hardwareID});
+					}
+					break;
 			}
 		})
 	}

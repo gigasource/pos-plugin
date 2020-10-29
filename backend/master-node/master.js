@@ -5,7 +5,6 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const updateCommit  = require('./updateCommit');
 const axios = require('axios');
 const internalIp = require('internal-ip');
-const syncExistingData = require('./syncData');
 
 const remoteServer = 'http://localhost:8088';
 
@@ -155,10 +154,6 @@ class Master {
 	async sendChangeRequest(commit) {
 		commit.storeId = await this.getStoreId();
 		updateCommit.handleCommit([commit]);
-	}
-
-	async syncDataToOnlineOrder() {
-		await syncExistingData(await this.getStoreId(), this.onlineOrderSocket);
 	}
 }
 

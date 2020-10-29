@@ -24,22 +24,20 @@ const updateCommit = {
 					temp: false,
 					groupTempId: mongoose.Types.ObjectId().toString(),
 					data: {
-						collection: coll
+						collection: coll,
+						hardwareID: global.APP_CONFIG.hardwareID
 					},
 					update: {
 						method: method,
 						query: JsonFn.stringify(query)
 					}
 				})
-				if (typeof _.last(query) === 'function') {
-					_.last(query)(null, {n: 1, ok: true});
-				}
-			} else {
-				try {
-					const collection = mongoose.connection.db.collection(coll);
-					return collection[method].apply(collection, query);
-				} catch (err) {
-				}
+			}
+			try {
+				const collection = mongoose.connection.db.collection(coll);
+				return collection[method].apply(collection, query);
+			} catch (err) {
+				console.error(err);
 			}
 		})
 	},

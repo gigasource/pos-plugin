@@ -43,37 +43,13 @@ module.exports = function (cms) {
 		// console.debug(getBaseSentryTags('initHandler'), '5. handler.init()');
 		await handler.init();
 		// console.debug(getBaseSentryTags('initHandler'), '6. Finish handler');
+		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
+		global.APP_CONFIG.hardwareID = posSettings.hardwareID;
 	}))
 	cms.post('load:masterIp', (deviceIp) => {
 		console.log(`ip of this device is ${deviceIp}`)
 		global.APP_CONFIG.deviceIp = deviceIp;
 	})
-	// cms.post('load:syncDbHook', async () => {
-	// 	if (global.APP_CONFIG.isMaster) {
-	// 		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
-	// 		const { onlineDevice } = posSettings;
-	// 		cms.post('load:syncDb', async () => {
-	// 			await handler.syncDataToOnlineOrder(await handler.getStoreId(), handler.onlineOrderSocket);
-	// 		})
-	// 	}
-	// })
-	// // mongoose will be synced
-	// mongoose.set('debug', function (coll, method, ...query) {
-	// 	if (global.APP_CONFIG.whiteListCollection.includes(coll)) {
-	// 		if (!handler) {
-	// 			console.error('Can not run because there is no master');
-	// 			return true;
-	// 		}
-	// 		const commit = {
-	// 			type: 'changeRequest',
-	// 			data: JSON.stringify({
-	// 				coll,
-	// 				method,
-	// 				query
-	// 			})
-	// 		}
-	// 	}
-	// })
 }
 
 async function initSocket(socket) {

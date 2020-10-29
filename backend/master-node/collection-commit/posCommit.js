@@ -29,8 +29,13 @@ async function posCommit(updateCommit) {
 		for (let commit of commits) {
 			lastTempId = commit.groupTempId;
 			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
-			const result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
+			let result;
+			if (!(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
+				result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
+			} else result = true;
+
 			if (result) {
+				await updateCommit.posCommitModel.create(commit);
 				if (commit.commitId) updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
@@ -76,7 +81,6 @@ async function posCommit(updateCommit) {
 				updateCommit[TYPENAME].highestPosCommitId++;
 			}
 			emitToFrontend(commit);
-			await updateCommit.posCommitModel.create(commit);
 			return true;
 		} catch (err) {
 			console.error('Error occurred', err);

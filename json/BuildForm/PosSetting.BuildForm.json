@@ -1168,6 +1168,12 @@
       "key": "signInRequest",
       "type": "object",
       "mixed": true
+    },
+    {
+      "_id": "5f9a46c3a3dd891955a700b8",
+      "schemaType": "string",
+      "key": "hardwareID",
+      "type": "input"
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",
