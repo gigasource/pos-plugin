@@ -259,6 +259,9 @@
     watch: {
       selectedProductLayout(value) {
         this.type = value.type
+      },
+      'dialog.popupModifiers'() {
+        this.loadPopupModifierGroups()
       }
     },
     async created() {
