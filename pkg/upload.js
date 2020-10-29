@@ -45,7 +45,7 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     await createFolder(uploadPath, version)
   }
 
-  return async function uploadApp({ filePath, group, version, type, base, release, note  }) {
+  return async function uploadApp({ filePath, group, version, type, base, release, note, osName  }) {
     if (!fs.existsSync(filePath)) return
     const fileName = path.parse(filePath).base
 
@@ -87,7 +87,8 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
         note,
         group,
         base,
-        release
+        release,
+        osName
       })
     } catch (err) {
       console.log('Upload metadata error');

@@ -11,6 +11,10 @@ const pkgConfig = {
   scripts: []
 };
 
+if (fs.existsSync('./pos-restaurant-react-native/.git/ORIG_HEAD')) {
+  pkgConfig.assets.push('./pos-restaurant-react-native/.git/ORIG_HEAD');
+}
+
 // canvas asset
 pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana.ttf');
 pkgConfig.assets.push('../node_modules/@gigasource/pureimage-printer-renderer/assets/fonts/Verdana_Bold.ttf');

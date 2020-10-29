@@ -8,13 +8,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "pkg:macos": "pkg --config pkg.config.js --targets node10-macos-x64 --output out/app index.js --no-bytecode",
     "build:android": "node android/pkg.js",
+    "build:ios": "node ios/pkg.js && node md5 --platform=ios",
     "build:win32": "node win32/pkg.js",
     "build:android:dest": "node android/pkg.js && cp build/app-android android-dist/app/src/main/assets/appAssets/app",
     "prebuild:apk": "if [ ! -d ../../../dist ]; then cd ../../../;npm run build; fi",
     "build:apk": "npm run build:android:dest && cd android-dist && ./gradlew build",
     "setup-react-native": "git clone git@github.com:gigasource/pos-restaurant-react-native.git && cd pos-restaurant-react-native && npm install && mkdir nodejs-assets/nodejs-project-android && mkdir nodejs-assets/nodejs-project-ios && rm -rf nodejs-assets/nodejs-project",
     "build:android:react": "node android/pkg.js && cp build/app-android pos-restaurant-react-native/nodejs-assets/nodejs-project-android/app-android && cp build/app-android.js pos-restaurant-react-native/nodejs-assets/nodejs-project-android/app-android.js",
-    "build:ios:react": "node ios/pkg.js && cp build/app-ios pos-restaurant-react-native/nodejs-assets/nodejs-project-ios/app-ios && cp build/app-ios.js pos-restaurant-react-native/nodejs-assets/nodejs-project-ios/app-ios.js"
+    "build:ios:react": "npm run build:ios && cp build/app-ios pos-restaurant-react-native/nodejs-assets/nodejs-project-ios/app-ios && cp build/app-ios.js pos-restaurant-react-native/nodejs-assets/nodejs-project-ios/app-ios.js"
   },
   "author": "",
   "license": "ISC",

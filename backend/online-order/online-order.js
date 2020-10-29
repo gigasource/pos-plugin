@@ -8,6 +8,8 @@ const dayjs = require('dayjs');
 const schedule = require('node-schedule');
 const { initSocket, handlerNewMasterId } = require('../master-node');
 const rnBridge = require('../rn-bridge/app-rn-bridge')
+const fs = require('fs')
+const path = require('path')
 
 let webshopUrl;
 let storeName;
@@ -432,11 +434,13 @@ module.exports = async cms => {
 
         console.log(`sentry:clientId=${onlineDevice.id},eventType=updateApp`, `Updating ${uploadPath}`);
 
-        await axios.post(`http://localhost:5000/update${type === 'PATCH' ? '' : '-original'}`, {
+        rnBridge.sendToRN(JSON.stringify({
+          action: 'updateApp',
           downlink: uploadPath,
+          type,
           store: (name ? name : ''),
-          clientID: onlineDevice.id
-        })
+          clientID: onlineDevice.id,
+        }))
       } catch (e) {
         console.error('Update app error or this is not an android device');
       }
@@ -539,6 +543,11 @@ module.exports = async cms => {
 
       cms.socket.emit('denySignIn')
       typeof ack === 'function' && ack()
+    })
+
+    // register device which is installed from store
+    cms.post('run:registerAppFromStore', () => {
+      socket.emit('registerAppFromStore');
     })
   }
 
@@ -730,6 +739,8 @@ module.exports = async cms => {
       requestBody.appVersion = require('../../package').version
       requestBody.hardware = global.APP_CONFIG.deviceName
       requestBody.release = require('../../package').release
+      requestBody.osName = global.APP_CONFIG.osName
+      requestBody.appBaseVersion = fs.readFileSync(path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/ORIG_HEAD'), 'utf8').trim()
       const response = await axios.post(pairingApiUrl, requestBody)
       const { deviceId, storeId, storeAlias: alias, storeName: name } = response.data
 
