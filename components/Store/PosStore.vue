@@ -31,7 +31,7 @@
         timeFormat: this.$t('dates.timeFormat'),
         dateFormat: this.$t('dates.dateFormat'),
         webShopConnected: false,
-        online: false,
+        online: true,
         storeId: '',
         locale: 'en',
         storeLocale: 'en',
@@ -482,12 +482,15 @@
       await this.setupReservationBell()
     },
     watch: {
-      online(val) {
-        if (val) {
-          this.closeSnackbar()
-        } else {
-          this.showOfflineSnackbar(this.$t('settings.noInternet'))
-        }
+      online: {
+        handler(val) {
+          if (val) {
+            this.closeSnackbar()
+          } else {
+            this.showOfflineSnackbar(this.$t('settings.noInternet'))
+          }
+        },
+        immediate: true
       },
       webShopConnected(val) {
         if (val) {
