@@ -28,6 +28,17 @@
             Reset Online Orders
           </g-btn>
         </div>
+
+        <div class="col-6 mt-3">
+          <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
+                 @click="uploadData">
+            Upload demo data
+          </g-btn>
+          <g-btn class="mt-2" flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
+                 @click="downloadData">
+            Import demo data
+          </g-btn>
+        </div>
       </div>
       <g-divider style="margin-top: 20px"/>
     </div>
@@ -130,7 +141,8 @@
         pairing: false,
         dialog: false,
         passcode: '',
-        disableResetBtn: false
+        disableResetBtn: false,
+        disableDataBtn: false
       }
     },
     computed: {
@@ -190,6 +202,18 @@
         this.dialog = false
         await cms.getModel('Order').deleteMany({ online: true })
         this.showInfoSnackbar('Deleted all online orders!')
+      },
+      uploadData() {
+        this.disableDataBtn = true
+        cms.socket.emit('export-demo-data', false, () => {
+          this.disableDataBtn = false
+        })
+      },
+      downloadData() {
+        this.disableDataBtn = true
+        cms.socket.emit('import-demo-data', () => {
+          this.disableDataBtn = false
+        })
       }
     },
     mounted() {
