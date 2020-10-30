@@ -335,15 +335,11 @@ module.exports = (cms) => {
 
   async function mapOrder(order, user) {
     const date = new Date()
-    const taxGroups = _.groupBy(order.items, 'tax')
-    const vTaxGroups = _.map(taxGroups, (val, key) => ({
-      taxType: key,
-      tax: orderUtil.calOrderTax(val),
-      sum: orderUtil.calOrderTotal(val)
-    }))
-    const vSum = orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items);
+    const taxGroups = orderUtil.getOrderTaxGroups(order.items)
+    const vTaxGroups = orderUtil.getOrderVTaxGroups(taxGroups)
+    const vSum = orderUtil.calOrderVSum(order);
     const payment = order.payment.map(i => ({ ...i, value: +i.value }))
-    const receive = _.sumBy(payment, 'value');
+    const receive = orderUtil.calOrderReceive(payment)
     const immediatePay = !order.items.some(i => i.printed)
 
     const cashback = receive - vSum;
