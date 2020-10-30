@@ -814,7 +814,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products, totalPrice,
+        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
@@ -841,7 +841,7 @@ module.exports = async function (cms) {
         deliveryTime,
         paypalOrderDetail,
         forwardedStore,
-        vSum: totalPrice
+        vSum: effectiveTotal
       }
       const newOrder = await cms.getModel('Order').create(order)
 
