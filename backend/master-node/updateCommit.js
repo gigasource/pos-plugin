@@ -15,23 +15,33 @@ const updateCommit = {
 		// updateCommit.systemCommitModel = cms.Types['SystemCommit'].Model;
 		await require('./collection-commit')(updateCommit);
 		mongoose.set('debug', function (coll, method, ...query) {
-			if (updateMethodList.includes(method) && _.filter(global.APP_CONFIG.whiteListCollection, collection => {
+			if (updateMethodList.includes(method))  {
+				const whiteListCollection = _.filter(global.APP_CONFIG.whiteListCollection, collection => {
 					return collection.name === coll;
-				}).length) {
-				updateCommit.handler.sendChangeRequest({
-					type: 'pos',
-					action: 'update',
-					temp: false,
-					groupTempId: mongoose.Types.ObjectId().toString(),
-					data: {
-						collection: coll,
-						hardwareID: global.APP_CONFIG.hardwareID
-					},
-					update: {
-						method: method,
-						query: JsonFn.stringify(query)
-					}
 				})
+				if (whiteListCollection.length) {
+					updateCommit.handler.sendChangeRequest({
+						type: 'pos',
+						action: 'update',
+						temp: false,
+						groupTempId: mongoose.Types.ObjectId().toString(),
+						data: {
+							collection: coll,
+							hardwareID: global.APP_CONFIG.hardwareID
+						},
+						update: {
+							method: method,
+							query: JsonFn.stringify(query)
+						}
+					})
+					// check collection need to be executed on master
+					if (whiteListCollection[0].needMaster) {
+						if (typeof _.last(query) === 'function') {
+							_.last(query)(null, {n: 1, ok: true});
+						}
+						return;
+					}
+				}
 			}
 			try {
 				const collection = mongoose.connection.db.collection(coll);
