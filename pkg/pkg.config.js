@@ -11,8 +11,8 @@ const pkgConfig = {
   scripts: []
 };
 
-if (fs.existsSync('./pos-restaurant-react-native/.git/ORIG_HEAD')) {
-  pkgConfig.assets.push('./pos-restaurant-react-native/.git/ORIG_HEAD');
+if (fs.existsSync('./pos-restaurant-react-native/.git/HEAD')) {
+  pkgConfig.assets.push('./pos-restaurant-react-native/.git/HEAD');
 }
 
 // canvas asset
