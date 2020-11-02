@@ -20,7 +20,7 @@
               <div :class="['dialog-grid__item', selectedDemo === demo && 'dialog-grid__item--selected']"
                    :style="getBackgroundImage(demo)"
                    :key="i" @click="selectDemo(demo)">
-                <div class="dialog-grid__item-title">{{demo}}</div>
+                <div class="dialog-grid__item-title">{{demo.storeName}}</div>
               </div>
             </template>
           </div>
@@ -30,7 +30,7 @@
         <div class="dialog-content">
           <p v-if="mode !== 'demo'"><b>Address:</b> {{address}}</p>
           <p v-if="mode !== 'demo'"><b>Phone number: </b> {{phone}}</p>
-          <p><b>Demo data: </b> <span style="text-transform: capitalize">{{selectedDemo || 'None'}}</span></p>
+          <p><b>Demo data: </b> <span style="text-transform: capitalize">{{selectedDemo && selectedDemo.storeName || 'None'}}</span></p>
           <p><b>License plan: </b><span class="license">DEMO</span></p>
           <p><b>End of plan: </b>{{date}}</p>
           <div class="dialog-content__notice">
@@ -76,14 +76,19 @@
     data() {
       return {
         step: 1,
-        listDemo: ['sushi', 'pizza', 'chinese', 'grill'],
-        selectedDemo: '',
+        listDemo: [],
+        selectedDemo: null,
       }
     },
     watch: {
       value(val) {
         if (val) {
           this.step = this.mode === 'demo' ? 1 : 2
+
+          cms.socket.emit('get-demo-stores', (stores, error) => {
+            if (error) return
+            this.listDemo = stores
+          })
         }
       }
     },
@@ -97,9 +102,9 @@
         }
       },
       title() {
-        if(this.step === 1) {
+        if (this.step === 1) {
           return 'Limited Features'
-        } else if(this.step === 2) {
+        } else if (this.step === 2) {
           return 'Import demo data'
         } else {
           return 'Confirm your details'
@@ -112,7 +117,7 @@
     methods: {
       getBackgroundImage(demo) {
         return {
-          'background-image' : `url("/plugins/pos-plugin/assets/image/${demo}.jpg")`
+          'background-image' : `url("${demo.image}")`
         }
       },
       selectDemo(demo) {
@@ -134,6 +139,8 @@
       },
       completeSetup() {
         this.internalValue = false
+        this.$emit('complete', this.selectedDemo)
+        this.selectedDemo = null
       }
     }
   }

@@ -10,7 +10,7 @@
               {{connected ? 'Connected' : 'Not connected'}}
             </span>
 
-            <span v-if="connected" style="color: #4CAF50"> ({{webshopName}})</span>
+            <span v-if="connected" style="color: #4CAF50"> ({{webshopName || 'Demo'}})</span>
           </div>
         </div>
 
@@ -30,10 +30,14 @@
         </div>
 
         <div class="col-6 mt-3">
-          <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
-                 @click="uploadData">
-            Upload demo data
-          </g-btn>
+          <div class="row-flex">
+            <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
+                   @click="uploadData">
+              Upload demo data
+            </g-btn>
+
+            <g-switch class="ml-3" label="Template Data" v-model="isTemplateData"/>
+          </div>
           <g-btn class="mt-2" flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
                  @click="downloadData">
             Import demo data
@@ -142,7 +146,8 @@
         dialog: false,
         passcode: '',
         disableResetBtn: false,
-        disableDataBtn: false
+        disableDataBtn: false,
+        isTemplateData: false,
       }
     },
     computed: {
@@ -205,7 +210,7 @@
       },
       uploadData() {
         this.disableDataBtn = true
-        cms.socket.emit('export-demo-data', false, () => {
+        cms.socket.emit('export-demo-data', this.isTemplateData, () => {
           this.disableDataBtn = false
         })
       },
@@ -255,7 +260,7 @@
 
     &__content {
       background: #FFFFFF;
-      width: 80%;
+      /*width: 80%;*/
       display: flex;
       flex-direction: column;
       font-size: 14px;
