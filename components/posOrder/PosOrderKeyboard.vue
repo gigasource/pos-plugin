@@ -2,7 +2,7 @@
   <div class="pos-keyboard" :style="keyboardStyles">
     <div class="pos-keyboard-screen" :style="screenStyles">
       <input class="pos-keyboard-screen__input" v-model="productIdQuery"/>
-      <g-icon v-if="productIdQuery" @click="clearScreen">icon-cancel</g-icon>
+      <g-icon v-if="productIdQuery" size="20" @click="clearScreen">icon-cancel</g-icon>
     </div>
     <g-keyboard :template="keyboardTemplate" :items="keyboardItems" v-model="productIdQuery" @submit="openDialogProductSearchResults" @edit="edit($event)"/>
   </div>
@@ -224,6 +224,7 @@
         color: #1d1d26;
         outline: none;
         font-size: 18px;
+        width: calc(100% - 24px);
       }
 
       .g-icon {
