@@ -852,6 +852,10 @@ module.exports = async function (cms) {
 
       if (store.gSms && store.gSms.enabled) {
         const gSmsDevices = await getGsmsDevices(store._id.toString())
+        const autoAcceptOrderEnabled =
+          !!(store.gSms && (store.gSms.autoAcceptOrder
+            || store.gSms.autoAcceptOrder === undefined)) // backward compatibility
+
         await sendNotification(
           gSmsDevices,
           {
@@ -861,7 +865,7 @@ module.exports = async function (cms) {
           {
             actionType: NOTIFICATION_ACTION_TYPE.ORDER,
             orderId: newOrder._id.toString(),
-            autoAcceptOrder: `${!!(store.gSms && store.gSms.autoAcceptOrder)}`,
+            autoAcceptOrder: `${autoAcceptOrderEnabled}`,
             timeToComplete: `${store.gSms && store.gSms.timeToComplete}`,
           },
         )
