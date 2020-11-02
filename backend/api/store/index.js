@@ -674,6 +674,34 @@ async function setMasterDevice(storeId, deviceId) {
   })
 }
 
+router.put('/demo-data/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  if (!storeId) return res.sendStatus(400)
+
+  const store = await StoreModel.findById(storeId)
+  if (!store) return res.sendStatus(400)
+
+  const { filePath } = req.body
+  if (filePath) {
+    await StoreModel.findOneAndUpdate({ _id: storeId }, {
+      demoDataSrc: filePath
+    })
+  }
+
+  res.sendStatus(200)
+})
+
+router.get('/demo-data/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  if (!storeId) return res.sendStatus(400)
+
+  const store = await StoreModel.findById(storeId)
+  if (!store) return res.sendStatus(400)
+  const demoDataSrc = store.demoDataSrc
+
+  res.status(200).json({ demoDataSrc })
+})
+
 module.exports = router
 module.exports.createStore = createStore
 module.exports.deleteStore = deleteStore

@@ -114,9 +114,10 @@
       </div>
       <div class="service-setting__content flex-auto">
         <div class="mb-3 fw-700">G-SMS {{$t('setting.settings')}}</div>
-        <div class="row-flex">
+        <div class="row-flex flex-wrap">
           <g-switch color="#536DFE" class="col-6" :label="$t('setting.enabled')" :input-value="computedGSms.enabled" @change="setGSmsValue('enabled', $event)"/>
           <g-switch color="#536DFE" class="col-6" :label="$t('setting.autoAcceptDevice')" :input-value="computedGSms.autoAccept" @change="setGSmsValue('autoAccept', $event)"/>
+          <g-switch color="#536DFE" class="col-6" :label="$t('setting.autoAcceptOrder')" :input-value="computedGSms.autoAcceptOrder" @change="setGSmsValue('autoAcceptOrder', $event)"/>
         </div>
         <div class="fw-700 mt-2">{{$t('setting.defaultTimeComplete')}}</div>
         <g-grid-select :items="[15, 30, 45, 60]" mandatory :grid="false" class="mb-3"
@@ -359,6 +360,7 @@
             enabled: false,
             timeToComplete: 30,
             autoAccept: false,
+            autoAcceptOrder: true,
             devices: []
           }
         },

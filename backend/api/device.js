@@ -61,7 +61,7 @@ router.post('/register', async (req, res) => {
   // hardware: Sunmi, Kindle-Fire, etc, ...
   // appName: Pos-Germany.apk
   // appVersion: 1.51
-  let {pairingCode, hardware, appName, appVersion, release} = req.body;
+  let {pairingCode, hardware, appName, appVersion, release, appBaseVersion, osName} = req.body;
   if (!pairingCode) return res.status(400).json({message: 'Missing pairingCode in request body'});
   const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
   if (deviceInfo) {
@@ -70,7 +70,7 @@ router.post('/register', async (req, res) => {
       name: hardware || 'New Device',
       paired: true,
       deviceType: 'pos',
-      hardware, appName, appVersion, release, features: {
+      hardware, appName, appVersion, release, appBaseVersion, osName, features: {
         fastCheckout: false,
         manualTable: false,
         delivery: false,

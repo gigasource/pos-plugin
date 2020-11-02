@@ -708,6 +708,10 @@ module.exports = async function (cms) {
       socket.on('nodeCall', (masterClientId, eventName, ...args) => {
         externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
       })
+
+      socket.on('registerAppFromStore', async () => {
+        await cms.getModel('Device').updateOne({ _id: clientId }, { 'metadata.isFromStore': true})
+      })
     }
 
     /** @deprecated */
@@ -810,7 +814,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products, totalPrice,
+        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
@@ -837,7 +841,7 @@ module.exports = async function (cms) {
         deliveryTime,
         paypalOrderDetail,
         forwardedStore,
-        vSum: totalPrice
+        vSum: effectiveTotal
       }
       const newOrder = await cms.getModel('Order').create(order)
 
@@ -847,56 +851,6 @@ module.exports = async function (cms) {
       }
 
       if (store.gSms && store.gSms.enabled) {
-        //cms.emit('sendOrderMessage', storeId, orderData) // send fcm message
-
-
-        function formatOrder(orderData) {
-          let {orderToken, createdDate, customer, deliveryDateTime, discounts, note, orderType, paymentType, products, shippingFee, totalPrice} = _.cloneDeep(orderData)
-
-          products = products.map(({id, modifiers, name, note, originalPrice, quantity}) => {
-            if (modifiers && modifiers.length) {
-              const sumOfModifiers = modifiers.reduce((sum, {price, quantity}) => sum + quantity * price, 0)
-              originalPrice = originalPrice + sumOfModifiers
-            }
-
-            return {
-              id,
-              name,
-              originalPrice,
-              note,
-              modifiers: modifiers.map(({name}) => name).join(', '),
-              quantity,
-            }
-          })
-
-          discounts = discounts.filter(d => d.type !== 'freeShipping').reduce((sum, discount) => sum + discount.value, 0)
-
-          customer = {
-            name: customer.name,
-            phone: customer.phone,
-            zipCode: customer.zipCode,
-            address: customer.address
-          }
-
-          return {
-            orderToken,
-            orderType,
-            paymentType,
-            customer: JSON.stringify(customer),
-            products: JSON.stringify(products),
-            note,
-            date: createdDate,
-            shippingFee,
-            total: totalPrice,
-            deliveryTime: deliveryDateTime,
-            discounts,
-            status: 'inProgress'
-          }
-        }
-
-        // const demoDevices = store.gSms.devices
-        // const formattedOrder = formatOrder(orderData);
-        // const gSmsDevices = await cms.getModel('Device').find({ storeId: store._id.toString(), deviceType: 'gsms' })
         const gSmsDevices = await getGsmsDevices(store._id.toString())
         await sendNotification(
           gSmsDevices,
@@ -904,20 +858,13 @@ module.exports = async function (cms) {
             title: store.name || store.settingName,
             body: `You have a new order!`
           },
-          { actionType: NOTIFICATION_ACTION_TYPE.ORDER, orderId: newOrder._id.toString() },
+          {
+            actionType: NOTIFICATION_ACTION_TYPE.ORDER,
+            orderId: newOrder._id.toString(),
+            autoAcceptOrder: `${!!(store.gSms && store.gSms.autoAcceptOrder)}`,
+            timeToComplete: `${store.gSms && store.gSms.timeToComplete}`,
+          },
         )
-
-        // demoDevices.filter(i => i.registered).forEach(({_id}) => {
-        //
-        //   /** @deprecated */
-        //   const targetClientIdOld = `${store.id}_${_id.toString()}`;
-        //   externalSocketIOServer.emitToPersistent(targetClientIdOld, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-        //
-        //   const targetClientId = _id.toString();
-        //   externalSocketIOServer.emitToPersistent(targetClientId, 'createOrder', [formattedOrder], 'demoAppCreateOrderAck', [store.id, _id, formattedOrder.total])
-        //   console.debug(`sentry:clientId=${targetClientId},store=${storeName},alias=${storeAlias},orderToken=${orderData.orderToken},eventType=orderStatus`,
-        //       `2a. Online order backend: received order from frontend, sending to demo device`);
-        // })
       }
 
       if (!device) {
@@ -944,6 +891,7 @@ module.exports = async function (cms) {
                 responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
               })
         }
+
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
         return console.error('No store device with onlineOrdering feature found, created online order will not be saved');
       }
