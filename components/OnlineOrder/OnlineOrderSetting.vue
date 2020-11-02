@@ -31,8 +31,8 @@
 
         <div class="col-6 mt-3">
           <div class="row-flex">
-            <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" :disabled="disableDataBtn"
-                   @click="uploadData">
+            <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" v-if="isMasterDevice"
+                   :disabled="disableDataBtn" @click="uploadData">
               Upload demo data
             </g-btn>
 
@@ -148,6 +148,7 @@
         disableResetBtn: false,
         disableDataBtn: false,
         isTemplateData: false,
+        isMasterDevice: false,
       }
     },
     computed: {
@@ -219,9 +220,15 @@
         cms.socket.emit('import-demo-data', () => {
           this.disableDataBtn = false
         })
+      },
+      async getMasterStatus() {
+        const posSettings = await cms.getModel('PosSetting').findOne().lean()
+        if (posSettings.onlineDevice && posSettings.onlineDevice.id) {
+          return posSettings.onlineDevice.id === posSettings.masterClientId
+        }
       }
     },
-    mounted() {
+    async mounted() {
       cms.socket.emit('getWebshopUrl', async webshopUrl => {
         this.webshopUrl = webshopUrl
 
@@ -236,6 +243,8 @@
       this.$nextTick(() => {
         this.$emit('getOnlineDevice')
       })
+
+      this.isMasterDevice = await this.getMasterStatus()
     },
     activated() {
       this.$nextTick(() => {
