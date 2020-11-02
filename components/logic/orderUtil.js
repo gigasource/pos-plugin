@@ -12,15 +12,18 @@ const orderUtil = {
     return +(orderUtil.calTax(item.price, item.tax) * item.quantity).toFixed(2);
   },
   calOrderTax(items) {
+    // vTax
     return _.sumBy(items, orderUtil.calItemTax);
   },
   calOrderTotal(items) {
+    // total without modifiers
     return _.sumBy(items, orderUtil.calItemTotal);
   },
   calItemDiscount(item) {
     return item.vDiscount ? (item.vDiscount * item.quantity) : 0
   },
   calOrderDiscount(items) {
+    // vDiscount
     return _.sumBy(items, orderUtil.calItemDiscount)
   },
   calItemModifier(item) {
@@ -28,6 +31,26 @@ const orderUtil = {
   },
   calOrderModifier(items) {
     return _.sumBy(items, orderUtil.calItemModifier)
+  },
+  calOrderReceive(payment) {
+    // receive
+    return _.sumBy(payment, 'value')
+  },
+  calOrderVSum(order) {
+    // vSum
+    return orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items)
+  },
+  getOrderTaxGroups(items) {
+    // taxGroups
+    return _.groupBy(items, 'tax')
+  },
+  getOrderVTaxGroups(taxGroups) {
+    // vTaxGroups
+    return _.map(taxGroups, (val, key) => ({
+      taxType: key,
+      tax: orderUtil.calOrderTax(val),
+      sum: orderUtil.calOrderTotal(val)
+    }))
   },
   applyDiscountForOrder(items, { difference, value }) {
     const totalWithoutDiscountResist = difference + value;
