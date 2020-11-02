@@ -740,7 +740,7 @@ module.exports = async cms => {
       requestBody.hardware = global.APP_CONFIG.deviceName
       requestBody.release = require('../../package').release
       requestBody.osName = global.APP_CONFIG.osName
-      requestBody.appBaseVersion = fs.readFileSync(path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/ORIG_HEAD'), 'utf8').trim()
+      requestBody.appBaseVersion = fs.readFileSync(path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD'), 'utf8').trim()
       const response = await axios.post(pairingApiUrl, requestBody)
       const { deviceId, storeId, storeAlias: alias, storeName: name } = response.data
 
