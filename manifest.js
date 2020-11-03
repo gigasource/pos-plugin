@@ -89,14 +89,14 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/fritzbox-call-handler/localhost-handler.js',
+      path: 'backend/call-system-handler/localhost-handler.js',
       type: 'backend'
     },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/fritzbox-call-handler/socketio-handler.js',
+      path: 'backend/call-system-handler/socketio-handler.js',
       type: 'backend'
     },
     {

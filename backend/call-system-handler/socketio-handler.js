@@ -5,35 +5,54 @@ module.exports = async (cms) => {
   let socketConnectStatus = '';
 
   cms.socket.on('connect', internalSocket => {
-    internalSocket.on('refresh-fritzbox-config', setupFritzboxSocket);
-    internalSocket.on('get-fritzbox-demo-status', (cb) => cb(socketConnectStatus));
+    internalSocket.on('refresh-call-system-config', setupFritzboxSocket);
+    internalSocket.on('get-call-system-status', updateConnectionStatus);
   });
+
+  async function updateConnectionStatus(cb, posSettings) {
+    if (!posSettings) posSettings = await cms.getModel('PosSetting').findOne();
+    const {call: callConfig} = posSettings;
+    const {mode} = callConfig;
+    const demoMode = mode === 'demo-fritzbox';
+
+    if (cb) cb(demoMode ? socketConnectStatus : null);
+    else cms.socket.emit('update-call-system-status', demoMode ? socketConnectStatus : null);
+  }
+
+  function reset() {
+    if (fritzboxSocket) {
+      fritzboxSocket.disconnect();
+      fritzboxSocket.removeAllListeners();
+      fritzboxSocket = null;
+    }
+    callMap = {};
+  }
 
   await setupFritzboxSocket();
 
   async function setupFritzboxSocket() {
     const posSettings = await cms.getModel('PosSetting').findOne();
     const {call: callConfig} = posSettings;
-    const {demoMode} = callConfig;
+    const {mode, ipAddresses = {}} = callConfig;
+    const demoMode = mode === 'demo-fritzbox';
 
     if (!demoMode && fritzboxSocket) {
-      fritzboxSocket.disconnect();
-      fritzboxSocket.removeAllListeners();
-      fritzboxSocket = null;
-      callMap = {};
-    } else if (demoMode && !fritzboxSocket) {
-      fritzboxSocket = ioClient('https://fritzbox-proxy-10000.gigasource.io');
+      reset();
+    } else if (demoMode) {
+      reset();
+      const ip = ipAddresses[mode] || 'https://fritzbox-proxy-10000.gigasource.io';
+      fritzboxSocket = ioClient(ip);
       socketConnectStatus = 'Connecting...';
-      cms.socket.emit('update-fritzbox-demo-status', socketConnectStatus);
+      await updateConnectionStatus(null, posSettings);
 
       fritzboxSocket.on('connect', () => {
         socketConnectStatus = 'Connected';
-        cms.socket.emit('update-fritzbox-demo-status', socketConnectStatus);
+        updateConnectionStatus();
         console.log('Connected to Fritzbox Socket.io server');
       });
       fritzboxSocket.on('disconnect', () => {
         socketConnectStatus = 'Disconnected';
-        cms.socket.emit('update-fritzbox-demo-status', socketConnectStatus);
+        updateConnectionStatus();
         console.log('Disconnected from Fritzbox Socket.io server');
       });
 

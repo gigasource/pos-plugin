@@ -135,15 +135,17 @@ module.exports = cms => {
       cb()
     })
   })
+}
 
-  async function importDemoData(data) {
-    for (const collection in data) {
-      if (data.hasOwnProperty(collection)) {
-        const documents = data[collection]
-        // drop local db, import from response
-        await cms.getModel(collection).deleteMany()
-        await cms.getModel(collection).create(documents)
-      }
+async function importDemoData(data) {
+  for (const collection in data) {
+    if (data.hasOwnProperty(collection)) {
+      const documents = data[collection]
+      // drop local db, import from response
+      await cms.getModel(collection).deleteMany()
+      await cms.getModel(collection).create(documents)
     }
   }
 }
+
+module.exports.importDemoData = importDemoData
