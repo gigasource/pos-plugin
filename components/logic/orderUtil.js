@@ -107,7 +107,6 @@ const orderUtil = {
 
       items.push({
         ..._.omit(item, 'category'),
-        product: item._id,
         category: item.category,
         date,
         ...item.groupPrinter && { groupPrinter: item.groupPrinter.name },

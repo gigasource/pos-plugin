@@ -45,6 +45,12 @@ module.exports = {
     },
     {
       loader: {
+        type: 'vue-singleton'
+      },
+      path: 'components/Store/InventoryStore.vue',
+    },
+    {
+      loader: {
         type: 'backend-api'
       },
       path: 'backend/rest-handler.js',
@@ -129,6 +135,12 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/order/index.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/order/inventory.js'
     },
     {
       loader: {

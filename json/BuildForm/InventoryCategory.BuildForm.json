@@ -5,7 +5,8 @@
     {
       "_id": "5f8d14860565d380841ed4fc",
       "schemaType": "string",
-      "key": "name"
+      "key": "name",
+      "type": "input"
     }
   ],
   "name": "InventoryCategory",

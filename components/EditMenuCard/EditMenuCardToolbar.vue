@@ -7,12 +7,35 @@
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" @click="showDeleteConfirmDialog" :disabled="!deletable">{{$t('ui.delete')}}</g-btn-bs>
       <g-spacer/>
       <g-btn-bs elevation="2" icon="fas fa-calculator" @click="showKeyboardEditor">{{$t('restaurant.menuEdit.editKeyboard')}}</g-btn-bs>
+      <g-btn-bs v-if="mode === 'basic'" elevation="2" icon="icon-basic-mode" @click="changeToIngredientMode">Basic mode</g-btn-bs>
+      <g-btn-bs v-else-if="mode === 'ingredient'" elevation="2" icon="icon-ingredient-mode" @click="changeToBasicMode">Ingredient mode</g-btn-bs>
     </g-toolbar>
 
     <dialog-confirm-delete
         v-model="dialog.confirmDeleteProductLayout"
         :type="deleteProductLayoutMessage"
         @submit="deleteItem(), hideDeleteConfirmDialog()"/>
+    <g-dialog v-model="dialog.mode" eager width="448">
+      <div class="dialog" @click="dialog.mode = false">
+        <div class="dialog-content">
+          <g-icon>icon-basic-mode</g-icon>
+          <div style="flex: 1; margin-left: 16px">
+            <p class="dialog-content__title">Basic mode</p>
+            <p class="dialog-content__detail">Change basic settings of a dish including name, price, printer, etc.</p>
+          </div>
+        </div>
+        <div class="dialog-content">
+          <g-icon>icon-ingredient-mode</g-icon>
+          <div style="flex: 1; margin-left: 16px">
+            <p class="dialog-content__title">Ingredient mode</p>
+            <p class="dialog-content__detail">Modify the ingredients of a dish. This function is a part of inventory control.</p>
+          </div>
+        </div>
+        <div class="dialog-message">
+          Click anywhere to dismiss
+        </div>
+      </div>
+    </g-dialog>
   </div>
 </template>
 <script>
@@ -28,6 +51,7 @@
       selectedCategoryLayout: null,
       selectedProductLayout: null,
       productDblClicked: null,
+      mode: String
     },
     data: function () {
       return {
@@ -42,6 +66,7 @@
         deleteProductLayoutMessage: ' this product',
         dialog: {
           confirmDeleteProductLayout: false,
+          mode: false
         }
       }
     },
@@ -273,6 +298,15 @@
       },
       showKeyboardEditor() {
         this.$emit('update:view', { name: 'KeyboardEditor'})
+      },
+      changeToIngredientMode() {
+        this.$emit('update:view', { name: 'IngredientEditor'})
+        this.$emit('update:mode', 'ingredient')
+        this.dialog.mode = true
+      },
+      changeToBasicMode() {
+        this.$emit('update:mode', 'basic')
+        this.$emit('update:view', { name: 'CategoryEditor'})
       }
     }
   }
@@ -302,6 +336,34 @@
     text-align: center;
 
     color: #1D1D26;
+  }
+
+  .dialog {
+    width: 100%;
+    background-color: white;
+    border-radius: 4px;
+    padding: 20px;
+
+    &-content {
+      display: flex;
+      margin-bottom: 16px;
+
+      &__title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      &__detail {
+        font-size: 13px;
+      }
+    }
+
+    &-message {
+      text-align: center;
+      font-size: 12px;
+      color: #9e9e9e;
+    }
   }
 
   @media screen and (max-width: 1023px) {
