@@ -68,7 +68,7 @@
           </div>
         </template>
         <template v-if="display === 'grid'">
-          <div class="inventory-report-grid-item" v-for="(inventory, i) in inventories" :key="`grid_${i}`" @click="selectItem(inventory)">
+          <div class="inventory-report-grid-item" v-for="(inventory, i) in sortedInventories" :key="`grid_${i}`" @click="selectItem(inventory)">
             <div class="inventory-report-grid-item__name">{{inventory.name}}</div>
             <div class="inventory-report-grid-item__detail">
               <div class="inventory-report-grid-item__add">
