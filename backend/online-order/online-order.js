@@ -7,9 +7,11 @@ const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
 const { initSocket, handlerNewMasterId } = require('../master-node');
+const { importDemoData } = require('../demo-data/socket-handler');
 const rnBridge = require('../rn-bridge/app-rn-bridge')
 const fs = require('fs')
 const path = require('path')
+const url = require('url')
 
 let webshopUrl;
 let storeName;
@@ -545,6 +547,13 @@ module.exports = async cms => {
       typeof ack === 'function' && ack()
     })
 
+    socket.on('import-init-data', async (demoDataSrc, ack = () => null) => {
+      console.log('importing data from server')
+      const downloadUrl = url.resolve(await getWebShopUrl(), demoDataSrc, { responseType: 'stream' })
+      const { data } = await axios.get(downloadUrl)
+      await importDemoData(data)
+      ack()
+    })
     // register device which is installed from store
     cms.post('run:registerAppFromStore', () => {
       socket.emit('registerAppFromStore');
@@ -740,7 +749,10 @@ module.exports = async cms => {
       requestBody.hardware = global.APP_CONFIG.deviceName
       requestBody.release = require('../../package').release
       requestBody.osName = global.APP_CONFIG.osName
-      requestBody.appBaseVersion = fs.readFileSync(path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD'), 'utf8').trim()
+      const pkgPath = path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD')
+      if (fs.existsSync(pkgPath)) {
+        requestBody.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
+      }
       const response = await axios.post(pairingApiUrl, requestBody)
       const { deviceId, storeId, storeAlias: alias, storeName: name } = response.data
 
