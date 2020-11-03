@@ -59,11 +59,11 @@
             <div class="inventory-report-list-item__unit">{{inventory.unit}}</div>
             <div class="inventory-report-list-item__add">
               <g-icon v-if="inventory.add || inventory.add === 0" size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>
-              {{inventory.add}}
+              {{inventory.add | formatNumber}}
             </div>
             <div class="inventory-report-list-item__remove">
               <g-icon v-if="inventory.remove || inventory.remove === 0" size="14" class="mr-1">icon-inventory-report-remove</g-icon>
-              {{inventory.remove}}
+              {{inventory.remove | formatNumber}}
             </div>
           </div>
         </template>
@@ -73,12 +73,12 @@
             <div class="inventory-report-grid-item__detail">
               <div class="inventory-report-grid-item__add">
                 <g-icon v-if="inventory.add || inventory.add === 0" size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>
-                {{inventory.add}}
+                {{inventory.add | formatNumber}}
               </div>
               <g-spacer/>
               <div class="inventory-report-grid-item__remove">
                 <g-icon v-if="inventory.remove || inventory.remove === 0" size="14" class="mr-1">icon-inventory-report-remove</g-icon>
-                {{inventory.remove}}
+                {{inventory.remove | formatNumber}}
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@
           <div class="col-4 pl-2">{{item.date | formatDate}}</div>
           <div class="col-2">
             <g-icon size="12" style="margin-bottom: 2px">{{`icon-inventory-report-${item.type}`}}</g-icon>
-            {{item.amount}}
+            {{item.amount | formatNumber}}
           </div>
           <div class="col-6">{{item.reason}}</div>
         </div>
@@ -123,6 +123,9 @@
     filters: {
       formatDate(value) {
         return dayjs(value).format('DD/MM/YYYY HH:mm')
+      },
+      formatNumber(number) {
+        return number && number.toFixed(2)
       }
     },
     data() {
