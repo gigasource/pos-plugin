@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
-
+const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
 const StoreModel = cms.getModel('Store')
 
@@ -61,13 +61,16 @@ router.post('/register', async (req, res) => {
   // hardware: Sunmi, Kindle-Fire, etc, ...
   // appName: Pos-Germany.apk
   // appVersion: 1.51
-  let {pairingCode, hardware, appName, appVersion, release} = req.body;
+  let {pairingCode, hardware, appName, appVersion, release, appBaseVersion, osName} = req.body;
   if (!pairingCode) return res.status(400).json({message: 'Missing pairingCode in request body'});
   const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
   if (deviceInfo) {
     // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
     await DeviceModel.updateOne({pairingCode}, {
-      name: hardware || 'New Device', paired: true, hardware, appName, appVersion, release, features: {
+      name: hardware || 'New Device',
+      paired: true,
+      deviceType: 'pos',
+      hardware, appName, appVersion, release, appBaseVersion, osName, features: {
         fastCheckout: false,
         manualTable: false,
         delivery: false,
@@ -93,6 +96,11 @@ router.post('/register', async (req, res) => {
       storeAlias: store.alias,
       storeId: store._id.toString()
     });
+
+    const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
+    if (storeDevices.length === 1) {
+      await setMasterDevice(store._id, deviceInfo._id)
+    }
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
   }

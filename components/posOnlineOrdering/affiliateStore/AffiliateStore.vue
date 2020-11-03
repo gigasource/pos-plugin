@@ -16,8 +16,11 @@
       <div class="affiliate-content__load" v-if="length < stores.length" @click="loadMore">Load more</div>
     </div>
     <div class="affiliate__footer">
-      <div class="fs-small-2">Copyright © 2020 Restaurant Plus. All Rights Reserved.</div>
-      <div class="fs-large fw-600 affiliate-hover" @click="openCompany">About Us</div>
+      <div class="fs-small-2 ta-center">Copyright © 2020 Restaurant Plus. All Rights Reserved.</div>
+      <div class="fs-large fw-600 affiliate-hover ta-center" @click="openCompany">About Us</div>
+    </div>
+    <div class="scroll-top-btn" @click="scrollTop">
+      <g-icon color="#1976D2">fas fa-angle-double-up</g-icon>
     </div>
   </div>
 </template>
@@ -31,7 +34,7 @@
       return {
         searchText: '',
         stores: [],
-        length: 5,
+        length: 10,
       }
     },
     computed: {
@@ -41,6 +44,15 @@
     },
     async created() {
       await this.findStore()
+    },
+    mounted() {
+      document.addEventListener('scroll', e => {
+        if(document.documentElement.scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+          if(this.length < this.stores.length) {
+            this.length += 5
+          }
+        }
+      })
     },
     methods: {
       async findStore() {
@@ -59,7 +71,10 @@
       },
       openCompany() {
         window.open('https://gigasource.io', '_blank')
-      }
+      },
+      scrollTop() {
+        window.scroll({top: 0, left: 0, behavior: 'smooth'})
+      },
     }
   }
 </script>
@@ -92,7 +107,7 @@
         position: absolute;
         top: 16px;
         left: 0;
-        padding-left: 16px;
+        padding: 0 16px;
         right: 0;
         bottom: 0;
         z-index: 2;
@@ -164,10 +179,100 @@
       right: 0;
       bottom: 0;
       cursor: pointer;
+      z-index: 2;
     }
 
     &-hover:hover {
       text-decoration: underline;
+    }
+
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 40px;
+      right: 16px;
+      background-color: white;
+      box-shadow: 0 1px 10px 1px rgba(21, 113, 191, 0.3);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .affiliate {
+
+      &-content {
+        padding: 8px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 650px) {
+    .affiliate {
+      &-header {
+        height: 250px;
+        padding: 8px;
+
+        img {
+          margin-bottom: 8px;
+          width: 150px;
+        }
+
+        &__title {
+          font-size: 32px;
+          line-height: 40px;
+        }
+
+        &__subtitle {
+          font-size: 24px;
+          margin-bottom: 24px;
+        }
+
+        &__search {
+          padding: 4px;
+          width: 80%;
+          margin: 0 10%;
+        }
+      }
+
+      .scroll-top-btn {
+        bottom: 69px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 350px) {
+    .affiliate {
+      &-header {
+        height: 220px;
+        padding: 8px;
+
+        img {
+          margin-bottom: 8px;
+          width: 150px;
+        }
+
+        &__title {
+          font-size: 24px;
+          line-height: 1.2;
+        }
+
+        &__subtitle {
+          font-size: 18px;
+          margin-bottom: 18px;
+        }
+
+        &__search {
+          padding: 4px;
+          width: 100%;
+          margin: 0;
+        }
+      }
     }
   }
 </style>

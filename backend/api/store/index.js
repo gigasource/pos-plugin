@@ -84,120 +84,14 @@ router.post('/new-store', async (req, res) => {
     return
   }
 
-  let {settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location} = req.body
+  const { createdStore: store, storeOwner: owner } = createStore(req.body, req.session.user._id)
+  res.json({ ok: true, store, owner })
+})
 
-  const stores = await StoreModel.find({}, { id: 1, alias: 1 })
-
-  // generate unique store id
-  const ids = _.map(stores, s => s.id)
-  let id = 0
-  do { id++ }
-  while(_.includes(ids, id.toString()))
-
-  // generate unique store alias
-  const aliases = _.map(stores, s => s.alias)
-  let lowerStoreSettingName = _.join(_.filter(_.toLower(settingName), x => x.match(storeAliasAcceptCharsRegex)), '')
-  let alias
-  let aliasIndex = 0
-  do {
-    alias = lowerStoreSettingName + (aliasIndex === 0 ? '' : `-${aliasIndex}`)
-    aliasIndex++
-  } while (_.includes(aliases, alias))
-
-  // Get Google Map Place ID of store if it's not present
-  if (!googleMapPlaceId) {
-    let restaurantPlace = await getGooglePlaceByText(`${settingName} ${settingAddress}`);
-    if (!restaurantPlace) restaurantPlace = await getGooglePlaceByText(settingAddress)
-
-    if (restaurantPlace) {
-      const { place_id, geometry: {location: {lat, lng}} } = restaurantPlace
-      googleMapPlaceId = place_id
-
-      coordinates = {long: lng, lat}
-      location = {
-        type: 'Point',
-        coordinates: [lng, lat]
-      }
-    }
-  } else {
-    try {
-      const { result: { geometry: {location: {lat, lng}} } } = await getPlaceDetail(googleMapPlaceId);
-      coordinates = {long: lng, lat}
-      location = {
-        type: 'Point',
-        coordinates: [lng, lat]
-      }
-    } catch (e) {
-      console.log('Cannot get geometry information')
-    }
-  }
-
-  // create store
-  const createdStore = await StoreModel.create({
-    id, settingName, settingAddress, alias, groups, country,
-    addedDate: new Date(),
-    openHours: [
-      {
-        dayInWeeks: [true, true, true, true, true, true, true],
-        openTime: '06:30',
-        closeTime: '22:30',
-        deliveryStart: '06:30',
-        deliveryEnd: '22:30'
-      }
-    ],
-    pickup: true,
-    delivery: false,
-    deliveryFee: {
-      acceptOrderInOtherZipCodes: false,
-      defaultFee: 0,
-      type: 'zipCode',
-      zipCodeFees: [],
-      distanceFees: []
-    },
-    orderTimeOut: 3,
-    deliveryTimeInterval: 15,
-    gSms: {
-      enabled: true,
-      timeToComplete: 30,
-      autoAccept: true,
-      devices: []
-    },
-    reservationSetting: {
-      activeReservation: true,
-      soundNotification: true,
-      hideEmpty: null,
-      emailConfirmation: true,
-      removeOverdueAfter: 30,
-      maxGuest: 20,
-      maxDay: 7
-    },
-    printers: [
-      "Kitchen"
-    ],
-    ...googleMapPlaceId ? {googleMapPlaceId} : {},
-    ...location && { location },
-    ...coordinates && { coordinates }
-  })
-
-  const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
-
-  // create store owner
-  const storeOwner = await cms.getModel('User').create({
-    name: `${settingName}__owner`,
-    username: `${alias}__owner__${new Date().getTime()}`,
-    password: new Date().getTime(),
-    store: createdStore._id,
-    createBy: req.session.user._id,
-    role: deviceRole._id,
-    active: true,
-    permissions: [{ permission: 'manageStore', value: true }]
-  })
-
-  res.json({
-    ok: true,
-    store: createdStore,
-    owner: storeOwner
-  })
+router.delete('/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  await deleteStore(storeId)
+  res.sendStatus(201)
 })
 
 router.post('/new-feedback', async (req, res) => {
@@ -216,7 +110,7 @@ router.post('/new-feedback', async (req, res) => {
 router.post('/sign-in-requests', async (req, res) => {
   // name: device owner's name enter by device owner
   // role: 'staff' | 'manager'
-  let {storeName, googleMapPlaceId, deviceId, role, name, avatar} = req.body;
+  let {storeName, googleMapPlaceId, deviceId, role, name, avatar, storeData, pos} = req.body;
   // compatible with old version (without name & role)
   // TODO: remove later
   role = role || 'staff';
@@ -228,7 +122,37 @@ router.post('/sign-in-requests', async (req, res) => {
   const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
   if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});
 
-  const store = await StoreModel.findOne({googleMapPlaceId});
+  let store = await StoreModel.findOne({googleMapPlaceId});
+
+  if (pos && !store) {
+    // create new store
+    const group = await cms.getModel('StoreGroup').findOne({ name: 'Unassigned' })
+    const { country, phone, zipCode, address, location } = storeData;
+    const data = {
+      settingName: storeName,
+      settingAddress: address,
+      groups: [group._id.toString()],
+      googleMapPlaceId: googleMapPlaceId,
+      country: { name: country } || { name: 'Germany', locale: 'de-DE' },
+      phone: phone,
+      zipCode: zipCode,
+    };
+
+    if (location) {
+      const { lat, lng } = location
+      Object.assign(data, {
+        coordinates: { lat, long: lng },
+        location: {
+          type: 'Point',
+          coordinates: [lng, lat]
+        }
+      })
+    }
+
+    const { createdStore } = await createStore(data, null, true)
+    store = createdStore._doc
+  }
+
   const request = await SignInRequestModel.create({
     device: deviceId,
     status: 'pending',
@@ -238,7 +162,9 @@ router.post('/sign-in-requests', async (req, res) => {
     ...store && {store: store._id},
     role,
     name,
-    ...avatar && {avatar}
+    ...avatar && {avatar},
+    storeData: storeData || {},
+    pos
   });
 
   const device = await cms.getModel('Device').findById(deviceId);
@@ -251,9 +177,15 @@ router.post('/sign-in-requests', async (req, res) => {
     role
   }
 
+  if (store) {
+    await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
+    await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
+  }
+
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
   cms.emit('newSignInRequest', result);
-  res.status(201).json(request._doc);
+  const response = Object.assign({}, request._doc, { storeData: store });
+  res.status(201).json(response);
 });
 
 router.get('/sign-in-requests', async (req, res) => {
@@ -356,6 +288,9 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
 
   if (status === 'approved') {
     // fallback
+    if (request.pos) {
+      await initApprovedDevice(request.store._id, request.device._id)
+    }
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn', [request.device._id, staff._doc]);
     // new R+
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'approveSignIn_v2', [{
@@ -366,6 +301,20 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
       storeAlias: request.store.alias,
     }]);
   } else if (status === 'notApproved') {
+    if (storeId) {
+      const store = await cms.getModel('Store').findById(storeId)
+      const devices = await cms.getModel('Device').find({storeId})
+      if (devices.length < 2 && store.autoGenerated) {
+        // delete store
+        await deleteStore(storeId)
+      }
+      await cms.getModel('Store').findOneAndUpdate({ _id: storeId }, {
+        $pull: {
+          devices: request.device._id
+        }
+      })
+      await cms.getModel('Device').findOneAndUpdate({_id: request.device._id}, {storeId: null})
+    }
     // fallback
     await getExternalSocketIoServer().emitToPersistent(request.device._id, 'denySignIn', [request.device._id]);
     // new R+
@@ -555,4 +504,205 @@ router.get('/delivery-forward', async (req, res) => {
   })
 })
 
+async function createStore(data, userId, auto) {
+  let {settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location, zipCode, phone} = data
+  const stores = await StoreModel.find({}, { id: 1, alias: 1 })
+
+  // generate unique store id
+  const ids = _.map(stores, s => s.id)
+  let id = 0
+  do { id++ }
+  while(_.includes(ids, id.toString()))
+
+  // generate unique store alias
+  const aliases = _.map(stores, s => s.alias)
+  let lowerStoreSettingName = _.join(_.filter(_.toLower(settingName), x => x.match(storeAliasAcceptCharsRegex)), '')
+  let alias
+  let aliasIndex = 0
+  do {
+    alias = lowerStoreSettingName + (aliasIndex === 0 ? '' : `-${aliasIndex}`)
+    aliasIndex++
+  } while (_.includes(aliases, alias))
+
+  // Get Google Map Place ID of store if it's not present
+  if (!googleMapPlaceId) {
+    let restaurantPlace = await getGooglePlaceByText(`${settingName} ${settingAddress}`);
+    if (!restaurantPlace) restaurantPlace = await getGooglePlaceByText(settingAddress)
+
+    if (restaurantPlace) {
+      const { place_id, geometry: {location: {lat, lng}} } = restaurantPlace
+      googleMapPlaceId = place_id
+
+      coordinates = {long: lng, lat}
+      location = {
+        type: 'Point',
+        coordinates: [lng, lat]
+      }
+    }
+  } else {
+    try {
+      const { result: { geometry: {location: {lat, lng}} } } = await getPlaceDetail(googleMapPlaceId);
+      coordinates = {long: lng, lat}
+      location = {
+        type: 'Point',
+        coordinates: [lng, lat]
+      }
+    } catch (e) {
+      console.log('Cannot get geometry information')
+    }
+  }
+
+  // create store
+  const createdStore = await StoreModel.create({
+    id, settingName, settingAddress, alias, groups, country,
+    addedDate: new Date(),
+    autoGenerated: auto,
+    name: settingName,
+    devices: [],
+    openHours: [
+      {
+        dayInWeeks: [true, true, true, true, true, true, true],
+        openTime: '06:30',
+        closeTime: '22:30',
+        deliveryStart: '06:30',
+        deliveryEnd: '22:30'
+      }
+    ],
+    pickup: true,
+    delivery: false,
+    deliveryFee: {
+      acceptOrderInOtherZipCodes: false,
+      defaultFee: 0,
+      type: 'zipCode',
+      zipCodeFees: [],
+      distanceFees: []
+    },
+    orderTimeOut: 3,
+    deliveryTimeInterval: 15,
+    gSms: {
+      enabled: true,
+      timeToComplete: 30,
+      autoAccept: true,
+      devices: []
+    },
+    reservationSetting: {
+      activeReservation: true,
+      soundNotification: true,
+      hideEmpty: null,
+      emailConfirmation: true,
+      removeOverdueAfter: 30,
+      maxGuest: 20,
+      maxDay: 7
+    },
+    printers: [
+      "Kitchen"
+    ],
+    ...googleMapPlaceId ? {googleMapPlaceId} : {},
+    ...location && { location },
+    ...coordinates && { coordinates },
+    ...zipCode && { zipCode },
+    ...phone && { phone }
+  })
+
+  const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
+
+  // create store owner
+  const storeOwner = await cms.getModel('User').create({
+    name: `${settingName}__owner`,
+    username: `${alias}__owner__${new Date().getTime()}`,
+    password: new Date().getTime(),
+    store: createdStore._id,
+    createBy: userId,
+    role: deviceRole._id,
+    active: true,
+    permissions: [{ permission: 'manageStore', value: true }]
+  })
+
+  return { createdStore, storeOwner }
+}
+
+async function deleteStore(storeId) {
+  // remove store
+  await cms.getModel('Store').deleteOne({_id: storeId})
+
+  // remove products
+  await cms.getModel('Product').deleteMany({store: storeId})
+
+  // remove discounts
+  await cms.getModel('Discount').deleteMany({store: storeId})
+
+  // remove store owner user
+  const deviceRole = await cms.getModel('Role').findOne({name: 'device'})
+  await cms.getModel('User').deleteOne({role: deviceRole._id, store: storeId})
+}
+
+async function initApprovedDevice(storeId, deviceId) {
+  await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, {
+    features: {
+      fastCheckout: true,
+      manualTable: true,
+      delivery: true,
+      editMenuCard: true,
+      tablePlan: true,
+      onlineOrdering: false,
+      editTablePlan: true,
+      staffReport: true,
+      eodReport: true,
+      monthlyReport: true,
+      remoteControl: true,
+      proxy: true,
+      alwaysOn: true,
+      reservation: false,
+      startOnBoot: false
+    }
+  })
+
+  const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
+  if (storeDevices.length === 1) {
+    await setMasterDevice(storeId, deviceId)
+  }
+}
+
+async function setMasterDevice(storeId, deviceId) {
+  const storeDevices = await cms.getModel('Device').find({ storeId })
+  await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
+  await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { master: true })
+  const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
+  devices.forEach(device => {
+    console.log(`Sending master ip to ${device._id.toString()}`);
+    getExternalSocketIoServer().emitToPersistent(device._id.toString(), 'updateMasterDevice', [deviceId]);
+  })
+}
+
+router.put('/demo-data/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  if (!storeId) return res.sendStatus(400)
+
+  const store = await StoreModel.findById(storeId)
+  if (!store) return res.sendStatus(400)
+
+  const { filePath } = req.body
+  if (filePath) {
+    await StoreModel.findOneAndUpdate({ _id: storeId }, {
+      demoDataSrc: filePath
+    })
+  }
+
+  res.sendStatus(200)
+})
+
+router.get('/demo-data/:storeId', async (req, res) => {
+  const { storeId } = req.params
+  if (!storeId) return res.sendStatus(400)
+
+  const store = await StoreModel.findById(storeId)
+  if (!store) return res.sendStatus(400)
+  const demoDataSrc = store.demoDataSrc
+
+  res.status(200).json({ demoDataSrc })
+})
+
 module.exports = router
+module.exports.createStore = createStore
+module.exports.deleteStore = deleteStore
+module.exports.setMasterDevice = setMasterDevice

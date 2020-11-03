@@ -851,6 +851,7 @@
           deliveryTime: this.deliveryTime === this.asap ? 'asap' : this.deliveryTime,
           deliveryDateTime,
           discounts: this.discounts,
+          effectiveTotal: this.effectiveTotal
         }
 
         if (!this.store.useMultiplePrinters) {
