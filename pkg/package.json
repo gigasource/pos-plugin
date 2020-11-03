@@ -22,7 +22,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "form-data": "^3.0.0",
-    "giga-pkg-patches": "github:gigasource/giga-pkg-patches#1.0.4",
+    "giga-pkg-patches": "github:gigasource/giga-pkg-patches#1.0.5",
     "pkg": "^4.4.4",
     "yargs": "^15.3.1"
   }
