@@ -27,7 +27,7 @@ const updateCommit = {
 						groupTempId: mongoose.Types.ObjectId().toString(),
 						data: {
 							collection: coll,
-							hardwareID: global.APP_CONFIG.hardwareID
+							hardwareID: (whiteListCollection[0].needMaster ? null : global.APP_CONFIG.hardwareID)
 						},
 						update: {
 							method: method,
