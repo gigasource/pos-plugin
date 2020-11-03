@@ -661,6 +661,11 @@ async function initApprovedDevice(storeId, deviceId) {
   const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
   if (storeDevices.length === 1) {
     await setMasterDevice(storeId, deviceId)
+
+    const store = await StoreModel.findById(storeId)
+    const demoData = store.demoDataSrc;
+    if (demoData)
+      await getExternalSocketIoServer().emitToPersistent(deviceId, 'import-init-data', demoData)
   }
 }
 

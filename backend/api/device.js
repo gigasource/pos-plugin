@@ -3,6 +3,7 @@ const randomstring = require('randomstring')
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
+const { getExternalSocketIoServer } = require('../socket-io-server');
 const ObjectId = mongoose.Types.ObjectId
 const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
@@ -71,16 +72,16 @@ router.post('/register', async (req, res) => {
       paired: true,
       deviceType: 'pos',
       hardware, appName, appVersion, release, appBaseVersion, osName, features: {
-        fastCheckout: false,
-        manualTable: false,
+        fastCheckout: true,
+        manualTable: true,
         delivery: false,
-        editMenuCard: false,
-        tablePlan: false,
+        editMenuCard: true,
+        tablePlan: true,
         onlineOrdering: false,
-        editTablePlan: false,
-        staffReport: false,
-        eodReport: false,
-        monthlyReport: false,
+        editTablePlan: true,
+        staffReport: true,
+        eodReport: true,
+        monthlyReport: true,
         remoteControl: true,
         proxy: true,
         alwaysOn: true,
@@ -100,6 +101,9 @@ router.post('/register', async (req, res) => {
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
     if (storeDevices.length === 1) {
       await setMasterDevice(store._id, deviceInfo._id)
+      const demoData = store.demoDataSrc;
+      if (demoData)
+        await getExternalSocketIoServer().emitToPersistent(deviceInfo._id, 'import-init-data', demoData)
     }
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
