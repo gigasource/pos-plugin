@@ -96,6 +96,11 @@
           </div>
         </div>
       </div>
+
+      <g-toolbar elevation="0" color="#eee" class="toolbar" v-if="!isMobile">
+        <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
+        <g-spacer/>
+      </g-toolbar>
     </g-dialog>
 
     <choose-table-dialog :table="currentTable" :active-orders="activeOrders" v-model="showChooseTableDialog" @submit="submitTable" />
@@ -340,6 +345,18 @@
         font-weight: 700;
       }
     }
+  }
+
+  .toolbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 64px;
+  }
+
+  .g-btn-bs {
+    background-color: white;
+    font-size: 14px;
   }
 </style>
 
