@@ -1,5 +1,6 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
+const { proxyBuilder } = require('./collection-commit/utils');
 
 class UpdateCommit {
 	constructor(storeId, client, db) {
@@ -9,8 +10,9 @@ class UpdateCommit {
 			storeId,
 			client,
 			db,
-			orderCommitModel: db.collection('ordercommits'),
-			orderModel: db.collection('orders'),
+			orderCommitModel: proxyBuilder('OrderCommit', db),
+			orderModel: proxyBuilder('Order', db),
+			posCommitModel: proxyBuilder('PosCommit', db),
 			commitType: ['order', 'report', 'pos'],
 			methods: {},
 			handler: {},
