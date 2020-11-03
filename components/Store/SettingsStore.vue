@@ -856,7 +856,16 @@
 
       async skipPairing() {
         await this.updatePosSetting('skipPairing', true)
-        this.$router.go(-1)
+        await this.unlockFeatures()
+        this.$router.push('/pos-login')
+      },
+      async unlockFeatures() {
+        const FeatureModel = cms.getModel('Feature');
+        const posFeatures = [
+          'fastCheckout', 'manualTable', 'delivery', 'editMenuCard', 'tablePlan', 'editTablePlan',
+          'staffReport', 'eodReport', 'monthlyReport', 'alwaysOn',
+        ]
+        await FeatureModel.updateMany({ name: { $in: posFeatures } }, { enabled: true }, { upsert: true })
       },
 
       getOnlineDeviceServices(callback) {

@@ -63,12 +63,12 @@
     </div>
     <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl"
                        @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
-<!--    <g-btn style="position: absolute; top: 10px; right: 10px" @click="openDialogDemo">Skip to Demo</g-btn>-->
-    <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>
+    <g-btn style="position: absolute; top: 10px; right: 10px" @click="openDialogDemo">Skip to Demo</g-btn>
+<!--    <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>-->
     <div v-if="showKeyboard" class="keyboard-wrapper">
       <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
     </div>
-    <dialog-demo v-model="dialog.demo" :mode="demoMode" :address="place" :phone="phone"/>
+    <dialog-demo v-model="dialog.demo" :mode="demoMode" :address="place" :phone="phone" @complete="selectDemoData"/>
   </div>
 </template>
 
@@ -235,6 +235,11 @@
       openDialogDemo() {
         this.demoMode = 'demo'
         this.dialog.demo = true
+      },
+      selectDemoData(store) {
+        cms.socket.emit('set-demo-store', store, () => {
+          this.$emit('skipPairing')
+        })
       }
     },
     watch: {

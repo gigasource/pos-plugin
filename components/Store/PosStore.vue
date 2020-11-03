@@ -30,7 +30,7 @@
         incorrectPasscode: false,
         timeFormat: this.$t('dates.timeFormat'),
         dateFormat: this.$t('dates.dateFormat'),
-        webShopConnected: false,
+        webShopConnected: true,
         online: true,
         storeId: '',
         locale: 'en',
@@ -485,7 +485,7 @@
       online: {
         handler(val) {
           if (val) {
-            this.closeSnackbar()
+            this.closeSnackbar && this.closeSnackbar()
           } else {
             this.showOfflineSnackbar(this.$t('settings.noInternet'))
           }
@@ -494,7 +494,7 @@
       },
       webShopConnected(val) {
         if (val) {
-          this.closeSnackbar()
+          this.closeSnackbar && this.closeSnackbar()
         } else {
           this.showOfflineSnackbar(this.$t('settings.noOnlineOrder'))
         }
