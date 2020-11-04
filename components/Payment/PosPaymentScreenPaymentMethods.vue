@@ -281,7 +281,14 @@
         if (val) {
           setTimeout(() => {
             if (!this.currentOrder.tip) this.tipEditValue = '' + this.paymentTotal
-            this.$nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
+            this.$nextTick(() => {
+              const tipTfRef = this.$refs['tip-textfield'];
+              if (tipTfRef) {
+                tipTfRef.$el.click();
+                const input = tipTfRef.$el.querySelector('input')
+                input && input.select()
+              }
+            })
           }, 500)
         }
       },
