@@ -279,8 +279,8 @@
     watch: {
       showAddTipDialog(val) {
         if (val) {
+          if (!this.currentOrder.tip) this.tipEditValue = '' + this.paymentTotal
           setTimeout(() => {
-            if (!this.currentOrder.tip) this.tipEditValue = '' + this.paymentTotal
             this.$nextTick(() => {
               const tipTfRef = this.$refs['tip-textfield'];
               if (tipTfRef) {
