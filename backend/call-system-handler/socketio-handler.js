@@ -15,7 +15,7 @@ module.exports = async (cms) => {
     const {mode} = callConfig;
     const demoMode = mode === 'demo-fritzbox';
 
-    if (cb) cb(demoMode ? socketConnectStatus : null);
+    if (cb && demoMode) cb(socketConnectStatus);
     else cms.socket.emit('update-call-system-status', demoMode ? socketConnectStatus : null);
   }
 

@@ -3,7 +3,8 @@
   "generalSetting": {
     "quickFnRows": 1,
     "quickBtn": true,
-    "useVirtualPrinter": true
+    "useVirtualPrinter": true,
+    "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU"
   },
   "leftFunctionButtons": [
     {
@@ -906,8 +907,7 @@
   "onlineOrderSorting": "order",
   "hardwares": [],
   "call": {
-    "active": false,
-    "ip": "192.168.178.1",
-    "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU"
+    "mode": "off",
+    "ipAddresses": {}
   }
 }

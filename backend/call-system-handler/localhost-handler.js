@@ -15,7 +15,7 @@ module.exports = async (cms) => {
     let {mode} = callConfig;
     const useLocalFritzbox = mode === 'localhost-fritzbox';
 
-    if (cb) cb(useLocalFritzbox ? connectionStatus : null);
+    if (cb && useLocalFritzbox) cb(connectionStatus);
     else cms.socket.emit('update-call-system-status', useLocalFritzbox ? connectionStatus : null);
   }
 

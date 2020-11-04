@@ -604,6 +604,11 @@
           "schemaType": "boolean",
           "key": "printReceiptWithPay",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "googleMapApiKey",
+          "type": "input"
         }
       ],
       "type": "object"
@@ -1132,16 +1137,6 @@
       "key": "call",
       "type": "object",
       "fields": [
-        {
-          "schemaType": "boolean",
-          "key": "active",
-          "type": "input@switch"
-        },
-        {
-          "schemaType": "string",
-          "key": "googleMapApiKey",
-          "type": "input"
-        },
         {
           "schemaType": "string",
           "key": "mode",

@@ -670,7 +670,9 @@ module.exports = async cms => {
 
   async function searchForPlace(text, token, language = 'en', country = 'DE') {
     let searchResult = []
-    const apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
+    const posSettings = await cms.getModel('PosSetting').findOne();
+    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey;
+
     const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
     const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
       params: {
@@ -690,7 +692,10 @@ module.exports = async cms => {
 
   async function getPlaceDetail(placeId, token, language = 'en') {
     const url = 'https://maps.googleapis.com/maps/api/place/details/json'
-    const apiKey = (await cms.getModel('PosSetting').findOne())['call']['googleMapApiKey']
+
+    const posSettings = await cms.getModel('PosSetting').findOne();
+    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey;
+
     const { data } = await axios.get(url, {
       params: {
         key: apiKey,

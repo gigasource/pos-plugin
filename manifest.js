@@ -103,6 +103,13 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/call-system-handler/robotic-modem-handler.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/print-utils/virtual-printer.js',
       type: 'backend'
     },

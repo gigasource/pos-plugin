@@ -35,6 +35,21 @@
         </pos-time-picker>
       </div>
       <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
+
+      <div class="row-flex align-items-center justify-between">
+        Google Map API Key
+      </div>
+      <g-text-field-bs class="google-map-api-input" v-model="googleMapApiKey">
+        <template v-slot:append-inner>
+          <g-icon @click="dialog.googleMapApiKey = true">icon-keyboard</g-icon>
+        </template>
+      </g-text-field-bs>
+      <dialog-text-filter
+          v-model="dialog.googleMapApiKey"
+          label="Google Map API Key"
+          :default-value="googleMapApiKey"
+          @submit="(value) => this.googleMapApiKey = value"/>
+
       <div class="row-flex align-items-center justify-between">
         Quick pay button's action
       </div>
@@ -54,6 +69,7 @@
           </template>
         </g-grid-select>
       </div>
+
     </div>
   </div>
 </template>
@@ -69,6 +85,9 @@
       return {
         generalSettings: {},
         quickPayButtonActions: ['auto', 'pay', 'receipt'],
+        dialog: {
+          googleMapApiKey: false,
+        },
       };
     },
     computed: {
@@ -174,18 +193,31 @@
         set(val) {
           this.$set(this.generalSettings, 'deliveryOrderMode', val);
         },
+      },
+      googleMapApiKey: {
+        get() {
+          return (this.generalSettings && this.generalSettings.googleMapApiKey) || '';
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'googleMapApiKey', val);
+        },
       }
     },
     async created() {
       const setting = await cms.getModel('PosSetting').findOne();
       this.generalSettings = setting.generalSetting || {};
+
+      // backward compatibility
+      if (!this.generalSettings.googleMapApiKey) {
+        this.$set(this.generalSettings, 'googleMapApiKey', setting.call.googleMapApiKey);
+      }
     },
     watch: {
       generalSettings: {
         async handler(val) {
           if (val) {
             const settingModel = cms.getModel('PosSetting');
-            await settingModel.findOneAndUpdate({}, { generalSetting: val })
+            await settingModel.findOneAndUpdate({}, { generalSetting: val });
           }
         },
         deep: true
@@ -236,6 +268,17 @@
       .input {
         color: #1d1d26;
       }
+    }
+  }
+
+  .google-map-api-input {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+
+    ::v-deep .input {
+      flex: 1;
+      padding-right: 12px;
     }
   }
 </style>
