@@ -54,40 +54,13 @@
       </template>
     </div>
 
-    <g-dialog v-model="showMultiPaymentDialog" width="50%">
-      <g-card class="dialog col-flex pa-3">
-        <div class="row-flex align-items-center">
-          <span class="fw-700 mb-2" style="font-size: 20px">Multi Payment</span>
-          <g-spacer/>
-          <span class="mr-1">Total:</span>
-          <span class="fw-700" style="font-size: 18px; color: #1271FF">{{$t('common.currency', storeLocale)}} {{paymentTotal}}</span>
-        </div>
-        <div>
-          <template v-for="item in listPayments">
-            <div class="mt-1 mb-2 row-flex align-items-center">
-              <g-btn-bs background-color="#2979ff" text-color="#fff" border-radius="2px">
-                <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-                <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
-              </g-btn-bs>
-              <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
-                                 v-model="cardEditValue" @click.stop="getRemainingValue"/>
-              <pos-textfield-new clearable v-else ref="cash-textfield"
-                                 v-model="cashEditValue" @click.stop="getRemainingValue"/>
-            </div>
-          </template>
-        </div>
-        <div class="mb-3 mt-3">
-          <pos-keyboard-full
-              style="grid-area: 1 / 1 / 5 / 4"
-              :template="keyboardTemplate"
-              :items="keyboardItems"/>
-        </div>
-        <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" :disabled="disableConfirmMulti"
-                  @click.stop="saveMulti">
-          Confirm
-        </g-btn-bs>
-      </g-card>
-    </g-dialog>
+    <dialog-multi-payment v-model="showMultiPaymentDialog"
+                          :total="paymentTotal"
+                          :store-locale="storeLocale"
+                          :card-value="cardEditValue"
+                          :cash-value="cashEditValue"
+                          @submit="saveMulti"
+    />
 
     <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%">
       <template #input>
@@ -102,11 +75,6 @@
 
   export default {
     name: 'PosPaymentScreenPaymentMethods',
-    injectService: [
-      'OrderStore:currentOrder',
-      'OrderStore:paymentTotal',
-      'PosStore:storeLocale',
-    ],
     props: {
       currentOrder: null,
       paymentTotal: Number,
@@ -114,32 +82,6 @@
     },
     data() {
       return {
-        keyboardTemplate: 'grid-template-areas: " key7 key7 key8 key8 key9 key9" ' +
-          '"key4 key4 key5 key5 key6 key6" ' +
-          '"key1 key1 key2 key2 key3 key3" ' +
-          '"keyDot keyDot key0 key0 del del";' +
-          'grid-auto-columns: 1fr; grid-gap: 10px',
-        keyboardItems: [
-          ...Object.values({
-            key7: { content: ['7'], style: 'grid-area: key7' },
-            key8: { content: ['8'], style: 'grid-area: key8' },
-            key9: { content: ['9'], style: 'grid-area: key9' },
-            key4: { content: ['4'], style: 'grid-area: key4' },
-            key5: { content: ['5'], style: 'grid-area: key5' },
-            key6: { content: ['6'], style: 'grid-area: key6' },
-            key1: { content: ['1'], style: 'grid-area: key1' },
-            key2: { content: ['2'], style: 'grid-area: key2' },
-            key3: { content: ['3'], style: 'grid-area: key3' },
-            key0: { content: ['0'], style: 'grid-area: key0' },
-            keyDot: { content: ['.'], style: 'grid-area: keyDot' },
-          }),
-          {
-            content: [''],
-            img: 'delivery/key_delete',
-            style: 'grid-area: del; background-color: #e0e0e0',
-            action: 'delete'
-          },
-        ],
         extraPaymentItems: [
           { type: 'tip', value: 0, icon: 'icon-tip' },
           { type: 'WC', value: 0.5 },
@@ -197,10 +139,6 @@
           value: isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
             : +item.value,
-
-          // replaceMode is used for overwriting instead of appending to payment value
-          // after the first character is entered, replaceMode will be set to false
-          replaceMode: item.type === 'cash',
         }
         this.$emit('updateCurrentOrder', 'payment', [newItem])
       },
@@ -260,13 +198,12 @@
         this.tipEditValue = ''
         this.selectedPayment = 'card'
       },
-      saveMulti() {
+      saveMulti({ card, cash }) {
+        this.cardEditValue = card
+        this.cashEditValue = cash
         this.$emit('updateCurrentOrder', 'payment', [
-          { type: 'card', value: +this.cardEditValue, replaceMode: false },
-
-          // replaceMode is used for overwriting instead of appending to payment value
-          // after the first character is entered, replaceMode will be set to false
-          { type: 'cash', value: +this.cashEditValue, replaceMode: true },
+          { type: 'card', value: +this.cardEditValue },
+          { type: 'cash', value: +this.cashEditValue },
         ])
         this.showMultiPaymentDialog = false
       },

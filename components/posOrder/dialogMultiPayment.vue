@@ -12,12 +12,13 @@
       <div>
         <template v-for="item in listPayments">
           <div class="mt-1 mb-2 row-flex align-items-center">
-            <g-btn-bs background-color="#2979ff" text-color="#fff" border-radius="2px"
-                      @click="click(`${item.name}-textfield`)">
+            <g-btn-bs :background-color="getBackgroundColor(item)" border-radius="2px"
+                      style="border: 1px solid #bdbdbd"
+                      @click="click(`${item.type}-textfield`)">
               <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-              <span class="ml-2" style="text-transform: capitalize">{{ item.name }}</span>
+              <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
             </g-btn-bs>
-            <pos-textfield-new clearable v-if="item.name === 'card'" ref="card-textfield"
+            <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
                                v-model="cardEditValue" @click.stop="getRemainingValue"/>
             <pos-textfield-new clearable v-else ref="cash-textfield"
                                v-model="cashEditValue" @click.stop="getRemainingValue"/>
@@ -45,8 +46,8 @@
       value: Boolean,
       total: [Number, String],
       storeLocale: String,
-      cardValue: Number,
-      cashValue: Number,
+      cardValue: [Number, String],
+      cashValue: [Number, String],
       rotate: Boolean,
     },
     data() {
@@ -78,8 +79,8 @@
           },
         ],
         listPayments: [
-          { name: 'cash', icon: 'icon-cash' },
-          { name: 'card', icon: 'icon-credit_card' },
+          { type: 'cash', icon: 'icon-cash' },
+          { type: 'card', icon: 'icon-credit_card' },
         ],
         cashEditValue: '',
         cardEditValue: '',
@@ -116,6 +117,16 @@
       },
       click(ref) {
         this.$refs[ref] && this.$refs[ref][0].$el.click()
+      },
+      getBackgroundColor(item) {
+        switch (item.type) {
+          case 'cash':
+            return this.cashEditValue > 0 ? '#2979ff' : '#fff'
+          case 'card':
+            return this.cardEditValue > 0 ? '#2979ff' : '#fff'
+          default:
+            return '#fff'
+        }
       }
     },
     watch: {
