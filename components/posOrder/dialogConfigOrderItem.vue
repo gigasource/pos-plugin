@@ -3,7 +3,7 @@
     <template v-slot:input>
       <g-tabs v-model="tab" :items="tabs" text-color="#1d1d26" color="white" active-text-color="#1d1d26"
               slider-color="#1471ff" slider-size="3">
-        <g-tab-item v-for="(tabItem, index) in tabs" :item="tabItem">
+        <g-tab-item v-for="(tabItem, index) in tabs" :key="index" :item="tabItem">
           <template v-if="index === 0">
             <div class="modifier-content row-flex flex-wrap justify-around mb-2">
               <pos-textfield-new style="width: 48%;" v-model="modifier" label="Modifier" placeholder="Name"/>
