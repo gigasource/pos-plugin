@@ -18,6 +18,10 @@
         <g-switch v-model="quickBtn"/>
       </div>
       <div class="row-flex align-items-center justify-between">
+        <span>Only checkout printed items</span>
+        <g-switch v-model="onlyCheckoutPrintedItems"/>
+      </div>
+      <div class="row-flex align-items-center justify-between">
         <span>Using virtual printer</span>
         <g-switch v-model="useVirtualPrinter"/>
       </div>
@@ -152,6 +156,14 @@
         },
         set(val) {
           this.$set(this.generalSettings, 'quickBtnAction', val);
+        },
+      },
+      onlyCheckoutPrintedItems: {
+        get() {
+          return (this.generalSettings && this.generalSettings.onlyCheckoutPrintedItems) || 'pay';
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'onlyCheckoutPrintedItems', val);
         },
       },
       useVirtualPrinter: {

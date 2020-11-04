@@ -3,7 +3,8 @@
   "generalSetting": {
     "quickFnRows": 1,
     "quickBtn": true,
-    "useVirtualPrinter": true
+    "useVirtualPrinter": true,
+    "onlyCheckoutPrintedItems": true
   },
   "leftFunctionButtons": [
     {

@@ -604,6 +604,11 @@
           "schemaType": "boolean",
           "key": "printReceiptWithPay",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "onlyCheckoutPrintedItems",
+          "type": "input@switch"
         }
       ],
       "type": "object"
