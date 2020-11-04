@@ -726,13 +726,18 @@ module.exports = async cms => {
       const data = {
         appName: 'POS_Android',
         appVersion: require('../../package').version,
-        hardware: global.APP_CONFIG.deviceName || 'macbook',
-        hardwareId: 'macbook', // todo get hwId via native bridge
+        hardware: global.APP_CONFIG.deviceName,
+        hardwareId: global.APP_CONFIG.hardwareID,
         release: require('../../package').release,
+        osName: global.APP_CONFIG.osName,
         metadata: {
           deviceIp: await getPublicIp()
         }
       };
+      const pkgPath = path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD')
+      if (fs.existsSync(pkgPath)) {
+        data.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
+      }
       const { data: { clientId: deviceId } } = await axios.post(`${webshopUrl}/pos-device/register`, data)
       if (deviceId) {
         await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { 'onlineDevice.id': deviceId } })
@@ -752,6 +757,7 @@ module.exports = async cms => {
       requestBody.appName = 'POS_Android'
       requestBody.appVersion = require('../../package').version
       requestBody.hardware = global.APP_CONFIG.deviceName
+      requestBody.hardwareId = global.APP_CONFIG.hardwareID
       requestBody.release = require('../../package').release
       requestBody.osName = global.APP_CONFIG.osName
       const pkgPath = path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD')
@@ -825,7 +831,10 @@ module.exports = async cms => {
 
       if (deviceId) {
         try {
-          !onlineOrderSocket && await createOnlineOrderSocket(deviceId);
+          if (!onlineOrderSocket || !onlineOrderSocket.connected) {
+            await createOnlineOrderSocket(deviceId);
+          }
+
           onlineOrderSocket.emit('getAppFeature', deviceId, async data => {
             await Promise.all(_.map(data, async (enabled, name) => {
               return await cms.getModel('Feature').updateOne({name}, {$set: {enabled}}, {upsert: true})

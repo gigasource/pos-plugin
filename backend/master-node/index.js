@@ -44,7 +44,9 @@ module.exports = function (cms) {
 		await handler.init();
 		// console.debug(getBaseSentryTags('initHandler'), '6. Finish handler');
 		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
-		global.APP_CONFIG.hardwareID = posSettings.hardwareID;
+		if (posSettings.hardwareID) {
+			global.APP_CONFIG.hardwareID = posSettings.hardwareID;
+		}
 	}))
 	cms.post('load:masterIp', (deviceIp) => {
 		console.log(`ip of this device is ${deviceIp}`)
