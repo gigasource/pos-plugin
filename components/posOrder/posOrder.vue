@@ -27,7 +27,7 @@
                           @click.stop="printOrder">
                   Print
                 </g-btn-bs>
-                <g-btn-bs icon="icon-wallet" @click="pay">Pay</g-btn-bs>
+                <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">Pay</g-btn-bs>
                 <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
               </div>
             </g-expand-x-transition>
@@ -175,7 +175,7 @@
 </template>
 
 <script>
-  import {Touch} from 'pos-vue-framework';
+  import { Touch } from 'pos-vue-framework';
 
   export default {
     name: "posOrder",
@@ -222,6 +222,7 @@
         actionTimeout: null,
         showSplitBtn: true,
         smallSidebar: true,
+        onlyCheckoutPrintedItems: true
       }
     },
     computed: {
@@ -237,6 +238,13 @@
       },
       disablePrintBtn() {
         return !this.unprintedItemCount && !this.orderHasChanges
+      },
+      disablePay() {
+        if (!this.table) return false
+        if (!this.items.some(i => i.quantity)) return true
+        if (this.onlyCheckoutPrintedItems) {
+          return this.items.some(i => !i.printed && i.quantity)
+        }
       },
       showPrint() {
         // return this.items.filter(i => !i.sent).length > 0
@@ -527,9 +535,11 @@
 
       const posSettings = await cms.getModel('PosSetting').findOne()
 
-      if (posSettings) {
-        this.showQuickBtn = posSettings.generalSetting && posSettings.generalSetting.quickBtn;
-        this.quickBtnAction = (posSettings.generalSetting && posSettings.generalSetting.quickBtnAction) || 'pay';
+      if (posSettings && posSettings.generalSetting) {
+        const { quickBtnAction, onlyCheckoutPrintedItems, quickBtn } = posSettings.generalSetting;
+        this.showQuickBtn = quickBtn;
+        this.quickBtnAction = quickBtnAction || 'pay';
+        this.onlyCheckoutPrintedItems = onlyCheckoutPrintedItems
       }
 
       this.loadSetting()

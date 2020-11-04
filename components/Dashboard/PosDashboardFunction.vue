@@ -15,6 +15,10 @@
            @click="btn.click">
         <g-icon size="60">{{btn.icon}}</g-icon>
         <span class="mt-3 ta-center">{{btn.title}}</span>
+        <div v-if="btn.notification" class="function-noti">
+          <g-icon color="white" size="16" class="mr-1">info</g-icon>
+          {{btn.notification}}
+        </div>
       </div>
     </div>
     <div v-if="demoLicense" :class="['demo-license-warning', dayLeft < 30 ? 'bg-red-lighten-5' : 'bg-blue-lighten-5']">
@@ -67,7 +71,7 @@
           {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', click: () => this.changePath('/pos-eod-report')},
           {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
           {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
-          {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
+          // {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
           {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
           {title: 'Dine-in Menu', feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
           {title: 'Delivery Menu', feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
@@ -83,8 +87,15 @@
         iframeDragging: false,
         iframeRefreshInterval: null,
         demoLicense: false,
-        dayLeft: 14
+        dayLeft: 14,
+        inventoryNotification: 0,
       }
+    },
+    async created() {
+      this.inventoryNotification = await cms.getModel('Inventory').countDocuments({stock: {$lte: 0}})
+      cms.socket.on('changeInventory', async () => {
+        this.inventoryNotification = await cms.getModel('Inventory').countDocuments({stock: {$lte: 0}})
+      })
     },
     computed: {
       computedBtnGroup1() {
@@ -98,17 +109,33 @@
       computedBtnGroup2() {
         if (!this.enabledFeatures || !this.enabledFeatures.length) return
 
-        return this.btnDown.filter(item => {
+        const items = this.btnDown.filter(item => {
           if (!this.user) return false
           if (!item.feature) return true
           if (this.user.role === 'admin')
-            if (item.feature === 'settings' || item.feature === 'printerSettings' || item.feature === 'customerInfo') return true
+            if (item.feature === 'settings' || item.feature === 'printerSettings' || item.feature === 'customerInfo' ) return true
+          if (item.feature === 'manageInventory')
+            return this.user.role === 'admin' || this.user.viewInventory
           if (item.feature === 'orderHistory')
             return this.user.role === 'admin' || this.user.viewOrderHistory
           if (item.feature === 'onlineOrdering')
             return (this.user.role === 'admin' || this.user.viewOnlineOrderMenu) && this.enabledFeatures.includes(item.feature)
           return this.enabledFeatures.includes(item.feature)
         })
+
+        if(this.inventoryNotification) {
+          return items.map(item => {
+            if(item.feature === 'manageInventory') {
+              return {
+                ...item,
+                notification: this.inventoryNotification
+              }
+            }
+            return item
+          })
+        }
+
+        return items
       },
 
     },
@@ -169,6 +196,7 @@
       width: 100%;
       min-height: 136px;
       background: white;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -180,6 +208,18 @@
       & > span {
         word-break: break-word;
       }
+    }
+
+    &-noti {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      border-radius: 2px;
+      background: #FFCB3A;
+      padding: 4px;
+      color: white;
+      font-size: 12px;
     }
 
     .demo-license-warning {

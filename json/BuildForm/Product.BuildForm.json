@@ -287,6 +287,25 @@
           ]
         }
       ]
+    },
+    {
+      "_id": "5f9fb2d7dc4b58bbe86031c9",
+      "schemaType": "array",
+      "key": "ingredients",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "inventory",
+          "ref": "Inventory",
+          "type": "ref-select"
+        },
+        {
+          "schemaType": "number",
+          "key": "amount",
+          "type": "input@number"
+        }
+      ]
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

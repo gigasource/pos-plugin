@@ -1,14 +1,9 @@
 <template>
   <g-dialog v-model="internalValue" fullscreen content-class="choose-table-dialog">
-    <g-card class="col-flex">
-      <g-card-title class="row-flex">
-        <div>Choose Table</div>
-        <g-spacer/>
-        <g-icon @click="close">close</g-icon>
-      </g-card-title>
-      <g-card-text class="fill-height">
-        <g-tabs v-model="tab" :items="tabs" vertical class="fill-height">
-          <g-tab-item v-for="item in tabs" :item="item" class="pl-2" :key="item.title">
+    <g-card style="display: flex; flex-direction: column">
+      <g-card-text style="flex: 1 0 0">
+        <g-tabs v-model="tab" :items="tabs" vertical style="height: 100%">
+          <g-tab-item v-for="item in tabs" :item="item" class="pl-2 h-100" :key="item.title">
             <template v-if="item.title === 'Manual'">
               <pos-textfield-new v-model="chooseTableInput" label="Table" class="mb-5"/>
               <g-spacer/>
@@ -17,7 +12,7 @@
               </div>
             </template>
             <template v-else>
-              <room :room-objects="item.room"
+              <room :room-objects="item.room" v-if="tab === item"
                     :in-progress-table="inProgressTable"
                     :disabled-tables="disabledTables"
                     @selectRoomObject="selectRoomObj">
@@ -31,6 +26,9 @@
           </g-tab-item>
         </g-tabs>
       </g-card-text>
+      <g-btn-bs style="position: absolute; left: 0; bottom: 0"
+                class="ml-3 mb-2"
+                icon="icon-back" @click.stop="close">{{$t('ui.back')}}</g-btn-bs>
     </g-card>
   </g-dialog>
 </template>
@@ -118,7 +116,6 @@
   .keyboard {
     background-color: #bdbdbd;
     padding: 0.5rem;
-    max-height: 50%;
 
     ::v-deep .key {
       border: 1px solid #BDBDBD;
@@ -128,4 +125,5 @@
       padding-bottom: 8px;
     }
   }
+
 </style>

@@ -3,107 +3,193 @@
     <g-simple-table striped fixed-header style="flex: 1">
       <thead>
       <tr>
-        <th class="ta-center">
-          Inventory
-          <g-icon size="12">mdi-magnify</g-icon>
-        </th>
+        <th></th>
+        <th>ID</th>
         <th>
-          Name
+          {{$t('article.name')}}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th class="ta-center">
-          Category
+        <th>Last Update</th>
+        <th>
+          {{$t('article.category')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
-        <th class="ta-left">
-          Unit
-        </th>
-        <th class="ta-right">
-          Stock
-        </th>
+        <th>Unit</th>
+        <th>Stock</th>
       </tr>
       </thead>
       <!-- Filter row -->
-      <tr v-if="inventoryFilters && inventoryFilters.length > 0">
-        <td colspan="8" class="td__sticky">
-          <div class="filter-list">
-            <span class="ml-1">...</span>
+      <tr>
+        <td class="bg-grey-lighten-1">
+          <g-checkbox v-if="inventories && inventories.length !== 0" v-model="selectedInventoryIDs" :value="listIDs"
+                      multiple>
+            <template v-slot:label>
+              <g-icon size="16" class="mb-1">fas fa-caret-down</g-icon>
+            </template>
+          </g-checkbox>
+          <g-checkbox v-else/>
+        </td>
+        <td colspan="6" class="filter-wrapper">
+          <div class="filter">
+            {{$t('settings.filter')}}
             <div class="group-chip">
-              <g-chip v-for="filter in inventoryFilters" :key="filter.title" label small background-color="white" close class="ma-1" @close="removeFilter(filter)">
+              <g-chip v-for="(filter, i) in inventoryFilters" :key="filter.title" label small background-color="white"
+                      close class="ma-1" @close="removeFilter(filter)">
                 <div>
                   <span class="chip-title">{{filter.title}}: </span>
                   <span class="chip-content">{{filter.text}}</span>
                 </div>
               </g-chip>
             </div>
+            <g-btn-bs v-if="inventoryFilters && inventoryFilters.length > 0" @click="clearFilter"><u>{{$t('settings.clearAll')}}</u>
+            </g-btn-bs>
             <g-spacer/>
-            <g-btn :uppercase="false" text x-small background-color="white" height="24">
-              <g-icon svg size="16">icon-cancel3</g-icon>
-            </g-btn>
+            <div class="btn-add-filter" @click="dialog.filter = true">+ Add Filter</div>
           </div>
         </td>
       </tr>
       <!-- Data row -->
       <tr v-for="(inventory, i) in inventories" :key="i">
-        <td>{{inventory.id}}</td>
-        <td class="ta-center">{{inventory.name}}</td>
-        <td class="ta-center" style="white-space: nowrap; text-transform: capitalize">{{ inventory.category }}</td>
-        <td class="ta-center">{{ inventory.unit }}</td>
-        <td>{{ inventory.stock }}</td>
+        <td>
+          <g-checkbox v-model="selectedInventoryIDs" :value="inventory._id" @change="getFirstSelectedInventory"/>
+        </td>
+        <td @click="editInventory(inventory)">{{inventory.id}}</td>
+        <td @click="editInventory(inventory)">{{inventory.name}}</td>
+        <td @click="editInventory(inventory)">{{inventory.lastUpdateTimestamp | formatDate}}</td>
+        <td @click="editInventory(inventory)">{{inventory.category.name}}</td>
+        <td @click="editInventory(inventory)">{{inventory.unit}}</td>
+        <td @click="openDialogStock(inventory)">
+          <div class="row-flex justify-between">
+            {{inventory.stock | formatNumber}}
+            <g-icon size="18" color="#757575">edit</g-icon>
+          </div>
+        </td>
       </tr>
     </g-simple-table>
-<!--    <pos-table-pagination @execQueryByPage="updatePagination"-->
-<!--                          :total-document="totalInventories"-->
-<!--                          :limit.sync="limit"-->
-<!--                          :current-page.sync="currentPage"/>-->
+    <!--    <pos-table-pagination @execQueryByPage="updatePagination"-->
+    <!--                          :total-document="totalInventories"-->
+    <!--                          :limit.sync="limit"-->
+    <!--                          :current-page.sync="currentPage"/>-->
     <div>
       <g-toolbar color="#eeeeee" elevation="0">
-        <g-btn :uppercase="false" style="margin-right: 5px">
-          <g-icon small style="margin-right: 5px">icon-back</g-icon>Back
+        <g-btn :uppercase="false" style="margin-right: 5px" @click="back">
+          <g-icon small style="margin-right: 5px">icon-back</g-icon>
+          Back
         </g-btn>
-        <g-btn :uppercase="false">
+        <g-btn :uppercase="false" @click="goToReportPage">
           <g-icon small style="margin-right: 5px">icon-inventory-report</g-icon>
           Report
         </g-btn>
         <g-spacer/>
-        <g-btn :uppercase="false" style="margin-right: 5px">
+        <g-btn :uppercase="false" style="margin-right: 5px" @click="goToStockPage">
           <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
           New stock
         </g-btn>
-        <g-btn :uppercase="false" style="margin-right: 5px">
+        <g-btn :uppercase="false" style="margin-right: 5px" @click="dialog.category = true">
           <g-icon small style="margin-right: 5px">icon-inventory-category</g-icon>
           Category
         </g-btn>
-        <g-btn :uppercase="false" style="margin-right: 5px">
+        <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="removeInventory">
           <g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
           Delete
         </g-btn>
-        <g-btn :uppercase="false" style="margin-right: 5px">
+        <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="openDialogInventory('edit')">
           <g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
           Edit
         </g-btn>
-        <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF">
-          + Create new inventory
+        <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF" @click="openDialogInventory('add')">
+          + Create item
         </g-btn>
       </g-toolbar>
     </div>
+
+    <dialog-form-input v-model="dialog.inventory" @submit="submitInventory">
+      <template #input>
+        <div class="row-flex flex-wrap justify-around">
+          <pos-textfield-new :key="`name_${dialog.inventory}`" style="width: 48%" label="Name" v-model="name" required/>
+          <pos-textfield-new :key="`stock_${dialog.inventory}`" :readonly="dialog.mode === 'edit'"
+                             :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" label="Stock" v-model="stock" required/>
+          <g-select :key="`cate_${dialog.inventory}`" menu-class="menu-select-inventory" outlined style="width: 48%" label="Category"
+                    :items="inventoryCategories" item-text="name" item-value="_id" v-model="category" required/>
+          <g-select :key="`unit_${dialog.inventory}`" menu-class="menu-select-inventory" outlined style="width: 48%" label="Unit" :items="units" v-model="unit" required/>
+        </div>
+      </template>
+    </dialog-form-input>
+
+    <dialog-change-stock v-model="dialog.stock"
+                         :name="selectedInventory && selectedInventory.name"
+                         :stock="selectedInventory && selectedInventory.stock"
+                         @submit="updateStock"/>
+
+    <dialog-inventory-category v-model="dialog.category" @submit="loadData"/>
+
+    <dialog-form-input v-model="dialog.filter" @submit="changeFilter">
+      <template v-slot:input>
+        <div class="row-flex flex-wrap justify-around mt-2">
+          <pos-textfield-new style="width: 30%" label="Product ID" v-model="filter.id" clearable/>
+          <pos-textfield-new style="width: 30%" label="Name" v-model="filter.name" clearable/>
+          <g-select menu-class="menu-select-inventory" outlined style="width: 30%" label="Category" clearable
+                    :items="inventoryCategories" item-text="name" return-object v-model="filter.category"/>
+          <div class="col-12 row-flex">
+            <p style="margin-top: 35px; margin-left: 16px">Stock Range:</p>
+            <pos-range-slider :min="0" :max="1000" prefix="" v-model="filter.stock"/>
+          </div>
+        </div>
+      </template>
+    </dialog-form-input>
   </div>
 </template>
 <script>
+  import {units} from './unit'
+  import _ from 'lodash'
+
   export default {
     name: 'Inventory',
-    injectService: ['InventoryStore:(inventories,inventoryFilters,selectedInventory,inventoryPagination,removeFilter,totalInventories)'],
+    injectService: ['InventoryStore:(inventories, loadInventories, inventoryFilters, removeFilter, clearFilter, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
+                                    'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
     props: {},
     data: function () {
       return {
-        inventories: [],
-        
+        dialog: {
+          filter: false,
+          inventory: false,
+          mode: 'add',
+          stock: false,
+          category: false,
+        },
+        name: '',
+        stock: '',
+        category: '',
+        unit: '',
+        units: units,
+        filter: {
+          name: '',
+          id: '',
+          category: '',
+          stock: [0, 0],
+        }
       }
+    },
+    filters: {
+      formatDate(date) {
+        return dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
+      formatNumber(number) {
+        return number && number.toFixed(2)
+      }
+    },
+    async created() {
+      await this.loadInventories()
+      await this.loadInventoryCategories()
+    },
+    async activated() {
+      await this.loadInventories()
+      await this.loadInventoryCategories()
     },
     computed: {
       limit: {
         get() {
-          if(this.inventoryPagination)
+          if (this.inventoryPagination)
             return this.inventoryPagination.limit;
           return 15
         },
@@ -113,21 +199,344 @@
       },
       currentPage: {
         get() {
-          if(this.inventoryPagination)
+          if (this.inventoryPagination)
             return this.inventoryPagination.currentPage;
           return 1
         },
         set(val) {
           this.inventoryPagination.currentPage = val;
         }
+      },
+      listIDs() {
+        return this.inventories.map(i => i._id);
       }
     },
     methods: {
+      back() {
+        this.$router.push({ path: '/pos-dashboard' });
+      },
+      goToReportPage() {
+        this.$router.push({ path: '/pos-inventory-report' });
+      },
+      goToStockPage() {
+        this.$router.push({ path: '/pos-inventory-stock' });
+      },
       updatePagination() {
-        // ...
+
+      },
+      getFirstSelectedInventory() {
+        if (this.selectedInventoryIDs.length > 0) {
+          this.selectedInventory = this.inventories.find(p => p._id === this.selectedInventoryIDs[0])
+        } else {
+          this.selectedInventory = null;
+        }
+      },
+      clearData() {
+        this.name = ''
+        this.stock = ''
+        this.category = ''
+        this.unit = 'piece'
+      },
+      openDialogInventory(mode) {
+        this.dialog.mode = mode
+        if (mode === 'edit') {
+          this.name = _.cloneDeep(this.selectedInventory.name)
+          this.stock = (_.cloneDeep(this.selectedInventory.stock)).toFixed(2)
+          this.category = _.cloneDeep(this.selectedInventory.category._id)
+          this.unit = _.cloneDeep(this.selectedInventory.unit)
+        } else {
+          this.clearData()
+        }
+        this.dialog.inventory = true
+      },
+      async loadData() {
+        this.selectedInventory = null
+        this.selectedInventoryIDs = []
+        await this.loadInventories()
+      },
+      async submitInventory() {
+        if(!this.name || !this.category || !this.unit || !this.stock || isNaN(this.stock)) return
+        const inventory = {
+          name: this.name,
+          category: this.category,
+          unit: this.unit,
+          stock: this.stock
+        }
+        if(this.dialog.mode === 'add') {
+          await this.createInventory(inventory)
+        } else {
+          await this.updateInventory({...inventory, _id: this.selectedInventory._id})
+          if(this.stock !== this.selectedInventory.stock) {
+            const history = {
+              inventory: this.selectedInventory._id,
+              category: this.category,
+              type: this.stock > this.selectedInventory.stock ? 'add' : 'remove',
+              amount: Math.abs(this.stock - this.selectedInventory.stock),
+              date: new Date(),
+              reason: 'Update stock'
+            }
+            await this.updateInventoryHistory(history)
+          }
+        }
+        await this.loadData()
+        this.dialog.inventory = false
+      },
+      async removeInventory() {
+        await this.deleteInventory(this.selectedInventoryIDs)
+        await this.loadData()
+      },
+      openDialogStock(inventory) {
+        this.selectedInventory = inventory
+        this.dialog.stock = true
+      },
+      async updateStock({type, change, value, reason}) {
+        await this.updateInventory({...this.selectedInventory, stock: value})
+        const history = {
+          inventory: this.selectedInventory._id,
+          category: this.selectedInventory.category._id,
+          type,
+          amount: change,
+          date: new Date(),
+          reason: reason || 'Update stock'
+        }
+        await this.updateInventoryHistory(history)
+        await this.loadData()
+      },
+      async changeFilter() {
+        let filters = []
+        if(this.filter.name) {
+          filters.push({
+            title: 'Name',
+            text: `'${this.filter.name}'`,
+            condition: {name: {"$regex": this.filter.name, "$options": 'i'}}
+          })
+        }
+        if(this.filter.category) {
+          filters.push({
+            title: 'Category',
+            text: this.filter.category.name,
+            condition: {category: this.filter.category._id}
+          })
+        }
+        if(this.filter.id) {
+          filters.push({
+            title: 'Product ID',
+            text: `'${this.filter.id}'`,
+            condition: {id: this.filter.id}
+          })
+        }
+        if(this.filter.stock && this.filter.stock[1]) {
+          filters.push({
+            title: 'Stock',
+            text: this.filter.stock[0] ? (this.filter.stock[0] + ' - ') : '≤ ' + this.filter.stock[1],
+            condition: {stock: { ...this.filter.stock[0] && {'$gte': this.filter.stock[0]}, '$lte': this.filter.stock[1] }}
+          })
+        }
+        this.inventoryFilters = filters
+        await this.loadInventories()
+        this.dialog.filter = false
+      },
+      editInventory(inventory) {
+        this.selectedInventory = inventory
+        this.openDialogInventory('edit')
       }
     }
   }
 </script>
-<style scoped>
+<style scoped lang="scss">
+  .g-table {
+    height: calc(100% - 64px);
+
+    ::v-deep table {
+      table-layout: fixed;
+    }
+
+    thead tr th {
+      font-size: 13px;
+      color: #1d1d26;
+      padding: 0 8px;
+      background-color: #fff;
+      cursor: pointer;
+      text-align: left;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    tr td {
+      padding: 0 8px;
+      font-size: 13px;
+      line-height: 16px;
+      height: 33px
+    }
+
+    tr td:first-child,
+    tr th:first-child {
+      padding-right: 0;
+    }
+
+    tr {
+      td:nth-child(1),
+      th:nth-child(1) {
+        width: 5%;
+      }
+
+      td:nth-child(2):not(.filter-wrapper),
+      th:nth-child(2) {
+        width: 10%;
+      }
+
+      td:nth-child(3),
+      th:nth-child(3) {
+        width: 30%;
+      }
+
+      td:nth-child(4),
+      th:nth-child(4) {
+        width: 15%;
+      }
+
+      td:nth-child(5),
+      th:nth-child(5) {
+        width: 15%;
+      }
+
+      td:nth-child(6),
+      th:nth-child(6) {
+        width: 10%;
+      }
+
+      td:nth-child(7),
+      th:nth-child(7) {
+        width: 10%;
+      }
+    }
+
+    .sticky {
+      td {
+        position: sticky;
+        z-index: 2;
+        top: 48px;
+      }
+    }
+
+    .filter-wrapper {
+      background-color: #bdbdbd;
+      height: 48px;
+
+      .filter {
+        color: #1d1d26;
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+
+        .group-chip {
+          display: flex;
+          flex-wrap: nowrap;
+          overflow: auto;
+          margin: 0 4px;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+
+          ::v-deep .g-chip {
+            overflow: visible;
+          }
+
+          .chip-title {
+            color: #97A3B4;
+            font-weight: 400;
+            font-size: 11px;
+          }
+
+          .chip-content {
+            color: #1D1D26;
+            font-weight: 700;
+            font-size: 12px;
+          }
+        }
+
+        .btn-add-filter {
+          border-radius: 4px;
+          background-color: #2979ff;
+          color: white;
+          padding: 10px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .g-select ::v-deep .g-tf-wrapper {
+    margin: 16px 0 4px;
+    width: 100%;
+
+    .g-tf-input--fake-caret span {
+      color: rgba(0, 0, 0, 0.87)
+    }
+
+    fieldset {
+      border-color: #C9C9C9;
+      border-radius: 2px;
+    }
+
+    &.g-tf__focused fieldset {
+      border-color: #1867c0;
+    }
+
+    .g-tf-label {
+      font-weight: bold;
+      color: #1D1D26;
+    }
+
+    .input {
+      padding-left: 6px;
+    }
+  }
+
+  @media screen and (max-height: 599px) {
+    .g-table {
+      thead tr th {
+        height: 36px;
+      }
+
+      tr td {
+        height: 28px;
+      }
+
+      .filter-wrapper {
+        height: 36px;
+
+        .filter {
+          .btn-add-filter {
+            padding: 4px 8px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+</style>
+
+<style lang="scss">
+  @media screen and (max-height: 599px) {
+    .menu-select-inventory {
+      .g-list {
+        .g-list-item {
+          min-height: 0;
+          padding: 4px;
+
+          .g-list-item-content {
+            margin: 0;
+
+            .g-list-item-text {
+              text-align: left;
+            }
+          }
+        }
+      }
+    }
+  }
 </style>

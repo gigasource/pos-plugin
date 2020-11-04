@@ -36,7 +36,7 @@
         {{$t('restaurant.cashAndTakeAway')}}
       </g-btn-bs>
     </template>
-    <g-btn-bs class="col-2" icon="icon-pay" :disabled="!enablePayBtn" @click="pay">
+    <g-btn-bs class="col-2" icon="icon-pay" :disabled="disablePay" @click="pay">
       {{$t('fnBtn.paymentFunctions.pay')}}
     </g-btn-bs>
   </g-toolbar>
@@ -51,7 +51,8 @@
     },
     data() {
       return {
-        showMenu: false
+        showMenu: false,
+        onlyCheckoutPrintedItems: true
       }
     },
     computed: {
@@ -63,7 +64,14 @@
       },
       disableMoveItemsBtn() {
         return !this.currentOrder.items.length
-      }
+      },
+      disablePay() {
+        if (!this.currentOrder.table) return false
+        if (!this.currentOrder.items.some(i => i.quantity)) return true
+        if (this.onlyCheckoutPrintedItems) {
+          return this.currentOrder.items.some(i => !i.printed && i.quantity)
+        }
+      },
     },
     methods: {
       back() {
@@ -90,6 +98,13 @@
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
+      }
+    },
+    async activated() {
+      const posSettings = await cms.getModel('PosSetting').findOne()
+
+      if (posSettings && posSettings.generalSetting) {
+        this.onlyCheckoutPrintedItems = posSettings.generalSetting.onlyCheckoutPrintedItems
       }
     }
   }

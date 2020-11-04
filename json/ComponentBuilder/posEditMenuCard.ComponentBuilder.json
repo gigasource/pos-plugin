@@ -2,7 +2,7 @@
   "events": [],
   "_id": "5e731c29be94c10a2f2a8a98",
   "data": {
-    "_code_": "module.exports = {\n  data: {\n    productDblClicked: null,\n    view: null,\n    orderLayout: null,\n    selectedCategoryLayout: null,\n    selectedProductLayout: null,\n    keyboardConfig: null,\n  }\n}",
+    "_code_": "module.exports = {\n  data: {\n    productDblClicked: null,\n    view: null,\n    orderLayout: null,\n    selectedCategoryLayout: null,\n    selectedProductLayout: null,\n    keyboardConfig: null,\n    mode: 'basic'\n  }\n}",
     "_code_type_": "commonJs"
   },
   "isProduction": true,
@@ -172,6 +172,11 @@
               "type": ".sync",
               "root": "data.keyboardConfig",
               "local": "keyboardConfig"
+            },
+            {
+              "type": ".sync",
+              "root": "data.mode",
+              "local": "mode"
             }
           ],
           "slotScopeBinding": [],
@@ -209,6 +214,11 @@
               "type": ".sync",
               "root": "data.productDblClicked",
               "local": "productDblClicked"
+            },
+            {
+              "type": ".sync",
+              "root": "data.mode",
+              "local": "mode"
             }
           ],
           "slotScopeBinding": [],
@@ -300,6 +310,27 @@
               "isScopedSlot": true,
               "url": "plugins/pos-plugin/components/EditMenuCard/KeyboardEditor.vue",
               "path": "components/EditMenuCard/KeyboardEditor.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "IngredientEditor",
+              "binding": [
+                {
+                  "type": ".sync",
+                  "root": "data.selectedProductLayout",
+                  "local": "layout"
+                },
+                {
+                  "type": ".sync",
+                  "root": "data.orderLayout",
+                  "local": "orderLayout"
+                }
+              ],
+              "slotScopeBinding": [],
+              "slot": "IngredientEditor",
+              "url": "plugins/pos-plugin/components/EditMenuCard/IngredientEditor.vue",
+              "path": "components/EditMenuCard/IngredientEditor.vue",
               "pluginName": "pos-plugin"
             }
           ],

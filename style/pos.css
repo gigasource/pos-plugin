@@ -844,3 +844,52 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-inventory-report-all {
+  background-image: url("../assets/inventory-report-all.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-report-add {
+  background-image: url("../assets/inventory-report-add.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-report-remove {
+  background-image: url("../assets/inventory-report-remove.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-report-list {
+  background-image: url("../assets/inventory-report-list.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-inventory-report-grid {
+  background-image: url("../assets/inventory-report-grid.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-ingredient-mode {
+  background-image: url("../assets/ingredient-mode.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-basic-mode {
+  background-image: url("../assets/basic-mode.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

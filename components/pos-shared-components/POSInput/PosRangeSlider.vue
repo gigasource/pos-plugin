@@ -1,7 +1,7 @@
 <template>
   <g-range-slider v-model="internalValue" :min="min" :max="max" height="8px" track-fill-color="#1271FF" thumb-color="#1271FF" thumb-label="always">
     <template v-slot:thumb-label="{value}">
-      <span>€{{value}}</span>
+      <span>{{prefix}}{{value}}</span>
       <div class="arrow_down"></div>
     </template>
   </g-range-slider>
@@ -14,6 +14,10 @@
       min: [String, Number],
       max: [String, Number],
       value: Array,
+      prefix: {
+        type: String,
+        default: '€'
+      }
     },
     computed: {
       internalValue: {

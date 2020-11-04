@@ -3,7 +3,7 @@
                                                 'background': 'url(\'/plugins/pos-plugin/assets/out.png\')',
                                                 'background-size': 'contain', 'overflow': displayOverlay ? 'hidden' : 'auto'}">
     <!-- Categories -->
-    <div style="padding: 4px; background-color: #E0E0E060; position: sticky; top: 0; z-index: 1">
+    <div :style="{padding: '4px', 'background-color': '#E0E0E0', ...!editable && { position: 'sticky', top: 0, 'z-index': 1}}">
       <div :style="categoryContainerStyle">
         <div v-for="(category, index) in categories"
              :class="['pol__cate', 'darken-effect']"
@@ -55,6 +55,7 @@
       productDblClicked: null,
       keyboardConfig: null,
       storeLocale: null,
+      mode: String,
       fontSize: String,
       category: Object,
       minimumTextRow: Boolean,
@@ -410,7 +411,11 @@
       async selectProduct(productLayout) {
         if (this.editable) {
           if (this.selectedCategoryLayout._id) {
-            this.$emit('update:view', { name: 'ProductEditor' })
+            if(this.mode === 'ingredient') {
+              this.$emit('update:view', { name: 'IngredientEditor' })
+            } else {
+              this.$emit('update:view', { name: 'ProductEditor' })
+            }
             this.$emit('update:selectedProductLayout', productLayout);
           }
         } else {

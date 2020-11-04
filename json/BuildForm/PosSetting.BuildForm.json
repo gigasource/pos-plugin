@@ -609,6 +609,11 @@
           "schemaType": "string",
           "key": "googleMapApiKey",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "onlyCheckoutPrintedItems",
+          "type": "input@switch"
         }
       ],
       "type": "object"

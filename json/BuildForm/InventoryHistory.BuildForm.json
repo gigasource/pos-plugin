@@ -3,33 +3,46 @@
   "extensions": [],
   "fields": [
     {
+      "_id": "5f9a856ad5785b926d4214cc",
+      "schemaType": "objectId",
+      "key": "inventory",
+      "ref": "Inventory",
+      "autopopulate": true
+    },
+    {
+      "_id": "5f9bd13dc9071da8216c258f",
+      "schemaType": "objectId",
+      "key": "category",
+      "ref": "InventoryCategory",
+      "type": "ref-select",
+      "autopopulate": true
+    },
+    {
       "_id": "5f8d15d80565d380841ed522",
       "schemaType": "date",
-      "key": "timestamp"
+      "key": "date",
+      "type": "input@date"
     },
     {
-      "_id": "5f8d15d80565d380841ed521",
-      "schemaType": "array",
-      "fields": [
-        {
-          "schemaType": "objectId",
-          "key": "inventory",
-          "ref": "Inventory"
-        },
-        {
-          "schemaType": "number",
-          "key": "change"
-        },
-        {
-          "schemaType": "string",
-          "key": "action",
-          "type": "input"
-        }
-      ],
-      "key": "inventories"
+      "_id": "5f9a856ad5785b926d4214ce",
+      "schemaType": "number",
+      "key": "amount",
+      "type": "input@number"
     },
     {
-      "_id": "5f8d3c88534d360923550bed",
+      "_id": "5f9a856ad5785b926d4214cf",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5f9a856ad5785b926d4214d0",
+      "schemaType": "string",
+      "key": "reason",
+      "type": "input"
+    },
+    {
+      "_id": "5f9a856ad5785b926d4214d1",
       "schemaType": "string",
       "key": "by",
       "type": "input"

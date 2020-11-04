@@ -105,7 +105,22 @@
         }
       },
       removePaymentItem(index) {
+        const offset = this.currentOrder.payment[index].value
         this.currentOrder.payment.splice(index, 1)
+        const payment = this.currentOrder.payment;
+        const cardPayment = payment.find(i => i.type === 'card')
+        const cashPayment = payment.find(i => i.type === 'cash')
+        if (cashPayment || cardPayment ) {
+          const filtered = cashPayment ? payment.filter(i => i.type !== 'cash') : payment.filter(i => i.type !== 'card')
+          this.$emit('updateCurrentOrder', 'payment',
+            [
+              {
+                type: cashPayment ? 'cash' : 'card',
+                value: (cashPayment ? cashPayment.value : cardPayment.value) + offset
+              },
+              ...filtered
+            ])
+        }
       },
     },
     computed: {

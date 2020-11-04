@@ -4,7 +4,8 @@
     "quickFnRows": 1,
     "quickBtn": true,
     "useVirtualPrinter": true,
-    "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU"
+    "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU",
+    "onlyCheckoutPrintedItems": true
   },
   "leftFunctionButtons": [
     {
