@@ -10,6 +10,10 @@
     methods: {
       pair() {
         this.$router.push('/pos-setup')
+      },
+      async updateSkipPairing() {
+        const posSettings = await cms.getModel('PosSetting').findOne()
+        this.skipPairing = posSettings.skipPairing
       }
     },
     data() {
@@ -17,14 +21,14 @@
         skipPairing: false
       }
     },
-    created() {
-      const posSettings = cms.getList('PosSetting')[0]
-      this.skipPairing = posSettings.skipPairing
+    async created() {
+      await this.updateSkipPairing()
     },
     mounted() {
       this.getStoreId()
     },
-    activated() {
+    async activated() {
+      await this.updateSkipPairing()
       this.getStoreId()
     }
   }

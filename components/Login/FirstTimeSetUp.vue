@@ -82,6 +82,7 @@
   export default {
     name: 'FirstTimeSetUp',
     components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl},
+    injectService: ['PosStore:toggleOverlay'],
     data() {
       return {
         dialog: {
@@ -237,8 +238,10 @@
         this.dialog.demo = true
       },
       selectDemoData(store) {
+        this.toggleOverlay()
         cms.socket.emit('set-demo-store', store, () => {
           this.$emit('skipPairing')
+          this.toggleOverlay()
         })
       }
     },
