@@ -48,6 +48,12 @@
       }))
       this.debounceUpdateAmount = _.debounce(this.updateProductIngredient, 300)
     },
+    async activated() {
+      this.inventories = (await cms.getModel('Inventory').find()).map(item => ({
+        text: `${item.name} (${item.unit})`,
+        value: item._id
+      }))
+    },
     watch: {
       layout(val) {
         if(val && val.product && val.product._id) {

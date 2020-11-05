@@ -3,7 +3,7 @@
 </template>
 <script>
   import { getProvided } from '../logic/commonUtils';
-  import _ from 'lodash'
+  import _ from 'lodash';
 
   const INVENTORY_COL = 'Inventory'
   const INVENTORY_CATEGORY_COL = 'InventoryCategory'
@@ -56,30 +56,29 @@
       // register socket to listen on inventory change request from master device
     },
     methods: {
+      genObjectId(id) {
+        const BSON = require('bson');
+        return new BSON.ObjectID(id);
+      },
       // category
       async loadInventoryCategories() {
         const inventoryCates = await cms.getModel(INVENTORY_CATEGORY_COL).find({})
         this.$set(this, 'inventoryCategories', inventoryCates)
       },
       async loadCategoriesWithItem() {
-        const categories = await cms.getModel(INVENTORY_CATEGORY_COL).aggregate([
-          {
-            $lookup: {
-              from: 'inventories',
-              localField: '_id',
-              foreignField: 'category',
-              as: 'items'
-            }
-          }
-        ])
-        return categories.map(c => ({...c, available: c.items.length === 0}))
+        const categories = await cms.getModel(INVENTORY_CATEGORY_COL).find()
+        for (const category of categories) {
+          const items = await cms.getModel(INVENTORY_COL).find({category: category._id.toString()})
+          category.available = items.length === 0
+        }
+        return categories
       },
       async updateInventoryCategory(categories) {
         for(const category of categories) {
           const oldCate = this.inventoryCategories.find(c => c._id === category._id)
           if(oldCate) {
             if(oldCate.name !== category.name) {
-              await cms.getModel(INVENTORY_CATEGORY_COL).findOneAndUpdate({_id: oldCate._id}, {name: category.name})
+              await cms.getModel(INVENTORY_CATEGORY_COL).findOneAndUpdate({_id: this.genObjectId(oldCate._id)}, {name: category.name})
             }
           } else {
             if(category.name && category.name.trim())
@@ -89,7 +88,7 @@
         await this.loadInventoryCategories()
       },
       async deleteInventoryCategory(_id) {
-        await cms.getModel(INVENTORY_CATEGORY_COL).deleteOne({_id})
+        await cms.getModel(INVENTORY_CATEGORY_COL).deleteOne({_id: this.genObjectId(_id)})
       },
       getTotalAmount(items, mode) {
         return items.reduce((acc, item) => {
@@ -108,38 +107,20 @@
           const fromDate = dayjs(filter.date.fromDate).startOf('day').toDate(), toDate = dayjs(filter.date.toDate).endOf('day').toDate()
           Object.assign(condition, { date : { $gte: fromDate, $lte: toDate }})
         }
-        // aggregate match can find category
-        // const inventories = await cms.getModel('InventoryHistory').aggregate([
-        //   {
-        //     $match: condition
-        //   },
-        //   {
-        //     $group: {
-        //       _id: '$inventory',
-        //       history: { $push: '$$ROOT' }
-        //     }
-        //   },
-        //   {
-        //     $lookup: {
-        //       from: 'inventories',
-        //       localField: '_id',
-        //       foreignField: '_id',
-        //       as: 'inventory'
-        //     }
-        //   },
-        //   {
-        //     $unwind: '$inventory'
-        //   }
-        // ])
-        return _.map(
-            (_.groupBy(await cms.getModel(INVENTORY_HISTORY_COL).find(condition), item => item.inventory && item.inventory._id)),
+        const histories = _.map(
+            (_.groupBy(await cms.getModel(INVENTORY_HISTORY_COL).find(condition), item => item.inventory)),
             group => ({inventory: group[0].inventory, history: group}))
             .filter(item => item.inventory)
             .map(item => ({
-              ...item.inventory,
+              inventory: item.inventory,
               add: this.getTotalAmount(item.history, 'add'),
               remove: this.getTotalAmount(item.history, 'remove'),
             }))
+        const inventories = await cms.getModel('Inventory').find()
+        return histories.map(item => ({
+          ...item,
+          ...inventories.find(i => i._id.toString() === item.inventory)
+        }))
       },
       // inventory
       async loadInventories() {
@@ -159,7 +140,7 @@
         while(_.includes(ids, id.toString()))
         const newInventory = await cms.getModel(INVENTORY_COL).create({...inventory, id, lastUpdateTimestamp: new Date()})
         const history = {
-          inventory: newInventory._id,
+          inventory: newInventory._id.toString(),
           category: newInventory.category,
           type: 'add',
           amount: newInventory.stock,
@@ -170,7 +151,7 @@
       },
       async updateInventory({ _id, name, category, unit, stock, lowStockThreshold }) {
         await cms.getModel(INVENTORY_COL).findOneAndUpdate(
-            { _id },
+            { _id: this.genObjectId(_id) },
             {
               name, category, unit, stock, lowStockThreshold, lastUpdateTimestamp: new Date()
             }
@@ -178,12 +159,13 @@
         cms.socket.emit('changeInventory')
       },
       async deleteInventory(ids) {
+        ids = ids.map(id => this.genObjectId(id))
         const inventories = await cms.getModel(INVENTORY_COL).find({_id: {$in: ids}})
         const result = await cms.getModel(INVENTORY_COL).deleteMany({_id: {$in: ids}})
         if(result.n === ids.length) {
           const histories = inventories.map(i => ({
-            inventory: i._id,
-            category: i.category._id,
+            inventory: i._id.toString(),
+            category: i.category,
             type: 'remove',
             amount: i.stock,
             date: new Date(),

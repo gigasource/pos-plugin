@@ -21,7 +21,7 @@ module.exports = cms => {
     const time = new Date()
     for(const change of ingredientChanges) {
       if(!change.amount) continue;
-      const update = await cms.getModel('Inventory').findOneAndUpdate({
+      await cms.getModel('Inventory').findOneAndUpdate({
         _id: change.inventory
       }, {
         $inc: {
@@ -29,9 +29,12 @@ module.exports = cms => {
         },
         lastUpdateTimestamp: time
       })
+
+      const category = (await cms.getModel('Inventory').findOne({_id: change.inventory})).category._id
+
       const history = {
         inventory: change.inventory,
-        category: update.category,
+        category,
         amount: change.amount,
         type: 'remove',
         date: time,

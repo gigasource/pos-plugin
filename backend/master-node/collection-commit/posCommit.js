@@ -60,7 +60,7 @@ async function posCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
 			const collection = mongoose.connection.db.collection(commit.data.collection);
-			const query = JsonFn.parse(commit.update.query, null, null, (key, value) => {
+			const query = JsonFn.parse(commit.update.query, true, true, (key, value) => {
 				if (!key.endsWith('_id')) {
 					return value;
 				}

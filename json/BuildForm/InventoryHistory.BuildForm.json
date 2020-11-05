@@ -3,19 +3,16 @@
   "extensions": [],
   "fields": [
     {
-      "_id": "5f9a856ad5785b926d4214cc",
-      "schemaType": "objectId",
+      "_id": "5fa37617902b4c34f4e15ffd",
+      "schemaType": "string",
       "key": "inventory",
-      "ref": "Inventory",
-      "autopopulate": true
+      "type": "input"
     },
     {
-      "_id": "5f9bd13dc9071da8216c258f",
-      "schemaType": "objectId",
+      "_id": "5fa37617902b4c34f4e15ffe",
+      "schemaType": "string",
       "key": "category",
-      "ref": "InventoryCategory",
-      "type": "ref-select",
-      "autopopulate": true
+      "type": "input"
     },
     {
       "_id": "5f8d15d80565d380841ed522",
