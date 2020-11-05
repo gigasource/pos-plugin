@@ -7,8 +7,8 @@
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" @click="showDeleteConfirmDialog" :disabled="!deletable">{{$t('ui.delete')}}</g-btn-bs>
       <g-spacer/>
       <g-btn-bs elevation="2" icon="fas fa-calculator" @click="showKeyboardEditor">{{$t('restaurant.menuEdit.editKeyboard')}}</g-btn-bs>
-      <g-btn-bs v-if="mode === 'basic'" elevation="2" icon="icon-basic-mode" @click="changeToIngredientMode">Basic mode</g-btn-bs>
-      <g-btn-bs v-else-if="mode === 'ingredient'" elevation="2" icon="icon-ingredient-mode" @click="changeToBasicMode">Ingredient mode</g-btn-bs>
+      <g-btn-bs v-if="mode === 'basic'" elevation="2" icon="icon-basic-mode" @click="changeToIngredientMode">{{$t('inventory.basicMode')}}</g-btn-bs>
+      <g-btn-bs v-else-if="mode === 'ingredient'" elevation="2" icon="icon-ingredient-mode" @click="changeToBasicMode">{{$t('inventory.ingredientMode')}}</g-btn-bs>
     </g-toolbar>
 
     <dialog-confirm-delete
@@ -20,19 +20,19 @@
         <div class="dialog-content">
           <g-icon>icon-basic-mode</g-icon>
           <div style="flex: 1; margin-left: 16px">
-            <p class="dialog-content__title">Basic mode</p>
-            <p class="dialog-content__detail">Change basic settings of a dish including name, price, printer, etc.</p>
+            <p class="dialog-content__title">{{$t('inventory.basicMode')}}</p>
+            <p class="dialog-content__detail">{{$t('inventory.basicNote')}}</p>
           </div>
         </div>
         <div class="dialog-content">
           <g-icon>icon-ingredient-mode</g-icon>
           <div style="flex: 1; margin-left: 16px">
-            <p class="dialog-content__title">Ingredient mode</p>
-            <p class="dialog-content__detail">Modify the ingredients of a dish. This function is a part of inventory control.</p>
+            <p class="dialog-content__title">{{$t('inventory.ingredientMode')}}</p>
+            <p class="dialog-content__detail">{{$t('inventory.ingredientNote')}}</p>
           </div>
         </div>
         <div class="dialog-message">
-          Click anywhere to dismiss
+          {{$t('inventory.clickDismiss')}}
         </div>
       </div>
     </g-dialog>

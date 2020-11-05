@@ -58,7 +58,9 @@
     },
     data() {
       const i18n = this.$i18n;
-      const { dashboard: { delivery, editMenuCard, editTablePlan, endOfDay, fastCheckout, monthlyReport, orderHistory, printerSettings, settings, staffReport, support, onlineOrdering } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+      const { dashboard: { delivery, editMenuCard, editTablePlan, endOfDay, fastCheckout, monthlyReport,
+                          orderHistory, printerSettings, settings, staffReport, support, onlineOrdering,
+                          dineInMenu, deliveryMenu, inventory, customer } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
 
       return {
         btnUp: [
@@ -68,15 +70,15 @@
         btnDown: [
           {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
           {title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => this.changePath('/pos-settings')},
-          {title: 'Dine-in Menu', feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
-          {title: 'Delivery Menu', feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
+          {title: dineInMenu, feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
+          {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
           {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', click: () => this.changePath('/pos-eod-report')},
           {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
           {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},
           {title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan',  click: () => this.changePath('/pos-edit-table-plan')},
           {title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting',  click: () => this.changePath('/pos-printer-setting')},
-          {title: 'Customer', feature: 'customerInfo', icon: 'icon-customer-info',  click: () => this.changePath('/pos-customer')},
-          {title: 'Inventory', feature: 'manageInventory', icon: 'icon-inventory', click: () => this.changePath('/pos-inventory') },
+          {title: customer, feature: 'customerInfo', icon: 'icon-customer-info',  click: () => this.changePath('/pos-customer')},
+          {title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => this.changePath('/pos-inventory') },
           {title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: this.openStoreSetting },
           // {title: support, icon: 'icon-support-2',  click: () => this.changePath('/pos-support')},
         ],

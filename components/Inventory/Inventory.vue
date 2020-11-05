@@ -9,13 +9,13 @@
           {{$t('article.name')}}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th>Last Update</th>
+        <th>{{$t('inventory.lastUpdate')}}</th>
         <th>
           {{$t('article.category')}}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
-        <th>Unit</th>
-        <th>Stock</th>
+        <th>{{$t('inventory.unit')}}</th>
+        <th>{{$t('inventory.stock')}}</th>
       </tr>
       </thead>
       <!-- Filter row -->
@@ -44,7 +44,7 @@
             <g-btn-bs v-if="inventoryFilters && inventoryFilters.length > 0" @click="clearFilter"><u>{{$t('settings.clearAll')}}</u>
             </g-btn-bs>
             <g-spacer/>
-            <div class="btn-add-filter" @click="dialog.filter = true">+ Add Filter</div>
+            <div class="btn-add-filter" @click="dialog.filter = true">+ {{$t('inventory.addFilter')}}</div>
           </div>
         </td>
       </tr>
@@ -74,31 +74,31 @@
       <g-toolbar color="#eeeeee" elevation="0">
         <g-btn :uppercase="false" style="margin-right: 5px" @click="back">
           <g-icon small style="margin-right: 5px">icon-back</g-icon>
-          Back
+          {{$t('ui.back')}}
         </g-btn>
         <g-btn :uppercase="false" @click="goToReportPage">
           <g-icon small style="margin-right: 5px">icon-inventory-report</g-icon>
-          Report
+          {{$t('inventory.report')}}
         </g-btn>
         <g-spacer/>
         <g-btn :uppercase="false" style="margin-right: 5px" @click="goToStockPage">
           <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
-          New stock
+          {{$t('inventory.newStock')}}
         </g-btn>
         <g-btn :uppercase="false" style="margin-right: 5px" @click="dialog.category = true">
           <g-icon small style="margin-right: 5px">icon-inventory-category</g-icon>
-          Category
+          {{$t('article.category')}}
         </g-btn>
         <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="removeInventory">
           <g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
-          Delete
+          {{$t('ui.delete')}}
         </g-btn>
         <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="openDialogInventory('edit')">
           <g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
-          Edit
+          {{$t('ui.edit')}}
         </g-btn>
         <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF" @click="openDialogInventory('add')">
-          + Create item
+          <span style="font-size: 14px !important">+ {{$t('inventory.newProduct')}}</span>
         </g-btn>
       </g-toolbar>
     </div>
@@ -108,10 +108,10 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new :key="`name_${dialog.inventory}`" style="width: 48%" label="Name" v-model="name" required/>
           <pos-textfield-new :key="`stock_${dialog.inventory}`" :readonly="dialog.mode === 'edit'"
-                             :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" label="Stock" v-model="stock" required/>
-          <g-select :key="`cate_${dialog.inventory}`" menu-class="menu-select-inventory" outlined style="width: 48%" label="Category"
+                             :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" :label="$t('inventory.stock')" v-model="stock" required/>
+          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" :label="$t('article.category')"
                     :items="inventoryCategories" item-text="name" item-value="_id" v-model="category" required/>
-          <g-select :key="`unit_${dialog.inventory}`" menu-class="menu-select-inventory" outlined style="width: 48%" label="Unit" :items="units" v-model="unit" required/>
+          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" :label="$t('inventory.unit')" :items="units" v-model="unit" required/>
         </div>
       </template>
     </dialog-form-input>
@@ -128,7 +128,7 @@
         <div class="row-flex flex-wrap justify-around mt-2">
           <pos-textfield-new style="width: 30%" label="Product ID" v-model="filter.id" clearable/>
           <pos-textfield-new style="width: 30%" label="Name" v-model="filter.name" clearable/>
-          <g-select menu-class="menu-select-inventory" outlined style="width: 30%" label="Category" clearable
+          <g-select menu-class="menu-select-inventory" outlined style="width: 30%" :label="$t('article.category')" clearable
                     :items="inventoryCategories" item-text="name" return-object v-model="filter.category"/>
           <div class="col-12 row-flex">
             <p style="margin-top: 35px; margin-left: 16px">Stock Range:</p>
@@ -514,6 +514,21 @@
             padding: 4px 8px;
             font-size: 12px;
           }
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    .g-toolbar {
+      .g-btn ::v-deep .g-btn__content {
+        font-size: 0;
+
+        .g-icon {
+          margin-right: 0 !important;
+          font-size: 24px !important;
+          width: 24px !important;
+          height: 24px !important;
         }
       }
     }

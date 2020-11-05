@@ -1,6 +1,6 @@
 <template>
   <div v-if="layout && layout.product && layout.product._id" class="ingredient-editor">
-    <g-btn-bs style="margin: 0" block background-color="#1271FF" icon="add@16" @click="addIngredient">Ingredient</g-btn-bs>
+    <g-btn-bs style="margin: 0" block background-color="#1271FF" icon="add@16" @click="addIngredient">{{$t('inventory.ingredient')}}</g-btn-bs>
     <div v-for="(ingredient, i) in ingredients" v-touch="getTouchHandler(i)" class="ingredient-editor__input" :key="i">
       <g-autocomplete text-field-component="GTextFieldBs" class="ingredient-editor__input--left"
                       @input-click="showKeyboard = true" @input="updateProductIngredient"
@@ -10,7 +10,7 @@
                        @click="showKeyboard = true" @input="debounceUpdateAmount"
                        virtual-event v-model="ingredient.amount"/>
     </div>
-    <div class="ingredient-editor__message">Swipe right to delete <g-icon style="margin-bottom: 2px" color="#757575" size="16">fas fa-angle-double-right</g-icon></div>
+    <div class="ingredient-editor__message">{{$t('inventory.swipeRight')}} <g-icon style="margin-bottom: 2px" color="#757575" size="16">fas fa-angle-double-right</g-icon></div>
     <div v-if="showKeyboard" class="ingredient-editor__keyboard">
       <div class="ingredient-editor__overlay" @click="showKeyboard = false"></div>
       <div class="ingredient-editor__keyboard-wrapper">

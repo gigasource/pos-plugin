@@ -10,10 +10,10 @@
             </div>
           </div>
         </div>
-        <p>* Only empty categories can be deleted</p>
+        <p>* {{$t('inventory.onlyEmpty')}}</p>
         <div class="dialog-action">
-          <g-btn-bs icon="add" background-color="#1271FF" @click="addCategory">Category</g-btn-bs>
-          <g-btn-bs background-color="#388E3C" @click="complete">Complete</g-btn-bs>
+          <g-btn-bs icon="add" background-color="#1271FF" @click="addCategory">{{$t('article.category')}}</g-btn-bs>
+          <g-btn-bs background-color="#388E3C" @click="complete">{{$t('inventory.complete')}}</g-btn-bs>
         </div>
       </div>
       <div v-if="showKeyboard" class="dialog-keyboard">

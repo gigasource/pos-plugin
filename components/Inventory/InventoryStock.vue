@@ -7,7 +7,7 @@
         <g-icon color="white">add</g-icon>
       </div>
       <g-spacer/>
-      <span class="fs-small">Products: </span>
+      <span class="fs-small">{{$t('inventory.products')}}: </span>
       <span class="fs-large text-red ml-1">{{items.length}}</span>
     </div>
     <g-simple-table striped fixed-header style="flex: 1">
@@ -15,10 +15,10 @@
         <tr>
           <th>Product ID</th>
           <th>Name</th>
-          <th>Category</th>
-          <th>Unit</th>
-          <th>Current Stock</th>
-          <th>Added Stock</th>
+          <th>{{$t('article.category')}}</th>
+          <th>{{$t('inventory.unit')}}</th>
+          <th>{{$t('inventory.currentStock')}}</th>
+          <th>{{$t('inventory.addedStock')}}</th>
           <th></th>
         </tr>
       </thead>
@@ -28,7 +28,7 @@
         <td @click="openDialog(inventory)">{{inventory.category.name}}</td>
         <td @click="openDialog(inventory)">{{inventory.unit}}</td>
         <td @click="openDialog(inventory)">{{inventory.stock | formatNumber}}</td>
-        <td @click="openDialog(inventory)">{{inventory.added}}</td>
+        <td class="fw-700 text-blue" @click="openDialog(inventory)">{{inventory.added}}</td>
         <td @click="removeItem(i)">
           <g-icon color="red">cancel</g-icon>
         </td>
@@ -38,15 +38,15 @@
       <g-toolbar color="#eeeeee">
         <g-btn :uppercase="false" style="margin-right: 5px" @click="back">
           <g-icon small style="margin-right: 5px">icon-back</g-icon>
-          Back
+          {{$t('ui.back')}}
         </g-btn>
         <g-btn :uppercase="false" @click="dialog.low = true">
-          Import low-stock items
+          {{$t('inventory.importLowStock')}}
         </g-btn>
         <g-spacer/>
         <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF" @click="complete">
           <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
-          Complete
+          {{$t('inventory.complete')}}
         </g-btn>
       </g-toolbar>
     </div>
@@ -57,10 +57,10 @@
           <g-autocomplete text-field-component="GTextFieldBs" v-model="itemId" style="width: 98%" class="inventory-stock-select" :key="dialog.inventory"
                           :items="inventories" item-text="name" item-value="_id" keep-menu-on-blur menu-class="menu-select-inventory"
                           @input="chooseItem"/>
-          <pos-textfield-new readonly style="width: 48%" v-model="category" label="Category"/>
-          <pos-textfield-new readonly style="width: 48%" v-model="unit" label="Unit"/>
-          <pos-textfield-new readonly style="width: 48%" v-model="stock" label="Current Stock"/>
-          <pos-textfield-new :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" v-model="added" label="Added Stock"/>
+          <pos-textfield-new readonly style="width: 48%" v-model="category" :label="$t('article.category')"/>
+          <pos-textfield-new readonly style="width: 48%" v-model="unit" :label="$t('inventory.unit')"/>
+          <pos-textfield-new readonly style="width: 48%" v-model="stock" :label="$t('inventory.currentStock')"/>
+          <pos-textfield-new :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" v-model="added" :label="$t('inventory.addedStock')"/>
         </div>
       </template>
     </dialog-form-input>
@@ -98,12 +98,22 @@
       }
     },
     async created() {
-      this.inventories = await cms.getModel('Inventory').find()
+      const inventories = await cms.getModel('Inventory').find();
+      const categories = await cms.getModel('InventoryCategory').find();
+      this.inventories = inventories.map(item => ({
+        ...item,
+        category: categories.find(cate => cate._id.toString() === item.category)
+      }))
       this.items = []
       this.selectedItem = null
     },
     async activated() {
-      this.inventories = await cms.getModel('Inventory').find()
+      const inventories = await cms.getModel('Inventory').find();
+      const categories = await cms.getModel('InventoryCategory').find();
+      this.inventories = inventories.map(item => ({
+        ...item,
+        category: categories.find(cate => cate._id.toString() === item.category)
+      }))
       this.items = []
       this.selectedItem = null
     },

@@ -1,12 +1,12 @@
 <template>
   <g-dialog v-model="internalValue">
     <div class="dialog">
-      <div class="dialog-title">Add/Remove Stock</div>
+      <div class="dialog-title">{{$t('inventory.useRemoveStock')}}</div>
       <g-icon size="16" class="dialog-icon--close" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
-        <p><b>Item: </b> {{name}}</p>
-        <p><b>Current stock: </b> {{stock | formatNumber}}</p>
-        <p><b>New stock: </b> <span :style="{...mode === 'add' && {color: '#1271FF'}, ...mode === 'remove' && {color: '#FF4452'}}">{{newStock | formatNumber}}</span></p>
+        <p><b>{{$t('inventory.item')}}: </b> {{name}}</p>
+        <p><b>{{$t('inventory.currentStock')}}: </b> {{stock | formatNumber}}</p>
+        <p><b>{{$t('inventory.newStock')}}: </b> <span :style="{...mode === 'add' && {color: '#1271FF'}, ...mode === 'remove' && {color: '#FF4452'}}">{{newStock | formatNumber}}</span></p>
         <div class="dialog-content__action">
           <div :class="['btn', mode === 'add' && 'btn--blue']" @click="mode = 'add'">
             <g-icon color="white" >add</g-icon>
@@ -44,7 +44,7 @@
         change: 0,
         mode: '',
         reason: '',
-        reasons: ['Ingredient is unusable/expired', 'Update to match current stock']
+        reasons: [$t('inventory.expiredIngredient'), $t('inventory.updateToMatch')]
       }
     },
     computed: {

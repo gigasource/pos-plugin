@@ -28,7 +28,11 @@ module.exports = {
       editMenuCard: 'Edit Menu Card',
       printerSettings: 'Printer Settings',
       support: 'Support',
-      onlineOrdering: 'Online Order Menu'
+      onlineOrdering: 'Online Order Settings',
+      dineInMenu: 'Dine-in menu',
+      deliveryMenu: 'Delivery menu',
+      inventory: 'Inventory',
+      customer: 'Customer'
     },
 
     //article view
@@ -534,6 +538,41 @@ module.exports = {
 
     service: {
 
+    },
+
+    inventory: {
+      basicMode: 'Basic mode',
+      basicNote: 'Change basic settings of a dish including name, price, printer, etc.',
+      ingredientMode: 'Ingredient mode',
+      ingredientNote: 'Modify the ingredients of a dish. This function is a part of inventory control.',
+      clickDismiss: 'Click anywhere to dismiss',
+      ingredient: 'Ingredient',
+      swipeRight: 'Swipe right to delete',
+      lastUpdate: 'Last update',
+      unit: 'Unit',
+      stock: 'Stock',
+      report: 'Report',
+      newStock: 'New stock',
+      newProduct: 'Create item',
+      piece: 'piece',
+      clearAll: 'Clear All',
+      addFilter: 'Add filter',
+      addRemoveStock: 'Add/Remove Stock',
+      item: 'Item',
+      currentStock: 'Current stock',
+      expiredIngregient: 'Ingredient is unusable/expired.',
+      updateToMatch: 'Update to match current stock.',
+      complete: 'Complete',
+      products: 'Products',
+      addedStock: 'Added stock',
+      importLowStock: 'Import low-stock items',
+      onlyEmpty: 'Only empty categories can be deleted',
+      all: 'All',
+      add: 'Add',
+      useRemove: 'Use/Remove',
+      date: 'Date',
+      amount: 'Amount',
+      reason: 'Reason',
     }
   }
 }

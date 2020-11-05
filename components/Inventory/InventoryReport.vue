@@ -10,7 +10,7 @@
           {{category.name}}
         </div>
       </div>
-      <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white"  icon="icon-back" @click="back">Back</g-btn-bs>
+      <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white"  icon="icon-back" @click="back">{{$t('ui.back')}}</g-btn-bs>
     </div>
     <div class="inventory-report__main">
       <div class="inventory-report__main-header">
@@ -23,21 +23,21 @@
           <template v-slot:activator="{on}">
             <div v-on="on" class="type">
               <g-icon :size="type === 'all' ? 24 : 16" class="mr-1">{{`icon-inventory-report-${type}`}}</g-icon>
-              {{type === 'remove' ? 'Use / Remove' : type}}
+              {{type === 'remove' ? $t('inventory.useRemove') : $t(`inventory.${type}`)}}
             </div>
           </template>
           <div class="type-menu">
             <div class="type-menu-item" @click="type = 'all'">
               <g-icon class="mr-2">icon-inventory-report-all</g-icon>
-              All
+              {{$t('inventory.all')}}
             </div>
             <div class="type-menu-item" @click="type = 'add'">
               <g-icon size="16" class="ml-1 mr-2">icon-inventory-report-add</g-icon>
-              Add
+              {{$t('inventory.add')}}
             </div>
             <div class="type-menu-item" @click="type = 'remove'">
               <g-icon size="16" class="ml-1 mr-2">icon-inventory-report-remove</g-icon>
-              Use / Remove
+              {{$t('inventory.useRemove')}}
             </div>
           </div>
         </g-menu>
@@ -70,6 +70,7 @@
         <template v-if="display === 'grid'">
           <div class="inventory-report-grid-item" v-for="(inventory, i) in sortedInventories" :key="`grid_${i}`" @click="selectItem(inventory)">
             <div class="inventory-report-grid-item__name">{{inventory.name}}</div>
+            <g-spacer/>
             <div class="inventory-report-grid-item__detail">
               <div class="inventory-report-grid-item__add">
                 <g-icon v-if="inventory.add || inventory.add === 0" size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>
@@ -96,9 +97,9 @@
              <div>Unit: ({{selectedItem.unit}})</div>
            </div>
            <div class="dialog-header__bar">
-             <div class="col-4 pl-2">Date</div>
-             <div class="col-2">Amount</div>
-             <div class="col-6">Reason</div>
+             <div class="col-4 pl-2">{{$t('inventory.date')}}</div>
+             <div class="col-2">{{$t('inventory.amount')}}</div>
+             <div class="col-6">{{$t('inventory.reason')}}</div>
            </div>
          </div>
         <div v-for="(item, i) in selectedItem.history" class="dialog-history-item" :key="`history_${i}`">
@@ -333,7 +334,7 @@
       }
 
       &__unit, &__add, &__remove {
-        flex: 0 0 10%;
+        flex: 0 0 12%;
         text-align: left;
       }
 
@@ -346,6 +347,8 @@
       padding: 8px;
       border-radius: 2px;
       font-size: 14px;
+      display: flex;
+      flex-direction: column;
 
       &:nth-child(8n+1),
       &:nth-child(8n+2),
