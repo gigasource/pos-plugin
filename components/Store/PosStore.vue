@@ -6,6 +6,10 @@
         <g-btn-bs background-color="#1271ff" @click.stop="setMasterDevice">SET THIS DEVICE AS MASTER</g-btn-bs>
       </div>
     </g-snackbar>
+
+    <g-dialog v-model="showLoadingOverlay" content-class="loading-overlay">
+      <g-progress-circular color="#fff" indeterminate size="100" width="10"/>
+    </g-dialog>
   </div>
 </template>
 
@@ -160,6 +164,7 @@
         masterClientId: null,
         isIOS: false,
         showVirtualReportInSidebar: false,
+        showLoadingOverlay: false
       }
     },
     computed: {
@@ -422,6 +427,9 @@
         console.log('PosStore:showVirtualPrinterSidebarItem')
         this.showVirtualReportInSidebar = true
       },
+      toggleOverlay() {
+        this.showLoadingOverlay = !this.showLoadingOverlay
+      },
       hideVirtualPrinterSidebarItem() {
         console.log('PosStore:hideVirtualPrinterSidebarItem')
         this.showVirtualReportInSidebar = false
@@ -529,5 +537,12 @@
       top: 10px;
       right: 10px;
     }
+  }
+</style>
+
+<style>
+  .loading-overlay {
+    display: flex;
+    justify-content: center;
   }
 </style>

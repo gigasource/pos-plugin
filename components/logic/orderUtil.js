@@ -34,7 +34,7 @@ const orderUtil = {
   },
   calOrderReceive(payment) {
     // receive
-    return _.sumBy(payment, 'value')
+    return _.sumBy(payment, i => +i.value)
   },
   calOrderVSum(order) {
     // vSum
