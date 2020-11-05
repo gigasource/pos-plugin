@@ -184,6 +184,8 @@
             const onlyResult = this.productIdQueryResults[0];
             if (onlyResult.attributes.length === 0 || onlyResult.attributes.keys().length === onlyResult.attributes.length) {
               if(onlyResult.isModifier) {
+                onlyResult.product = onlyResult._id.toString()
+                onlyResult.quantity = onlyResult.quantity || 1
                 this.addModifierToProduct(onlyResult)
               } else {
                 this.addProductToOrder(onlyResult)

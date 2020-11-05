@@ -473,9 +473,10 @@
           return
         if (product.isModifier) {
           this.$emit('addModifierToProduct', {
+            product: product._id.toString(),
             name: product.name,
             price: product.price,
-            quantity: 1
+            quantity: 1,
           })
         } else {
           this.$emit('addProductToOrder', product)
@@ -497,7 +498,7 @@
       addProductWithModifier(product, modifiers) {
         this.$emit('addProductToOrder', {
           ...product,
-          modifiers: modifiers.map(({ name, price }) => ({ name, price, quantity: 1 }))
+          modifiers: modifiers.map(({ _id, name, price }) => ({ product: _id.toString(), name, price, quantity: 1 }))
         })
       },
 

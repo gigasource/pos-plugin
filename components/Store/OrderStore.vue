@@ -654,6 +654,7 @@
 
       //<!--<editor-fold desc="Restaurant functions">-->
       async addModifierToProduct(modifier, product) {
+        console.log(modifier)
         if (!this.currentOrder || !this.currentOrder.items || !this.currentOrder.items.length) return
         product = product
           ? _.find(this.currentOrder.items, item => item === product)

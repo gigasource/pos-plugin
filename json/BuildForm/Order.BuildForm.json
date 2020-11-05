@@ -801,6 +801,11 @@
               "type": "input@number",
               "key": "originalPrice",
               "addable": false
+            },
+            {
+              "schemaType": "string",
+              "key": "product",
+              "type": "input"
             }
           ],
           "expansion": [],

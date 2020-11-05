@@ -125,7 +125,12 @@
       // inventory
       async loadInventories() {
         const condition = this.inventoryFilters.reduce((acc, filter) => ({...acc, ...filter['condition']}), {});
-        this.inventories = await cms.getModel(INVENTORY_COL).find(condition);
+        const inventories = await cms.getModel(INVENTORY_COL).find(condition);
+        const categories = await cms.getModel(INVENTORY_CATEGORY_COL).find();
+        this.inventories = inventories.map(item => ({
+          ...item,
+          category: categories.find(cate => cate._id.toString() === item.category)
+        }))
         this.inventoriesLoadTimestamp = new Date().getTime()
       },
       async loadInventoryUnits() {
