@@ -315,6 +315,10 @@ module.exports = (cms) => {
     })
 
     socket.on('cancel-order', cancelOrder)
+
+    socket.on('update-customer-order', order => {
+      cms.socket.emit('get-customer-order', order)
+    })
   })
 
   async function cancelOrder ({ _id, table }, cb = () => null) {

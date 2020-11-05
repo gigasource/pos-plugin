@@ -3,10 +3,10 @@
     <div class="image col-6"></div>
     <div class="customer-order col-6">
       <div class="customer-order__top">
-        <div class="customer-order__top--title">Pizza Hut - Berlin</div>
+        <div class="customer-order__top--title">{{companyName}}</div>
         <div>
-          <p>May 20, 2019</p>
-          <p class="ta-right">16:43</p>
+          <p>{{date}}</p>
+          <p class="ta-right" style="font-weight: normal">{{time}}</p>
         </div>
       </div>
       <div class="customer-order__table">
@@ -14,32 +14,36 @@
           <thead>
           <tr>
             <th>Name</th>
-            <th>Unit</th>
             <th>Quantity</th>
-            <th>Each(€)</th>
-            <th>Total(€)</th>
+            <th>Each (€)</th>
+            <th>Total (€)</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="product in productList">
+          <tr v-for="product in items" :key="product._id">
             <td>
               <p>{{product.name}}</p>
-              <p v-if="product.promotion" class="promotion ml-3">{{product.promotion}}</p>
+<!--              <p v-if="product.promotion" class="promotion ml-3">{{product.promotion}}</p>-->
+              <div>
+                <g-chip v-for="(modifier, index) in product.modifiers" :key="`${product._id}_${index}`"
+                        label small text-color="#616161">
+                  {{modifier.name}}
+                </g-chip>
+              </div>
             </td>
-            <td>{{product.unit}}</td>
             <td>{{product.quantity}}</td>
             <td>
-              <p>{{product.price.toFixed(2)}}</p>
-              <p v-if="product.promotion" class="promotion line-through">{{product.discount.toFixed(2)}}</p>
+              <p>{{getItemPrice(product) | convertMoney}}</p>
+              <p v-if="hasPromotion(product)" class="promotion line-through">{{getItemPrice(product, true) | convertMoney}}</p>
             </td>
             <td>
-              <p class="fw-700">{{(product.price * product.quantity).toFixed(2)}}</p>
-              <p v-if="product.promotion" class="promotion line-through">{{(product.discount *
-                product.quantity).toFixed(2)}}</p>
+              <p class="fw-700">{{getItemTotal(product) | convertMoney}}</p>
+              <p v-if="hasPromotion(product)" class="promotion line-through">
+                {{getItemTotal(product, true)  | convertMoney}}
+              </p>
             </td>
           </tr>
           <tr v-for="row in 10">
-            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -50,26 +54,32 @@
       </div>
       <div class="customer-order__bottom">
         <div class="customer-order__bottom--left">
-          <p>Discount(€)</p>
-          <p class="ta-right">- 1.20</p>
-          <p>Tax(€)</p>
-          <p class="ta-right">2.56</p>
-          <p>Sub-total(€)</p>
-          <p class="fw-700 ta-right">25.58</p>
-          <p class="fw-700">Total(€)</p>
-          <p class="fw-700 fs-large-3 ta-right" style="color: #1271FF">28.14</p>
+          <p>Discount (€)</p>
+          <p class="ta-right">- {{discount | convertMoney}}</p>
+          <p>Tax (€)</p>
+          <p class="ta-right">{{tax | convertMoney}}</p>
+          <p>Sub-total (€)</p>
+          <p class="fw-700 ta-right">{{subTotal | convertMoney}}</p>
+          <p class="fw-700">Total (€)</p>
+          <p class="fw-700 fs-large-3 ta-right" style="color: #1271FF">{{total | convertMoney}}</p>
         </div>
         <g-divider vertical/>
         <div class="customer-order__bottom--right">
-          <p>Payment method:</p>
-          <p class="fw-700">Cash</p>
           <div class="row-flex justify-between align-items-center">
-            <p>Received(€)</p>
-            <p>50</p>
+            <p>Payment method:</p>
+            <p class="fw-700">{{payment}}</p>
           </div>
           <div class="row-flex justify-between align-items-center">
-            <p>Change due(€)</p>
-            <p class="fw-700 fs-large-3" style="color: #1271FF">21.86</p>
+            <p>Received (€)</p>
+            <p class="fw-700">{{receive | convertMoney}}</p>
+          </div>
+          <div class="row-flex justify-between align-items-center">
+            <p>Tip (€)</p>
+            <p class="fw-700">{{tip | convertMoney}}</p>
+          </div>
+          <div class="row-flex justify-between align-items-center">
+            <p>Change due (€)</p>
+            <p class="fw-700 fs-large-3" style="color: #1271FF">{{change | convertMoney}}</p>
           </div>
         </div>
       </div>
@@ -78,8 +88,15 @@
 </template>
 
 <script>
+  import * as orderUtils from '../logic/orderUtil'
+
   export default {
     name: "CustomerOrder",
+    filters: {
+      convertMoney(value) {
+        return !isNaN(value) ? value.toFixed(2) : value
+      }
+    },
     data() {
       return {
         productList: [
@@ -95,7 +112,82 @@
           {
             name: 'Egg', unit: 'piece', quantity: 12, price: 0.5, promotion: 'Promotion A', discount: 0.10
           },
-        ]
+        ],
+        currentOrder: {},
+        dateTime: new Date(),
+        companyName: ''
+      }
+    },
+    computed: {
+      discount() {
+        return orderUtils.calOrderDiscount(this.currentOrder.items || [])
+      },
+      tax() {
+        return orderUtils.calOrderTax(this.currentOrder.items || [])
+      },
+      total() {
+        return orderUtils.calOrderVSum(this.currentOrder)
+      },
+      subTotal() {
+        return this.total - this.tax
+      },
+      receive() {
+        return orderUtils.calOrderReceive(this.currentOrder.payment || [])
+      },
+      tip() {
+        return this.currentOrder.tip || 0
+      },
+      change() {
+        if (!this.receive) return 0
+        const change = this.total - this.receive - this.tip
+        return change > 0 ? change : 0
+      },
+      payment() {
+        const payment = this.currentOrder.payment || []
+        return payment.map(i => i.type.charAt(0).toUpperCase() + i.type.slice(1)).join(', ')
+      },
+      items() {
+        const items = this.currentOrder.items || [];
+        return items.filter(i => i.quantity)
+      },
+      date() {
+        return dayjs(this.dateTime).format('MMM DD, YYYY')
+      },
+      time() {
+        return dayjs(this.dateTime).format('HH:mm')
+      }
+    },
+    methods: {
+      hasPromotion(item) {
+        return item.price < item.originalPrice
+      },
+      getItemTotal(item, original) {
+        const price = this.getItemPrice(item, original)
+        return item.quantity * price
+      },
+      getItemPrice(item, original) {
+        let price = original ? item.originalPrice : item.price
+        if (item.modifiers && item.modifiers.length) price += _.sumBy(item.modifiers, 'price')
+        return price
+      }
+    },
+    async created() {
+      cms.socket.on('get-customer-order', order => {
+        this.currentOrder = order
+      })
+      this.getDateInterval = setInterval(() => {
+        this.dateTime = new Date()
+      }, 5000)
+
+      const posSettings = await cms.getModel('PosSetting').findOne()
+      if (posSettings.companyInfo) {
+        this.companyName = posSettings.companyInfo.name || ''
+      }
+    },
+    beforeDestroy() {
+      if (this.getDateInterval) {
+        clearInterval(this.getDateInterval)
+        this.getDateInterval = null
       }
     }
   }
@@ -174,7 +266,7 @@
 
     &__bottom {
       display: flex;
-      padding: 12px;
+      padding: 12px 24px 12px 24px;
       justify-content: space-between;
 
       &--left {

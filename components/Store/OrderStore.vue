@@ -815,6 +815,8 @@
       },
       setNewPrice(price, product) {
         this.$set(product, 'price', price)
+        const vDiscount = product.originalPrice - price;
+        this.$set(product, 'vDiscount', vDiscount)
         this.actionList.push({
           type: 'order',
           action: 'update',
@@ -830,7 +832,8 @@
             method: 'findOneAndUpdate',
             query: jsonfn.stringify({
               $set: {
-                'items.$.price': price
+                'items.$.price': price,
+                'items.$.vDiscount': vDiscount
               }
             })
           }
@@ -1547,6 +1550,15 @@
 
           await this.resetOrderData()
         }
+      },
+      currentOrder: {
+        handler(val) {
+          if (val) {
+            cms.socket.emit('update-customer-order', val)
+          }
+        },
+        deep: true,
+        immediate: true
       }
     },
     provide() {

@@ -57,7 +57,7 @@
     },
     computed: {
       items() {
-        return this.currentOrder.items
+        return this.currentOrder.items.filter(i => i.quantity)
       },
       table() {
         return this.currentOrder.table

@@ -263,6 +263,7 @@
         return this.items.reduce((acc, item) => item.printed ? acc : acc + item.quantity, 0);
       },
       orderHasChanges() {
+        if (!this.table) return false
         const printedOrderItems = (this.printedOrder && this.printedOrder.items) || [];
 
         // 1. Filter out unprinted items with quantity = 0
