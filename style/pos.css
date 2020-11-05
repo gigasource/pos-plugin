@@ -893,3 +893,17 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+.icon-floppy-disk {
+  background-image: url("../assets/floppy-disk.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-floppy-disk_white {
+  background-image: url("../assets/floppy-disk_white.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
