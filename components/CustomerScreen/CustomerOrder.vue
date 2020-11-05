@@ -23,7 +23,7 @@
           <tr v-for="product in items" :key="product._id">
             <td>
               <p>{{product.name}}</p>
-<!--              <p v-if="product.promotion" class="promotion ml-3">{{product.promotion}}</p>-->
+              <!--              <p v-if="product.promotion" class="promotion ml-3">{{product.promotion}}</p>-->
               <div>
                 <g-chip v-for="(modifier, index) in product.modifiers" :key="`${product._id}_${index}`"
                         label small text-color="#616161">
@@ -39,7 +39,7 @@
             <td>
               <p class="fw-700">{{getItemTotal(product) | convertMoney}}</p>
               <p v-if="hasPromotion(product)" class="promotion line-through">
-                {{getItemTotal(product, true)  | convertMoney}}
+                {{getItemTotal(product, true) | convertMoney}}
               </p>
             </td>
           </tr>
@@ -91,7 +91,7 @@
   import * as orderUtils from '../logic/orderUtil'
 
   export default {
-    name: "CustomerOrder",
+    name: 'CustomerOrder',
     filters: {
       convertMoney(value) {
         return !isNaN(value) ? value.toFixed(2) : value
@@ -139,12 +139,14 @@
       },
       change() {
         if (!this.receive) return 0
-        const change = this.total - this.receive - this.tip
+        const change = this.receive - this.total - this.tip
         return change > 0 ? change : 0
       },
       payment() {
         const payment = this.currentOrder.payment || []
-        return payment.map(i => i.type.charAt(0).toUpperCase() + i.type.slice(1)).join(', ')
+        return payment
+        .filter(i => i.type === 'cash' || i.type === 'card')
+        .map(i => i.type.charAt(0).toUpperCase() + i.type.slice(1)).join(', ')
       },
       items() {
         const items = this.currentOrder.items || [];
@@ -286,6 +288,10 @@
         align-items: center;
         margin-left: 24px;
       }
+    }
+
+    .g-chip {
+      margin: 0 4px 4px 0;
     }
   }
 </style>
