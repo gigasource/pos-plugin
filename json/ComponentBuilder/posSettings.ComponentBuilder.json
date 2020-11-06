@@ -550,7 +550,17 @@
               "component": "PosOrderDeliveryConfig",
               "binding": [],
               "slotScopeBinding": [],
-              "slot": "deliveryConfig"
+              "slot": "deliveryConfig",
+              "url": "plugins/pos-plugin/components/posOrder/PosOrderDeliveryConfig.vue",
+              "path": "components/posOrder/PosOrderDeliveryConfig.vue",
+              "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "CustomerScreenConfig",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "customerScreen"
             }
           ],
           "inject": [

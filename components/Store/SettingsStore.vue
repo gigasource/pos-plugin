@@ -32,7 +32,8 @@
               { title: deliveryMenu, icon: 'icon-menu2', isView: true, key: 'deliveryConfig' }
             ]
           },
-          { title: 'Call system', icon: 'icon-telephone', isView: true, key: 'callSystem' }
+          { title: 'Call system', icon: 'icon-telephone', isView: true, key: 'callSystem' },
+          { title: 'Customer Screen', icon: 'icon-screen', isView: true, key: 'customerScreen' },
         ],
         printerSidebarDefault: [
           {

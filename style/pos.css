@@ -907,3 +907,11 @@ body::-webkit-scrollbar {
   background-size: contain;
   background-position: center;
 }
+
+
+.icon-screen {
+  background-image: url("../assets/screen.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
