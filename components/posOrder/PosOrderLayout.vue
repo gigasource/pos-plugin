@@ -6,7 +6,7 @@
     <div :style="{padding: '4px', 'background-color': '#E0E0E0', ...!editable && { position: 'sticky', top: 0, 'z-index': 1}}">
       <div :style="categoryContainerStyle">
         <div v-for="(category, index) in categories"
-             :class="['pol__cate', 'darken-effect']"
+             :class="['pol__cate']"
              :key="index"
              :style="[getCategoryStyle(category), getAreaStyle(category)]"
              @click="selectCategory(category)">
@@ -350,8 +350,8 @@
         return {
           backgroundColor: category.color,
           color: '#000',
-          border: `1px solid ${isCategorySelected ? '#757575' : 'transparent'}`,
-          boxShadow: isCategorySelected ? '1px 0px 3px rgba(0, 0, 0, 0.36)' : 'none',
+          border: `1px solid ${isCategorySelected ? '#1271FF' : 'transparent'}`,
+          boxShadow: isCategorySelected ? '1px 0px 3px rgba(18, 113, 255, 0.36)' : 'none',
           ... this.category && this.category.differentSize && (this.category.type === 'horizontal' ? { marginRight: "5px" } : { marginBottom: "5px"}),
           ... this.category && this.category.fontSize && { fontSize: this.category.fontSize }
         }
