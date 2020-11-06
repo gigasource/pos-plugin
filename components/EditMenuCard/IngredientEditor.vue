@@ -4,7 +4,7 @@
     <div v-for="(ingredient, i) in ingredients" v-touch="getTouchHandler(i)" class="ingredient-editor__input" :key="i">
       <g-autocomplete text-field-component="GTextFieldBs" class="ingredient-editor__input--left"
                       @input-click="showKeyboard = true" @input="updateProductIngredient"
-                      virtual-event keep-menu-on-blur menu-class="menu-select-inventory"
+                      virtual-event menu-class="menu-select-inventory" :key="`auto_${ingredients.length - i}`"
                       :rules="rules" :items="inventories" :arrow="false" v-model="ingredient.inventory"/>
       <g-text-field-bs :rules="[val => !isNaN(val) || '']" class="ingredient-editor__input--right"
                        @click="showKeyboard = true" @input="debounceUpdateAmount"

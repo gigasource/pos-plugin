@@ -12,7 +12,7 @@
     injectService: ['PosStore:(user, device)'],
     data() {
       const i18n = this.$i18n;
-      const { sidebar } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
+      const { sidebar, dashboard: { deliveryMenu } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
 
       return {
         sidebarData: [
@@ -26,7 +26,12 @@
               { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax' },
             ]
           },
-          { title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings' },
+          {
+            title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings',
+            items: [
+              { title: deliveryMenu, icon: 'icon-menu2', isView: true, key: 'deliveryConfig' }
+            ]
+          },
           { title: 'Call system', icon: 'icon-telephone', isView: true, key: 'callSystem' }
         ],
         printerSidebarDefault: [

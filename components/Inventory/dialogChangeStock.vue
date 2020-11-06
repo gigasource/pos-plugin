@@ -11,7 +11,7 @@
           <div :class="['btn', mode === 'add' && 'btn--blue']" @click="mode = 'add'">
             <g-icon color="white" >add</g-icon>
           </div>
-          <div :class="['btn', mode === 'remove' && 'btn--red']" @click="mode = 'remove'">
+          <div :class="['btn', mode === 'remove' && 'btn--red', !removeable && 'disabled']" @click="mode = 'remove'">
             <g-icon color="white">remove</g-icon>
           </div>
           <g-text-field-bs ref="textfield" :rules="rules" :value="change" @input="changeValue"/>
@@ -32,7 +32,11 @@
     props: {
       value: Boolean,
       name: String,
-      stock: Number
+      stock: Number,
+      removeable: {
+        type: Boolean,
+        default: true
+      },
     },
     filters: {
       formatNumber(number) {
@@ -42,7 +46,7 @@
     data() {
       return {
         change: 0,
-        mode: '',
+        mode: !this.removeable ? 'add' : '',
         reason: '',
         reasons: [$t('inventory.expiredIngredient'), $t('inventory.updateToMatch')]
       }

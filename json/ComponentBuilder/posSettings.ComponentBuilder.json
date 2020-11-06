@@ -544,6 +544,13 @@
               "url": "plugins/pos-plugin/components/OnlineOrder/CallSystem.vue",
               "path": "components/OnlineOrder/CallSystem.vue",
               "pluginName": "pos-plugin"
+            },
+            {
+              "choice": "view",
+              "component": "PosOrderDeliveryConfig",
+              "binding": [],
+              "slotScopeBinding": [],
+              "slot": "deliveryConfig"
             }
           ],
           "inject": [
@@ -748,7 +755,10 @@
             "_code_": "module.exports = async function(val) {\n  const filter = {\n    title: 'Price',\n    text: val[0] + ' - ' + val[1],\n    condition: {price: { '$gte': val[0], '$lte': val[1] }}\n  }\n  this.$getService('PosStore:updateProductFilters')(filter);\n    await this.$getService('PosStore:getTotalProducts')();\n  await this.$getService('PosStore:getListProducts')();\n}",
             "_code_type_": "commonJs"
           }
-        }
+        },
+        "preprocess": [
+          "label"
+        ]
       },
       "binding": [],
       "slotScopeBinding": [],

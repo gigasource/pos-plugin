@@ -1,7 +1,7 @@
 <template>
   <div class="inventory-stock">
     <div class="inventory-stock__header">
-      <g-select text-field-component="GTextFieldBs" @input="selectItem" skip-search
+      <g-autocomplete text-field-component="GTextFieldBs" @input="selectItem"
                 :items="inventories" item-text="name" return-object menu-class="menu-inventory-stock"/>
       <div class="inventory-stock__header-btn" @click="openDialog()">
         <g-icon color="white">add</g-icon>
@@ -28,7 +28,7 @@
         <td @click="openDialog(inventory)">{{inventory.category.name}}</td>
         <td @click="openDialog(inventory)">{{inventory.unit}}</td>
         <td @click="openDialog(inventory)">{{inventory.stock | formatNumber}}</td>
-        <td class="fw-700 text-blue" @click="openDialog(inventory)">{{inventory.added}}</td>
+        <td class="fw-700 text-blue" @click="openDialogAdd(inventory)">{{inventory.added}}</td>
         <td @click="removeItem(i)">
           <g-icon color="red">cancel</g-icon>
         </td>
@@ -66,11 +66,17 @@
     </dialog-form-input>
 
     <dialog-number-filter v-model="dialog.low" label="Low-stock threshold" @submit="getLowStockItems" />
+    <dialog-change-stock v-model="dialog.add"
+                         :removeable="false"
+                         :name="name"
+                         :stock="stock"
+                         @submit="updateStock"/>
   </div>
 </template>
 
 <script>
   import _ from 'lodash'
+  import DialogChangeStock from "./dialogChangeStock";
 
   export default {
     name: "InventoryStock",
@@ -88,8 +94,10 @@
         selectedItem: null,
         dialog: {
           inventory: false,
-          low: false
+          low: false,
+          add: false,
         },
+        name: '',
         itemId: '',
         category: '',
         unit: '',
@@ -156,6 +164,30 @@
           })
         this.dialog.inventory = false
       },
+      openDialogAdd(item) {
+        if(item) {
+          this.itemId = _.cloneDeep(item._id)
+          this.category = _.cloneDeep(item.category.name)
+          this.unit = _.cloneDeep(item.unit)
+          this.stock = _.cloneDeep(+item.stock)
+          this.added = _.cloneDeep(+item.added)
+        }
+        this.dialog.add = true
+      },
+      updateStock({change}) {
+        const item = this.inventories.find(item => item._id === this.itemId)
+        const index = this.items.findIndex(i => i._id === item._id)
+        if(index === -1)
+          this.items.push({
+            ...item,
+            added: +change
+          })
+        else
+          this.items.splice(index, 1, {
+            ...item,
+            added: +change
+          })
+      },
       chooseItem(_id) {
         const item = this.inventories.find(item => item._id === _id)
         this.category = _.cloneDeep(item.category.name)
@@ -196,7 +228,7 @@
           await this.updateInventoryHistory(history)
         }
         this.back()
-      }
+      },
     }
   }
 </script>
@@ -213,7 +245,7 @@
       display: flex;
       align-items: center;
 
-      .g-select {
+      .g-autocomplete {
         flex: 1;
 
         ::v-deep .bs-tf-wrapper {

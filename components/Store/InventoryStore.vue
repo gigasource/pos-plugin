@@ -77,7 +77,7 @@
         for(const category of categories) {
           const oldCate = this.inventoryCategories.find(c => c._id === category._id)
           if(oldCate) {
-            if(oldCate.name !== category.name) {
+            if(category.name && category.name.trim() && oldCate.name !== category.name) {
               await cms.getModel(INVENTORY_CATEGORY_COL).findOneAndUpdate({_id: this.genObjectId(oldCate._id)}, {name: category.name})
             }
           } else {

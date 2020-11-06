@@ -2,7 +2,6 @@
   <div class="delivery-config">
     <div class="delivery-config__title">
       Configuration
-      <g-btn-bs class="elevation-2" icon="icon-back" @click="back">Back</g-btn-bs>
     </div>
     <div class="row-flex flex-grow-1">
       <div class="col-6">
@@ -72,11 +71,6 @@
               keyboardDeliveryConfig: this.keyboardConfig
             }
         )
-      },
-      back() {
-        this.$emit('update:view', {
-          name: 'Functions'
-        })
       }
     }
   }

@@ -71,7 +71,7 @@
           {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
           {title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => this.changePath('/pos-settings')},
           {title: dineInMenu, feature: 'editMenuCard', icon: 'icon-menu1',  click: () => this.changePath('/pos-edit-menu-card')},
-          {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
+          // {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => this.updateView('DeliveryConfig')},
           {title: endOfDay, feature:'eodReport', icon: 'icon-calendar', click: () => this.changePath('/pos-eod-report')},
           {title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report',  click: () => this.changePath('/pos-month-report')},
           {title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => this.changePath('/pos-staff-report')},
