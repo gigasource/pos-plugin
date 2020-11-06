@@ -1,5 +1,5 @@
 <template>
-  <div class="discount">
+  <div class="discount h-100">
     <div class="discount-content">
       <div class="w-10 mx-2">
         <div class="fw-700 ta-center fs-small">Percent (%)</div>
@@ -33,7 +33,7 @@
 
 <script>
   export default {
-    name: "DiscountInput",
+    name: 'DiscountInput',
     injectService: ['PosStore:storeLocale'],
     data() {
       return {
@@ -51,53 +51,54 @@
     },
     created() {
       const quickDiscount = localStorage.getItem('QuickDiscount')
-      if(quickDiscount) {
+      if (quickDiscount) {
         this.quickDiscount = JSON.parse(quickDiscount)
       }
     },
-    computed: {
-
-    },
+    computed: {},
     watch: {
       custom(val) {
-        if(val) {
+        if (val) {
           this.amount = ''
           this.percent = ''
         }
       },
       type(val) {
-        if(val === 'percentage') {
+        if (val === 'percentage') {
           this.percent = this.value
         } else {
-          if(this.listAmount.findIndex(item => item === this.value) > -1) {
+          if (this.listAmount.findIndex(item => item === this.value) > -1) {
             this.amount = this.value
           } else {
             this.custom = this.value
           }
         }
       },
-      value(val) {
-        if(this.type === 'percentage') {
-          this.percent = val
-        } else {
-          if(this.listAmount.findIndex(item => item === val) > -1) {
-            this.amount = val
+      value: {
+        handler(val) {
+          if (this.type === 'percentage') {
+            this.percent = val
           } else {
-            this.custom = val
+            if (this.listAmount.findIndex(item => item === val) > -1) {
+              this.amount = val
+            } else {
+              this.custom = val
+            }
           }
-        }
+        },
+        immediate: true
       },
     },
     methods: {
       selectPercent(percent) {
-        if(percent) {
+        if (percent) {
           this.percent = percent
           this.amount = ''
           this.custom = ''
         }
       },
       selectAmount(amount) {
-        if(amount) {
+        if (amount) {
           this.amount = amount
           this.percent = ''
           this.custom = ''
@@ -107,7 +108,7 @@
         this.custom = discount
       },
       removeQuickDiscount(index) {
-        if(this.custom === this.quickDiscount[index]) {
+        if (this.custom === this.quickDiscount[index]) {
           this.custom = ''
         }
         this.quickDiscount.splice(index, 1)
@@ -116,10 +117,10 @@
       removeDiscount() {
         this.$emit('remove-discount')
       },
-      submit(){
+      submit() {
         let value = this.percent || this.amount || this.custom || 0
-        if(this.custom && this.quickDiscount.findIndex(discount => discount === this.custom) === -1) {
-          if(this.quickDiscount.length === 10) { // max 10 recent items
+        if (this.custom && this.quickDiscount.findIndex(discount => discount === this.custom) === -1) {
+          if (this.quickDiscount.length === 10) { // max 10 recent items
             this.quickDiscount.shift()
           }
           this.quickDiscount.push(this.custom)
@@ -166,7 +167,7 @@
     }
 
     &-quick {
-      display:  flex;
+      display: flex;
       margin-left: 4px;
 
       &__item {

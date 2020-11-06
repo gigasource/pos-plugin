@@ -7,9 +7,6 @@
       </template>
       <div class="col-flex bg-white">
         <g-btn-bs icon="icon-move-items" @click.stop="moveItems" :disabled="disableMoveItemsBtn">Move Items</g-btn-bs>
-        <g-btn-bs icon="icon-promotion">
-          {{$t('fnBtn.paymentFunctions.discount')}}
-        </g-btn-bs>
         <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
       </div>
     </g-menu>
