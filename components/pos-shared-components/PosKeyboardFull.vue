@@ -133,7 +133,7 @@
           '". a a s s d d f f g g h h j j k k l l . key4 key4 key5 key5 key6 key6" ' +
           '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del key1 key1 key2 key2 key3 key3" ' +
           '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
-          'grid-auto-columns: 1fr; grid-gap: 8px',
+          'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardGerman: [
           ...Object.values(keys.baseEN),
           ...Object.values(keys.baseDE),
@@ -147,7 +147,7 @@
           '". a a s s d d f f g g h h j j k k l l oe oe ae ae . key4 key4 key5 key5 key6 key6" ' +
           '"shift1 shift1 shift1 y y x x c c v v b b n n m m comma comma dot dot del del del key1 key1 key2 key2 key3 key3" ' +
           '"sym sym sym lang lang space space space space space space space space space space space space space space enter enter enter enter enter key0 key0 key0 key0 keyDot keyDot";' +
-          'grid-auto-columns: 1fr; grid-gap: 5px',
+          'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardNumeric: [
           ...Object.values(keys.numpad),
           keys.mods.keyEnter,
@@ -167,7 +167,7 @@
           '". a a s s d d f f g g h h j j k k l l . " ' +
           '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del " ' +
           '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter ";' +
-          'grid-auto-columns: 1fr; grid-gap: 10px',
+          'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardAlphaDE: [
           ...Object.values(keys.baseEN),
           ...Object.values(keys.baseDE),
@@ -180,7 +180,7 @@
           '". a a s s d d f f g g h h j j k k l l oe oe ae ae ." ' +
           '"shift1 shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del del " ' +
           '"sym sym sym comma comma lang lang space space space space space space space space space space dot dot enter enter enter enter enter ";' +
-          'grid-auto-columns: 1fr; grid-gap: 5px',
+          'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardSymbol: [
           ...Object.values(keys.symbols),
           { content: ['ABC'], img: '', style: 'grid-area: sym; background-color: #e0e0e0; font-size: 14px', action: () => this.revertSymbolMode() },
@@ -189,7 +189,7 @@
           '"at at hash hash dollar dollar eur eur amp amp hyphen hyphen underscore underscore leftpar leftpar rightpar rightpar slash slash" ' +
           '"shift1 shift1 shift1 ast ast quot quot apos apos colon colon semicolon semicolon quotmk quotmk qnmk qnmk del del del " ' +
           '"sym sym sym comma comma percent percent space space space space space space space space dot dot enter enter enter ";' +
-          'grid-auto-columns: 1fr; grid-gap: 10px',
+          'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardAlplaNumEN: [
           ...Object.values(_.omit(keys.numpad, 'keyDot')),
           ...Object.values(keys.baseEN),
@@ -202,7 +202,7 @@
             '" . a a s s d d f f g g h h j j k k l l . " ' +
             '"shift1 shift1 shift1 z z x x c c v v b b n n m m del del del " ' +
             '"sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter ";' +
-            'grid-auto-columns: 1fr; grid-gap: 10px',
+            'grid-auto-columns: 1fr; grid-gap: 4px',
         keyboardAlplaNumDE: [
           ...Object.values(_.omit(keys.numpad, 'keyDot')),
           ...Object.values(keys.baseEN),
@@ -213,11 +213,11 @@
           { content: ['Speichern'], classes: 'key-enter', style: 'grid-area: enter; background: #2979FF; color: #fff; font-size: 20px', type: 'enter', action: 'enter' },
         ],
         templateAlphaNumDE: 'grid-template-areas: " key1 key1 key2 key2 key3 key3 key4 key4 key5 key5 key6 key6 key7 key7 key8 key8 key9 key9 key0 key0 ss ss" ' +
-            '" q q w w e e r r t t y y u u i i o o p p ue ue" ' +
+            '" q q w w e e r r t t z z u u i i o o p p ue ue" ' +
             '" a a s s d d f f g g h h j j k k l l oe oe ae ae " ' +
-            '"shift1 shift1 shift1 shift1 z z x x c c v v b b n n m m del del del del " ' +
+            '"shift1 shift1 shift1 shift1 y y x x c c v v b b n n m m del del del del " ' +
             '"sym sym sym sym comma comma lang lang space space space space space space space space dot dot enter enter enter enter ";' +
-            'grid-auto-columns: 1fr; grid-gap: 10px',
+            'grid-auto-columns: 1fr; grid-gap: 4px',
         internalType: 'alphanumeric',
         internalLocale: 'en'
       }

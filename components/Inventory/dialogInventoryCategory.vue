@@ -190,16 +190,6 @@
       right: 33%;
     }
   }
-
-  @media screen and (max-height: 599px) {
-    .dialog {
-      &-keyboard {
-        ::v-deep .key {
-          font-size: 16px !important;
-        }
-      }
-    }
-  }
 </style>
 
 <style>

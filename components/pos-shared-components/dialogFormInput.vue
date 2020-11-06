@@ -153,7 +153,7 @@
         margin: 0 -8px -8px -8px;
 
         ::v-deep .key {
-          font-size: 16px;
+          font-size: 18px;
         }
       }
     }
