@@ -5,6 +5,7 @@ const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
 const mongoose = require('mongoose');
+const updateCommit = require('../master-node/updateCommit');
 
 module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
@@ -298,6 +299,7 @@ module.exports = (cms) => {
       console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
 
       // print new items
+      const newOrder = await updateCommit.getMethod('order', 'buildTempOrder')(table);
       let itemsToPrint = newItems.filter(i => !i.printed)
       // merge if needed
       const shouldMerge = await getMergeOrderSettings()
@@ -309,7 +311,7 @@ module.exports = (cms) => {
       if (itemsToPrint.length) {
         const printOrder = Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint });
         await cms.getModel('OrderCommit').addCommits([
-          getPrintCommit('kitchenAdd', printOrder, device)])
+          getPrintCommit('kitchenAdd', printOrder)])
       }
       cb(updatedOrder)
     })
