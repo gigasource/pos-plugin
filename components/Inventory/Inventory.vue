@@ -175,7 +175,9 @@
         return dayjs(date).format('DD/MM/YYYY HH:mm')
       },
       formatNumber(number) {
-        return number && number.toFixed(2)
+        if(!number || isNaN(number) || Math.floor(number) === number)
+          return number
+        return number.toFixed(2)
       }
     },
     async created() {
