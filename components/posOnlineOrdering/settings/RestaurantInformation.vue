@@ -69,6 +69,10 @@
             <div class="mb-2">{{$t('setting.storeLogo')}}</div>
             <upload-zone :url="store.logoImageSrc" @url="update({ logoImageSrc: $event })" :option="{maxHeight: 500, maxWidth: 500}"/>
           </div>
+          <div>
+            <div class="mb-2">Demo Data Image</div>
+            <upload-zone :url="store.demoImgSrc" @url="update({ demoImgSrc: $event })" :option="{maxHeight: 500, maxWidth: 500}"/>
+          </div>
         </div>
         <template>
           <div v-if="!store.faviconImageSrc">
