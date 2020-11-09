@@ -62,19 +62,19 @@
         if (tseConfig && tseConfig.tseEnable && tseConfig.numberOfCustomersDialog) {
           this.showNumberOfCustomersDialog = true
         } else {
+          this.$emit('setInitOrderProps', {
+            manual: await this.isManualTable(this.trimmedText)
+          })
           this.routeToOrder()
         }
       },
       async onCustomerDialogSubmit({ numberOfCustomers, tseMethod }) {
         this.showNumberOfCustomersDialog = false
-        await this.loadRoom()
-        const tables = this.rooms.map(room => room.roomObjects.filter(i => i.type === 'table')).flat()
-        const includesTable = tables.includes(this.trimmedText);
 
         this.$emit('setInitOrderProps', {
           ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
           tseMethod: tseMethod || 'auto',
-          manual: !includesTable
+          manual: await this.isManualTable(this.trimmedText)
         })
         this.routeToOrder()
       },
@@ -98,6 +98,11 @@
       },
       isBusyTable(table) {
         return this.activeOrders.some(o => o.table === table)
+      },
+      async isManualTable(table) {
+        await this.loadRoom()
+        const tables = this.rooms.map(room => room.roomObjects.filter(i => i.type === 'table')).flat()
+        return !tables.includes(table);
       }
     }
   }

@@ -1,10 +1,10 @@
-
 const mongoose = require('mongoose');
 const socketIO = require('socket.io');
 const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const updateCommit  = require('./updateCommit');
 const axios = require('axios');
 const internalIp = require('internal-ip');
+const argv = require('yargs').argv;
 
 const remoteServer = 'http://localhost:8088';
 
@@ -80,7 +80,13 @@ class Master {
 		// online order socket
 		const _this = this;
 	  _this.onlineOrderSocket = p2pClientPlugin(socket, socket.clientId);
-		_this.onlineOrderSocket.emit('registerMasterDevice', (`${internalIp.v4.sync() ? internalIp.v4.sync() : global.APP_CONFIG.deviceIp}:${global.APP_CONFIG.port}`));
+	  let ip;
+	  if (argv.mode !== 'android-embedded' && argv.mode !== 'ios') {
+	  	ip = internalIp.v4.sync();
+	  } else {
+	  	ip = global.APP_CONFIG.deviceIp;
+	  }
+		_this.onlineOrderSocket.emit('registerMasterDevice', ip);
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
 		_this.onlineOrderSocket.on('nodeCall', (...args) => {

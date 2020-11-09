@@ -320,7 +320,7 @@ module.exports = {
       productLayout: 'Product Layout',
       reporting: 'Reporting',
       user: 'Benutzer',
-      settings: 'Settings',
+      settings: 'Einstellungen',
       general: 'allgm. Einstellungen',
       generalSettings: 'allgm. Einstellungen',
       orderScreen: 'Order Screen',
@@ -340,13 +340,15 @@ module.exports = {
       receiptCategory: 'Boneinstellung',
       invoiceReport: 'Rechnung, Bericht',
       entireReceipt: 'Entire Receipt',
-      onlineOrderSettings: 'Online Bestellung Einstellungen',
+      onlineOrderSettings: 'Online Bestellung',
       manualTable: 'Tisch Auswahl',
       functions: 'Funktionen',
       logOut: 'Abmelden',
       restaurant: 'Restaurant',
       services: 'Dienstleistungen',
-      reservation: 'Reservierung'
+      reservation: 'Reservierung',
+      callSystem: 'Call system',
+      customerScreen: 'Customer Screen'
     },
 
     restaurant: {

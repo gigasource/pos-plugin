@@ -27,13 +27,14 @@
             ]
           },
           {
-            title: sidebar.onlineOrderSettings, icon: 'icon-general_setting', isView: true, key: 'onlineOrderSettings',
+            title: sidebar.onlineOrderSettings, icon: 'icon-general_setting',
             items: [
-              { title: deliveryMenu, icon: 'icon-menu2', isView: true, key: 'deliveryConfig' }
+              { title: sidebar.settings, icon: 'radio_button_unchecked', iconType: 'small',  isView: true, key: 'onlineOrderSettings' },
+              { title: deliveryMenu, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig' },
             ]
           },
-          { title: 'Call system', icon: 'icon-telephone', isView: true, key: 'callSystem' },
-          { title: 'Customer Screen', icon: 'icon-screen', isView: true, key: 'customerScreen' },
+          { title: sidebar.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem' },
+          { title: sidebar.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen' },
         ],
         printerSidebarDefault: [
           {

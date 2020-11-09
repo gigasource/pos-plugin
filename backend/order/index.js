@@ -124,6 +124,7 @@ module.exports = (cms) => {
           action: 'update',
           data: {
             split: true,
+            allowMutateInactiveOrder: true
           },
           where: JSON.stringify({ _id }),
           update: {

@@ -346,13 +346,15 @@ module.exports = {
       receiptCategory: 'Receipt Category',
       invoiceReport: 'Invoice, Report',
       entireReceipt: 'Entire Receipt',
-      onlineOrderSettings: 'Online Order Settings',
+      onlineOrderSettings: 'Online Order',
       manualTable: 'Manual Table',
       functions: 'Functions',
       logOut: 'Log Out',
       restaurant: 'Restaurant',
       services: 'Services',
-      reservation: 'Reservation'
+      reservation: 'Reservation',
+      callSystem: 'Call system',
+      customerScreen: 'Customer Screen'
     },
 
     restaurant: {
