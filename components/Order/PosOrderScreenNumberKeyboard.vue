@@ -125,4 +125,13 @@
       grid-template-rows: repeat(5, calc(20% - 3.67px))!important;
     }
   }
+
+  @media screen and (max-height: 600px) {
+    .keyboard {
+
+      ::v-deep .key {
+        font-size: 14px;
+      }
+    }
+  }
 </style>

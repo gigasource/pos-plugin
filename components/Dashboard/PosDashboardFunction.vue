@@ -65,7 +65,8 @@
       return {
         btnUp: [
           {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-3' : '/pos-order-2')},
-          {title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => this.changePath('/pos-order-delivery')}
+          {title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => this.changePath('/pos-order-delivery')},
+          {title: 'Retail', icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-retail-2' : '/pos-order-retail')}
         ],
         btnDown: [
           {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},

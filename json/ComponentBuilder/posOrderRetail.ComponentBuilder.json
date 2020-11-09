@@ -1,6 +1,7 @@
 {
   "events": [],
   "_id": "5dd7b8219418e40d10e12857",
+  "isProduction": true,
   "items": [
     {
       "choice": "view",
@@ -35,25 +36,49 @@
             "justifyItems": "",
             "justifyContent": "",
             "columns": [
-              "1fr",
+              "20%",
+              "50%",
               "30%"
             ],
             "rows": [
-              "1fr",
-              "64px"
+              "100%"
             ],
             "columnGap": 0,
             "rowGap": 0,
             "subAreas": [
               {
-                "name": "layout__left",
+                "name": "category",
                 "top": 1,
                 "left": 1,
                 "width": 1,
                 "height": 1,
                 "margin": "",
                 "padding": "",
-                "bgColor": "hsl(239, 100%, 50%, 50%)",
+                "bgColor": "hsl(23, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "main",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(220, 100%, 50%, 50%)",
                 "alignSelf": "",
                 "justifySelf": "",
                 "wrapInDiv": false,
@@ -73,25 +98,25 @@
                 "justifyItems": "",
                 "justifyContent": "",
                 "columns": [
-                  "1fr"
+                  "50%",
+                  "50%"
                 ],
                 "rows": [
-                  "12%",
-                  "1fr",
-                  "1fr"
+                  "50%",
+                  "50%"
                 ],
                 "columnGap": 0,
                 "rowGap": 0,
                 "subAreas": [
                   {
-                    "name": "menu",
+                    "name": "window",
                     "top": 1,
                     "left": 1,
-                    "width": 1,
+                    "width": 2,
                     "height": 1,
                     "margin": "",
                     "padding": "",
-                    "bgColor": "hsl(21, 100%, 50%, 50%)",
+                    "bgColor": "hsl(47, 100%, 50%, 50%)",
                     "alignSelf": "",
                     "justifySelf": "",
                     "wrapInDiv": false,
@@ -108,78 +133,14 @@
                     "flexAlignSelf": ""
                   },
                   {
-                    "name": "main_row2",
-                    "top": 3,
-                    "left": 1,
-                    "width": 1,
-                    "height": 1,
-                    "margin": "",
-                    "padding": "",
-                    "bgColor": "hsl(94, 100%, 50%, 50%)",
-                    "alignSelf": "",
-                    "justifySelf": "",
-                    "wrapInDiv": false,
-                    "displayFlex": false,
-                    "flexDirection": "row",
-                    "flexWrap": false,
-                    "flexJustifyContent": "",
-                    "flexAlignItems": "",
-                    "flexAlignContent": "",
-                    "flexOrder": "",
-                    "flexGrow": "",
-                    "flexShrink": "",
-                    "flexBasis": "",
-                    "flexAlignSelf": "",
-                    "alignItems": "",
-                    "alignContent": "",
-                    "justifyItems": "",
-                    "justifyContent": "",
-                    "columns": [
-                      "1fr",
-                      "1fr",
-                      "1fr"
-                    ],
-                    "rows": [
-                      "1fr"
-                    ],
-                    "columnGap": 6,
-                    "rowGap": 0,
-                    "subAreas": [
-                      {
-                        "name": "keyboard",
-                        "top": 1,
-                        "left": 3,
-                        "width": 1,
-                        "height": 1,
-                        "margin": "",
-                        "padding": "0 8px 0 0",
-                        "bgColor": "hsl(252, 100%, 50%, 50%)",
-                        "alignSelf": "",
-                        "justifySelf": "",
-                        "wrapInDiv": false,
-                        "displayFlex": false,
-                        "flexDirection": "row",
-                        "flexWrap": false,
-                        "flexJustifyContent": "",
-                        "flexAlignItems": "",
-                        "flexAlignContent": "",
-                        "flexOrder": "",
-                        "flexGrow": "",
-                        "flexShrink": "",
-                        "flexBasis": "",
-                        "flexAlignSelf": ""
-                      }
-                    ]
-                  },
-                  {
-                    "name": "main_row1",
+                    "name": "keyboard",
                     "top": 2,
                     "left": 1,
                     "width": 1,
                     "height": 1,
                     "margin": "",
                     "padding": "",
-                    "bgColor": "hsl(7, 100%, 50%, 50%)",
+                    "bgColor": "hsl(80, 100%, 50%, 50%)",
                     "alignSelf": "",
                     "justifySelf": "",
                     "wrapInDiv": false,
@@ -193,56 +154,43 @@
                     "flexGrow": "",
                     "flexShrink": "",
                     "flexBasis": "",
-                    "flexAlignSelf": "",
-                    "alignItems": "",
-                    "alignContent": "",
-                    "justifyItems": "",
-                    "justifyContent": "",
-                    "columns": [
-                      "1fr"
-                    ],
-                    "rows": [
-                      "1fr"
-                    ],
-                    "columnGap": 0,
-                    "rowGap": 0,
-                    "subAreas": []
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "buttons",
+                    "top": 2,
+                    "left": 2,
+                    "width": 1,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(318, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
                   }
                 ]
               },
               {
-                "name": "toolbar",
-                "top": 2,
-                "left": 1,
-                "width": 2,
-                "height": 1,
-                "margin": "",
-                "padding": "",
-                "bgColor": "hsl(157, 100%, 50%, 50%)",
-                "alignSelf": "",
-                "justifySelf": "",
-                "wrapInDiv": false,
-                "displayFlex": false,
-                "flexDirection": "row",
-                "flexWrap": false,
-                "flexJustifyContent": "",
-                "flexAlignItems": "",
-                "flexAlignContent": "",
-                "flexOrder": "",
-                "flexGrow": "",
-                "flexShrink": "",
-                "flexBasis": "",
-                "flexAlignSelf": ""
-              },
-              {
                 "name": "detail",
                 "top": 1,
-                "left": 2,
+                "left": 3,
                 "width": 1,
                 "height": 1,
                 "margin": "",
                 "padding": "",
-                "bgColor": "hsl(274, 100%, 50%, 50%)",
+                "bgColor": "hsl(143, 100%, 50%, 50%)",
                 "alignSelf": "",
                 "justifySelf": "",
                 "wrapInDiv": false,
@@ -282,42 +230,34 @@
         },
         {
           "choice": "view",
-          "component": "PosOrderScreenProductCategoryMenu",
+          "component": "PosRetailOrder",
           "binding": [],
           "slotScopeBinding": [],
-          "slot": "menu",
-          "url": "plugins/pos-plugin/components/Order/PosOrderScreenProductCategoryMenu.vue",
-          "path": "components/Order/PosOrderScreenProductCategoryMenu.vue",
-          "pluginName": "pos-plugin"
+          "slot": "detail"
         },
         {
           "choice": "view",
-          "component": "PosOrderScreenDetail",
+          "component": "PosRetailCategory",
           "binding": [],
           "slotScopeBinding": [],
-          "slot": "table",
-          "url": "plugins/pos-plugin/components/Order/PosOrderScreenDetail.vue",
-          "path": "components/Order/PosOrderScreenDetail.vue",
-          "pluginName": "pos-plugin"
+          "slot": "category",
+          "items": []
         },
         {
           "choice": "view",
-          "component": "PosOrderScreenToolbar",
+          "component": "PosOrderScreenButtonGroup",
           "binding": [],
           "slotScopeBinding": [],
-          "slot": "toolbar",
-          "url": "plugins/pos-plugin/components/Order/PosOrderScreenToolbar.vue",
-          "path": "components/Order/PosOrderScreenToolbar.vue",
-          "pluginName": "pos-plugin"
+          "slot": "buttons"
         },
         {
           "choice": "view",
-          "component": "PosOrderScreenDetail",
+          "component": "PosOrderScreenScrollWindow",
           "binding": [],
           "slotScopeBinding": [],
-          "slot": "detail",
-          "url": "plugins/pos-plugin/components/Order/PosOrderScreenDetail.vue",
-          "path": "components/Order/PosOrderScreenDetail.vue",
+          "slot": "window",
+          "url": "plugins/pos-plugin/components/Order/PosOrderScreenScrollWindow.vue",
+          "path": "components/Order/PosOrderScreenScrollWindow.vue",
           "pluginName": "pos-plugin"
         }
       ]
@@ -406,11 +346,10 @@
       "pluginName": "pos-plugin"
     }
   ],
+  "name": "posOrderRetail",
   "props": {
     "fields": []
   },
-  "isProduction": true,
-  "name": "posOrderRetail",
   "renderInAdminPage": true,
-  "renderToRoute": "pos-order/:id"
+  "renderToRoute": "pos-order-retail"
 }
