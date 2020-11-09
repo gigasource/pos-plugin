@@ -46,6 +46,12 @@
         text: `${item.name} (${item.unit})`,
         value: item._id
       }))
+      if(this.layout && this.layout.product && this.layout.product._id) {
+        this.ingredients = this.layout.product.ingredients.map(item => ({
+          inventory: item.inventory,
+          amount: ''+item.amount
+        })) || []
+      }
       this.debounceUpdateAmount = _.debounce(this.updateProductIngredient, 300)
     },
     async activated() {
@@ -53,6 +59,12 @@
         text: `${item.name} (${item.unit})`,
         value: item._id
       }))
+      if(this.layout && this.layout.product && this.layout.product._id) {
+        this.ingredients = this.layout.product.ingredients.map(item => ({
+          inventory: item.inventory,
+          amount: ''+item.amount
+        })) || []
+      }
     },
     watch: {
       layout(val) {
