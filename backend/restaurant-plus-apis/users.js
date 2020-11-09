@@ -29,10 +29,7 @@ const mapperConfig = {
   followedStores: {
     key: 'followedStores',
     transform(sourceValue) {
-      return Object.keys(sourceValue).reduce((acc, key) => {
-        if (key !== 'length') acc.push(objectMapper(sourceValue[key]._doc, storeMapperConfig));
-        return acc;
-      }, []);
+      return (sourceValue || []).map(item => objectMapper(item, storeMapperConfig))
     },
   },
   apiToken: 'apiToken',
