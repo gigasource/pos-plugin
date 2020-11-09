@@ -73,6 +73,12 @@
       "autopopulate": true,
       "type": "ref-select",
       "labelProp": "name"
+    },
+    {
+      "_id": "5f9a2ee4ec24a10acb7c234d",
+      "schemaType": "string",
+      "key": "osName",
+      "type": "input"
     }
   ],
   "name": "AppItem",

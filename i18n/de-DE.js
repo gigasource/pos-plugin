@@ -53,7 +53,7 @@ module.exports = {
       notApplicable: 'Gutschein für diese Bestellung nicht anwendbar!',
       openHours: 'Öffnungszeiten',
       merchantClose: 'Das Restaurant ist vorübergehend geschlossen',
-      merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte kommen Sie später wieder. Wir entschuldigen uns für die Umstände.',
+      merchantClose1: 'Das Restaurant ist vorübergehend geschlossen und nimmt Bestellungen erst {0} ab {1} entgegen. Bitte besuchen Sie uns zu einem späteren Zeitpunkt. Vielen Dank!',
       merchantClose2: 'Das Restaurant ist vorübergehend geschlossen. Wir entschuldigen uns für die Umstände.',
       merchantClose3: 'Der Händler ist vorübergehend geschlossen, akzeptiert jedoch in dem Augenblick noch Online-Bestellungen. Ihre Bestellungen stehen zum Mitnehmen zur Verfügung und werden nach {0} Uhr geliefert.',
       minimumOrder: 'Mindestbestellwert',
@@ -159,7 +159,8 @@ module.exports = {
       deliveryHourNote: 'Hinweis: Die Lieferungszeit musst in der Öffnungszeit gewesen sein.',
       settings: 'Settings',
       enabled: 'Ermöglich',
-      autoAcceptDevice: 'Automat akzeptiert neue Geräte.',
+      autoAcceptDevice: 'Automat akzeptiert neue Geräte',
+      autoAcceptOrder: 'Auto-accept orders', // temporary
       defaultTimeComplete: 'Standardzeit zum Abschließen der Bestellung',
       recommendGSMS: 'Wir empfehlen, diese Einstellung standardmäßig zu deaktivieren. Für weitere Informationen wenden Sie sich bitte an Ihren Diensteanbieter.',
       activeReservation: 'Aktive Reservierung',

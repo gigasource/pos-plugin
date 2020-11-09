@@ -118,7 +118,7 @@
           _.each(this.orderedAppItems, appItem => {
             if (appItem.app._id === app._id)
               appViewModel.files.push({
-                ..._.pick(appItem, ['_id', 'version', 'type', 'release', 'uploadDate', 'uploadPath']),
+                ..._.pick(appItem, ['_id', 'version', 'type', 'release', 'uploadDate', 'uploadPath', 'osName']),
                 base: appItem.baseVersion,
                 note: appItem.changeLog,
                 menu: false
@@ -226,6 +226,7 @@
             return {
               ...device,
               // store all version of device's app
+              appItem,
               versions,
               // store selected version to update, default set to latest version
               updateVersion: deviceVersions.length && deviceVersions[0].value,
@@ -396,7 +397,24 @@
 
         const {socket} = window.cms
         const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
-        const type = semverLt(device.appVersion, versionInfo.base) ? 'APK' : 'PATCH'
+        const patchInfo = device.appItem.filter(item => item.version === device.updateVersion && item.type === 'PATCH' && item.osName === device.osName);
+        let type = 'PATCH';
+        if (!patchInfo.length || patchInfo[0].base !== device.appBaseVersion) {
+          if (device.osName === 'android') {
+            const apkInfo = device.appItem.filter(item => item.version === device.updateVersion && item.type === 'APK');
+            if (apkInfo.length && (!device.metadata || !device.metadata.isFromStore)) {
+              type = 'APK';
+            } else {
+              // TODO: warning to user this is can not update because this must be update via store
+              return;
+            }
+          } else if (device.osName === 'ios') {
+            // TODO: warning to user this is can not update because this must be update via store
+            return;
+          }
+        }
+        const selectedItem = device.appItem.filter(item => item.version === device.updateVersion && item.type === type);
+        console.log(selectedItem);
         socket.emit('updateApp', device._id, getCdnUrl(versionInfo[type].downloadPath), type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI

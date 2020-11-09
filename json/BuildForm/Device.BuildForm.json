@@ -297,6 +297,12 @@
       "key": "enableMultiStore",
       "default": "false",
       "type": "input@switch"
+    },
+    {
+      "_id": "5f994c536bfb1526dc311ff9",
+      "schemaType": "string",
+      "key": "appBaseVersion",
+      "type": "input"
     }
   ],
   "name": "Device",

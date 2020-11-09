@@ -185,6 +185,7 @@
       const storeIdOrAlias = this.$route.params.storeIdOrAlias
       if (storeIdOrAlias) {
         const store = await cms.getModel('Store').findOne({alias: storeIdOrAlias})
+        if (store.gSms && store.gSms.autoAcceptOrder === undefined) store.gSms.autoAcceptOrder = true // backward compatibility
 
         if (!store) {
           this.permissionDenied = true;

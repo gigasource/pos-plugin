@@ -8,8 +8,15 @@
       <div class="store-item__name">{{store.name || store.settingName}}</div>
       <div class="store-item__address">{{store.address}}</div>
       <g-spacer/>
-      <div :style="storeOpenStatusStyle">
-        • {{ storeOpenStatus }}
+      <div class="row-flex align-items-center">
+        <g-btn-bs v-if="store && store.pickup" background-color="#EDF0F5" icon="icon-take-away@16" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
+        <g-btn-bs v-if="store && (store.delivery || (store.affiliateDelivery && store.affiliateDelivery.active))" background-color="#EDF0F5" icon="icon-delivery-scooter@16" @click="openStore('delivery')">{{$t('store.delivery')}}</g-btn-bs>
+        <g-btn-bs v-if="store && store.reservationSetting && store.reservationSetting.activeReservation"
+                  background-color="#EDF0F5" icon="icon-table-reservation@16" @click="openReservation">{{$t('setting.reservation')}}</g-btn-bs>
+        <g-spacer/>
+        <div class="store-item__time" :style="storeOpenStatusStyle">
+          • {{ storeOpenStatus }}
+        </div>
       </div>
     </div>
   </div>
@@ -76,13 +83,38 @@
         })
         return openHours
       },
-      openStore() {
-        let url = `https://restaurantplus.net/store/${this.store.alias}`
-        if(this.store.affiliateDelivery && this.store.affiliateDelivery.active) {
-          url = this.store.affiliateDelivery.url
+      openStore(type) {
+        if(type === 'delivery' && !this.store.delivery) {
+          if(this.store.affiliateDelivery && this.store.affiliateDelivery.active) {
+            const { active, url, lastMonthCounter, currentMonthCounter, oldTimeCounter, lastSync } = this.store.affiliateDelivery
+            const date = new Date()
+            let tempCurrent, tempLast, tempOld
+            if(!lastSync || dayjs(date).diff(dayjs(lastSync), 'month') === 1) {
+              tempCurrent = 1
+              tempLast = currentMonthCounter || 0
+              tempOld = oldTimeCounter + lastMonthCounter
+            } else {
+              tempCurrent = currentMonthCounter + 1
+              tempLast = lastMonthCounter || 0
+              tempOld = oldTimeCounter || 0
+            }
+            cms.socket.emit('updateAffiliateDelivery', this.store._id, {
+              active,
+              url,
+              lastMonthCounter: tempLast,
+              currentMonthCounter: tempCurrent,
+              oldTimeCounter: tempOld,
+              lastSync: date
+            })
+            window.open(url)
+            return
+          }
         }
-        window.open(url, '_blank')
-      }
+        window.open(`${location.origin}/store/${this.store.alias}/order/?type=${type}`)
+      },
+      openReservation() {
+        window.open(`${location.origin}/store/${this.store.alias}/reservation`)
+      },
     }
   }
 </script>
@@ -131,6 +163,10 @@
       font-size: 14px;
       color: #737A9D;
     }
+
+    .g-btn-bs {
+      margin: 0 8px 0 0;
+    }
   }
 
   .menu-hour {
@@ -138,5 +174,33 @@
     background: white;
     border-radius: 2px;
     min-width: 280px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .store-item {
+      padding: 4px;
+
+      &__logo {
+        display: none;
+      }
+
+      &__address {
+        margin-bottom: 8px;
+      }
+
+      .g-btn-bs {
+        padding: 4px;
+        font-size: 12px;
+        font-weight: bold;
+
+        .g-icon {
+          margin-right: 4px;
+        }
+      }
+
+      &__time {
+        font-size: 12px;
+      }
+    }
   }
 </style>
