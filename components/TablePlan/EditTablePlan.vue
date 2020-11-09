@@ -226,7 +226,7 @@
         return name
       },
       async addNewRoom() {
-        const largestOrder = _.maxBy(this.rooms, r => r.order).order;
+        const largestOrder = this.rooms.length > 0 ? _.maxBy(this.rooms, r => r.order).order : 0;
         const newName = this.getUniqueRoomName('Room ')
         const created = await cms.getModel('Room').create({ name: newName, order: largestOrder + 1 });
         await this.loadRooms()
