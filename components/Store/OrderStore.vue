@@ -492,15 +492,41 @@
         })
         return resultArr
       },
+      addOrderCommits(changes) {
+        this.actionList.push(...changes.map(change => ({
+          type: 'order',
+          action: 'update',
+          where: jsonfn.stringify({
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
+          }),
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: jsonfn.stringify(change)
+          }
+        })))
+      },
       discountCurrentOrder(change) {
-        this.$set(this.currentOrder, 'items', orderUtil.applyDiscountForOrder(this.compactOrder(this.currentOrder.items), change));
+        const items = this.currentOrder.items.filter(i => i.quantity);
+        this.$set(this.currentOrder, 'items', orderUtil.applyDiscountForOrder(items, change));
         this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
         this.$set(this.currentOrder, 'discount', change)
+        this.currentOrder.items.forEach(item => this.setNewPrice(item.price, item))
+        this.addOrderCommits([
+          { hasOrderWideDiscount: true, discount: change }
+        ])
       },
       resetOrderDiscount() {
         this.$set(this.currentOrder, 'items', orderUtil.resetDiscount(this.compactOrder(this.currentOrder.items)));
         this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
         this.$set(this.currentOrder, 'discount', null)
+        this.currentOrder.items.forEach(item => this.setNewPrice(item.price, item))
+        this.addOrderCommits([
+          { hasOrderWideDiscount: true, discount: null }
+        ])
       },
       //<!--</editor-fold>-->
 
@@ -1443,6 +1469,7 @@
           this.$set(this.currentOrder, 'user', _.cloneDeep(order.user))
           this.$set(this.currentOrder, 'items', _.cloneDeep(order.items))
           this.$set(this.currentOrder, 'manual', order.manual)
+          this.$set(this.currentOrder, 'discount', order.discount)
           order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
           order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
           order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)

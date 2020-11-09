@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="dialog" overlay-color="#6b6f82" overlay-opacity="0.95" fullscreen>
+  <g-dialog v-model="dialog" overlay-color="#6b6f82" :fullscreen="isMobile" overlay-opacity="0.95">
     <div class="dialog-change w-100" :style="[{background: 'white'}]">
       <g-icon class="dialog-change--close" @click="dialog = false">close</g-icon>
       <discount-input :type="changeType" :value="change" @submit="submit" @remove-discount="removeDiscount"/>
@@ -13,6 +13,7 @@
   export default {
     name: 'dialogChangeValue',
     components: {DiscountInput, ChangeValue },
+    injectService: ['PosStore:isMobile'],
     props: {
       value: Boolean,
       newValueEditable: false,
