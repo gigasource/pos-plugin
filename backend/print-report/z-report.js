@@ -1,7 +1,4 @@
-const {convertHtmlToPng} = require('../print-utils/print-utils');
-const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
 const _ = require('lodash');
-const Vue = require('vue');
 
 async function makePrintData(cms, {z}) {
   const posSetting = await cms.getModel('PosSetting').findOne({});

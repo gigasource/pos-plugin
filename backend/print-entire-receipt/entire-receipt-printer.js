@@ -1,6 +1,5 @@
-const Vue = require('vue');
 const _ = require('lodash');
-const {renderer, print, groupArticles, getEscPrinter} = require('../print-utils/print-utils');
+const {groupArticles, getEscPrinter} = require('../print-utils/print-utils');
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer');
 

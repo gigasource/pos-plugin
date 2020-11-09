@@ -1,7 +1,3 @@
-const {convertHtmlToPng} = require('../print-utils/print-utils');
-const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
-const Vue = require('vue');
-
 async function makePrintData(cms, order, locale) {
   const posSetting = await cms.getModel('PosSetting').findOne({})
   if (!order) return null

@@ -1,8 +1,4 @@
-const {convertHtmlToPng} = require('../print-utils/print-utils');
-const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
-const Vue = require('vue');
 const dayjs = require('dayjs');
-const fs = require('fs')
 
 function convertMoney(value) {
   return !isNaN(value) ? value.toFixed(2) : value

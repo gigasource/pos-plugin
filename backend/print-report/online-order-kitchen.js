@@ -1,6 +1,3 @@
-const {convertHtmlToPng} = require('../print-utils/print-utils');
-const vueSsrRenderer = require('../print-utils/vue-ssr-renderer');
-const Vue = require('vue');
 const dayjs = require('dayjs')
 
 function convertMoney(value) {

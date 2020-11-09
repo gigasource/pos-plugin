@@ -1,6 +1,4 @@
 const fs = require('fs');
-const PhantomUtil = require('../print-utils/phantom-util');
-const phantomUtil = new PhantomUtil();
 const EscPrinter = require('../print-utils/node-thermal-printer');
 const _ = require('lodash')
 
@@ -32,22 +30,6 @@ module.exports = {
     if (!groupPrinters) return null;
 
     return groupPrinters;
-  },
-
-  async print(html, printerInfo) {
-    try {
-      const png = await phantomUtil.render(html)
-
-      const printer = new EscPrinter(printerInfo);
-      printer.printPng(png);
-      await printer.print();
-    } catch (e) {
-      throw e
-    }
-  },
-
-  async convertHtmlToPng(html) {
-    return await phantomUtil.render(html);
   },
 
   groupArticles(items) {

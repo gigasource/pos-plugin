@@ -175,54 +175,6 @@ module.exports = {
     },
     {
       loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/MonthReport.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/OrderReport.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/StaffReport.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/XReport.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/ZReport.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/Kitchen.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/KitchenDelivery.vue'
-    },
-    {
-      loader: {
-        type: 'ssr'
-      },
-      path: 'components/Report/OrderDelivery.vue'
-    },
-    {
-      loader: {
         type: 'i18n'
       },
       path: 'i18n/de.js'
