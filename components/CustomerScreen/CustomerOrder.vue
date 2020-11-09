@@ -115,7 +115,9 @@
         ],
         currentOrder: {},
         dateTime: new Date(),
-        companyName: ''
+        companyName: '',
+        justPaidOrder: false,
+        tempOrder: null
       }
     },
     computed: {
@@ -175,7 +177,21 @@
     },
     async created() {
       cms.socket.on('get-customer-order', order => {
+        if (this.justPaidOrder) {
+          this.tempOrder = order
+          return
+        }
+
         this.currentOrder = order
+
+        if (order.status === 'paid') {
+          this.justPaidOrder = true
+          setTimeout(() => {
+            this.justPaidOrder = false
+            this.currentOrder = this.tempOrder
+            this.tempOrder = null
+          }, 5000)
+        }
       })
       this.getDateInterval = setInterval(() => {
         this.dateTime = new Date()

@@ -9,7 +9,7 @@ const orderUtil = {
     return price * (1 - 1 / (1 + tax / 100))
   },
   calItemTax(item) {
-    return +(orderUtil.calTax(item.price, item.tax) * item.quantity).toFixed(2);
+    return +(orderUtil.calTax(item.price, item.tax || 0) * item.quantity).toFixed(2);
   },
   calOrderTax(items) {
     // vTax
