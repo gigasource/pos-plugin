@@ -28,7 +28,7 @@
             <div v-for="item in currentSplitOrder" :key="item._id.toString()" class="item">
               <div class="item-detail" @click.stop="returnItem(item)">
                 <div>
-                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id}}. {{item.name}}</p>
+                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id && `${item.id}. `}} {{item.name}}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
                       {{$t('common.currency', storeLocale)}} {{item.originalPrice | convertMoney}}
@@ -110,7 +110,7 @@
                  @click.stop="addToSplitOrder(item)">
               <div class="item-detail">
                 <div>
-                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id}}. {{item.name}}</p>
+                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id && `${item.id}. `}} {{item.name}}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
                       €{{item.originalPrice | convertMoney}}

@@ -50,7 +50,7 @@
         <template v-if="split">
           <div class="receipt-main__item" v-for="(split, i) in order.splits" :key="split._id">
             <div class="row-flex align-items-center">
-              <g-menu v-model="menu[i]" open-on-hover nudge-bottom="10" content-class="menu-receipt-action">
+              <g-menu v-model="menu[i]" nudge-bottom="10" content-class="menu-receipt-action">
                 <template v-slot:activator="{ on }">
                   <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
                 </template>
