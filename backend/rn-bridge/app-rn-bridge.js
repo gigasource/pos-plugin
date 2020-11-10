@@ -10,6 +10,12 @@ try {
 			}, 1000);
 		})
 
+		cms.post('run:internalSocketConnected', (socket) => {
+			socket.on('screen-loaded', () => {
+				rn_bridge.channel.send('ScreenLoaded');
+			})
+		})
+
 		rn_bridge.channel.on('message', async (msg) => {
 			const data = JSON.parse(msg);
 			switch (data.type) {

@@ -132,6 +132,8 @@ module.exports = cms => {
       const downloadUrl = url.resolve(await getWebShopUrl(), fileName, { responseType: 'stream' })
       const { data } = await axios.get(downloadUrl)
       await importDemoData(data)
+      global.APP_CONFIG.isMaster = true;
+      await cms.execPostAsync('load:handler')
       cb()
     })
   })
