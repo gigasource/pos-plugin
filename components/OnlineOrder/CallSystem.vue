@@ -38,10 +38,8 @@
               mandatory
               :elevation="0"
               height="200px"
-              item-text="fullName"
-              item-value="path"
               v-model="selectedSerialDevice"
-              :items="serialDevices"/>
+              :items="usbDevices"/>
     </div>
 
     <g-btn-bs width="80" background-color="#2979FF" style="margin: 16px 0 0; flex: 0 0 36px; align-self: flex-end"
@@ -83,14 +81,27 @@ export default {
       },
       lastSavedConfig: null,
       CALL_SYSTEM_MODES,
-      serialDevices: [],
+      usbDevices: [],
       selectedSerialDevice: '',
     }
   },
   async created() {
     await this.loadData();
     cms.socket.on('update-call-system-status', this.updateConnectStatus);
-    this.updateSerialDeviceList();
+    cms.socket.on('list-usb-devices', (devices) => {
+      this.usbDevices = devices.map(({devicePath, deviceManufacturerName, deviceProductName}) => {
+        return {
+          text: `${devicePath} - ${deviceProductName} - ${deviceManufacturerName}`,
+          value: devicePath,
+        };
+      });
+
+      this.selectedSerialDevice = this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
+          ? this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
+          : (this.usbDevices.length > 0 ? this.usbDevices[0].value : '');
+    });
+
+    this.updateUsbDeviceList();
   },
   async activated() {
 
@@ -129,7 +140,7 @@ export default {
       if (value === CALL_SYSTEM_MODES.DEMO.value) defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
       else if (value === CALL_SYSTEM_MODES.FRITZBOX.value) defaultValue = '192.168.178.1:1012';
       else if (value === CALL_SYSTEM_MODES.OFF.value) defaultValue = '';
-      else if (value === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value) this.updateSerialDeviceList();
+      else if (value === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value) this.updateUsbDeviceList();
 
       this.ipAddresses[value] = this.ipAddresses[value] || defaultValue;
     },
@@ -150,7 +161,7 @@ export default {
       this.currentCallSystemMode = callSystem.mode
       this.lastSavedConfig = cloneDeep(callSystem)
 
-      this.updateSerialDeviceList();
+      this.updateUsbDeviceList();
     },
     async update() {
       const configChanged = this.callSystemConfigChanged;
@@ -170,15 +181,9 @@ export default {
     updateConnectStatus(status) {
       if (status) this.callSystemConnectionStatus = status;
     },
-    updateSerialDeviceList() {
-      cms.socket.emit('get-serial-devices', (devices) => {
-        this.serialDevices = devices;
-
-        this.selectedSerialDevice = this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
-            ? this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
-            : (this.serialDevices.length > 0 ? this.serialDevices[0] : '');
-      });
-    }
+    updateUsbDeviceList() {
+      cms.socket.emit('list-usb-devices');
+    },
   }
 }
 </script>
