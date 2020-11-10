@@ -47,6 +47,7 @@
     "terser": "^4.8.0",
     "tmp-promise": "^2.0.2",
     "uuid": "^3.3.3",
-    "xlsx": "^0.16.2"
+    "xlsx": "^0.16.2",
+    "schemahandler": "github:gigasource/schemaHandler#1.0.8"
   }
 }

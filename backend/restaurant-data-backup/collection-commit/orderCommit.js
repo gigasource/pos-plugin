@@ -108,10 +108,6 @@ async function orderCommit(updateCommit) {
 		}
 		// console.debug(getBaseSentryTags('updateCommitQueue'), 'After exec commits', JSON.stringify(activeOrders));
 		// wait for db update
-		setTimeout(() => {
-			updateCommit.handler.cms.socket.emit('updateOrderItems');
-			updateCommit.handler.cms.socket.emit('update-table-status');
-		}, 200);
 		if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
 			const deleteCommit =
 				await updateCommit.getMethod(TYPENAME, 'deleteTempCommit')({groupTempId: lastTempId});

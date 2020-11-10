@@ -1,19 +1,29 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
 const { proxyBuilder } = require('./collection-commit/utils');
+const orm = require('schemahandler/orm');
+orm.setMultiDbMode();
+orm.connected = true;
 
 class UpdateCommit {
-	constructor(storeId, client, db) {
+	constructor(storeId, client) {
+		orm.registerSchema('Order', storeId,{
+			items: [{ modifiers: [{}] }],
+			cancellationItems: [{ modifiers: [{}] }],
+			recentItems: [{ modifiers: [{}] }],
+			recentCancellationItems: [{ modifiers: [{}] }]
+		})
 		const _this = this;
 		_this.updateCommit = {
+			isOnlineOrder: true,
 			isMaster: false,
 			storeId,
 			client,
-			db,
-			orderCommitModel: proxyBuilder('OrderCommit', db),
-			orderModel: proxyBuilder('Order', db),
-			posCommitModel: proxyBuilder('PosCommit', db),
-			commitType: ['order', 'report', 'pos'],
+			db: client.db(storeId),
+			orderCommitModel: orm.getCollection('OrderCommit', storeId),
+			orderModel: orm.getCollection('Order', storeId),
+			posCommitModel: orm.getCollection('PosCommit', storeId),
+			commitType: ['order', 'pos'],
 			methods: {},
 			handler: {},
 			init: async function (socket) {
@@ -52,7 +62,7 @@ class UpdateCommit {
 			getMethod: function (type, name) {
 				if (!_this.updateCommit[type]) _this.updateCommit[type] = {};
 				return _this.updateCommit[type].methods && _this.updateCommit[type].methods[name] ? _this.updateCommit[type].methods[name] : function () {
-					console.warn(`Method ${name} is not defined`);
+					console.warn(`Method ${name} of ${type} is not defined`);
 				}
 			}
 		}

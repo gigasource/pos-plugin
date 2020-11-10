@@ -3,8 +3,10 @@ const router = express.Router();
 const { MongoClient } = require('mongodb');
 const UpdateCommit = require('./updateCommit');
 const mongoose = require('mongoose');
-
+const orm = require('schemahandler/orm');
 const connnectionUri = `mongodb://${global.APP_CONFIG.database.username}:${global.APP_CONFIG.database.password}@mongo-vn-office.gigasource.io:27017`;
+
+orm.connect(connnectionUri);
 let connectionHandlers = {};
 
 async function initConnection(socket) {
@@ -12,9 +14,7 @@ async function initConnection(socket) {
 		const storesList = await cms.getModel('Store').find({}).lean();
 		for (let id = 0; id < storesList.length; id++) {
 			const store = storesList[id];
-			const client = await MongoClient.connect(connnectionUri);
-			const db = client.db(store._id.toString());
-			connectionHandlers[store._id.toString()] = new UpdateCommit(store._id.toString(), client, db);
+			connectionHandlers[store._id.toString()] = new UpdateCommit(store._id.toString(), orm.cache.get('client'));
 			await connectionHandlers[store._id.toString()].updateCommit.init(socket);
 			connectionHandlers[store._id.toString()].updateCommit.commitType.forEach(type => {
 				connectionHandlers[store._id.toString()].updateCommit.getMethod(type, 'resumeQueue')();
@@ -57,7 +57,7 @@ async function updateCommitNode(storeId, commits, socket) {
 			connection.updateCommit.handleCommit(typeCommits);
 			connection.updateCommit.setHighestCommitIds(typeCommits);
 		} else {
-			socket.emit('requireSync', oldHighestCommitId, buildNodeSync(connection));
+			socket.emit('requireSync', type, oldHighestCommitId, buildNodeSync(connection));
 		}
 	})
 	// const oldHighestCommitId = commits.length ? connection.checkHighestCommitId(commits[0].commitId) : null;

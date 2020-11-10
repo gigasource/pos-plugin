@@ -2,12 +2,12 @@ const Queue = require('better-queue');
 const mongoose = require('mongoose');
 const JsonFn = require('json-fn');
 const _ = require('lodash');
-const { convertResultToObject, convertToObjectId, convertMongooseQueryToMongoQuery } = require('./utils');
 
 async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
 
 	function emitToFrontend(commit) {
+		if (updateCommit.isOnlineOrder) return;
 		if (commit.data.collection === 'products') {
 			cms.socket.emit('updateProductProps');
 		} else if (commit.data.collection === 'rooms') {
@@ -20,8 +20,8 @@ async function posCommit(updateCommit) {
 	if (!updateCommit[TYPENAME])
 		updateCommit[TYPENAME] = {};
 
-	const commitDoc = await convertResultToObject('find', await updateCommit.posCommitModel.find({}).sort({'id': -1}).limit(1));
-	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
+	const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId');
+	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
 	updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating = 0;
 	updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
 		const { commits } = data;
@@ -30,8 +30,13 @@ async function posCommit(updateCommit) {
 		for (let commit of commits) {
 			lastTempId = commit.groupTempId;
 			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
-			const result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
+			let result;
+			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
+				result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
+			} else result = true;
+
 			if (result) {
+				await updateCommit.posCommitModel.create(commit);
 				if (commit.commitId) updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
@@ -55,8 +60,8 @@ async function posCommit(updateCommit) {
 
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
-			const collection = mongoose.connection.db.collection(commit.data.collection);
-			const query = JsonFn.parse(commit.update.query, null, null, (key, value) => {
+			const collection = updateCommit.db.collection(commit.data.collection);
+			const query = JsonFn.parse(commit.update.query, true, true, (key, value) => {
 				if (!key.endsWith('_id')) {
 					return value;
 				}
@@ -77,7 +82,6 @@ async function posCommit(updateCommit) {
 				updateCommit[TYPENAME].highestPosCommitId++;
 			}
 			emitToFrontend(commit);
-			await updateCommit.posCommitModel.create(commit);
 			return true;
 		} catch (err) {
 			console.error('Error occurred', err);
