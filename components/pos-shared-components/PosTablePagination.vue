@@ -16,7 +16,6 @@
       <g-combobox menu-class="menu-pagination"
           v-model="comboPage"
           :items="listPageNumber"
-          @input="gotoPage($event)"
           style="font-size: 13px;"
       ></g-combobox>
     </div>
@@ -69,12 +68,6 @@
           this.$emit('execQueryByPage');
         });
       },
-      gotoPage(v) {
-        let value = parseInt(v);
-        if (!isNaN(value) && value <= this.totalPage) {
-          this.$emit('execQueryByPage');
-        }
-      },
       gotoFirstPage() {
         this.$emit('update:currentPage', 1);
         this.$emit('execQueryByPage');
@@ -111,6 +104,7 @@
           let value = parseInt(v);
           if (!isNaN(value) && value <= this.totalPage) {
             this.$emit('update:currentPage', value);
+            this.$emit('execQueryByPage');
           }
         }
       },

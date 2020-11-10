@@ -78,8 +78,10 @@
     </g-simple-table>
     <pos-table-pagination @execQueryByPage="updatePagination"
                           :total-document="totalOrders"
-                          :limit.sync="limit"
-                          :current-page.sync="currentPage"/>
+                          :limit="orderHistoryPagination.limit"
+                          @update:limit="updateLimit"
+                          :current-page="orderHistoryPagination.currentPage"
+                          @update:currentPage="updateCurrentPage"/>
     <dialog-selection-filter v-model="dialog.type" :label="$t('orderHistory.type')" :items="orderTypes" @submit="setTypeFilter"/>
     <dialog-selection-filter v-model="dialog.payment" label="Payment Method" :items="paymentMethods" @submit="setPaymentFilter"/>
     <dialog-number-filter v-model="dialog.table" :label="$t('orderHistory.tableNo')" @submit="setTableFilter"/>
@@ -109,36 +111,6 @@
           {text: 'Dine-in', value: 'dinein'}
         ],
         paymentMethods: []
-      }
-    },
-    computed: {
-      limit: {
-        get() {
-          if(this.orderHistoryPagination)
-            return this.orderHistoryPagination.limit;
-          return 15
-        },
-        set(val) {
-          this.orderHistoryPagination.limit = val;
-        }
-      },
-      currentPage: {
-        get() {
-          if(this.orderHistoryPagination)
-            return this.orderHistoryPagination.currentPage;
-          return 1
-        },
-        set(val) {
-          this.orderHistoryPagination.currentPage = val;
-        }
-      }
-    },
-    watch: {
-      async limit() {
-        await this.getOrderHistory();
-      },
-      async currentPage() {
-        await this.getOrderHistory();
       }
     },
     methods: {
@@ -223,6 +195,14 @@
         this.updateOrderHistoryFilter(filter);
         await this.getOrderHistory();
         await this.getTotalOrders();
+      },
+      async updateCurrentPage(val) {
+        this.orderHistoryPagination.currentPage = val
+        await this.getOrderHistory();
+      },
+      async updateLimit(val) {
+        this.orderHistoryPagination.limit = val
+        await this.getOrderHistory();
       }
     },
     async created() {
