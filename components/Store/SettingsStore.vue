@@ -112,12 +112,13 @@
       this.defaultPrepareTime = posSettings.defaultPrepareTime
       this.onlineOrderSorting = posSettings.onlineOrderSorting
 
+      await this.loadUsbPrinters()
       await this.getOnlineDevice()
       await this.registerHardware()
       await this.setupPairDevice()
       await this.getPairStatus()
       await this.getWebshopName()
-      await this.loadUsbPrinters()
+      
     },
     watch: {
       'productPagination.limit'(newVal) {
@@ -768,7 +769,15 @@
         this.selectedPrinterMenu = this.printerSidebar.find(s => s.slot === 'general')
       },
       async loadUsbPrinters() {
-        cms.socket.emit('load-usb-printers', deviceList => this.usbPrinters = deviceList)
+        console.log('SettingStore: load-usb-printers')
+        try {
+          cms.socket.emit('load-usb-printers', deviceList => {
+            console.log('SettingsStore:loadUsbPrinters', deviceList)
+            this.usbPrinters = deviceList
+          })
+        } catch(e) {
+          console.log(e)
+        }
       },
       //keyboard Config
       async updateKeyboardConfig(keyboardConfig) {

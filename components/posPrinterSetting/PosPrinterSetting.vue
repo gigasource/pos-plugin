@@ -34,12 +34,14 @@
         </g-btn-bs>
       </div>
       <div v-else-if="selectedPrinterType.value === 'usb'" class="config row-flex align-items-end">
-        <g-select class="config__usb-printer-paths"
-                  :style="{ flex: 1 }"
-                  :items="usbPrinterSelectModel"
-                  :value="printer.usb"
-                  @input="setUsbPrinter"
-                  textFieldComponent="GTextFieldBs"/>
+        <g-select
+            returnObject
+            class="config__usb-printer-paths"
+            :style="{ flex: 1 }"
+            :items="usbPrinterSelectModel"
+            :value="printer.usb"
+            @input="setUsbPrinter"
+            textFieldComponent="GTextFieldBs"/>
         <g-btn-bs background-color="blue accent 3" style="padding: 6px; transition: none" @click="$emit('testPrinter', printer)">
           {{$t('settings.testPrinter')}}
         </g-btn-bs>
@@ -379,7 +381,11 @@
         }
       },
       usbPrinterSelectModel () {
-        return (this.usbPrinters || []).map(printer => ({ text: printer, value: printer }))
+        // refer: backend/usb-printer/usb-printer.js
+        return (this.usbPrinters || []).map(printer => ({
+          text: printer.productName,
+          value: printer
+        }))
       }
     },
     methods: {
@@ -429,6 +435,7 @@
         this.showDialog = false
       },
       async setUsbPrinter(value) {
+        console.log("PosPrinterSetting:setUsbPrinter", value)
         if (this.printer) {
           this.printer.usb = value;
         } else {
