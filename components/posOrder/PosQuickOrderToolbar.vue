@@ -13,12 +13,12 @@
     <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
     <g-spacer/>
     <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
-              :disabled="disablePrintBtn"
+              :disabled="disablePrintBtn" icon="icon-print"
               @click.stop="print">
       Print
     </g-btn-bs>
     <template v-if="currentOrder.table">
-      <g-btn-bs class="col-2" :disabled="!enablePayBtn"
+      <g-btn-bs class="col-2" :disabled="!enablePayBtn" icon="icon-split_check_2"
                 @click.stop="splitOrder">
         Split order
       </g-btn-bs>

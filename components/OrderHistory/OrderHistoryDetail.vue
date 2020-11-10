@@ -72,6 +72,10 @@
       </div>
     </div>
   </div>
+  <div v-else class="order-detail align-items-center justify-center">
+    <img class="mb-1" alt src="/plugins/pos-plugin/assets/pending_order.svg"/>
+    Order history is currently empty
+  </div>
 </template>
 
 <script>
