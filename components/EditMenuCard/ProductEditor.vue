@@ -105,28 +105,28 @@
       </div>
 
       <!-- Happy hour -->
-      <div class="mt-2" v-if="isProductLayout">
-        <div class="product-editor__label">{{$t('restaurant.product.happyHour')}}</div>
-        <div class="prop-option i">
-          <p>14:00 - 17:00 : 20%</p>
-          <p>Mo Di Mi Do Fr Sa So</p>
-        </div>
-      </div>
+<!--      <div class="mt-2" v-if="isProductLayout">-->
+<!--        <div class="product-editor__label">{{$t('restaurant.product.happyHour')}}</div>-->
+<!--        <div class="prop-option i">-->
+<!--          <p>14:00 - 17:00 : 20%</p>-->
+<!--          <p>Mo Di Mi Do Fr Sa So</p>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <!-- Category -->
-      <div class="mt-2">
-        <div class="product-editor__label">{{$t('article.category')}}</div>
-        <div>
-          <g-grid-select mandatory v-model="selectedProduct.category" item-text="name" item-value="_id" :items="categories" itemCols="auto">
-            <template #default="{ toggleSelect, item, index }">
-              <div class="prop-option" @click="e => { toggleSelect(item); changeCategory(item) }">{{item.name}}</div>
-            </template>
-            <template #selected="{ toggleSelect, item, index }">
-              <div class="prop-option prop-option--1" @click="e => { toggleSelect(item); changeCategory(item) } ">{{item.name}}</div>
-            </template>
-          </g-grid-select>
-        </div>
-      </div>
+<!--      <div class="mt-2">-->
+<!--        <div class="product-editor__label">{{$t('article.category')}}</div>-->
+<!--        <div>-->
+<!--          <g-grid-select mandatory v-model="selectedProduct.category" item-text="name" item-value="_id" :items="categories" itemCols="auto">-->
+<!--            <template #default="{ toggleSelect, item, index }">-->
+<!--              <div class="prop-option" @click="e => { toggleSelect(item); changeCategory(item) }">{{item.name}}</div>-->
+<!--            </template>-->
+<!--            <template #selected="{ toggleSelect, item, index }">-->
+<!--              <div class="prop-option prop-option&#45;&#45;1" @click="e => { toggleSelect(item); changeCategory(item) } ">{{item.name}}</div>-->
+<!--            </template>-->
+<!--          </g-grid-select>-->
+<!--        </div>-->
+<!--      </div>-->
     </template>
 
     <!-- Popup modifiers -->
