@@ -64,7 +64,8 @@
         action: null, // current action -- see list of available action above
         lastPos: null, // store last mouse clientX, Y position which already handled by "applyChange throttle"
         swiping: false,
-        zoom: 0
+        zoom: 0,
+        minimumSize: 60
       }
     },
     computed: {
@@ -301,6 +302,10 @@
       resizeAction(change) {
         this.selectingObj.size.width += change.offsetX;
         this.selectingObj.size.height += change.offsetY;
+        if(this.selectingObj.size.width < this.minimumSize)
+          this.selectingObj.size.width = this.minimumSize
+        if(this.selectingObj.size.height < this.minimumSize)
+          this.selectingObj.size.height = this.minimumSize
       }
     }
   }
