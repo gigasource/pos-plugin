@@ -3,6 +3,7 @@ const randomstring = require('randomstring')
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
+const { getExternalSocketIoServer } = require('../socket-io-server');
 const ObjectId = mongoose.Types.ObjectId
 const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
@@ -61,37 +62,68 @@ router.post('/register', async (req, res) => {
   // hardware: Sunmi, Kindle-Fire, etc, ...
   // appName: Pos-Germany.apk
   // appVersion: 1.51
-  let {pairingCode, hardware, appName, appVersion, release, appBaseVersion, osName} = req.body;
+  let {pairingCode, hardware, hardwareId, appName, appVersion, release, appBaseVersion, osName} = req.body;
   if (!pairingCode) return res.status(400).json({message: 'Missing pairingCode in request body'});
-  const deviceInfo = await DeviceModel.findOne({pairingCode, paired: false});
-  if (deviceInfo) {
-    // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
-    await DeviceModel.updateOne({pairingCode}, {
-      name: hardware || 'New Device',
-      paired: true,
-      deviceType: 'pos',
-      hardware, appName, appVersion, release, appBaseVersion, osName, features: {
-        fastCheckout: false,
-        manualTable: false,
-        delivery: false,
-        editMenuCard: false,
-        tablePlan: false,
-        onlineOrdering: false,
-        editTablePlan: false,
-        staffReport: false,
-        eodReport: false,
-        monthlyReport: false,
-        remoteControl: true,
-        proxy: true,
-        alwaysOn: true,
-        reservation: false,
-        startOnBoot: false
-      }
-    });
-    const store = await addPairedDeviceToStore(deviceInfo._id, deviceInfo.storeId);
-    cms.socket.emit('reloadStores', deviceInfo.storeId);
+  const tempDevice = await DeviceModel.findOne({pairingCode, paired: false});
+  const existingDevice = hardwareId ? await DeviceModel.findOne({ hardwareId }) : null
+  let device
+  if (tempDevice) {
+    if (existingDevice) {
+      device = await DeviceModel.findOneAndUpdate({ hardwareId }, {
+        name: hardware || 'New Device',
+        paired: true,
+        deviceType: 'pos',
+        pairingCode,
+        storeId: tempDevice.storeId,
+        hardware, appName, appVersion, release, appBaseVersion, osName, features: {
+          fastCheckout: true,
+          manualTable: true,
+          delivery: false,
+          editMenuCard: true,
+          tablePlan: true,
+          onlineOrdering: false,
+          editTablePlan: true,
+          staffReport: true,
+          eodReport: true,
+          monthlyReport: true,
+          remoteControl: true,
+          proxy: true,
+          alwaysOn: true,
+          reservation: false,
+          startOnBoot: false
+        }
+      }, { new: true });
+      await DeviceModel.deleteOne({ _id: tempDevice._id })
+    } else {
+      // online status will be updated when client connects to external Socket.io server (see backend/socket-io-server.js file)
+      device = await DeviceModel.findOneAndUpdate({pairingCode}, {
+        name: hardware || 'New Device',
+        paired: true,
+        deviceType: 'pos',
+        hardware, hardwareId, appName, appVersion, release, appBaseVersion, osName, features: {
+          fastCheckout: true,
+          manualTable: true,
+          delivery: false,
+          editMenuCard: true,
+          tablePlan: true,
+          onlineOrdering: false,
+          editTablePlan: true,
+          staffReport: true,
+          eodReport: true,
+          monthlyReport: true,
+          remoteControl: true,
+          proxy: true,
+          alwaysOn: true,
+          reservation: false,
+          startOnBoot: false
+        }
+      }, { new: true });
+    }
+
+    const store = await addPairedDeviceToStore(device._id, device.storeId);
+    cms.socket.emit('reloadStores', device.storeId);
     res.status(200).json({
-      deviceId: deviceInfo._id,
+      deviceId: device._id,
       storeName: store.name || store.settingName,
       storeAlias: store.alias,
       storeId: store._id.toString()
@@ -99,7 +131,10 @@ router.post('/register', async (req, res) => {
 
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
     if (storeDevices.length === 1) {
-      await setMasterDevice(store._id, deviceInfo._id)
+      await setMasterDevice(store._id, device._id)
+      const demoData = store.demoDataSrc;
+      if (demoData)
+        await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)
     }
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})

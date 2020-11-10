@@ -1,3 +1,4 @@
+const path = require('path')
 const uuidv1 = require('uuid')
 const _ = require('lodash')
 const express = require('express')
@@ -660,6 +661,11 @@ async function initApprovedDevice(storeId, deviceId) {
   const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
   if (storeDevices.length === 1) {
     await setMasterDevice(storeId, deviceId)
+
+    const store = await StoreModel.findById(storeId)
+    const demoData = store.demoDataSrc;
+    if (demoData)
+      await getExternalSocketIoServer().emitToPersistent(deviceId, 'import-init-data', demoData)
   }
 }
 
@@ -700,6 +706,28 @@ router.get('/demo-data/:storeId', async (req, res) => {
   const demoDataSrc = store.demoDataSrc
 
   res.status(200).json({ demoDataSrc })
+})
+
+router.get('/demo-stores', async (req, res) => {
+  const templateFolderPath = '/store-demo-data/template'
+  const { data } = await axios.get(
+    `http://localhost:${global.APP_CONFIG.port}/cms-files/file-metadata?folderPath=${templateFolderPath}`)
+  let files = []
+
+  if (data && data.length) {
+    files = data.filter(f => !f.isFolder && f.fileName.endsWith('.json')).map(({ fileName }) =>
+      ({ fileName: `/cms-files/files/view/${templateFolderPath}/${fileName}` }))
+    for (const file of files) {
+      const fileName = path.basename(file.fileName, '.json')
+      const storeId = fileName.split('-')[2]
+      const store = await StoreModel.findById(storeId).lean()
+      file.image = store.demoImgSrc
+      file.storeId = storeId
+      file.storeName = store.name || store.settingName
+    }
+  }
+
+  res.status(200).json(files)
 })
 
 module.exports = router

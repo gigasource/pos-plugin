@@ -26,6 +26,9 @@
         <div class="col-6">
           <g-switch v-model="features.editTablePlan" label="Edit Table Plan"/>
         </div>
+        <div class="col-6">
+          <g-switch v-model="features.manageInventory" label="Manage Inventory"/>
+        </div>
         <div class="dlg-feature-control__body__line"></div>
         <div class="col-12">
           <g-switch :disabled="!canUseFeature('onlineOrdering')" v-model="features.onlineOrdering" label="Online Ordering"/>
