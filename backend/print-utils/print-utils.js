@@ -3,10 +3,6 @@ const EscPrinter = require('../print-utils/node-thermal-printer');
 const _ = require('lodash')
 
 module.exports = {
-  renderer: require('vue-server-renderer').createRenderer({
-    template: fs.readFileSync(`${__dirname}/print-template.html`, 'utf-8')
-  }),
-
   async getGroupPrinterInfo(cms, device, type) {
     const {printerGeneralSetting} = await cms.getModel('PosSetting').findOne();
     const {useMultiPrinterForEntirePrinter, useMultiPrinterForInvoicePrinter, useMultiPrinterForKitchenPrinter} = printerGeneralSetting;

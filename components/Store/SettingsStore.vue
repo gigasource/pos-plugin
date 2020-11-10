@@ -98,6 +98,8 @@
         reservationSetting: null,
         //call system
         callSystem: null,
+        //
+        usbPrinters: [],
       }
     },
     async created() {
@@ -115,6 +117,7 @@
       await this.setupPairDevice()
       await this.getPairStatus()
       await this.getWebshopName()
+      await this.loadUsbPrinters()
     },
     watch: {
       'productPagination.limit'(newVal) {
@@ -763,6 +766,9 @@
         await cms.getModel('GroupPrinter').deleteMany({name: {$regex: regex}, type: 'entire'})
         await this.genPrinterSidebar()
         this.selectedPrinterMenu = this.printerSidebar.find(s => s.slot === 'general')
+      },
+      async loadUsbPrinters() {
+        cms.socket.emit('load-usb-printers', deviceList => this.usbPrinters = deviceList)
       },
       //keyboard Config
       async updateKeyboardConfig(keyboardConfig) {

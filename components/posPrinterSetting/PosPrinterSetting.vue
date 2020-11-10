@@ -20,21 +20,37 @@
       </div>
     </div>
     <g-divider inset/>
-    <div v-if="selectedPrinterType && selectedPrinterType.value === 'ip'" class="config row-flex align-items-end">
-      <g-text-field-bs :label="$t('settings.ipAddress')" v-model="ipAddress">
-        <template #append-inner>
-          <g-icon style="cursor: pointer" @click="openDialog('ipInput')">icon-keyboard</g-icon>
-        </template>
-      </g-text-field-bs>
-      <g-btn-bs background-color="blue accent 3" style="padding: 6px; flex: 1; transition: none" @click="$emit('testPrinter', printer)">
-        {{$t('settings.testPrinter')}}
-      </g-btn-bs>
-    </div>
-    <div v-else-if="selectedPrinterType && selectedPrinterType !== 'ip'" class="config">
-      <g-btn-bs background-color="blue accent 3" style="padding: 6px 16px; transition: none" @click="$emit('testPrinter', printer)">
-        {{$t('settings.testPrinter')}}
-      </g-btn-bs>
-    </div>
+    
+    <!-- Printer config -->
+    <template v-if="selectedPrinterType">
+      <div v-if="selectedPrinterType.value === 'ip'" class="config row-flex align-items-end">
+        <g-text-field-bs :label="$t('settings.ipAddress')" v-model="ipAddress">
+          <template #append-inner>
+            <g-icon style="cursor: pointer" @click="openDialog('ipInput')">icon-keyboard</g-icon>
+          </template>
+        </g-text-field-bs>
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px; flex: 1; transition: none" @click="$emit('testPrinter', printer)">
+          {{$t('settings.testPrinter')}}
+        </g-btn-bs>
+      </div>
+      <div v-else-if="selectedPrinterType.value === 'usb'" class="config row-flex align-items-end">
+        <g-select class="config__usb-printer-paths"
+                  :style="{ flex: 1 }"
+                  :items="usbPrinterSelectModel"
+                  :value="printer.usb"
+                  @input="setUsbPrinter"
+                  textFieldComponent="GTextFieldBs"/>
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px; transition: none" @click="$emit('testPrinter', printer)">
+          {{$t('settings.testPrinter')}}
+        </g-btn-bs>
+      </div>
+      <div v-else class="config">
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px 16px; transition: none" @click="$emit('testPrinter', printer)">
+          {{$t('settings.testPrinter')}}
+        </g-btn-bs>
+      </div>
+    </template>
+    
     <div v-if="type === 'entire'" class="receipt-config">
       <g-switch :label="$t('settings.onlyTakeAway')" v-model="onlyTakeAway"/>
       <div class="title">Include:</div>
@@ -144,7 +160,7 @@
       index: Number
     },
     injectService: [
-      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter)',
+      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter, usbPrinters)',
     ],
     data() {
       return {
@@ -163,7 +179,7 @@
         showDialog: false,
         printer: null,
         listTaxCategories: [],
-        groupPrinter: null
+        groupPrinter: null,
       }
     },
     computed: {
@@ -361,6 +377,9 @@
           await this.updateGroupPrinter(this.id, 'defaultTakeAwayTax', taxCategory.value)
           this.groupPrinter = await this.getGroupPrinterById(this.id)
         }
+      },
+      usbPrinterSelectModel () {
+        return (this.usbPrinters || []).map(printer => ({ text: printer, value: printer }))
       }
     },
     methods: {
@@ -408,6 +427,14 @@
           this.ipAddress = this.editIp
         }
         this.showDialog = false
+      },
+      async setUsbPrinter(value) {
+        if (this.printer) {
+          this.printer.usb = value;
+        } else {
+          this.printer = { usb: value }
+        }
+        await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
       }
     },
     watch: {
@@ -478,6 +505,15 @@
         &__active {
           border-color: #1271ff;
           background: #E3F2FD;
+        }
+      }
+      
+      &__usb-printer-paths {
+        ::v-deep {
+          .bs-tf-wrapper {
+            margin-top: 0;
+            margin-bottom: 0;
+          }
         }
       }
     }

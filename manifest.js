@@ -175,6 +175,12 @@ module.exports = {
     },
     {
       loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/usb-printer/usb-printer.js'
+    },
+    {
+      loader: {
         type: 'i18n'
       },
       path: 'i18n/de.js'
