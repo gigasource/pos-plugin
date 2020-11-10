@@ -513,6 +513,7 @@
       if (!this.online) {
         this.showOfflineSnackbar()
       }
+      cms.socket.emit('screen-loaded')
     },
     beforeDestroy() {
       this.setDateInterval && clearInterval(this.setDateInterval)

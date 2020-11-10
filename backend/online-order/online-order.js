@@ -1088,5 +1088,7 @@ module.exports = async cms => {
         console.debug(sentryTags, 'Error setting master device', e)
       }
     })
+
+    await cms.execPostAsync('run:internalSocketConnected', null, [socket])
   })
 }

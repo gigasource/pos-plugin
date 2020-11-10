@@ -7,6 +7,7 @@ async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
 
 	function emitToFrontend(commit) {
+		if (updateCommit.isOnlineOrder) return;
 		if (commit.data.collection === 'products') {
 			cms.socket.emit('updateProductProps');
 		} else if (commit.data.collection === 'rooms') {
@@ -30,13 +31,18 @@ async function posCommit(updateCommit) {
 			lastTempId = commit.groupTempId;
 			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
 			let result;
-			if (!(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
+			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
 				result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
 			} else result = true;
 
 			if (result) {
+				if (commit.commitId) {
+					updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
+				} else {
+					commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
+					updateCommit[TYPENAME].highestPosCommitId++;
+				}
 				await updateCommit.posCommitModel.create(commit);
-				if (commit.commitId) updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
 				newCommits.push(commit);
 			}
 		}
@@ -59,7 +65,7 @@ async function posCommit(updateCommit) {
 
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
-			const collection = mongoose.connection.db.collection(commit.data.collection);
+			const collection = updateCommit.db.collection(commit.data.collection);
 			const query = JsonFn.parse(commit.update.query, true, true, (key, value) => {
 				if (!key.endsWith('_id')) {
 					return value;
