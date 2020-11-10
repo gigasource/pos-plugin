@@ -1,118 +1,121 @@
 module.exports = async (cms) => {
-  const SerialPort = require('serialport');
-  let roboticDevice;
-  let connectionStatus = '';
+  try {
+    const SerialPort = require('serialport');
+    let roboticDevice;
+    let connectionStatus = '';
 
-  cms.socket.on('connect', internalSocket => {
-    internalSocket.on('get-serial-devices', listSerialDevices);
-    internalSocket.on('refresh-call-system-config', setupRoboticDevice);
-    internalSocket.on('get-call-system-status', updateConnectionStatus);
-  });
-
-  async function updateConnectionStatus(cb, posSettings) {
-    if (!posSettings) posSettings = await cms.getModel('PosSetting').findOne();
-    const {call: callConfig} = posSettings;
-    let {mode} = callConfig;
-    const useRoboticModem = mode === 'robotic-modem';
-
-    if (cb && useRoboticModem) cb(connectionStatus);
-    else cms.socket.emit('update-call-system-status', useRoboticModem ? connectionStatus : null);
-  }
-
-  async function listSerialDevices(cb) {
-    let serialDeviceList = await SerialPort.list();
-    serialDeviceList = serialDeviceList.map(device => {
-      let deviceName = device.path;
-
-      if (device.manufacturer) deviceName += ` - ${device.manufacturer}`;
-      else device.manufacturer = '';
-
-      device.fullName = deviceName;
-
-      return device;
-    }).sort((e1, e2) => {
-      return e2.manufacturer.localeCompare(e1.manufacturer)
+    cms.socket.on('connect', internalSocket => {
+      internalSocket.on('get-serial-devices', listSerialDevices);
+      internalSocket.on('refresh-call-system-config', setupRoboticDevice);
+      internalSocket.on('get-call-system-status', updateConnectionStatus);
     });
 
-    cb(serialDeviceList);
-  }
+    async function updateConnectionStatus(cb, posSettings) {
+      if (!posSettings) posSettings = await cms.getModel('PosSetting').findOne();
+      const {call: callConfig} = posSettings;
+      let {mode} = callConfig;
+      const useRoboticModem = mode === 'robotic-modem';
 
-  function reset() {
-    if (roboticDevice) {
-      roboticDevice.close(err => err && console.error(err));
-      roboticDevice.removeAllListeners();
-      roboticDevice = null;
+      if (cb && useRoboticModem) cb(connectionStatus);
+      else cms.socket.emit('update-call-system-status', useRoboticModem ? connectionStatus : null);
     }
-  }
 
-  await setupRoboticDevice();
+    async function listSerialDevices(cb) {
+      let serialDeviceList = await SerialPort.list();
+      serialDeviceList = serialDeviceList.map(device => {
+        let deviceName = device.path;
 
-  async function setupRoboticDevice() {
-    const posSettings = await cms.getModel('PosSetting').findOne();
-    const {call: callConfig} = posSettings;
-    let {mode, ipAddresses = {}} = callConfig;
-    const useRoboticDevice = mode === 'robotic-modem';
+        if (device.manufacturer) deviceName += ` - ${device.manufacturer}`;
+        else device.manufacturer = '';
 
-    if (!useRoboticDevice && roboticDevice) {
-      reset();
-    } else if (useRoboticDevice) {
-      reset();
-      roboticDevice = new SerialPort(ipAddresses[mode]);
-      connectionStatus = 'Connecting...';
-      await updateConnectionStatus(null, posSettings);
+        device.fullName = deviceName;
 
-      const connectionErrorTimeout = setTimeout(() => {
-        connectionStatus = 'Connection error, please choose another device';
-        updateConnectionStatus();
-      }, 5000);
-
-      roboticDevice.on('open', function () {
-        roboticDevice.write('AT+VCID=1\r', (err) => {
-          if (err) console.error(err);
-        });
-
-        roboticDevice.on('data', function (data) {
-          if (data.toString().trim() === 'OK') {
-            clearTimeout(connectionErrorTimeout);
-            connectionStatus = 'Connected';
-            updateConnectionStatus();
-          }
-
-          handleRoboticData(data);
-        });
+        return device;
+      }).sort((e1, e2) => {
+        return e2.manufacturer.localeCompare(e1.manufacturer)
       });
 
-      roboticDevice.on('close', function () {
-        connectionStatus = 'Disconnected';
-        updateConnectionStatus();
-      });
-    }
-  }
-
-  function handleRoboticData(data) {
-    const trimmedData = data.toString().trim();
-
-    // if (trimmedData === 'NO CARRIER') {
-    // this means the call is answered
-    // (this signal appears a few seconds after the call ends)
-
-    // } else {
-    let callerPhoneNumber;
-    const phoneData = trimmedData.split('\r\n');
-    const callerNameInfo = phoneData.find(e => e.startsWith('NAME'));
-    const callerNumberInfo = phoneData.find(e => e.startsWith('NMBR'));
-
-    if (callerNameInfo) {
-      callerPhoneNumber = callerNameInfo.split('=')[1];
+      cb(serialDeviceList);
     }
 
-    if (callerNumberInfo && !(/^\d+$/.test(callerPhoneNumber))) {
-      callerPhoneNumber = callerNumberInfo.split('=')[1];
+    function reset() {
+      if (roboticDevice) {
+        roboticDevice.close(err => err && console.error(err));
+        roboticDevice.removeAllListeners();
+        roboticDevice = null;
+      }
     }
 
-    if (/^\d+$/.test(callerPhoneNumber)) cms.socket.emit('new-phone-call', callerPhoneNumber, new Date());
+    await setupRoboticDevice();
 
-    // }
+    async function setupRoboticDevice() {
+      const posSettings = await cms.getModel('PosSetting').findOne();
+      const {call: callConfig} = posSettings;
+      let {mode, ipAddresses = {}} = callConfig;
+      const useRoboticDevice = mode === 'robotic-modem';
+
+      if (!useRoboticDevice && roboticDevice) {
+        reset();
+      } else if (useRoboticDevice) {
+        reset();
+        roboticDevice = new SerialPort(ipAddresses[mode]);
+        connectionStatus = 'Connecting...';
+        await updateConnectionStatus(null, posSettings);
+
+        const connectionErrorTimeout = setTimeout(() => {
+          connectionStatus = 'Connection error, please choose another device';
+          updateConnectionStatus();
+        }, 5000);
+
+        roboticDevice.on('open', function () {
+          roboticDevice.write('AT+VCID=1\r', (err) => {
+            if (err) console.error(err);
+          });
+
+          roboticDevice.on('data', function (data) {
+            if (data.toString().trim() === 'OK') {
+              clearTimeout(connectionErrorTimeout);
+              connectionStatus = 'Connected';
+              updateConnectionStatus();
+            }
+
+            handleRoboticData(data);
+          });
+        });
+
+        roboticDevice.on('close', function () {
+          connectionStatus = 'Disconnected';
+          updateConnectionStatus();
+        });
+      }
+    }
+
+    function handleRoboticData(data) {
+      const trimmedData = data.toString().trim();
+
+      // if (trimmedData === 'NO CARRIER') {
+      // this means the call is answered
+      // (this signal appears a few seconds after the call ends)
+
+      // } else {
+      let callerPhoneNumber;
+      const phoneData = trimmedData.split('\r\n');
+      const callerNameInfo = phoneData.find(e => e.startsWith('NAME'));
+      const callerNumberInfo = phoneData.find(e => e.startsWith('NMBR'));
+
+      if (callerNameInfo) {
+        callerPhoneNumber = callerNameInfo.split('=')[1];
+      }
+
+      if (callerNumberInfo && !(/^\d+$/.test(callerPhoneNumber))) {
+        callerPhoneNumber = callerNumberInfo.split('=')[1];
+      }
+
+      if (/^\d+$/.test(callerPhoneNumber)) cms.socket.emit('new-phone-call', callerPhoneNumber, new Date());
+
+      // }
+    }
+  } catch (err) {
   }
 }
 
