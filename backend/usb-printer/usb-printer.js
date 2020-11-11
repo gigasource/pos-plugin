@@ -3,7 +3,7 @@ try {
   const usb = require('usb');
   const rnBridge = require('rn-bridge')
 
-  const EVENT = 'load-usb-printers';
+  const LOAD_USB_PRINTER = 'load-usb-printers';
 
   const getUsbPrinterDevices = () => {
     return usb.getDeviceList().filter(device => {
@@ -28,38 +28,37 @@ try {
 
   const getMetaData = (metaDataCol, vendorId, productId) => {
     const metadata = metaDataCol.find(p => p.mVendorId === vendorId && p.mProductId === productId)
+    const productName = metadata.mProductName ? metadata.mProductName : metadata.mName
+    const manufacturerName = metadata.mManufacturerName ? metadata.mManufacturerName : "Noname"
     return {
       name: metadata.mName,
-      manufacturerName: metadata.mManufacturerName,
-      productName: metadata.mProductName
+      manufacturerName: manufacturerName,
+      productName: productName
     }
   }
 
-  const cbCache = {}
-
-  rnBridge.app.on('load-usb-printers', (payload) => {
-    console.log('usb-printer:load-usb-printer:response', payload);
-    try {
-      const { devices, callbackId } = payload;
-      const result = getUsbPrinterDevices().map(d => extractDeviceInfo(d, devices))
-      if (callbackId && cbCache[callbackId]) {
-        cbCache[callbackId](result)
-      } else {
-        console.log(`Found 0 callback with callback id = "${callbackId}" for current response.`)
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  });
-
   module.exports = cms => {
     cms.socket.on('connect', socket => {
-      socket.on('load-usb-printers', callback => {
-        console.log('usb-printer:load-usb-printers. gathering metadata from android...');
-        const callbackId = uuid.v4()
-        console.log(`Register callback with id = "${callbackId}" for event "load-usb-printers"`)
-        cbCache[callbackId] = callback
-        rnBridge.app.sendObject('load-usb-printers', { callbackId });
+      socket.on(LOAD_USB_PRINTER, callback => {
+
+        if (typeof (callback) !== 'function') {
+          console.error(`usb-printer:${LOAD_USB_PRINTER}: callback is not a function.`)
+          return;
+        }
+
+        rnBridge.app.once(LOAD_USB_PRINTER, payload => {
+          console.log(`usb-printer:${LOAD_USB_PRINTER}:response`, payload);
+          try {
+            const { devices } = payload;
+            const result = getUsbPrinterDevices().map(d => extractDeviceInfo(d, devices))
+            callback && callback(result)
+          } catch (e) {
+            console.log(e)
+          }
+        });
+
+        console.log(`usb-printer:${LOAD_USB_PRINTER}. gathering metadata from android`);
+        rnBridge.app.sendObject(LOAD_USB_PRINTER, { });
       })
     })
   }

@@ -143,6 +143,7 @@ const UsbManager = {
   queues: {},
   device: {},
   push: function (path, {nr, printer}) {
+    console.log(`UsbManager.push:path=${path}`)
     const uuid = uuidV1();
     usbQueue.push(next => {
       let reprintTime = 0;
@@ -735,7 +736,7 @@ module.exports = class EscPrinter {
       nr++;
     } else if (this.address.printerType === 'usb') {
       //yield this.printUsb(this.address.usb, cut);
-      UsbManager.push(this.address.usb, {
+      UsbManager.push(this.address.usb.name, {
         nr,
         printer: this
       });

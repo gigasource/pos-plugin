@@ -162,7 +162,7 @@
       index: Number
     },
     injectService: [
-      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter, usbPrinters)',
+      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter, usbPrinters, loadUsbPrinters)',
     ],
     data() {
       return {
@@ -398,6 +398,11 @@
             printerType: type.value
           }
         }
+        
+        if (type ==='usb') {
+          await this.loadUsbPrinters();
+        }
+        
         await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
       },
       async resetPrinter() {
@@ -437,9 +442,9 @@
       async setUsbPrinter(value) {
         console.log("PosPrinterSetting:setUsbPrinter", value)
         if (this.printer) {
-          this.printer.usb = value;
+          this.$set(this.printer, 'usb', value);
         } else {
-          this.printer = { usb: value }
+          this.$set(this, 'printer', { usb: value });
         }
         await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
       }
