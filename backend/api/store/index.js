@@ -178,7 +178,7 @@ router.post('/sign-in-requests', async (req, res) => {
     role
   }
 
-  if (store) {
+  if (pos && store) {
     await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
     await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
   }
