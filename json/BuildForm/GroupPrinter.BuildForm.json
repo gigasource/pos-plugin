@@ -195,41 +195,9 @@
           ]
         },
         {
-          "schemaType": "object",
+          "schemaType": "string",
           "key": "usb",
-          "type": "object",
-          "fields": [
-            {
-              "schemaType": "string",
-              "key": "id",
-              "type": "input"
-            },
-            {
-              "schemaType": "string",
-              "key": "idVendor",
-              "type": "input"
-            },
-            {
-              "schemaType": "string",
-              "key": "idProduct",
-              "type": "input"
-            },
-            {
-              "schemaType": "string",
-              "key": "name",
-              "type": "input"
-            },
-            {
-              "schemaType": "string",
-              "key": "manufacturerName",
-              "type": "input"
-            },
-            {
-              "schemaType": "string",
-              "key": "productName",
-              "type": "input"
-            }
-          ]
+          "type": "input"
         }
       ],
       "type": "array",
