@@ -1,53 +1,84 @@
 module.exports = async (cms) => {
-  const rnBridge = require('rn-bridge');
+  let rnBridge;
+
+  try {
+    rnBridge = require('rn-bridge');
+  } catch (e) {
+    // this only works on mobile version
+    return;
+  }
+
   let selectedDevicePath;
   let connectionStatus;
   let deviceList;
   let initialized = false;
 
   function parseRnMessage(data) {
+    if (typeof data === 'object') return data;
+
     try {
       data = JSON.parse(data);
     } catch (e) {
-      // nothing to do, just treat this payload as string
+      data = {};
     }
 
     return data;
   }
 
-  function listUsbDevicesHandler(data) {
+  async function listUsbDevicesHandler(data) {
     let {deviceList: dList} = parseRnMessage(data);
+    if (!dList) return;
+
     deviceList = dList;
     cms.socket.emit('list-usb-devices', dList);
 
+    // only try reconnecting if device is disconnected
+    if (!connectionStatus || connectionStatus.toLowerCase() === 'disconnected') {
+      const posSettings = await cms.getModel('PosSetting').findOne();
+      const {call: callConfig} = posSettings;
+      const {ipAddresses = {}} = callConfig;
+      const devicePathInConfig = ipAddresses['robotic-modem'];
+
+      if (deviceList && deviceList.some(d => d.devicePath === devicePathInConfig)) {
+        openUsbDevice(devicePathInConfig);
+      }
+    }
+
     if (!initialized) {
       initialized = true;
-      setupRoboticDevice();
+      await setupRoboticDevice();
     }
   }
 
   function openUsbDeviceHandler(data) {
     const {message} = parseRnMessage(data);
+    if (!message) return;
+
     selectedDevicePath = message;
   }
 
   function connectionStatusHandler(data) {
     const {status, devicePath} = parseRnMessage(data);
+    if (!status || !devicePath) return;
 
-    // Special case
-    if (status.toLowerCase() === 'disconnected' &&
-      devicePath === selectedDevicePath) connectionStatus = status;
+    if (devicePath === selectedDevicePath) connectionStatus = status;
 
     updateConnectionStatus();
   }
 
   function usbDataHandler(data) {
     const {message} = parseRnMessage(data);
+    if (!message) return;
+
     handleRoboticData(message);
   }
 
   function usbErrorHandler(data) {
     const {error} = parseRnMessage(data);
+    if (!error) return;
+
+    connectionStatus = error;
+    updateConnectionStatus();
     cms.socket.emit('usrobotics-error', error);
   }
 
@@ -61,9 +92,8 @@ module.exports = async (cms) => {
     internalSocket.on('list-usb-devices', listSerialDevices);
     internalSocket.on('refresh-call-system-config', setupRoboticDevice);
     internalSocket.on('get-call-system-status', updateConnectionStatus);
+    internalSocket.on('screen-loaded', listSerialDevices);
   });
-
-  listSerialDevices();
 
   function listSerialDevices() {
     rnBridge.app.sendObject('list-usb-devices', {});
@@ -115,7 +145,7 @@ module.exports = async (cms) => {
     let {mode, ipAddresses = {}} = callConfig;
     const useRoboticDevice = mode === 'robotic-modem';
     const devicePathInConfig = ipAddresses[mode];
-    const deviceConnected = !!deviceList.find(d => d.devicePath === devicePathInConfig);
+    const deviceConnected = deviceList.some(d => d.devicePath === devicePathInConfig);
 
     if (!useRoboticDevice && selectedDevicePath) {
       reset();

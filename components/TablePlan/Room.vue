@@ -11,7 +11,7 @@
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          v-touch="getTouchHandlers(roomObject)"
          :class="[
-           ...!editable && !isTableDisabled(roomObject) && ['waves-effect', 'waves-red'],
+           ...!editable && !isTableDisabled(roomObject) && isTable(roomObject) && ['waves-effect', 'waves-red'],
            ...transferTableFrom && transferTableFrom.name === roomObject.name &&
            ['animated', 'bounce', 'infinite']
          ]"
@@ -302,6 +302,7 @@
       resizeAction(change) {
         this.selectingObj.size.width += change.offsetX;
         this.selectingObj.size.height += change.offsetY;
+        if(this.selectingObj.type !== 'table') return
         if(this.selectingObj.size.width < this.minimumSize)
           this.selectingObj.size.width = this.minimumSize
         if(this.selectingObj.size.height < this.minimumSize)

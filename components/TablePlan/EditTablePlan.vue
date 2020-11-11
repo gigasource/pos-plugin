@@ -52,7 +52,7 @@
             </pos-text-field>
             <div style="margin: 5px">
               <div> {{$t('ui.color')}}:</div>
-              <color-selector key="table" :value="roomObj.bgColor" :colors="tableColors" @input="_updateRoomObject({ bgColor: $event || 'black' })" :item-size="18" :badge-size="12"/>
+              <color-selector key="table" :value="roomObj.bgColor" :colors="tableColors" @input="_updateRoomObject({ bgColor: $event || '#FFFFFF' })" :item-size="18" :badge-size="12"/>
               <div style="display: flex; align-items: center">
                 <span style="margin-right: 10px">{{$t('restaurant.takeAway')}}:</span>
                 <g-switch v-model="roomObj.takeAway" @change="_updateRoomObject({ takeAway: $event })"/>
