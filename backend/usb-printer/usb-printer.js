@@ -1,9 +1,17 @@
-const usb = require('usb');
+let usb;
+
+const getUsb = () => {
+  if (usb === null) {
+    usb = require('usb');
+  }
+  return usb;
+}
+
 const { exec, spawn } = require('child_process');
 const LOAD_USB_PRINTER = 'load-usb-printers';
 
 const getUsbPrinterDevices = () => {
-  return usb.getDeviceList().filter(device => {
+  return getUsb().getDeviceList().filter(device => {
     try {
       return device.configDescriptor.interfaces.filter(iface => iface.filter(conf => conf.bInterfaceClass === 0x07).length).length;
     } catch (e) {
