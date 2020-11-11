@@ -198,6 +198,11 @@
           "schemaType": "string",
           "key": "usb",
           "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "tscPos",
+          "type": "input@switch"
         }
       ],
       "type": "array",

@@ -1,4 +1,5 @@
 const usb = require('usb');
+const { exec } = require('child_process');
 const LOAD_USB_PRINTER = 'load-usb-printers';
 
 const getUsbPrinterDevices = () => {
@@ -17,7 +18,24 @@ const extractDeviceInfo = (d) => {
   return `${idVendor.toString(16)}/${idProduct.toString(16)}/${d.portNumbers.join('/')}`;
 }
 
-module.exports = cms => {
+
+const usbChMod = () => {
+  console.log('change /dev/bus/usb to 777')
+  exec('su chmod -R 777 /dev/bus/usb', (code) => {
+    console.log(`chmod completed with code ${code}`)
+  })
+}
+
+module.exports = async cms => {
+  // /dev/bus/usb
+  try {
+    if (/^android/.test(process.platform))
+      usbChMod();
+  } catch (e) {
+    console.log(e)
+  }
+
+  console.log('registering socket handler for usb-printers...')
   cms.socket.on('connect', socket => {
     socket.on(LOAD_USB_PRINTER, callback => {
       console.log(`usb-printer:${LOAD_USB_PRINTER}`)

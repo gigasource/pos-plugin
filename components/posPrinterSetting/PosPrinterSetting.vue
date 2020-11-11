@@ -74,6 +74,7 @@
       <g-switch :label="$t('settings.groupArticles')" v-model="groupArticles" v-if="type === 'kitchen'"/>
       <g-switch :label="$t('settings.sound')" v-model="sound"/>
       <g-switch :label="$t('settings.escPos')" v-model="escPOS"/>
+      <g-switch label="TSC POS" v-model="tscPOS"/>
     </div>
     <div class="title" style="margin-left: 12px">{{$t('settings.receiptFontSize')}}</div>
     <g-grid-select mandatory item-cols="auto" :items="listFontSize" v-model="fontSize" style="margin-left: 12px; padding-top: 4px">
@@ -323,6 +324,21 @@
           await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
+      tscPOS: {
+        get() {
+          if(this.printer) {
+            return this.printer.tscPOS
+          }
+          return false
+        },
+        async set(val) {
+          if(this.printer)
+            this.$set(this.printer, 'tscPOS', val)
+          else
+            this.$set(this, 'printer', { tscPOS: val })
+          await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
+        }
+      },
       fontSize: {
         get() {
           if(this.printer) {
@@ -381,7 +397,10 @@
       },
       usbPrinterSelectModel () {
         // refer: backend/usb-printer/usb-printer.js
-        return (this.usbPrinters || []).map(printer => ({ text: printer, value: printer }))
+        return (this.usbPrinters || []).map((printer, i) => ({
+          text: `Printer ${i+1} (${printer})`,
+          value: printer
+        }))
       }
     },
     methods: {
@@ -438,7 +457,7 @@
       async setUsbPrinter(value) {
         console.log("PosPrinterSetting:setUsbPrinter", value)
         if (this.printer) {
-          this.printer.usb = value;
+          this.$set(this.printer, 'usb', value);
         } else {
           this.$set(this, 'printer', { usb: value });
         }
