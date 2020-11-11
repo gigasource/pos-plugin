@@ -2,7 +2,7 @@
   <div class="call">
     <div class="call-title mb-2">
       <span>Call system</span>
-      <span>{{ callSystemStatus }}</span>
+      <span v-if="callSystemStatus"> {{ callSystemStatusComputed }}</span>
     </div>
     <div class="row-flex align-items-center justify-start">
       <g-grid-select class="mt-2"
@@ -42,9 +42,19 @@
               :items="usbDevices"/>
     </div>
 
-    <g-btn-bs width="80" background-color="#2979FF" style="margin: 16px 0 0; flex: 0 0 36px; align-self: flex-end"
-              @click="update">Update
-    </g-btn-bs>
+    <div class="action-buttons">
+      <g-btn-bs v-if="currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value"
+                width="80"
+                background-color="#2979FF"
+                @click="updateUsbDeviceList">
+        Refresh
+      </g-btn-bs>
+      <g-btn-bs width="80"
+                background-color="#2979FF"
+                @click="update">
+        Update
+      </g-btn-bs>
+    </div>
 
     <dialog-text-filter
         v-model="dialog.ip"
@@ -56,13 +66,7 @@
 
 <script>
 import cloneDeep from 'lodash/cloneDeep'
-
-const CALL_SYSTEM_MODES = {
-  OFF: {text: 'Off', value: 'off'},
-  FRITZBOX: {text: 'Localhost (Fritzbox)', value: 'localhost-fritzbox'},
-  DEMO: {text: 'Demo (Fritzbox)', value: 'demo-fritzbox'},
-  MODEM_ROBOTIC: {text: 'Modem (Robotic)', value: 'robotic-modem'},
-}
+import {CALL_SYSTEM_MODES} from '../constants';
 
 export default {
   name: "CallSystem",
@@ -74,7 +78,7 @@ export default {
         CALL_SYSTEM_MODES.DEMO,
         CALL_SYSTEM_MODES.MODEM_ROBOTIC],
       currentCallSystemMode: CALL_SYSTEM_MODES.OFF.value,
-      callSystemConnectionStatus: '',
+      callSystemStatus: '',
       ipAddresses: {},
       dialog: {
         ip: false,
@@ -112,13 +116,13 @@ export default {
           && this.lastSavedConfig.mode === this.currentCallSystemMode
           && this.lastSavedConfig.ipAddresses[this.currentCallSystemMode] === this.ipAddresses[this.currentCallSystemMode])
     },
-    callSystemStatus() {
+    callSystemStatusComputed() {
       if (!this.callSystemConfigChanged && this.currentCallSystemMode === CALL_SYSTEM_MODES.OFF.value) return '';
 
       if (this.callSystemConfigChanged) {
         return " (Call system config has changed, press 'Update' to apply changes)";
       } else {
-        return ` (${this.callSystemConnectionStatus})`;
+        return ` (${this.callSystemStatus})`;
       }
     },
     callSystemIpText() {
@@ -147,13 +151,13 @@ export default {
     selectedSerialDevice(value) {
       this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value] = value;
     },
-    callSystemStatus(value) {
+    callSystemStatusComputed(value) {
       this.test = value;
     }
   },
   methods: {
     async loadData() {
-      const callSystem = (await cms.getModel('PosSetting').findOne())['call']
+      const callSystem = (await cms.getModel('PosSetting').findOne()).call
       callSystem.mode = callSystem.mode || CALL_SYSTEM_MODES.OFF.value
       callSystem.ipAddresses = callSystem.ipAddresses || {};
 
@@ -179,7 +183,7 @@ export default {
       this.ipAddresses[this.currentCallSystemMode] = value
     },
     updateConnectStatus(status) {
-      if (status) this.callSystemConnectionStatus = status;
+      if (status) this.callSystemStatus = status;
     },
     updateUsbDeviceList() {
       cms.socket.emit('list-usb-devices');
@@ -189,8 +193,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@media only screen and (max-width: 1280px) {
+  .call {
+    width: initial;
+    padding-right: 24px;
+  }
+}
+
+@media only screen and (min-width: 1281px) {
+  .call {
+    width: 65%;
+  }
+}
+
 .call {
-  width: 65%;
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -221,6 +237,11 @@ export default {
 
   &-device-table {
     border: 1px solid #ced4d9;
+  }
+
+  .action-buttons {
+    align-self: flex-end;
+    margin-top: 12px;
   }
 }
 </style>

@@ -2,12 +2,22 @@
   <div class="main">
     <div class="pending-orders pr-2">
       <div class="header">
-        {{$t('onlineOrder.pendingOrders')}}
-        <g-badge inline :value="true" color="#4CAF50" v-if="internalOrders && internalOrders.length">
+        <span>{{ $t('onlineOrder.pendingOrders') }}</span>
+        <g-badge class="ml-1"
+                 inline
+                 :value="true"
+                 color="#4CAF50"
+                 v-if="internalOrders && internalOrders.length">
           <template v-slot:badge>
-            <div class="px-2">{{internalOrders.length}}</div>
+            <div class="px-2">{{ internalOrders.length }}</div>
           </template>
         </g-badge>
+
+        <g-spacer />
+        <span v-if="modemDeviceConnected === false"
+              style="color: #D32F2F">
+          Modem not connected
+        </span>
       </div>
       <div class="content">
         <template v-if="(!internalOrders || !internalOrders.length) && calls.length === 0 && missedCalls.length === 0">
@@ -193,7 +203,11 @@
     <div class="kitchen-orders pl-2">
       <div class="header">
         {{$t('onlineOrder.sentToKitchen')}}
-        <g-badge inline :value="true" color="#F9A825" v-if="sortedKitchenOrders && sortedKitchenOrders.length">
+        <g-badge v-if="sortedKitchenOrders && sortedKitchenOrders.length"
+                 class="ml-1"
+                 inline
+                 :value="true"
+                 color="#F9A825">
           <template v-slot:badge>
             <div class="px-2">{{sortedKitchenOrders.length}}</div>
           </template>
@@ -266,6 +280,7 @@
 <script>
   import orderUtil from '../logic/orderUtil'
   import { Touch } from 'pos-vue-framework'
+  import {CALL_SYSTEM_MODES} from '../constants';
 
   export default {
     name: 'OnlineOrderMain',
@@ -304,6 +319,7 @@
         },
         timeoutInterval: {},
         timeoutProgress: {},
+        modemDeviceConnected: null,
       }
     },
     watch: {
@@ -447,7 +463,24 @@
       },
       deleteMissedCall(index) {
         this.missedCalls.splice(index, 1)
+      },
+      async updateModemDeviceStatus(connectionStatus) {
+        if (!connectionStatus) return;
+
+        const callSystem = (await cms.getModel('PosSetting').findOne()).call;
+
+        if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
+          this.modemDeviceConnected = null;
+        } else {
+          this.modemDeviceConnected =
+              typeof connectionStatus === 'string'
+              && connectionStatus.toLowerCase() === 'connected';
+        }
       }
+    },
+    created() {
+      cms.socket.on('update-call-system-status', this.updateModemDeviceStatus);
+      cms.socket.emit('get-call-system-status', this.updateModemDeviceStatus);
     },
     mounted() {
       this.decimals = this.$t('common.currencyDecimal')
@@ -456,10 +489,11 @@
       })
     },
     activated() {
+      cms.socket.emit('get-call-system-status', this.updateModemDeviceStatus);
       this.$nextTick(() => {
         this.$emit('updateOnlineOrders')
       })
-    }
+    },
   }
 </script>
 
@@ -500,6 +534,8 @@
   }
 
   .header {
+    display: flex;
+    flex-wrap: wrap;
     font-size: 15px;
     font-weight: 700;
     margin-bottom: 12px;
