@@ -119,12 +119,8 @@
     },
     methods: {
       getBackgroundImage(demo) {
-        if(demo.image)
-         return {
-          'background-image' : `url("${demo.image}")`
-         }
         return {
-          'background-color': '#F0F0F0'
+          'background-image' : `url("${demo.image || '/plugins/pos-plugin/assets/image/no-demo.png'}")`
         }
       },
       selectDemo(demo) {
