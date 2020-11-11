@@ -3,7 +3,7 @@
   "generalSetting": {
     "quickFnRows": 1,
     "quickBtn": true,
-    "useVirtualPrinter": true,
+    "useVirtualPrinter": false,
     "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU",
     "onlyCheckoutPrintedItems": true
   },
