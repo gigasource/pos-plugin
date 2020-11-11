@@ -35,7 +35,6 @@
       </div>
       <div v-else-if="selectedPrinterType.value === 'usb'" class="config row-flex align-items-end">
         <g-select
-            returnObject
             class="config__usb-printer-paths"
             :style="{ flex: 1 }"
             :items="usbPrinterSelectModel"

@@ -736,7 +736,7 @@ module.exports = class EscPrinter {
       nr++;
     } else if (this.address.printerType === 'usb') {
       //yield this.printUsb(this.address.usb, cut);
-      UsbManager.push(this.address.usb.name, {
+      UsbManager.push(this.address.usb, {
         nr,
         printer: this
       });

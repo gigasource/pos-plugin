@@ -13,6 +13,9 @@
         <div v-if="isTable(roomObject) || !isWall(roomObject)">
           <div>{{ roomObject.name }}</div>
         </div>
+        <div v-if="isTableBusy(roomObject)" style="font-size: 10px; position: absolute; bottom: 2px">
+          {{ getOrderTime(roomObject.name) }} mins
+        </div>
       </template>
     </room>
     <number-of-customers-dialog v-model="showNumberOfCustomersDialog" @submit="onCustomerDialogSubmit"/>
@@ -38,12 +41,14 @@
         inProgressTable: [],
         userTables: [],
         transferTableFrom: null,
-        showNumberOfCustomersDialog: false
+        showNumberOfCustomersDialog: false,
+        currentTime: new Date()
       }
     },
     async created() {
       await this.loadRoom()
       cms.socket.on('updateRooms', this.loadRoom)
+      setInterval(() => this.currentTime = new Date(), 30000)
     },
     destroyed() {
       cms.socket.off('updateRooms');
@@ -137,6 +142,10 @@
           await this.loadRoom()
           this.transferTableFrom = null
         })
+      },
+      getOrderTime(table) {
+        const order = this.activeOrders.find(o => o.table === table)
+        return order && dayjs(this.currentTime).diff(order.date, 'm')
       }
     }
   }
