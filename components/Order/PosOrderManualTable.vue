@@ -2,7 +2,10 @@
   <div class="wrapper col-flex">
     <div class="room-container flex-grow-1" ref="room">
       <div class="table waves-effect waves-red" v-for="table in manualTables" @click.stop="routeToOrder(table)">
-        {{table}}
+        <div>{{table}}</div>
+        <div style="font-size: 10px; position: absolute; bottom: 2px">
+          {{ getOrderTime(table) }} mins
+        </div>
       </div>
     </div>
     <div class="keyboard">
@@ -103,6 +106,10 @@
         await this.loadRoom()
         const tables = this.rooms.map(room => room.roomObjects.filter(i => i.type === 'table')).flat()
         return !tables.includes(table);
+      },
+      getOrderTime(table) {
+        const order = this.activeOrders.find(o => o.table === table)
+        return order && dayjs(this.currentTime).diff(order.date, 'm')
       }
     }
   }
@@ -130,6 +137,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
       }
     }
   }
