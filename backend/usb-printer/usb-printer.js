@@ -1,5 +1,5 @@
 const usb = require('usb');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const LOAD_USB_PRINTER = 'load-usb-printers';
 
 const getUsbPrinterDevices = () => {
@@ -21,9 +21,7 @@ const extractDeviceInfo = (d) => {
 
 const usbChMod = () => {
   console.log('change /dev/bus/usb to 777')
-  exec('su chmod -R 777 /dev/bus/usb', (code) => {
-    console.log(`chmod completed with code ${code}`)
-  })
+  exec('su -c chmod -R 777 /dev/bus/usb', code => console.log(`chmod completed with code ${code}`))
 }
 
 module.exports = async cms => {
