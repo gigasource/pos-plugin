@@ -502,14 +502,15 @@ module.exports = async cms => {
       })))
     })
 
-    socket.on('approveSignIn_v2', async ({ clientId: deviceId, requestId, storeId, storeAlias: alias, storeName: name }, ack) => {
+    socket.on('approveSignIn_v2', async ({ clientId: deviceId, requestId, storeId, storeAlias: alias, storeName: name, storeLocale: locale }, ack) => {
       console.log('approveSignIn_v2')
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
           'onlineDevice.store': {
             id: storeId,
             name,
-            alias
+            alias,
+            locale
           },
           signInRequest: null
         }
@@ -765,8 +766,7 @@ module.exports = async cms => {
         requestBody.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
       }
       const response = await axios.post(pairingApiUrl, requestBody)
-      const { deviceId, storeId, storeAlias: alias, storeName: name } = response.data
-
+      const { deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale } = response.data
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
           onlineDevice: {
@@ -774,7 +774,8 @@ module.exports = async cms => {
             store: {
               id: storeId,
               name,
-              alias
+              alias,
+              locale
             }
           },
           signInRequest: null
