@@ -442,7 +442,7 @@
             { $push: { 'categories.$.products' : productLayout } },
             { new: true });
 
-        // this.$emit('update:orderLayout', result)
+        this.$emit('update:orderLayout', result)
       },
       openDialogInfo(focus) {
         this.dialog.focus = focus
