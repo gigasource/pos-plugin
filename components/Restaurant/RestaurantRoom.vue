@@ -10,6 +10,9 @@
           @setTransferTableFrom="setTransferTableFrom"
           @setTransferTableTo="setTransferTableTo">
       <template #room-object="{roomObject}">
+        <div v-if="isTableBusy(roomObject)" style="font-size: 10px; position: absolute; top: 2px">
+          {{ $t('common.currency', storeLocale)}}{{getOrderTotal(roomObject.name)}}
+        </div>
         <div v-if="isTable(roomObject) || !isWall(roomObject)">
           <div>{{ roomObject.name }}</div>
         </div>
@@ -23,10 +26,11 @@
 </template>
 <script>
   import _ from 'lodash'
+  import orderUtil from '../logic/orderUtil';
 
   export default {
     name: 'RestaurantRoom',
-    injectService: ['PosStore:isMobile'],
+    injectService: ['PosStore:(isMobile, storeLocale)'],
     props: {
       id: null,
       user: null,
@@ -146,6 +150,10 @@
       getOrderTime(table) {
         const order = this.activeOrders.find(o => o.table === table)
         return order && dayjs(this.currentTime).diff(order.date, 'm')
+      },
+      getOrderTotal(table) {
+        const order = this.activeOrders.find(o => o.table === table)
+        return order && (orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items))
       }
     }
   }
