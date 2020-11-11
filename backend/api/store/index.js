@@ -300,6 +300,7 @@ router.put('/sign-in-requests/:requestId', async (req, res) => {
       storeId: request.store._id.toString(),
       storeName: request.store.name || request.store.settingName,
       storeAlias: request.store.alias,
+      storeLocale: request.store.country ? request.store.country.locale : 'en'
     }]);
   } else if (status === 'notApproved') {
     if (storeId) {

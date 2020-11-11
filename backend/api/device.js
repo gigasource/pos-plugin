@@ -126,7 +126,8 @@ router.post('/register', async (req, res) => {
       deviceId: device._id,
       storeName: store.name || store.settingName,
       storeAlias: store.alias,
-      storeId: store._id.toString()
+      storeId: store._id.toString(),
+      storeLocale: store.country ? store.country.locale : 'en'
     });
 
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
