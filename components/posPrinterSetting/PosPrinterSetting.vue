@@ -382,10 +382,7 @@
       },
       usbPrinterSelectModel () {
         // refer: backend/usb-printer/usb-printer.js
-        return (this.usbPrinters || []).map(printer => ({
-          text: printer.productName,
-          value: printer
-        }))
+        return (this.usbPrinters || []).map(printer => ({ text: printer, value: printer }))
       }
     },
     methods: {
@@ -442,7 +439,7 @@
       async setUsbPrinter(value) {
         console.log("PosPrinterSetting:setUsbPrinter", value)
         if (this.printer) {
-          this.$set(this.printer, 'usb', value);
+          this.printer.usb = value;
         } else {
           this.$set(this, 'printer', { usb: value });
         }
