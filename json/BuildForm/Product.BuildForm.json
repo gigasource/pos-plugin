@@ -306,6 +306,18 @@
           "type": "input@number"
         }
       ]
+    },
+    {
+      "_id": "5faa58216c4b27f60dec5a0e",
+      "schemaType": "string",
+      "key": "taxCategory",
+      "type": "input"
+    },
+    {
+      "_id": "5faa58216c4b27f60dec5a0f",
+      "schemaType": "string",
+      "key": "taxCategory2",
+      "type": "input"
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

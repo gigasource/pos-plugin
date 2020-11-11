@@ -61,19 +61,20 @@
 
       <!-- Tax -->
       <div class="row-flex mt-2 product-editor__tax">
-        <div class="col-6" v-show="showDineInTax">
+        <div class="col-6">
           <div class="product-editor__label">{{$t('restaurant.product.dineInTax')}}</div>
-          <g-grid-select mandatory v-model="selectedProduct.tax" :items="dineInTaxes" itemCols="auto">
+          <g-grid-select mandatory v-model="selectedProduct.taxCategory" item-value="_id"
+                         :items="dineInTaxes" itemCols="auto">
             <template #default="{ toggleSelect, item, index }">
               <div class="prop-option"
-                   @click="e => {toggleSelect(item); updateProduct({ tax: item.value })}">
-                {{item.text}}
+                   @click="e => {toggleSelect(item); updateProduct({ tax: item.value, taxCategory: item._id })}">
+                {{item.text}} ({{item.value}}%)
               </div>
             </template>
             <template #selected="{ toggleSelect, item, index }">
               <div class="prop-option prop-option--1"
-                   @click="e => {toggleSelect(item); updateProduct({ tax: item.value })}">
-                {{item.text}}
+                   @click="e => {toggleSelect(item); updateProduct({ tax: item.value, taxCategory: item._id })}">
+                {{item.text}} ({{item.value}}%)
               </div>
             </template>
           </g-grid-select>
@@ -81,17 +82,18 @@
 
         <div class="col-6">
           <div class="product-editor__label">{{$t('restaurant.product.takeAwayTax')}}</div>
-          <g-grid-select mandatory v-model="selectedProduct.tax2" :items="takeAwayTaxes" itemCols="auto">
+          <g-grid-select mandatory v-model="selectedProduct.taxCategory2" item-value="_id"
+                         :items="takeAwayTaxes" itemCols="auto">
             <template #default="{ toggleSelect, item, index }">
               <div class="prop-option"
-                   @click="e => {toggleSelect(item); updateProduct({ tax2: item.value })}">
-                {{item.text}}
+                   @click="e => {toggleSelect(item); updateProduct({ tax2: item.value, taxCategory2: item._id })}">
+                {{item.text}} ({{item.value}}%)
               </div>
             </template>
             <template #selected="{ toggleSelect, item, index }">
               <div class="prop-option prop-option--1"
-                   @click="e => {toggleSelect(item); updateProduct({ tax2: item.value })}">
-                {{item.text}}
+                   @click="e => {toggleSelect(item); updateProduct({ tax2: item.value, taxCategory2: item._id })}">
+                {{item.text}} ({{item.value}}%)
               </div>
             </template>
           </g-grid-select>
@@ -296,10 +298,9 @@
         await this.updateProduct({ category: category._id })
       },
       async loadTaxes() {
-        const taxes = _.filter(cms.getList('PosSetting')[0].taxCategory, tax => !tax.hideAtEditView)
-        const taxModels = _.map(taxes, tax => ({ text: `${tax.value}%`, value: tax.value }))
-        this.dineInTaxes.splice(0, this.dineInTaxes.length, ...taxModels)
-        this.takeAwayTaxes.splice(0, this.takeAwayTaxes.length, ...taxModels)
+        const taxes = await cms.getModel('TaxCategory').find()
+        this.dineInTaxes = taxes.filter(i => i.type.includes('dineIn')).map(({ _id, value, name }) => ({ _id, text: name, value }))
+        this.takeAwayTaxes = taxes.filter(i => i.type.includes('takeAway')).map(({ _id, value, name }) => ({ _id, text: name, value }))
       },
       showNotify(content) {
         this.notifyContent = content || 'Saved'
@@ -320,7 +321,6 @@
       },
       async selectPrinter(id) {
         const printer = this.printers.find(p => p._id === id)
-        this.showDineInTax = printer.showDineInTax
 
         const change = {
           isItemNote: false,
@@ -338,12 +338,16 @@
         }
 
         if (!this.selectedProduct.tax && printer.defaultDineInTax) {
-          this.$set(this.selectedProduct, 'tax', printer.defaultDineInTax)
-          change.tax = printer.defaultDineInTax
+          const taxCategory = printer.defaultDineInTax;
+          this.$set(this.selectedProduct, 'tax', taxCategory)
+          change.taxCategory = taxCategory
+          change.tax = this.dineInTaxes.find(i => i._id.toString() === taxCategory).value
         }
         if (!this.selectedProduct.tax2 && printer.defaultTakeAwayTax) {
-          this.$set(this.selectedProduct, 'tax2', printer.defaultTakeAwayTax)
-          change.tax2 = printer.defaultTakeAwayTax
+          const taxCategory2 = printer.defaultTakeAwayTax;
+          this.$set(this.selectedProduct, 'tax2', taxCategory2)
+          change.taxCategory2 = taxCategory2
+          change.tax2 = this.takeAwayTaxes.find(i => i._id.toString() === taxCategory2).value
         }
 
         await this.updateProduct(change)

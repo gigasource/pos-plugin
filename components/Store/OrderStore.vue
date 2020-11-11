@@ -202,13 +202,16 @@
           ...!p.quantity && { quantity: 1 },
           ...!p.course && { course: 1 },
           product: p._id,
-          _id: this.genObjectId()
+          _id: this.genObjectId(),
+          taxes: [p.tax, p.tax2]
         }
       },
       addProductToOrder(product) {
         if (!this.currentOrder || !product) return
         if (!this.currentOrder._id && !this.actionList.some(i => i.type === 'order')) {
-          this.$set(this.currentOrder, 'firstInit', true);
+          this.$set(this.currentOrder, 'firstInit', true)
+          const takeAway = !this.currentOrder.table;
+          this.$set(this.currentOrder, 'takeAway', takeAway)
           this.actionList.push({
             type: 'order',
             action: 'createOrder',
@@ -221,7 +224,8 @@
               query: jsonfn.stringify({
                 table: this.currentOrder.table,
                 items: [],
-                status: 'inProgress'
+                status: 'inProgress',
+                takeAway
               })
             }
           })
@@ -282,7 +286,7 @@
           this.currentOrder.items.push(mappedProduct)
         }
       },
-      addItemQuantity(item) { // remove action
+      addItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         this.actionList.push({
@@ -332,6 +336,34 @@
           }
         })
         itemToUpdate.quantity--
+      },
+      updateOrderItem(_id, update) {
+        const item = this.currentOrder.items.find(i => i._id === _id)
+        _.forEach(update, (val, key) => {
+          this.$set(item, key, val)
+        })
+
+        const updates = _.reduce(update, (acc, val, key) => {
+          acc[`items.$.${key}`] = val
+          return acc
+        }, {})
+        console.log('updates', updates)
+        this.actionList.push({
+          type: 'order',
+          action: 'update',
+          where: jsonfn.stringify({
+            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
+            'items._id': item._id
+          }),
+          data: {
+            orderId: this.currentOrder.id,
+            table: this.currentOrder.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: jsonfn.stringify(updates)
+          }
+        })
       },
       calculateNewPrice(changeType, amount, update = false) {
         if (this.activeProduct) {

@@ -115,7 +115,7 @@
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
               <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
-              <span :class="['item-detail__option', item.takeout ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
+              <span :class="['item-detail__option', item.takeAway ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
             </p>
           </div>
           <div class="item-action">
@@ -319,35 +319,37 @@
           left: () => {
             // console.log(`RTL ${item.name}`)
 
-            if (!item.course) this.$set(item, 'course', 1)
+            if (!item.course) this.$emit('updateOrderItem', item._id, { course: 1 })
 
             if (item.course === 1) {
-              if (item.takeout) {
-                this.$set(item, 'takeout', false)
-                this.$set(item, 'separate', true)
+              if (item.takeAway) {
+                this.$emit('updateOrderItem', item._id, {
+                  takeAway: false,
+                  separate: true
+                })
               }
-              else this.$set(item, 'takeout', true)
+              else this.$emit('updateOrderItem', item._id, { takeAway: true })
             } else {
-              this.$set(item, 'course', item.course - 1)
+              this.$emit('updateOrderItem', item._id, { course: item.course - 1 })
             }
           },
           right: () => {
             // console.log(`LTR ${item.name}`)
 
-            if (!item.course) this.$set(item, 'course', 1)
+            if (!item.course) this.$emit('updateOrderItem', item._id, { course: 1 })
 
             if (item.separate) {
-              return this.$set(item, 'separate', false)
+              return this.$emit('updateOrderItem', item._id, { separate: false })
             }
 
-            if (item.takeout) this.$set(item, 'takeout', false)
-            else this.$set(item, 'course', item.course + 1)
+            if (item.takeAway) this.$emit('updateOrderItem', item._id, { takeAway: false })
+            else this.$emit('updateOrderItem', item._id, { course: item.course + 1 })
           }
         }
       },
-      getItemSubtext({ course, takeout, separate }) {
+      getItemSubtext({ course, takeAway, separate }) {
         if (separate) return
-        if (takeout) return 'Take-away'
+        if (takeAway) return 'Take-away'
         if (course && course > 1) return `Course: ${course}`
       },
       back() {
@@ -378,7 +380,7 @@
         if (this.actionTimeout) clearTimeout(this.actionTimeout);
       },
       quickCash(isTakeout = false) {
-        this.currentOrder.takeOut = isTakeout
+        this.currentOrder.takeAway = isTakeout
         this.$emit('quickCash')
       },
       splitOrder() {

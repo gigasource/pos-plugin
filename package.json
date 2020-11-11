@@ -1,6 +1,6 @@
 {
   "name": "pos-plugin",
-  "version": "1.1.102",
+  "version": "1.1.103",
   "release": "Stable",
   "description": "",
   "main": "index.js",
@@ -34,6 +34,7 @@
     "queue": "^6.0.1",
     "serialport": "^8.0.7",
     "usb": "^1.6.2",
+    "usbserial": "0.0.2",
     "uuid": "^3.4.0"
   }
 }

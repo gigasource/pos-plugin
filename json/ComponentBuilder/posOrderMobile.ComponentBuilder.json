@@ -347,6 +347,11 @@
               "service": "OrderStore:printedOrder",
               "local": "printedOrder",
               "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateOrderItem",
+              "local": "updateOrderItem",
+              "type": "event"
             }
           ]
         }
