@@ -209,16 +209,16 @@
       "flex": "md12"
     },
     {
-      "_id": "5e943cb78ba20323f4c1a657",
-      "schemaType": "number",
+      "_id": "5fab95e2c247ab00fba81611",
+      "schemaType": "string",
       "key": "defaultDineInTax",
-      "type": "input@number"
+      "type": "input"
     },
     {
-      "_id": "5e943cb78ba20323f4c1a658",
-      "schemaType": "number",
+      "_id": "5fab95e2c247ab00fba81612",
+      "schemaType": "string",
       "key": "defaultTakeAwayTax",
-      "type": "input@number"
+      "type": "input"
     }
   ],
   "id": "5c5ee40bc1c8891f00507c68",

@@ -2,6 +2,7 @@
   <div style="height: 100%; width: 100%">
     <g-toolbar height="100%" elevation="0" color="#eee">
       <g-btn-bs elevation="2" icon="icon-back" @click="back">{{$t('ui.back')}}</g-btn-bs>
+      <g-btn-bs v-if="!orderLayout" text-color="#1271FF" elevation="2" icon="add_circle" @click="addLayout">{{$t('ui.add')}}</g-btn-bs>
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" @click="switchItem" :disabled="!switchable">{{$t('ui.switch')}}</g-btn-bs>
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" @click="copyItem" :disabled="!copyable">{{$t('ui.copy')}}</g-btn-bs>
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" @click="showDeleteConfirmDialog" :disabled="!deletable">{{$t('ui.delete')}}</g-btn-bs>
@@ -36,6 +37,14 @@
         </div>
       </div>
     </g-dialog>
+    <dialog-form-input v-model="dialog.add" @submit="createLayout">
+      <template v-slot:input>
+        <div class="row-flex flex-wrap justify-around mt-2">
+          <pos-textfield-new style="width: 48%" label="Column" v-model="column" clearable/>
+          <pos-textfield-new style="width: 48%" label="Row" v-model="row" clearable/>
+        </div>
+      </template>
+    </dialog-form-input>
   </div>
 </template>
 <script>
@@ -66,8 +75,11 @@
         deleteProductLayoutMessage: ' this product',
         dialog: {
           confirmDeleteProductLayout: false,
-          mode: false
-        }
+          mode: false,
+          add: false
+        },
+        column: 4,
+        row: 2
       }
     },
     computed: {
@@ -307,6 +319,18 @@
       changeToBasicMode() {
         this.$emit('update:mode', 'basic')
         this.$emit('update:view', { name: 'CategoryEditor'})
+      },
+      addLayout() {
+        this.dialog.add = true
+      },
+      async createLayout() {
+        const layout = await cms.getModel('OrderLayout').create({
+          columns: this.column,
+          rows: this.row,
+          type: 'default'
+        })
+        this.$emit('update:orderLayout', layout)
+        this.dialog.add = false
       }
     }
   }

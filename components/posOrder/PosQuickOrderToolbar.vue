@@ -18,7 +18,7 @@
       Print
     </g-btn-bs>
     <template v-if="currentOrder.table">
-      <g-btn-bs class="col-2" :disabled="!enablePayBtn" icon="icon-split_check_2"
+      <g-btn-bs :disabled="!enablePayBtn" icon="icon-split_check_2"
                 @click.stop="splitOrder">
         Split order
       </g-btn-bs>

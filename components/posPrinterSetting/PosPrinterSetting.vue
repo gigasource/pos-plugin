@@ -107,15 +107,15 @@
       <div class="title" style="margin-left: 12px">Default tax</div>
       <div class="row-flex" style="margin-left: 12px">
         <div class="col-3">{{$t('restaurant.product.dineInTax')}}</div>
-        <g-grid-select mandatory return-object item-cols="auto" :items="listTaxCategories" v-model="dineInTax" style="margin-left: 12px">
+        <g-grid-select mandatory return-object item-cols="auto" :items="dineInTaxCategories" item-value="_id" v-model="dineInTax" style="margin-left: 12px">
           <template v-slot:default="{ toggleSelect, item }">
             <div class="option" @click="toggleSelect(item)">
-              {{item.value}}%
+              {{item.name}} ({{item.value}}%)
             </div>
           </template>
           <template v-slot:selected="{ item }">
             <div class="option option--selected">
-              {{item.value}}%
+              {{item.name}} ({{item.value}}%)
             </div>
           </template>
         </g-grid-select>
@@ -123,15 +123,15 @@
 
     <div class="row-flex" style="margin-left: 12px; margin-top: 8px;">
       <div class="col-3">{{$t('restaurant.product.takeAwayTax')}}</div>
-      <g-grid-select mandatory return-object item-cols="auto" :items="listTaxCategories" v-model="takeAwayTax" style="margin-left: 12px">
+      <g-grid-select mandatory return-object item-cols="auto" :items="takeAwayTaxCategories" item-value="_id" v-model="takeAwayTax" style="margin-left: 12px">
         <template v-slot:default="{ toggleSelect, item }">
           <div class="option" @click="toggleSelect(item)">
-            {{item.value}}%
+            {{item.name}} ({{item.value}}%)
           </div>
         </template>
         <template v-slot:selected="{ item }">
           <div class="option option--selected">
-            {{item.value}}%
+            {{item.name}} ({{item.value}}%)
           </div>
         </template>
       </g-grid-select>
@@ -181,7 +181,7 @@
         showDialog: false,
         printer: null,
         listTaxCategories: [],
-        groupPrinter: null,
+        groupPrinter: null
       }
     },
     computed: {
@@ -375,11 +375,11 @@
         get() {
           if (!this.groupPrinter || !this.listTaxCategories || !this.listTaxCategories.length) return
           if (this.groupPrinter && this.groupPrinter.defaultDineInTax) {
-            return this.listTaxCategories.find(i => i.value === this.groupPrinter.defaultDineInTax)
+            return this.listTaxCategories.find(i => i._id.toString() === this.groupPrinter.defaultDineInTax)
           }
         },
         async set(taxCategory) {
-          await this.updateGroupPrinter(this.id, 'defaultDineInTax', taxCategory.value)
+          await this.updateGroupPrinter(this.id, 'defaultDineInTax', taxCategory._id.toString())
           this.groupPrinter = await this.getGroupPrinterById(this.id)
         }
       },
@@ -387,13 +387,21 @@
         get() {
           if (!this.groupPrinter || !this.listTaxCategories || !this.listTaxCategories.length) return
           if (this.groupPrinter && this.groupPrinter.defaultTakeAwayTax) {
-            return this.listTaxCategories.find(i => i.value === this.groupPrinter.defaultTakeAwayTax)
+            return this.listTaxCategories.find(i => i._id.toString() === this.groupPrinter.defaultTakeAwayTax)
           }
         },
         async set(taxCategory) {
-          await this.updateGroupPrinter(this.id, 'defaultTakeAwayTax', taxCategory.value)
+          await this.updateGroupPrinter(this.id, 'defaultTakeAwayTax', taxCategory._id.toString())
           this.groupPrinter = await this.getGroupPrinterById(this.id)
         }
+      },
+      dineInTaxCategories() {
+        if (!this.listTaxCategories || !this.listTaxCategories.length) return []
+        return this.listTaxCategories.filter(i => i.type.includes('dineIn'))
+      },
+      takeAwayTaxCategories() {
+        if (!this.listTaxCategories || !this.listTaxCategories.length) return []
+        return this.listTaxCategories.filter(i => i.type.includes('takeAway'))
       },
       usbPrinterSelectModel () {
         // refer: backend/usb-printer/usb-printer.js

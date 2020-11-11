@@ -115,8 +115,8 @@ module.exports = cms => {
         const stores = await Promise.all(data.map(async d => {
           return {
             ...d,
-            fileName: url.resolve(await getWebShopUrl(), d.fileName).toString(),
-            image: url.resolve(await getWebShopUrl(), d.image).toString()
+            fileName: d.fileName && url.resolve(await getWebShopUrl(), d.fileName).toString(),
+            image: d.image && url.resolve(await getWebShopUrl(), d.image).toString()
           }
         }));
         cb(stores)

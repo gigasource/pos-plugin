@@ -1,10 +1,20 @@
 <template>
   <div v-if="selectedCategoryLayout" class="category-editor">
     <div class="category-editor__label">{{$t('restaurant.menuEdit.categoriesNo')}}</div>
-    <input-number
-        :value="orderLayout.columns" :min="1" :max="8"
-        width="148"
-        @input="changeOrderLayoutColumn"/>
+    <div class="row-flex align-items-center justify-between">
+      <div class="fw-700 fs-small mr-2">{{$t('restaurant.menuEdit.columns')}}:</div>
+      <input-number
+          :value="orderLayout.columns" :min="1" :max="8"
+          width="148"
+          @input="changeOrderLayoutColumn"/>
+    </div>
+    <div class="row-flex align-items-center justify-between mt-1">
+      <div class="fw-700 fs-small mr-2">{{$t('restaurant.menuEdit.rows')}}:</div>
+      <input-number
+          :value="orderLayout.rows" :min="1" :max="3"
+          width="148"
+          @input="changeOrderLayoutRow"/>
+    </div>
 
     <div class="category-editor__label">{{$t('ui.name')}}</div>
     <g-text-field-bs border-color="#979797" :value="selectedCategoryLayout.name" @input="debouncedUpdateCategory({ name: $event })">
@@ -84,6 +94,11 @@
     methods: {
       async changeOrderLayoutColumn(columns) {
         const result = await cms.getModel('OrderLayout').findOneAndUpdate({_id: this.orderLayout._id}, { columns }, { new: true })
+        this.showNotify()
+        this.$emit('update:orderLayout', result)
+      },
+      async changeOrderLayoutRow(rows) {
+        const result = await cms.getModel('OrderLayout').findOneAndUpdate({_id: this.orderLayout._id}, { rows }, { new: true })
         this.showNotify()
         this.$emit('update:orderLayout', result)
       },

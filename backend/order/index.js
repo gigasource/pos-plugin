@@ -102,10 +102,22 @@ module.exports = (cms) => {
         return list
       }, [])
 
-      const mappedActionList = markPrintedItemCommits(mergedActionList)
-
+      mergedActionList.push({
+        type: 'order',
+        action: 'update',
+        where: JSON.stringify({ _id: order._id }),
+        data: {
+          table: order.table,
+        },
+        update: {
+          method: 'findOneAndUpdate',
+          query: JSON.stringify({
+            $set: { items: getUpdatedOrderItems(order.items) }
+          })
+        }
+      })
       // save order | create commits
-      const newOrder = await createOrderCommits(mappedActionList)
+      const newOrder = await createOrderCommits(mergedActionList)
       if (!newOrder.items.some(i => i.quantity > 0)) {
         await cancelOrder(newOrder)
         newOrder.status = 'cancelled'
@@ -158,6 +170,21 @@ module.exports = (cms) => {
           const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
           actionList.push(getPrintCommit('kitchenCancel', printOrder, device, oldOrder))
         }
+
+        actionList.push({
+          type: 'order',
+          action: 'update',
+          where: JSON.stringify({ _id: order._id }),
+          data: {
+            table: order.table,
+          },
+          update: {
+            method: 'findOneAndUpdate',
+            query: JSON.stringify({
+              $set: { items: getUpdatedOrderItems(order.items) }
+            })
+          }
+        })
 
         let newOrder
         if (isSplit) {
@@ -238,7 +265,6 @@ module.exports = (cms) => {
               })
             }
           })
-          actionList = markPrintedItemCommits(actionList)
           newOrder = await createOrderCommits(actionList)
         }
 
@@ -372,6 +398,7 @@ module.exports = (cms) => {
       numberOfCustomers: order.numberOfCustomers,
       tseMethod: order.tseMethod,
       immediatePay,
+      takeAway: order.takeAway,
       status: 'paid'
     }
   }
@@ -399,15 +426,15 @@ module.exports = (cms) => {
     return cms.getModel('OrderCommit').addCommits(commits);
   }
 
-  function markPrintedItemCommits(commits) {
-    return commits.map(action => {
-      if (action.type === 'order' && action.action === 'addItem') {
-        const query = JsonFn.parse(action.update.query)
-        query['$push']['items'].sent = true;
-        query['$push']['items'].printed = true;
-        action.update.query = JsonFn.stringify(query);
-      }
-      return action
+  function getUpdatedOrderItems(items) {
+    return items.map(i => {
+      const [tax, tax2] = i.taxes
+      return ({
+        ...i,
+        printed: true,
+        sent: true,
+        tax: i.takeAway ? tax2 : tax
+      });
     })
   }
 
@@ -469,7 +496,7 @@ function isSameProduct(item, otherItem, merge) {
     const samePrice = item.price === otherItem.price
     const sameCourse = item.course === otherItem.course
 
-    return sameProduct && samePrice && sameCourse && isSameModifiers(item, otherItem)
+    return sameProduct && samePrice && sameCourse && isSameModifiers(item, otherItem) && item.takeAway === otherItem.takeAway
   }
 
   return item._id.toString() === otherItem._id.toString()

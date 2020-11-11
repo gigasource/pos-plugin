@@ -257,46 +257,22 @@
         this.selectedProductIDs = [];
       },
       async getAllTaxCategory() {
-        const settings = await cms.getModel('PosSetting').findOne();
-        this.listTaxCategories = settings.taxCategory
-        return settings.taxCategory;
+        const listTaxCategories = await cms.getModel('TaxCategory').find();
+        this.listTaxCategories = listTaxCategories
+        return listTaxCategories
       },
 
       //tax category view
       async updateTaxCategory(oldTaxId, newTaxCategory) {
-        const settingsModel = cms.getModel('PosSetting');
-        if (oldTaxId && !newTaxCategory) {
-          await settingsModel.findOneAndUpdate(
-              {},
-              {
-                $pull: {
-                  taxCategory: {_id: oldTaxId}
-                }
-              }
-          )
-        } else if (newTaxCategory && !oldTaxId) {
-          await settingsModel.findOneAndUpdate(
-              {},
-              {
-                $push: {
-                  taxCategory: {...newTaxCategory}
-                }
-              }
-          )
-        } else {
-          await settingsModel.findOneAndUpdate(
-              {
-                'taxCategory._id': oldTaxId
-              },
-              {
-                $set: {
-                  'taxCategory.$': newTaxCategory,
-                }
-              }
-          )
+        const TaxCategoryModel = cms.getModel('TaxCategory');
+        if (oldTaxId && !newTaxCategory) { // delete
+          await TaxCategoryModel.deleteOne({ _id: oldTaxId })
+        } else if (newTaxCategory && !oldTaxId) { // insert
+          await TaxCategoryModel.create(newTaxCategory)
+        } else { // update
+          await TaxCategoryModel.findOneAndUpdate({ _id: oldTaxId }, newTaxCategory)
         }
-        const setting = await settingsModel.findOne();
-        this.listTaxCategories = setting.taxCategory;
+        await this.getAllTaxCategory()
       },
       //payment view
       async getListPayments() {

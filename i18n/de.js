@@ -373,6 +373,8 @@ module.exports = {
         keyboardHeight: 'Keyboard Height',
         expansionColumn: 'Expansion Column',
         keyboardPosition: 'Keyboard Position',
+        rows: 'Zeilen',
+        columns: 'Spalten'
       },
 
       product: {

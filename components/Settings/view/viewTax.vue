@@ -2,13 +2,15 @@
   <div>
     <g-simple-table striped>
       <tr>
+        <th>Name</th>
         <th>{{$t('common.tax')}}</th>
-        <th>{{$t('settings.noteLetter')}}</th>
+        <th>Type</th>
       </tr>
       <tr v-for="(tax, i) in listTaxCategories" :key="i" @click="select(tax)"
           :class="[selectedTaxCategory && selectedTaxCategory._id === tax._id && 'bordered']">
+        <td>{{tax.name}}</td>
         <td>{{tax.value}}%</td>
-        <td>{{tax.invoiceLetter}}</td>
+        <td>{{tax.type}}</td>
       </tr>
     </g-simple-table>
   </div>

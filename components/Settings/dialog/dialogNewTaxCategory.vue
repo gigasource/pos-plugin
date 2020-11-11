@@ -4,8 +4,9 @@
       <g-icon @click="dialogNewTaxCategory = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
         <div class="input">
+          <pos-textfield-new @click="check = 'letter'" large label="Name" v-model="name" suffix="%"/>
           <pos-textfield-new @click="check = 'tax'" large :label="$t('common.tax')" v-model="tax" :rules="[rules.number, rules.range]" suffix="%"/>
-          <pos-textfield-new @click="check = 'letter'" large :label="$t('settings.invoiceLetter')" v-model="computedLetter"/>
+          <pos-textfield-new @click="check = 'letter'" large label="Type" v-model="type"/>
         </div>
         <div v-if="!isMobile" class="action">
           <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogNewTaxCategory = false">{{$t('ui.cancel')}}</g-btn>
@@ -13,7 +14,7 @@
         </div>
       </div>
       <div class="bg-grey-lighten-1 pa-2">
-        <pos-keyboard-full v-model="keyboard" @enter-pressed="submit"/>
+        <pos-keyboard-full @enter-pressed="submit"/>
       </div>
     </div>
   </g-dialog>
@@ -33,9 +34,11 @@
     data() {
       return {
         tax: '',
-        letter: '',
+        name: '',
+        type: '',
         check: 'tax',
         internalValue: false,
+        isEdit: false,
         rules: {
           number: val => !isNaN(val) || 'Must be a number',
           range: val => isNaN(val) || (val <= 100 && val >= 0) || 'Tax Range: 0 - 100'
@@ -51,59 +54,41 @@
           this.internalValue = val
         }
       },
-      computedLetter: {
-        get() {
-          return this.letter ? this.letter.toUpperCase() : '';
-        },
-        set(val) {
-          this.letter = val.charAt(val.length - 1).toUpperCase();
-        }
-      },
-      keyboard: {
-        get() {
-          if (this.check === 'tax') {
-            return this.tax;
-          } else if (this.check === 'letter') {
-            return this.letter;
-          }
-        },
-        set(val) {
-          if (this.check === 'tax') {
-            return this.tax = val;
-          } else if (this.check === 'letter') {
-            return this.computedLetter = val;
-          }
-        }
-      },
       valid() {
-        return !(!this.tax || !this.letter || typeof this.rules.number(this.tax) === 'string' || typeof this.rules.range(this.tax) === 'string');
+        return !(!this.tax || !this.name || typeof this.rules.number(this.tax) === 'string' || typeof this.rules.range(this.tax) === 'string');
       }
     },
     methods: {
       async submit() {
-        if(this.selectedTaxCategory) {
+        let taxCategory
+        if (this.isEdit) {
           this.selectedTaxCategory.value = parseInt(this.tax);
-          this.selectedTaxCategory.name = this.tax + '%';
-          this.selectedTaxCategory.invoiceLetter = this.letter;
+          this.selectedTaxCategory.name = this.name;
+          this.selectedTaxCategory.type = this.type;
+          taxCategory = this.selectedTaxCategory
         } else {
-          this.selectedTaxCategory = {
+          taxCategory = {
             value: parseInt(this.tax),
-            name: this.tax + '%',
-            invoiceLetter: this.letter
+            name: this.name,
+            type: this.type
           }
         }
-        await this.updateTaxCategory(this.selectedTaxCategory._id, this.selectedTaxCategory);
+        await this.updateTaxCategory(taxCategory._id, taxCategory);
         this.tax = '';
-        this.letter = '';
+        this.name = '';
+        this.type = '';
         this.dialogNewTaxCategory = false;
       },
       open(isEdit) {
+        this.isEdit = isEdit
         if (isEdit && this.selectedTaxCategory) {
           this.tax = this.selectedTaxCategory.value.toString()
-          this.letter = this.selectedTaxCategory.invoiceLetter;
+          this.name = this.selectedTaxCategory.name;
+          this.type = this.selectedTaxCategory.type;
         } else {
           this.tax = '';
-          this.letter = '';
+          this.name = '';
+          this.type = '';
         }
         this.check = 'tax';
         this.dialogNewTaxCategory = true;

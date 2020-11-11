@@ -86,7 +86,10 @@
           this.step = this.mode === 'demo' ? 1 : 2
 
           cms.socket.emit('get-demo-stores', (stores, error) => {
-            if (error) return
+            if (error) {
+              console.log(error)
+              return
+            }
             this.listDemo = stores
           })
         }
@@ -116,8 +119,12 @@
     },
     methods: {
       getBackgroundImage(demo) {
-        return {
+        if(demo.image)
+         return {
           'background-image' : `url("${demo.image}")`
+         }
+        return {
+          'background-color': '#F0F0F0'
         }
       },
       selectDemo(demo) {

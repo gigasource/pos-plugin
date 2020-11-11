@@ -379,6 +379,8 @@ module.exports = {
         keyboardHeight: 'Keyboard Height',
         expansionColumn: 'Expansion Column',
         keyboardPosition: 'Keyboard Position',
+        rows: 'Rows',
+        columns: 'Columns'
       },
 
       product: {
