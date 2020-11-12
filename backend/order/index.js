@@ -112,7 +112,7 @@ module.exports = (cms) => {
         update: {
           method: 'findOneAndUpdate',
           query: JSON.stringify({
-            $set: { items: getUpdatedOrderItems(order.items) }
+            $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
           })
         }
       })
@@ -181,7 +181,7 @@ module.exports = (cms) => {
           update: {
             method: 'findOneAndUpdate',
             query: JSON.stringify({
-              $set: { items: getUpdatedOrderItems(order.items) }
+              $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
             })
           }
         })
@@ -426,14 +426,14 @@ module.exports = (cms) => {
     return cms.getModel('OrderCommit').addCommits(commits);
   }
 
-  function getUpdatedOrderItems(items) {
+  function getUpdatedOrderItems(items, takeAwayOrder) {
     return items.map(i => {
       const [tax, tax2] = i.taxes
       return ({
         ...i,
         printed: true,
         sent: true,
-        tax: i.takeAway ? tax2 : tax
+        tax: (takeAwayOrder || i.takeAway) ? tax2 : tax
       });
     })
   }

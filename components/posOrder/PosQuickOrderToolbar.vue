@@ -10,7 +10,10 @@
         <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
       </div>
     </g-menu>
-    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>
+<!--    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>-->
+    <g-btn-bs icon="icon-delivery" :background-color="currentOrder.takeAway ? '#2979FF' : '#fff'"
+              :disabled="disableTakeAway"
+              @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
     <g-spacer/>
     <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
               :disabled="disablePrintBtn" icon="icon-print"
@@ -69,6 +72,9 @@
           return this.currentOrder.items.some(i => !i.printed && i.quantity)
         }
       },
+      disableTakeAway() {
+        return !this.currentOrder.items.some(i => i.quantity)
+      }
     },
     methods: {
       back() {
@@ -95,6 +101,9 @@
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
+      },
+      toggleTakeAwayOrder() {
+        this.$emit('updateCurrentOrder', 'takeAway', !this.currentOrder.takeAway, true)
       }
     },
     async activated() {
