@@ -35,10 +35,14 @@ module.exports = async cms => {
   sendSavedMessages();
 
   const fn = _.once(async () => {
+    //if (process.platform === 'darwin') return process.exit();
     if (onlineOrderSocket && onlineOrderSocket.connected) {
-      saveDisconnectMessage(onlineOrderSocket)
-          .catch(err => console.error(err))
-          .finally(() => process.exit());
+      try {
+        await saveDisconnectMessage(onlineOrderSocket);
+      } catch (e) {
+        console.error(e)
+      }
+      process.exit();
     } else {
       process.exit();
     }

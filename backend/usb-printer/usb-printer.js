@@ -1,7 +1,7 @@
 let usb;
 
 const getUsb = () => {
-  if (usb === null) {
+  if (!usb) {
     usb = require('usb');
   }
   return usb;

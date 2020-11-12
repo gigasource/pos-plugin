@@ -20,8 +20,8 @@ async function posCommit(updateCommit) {
 	if (!updateCommit[TYPENAME])
 		updateCommit[TYPENAME] = {};
 
-	const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId');
-	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
+	const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId').lean();
+	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
 	updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating = 0;
 	updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
 		const { commits } = data;

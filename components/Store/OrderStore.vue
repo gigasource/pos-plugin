@@ -989,7 +989,7 @@
           }
         }]);
       },
-      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = true, fromPayBtn, cb = () => null) {
+      saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = false, fromPayBtn, cb = () => null) {
         return new Promise(async (resolve, reject) => {
           try {
             if (!this.currentOrder || !this.currentOrder.items.length) return

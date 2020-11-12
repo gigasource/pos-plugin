@@ -71,14 +71,14 @@ async function orderCommit(updateCommit) {
   });
 
   cms.post('resetHighestOrderId', async () => {
-    const orderDoc = await updateCommit.orderModel.findOne({}).sort('-id');
-    updateCommit[TYPENAME].highestOrderId = (orderDoc && orderDoc._doc.id) ? orderDoc._doc.id + 1 : 1;
+    const orderDoc = await updateCommit.orderModel.findOne({}).sort('-id').lean();
+    updateCommit[TYPENAME].highestOrderId = (orderDoc && orderDoc.id) ? orderDoc.id + 1 : 1;
   })
 
   await cms.execPostAsync('resetHighestOrderId', null, []);
 
-  const commitDoc = await updateCommit.orderCommitModel.findOne({}).sort('-commitId');
-  updateCommit[TYPENAME].highestOrderCommitId = (commitDoc && commitDoc._doc.commitId) ? commitDoc._doc.commitId + 1 : 1;
+  const commitDoc = await updateCommit.orderCommitModel.findOne({}).sort('-commitId').lean();
+  updateCommit[TYPENAME].highestOrderCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
   updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating = 0;
 
   updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
@@ -244,10 +244,10 @@ async function orderCommit(updateCommit) {
       if (!checkOrderActive(commit)) return;
       const query = JsonFn.parse(commit.update.query);
       const condition = getCondition(commit);
-      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true});
-      updateCommit[TYPENAME].activeOrders[commit.data.table] = result.toJSON();
+      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true}).lean();
+      updateCommit[TYPENAME].activeOrders[commit.data.table] = result;
       setCommitId(commit);
-      query['$push']['items']._id = result._doc['items'][result._doc['items'].length - 1]._doc._id;
+      query['$push']['items']._id = result['items'][result['items'].length - 1]._id;
       commit.update.query = JsonFn.stringify(query);
       await updateCommit.orderCommitModel.create(commit);
       return true;

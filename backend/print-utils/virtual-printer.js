@@ -12,7 +12,7 @@ function createPureImageVirtualPrinter(printerInfo, type) {
           const bufferInBase64 = PNG.sync.write(png).toString('base64')
           await cms.getModel('VirtualReport').create({
             imageContent: bufferInBase64,
-            created: dayjs(),
+            created: dayjs().toDate(),
             type: type,
             printerId: printerInfo._id,
             printerGroupId: printerInfo.groupPrinterId

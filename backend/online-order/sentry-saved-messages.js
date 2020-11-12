@@ -1,15 +1,17 @@
 const SentrySavedMessagesModel = cms.getModel('SentrySavedMessage');
 
-function sendSavedMessages() {
-  SentrySavedMessagesModel.find({}, (err, docs) => {
-    if (err) return console.error(err);
+async function sendSavedMessages() {
+  try {
+    const docs = await SentrySavedMessagesModel.find({});
 
     const savedSentryMessageIds = docs.map(({_id}) => _id);
     SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}}).exec();
     docs.forEach(({tagString, message}) => {
       console.debug(tagString, message);
     });
-  });
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 function saveDisconnectMessage(onlineOrderSocket) {
