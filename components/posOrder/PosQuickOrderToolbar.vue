@@ -15,7 +15,7 @@
               :disabled="disableTakeAway"
               @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
     <g-spacer/>
-    <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
+    <g-btn-bs v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
               :disabled="disablePrintBtn" icon="icon-print"
               @click.stop="print">
       {{$t('ui.print')}}
