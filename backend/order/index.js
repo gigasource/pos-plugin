@@ -307,7 +307,7 @@ module.exports = (cms) => {
             query: JsonFn.stringify({
               _id: new mongoose.Types.ObjectId(),
               table,
-              items: newItems,
+              items: getUpdatedOrderItems(newItems),
               status: 'inProgress',
               user: [{ name: user.name, date: new Date() }]
             })
