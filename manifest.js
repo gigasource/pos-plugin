@@ -109,7 +109,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/call-system-handler/usrobotics-device-java-handler.js',
+      path: 'backend/call-system-handler/modem-device-java-handler.js',
       type: 'backend'
     },
     {

@@ -14,7 +14,7 @@ async function sendSavedMessages() {
   }
 }
 
-function saveDisconnectMessage(onlineOrderSocket) {
+async function saveDisconnectMessage(onlineOrderSocket) {
   if (onlineOrderSocket.clientId) return SentrySavedMessagesModel.create({
     tagString: `sentry:clientId=${onlineOrderSocket.clientId},eventType=socketConnection,socketId=${onlineOrderSocket.serverSocketId}`,
     message: `2b. (Startup) onlineOrderSocket disconnected`,
