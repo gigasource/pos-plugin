@@ -912,8 +912,11 @@
       updateOrderItems(items) {
         this.$set(this.currentOrder, 'items', items)
       },
-      updateCurrentOrder(key, val) {
+      updateCurrentOrder(key, val, commit) {
         this.$set(this.currentOrder, key, val)
+        if (commit) {
+          this.addOrderCommits([{ [key]: val }])
+        }
       },
       updatePrintedOrder(key, val) {
         this.$set(this.printedOrder, key, val)
@@ -1375,8 +1378,9 @@
         const reservations = await cms.getModel('Reservation').find({date: { $gte: dateFrom, $lte: dateTo }, status: {$ne: 'declined'}})
         return reservations && reservations.length > 0
       },
-      genObjectId() {
+      genObjectId(id) {
         const BSON = require('bson');
+        if (id) return new BSON.ObjectID(id)
         return new BSON.ObjectID();
       },
       async getTempOrder() {
@@ -1502,6 +1506,7 @@
           this.$set(this.currentOrder, 'items', _.cloneDeep(order.items))
           this.$set(this.currentOrder, 'manual', order.manual)
           this.$set(this.currentOrder, 'discount', order.discount)
+          this.$set(this.currentOrder, 'takeAway', order.takeAway)
           order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
           order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
           order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)
@@ -1619,6 +1624,14 @@
         },
         deep: true,
         immediate: true
+      },
+      activeOrders(val) {
+        if (val && this.currentOrder) {
+          const currentTable = this.currentOrder.table;
+          if (currentTable && !val.some(o => o.table === currentTable)) {
+            this.$route.path !== '/pos-dashboard' && this.$router.push('/pos-dashboard')
+          }
+        }
       }
     },
     provide() {

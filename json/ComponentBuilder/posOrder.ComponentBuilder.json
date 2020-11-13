@@ -314,6 +314,11 @@
               "service": "OrderStore:updateOrderTable",
               "local": "updateOrderTable",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
             }
           ]
         }
