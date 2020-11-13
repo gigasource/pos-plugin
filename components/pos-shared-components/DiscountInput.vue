@@ -3,7 +3,7 @@
     <div class="discount-content">
       <div class="w-10 mx-2">
         <div class="fw-700 ta-center fs-small">{{$t('discount.percent')}} (%)</div>
-        <scroll-select ref="scroll-percentage" :value="percent" :items="listPercent" :height="200"
+        <scroll-select ref="scroll-percentage" :value="percent" :items="listPercent" :height="200" :class="percent && 'scroll--selected'"
                        :item-height="40" selected-color="#1271FF" @input="selectPercent"/>
       </div>
       <div class="w-10 mx-2">
