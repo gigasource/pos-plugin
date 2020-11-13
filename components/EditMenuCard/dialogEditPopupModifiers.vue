@@ -233,8 +233,8 @@
       async addCategory() {
         this.newCategory = {
           name: 'New Category',
-          mandatory: false,
-          selectOne: false,
+          mandatory: true,
+          selectOne: true,
           modifierGroup: this.activeGroup._id,
           freeItems: 0
         }
