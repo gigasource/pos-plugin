@@ -124,7 +124,7 @@
           'grid-template-columns': this.getGridTemplateFromNumber(this.orderLayout.columns),
           'grid-template-rows': this.getGridTemplateFromNumber(this.orderLayout.rows),
           'grid-gap': '5px',
-          height: this.category ? this.category.size : '90px'
+          height: this.category ? this.category.size : `${40 * this.orderLayout.rows}px`
         }
       },
       productContainerStyle() {
