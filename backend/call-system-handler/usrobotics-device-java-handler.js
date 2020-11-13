@@ -5,7 +5,7 @@ module.exports = async (cms) => {
     rnBridge = require('rn-bridge');
   } catch (e) {
     // this only works on mobile version
-    return;
+    rnBridge = require('../rn-bridge/rn-bridge-proxy');
   }
 
   let selectedDevicePath;

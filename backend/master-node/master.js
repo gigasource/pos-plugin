@@ -86,6 +86,7 @@ class Master {
 	  } else {
 	  	ip = global.APP_CONFIG.deviceIp;
 	  }
+	  ip = `${ip}:${global.APP_CONFIG.port ? global.APP_CONFIG.port : '8888'}`;
 		_this.onlineOrderSocket.emit('registerMasterDevice', ip);
 		_this.onlineOrderSocket.on('updateCommits', updateCommits);
 		_this.onlineOrderSocket.on('requireSync', requireSync);
@@ -143,7 +144,9 @@ class Master {
 	}
 
 	emitToAll(commits) {
-		this.onlineOrderSocket.emit('emitToAllDevices', commits, this.storeId);
+		if (this.onlineOrderSocket) {
+			this.onlineOrderSocket.emit('emitToAllDevices', commits, this.storeId);
+		}
 		for (let clientId in this.connection) {
 			this.connection[clientId].emit('updateCommitNode', commits);
 		}

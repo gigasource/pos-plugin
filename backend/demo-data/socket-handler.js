@@ -126,14 +126,14 @@ module.exports = cms => {
     })
 
     socket.on('set-demo-store', async (store, cb) => {
+      global.APP_CONFIG.isMaster = true
+      await cms.execPostAsync('load:handler')
       if (!store) return cb()
 
       const { fileName } = store
       const downloadUrl = url.resolve(await getWebShopUrl(), fileName, { responseType: 'stream' })
       const { data } = await axios.get(downloadUrl)
       await importDemoData(data)
-      global.APP_CONFIG.isMaster = true;
-      await cms.execPostAsync('load:handler')
       cb()
     })
   })
