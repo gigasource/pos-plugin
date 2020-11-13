@@ -127,7 +127,12 @@
       onClickModifier(modifier, category, select) {
         // not selected
         if (!this.listModifiers2.some(mod => mod._id === modifier._id)) {
-          this.listModifiers2.push(modifier)
+          if (category.selectOne) {
+            this.listModifiers2 = [modifier]
+          } else {
+            this.listModifiers2.push(modifier)
+          }
+
           return select(modifier)
         }
 
