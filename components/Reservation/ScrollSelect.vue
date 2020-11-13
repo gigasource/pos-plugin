@@ -4,7 +4,7 @@
       <div class="scroll-select__container">
         <template v-for="(item, index) in computedList">
           <slot name="item">
-            <div class="scroll-select__container--item" :key="index" :id="item"
+            <div class="scroll-select__container--item" :key="index" :id="item" @click="chooseItem(item, index)"
                  :style="{height: computedItemHeight, ...value === item && { color: 'white', fontWeight: '700' }}">
               {{item}}
             </div>
@@ -73,6 +73,11 @@
         setTimeout(() => {
           this.$refs.container.scrollTop = this.itemHeight * index
         }, 100)
+      },
+      chooseItem(item, index) {
+        if (!item) return
+        this.$emit('input', item)
+        this.$refs.container.scroll({top: this.itemHeight * (index - 2), behavior: 'smooth'})
       }
     }
   }

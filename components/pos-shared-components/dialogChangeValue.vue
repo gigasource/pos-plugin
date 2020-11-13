@@ -2,7 +2,10 @@
   <g-dialog v-model="dialog" overlay-color="#6b6f82" :fullscreen="isMobile" overlay-opacity="0.95">
     <div class="dialog-change w-100" :style="[{background: 'white'}]">
       <g-icon class="dialog-change--close" @click="dialog = false">close</g-icon>
-      <discount-input :type="changeType" :value="change" @submit="submit" @remove-discount="removeDiscount"/>
+      <discount-input v-if="dialog" :type="changeType" :value="change" @submit="submit" @remove-discount="removeDiscount"/>
+      <g-snackbar :value="showSnackBar" timeout="2000" color="#FF4552">
+        <div>Discount exceeds order value!</div>
+      </g-snackbar>
     </div>
   </g-dialog>
 </template>
@@ -23,7 +26,8 @@
         changeType: null,
         showDialog: false,
         originalValue: 0,
-        change: 0
+        change: 0,
+        showSnackBar: false
       }
     },
     computed: {
@@ -60,9 +64,13 @@
           } else {
             difference = this.change
           }
+          if(difference > this.originalValue) {
+            this.showSnackBar = true
+            return
+          }
           const change = {
             type: this.changeType,
-            value: this.originalValue - this.change,
+            value: this.originalValue - difference,
             difference,
             change: this.change
           }

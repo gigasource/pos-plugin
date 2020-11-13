@@ -137,7 +137,10 @@
       },
       paymentTotal() {
         if (this.currentOrder) {
-          return orderUtil.calOrderTotal(this.currentOrder.items) + orderUtil.calOrderModifier(this.currentOrder.items)
+          const total = orderUtil.calOrderTotal(this.currentOrder.items) + orderUtil.calOrderModifier(this.currentOrder.items)
+          if(Number.isInteger(total))
+            return total
+          return +total.toFixed(2)
         }
         return 0
       },
