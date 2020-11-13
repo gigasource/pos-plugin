@@ -134,6 +134,7 @@ module.exports = cms => {
       const downloadUrl = url.resolve(await getWebShopUrl(), fileName, { responseType: 'stream' })
       const { data } = await axios.get(downloadUrl)
       await importDemoData(data)
+      cms.socket.emit('updateRooms')
       cb()
     })
   })
