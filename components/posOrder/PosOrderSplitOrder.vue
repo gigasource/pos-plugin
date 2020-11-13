@@ -7,7 +7,7 @@
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
             <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">
               <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
-              <span>View receipt</span>
+              <span>{{$t('restaurant.viewReceipt')}}</span>
             </g-btn-bs>
             <g-spacer v-if="splitOrders.length"/>
             <div v-if="splitOrders.length">

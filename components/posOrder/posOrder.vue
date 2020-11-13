@@ -18,16 +18,16 @@
             </template>
             <g-expand-x-transition>
               <div class="order-detail__menu">
-                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
-                <g-btn-bs icon="icon-move-items" @click="moveItems">Move Items</g-btn-bs>
-                <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
+                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">{{$t('order.splitOrder')}}</g-btn-bs>
+                <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
+                <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
                 <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
                 <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
                           @click.stop="printOrder">
-                  Print
+                  {{$t('ui.print')}}
                 </g-btn-bs>
-                <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">Pay</g-btn-bs>
+                <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">{{$t('article.pay')}}</g-btn-bs>
                 <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
               </div>
             </g-expand-x-transition>

@@ -8,7 +8,9 @@ module.exports = {
       internet: 'Internet',
       errorPasscode: 'Passcode is incorrect',
       english: 'English',
-      german: 'German'
+      german: 'German',
+      key: 'Login',
+      loginMess: 'Enter your passcode to login',
     },
     //dashboard
     dashboard: {
@@ -187,6 +189,9 @@ module.exports = {
       quantity: 'Qty',
       each: 'Each',
       savedList: 'Saved List',
+      splitOrder: 'Split order',
+      moveItem: 'Move items',
+      voucher: 'Voucher'
     },
 
     orderHistory: {
@@ -209,7 +214,11 @@ module.exports = {
       change: 'Change',
       tip: 'Tip',
       selectCustomer: 'Select Customer',
-      alertDiscount: 'This order has already applied discount in items'
+      alertDiscount: 'This order has already applied discount in items',
+      enterTender: 'Please enter tendered cash',
+      cash: 'Cash',
+      card: 'Card',
+      multi: 'Multi'
     },
 
     settings: {
@@ -366,6 +375,10 @@ module.exports = {
       room: 'Room',
       addRoom: 'Add New Room',
       takeAway: 'Take Away',
+      createVoucher: 'Create voucher',
+      redeemVoucher: 'Redeem voucher',
+      voucherValue: 'Value',
+      viewReceipt: 'View receipt',
 
       menuEdit: {
         categoriesNo: 'Number of Categories',
@@ -577,6 +590,14 @@ module.exports = {
       date: 'Date',
       amount: 'Amount',
       reason: 'Reason',
+    },
+
+    discount: {
+      percent: 'Percent',
+      amount: 'Amount',
+      discount: 'Discount',
+      custom: 'Custom',
+      quickDiscount: 'Quick discount'
     }
   }
 }

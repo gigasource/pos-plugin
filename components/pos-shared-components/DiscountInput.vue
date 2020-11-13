@@ -2,19 +2,19 @@
   <div class="discount h-100">
     <div class="discount-content">
       <div class="w-10 mx-2">
-        <div class="fw-700 ta-center fs-small">Percent (%)</div>
+        <div class="fw-700 ta-center fs-small">{{$t('discount.percent')}} (%)</div>
         <scroll-select ref="scroll-percentage" :value="percent" :items="listPercent" :height="200"
                        :item-height="40" selected-color="#1271FF" @input="selectPercent"/>
       </div>
       <div class="w-10 mx-2">
-        <div class="fw-700 ta-center fs-small">Amount ({{$t('common.currency', storeLocale)}})</div>
+        <div class="fw-700 ta-center fs-small">{{$t('discount.amount')}} ({{$t('common.currency', storeLocale)}})</div>
         <scroll-select ref="scroll-amount" :value="amount" :items="listAmount" :height="200" :class="amount && 'scroll--selected'"
                        :item-height="40" selected-color="#1271FF" @input="selectAmount"/>
       </div>
       <div class="flex-grow-1 ml-3">
-        <div class="fw-700 ml-1">Discount</div>
-        <pos-textfield-new :label="`Custom (${$t('common.currency', storeLocale)})`" v-model="custom"/>
-        <div class="fw-700 fs-small ml-1 mb-1">Recent discount</div>
+        <div class="fw-700 ml-1">{{$t('discount.discount')}}</div>
+        <pos-textfield-new :label="`${$t('discount.custom')} (${$t('common.currency', storeLocale)})`" v-model="custom"/>
+        <div class="fw-700 fs-small ml-1 mb-1">{{$t('discount.quickDiscount')}}</div>
         <div class="discount-quick">
           <div v-for="(discount, i) in quickDiscount" :key="i" @click="selectDiscount(discount)"
                :class="['discount-quick__item', custom === discount && 'discount-quick__item--selected']">
