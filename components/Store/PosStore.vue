@@ -16,6 +16,7 @@
 <script>
   import customParseFormat from 'dayjs/plugin/customParseFormat'
   import { getProvided, mobileCheck } from '../logic/commonUtils';
+  import _ from 'lodash';
 
   dayjs.extend(customParseFormat)
 
@@ -24,7 +25,7 @@
     props: {},
     injectService: [
       'Snackbar:(showSnackbar,closeSnackbar)',
-      'VirtualPrinterStore:reportCount'
+      'VirtualPrinterStore:reportCount',
     ],
     data() {
       return {
@@ -42,29 +43,22 @@
         device: 'Terminal1',
         enabledFeatures: [],
         version: '0.0.0',
-        dashboardSidebar: [
+        rooms: [],
+        pendingReservationsLength: 0,
+        reservationBell: null,
+        isMobile: false,
+        masterClientId: null,
+        isIOS: false,
+        showVirtualReportInSidebar: false,
+        showLoadingOverlay: false,
+      }
+    },
+    computed: {
+      dashboardSidebar() {
+        return [
           {
             icon: 'icon-restaurant',
-            children() {
-              const rooms = this.$getService('RoomStore').rooms
-              const result = rooms.map(room => {
-                return {
-                  title: room.name,
-                  icon: 'radio_button_unchecked',
-                  iconType: 'small',
-                  onClick() {
-                    this.$emit('update:view', {
-                      name: 'Restaurant',
-                      params: {
-                        id: room._id
-                      }
-                    })
-                  }
-                }
-              });
-
-              return result;
-            },
+            children: this.getDashboardRooms,
             title: this.$t('sidebar.restaurant'),
             feature: 'tablePlan'
           },
@@ -157,17 +151,8 @@
             },
             title: this.$t('sidebar.functions')
           }
-        ],
-        pendingReservationsLength: 0,
-        reservationBell: null,
-        isMobile: false,
-        masterClientId: null,
-        isIOS: false,
-        showVirtualReportInSidebar: false,
-        showLoadingOverlay: false
-      }
-    },
-    computed: {
+        ]
+      },
       computedDashboardSidebar() {
         let sidebar = _.cloneDeep(this.dashboardSidebar)
         if (this.user && this.user.role !== 'admin') {
@@ -433,6 +418,30 @@
       hideVirtualPrinterSidebarItem() {
         console.log('PosStore:hideVirtualPrinterSidebarItem')
         this.showVirtualReportInSidebar = false
+      },
+      async getRooms() {
+        const rooms = await cms.getModel('Room').find()
+        this.rooms = _.orderBy(rooms, ['order'], ['asc'])
+      },
+      getDashboardRooms() {
+        if (this.rooms) {
+          return this.rooms.map(room => {
+            return {
+              title: room.name,
+              icon: 'radio_button_unchecked',
+              iconType: 'small',
+              onClick() {
+                this.$emit('update:view', {
+                  name: 'Restaurant',
+                  params: {
+                    id: room._id
+                  }
+                })
+              }
+            }
+          });
+        }
+        return []
       }
     },
     async created() {
@@ -488,6 +497,8 @@
 
       await this.getPendingReservationsLength()
       await this.setupReservationBell()
+      await this.getRooms()
+      cms.socket.on('updateRooms', this.getRooms)
     },
     watch: {
       online: {

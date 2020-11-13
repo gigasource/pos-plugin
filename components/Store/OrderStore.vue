@@ -503,7 +503,7 @@
       async saveSplitOrder(items, payment, isLast, callback = () => null) {
         // last split, pay for original order
         if (isLast && this.currentOrder._id) {
-          const order = await this.saveRestaurantOrder(payment, false, false)
+          const order = await this.saveRestaurantOrder(payment, false, false, false)
           return callback(order)
         }
 
@@ -1012,7 +1012,7 @@
               this.actionList[0].update.query = jsonfn.stringify(query);
             }
             this.actionList.forEach(actionInfo => {
-              if (actionInfo.action != 'createOrder') {
+              if (actionInfo.action !== 'createOrder') {
                 if (actionInfo.where) {
                   const condition = jsonfn.parse(actionInfo.where);
                   if (!condition._id) {
@@ -1628,14 +1628,6 @@
         deep: true,
         immediate: true
       },
-      activeOrders(val) {
-        if (val && this.currentOrder) {
-          const currentTable = this.currentOrder.table;
-          if (currentTable && !val.some(o => o.table === currentTable)) {
-            this.$route.path !== '/pos-dashboard' && this.$router.push('/pos-dashboard')
-          }
-        }
-      }
     },
     provide() {
       return {

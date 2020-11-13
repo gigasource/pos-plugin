@@ -54,7 +54,7 @@
           <div class="splitter__actions">
             <g-btn-bs class="flex-grow-1 w-50 row-flex align-items-center justify-center splitter__actions-btn ma-0"
                       style="background: #046EFF; color: #fff; border-radius: 0 0 0 6px"
-                      :disabled="!totalCurrent"
+                      :disabled="disablePayment"
                       @click.stop="createOrder([{ type: 'cash', value: totalCurrent }])">
               <g-icon size="36" class="mr-2">icon-cash</g-icon>
               <span>Cash</span>
@@ -67,7 +67,7 @@
               <template #activator="{ on }">
                 <g-btn-bs v-on="on" class="row-flex align-items-center justify-center w-100 ma-0"
                           style="background-color: #FFCB3A; border-radius: 0 0 6px 0"
-                          :disabled="!totalCurrent">
+                          :disabled="disablePayment">
                   <g-icon size="36" color="#fff">more_horiz</g-icon>
                 </g-btn-bs>
               </template>
@@ -183,7 +183,8 @@
         showPaymentMethodsMenu: false,
         showMultiPaymentdialog: false,
         showReceipt: false,
-        splitId: null
+        splitId: null,
+        paying: false,
       }
     },
     computed: {
@@ -214,6 +215,9 @@
       orderWithSplits() {
         return Object.assign({}, this.currentOrder, { splits: this.splitOrders })
       },
+      disablePayment() {
+        return this.paying || !this.totalCurrent
+      }
     },
     methods: {
       back() {
@@ -285,6 +289,7 @@
         const isLastSplit = this.remainingItems.length === 0;
         this.$emit('saveSplitOrder', this.currentSplitOrder, paymentMethod, isLastSplit,
           order => {
+            this.paying = false
             this.currentSplitOrder = []
 
             if (order) {
@@ -295,9 +300,10 @@
               this.$emit('updatePrintedOrder', 'items', printedItems)
               if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: printedItems })
             }
-          })
 
-        if (isLastSplit) this.showReceipt = true
+            if (isLastSplit) this.showReceipt = true
+          })
+        this.paying = true
       },
       updateSplitPayment(_id, payment, tip) {
         cms.socket.emit('update-split-payment', _id, payment, ({ order, error }) => {
@@ -324,13 +330,11 @@
       }
     },
     watch: {
-      'currentOrder.items'(val) {
-        if (val) this.remainingItems = _.cloneDeep(val)
-      },
       value(val) {
         this.currentSplitOrder = []
         this.splitOrders = []
         this.remainingItems = _.cloneDeep(this.currentOrder.items)
+        this.paying = false
 
         if (val) {
           if (this.currentOrder.splitId) {
@@ -341,6 +345,10 @@
             if (this.currentOrder._id) {
               this.$emit('createOrderCommit', { key: 'splitId', value: this.splitId })
             }
+          }
+
+          if (this.currentOrder.items) {
+            this.remainingItems = _.cloneDeep(this.currentOrder.items)
           }
         }
       }
