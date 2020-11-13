@@ -222,7 +222,8 @@
         actionTimeout: null,
         showSplitBtn: true,
         smallSidebar: true,
-        onlyCheckoutPrintedItems: true
+        onlyCheckoutPrintedItems: true,
+        changedAvatar: false
       }
     },
     computed: {
@@ -230,6 +231,7 @@
         return this.user ? this.user.name : ''
       },
       avatar() {
+        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.png'
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
@@ -509,6 +511,12 @@
           this.$set(this, 'showSplitBtn', showSplitBtn)
           this.$set(this, 'smallSidebar', smallSidebar)
         }
+
+        if(this.isMobile) {
+          setTimeout(() => {
+            this.changedAvatar = true
+          }, 3000)
+        }
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
@@ -546,7 +554,11 @@
       }
 
       this.loadSetting()
+
     },
+    deactivated() {
+      this.changedAvatar = false
+    }
   }
 </script>
 
