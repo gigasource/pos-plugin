@@ -1,4 +1,5 @@
 module.exports = async (cms) => {
+  const {checkModeActive} = require('./utils');
   const ioClient = require('socket.io-client');
   let callMap = {};
   let fritzboxSocket;
@@ -11,9 +12,7 @@ module.exports = async (cms) => {
 
   async function updateConnectionStatus(cb, posSettings) {
     if (!posSettings) posSettings = await cms.getModel('PosSetting').findOne();
-    const {call: callConfig} = posSettings;
-    const {mode} = callConfig;
-    const demoMode = mode === 'demo-fritzbox';
+    const demoMode = await checkModeActive('demo-fritzbox', posSettings);
 
     if (cb && demoMode) cb(socketConnectStatus);
     else cms.socket.emit('update-call-system-status', demoMode ? socketConnectStatus : null);
@@ -34,7 +33,7 @@ module.exports = async (cms) => {
     const posSettings = await cms.getModel('PosSetting').findOne();
     const {call: callConfig} = posSettings;
     const {mode, ipAddresses = {}} = callConfig;
-    const demoMode = mode === 'demo-fritzbox';
+    const demoMode = await checkModeActive('demo-fritzbox', posSettings);
 
     if (!demoMode && fritzboxSocket) {
       reset();

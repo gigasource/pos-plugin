@@ -31,7 +31,8 @@
       </g-text-field-bs>
     </div>
 
-    <div v-else-if="currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value">
+    <div v-else-if="currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value
+                 || currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ARTECH.value">
       <p class="call-title">{{ callSystemIpText }}</p>
       <g-list class="call-device-table"
               selectable
@@ -43,7 +44,8 @@
     </div>
 
     <div class="action-buttons">
-      <g-btn-bs v-if="currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value"
+      <g-btn-bs v-if="currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value
+                   || currentCallSystemMode === CALL_SYSTEM_MODES.MODEM_ARTECH.value"
                 width="80"
                 background-color="#2979FF"
                 @click="updateUsbDeviceList">
@@ -76,7 +78,9 @@ export default {
         CALL_SYSTEM_MODES.OFF,
         CALL_SYSTEM_MODES.FRITZBOX,
         CALL_SYSTEM_MODES.DEMO,
-        CALL_SYSTEM_MODES.MODEM_ROBOTIC],
+        CALL_SYSTEM_MODES.MODEM_ROBOTIC,
+        CALL_SYSTEM_MODES.MODEM_ARTECH,
+      ],
       currentCallSystemMode: CALL_SYSTEM_MODES.OFF.value,
       callSystemStatus: '',
       ipAddresses: {},
@@ -92,7 +96,9 @@ export default {
   async created() {
     await this.loadData();
     cms.socket.on('update-call-system-status', this.updateConnectStatus);
-    cms.socket.on('list-usb-devices', (devices) => {
+    cms.socket.on('list-usb-devices', (devices, mode) => {
+      if (mode !== this.currentCallSystemMode) return;
+
       this.usbDevices = devices.map(({devicePath, deviceManufacturerName, deviceProductName}) => {
         return {
           text: `${devicePath} - ${deviceProductName} - ${deviceManufacturerName}`,
@@ -100,8 +106,8 @@ export default {
         };
       });
 
-      this.selectedSerialDevice = this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
-          ? this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value]
+      this.selectedSerialDevice = this.ipAddresses[mode]
+          ? this.ipAddresses[mode]
           : (this.usbDevices.length > 0 ? this.usbDevices[0].value : '');
     });
 
@@ -144,16 +150,14 @@ export default {
       if (value === CALL_SYSTEM_MODES.DEMO.value) defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
       else if (value === CALL_SYSTEM_MODES.FRITZBOX.value) defaultValue = '192.168.178.1:1012';
       else if (value === CALL_SYSTEM_MODES.OFF.value) defaultValue = '';
-      else if (value === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value) this.updateUsbDeviceList();
+      else if (value === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value
+          || value === CALL_SYSTEM_MODES.MODEM_ARTECH.value) this.updateUsbDeviceList();
 
       this.ipAddresses[value] = this.ipAddresses[value] || defaultValue;
     },
     selectedSerialDevice(value) {
-      this.ipAddresses[CALL_SYSTEM_MODES.MODEM_ROBOTIC.value] = value;
+      this.ipAddresses[this.currentCallSystemMode] = value;
     },
-    callSystemStatusComputed(value) {
-      this.test = value;
-    }
   },
   methods: {
     async loadData() {
@@ -186,7 +190,7 @@ export default {
       if (status) this.callSystemStatus = status;
     },
     updateUsbDeviceList() {
-      cms.socket.emit('list-usb-devices');
+      cms.socket.emit('list-usb-devices', this.currentCallSystemMode);
     },
   }
 }

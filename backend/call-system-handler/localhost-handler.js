@@ -1,4 +1,5 @@
 module.exports = async (cms) => {
+  const {checkModeActive} = require('./utils');
   const {CallMonitor} = require('fritz-callmonitor');
   let callMap = {};
   let fritzboxMonitor;
@@ -11,9 +12,7 @@ module.exports = async (cms) => {
 
   async function updateConnectionStatus(cb, posSettings) {
     if (!posSettings) posSettings = await cms.getModel('PosSetting').findOne();
-    const {call: callConfig} = posSettings;
-    let {mode} = callConfig;
-    const useLocalFritzbox = mode === 'localhost-fritzbox';
+    const useLocalFritzbox = await checkModeActive('localhost-fritzbox', posSettings);
 
     if (cb && useLocalFritzbox) cb(connectionStatus);
     else cms.socket.emit('update-call-system-status', useLocalFritzbox ? connectionStatus : null);
@@ -35,7 +34,7 @@ module.exports = async (cms) => {
     const posSettings = await cms.getModel('PosSetting').findOne();
     const {call: callConfig} = posSettings;
     let {mode, ipAddresses = {}} = callConfig;
-    const useLocalFritzbox = mode === 'localhost-fritzbox';
+    const useLocalFritzbox = await checkModeActive('localhost-fritzbox', posSettings);
 
     if (!useLocalFritzbox && fritzboxMonitor) {
       reset();
