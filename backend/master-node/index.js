@@ -2,7 +2,8 @@ const Master = require('./master');
 const Node = require('./node');
 const updateCommit = require('./updateCommit');
 const _ = require('lodash')
-// const mongoose = require('mongoose');
+const JsonFn = require('json-fn');
+const mongoose = require('mongoose');
 
 let handler;
 
@@ -34,6 +35,7 @@ module.exports = function (cms) {
 		})
 	});
 	cms.post('load:handler', _.once(async () => {
+		await setUpPosCommit();
 		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});
 		if (global.APP_CONFIG.isMaster) {
 			handler = new Master(cms);
@@ -52,6 +54,53 @@ module.exports = function (cms) {
 		console.log(`ip of this device is ${deviceIp}`)
 		global.APP_CONFIG.deviceIp = deviceIp;
 	})
+	cms.socket.on('connect', async (socket) => {
+		await cms.execPostAsync('run:internalSocketConnected', null, [socket])
+	})
+}
+
+async function setUpPosCommit() {
+	console.log('Setup pos commit');
+	const posCommitCollectionExists = (await cms.getModel('PosCommit').findOne({}).lean()) ? 1 : 0;
+	const needCreatePosCommitCollection = [];
+	let commitId = 0;
+	mongoose.set('debug', function (coll, method, ...query) {
+		if (needCreatePosCommitCollection.includes(coll) && method === 'insertMany') {
+			commitId++;
+			cms.getModel('PosCommit').create({
+				type: 'pos',
+				action: 'update',
+				temp: false,
+				data: {
+					collection: coll
+				},
+				commitId,
+				update: {
+					method: method,
+					query: JsonFn.stringify(query)
+				}
+			}).then(() => {
+				if (typeof _.last(query) === 'function') {
+					_.last(query)(null, {n: 1, ok: true});
+				}
+			})
+			return;
+		}
+		const collection = mongoose.connection.db.collection(coll);
+		return collection[method].apply(collection, query);
+	})
+	if (!posCommitCollectionExists) {
+		for (let coll of global.APP_CONFIG.whiteListCollection) {
+			if (coll.mongooseName && cms.getModel(coll.mongooseName).find) {
+				const collExists = (await cms.getModel(coll.mongooseName).find({}).lean());
+				if (collExists) {
+					needCreatePosCommitCollection.push(coll.name);
+					await cms.getModel(coll.mongooseName).insertMany(collExists);
+				}
+			}
+		}
+	}
+	mongoose.set('debug', null);
 }
 
 async function initSocket(socket) {
