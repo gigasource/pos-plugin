@@ -3,12 +3,14 @@ module.exports = {
     //login
     login: {
       network: 'Network',
-      support: 'Support',
+      support: 'Unterstützung',
       version: 'Version',
       internet: 'Internet',
       errorPasscode: 'Passcode is incorrect',
       english: 'English',
-      german: 'German'
+      german: 'German',
+      key: 'Einloggen',
+      loginMess: 'Geben Sie Passcode ein, um sich einzuloggen'
     },
     //dashboard
     dashboard: {
@@ -187,6 +189,9 @@ module.exports = {
       quantity: 'Qty',
       each: 'Each',
       savedList: 'Saved List',
+      splitOrder: 'Geteilte bestellung',
+      moveItem: 'Artikel verchieben',
+      voucher: 'Gutschein'
     },
 
     orderHistory: {
@@ -205,9 +210,13 @@ module.exports = {
       balanceDue: 'Betrag',
       amountTendered: 'Gegeben',
       change: 'Rückgeld',
-      tip: 'Tip',
+      tip: 'Trinkgeld',
       selectCustomer: 'Select Customer',
-      alertDiscount: 'This order has already applied discount in items'
+      alertDiscount: 'This order has already applied discount in items',
+      enterTender: 'Bitte geben Sie das angebotene Bargeld ein',
+      cash: 'Bargeld',
+      card: 'Karte',
+      multi: 'Mehr'
     },
 
     settings: {
@@ -360,6 +369,10 @@ module.exports = {
       room: 'Room',
       addRoom: 'Raum erstellen',
       takeAway: 'Take Away',
+      createVoucher: 'Gutschein erstellen',
+      redeemVoucher: 'Gutschein einlösen',
+      voucherValue: 'Gutscheinwert',
+      viewReceipt: 'Quittung anzeigen',
 
       menuEdit: {
         categoriesNo: 'Anzahl der Kategorien',
@@ -566,6 +579,13 @@ module.exports = {
       date: 'Datum',
       amount: 'Menge',
       reason: 'Grund',
+    },
+    discount: {
+      percent: 'Prozent',
+      amount: 'Menge',
+      discount: 'Rabatt',
+      custom: 'Selbserstellte',
+      quickDiscount: 'Schneller Rabatt'
     }
   }
 }

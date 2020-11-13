@@ -2,24 +2,23 @@
   <div class="discount h-100">
     <div class="discount-content">
       <div class="w-10 mx-2">
-        <div class="fw-700 ta-center fs-small">Percent (%)</div>
+        <div class="fw-700 ta-center fs-small">{{$t('discount.percent')}} (%)</div>
         <scroll-select ref="scroll-percentage" :value="percent" :items="listPercent" :height="200"
                        :item-height="40" selected-color="#1271FF" @input="selectPercent"/>
       </div>
       <div class="w-10 mx-2">
-        <div class="fw-700 ta-center fs-small">Amount ({{$t('common.currency', storeLocale)}})</div>
-        <scroll-select ref="scroll-amount" :value="amount" :items="listAmount" :height="200"
+        <div class="fw-700 ta-center fs-small">{{$t('discount.amount')}} ({{$t('common.currency', storeLocale)}})</div>
+        <scroll-select ref="scroll-amount" :value="amount" :items="listAmount" :height="200" :class="amount && 'scroll--selected'"
                        :item-height="40" selected-color="#1271FF" @input="selectAmount"/>
       </div>
       <div class="flex-grow-1 ml-3">
-        <div class="fw-700 ml-1">Discount</div>
-        <pos-textfield-new :label="`Custom (${$t('common.currency', storeLocale)})`" v-model="custom"/>
-        <div class="fw-700 fs-small ml-1 mb-1">Quick discount</div>
+        <div class="fw-700 ml-1">{{$t('discount.discount')}}</div>
+        <pos-textfield-new :label="`${$t('discount.custom')} (${$t('common.currency', storeLocale)})`" v-model="custom"/>
+        <div class="fw-700 fs-small ml-1 mb-1">{{$t('discount.quickDiscount')}}</div>
         <div class="discount-quick">
           <div v-for="(discount, i) in quickDiscount" :key="i" @click="selectDiscount(discount)"
                :class="['discount-quick__item', custom === discount && 'discount-quick__item--selected']">
             <span>{{$t('common.currency', storeLocale)}} {{discount}}</span>
-            <g-icon class="ml-2" size="16" color="#ff4452" @click.stop="removeQuickDiscount(i)">cancel</g-icon>
           </div>
         </div>
         <g-btn-bs v-if="value" background-color="#ff4452" icon="icon-delete2" @click="removeDiscount">Remove discount</g-btn-bs>
@@ -120,7 +119,7 @@
       submit() {
         let value = this.percent || this.amount || this.custom || 0
         if (this.custom && this.quickDiscount.findIndex(discount => discount === this.custom) === -1) {
-          if (this.quickDiscount.length === 10) { // max 10 recent items
+          if (this.quickDiscount.length === 5) { // max 10 recent items
             this.quickDiscount.shift()
           }
           this.quickDiscount.push(this.custom)
@@ -164,6 +163,10 @@
           }
         }
       }
+
+      .scroll--selected ::v-deep .scroll-select__container--item {
+        color: #1d1d26;
+      }
     }
 
     &-quick {
@@ -197,6 +200,16 @@
 
       ::v-deep .key {
         font-size: 16px;
+      }
+    }
+  }
+
+  @media screen and (min-height: 600px) {
+    .discount {
+      &-keyboard {
+        ::v-deep .key {
+          font-size: 20px;
+        }
       }
     }
   }

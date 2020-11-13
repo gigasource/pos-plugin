@@ -18,16 +18,14 @@
                            :multiple="!category.selectOne" :mandatory="category.mandatory"
                            :value="selectedModifiers[category._id]" @input="selectModifier($event, category)">
               <template #default="{ toggleSelect, item, index }">
-                <g-btn :uppercase="false" border-radius="2" outlined class="mr-3" background-color="#F0F0F0"
+                <g-btn :uppercase="false" border-radius="2" outlined class="mr-3 mb-2" background-color="#F0F0F0"
                        style="border: 1px solid #C9C9C9"
                        @click="onClickModifier(item, category, toggleSelect)">
                   {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
                 </g-btn>
-
               </template>
               <template #selected="{ toggleSelect, item, index }">
-
-                <g-badge v-if="getModifierQty(item._id) > 1" overlay color="#FF4452" class="mr-3">
+                <g-badge v-if="getModifierQty(item._id) > 1" overlay color="#FF4452" class="mr-3 mb-2">
                   <template #badge>
                     <div>{{getModifierQty(item._id)}}</div>
                   </template>
@@ -36,12 +34,10 @@
                     {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
                   </g-btn>
                 </g-badge>
-
-                <g-btn v-else :uppercase="false" border-radius="2" flat class="mr-3" background-color="#2979FF" text-color="#fff"
+                <g-btn v-else :uppercase="false" border-radius="2" flat class="mr-3 mb-2" background-color="#2979FF" text-color="#fff"
                        @click="onClickModifier(item, category, toggleSelect)">
                   {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
                 </g-btn>
-
               </template>
             </g-grid-select>
           </div>

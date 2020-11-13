@@ -9,7 +9,7 @@
                :text-color="selectedPayment === item.type ? '#fff' : '#1D1D26'"
                @click.stop="addPaymentMethod(item)">
           <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-          <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
+          <span class="ml-2" style="text-transform: capitalize">{{ $t(`payment.${item.type}`) }}</span>
         </g-btn>
       </template>
       <g-btn elevation="3"
@@ -19,27 +19,26 @@
              :text-color="selectedPayment === 'multi' ? '#fff' : '#1D1D26'"
              @click.stop="addPaymentMethod({ type: 'multi' })">
         <g-icon size="20">icon-multi_payment</g-icon>
-        <span class="ml-2" style="text-transform: capitalize">Multi</span>
+        <span class="ml-2" style="text-transform: capitalize">{{$t('payment.multi')}}</span>
       </g-btn>
     </div>
 
     <div class="row-flex">
       <template v-for="item in extraPaymentItems">
-        <g-badge v-if="getBadgeCount(item)" overlay color="#FF4452" style="margin-right: 12px; flex-basis: 20%">
-          <template #badge>
-            <div>{{getBadgeCount(item)}}</div>
-          </template>
-          <g-btn elevation="3"
-                 :uppercase="false" x-large
-                 class="payment-method-btn"
-                 style="width: 100%"
-                 @click.stop="addFixedItem(item)">
-            <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-            <span class="ml-2" style="text-transform: capitalize">
-              {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
-            </span>
-          </g-btn>
-        </g-badge>
+        <g-btn v-if="getBadgeCount(item)" elevation="3"
+               :uppercase="false" x-large
+               class="payment-method-btn"
+               @click.stop="addFixedItem(item)">
+          <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
+          <span class="ml-2 mr-2" style="text-transform: capitalize">
+            {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
+          </span>
+          <g-badge inline color="#FF4452">
+            <template #badge>
+              <div>{{getBadgeCount(item)}}</div>
+            </template>
+          </g-badge>
+        </g-btn>
 
         <g-btn v-else elevation="3"
                :uppercase="false" x-large

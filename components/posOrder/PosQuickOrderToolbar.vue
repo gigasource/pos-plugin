@@ -6,8 +6,8 @@
         <g-btn-bs icon="icon-menu" @click="toggleContent">{{$t('ui.more')}}</g-btn-bs>
       </template>
       <div class="col-flex bg-white">
-        <g-btn-bs icon="icon-move-items" @click.stop="moveItems" :disabled="disableMoveItemsBtn">Move Items</g-btn-bs>
-        <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
+        <g-btn-bs icon="icon-move-items" @click.stop="moveItems" :disabled="disableMoveItemsBtn">{{$t('order.moveItem')}}</g-btn-bs>
+        <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
       </div>
     </g-menu>
 <!--    <g-btn-bs icon="icon-cashier">{{$t('fnBtn.paymentFunctions.cashDrawer')}}</g-btn-bs>-->
@@ -15,15 +15,15 @@
               :disabled="disableTakeAway"
               @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
     <g-spacer/>
-    <g-btn-bs class="col-1" v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
+    <g-btn-bs v-if="currentOrder.table" background-color="#1271ff" text-color="#fff"
               :disabled="disablePrintBtn" icon="icon-print"
               @click.stop="print">
-      Print
+      {{$t('ui.print')}}
     </g-btn-bs>
     <template v-if="currentOrder.table">
       <g-btn-bs :disabled="!enablePayBtn" icon="icon-split_check_2"
                 @click.stop="splitOrder">
-        Split order
+        {{$t('order.splitOrder')}}
       </g-btn-bs>
     </template>
     <template v-else>

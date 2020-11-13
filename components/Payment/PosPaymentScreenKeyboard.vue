@@ -6,7 +6,7 @@
     </div>
     <div class="col-flex" style="height: 100%">
       <div class="payment-table__header">
-        <span>Total</span>
+        <span>{{$t('onlineOrder.total')}}</span>
         <g-spacer/>
         <span class="total-value">{{paymentTotal.toFixed(2)}}</span>
       </div>
@@ -15,7 +15,7 @@
         <tr v-for="(payment, index) in paymentList">
           <div :class="['payment-table__row', payment.type !== 'card' && payment.type !== 'cash' && 'text-blue']">
             <div class="flex-grow-1 row-flex align-items-center">
-              <span style="text-transform: capitalize">{{ payment.type }}</span>
+              <span style="text-transform: capitalize">{{ $t(`payment.${payment.type}`) }}</span>
               <div class="ml-2 pa-2" @click="removePaymentItem(index)"
                    v-if="payment.type !== 'card' && payment.type !== 'cash'" v-model="payment.value">
                 <g-icon color="#FF4452">close</g-icon>
@@ -33,16 +33,16 @@
         </tbody>
       </g-table>
       <div class="payment-table__footer">
-        <div class="payment-change__description mt-2">Please enter tendered cash</div>
+        <div class="payment-change__description mt-2">{{$t('payment.enterTender')}}</div>
         <g-divider inset class="mb-2"/>
         <div class="payment-footer">
           <div class="row-flex payment-footer__value">
-            <div class="flex-grow-1">Change</div>
+            <div class="flex-grow-1">{{$t('payment.change')}}</div>
             <div v-if="!isNaN(change)" class="payment-footer__value__number">{{ (+change || 0).toFixed(2)}}</div>
             <div v-else class="payment-footer__value__number">{{(0).toFixed(2)}}</div>
           </div>
           <div class="row-flex payment-footer__value" v-if="currentOrder.tip > 0">
-            <div class="flex-grow-1">Tip</div>
+            <div class="flex-grow-1">{{$t('payment.tip')}}</div>
             <g-spacer/>
             <div class="payment-footer__value__number">{{currentOrder.tip.toFixed(2)}}</div>
           </div>

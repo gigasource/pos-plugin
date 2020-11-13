@@ -3,13 +3,13 @@
     <g-card>
       <g-tabs vertical :items="tabs" v-model="tab" active-text-color="#1471FF" slider-color="#1471FF">
         <g-tab-item :item="tabs[0]">
-          <pos-textfield-new class="mb-5 mt-4" label="Value" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[0].ref"/>
+          <pos-textfield-new class="mb-5 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[0].ref"/>
           <div class="row-flex justify-center">
             <pos-keyboard-full class="keyboard" width="100%" type="numeric" @enter-pressed="submit(true)"/>
           </div>
         </g-tab-item>
         <g-tab-item :item="tabs[1]">
-          <pos-textfield-new class="mb-5 mt-4" label="Value" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[1].ref"/>
+          <pos-textfield-new class="mb-5 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[1].ref"/>
           <div class="row-flex justify-center">
             <pos-keyboard-full class="keyboard" width="100%" type="numeric" @enter-pressed="submit(false)"/>
           </div>
@@ -27,7 +27,7 @@
     },
     data() {
       return {
-        tabs: [{ title: 'Create Voucher', ref: 'createTf' }, { title: 'Redeem Voucher', ref: 'redeemTf' }],
+        tabs: [{ title: $t('restaurant.createVoucher'), ref: 'createTf' }, { title: $t('restaurant.redeemVoucher'), ref: 'redeemTf' }],
         tab: null,
         voucherValue: ''
       }

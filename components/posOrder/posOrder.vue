@@ -18,16 +18,16 @@
             </template>
             <g-expand-x-transition>
               <div class="order-detail__menu">
-                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">Split check</g-btn-bs>
-                <g-btn-bs icon="icon-move-items" @click="moveItems">Move Items</g-btn-bs>
-                <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">Voucher</g-btn-bs>
+                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">{{$t('order.splitOrder')}}</g-btn-bs>
+                <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
+                <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
                 <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
                 <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
                           @click.stop="printOrder">
-                  Print
+                  {{$t('ui.print')}}
                 </g-btn-bs>
-                <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">Pay</g-btn-bs>
+                <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">{{$t('article.pay')}}</g-btn-bs>
                 <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
               </div>
             </g-expand-x-transition>
@@ -222,7 +222,8 @@
         actionTimeout: null,
         showSplitBtn: true,
         smallSidebar: true,
-        onlyCheckoutPrintedItems: true
+        onlyCheckoutPrintedItems: true,
+        changedAvatar: false
       }
     },
     computed: {
@@ -230,6 +231,7 @@
         return this.user ? this.user.name : ''
       },
       avatar() {
+        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.png'
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
@@ -509,6 +511,12 @@
           this.$set(this, 'showSplitBtn', showSplitBtn)
           this.$set(this, 'smallSidebar', smallSidebar)
         }
+
+        if(this.isMobile) {
+          setTimeout(() => {
+            this.changedAvatar = true
+          }, 3000)
+        }
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
@@ -546,7 +554,11 @@
       }
 
       this.loadSetting()
+
     },
+    deactivated() {
+      this.changedAvatar = false
+    }
   }
 </script>
 

@@ -153,7 +153,12 @@
       },
       getOrderTotal(table) {
         const order = this.activeOrders.find(o => o.table === table)
-        return order && (orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items))
+        if(order) {
+          const total = orderUtil.calOrderTotal(order.items) + orderUtil.calOrderModifier(order.items)
+          if(Number.isInteger(total))
+            return total
+          return total.toFixed(2)
+        }
       }
     }
   }
