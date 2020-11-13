@@ -193,6 +193,7 @@
       },
 
       async switchProduct() {
+        if (!this.prevProductLayout._id) return
         console.log('switchProduct')
         if (this.prevCategoryLayout._id === this.selectedCategoryLayout._id) {
           console.log('switch product in same category')

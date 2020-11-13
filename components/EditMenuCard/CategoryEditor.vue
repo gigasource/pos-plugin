@@ -32,7 +32,7 @@
 
     <div class="category-editor__label">{{$t('restaurant.menuEdit.rowsNo')}}</div>
     <input-number
-        :value="cateRows" :min="6" :max="10"
+        :value="cateRows" :min="4" :max="10"
         width="148"
         @input="updateCategory({rows: $event})"/>
 
