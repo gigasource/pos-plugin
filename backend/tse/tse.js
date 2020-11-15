@@ -42,7 +42,6 @@ module.exports = async (cms) => {
   const Order = cms.getModel('Order');
   const EndOfDay = cms.getModel('EndOfDay')
   let OrderCommit;
-  await initTse();
 
   cms.app.get('/api/deleteAll', async function (req, res) {
     await Order.remove({})
@@ -53,6 +52,8 @@ module.exports = async (cms) => {
     await OrderTseContent.remove({});
     res.send('ok');
   })
+
+  await initTse();
 
   const posSetting = await PosSetting.findOne({});
   const tseConfig = await TseConfig.findOne({});
@@ -598,7 +599,8 @@ module.exports = async (cms) => {
     await initFirstTimeTse();
 
     async function initFirstTimeTse() {
-      const tseConfig = await TseConfig.findOne({});
+      let tseConfig = await TseConfig.findOne({});
+      if (!tseConfig) tseConfig = {};
 
       tseConfig.inited = true;
       tseConfig.tsePublicKey = await tse.getTsePublicKey();
