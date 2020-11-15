@@ -443,7 +443,7 @@ module.exports = (cms) => {
       if (typeof gp === 'object') {
         return gp.name
       }
-      const printer = await cms.getModel('GroupPrinter').findById(gp)
+      const printer = await cms.getModel('GroupPrinter').findOne({name: gp})
       if (printer) return printer.name
     }
 

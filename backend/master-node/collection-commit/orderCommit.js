@@ -281,8 +281,8 @@ async function orderCommit(updateCommit) {
             {$set: {cancellationItems: updateCommit[TYPENAME].activeOrders[commit.data.table].cancellationItems}});
         }
       }
-      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true});
-      updateCommit[TYPENAME].activeOrders[commit.data.table] = result.toJSON();
+      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true}).lean();
+      updateCommit[TYPENAME].activeOrders[commit.data.table] = result;
       setCommitId(commit);
       await updateCommit.orderCommitModel.create(commit);
       return true;
@@ -297,9 +297,9 @@ async function orderCommit(updateCommit) {
       if (!checkOrderActive(commit)) return;
       const query = JsonFn.parse(commit.update.query);
       const condition = getCondition(commit);
-      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true});
-      if (result.status !== 'paid' && result.toJSON) {
-        updateCommit[TYPENAME].activeOrders[commit.data.table] = result.toJSON();
+      const result = await updateCommit.orderModel[commit.update.method](condition, query, {new: true}).lean();
+      if (result.status !== 'paid') {
+        updateCommit[TYPENAME].activeOrders[commit.data.table] = result;
       }
       commit.where = JsonFn.stringify(condition);
       setCommitId(commit);
