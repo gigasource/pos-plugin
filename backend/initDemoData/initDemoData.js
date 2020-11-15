@@ -19,6 +19,7 @@ module.exports = async function (cms) {
           }
         }
       }
+      console.log('initDemoData completed')
     } catch (e) {
       console.log(e)
     }

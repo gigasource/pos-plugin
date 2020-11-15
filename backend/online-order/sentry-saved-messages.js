@@ -5,7 +5,7 @@ async function sendSavedMessages() {
     const docs = await SentrySavedMessagesModel.find({});
 
     const savedSentryMessageIds = docs.map(({_id}) => _id);
-    SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}}).exec();
+    await SentrySavedMessagesModel.deleteMany({_id: {$in: savedSentryMessageIds}});
     docs.forEach(({tagString, message}) => {
       console.debug(tagString, message);
     });
