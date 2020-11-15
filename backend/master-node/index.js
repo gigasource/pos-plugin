@@ -64,7 +64,31 @@ async function setUpPosCommit() {
 	const posCommitCollectionExists = (await cms.getModel('PosCommit').findOne({}).lean()) ? 1 : 0;
 	const needCreatePosCommitCollection = [];
 	let commitId = 0;
-	mongoose.set('debug', function (coll, method, ...query) {
+	cms.orm.post('debug', null, async ({target, proxy}, returnResult) => {
+		if (needCreatePosCommitCollection.includes(target.collectionName) && target.cmd === 'insertMany') {
+			commitId++;
+			await cms.getModel('PosCommit').create({
+				type: 'pos',
+				action: 'update',
+				temp: false,
+				data: {
+					collection: coll
+				},
+				commitId,
+				update: {
+					method: method,
+					query: JsonFn.stringify(query)
+				}
+			})
+			returnResult.ok = 1;
+			returnResult.value = null;
+			return;
+		}
+		const collection = mongoose.connection.db.collection(coll);
+		return collection[method].apply(collection, query);
+
+	})
+	/*mongoose.set('debug', function (coll, method, ...query) {
 		if (needCreatePosCommitCollection.includes(coll) && method === 'insertMany') {
 			commitId++;
 			cms.getModel('PosCommit').create({
@@ -88,7 +112,7 @@ async function setUpPosCommit() {
 		}
 		const collection = mongoose.connection.db.collection(coll);
 		return collection[method].apply(collection, query);
-	})
+	})*/
 	if (!posCommitCollectionExists) {
 		for (let coll of global.APP_CONFIG.whiteListCollection) {
 			if (coll.mongooseName && cms.getModel(coll.mongooseName).find) {
@@ -100,7 +124,8 @@ async function setUpPosCommit() {
 			}
 		}
 	}
-	mongoose.set('debug', null);
+	cms.orm._posts.get('debug').length = 0;
+	//mongoose.set('debug', null);
 }
 
 async function initSocket(socket) {

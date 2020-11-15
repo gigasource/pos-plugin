@@ -1,13 +1,15 @@
 const Queue = require('better-queue');
 const _ = require('lodash');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const JsonFn = require('json-fn');
+const {ObjectID} = require("bson");
+const orm = require('schemahandler');
 
 const updateMethodList = ['update', 'findOneAndUpdate', 'findOneAndModify', 'insertOne', 'create', 'insertMany', 'remove', 'deleteMany', 'insert', 'updateOne'];
 
 const updateCommit = {
 	commitType: ['order', 'report', 'pos'],
-	db: mongoose.connection.db,
+	db: orm.db,
 	init: async function (handler) {
 		updateCommit.handler = handler;
 		updateCommit.orderCommitModel = cms.Types['OrderCommit'].Model;
@@ -15,7 +17,50 @@ const updateCommit = {
 		updateCommit.orderModel = cms.Types['Order'].Model;
 		// updateCommit.systemCommitModel = cms.Types['SystemCommit'].Model;
 		await require('./collection-commit')(updateCommit);
-		mongoose.set('debug', function (coll, method, ...query) {
+		cms.orm.post('debug', null, async ({target, proxy}, returnResult) => {
+			const coll = target.collectionName;
+			const method = target.cmd;
+			if (updateMethodList.includes(method))  {
+				const whiteListCollection = _.filter(global.APP_CONFIG.whiteListCollection, collection => {
+					return collection.name === coll;
+				})
+				if (whiteListCollection.length) {
+					updateCommit.handler.sendChangeRequest({
+						type: 'pos',
+						action: 'update',
+						temp: false,
+						groupTempId: ObjectID().toString(),
+						data: {
+							collection: coll,
+							hardwareID: (whiteListCollection[0].needMaster ? null : global.APP_CONFIG.hardwareID)
+						},
+						update: {
+							method: method,
+							query: JsonFn.stringify(query)
+						}
+					})
+					// check collection need to be executed on master
+					if (whiteListCollection[0].needMaster) {
+						/*if (typeof _.last(query) === 'function') {
+							_.last(query)(null, {n: 1, ok: true});
+						}*/
+						returnResult.ok = 1;
+						returnResult.value = null;
+						return;
+					}
+				}
+			}
+			return;
+			/*try {
+				const collection = orm.getCollection();
+				//todo: make chainable here
+				debugger
+				return collection[method].apply(collection, query);
+			} catch (err) {
+				console.error(err);
+			}*/
+		})
+		/*mongoose.set('debug', function (coll, method, ...query) {
 			if (updateMethodList.includes(method))  {
 				const whiteListCollection = _.filter(global.APP_CONFIG.whiteListCollection, collection => {
 					return collection.name === coll;
@@ -50,7 +95,7 @@ const updateCommit = {
 			} catch (err) {
 				console.error(err);
 			}
-		})
+		})*/
 	},
 	handleCommit: function (commits) {
 		updateCommit.commitType.forEach(type => {

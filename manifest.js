@@ -149,6 +149,12 @@ module.exports = {
       },
       path: 'backend/order/inventory.js'
     },
+    /*{
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/tse/tse.js'
+    },*/
     {
       loader: {
         type: 'backend-api'
