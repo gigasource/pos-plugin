@@ -908,10 +908,18 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
-
 .icon-screen {
   background-image: url("../assets/screen.svg");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
 }
+
+.icon-blue-cog {
+  background-image: url("../assets/blue-cog.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+

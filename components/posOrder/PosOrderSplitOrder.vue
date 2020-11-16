@@ -21,7 +21,10 @@
           </div>
           <div class="splitter__header" v-else>
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
-            <span style="font-size: 18px; color: #ff4452"> {{ totalCurrent | convertMoney }}</span>
+            <p>
+              Total:
+              <span style="font-size: 18px; color: #ff4452"> {{ totalCurrent | convertMoney }}</span>
+            </p>
           </div>
           <div class="splitter__content">
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
@@ -52,36 +55,20 @@
             </div>
           </div>
           <div class="splitter__actions">
-            <g-btn-bs class="flex-grow-1 w-50 row-flex align-items-center justify-center splitter__actions-btn ma-0"
-                      style="background: #046EFF; color: #fff; border-radius: 0 0 0 6px"
-                      :disabled="disablePayment"
+            <g-btn-bs class="splitter__actions-btn" background-color="#046EFF" :disabled="disablePayment"
+                      style="border-radius: 0 0 0 6px"
                       @click.stop="createOrder([{ type: 'cash', value: totalCurrent }])">
-              <g-icon size="36" class="mr-2">icon-cash</g-icon>
-              <span>Cash</span>
+              <g-icon size="36">icon-cash</g-icon>
             </g-btn-bs>
-            <g-menu v-model="showPaymentMethodsMenu"
-                    close-on-content-click
-                    class="flex-grow-1 w-50 splitter__actions-btn"
-                    content-class="splitter__actions-menu" top right
-                    min-width="120px" max-width="120px" nudge-top="4px">
-              <template #activator="{ on }">
-                <g-btn-bs v-on="on" class="row-flex align-items-center justify-center w-100 ma-0"
-                          style="background-color: #FFCB3A; border-radius: 0 0 6px 0"
-                          :disabled="disablePayment">
-                  <g-icon size="36" color="#fff">more_horiz</g-icon>
-                </g-btn-bs>
-              </template>
-              <div class="col-flex">
-                <g-btn-bs class="mb-1" @click.stop="showMultiPaymentdialog = true">
-                  <g-icon size="30" class="mr-2">icon-multi_payment</g-icon>
-                  <span>Multi</span>
-                </g-btn-bs>
-                <g-btn-bs @click.stop="createOrder([{ type: 'card', value: totalCurrent }])">
-                  <g-icon size="30" class="mr-2">icon-credit_card</g-icon>
-                  <span>Card</span>
-                </g-btn-bs>
-              </div>
-            </g-menu>
+            <g-btn-bs class="splitter__actions-btn" background-color="#0EA76F" :disabled="disablePayment"
+                      @click.stop="createOrder([{ type: 'card', value: totalCurrent }])">
+              <g-icon size="36">icon-credit_card</g-icon>
+            </g-btn-bs>
+            <g-btn-bs class="splitter__actions-btn" background-color="#795548" :disabled="disablePayment"
+                      style="border-radius: 0 0 6px 0"
+                      @click.stop="showMultiPaymentdialog = true">
+              <g-icon size="36">icon-multi_payment</g-icon>
+            </g-btn-bs>
           </div>
         </div>
 
@@ -390,8 +377,9 @@
       align-items: center;
 
       &-btn {
-        font-size: 16px;
-        font-weight: 700;
+        flex: 1;
+        margin: 0;
+        border-radius: 0;
       }
     }
   }

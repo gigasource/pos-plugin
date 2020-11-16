@@ -48,7 +48,7 @@
           :default-value="selectedCategoryLayout.name"
           v-model="dialog.showCategoryNameKbd"
           @submit="updateCategory({ name: $event}, $event)"/>
-      <g-snackbar v-model="showSnackbar" top right color="#1976d2" time-out="2000">
+      <g-snackbar v-model="showSnackbar" top right color="#1976d2" timeout="1000">
         {{notifyContent}}
       </g-snackbar>
     </template>

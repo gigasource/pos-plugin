@@ -18,17 +18,18 @@
             </template>
             <g-expand-x-transition>
               <div class="order-detail__menu">
-                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">{{$t('order.splitOrder')}}</g-btn-bs>
-                <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
+                <g-btn-bs icon="icon-blue-cog" @click="edit = true">Edit Screen</g-btn-bs>
                 <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
-                <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
-                <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
+                <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
+<!--                <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>-->
+                <g-btn-bs icon="icon-food_container" :background-color="isTakeAwayOrder ? '#2979FF' : '#FFF'"
+                          @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
+                <g-btn-bs icon="icon-split_check_2" @click="splitOrder">{{$t('order.splitOrder')}}</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
                           @click.stop="printOrder">
                   {{$t('ui.print')}}
                 </g-btn-bs>
                 <g-btn-bs icon="icon-wallet" :disabled="disablePay" @click="pay">{{$t('article.pay')}}</g-btn-bs>
-                <g-btn-bs icon="icon-cog" @click="edit = true">Edit Screen</g-btn-bs>
               </div>
             </g-expand-x-transition>
           </g-menu>
@@ -103,7 +104,7 @@
         <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
       </template>
     </div>
-    <div v-if="!editMode" class="order-detail__content">
+    <div v-if="!editMode" class="order-detail__content" ref="table">
       <div v-for="item in items" :key="item._id.toString()"
            v-if="item.quantity || (item.quantityModified && item.printed)"
            class="item"
@@ -200,6 +201,7 @@
       actionMode: String,
       showOverlay: Boolean,
       scrollabeLayout: Boolean,
+      isTakeAwayOrder: Boolean
     },
     filters: {
       convertMoney(value) {
@@ -231,7 +233,7 @@
         return this.user ? this.user.name : ''
       },
       avatar() {
-        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.png'
+        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.svg'
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
@@ -392,7 +394,7 @@
         this.$getService('PosOrderMoveItems:setActive')(true)
       },
       showOrderReceipt() {
-        this.$getService('OrderStore:updateCurrentOrder')('payment', [{ type: 'cash', value: this.total }])
+        this.$emit('updateCurrentOrder', 'payment', [{ type: 'cash', value: this.total }])
         this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
@@ -520,6 +522,9 @@
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
+      },
+      toggleTakeAwayOrder() {
+        this.$emit('updateCurrentOrder', 'takeAway', !this.isTakeAwayOrder, true)
       }
     },
     created() {
@@ -558,6 +563,16 @@
     },
     deactivated() {
       this.changedAvatar = false
+    },
+    watch: {
+      items(val) {
+        if(val && this.$refs) {
+          this.$nextTick(() => {
+            const table = this.$refs.table
+            table.scroll({top: table.scrollHeight, behavior: 'smooth'})
+          })
+        }
+      }
     }
   }
 </script>

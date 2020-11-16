@@ -32,7 +32,7 @@ module.exports = cms => {
       const storeId = await getStoreId()
       if (!storeId) return cb()
 
-      // collections: Category, Product, OrderLayout, GroupPrinter,
+      // collections: Category, Product, OrderLayout,
       // PosModifierGroup, PosModifierCategory, PosPopupModifier, Room
       const data = {}
       const categories = await cms.getModel('Category').find()
@@ -41,11 +41,9 @@ module.exports = cms => {
       const popUpModifierGroups = await cms.getModel('PosModifierGroup').find()
       const popUpModifierCategories = await cms.getModel('PosModifierCategory').find()
       const popUpModifiers = await cms.getModel('PosPopupModifier').find()
-      const groupPrinters = await cms.getModel('GroupPrinter').find()
       const rooms = await cms.getModel('Room').find()
 
       Object.assign(data, {
-        'GroupPrinter': groupPrinters,
         'Category': categories,
         'PosModifierGroup': popUpModifierGroups,
         'PosModifierCategory': popUpModifierCategories,
@@ -92,10 +90,8 @@ module.exports = cms => {
     })
 
     socket.on('import-demo-data', async (cb) => {
-      const storeId = await getStoreId()
-      if (!storeId) return cb()
       try {
-        const { data: { demoDataSrc } } = await axios.get(url.resolve(await getWebShopUrl(), `store/demo-data/${storeId}`))
+        const { fileName: demoDataSrc } = await getCurrentStoreData()
         if (!demoDataSrc) return
         const downloadUrl = url.resolve(await getWebShopUrl(), demoDataSrc, { responseType: 'stream' })
         const { data } = axios.get(downloadUrl)
@@ -108,11 +104,16 @@ module.exports = cms => {
       }
     })
 
-    socket.on('get-demo-stores', async cb => {
-      const apiUrl = url.resolve(await getWebShopUrl(), 'store/demo-stores');
+    socket.on('get-demo-stores', async (isFirstDevice, cb) => {
       try {
-        const { data } = await axios.get(apiUrl)
-        const stores = await Promise.all(data.map(async d => {
+        const files = []
+        if (isFirstDevice) {
+          const currentStoreData = await getCurrentStoreData()
+          currentStoreData && files.push(currentStoreData)
+        }
+        const data = await getDemoStores()
+        files.push(...data)
+        const stores = await Promise.all(files.map(async d => {
           return {
             ...d,
             fileName: d.fileName && url.resolve(await getWebShopUrl(), d.fileName).toString(),
@@ -125,19 +126,40 @@ module.exports = cms => {
       }
     })
 
-    socket.on('set-demo-store', async (store, cb) => {
-      global.APP_CONFIG.isMaster = true
-      await cms.execPostAsync('load:handler')
+    socket.on('set-demo-store', async (store, paired, cb) => {
+      if (!paired) {
+        global.APP_CONFIG.isMaster = true
+        await cms.execPostAsync('load:handler')
+      }
       if (!store) return cb()
-
       const { fileName } = store
       const downloadUrl = url.resolve(await getWebShopUrl(), fileName, { responseType: 'stream' })
       const { data } = await axios.get(downloadUrl)
       await importDemoData(data)
-      cms.socket.emit('updateRooms')
       cb()
+      cms.socket.emit('updateRooms')
     })
   })
+}
+
+async function getCurrentStoreData() {
+  const storeId = await getStoreId()
+  if (!storeId) return
+  const { data: { demoDataSrc } } = await axios.get(url.resolve(await getWebShopUrl(), `store/demo-data/${storeId}`))
+  if (demoDataSrc) {
+    return {
+      fileName: demoDataSrc,
+      storeId,
+      storeName: 'Existing Store Data',
+      existingData: true
+    }
+  }
+}
+
+async function getDemoStores() {
+  const apiUrl = url.resolve(await getWebShopUrl(), 'store/demo-stores');
+  const { data } = await axios.get(apiUrl)
+  return data
 }
 
 async function importDemoData(data) {
