@@ -22,7 +22,8 @@
                 <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
                 <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
                 <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>
-                <g-btn-bs icon="icon-food_container" @click="quickCash(true)">Take away</g-btn-bs>
+                <g-btn-bs icon="icon-food_container" :background-color="isTakeAwayOrder ? '#2979FF' : '#FFF'"
+                          @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
                           @click.stop="printOrder">
                   {{$t('ui.print')}}
@@ -200,6 +201,7 @@
       actionMode: String,
       showOverlay: Boolean,
       scrollabeLayout: Boolean,
+      isTakeAwayOrder: Boolean
     },
     filters: {
       convertMoney(value) {
@@ -392,7 +394,7 @@
         this.$getService('PosOrderMoveItems:setActive')(true)
       },
       showOrderReceipt() {
-        this.$getService('OrderStore:updateCurrentOrder')('payment', [{ type: 'cash', value: this.total }])
+        this.$emit('updateCurrentOrder', 'payment', [{ type: 'cash', value: this.total }])
         this.$getService('PosOrderReceipt:setActive')(true)
       },
       printOrder() {
@@ -520,6 +522,9 @@
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
+      },
+      toggleTakeAwayOrder() {
+        this.$emit('updateCurrentOrder', 'takeAway', !this.isTakeAwayOrder, true)
       }
     },
     created() {

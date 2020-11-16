@@ -32,7 +32,7 @@ module.exports = cms => {
       const storeId = await getStoreId()
       if (!storeId) return cb()
 
-      // collections: Category, Product, OrderLayout, GroupPrinter,
+      // collections: Category, Product, OrderLayout,
       // PosModifierGroup, PosModifierCategory, PosPopupModifier, Room
       const data = {}
       const categories = await cms.getModel('Category').find()
@@ -41,11 +41,9 @@ module.exports = cms => {
       const popUpModifierGroups = await cms.getModel('PosModifierGroup').find()
       const popUpModifierCategories = await cms.getModel('PosModifierCategory').find()
       const popUpModifiers = await cms.getModel('PosPopupModifier').find()
-      const groupPrinters = await cms.getModel('GroupPrinter').find()
       const rooms = await cms.getModel('Room').find()
 
       Object.assign(data, {
-        'GroupPrinter': groupPrinters,
         'Category': categories,
         'PosModifierGroup': popUpModifierGroups,
         'PosModifierCategory': popUpModifierCategories,
