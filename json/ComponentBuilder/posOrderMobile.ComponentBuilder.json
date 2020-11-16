@@ -352,6 +352,16 @@
               "service": "OrderStore:updateOrderItem",
               "local": "updateOrderItem",
               "type": "event"
+            },
+            {
+              "service": "OrderStore:currentOrder.takeAway",
+              "local": "isTakeAwayOrder",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:updateCurrentOrder",
+              "local": "updateCurrentOrder",
+              "type": "event"
             }
           ]
         }
