@@ -36,6 +36,10 @@ async function removePairedDeviceFromStore(deviceId, storeId) {
   const deviceIds = _.map(store.devices, e => e._id)
   const newDeviceIds = _.filter(deviceIds, id => id !== deviceId)
   await StoreModel.updateOne({_id: storeId.toString()}, {devices: newDeviceIds});
+  const removedDevice = await DeviceModel.findOne({ _id: deviceId });
+  if (removedDevice && removedDevice.master) {
+    await cms.execPostAsync('run:triggerOnlineAsMaster', null, [storeId]);
+  }
 }
 
 router.get('/pairing-code', async (req, res) => {
@@ -130,13 +134,13 @@ router.post('/register', async (req, res) => {
       storeLocale: store.country ? store.country.locale : 'en'
     });
 
-    const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
-    if (storeDevices.length === 1) {
-      await setMasterDevice(store._id, device._id)
-      const demoData = store.demoDataSrc;
-      if (demoData)
-        await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)
-    }
+    // const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
+    // if (storeDevices.length === 1) {
+    //   await setMasterDevice(store._id, device._id)
+    //   const demoData = store.demoDataSrc;
+    //   if (demoData)
+    //     await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)
+    // }
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
   }

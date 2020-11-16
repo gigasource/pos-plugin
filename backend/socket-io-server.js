@@ -14,7 +14,7 @@ const nodemailer = require('nodemailer')
 const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
 const { sendNotification } = require('./app-notification');
 
-const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync } = require('./restaurant-data-backup/index');
+const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync, updateCommits } = require('./restaurant-data-backup/index');
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
@@ -699,7 +699,12 @@ module.exports = async function (cms) {
       // })
 
       socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
-        externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+        } else {
+          const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+          requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
+        }
       })
 
       socket.on('emitToAllDevices', async (commits, storeAlias) => {
@@ -720,11 +725,22 @@ module.exports = async function (cms) {
       })
 
       socket.on('nodeCall', (masterClientId, eventName, ...args) => {
-        externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
+        }
       })
 
       socket.on('registerAppFromStore', async () => {
         await cms.getModel('Device').updateOne({ _id: clientId }, { 'metadata.isFromStore': true})
+      })
+
+      socket.on('updateCommits', async (masterClientId, commits, ack) => {
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'updateCommits', commits, ack);
+        } else {
+          const device = await cms.getModel('Device').findOne({ _id: clientId });
+          await updateCommits(device.storeId, commits, ack);
+        }
       })
     }
 

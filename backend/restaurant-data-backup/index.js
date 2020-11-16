@@ -5,12 +5,19 @@ const UpdateCommit = require('./updateCommit');
 const mongoose = require('mongoose');
 const orm = require('schemahandler/orm');
 const connnectionUri = `mongodb://${global.APP_CONFIG.database.username}:${global.APP_CONFIG.database.password}@mongo-vn-office.gigasource.io:27017`;
+const _ = require('lodash');
 
 orm.connect(connnectionUri);
 let connectionHandlers = {};
 
 async function initConnection(socket) {
 	try {
+		cms.post('run:triggerOnlineAsMaster', (storeId) => {
+			if (typeof storeId !== 'string') {
+				storeId = storeId.toString();
+			}
+			connectionHandlers[storeId].updateCommit.isMaster = true;
+		})
 		const storesList = await cms.getModel('Store').find({}).lean();
 		for (let id = 0; id < storesList.length; id++) {
 			const store = storesList[id];
@@ -19,6 +26,11 @@ async function initConnection(socket) {
 			connectionHandlers[store._id.toString()].updateCommit.commitType.forEach(type => {
 				connectionHandlers[store._id.toString()].updateCommit.getMethod(type, 'resumeQueue')();
 			})
+			const devices = await cms.getModel('Device').find({ _id: store._id }).lean();
+			const masterDevice = _.find(devices, device => device.master);
+			if (!masterDevice) {
+				await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
+			}
 		}
 	} catch (err) {
 		console.error('init connection to master and node error', err)
@@ -83,11 +95,25 @@ function addCollection(storeId, collectionName, docs) {
 	connectionHandlers[storeId].updateCommit.db.collection(collectionName).insertMany(docs);
 }
 
+async function updateCommits(storeId, commits, ack) {
+	if (ack) {
+		ack(true);
+	}
+	const connection = connectionHandlers[storeId];
+	const newCommits = [];
+	for (let id in commits) {
+		const commit = commits[id];
+		if (!(await connection.updateCommit.checkCommitExist(commit))) newCommits.push(commit);
+	}
+	if (newCommits.length) connection.updateCommit.handleCommit(newCommits);
+}
+
 module.exports = {
 	initConnection,
 	updateCommitNode,
 	buildNodeSync,
 	requireSyncWithMaster,
 	requireSync,
-	addCollection
+	addCollection,
+	updateCommits
 }
