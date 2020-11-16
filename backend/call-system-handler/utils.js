@@ -1,7 +1,7 @@
 const phoneCallMap = {};
 
 // calls are considered missed if no action is taken during this time
-const CALL_TIMEOUT_THRESHOLD = 10 * 1000;
+const CALL_TIMEOUT_THRESHOLD = 60 * 1000;
 
 const {v4: uuidv4} = require('uuid');
 
