@@ -34,18 +34,18 @@
                 <g-spacer/>
                 <g-icon size="20">icon-call</g-icon>
               </div>
-              <p class="fs-small-2 text-grey-darken-1">{{call.type === 'missed' ? 'Missed' : 'Incomming'}} call</p>
+              <p class="fs-small-2 text-grey-darken-1">{{call.type === 'missed' ? 'Missed' : 'Incoming'}} call</p>
               <div class="pending-orders--call-buttons">
-                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i, call)">
                   <g-icon size="16">icon-cross-red</g-icon>
                 </g-btn-bs>
-                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call)">
                   <g-icon size="16">icon-table-reservation</g-icon>
                 </g-btn-bs>
-                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
+                <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call, 'pickup')">
                   <g-icon size="16">icon-take-away</g-icon>
                 </g-btn-bs>
-                <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
+                <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call, 'delivery')">
                   <g-icon size="16">icon-delivery-scooter</g-icon>
                 </g-btn-bs>
               </div>
@@ -62,13 +62,13 @@
               <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteMissedCall(i)">
                 <g-icon size="16">icon-cross-red</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call)">
                 <g-icon size="16">icon-table-reservation</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup', i)">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call, 'pickup', i)">
                 <g-icon size="16">icon-take-away</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery', i)">
+              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call, 'delivery', i)">
                 <g-icon size="16">icon-delivery-scooter</g-icon>
               </g-btn-bs>
             </div>
@@ -81,18 +81,18 @@
               <g-spacer/>
               <g-icon>icon-call</g-icon>
             </div>
-            <p class="fs-small-2 text-grey-darken-1">Incomming call</p>
+            <p class="fs-small-2 text-grey-darken-1">Incoming call</p>
             <div class="pending-orders--call-buttons">
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i)">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i, call)">
                 <g-icon size="16">icon-cross-red</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call.customer)">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openReservationDialog(call)">
                 <g-icon size="16">icon-table-reservation</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'pickup')">
+              <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="openOrderDialog(call, 'pickup')">
                 <g-icon size="16">icon-take-away</g-icon>
               </g-btn-bs>
-              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call.customer, 'delivery')">
+              <g-btn-bs class="flex-equal" border-color="#C4C4C4" @click="openOrderDialog(call, 'delivery')">
                 <g-icon size="16">icon-delivery-scooter</g-icon>
               </g-btn-bs>
             </div>
@@ -437,14 +437,18 @@
       getExtraInfo(item) {
         return orderUtil.getExtraInfo(item)
       },
-      deleteCall(index) {
+      deleteCall(index, {callId}) {
         this.calls.splice(index, 1)
+        this.cancelMissedCallTimeout(callId)
       },
-      openReservationDialog(customer) {
+      openReservationDialog({customer, callId}) {
         this.selectedCustomer = customer
         this.dialog.reservation = true
+        this.cancelMissedCallTimeout(callId)
       },
-      openOrderDialog(customer, type, index) {
+      openOrderDialog({customer, callId}, type, index) {
+        this.cancelMissedCallTimeout(callId);
+
         if (index) {
           this.calls.unshift({
             ...this.missedCalls[index],
@@ -476,6 +480,9 @@
               typeof connectionStatus === 'string'
               && connectionStatus.toLowerCase() === 'connected';
         }
+      },
+      cancelMissedCallTimeout(callId) {
+        cms.socket.emit('cancel-missed-call-timeout', callId);
       }
     },
     created() {
