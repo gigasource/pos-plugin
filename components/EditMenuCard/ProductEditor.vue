@@ -4,7 +4,8 @@
     <div class="product-editor__prop-grid">
       <template v-if="types">
         <div>{{$t('article.type')}}</div>
-        <g-select text-field-component="GTextFieldBs" v-model="type" :items="types" @input="changeType"/>
+        <g-select :disabled="!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)"
+                  text-field-component="GTextFieldBs" v-model="type" :items="types" @input="changeType"/>
       </template>
       <template v-if="isProductLayout">
         <div>{{$t('article.id')}} </div>
@@ -159,7 +160,7 @@
         v-model="dialog.showTextKbd"
         @submit="updateProductLayout({ text: $event, type: 'Text' }, $event)"/>
     <dialog-edit-popup-modifiers v-model="dialog.popupModifiers" :product="selectedProduct" />
-    <g-snackbar v-model="showSnackbar" top right color="#1976d2" time-out="2000">{{notifyContent}}</g-snackbar>
+    <g-snackbar v-model="showSnackbar" top right color="#1976d2" timeout="1000">{{notifyContent}}</g-snackbar>
 
   </div>
 </template>
