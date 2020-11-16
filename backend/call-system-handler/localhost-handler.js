@@ -1,5 +1,5 @@
 module.exports = async (cms) => {
-  const {checkModeActive} = require('./utils');
+  const {checkModeActive, emitNewCall, cancelMissedCallTimeout} = require('./utils');
   const {CallMonitor} = require('fritz-callmonitor');
   let callMap = {};
   let fritzboxMonitor;
@@ -8,6 +8,7 @@ module.exports = async (cms) => {
   cms.socket.on('connect', internalSocket => {
     internalSocket.on('refresh-call-system-config', setupLocalFritzbox);
     internalSocket.on('get-call-system-status', updateConnectionStatus);
+    internalSocket.on('cancel-missed-call-timeout', cancelMissedCallTimeout);
   });
 
   async function updateConnectionStatus(cb, posSettings) {
@@ -57,7 +58,7 @@ module.exports = async (cms) => {
         const {connectionId, caller} = callInfo;
         callMap[connectionId] = {pickedUp: false, caller}
 
-        cms.socket.emit('new-phone-call', callInfo.caller, new Date());
+        emitNewCall(callInfo.caller);
       });
 
       fritzboxMonitor.on("pickup", (callInfo) => {
@@ -70,7 +71,7 @@ module.exports = async (cms) => {
         const callSession = callMap[connectionId];
 
         if (callSession && !callSession.pickedUp) {
-          cms.socket.emit('new-missed-phone-call', callSession.caller, new Date());
+          // cms.socket.emit('new-missed-phone-call', callSession.caller, new Date());
           delete callMap[connectionId];
         }
       });

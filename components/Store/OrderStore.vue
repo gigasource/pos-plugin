@@ -1558,17 +1558,21 @@
       })
       await this.getReservations()
 
-      cms.socket.on('new-phone-call', async (phoneNumber, date) => {
+      cms.socket.on('new-phone-call', async (phoneNumber, date, callId) => {
         const customer = await this.getCustomerInfo(phoneNumber);
-        this.calls.unshift({customer, date, phoneNumber});
+        this.calls.unshift({customer, date, phoneNumber, callId});
       })
 
-      cms.socket.on('new-missed-phone-call', async (phoneNumber, date) => {
-        const customer = await this.getCustomerInfo(phoneNumber);
+      cms.socket.on('new-missed-phone-call', async (callId) => {
+        const callIndex = this.calls.findIndex(e => e.callId === callId);
 
-        const callIndex = this.calls.findIndex(e => e.phoneNumber === phoneNumber);
-        if (callIndex > -1) this.calls.splice(callIndex, 1);
-        this.missedCalls.unshift({customer, date});
+        if (callIndex > -1) {
+          const removedCall = this.calls.splice(callIndex, 1)[0];
+          const {phoneNumber, date} = removedCall;
+
+          const customer = await this.getCustomerInfo(phoneNumber);
+          this.missedCalls.unshift({customer, date});
+        }
       })
     },
     watch: {

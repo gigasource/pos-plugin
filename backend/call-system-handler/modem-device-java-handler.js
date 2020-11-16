@@ -4,7 +4,7 @@ module.exports = async (cms) => {
   const ARTECH_MODEM_MODE = 'artech-modem';
   const ARTECH_MODEM_MODE_PREFIX = 'artech-';
 
-  const {checkModeActive, getActiveMode} = require('./utils');
+  const {checkModeActive, getActiveMode, emitNewCall, cancelMissedCallTimeout} = require('./utils');
   let rnBridge;
   let currentMode;
 
@@ -41,7 +41,7 @@ module.exports = async (cms) => {
 
     const modeIsActive = await checkModeActive(mode);
     // only try reconnecting if device is disconnected
-    if (modeIsActive && !connectionStatus || connectionStatus.toLowerCase() === 'disconnected') {
+    if (modeIsActive && (!connectionStatus || connectionStatus.toLowerCase() === 'disconnected')) {
       const posSettings = await cms.getModel('PosSetting').findOne();
       const {call: callConfig} = posSettings;
       const {ipAddresses = {}} = callConfig;
@@ -111,6 +111,7 @@ module.exports = async (cms) => {
     internalSocket.on('refresh-call-system-config', setupModemDevice);
     internalSocket.on('get-call-system-status', updateConnectionStatus);
     internalSocket.on('screen-loaded', listSerialDevices);
+    internalSocket.on('cancel-missed-call-timeout', cancelMissedCallTimeout);
   });
 
   async function listSerialDevices(mode) {
@@ -142,7 +143,7 @@ module.exports = async (cms) => {
   }
 
   function handleArtechData(phoneNumber = '') {
-    if (/^\d+$/.test(phoneNumber.trim())) cms.socket.emit('new-phone-call', phoneNumber, new Date());
+    if (/^\d+$/.test(phoneNumber.trim())) emitNewCall(phoneNumber);
   }
 
   function handleUsroboticsData(data) {
@@ -153,20 +154,20 @@ module.exports = async (cms) => {
     // (this signal appears a few seconds after the call ends)
 
     // } else {
-    let callerPhoneNumber;
+    let phoneNumber;
     const phoneData = trimmedData.split('\r\n');
     const callerNameInfo = phoneData.find(e => e.startsWith('NAME'));
     const callerNumberInfo = phoneData.find(e => e.startsWith('NMBR'));
 
     if (callerNameInfo) {
-      callerPhoneNumber = callerNameInfo.split('=')[1];
+      phoneNumber = callerNameInfo.split('=')[1];
     }
 
-    if (callerNumberInfo && !(/^\d+$/.test(callerPhoneNumber))) {
-      callerPhoneNumber = callerNumberInfo.split('=')[1];
+    if (callerNumberInfo && !(/^\d+$/.test(phoneNumber))) {
+      phoneNumber = callerNumberInfo.split('=')[1];
     }
 
-    if (/^\d+$/.test(callerPhoneNumber)) cms.socket.emit('new-phone-call', callerPhoneNumber, new Date());
+    if (/^\d+$/.test(phoneNumber)) emitNewCall(phoneNumber);
     // }
   }
 

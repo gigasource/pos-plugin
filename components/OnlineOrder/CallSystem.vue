@@ -2,7 +2,7 @@
   <div class="call">
     <div class="call-title mb-2">
       <span>Call system</span>
-      <span v-if="callSystemStatus"> {{ callSystemStatusComputed }}</span>
+      <span v-if="callSystemStatusComputed"> {{ callSystemStatusComputed }}</span>
     </div>
     <div class="row-flex align-items-center justify-start">
       <g-grid-select class="mt-2"

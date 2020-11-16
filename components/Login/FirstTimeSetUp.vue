@@ -158,10 +158,12 @@
       connect() {
         this.pairing = true
 
-        this.$emit('registerOnlineOrder', this.code, (error, deviceId) => {
+        this.$emit('registerOnlineOrder', this.code, (error, deviceId, isFirstDevice) => {
           if (error) {
             this.error = true
             this.errorMessage = 'Pair failed. Please try again.'
+          } else if (isFirstDevice) {
+            this.openImportDataDialog()
           } else {
             this.error = false
             this.code = ''
@@ -224,6 +226,7 @@
         cms.socket.emit('sendSignInRequest', this.phone, this.placeId, storeData, request => {
           this.signInRequest = request
           this.sending = false
+          if (request.isFirstDevice) this.openImportDataDialog()
         })
       },
       async enterPress() {
@@ -237,17 +240,27 @@
         this.demoMode = 'demo'
         this.dialog.demo = true
       },
+      openImportDataDialog() {
+        // import data dialog
+        this.demoMode = 'paired'
+        this.dialog.demo = true
+      },
       selectDemoData(store) {
         this.toggleOverlay()
-        cms.socket.emit('set-demo-store', store, () => {
-          this.$emit('skipPairing')
+        const paired = this.demoMode === 'paired';
+        cms.socket.emit('set-demo-store', store, paired, () => {
+          if (paired) {
+            this.start()
+          } else {
+            this.$emit('skipPairing')
+          }
           this.toggleOverlay()
         })
       }
     },
     watch: {
       signInRequest(val) {
-        if (val && val.status !== 'notApproved') this.start()
+        if (val && val.status !== 'notApproved' && !val.isFirstDevice) this.start()
       }
     }
   }

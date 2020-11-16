@@ -28,12 +28,12 @@
       </template>
       <template v-else>
         <div class="dialog-content">
-          <p v-if="mode !== 'demo'"><b>Address:</b> {{address}}</p>
-          <p v-if="mode !== 'demo'"><b>Phone number: </b> {{phone}}</p>
-          <p><b>Demo data: </b> <span style="text-transform: capitalize">{{selectedDemo && selectedDemo.storeName || 'None'}}</span></p>
-          <p><b>License plan: </b><span class="license">DEMO</span></p>
-          <p><b>End of plan: </b>{{date}}</p>
-          <div class="dialog-content__notice">
+          <p v-if="mode !== 'demo' && address"><b>Address:</b> {{address}}</p>
+          <p v-if="mode !== 'demo' && phone"><b>Phone number: </b> {{phone}}</p>
+          <p><b>Import data: </b><span style="text-transform: capitalize">{{selectedDemo && selectedDemo.storeName || 'None'}}</span></p>
+          <p v-if="mode === 'demo'"><b>License plan: </b><span class="license">DEMO</span></p>
+          <p v-if="mode === 'demo'"><b>End of plan: </b>{{date}}</p>
+          <div v-if="mode === 'demo'" class="dialog-content__notice">
             <div class="dialog-content__notice-title">
               <g-icon size="18" color="white" class="mr-2">info</g-icon>
               Important notice
@@ -78,6 +78,7 @@
         step: 1,
         listDemo: [],
         selectedDemo: null,
+        isFirstDevice: false
       }
     },
     watch: {
@@ -85,12 +86,13 @@
         if (val) {
           this.step = this.mode === 'demo' ? 1 : 2
 
-          cms.socket.emit('get-demo-stores', (stores, error) => {
+          cms.socket.emit('get-demo-stores', this.mode === 'paired', (stores, error) => {
             if (error) {
               console.log(error)
               return
             }
             this.listDemo = stores
+            this.selectedDemo = this.listDemo.find(s => s.existingData)
           })
         }
       }
@@ -144,6 +146,7 @@
         this.internalValue = false
         this.$emit('complete', this.selectedDemo)
         this.selectedDemo = null
+        this.isFirstDevice = false
       }
     }
   }
