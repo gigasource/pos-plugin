@@ -1057,7 +1057,7 @@ module.exports = async cms => {
           await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } })
         }
         if (request && request.storeData) {
-          const { _id, name, alias, settingName } = storeData
+          const { _id, name, alias, settingName } = request.storeData
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
             $set: {
               'onlineDevice.store': {
