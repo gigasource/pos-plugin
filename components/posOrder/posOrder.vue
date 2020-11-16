@@ -231,7 +231,7 @@
         return this.user ? this.user.name : ''
       },
       avatar() {
-        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.png'
+        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.svg'
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
