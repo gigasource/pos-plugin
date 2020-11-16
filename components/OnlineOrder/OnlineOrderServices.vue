@@ -2,30 +2,10 @@
   <div class="online-order-services">
     <div class="row-flex">
       <div class="online-order-services__item">
-        <div class="online-order-services__title">{{$t('onlineOrder.delivery')}}</div>
-        <div class="online-order-services__content row-flex align-items-center">
-          <g-radio-group v-model="delivery" row>
-            <g-radio small color="#536DFE" :label="$t('onlineOrder.yes')" :value="true" :class="[delivery && 'selected']"/>
-            <g-radio small color="#536DFE" :label="$t('onlineOrder.no2')" :value="false" :class="[!delivery && 'selected']"/>
-          </g-radio-group>
-          <!--        <div class="row-flex align-items-center">-->
-          <!--          <div>Automatically turn off after</div>-->
-          <!--          <g-select text-field-component="GTextFieldBs" :items="timerOptions" v-model="deliveryTimer"/>-->
-          <!--        </div>-->
-        </div>
+        <g-switch v-model="delivery" :label="$t('onlineOrder.delivery')"/>
       </div>
       <div class="online-order-services__item">
-        <div class="online-order-services__title">{{$t('onlineOrder.pickup')}}</div>
-        <div class="online-order-services__content row-flex align-items-center">
-          <g-radio-group v-model="pickup" row>
-            <g-radio small color="#536DFE" :label="$t('onlineOrder.yes')" :value="true" :class="[pickup && 'selected']"/>
-            <g-radio small color="#536DFE" :label="$t('onlineOrder.no2')" :value="false" :class="[!pickup && 'selected']"/>
-          </g-radio-group>
-          <!--        <div class="row-flex align-items-center">-->
-          <!--          <div>Automatically turn off after</div>-->
-          <!--          <g-select text-field-component="GTextFieldBs" :items="timerOptions" v-model="pickupTimer"/>-->
-          <!--        </div>-->
-        </div>
+        <g-switch v-model="pickup" :label="$t('onlineOrder.pickup')"/>
       </div>
     </div>
 

@@ -84,8 +84,8 @@ const orderUtil = {
   },
   async getComputedOrderItems(orderItems, date) {
     const items = []
-    const { mongoose } = cms
-    const isValidObjectId = mongoose.Types.ObjectId.isValid;
+    const BSON = require('bson');
+    const isValidObjectId = BSON.ObjectID.isValid;
 
     for (const item of orderItems) {
       if (item.groupPrinter && typeof item.groupPrinter === 'string' && isValidObjectId(item.groupPrinter)) {
