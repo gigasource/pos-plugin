@@ -8,6 +8,7 @@ const updateMethodList = ['update', 'findOneAndUpdate', 'findOneAndModify', 'ins
 const updateCommit = {
 	commitType: ['order', 'report', 'pos'],
 	db: mongoose.connection.db,
+	isOnlineOrder: false,
 	init: async function (handler) {
 		updateCommit.handler = handler;
 		updateCommit.orderCommitModel = cms.Types['OrderCommit'].Model;
