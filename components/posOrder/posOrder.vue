@@ -103,7 +103,7 @@
         <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
       </template>
     </div>
-    <div v-if="!editMode" class="order-detail__content">
+    <div v-if="!editMode" class="order-detail__content" ref="table">
       <div v-for="item in items" :key="item._id.toString()"
            v-if="item.quantity || (item.quantityModified && item.printed)"
            class="item"
@@ -558,6 +558,16 @@
     },
     deactivated() {
       this.changedAvatar = false
+    },
+    watch: {
+      items(val) {
+        if(val && this.$refs) {
+          this.$nextTick(() => {
+            const table = this.$refs.table
+            table.scroll({top: table.scrollHeight, behavior: 'smooth'})
+          })
+        }
+      }
     }
   }
 </script>
