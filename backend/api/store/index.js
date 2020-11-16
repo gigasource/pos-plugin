@@ -123,7 +123,7 @@ router.post('/sign-in-requests', async (req, res) => {
   const existingSignInRequest = await SignInRequestModel.findOne({device: new mongoose.Types.ObjectId(deviceId), status: 'pending'});
   if (existingSignInRequest) return res.status(200).json({message: 'This device already has a pending sign in request'});
 
-  let store = await StoreModel.findOne({googleMapPlaceId});
+  let store = await StoreModel.findOne({googleMapPlaceId}).lean();
 
   if (pos && !store) {
     // create new store
@@ -178,14 +178,16 @@ router.post('/sign-in-requests', async (req, res) => {
     role
   }
 
+  const response = Object.assign({}, request._doc, { storeData: { _id: store._id.toString(), ...store } });
   if (pos && store) {
     await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
     await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
+    const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
+    if (storeDevices.length === 1) response.isFirstDevice = true
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
   cms.emit('newSignInRequest', result);
-  const response = Object.assign({}, request._doc, { storeData: store });
   res.status(201).json(response);
 });
 
@@ -660,7 +662,8 @@ async function initApprovedDevice(storeId, deviceId) {
   })
 
   const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
-  if (storeDevices.length === 1) {
+  const isFirstDevice = storeDevices.length === 1;
+  if (isFirstDevice) {
     await setMasterDevice(storeId, deviceId)
 
     const store = await StoreModel.findById(storeId)
@@ -668,6 +671,8 @@ async function initApprovedDevice(storeId, deviceId) {
     if (demoData)
       await getExternalSocketIoServer().emitToPersistent(deviceId, 'import-init-data', demoData)
   }
+
+  return isFirstDevice
 }
 
 async function setMasterDevice(storeId, deviceId) {
