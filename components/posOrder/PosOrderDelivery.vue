@@ -142,10 +142,8 @@
       <template v-else>
         <div class="delivery-order__content">
           <g-autocomplete text-field-component="GTextFieldBs" v-model="selectedProduct" :items="products"
-                          @input="chooseProduct" ref="autocomplete" :filter="(itemText, text) => {
-                          return itemText.toLowerCase().includes(text.toLowerCase())
-                        }"
-                          return-object/>
+                          ref="autocomplete" return-object
+                          :filter="(itemText, text) => {return itemText.toLowerCase().includes(text.toLowerCase())}"/>
           <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos quantity" v-model="quantity" label="Quantity"/>
           <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :value="selectedProduct.price" label="Price"
                            @input="debouceUpdatePrice"/>
@@ -218,7 +216,7 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" v-model="placeId" clearable :virtual-event="isIOS" skip-search
+          <g-combobox style="width: 98%" label="Address" :value="placeId" clearable :virtual-event="isIOS" skip-search
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
                       @input="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
@@ -235,16 +233,16 @@
       <g-card class="dialog r">
         <g-icon class="dialog-icon--close" @click="closeDialogConfirm" size="20">icon-close</g-icon>
         <div class="mx-2">
-          <b>Name: </b> {{this.selectedCustomer.name}}
+          <b>Name: </b> {{selectedCustomer.name}}
         </div>
         <div class="mx-2">
-          <b>Phone: </b> {{this.selectedCustomer.phone}}
+          <b>Phone: </b> {{selectedCustomer.phone}}
         </div>
         <div class="mx-2">
-          <b>Address: </b> {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 &&
-          this.selectedCustomer.addresses[this.selectedAddress].address}}
-          {{this.selectedCustomer.addresses && this.selectedCustomer.addresses.length > 0 &&
-          this.selectedCustomer.addresses[this.selectedAddress].zipcode}}
+          <b>Address: </b> {{selectedCustomer.addresses && selectedCustomer.addresses.length > 0 &&
+          selectedCustomer.addresses[selectedAddress].address}}
+          {{selectedCustomer.addresses && selectedCustomer.addresses.length > 0 &&
+          selectedCustomer.addresses[selectedAddress].zipcode}}
         </div>
         <g-text-field-bs label="Delivery note:" v-model="note">
           <template v-slot:append-inner>
@@ -460,12 +458,11 @@
       },
       addNewCustomer() {
         if (this.dialogMode === 'add') {
-          let customer = {}
-          customer.name = this.name
-          customer.phone = this.phone
-          if (this.selectedCustomer.addresses) {
-            customer.addresses = [
-              ...this.selectedCustomer.addresses,
+          Object.assign(this.selectedCustomer, {
+            name: this.name,
+            phone: this.phone,
+            addresses: [
+              ...!!this.selectedCustomer.addresses ? _.cloneDeep(this.selectedCustomer.addresses) : [],
               {
                 address: this.address,
                 zipcode: this.zipcode,
@@ -474,17 +471,8 @@
                 city: this.city
               }
             ]
-          } else {
-            customer.addresses = [{
-              address: this.address,
-              zipcode: this.zipcode,
-              house: this.house,
-              street: this.street,
-              city: this.city
-            }]
-          }
-          this.$set(this, 'selectedCustomer', customer)
-          this.selectedAddress = customer.addresses.length - 1
+          })
+          this.selectedAddress = this.selectedCustomer.addresses.length - 1
           this.isNewCustomer = false
         }
         if (this.dialogMode === 'edit') {
@@ -497,11 +485,6 @@
             city: this.city
           })
         }
-        this.address = ''
-        this.zipcode = ''
-        this.house = ''
-        this.street = ''
-        this.city = ''
         this.dialog.input = false
       },
       isItemDiscounted(item) {
@@ -571,6 +554,7 @@
           this.house = ''
           this.street = ''
           this.city = ''
+          this.placeId = ''
         }
         if (mode === 'edit') {
           this.name = this.selectedCustomer.name || ''
@@ -616,21 +600,23 @@
         })
       },
       chooseProduct(productString) {
-        let [productId, quantity] = productString.split(' x ')
-        if (!productId) return
-        if (!quantity) quantity = 1
-        const product = this.products.find(p => p.id.toLowerCase() === productId.toLowerCase())
-        if (product) {
-          if (product.choices && product.choices.length > 0) {
-            this.quantity = +quantity
-            this.selectedProduct = product
-            this.dialog.choice = true
-          } else {
-            this.$emit('addProductToOrder', {
-              ...product,
-              quantity,
-              modifiers: []
-            })
+        if(typeof productString === 'string') {
+          let [productId, quantity] = productString.split(' x ')
+          if (!productId) return
+          if (!quantity) quantity = 1
+          const product = this.products.find(p => p.id.toLowerCase() === productId.toLowerCase())
+          if (product) {
+            if (product.choices && product.choices.length > 0) {
+              this.quantity = +quantity
+              this.selectedProduct = product
+              this.dialog.choice = true
+            } else {
+              this.$emit('addProductToOrder', {
+                ...product,
+                quantity,
+                modifiers: []
+              })
+            }
           }
         }
       },
@@ -638,7 +624,7 @@
         event.stopPropagation()
         if (event.key === 'p') {
           const autocomplete = document.querySelector('.g-autocomplete input')
-          if(autocomplete !== document.activeElement) {
+          if(autocomplete !== document.activeElement  && document.activeElement.tagName !== 'INPUT') {
             event.preventDefault()
             autocomplete.click()
           }
@@ -667,9 +653,11 @@
         })
       },
       async selectAutocompleteAddress(place_id) {
+        this.placeId = place_id
         if (this.autocompleteAddresses.find(item => item.value === place_id)) {
           cms.socket.emit('getPlaceDetail', place_id, this.token, data => {
             if (!_.isEmpty(data)) {
+              console.log(data)
               for (const component of data.address_components) {
                 if (component.types.includes('street_number')) {
                   this.house = component.long_name
@@ -813,18 +801,6 @@
         window.addEventListener('keydown', this.keyboardHanle.bind(this))
       }
     },
-    watch: {
-      zipcode(val) {
-        if(val && this.selectedCustomer && this.selectedCustomer.addresses) {
-          this.selectedCustomer.addresses[this.selectedAddress].zipcode = val
-        }
-      },
-      address(val) {
-        if(val && this.selectedCustomer && this.selectedCustomer.addresses) {
-          this.selectedCustomer.addresses[this.selectedAddress].address = val
-        }
-      }
-    }
   }
 </script>
 

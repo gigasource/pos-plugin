@@ -403,6 +403,7 @@ module.exports = async cms => {
     socket.on('unpairDevice', async cb => {
       await unregisterOnlineOrderDevice()
       cms.socket.emit('unpairDevice')
+      cms.socket.emit('denySignIn')
       cb();
     });
     socket.on('startRemoteControl', async (proxyServerHost, proxyServerPort, callback) => {
@@ -506,8 +507,9 @@ module.exports = async cms => {
       })))
     })
 
-    socket.on('approveSignIn_v2', async ({ clientId: deviceId, requestId, storeId, storeAlias: alias, storeName: name, storeLocale: locale }, ack) => {
+    socket.on('approveSignIn_v2', async (response, ack) => {
       console.log('approveSignIn_v2')
+      const { clientId: deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale, isFirstDevice } = response
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
           'onlineDevice.store': {
@@ -535,7 +537,7 @@ module.exports = async cms => {
         await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
       });
 
-      cms.socket.emit('approveSignIn')
+      cms.socket.emit('approveSignIn', isFirstDevice)
       typeof ack === 'function' && ack()
     })
 
@@ -578,7 +580,8 @@ module.exports = async cms => {
         'onlineDevice': {
           id: null,
           store: {}
-        }
+        },
+        'signInRequest.status': 'notApproved',
       }
     })
   }
@@ -770,7 +773,7 @@ module.exports = async cms => {
         requestBody.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
       }
       const response = await axios.post(pairingApiUrl, requestBody)
-      const { deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale } = response.data
+      const { deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale, isFirstDevice } = response.data
       await cms.getModel('PosSetting').findOneAndUpdate({}, {
         $set: {
           onlineDevice: {
@@ -785,7 +788,7 @@ module.exports = async cms => {
           signInRequest: null
         }
       })
-      return { deviceId }
+      return { deviceId, isFirstDevice }
     } catch (error) {
       console.error(error)
       return { error }
@@ -832,7 +835,7 @@ module.exports = async cms => {
     })
 
     socket.on('registerOnlineOrderDevice', async (pairingCode, callback) => {
-      const { deviceId } = await registerWithCode(pairingCode)
+      const { deviceId, isFirstDevice } = await registerWithCode(pairingCode)
 
       if (deviceId) {
         try {
@@ -851,7 +854,7 @@ module.exports = async cms => {
             await cms.getModel('PosSetting').updateOne({}, { reservation: setting });
           });
 
-          if (typeof callback === 'function') callback(null, deviceId)
+          if (typeof callback === 'function') callback(null, deviceId, isFirstDevice)
         } catch (e) {
           console.error(e);
           callback(e);
@@ -1050,12 +1053,11 @@ module.exports = async cms => {
           pos: true
         })
         console.debug(sentryTags, 'POS backend: sendSignInRequest success', request)
-        cb(request)
         if (!request.message) {
           await cms.getModel('PosSetting').findOneAndUpdate({}, { $set: { signInRequest: request } })
         }
         if (request && request.storeData) {
-          const { _id, name, alias, settingName } = storeData
+          const { _id, name, alias, settingName } = request.storeData
           await cms.getModel('PosSetting').findOneAndUpdate({}, {
             $set: {
               'onlineDevice.store': {
@@ -1066,6 +1068,7 @@ module.exports = async cms => {
             }
           })
         }
+        cb(request)
       } catch (e) {
         console.debug(sentryTags, 'POS backend: sendSignInRequest error', e)
       }

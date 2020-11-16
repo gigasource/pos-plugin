@@ -118,7 +118,7 @@
       await this.setupPairDevice()
       await this.getPairStatus()
       await this.getWebshopName()
-      
+
     },
     watch: {
       'productPagination.limit'(newVal) {
@@ -843,8 +843,9 @@
             this.$router.push('/pos-setup')
         })
 
-        cms.socket.on('approveSignIn', () => {
-          this.$route.path === '/pos-setup' && this.$router.push('/pos-login')
+        cms.socket.on('approveSignIn', (isFirstDevice) => {
+          if (!isFirstDevice)
+            this.$route.path === '/pos-setup' && this.$router.push('/pos-login')
         })
 
         cms.socket.on('denySignIn', () => {
