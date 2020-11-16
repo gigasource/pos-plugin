@@ -5,7 +5,7 @@
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
           <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
-                      keep-menu-on-blur clearable virtual-event skip-search menu-class="menu-autocomplete-setup"
+                      keep-menu-on-blur clearable skip-search menu-class="menu-autocomplete-setup"
                       :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
           </g-combobox>
           <pos-textfield-new class="tf-phone" label="Phone number" @click="showKeyboard = true" v-model="phone"/>
@@ -39,7 +39,7 @@
           </div>
         </g-tab-item>
         <g-tab-item :item="items[1]" style="height: 200px; padding-top: 4px">
-          <g-text-field-bs large virtual-event class="bs-tf__pos mt-1" v-model="code" style="margin-bottom: 12px;" @click="showKeyboard = true">
+          <g-text-field-bs large class="bs-tf__pos mt-1" v-model="code" style="margin-bottom: 12px;" @click="showKeyboard = true">
           </g-text-field-bs>
           <div v-if="error" class="dialog-message--error">
             <g-icon v-if="offline">icon-no-connection</g-icon>
@@ -130,6 +130,10 @@
       this.debouncedSearch = _.debounce(this.searchPlace, 500)
       await this.getRequest()
 
+      cms.socket.on('approveSignIn', (isFirstDevice) => {
+        if (isFirstDevice) this.openImportDataDialog()
+      })
+
       cms.socket.on('denySignIn', () => {
         if (this.signInRequest) this.$set(this.signInRequest, 'status', 'notApproved')
         else this.getRequest()
@@ -158,10 +162,12 @@
       connect() {
         this.pairing = true
 
-        this.$emit('registerOnlineOrder', this.code, (error, deviceId) => {
+        this.$emit('registerOnlineOrder', this.code, (error, deviceId, isFirstDevice) => {
           if (error) {
             this.error = true
             this.errorMessage = 'Pair failed. Please try again.'
+          } else if (isFirstDevice) {
+            this.openImportDataDialog()
           } else {
             this.error = false
             this.code = ''
@@ -224,6 +230,7 @@
         cms.socket.emit('sendSignInRequest', this.phone, this.placeId, storeData, request => {
           this.signInRequest = request
           this.sending = false
+          if (request.isFirstDevice) this.openImportDataDialog()
         })
       },
       async enterPress() {
@@ -237,17 +244,27 @@
         this.demoMode = 'demo'
         this.dialog.demo = true
       },
+      openImportDataDialog() {
+        // import data dialog
+        this.demoMode = 'paired'
+        this.dialog.demo = true
+      },
       selectDemoData(store) {
         this.toggleOverlay()
-        cms.socket.emit('set-demo-store', store, () => {
-          this.$emit('skipPairing')
+        const paired = this.demoMode === 'paired';
+        cms.socket.emit('set-demo-store', store, paired, () => {
+          if (paired) {
+            this.start()
+          } else {
+            this.$emit('skipPairing')
+          }
           this.toggleOverlay()
         })
       }
     },
     watch: {
       signInRequest(val) {
-        if (val && val.status !== 'notApproved') this.start()
+        if (val && val.status !== 'notApproved' && !val.isFirstDevice) this.start()
       }
     }
   }
