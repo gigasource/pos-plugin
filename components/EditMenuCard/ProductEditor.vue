@@ -141,10 +141,10 @@
       <div>
         <g-grid-select v-model="selectedProduct.activePopupModifierGroup" item-text="name" item-value="_id" :items="popupModifierGroups" itemCols="auto">
           <template #default="{ toggleSelect, item, index }">
-            <div class="prop-option" @click="() => { toggleSelect(item); changePopupModifierGroup(item) }">{{item.name}}</div>
+            <div class="prop-option" @click="toggleSelect(item); changePopupModifierGroup(item)">{{item.name}}</div>
           </template>
-          <template #selected="{ item, index }">
-            <div class="prop-option prop-option--1">{{item.name}}</div>
+          <template #selected="{ toggleSelect, item, index }">
+            <div class="prop-option prop-option--1" @click="toggleSelect(item); changePopupModifierGroup(null)">{{item.name}}</div>
           </template>
         </g-grid-select>
       </div>
@@ -378,7 +378,7 @@
         await this.updateProductLayout({type})
       },
       changePopupModifierGroup(group) {
-        return this.updateProduct({ activePopupModifierGroup: group._id })
+        return this.updateProduct({ activePopupModifierGroup: group && group._id })
       },
 
       // update color, update text
