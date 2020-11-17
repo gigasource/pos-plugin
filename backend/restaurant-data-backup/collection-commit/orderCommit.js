@@ -419,8 +419,8 @@ async function orderCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'printOrder', async function (commit) {
 		try {
 			if (commit.order._id) {
-				const order = await cms.getModel('Order').findById(commit.order._id)
-				if (order) commit.order.id = order.toJSON().id
+				const order = await cms.getModel('Order').findById(commit.order._id).lean()
+				if (order) commit.order.id = order.id
 			}
 			await cms.execPostAsync('run:print', null, [commit]);
 		} catch (err) {
