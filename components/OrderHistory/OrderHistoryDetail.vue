@@ -65,10 +65,27 @@
       </div>
       <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
         <span>Payment</span>
-        <div class="row-flex align-items-center">
-          <img :src="payment.icon" v-if="payment.icon" style="height: 16px" class="mr-2">
-          <span>{{payment.name || payment.type}}</span>
-        </div>
+        <template v-if="payment.length > 1">
+          <div class="row-flex">
+            <g-icon size="24" class="mr-2">icon-multi_payment</g-icon>
+            <div v-for="(p, index) in payment" class="row-flex align-items-center">
+              <span :style="{ color: p.type === 'cash' ? '#25D778' : '#FFCB3A' }">
+                {{p.value | formatNumber}}
+              </span>
+              <g-divider vertical v-if="!index" class="ml-1 mr-1"/>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="row-flex align-items-center">
+            <img :src="payment[0].icon" v-if="payment[0].icon" style="height: 16px" class="mr-2">
+            <span>{{payment[0].value | formatNumber}}</span>
+          </div>
+        </template>
+      </div>
+      <div v-if="tip" class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
+        <span>Tip</span>
+        <span>€ {{tip | formatNumber}}</span>
       </div>
     </div>
   </div>
@@ -80,6 +97,7 @@
 
 <script>
   import orderUtil from '../logic/orderUtil'
+  import { formatNumber } from '../logic/commonUtils'
 
   export default {
     name: 'OrderHistoryDetail',
@@ -88,9 +106,7 @@
       'OrderStore:orderHistoryCurrentOrder'
     ],
     filters: {
-      formatNumber: (val) => {
-        return isNaN(val) ? '0.00' : val.toFixed(2)
-      },
+      formatNumber,
       formatDate(val) {
         return dayjs(val).format('DD MMM YY, HH:mm')
       }
@@ -103,9 +119,19 @@
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.amount - this.orderHistoryCurrentOrder.tax;
       },
       payment() {
-        const { value, type } = this.orderHistoryCurrentOrder.payment[0]
-        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
-        return Object.assign(paymentMethod || {}, { value, type })
+        let paymentMethods = cms.getList('PosSetting')[0].payment
+        return this.orderHistoryCurrentOrder.payment
+        .filter(i => paymentMethods.some(m => m.name === i.type))
+        .map(i => {
+          const method = paymentMethods.find(m => m.name === i.type)
+          return {
+            ...method,
+            ...i
+          }
+        })
+      },
+      tip() {
+        return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.tip
       }
     },
     methods: {

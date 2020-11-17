@@ -132,41 +132,13 @@ async function initSocket(socket) {
 	// console.debug(getBaseSentryTags('initHandler'), '2. Set socket');
 	const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
 	const { masterClientId, onlineDevice } = posSettings;
-	if (!masterClientId) {
-		// console.debug(getBaseSentryTags('initHandler'), '3. There is no masterClientId');
-		let retryTime = 0;
-		const getMasterFromOnlineOrder = async () => {
-			const { onlineDevice } = await cms.getModel("PosSetting").findOne({}).lean();
-			socket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
-				cms.socket.emit('getMasterDevice', masterClientId);
-				console.log(`Master ip is ${masterIp}`);
-				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
-				if (!masterClientId) {
-					if (retryTime < 5) setTimeout(async () => {
-						await getMasterFromOnlineOrder();
-					}, 5000)
-					retryTime += 1;
-					return;
-				}
-				if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
-					global.APP_CONFIG.isMaster = true;
-				}
-				await cms.execPostAsync('load:handler');
-				await handler.initSocket(socket, masterClientId);
-			})
-		}
-		setTimeout(async () => {
-			await getMasterFromOnlineOrder();
-		}, 3000);
-	} else {
-		cms.socket.emit('getMasterDevice', masterClientId);
-		// console.debug(getBaseSentryTags('initHandler'), '4. Already had masterClientId');
-		if (onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
-			global.APP_CONFIG.isMaster = true;
-		}
-		await cms.execPostAsync('load:handler');
-		await handler.initSocket(socket, masterClientId);
+	cms.socket.emit('getMasterDevice', masterClientId);
+	// console.debug(getBaseSentryTags('initHandler'), '4. Already had masterClientId');
+	if (masterClientId && onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
+		global.APP_CONFIG.isMaster = true;
 	}
+	await cms.execPostAsync('load:handler');
+	await handler.initSocket(socket, masterClientId);
 }
 
 /*
@@ -174,7 +146,7 @@ async function initSocket(socket) {
 	function always change state from node
 	to master
  */
-async function handlerNewMasterId(socket) {
+async function handleNewMasterId(socket) {
 	await initSocket(socket);
 }
 
@@ -189,5 +161,5 @@ async function handlerNewMasterId(socket) {
 // }
 
 module.exports.initSocket = initSocket;
-module.exports.handlerNewMasterId = handlerNewMasterId;
+module.exports.handleNewMasterId = handleNewMasterId;
 // module.exports.getBaseSentryTags = getBaseSentryTags;

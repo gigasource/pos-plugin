@@ -189,7 +189,7 @@
           return
         }
 
-        this.$emit('updateCurrentOrder', 'tip', tip)
+        this.$emit('updateCurrentOrder', 'tip', tip, true)
         this.$emit('updateCurrentOrder', 'payment',
           [{ type: 'card', value: +this.tipEditValue }, ...filtered,])
 

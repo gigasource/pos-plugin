@@ -88,7 +88,7 @@ async function orderCommit(updateCommit) {
       // preset value
       const commit = commits[id];
       commit.temp = false;
-      if (lastTempId && lastTempId != commit.groupTempId && global.APP_CONFIG.isMaster) {
+      if (lastTempId && lastTempId != commit.groupTempId && updateCommit.isMaster) {
         const deleteCommit =
           await updateCommit.getMethod(TYPENAME, 'deleteTempCommit')({groupTempId: lastTempId});
         if (deleteCommit) newCommits.push(deleteCommit);
@@ -110,7 +110,7 @@ async function orderCommit(updateCommit) {
         updateCommit.handler.cms.socket.emit('update-table-status');
       }, 200);
     }
-    if (global.APP_CONFIG.isMaster && lastTempId) { // add a commit to delete temp commit
+    if (updateCommit.isMaster && lastTempId) { // add a commit to delete temp commit
       const deleteCommit =
         await updateCommit.getMethod(TYPENAME, 'deleteTempCommit')({groupTempId: lastTempId});
       newCommits.push(deleteCommit);

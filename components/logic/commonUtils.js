@@ -17,3 +17,9 @@ export function mobileCheck() {
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
 }
+
+export function formatNumber(value, decimals = 2) {
+  if (!value || isNaN(value) || Math.floor(value) === value)
+    return value
+  return value.toFixed(decimals)
+}

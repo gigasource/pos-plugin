@@ -47,7 +47,7 @@ const orderUtil = {
   getOrderVTaxGroups(taxGroups) {
     // vTaxGroups
     return _.map(taxGroups, (val, key) => ({
-      taxType: key,
+      taxType: isNaN(+key) ? 0 : key,
       tax: orderUtil.calOrderTax(val),
       sum: orderUtil.calOrderTotal(val)
     }))

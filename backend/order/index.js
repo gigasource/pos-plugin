@@ -375,7 +375,7 @@ module.exports = (cms) => {
     const receive = orderUtil.calOrderReceive(payment)
     const immediatePay = !order.items.some(i => i.printed)
 
-    const cashback = receive - vSum;
+    const cashback = receive - vSum - order.tip;
     return {
       _id: order._id || new mongoose.Types.ObjectId(),
       id: order.id,
@@ -429,12 +429,14 @@ module.exports = (cms) => {
   function getUpdatedOrderItems(items, takeAwayOrder) {
     return items.map(i => {
       const [tax, tax2] = i.taxes
-      return ({
+      const newItem = {
         ...i,
         printed: true,
         sent: true,
-        tax: (takeAwayOrder || i.takeAway) ? tax2 : tax
-      });
+        tax: takeAwayOrder || i.takeAway ? tax2 : tax
+      };
+      delete newItem.quantityModified
+      return newItem
     })
   }
 

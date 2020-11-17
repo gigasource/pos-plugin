@@ -5,12 +5,12 @@
         <div class="header">
           <template v-for="group in allGroups">
             <g-btn outlined :uppercase="false" background-color="#F0F0F0" :key="group._id"
-                   :class="[...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
+                   :class="['mb-2', ...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
                    @click="setActiveGroup(group)">
               {{group.name}}
             </g-btn>
           </template>
-          <g-btn flat background-color="#1271ff" text-color="#fff" :uppercase="false" v-show="!newGroup" @click="addGroup">
+          <g-btn class="mb-1" flat background-color="#1271ff" text-color="#fff" :uppercase="false" v-show="!newGroup" @click="addGroup">
             <g-icon color="#fff" size="18" class="mr-2">add</g-icon>
             <span>Group</span>
           </g-btn>
@@ -109,7 +109,7 @@
                 </g-text-field-bs>
                 <div>
                   <div style="font-size: 13px; margin: 12px 4px 2px 4px;">Group printer</div>
-                  <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer"
+                  <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer" :grid="false"
                                  item-text="name" item-value="_id" :items="groupPrinters" itemCols="auto">
                     <template #default="{ toggleSelect, item, index }">
                       <div class="prop-option" @click="e => { toggleSelect(item) }">{{item.name}}</div>
@@ -128,7 +128,8 @@
               </template>
             </div>
 
-            <div class="row-flex flex-grow-1 align-items-end">
+            <g-spacer/>
+            <div class="row-flex" style="position: sticky; z-index: 1">
               <g-btn flat background-color="#ff4452" text-color="#fff" border-radius="0"
                      @click="close" style="flex: 1; margin: 0">
                 Close
@@ -404,8 +405,10 @@
         immediate: true
       },
       activeEditItem: {
-        handler: _.debounce(function (val) {
-          if (val) this.save()
+        handler: _.debounce(function (oldVal, val) {
+          if (val && oldVal) {
+            if (val._id && oldVal._id && val._id.toString() === oldVal._id.toString()) this.save()
+          }
         }, 500),
         deep: true
       }
@@ -421,15 +424,19 @@
 
   .content {
     flex: 1;
+    overflow: scroll;
 
     &--main {
       flex-grow: 1;
       padding: 16px;
+      overflow: scroll;
     }
 
     &--sidebar {
       border-left: 0.5px solid #979797;
       width: 25%;
+      overflow: scroll;
+      position: relative;
     }
   }
 
