@@ -179,31 +179,33 @@ module.exports = async (cms) => {
 
     const devicePathInConfig = ipAddresses[mode];
     const deviceConnected = deviceList.some(d => d.devicePath === devicePathInConfig);
+    const closeEvent = 'close-usb-device';
 
-    if (mode !== USROBOTICS_MODEM_MODE && mode !== ARTECH_MODEM_MODE && selectedDevicePath) {
-      reset();
+    if ((mode !== USROBOTICS_MODEM_MODE || mode !== ARTECH_MODEM_MODE) && selectedDevicePath) {
+      if (mode !== USROBOTICS_MODEM_MODE) {
+        rnBridge.app.sendObject(USROBOTICS_MODEM_MODE_PREFIX + closeEvent, {devicePath: selectedDevicePath});
+      }
+
+      if (mode !== ARTECH_MODEM_MODE) {
+        rnBridge.app.sendObject(ARTECH_MODEM_MODE_PREFIX + closeEvent, {devicePath: selectedDevicePath});
+      }
+
+      selectedDevicePath = null;
     } else {
-      if ((mode === USROBOTICS_MODEM_MODE || mode === ARTECH_MODEM_MODE) && devicePathInConfig && deviceConnected) {
-        reset();
-        await openDevice(ipAddresses[mode]);
+      if (mode === USROBOTICS_MODEM_MODE && devicePathInConfig && deviceConnected) {
+        reset(ARTECH_MODEM_MODE + closeEvent);
+        setTimeout(() => openDevice(ipAddresses[mode]), 500);
+      } else if (mode === ARTECH_MODEM_MODE && devicePathInConfig && deviceConnected) {
+        reset(USROBOTICS_MODEM_MODE_PREFIX + closeEvent);
+        setTimeout(() => openDevice(ipAddresses[mode]), 500);
       }
     }
   }
 
-  function reset() {
+  function reset(closeEvent) {
     if (selectedDevicePath) {
-      closeDevice(selectedDevicePath);
+      rnBridge.app.sendObject(closeEvent, {devicePath: selectedDevicePath});
       selectedDevicePath = null;
     }
-  }
-
-  async function closeDevice(devicePath) {
-    const mode = await getActiveMode();
-    let event = 'close-usb-device';
-
-    if (mode === USROBOTICS_MODEM_MODE) event = USROBOTICS_MODEM_MODE_PREFIX + event;
-    else if (mode === ARTECH_MODEM_MODE) event = ARTECH_MODEM_MODE_PREFIX + event;
-
-    rnBridge.app.sendObject(event, {devicePath});
   }
 }

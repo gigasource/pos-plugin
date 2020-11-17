@@ -2,7 +2,7 @@
   <div class="call">
     <div class="call-title mb-2">
       <span>Call system</span>
-      <span v-if="callSystemStatusComputed"> {{ callSystemStatusComputed }}</span>
+      <span v-if="callSystemStatus || callSystemConfigChanged"> {{ callSystemStatusComputed }}</span>
     </div>
     <div class="row-flex align-items-center justify-start">
       <g-grid-select class="mt-2"
@@ -145,13 +145,15 @@ export default {
   watch: {
     currentCallSystemMode(value) {
       cms.socket.emit('get-call-system-status', this.updateConnectStatus);
-      let defaultValue = '';
+      let defaultValue = null;
 
       if (value === CALL_SYSTEM_MODES.DEMO.value) defaultValue = 'https://fritzbox-proxy-10000.gigasource.io';
       else if (value === CALL_SYSTEM_MODES.FRITZBOX.value) defaultValue = '192.168.178.1:1012';
-      else if (value === CALL_SYSTEM_MODES.OFF.value) defaultValue = '';
+      else if (value === CALL_SYSTEM_MODES.OFF.value) defaultValue = null;
       else if (value === CALL_SYSTEM_MODES.MODEM_ROBOTIC.value
           || value === CALL_SYSTEM_MODES.MODEM_ARTECH.value) this.updateUsbDeviceList();
+
+      if (defaultValue === null) return;
 
       this.ipAddresses[value] = this.ipAddresses[value] || defaultValue;
     },
