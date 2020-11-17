@@ -63,12 +63,13 @@ class Node {
 	constructor(cms) {
 		console.log('Starting node');
 		this.cms = cms;
-		this.onlineOrderSocket = null;
-		this.socket = null;
+		this.onlineOrderSocket = {};
+		this.socket = {};
 		this.storeId = null;
 		this.highestCommitId = 0;
 		this.isConnect = false;
 		this.masterClientId = null;
+		updateCommit.isMaster = false;
 		cms.post('load:masterClientId', async () => {
 			const posSettings = await cms.getModel("PosSetting").findOne({});
 			const { masterIp, masterClientId } = posSettings;
@@ -132,7 +133,7 @@ class Node {
 			cms.bridge.emit(args[0], ...args.slice(1));
 		})
 		_this.onlineOrderSocket.emit('getMasterIp', onlineDevice.store.alias, async (masterIp, masterClientId) => {
-			if (masterIp != posSettings.masterIp) {
+			if (masterIp && masterIp != posSettings.masterIp) {
 				await connectToMaster(_this, masterIp);
 				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
 			}
@@ -181,7 +182,7 @@ class Node {
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
-					} else if (_this.masterClientId) {
+					} else if (_this.onlineOrderSocket.connected) {
 						_this.onlineOrderSocket.emit('updateCommits', _this.masterClientId, commits);
 					} else {
 						throw new Error('Can not connect to master');
@@ -200,19 +201,22 @@ class Node {
 	}
 
 	turnOff() {
-		if (this.onlineOrderSocket) this.onlineOrderSocket.off('updateCommitNode');
+		if (this.onlineOrderSocket) {
+			this.onlineOrderSocket.off('updateCommitNode');
+			this.onlineOrderSocket.off('masterCall');
+		}
 		if (this.socket) this.socket.disconnect();
 	}
 
-	async sendChangeRequest(commit) {
+	async sendChangeRequest(commit, ack) {
 		commit.storeId = await this.getStoreId();
-		if (!this.onlineOrderSocket.connected || !this.socket.connected) {
+		if (!this.onlineOrderSocket.connected && !this.socket.connected) {
 			return console.error('Socket is not connected');
 		}
-		if (this.socket.connected) {
-			this.socket.emit('updateCommits', [commit]);
+		if (this.socket && this.socket.connected) {
+			this.socket.emit('updateCommits', [commit], ack);
 		} else {
-			this.onlineOrderSocket.emit('updateCommits', this.masterClientId, [commit]);
+			this.onlineOrderSocket.emit('updateCommits', this.masterClientId, [commit], ack);
 		}
 	}
 }

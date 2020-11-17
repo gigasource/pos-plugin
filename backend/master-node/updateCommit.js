@@ -9,6 +9,7 @@ const updateCommit = {
 	commitType: ['order', 'report', 'pos'],
 	db: mongoose.connection.db,
 	isOnlineOrder: false,
+	isMaster: global.APP_CONFIG.isMaster,
 	init: async function (handler) {
 		updateCommit.handler = handler;
 		updateCommit.orderCommitModel = cms.Types['OrderCommit'].Model;
@@ -22,6 +23,15 @@ const updateCommit = {
 					return collection.name === coll;
 				})
 				if (whiteListCollection.length) {
+					const triggerQuery = _.once(function (fromMaster) {
+						if (fromMaster) {
+							const collection = mongoose.connection.db.collection(coll);
+							return collection[method].apply(collection, query);
+						}
+						if (typeof _.last(query) === 'function') {
+							_.last(query)(null, {n: 0, ok: false, mess: 'Master did not response'});
+						}
+					})
 					updateCommit.handler.sendChangeRequest({
 						type: 'pos',
 						action: 'update',
@@ -35,14 +45,17 @@ const updateCommit = {
 							method: method,
 							query: JsonFn.stringify(query)
 						}
-					})
+					}, triggerQuery);
+					setTimeout(() => {
+						triggerQuery(false);
+					}, 30000)
 					// check collection need to be executed on master
 					if (whiteListCollection[0].needMaster) {
 						if (typeof _.last(query) === 'function') {
 							_.last(query)(null, {n: 1, ok: true});
 						}
-						return;
 					}
+					return;
 				}
 			}
 			try {

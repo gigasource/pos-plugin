@@ -6,7 +6,7 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
-const { initSocket, handlerNewMasterId } = require('../master-node');
+const { initSocket, handleNewMasterId } = require('../master-node');
 const { importDemoData } = require('../demo-data/socket-handler');
 const rnBridge = require('../rn-bridge/app-rn-bridge')
 const fs = require('fs')
@@ -486,7 +486,7 @@ module.exports = async cms => {
       cms.socket.emit('getMasterDevice', masterClientId)
       if (ack) ack();
       //await cms.execPostAsync('load:syncDbHook'); //todo uncomment
-      await handlerNewMasterId(socket);
+      await handleNewMasterId(socket);
     })
 
     socket.on('updateProducts', async (data) => {

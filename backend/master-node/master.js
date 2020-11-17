@@ -32,11 +32,12 @@ class Master {
 	constructor(cms) {
 		console.log('Starting master');
 		this.cms = cms;
-		this.onlineOrderSocket = null;
-		this.socket = null;
+		this.onlineOrderSocket = {};
+		this.socket = {};
 		this.storeId = null;
 		this.highestCommitId = 0;
 		this.connection = {};
+		updateCommit.isMaster = true;
 
 		// p2p socket
 		cms.post('load:masterSocket', () => {
@@ -160,7 +161,8 @@ class Master {
 		}
 	}
 
-	async sendChangeRequest(commit) {
+	async sendChangeRequest(commit, ack) {
+		ack();
 		commit.storeId = await this.getStoreId();
 		updateCommit.handleCommit([commit]);
 	}
