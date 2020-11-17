@@ -29,8 +29,30 @@
         <pos-order-keyboard v-if="showCalculator" :keyboard-config="keyboardConfig" :mode="editable ? 'edit' : 'active'" @edit:keyboard="opendDialogEdit($event)"/>
       </div>
     </div>
-    <g-overlay :value="displayOverlay" absolute opacity="0.25" color="rgb(150, 150, 150)">
-      <g-icon size="120">{{actionMode === 'print' ? 'icon-print' : 'icon-wallet'}}</g-icon>
+    <g-overlay :value="displayOverlay" absolute opacity="0.7" color="rgba(107, 111, 130)">
+      <template v-if="actionMode === 'print'">
+        <div class="py-3 px-5 bg-white col-flex align-items-center br-2">
+          <g-btn-bs background-color="#0EA76F" border-color="#f0f0f0" width="100">
+            <g-icon>icon-print</g-icon>
+          </g-btn-bs>
+          <p class="ta-center mt-3">Click <b>Print</b> buttons on the</p>
+          <p class="ta-center mb-3"><b>top right corner</b> again to continue</p>
+        </div>
+      </template>
+      <template v-else>
+        <div class="py-3 px-5 bg-white col-flex align-items-center br-2">
+          <div class="row-flex align-items-center mb-3">
+            <g-btn-bs background-color="#FFCB3A" border-color="#f0f0f0" width="100">
+              <g-icon>icon-split_check_2</g-icon>
+            </g-btn-bs>
+            <g-btn-bs background-color="#E91E63" border-color="#f0f0f0" width="100">
+              <g-icon>icon-wallet</g-icon>
+            </g-btn-bs>
+          </div>
+          <p class="ta-center">Click <b>Split</b> or <b>Pay</b> buttons on the</p>
+          <p class="ta-center mb-3"><b>top right corner</b> again to continue</p>
+        </div>
+      </template>
     </g-overlay>
     <dialog-text-filter v-model="dialog.value" @submit="changeKeyboardExtension($event)"/>
     <dialog-choose-popup-modifier v-model="popupModifierDialog.value" :product="popupModifierDialog.product" @save="addProductWithModifier"/>
@@ -587,9 +609,5 @@
         overflow: hidden;
       }
     }
-  }
-
-  .overlay ::v-deep .overlay-scrim {
-    backdrop-filter: blur(5px);
   }
 </style>

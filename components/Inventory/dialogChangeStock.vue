@@ -1,7 +1,7 @@
 <template>
   <g-dialog v-model="internalValue">
     <div class="dialog">
-      <div class="dialog-title">{{$t('inventory.useRemoveStock')}}</div>
+      <div class="dialog-title">{{$t('inventory.addRemoveStock')}}</div>
       <g-icon size="16" class="dialog-icon--close" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
         <p><b>{{$t('inventory.item')}}: </b> {{name}}</p>
@@ -84,16 +84,19 @@
         return rules
       }
     },
+    created() {
+      this.enterHandler = this.handleEnter.bind(this)
+    },
     watch: {
       internalValue(val) {
         if(val) {
-          if(this.$refs && this.$refs.textfield) {
-            this.$refs.textfield.$refs.input.click()
-          } else {
-            setTimeout(() => {
-              this.$refs.textfield.$refs.input.click()
-            }, 200)
-          }
+          this.mode = 'add'
+          setTimeout(() => {
+              this.$refs.textfield.$refs.input.focus()
+          }, 200)
+          window.addEventListener('keydown', this.enterHandler, false)
+        } else {
+          window.removeEventListener('keydown', this.enterHandler, false)
         }
       }
     },
@@ -110,8 +113,14 @@
           reason: this.reason
         })
         this.internalValue = false
+      },
+      handleEnter(event) {
+        event.stopPropagation()
+        if(event.key === 'Enter') {
+          this.submit()
+        }
       }
-    }
+    },
   }
 </script>
 

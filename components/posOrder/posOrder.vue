@@ -2,7 +2,7 @@
   <div class="order-detail" :style="getStyle()">
     <div class="order-detail__header">
       <g-spacer style="flex: 4 0 0" v-if="isMobile && showSplitBtn && actionMode === 'pay'"/>
-      <g-btn-bs v-show="isMobile && showSplitBtn && actionMode === 'pay'" background-color="#FFF59D" border-color="#f0f0f0" width="75"
+      <g-btn-bs v-show="isMobile && showSplitBtn && actionMode === 'pay'" background-color="#FFCB3A" border-color="#f0f0f0" width="75"
                   style="transition-delay: 0.6s; padding: 4px" @click="splitOrder">
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>
@@ -66,7 +66,7 @@
               </div>
             </transition>
             <transition name="back">
-              <div v-if="actionMode === 'print'" class="animation-wrapper bg-light-green-accent-2">
+              <div v-if="actionMode === 'print'" class="animation-wrapper" style="background-color: #0EA76F">
                 <g-icon>icon-print</g-icon>
               </div>
             </transition>
@@ -85,17 +85,17 @@
               </div>
             </transition>
             <transition name="back">
-              <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink-accent-2">
+              <div v-if="actionMode === 'pay'" class="animation-wrapper bg-pink">
                 <g-icon>icon-wallet</g-icon>
               </div>
             </transition>
           </g-btn-bs>
         </template>
         <template v-else>
-          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrder">
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrderToggle">
             <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
           </g-btn-bs>
-          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="pay">
+          <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="payToggle">
             <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
           </g-btn-bs>
         </template>
@@ -225,7 +225,6 @@
         showSplitBtn: true,
         smallSidebar: true,
         onlyCheckoutPrintedItems: true,
-        changedAvatar: false
       }
     },
     computed: {
@@ -233,7 +232,6 @@
         return this.user ? this.user.name : ''
       },
       avatar() {
-        if(this.changedAvatar) return '/plugins/pos-plugin/assets/image/menu.svg'
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
@@ -513,12 +511,6 @@
           this.$set(this, 'showSplitBtn', showSplitBtn)
           this.$set(this, 'smallSidebar', smallSidebar)
         }
-
-        if(this.isMobile) {
-          setTimeout(() => {
-            this.changedAvatar = true
-          }, 3000)
-        }
       },
       showVoucherDialog() {
         this.$getService('PosOrderVoucherDialog:setActive')(true)
@@ -560,9 +552,6 @@
 
       this.loadSetting()
 
-    },
-    deactivated() {
-      this.changedAvatar = false
     },
     watch: {
       items(val) {
@@ -781,7 +770,6 @@
       &-enter, &-leave-to {
         opacity: 0;
       }
-
     }
   }
 

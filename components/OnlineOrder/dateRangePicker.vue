@@ -191,7 +191,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100%;
+      height: 30px;
       border-left: 1px solid #E0E0E0;
       border-right: 1px solid #E0E0E0;
       padding-left: 12px;

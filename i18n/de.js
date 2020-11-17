@@ -372,7 +372,7 @@ module.exports = {
       createVoucher: 'Gutschein erstellen',
       redeemVoucher: 'Gutschein einlösen',
       voucherValue: 'Gutscheinwert',
-      viewReceipt: 'Quittung anzeigen',
+      viewReceipt: 'Rechnung',
 
       menuEdit: {
         categoriesNo: 'Anzahl der Kategorien',
