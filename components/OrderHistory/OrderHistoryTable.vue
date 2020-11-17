@@ -69,7 +69,10 @@
         <td class="ta-left">{{order.table || ''}}</td>
         <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
         <td class="ta-center">
-          <img alt v-if="getOrderPayment(order).icon" :src="getOrderPayment(order).icon" style="height: 16px;" class="mr-2"/>
+          <template v-if="getOrderPayment(order).icon">
+            <g-icon v-if="getOrderPayment(order).multi" size="24" class="mr-2">{{getOrderPayment(order).icon}}</g-icon>
+            <img alt v-else :src="getOrderPayment(order).icon" style="width: 24px;" class="mr-2"/>
+          </template>
         </td>
         <td>
           <p class="staff-name">{{getStaffName(order.staff)}}</p>
@@ -182,6 +185,11 @@
         await this.getTotalOrders()
       },
       getOrderPayment({ payment }) {
+        const payments = payment.filter(i => i.type === 'card' || i.type === 'cash')
+        if (payments.length > 1) {
+          return { icon: 'icon-multi_payment', multi: true }
+        }
+
         const { value, type } = payment[0];
         let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
         return Object.assign(paymentMethod || {}, { value, type })
