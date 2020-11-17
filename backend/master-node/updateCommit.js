@@ -27,11 +27,20 @@ const updateCommit = {
 					return collection.name === coll;
 				})
 				if (whiteListCollection.length) {
+					const triggerQuery = _.once(function (fromMaster) {
+						if (fromMaster) {
+							const collection = mongoose.connection.db.collection(coll);
+							return collection[method].apply(collection, query);
+						}
+						if (typeof _.last(query) === 'function') {
+							_.last(query)(null, {n: 0, ok: false, mess: 'Master did not response'});
+						}
+					})
 					updateCommit.handler.sendChangeRequest({
 						type: 'pos',
 						action: 'update',
 						temp: false,
-						groupTempId: ObjectID().toString(),
+						groupTempId: mongoose.Types.ObjectId().toString(),
 						data: {
 							collection: coll,
 							hardwareID: (whiteListCollection[0].needMaster ? null : global.APP_CONFIG.hardwareID)
@@ -40,16 +49,17 @@ const updateCommit = {
 							method: method,
 							query: JsonFn.stringify(query)
 						}
-					})
+					}, triggerQuery);
+					setTimeout(() => {
+						triggerQuery(false);
+					}, 30000)
 					// check collection need to be executed on master
 					if (whiteListCollection[0].needMaster) {
-						/*if (typeof _.last(query) === 'function') {
+						if (typeof _.last(query) === 'function') {
 							_.last(query)(null, {n: 1, ok: true});
-						}*/
-						returnResult.ok = 1;
-						returnResult.value = null;
-						return;
+						}
 					}
+					return;
 				}
 			}
 			return;
