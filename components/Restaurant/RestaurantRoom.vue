@@ -77,7 +77,7 @@
       },
       user: {
         handler(val) {
-          if (val) {
+          if (val && this.activeOrders) {
             this.userTables = this.activeOrders.filter(order => order.user && order.user.some(u => u.name === val.name)).map(order => order.table)
           }
         },

@@ -922,4 +922,18 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-cutleries2 {
+  background-image: url("../assets/cutleries2.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-money-bag {
+  background-image: url("../assets/money-bag.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 

@@ -6,14 +6,15 @@
       </div>
       <g-spacer/>
       <div class="online-order-list__info">
-        <p>
-          <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.orders')}}:</span>
+        <div class="row-flex align-items-center">
+          <g-icon class="ml-3 mr-3" size="20">icon-cutleries2</g-icon>
           <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
-        </p>
-        <p>
-          <span class="text-grey-darken-1 fs-small mr-1">{{$t('onlineOrder.total')}}:</span>
-          <span class="fw-700 fs-large">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
-        </p>
+        </div>
+        <div style="width: 1px; height: 100%; background-color: #e0e0e0" class="mr-3"/>
+        <div class="row-flex align-items-center">
+          <g-icon class="mr-3" size="20">icon-money-bag</g-icon>
+          <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
+        </div>
       </div>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
     </div>
@@ -242,6 +243,10 @@
       display: flex;
       align-items: center;
       margin-right: 16px;
+      background-color: #fff;
+      height: 32px;
+      border: 1px solid #E0E0E0;
+      border-radius: 4px;
     }
 
     &__table {
