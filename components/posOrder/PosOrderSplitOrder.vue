@@ -11,11 +11,11 @@
             </g-btn-bs>
             <g-spacer v-if="splitOrders.length"/>
             <div v-if="splitOrders.length">
-              <div style="font-weight: 700; font-size: 15px">Split</div>
-              <div style="font-weight: 600; font-size: 18px; color: #ff4452">{{splitOrders.length}}</div>
+              <span style="font-weight: 700; font-size: 15px">Split: </span>
+              <span style="font-weight: 600; color: #ff4452">{{splitOrders.length}}</span>
             </div>
             <g-spacer/>
-            <div style="font-weight: 600; font-size: 18px; color: #ff4452">
+            <div style="font-weight: 600; color: #ff4452">
               {{$t('common.currency', storeLocale)}} {{ totalCurrent | convertMoney }}
             </div>
           </div>
@@ -346,7 +346,7 @@
 <style scoped lang="scss">
   .splitter {
     background: #fff;
-    flex-basis: 30%;
+    flex-basis: 40%;
     padding-top: 8px;
     display: flex;
     flex-direction: column;

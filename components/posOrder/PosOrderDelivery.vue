@@ -387,8 +387,9 @@
       this.debouceUpdatePrice = _.debounce(this.updatePrice, 300)
       const setting = await cms.getModel('PosSetting').findOne()
       this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
+      this.keyboardEventHandler = this.keyboardHanle.bind(this)
       if(this.deliveryOrderMode === 'tablet') {
-        window.addEventListener('keydown', this.keyboardHanle.bind(this))
+        window.addEventListener('keydown', this.keyboardEventHandler, false)
       }
     },
     computed: {
@@ -631,8 +632,17 @@
         }
         if (event.key === 'Enter') {
           if (this.enterPressed === 0) {
-            const tf = document.querySelector('.quantity input')
-            tf && tf.focus()
+            const autocomplete = this.$refs && this.$refs.autocomplete
+            if(autocomplete && !this.selectedProduct) {
+              const list = autocomplete.renderList
+              if(list.length === 1) {
+                this.selectedProduct = list[0]
+              }
+            }
+            setTimeout(() => {
+              const tf = document.querySelector('.quantity input')
+              tf && tf.focus()
+            }, 200)
             this.enterPressed++
             return
           }
@@ -798,9 +808,14 @@
       const setting = (await cms.getModel('PosSetting').findOne())
       this.deliveryOrderMode = setting['generalSetting'].deliveryOrderMode || 'tablet'
       if(this.deliveryOrderMode === 'tablet') {
-        window.addEventListener('keydown', this.keyboardHanle.bind(this))
+        window.addEventListener('keydown', this.keyboardEventHandler, false)
       }
     },
+    deactivated() {
+      if(this.deliveryOrderMode === 'tablet') {
+        window.removeEventListener('keydown', this.keyboardEventHandler, false)
+      }
+    }
   }
 </script>
 

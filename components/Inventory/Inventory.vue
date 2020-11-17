@@ -107,7 +107,7 @@
       <template #input>
         <div class="row-flex flex-wrap justify-around" :key="dialog.inventory">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name" required/>
-          <pos-textfield-new :readonly="dialog.mode === 'edit'"
+          <pos-textfield-new :disabled="dialog.mode === 'edit'"
                              :rules="[val => !isNaN(val) || 'Must be a number!']" style="width: 48%" :label="$t('inventory.stock')" v-model="stock" required/>
           <g-select menu-class="menu-select-inventory" outlined style="width: 48%" :label="$t('article.category')"
                     :items="inventoryCategories" item-text="name" item-value="_id" v-model="category" required/>

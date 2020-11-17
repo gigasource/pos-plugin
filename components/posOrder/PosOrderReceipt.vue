@@ -54,33 +54,33 @@
                 <template v-slot:activator="{ on }">
                   <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
                 </template>
-                <div class="row-flex pa-2 bg-white align-items-start">
+                <div class="menu-seat-btn">
                   <g-btn-bs icon="icon-printer" class="elevation-2" @click.stop="print(split)">
                     Print
                   </g-btn-bs>
                   <g-btn-bs class="elevation-2">
                     Bewirtung
                   </g-btn-bs>
-                  <div>
-                    <g-btn-bs width="90" block icon="icon-credit_card"
+                  <div class="menu-seat-btn--payment">
+                    <g-btn-bs width="90" icon="icon-credit_card"
                               :background-color="getPaymentColor(split.payment, 'card')"
                               class="elevation-2" @click.stop="savePayment(split, 'card')">
                       Card
                     </g-btn-bs>
-                    <g-btn-bs width="90" block icon="icon-cash"
+                    <g-btn-bs width="90" icon="icon-cash"
                               :background-color="getPaymentColor(split.payment, 'cash')"
-                              class="elevation-2 my-2" @click.stop="savePayment(split, 'cash')">
+                              class="elevation-2" @click.stop="savePayment(split, 'cash')">
                       Cash
                     </g-btn-bs>
-                    <g-btn-bs width="90" block icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
+                    <g-btn-bs width="90" icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
                               class="elevation-2" @click.stop="openMultiDialog(split)">
                       Multi
                     </g-btn-bs>
                   </div>
-                  <g-btn-bs width="90" block icon="icon-email" class="elevation-2">
+                  <g-btn-bs width="90" icon="icon-email" class="elevation-2">
                     Email
                   </g-btn-bs>
-                  <g-btn-bs block icon="icon-coin-box" class="elevation-2" @click.stop="showTipDialog(split)">
+                  <g-btn-bs icon="icon-coin-box" class="elevation-2" @click.stop="showTipDialog(split)">
                     Trinkgeld
                   </g-btn-bs>
                 </div>
@@ -89,7 +89,6 @@
               <g-spacer/>
 
               <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
-                <span v-if="iP > 0"> | </span>
                 <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
                 <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
               </div>
@@ -101,12 +100,12 @@
             </div>
             <div class="receipt-main__item-header">
               <div class="col-1">Q.ty</div>
-              <div class="col-9">Item name</div>
+              <div class="col-9 pl-2">Item name</div>
               <div class="col-2 ta-right">Total</div>
             </div>
             <div class="receipt-main__item-row" v-for="(item, j) in split.items" :key="`item_${i}_${j}`">
               <div class="col-1">{{item.quantity}}</div>
-              <div class="col-9">
+              <div class="col-9 pl-2">
                 <div>{{item.name}}</div>
                 <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
                   {{formatModifiers(item)}}
@@ -462,6 +461,48 @@
   .g-btn-bs {
     font-size: 14px;
     background-color: white;
+  }
+
+  .menu-seat-btn {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px;
+    background-color: white;
+
+    &--payment {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  @media screen and (max-height: 599px) {
+    .g-toolbar {
+      .g-btn-bs {
+        width: auto !important;
+        font-size: 0;
+
+        ::v-deep .g-icon {
+          margin-right: 0 !important;
+        }
+      }
+    }
+
+    .receipt-main__item-header {
+      font-size: 14px;
+    }
+
+    .menu-seat-btn {
+      flex-direction: column;
+
+      .g-btn-bs {
+        margin-bottom: 8px;
+        margin-left: 0;
+      }
+
+      &--payment {
+        flex-direction: row;
+      }
+    }
   }
 </style>
 

@@ -26,7 +26,7 @@
         <th></th>
       </tr>
       </thead>
-      <tr v-for="(inventory, i) in items" :key="i">
+      <tr v-for="(inventory, i) in items" :key="i" :class="selectedItem && selectedItem._id === inventory._id && 'row--selected'">
         <td @click="openDialogAdd(inventory)">{{inventory.id}}</td>
         <td @click="openDialogAdd(inventory)">{{inventory.name}}</td>
         <td @click="openDialogAdd(inventory)">{{inventory.category.name}}</td>
@@ -132,10 +132,13 @@
       this.selectedItem = null
       document.addEventListener('click', e => {
         const target = e.target
-        if(!target.classList.contains('key') && !target.parentElement.classList.contains('key') && !target.classList.contains('g-icon') && target.tagName !== 'INPUT') {
+        if( !target.classList.contains('key') && (!target.parentElement || !target.parentElement.classList.contains('key'))
+            && !target.classList.contains('g-icon') && target.tagName !== 'INPUT') {
           this.showKeyboard = false
         }
       })
+      this.keyboardHandler = this.keyboardHandle.bind(this)
+      window.addEventListener('keydown', this.keyboardHandler, false)
     },
     async activated() {
       const inventories = await cms.getModel('Inventory').find();
@@ -147,6 +150,10 @@
       }))
       this.items = []
       this.selectedItem = null
+      window.addEventListener('keydown', this.keyboardHandler, false)
+    },
+    deactivated() {
+      window.removeEventListener('keydown', this.keyboardHandler, false)
     },
     computed: {},
     methods: {
@@ -186,21 +193,25 @@
           this.stock = _.cloneDeep(+item.stock)
           this.added = _.cloneDeep(+item.added)
         }
+        this.selectedItem = item
         this.dialog.add = true
       },
       updateStock({change}) {
         const item = this.inventories.find(item => item._id === this.itemId)
         const index = this.items.findIndex(i => i._id === item._id)
-        if (index === -1)
+        if (index === -1) {
           this.items.push({
             ...item,
             added: +change
           })
-        else
+          this.selectedItem = _.last(this.items)
+        } else {
           this.items.splice(index, 1, {
             ...item,
             added: +change
           })
+          this.selectedItem = this.items[index]
+        }
       },
       chooseItem(_id) {
         const item = this.inventories.find(item => item._id === _id)
@@ -247,6 +258,44 @@
         }
         this.back()
       },
+      keyboardHandle(event) {
+        event.stopPropagation()
+        if(event.key === 'Tab' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+          event.preventDefault()
+          if(this.items.length > 0) {
+            if(!this.selectedItem) {
+              this.selectedItem = this.items[0]
+            } else {
+              const index = this.items.findIndex(i => i._id === this.selectedItem._id)
+              if(index === this.items.length - 1) {
+                this.selectedItem = this.items[0]
+              } else {
+                this.selectedItem = this.items[index + 1]
+              }
+            }
+          }
+        }
+        if(event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+          event.preventDefault()
+          if(this.items.length > 0) {
+            if(!this.selectedItem) {
+              this.selectedItem = _.last(this.items)
+            } else {
+              const index = this.items.findIndex(i => i._id === this.selectedItem._id)
+              if(index === 0) {
+                this.selectedItem = _.last(this.items)
+              } else {
+                this.selectedItem = this.items[index - 1]
+              }
+            }
+          }
+        }
+        if(event.key === 'Enter') {
+          if(this.selectedItem) {
+            this.openDialogAdd(this.selectedItem)
+          }
+        }
+      }
     }
   }
 </script>
@@ -344,6 +393,21 @@
         td:nth-child(7),
         th:nth-child(7) {
           width: 5%;
+        }
+
+        &.row--selected {
+          td {
+            border-top: 2px solid #1271FF;
+            border-bottom: 2px solid #1271FF;
+          }
+
+          td:first-child {
+            border-left: 2px solid #1271FF;
+          }
+
+          td:last-child {
+            border-right: 2px solid #1271FF;
+          }
         }
       }
     }

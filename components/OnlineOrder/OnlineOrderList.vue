@@ -7,13 +7,12 @@
       <g-spacer/>
       <div class="online-order-list__info">
         <div class="row-flex align-items-center">
-          <g-icon class="ml-3 mr-3" size="20">icon-cutleries2</g-icon>
-          <span class="fw-700 fs-large mr-3">{{ totalOrder }}</span>
+          <g-icon class="mr-2" size="20">icon-cutleries2</g-icon>
+          <span class="fw-700">{{ totalOrder }}</span>
         </div>
-        <div style="width: 1px; height: 100%; background-color: #e0e0e0" class="mr-3"/>
         <div class="row-flex align-items-center">
-          <g-icon class="mr-3" size="20">icon-money-bag</g-icon>
-          <span class="fw-700 fs-large mr-3">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
+          <g-icon class="mr-2" size="20">icon-money-bag</g-icon>
+          <span class="fw-700">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
         </div>
       </div>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
@@ -244,9 +243,16 @@
       align-items: center;
       margin-right: 16px;
       background-color: #fff;
-      height: 32px;
       border: 1px solid #E0E0E0;
       border-radius: 4px;
+
+      & > div:first-child {
+        border-right: 1px solid #E0E0E0;
+      }
+
+      div {
+        padding: 5px 8px;
+      }
     }
 
     &__table {
@@ -255,8 +261,8 @@
 
       .g-table {
         th, td {
-          height: 69px;
-          padding: 8px 4px 0;
+          height: auto;
+          padding: 8px 4px;
           vertical-align: top;
           font-size: 14px;
           word-break: break-word;
@@ -318,9 +324,6 @@
 
   @media screen and (max-width: 1023px) {
     .online-order-list {
-      &__info {
-        display: block;
-      }
 
       &__table {
         .g-table td {

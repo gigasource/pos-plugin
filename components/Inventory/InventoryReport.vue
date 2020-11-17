@@ -191,7 +191,7 @@
       },
       async loadData() {
         const filter = {
-          category: this.selectedCategory._id ? this.selectedCategory._id : null,
+          category: typeof this.selectedCategory === 'object' ? this.selectedCategory._id : null,
           date: this.dateFilter
         }
         this.inventories = await this.loadInventoriesWithChange(filter)
