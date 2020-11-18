@@ -1,11 +1,10 @@
 <template>
   <g-dialog v-model="dialogSelectAvatar" overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager>
-    <div class="dialog-select-avatar">
-      <div class="header">
+    <g-card>
+      <g-card-title style="font-size: 16px; padding-bottom: 0">
         <span>{{$t('settings.selectAvatar')}}</span>
-        <g-icon svg size="20" @click="dialogSelectAvatar = false">icon-close</g-icon>
-      </div>
-      <div class="content">
+      </g-card-title>
+      <g-card-text class="content">
         <g-item-group :items="listAvatars" v-model="selectedAvatar">
           <template v-slot:item="{item, toggle, active}">
             <g-badge v-model="active" overlay>
@@ -18,12 +17,13 @@
             </g-badge>
           </template>
         </g-item-group>
-      </div>
-      <div class="action">
+      </g-card-text>
+      <g-card-actions>
+        <g-spacer/>
         <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogSelectAvatar = false">{{$t('ui.cancel')}}</g-btn>
         <g-btn :uppercase="false" flat background-color="blue accent 3" text-color="white" width="120" @click="submit">{{$t('ui.ok')}}</g-btn>
-      </div>
-    </div>
+      </g-card-actions>
+    </g-card>
   </g-dialog>
 </template>
 
@@ -83,48 +83,31 @@
 </script>
 
 <style scoped lang="scss">
-  .dialog-select-avatar {
-    width: 100%;
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
+  .content {
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-      font-size: 16px;
-      line-height: 20px;
-      color: #1D1D26;
-      margin-bottom: 32px;
+    .g-item-group {
+      flex-wrap: wrap !important;
     }
 
-    .content {
+    ::v-deep .g-avatar {
+      box-sizing: content-box;
+      border: 2px solid transparent;
 
-      .g-item-group {
-        flex-wrap: wrap !important;
+      &.avatar__selected {
+        border: 2px solid #1271ff;
       }
-
-      ::v-deep .g-avatar {
-        box-sizing: content-box;
-        border: 2px solid transparent;
-
-        &.avatar__selected {
-          border: 2px solid #1271ff;
-        }
-      }
-
-      ::v-deep .g-badge {
-        transform: translate(-65%, 65%) !important;
-        padding: 0 !important;
-      }
-
     }
 
-    .action {
-      margin-top: 32px;
-      display: flex;
-      justify-content: flex-end;
+    ::v-deep .g-badge {
+      transform: translate(-65%, 65%) !important;
+      padding: 0 !important;
     }
+
+  }
+
+  .action {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
   }
 </style>
