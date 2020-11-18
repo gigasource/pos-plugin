@@ -1,0 +1,386 @@
+{
+  "events": [],
+  "_id": "5fa92196939c7d07784e2d77",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "order",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(136, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "50%",
+              "50%"
+            ],
+            "rows": [
+              "100%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "table",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(223, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "main-retail",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(338, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": "",
+                "alignItems": "",
+                "alignContent": "",
+                "justifyItems": "",
+                "justifyContent": "",
+                "columns": [
+                  "50%",
+                  "50%"
+                ],
+                "rows": [
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "1fr",
+                  "1fr"
+                ],
+                "columnGap": 0,
+                "rowGap": 0,
+                "subAreas": [
+                  {
+                    "name": "info",
+                    "top": 1,
+                    "left": 1,
+                    "width": 2,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(56, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "report",
+                    "top": 2,
+                    "left": 1,
+                    "width": 2,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(109, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "action",
+                    "top": 3,
+                    "left": 1,
+                    "width": 2,
+                    "height": 1,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(117, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "keyboard",
+                    "top": 4,
+                    "left": 1,
+                    "width": 1,
+                    "height": 3,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(147, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  },
+                  {
+                    "name": "buttons",
+                    "top": 4,
+                    "left": 2,
+                    "width": 1,
+                    "height": 3,
+                    "margin": "",
+                    "padding": "",
+                    "bgColor": "hsl(324, 100%, 50%, 50%)",
+                    "alignSelf": "",
+                    "justifySelf": "",
+                    "wrapInDiv": false,
+                    "displayFlex": false,
+                    "flexDirection": "row",
+                    "flexWrap": false,
+                    "flexJustifyContent": "",
+                    "flexAlignItems": "",
+                    "flexAlignContent": "",
+                    "flexOrder": "",
+                    "flexGrow": "",
+                    "flexShrink": "",
+                    "flexBasis": "",
+                    "flexAlignSelf": ""
+                  }
+                ]
+              }
+            ]
+          },
+          "displayPreviewColor": false,
+          "style": {
+            "height": "100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "slot": null,
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosOrderScreenNumberKeyboard",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "keyboard",
+          "url": "plugins/pos-plugin/components/Order/PosOrderScreenNumberKeyboard.vue",
+          "path": "components/Order/PosOrderScreenNumberKeyboard.vue",
+          "pluginName": "pos-plugin"
+        },
+        {
+          "choice": "view",
+          "component": "PosOrderScreenButtonGroup",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "buttons"
+        },
+        {
+          "choice": "view",
+          "component": "PosOrderScreenTable",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "table"
+        },
+        {
+          "choice": "view",
+          "component": "PosRetailMobileInfo",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "info"
+        },
+        {
+          "choice": "view",
+          "component": "PosOrderScreenAction",
+          "binding": [],
+          "slotScopeBinding": [],
+          "items": [],
+          "slot": "action"
+        },
+        {
+          "choice": "view",
+          "component": "PosOrderScreenReport",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "report"
+        }
+      ]
+    },
+    {
+      "choice": "view",
+      "component": "dialogSavedList",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogSavedList",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/Order/components/dialogSavedList.vue",
+      "path": "components/Order/components/dialogSavedList.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogProductSearchResult",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogProductSearchResult",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/Order/components/dialogProductSearchResult.vue",
+      "path": "components/Order/components/dialogProductSearchResult.vue",
+      "pluginName": "pos-plugin"
+    },
+    {
+      "choice": "view",
+      "component": "dialogChangeValue",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogChangePrice",
+        "binding": [
+          {
+            "type": "method",
+            "serviceName": "open"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/pos-shared-components/dialogChangeValue.vue",
+      "path": "components/pos-shared-components/dialogChangeValue.vue",
+      "pluginName": "pos-plugin",
+      "content": {
+        "props": {
+          "newValueEditable": true
+        },
+        "events": {
+          "submit": {
+            "_code_": "module.exports = function(val) {\n  this.$getService('PosStore:updateNewPrice')(val);\n}",
+            "_code_type_": "commonJs"
+          }
+        }
+      }
+    },
+    {
+      "choice": "view",
+      "component": "dialogProductLookup",
+      "binding": [],
+      "slotScopeBinding": [],
+      "provide": {
+        "domain": "dialogProductLookup",
+        "binding": [
+          {
+            "type": "v-model",
+            "serviceName": "active"
+          }
+        ]
+      },
+      "url": "plugins/pos-plugin/components/Order/components/dialogProductLookup.vue",
+      "path": "components/Order/components/dialogProductLookup.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posOrderRetailMobile",
+  "props": {
+    "fields": []
+  },
+  "renderInAdminPage": true,
+  "renderToRoute": "pos-order-retail-2"
+}
