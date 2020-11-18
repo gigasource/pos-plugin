@@ -603,6 +603,11 @@
         font-size: 13px;
         flex-grow: 1;
         line-height: 16px;
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
       }
 
       &-title {
