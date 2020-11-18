@@ -231,6 +231,7 @@
       width: String,
       template: String,
       items: Array,
+      gap: String
     },
     created() {
       this.internalLocale = this.locale || 'en'
@@ -290,12 +291,19 @@
         }
       },
       computedStyles() {
-        if(this.width) return { width: this.width }
+        const styles = {}
+
         if (this.computedType === 'numeric') {
-          return { width: '50%'}
+          Object.assign(styles, { width: '50%'})
         } else {
-          return { width: '100%'}
+          Object.assign(styles, { width: '100%'})
         }
+
+        if (this.width) Object.assign(styles, { width: this.width })
+
+        if (this.gap) Object.assign(styles, { gap: this.gap })
+
+        return styles
       }
     },
     methods: {
