@@ -2,13 +2,13 @@
   <div class="order-detail">
     <div class="order-detail__header">
       <g-avatar size="36">
-        <img src="../../assets/customer_ava.svg">
+        <img :src="avatar" alt="">
       </g-avatar>
       <div class="ml-2">
         <span class="order-detail__header-username">{{username}}</span>
-        <div>
-          <span class="order-detail__header-title" v-if="table">{{$t('restaurant.table')}}</span>
-          <span class="order-detail__header-value" v-if="table">{{table}}</span>
+        <div v-if="table">
+          <span class="order-detail__header-title">{{$t('restaurant.table')}}</span>
+          <span class="order-detail__header-value">{{table}}</span>
         </div>
       </div>
       <g-spacer/>
@@ -47,7 +47,8 @@
     props: {
       compactOrder: Function,
       total: 0,
-      currentOrder: null
+      currentOrder: null,
+      user: null
     },
     filters: {
       convertMoney(value) {
@@ -61,6 +62,9 @@
       }
     },
     computed: {
+      avatar() {
+        return this.user ? this.user.avatar : ''
+      },
       items() {
         return this.currentOrder.items.filter(i => i.quantity)
       },
@@ -92,11 +96,10 @@
     &__header {
       display: flex;
       align-items: center;
-      padding: 8px 0;
 
       &-username {
         font-weight: 700;
-        font-size: 13px;
+        font-size: 11px;
         flex-grow: 1;
       }
 

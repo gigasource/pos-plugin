@@ -19,10 +19,9 @@
                 <template v-if="payment.type === 'card' || payment.type === 'cash'">{{ $t(`payment.${payment.type}`) }}</template>
                 <template v-else>{{payment.type}}</template>
               </span>
-              <div class="ml-2" @click="removePaymentItem(index)"
-                   v-if="payment.type !== 'card' && payment.type !== 'cash'" v-model="payment.value">
-                <g-icon color="#FF4452" size="16">close</g-icon>
-              </div>
+              <g-icon class="ml-2" @click="removePaymentItem(index)"
+                      v-if="payment.type !== 'card' && payment.type !== 'cash'"
+                      color="#FF4452" size="16">close</g-icon>
             </div>
             <div class="value-input w-20">
               <pos-textfield-new

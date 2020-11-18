@@ -355,16 +355,22 @@
       },
     },
     methods: {
-      getPayment({ payment }) {
+      getPayment({ _id, payment }) {
         const { value, type } = payment[0];
-        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
-        return Object.assign(paymentMethod || {}, { value, type })
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type) || {}
+        return {
+          ...paymentMethod,
+          value,
+          type
+        }
       },
       declineOrder(order) {
         this.$emit('declineOrder', order)
+        this.$emit('getPendingOnlineOrderCounter')
       },
       acceptOrder(order) {
         this.$emit('acceptPendingOrder', order)
+        this.$emit('getPendingOnlineOrderCounter')
       },
       completeOrder(order) {
         this.$emit('completeOrder', order)
@@ -413,7 +419,10 @@
             const now = new Date()
             const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
             const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
-            if (diff <= 0) return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+            if (diff <= 0){
+              this.$emit('getPendingOnlineOrderCounter')
+              return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+            }
 
             const x = (timeout - diff) / timeout
             const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))

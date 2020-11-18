@@ -5,7 +5,7 @@
         <g-btn-bs width="120" icon="icon-back" class="elevation-2" @click="back">
           Back
         </g-btn-bs>
-        <g-btn-bs width="120" icon="icon-printer" class="elevation-2" @click.stop="print(null)">
+        <g-btn-bs width="120" icon="icon-print" class="elevation-2" @click.stop="print(null)">
           Print
         </g-btn-bs>
         <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
@@ -55,32 +55,34 @@
                   <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
                 </template>
                 <div class="menu-seat-btn">
-                  <g-btn-bs icon="icon-printer" class="elevation-2" @click.stop="print(split)">
-                    Print
-                  </g-btn-bs>
-                  <g-btn-bs class="elevation-2">
-                    Bewirtung
-                  </g-btn-bs>
                   <div class="menu-seat-btn--payment">
-                    <g-btn-bs width="90" icon="icon-credit_card"
+                    <g-btn-bs width="100" icon="icon-print" class="elevation-2" @click.stop="print(split)">
+                      Print
+                    </g-btn-bs>
+                    <g-btn-bs width="100" class="elevation-2">
+                      Bewirtung
+                    </g-btn-bs>
+                  </div>
+                  <div class="menu-seat-btn--payment">
+                    <g-btn-bs width="100" icon="icon-credit_card"
                               :background-color="getPaymentColor(split.payment, 'card')"
                               class="elevation-2" @click.stop="savePayment(split, 'card')">
                       Card
                     </g-btn-bs>
-                    <g-btn-bs width="90" icon="icon-cash"
+                    <g-btn-bs width="100" icon="icon-cash"
                               :background-color="getPaymentColor(split.payment, 'cash')"
                               class="elevation-2" @click.stop="savePayment(split, 'cash')">
                       Cash
                     </g-btn-bs>
-                    <g-btn-bs width="90" icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
+                    <g-btn-bs width="100" icon="icon-multi_payment" :background-color="getPaymentColor(split.payment, 'multi')"
                               class="elevation-2" @click.stop="openMultiDialog(split)">
                       Multi
                     </g-btn-bs>
                   </div>
-                  <g-btn-bs width="90" icon="icon-email" class="elevation-2">
+                  <g-btn-bs width="100" icon="icon-email" class="elevation-2">
                     Email
                   </g-btn-bs>
-                  <g-btn-bs icon="icon-coin-box" class="elevation-2" @click.stop="showTipDialog(split)">
+                  <g-btn-bs width="100" icon="icon-coin-box" class="elevation-2" @click.stop="showTipDialog(split)">
                     Trinkgeld
                   </g-btn-bs>
                 </div>
@@ -472,6 +474,11 @@
     &--payment {
       display: flex;
       flex-direction: column;
+
+      .g-btn-bs:nth-child(2) {
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
     }
   }
 

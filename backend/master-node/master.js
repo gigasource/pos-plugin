@@ -162,7 +162,7 @@ class Master {
 	}
 
 	async sendChangeRequest(commit, ack) {
-		ack();
+		ack(true);
 		commit.storeId = await this.getStoreId();
 		updateCommit.handleCommit([commit]);
 	}

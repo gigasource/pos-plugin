@@ -355,6 +355,8 @@
             }
           })
         } else if (newUser && !oldUserId) {
+          const defaultAvatar = await cms.getModel('Avatar').findOne({ name: 'man-1' })
+          newUser.avatar = defaultAvatar.image
           await settingModel.findOneAndUpdate({}, {
             $push: {
               user: {...newUser}

@@ -374,6 +374,11 @@
               "service": "OrderStore:paymentTotal",
               "local": "total",
               "type": "prop"
+            },
+            {
+              "service": "PosStore:user",
+              "local": "user",
+              "type": "prop"
             }
           ],
           "url": "plugins/pos-plugin/components/posRestaurantPayment/PosRestaurantPaymentOrderDetail.vue",

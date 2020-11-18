@@ -474,7 +474,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(107, 111, 130, 0.7);
     z-index: 2;
   }
 </style>

@@ -1,80 +1,54 @@
 <template>
-  <g-dialog v-model="internalValue" :width="isMobile ? '100%' : '50%'">
-    <g-card :class="['dialog-multi-payment', 'col-flex', 'pa-3', rotate && 'rotate', isMobile && 'mobile']">
-      <template v-if="isMobile">
-        <div class="pr-3" style="min-width: 45%;">
-          <pos-keyboard-full
-              style="grid-area: 1 / 1 / 5 / 4"
-              :template="keyboardTemplate"
-              :items="keyboardItems"/>
-        </div>
-        <div class="flex-grow-1">
-          <div class="row-flex align-items-center">
-            <span class="fw-700 mb-2" style="font-size: 20px">Multi Payment</span>
-            <g-spacer/>
-            <span class="mr-1">Total:</span>
-            <span class="fw-700" style="font-size: 18px; color: #1271FF">
-              {{$t('common.currency', storeLocale)}} {{total}}
-            </span>
+  <g-dialog v-model="internalValue" width="50%">
+    <g-card :class="['dialog-multi-payment', rotate && 'rotate']">
+      <div class="dialog-multi-payment__header">
+        <span class="dialog-multi-payment__header-title">Multi Payment</span>
+        <g-spacer/>
+        <span class="mr-1">Total:</span>
+        <span class="dialog-multi-payment__header-number">
+          {{$t('common.currency', storeLocale)}} {{total}}
+        </span>
+      </div>
+      <div class="dialog-multi-payment__screen">
+        <template v-for="item in listPayments">
+          <div class="mt-1 mb-2 row-flex align-items-center">
+            <g-btn-bs :background-color="getBackgroundColor(item)" border-radius="2px"
+                      style="border: 1px solid #bdbdbd"
+                      @click="click(`${item.type}-textfield`)">
+              <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
+              <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
+            </g-btn-bs>
+            <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
+                               v-model="cardEditValue" @click.stop="getRemainingValue"/>
+            <pos-textfield-new clearable v-else ref="cash-textfield"
+                               v-model="cashEditValue" @click.stop="getRemainingValue"/>
           </div>
-          <div>
-            <template v-for="item in listPayments">
-              <div class="mt-1 mb-2 row-flex align-items-center">
-                <g-btn-bs :background-color="getBackgroundColor(item)" border-radius="2px"
-                          style="border: 1px solid #bdbdbd"
-                          @click="click(`${item.type}-textfield`)">
-                  <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-                  <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
-                </g-btn-bs>
-                <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
-                                   v-model="cardEditValue" @click.stop="getRemainingValue"/>
-                <pos-textfield-new clearable v-else ref="cash-textfield"
-                                   v-model="cashEditValue" @click.stop="getRemainingValue"/>
-              </div>
-            </template>
-          </div>
-          <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" :disabled="disableConfirmMulti"
-                    @click.stop="submit">
-            Confirm
-          </g-btn-bs>
-        </div>
-      </template>
-      <template v-else>
-        <div class="row-flex align-items-center">
-          <span class="fw-700 mb-2" style="font-size: 20px">Multi Payment</span>
-          <g-spacer/>
-          <span class="mr-1">Total:</span>
-          <span class="fw-700" style="font-size: 18px; color: #1271FF">
-            {{$t('common.currency', storeLocale)}} {{total}}
-          </span>
-        </div>
-        <div>
-          <template v-for="item in listPayments">
-            <div class="mt-1 mb-2 row-flex align-items-center">
-              <g-btn-bs :background-color="getBackgroundColor(item)" border-radius="2px"
-                        style="border: 1px solid #bdbdbd"
-                        @click="click(`${item.type}-textfield`)">
-                <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-                <span class="ml-2" style="text-transform: capitalize">{{ item.type }}</span>
-              </g-btn-bs>
-              <pos-textfield-new clearable v-if="item.type === 'card'" ref="card-textfield"
-                                 v-model="cardEditValue" @click.stop="getRemainingValue"/>
-              <pos-textfield-new clearable v-else ref="cash-textfield"
-                                 v-model="cashEditValue" @click.stop="getRemainingValue"/>
-            </div>
+        </template>
+      </div>
+      <div class="dialog-multi-payment__screen--mobile">
+        <g-text-field clearable ref="card-textfield" outlined :label="$t('payment.cash')" class="mr-1"
+                      v-model="cardEditValue" @click.stop="getRemainingValue">
+          <template v-slot:prepend-inner>
+            <g-icon>icon-cash</g-icon>
           </template>
-        </div>
-        <div class="mb-3 mt-3">
-          <pos-keyboard-full
-              style="grid-area: 1 / 1 / 5 / 4"
-              :template="keyboardTemplate"
-              :items="keyboardItems"/>
-        </div>
-        <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" :disabled="disableConfirmMulti"
-                  @click.stop="submit">
-          Confirm
-        </g-btn-bs>
-      </template>
+        </g-text-field>
+        <g-text-field clearable ref="cash-textfield" outlined :label="$t('payment.card')"
+                           v-model="cashEditValue" @click.stop="getRemainingValue">
+          <template v-slot:prepend-inner>
+            <g-icon>icon-credit_card</g-icon>
+          </template>
+        </g-text-field>
+      </div>
+      <div class="dialog-multi-payment__keyboard">
+        <pos-keyboard-full
+            style="grid-area: 1 / 1 / 5 / 4"
+            :template="keyboardTemplate"
+            :items="keyboardItems"/>
+      </div>
+      <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" :disabled="disableConfirmMulti"
+                @click.stop="submit">
+        Confirm
+      </g-btn-bs>
     </g-card>
   </g-dialog>
 </template>
@@ -89,7 +63,6 @@
       cardValue: [Number, String],
       cashValue: [Number, String],
       rotate: Boolean,
-      isMobile: Boolean,
     },
     data() {
       return {
@@ -196,11 +169,6 @@
     padding-bottom: 16px;
   }
 
-  .mobile {
-    display: flex;
-    flex-direction: row;
-  }
-
   .g-btn-bs {
     margin: 0;
     flex-basis: 40%;
@@ -223,11 +191,96 @@
     }
   }
 
+  .dialog-multi-payment {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+
+    &__header {
+      display: flex;
+      align-items: center;
+
+      &-title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      &-number {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1271FF;
+      }
+    }
+
+    &__screen {
+      display: block;
+
+      &--mobile {
+         display: none;
+      }
+    }
+
+    &__keyboard {
+      margin: 16px 0;
+    }
+  }
+
   .rotate {
     width: 400px;
     height: 580px !important;
     transform: rotate(-90deg) translateX(-100%);
     transform-origin: left top;
+  }
+
+  @media screen and (max-height: 599px) {
+    .dialog-multi-payment {
+      padding: 8px;
+
+      &__header {
+        font-size: 14px;
+
+        &-title {
+          font-size: 16px;
+        }
+
+        &-number {
+          font-size: 14px;
+        }
+      }
+
+      &__screen {
+        display: none;
+
+        &--mobile {
+          display: flex;
+
+          .g-tf-wrapper {
+            margin-top: 8px;
+
+            ::v-deep fieldset {
+              border-color: #ced4da;
+            }
+
+            &.g-tf__focused ::v-deep fieldset {
+              border-color: #1867c0;
+            }
+          }
+        }
+      }
+
+      &__keyboard {
+        margin: 8px 0;
+
+        ::v-deep .keyboard__template {
+          grid-gap: 5px !important;
+
+          .key {
+            font-size: 16px;
+            padding: 8px;
+          }
+        }
+      }
+    }
   }
 </style>
 

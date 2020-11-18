@@ -22,7 +22,7 @@
           </template>
         </g-text-field-bs>
 
-        <div>{{$t('article.price')}}</div>
+        <div>{{$t('article.price')}} <span style="color: #FF4452">*</span></div>
         <g-text-field-bs :value="selectedProduct.price" @input="$set(selectedProduct, 'price', $event);debouncedUpdateProduct('price', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('price')">icon-keyboard</g-icon>

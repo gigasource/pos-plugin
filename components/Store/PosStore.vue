@@ -51,6 +51,7 @@
         isIOS: false,
         showVirtualReportInSidebar: false,
         showLoadingOverlay: false,
+        pendingOnlineOrderCounter: 0
       }
     },
     computed: {
@@ -87,7 +88,8 @@
                     name: 'Dashboard'
                   })
                 },
-                title: this.$t('onlineOrder.dashboard')
+                title: this.$t('onlineOrder.dashboard'),
+                key: 'Orders'
               },
               {
                 icon: 'radio_button_unchecked',
@@ -195,6 +197,20 @@
               return {
                 ...item,
                 ...this.pendingReservationsLength && { badge: this.pendingReservationsLength + '', badgeColor: '#FF5252' }
+              }
+            case 'Dashboard':
+              const items = item.items.map(i => {
+                if(i.key === 'Orders') {
+                  return {
+                    ...i,
+                    ...this.pendingOnlineOrderCounter && { badge: this.pendingOnlineOrderCounter + '', badgeColor: '#FF5252' }
+                  }
+                }
+                return i
+              })
+              return {
+                ...item,
+                items
               }
             default:
               return item;
@@ -335,6 +351,10 @@
               break;
           }
         })
+
+        cms.socket.on('updateOnlineOrderCounter', async () => {
+          await this.getPendingOnlineOrderCounter()
+        })
       },
       setMasterDevice() {
         cms.socket.emit('setMasterDevice')
@@ -442,6 +462,13 @@
           });
         }
         return []
+      },
+      async getPendingOnlineOrderCounter() {
+        this.pendingOnlineOrderCounter = await cms.getModel('Order').countDocuments({
+          status: 'inProgress',
+          online: true
+        })
+        console.log('counters', this.pendingOnlineOrderCounter)
       }
     },
     async created() {
@@ -499,6 +526,7 @@
       await this.setupReservationBell()
       await this.getRooms()
       cms.socket.on('updateRooms', this.getRooms)
+      await this.getPendingOnlineOrderCounter()
     },
     watch: {
       online: {

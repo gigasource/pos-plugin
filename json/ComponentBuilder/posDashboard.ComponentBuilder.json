@@ -316,6 +316,11 @@
                   "service": "SettingsStore:onlineOrderSorting",
                   "local": "onlineOrderSorting",
                   "type": "prop"
+                },
+                {
+                  "service": "PosStore:getPendingOnlineOrderCounter",
+                  "local": "getPendingOnlineOrderCounter",
+                  "type": "event"
                 }
               ]
             },

@@ -30,7 +30,7 @@
                class="payment-method-btn"
                @click.stop="addFixedItem(item)">
           <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-          <span class="ml-2 mr-2" style="text-transform: capitalize">
+          <span class="mr-2" style="text-transform: capitalize">
             {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
           </span>
           <g-badge inline color="#FF4452">
@@ -46,7 +46,7 @@
                class="payment-method-btn"
                @click.stop="addFixedItem(item)">
           <g-icon v-if="item.icon" size="20">{{item.icon}}</g-icon>
-          <span class="ml-2" style="text-transform: capitalize">
+          <span style="text-transform: capitalize">
             {{`${item.type}${item.value ? ` ${$t('common.currency', storeLocale)}${item.value}` : ''}`}}
           </span>
         </g-btn>
