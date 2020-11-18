@@ -22,7 +22,7 @@
                 <g-btn-bs icon="icon-voucher" @click="showVoucherDialog">{{$t('order.voucher')}}</g-btn-bs>
                 <g-btn-bs icon="icon-move-items" @click="moveItems">{{$t('order.moveItem')}}</g-btn-bs>
 <!--                <g-btn-bs icon="icon-dinner_2">Div. item</g-btn-bs>-->
-                <g-btn-bs icon="icon-food_container" :background-color="isTakeAwayOrder ? '#2979FF' : '#FFF'"
+                <g-btn-bs icon="icon-delivery" :background-color="isTakeAwayOrder ? '#2979FF' : '#FFF'"
                           @click="toggleTakeAwayOrder">Take Away</g-btn-bs>
                 <g-btn-bs icon="icon-split_check_2" @click="splitOrder">{{$t('order.splitOrder')}}</g-btn-bs>
                 <g-btn-bs v-if="actionList" :disabled="disablePrintBtn" icon="icon-print"
@@ -172,6 +172,7 @@
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
+    <g-overlay :value="overlay" absolute opacity="0.7" color="rgba(255, 255, 255)" style="top: 54px"></g-overlay>
   </div>
 </template>
 
@@ -225,6 +226,7 @@
         showSplitBtn: true,
         smallSidebar: true,
         onlyCheckoutPrintedItems: true,
+        overlay: false
       }
     },
     computed: {
@@ -366,8 +368,10 @@
       payToggle() {
         if (this.actionMode === 'none') {
           this.$emit('update:actionMode', 'pay');
+          this.overlay = true
           this.actionTimeout = setTimeout(() => {
             this.$emit('update:actionMode', 'none');
+            this.overlay = false
           }, 5000)
           return
         }
@@ -378,6 +382,7 @@
           this.pay();
         }
 
+        this.overlay = false
         this.$emit('update:actionMode', 'none');
         if (this.actionTimeout) clearTimeout(this.actionTimeout);
       },
@@ -402,13 +407,16 @@
       printOrderToggle() {
         if(this.actionMode === 'none') {
           this.$emit('update:actionMode', 'print');
+          this.overlay = true
           this.actionTimeout = setTimeout(() => {
             this.$emit('update:actionMode', 'none');
+            this.overlay = false
           }, 5000)
           return
         }
         this.printOrder()
         this.$emit('update:actionMode', 'none');
+        this.overlay = false
         if(this.actionTimeout) clearTimeout(this.actionTimeout)
       },
       getStyle() {

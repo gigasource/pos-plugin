@@ -324,6 +324,7 @@ module.exports = async cms => {
 
       const result = await cms.getModel('Order').create(order)
       cms.socket.emit('updateOnlineOrders', getBaseSentryTags('orderStatus') + `,orderToken=${orderData.orderToken},orderId=${newOrderId}`)
+      cms.socket.emit('updateOnlineOrderCounter')
 
       if (timeoutDate) {
         await scheduleDeclineOrder(timeoutDate, result._id, () => {

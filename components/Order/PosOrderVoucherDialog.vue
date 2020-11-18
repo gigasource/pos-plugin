@@ -1,15 +1,15 @@
 <template>
-  <g-dialog v-model="internalValue" width="60%">
+  <g-dialog v-model="internalValue" width="600">
     <g-card>
       <g-tabs vertical :items="tabs" v-model="tab" active-text-color="#1471FF" slider-color="#1471FF">
         <g-tab-item :item="tabs[0]">
-          <pos-textfield-new class="mb-5 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[0].ref"/>
+          <pos-textfield-new class="mb-3 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[0].ref"/>
           <div class="row-flex justify-center">
             <pos-keyboard-full class="keyboard" width="100%" type="numeric" @enter-pressed="submit(true)"/>
           </div>
         </g-tab-item>
         <g-tab-item :item="tabs[1]">
-          <pos-textfield-new class="mb-5 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[1].ref"/>
+          <pos-textfield-new class="mb-3 mt-4" :label="$t('restaurant.voucherValue')" placeholder="Voucher value" v-model="voucherValue" :ref="tabs[1].ref"/>
           <div class="row-flex justify-center">
             <pos-keyboard-full class="keyboard" width="100%" type="numeric" @enter-pressed="submit(false)"/>
           </div>
@@ -79,7 +79,6 @@
     background-color: #bdbdbd;
     padding: 0.5rem;
     flex-grow: 1;
-    max-width: 600px;
   }
 
   ::v-deep .key {
@@ -90,5 +89,16 @@
     box-shadow: unset;
     padding-top: 16px;
     padding-bottom: 16px;
+  }
+
+  @media screen and (max-height: 599px) {
+    ::v-deep .keyboard__template {
+      grid-gap: 5px !important;
+
+      .key {
+        font-size: 16px;
+        padding: 8px;
+      }
+    }
   }
 </style>

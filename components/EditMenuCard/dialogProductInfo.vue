@@ -4,7 +4,7 @@
       <div class="row-flex justify-between flex-wrap">
         <pos-textfield-new style="width: 48%;" ref="id" label="ID" v-model="id"/>
         <pos-textfield-new style="width: 48%;" ref="name" label="Name" required v-model="name" validate-on-blur :rules="[rules.required]"/>
-        <pos-textfield-new style="width: 48%;" ref="price" label="Price" v-model="price" :rules="[rules.number]"/>
+        <pos-textfield-new style="width: 48%;" ref="price" label="Price" required v-model="price" :rules="[rules.number]"/>
       </div>
     </template>
   </dialog-form-input>
@@ -73,6 +73,7 @@
     },
     methods: {
       updateProduct() {
+        if(!this.name || !this.price) return
         const change = {
           id: this.id,
           name: this.name,

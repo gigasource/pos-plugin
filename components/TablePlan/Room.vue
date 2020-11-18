@@ -65,7 +65,8 @@
         lastPos: null, // store last mouse clientX, Y position which already handled by "applyChange throttle"
         swiping: false,
         zoom: 0,
-        minimumSize: 60
+        minimumSize: 60,
+        rooms: []
       }
     },
     computed: {
@@ -76,23 +77,6 @@
       transferringTable() {
         return !!this.transferTableFrom
       },
-      rooms() {
-        if(this.editable || this.zoom === 0) {
-          return this.roomObjects
-        } else {
-          return this.roomObjects.map(obj => ({
-            ...obj,
-            location: {
-              x: obj.location.x * this.zoom,
-              y: obj.location.y * this.zoom,
-            },
-            size: {
-              width: obj.size.width * this.zoom,
-              height: obj.size.height * this.zoom
-            }
-          }))
-        }
-      }
     },
     created() {
       this.applyChange = _.throttle(e => {
@@ -108,10 +92,12 @@
         // update last position
         this.lastPos = { x: e.clientX, y: e.clientY }
       }, 20)
+      this.rooms = this.roomObjects
     },
     watch: {
       roomObjects: {
-        handler() {
+        handler(val) {
+          this.rooms = val
           this.$nextTick(() => {
             const roomEl = this.$refs['room']
 
@@ -120,10 +106,20 @@
 
             if (zoomHorizontalRatio > 1 || zoomVerticalRatio > 1) return
             const zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
-            if(this.editable)
+            if(this.editable) {
               roomEl.style.zoom = zoom
-            else
-              this.zoom = zoom
+            } else
+              this.rooms = this.roomObjects.map(obj => ({
+                ...obj,
+                location: {
+                  x: obj.location.x * zoom,
+                  y: obj.location.y * zoom,
+                },
+                size: {
+                  width: obj.size.width * zoom,
+                  height: obj.size.height * zoom
+                }
+              }))
           })
         },
         immediate: true
