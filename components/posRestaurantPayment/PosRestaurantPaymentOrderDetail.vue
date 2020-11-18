@@ -4,9 +4,14 @@
       <g-avatar size="36">
         <img src="../../assets/customer_ava.svg">
       </g-avatar>
-      <span class="order-detail__header-username">{{username}}</span>
-      <span class="order-detail__header-title" v-if="table">{{$t('restaurant.table')}}</span>
-      <span class="order-detail__header-value" v-if="table">{{table}}</span>
+      <div class="ml-2">
+        <span class="order-detail__header-username">{{username}}</span>
+        <div>
+          <span class="order-detail__header-title" v-if="table">{{$t('restaurant.table')}}</span>
+          <span class="order-detail__header-value" v-if="table">{{table}}</span>
+        </div>
+      </div>
+      <g-spacer/>
       <span class="order-detail__header-title">Total</span>
       <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
     </div>
@@ -92,19 +97,17 @@
       &-username {
         font-weight: 700;
         font-size: 13px;
-        margin-left: 8px;
         flex-grow: 1;
       }
 
       &-title {
         opacity: 0.5;
-        margin-left: 16px;
         font-size: 11px;
         font-weight: 600;
       }
 
       &-value {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
         margin-left: 4px;
       }

@@ -1,10 +1,10 @@
 <template>
   <div class="pos-payment-keyboard">
     <div style="position: relative">
-      <pos-keyboard-full :template="keyboardTemplate" :items="keyboardItems" style="height: 100%"/>
+      <pos-keyboard-full :template="keyboardTemplate" :items="keyboardItems" gap="4px" style="height: 100%"/>
       <div class="keyboard-overlay" v-if="disableKeyboard" />
     </div>
-    <div class="col-flex" style="height: 100%">
+    <div :class="['col-flex', isMobile && 'payment-table--mobile']" style="height: 100%">
       <div class="payment-table__header">
         <span>{{$t('onlineOrder.total')}}</span>
         <g-spacer/>
@@ -15,10 +15,13 @@
         <tr v-for="(payment, index) in paymentList">
           <div :class="['payment-table__row', payment.type !== 'card' && payment.type !== 'cash' && 'text-blue']">
             <div class="flex-grow-1 row-flex align-items-center">
-              <span style="text-transform: capitalize">{{ $t(`payment.${payment.type}`) }}</span>
-              <div class="ml-2 pa-2" @click="removePaymentItem(index)"
+              <span style="text-transform: capitalize">
+                <template v-if="payment.type === 'card' || payment.type === 'cash'">{{ $t(`payment.${payment.type}`) }}</template>
+                <template v-else>{{payment.type}}</template>
+              </span>
+              <div class="ml-2" @click="removePaymentItem(index)"
                    v-if="payment.type !== 'card' && payment.type !== 'cash'" v-model="payment.value">
-                <g-icon color="#FF4452">close</g-icon>
+                <g-icon color="#FF4452" size="16">close</g-icon>
               </div>
             </div>
             <div class="value-input w-20">
@@ -33,7 +36,7 @@
         </tbody>
       </g-table>
       <div class="payment-table__footer">
-        <div class="payment-change__description mt-2">{{$t('payment.enterTender')}}</div>
+        <div class="payment-change__description mt-2" v-if="!disableKeyboard">{{$t('payment.enterTender')}}</div>
         <g-divider inset class="mb-2"/>
         <div class="payment-footer">
           <div class="row-flex payment-footer__value">
@@ -57,7 +60,8 @@
     name: 'PosPaymentScreenKeyboard',
     props: {
       paymentTotal: Number,
-      currentOrder: null
+      currentOrder: null,
+      isMobile: Boolean
     },
     data() {
       return {
@@ -65,7 +69,7 @@
           '"key4 key4 key5 key5 key6 key6" ' +
           '"key1 key1 key2 key2 key3 key3" ' +
           '"keyDot keyDot key0 key0 del del";' +
-          'grid-auto-columns: 1fr; grid-gap: 10px',
+          'grid-auto-columns: 1fr; grid-gap: 5px',
         keyboardItems: [
           ...Object.values({
             key7: { content: ['7'], style: 'grid-area: key7' },
@@ -210,7 +214,7 @@
 
     &__header {
       background-color: #EEEEEE;
-      padding: 10px 16px 4px 16px;
+      padding: 5px 8px 2px 8px;
       font-weight: bold;
       display: flex;
       flex-direction: row;
@@ -229,7 +233,7 @@
       border-bottom-left-radius: 2px;
       border-bottom-right-radius: 2px;
       font-size: 14px;
-      padding: 0 16px 10px 16px;
+      padding: 0 8px 5px 8px;
     }
 
     &__row {
@@ -237,8 +241,8 @@
       flex-direction: row;
       align-items: center;
       width: 100%;
-      font-size: 16px !important;
-      padding: 8px 16px;
+      font-size: 14px;
+      padding: 2px 8px;
 
       ::v-deep .value-input {
         text-align: right;
@@ -253,10 +257,39 @@
         }
 
         input {
-          line-height: 24px;
+          line-height: 22px;
           padding: 4px 0;
-          font-size: 16px;
+          font-size: 14px;
           text-align: right;
+        }
+      }
+    }
+  }
+
+  .payment-table--mobile {
+    .payment-table {
+      &__header {
+        padding: 5px 8px 2px 8px;
+      }
+
+      &__footer {
+        padding: 0 8px 5px 8px;
+      }
+
+      &__row {
+        font-size: 14px !important;
+        padding: 2px 8px;
+
+        ::v-deep .value-input {
+          .g-tf-wrapper {
+            margin: 0;
+            width: 100%;
+          }
+
+          input {
+            line-height: 16px;
+            font-size: 14px;
+          }
         }
       }
     }
