@@ -58,6 +58,7 @@
                           :store-locale="storeLocale"
                           :card-value="cardEditValue"
                           :cash-value="cashEditValue"
+                          :is-mobile="isMobile"
                           @submit="saveMulti"
     />
 
@@ -77,7 +78,8 @@
     props: {
       currentOrder: null,
       paymentTotal: Number,
-      storeLocale: null
+      storeLocale: null,
+      isMobile: Boolean,
     },
     data() {
       return {

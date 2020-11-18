@@ -79,8 +79,8 @@
                   "1fr"
                 ],
                 "rows": [
-                  "50%",
-                  "50%"
+                  "40%",
+                  "60%"
                 ],
                 "columnGap": 0,
                 "rowGap": 0,
@@ -271,6 +271,11 @@
               "service": "PosStore:storeLocale",
               "local": "storeLocale",
               "type": "prop"
+            },
+            {
+              "service": "PosStore:isMobile",
+              "local": "isMobile",
+              "type": "prop"
             }
           ]
         },
@@ -303,6 +308,11 @@
               "service": "OrderStore:updateCurrentOrder",
               "local": "updateCurrentOrder",
               "type": "event"
+            },
+            {
+              "service": "PosStore:isMobile",
+              "local": "isMobile",
+              "type": "prop"
             }
           ]
         },
