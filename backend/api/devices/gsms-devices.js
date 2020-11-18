@@ -151,9 +151,9 @@ router.delete('/devices/:deviceId', async (req, res) => {
   // multi store
   if (device.enableMultiStore) {
     const stores = await StoreModel.find({ _id: { $in: device.storeIds } })
-    _.each(stores, s => {
+    _.each(stores, async s => {
       if (s.gSms && s.gSms.devices) {
-        StoreModel.findOneAndUpdate(
+        await StoreModel.findOneAndUpdate(
             {_id: s._id},
             {$pull: {'gSms.devices': { _id: deviceId }} }
         )
