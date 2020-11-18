@@ -8,6 +8,7 @@ const ObjectId = mongoose.Types.ObjectId
 const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
 const StoreModel = cms.getModel('Store')
+const { dbExists } = require('../restaurant-data-backup/index');
 
 function generateDeviceCode() {
   return randomstring.generate({length: 9, charset: 'numeric'})
@@ -134,15 +135,7 @@ router.post('/register', async (req, res) => {
       storeLocale: store.country ? store.country.locale : 'en'
     };
 
-    // const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
-    // if (storeDevices.length === 1) {
-    //   await setMasterDevice(store._id, device._id)
-    //   const demoData = store.demoDataSrc;
-    //   if (demoData)
-    //     await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)
-    // }
-    const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
-    if (storeDevices.length === 1) {
+    if (!(await dbExists(device.storeId))) {
       response.isFirstDevice = true
       res.status(200).json(response);
 

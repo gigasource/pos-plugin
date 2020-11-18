@@ -9,9 +9,11 @@ const _ = require('lodash');
 
 orm.connect(connnectionUri);
 let connectionHandlers = {};
+let externalSocketIOServer;
 
 async function initConnection(socket) {
 	try {
+		externalSocketIOServer = socket;
 		cms.post('run:triggerOnlineAsMaster', (storeId) => {
 			if (typeof storeId !== 'string') {
 				storeId = storeId.toString();
@@ -108,6 +110,20 @@ async function updateCommits(storeId, commits, ack) {
 	if (newCommits.length) connection.updateCommit.handleCommit(newCommits);
 }
 
+async function dbExists(storeId) {
+	return await connectionHandlers[storeId].updateCommit.db.collection('poscommits').count() ||
+		await connectionHandlers[storeId].updateCommit.db.collection('ordercommits').count();
+}
+
+async function createStoreBackUpDb(storeId) {
+	connectionHandlers[storeId] = new UpdateCommit(storeId, orm.cache.get('client'));
+	await connectionHandlers[storeId].updateCommit.init(externalSocketIOServer);
+	connectionHandlers[storeId].updateCommit.commitType.forEach(type => {
+		connectionHandlers[storeId].updateCommit.getMethod(type, 'resumeQueue')();
+	})
+	await cms.execPostAsync('run:triggerOnlineAsMaster', null, [storeId]);
+}
+
 module.exports = {
 	initConnection,
 	updateCommitNode,
@@ -115,5 +131,7 @@ module.exports = {
 	requireSyncWithMaster,
 	requireSync,
 	addCollection,
-	updateCommits
+	updateCommits,
+	dbExists,
+	createStoreBackUpDb
 }

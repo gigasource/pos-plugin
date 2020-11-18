@@ -1,7 +1,7 @@
 const Queue = require('better-queue');
-const mongoose = require('mongoose');
 const JsonFn = require('json-fn');
 const _ = require('lodash');
+const orm = require('schemahandler');
 
 async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
@@ -46,7 +46,7 @@ async function posCommit(updateCommit) {
 				newCommits.push(commit);
 			}
 		}
-		if (global.APP_CONFIG.isMaster && lastTempId && newCommits.length) {
+		if (updateCommit.isMaster && lastTempId && newCommits.length) {
 			updateCommit.handler.emitToAll(newCommits);
 		}
 		cb(null);
@@ -70,18 +70,12 @@ async function posCommit(updateCommit) {
 				if (!key.endsWith('_id')) {
 					return value;
 				}
-				return (typeof value === 'string' && value.length === 24) ? mongoose.Types.ObjectId(value) : value;
+				return (typeof value === 'string' && value.length === 24) ? new orm.ObjectId(value) : value;
 			});
-			if (typeof _.last(query) === 'function') {
-				query.pop();
+			if (updateCommit.isOnlineOrder) {
+				query.name = `${query.name}@${updateCommit.storeId}`;
 			}
-			await new Promise((resolve, reject) => {
-				query.push(function (err, doc) {
-					if (err) reject(err);
-					resolve(doc);
-				})
-				collection[commit.update.method].apply(collection, query);
-			})
+			await orm.execChain(query);
 			if (!commit.commitId) {
 				commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
 				updateCommit[TYPENAME].highestPosCommitId++;

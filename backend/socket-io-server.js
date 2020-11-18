@@ -650,10 +650,10 @@ module.exports = async function (cms) {
       })
 
       socket.on('getReservationSetting', async (deviceId, callback) => {
-        const device = await cms.getModel('Device').findById(deviceId)
+        const device = await cms.getModel('Device').findById(deviceId).lean()
         if (!device) return callback(null)
 
-        const store = await cms.getModel('Store').findById(device.storeId)
+        const store = await cms.getModel('Store').findById(device.storeId).lean()
         if (!store) return callback(null)
 
         callback({
@@ -688,15 +688,6 @@ module.exports = async function (cms) {
         const device = await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
         requireSyncWithMaster(device.storeId, socket);
       })
-
-      // socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
-      //   const store = await cms.getModel('Store').findOne({ alias: storeAlias }).lean();
-      //   if (store.onlineIsMaster) {
-      //     requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
-      //   } else {
-      //     externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
-      //   }
-      // })
 
       socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
         if (masterClientId) {
