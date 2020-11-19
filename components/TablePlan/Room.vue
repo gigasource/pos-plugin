@@ -104,8 +104,8 @@
             const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
             const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
 
-            if (zoomHorizontalRatio > 1 || zoomVerticalRatio > 1) return
-            const zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05).toFixed(1)
+            if (zoomHorizontalRatio >= 1 && zoomVerticalRatio >= 1) return
+            const zoom = Math.floor((Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05)).toFixed(1)
             if(this.editable) {
               roomEl.style.zoom = zoom
             } else
