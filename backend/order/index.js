@@ -36,13 +36,13 @@ module.exports = (cms) => {
         actionList.push({
           type: 'order',
           action: 'update',
-          where: JSON.stringify({ _id: order._id }),
+          where: JsonFn.stringify({ _id: order._id }),
           data: {
             table: order.table,
           },
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: JsonFn.stringify({
               $set: { items: order.items }
             })
           }
@@ -105,13 +105,13 @@ module.exports = (cms) => {
       mergedActionList.push({
         type: 'order',
         action: 'update',
-        where: JSON.stringify({ _id: order._id }),
+        where: JsonFn.stringify({ _id: order._id }),
         data: {
           table: order.table,
         },
         update: {
           method: 'findOneAndUpdate',
-          query: JSON.stringify({
+          query: JsonFn.stringify({
             $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
           })
         }
@@ -138,10 +138,10 @@ module.exports = (cms) => {
             split: true,
             allowMutateInactiveOrder: true
           },
-          where: JSON.stringify({ _id }),
+          where: JsonFn.stringify({ _id }),
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: JsonFn.stringify({
               $set: {
                 'payment': payment
               }
@@ -174,13 +174,13 @@ module.exports = (cms) => {
         actionList.push({
           type: 'order',
           action: 'update',
-          where: JSON.stringify({ _id: order._id }),
+          where: JsonFn.stringify({ _id: order._id }),
           data: {
             table: order.table,
           },
           update: {
             method: 'findOneAndUpdate',
-            query: JSON.stringify({
+            query: JsonFn.stringify({
               $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
             })
           }
@@ -197,20 +197,20 @@ module.exports = (cms) => {
               },
               update: {
                 method: 'create',
-                query: JSON.stringify(mappedOrder)
+                query: JsonFn.stringify(mappedOrder)
               }
             },
             ...actionList,
             {
               type: 'order',
               action: 'closeOrder',
-              where: JSON.stringify({ _id: mappedOrder._id }),
+              where: JsonFn.stringify({ _id: mappedOrder._id }),
               data: {
                 fromPayBtn
               },
               update: {
                 method: 'findOneAndUpdate',
-                query: JSON.stringify({
+                query: JsonFn.stringify({
                   $set: { status: 'paid' }
                 })
               }
@@ -223,13 +223,13 @@ module.exports = (cms) => {
           const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
             type: 'order',
             action: 'update',
-            where: JSON.stringify({ _id: mappedOrder._id }),
+            where: JsonFn.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
             },
             update: {
               method: 'findOneAndUpdate',
-              query: JSON.stringify({
+              query: JsonFn.stringify({
                 $set: { [key]: value }
               })
             }
@@ -238,7 +238,7 @@ module.exports = (cms) => {
           actionList.push({
             type: 'order',
             action: 'closeOrder',
-            where: JSON.stringify({ _id: mappedOrder._id }),
+            where: JsonFn.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
               mutate: true,
@@ -246,21 +246,21 @@ module.exports = (cms) => {
             },
             update: {
               method: 'findOneAndUpdate',
-              query: JSON.stringify({
+              query: JsonFn.stringify({
                 $set: { status: 'paid' }
               })
             }
           }, {
             type: 'order',
             action: 'update',
-            where: JSON.stringify({ _id: mappedOrder._id }),
+            where: JsonFn.stringify({ _id: mappedOrder._id }),
             data: {
               table: mappedOrder.table,
               allowMutateInactiveOrder: true
             },
             update: {
               method: 'findOneAndUpdate',
-              query: JSON.stringify({
+              query: JsonFn.stringify({
                 $set: { recentCancellationItems: [], recentItems: [] }
               })
             }
@@ -356,7 +356,7 @@ module.exports = (cms) => {
     await cms.getModel('OrderCommit').addCommits([{
       type: 'order',
       action: 'delete',
-      where: JSON.stringify({ _id }),
+      where: JsonFn.stringify({ _id }),
       data: { table },
       update: {
         method: 'deleteOne'
@@ -407,13 +407,13 @@ module.exports = (cms) => {
     return await cms.getModel('OrderCommit').addCommits([{
       type: 'order',
       action: 'update',
-      where: JSON.stringify({ _id: order._id }),
+      where: JsonFn.stringify({ _id: order._id }),
       data: {
         table: order.table,
       },
       update: {
         method: 'findOneAndUpdate',
-        query: JSON.stringify({
+        query: JsonFn.stringify({
           $set: {
             [key]: value
           }
@@ -566,13 +566,13 @@ function getRecentItemCommits(recentItems, recentCancellationItems, order) {
     actionList.push({
       type: 'order',
       action: 'update',
-      where: JSON.stringify({ _id: order._id }),
+      where: JsonFn.stringify({ _id: order._id }),
       data: {
         table: order.table,
       },
       update: {
         method: 'findOneAndUpdate',
-        query: JSON.stringify({
+        query: JsonFn.stringify({
           $set: { recentItems }
         })
       }
@@ -583,13 +583,13 @@ function getRecentItemCommits(recentItems, recentCancellationItems, order) {
     actionList.push({
       type: 'order',
       action: 'update',
-      where: JSON.stringify({ _id: order._id }),
+      where: JsonFn.stringify({ _id: order._id }),
       data: {
         table: order.table,
       },
       update: {
         method: 'findOneAndUpdate',
-        query: JSON.stringify({
+        query: JsonFn.stringify({
           $set: { recentCancellationItems }
         })
       }

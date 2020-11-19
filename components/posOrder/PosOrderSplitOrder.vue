@@ -285,7 +285,8 @@
               const printedItems = newItems.filter(i => i.printed);
               this.$emit('updateCurrentOrder', 'items', newItems)
               this.$emit('updatePrintedOrder', 'items', printedItems)
-              if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: printedItems })
+              if (!isLastSplit)
+                if (this.currentOrder._id) this.$emit('createOrderCommit', { key: 'items', value: printedItems })
             }
 
             if (isLastSplit) this.showReceipt = true
