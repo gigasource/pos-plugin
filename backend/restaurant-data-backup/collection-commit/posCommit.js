@@ -8,11 +8,11 @@ async function posCommit(updateCommit) {
 
 	function emitToFrontend(commit) {
 		if (updateCommit.isOnlineOrder) return;
-		if (commit.data.collection === 'products') {
+		if (commit.data.collection === 'Product') {
 			cms.socket.emit('updateProductProps');
-		} else if (commit.data.collection === 'rooms') {
+		} else if (commit.data.collection === 'Room') {
 			cms.socket.emit('updateRooms');
-		} else if (commit.data.collection === 'orderlayouts') {
+		} else if (commit.data.collection === 'OrderLayout') {
 			cms.socket.emit('updateOrderLayouts');
 		}
 	}
@@ -31,7 +31,7 @@ async function posCommit(updateCommit) {
 			lastTempId = commit.groupTempId;
 			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
 			let result;
-			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
+			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.appUUID === global.APP_CONFIG.appUUID)) {
 				result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
 			} else result = true;
 

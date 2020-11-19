@@ -101,6 +101,9 @@ async function updateCommits(storeId, commits, ack) {
 	if (ack) {
 		ack(true);
 	}
+	if (typeof storeId !== 'string') {
+		storeId = storeId.toString();
+	}
 	const connection = connectionHandlers[storeId];
 	const newCommits = [];
 	for (let id in commits) {
@@ -116,6 +119,7 @@ async function dbExists(storeId) {
 }
 
 async function createStoreBackUpDb(storeId) {
+	if (connectionHandlers[storeId]) return;
 	connectionHandlers[storeId] = new UpdateCommit(storeId, orm.cache.get('client'));
 	await connectionHandlers[storeId].updateCommit.init(externalSocketIOServer);
 	connectionHandlers[storeId].updateCommit.commitType.forEach(type => {

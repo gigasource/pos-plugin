@@ -3,9 +3,6 @@ const JsonFn = require('json-fn');
 const _ = require('lodash');
 const mongoose = require('mongoose');
 
-const COMMIT_TIME_OUT = 5 * 60 * 1000;
-const COMMIT_CLOSE_TIME_OUT = 30 * 1000;
-
 async function orderCommit(updateCommit) {
 	const TYPENAME = 'order';
 
@@ -15,14 +12,12 @@ async function orderCommit(updateCommit) {
 	}
 
 	async function validateCommit(commit) {
-		if ((!commit.timeStamp || (new Date()).getTime() - commit.timeStamp <= COMMIT_TIME_OUT)) {
-			if (commit.data && commit.data.table) {
-				const activeOrder = await getActiveOrder(commit.data.table);
-				if (!commit.data.orderId && activeOrder) {
-					commit.data.orderId = activeOrder._id.toString();
-				}
+		if (commit.data && commit.data.table) {
+			const activeOrder = await getActiveOrder(commit.data.table);
+			if (!commit.data.orderId && activeOrder) {
+				commit.data.orderId = activeOrder._id.toString();
 			}
-		} else return false;
+		}
 		if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestOrderCommitId) return false;
 		return true;
 	}
@@ -210,10 +205,13 @@ async function orderCommit(updateCommit) {
 			if (commit.data && commit.data.mutate) {
 				if (!(await validateOrderId(commit))) return;
 				const condition = await getCondition(commit);
-				if (commit.timeStamp && (new Date()).getTime() - commit.timeStamp > COMMIT_CLOSE_TIME_OUT) return null;
 				const activeOrder = await getActiveOrder(commit.data.table);
 				if (!activeOrder) {
 					console.error('Order has been closed');
+					return null;
+				}
+				if (activeOrder._id.toString() !== condition._id.toString()) {
+					console.error('This commit is not for this order');
 					return null;
 				}
 				setCommitId(commit);
