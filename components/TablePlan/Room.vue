@@ -98,6 +98,9 @@
       roomObjects: {
         handler(val) {
           this.rooms = val
+          if(this.$refs && this.$refs['room']) {
+            this.$refs['room'].style.zoom = ''
+          }
           this.$nextTick(() => {
             const roomEl = this.$refs['room']
 
@@ -105,7 +108,7 @@
             const zoomHorizontalRatio = roomEl.clientWidth / roomEl.scrollWidth
 
             if (zoomHorizontalRatio >= 1 && zoomVerticalRatio >= 1) return
-            const zoom = Math.floor((Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.05)).toFixed(1)
+            const zoom = (Math.min(zoomVerticalRatio, zoomHorizontalRatio) - 0.055).toFixed(1)
             if(this.editable) {
               roomEl.style.zoom = zoom
             } else
