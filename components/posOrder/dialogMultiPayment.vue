@@ -130,7 +130,7 @@
         })
       },
       click(ref) {
-        this.$refs[ref] && this.$refs[ref][0].$el.click()
+        this.$refs[ref] && this.$refs[ref].$el.click()
       },
       getBackgroundColor(item) {
         switch (item.type) {

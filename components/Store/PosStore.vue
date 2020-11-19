@@ -468,7 +468,6 @@
           status: 'inProgress',
           online: true
         })
-        console.log('counters', this.pendingOnlineOrderCounter)
       }
     },
     async created() {
