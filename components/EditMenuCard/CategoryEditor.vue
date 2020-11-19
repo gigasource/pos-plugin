@@ -160,6 +160,10 @@
     }
   }
 
+  .g-snack ::v-deep .g-snack-wrapper {
+    min-width: auto;
+  }
+
   @media screen and (max-width: 1023px) {
     .category-editor {
       padding-left: 8px;

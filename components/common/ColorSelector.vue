@@ -2,20 +2,16 @@
   <g-grid-select :grid="false" :items="values" :value="internalColor" @input="updateColor" style="padding: 5px">
 
     <template #default="{toggleSelect, item, index}">
-      <div style="margin-right: 5px">
-        <div :key="index" :ripple="false" :style="getColorItemStyle(item)" @click="toggleSelect(item)"/>
-      </div>
+      <div :key="index" :ripple="false" :style="getColorItemStyle(item)" @click="toggleSelect(item)"/>
     </template>
 
     <template #selected="{toggleSelect, item, index}">
-      <div :style="`margin-right: 5px`">
-        <g-badge :badge-size="badgeSize" overlay nudge-top="-2" nudge-right="-2">
-          <template v-slot:badge>
-            <g-icon color="#FFF">done</g-icon>
-          </template>
-          <div :key="index" :ripple="false" :style="getColorItemStyle(item)" @click="toggleSelect(item)"/>
-        </g-badge>
-      </div>
+      <g-badge :badge-size="badgeSize" overlay nudge-top="-6" nudge-right="-6">
+        <template v-slot:badge>
+          <g-icon color="#FFF">done</g-icon>
+        </template>
+        <div :key="index" :ripple="false" :style="getColorItemStyle(item)" @click="toggleSelect(item)"/>
+      </g-badge>
     </template>
 
   </g-grid-select>
@@ -30,7 +26,7 @@
       value: String,
       colors: {
         type: Array,
-        default: () => ['#FBE4EC', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91' ]
+        default: () => ['#FBE4EC', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91']
       },
       itemSize: {
         type: [Number, String],
@@ -46,7 +42,7 @@
       }
     },
     data: function () {
-      const toColorModel = colors => _.map(colors, (c, i) => ({ index: i, text: c, value: c }))
+      const toColorModel = colors => _.map(colors, (c, i) => ({index: i, text: c, value: c}))
       return {
         internalColor: this.value,
         values: toColorModel(this.colors)
@@ -69,9 +65,11 @@
           width: `${this.itemSize}px`,
           minWidth: `${this.itemSize}px`,
           height: `${this.itemSize}px`,
-          border: `${itemSelected? 2 : 1}px solid ${ itemSelected ? '#1271FF' : '#D2D2D2'}`,
+          border: `${itemSelected ? 2 : 1}px solid ${itemSelected ? '#1271FF' : '#D2D2D2'}`,
           backgroundColor: item.value,
-          borderRadius: '100%'
+          borderRadius: '100%',
+          marginRight: '4px',
+          marginBottom: '4px'
         };
       }
     }
