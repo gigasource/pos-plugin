@@ -45,8 +45,9 @@ module.exports = (cms) => {
 				global.APP_CONFIG.deviceName = data.deviceName;
 				if (data.hardwareID && !global.APP_CONFIG.hardwareID) {
 					global.APP_CONFIG.hardwareID = data.hardwareID;
-					await cms.getModel("PosSetting").findOneAndUpdate({}, {hardwareID: data.hardwareID});
+					await cms.getModel('PosSetting').findOneAndUpdate({}, {hardwareID: data.hardwareID});
 				}
+				cms.execPostSync('load:hardwareID', null, [global.APP_CONFIG.hardwareID]);
 				break;
 		}
 	})
