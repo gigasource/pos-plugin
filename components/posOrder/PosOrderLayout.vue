@@ -29,7 +29,9 @@
         <pos-order-keyboard v-if="showCalculator" :keyboard-config="keyboardConfig" :mode="editable ? 'edit' : 'active'" @edit:keyboard="opendDialogEdit($event)"/>
       </div>
     </div>
-    <g-overlay :value="displayOverlay" absolute opacity="0.7" color="rgba(107, 111, 130)"></g-overlay>
+    <g-overlay :value="displayOverlay" absolute opacity="0.25" color="rgb(150, 150, 150)">
+      <g-icon size="120">{{actionMode === 'print' ? 'icon-print' : 'icon-wallet'}}</g-icon>
+    </g-overlay>
     <dialog-text-filter v-model="dialog.value" @submit="changeKeyboardExtension($event)"/>
     <dialog-choose-popup-modifier v-model="popupModifierDialog.value" :product="popupModifierDialog.product" @save="addProductWithModifier"/>
   </div>
