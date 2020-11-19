@@ -1,5 +1,5 @@
 const EscPrinter = require('../print-utils/node-thermal-printer');
-const DataForSendToTSC = require('tscprinter/src/DataForSendToPrinterTSC')
+const TscPrinterLib = require('tscprinter/src/TSCPrinter')
 
 class TscPrinter extends EscPrinter {
     constructor(printerConfig) {
@@ -8,10 +8,10 @@ class TscPrinter extends EscPrinter {
 
     println(text) {
       this.buffer = Buffer.concat([
-        DataForSendToTSC.sizeBydot(480, 240),
-        DataForSendToTSC.cls(),
-        DataForSendToTSC.text(0, 0, '1', 0, 2, 2, text),
-        DataForSendToTSC.print(1)
+        TscPrinterLib.sizeBydot(480, 240),
+        TscPrinterLib.cls(),
+        TscPrinterLib.text(0, 0, '1', 0, 2, 2, text),
+        TscPrinterLib.print(1)
       ])
     }
 }
