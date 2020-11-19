@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 let handler;
 
-module.exports = function (cms) {
+module.exports = async function (cms) {
 	// pre define cms.bridge
 	if (!cms.bridge) cms.bridge = {
 		emitToMaster: function () {
@@ -26,7 +26,6 @@ module.exports = function (cms) {
 			}
 		}
 	})
-	// console.debug(getBaseSentryTags('initHandler'), '1. Set handler');
 	// init frontend socket beforehand
 	this.cms.socket.on('connect', socket => {
 		socket.on('buildTempOrder', async (table, fn) => {
@@ -35,16 +34,13 @@ module.exports = function (cms) {
 		})
 	});
 	cms.post('load:handler', _.once(async () => {
-		await setUpPosCommit();
 		await cms.getModel('OrderCommit').deleteMany({commitId: {$exists: false}});
 		if (global.APP_CONFIG.isMaster) {
 			handler = new Master(cms);
 		} else {
 			handler = new Node(cms);
 		}
-		// console.debug(getBaseSentryTags('initHandler'), '5. handler.init()');
 		await handler.init();
-		// console.debug(getBaseSentryTags('initHandler'), '6. Finish handler');
 		const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
 		if (posSettings.hardwareID) {
 			global.APP_CONFIG.hardwareID = posSettings.hardwareID;
@@ -129,11 +125,9 @@ async function setUpPosCommit() {
 }
 
 async function initSocket(socket) {
-	// console.debug(getBaseSentryTags('initHandler'), '2. Set socket');
 	const posSettings = await cms.getModel("PosSetting").findOne({}).lean();
 	const { masterClientId, onlineDevice } = posSettings;
 	cms.socket.emit('getMasterDevice', masterClientId);
-	// console.debug(getBaseSentryTags('initHandler'), '4. Already had masterClientId');
 	if (masterClientId && onlineDevice && onlineDevice.id && onlineDevice.id == masterClientId) {
 		global.APP_CONFIG.isMaster = true;
 	}
@@ -150,16 +144,5 @@ async function handleNewMasterId(socket) {
 	await initSocket(socket);
 }
 
-// function getBaseSentryTags(eventType, clientId) {
-// 	const appVersion = require('../../package').version;
-// 	const {deviceName} = global.APP_CONFIG;
-//
-// 	let tag = `sentry:version=${appVersion},deviceName=${deviceName},eventType=${eventType}`;
-// 	if (clientId) tag += `,clientId=${clientId}`;
-//
-// 	return tag;
-// }
-
-module.exports.initSocket = initSocket;
+module.exports.initSocket = _.once(initSocket);
 module.exports.handleNewMasterId = handleNewMasterId;
-// module.exports.getBaseSentryTags = getBaseSentryTags;

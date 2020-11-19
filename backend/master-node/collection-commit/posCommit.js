@@ -1,18 +1,18 @@
 const Queue = require('better-queue');
-const mongoose = require('mongoose');
 const JsonFn = require('json-fn');
 const _ = require('lodash');
+const orm = require('schemahandler');
 
 async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
 
 	function emitToFrontend(commit) {
 		if (updateCommit.isOnlineOrder) return;
-		if (commit.data.collection === 'products') {
+		if (commit.data.collection === 'Product') {
 			cms.socket.emit('updateProductProps');
-		} else if (commit.data.collection === 'rooms') {
+		} else if (commit.data.collection === 'Room') {
 			cms.socket.emit('updateRooms');
-		} else if (commit.data.collection === 'orderlayouts') {
+		} else if (commit.data.collection === 'OrderLayout') {
 			cms.socket.emit('updateOrderLayouts');
 		}
 	}
@@ -31,7 +31,7 @@ async function posCommit(updateCommit) {
 			lastTempId = commit.groupTempId;
 			if (commit.commitId && commit.commitId < updateCommit[TYPENAME].highestPosCommitId) continue;
 			let result;
-			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.hardwareID === global.APP_CONFIG.hardwareID)) {
+			if (updateCommit.isOnlineOrder || !(commit.data && commit.data.appUUID === global.APP_CONFIG.appUUID)) {
 				result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
 			} else result = true;
 
@@ -46,7 +46,7 @@ async function posCommit(updateCommit) {
 				newCommits.push(commit);
 			}
 		}
-		if (global.APP_CONFIG.isMaster && lastTempId && newCommits.length) {
+		if (updateCommit.isMaster && lastTempId && newCommits.length) {
 			updateCommit.handler.emitToAll(newCommits);
 		}
 		cb(null);
@@ -66,22 +66,11 @@ async function posCommit(updateCommit) {
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
 			const collection = updateCommit.db.collection(commit.data.collection);
-			const query = JsonFn.parse(commit.update.query, true, true, (key, value) => {
-				if (!key.endsWith('_id')) {
-					return value;
-				}
-				return (typeof value === 'string' && value.length === 24) ? mongoose.Types.ObjectId(value) : value;
-			});
-			if (typeof _.last(query) === 'function') {
-				query.pop();
+			const query = JsonFn.parse(commit.update.query, true, true);
+			if (updateCommit.isOnlineOrder) {
+				query.name = `${query.name}@${updateCommit.storeId}`;
 			}
-			await new Promise((resolve, reject) => {
-				query.push(function (err, doc) {
-					if (err) reject(err);
-					resolve(doc);
-				})
-				collection[commit.update.method].apply(collection, query);
-			})
+			await orm.execChain(query);
 			if (!commit.commitId) {
 				commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
 				updateCommit[TYPENAME].highestPosCommitId++;

@@ -138,12 +138,10 @@ class Node {
 				await cms.getModel("PosSetting").findOneAndUpdate({}, {masterIp, masterClientId});
 			}
 		})
-		if (_this.masterClientId) {
-			updateCommit.commitType.forEach(type => {
-				_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
-					updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
-			})
-		}
+		updateCommit.commitType.forEach(type => {
+			_this.onlineOrderSocket.emit('requireSync', _this.masterClientId, type,
+				updateCommit.getMethod(type, 'checkHighestCommitId')(), storeId, nodeSync);
+		})
 	}
 
 	async init() {
