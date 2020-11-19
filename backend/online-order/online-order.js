@@ -582,7 +582,7 @@ module.exports = async cms => {
           id: null,
           store: {}
         },
-        'signInRequest.status': 'notApproved',
+        'signInRequest': null,
       }
     })
   }

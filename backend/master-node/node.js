@@ -5,6 +5,7 @@ const { p2pClientPlugin } = require('@gigasource/socket.io-p2p-plugin');
 const uuid = require('uuid');
 const updateCommit = require('./updateCommit');
 const _ = require('lodash');
+const jsonFn = require('json-fn')
 
 const nodeSync = async function (commits) {
 	/*
@@ -176,7 +177,7 @@ class Node {
 						commit.temp = true;
 						commit.storeId = _storeId;
 						commit.timeStamp = timeStamp;
-						if (commit.data) table = commit.data.table;
+						if (commit.data && commit.data.table) table = commit.data.table;
 					})
 					if (_this.socket && _this.socket.connected) {
 						_this.socket.emit('updateCommits', commits);
@@ -187,7 +188,8 @@ class Node {
 					}
 					await updateCommit.getMethod('order', 'updateTempCommit')(commits);
 					if (commits.length && commits[0].data && commits[0].data.split) {
-						return commits[0].update.create;
+						const order = commits.find(c => c.action === 'createOrder').update.query;
+						return jsonFn.parse(order)
 					}
 					return await updateCommit.getMethod('order', 'buildTempOrder')(table);
 				}
