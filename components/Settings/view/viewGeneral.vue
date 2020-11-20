@@ -29,6 +29,10 @@
         <span>Pay button prints receipt</span>
         <g-switch v-model="printReceiptWithPay"/>
       </div>
+      <div class="row-flex align-items-center justify-between">
+        <span>Show tutorial button</span>
+        <g-switch v-model="showTutorial"/>
+      </div>
     </div>
     <div class="flex-grow-1 offset-1">
       <div class="row-flex align-items-center justify-center">
@@ -212,6 +216,14 @@
         },
         set(val) {
           this.$set(this.generalSettings, 'googleMapApiKey', val);
+        },
+      },
+      showTutorial: {
+        get() {
+          return (this.generalSettings && this.generalSettings.showTutorial) || false;
+        },
+        set(val) {
+          this.$set(this.generalSettings, 'showTutorial', val);
         },
       }
     },

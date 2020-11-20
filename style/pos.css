@@ -936,4 +936,39 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-tutorial {
+  background-image: url("../assets/tutorial.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-tablet {
+  background-image: url("../assets/tablet.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-smartphone {
+  background-image: url("../assets/smartphone.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-restriction {
+  background-image: url("../assets/restriction.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon-video-duration {
+  background-image: url("../assets/video-duration.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 

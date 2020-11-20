@@ -5,7 +5,8 @@
     "quickBtn": true,
     "useVirtualPrinter": false,
     "googleMapApiKey": "AIzaSyBRwI87BhIHdQmkZ-Mih_A0FvBhubfQhsU",
-    "onlyCheckoutPrintedItems": true
+    "onlyCheckoutPrintedItems": true,
+    "showTutorial": true
   },
   "leftFunctionButtons": [
     {

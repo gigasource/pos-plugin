@@ -65,7 +65,8 @@
       return {
         btnUp: [
           {title: fastCheckout, feature: 'fastCheckout',icon: 'icon-fast-checkout', click: () => this.changePath(this.isMobile ? '/pos-order-3' : '/pos-order-2')},
-          {title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => this.changePath('/pos-order-delivery')}
+          {title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => this.changePath('/pos-order-delivery')},
+          {title: 'Tutorial', feature: 'tutorial', icon: 'icon-tutorial', click: () => this.changePath('/pos-tutorial')},
         ],
         btnDown: [
           {title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => this.changePath('/pos-order-history')},
@@ -91,6 +92,7 @@
         demoLicense: false,
         dayLeft: 14,
         inventoryNotification: 0,
+        generalSettings: null
       }
     },
     async created() {
@@ -98,6 +100,10 @@
       cms.socket.on('changeInventory', async () => {
         this.inventoryNotification = await cms.getModel('Inventory').countDocuments({stock: {$lte: 0}})
       })
+      this.generalSettings = (await cms.getModel('PosSetting').findOne()).generalSetting
+    },
+    async activated() {
+      this.generalSettings = (await cms.getModel('PosSetting').findOne()).generalSetting
     },
     computed: {
       computedBtnGroup1() {
@@ -105,6 +111,9 @@
 
         return this.btnUp.filter(item => {
           if (!item.feature) return true
+          if (item.feature === 'tutorial') {
+            return !!(this.generalSettings && this.generalSettings.showTutorial)
+          }
           return (this.enabledFeatures.includes(item.feature))
         })
       },
