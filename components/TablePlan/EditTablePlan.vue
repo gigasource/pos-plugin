@@ -128,6 +128,7 @@
   import ColorSelector from '../common/ColorSelector';
   import PosTextField from '../pos-shared-components/POSInput/PosTextField';
   import DialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  const BSON = require('bson')
 
   export default {
     name: 'EditTablePlan',
@@ -282,7 +283,8 @@
           size: { width: 300, height: 10 },
           location: { x: 0, y: 0 },
           type: 'wall',
-          bgColor: 'black'
+          bgColor: 'black',
+          _id: new BSON.ObjectID()
         })
       },
       async addNewTable() {
@@ -292,7 +294,8 @@
           type: 'table',
           bgColor: 'white',
           name: this.getUniqueTableName(),
-          takeAway: false
+          takeAway: false,
+          _id: new BSON.ObjectID()
         })
       },
       async duplicateRoomObj() {
