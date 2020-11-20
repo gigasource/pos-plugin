@@ -121,7 +121,8 @@
                 size: {
                   width: obj.size.width * zoom,
                   height: obj.size.height * zoom
-                }
+                },
+                fontSize: 20 * zoom
               }))
           })
         },
@@ -140,7 +141,7 @@
           transform: `rotate(${roomObj.rotate}deg)`,
           transformOrigin: '50% 50%',
           border: '1px solid transparent',
-          fontSize: `${this.zoom ? this.zoom * 20 : 20}px`,
+          fontSize: `${roomObj.fontSize ? roomObj.fontSize : 20}px`,
           fontWeight: '700',
           transition: 'none'
         };

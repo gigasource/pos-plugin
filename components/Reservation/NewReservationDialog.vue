@@ -1,5 +1,5 @@
 <template>
-  <g-dialog v-model="internalValue" fullscreen>
+  <g-dialog v-model="internalValue" fullscreen eager>
     <div class="dialog">
       <g-icon class="dialog-icon--close" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
@@ -130,7 +130,7 @@
       },
       seatLimitByDay() {
         let list = []
-        if(this.date) {
+        if(this.date && this.reservationSetting) {
           const date = this.date === $t('onlineOrder.today') ? dayjs() : (this.date === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day') : dayjs(this.date, 'DD MMM'))
           const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.day()]
           for(const limit of this.reservationSetting.seatLimit) {
