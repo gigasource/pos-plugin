@@ -623,7 +623,7 @@ async function createStore(data, userId, auto) {
     active: true,
     permissions: [{ permission: 'manageStore', value: true }]
   })
-  await createStoreBackUpDb(store._id.toString());
+  await createStoreBackUpDb(createdStore._id.toString());
 
   return { createdStore, storeOwner }
 }
