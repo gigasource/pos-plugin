@@ -64,7 +64,7 @@
         }
         const stores = await cms.getModel('Store').find(condition)
         this.stores = _.orderBy(stores, ['affiliateDelivery', 'name'])
-        this.length = 5;
+        this.length = 10;
       },
       loadMore() {
         this.length += 5
