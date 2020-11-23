@@ -23,7 +23,7 @@
      <div class="overview-main__action">
        <p class="fw-700 mb-2">{{$t('setting.ourService')}}</p>
        <div class="row-flex align-items-center">
-         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">{{$t('setting.pickup')}}</g-btn-bs>
+         <g-btn-bs style="margin-right: 2%" :disabled="!store || !store.pickup" icon="icon-take-away" @click="openStore('pickup')">{{$t('setting.takeAway')}}</g-btn-bs>
          <g-btn-bs style="margin-right: 2%" :disabled="!store || (!store.delivery && (!store.affiliateDelivery || !store.affiliateDelivery.active))"
                    icon="icon-delivery-scooter" @click="openDelivery">{{$t('store.delivery')}}</g-btn-bs>
          <g-btn-bs :disabled="!store || !store.reservationSetting || !store.reservationSetting.activeReservation"

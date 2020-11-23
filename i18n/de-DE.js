@@ -245,7 +245,7 @@ module.exports = {
       requireMinOrderDistance: 'erforderlicher Mindestbestellwert für jeden Radius',
       ourService: 'Unsere Dienstleistungen',
       ourMenu: 'Unser Menü',
-      takeAway: 'Mitnehmen',
+      takeAway: 'Abholung',
       other: 'Andere',
       otherSetting: 'andere Einstellung',
       deliveryForwarding: 'Lieferung weiterleiten',
