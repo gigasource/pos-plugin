@@ -122,21 +122,28 @@ router.post('/register', async (req, res) => {
 
     const store = await addPairedDeviceToStore(device._id, device.storeId);
     cms.socket.emit('reloadStores', device.storeId);
-    res.status(200).json({
+    const response = {
       deviceId: device._id,
       storeName: store.name || store.settingName,
       storeAlias: store.alias,
       storeId: store._id.toString(),
       storeLocale: store.country ? store.country.locale : 'en'
-    });
+    };
 
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
     if (storeDevices.length === 1) {
+      response.isFirstDevice = true
+      res.status(200).json(response);
+
       await setMasterDevice(store._id, device._id)
       const demoData = store.demoDataSrc;
       if (demoData)
         await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)
+
+      return
     }
+
+    res.status(200).json(response);
   } else {
     res.status(400).json({message: 'Invalid pairing code or pairing code has been used by another device'})
   }
@@ -148,6 +155,7 @@ router.post('/unregister', async (req, res) => {
   if (deviceInfo) {
     await removePairedDeviceFromStore(_id, deviceInfo.storeId)
     await DeviceModel.deleteOne({_id})
+    await cms.getModel('SignInRequest').deleteMany({ device: _id })
     res.status(200).json({deviceId: deviceInfo._id})
   } else {
     res.status(400).json({message: 'Bad request: Invalid id'})
