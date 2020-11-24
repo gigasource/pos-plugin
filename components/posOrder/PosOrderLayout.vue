@@ -338,7 +338,7 @@
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
       getAreaStyle(item) {
-        if(!item.top) {
+        if(!item.top && item.top !== 0) {
           return
         }
         return {
