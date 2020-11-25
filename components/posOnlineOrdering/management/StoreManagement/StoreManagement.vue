@@ -59,6 +59,7 @@
                 @update:groupName="changeStoreGroupName"
                 @delete:group="deleteStoreGroup"
                 @update:deviceAppVersion="updateDeviceAppVersion"
+                @update:forceDeviceAppVersion="updateForceDeviceAppVersion"
                 @open:editDeviceFeatureDialog="showFeatureControlDialog"
                 @open:editDeviceNameDialog="showEditDeviceNameDialog"
                 @open:deleteDeviceDialog="showDeleteDeviceDialog"
@@ -177,7 +178,7 @@
       // stores
       'PosOnlineOrderManagementStore:(stores,loadStores,addStore,removeStore,updateStore,checkDeviceOnlineStatus)',
       // devices
-      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,removeGSmsDevice,updateGSmsDevice,updateDeviceFeatures,updateDeviceAppVersion,showMessage)',
+      'PosOnlineOrderManagementStore:(addDevice,removeDevice,updateDevice,removeGSmsDevice,updateGSmsDevice,updateDeviceFeatures,updateDeviceAppVersion,updateForceDeviceAppVersion, showMessage)',
       // app
       'PosOnlineOrderManagementStore:(apps,appItems)',
       // store management permissions

@@ -753,6 +753,13 @@
       "schemaType": "string",
       "key": "demoImgSrc",
       "type": "input"
+    },
+    {
+      "_id": "5f8a6a161d12dd11c9b1d808",
+      "schemaType": "boolean",
+      "key": "onlineIsMaster",
+      "default": "",
+      "type": "input@switch"
     }
   ],
   "name": "Store",

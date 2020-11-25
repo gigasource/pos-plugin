@@ -405,11 +405,11 @@
             if (apkInfo.length && (!device.metadata || !device.metadata.isFromStore)) {
               type = 'APK';
             } else {
-              // TODO: warning to user this is can not update because this must be update via store
+              // TODO: warning to user this can not update because this must be update via store
               return;
             }
           } else if (device.osName === 'ios') {
-            // TODO: warning to user this is can not update because this must be update via store
+            // TODO: warning to user this can not update because this must be update via store
             return;
           }
         }
@@ -418,6 +418,21 @@
         socket.emit('updateApp', device._id, getCdnUrl(versionInfo[type].downloadPath), type)
         await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
         // TODO: Update device version in UI
+      },
+
+      async updateForceDeviceAppVersion(device) {
+        if (!device.updateVersion)
+          return
+
+        // prevent re-update
+        // TODO: UX
+        device.canUpdate = false
+        const {socket} = window.cms
+        const versionInfo = _.find(device.versions, version => version.value === device.updateVersion)
+        if (!versionInfo.APK) return; // can not force update
+        socket.emit('updateApp', device._id, getCdnUrl(versionInfo.APK.downloadPath), 'APK')
+        await cms.getModel('Device').updateOne({_id: device._id}, versionInfo)
+        // TODO: warning to user this can not update because this must be update via store
       },
 
       // apps
@@ -584,6 +599,7 @@
         updateDevice: this.updateDevice,
         updateDeviceFeatures: this.updateDeviceFeatures,
         updateDeviceAppVersion: this.updateDeviceAppVersion,
+        updateForceDeviceAppVersion: this.updateForceDeviceAppVersion,
 
         // apps
         apps: this.apps,

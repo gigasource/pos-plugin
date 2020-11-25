@@ -20,6 +20,7 @@
     "@gigasource/payment-provider": "github:gigasource/payment-provider#1.0.3",
     "@paypal/checkout-server-sdk": "^1.0.2",
     "apn": "^2.2.0",
+    "better-queue": "^3.8.10",
     "clone-buffer": "^1.0.0",
     "cron": "^1.8.2",
     "cropperjs": "^1.5.6",
@@ -46,6 +47,7 @@
     "terser": "^4.8.0",
     "tmp-promise": "^2.0.2",
     "uuid": "^3.3.3",
-    "xlsx": "^0.16.2"
+    "xlsx": "^0.16.2",
+    "schemahandler": "github:gigasource/schemaHandler#1.0.56"
   }
 }
