@@ -54,7 +54,6 @@ async function orderCommit(updateCommit) {
   function setCommitId(commit) {
     if (!commit.commitId) {
       commit.commitId = updateCommit[TYPENAME].highestOrderCommitId;
-      updateCommit[TYPENAME].highestOrderCommitId++;
     }
   }
 
@@ -62,15 +61,19 @@ async function orderCommit(updateCommit) {
 
 
   if (!updateCommit[TYPENAME]) updateCommit[TYPENAME] = {};
-  cms.post('resetHighestOrderId', async () => {
+  cms.post('run:resetHighestOrderId', async () => {
     const orderDoc = await updateCommit.orderModel.findOne({}).sort('-id').lean();
     updateCommit[TYPENAME].highestOrderId = (orderDoc && orderDoc.id) ? orderDoc.id + 1 : 1;
   })
 
-  await cms.execPostAsync('resetHighestOrderId', null, []);
+  cms.post('run:resetHighestOrderCommitId', async () => {
+    const commitDoc = await updateCommit.orderCommitModel.findOne({}).sort('-commitId').lean();
+    updateCommit[TYPENAME].highestOrderCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
+  })
 
-  const commitDoc = await updateCommit.orderCommitModel.findOne({}).sort('-commitId').lean();
-  updateCommit[TYPENAME].highestOrderCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
+  await cms.execPostAsync('run:resetHighestOrderId', null, []);
+  await cms.execPostAsync('run:resetHighestOrderCommitId', null, []);
+
   updateCommit[TYPENAME].nodeHighestOrderCommitIdUpdating = 0;
 
   updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
@@ -93,7 +96,6 @@ async function orderCommit(updateCommit) {
       if (!(await validateCommit(commit))) continue;
       const result = await updateCommit.getMethod(TYPENAME, commit.action)(commit);
       if (result) {
-        if (commit.commitId) updateCommit[TYPENAME].highestOrderCommitId = commit.commitId + 1;
         newCommits.push(commit);
       }
       if (commit.data && commit.data.table) lastTable = commit.data.table;
@@ -120,6 +122,7 @@ async function orderCommit(updateCommit) {
 	Delete temporary commit for order
 	 */
   updateCommit.registerMethod(TYPENAME, 'deleteTempCommit', async function ({groupTempId}) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     let commit = null;
     await updateCommit.orderCommitModel.deleteMany({groupTempId, temp: true});
     commit = {
@@ -127,7 +130,7 @@ async function orderCommit(updateCommit) {
       action: 'deleteTempCommit',
       groupTempId,
       temp: false,
-      commitId: updateCommit[TYPENAME].highestOrderCommitId++
+      commitId: updateCommit[TYPENAME].highestOrderCommitId
     }
     await updateCommit.orderCommitModel.create(commit);
     return commit;
@@ -163,6 +166,8 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'createOrder', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
+    await cms.execPostAsync('run:resetHighestOrderId');
     try {
       // Verify id for commit and order
       if (!(await validateOrderId(commit))) return;
@@ -171,7 +176,6 @@ async function orderCommit(updateCommit) {
       const query = JsonFn.parse(commit.update.query);
       if (commit.data.split) { // split order has been paid
         query.id = updateCommit[TYPENAME].highestOrderId;
-        updateCommit[TYPENAME].highestOrderId++;
       }
       let result;
       if (commit.data.split) {
@@ -199,6 +203,8 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'closeOrder', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
+    await cms.execPostAsync('run:resetHighestOrderId');
     try {
       // Verify id for commit and order
       let order;
@@ -235,6 +241,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'addItem', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     try {
       if (!(await checkOrderActive(commit))) return;
       const query = JsonFn.parse(commit.update.query);
@@ -252,6 +259,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'changeItemQuantity', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     try {
       if (!(await checkOrderActive(commit))) return;
       const query = JsonFn.parse(commit.update.query);
@@ -287,6 +295,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     try {
       if (!(await checkOrderActive(commit))) return;
       const query = JsonFn.parse(commit.update.query);
@@ -303,6 +312,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'delete', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     try {
       if (!(await checkOrderActive(commit))) return;
       const query = commit.update.query ? JsonFn.parse(commit.update.query) : {};
@@ -321,6 +331,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'changeTable', async function (commit) {
+    await cms.execPostAsync('run:resetHighestOrderCommitId');
     try {
       const result =
         await updateCommit.orderCommitModel.updateMany({groupTempId: commit.groupTempId}, {data: { table: commit.update, orderId: commit.data.orderId }}, {new: true});
@@ -363,7 +374,7 @@ async function orderCommit(updateCommit) {
   })
 
   updateCommit.registerMethod(TYPENAME, 'getNewOrderId', async function () {
-    updateCommit[TYPENAME].highestOrderId++
+    await cms.execPostAsync('run:resetHighestOrderId');
     return updateCommit[TYPENAME].highestOrderId - 1
   })
 

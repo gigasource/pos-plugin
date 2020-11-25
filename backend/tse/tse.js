@@ -225,7 +225,7 @@ module.exports = async (cms) => {
         }
       }
 
-      await makeExecPostAsync('resetHighestOrderId');
+      await makeExecPostAsync('run:resetHighestOrderId');
 
       let i = startId;
       for (const order of orders1.filter(o => o.qrCode)) {
