@@ -13,6 +13,9 @@ let externalSocketIOServer;
 
 async function initConnection(socket) {
 	try {
+		if (!orm.connected || orm.closed || orm.connecting) {
+			await orm.waitForConnected();
+		}
 		externalSocketIOServer = socket;
 		cms.post('run:triggerOnlineAsMaster', (storeId) => {
 			if (typeof storeId !== 'string') {
@@ -34,6 +37,7 @@ async function initConnection(socket) {
 				await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
 			}
 		}
+		console.log('init db for each store completed');
 	} catch (err) {
 		console.error('init connection to master and node error', err)
 	}
