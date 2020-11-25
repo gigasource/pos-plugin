@@ -4,7 +4,7 @@
     <div class="product-editor__prop-grid">
       <template v-if="types">
         <div>{{$t('article.type')}}</div>
-        <g-select :disabled="!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)"
+        <g-select :disabled="!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)" skip-search
                   text-field-component="GTextFieldBs" v-model="type" :items="types" @input="changeType"/>
       </template>
       <template v-if="isProductLayout">
