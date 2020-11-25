@@ -21,8 +21,12 @@ async function posCommit(updateCommit) {
 	if (!updateCommit[TYPENAME])
 		updateCommit[TYPENAME] = {};
 
-	const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId').lean();
-	updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
+	cms.post('run:resetHighestPosCommitId', async () => {
+		const commitDoc = await updateCommit.posCommitModel.findOne({}).sort('-commitId').lean();
+		updateCommit[TYPENAME].highestPosCommitId = (commitDoc && commitDoc.commitId) ? commitDoc.commitId + 1 : 1;
+	})
+
+	await cms.execPostAsync('run:resetHighestPosCommitId');
 	updateCommit[TYPENAME].nodeHighestPosCommitIdUpdating = 0;
 	updateCommit[TYPENAME].queue = new Queue(async (data, cb) => {
 		const { commits } = data;
@@ -37,11 +41,11 @@ async function posCommit(updateCommit) {
 			} else result = true;
 
 			if (result) {
+				await cms.execPostAsync('run:resetHighestPosCommitId');
 				if (commit.commitId) {
 					updateCommit[TYPENAME].highestPosCommitId = commit.commitId + 1;
 				} else {
 					commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
-					updateCommit[TYPENAME].highestPosCommitId++;
 				}
 				await updateCommit.posCommitModel.create(commit);
 				newCommits.push(commit);
@@ -66,6 +70,7 @@ async function posCommit(updateCommit) {
 
 	updateCommit.registerMethod(TYPENAME, 'update', async function (commit) {
 		try {
+			await cms.execPostAsync('run:resetHighestPosCommitId');
 			const collection = updateCommit.db.collection(commit.data.collection);
 			const query = JsonFn.parse(commit.update.query, true, true, (key, value) => {
 				if (!key.endsWith('_id')) {
@@ -79,7 +84,6 @@ async function posCommit(updateCommit) {
 			await orm.execChain(query);
 			if (!commit.commitId) {
 				commit.commitId = updateCommit[TYPENAME].highestPosCommitId;
-				updateCommit[TYPENAME].highestPosCommitId++;
 			}
 			emitToFrontend(commit);
 			return true;
@@ -100,6 +104,7 @@ async function posCommit(updateCommit) {
 	})
 
 	updateCommit.registerMethod(TYPENAME, 'checkCommitExist', async function ({ commitId }) {
+		await cms.execPostAsync('run:resetHighestPosCommitId');
 		return updateCommit[TYPENAME].highestPosCommitId > commitId;
 	})
 
