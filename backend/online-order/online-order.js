@@ -733,7 +733,7 @@ module.exports = async cms => {
 
     try {
       const data = {
-        appName: 'POS_Android',
+        appName: global.APP_CONFIG.appName,
         appVersion: require('../../package').version,
         hardware: global.APP_CONFIG.deviceName,
         hardwareId: global.APP_CONFIG.hardwareID,
@@ -769,10 +769,7 @@ module.exports = async cms => {
       requestBody.hardwareId = global.APP_CONFIG.hardwareID
       requestBody.release = require('../../package').release
       requestBody.osName = global.APP_CONFIG.osName
-      const pkgPath = path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD')
-      if (fs.existsSync(pkgPath)) {
-        requestBody.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
-      }
+      requestBody.appBaseVersion = global.APP_CONFIG.buildNumber
       const response = await axios.post(pairingApiUrl, requestBody)
       const { deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale, isFirstDevice } = response.data
       await cms.getModel('PosSetting').findOneAndUpdate({}, {

@@ -43,6 +43,7 @@ module.exports = (cms) => {
 			case 'deviceInfo':
 				global.APP_CONFIG.osName = data.deviceOS;
 				global.APP_CONFIG.deviceName = data.deviceName;
+				global.APP_CONFIG.buildNumber = data.buildNumber;
 				if (data.hardwareID && !global.APP_CONFIG.hardwareID) {
 					global.APP_CONFIG.hardwareID = data.hardwareID;
 					await cms.getModel('PosSetting').findOneAndUpdate({}, {hardwareID: data.hardwareID});
