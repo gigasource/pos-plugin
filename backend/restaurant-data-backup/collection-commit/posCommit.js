@@ -2,6 +2,7 @@ const Queue = require('better-queue');
 const JsonFn = require('json-fn');
 const _ = require('lodash');
 const orm = require('schemahandler');
+const mongoose = require('mongoose');
 
 async function posCommit(updateCommit) {
 	const TYPENAME = 'pos';
@@ -70,7 +71,7 @@ async function posCommit(updateCommit) {
 				if (!key.endsWith('_id')) {
 					return value;
 				}
-				return (typeof value === 'string' && value.length === 24) ? new orm.ObjectId(value) : value;
+				return (typeof value === 'string' && value.length === 24) ? mongoose.Types.ObjectId(value) : value;
 			});
 			if (updateCommit.isOnlineOrder) {
 				query.name = `${query.name}@${updateCommit.storeId}`;
