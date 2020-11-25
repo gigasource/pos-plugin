@@ -8,7 +8,6 @@ const ObjectId = mongoose.Types.ObjectId
 const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
 const StoreModel = cms.getModel('Store')
-const { dbExists } = require('../restaurant-data-backup/index');
 
 function generateDeviceCode() {
   return randomstring.generate({length: 9, charset: 'numeric'})
@@ -37,10 +36,6 @@ async function removePairedDeviceFromStore(deviceId, storeId) {
   const deviceIds = _.map(store.devices, e => e._id)
   const newDeviceIds = _.filter(deviceIds, id => id !== deviceId)
   await StoreModel.updateOne({_id: storeId.toString()}, {devices: newDeviceIds});
-  const removedDevice = await DeviceModel.findOne({ _id: deviceId });
-  if (removedDevice && removedDevice.master) {
-    await cms.execPostAsync('run:triggerOnlineAsMaster', null, [storeId]);
-  }
 }
 
 router.get('/pairing-code', async (req, res) => {
@@ -135,10 +130,12 @@ router.post('/register', async (req, res) => {
       storeLocale: store.country ? store.country.locale : 'en'
     };
 
-    if (!(await dbExists(device.storeId))) {
+    const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
+    if (storeDevices.length === 1) {
       response.isFirstDevice = true
       res.status(200).json(response);
 
+      await setMasterDevice(store._id, device._id)
       const demoData = store.demoDataSrc;
       if (demoData)
         await getExternalSocketIoServer().emitToPersistent(device._id, 'import-init-data', demoData)

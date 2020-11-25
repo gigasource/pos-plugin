@@ -108,9 +108,6 @@
                       <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2"
                          style="cursor: pointer"
                          @click="$emit('update:deviceAppVersion', device)">Update</p>
-                      <p v-if="device.updateVersion && device.canUpdate" class="ml-3 text-indigo-accent-2"
-                         style="cursor: pointer"
-                         @click="$emit('update:forceDeviceAppVersion', device)">Force update</p>
                     </template>
                   </div>
                   <div class="col-1 row-flex align-items-center">
