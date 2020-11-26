@@ -11,9 +11,9 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer = require('nodemailer')
-const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
+const { NOTIFICATION_ACTION_TYPE, ORDER_RESPONSE_STATUS } = require('./restaurant-plus-apis/constants');
 const { sendNotification } = require('./app-notification');
-
+const { updateOrderStatus: updateWithAutoAccept, sendOrderNotificationToDevice } = require('./restaurant-plus-apis/orders/controller');
 const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync, updateCommits } = require('./restaurant-data-backup/index');
 
 const Schema = mongoose.Schema
@@ -342,6 +342,10 @@ module.exports = async function (cms) {
     }
   })
 
+  externalSocketIOServer.registerAckFunction('createOrderAck', orderToken => {
+    sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
+  });
+
   function notifyDeviceStatusChanged(clientId) {
     console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Backend notifies frontend to update online/offline status`);
     internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus', clientId);
@@ -483,6 +487,7 @@ module.exports = async function (cms) {
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId},eventType=orderStatus`,
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
+        sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
         // NOTE: cashPayment may have paypalOrderDetail is empty object
         const isPaypalPayment = paypalOrderDetail && paypalOrderDetail.orderID
         const isCashPayment = !isPaypalPayment // more provider here
@@ -872,10 +877,7 @@ module.exports = async function (cms) {
       }
 
       if (store.gSms && store.gSms.enabled) {
-        const gSmsDevices = await getGsmsDevices(store._id.toString())
-        const autoAcceptOrderEnabled =
-          !!(store.gSms && (store.gSms.autoAcceptOrder
-            || store.gSms.autoAcceptOrder === undefined)) // backward compatibility
+        const gSmsDevices = await getGsmsDevices(store._id.toString());
 
         await sendNotification(
           gSmsDevices,
@@ -886,10 +888,10 @@ module.exports = async function (cms) {
           {
             actionType: NOTIFICATION_ACTION_TYPE.ORDER,
             orderId: newOrder._id.toString(),
-            autoAcceptOrder: `${autoAcceptOrderEnabled}`,
+            autoAcceptOrder: `${!!(store.gSms && store.gSms.autoAcceptOrder)}`,
             timeToComplete: `${store.gSms && store.gSms.timeToComplete}`,
           },
-        )
+        );
       }
 
       if (!device) {
@@ -910,11 +912,17 @@ module.exports = async function (cms) {
             }
           }
 
-          return updateOrderStatus(orderData.orderToken,
+          await updateOrderStatus(orderData.orderToken,
               {
                 storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',
                 responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
-              })
+              });
+
+          if (Array.isArray(store.gSms.devices) && store.gSms.devices.length > 0 && store.gSms.autoAcceptOrder) {
+            await updateWithAutoAccept(newOrder._id.toString(), 'kitchen', timeToComplete);
+          }
+
+          return;
         }
 
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
