@@ -29,11 +29,11 @@ async function sendFirebaseNotification(notification, data, tokens) {
   }
   const message = {
     data: formattedData,
+    notification,
     tokens,
     apns: {
       payload: {
         aps: {
-          'mutable-content': 1,
           'content-available': 1
         }
       }
