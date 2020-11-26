@@ -542,7 +542,7 @@
         {
           "schemaType": "boolean",
           "key": "autoAcceptOrder",
-          "default": "true",
+          "default": "false",
           "type": "input@switch"
         }
       ]
