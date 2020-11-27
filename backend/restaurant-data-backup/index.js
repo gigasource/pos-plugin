@@ -25,6 +25,7 @@ async function initConnection(socket) {
 		})
 		const storesList = await cms.getModel('Store').find({}).lean();
 		for (let id = 0; id < storesList.length; id++) {
+			console.log(`Start init db backup for store ${id}`);
 			const store = storesList[id];
 			connectionHandlers[store._id.toString()] = new UpdateCommit(store._id.toString(), orm.cache.get('client'));
 			await connectionHandlers[store._id.toString()].updateCommit.init(socket);
@@ -36,6 +37,7 @@ async function initConnection(socket) {
 			if (!masterDevice) {
 				await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
 			}
+			console.log(`Finish init db backup for ${id + 1}/${storesList.length} ${id > 0 ? 'store' : 'stores'}`)
 		}
 		console.log('init db for each store completed');
 	} catch (err) {
