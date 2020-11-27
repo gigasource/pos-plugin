@@ -4,10 +4,11 @@ const { MongoClient } = require('mongodb');
 const UpdateCommit = require('./updateCommit');
 const mongoose = require('mongoose');
 const orm = require('schemahandler/orm');
-const connnectionUri = `mongodb://${global.APP_CONFIG.database.username}:${global.APP_CONFIG.database.password}@mongo-vn-office.gigasource.io:27017`;
+const { username, password, host } = global.APP_CONFIG.backupDatabaseConfig;
+const backupDbConnectionUri = `mongodb://${username}:${password}@${host}`;
 const _ = require('lodash');
 
-orm.connect(connnectionUri, (err) => {
+orm.connect(backupDbConnectionUri, (err) => {
 	if (err) {
 		console.log('Error is:', err);
 	}
