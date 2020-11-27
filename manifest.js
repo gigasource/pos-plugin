@@ -125,12 +125,12 @@ module.exports = {
       },
       path: 'style/pos.css'
     },
-    {
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/initDemoData/initDemoData.js'
-    },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/initDemoData/initDemoData.js'
+    // },
     {
       loader: {
         type: 'backend-api'
@@ -184,6 +184,12 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/usb-printer/usb-printer.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/handle-version/handle-version.js'
     },
     {
       loader: {
