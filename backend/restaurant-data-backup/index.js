@@ -7,7 +7,11 @@ const orm = require('schemahandler/orm');
 const connnectionUri = `mongodb://${global.APP_CONFIG.database.username}:${global.APP_CONFIG.database.password}@mongo-vn-office.gigasource.io:27017`;
 const _ = require('lodash');
 
-orm.connect(connnectionUri);
+orm.connect(connnectionUri, (err) => {
+	if (err) {
+		console.log('Error is:', err);
+	}
+});
 let connectionHandlers = {};
 let externalSocketIOServer;
 
