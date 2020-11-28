@@ -177,7 +177,7 @@
       formatNumber(number) {
         if(!number || isNaN(number) || Math.floor(number) === number)
           return number
-        return number.toFixed(2)
+        return parseFloat(number).toFixed(2);
       }
     },
     async created() {
@@ -257,6 +257,7 @@
         await this.loadInventories()
       },
       async submitInventory() {
+        console.log('123');
         if(!this.name || !this.category || !this.unit || !this.stock || isNaN(this.stock)) return
         const inventory = {
           name: this.name,
