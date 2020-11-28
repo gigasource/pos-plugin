@@ -1,0 +1,114 @@
+{
+  "_id": "5e6f038c7f9b3a05b950ae7d",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e6f03b77f9b3a05b950ae7f",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5e6f05467f9b3a05b950aeb0",
+      "schemaType": "array",
+      "key": "roomObjects",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "object",
+          "key": "location",
+          "fields": [
+            {
+              "schemaType": "number",
+              "key": "x",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "y",
+              "type": "input@number"
+            }
+          ],
+          "type": "GObjectDelegate",
+          "dynamicFieldsType": "code",
+          "formatItems": {
+            "_code_": "module.exports = function (item) {\n  return [{\n    text: `x: ${item.x || ''}, y: ${item.y || ''}`\n  }]\n}",
+            "_code_type_": "commonJs"
+          },
+          "editOnFocus": true
+        },
+        {
+          "schemaType": "object",
+          "key": "size",
+          "fields": [
+            {
+              "schemaType": "number",
+              "key": "width",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "height",
+              "type": "input@number"
+            }
+          ],
+          "type": "object"
+        },
+        {
+          "schemaType": "number",
+          "key": "rotate",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "string",
+          "key": "bgColor",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "takeAway",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "type",
+          "type": "input@select",
+          "label": "type",
+          "optionsType": "textValue",
+          "options": [
+            {
+              "value": "table",
+              "text": "table"
+            },
+            {
+              "value": "wall",
+              "text": "wall"
+            },
+            {
+              "value": "other",
+              "text": "other"
+            }
+          ]
+        }
+      ],
+      "type": "tableArray",
+      "expansion": [
+        "size"
+      ]
+    },
+    {
+      "_id": "5e7c9a345eb24b13bf72f00f",
+      "schemaType": "number",
+      "key": "order",
+      "type": "input@number"
+    }
+  ],
+  "name": "Room",
+  "tabs": [],
+  "type": "Collection",
+  "alwaysLoad": true
+}

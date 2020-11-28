@@ -1,0 +1,27 @@
+{
+  "_id": "5c46e2b15889c52fe001ab83",
+  "__v": 0,
+  "alwaysLoad": true,
+  "class": null,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5df6ef937854273fa4fd982c",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5e6622acac204918b3c6de12",
+      "schemaType": "number",
+      "clickable": true,
+      "key": "position",
+      "type": "input@number"
+    }
+  ],
+  "id": "5c46e2b15889c52fe001ab83",
+  "name": "Category",
+  "tabs": [],
+  "title": "name",
+  "type": "Collection"
+}

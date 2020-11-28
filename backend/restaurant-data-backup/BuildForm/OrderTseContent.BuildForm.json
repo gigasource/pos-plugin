@@ -1,0 +1,24 @@
+{
+  "_id": "5f7c00089815461fcd57a193",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7c01b59815461fcd57a1a2",
+      "schemaType": "objectId",
+      "key": "order",
+      "ref": "Order",
+      "type": "ref-select",
+      "labelProp": "id"
+    },
+    {
+      "_id": "5f7c01b59815461fcd57a1a1",
+      "schemaType": "mixed",
+      "key": "content",
+      "type": "object",
+      "addable": true
+    }
+  ],
+  "name": "OrderTseContent",
+  "tabs": [],
+  "type": "Collection"
+}

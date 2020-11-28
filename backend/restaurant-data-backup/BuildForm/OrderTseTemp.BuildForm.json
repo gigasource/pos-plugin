@@ -1,0 +1,45 @@
+{
+  "_id": "5f7c01e69815461fcd57a1e6",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7c02299815461fcd57a1ed",
+      "schemaType": "date",
+      "key": "date",
+      "type": "date-picker"
+    },
+    {
+      "_id": "5f7c02299815461fcd57a1ec",
+      "schemaType": "number",
+      "key": "passthroughOrderNumber",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f7c02299815461fcd57a1eb",
+      "schemaType": "number",
+      "key": "orderNumber",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f7c02299815461fcd57a1ea",
+      "schemaType": "number",
+      "key": "sum",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f7c02299815461fcd57a1e9",
+      "schemaType": "number",
+      "key": "passthroughSum",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f7c02299815461fcd57a1e8",
+      "schemaType": "number",
+      "key": "onlyFoodHoldNumber",
+      "type": "input@number"
+    }
+  ],
+  "name": "OrderTseTemp",
+  "tabs": [],
+  "type": "Collection"
+}

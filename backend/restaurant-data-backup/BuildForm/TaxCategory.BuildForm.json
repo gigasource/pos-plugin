@@ -1,0 +1,27 @@
+{
+  "_id": "5faa45eb6c4b27f60dec585d",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5faa48a56c4b27f60dec585f",
+      "schemaType": "string",
+      "type": "input",
+      "key": "name"
+    },
+    {
+      "_id": "5fab8b3e3408522f2bd3abee",
+      "schemaType": "number",
+      "key": "value",
+      "type": "input@number"
+    },
+    {
+      "_id": "5fab8b3e3408522f2bd3abef",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    }
+  ],
+  "name": "TaxCategory",
+  "tabs": [],
+  "type": "Collection"
+}

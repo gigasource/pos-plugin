@@ -1,0 +1,19 @@
+{
+  "_id": "5ef0570d15eeb7351e9057c8",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5ef0574815eeb7351e9057ca",
+      "schemaType": "string",
+      "key": "tagString"
+    },
+    {
+      "_id": "5ef0574815eeb7351e9057cb",
+      "schemaType": "string",
+      "key": "message"
+    }
+  ],
+  "name": "SentrySavedMessage",
+  "tabs": [],
+  "type": "Collection"
+}

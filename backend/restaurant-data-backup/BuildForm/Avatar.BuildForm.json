@@ -1,0 +1,28 @@
+{
+  "_id": "5def2033fdeb6602ac49bf2b",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5def2115fdeb6602ac49bf3a",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5def20a5fdeb6602ac49bf2d",
+      "schemaType": "string",
+      "key": "image",
+      "type": "inline-image",
+      "flex": "md6",
+      "onChange": {
+        "_code_": "",
+        "_code_type_": "commonJs"
+      }
+    }
+  ],
+  "name": "Avatar",
+  "tabs": [],
+  "title": "",
+  "type": "Collection",
+  "alwaysLoad": null
+}

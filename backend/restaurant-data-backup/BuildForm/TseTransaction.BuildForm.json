@@ -1,0 +1,79 @@
+{
+  "_id": "5f7bf8179815461fcd57a0e0",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7bf9b39815461fcd57a0ea",
+      "schemaType": "number",
+      "key": "TSE_TANR",
+      "type": "input@number",
+      "flex": "md4"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e9",
+      "schemaType": "date",
+      "key": "TSE_TA_START",
+      "type": "date-picker",
+      "flex": "md4",
+      "pickerType": "datetime",
+      "clearable": true,
+      "showIcon": true
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e8",
+      "schemaType": "date",
+      "key": "TSE_TA_ENDE",
+      "type": "date-picker",
+      "flex": "md4",
+      "pickerType": "datetime",
+      "clearable": true,
+      "showIcon": true
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e7",
+      "schemaType": "string",
+      "key": "TSE_TA_VORGANGSART",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e6",
+      "schemaType": "number",
+      "key": "TSE_TA_SIGZ",
+      "type": "input@number",
+      "flex": "md4"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e5",
+      "schemaType": "string",
+      "key": "TSE_TA_SIG",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e4",
+      "schemaType": "string",
+      "key": "TSE_TA_FEHLER",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e3",
+      "schemaType": "string",
+      "key": "TSE_TA_VORGANGSDATEN",
+      "type": "input"
+    },
+    {
+      "_id": "5f7bf9b39815461fcd57a0e2",
+      "schemaType": "objectId",
+      "key": "order",
+      "ref": "Order",
+      "autopopulate": null,
+      "type": "ref-select",
+      "labelProp": "id"
+    }
+  ],
+  "name": "TseTransaction",
+  "tabs": [],
+  "type": "Collection"
+}

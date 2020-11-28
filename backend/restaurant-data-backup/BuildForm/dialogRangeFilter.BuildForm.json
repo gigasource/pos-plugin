@@ -1,0 +1,45 @@
+{
+  "_id": "5de734dfa7884176a656eef6",
+  "extensions": [
+    {
+      "_id": "5de7351ba7884176a656ef05",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ],
+      "slotsType": "array",
+      "slots": [
+        "default"
+      ],
+      "preprocess": [
+        "label"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5ea3b4eaf221a0602aba6375",
+      "schemaType": "mixed",
+      "key": "label",
+      "type": "I18nInput",
+      "addable": true
+    },
+    {
+      "_id": "5de7351ba7884176a656ef03",
+      "schemaType": "number",
+      "key": "min",
+      "type": "input@number",
+      "addable": true
+    },
+    {
+      "_id": "5de7351ba7884176a656ef02",
+      "schemaType": "number",
+      "key": "max",
+      "type": "input@number",
+      "addable": true
+    }
+  ],
+  "name": "dialogRangeFilter",
+  "tabs": [],
+  "type": "Component"
+}

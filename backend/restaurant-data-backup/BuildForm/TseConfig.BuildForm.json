@@ -1,0 +1,78 @@
+{
+  "_id": "5f7c43b87c27a12cb22524bb",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7c44447c27a12cb22524c2",
+      "schemaType": "boolean",
+      "key": "inited",
+      "type": "input@checkbox",
+      "flex": "md12"
+    },
+    {
+      "_id": "5f7c44447c27a12cb22524c1",
+      "schemaType": "string",
+      "key": "tsePublicKey",
+      "type": "input",
+      "flex": "md12"
+    },
+    {
+      "_id": "5f7c44447c27a12cb22524c0",
+      "schemaType": "string",
+      "key": "signatureAlgorithm",
+      "type": "input",
+      "flex": "md12"
+    },
+    {
+      "_id": "5f7c44447c27a12cb22524bf",
+      "schemaType": "string",
+      "key": "serialNumber",
+      "type": "input",
+      "flex": "md12"
+    },
+    {
+      "_id": "5f7c44447c27a12cb22524be",
+      "schemaType": "date",
+      "key": "certificateExpirationDate",
+      "type": "date-picker",
+      "flex": "md12",
+      "pickerType": "datetime",
+      "clearable": true,
+      "showIcon": true
+    },
+    {
+      "_id": "5f7c44447c27a12cb22524bd",
+      "schemaType": "string",
+      "key": "tsePublicKey",
+      "type": "input",
+      "flex": "md12"
+    },
+    {
+      "_id": "5f7c4a8d7c27a12cb2252507",
+      "schemaType": "boolean",
+      "key": "tseEnable",
+      "type": "input@checkbox"
+    },
+    {
+      "_id": "5f7c4a8d7c27a12cb2252506",
+      "schemaType": "boolean",
+      "key": "passthroughEnable",
+      "type": "input@checkbox"
+    },
+    {
+      "_id": "5f7c4a8d7c27a12cb2252505",
+      "schemaType": "number",
+      "key": "procent",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f7c4a8d7c27a12cb2252504",
+      "schemaType": "boolean",
+      "key": "numberOfCustomersDialog",
+      "type": "input@checkbox"
+    }
+  ],
+  "name": "TseConfig",
+  "tabs": [],
+  "type": "Collection"
+}

@@ -1,0 +1,14 @@
+{
+  "_id": "5e12f3fff563d694ca66ad4c",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e12f41cf563d694ca66ad4e",
+      "schemaType": "number",
+      "key": "z",
+      "type": "input@number"
+    }
+  ],
+  "name": "zQuery",
+  "tabs": []
+}

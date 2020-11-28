@@ -1,0 +1,17 @@
+{
+  "_id": "5de7778bb9015752d80bc444",
+  "alwaysLoad": false,
+  "extensions": [
+    {
+      "_id": "5de7779fb9015752d80bc446",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ]
+    }
+  ],
+  "fields": [],
+  "name": "PosLoginKeyboard",
+  "tabs": [],
+  "type": "Component"
+}

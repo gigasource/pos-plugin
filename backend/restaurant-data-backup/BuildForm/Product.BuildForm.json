@@ -1,0 +1,328 @@
+{
+  "_id": "5c46e1c05889c52fe001ab7b",
+  "__v": 0,
+  "alwaysLoad": true,
+  "class": null,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5ddcd49f12b6deb7261044d8",
+      "schemaType": "string",
+      "key": "id",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "_id": "5c46e2065889c52fe001ab7d",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input",
+      "label": "",
+      "flex": "md4",
+      "default": null
+    },
+    {
+      "_id": "5c46e2065889c52fe001ab7c",
+      "schemaType": "number",
+      "key": "price",
+      "type": "input@number",
+      "label": "",
+      "flex": "md4"
+    },
+    {
+      "_id": "5ddcd49f12b6deb7261044d5",
+      "schemaType": "number",
+      "key": "price2",
+      "type": "input@number",
+      "label": "",
+      "flex": "md4"
+    },
+    {
+      "_id": "5c5eda4514922b1ee01777a3",
+      "schemaType": "number",
+      "type": "input@select:number",
+      "optionsType": "textValue",
+      "options": [
+        {
+          "value": "7",
+          "text": "7%"
+        },
+        {
+          "value": "19",
+          "text": "19%"
+        },
+        {
+          "value": "0",
+          "text": "0%"
+        }
+      ],
+      "key": "tax",
+      "flex": "md4"
+    },
+    {
+      "_id": "5ddce0a012b6deb726104505",
+      "schemaType": "number",
+      "type": "input@select:number",
+      "optionsType": "textValue",
+      "options": [
+        {
+          "value": "7",
+          "text": "7%"
+        },
+        {
+          "value": "19",
+          "text": "19%"
+        },
+        {
+          "value": "0",
+          "text": "0%"
+        }
+      ],
+      "key": "tax2",
+      "flex": "md4"
+    },
+    {
+      "_id": "5e782f1efbe5dc038265be12",
+      "schemaType": "objectId",
+      "key": "category",
+      "ref": "Category",
+      "autopopulate": true,
+      "type": "ref-select",
+      "label": "name",
+      "labelProp": "name",
+      "clipboardType": "cut"
+    },
+    {
+      "_id": "5ddce0a012b6deb726104504",
+      "schemaType": "number",
+      "key": "drinkPart",
+      "type": "input@number",
+      "flex": "md4",
+      "addable": true
+    },
+    {
+      "_id": "5ddce0a012b6deb726104503",
+      "schemaType": "string",
+      "key": "barcode",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "_id": "5ddce0a012b6deb726104502",
+      "schemaType": "string",
+      "key": "unit",
+      "type": "input@select",
+      "flex": "md4",
+      "optionsType": "onlyValue",
+      "options": [
+        "box",
+        "pack",
+        "piece"
+      ]
+    },
+    {
+      "_id": "5ddce0a012b6deb726104501",
+      "schemaType": "array",
+      "key": "attributes",
+      "type": "tableArray",
+      "addable": true,
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "key",
+          "type": "input@select",
+          "optionsType": "onlyValue",
+          "options": [
+            "color",
+            "age"
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "value",
+          "type": "input",
+          "flex": null
+        }
+      ]
+    },
+    {
+      "_id": "5dddf14659eb3cc0fb5c0d64",
+      "schemaType": "objectId",
+      "key": "groupPrinter",
+      "ref": "GroupPrinter",
+      "autopopulate": true,
+      "type": "ref-select",
+      "flex": null,
+      "labelProp": "name",
+      "addable": false,
+      "editable": true
+    },
+    {
+      "_id": "5e7844d0fbe5dc038265bebb",
+      "schemaType": "objectId",
+      "key": "groupPrinter2",
+      "ref": "GroupPrinter",
+      "autopopulate": true,
+      "type": "ref-select",
+      "label": "",
+      "labelProp": "name",
+      "addable": null,
+      "editable": true
+    },
+    {
+      "_id": "5df1b99ffdeb6602ac49d3d6",
+      "schemaType": "object",
+      "key": "option",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "favorite",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "nonRefundable",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "showOnOrderScreen",
+          "default": "",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "manualPrice",
+          "type": "input@switch"
+        }
+      ],
+      "type": "object"
+    },
+    {
+      "_id": "5dfaf12eac2798029d736ccf",
+      "schemaType": "number",
+      "key": "refundPrice",
+      "type": "input@number",
+      "addable": true
+    },
+    {
+      "_id": "5e74bab077c3dd141336469f",
+      "schemaType": "boolean",
+      "key": "isModifier",
+      "type": "input@checkbox"
+    },
+    {
+      "_id": "5e79bd36452c0b09364f6c91",
+      "schemaType": "boolean",
+      "key": "isItemNote",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5e7871894eddea12eaf34bd3",
+      "schemaType": "boolean",
+      "key": "isNoPrint",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5e788d6a5d78da15459b9810",
+      "schemaType": "boolean",
+      "key": "isDivArticle",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5f4cb3e5c6a8fc264c003222",
+      "schemaType": "objectId",
+      "key": "activePopupModifierGroup",
+      "ref": "PosModifierGroup",
+      "type": "ref-select",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f69a70c2041162d7a206e2e",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5f69a70c2041162d7a206e2f",
+      "schemaType": "array",
+      "key": "choices",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "mandatory",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "select",
+          "type": "input"
+        },
+        {
+          "schemaType": "array",
+          "key": "options",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": "5f9fb2d7dc4b58bbe86031c9",
+      "schemaType": "array",
+      "key": "ingredients",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "objectId",
+          "key": "inventory",
+          "ref": "Inventory",
+          "type": "ref-select"
+        },
+        {
+          "schemaType": "number",
+          "key": "amount",
+          "type": "input@number"
+        }
+      ]
+    },
+    {
+      "_id": "5faa58216c4b27f60dec5a0e",
+      "schemaType": "string",
+      "key": "taxCategory",
+      "type": "input"
+    },
+    {
+      "_id": "5faa58216c4b27f60dec5a0f",
+      "schemaType": "string",
+      "key": "taxCategory2",
+      "type": "input"
+    }
+  ],
+  "id": "5c46e1c05889c52fe001ab7b",
+  "name": "Product",
+  "tabs": [],
+  "title": "name",
+  "type": "Collection"
+}

@@ -1,0 +1,23 @@
+{
+  "_id": "5e0f178fc106bd02fdb3538f",
+  "extensions": [
+    {
+      "_id": "5e0f17c3c106bd02fdb35392",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5e0f17c3c106bd02fdb35391",
+      "schemaType": "boolean",
+      "key": "newValueEditable",
+      "type": "input@switch"
+    }
+  ],
+  "name": "dialogChangeValue",
+  "tabs": [],
+  "type": "Component"
+}

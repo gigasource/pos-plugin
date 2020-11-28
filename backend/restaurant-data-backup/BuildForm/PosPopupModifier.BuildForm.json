@@ -1,0 +1,45 @@
+{
+  "_id": "5f4cc57bc6a8fc264c0032ee",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f4cc5dec6a8fc264c0032f3",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5f4cc5dec6a8fc264c0032f4",
+      "schemaType": "number",
+      "key": "price",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f4cc5dec6a8fc264c0032f5",
+      "schemaType": "number",
+      "key": "max",
+      "type": "input@number"
+    },
+    {
+      "_id": "5f4cc5dec6a8fc264c0032f6",
+      "schemaType": "objectId",
+      "key": "printer",
+      "ref": "GroupPrinter",
+      "type": "ref-select",
+      "labelProp": "name"
+    },
+    {
+      "_id": "5f995f88624e38720c84f991",
+      "schemaType": "string",
+      "key": "modifierGroup"
+    },
+    {
+      "_id": "5f995f88624e38720c84f992",
+      "schemaType": "string",
+      "key": "category"
+    }
+  ],
+  "name": "PosPopupModifier",
+  "tabs": [],
+  "type": "Collection"
+}

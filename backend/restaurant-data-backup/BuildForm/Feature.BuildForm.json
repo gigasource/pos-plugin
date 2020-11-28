@@ -1,0 +1,22 @@
+{
+  "_id": "5ea3e714edc74651fc2c21aa",
+  "alwaysLoad": null,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5ea3e7e7edc74651fc2c21ac",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5ea3e7e7edc74651fc2c21ad",
+      "schemaType": "boolean",
+      "key": "enabled",
+      "type": "input@checkbox"
+    }
+  ],
+  "tabs": [],
+  "type": "Collection",
+  "name": "Feature"
+}

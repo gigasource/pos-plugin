@@ -1,0 +1,40 @@
+{
+  "_id": "5fb63f6b4061cd4a6546a093",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5fb63fc24061cd4a6546a095",
+      "schemaType": "string",
+      "key": "title",
+      "type": "input"
+    },
+    {
+      "_id": "5fb63fc24061cd4a6546a096",
+      "schemaType": "string",
+      "key": "duration",
+      "type": "input"
+    },
+    {
+      "_id": "5fb63fc24061cd4a6546a097",
+      "schemaType": "string",
+      "key": "url",
+      "type": "input"
+    },
+    {
+      "_id": "5fb63fc24061cd4a6546a098",
+      "schemaType": "string",
+      "key": "thumbnail",
+      "type": "input"
+    },
+    {
+      "_id": "5fb63fc24061cd4a6546a099",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    }
+  ],
+  "tabs": [],
+  "alwaysLoad": null,
+  "name": "Tutorial",
+  "type": "Collection"
+}

@@ -1,0 +1,28 @@
+{
+  "_id": "5c69411994b44769f7ad4e63",
+  "__v": 0,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5c863f31dadddd317f5017de",
+      "schemaType": "date",
+      "key": "from",
+      "type": "date-picker",
+      "pickerType": "date",
+      "clearable": true,
+      "showIcon": true
+    },
+    {
+      "_id": "5c863f31dadddd317f5017dd",
+      "schemaType": "date",
+      "key": "to",
+      "type": "date-picker",
+      "pickerType": "date",
+      "clearable": true,
+      "showIcon": true
+    }
+  ],
+  "id": "5c69411994b44769f7ad4e63",
+  "name": "QueryTest",
+  "tabs": []
+}

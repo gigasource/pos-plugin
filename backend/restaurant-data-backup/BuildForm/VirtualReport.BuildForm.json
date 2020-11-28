@@ -1,0 +1,61 @@
+{
+  "_id": "5f7c152a50832aa09fd3bf67",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7c166e50832aa09fd3bf6c",
+      "schemaType": "string",
+      "key": "imageContent",
+      "type": "input"
+    },
+    {
+      "_id": "5f7c166e50832aa09fd3bf6b",
+      "schemaType": "date",
+      "key": "created",
+      "type": "input@date"
+    },
+    {
+      "_id": "5f7c166e50832aa09fd3bf6a",
+      "schemaType": "objectId",
+      "key": "orderId",
+      "ref": "Order",
+      "type": null
+    },
+    {
+      "_id": "5f7c166e50832aa09fd3bf69",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input@select",
+      "label": "type",
+      "optionsType": "textValue",
+      "options": [
+        {
+          "value": "kitchen",
+          "text": "kitchen"
+        },
+        {
+          "value": "invoice",
+          "text": "invoice"
+        }
+      ]
+    },
+    {
+      "_id": "5f7d3e8199f48c09d065c5dd",
+      "schemaType": "objectId",
+      "key": "printerGroupId",
+      "ref": "GroupPrinter",
+      "type": "ref-select",
+      "label": "",
+      "labelProp": ""
+    },
+    {
+      "_id": "5f7d3e8199f48c09d065c5dc",
+      "schemaType": "string",
+      "key": "printerId",
+      "type": "input"
+    }
+  ],
+  "name": "VirtualReport",
+  "tabs": [],
+  "type": "Collection"
+}

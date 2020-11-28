@@ -1,0 +1,131 @@
+{
+  "_id": "5e71d7d691c0240483d164bd",
+  "extensions": [
+    {
+      "_id": "5e71da0091c0240483d164f8",
+      "extensionType": "ComponentLib",
+      "preprocess": []
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5e71d88d91c0240483d164c4",
+      "schemaType": "mixed",
+      "key": "items",
+      "fields": [
+        {
+          "schemaType": "object",
+          "key": "item",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "icon",
+              "fields": [],
+              "type": "input",
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "string",
+              "key": "iconType",
+              "type": "input",
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "mixed",
+              "key": "onClick",
+              "type": "editor",
+              "addable": true,
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "mixed",
+              "key": "title",
+              "type": "I18nInput",
+              "label": "title"
+            }
+          ]
+        },
+        {
+          "schemaType": "object",
+          "key": "dynamicItem",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "icon",
+              "fields": [],
+              "type": "input",
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "string",
+              "key": "iconType",
+              "type": "input",
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "mixed",
+              "key": "onClick",
+              "type": "editor",
+              "addable": true,
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "mixed",
+              "key": "children",
+              "type": "editor",
+              "addable": true
+            },
+            {
+              "schemaType": "mixed",
+              "key": "title",
+              "type": "I18nInput",
+              "label": "title"
+            }
+          ],
+          "clipboardType": "cut"
+        },
+        {
+          "schemaType": "object",
+          "key": "slotItem",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "slot",
+              "type": "input"
+            }
+          ],
+          "clipboardType": "cut"
+        }
+      ],
+      "type": "tree",
+      "getText": {
+        "_code_": "module.exports = function(item) {\n  return `${item.title || ''} : ${item.icon || ''}`\n}",
+        "_code_type_": "commonJs"
+      },
+      "children": "items"
+    },
+    {
+      "_id": "5e7c799e5eb24b13bf72ec68",
+      "schemaType": "mixed",
+      "key": "afterMountFn",
+      "mixed": true,
+      "type": "editor",
+      "label": "afterMountFn",
+      "addable": true
+    },
+    {
+      "_id": "5e7c799e5eb24b13bf72ec69",
+      "schemaType": "string",
+      "key": "defaultPath",
+      "type": "input",
+      "label": "defaultPath",
+      "addable": true
+    }
+  ],
+  "name": "PosDashboardSidebar",
+  "tabs": [],
+  "type": "Component"
+}

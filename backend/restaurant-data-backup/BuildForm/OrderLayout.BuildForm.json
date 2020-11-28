@@ -1,0 +1,128 @@
+{
+  "_id": "5e732b59be94c10a2f2a8b41",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e734c33be94c10a2f2a8c4e",
+      "schemaType": "number",
+      "key": "columns",
+      "type": "input@number",
+      "label": "Columns"
+    },
+    {
+      "_id": "5e734c33be94c10a2f2a8c4f",
+      "schemaType": "number",
+      "key": "rows",
+      "type": "input@number",
+      "label": "Rows"
+    },
+    {
+      "_id": "5e734c33be94c10a2f2a8c50",
+      "schemaType": "array",
+      "key": "categories",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "color",
+          "type": "input"
+        },
+        {
+          "schemaType": "number",
+          "key": "top",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "left",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "columns",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "rows",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "array",
+          "key": "products",
+          "fields": [
+            {
+              "schemaType": "objectId",
+              "key": "product",
+              "ref": "Product",
+              "autopopulate": true,
+              "type": "ref-select",
+              "label": "name",
+              "labelProp": "name"
+            },
+            {
+              "schemaType": "string",
+              "key": "color",
+              "type": "input"
+            },
+            {
+              "schemaType": "number",
+              "key": "top",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "number",
+              "key": "left",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "string",
+              "key": "type",
+              "type": "input@select",
+              "addable": true,
+              "optionsType": "textValue",
+              "options": [
+                {
+                  "value": "Article",
+                  "text": "Article"
+                },
+                {
+                  "value": "Div.Article",
+                  "text": "Div.Article"
+                },
+                {
+                  "value": "Menu",
+                  "text": "Menu"
+                },
+                {
+                  "value": "Text",
+                  "text": "Text"
+                }
+              ]
+            },
+            {
+              "schemaType": "string",
+              "key": "text",
+              "type": "input"
+            }
+          ],
+          "type": "tableArray"
+        }
+      ]
+    },
+    {
+      "_id": "5f633b55a0556535c04e71db",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    }
+  ],
+  "name": "OrderLayout",
+  "tabs": [],
+  "type": "Collection"
+}

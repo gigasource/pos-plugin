@@ -1,0 +1,32 @@
+{
+  "_id": "5de732bea7884176a656eeb0",
+  "extensions": [
+    {
+      "_id": "5de732f7a7884176a656eeb3",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ],
+      "slotsType": "array",
+      "slots": [
+        "default"
+      ],
+      "preprocess": [
+        "label"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5ea3b4d1f221a0602aba6370",
+      "schemaType": "mixed",
+      "key": "label",
+      "type": "I18nInput",
+      "label": "label",
+      "addable": true
+    }
+  ],
+  "name": "dialogTextFilter",
+  "tabs": [],
+  "type": "Component"
+}

@@ -1,0 +1,1276 @@
+{
+  "_id": "5ddb985ff26bb37e5ccc5c43",
+  "__v": 0,
+  "alwaysLoad": true,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5ddb9df3f26bb37e5ccc5c5a",
+      "schemaType": "array",
+      "key": "leftFunctionButtons",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "text",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunction",
+          "type": "input@select",
+          "chips": true,
+          "optionsType": null,
+          "options": null,
+          "flex": null,
+          "notOnlyValueInOptions": true
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunctionValue",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "backgroundColor",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "textColor",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "array",
+          "key": "containedButtons",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "type": "input"
+            }
+          ]
+        },
+        {
+          "schemaType": "array",
+          "key": "rows",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "type": "input@multiSelect",
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "cols",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "type": "input@multiSelect",
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalRows",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalCols",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "object",
+          "key": "buyback",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "objectId",
+              "key": "product",
+              "ref": "Product",
+              "autopopulate": true,
+              "type": "ref-select",
+              "flex": null,
+              "labelProp": "name"
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number",
+              "addable": false,
+              "clipboardType": "cut"
+            },
+            {
+              "schemaType": "string",
+              "key": "unit",
+              "type": "input"
+            }
+          ],
+          "flex": null
+        }
+      ],
+      "expansion": [
+        "containedButtons",
+        "textColor",
+        "rows",
+        "cols",
+        "buyback"
+      ],
+      "lazy": true
+    },
+    {
+      "_id": "5de0e0378cc2b9147731b5ff",
+      "schemaType": "array",
+      "key": "rightFunctionButtons",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "text",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunction",
+          "type": "input@select",
+          "chips": true,
+          "optionsType": "onlyValue",
+          "options": [
+            "Product Lookup",
+            "Pay",
+            "Discount"
+          ],
+          "flex": null,
+          "notOnlyValueInOptions": true
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunctionValue",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "backgroundColor",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "textColor",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "array",
+          "key": "containedButtons",
+          "fields": [
+            {
+              "schemaType": "string",
+              "type": "input"
+            }
+          ],
+          "type": "array",
+          "label": "containedButtons"
+        },
+        {
+          "schemaType": "array",
+          "key": "rows",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "cols",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalRows",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalCols",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "object",
+          "key": "buyback",
+          "type": "object",
+          "fields": [
+            {
+              "schemaType": "objectId",
+              "key": "product",
+              "ref": "Product",
+              "autopopulate": true,
+              "type": "ref-select",
+              "labelProp": "name"
+            },
+            {
+              "schemaType": "number",
+              "key": "price",
+              "type": "input@number"
+            },
+            {
+              "schemaType": "string",
+              "key": "unit",
+              "type": "input"
+            }
+          ],
+          "flex": null,
+          "clipboardType": "cut"
+        }
+      ],
+      "expansion": [
+        "containedButtons",
+        "textColor",
+        "rows",
+        "cols",
+        "buyback"
+      ],
+      "lazy": true
+    },
+    {
+      "_id": "5de76b73b9015752d80bc3c1",
+      "schemaType": "array",
+      "key": "user",
+      "type": "array",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "passcode",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "avatar",
+          "type": "inline-image",
+          "flex": "md4",
+          "onChange": {
+            "_code_": "",
+            "_code_type_": "commonJs"
+          }
+        },
+        {
+          "schemaType": "string",
+          "key": "role",
+          "default": "user",
+          "type": "input@select",
+          "optionsType": "onlyValue",
+          "options": [
+            "admin",
+            "user"
+          ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOwnReport",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOtherReport",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "editArticle",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "accessZReport",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "itemCancellation",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "allowTableTakeover",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "itemCancellationReactivePaidTable",
+          "type": "input@switch",
+          "label": "Item Cancellation after Reactive Paid Table",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "allowMoveItem",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "allowTableSwitch",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "reactivePaidTable",
+          "unique": false,
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "openCashdrawerManually",
+          "type": "input@switch",
+          "label": "Open Cashdrawer Manually",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "discount",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "cancelInvoice",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOrder",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOnlineOrderMenu",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOrderHistory",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewOnlineOrderDashboard",
+          "type": "input@switch",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "viewReservation",
+          "type": "input@switch"
+        }
+      ]
+    },
+    {
+      "_id": "5de8d754cdff2284f2ce4a27",
+      "schemaType": "array",
+      "key": "payment",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "icon",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "editable",
+          "default": "",
+          "type": "input@switch"
+        }
+      ],
+      "type": "tableArray",
+      "lazy": true
+    },
+    {
+      "_id": "5de8d754cdff2284f2ce4a26",
+      "schemaType": "object",
+      "key": "companyInfo",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "address",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "address2",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "zipCode",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "city",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "telephone",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "taxNumber",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "ustId",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "logo",
+          "type": "inline-image",
+          "flex": "md6",
+          "onChange": {
+            "_code_": "",
+            "_code_type_": "commonJs"
+          }
+        },
+        {
+          "schemaType": "number",
+          "key": "logoSize",
+          "type": "input@select:number",
+          "flex": "md6",
+          "optionsType": "onlyValue",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        }
+      ],
+      "type": "object"
+    },
+    {
+      "_id": "5de8d89ccdff2284f2ce4a32",
+      "schemaType": "object",
+      "key": "generalSetting",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "useVirtualPrinter",
+          "default": "true",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "barcode",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "favoriteArticle",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "virtualKeyboard",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "automaticCashdrawer",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "number",
+          "key": "quickFnRows",
+          "type": "input@select:number",
+          "optionsType": "onlyValue",
+          "options": [
+            "1",
+            "2",
+            "0"
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "beginHour",
+          "type": "time-picker",
+          "clearable": true,
+          "showIcon": true,
+          "label": "beginHour"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "quickBtn",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "deliveryOrderMode",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "printReceiptWithPay",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "googleMapApiKey",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "onlyCheckoutPrintedItems",
+          "type": "input@switch"
+        }
+      ],
+      "type": "object"
+    },
+    {
+      "_id": "5df1f653fdeb6602ac49d55c",
+      "schemaType": "array",
+      "key": "taxCategory",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "number",
+          "key": "value",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "string",
+          "key": "invoiceLetter",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "hideAtEditView",
+          "type": "input@checkbox"
+        }
+      ],
+      "lazy": true
+    },
+    {
+      "_id": "5e09d91349b6aa0421cceb72",
+      "schemaType": "array",
+      "key": "paymentFunctionButtons",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "text",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunction",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "buttonFunctionValue",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "backgroundColor",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "textColor",
+          "type": "input"
+        },
+        {
+          "schemaType": "array",
+          "key": "containedButtons",
+          "fields": [
+            {
+              "schemaType": "string",
+              "type": "input"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "schemaType": "array",
+          "key": "rows",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "cols",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalRows",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number",
+              "type": "input@number"
+            }
+          ],
+          "chips": true
+        },
+        {
+          "schemaType": "array",
+          "key": "originalCols",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "number"
+            }
+          ],
+          "chips": true
+        }
+      ],
+      "expansion": [
+        "textColor",
+        "backgroundColor",
+        "buttonFunction",
+        "buttonFunctionValue",
+        "containedButtons"
+      ],
+      "flex": "",
+      "addable": null,
+      "lazy": true
+    },
+    {
+      "_id": "5e7acfa6b6acd33c45944710",
+      "schemaType": "object",
+      "key": "keyboardConfig",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "active",
+          "type": "input@checkbox",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "onlyShowInFirstPage",
+          "type": "input@checkbox",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "x",
+          "default": "true",
+          "type": "input@checkbox",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "number",
+          "key": "top",
+          "type": "input@number",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "number",
+          "key": "left",
+          "type": "input@number",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "number",
+          "key": "width",
+          "type": "input@number",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "number",
+          "key": "height",
+          "type": "input@number",
+          "flex": "md3"
+        },
+        {
+          "_id": "5e7ace78b6acd33c45944693",
+          "schemaType": "array",
+          "key": "layout",
+          "type": "tableArray",
+          "fields": [
+            {
+              "schemaType": "array",
+              "key": "rows",
+              "type": "input@multiSelect",
+              "fields": [
+                {
+                  "schemaType": "string"
+                }
+              ],
+              "optionsType": "onlyValue",
+              "options": [
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f",
+                "g",
+                "h",
+                "i",
+                "j",
+                "k",
+                "l",
+                "m",
+                "n",
+                "o",
+                "p",
+                "q",
+                "r",
+                "s",
+                "t",
+                "u",
+                "v",
+                "w",
+                "x",
+                "y",
+                "z"
+              ],
+              "allowDuplicates": true
+            }
+          ],
+          "clipboardType": "cut"
+        }
+      ],
+      "type": "object"
+    },
+    {
+      "_id": "5e7d74202526c64008ced791",
+      "schemaType": "array",
+      "key": "hardwares",
+      "type": "tableArray",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "name",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "config",
+          "type": "input"
+        }
+      ]
+    },
+    {
+      "_id": "5e7d75aa2526c64008ced80b",
+      "schemaType": "object",
+      "key": "printerGeneralSetting",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "useMultiPrinterForKitchenPrinter",
+          "type": "input@checkbox",
+          "flex": "md4",
+          "fields": []
+        },
+        {
+          "schemaType": "boolean",
+          "key": "useMultiPrinterForInvoicePrinter",
+          "type": "input@checkbox",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "useMultiPrinterForEntirePrinter",
+          "type": "input@checkbox",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "number",
+          "key": "entireReceipt",
+          "type": "input@select:number",
+          "optionsType": "onlyValue",
+          "options": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "mergeAfterPrint",
+          "type": "input@checkbox"
+        }
+      ]
+    },
+    {
+      "_id": "5e91b0a8e4010703a5932ffc",
+      "schemaType": "object",
+      "key": "onlineDevice",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "id",
+          "type": "input"
+        },
+        {
+          "schemaType": "string",
+          "key": "url",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "sound",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "string",
+          "key": "soundLoop",
+          "type": "input@select",
+          "optionsType": "onlyValue",
+          "options": [
+            "none",
+            "once",
+            "repeat"
+          ]
+        },
+        {
+          "schemaType": "object",
+          "key": "services",
+          "fields": [
+            {
+              "schemaType": "boolean",
+              "key": "delivery",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "boolean",
+              "key": "pickup",
+              "type": "input@checkbox"
+            },
+            {
+              "schemaType": "string",
+              "key": "noteToCustomers",
+              "type": "input"
+            }
+          ],
+          "type": "object"
+        },
+        {
+          "schemaType": "object",
+          "key": "store",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "id",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "name",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "alias",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "locale",
+              "type": "input"
+            }
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "_id": "5e93897a1df7eb1e59a859e5",
+      "schemaType": "number",
+      "key": "defaultPrepareTime",
+      "type": "input@number"
+    },
+    {
+      "_id": "5e93897a1df7eb1e59a859e6",
+      "schemaType": "string",
+      "key": "onlineOrderSorting",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "time",
+        "order"
+      ]
+    },
+    {
+      "_id": "5e9e1eb027f0c59664ad1173",
+      "schemaType": "boolean",
+      "key": "showDineInTax",
+      "type": "input@checkbox"
+    },
+    {
+      "_id": "5ea901742fbeda3b5c37fb55",
+      "schemaType": "boolean",
+      "key": "skipPairing",
+      "type": "input@switch"
+    },
+    {
+      "_id": "5ebf5eec5af4ab3673c3a56f",
+      "schemaType": "string",
+      "key": "customServerUrl",
+      "type": "input"
+    },
+    {
+      "_id": "5edf3aa09c050511ef6620b6",
+      "schemaType": "object",
+      "key": "reservation",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "boolean",
+          "key": "activeReservation",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "soundNotification",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "hideEmpty",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "number",
+          "key": "removeOverdueAfter",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "array",
+          "key": "openHours",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "array",
+              "key": "dayInWeeks",
+              "type": null,
+              "fields": [
+                {
+                  "schemaType": "boolean",
+                  "key": "dayInWeek"
+                }
+              ]
+            },
+            {
+              "schemaType": "string",
+              "key": "openTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "closeTime",
+              "type": "input"
+            }
+          ]
+        },
+        {
+          "schemaType": "number",
+          "key": "maxGuest",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "number",
+          "key": "maxDay",
+          "type": "input@number"
+        },
+        {
+          "schemaType": "array",
+          "key": "seatLimit",
+          "type": "array",
+          "fields": [
+            {
+              "schemaType": "string",
+              "key": "startTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "string",
+              "key": "endTime",
+              "type": "input"
+            },
+            {
+              "schemaType": "array",
+              "key": "days",
+              "type": "array",
+              "fields": [
+                {
+                  "schemaType": "string",
+                  "key": "day"
+                }
+              ]
+            },
+            {
+              "schemaType": "number",
+              "key": "seat",
+              "type": "input@number"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_id": "5f647eccbb607e1722b432d1",
+      "schemaType": "string",
+      "key": "masterIp"
+    },
+    {
+      "_id": "5f6acb0e77ebcf0ca67e4740",
+      "schemaType": "string",
+      "key": "masterClientId"
+    },
+    {
+      "_id": "5f6c0e485039c3860e5ad429",
+      "schemaType": "object",
+      "key": "call",
+      "type": "object",
+      "fields": [
+        {
+          "schemaType": "string",
+          "key": "mode",
+          "default": "off"
+        },
+        {
+          "schemaType": "object",
+          "key": "ipAddresses",
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "_id": "5f755fd3f9e558278877147b",
+      "schemaType": "array",
+      "key": "keyboardDeliveryConfig",
+      "type": null,
+      "fields": []
+    },
+    {
+      "_id": "5f7ee441363c49200328e80b",
+      "schemaType": "mixed",
+      "key": "signInRequest",
+      "type": "object",
+      "mixed": true
+    },
+    {
+      "_id": "5f9a46c3a3dd891955a700b8",
+      "schemaType": "string",
+      "key": "hardwareID",
+      "type": "input"
+    },
+    {
+      "schemaType": "string",
+      "key": "installUUID",
+      "type": "input"
+    }
+  ],
+  "id": "5ddb985ff26bb37e5ccc5c43",
+  "name": "PosSetting",
+  "tabs": [
+    {
+      "fields": [
+        "leftFunctionButtons"
+      ],
+      "_id": "5ddb9f1ff26bb37e5ccc5c8e",
+      "name": "LeftFunctionButtons"
+    },
+    {
+      "fields": [
+        "rightFunctionButtons"
+      ],
+      "_id": "5ddb9f1ff26bb37e5ccc5c8d",
+      "name": "RightFunctionButtons"
+    },
+    {
+      "fields": [
+        "user"
+      ],
+      "_id": "5de76b73b9015752d80bc3c4",
+      "name": "User"
+    },
+    {
+      "fields": [
+        "payment"
+      ],
+      "_id": "5de8d754cdff2284f2ce4a2d",
+      "name": "Payment"
+    },
+    {
+      "fields": [
+        "companyInfo"
+      ],
+      "_id": "5de8d754cdff2284f2ce4a2c",
+      "name": "Company Info"
+    },
+    {
+      "fields": [
+        "generalSetting",
+        "showDineInTax"
+      ],
+      "_id": "5de8d754cdff2284f2ce4a2b",
+      "name": "General"
+    },
+    {
+      "fields": [
+        "taxCategory"
+      ],
+      "_id": "5df1f4e0fdeb6602ac49d4e5",
+      "name": "Tax Category"
+    },
+    {
+      "fields": [
+        "paymentFunctionButtons"
+      ],
+      "_id": "5e0ab31749b6aa0421cceba0",
+      "name": "PaymentFunctionButtons"
+    },
+    {
+      "fields": [
+        "keyboardConfig"
+      ],
+      "_id": "5e7ace78b6acd33c4594469c",
+      "name": "KeyboardConfig"
+    },
+    {
+      "fields": [
+        "hardwares"
+      ],
+      "_id": "5e7d74202526c64008ced79b",
+      "name": "Hardware"
+    },
+    {
+      "fields": [
+        "printerGeneralSetting"
+      ],
+      "_id": "5e7db3c12526c64008ced8cb",
+      "name": "PrinterGeneralSetting"
+    },
+    {
+      "fields": [
+        "onlineDevice",
+        "defaultPrepareTime",
+        "onlineOrderSorting"
+      ],
+      "_id": "5e8e3ffc9239c47dba244d2e",
+      "name": "OnlineDevices"
+    }
+  ],
+  "title": "",
+  "type": "Collection"
+}

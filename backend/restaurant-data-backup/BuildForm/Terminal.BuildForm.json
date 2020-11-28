@@ -1,0 +1,153 @@
+{
+  "_id": "5dfb015d874421344a720346",
+  "alwaysLoad": true,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5dfb19ac874421344a72038b",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5dfb055f874421344a720380",
+      "schemaType": "array",
+      "key": "thermalPrinters",
+      "type": "array",
+      "fields": [
+        {
+          "_id": "5dfb03b4874421344a72036a",
+          "schemaType": "string",
+          "key": "printerType",
+          "type": "input@select",
+          "flex": "md12",
+          "optionsType": "onlyValue",
+          "options": [
+            "ip",
+            "com",
+            "usb"
+          ]
+        },
+        {
+          "_id": "5dfb03b4874421344a720369",
+          "schemaType": "string",
+          "key": "ip",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "_id": "5dfb03b4874421344a720368",
+          "schemaType": "string",
+          "key": "ip2",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "_id": "5dfb03b4874421344a720367",
+          "schemaType": "string",
+          "key": "multiIp",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "_id": "5dfb03b4874421344a720366",
+          "schemaType": "string",
+          "key": "com",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "_id": "5dfb03b4874421344a720365",
+          "schemaType": "number",
+          "key": "baudrate",
+          "type": "input@number",
+          "flex": "md6"
+        },
+        {
+          "_id": "5dfb03b4874421344a720364",
+          "schemaType": "string",
+          "key": "usb",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "_id": "5dfb03b4874421344a720363",
+          "schemaType": "string",
+          "key": "port",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "_id": "5dfb03b4874421344a720362",
+          "schemaType": "boolean",
+          "key": "compress",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a720361",
+          "schemaType": "boolean",
+          "key": "separate",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a720360",
+          "schemaType": "boolean",
+          "key": "beep",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a72035f",
+          "schemaType": "boolean",
+          "key": "merge",
+          "default": "true",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a72035e",
+          "schemaType": "boolean",
+          "key": "escpos",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a72035d",
+          "schemaType": "boolean",
+          "key": "deactivate",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "_id": "5dfb03b4874421344a72035c",
+          "schemaType": "number",
+          "key": "size",
+          "type": "input@number",
+          "flex": "md6"
+        }
+      ]
+    },
+    {
+      "_id": "5dfb05bf874421344a720382",
+      "schemaType": "object",
+      "key": "POS",
+      "mixed": false
+    },
+    {
+      "_id": "5dfb19ac874421344a72038d",
+      "schemaType": "object",
+      "key": "customerDisplay"
+    },
+    {
+      "_id": "5dfb19ac874421344a72038c",
+      "schemaType": "object",
+      "key": "a4Printer"
+    }
+  ],
+  "name": "Terminal",
+  "tabs": [],
+  "type": "Collection",
+  "title": "name"
+}

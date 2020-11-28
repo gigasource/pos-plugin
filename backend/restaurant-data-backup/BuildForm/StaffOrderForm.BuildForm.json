@@ -1,0 +1,26 @@
+{
+  "_id": "5e1d660424e78a033450351f",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e1d662c24e78a0334503527",
+      "schemaType": "date",
+      "key": "from",
+      "type": "input@date"
+    },
+    {
+      "_id": "5e1d662c24e78a0334503526",
+      "schemaType": "date",
+      "key": "to",
+      "type": "input@date"
+    },
+    {
+      "_id": "5e1d662c24e78a0334503525",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    }
+  ],
+  "tabs": [],
+  "name": "StaffOrderForm"
+}

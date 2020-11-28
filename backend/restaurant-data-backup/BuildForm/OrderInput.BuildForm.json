@@ -1,0 +1,15 @@
+{
+  "_id": "5e809200d5032e605e20b1e9",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e809246d5032e605e20b1ed",
+      "schemaType": "mixed",
+      "key": "order",
+      "type": "editor",
+      "addable": true
+    }
+  ],
+  "name": "OrderInput",
+  "tabs": []
+}

@@ -1,0 +1,47 @@
+{
+  "_id": "5de72a4fa7884176a656ee4c",
+  "extensions": [
+    {
+      "_id": "5de72c1ba7884176a656ee55",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ],
+      "slotsType": "array",
+      "slots": [
+        "default"
+      ],
+      "preprocess": [
+        "label"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5de75301a7884176a656ef5f",
+      "schemaType": "array",
+      "key": "rules",
+      "default": "",
+      "type": "array",
+      "addable": true,
+      "fields": [
+        {
+          "schemaType": "mixed",
+          "key": "fn",
+          "type": "editor",
+          "addable": true
+        }
+      ]
+    },
+    {
+      "_id": "5ea3b661f221a0602aba63a8",
+      "schemaType": "mixed",
+      "key": "label",
+      "type": "I18nInput",
+      "addable": true
+    }
+  ],
+  "name": "dialogNumberFilter",
+  "tabs": [],
+  "type": "Component"
+}

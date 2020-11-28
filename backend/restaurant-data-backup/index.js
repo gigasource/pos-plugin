@@ -4,18 +4,38 @@ const { MongoClient } = require('mongodb');
 const UpdateCommit = require('./updateCommit');
 const mongoose = require('mongoose');
 const orm = require('schemahandler/orm');
-const connnectionUri = `mongodb://${global.APP_CONFIG.database.username}:${global.APP_CONFIG.database.password}@mongo-vn-office.gigasource.io:27017`;
+const { username, password, host } = global.APP_CONFIG.backupDatabaseConfig;
+const backupDbConnectionUri = `mongodb://${username}:${password}@${host}`;
 const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
 
-orm.connect(connnectionUri);
+// this must be removed after migrate online-order from using mongoose to using orm
+orm.connect(backupDbConnectionUri, (err) => {
+	if (err) {
+		console.log('Error is:', err);
+	}
+});
 let connectionHandlers = {};
 let externalSocketIOServer;
+
+async function initSchema() {
+	if (fs.existsSync(path.resolve(__dirname, './BuildForm'))) {
+		const filesList = fs.readdirSync(path.resolve(__dirname, './BuildForm'));
+		filesList.map(file => {
+			const collectionName = file.split('.')[0];
+			const schemaForm = fs.readFileSync(path.resolve(__dirname, `./BuildForm/${file}`));
+			orm.registerSchema(collectionName, (dbName) => collectionName[dbName] !== undefined, cms.convertFormToSchema(schemaForm));
+		})
+	}
+}
 
 async function initConnection(socket) {
 	try {
 		if (!orm.connected || orm.closed || orm.connecting) {
 			await orm.waitForConnected();
 		}
+		await initSchema();
 		externalSocketIOServer = socket;
 		cms.post('run:triggerOnlineAsMaster', (storeId) => {
 			if (typeof storeId !== 'string') {

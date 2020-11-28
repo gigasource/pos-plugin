@@ -1,0 +1,45 @@
+{
+  "_id": "5e032dc5dd850d384e9fa18c",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5e03305cdd850d384e9fa199",
+      "schemaType": "number",
+      "key": "z",
+      "type": "input@number"
+    },
+    {
+      "_id": "5e03305cdd850d384e9fa198",
+      "schemaType": "number",
+      "key": "sum",
+      "type": "input@number"
+    },
+    {
+      "_id": "5e03305cdd850d384e9fa197",
+      "schemaType": "date",
+      "key": "begin",
+      "type": "date-picker",
+      "pickerType": "datetime",
+      "pickSeconds": null,
+      "clearable": null,
+      "showIcon": null
+    },
+    {
+      "_id": "5e03305cdd850d384e9fa196",
+      "schemaType": "date",
+      "key": "end",
+      "type": "date-picker",
+      "pickerType": "datetime"
+    },
+    {
+      "_id": "5e03305cdd850d384e9fa195",
+      "schemaType": "boolean",
+      "key": "withCoupon",
+      "type": "input@switch"
+    }
+  ],
+  "name": "EndOfDay",
+  "tabs": [],
+  "type": "Collection",
+  "alwaysLoad": true
+}

@@ -1,0 +1,229 @@
+{
+  "_id": "5c5ee40bc1c8891f00507c68",
+  "__v": 0,
+  "alwaysLoad": true,
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5dde216e8430f7c6a08b7a24",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input"
+    },
+    {
+      "_id": "5dde216e8430f7c6a08b7a23",
+      "schemaType": "string",
+      "key": "printer",
+      "type": "input"
+    },
+    {
+      "_id": "5e7c687eb9b120681038863c",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "invoice",
+        "kitchen",
+        "entire"
+      ]
+    },
+    {
+      "_id": "5e7d77032526c64008ced81c",
+      "schemaType": "array",
+      "key": "printers",
+      "fields": [
+        {
+          "schemaType": "array",
+          "key": "hardwares",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "string"
+            }
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "printerType",
+          "type": "input@select",
+          "flex": "md12",
+          "optionsType": "onlyValue",
+          "options": [
+            "ip",
+            "com",
+            "usb",
+            "integrate"
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "ip",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "ip2",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "multiIp",
+          "type": "input",
+          "flex": "md4"
+        },
+        {
+          "schemaType": "string",
+          "key": "com",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "number",
+          "key": "baudrate",
+          "type": "input@number",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "string",
+          "key": "port",
+          "type": "input",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "compress",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "separate",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "beep",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "merge",
+          "default": "true",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "escpos",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "deactivate",
+          "type": "input@checkbox",
+          "flex": "md3"
+        },
+        {
+          "schemaType": "number",
+          "key": "size",
+          "type": "input@number",
+          "flex": "md6"
+        },
+        {
+          "schemaType": "array",
+          "key": "includes",
+          "type": "input@multiSelect",
+          "fields": [
+            {
+              "schemaType": "string"
+            }
+          ]
+        },
+        {
+          "schemaType": "boolean",
+          "key": "onlyTakeAway",
+          "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "oneReceiptForOneArticle",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "groupArticles",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "sound",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "escPOS",
+          "type": "input@checkbox"
+        },
+        {
+          "schemaType": "number",
+          "key": "marginTop",
+          "type": "input@select:number",
+          "optionsType": "onlyValue",
+          "options": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "schemaType": "number",
+          "key": "fontSize",
+          "type": "input@select:number",
+          "optionsType": "onlyValue",
+          "options": [
+            "1",
+            "2",
+            "3"
+          ]
+        },
+        {
+          "schemaType": "string",
+          "key": "usb",
+          "type": "input"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "tscPos",
+          "type": "input@switch"
+        }
+      ],
+      "type": "array",
+      "flex": "md12"
+    },
+    {
+      "_id": "5fab95e2c247ab00fba81611",
+      "schemaType": "string",
+      "key": "defaultDineInTax",
+      "type": "input"
+    },
+    {
+      "_id": "5fab95e2c247ab00fba81612",
+      "schemaType": "string",
+      "key": "defaultTakeAwayTax",
+      "type": "input"
+    }
+  ],
+  "id": "5c5ee40bc1c8891f00507c68",
+  "name": "GroupPrinter",
+  "tabs": [],
+  "title": "name",
+  "type": "Collection"
+}

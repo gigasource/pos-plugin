@@ -1,0 +1,33 @@
+{
+  "_id": "5e0d6d8bc106bd02fdb348a9",
+  "extensions": [
+    {
+      "_id": "5e0d6db8c106bd02fdb348ad",
+      "extensionType": "ComponentLib",
+      "events": [
+        "submit"
+      ],
+      "slotsType": "array",
+      "slots": [
+        "default"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "_id": "5e0d6db8c106bd02fdb348ac",
+      "schemaType": "string",
+      "key": "type",
+      "type": "input"
+    },
+    {
+      "_id": "5ea3b4b9f221a0602aba636b",
+      "schemaType": "mixed",
+      "key": "label",
+      "type": "I18nInput"
+    }
+  ],
+  "name": "dialogConfirmDelete",
+  "tabs": [],
+  "type": "Component"
+}

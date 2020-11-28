@@ -1,0 +1,21 @@
+{
+  "_id": "5f7bf5de9815461fcd57a09b",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f7bf6789815461fcd57a09d",
+      "schemaType": "array",
+      "key": "certificates",
+      "fields": [
+        {
+          "schemaType": "string",
+          "type": "input"
+        }
+      ],
+      "type": "array"
+    }
+  ],
+  "name": "TseCertificate",
+  "tabs": [],
+  "type": "Collection"
+}
