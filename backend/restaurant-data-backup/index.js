@@ -24,8 +24,9 @@ async function initSchema() {
 		const filesList = fs.readdirSync(path.resolve(__dirname, './BuildForm'));
 		filesList.map(file => {
 			const collectionName = file.split('.')[0];
-			const schemaForm = fs.readFileSync(path.resolve(__dirname, `./BuildForm/${file}`));
-			orm.registerSchema(collectionName, (dbName) => collectionName[dbName] !== undefined, cms.convertFormToSchema(schemaForm));
+			const schemaForm = JSON.parse(fs.readFileSync(path.resolve(__dirname, `./BuildForm/${file}`), 'utf8'));
+			const schema = cms.convertFormToSchema(schemaForm);
+			orm.registerSchema(collectionName, (dbName) => connectionHandlers[dbName] !== undefined, schema);
 		})
 	}
 }
