@@ -136,11 +136,8 @@
         box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.08);
 
         &-thumbnail {
-          max-height: 140px;
-
           img {
             width: 100%;
-            max-height: 140px;
           }
         }
 
