@@ -25,18 +25,21 @@ async function initConnection(socket) {
 		})
 		const storesList = await cms.getModel('Store').find({}).lean();
 		for (let id = 0; id < storesList.length; id++) {
-			console.log(`Start init db backup for store ${id}`);
 			const store = storesList[id];
 			connectionHandlers[store._id.toString()] = new UpdateCommit(store._id.toString(), orm.cache.get('client'));
-			await connectionHandlers[store._id.toString()].updateCommit.init(socket);
-			connectionHandlers[store._id.toString()].updateCommit.commitType.forEach(type => {
-				connectionHandlers[store._id.toString()].updateCommit.getMethod(type, 'resumeQueue')();
-			})
-			const devices = await cms.getModel('Device').find({ _id: store._id }).lean();
-			const masterDevice = _.find(devices, device => device.master);
-			if (!masterDevice) {
-				await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
-			}
+		}
+		for (let id = 0; id < storesList.length; id++) {
+			console.log(`Start init db backup for store ${id}`);
+			const store = storesList[id];
+			// await connectionHandlers[store._id.toString()].updateCommit.init(socket);
+			// connectionHandlers[store._id.toString()].updateCommit.commitType.forEach(type => {
+			// 	connectionHandlers[store._id.toString()].updateCommit.getMethod(type, 'resumeQueue')();
+			// })
+			// const devices = await cms.getModel('Device').find({ _id: store._id }).lean();
+			// const masterDevice = _.find(devices, device => device.master);
+			// if (!masterDevice) {
+			// 	await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
+			// }
 			console.log(`Finish init db backup for ${id + 1}/${storesList.length} ${id > 0 ? 'store' : 'stores'}`)
 		}
 		console.log('init db for each store completed');
@@ -120,6 +123,7 @@ async function updateCommits(storeId, commits, ack) {
 }
 
 async function dbExists(storeId) {
+	if (!connectionHandlers[storeId]) return false
 	return await connectionHandlers[storeId].updateCommit.db.collection('poscommits').count() ||
 		await connectionHandlers[storeId].updateCommit.db.collection('ordercommits').count();
 }
