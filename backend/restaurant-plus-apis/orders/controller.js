@@ -156,14 +156,25 @@ function getOrderStatusResponseMessage(order, store, timeToComplete) {
           deliveryDateTime = dayjs(_deliveryTime)
         }
       }
+
+      try {
+        console.debug('sentry=testdebug', '1. deliveryDateTime as date', deliveryDateTime.toDate().toString());
+        console.debug('sentry=testdebug', '2. deliveryDateTime as json', JSON.stringify(deliveryDateTime));
+      } catch (e) {
+        console.error(e);
+      }
+
       const diff = deliveryDateTime.diff(dayjs(order.date), 'minute')
       const storeLocale = store.country.locale || 'en'
 
       const pluginPath = cms.allPlugins['pos-plugin'].pluginPath
       const localeFilePath = path.join(pluginPath, 'i18n', `${storeLocale}.js`);
 
+      console.debug('sentry=testdebug', '3. test debug step 3', JSON.stringify({diff, storeLocale, pluginPath, localeFilePath, exist: fs.existsSync(localeFilePath)}));
+
       if (fs.existsSync(localeFilePath)) {
         const {[storeLocale]: {store}} = require(localeFilePath)
+        console.debug('sentry=testdebug', '4. test debug step 4', JSON.stringify({storeLocale, store, order}));
         if (store && store.deliveryIn && store.pickUpIn) {
           return (order.type === 'delivery' ? store.deliveryIn : store.pickUpIn).replace('{0}', diff)
         }
@@ -363,6 +374,7 @@ async function updateOrderStatus(orderId, status, timeToComplete, declineReason)
       total: updatedOrder.vSum,
       storeAlias: store.alias
     }
+    console.debug('sentry=testdebug', '5. test debug step 5', JSON.stringify(orderStatus));
 
     cms.socket.to(updatedOrder.onlineOrderId).emit('updateOrderStatus', orderStatus)
   }
