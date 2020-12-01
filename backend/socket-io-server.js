@@ -840,7 +840,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal,
+        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal, deliveryDateTime,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
@@ -865,6 +865,7 @@ module.exports = async function (cms) {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
+        ...deliveryDateTime && {deliveryDateTime},
         paypalOrderDetail,
         forwardedStore,
         vSum: effectiveTotal

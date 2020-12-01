@@ -140,21 +140,10 @@ function getOrderStatusResponseMessage(order, store, timeToComplete) {
   switch (order.status) {
     case 'kitchen':
       let deliveryDateTime;
-      if (order.deliveryTime === 'asap') {
+      if (order.deliveryTime === 'asap' || !order.deliveryDateTime) {
         deliveryDateTime = dayjs().add(timeToComplete, 'minute')
       } else {
-        const _deliveryTime = new Date(order.deliveryTime)
-        if (isNaN(_deliveryTime)) { // if not ISO format
-          const timeRegex = new RegExp(/^([01]\d|2[0-3]):?([0-5]\d)$/)
-          if (timeRegex.test(order.deliveryTime.trim())) { // if HH:mm format
-            const [hour, minute] = order.deliveryTime.split(':')
-            deliveryDateTime = dayjs(order.date).hour(hour).minute(minute)
-          } else { // fallback to current date
-            deliveryDateTime = dayjs()
-          }
-        } else { // ISO format
-          deliveryDateTime = dayjs(_deliveryTime)
-        }
+        deliveryDateTime = dayjs(order.deliveryDateTime);
       }
 
       const diff = deliveryDateTime.diff(dayjs(order.date), 'minute')
