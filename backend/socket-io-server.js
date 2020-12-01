@@ -367,7 +367,7 @@ module.exports = async function (cms) {
 
   }, SOCKET_IO_REDIS_SYNC_INTERVAL);
 
-  await initConnection(externalSocketIOServer);
+  initConnection(externalSocketIOServer);
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
