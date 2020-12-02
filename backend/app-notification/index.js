@@ -34,7 +34,8 @@ async function sendFirebaseNotification(notification, data, tokens) {
     apns: {
       payload: {
         aps: {
-          'content-available': 1
+          'content-available': 1,
+          sound: 'bell',
         }
       }
     },
