@@ -180,7 +180,9 @@ router.post('/sign-in-requests', async (req, res) => {
     role
   }
 
-  const response = Object.assign({}, request._doc, { storeData: { _id: store._id.toString(), ...store } });
+  const storeDataInResponse = store ? { _id: store._id.toString(), ...store } : store;
+  const response = Object.assign({}, request._doc, { storeData: storeDataInResponse });
+
   if (pos && store) {
     await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
     await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
