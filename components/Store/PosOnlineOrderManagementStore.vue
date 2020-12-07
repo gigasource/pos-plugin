@@ -304,6 +304,7 @@
         const stores = await cms.getModel('Store').find({groups: {$elemMatch: {$in: storeGroupIds}}})
         this.stores.splice(0, this.stores.length, ...stores)
         await this.checkDeviceOnlineStatus()
+        await this.genStoresStatistic()
       },
       checkDeviceOnlineStatus() {
         return new Promise(resolve => {
@@ -314,6 +315,79 @@
             resolve()
           })
         })
+      },
+      async genStoresStatistic() {
+        const lastMonthOrders = await this.getOrdersStatistic(-1);
+        const currentMonthOrders = await this.getOrdersStatistic();
+        const lastMonthReservations = await this.getReservationStatistic(-1);
+        const currentMonthReservations = await this.getReservationStatistic();
+        this.stores = this.stores.map(store => {
+          const s = _.cloneDeep(store)
+          const prevMonthReport = _.cloneDeep(s.prevMonthReport), currentMonthReport = _.cloneDeep(s.currentMonthReport)
+          if(lastMonthOrders[s._id]) {
+            Object.assign(prevMonthReport, lastMonthOrders[s._id])
+          }
+          if(lastMonthReservations[s._id]) {
+            Object.assign(prevMonthReport, lastMonthReservations[s._id])
+          }
+          if(currentMonthOrders[s._id]) {
+            Object.assign(currentMonthReport, currentMonthOrders[s._id])
+          }
+          if(currentMonthReservations[s._id]) {
+            Object.assign(currentMonthReport, currentMonthReservations[s._id])
+          }
+          Object.assign(s, {prevMonthReport, currentMonthReport})
+          return s
+        })
+      },
+      async getOrdersStatistic(month = 0) {
+        const statistics = await cms.getModel('Order').aggregate([
+          {
+            $match: {
+              online: true,
+              date: {
+                $gte: dayjs().startOf('month').add(month, 'month').toDate(),
+                $lte: dayjs().endOf('month').add(month, 'month').toDate(),
+              },
+              status: 'kitchen'
+            }
+          },
+          {
+            $group: {
+              _id: "$storeId",
+              orders: {$sum: 1},
+              total: {$sum: "$vSum"}
+            }
+          }
+        ]);
+        let orderStatistic = {}
+        for(const statistic of statistics) {
+          _.set(orderStatistic, statistic._id, {orders: statistic.orders, total: statistic.total})
+        }
+        return orderStatistic
+      },
+      async getReservationStatistic(month = 0) {
+        const statistics = await cms.getModel('Reservation').aggregate([
+          {
+            $match: {
+              date: {
+                $gte: dayjs().startOf('month').add(month, 'month').format('YYYY-MM-DD'),
+                $lte: dayjs().endOf('month').add(month, 'month').format('YYYY-MM-DD'),
+              },
+            }
+          },
+          {
+            $group: {
+              _id: "$store",
+              reservation: {$sum: 1},
+            }
+          }
+        ])
+        let resevationStatistic = {}
+        for(const statistic of statistics) {
+          _.set(resevationStatistic, statistic._id, {reservations: statistic.reservation})
+        }
+        return resevationStatistic
       },
       async addStore({ settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location }) {
         await axios.post('/store/new-store', { settingName, settingAddress, groups, country, googleMapPlaceId, coordinates, location })

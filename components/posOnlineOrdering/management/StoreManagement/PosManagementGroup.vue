@@ -60,12 +60,12 @@
                 <div style="font-size: 12px;" v-if="viewMonthlyRevenuePerm">
                   <div v-if="store.prevMonthReport">
                     <span style="font-weight: bold;">Previous month: </span>
-                    <span>{{store.prevMonthReport.orders}} orders{{store.prevMonthReport.orderTimeouts > 0
+                    <span>{{store.prevMonthReport.orders || 0}} orders{{store.prevMonthReport.orderTimeouts > 0
                       ? ` (+ ${store.prevMonthReport.orderTimeouts} timeouts)` : ''}}, {{store.prevMonthReport.total | currency(store.country.locale)}}, {{store.prevMonthReport.reservations || 0}} reservations</span>
                   </div>
                   <div v-if="store.currentMonthReport">
                     <span style="font-weight: bold;">Current month: </span>
-                    <span>{{store.currentMonthReport.orders}} orders{{store.currentMonthReport.orderTimeouts > 0
+                    <span>{{store.currentMonthReport.orders || 0}} orders{{store.currentMonthReport.orderTimeouts > 0
                       ? ` (+${store.currentMonthReport.orderTimeouts} timeouts)` : ''}}, {{store.currentMonthReport.total | currency(store.country.locale)}}, {{store.currentMonthReport.reservations || 0}} reservations</span>
                   </div>
                 </div>
