@@ -20,7 +20,7 @@ const rpVoucherApi = require('./restaurant-plus-apis/vouchers');
 const rpPromotionApi = require('./restaurant-plus-apis/promotions');
 const rpUserApi = require('./restaurant-plus-apis/users');
 const rpPointHistoryApi = require('./restaurant-plus-apis/point-histories');
-const rpOrderApi = require('./restaurant-plus-apis/orders');
+const rpOrderApi = require('./restaurant-plus-apis/orders/router');
 const {authMiddleware} = require('./restaurant-plus-apis/api-security');
 const topaz = require('./api/topazAI')
 

@@ -13,6 +13,7 @@ const teamRoute = require('./team')
 const taskRoute = require('./task')
 const staffRoute = require('./staff')
 const {DEVICE_TYPE} = require('../devices/constants')
+const { createStoreBackUpDb, dbExists } = require('../../restaurant-data-backup/index')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -152,6 +153,7 @@ router.post('/sign-in-requests', async (req, res) => {
 
     const { createdStore } = await createStore(data, null, true)
     store = createdStore._doc
+    await createStoreBackUpDb(store._id.toString());
   }
 
   const request = await SignInRequestModel.create({
@@ -183,7 +185,7 @@ router.post('/sign-in-requests', async (req, res) => {
     await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
     await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
-    if (storeDevices.length === 1) response.isFirstDevice = true
+    if (!(await dbExists(store._id.toString()))) response.isFirstDevice = true
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
@@ -621,6 +623,7 @@ async function createStore(data, userId, auto) {
     active: true,
     permissions: [{ permission: 'manageStore', value: true }]
   })
+  await createStoreBackUpDb(createdStore._id.toString());
 
   return { createdStore, storeOwner }
 }
@@ -662,10 +665,8 @@ async function initApprovedDevice(storeId, deviceId) {
   })
 
   const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
-  const isFirstDevice = storeDevices.length === 1;
+  const isFirstDevice = !(await dbExists(storeId));
   if (isFirstDevice) {
-    await setMasterDevice(storeId, deviceId)
-
     const store = await StoreModel.findById(storeId)
     const demoData = store.demoDataSrc;
     if (demoData)

@@ -1271,6 +1271,12 @@
       "key": "forwardedStore",
       "ref": "Store",
       "type": "ref-select"
+    },
+    {
+      "_id": "5fc5fad210838c1f84c384b3",
+      "schemaType": "date",
+      "key": "deliveryDateTime",
+      "type": "input@date"
     }
   ],
   "id": "5c42fb05c016df1bbe8cc7ae",

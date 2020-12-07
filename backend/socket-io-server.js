@@ -11,8 +11,10 @@ const fs = require('fs')
 const path = require('path')
 const jsonFn = require('json-fn')
 const nodemailer = require('nodemailer')
-const { NOTIFICATION_ACTION_TYPE } = require('./restaurant-plus-apis/constants');
+const { NOTIFICATION_ACTION_TYPE, ORDER_RESPONSE_STATUS } = require('./restaurant-plus-apis/constants');
 const { sendNotification } = require('./app-notification');
+const { updateOrderStatus: updateWithAutoAccept, sendOrderNotificationToDevice } = require('./restaurant-plus-apis/orders/controller');
+const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync, updateCommits } = require('./restaurant-data-backup/index');
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
@@ -340,6 +342,10 @@ module.exports = async function (cms) {
     }
   })
 
+  externalSocketIOServer.registerAckFunction('createOrderAck', orderToken => {
+    sendOrderNotificationToDevice(orderToken, ORDER_RESPONSE_STATUS.ORDER_IN_PROGRESS);
+  });
+
   function notifyDeviceStatusChanged(clientId) {
     console.debug(`sentry:clientId=${clientId},eventType=socketConnection`, `Backend notifies frontend to update online/offline status`);
     internalSocketIOServer.to(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`).emit('updateDeviceStatus', clientId);
@@ -361,6 +367,7 @@ module.exports = async function (cms) {
 
   }, SOCKET_IO_REDIS_SYNC_INTERVAL);
 
+  initConnection(externalSocketIOServer);
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
@@ -480,6 +487,7 @@ module.exports = async function (cms) {
         console.debug(`sentry:orderToken=${onlineOrderId},store=${storeName},alias=${storeAlias},clientId=${clientId},eventType=orderStatus`,
             `10. Online order backend: received order status from restaurant, status = ${status}`);
 
+        sendOrderNotificationToDevice(onlineOrderId, status, responseMessage);
         // NOTE: cashPayment may have paypalOrderDetail is empty object
         const isPaypalPayment = paypalOrderDetail && paypalOrderDetail.orderID
         const isCashPayment = !isPaypalPayment // more provider here
@@ -647,10 +655,10 @@ module.exports = async function (cms) {
       })
 
       socket.on('getReservationSetting', async (deviceId, callback) => {
-        const device = await cms.getModel('Device').findById(deviceId)
+        const device = await cms.getModel('Device').findById(deviceId).lean()
         if (!device) return callback(null)
 
-        const store = await cms.getModel('Store').findById(device.storeId)
+        const store = await cms.getModel('Store').findById(device.storeId).lean()
         if (!store) return callback(null)
 
         callback({
@@ -682,16 +690,23 @@ module.exports = async function (cms) {
       })
 
       socket.on('registerMasterDevice', async (ip) => {
-        await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+        const device = await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+        requireSyncWithMaster(device.storeId, socket);
       })
 
       socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
-        externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+        } else {
+          const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+          requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
+        }
       })
 
       socket.on('emitToAllDevices', async (commits, storeAlias) => {
-        const storeId = await cms.getModel('Store').findOne({ alias: storeAlias });
-        const devices = await cms.getModel('Device').find({ storeId: storeId._doc._id, paired: true });
+        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+        await updateCommitNode(store._doc._id, commits, socket);
+        const devices = await cms.getModel('Device').find({ storeId: store._doc._id, paired: true });
         devices.forEach((device) => {
           externalSocketIOServer.emitTo(device._id.toString(), 'updateCommitNode', commits)
         });
@@ -706,11 +721,22 @@ module.exports = async function (cms) {
       })
 
       socket.on('nodeCall', (masterClientId, eventName, ...args) => {
-        externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'nodeCall', eventName, ...args);
+        }
       })
 
       socket.on('registerAppFromStore', async () => {
         await cms.getModel('Device').updateOne({ _id: clientId }, { 'metadata.isFromStore': true})
+      })
+
+      socket.on('updateCommits', async (masterClientId, commits, ack) => {
+        if (masterClientId) {
+          externalSocketIOServer.emitTo(masterClientId, 'updateCommits', commits, ack);
+        } else {
+          const device = await cms.getModel('Device').findOne({ _id: clientId });
+          await updateCommits(device.storeId, commits, ack);
+        }
       })
     }
 
@@ -814,7 +840,7 @@ module.exports = async function (cms) {
       const storeAlias = store.alias
 
       let {
-        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal,
+        orderType: type, paymentType, customer, products, totalPrice, effectiveTotal, deliveryDateTime,
         createdDate, timeoutDate, shippingFee, note, orderToken, discounts, deliveryTime, paypalOrderDetail, forwardedStore
       } = orderData
 
@@ -839,6 +865,7 @@ module.exports = async function (cms) {
         onlineOrderId: orderToken,
         discounts,
         deliveryTime,
+        ...deliveryDateTime && {deliveryDateTime},
         paypalOrderDetail,
         forwardedStore,
         vSum: effectiveTotal
@@ -851,10 +878,7 @@ module.exports = async function (cms) {
       }
 
       if (store.gSms && store.gSms.enabled) {
-        const gSmsDevices = await getGsmsDevices(store._id.toString())
-        const autoAcceptOrderEnabled =
-          !!(store.gSms && (store.gSms.autoAcceptOrder
-            || store.gSms.autoAcceptOrder === undefined)) // backward compatibility
+        const gSmsDevices = await getGsmsDevices(store._id.toString());
 
         await sendNotification(
           gSmsDevices,
@@ -865,10 +889,10 @@ module.exports = async function (cms) {
           {
             actionType: NOTIFICATION_ACTION_TYPE.ORDER,
             orderId: newOrder._id.toString(),
-            autoAcceptOrder: `${autoAcceptOrderEnabled}`,
+            autoAcceptOrder: `${!!(store.gSms && store.gSms.autoAcceptOrder)}`,
             timeToComplete: `${store.gSms && store.gSms.timeToComplete}`,
           },
-        )
+        );
       }
 
       if (!device) {
@@ -889,11 +913,17 @@ module.exports = async function (cms) {
             }
           }
 
-          return updateOrderStatus(orderData.orderToken,
+          await updateOrderStatus(orderData.orderToken,
               {
                 storeName, storeAlias, onlineOrderId: orderData.orderToken, status: 'inProgress',
                 responseMessage, total: orderData.totalPrice - (_.sumBy(orderData.discounts, i => i.value) || 0)
-              })
+              });
+
+          if (Array.isArray(store.gSms.devices) && store.gSms.devices.length > 0 && store.gSms.autoAcceptOrder) {
+            await updateWithAutoAccept(newOrder._id.toString(), 'kitchen', timeToComplete);
+          }
+
+          return;
         }
 
         internalSocketIOServer.to(orderData.orderToken).emit('noOnlineOrderDevice', orderData.orderToken)
