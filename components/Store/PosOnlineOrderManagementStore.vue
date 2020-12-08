@@ -323,7 +323,7 @@
         const currentMonthReservations = await this.getReservationStatistic();
         this.stores = this.stores.map(store => {
           const s = _.cloneDeep(store)
-          const prevMonthReport = _.cloneDeep(s.prevMonthReport), currentMonthReport = _.cloneDeep(s.currentMonthReport)
+          const prevMonthReport = _.cloneDeep(s.prevMonthReport) || {}, currentMonthReport = _.cloneDeep(s.currentMonthReport) || {}
           if(lastMonthOrders[s._id]) {
             Object.assign(prevMonthReport, lastMonthOrders[s._id])
           }
