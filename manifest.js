@@ -179,12 +179,12 @@ module.exports = {
       },
       path: 'backend/demo-data/socket-handler.js'
     },
-    {
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/usb-printer/usb-printer.js'
-    },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/usb-printer/usb-printer.js'
+    // },
     {
       loader: {
         type: 'backend-api'

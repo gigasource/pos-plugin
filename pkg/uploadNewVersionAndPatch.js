@@ -9,23 +9,33 @@ console.log("The domain is", argv.domain);
 
 async function doUpdate() {
   await upload({
-    filePath: path.resolve(__dirname, './android-dist/originalBuild/app/assets/appAssets/patch/patch_signed_7zip.apk'),
+    filePath: path.resolve(__dirname, './build/app-release.apk'),
     group: 'POS_Android',
-    version: version,
-    type: 'PATCH',
-    base: process.env.BASE_VERSION || '1.0.0',
-    release: release,
-    note: 'New version'
-  })
-  await upload({
-    filePath: path.resolve(__dirname, `./android-dist/originalBuild/${appName}`),
-    group: 'POS_Android',
-    version: version,
+    version: '1.1.113',
     type: 'APK',
-    base: process.env.BASE_VERSION || '1.0.0',
+    base: '7',
     release: release,
-    note: 'New version'
+    note: 'Test',
+    osName: 'android'
   })
+  // await upload({
+  //   filePath: path.resolve(__dirname, './android-dist/originalBuild/app/assets/appAssets/patch/patch_signed_7zip.apk'),
+  //   group: 'POS_Android',
+  //   version: version,
+  //   type: 'PATCH',
+  //   base: process.env.BASE_VERSION || '1.0.0',
+  //   release: release,
+  //   note: 'New version'
+  // })
+  // await upload({
+  //   filePath: path.resolve(__dirname, `./android-dist/originalBuild/${appName}`),
+  //   group: 'POS_Android',
+  //   version: version,
+  //   type: 'APK',
+  //   base: process.env.BASE_VERSION || '1.0.0',
+  //   release: release,
+  //   note: 'New version'
+  // })
 }
 
 doUpdate();

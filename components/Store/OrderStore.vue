@@ -211,26 +211,11 @@
       },
       addProductToOrder(product) {
         if (!this.currentOrder || !product) return
-        if (!this.currentOrder._id && !this.actionList.some(i => i.type === 'order')) {
-          this.$set(this.currentOrder, 'firstInit', true)
+        if (!this.currentOrder._id) {
           const takeAway = !this.currentOrder.table;
           this.$set(this.currentOrder, 'takeAway', takeAway)
           this.actionList.push({
-            type: 'order',
-            action: 'createOrder',
-            where: null,
-            data: {
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'create',
-              query: jsonfn.stringify({
-                table: this.currentOrder.table,
-                items: [],
-                status: 'inProgress',
-                takeAway
-              })
-            }
+            tag: 'createOrder'
           })
         } else this.$set(this.currentOrder, 'firstInit', false);
 
