@@ -6,9 +6,8 @@ module.exports = async function (cms) {
 	// todo check this later
 	orm.plugin(syncPlugin)
 	orm.plugin(syncFlow)
-	// cms.setMaster = function (_isMaster) {
-	// 	// todo impl
-	// }
-	cms.emit('commit:flow:setMaster', true)
+	cms.setMaster = function (_isMaster) {
+		cms.emit('commit:flow:setMaster', _isMaster)
+	}
 	orm.plugin(require('./orderCommit'))
 }

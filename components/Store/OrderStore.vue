@@ -749,7 +749,7 @@
           }
         })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
-          this.actionList = [];
+          this.actionList = []
           this.$set(this.currentOrder, 'status', order.status || 'inProgress')
           if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
           this.currentOrder.user.unshift({ name: this.user.name })

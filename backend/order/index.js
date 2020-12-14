@@ -12,8 +12,9 @@ module.exports = (cms) => {
   cms.socket.on('connect', async (socket) => {
 
     socket.on('print-to-kitchen', async (device, order, oldOrder = { items: [] }, actionList, cb = () => null) => {
+      await execAllChain(actionList, 'Order')
       const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldOrder.items)
-      getRecentItemCommits(recentItems, recentCancellationItems, order)
+      await getRecentItemCommits(recentItems, recentCancellationItems, order)
       const shouldMerge = await getMergeOrderSettings()
 
       if (shouldMerge) {
@@ -136,7 +137,7 @@ module.exports = (cms) => {
         const oldOrder = await cms.getModel('Order').findById(order._id)
         const oldItems = (oldOrder && oldOrder.items) || []
         const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldItems)
-        getRecentItemCommits(recentItems, recentCancellationItems, order)
+        await getRecentItemCommits(recentItems, recentCancellationItems, order)
         if (recentItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
           // actionList.push(getPrintCommit('kitchenAdd', printOrder, device, oldOrder)) // todo fix this
@@ -507,6 +508,19 @@ function getRecentQuantityItems(items, oldItems = []) {
     list.recentItems.push(item)
     return list
   }, { recentItems: [], recentCancellationItems: [] })
+}
+
+async function execAllChain(chains, collectionName) {
+  const { orm } = cms
+  let finalResult
+  for (let chain of chains) {
+    let result = orm(collectionName)
+    chain.forEach(({ fn, args }) => {
+      result = result[fn](...args)
+    })
+    finalResult = result = await result
+  }
+  return finalResult
 }
 
 async function getRecentItemCommits(recentItems, recentCancellationItems, order) {

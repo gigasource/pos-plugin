@@ -5,7 +5,7 @@ module.exports = async function (orm) {
 		if (!table) return false
 		const activeOrder = await orm('Order').findOne({
 			table,
-			inProgress: true
+			status: 'inProgress'
 		})
 		return activeOrder ? activeOrder : false
 	}
