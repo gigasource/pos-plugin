@@ -32,6 +32,11 @@ module.exports = async function (orm) {
 		}
 	})
 
+	orm.on('process:commit:splitOrder', function (commit) {
+		// do nothing
+		this.value = commit
+	})
+
 	orm.on('process:commit:createOrder', async function (commit) {
 		if (await checkActiveOrder(commit.data.table)) {
 			await buildDoNothingCommit(commit)

@@ -8,21 +8,12 @@ const mongoose = require('mongoose');
 const updateCommit = require('../master-node/updateCommit');
 
 module.exports = (cms) => {
+  const { orm } = cms
   cms.socket.on('connect', async (socket) => {
 
     socket.on('print-to-kitchen', async (device, order, oldOrder = { items: [] }, actionList, cb = () => null) => {
-      if (!order._id) {
-        order._id = new mongoose.Types.ObjectId();
-        actionList.forEach(action => {
-          if (action.action === 'createOrder') {
-            const query = JsonFn.parse(action.update.query);
-            query._id = order._id;
-            action.update.query = JsonFn.stringify(query);
-          }
-        })
-      }
       const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldOrder.items)
-      actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
+      getRecentItemCommits(recentItems, recentCancellationItems, order)
       const shouldMerge = await getMergeOrderSettings()
 
       if (shouldMerge) {
@@ -32,21 +23,13 @@ module.exports = (cms) => {
           sent: true
         }))
         oldOrder.items = mergeOrderItems(oldOrder.items)
-
-        actionList.push({
-          type: 'order',
-          action: 'update',
-          where: JsonFn.stringify({ _id: order._id }),
-          data: {
-            table: order.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: JsonFn.stringify({
-              $set: { items: order.items }
-            })
+        await orm('Order').findOneAndUpdate({
+          _id: order._id
+        }, {
+          $set: {
+            items: order.items
           }
-        })
+        }).commit('updateActiveOrder', { table: order.table })
       }
 
       const diff = _.differenceWith(order.items, oldOrder.items, (item, otherItem) => {
@@ -82,42 +65,34 @@ module.exports = (cms) => {
         }
         return list
       }, [])
-      actionList.push(...printCommits)
+      // actionList.push(...printCommits)
 
-      const mergedActionList = actionList.reduce((list, current) => {
-        if (current.type !== 'item' || !current.update['inc'] || current.update['inc'].key !== 'items.$.quantity') {
-          list.push(current)
-          return list
-        }
+      // const mergedActionList = actionList.reduce((list, current) => {
+      //   if (current.type !== 'item' || !current.update['inc'] || current.update['inc'].key !== 'items.$.quantity') {
+      //     list.push(current)
+      //     return list
+      //   }
+      //
+      //   const existingItem = list.find(i => i.where && i.where.pairedObject
+      //     && i.where.pairedObject.key[0] === 'items._id'
+      //     && i.where.pairedObject.value[0] === current.where.pairedObject.value[0])
+      //   if (existingItem) {
+      //     existingItem.update['inc'].value += current.update['inc'].value
+      //   } else {
+      //     list.push(current)
+      //   }
+      //
+      //   return list
+      // }, [])
 
-        const existingItem = list.find(i => i.where && i.where.pairedObject
-          && i.where.pairedObject.key[0] === 'items._id'
-          && i.where.pairedObject.value[0] === current.where.pairedObject.value[0])
-        if (existingItem) {
-          existingItem.update['inc'].value += current.update['inc'].value
-        } else {
-          list.push(current)
-        }
-
-        return list
-      }, [])
-
-      mergedActionList.push({
-        type: 'order',
-        action: 'update',
-        where: JsonFn.stringify({ _id: order._id }),
-        data: {
-          table: order.table,
-        },
-        update: {
-          method: 'findOneAndUpdate',
-          query: JsonFn.stringify({
-            $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
-          })
-        }
-      })
       // save order | create commits
-      const newOrder = await createOrderCommits(mergedActionList)
+      const newOrder = await orm('Order').findOneAndUpdate({
+        _id: order._id
+      }, {
+        $set: {
+          items: getUpdatedOrderItems(order.items, order.takeAway)
+        }
+      }).commit('updateActiveOrder', { table: order.table })
       if (!newOrder.items.some(i => i.quantity > 0)) {
         await cancelOrder(newOrder)
         newOrder.status = 'cancelled'
@@ -126,7 +101,8 @@ module.exports = (cms) => {
     })
 
     socket.on('print-invoice', async (order) => {
-      await cms.getModel('OrderCommit').addCommits([getPrintCommit('invoice', order, device)])
+      // todo modify this
+      // await cms.getModel('OrderCommit').addCommits([getPrintCommit('invoice', order, device)])
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
@@ -160,63 +136,37 @@ module.exports = (cms) => {
         const oldOrder = await cms.getModel('Order').findById(order._id)
         const oldItems = (oldOrder && oldOrder.items) || []
         const { recentItems, recentCancellationItems } = getRecentQuantityItems(order.items, oldItems)
-        actionList.push(...getRecentItemCommits(recentItems, recentCancellationItems, order))
+        getRecentItemCommits(recentItems, recentCancellationItems, order)
         if (recentItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
-          actionList.push(getPrintCommit('kitchenAdd', printOrder, device, oldOrder))
+          // actionList.push(getPrintCommit('kitchenAdd', printOrder, device, oldOrder)) // todo fix this
         }
 
         if (recentCancellationItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
-          actionList.push(getPrintCommit('kitchenCancel', printOrder, device, oldOrder))
+          // actionList.push(getPrintCommit('kitchenCancel', printOrder, device, oldOrder)) // todo fix this
         }
 
-        actionList.push({
-          type: 'order',
-          action: 'update',
-          where: JsonFn.stringify({ _id: order._id }),
-          data: {
-            table: order.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: JsonFn.stringify({
-              $set: { items: getUpdatedOrderItems(order.items, order.takeAway) }
-            })
+        await orm('Order').findOneAndUpdate({
+          _id: order._id
+        }, {
+          $set: {
+            items: getUpdatedOrderItems(order.items, order.takeAway)
           }
         })
 
         let newOrder
         if (isSplit) {
-          const commits = [
-            {
-              type: 'order',
-              action: 'createOrder',
-              data: {
-                split: true,
-              },
-              update: {
-                method: 'create',
-                query: JsonFn.stringify(mappedOrder)
-              }
-            },
-            ...actionList,
-            {
-              type: 'order',
-              action: 'closeOrder',
-              where: JsonFn.stringify({ _id: mappedOrder._id }),
-              data: {
-                fromPayBtn
-              },
-              update: {
-                method: 'findOneAndUpdate',
-                query: JsonFn.stringify({
-                  $set: { status: 'paid' }
-                })
-              }
+          await orm('Order').create({
+            ...mappedOrder
+          }).commit('splitOrder')
+          await orm('Order').findOneAndUpdate({
+            _id: mappedOrder._id
+          }, {
+            $set: {
+              status: 'paid'
             }
-          ]
-          newOrder = await createOrderCommits(commits)
+          }).commit('splitOrder')
         } else {
           const excludes = ['_id', 'table', 'id', 'splitId', 'status']
 
@@ -559,44 +509,29 @@ function getRecentQuantityItems(items, oldItems = []) {
   }, { recentItems: [], recentCancellationItems: [] })
 }
 
-function getRecentItemCommits(recentItems, recentCancellationItems, order) {
+async function getRecentItemCommits(recentItems, recentCancellationItems, order) {
+  const { orm } = cms
   const actionList = []
 
   if (recentItems.length) {
-    actionList.push({
-      type: 'order',
-      action: 'update',
-      where: JsonFn.stringify({ _id: order._id }),
-      data: {
-        table: order.table,
-      },
-      update: {
-        method: 'findOneAndUpdate',
-        query: JsonFn.stringify({
-          $set: { recentItems }
-        })
+    await orm('Order').findOneAndUpdate({
+      _id: order._id,
+    }, {
+      $set: {
+        recentItems
       }
-    })
+    }).commit('updateActiveOrder', { table: order.table })
   }
 
   if (recentCancellationItems.length) {
-    actionList.push({
-      type: 'order',
-      action: 'update',
-      where: JsonFn.stringify({ _id: order._id }),
-      data: {
-        table: order.table,
-      },
-      update: {
-        method: 'findOneAndUpdate',
-        query: JsonFn.stringify({
-          $set: { recentCancellationItems }
-        })
+    await orm('Order').findOneAndUpdate({
+      _id: order._id
+    }, {
+      $set: {
+        recentCancellationItems
       }
-    })
+    }).commit('updateActiveOrder', { table: order.table })
   }
-
-  return actionList
 }
 
 function getPrintCommit(printType, order, device, oldOrder) {
