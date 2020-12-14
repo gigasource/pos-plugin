@@ -15,10 +15,9 @@
         <div class="dialog-title">{{$t('restaurant.menuEdit.keyboardPosition')}}</div>
         <div class="dialog-content" :style="getDialogStyles()">
           <template v-for="row in selectedCategoryLayout.rows">
-            <template v-for="column in selectedCategoryLayout.columns">
+            <template v-for="column in selectedCategoryLayout.columns" :key="`${column}_${row}`">
               <div class="dialog-content__cell"
                    :style="getCellStyles(column, row)"
-                   :key="`${column}_${row}`"
                    @mousedown="(e) => onmousedown(e, column, row)"
                    @touchstart="(e) => onmousedown(e, column, row)"
                    @mouseenter="() => mouseenter(column, row)"

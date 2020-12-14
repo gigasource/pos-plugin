@@ -178,8 +178,8 @@
 
       <g-item-group area="delimeter" mandatory>
         <template v-slot:default="{ toggle, active }">
-          <template v-for="(item, index) in 3">
-            <g-item :key="index">
+          <template v-for="(item, index) in 3" :key="index">
+            <g-item>
               <g-btn></g-btn>
             </g-item>
           </template>

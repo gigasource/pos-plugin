@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 import { pad, TableUtil, DateTableUtil } from 'pos-vue-framework';
 
 export const _computedDatesInMonthCustom = (props, state) => {

@@ -6,7 +6,7 @@
 </template>
 <script>
   import _ from 'lodash';
-  import { computed, ref } from '@vue/composition-api';
+  import { computed, ref } from 'vue';
   import {getVModel} from 'pos-vue-framework';
 
   export default {

@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import { computed } from '@vue/composition-api'
+  import { computed } from 'vue'
   import { _computedDatesInMonthCustom } from './computedDateInMonth';
   import { setBackgroundColor, setTextColor, GDatePickerUtil, GPicker } from 'pos-vue-framework';
 

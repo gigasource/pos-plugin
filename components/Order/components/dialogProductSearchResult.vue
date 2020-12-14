@@ -38,7 +38,7 @@
                 <div style="display: flex; justify-content: center; align-items: center;">
                   <g-item-group :items="product.unit" v-model="product.selectedUnit">
                     <template v-slot:item="{item, toggle, active}">
-                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" v-model="active" badge-size="14">
+                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" :value="active" badge-size="14">
                         <template v-slot:badge>
                           <g-icon style="font-size: 13px ;font-weight: bold">done</g-icon>
                         </template>
@@ -63,7 +63,7 @@
                                 v-model="product.selectedAttributes[key]"
                   >
                     <template v-slot:item="{item, toggle, active}">
-                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" v-model="active" badge-size="14">
+                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" :value="active" badge-size="14">
                         <template v-slot:badge>
                           <g-icon style="font-size: 13px ;font-weight: bold">done</g-icon>
                         </template>

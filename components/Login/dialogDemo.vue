@@ -16,10 +16,10 @@
             the system <span class="i text-grey-darken-1 fw-200">(Optional)</span>
           </div>
           <div class="dialog-grid">
-            <template v-for="(demo, i) in listDemo">
+            <template v-for="(demo, i) in listDemo" :key="i">
               <div :class="['dialog-grid__item', selectedDemo === demo && 'dialog-grid__item--selected']"
                    :style="getBackgroundImage(demo)"
-                   :key="i" @click="selectDemo(demo)">
+                   @click="selectDemo(demo)">
                 <div class="dialog-grid__item-title">{{demo.storeName}}</div>
               </div>
             </template>

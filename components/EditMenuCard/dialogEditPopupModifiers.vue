@@ -3,8 +3,8 @@
     <g-dialog fullscreen v-model="internalValue">
       <div class="col-flex flex-grow-1" style="background: #fff">
         <div class="header">
-          <template v-for="group in allGroups">
-            <g-btn outlined :uppercase="false" background-color="#F0F0F0" :key="group._id"
+          <template v-for="group in allGroups" :key="group._id">
+            <g-btn outlined :uppercase="false" background-color="#F0F0F0"
                    :class="['mb-2', ...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
                    @click="setActiveGroup(group)">
               {{group.name}}
@@ -17,16 +17,16 @@
         </div>
         <div class="content row-flex">
           <div class="content--main col-flex align-items-start">
-            <template v-for="category in allCategories">
-              <g-btn flat :uppercase="false" :key="category._id"
+            <template v-for="category in allCategories" :key="category._id">
+              <g-btn flat :uppercase="false"
                      :class="['mb-2', ...activeEditItem && activeEditItem._id === category._id && ['active-btn', 'edit-btn']]"
                      @click="setActiveCategory(category)">
                 {{category.name}}
               </g-btn>
               <div class="mb-3">
                 <g-icon>keyboard_arrow_right</g-icon>
-                <template v-for="mod in modifiersByCategory[category._id]">
-                  <g-btn flat :uppercase="false" :key="mod._id"
+                <template v-for="mod in modifiersByCategory[category._id]" :key="mod._id">
+                  <g-btn flat :uppercase="false"
                          :class="[...activeEditItem && activeEditItem._id === mod._id && ['active-btn', 'edit-btn']]"
                          @click="setActiveModifier(mod)">
                     {{mod.name}}

@@ -4,7 +4,7 @@
       <g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="screen">
         <g-combobox :multiple="multiple" :items="items" v-model="screenValue" :label="label"
-                    text-field-component="GTextFieldBs"class="bs-tf__pos" large  ref="combobox"/>
+                    text-field-component="GTextFieldBs" class="bs-tf__pos" large  ref="combobox"/>
         <div v-if="!isMobile" class="buttons">
           <g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
             {{$t('ui.cancel')}}

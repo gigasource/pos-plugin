@@ -27,8 +27,8 @@
           </div>
         </template>
         <template v-else-if="(!internalOrders || !internalOrders.length) && (calls.length > 0 || missedCalls.length > 0)">
-          <template v-for="(call, i) in calls">
-            <div :class="['pending-orders--call', call.type === 'missed' && 'b-red']" :key="`call_${i}`">
+          <template v-for="(call, i) in calls" :key="`call_${i}`">
+            <div :class="['pending-orders--call', call.type === 'missed' && 'b-red']">
               <div class="pending-orders--call-title">
                 <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
                 <g-spacer/>

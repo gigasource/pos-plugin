@@ -22,7 +22,7 @@
 
 <script>
   import { getInternalValue } from 'pos-vue-framework';
-  import { ref } from '@vue/composition-api';
+  import { ref } from 'vue';
   import _ from 'lodash'
 
   export default {
