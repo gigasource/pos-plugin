@@ -171,7 +171,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/master-node/index.js'
+      path: 'backend/commit/index.js'
     },
     {
       loader: {

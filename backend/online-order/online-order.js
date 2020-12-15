@@ -6,7 +6,7 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
-const { initSocket, handleNewMasterId } = require('../master-node');
+// const { initSocket, handleNewMasterId } = require('../master-node');
 const { importDemoData } = require('../demo-data/socket-handler');
 const rnBridge = require('../rn-bridge/app-rn-bridge')
 const fs = require('fs')
@@ -480,15 +480,6 @@ module.exports = async cms => {
       }
       cb && cb()
     });
-    socket.on('updateMasterDevice', async (masterClientId, ack) => {
-      // set masterClientId
-      // newMasterClientId is always different from the old one
-      await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId });
-      cms.socket.emit('getMasterDevice', masterClientId)
-      if (ack) ack();
-      //await cms.execPostAsync('load:syncDbHook'); //todo uncomment
-      await handleNewMasterId(socket);
-    })
 
     socket.on('updateProducts', async (data) => {
       const { products } = data
@@ -599,13 +590,15 @@ module.exports = async cms => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
-          await initSocket(onlineOrderSocket);
+          await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+          // await initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
-        await initSocket(onlineOrderSocket);
+        await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+        // await initSocket(onlineOrderSocket);
       }
     });
   }

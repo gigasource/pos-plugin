@@ -132,7 +132,7 @@ async function initSocket(socket) {
 		global.APP_CONFIG.isMaster = true;
 	}
 	await cms.execPostAsync('load:handler');
-	await handler.initSocket(socket, masterClientId);
+	// await handler.initSocket(socket, masterClientId);
 }
 
 /*
