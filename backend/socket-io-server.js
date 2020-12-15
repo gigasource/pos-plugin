@@ -14,7 +14,6 @@ const nodemailer = require('nodemailer')
 const { NOTIFICATION_ACTION_TYPE, ORDER_RESPONSE_STATUS } = require('./restaurant-plus-apis/constants');
 const { sendNotification } = require('./app-notification');
 const { updateOrderStatus: updateWithAutoAccept, sendOrderNotificationToDevice } = require('./restaurant-plus-apis/orders/controller');
-const { initConnection, updateCommitNode, requireSyncWithMaster, addCollection, requireSync, updateCommits } = require('./restaurant-data-backup/index');
 
 const Schema = mongoose.Schema
 let externalSocketIOServer;
@@ -366,9 +365,8 @@ module.exports = async function (cms) {
         });
 
   }, SOCKET_IO_REDIS_SYNC_INTERVAL);
-
-  initConnection(externalSocketIOServer);
   // externalSocketIOServer is Socket.io namespace for store/restaurant app to connect (use default namespace)
+  await cms.execPostAsync('externalSocketIOServer', null, [externalSocketIOServer])
   externalSocketIOServer.on('connect', socket => {
     if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
       const clientId = socket.request._query.clientId;
@@ -685,40 +683,18 @@ module.exports = async function (cms) {
         cb(clientId)
         devices.forEach(device => {
           console.log(`Sending master ip to ${device._id.toString()}`);
-          externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateMasterDevice', [clientId]);
+          externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateMasterDevice');
         })
       })
 
-      socket.on('registerMasterDevice', async (ip) => {
-        const device = await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
-        requireSyncWithMaster(device.storeId, socket);
-      })
-
-      socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
-        if (masterClientId) {
-          externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
-        } else {
-          const store = await cms.getModel('Store').findOne({ alias: storeAlias });
-          requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
-        }
-      })
-
-      socket.on('emitToAllDevices', async (commits, storeAlias) => {
-        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
-        await updateCommitNode(store._doc._id, commits, socket);
-        const devices = await cms.getModel('Device').find({ storeId: store._doc._id, paired: true });
-        devices.forEach((device) => {
-          externalSocketIOServer.emitTo(device._id.toString(), 'updateCommitNode', commits)
-        });
-      })
-
-      socket.on('getMasterIp', async (storeAlias, fn) => {
-        const store = await cms.getModel('Store').findOne({ alias: storeAlias });
-        if (!store) return fn(null, null);
-        const device = await cms.getModel('Device').findOne({ storeId: store._doc._id, paired: true, master: true }).lean();
-        if (!device) return fn(null, null);
-        fn(device.metadata ? device.metadata.ip : null, device._id.toString());
-      })
+      // socket.on('requireSync', async (masterClientId, type, oldHighestCommitId, storeAlias, nodeSync) => {
+      //   if (masterClientId) {
+      //     externalSocketIOServer.emitTo(masterClientId, 'requireSync', type, oldHighestCommitId, nodeSync);
+      //   } else {
+      //     const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+      //     requireSync(store._id.toString(), type, oldHighestCommitId, nodeSync);
+      //   }
+      // })
 
       socket.on('nodeCall', (masterClientId, eventName, ...args) => {
         if (masterClientId) {
@@ -730,14 +706,14 @@ module.exports = async function (cms) {
         await cms.getModel('Device').updateOne({ _id: clientId }, { 'metadata.isFromStore': true})
       })
 
-      socket.on('updateCommits', async (masterClientId, commits, ack) => {
-        if (masterClientId) {
-          externalSocketIOServer.emitTo(masterClientId, 'updateCommits', commits, ack);
-        } else {
-          const device = await cms.getModel('Device').findOne({ _id: clientId });
-          await updateCommits(device.storeId, commits, ack);
-        }
-      })
+      // socket.on('updateCommits', async (masterClientId, commits, ack) => {
+      //   if (masterClientId) {
+      //     externalSocketIOServer.emitTo(masterClientId, 'updateCommits', commits, ack);
+      //   } else {
+      //     const device = await cms.getModel('Device').findOne({ _id: clientId });
+      //     await updateCommits(device.storeId, commits, ack);
+      //   }
+      // })
     }
 
     /** @deprecated */
@@ -792,11 +768,7 @@ module.exports = async function (cms) {
     socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
     socket.on('updateMasterDevice', async (storeId, masterDeviceId) => {
-      const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
-      devices.forEach(device => {
-        console.log(`Sending master ip to ${device._id.toString()}`);
-        externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateMasterDevice', [masterDeviceId]);
-      })
+      await externalSocketIOServer.emitToPersistent(masterDeviceId, 'setDeviceAsMaster')
     })
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {

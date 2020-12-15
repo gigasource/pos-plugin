@@ -13,7 +13,6 @@ const teamRoute = require('./team')
 const taskRoute = require('./task')
 const staffRoute = require('./staff')
 const {DEVICE_TYPE} = require('../devices/constants')
-const { createStoreBackUpDb, dbExists } = require('../../restaurant-data-backup/index')
 
 const storeAliasAcceptCharsRegex = /[a-zA-Z-0-9\-]/g
 const storeAliasNotAcceptCharsRegex = /([^a-zA-Z0-9\-])/g
@@ -153,7 +152,7 @@ router.post('/sign-in-requests', async (req, res) => {
 
     const { createdStore } = await createStore(data, null, true)
     store = createdStore._doc
-    await createStoreBackUpDb(store._id.toString());
+    // await createStoreBackUpDb(store._id.toString());
   }
 
   const request = await SignInRequestModel.create({
@@ -185,7 +184,7 @@ router.post('/sign-in-requests', async (req, res) => {
     await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { storeId: store._id })
     await cms.getModel('Store').findOneAndUpdate({ _id: store._id }, { $push: { devices: deviceId } })
     const storeDevices = await cms.getModel('Device').find({ storeId: store._id, deviceType: { $ne: 'gsms' } }).lean()
-    if (!(await dbExists(store._id.toString()))) response.isFirstDevice = true
+    response.isFirstDevice = cms.dbExists ? !(await cms.dbExists(store._id.toString())) : false
   }
 
   cms.socket.emit('newSignInRequest', {..._.omit(result, ['store', 'device']), ...store && {storeId: store._id}});
@@ -623,7 +622,7 @@ async function createStore(data, userId, auto) {
     active: true,
     permissions: [{ permission: 'manageStore', value: true }]
   })
-  await createStoreBackUpDb(createdStore._id.toString());
+  // await createStoreBackUpDb(createdStore._id.toString());
 
   return { createdStore, storeOwner }
 }
@@ -665,7 +664,7 @@ async function initApprovedDevice(storeId, deviceId) {
   })
 
   const storeDevices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' } }).lean()
-  const isFirstDevice = !(await dbExists(storeId));
+  const isFirstDevice = cms.dbExists ? !(await cms.dbExists(storeId)) : false;
   if (isFirstDevice) {
     const store = await StoreModel.findById(storeId)
     const demoData = store.demoDataSrc;
@@ -676,16 +675,16 @@ async function initApprovedDevice(storeId, deviceId) {
   return isFirstDevice
 }
 
-async function setMasterDevice(storeId, deviceId) {
-  const storeDevices = await cms.getModel('Device').find({ storeId })
-  await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
-  await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { master: true })
-  const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
-  devices.forEach(device => {
-    console.log(`Sending master ip to ${device._id.toString()}`);
-    getExternalSocketIoServer().emitToPersistent(device._id.toString(), 'updateMasterDevice', [deviceId]);
-  })
-}
+// async function setMasterDevice(storeId, deviceId) {
+//   const storeDevices = await cms.getModel('Device').find({ storeId })
+//   await cms.getModel('Device').updateMany({ _id: { $in: storeDevices.map(d => d._id) } }, { master: false })
+//   await cms.getModel('Device').findOneAndUpdate({ _id: deviceId }, { master: true })
+//   const devices = await cms.getModel('Device').find({ storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
+//   devices.forEach(device => {
+//     console.log(`Sending master ip to ${device._id.toString()}`);
+//     getExternalSocketIoServer().emitToPersistent(device._id.toString(), 'updateMasterDevice', [deviceId]);
+//   })
+// }
 
 router.put('/demo-data/:storeId', async (req, res) => {
   const { storeId } = req.params
@@ -740,4 +739,4 @@ router.get('/demo-stores', async (req, res) => {
 module.exports = router
 module.exports.createStore = createStore
 module.exports.deleteStore = deleteStore
-module.exports.setMasterDevice = setMasterDevice
+// module.exports.setMasterDevice = setMasterDevice

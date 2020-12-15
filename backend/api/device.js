@@ -5,7 +5,7 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const { getExternalSocketIoServer } = require('../socket-io-server');
 const ObjectId = mongoose.Types.ObjectId
-const { setMasterDevice } = require('./store')
+// const { setMasterDevice } = require('./store')
 const DeviceModel = cms.getModel('Device');
 const StoreModel = cms.getModel('Store')
 const { dbExists } = require('../restaurant-data-backup/index');
@@ -135,7 +135,7 @@ router.post('/register', async (req, res) => {
       storeLocale: store.country ? store.country.locale : 'en'
     };
 
-    if (!(await dbExists(device.storeId))) {
+    if (cms.dbExists && !(await cms.dbExists(device.storeId))) {
       response.isFirstDevice = true
       res.status(200).json(response);
 

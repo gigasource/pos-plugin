@@ -60,6 +60,12 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/restaurant-data-backup/index.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/app-notification/firebase-messaging/admin.js'
     },
     {

@@ -1,156 +1,80 @@
-const express = require('express');
-const router = express.Router();
-const { MongoClient } = require('mongodb');
-const UpdateCommit = require('./updateCommit');
-const mongoose = require('mongoose');
-const orm = require('schemahandler/orm');
+const orm = require('schemahandler/orm')
+const syncPlugin = require('schemahandler/sync/sync-plugin-multi')
+const syncFlow = require('schemahandler/sync/sync-flow')
+const syncTransporter = require('schemahandler/sync/sync-transporter')
+const _ = require('lodash')
 const { username, password, host } = global.APP_CONFIG.backupDatabaseConfig;
 const backupDbConnectionUri = `mongodb://${username}:${password}@${host}`;
-const _ = require('lodash');
 
-orm.connect(backupDbConnectionUri, (err) => {
-	if (err) {
-		console.log('Error is:', err);
-	}
-});
-let connectionHandlers = {};
-let externalSocketIOServer;
-
-async function initConnection(socket) {
-	try {
-		if (!orm.connected || orm.closed || orm.connecting) {
-			await orm.waitForConnected();
+module.exports = async function (cms) {
+	orm.setMultiDbMode()
+	orm.plugin(syncPlugin)
+	orm.plugin(syncFlow)
+	orm.plugin(syncTransporter)
+	orm.plugin(require('./collection-commit/orderCommit'))
+	orm.connect(backupDbConnectionUri, (err) => {
+		if (err) {
+			console.log('Error is:', err)
 		}
-		externalSocketIOServer = socket;
-		cms.post('run:triggerOnlineAsMaster', (storeId) => {
-			if (typeof storeId !== 'string') {
-				storeId = storeId.toString();
+	})
+
+	cms.post('createStoreBackupDb', async () => {
+		// todo implement this
+	})
+
+	cms.post('setMaster', async (_isMaster, dbName) => {
+		orm.emit('commit:flow:setMaster', _isMaster, dbName)
+	})
+
+	const handleNewSocket = (socket, clientId, dbName) => {
+		cms.getModel('Device').findById(clientId).then(device => {
+			const _isMaster = orm.getMaster(device.storeId)
+
+			if (_isMaster) {
+				orm.emit('initSyncForMaster', socket, dbName)
+			} else {
+				if (device.master) {
+					orm.emit('initSyncForClient', socket, dbName)
+				}
 			}
-			connectionHandlers[storeId].updateCommit.isMaster = true;
 		})
-		const storesList = await cms.getModel('Store').find({}).lean();
-		for (let id = 0; id < storesList.length; id++) {
-			const store = storesList[id];
-			connectionHandlers[store._id.toString()] = new UpdateCommit(store._id.toString(), orm.cache.get('client'));
-		}
-		for (let id = 0; id < storesList.length; id++) {
-			console.log(`Start init db backup for store ${id}`);
-			const store = storesList[id];
-			// await connectionHandlers[store._id.toString()].updateCommit.init(socket);
-			// connectionHandlers[store._id.toString()].updateCommit.commitType.forEach(type => {
-			// 	connectionHandlers[store._id.toString()].updateCommit.getMethod(type, 'resumeQueue')();
-			// })
-			// const devices = await cms.getModel('Device').find({ _id: store._id }).lean();
-			// const masterDevice = _.find(devices, device => device.master);
-			// if (!masterDevice) {
-			// 	await cms.execPostAsync('run:triggerOnlineAsMaster', null, [store._id]);
-			// }
-			console.log(`Finish init db backup for ${id + 1}/${storesList.length} ${id > 0 ? 'store' : 'stores'}`)
-		}
-		console.log('init db for each store completed');
-	} catch (err) {
-		console.error('init connection to master and node error', err)
 	}
-}
 
-function buildNodeSync(connection) {
-	if (connection instanceof mongoose.Types.ObjectId) { // is storeId
-		connection = connectionHandlers[connection.toString()];
-	}
-	return async function (commits) {
-		const newCommits = [];
-		for (let id in commits) {
-			const commit = commits[id];
-			if (!(await connection.updateCommit.checkCommitExist(commit))) newCommits.push(commit);
-		}
-		if (newCommits.length) connection.updateCommit.handleCommit(newCommits);
-		if (newCommits && newCommits.length) connection.updateCommit.setHighestCommitIds(commits);
-	}
-}
-
-function requireSyncWithMaster(storeId, socket) {
-	const updateCommit = connectionHandlers[storeId].updateCommit;
-	return updateCommit.commitType.forEach(type => {
-		socket.emit('requireSync', type, updateCommit.getMethod(type, 'checkHighestCommitId'), buildNodeSync(storeId));
-	});
-}
-
-async function updateCommitNode(storeId, commits, socket) {
-	const connection = connectionHandlers[storeId];
-	connection.updateCommit.commitType.forEach(type => {
-		const typeCommits = commits.filter(commit => commit.type === type);
-		if (!typeCommits.length) return;
-		const oldHighestCommitId = connection.updateCommit.getMethod(type, 'checkHighestCommitId')(typeCommits[0].commitId);
-		if (!oldHighestCommitId) {
-			connection.updateCommit.handleCommit(typeCommits);
-			connection.updateCommit.setHighestCommitIds(typeCommits);
-		} else {
-			socket.emit('requireSync', type, oldHighestCommitId, buildNodeSync(connection));
-		}
+	cms.post('externalSocketIOServer', (externalSocketIOServer) => {
+		externalSocketIOServer.on('connect', async socket => {
+			if (socket.request._query && socket.request._query.clientId && !socket.request._query.demo) {
+				const clientId = socket.request._query.clientId;
+				const device = await cms.getModel('Device').findById(clientId)
+				handleNewSocket(socket, clientId, device.storeId)
+				socket.on('registerMasterDevice', async (ip) => {
+					const masterDevice = await cms.getModel('Device').findOneAndUpdate({ _id: clientId }, { master: true, 'metadata.ip': ip})
+					const devices = await cms.getModel('Device').find({ storeId: masterDevice.storeId, deviceType: { $ne: 'gsms' }, paired: true }).lean();
+					devices.forEach(device => {
+						externalSocketIOServer.emitToPersistent(device._id.toString(), 'updateMasterDevice');
+					})
+				})
+				socket.on('getMasterIp', async (storeAlias, fn) => {
+					const store = await cms.getModel('Store').findOne({ alias: storeAlias });
+					if (!store) return fn(null, null);
+					const device = await cms.getModel('Device').findOne({ storeId: store._doc._id, paired: true, master: true }).lean();
+					if (!device) return fn(null, null);
+					fn(device.metadata ? device.metadata.ip : null, device._id.toString());
+				})
+			}
+		})
 	})
-	// const oldHighestCommitId = commits.length ? connection.checkHighestCommitId(commits[0].commitId) : null;
-	// if (!oldHighestCommitId) {
-	// 	connection.updateCommit.handleCommit(commits);
-	// 	connection.updateCommit.setHighestCommitIds(commits);
-	// } else {
-	// 	socket.emit('requireSync', connection.checkHighestCommitId(), buildNodeSync(connection));
-	// }
-}
 
-function requireSync(storeId, type, oldHighestCommitId, ack) {
-	const commit = {
-		type,
-		action: 'requireSync',
-		oldHighestCommitId,
-		ack
+	cms.dbExists = async (dbName) => {
+		return (await orm('Order').count()) !== 0
 	}
-	connectionHandlers[storeId].updateCommit.handleCommit([commit]);
-}
 
-function addCollection(storeId, collectionName, docs) {
-	connectionHandlers[storeId].updateCommit.db.collection(collectionName).insertMany(docs);
-}
-
-async function updateCommits(storeId, commits, ack) {
-	if (ack) {
-		ack(true);
+	const storesList = await cms.getModel('Store').find({}).lean();
+	for (let id = 0; id < storesList.length; id++) {
+		const store = storesList[id];
+		const devices = await cms.getModel('Device').find({ _id: store._id }).lean();
+		const masterDevice = _.find(devices, device => device.master);
+		if (!masterDevice) {
+			orm.emit('commit:flow:setMaster', true, store._id)
+		}
 	}
-	if (typeof storeId !== 'string') {
-		storeId = storeId.toString();
-	}
-	const connection = connectionHandlers[storeId];
-	const newCommits = [];
-	for (let id in commits) {
-		const commit = commits[id];
-		if (!(await connection.updateCommit.checkCommitExist(commit))) newCommits.push(commit);
-	}
-	if (newCommits.length) connection.updateCommit.handleCommit(newCommits);
-}
-
-async function dbExists(storeId) {
-	if (!connectionHandlers[storeId]) return false
-	return await connectionHandlers[storeId].updateCommit.db.collection('poscommits').count() ||
-		await connectionHandlers[storeId].updateCommit.db.collection('ordercommits').count();
-}
-
-async function createStoreBackUpDb(storeId) {
-	if (connectionHandlers[storeId]) return;
-	connectionHandlers[storeId] = new UpdateCommit(storeId, orm.cache.get('client'));
-	await connectionHandlers[storeId].updateCommit.init(externalSocketIOServer);
-	connectionHandlers[storeId].updateCommit.commitType.forEach(type => {
-		connectionHandlers[storeId].updateCommit.getMethod(type, 'resumeQueue')();
-	})
-	await cms.execPostAsync('run:triggerOnlineAsMaster', null, [storeId]);
-}
-
-module.exports = {
-	initConnection,
-	updateCommitNode,
-	buildNodeSync,
-	requireSyncWithMaster,
-	requireSync,
-	addCollection,
-	updateCommits,
-	dbExists,
-	createStoreBackUpDb
 }
