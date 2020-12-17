@@ -1,6 +1,7 @@
 module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
+    { loader: { type: 'route' }, filePath: 'components/Login/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
     {
       loader: {
         type: 'vue-singleton'

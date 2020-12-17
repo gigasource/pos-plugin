@@ -553,7 +553,7 @@
       }
       cms.socket.emit('screen-loaded')
     },
-    beforeDestroy() {
+    beforeUnmount() {
       this.setDateInterval && clearInterval(this.setDateInterval)
     },
     provide() {

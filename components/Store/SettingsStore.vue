@@ -1,5 +1,5 @@
 <template>
-  <fragment/>
+
 </template>
 
 <script>
