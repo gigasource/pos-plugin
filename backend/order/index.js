@@ -108,23 +108,13 @@ module.exports = (cms) => {
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
       try {
-        const updatedSplit = await createOrderCommits([{
-          type: 'order',
-          action: 'update',
-          data: {
-            split: true,
-            allowMutateInactiveOrder: true
-          },
-          where: JsonFn.stringify({ _id }),
-          update: {
-            method: 'findOneAndUpdate',
-            query: JsonFn.stringify({
-              $set: {
-                'payment': payment
-              }
-            })
+        const updatedSplit = await orm('Order').findOneAndUpdate({
+          _id
+        }, {
+          $set: {
+            'payment': payment
           }
-        }])
+        })
         cb({ order: updatedSplit })
       } catch (error) {
         cb({ error })
@@ -171,57 +161,39 @@ module.exports = (cms) => {
         } else {
           const excludes = ['_id', 'table', 'id', 'splitId', 'status']
 
-          const updates = _(mappedOrder).omit(excludes).map((value, key) => ({
-            type: 'order',
-            action: 'update',
-            where: JsonFn.stringify({ _id: mappedOrder._id }),
-            data: {
-              table: mappedOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: JsonFn.stringify({
-                $set: { [key]: value }
-              })
-            }
-          })).value()
-          actionList.push(...updates)
-          actionList.push({
-            type: 'order',
-            action: 'closeOrder',
-            where: JsonFn.stringify({ _id: mappedOrder._id }),
-            data: {
-              table: mappedOrder.table,
-              mutate: true,
-              fromPayBtn
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: JsonFn.stringify({
-                $set: { status: 'paid' }
-              })
-            }
-          }, {
-            type: 'order',
-            action: 'update',
-            where: JsonFn.stringify({ _id: mappedOrder._id }),
-            data: {
-              table: mappedOrder.table,
-              allowMutateInactiveOrder: true
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: JsonFn.stringify({
-                $set: { recentCancellationItems: [], recentItems: [] }
-              })
-            }
+          _(mappedOrder).omit(excludes).map(async (value, key) => {
+            await orm('Order').findOneAndUpdate({
+              _id: mappedOrder._id
+            }, {
+              $set: {
+                [key]: value
+              }
+            }).commit('updateActiveOrder', { table: mappedOrder.table })
           })
-          newOrder = await createOrderCommits(actionList)
+          await orm('Order').findOneAndUpdate({
+            _id: mappedOrder._id
+          }, {
+            $set: {
+              status: 'paid'
+            }
+          }).commit('updateActiveOrder', {
+            table: mappedOrder.table,
+            mutate: true,
+            fromPayBtn
+          })
+          await orm('Order').findOneAndUpdate({
+            _id: mappedOrder._id
+          }, {
+            $set: {
+              recentCancellationItems: [], recentItems: []
+            }
+          }).commit({ table: mappedOrder.table })
+          newOrder = await orm('Order').findById(mappedOrder._id)
         }
 
         if (print) {
-          await cms.getModel('OrderCommit').addCommits([
-            getPrintCommit('invoice', mappedOrder, device, oldOrder)])
+          // await cms.getModel('OrderCommit').addCommits([
+          //   getPrintCommit('invoice', mappedOrder, device, oldOrder)])
         }
 
         cb(newOrder)
@@ -248,22 +220,12 @@ module.exports = (cms) => {
         await createOrderCommit(existingOrder, 'items', items);
         console.debug(sentryTags, `3. POS backend: moved items to existing order at table ${table}`)
       } else {
-        await cms.getModel('OrderCommit').addCommits([{
-          type: 'order',
-          action: 'createOrder',
-          where: null,
-          data: { table },
-          update: {
-            method: 'create',
-            query: JsonFn.stringify({
-              _id: new mongoose.Types.ObjectId(),
-              table,
-              items: getUpdatedOrderItems(newItems),
-              status: 'inProgress',
-              user: [{ name: user.name, date: new Date() }]
-            })
-          }
-        }]);
+        await orm('Order').create({
+          table,
+          items: getUpdatedOrderItems(newItems),
+          status: 'inProgress',
+          user: [{ name: user.name, date: new Date() }]
+        }).commit('createOrder', { table })
         console.debug(sentryTags, `3. POS backend: moved items to new order at table ${table}`)
       }
 
@@ -288,8 +250,8 @@ module.exports = (cms) => {
       // commits: print, set sent/printed items
       if (itemsToPrint.length) {
         const printOrder = Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint });
-        await cms.getModel('OrderCommit').addCommits([
-          getPrintCommit('kitchenAdd', printOrder)])
+        // await cms.getModel('OrderCommit').addCommits([
+        //   getPrintCommit('kitchenAdd', printOrder)])
       }
       cb(updatedOrder)
     })
@@ -304,15 +266,7 @@ module.exports = (cms) => {
   async function cancelOrder ({ _id, table }, cb = () => null) {
     if (!_id) return cb()
 
-    await cms.getModel('OrderCommit').addCommits([{
-      type: 'order',
-      action: 'delete',
-      where: JsonFn.stringify({ _id }),
-      data: { table },
-      update: {
-        method: 'deleteOne'
-      }
-    }]);
+    await orm('Order').deleteOne({_id}).commit({table})
 
     cb()
   }
@@ -355,26 +309,13 @@ module.exports = (cms) => {
   }
 
   async function createOrderCommit(order, key, value) {
-    return await cms.getModel('OrderCommit').addCommits([{
-      type: 'order',
-      action: 'update',
-      where: JsonFn.stringify({ _id: order._id }),
-      data: {
-        table: order.table,
-      },
-      update: {
-        method: 'findOneAndUpdate',
-        query: JsonFn.stringify({
-          $set: {
-            [key]: value
-          }
-        })
+    return await orm('Order').findOneAndUpdate({
+      _id: order._id
+    }, {
+      $set: {
+        [key]: value
       }
-    }]);
-  }
-
-  async function createOrderCommits(commits) {
-    return cms.getModel('OrderCommit').addCommits(commits);
+    }).commit('updateActiveOrder', {table: order.table})
   }
 
   function getUpdatedOrderItems(items, takeAwayOrder) {

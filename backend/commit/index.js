@@ -2,7 +2,8 @@ const syncPlugin = require('schemahandler/sync/sync-plugin-multi')
 const syncFlow = require('schemahandler/sync/sync-flow')
 const syncTransporter = require('schemahandler/sync/sync-transporter')
 const internalIp = require('internal-ip')
-const socketClient = require('socket.io-client');
+const socketClient = require('socket.io-client')
+const _ = require('lodash')
 
 module.exports = async function (cms) {
 	const { orm } = cms
@@ -66,7 +67,7 @@ module.exports = async function (cms) {
 	/*
 	 -------------------------------------------
 	 */
-	cms.post('onlineOrderSocket', async function (socket) {
+	cms.post('onlineOrderSocket', _.once(async function (socket) {
 		const posSettings = await cms.getModel('PosSetting').findOne({}).lean()
 		const { onlineDevice, masterIp } = posSettings
 		if (!onlineDevice.store) return
@@ -92,10 +93,12 @@ module.exports = async function (cms) {
 
 		if (!masterIp) {
 			orm.emit('initSyncForClient', socket)
+			const {value: highestId} = await orm.emit('getHighestCommitId')
+			orm.emit('transport:require-sync', highestId)
 		} else {
 			// todo impl case through online
 		}
-	})
+	}))
 
 	/*
 	 -------------------------------------------

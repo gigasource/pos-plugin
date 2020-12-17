@@ -550,15 +550,15 @@
             reject()
           }
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
-              action: 'print',
-              data: {
-                reportType: 'OrderReport',
-                printData: order,
-                device: this.device
-              }
-            }])
+            // await cms.getModel('OrderCommit').addCommits([{
+            //   type: 'report',
+            //   action: 'print',
+            //   data: {
+            //     reportType: 'OrderReport',
+            //     printData: order,
+            //     device: this.device
+            //   }
+            // }])
             resolve()
           } catch (e) {
             reject(e.message)
@@ -852,18 +852,13 @@
           return Promise.all(commits.map(this.createOrderCommit))
       },
       async createOrderCommit(commit) { // key-value pair
-        return await cms.getModel('OrderCommit').addCommits([{
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({ _id: this.currentOrder._id }),
-          data: {
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({$set: {[commit.key]: commit.value}})
+        return await cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id
+        }, {
+          $set: {
+            [commit.key]: commit.value
           }
-        }]);
+        }).commit('updateActiveOrder', { table: this.currentOrder.table })
       },
       saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = false, fromPayBtn, cb = () => null) {
         return new Promise(async (resolve, reject) => {
@@ -915,35 +910,13 @@
         await this.saveRestaurantOrder({ type: 'cash', value: this.paymentTotal });
       },
       async changeTable(order, newTable, cb) {
-        await cms.getModel('OrderCommit').addCommits([
-          {
-            type: 'order',
-            where: jsonfn.stringify({ _id: order._id }),
-            action: 'update',
-            data: {
-              orderId: order.id,
-              table: order.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({
-                $set: {
-                  table: newTable
-                }
-              })
-            }
-          },
-          {
-            type: 'order',
-            action: 'changeTable',
-            where: jsonfn.stringify({ _id: order._id }),
-            data: {
-              table: order.table,
-              orderId: order._id
-            },
-            update: newTable
+        await cms.getModel('Order').findOneAndUpdate({
+          _id: order._id
+        }, {
+          $set: {
+            table: newTable
           }
-        ])
+        }).commit('updateActiveOrder', { orderId: order._id, table: order.table, newTable })
         cb()
       },
       //<!--</editor-fold>-->
@@ -964,15 +937,15 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
-              action: 'print',
-              data: {
-                reportType: 'OnlineOrderReport',
-                printData: { orderId },
-                device: this.device
-              }
-            }])
+            // await cms.getModel('OrderCommit').addCommits([{
+            //   type: 'report',
+            //   action: 'print',
+            //   data: {
+            //     reportType: 'OnlineOrderReport',
+            //     printData: { orderId },
+            //     device: this.device
+            //   }
+            // }])
             resolve()
           } catch(e) {
             reject(e.message)
@@ -983,15 +956,15 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
-              action: 'print',
-              data: {
-                reportType: 'OnlineOrderKitchen',
-                printData: { orderId },
-                device: this.device
-              }
-            }])
+            // await cms.getModel('OrderCommit').addCommits([{
+            //   type: 'report',
+            //   action: 'print',
+            //   data: {
+            //     reportType: 'OnlineOrderKitchen',
+            //     printData: { orderId },
+            //     device: this.device
+            //   }
+            // }])
             resolve()
           } catch(e) {
             reject(e.message)

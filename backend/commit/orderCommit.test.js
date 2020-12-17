@@ -32,13 +32,13 @@ describe("Order commit test", () => {
 
   it("Create duplicate order", async () => {
     const m1 = await orm("Order")
-      .create({ table: 10, items: [], inProgress: true })
+      .create({ table: 10, items: [], status: "inProgress" })
       .commit("createOrder");
     expect(stringify(m1)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
-        "inProgress": true,
         "items": Array [],
+        "status": "inProgress",
         "table": 10,
       }
     `);
@@ -50,7 +50,7 @@ describe("Order commit test", () => {
 
   it("Update an order", async () => {
     const m1 = await orm("Order")
-      .create({ table: 10, items: [], inProgress: true })
+      .create({ table: 10, items: [], status: "inProgress" })
       .commit("createOrder");
     const { items } = await orm("Order")
       .updateOne(
@@ -61,6 +61,7 @@ describe("Order commit test", () => {
     expect(stringify(items)).toMatchInlineSnapshot(`
       Array [
         Object {
+          "_id": "ObjectID",
           "name": "fanta",
           "quantity": 1,
         },
@@ -78,13 +79,14 @@ describe("Order commit test", () => {
     expect(stringify(updatedItem)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
-        "inProgress": true,
         "items": Array [
           Object {
+            "_id": "ObjectID",
             "name": "fanta",
             "quantity": 3,
           },
         ],
+        "status": "inProgress",
         "table": 10,
       }
     `);
@@ -103,5 +105,54 @@ describe("Order commit test", () => {
         "table": 10,
       }
     `);
+  });
+
+  it("Test change table", async function(done) {
+    const order = await orm("Order")
+      .create({ table: 10, items: [], status: "inProgress" })
+      .commit("createOrder");
+    await orm("Order")
+      .findOneAndUpdate(
+        {
+          _id: order._id
+        },
+        {
+          table: 9
+        }
+      )
+      .commit("changeTable", { table: 10, newTable: 9 });
+    await orm("Order")
+      .create({ table: 10, items: [], status: "inProgress" })
+      .commit("createOrder");
+    const orders = await orm("Order").find();
+    expect(stringify(orders)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "items": Array [],
+          "status": "inProgress",
+          "table": 9,
+        },
+        Object {
+          "_id": "ObjectID",
+          "items": Array [],
+          "status": "inProgress",
+          "table": 10,
+        },
+      ]
+    `);
+    await orm("Order")
+      .findOneAndUpdate(
+        {
+          _id: order._id
+        },
+        {
+          table: 10
+        }
+      )
+      .commit("changeTable", { table: 9, newTable: 10 });
+    const orders1 = orm("Order").find();
+    expect(orders).toEqual(orders1)
+    done();
   });
 });
