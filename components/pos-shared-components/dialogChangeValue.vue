@@ -15,10 +15,10 @@
   import DiscountInput from "./DiscountInput";
   export default {
     name: 'dialogChangeValue',
-    components: {DiscountInput, ChangeValue },
+    components: { DiscountInput, ChangeValue },
     injectService: ['PosStore:isMobile'],
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       newValueEditable: false,
     },
     data() {
@@ -37,7 +37,7 @@
         },
         set(value) {
           this.showDialog = value
-          this.$emit('input', value);
+          this.$emit('update:modelValue', value);
         }
       },
 

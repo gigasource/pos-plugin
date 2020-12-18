@@ -17,15 +17,15 @@
     name: 'PosSettingsScreenSidebar',
     injectService: ['PosStore:user', 'SettingsStore:sidebarData'],
     props: {
-      value: null
+      modelValue: null
     },
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
       userName() {

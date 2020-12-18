@@ -3,7 +3,7 @@
     name: "PosTextfieldNew",
     injectService: ['PosStore:(isMobile, isIOS)'],
     props: {
-      value: null,
+      modelValue: null,
       label: String,
       placeholder: String,
       clearable: Boolean,
@@ -16,18 +16,18 @@
     data() {
       return {
         listeners: {
-          click: (e) => this.$emit('click', e),
-          focus: (e) => this.$emit('focus', e),
+          onClick: (e) => this.$emit('click', e),
+          onFocus: (e) => this.$emit('focus', e),
         }
       }
     },
     computed: {
       internalValue: {
         get() {
-          return '' + this.value
+          return '' + this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },
@@ -45,14 +45,14 @@
       if (this.isMobile) {
         return (
             <g-text-field ref="textfield" {...{
-              props: { outlined: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readOnly: this.readonly},
-              on: { input: (val) => this.internalValue = val, ...this.listeners }
+              ...{ outlined: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readOnly: this.readonly}, // props
+              ...{ onInput: (val) => this.internalValue = val, ...this.listeners } //listeners
             }} />
         )
       }
       return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
-        props: { large: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readonly: this.readonly},
-        on: { input: (val) => this.internalValue = val, ...this.listeners }
+        ...{ large: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readonly: this.readonly}, //props
+        ...{ onInput: (val) => this.internalValue = val, ...this.listeners } //listeners
       }} />
     }
   }

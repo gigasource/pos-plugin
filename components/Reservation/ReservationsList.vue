@@ -90,6 +90,7 @@
 
 <script>
   import isBetween from 'dayjs/plugin/isBetween'
+  import { nextTick } from 'vue';
   dayjs.extend(isBetween)
 
   export default {
@@ -130,7 +131,7 @@
       })
     },
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         const firstReservation = _.minBy(this.reservations, r => r.date)
         if(firstReservation) {
           const hour = dayjs(firstReservation.date).format('HH')
@@ -153,7 +154,7 @@
         if (!val) this.edit = false
       },
       reservations(val) {
-        this.$nextTick(() => {
+        nextTick(() => {
           const firstReservation = _.minBy(val, r => r.date)
           if(firstReservation) {
             const hour = dayjs(firstReservation.date).format('HH')

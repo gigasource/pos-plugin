@@ -23,7 +23,7 @@
   export default {
     name: 'PosOrderVoucherDialog',
     props: {
-      value: Boolean
+      modelValue: Boolean
     },
     data() {
       return {
@@ -35,10 +35,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },

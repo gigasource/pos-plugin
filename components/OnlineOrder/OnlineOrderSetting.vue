@@ -115,6 +115,7 @@
   import ValuePicker from './ValuePicker';
   import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import axios from 'axios';
+  import { nextTick } from 'vue';
 
   export default {
     name: "OnlineOrderSetting",
@@ -240,14 +241,14 @@
         }
       });
 
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('getOnlineDevice')
       })
 
       this.isMasterDevice = await this.getMasterStatus()
     },
     activated() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('getOnlineDevice')
       })
     }

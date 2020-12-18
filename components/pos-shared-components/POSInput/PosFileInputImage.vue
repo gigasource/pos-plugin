@@ -13,16 +13,16 @@
   export default {
     name: "PosFileInputImage",
     props: {
-      value: null,
+      modelValue: null,
       label: String
     },
     computed: {
       src: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       }
     },

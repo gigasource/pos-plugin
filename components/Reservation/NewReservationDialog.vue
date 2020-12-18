@@ -36,7 +36,7 @@
   export default {
     name: 'NewReservationDialog',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       reservation: Object,
       edit: Boolean,
       receivedPhone: [Number, String]
@@ -77,10 +77,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       timeList() {

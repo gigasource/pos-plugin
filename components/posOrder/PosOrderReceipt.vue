@@ -174,6 +174,7 @@
 
 <script>
   import * as orderUtil from '../logic/orderUtil';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'PosOrderReceipt',
@@ -216,10 +217,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       blurReceipt() {
@@ -249,7 +250,7 @@
         if (val) {
           setTimeout(() => {
             if (!this.tipEditValue) this.tipEditValue = '' + this.tempSplit.vSum
-            this.$nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
+            nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
           }, 500)
         }
       },

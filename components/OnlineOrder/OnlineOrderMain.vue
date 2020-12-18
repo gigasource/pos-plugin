@@ -281,6 +281,7 @@
   import orderUtil from '../logic/orderUtil'
   import { Touch } from 'pos-vue-framework'
   import {CALL_SYSTEM_MODES} from '../constants';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'OnlineOrderMain',
@@ -500,13 +501,13 @@
     },
     mounted() {
       this.decimals = this.$t('common.currencyDecimal')
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('updateOnlineOrders')
       })
     },
     activated() {
       cms.socket.emit('get-call-system-status', this.updateModemDeviceStatus);
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('updateOnlineOrders')
       })
     },

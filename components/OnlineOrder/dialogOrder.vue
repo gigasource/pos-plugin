@@ -73,7 +73,7 @@
     name: "dialogOrder",
     props: {
       customer: Object,
-      value: Boolean,
+      modelValue: Boolean,
       defaultMode: String,
     },
     injectService: ['OrderStore:(createCallInOrder, createCustomer, updateCustomer)'],
@@ -99,24 +99,24 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },
     watch: {
       internalValue: {
-        handler: function (val) {
+        handler(val) {
           this.resetData();
-          if(val) {
+          if (val) {
             const customer = _.cloneDeep(this.customer)
-            if(customer) {
+            if (customer) {
               this.name = customer.name === 'New customer' ? '' : customer.name
               this.phone = customer.phone
               this.addresses = customer.addresses
-              if(customer.addresses && customer.addresses.length > 0) {
+              if (customer.addresses && customer.addresses.length > 0) {
                 this.address = customer.addresses[0].address
                 this.street = customer.addresses[0].street
                 this.house = customer.addresses[0].house
@@ -161,7 +161,7 @@
         this.selectedItem = index
       },
       updateAddress() {
-        if(this.isEditingNote) {
+        if (this.isEditingNote) {
           this.changeMode('select')
           return
         }
@@ -172,7 +172,7 @@
           zipcode: this.zipcode,
           city: this.city
         }
-        if(this.isEditingAddress) {
+        if (this.isEditingAddress) {
           this.addresses.splice(this.selectedItem, 1, newAddress)
         } else {
           this.addresses.push(newAddress)
@@ -188,7 +188,7 @@
         this.changeMode('input')
       },
       async complete() {
-        if(this.customer.name === 'New customer') {
+        if (this.customer.name === 'New customer') {
           await this.createCustomer({
             name: this.name,
             addresses: this.addresses,

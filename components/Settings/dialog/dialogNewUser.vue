@@ -43,7 +43,7 @@
   export default {
     name: 'dialogNewUser',
     props: {
-      value: null
+      modelValue: null
     },
     data() {
       return {
@@ -63,10 +63,10 @@
     computed: {
       dialogNewUser: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
       keyboard: {

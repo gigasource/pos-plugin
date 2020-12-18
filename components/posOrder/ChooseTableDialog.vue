@@ -37,7 +37,7 @@
   export default {
     name: 'ChooseTableDialog',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       table: String,
       activeOrders: Array
     },
@@ -51,10 +51,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       disabledTables() {
@@ -83,7 +83,7 @@
       }
     },
     watch: {
-      value: {
+      modelValue: {
         async handler(val) {
           if (val) {
             this.chooseTableInput = ''

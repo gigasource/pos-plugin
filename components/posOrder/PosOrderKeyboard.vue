@@ -9,6 +9,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   const actionMap = {
     insert: (value, append) => (value + append),
     delete: (value) => value.substring(0, value.length - 1),
@@ -194,7 +196,7 @@
               return
             }
           }
-          this.$nextTick(() => {
+          nextTick(() => {
             this.$getService('dialogProductSearchResult:setActive')(true)
           })
         }

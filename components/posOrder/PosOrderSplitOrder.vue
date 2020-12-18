@@ -151,7 +151,7 @@
   export default {
     name: 'PosOrderSplitOrder',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       currentOrder: null,
       user: null,
       storeLocale: String,
@@ -177,10 +177,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       username() {
@@ -317,7 +317,7 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         this.currentSplitOrder = []
         this.splitOrders = []
         this.remainingItems = _.cloneDeep(this.currentOrder.items)

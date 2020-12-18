@@ -7,7 +7,7 @@
       </div>
       <div class="dlg-buttons">
         <slot name="actions">
-          <g-btn-bs background-color="#2979FF" text-color="white" @click="$emit('input',false)" width="100" style="margin: 0">OK</g-btn-bs>
+          <g-btn-bs background-color="#2979FF" text-color="white" @click.stop="closeDialog" width="100" style="margin: 0">OK</g-btn-bs>
         </slot>
       </div>
     </div>
@@ -18,7 +18,7 @@
     name: 'dialogCommon',
     props: {
       title: String,
-      value: Boolean,
+      modelValue: Boolean,
     },
     data: function () {
       return {}
@@ -26,14 +26,18 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(v) {
-          this.$emit('input', v)
+          this.$emit('update:modelValue', v)
         }
       }
     },
-    methods: {}
+    methods: {
+      closeDialog() {
+        this.internalValue = false
+      }
+    }
   }
 </script>
 <style scoped lang="scss">
@@ -46,7 +50,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     &-title {
       font-size: 20px;
       font-weight: 600;
@@ -54,13 +58,13 @@
       margin-bottom: 24px;
       align-self: flex-start;
     }
-    
+
     &-message {
       font-size: 15px;
       width: 100%;
       color: #333333;
     }
-    
+
     &-buttons {
       display: inline-flex;
       align-self: flex-end;

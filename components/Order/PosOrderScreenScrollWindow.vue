@@ -41,6 +41,7 @@
 <script>
   import _ from 'lodash'
   import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'PosOrderScreenScrollWindow',
@@ -157,13 +158,13 @@
     async activated() {
       this.shouldForceUpdate = true;
       await this.$getService('OrderStore:getScrollWindowProducts')();
-      this.$nextTick(() => {
+      nextTick(() => {
         this.shouldForceUpdate = false
       })
     },
     async mounted() {
       await this.$getService('OrderStore:getScrollWindowProducts')();
-      this.$nextTick(() => {
+      nextTick(() => {
         this.shouldForceUpdate = false
       })
     },

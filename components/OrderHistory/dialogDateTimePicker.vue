@@ -22,7 +22,7 @@
   export default {
     name: 'dialogDateTimePicker',
     props: {
-      value: null
+      modelValue: null
     },
     injectService: [
       'OrderStore:(orderHistoryFilters, getOrderHistory, getTotalOrders)',
@@ -34,10 +34,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       }
     },

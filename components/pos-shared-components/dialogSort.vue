@@ -26,7 +26,7 @@
   export default {
     name: "dialogSort",
     props: {
-      value: Boolean
+      modelValue: Boolean
     },
     data() {
       return {
@@ -45,30 +45,30 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
           if(val === false) {
             this.tempOption = this.sortOption
             this.tempValue = this.sortValue
           }
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },
     methods: {
       select(option) {
-        if(this.tempOption !== option)
+        if (this.tempOption !== option)
           this.tempValue = 0
         this.tempOption = option
         this.increaseValue()
       },
       increaseValue() {
-        if(this.tempValue === 0)
+        if (this.tempValue === 0)
            this.tempValue = 1
-        else if(this.tempValue === 1)
+        else if (this.tempValue === 1)
            this.tempValue = -1
-        else if(this.tempValue === -1) {
+        else if (this.tempValue === -1) {
           this.tempValue = 0
           this.tempOption = ''
         }
@@ -77,7 +77,7 @@
         let sort = {}
         this.sortOption = this.tempOption
         this.sortValue = this.tempValue
-        if(this.sortOption && this.sortValue !== 0)
+        if (this.sortOption && this.sortValue !== 0)
           _.set(sort, this.sortOption, this.sortValue)
         this.$emit('submit', sort)
         this.internalValue = false

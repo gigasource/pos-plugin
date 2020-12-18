@@ -30,7 +30,7 @@
   export default {
     name: "dialogChangeStock",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       name: String,
       stock: Number,
       removeable: {
@@ -56,19 +56,19 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          if(!val) {
+          if (!val) {
             this.mode = ''
             this.change = 0
             this.reason = ''
           }
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       newStock() {
-        if(this.mode === 'add')
+        if (this.mode === 'add')
           return this.stock + this.change
         else if (this.mode === 'remove')
           return (this.stock - this.change) > 0 ? (this.stock - this.change) : 0
@@ -89,7 +89,7 @@
     },
     watch: {
       internalValue(val) {
-        if(val) {
+        if (val) {
           this.mode = 'add'
           setTimeout(() => {
               this.$refs.textfield.$refs.input.focus()

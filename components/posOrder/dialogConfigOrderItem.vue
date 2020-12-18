@@ -72,7 +72,7 @@
     injectService: ['PosStore:storeLocale'],
     components: { PosTextfieldNew, ChangeValue },
     props: {
-      value: null,
+      modelValue: null,
       product: null,
       originalValue: Number
     },
@@ -102,12 +102,12 @@
     computed: {
       dialogConfigOrderItem: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
           this.modifier = ''
           this.price = ''
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       tabs() {

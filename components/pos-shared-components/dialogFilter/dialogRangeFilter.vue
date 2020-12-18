@@ -36,7 +36,7 @@
         type: [Number, String],
         default: 500
       },
-      value: null,
+      modelValue: null,
     },
     data() {
       return {
@@ -46,10 +46,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value || false
+          return this.modelValue || false
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       }
     },

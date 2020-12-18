@@ -113,7 +113,7 @@
     name: 'PosOrderMoveItems',
     components: { ChooseTableDialog },
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       currentOrder: null,
       user: null,
       storeLocale: String,
@@ -135,10 +135,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       currentTable() {
@@ -225,7 +225,7 @@
       'currentOrder.items'(val) {
         if (val) this.remainingItems = _.cloneDeep(val)
       },
-      value(val) {
+      modelValue(val) {
         this.itemsToMove = []
         if (val) {
           this.remainingItems = _.cloneDeep(this.currentOrder.items)

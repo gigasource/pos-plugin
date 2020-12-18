@@ -3,7 +3,7 @@
     <template v-for="item in values">
       <slot name="item" :item="item" :select="pickValue" :isSelected="isValueSelected">
         <g-btn-bs  @click.stop="pickValue(item)"
-                   :class="['mb-1',isValueSelected(item) ? 'selected' : null]"
+                   :class="['mb-1', isValueSelected(item) && 'selected']"
                    border-color="#C4C4C4" text-color="black" width="40" height="30">
           {{item}}
         </g-btn-bs>
@@ -19,17 +19,19 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'ValuePicker',
     props: {
       values: Array,
       allowCustom: Boolean,
-      value: null,
+      modelValue: null,
       defaultValue: null
     },
     data() {
       return {
-        inputValue: (!this.values.includes(this.value) && this.value) || '',
+        inputValue: (!this.values.includes(this.modelValue) && this.modelValue) || '',
         dialog: false
       }
     },
@@ -38,13 +40,13 @@
         if (this.allowCustom) {
           this.inputValue = null
         }
-        this.$emit('input', val)
+        this.$emit('update:modelValue', val)
       },
       pickCustomValue(val) {
-        this.$emit('input', +val)
+        this.$emit('update:modelValue', +val)
       },
       isValueSelected(val) {
-        return this.value === val
+        return this.modelValue === val
       },
       changeValue(val) {
         this.inputValue = +val
@@ -52,8 +54,8 @@
       }
     },
     mounted() {
-      this.$nextTick(() => {
-        if (!this.value && this.defaultValue) this.$emit('input', this.defaultValue)
+      nextTick(() => {
+        if (!this.modelValue && this.defaultValue) this.$emit('update:modelValue', this.defaultValue)
       })
     }
   }

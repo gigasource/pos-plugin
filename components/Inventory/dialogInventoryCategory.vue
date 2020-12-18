@@ -31,7 +31,7 @@
     name: "dialogInventoryCategory",
     injectService: ['InventoryStore:(loadCategoriesWithItem, updateInventoryCategory, loadInventoryCategories, deleteInventoryCategory)'],
     props: {
-      value: Boolean
+      modelValue: Boolean
     },
     data() {
       return {
@@ -42,11 +42,11 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
           this.showKeyboard = false
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       rules() {

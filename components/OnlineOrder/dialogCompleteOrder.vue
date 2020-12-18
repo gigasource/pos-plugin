@@ -80,7 +80,7 @@
   export default {
     name: 'dialogCompleteOrder',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       disabledBtn: Boolean
     },
     injectService: ['PosStore:storeLocale'],
@@ -102,10 +102,10 @@
     computed: {
       dialog: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         },
       },
       subTotal() {

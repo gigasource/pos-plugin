@@ -65,7 +65,7 @@
   export default {
     name: "dialogDemo",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       mode: {
         type: String,
         default: 'demo'
@@ -82,7 +82,7 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         if (val) {
           this.step = this.mode === 'demo' ? 1 : 2
 
@@ -100,10 +100,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       title() {
@@ -126,14 +126,14 @@
         }
       },
       selectDemo(demo) {
-        if(this.selectedDemo === demo) {
+        if (this.selectedDemo === demo) {
           this.selectedDemo = ''
         } else {
           this.selectedDemo = demo
         }
       },
       back() {
-        if(this.step === 3 || (this.step === 2 && this.mode === 'demo')) {
+        if (this.step === 3 || (this.step === 2 && this.mode === 'demo')) {
           this.step --
         } else {
           this.internalValue = false

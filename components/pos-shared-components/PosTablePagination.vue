@@ -36,6 +36,7 @@
 
 <script>
   import _ from 'lodash';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'PosTablePagination',
@@ -61,7 +62,7 @@
       },
       changeLimitRow(number) {
         this.$emit('update:limit', number);
-        this.$nextTick(() => {
+        nextTick(() => {
           if (this.currentPage > this.totalPage) {
             this.$emit('update:currentPage', this.totalPage);
           }

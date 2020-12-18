@@ -23,7 +23,7 @@
   export default {
     name: 'dialogUserDetail',
     props: {
-      value: null,
+      modelValue: null,
 			focusInput: String,
       add: Boolean
     },
@@ -42,10 +42,10 @@
     computed: {
       dialogUserDetail: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
       check: {
@@ -80,7 +80,7 @@
 			}
 		},
 		watch: {
-      value: function(val) {
+      modelValue(val) {
         setTimeout(() => {
           const textfield = this.$refs[this.focusInput];
           if (textfield && textfield.$refs && textfield.$refs.textfield)

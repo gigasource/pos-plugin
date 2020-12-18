@@ -33,6 +33,8 @@
 <script>
   //todo on/off timer (awaiting redesign/conceptualization)
 
+  import { nextTick } from 'vue';
+
   export default {
     name: 'OnlineOrderServices',
     data() {
@@ -100,12 +102,12 @@
       }
     },
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.getServices()
       })
     },
     activated() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.getServices()
       })
     }

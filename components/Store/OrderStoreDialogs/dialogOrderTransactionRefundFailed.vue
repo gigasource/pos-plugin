@@ -1,5 +1,5 @@
 <template>
-  <dialog-common v-model="value" :title="$t('onlineOrder.refundFailedDialog.title')">
+  <dialog-common v-model="modelValue" :title="$t('onlineOrder.refundFailedDialog.title')">
     <div style="font-size: 18px; margin-bottom: 5px;">{{ $t('onlineOrder.refundFailedDialog.detail') }}:</div>
     <div v-for="(rc, index) in refundCaptures" :key="index" class="refund-capture">
       <div class="refund-capture-header">
@@ -16,7 +16,7 @@
     </div>
     <div v-if="error">{{ error }} </div>
     <template #actions>
-      <g-btn-bs @click="$emit('input', false)" background-color="#2979FF" text-color="#fff" width="100" style="margin: 0">{{ $t('onlineOrder.refundFailedDialog.ok') }}</g-btn-bs>
+      <g-btn-bs @click="closeDialog" background-color="#2979FF" text-color="#fff" width="100" style="margin: 0">{{ $t('onlineOrder.refundFailedDialog.ok') }}</g-btn-bs>
     </template>
   </dialog-common>
 </template>
@@ -25,7 +25,7 @@
   export default {
     name: 'dialogOrderTransactionRefundFailed',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       error: String, // un-expected error return from server
       captureResponses: Object,
       refundResponses: Array,
@@ -50,6 +50,11 @@
           }
         })
       }
+    },
+    methods: {
+      closeDialog() {
+        this.$emit('update:modelValue', false)
+      }
     }
   }
 </script>
@@ -58,16 +63,16 @@
     background-color: #eee;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.3);
     border-radius:10px;
-    
+
     &-header {
       padding: 10px;
       border-bottom: 1px solid #ccc;
     }
-    
+
     &-body {
       padding: 10px;
     }
-    
+
     &-status {
       background-color: #ccc;
       padding: 3px 5px;

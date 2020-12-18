@@ -178,6 +178,7 @@
 
 <script>
   import { Touch } from 'pos-vue-framework';
+  import { nextTick } from 'vue';
 
   export default {
     name: "posOrder",
@@ -564,7 +565,7 @@
     watch: {
       items(val) {
         if(val && this.$refs) {
-          this.$nextTick(() => {
+          nextTick(() => {
             const table = this.$refs.table
             table.scroll({top: table.scrollHeight, behavior: 'smooth'})
           })

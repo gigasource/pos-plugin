@@ -1,4 +1,5 @@
 <script>
+  import { nextTick } from 'vue'
   import { GTextFieldBs } from 'pos-vue-framework';
 
   export default {
@@ -9,7 +10,7 @@
     },
     mixins: [GTextFieldBs],
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         const input = this.$refs.input
         input.addEventListener('keydown', e => {
           if(e.keyCode === 13) {

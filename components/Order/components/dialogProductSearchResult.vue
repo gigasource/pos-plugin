@@ -102,7 +102,7 @@
   export default {
     name: 'dialogProductSearchResult',
     props: {
-      value: null
+      modelValue: null
     },
     injectService: ['OrderStore:(productIdQuery,productIdQueryResults)'],
     data: () => ({
@@ -115,7 +115,7 @@
           return this.value;
         },
         set(value) {
-          this.$emit('input', value);
+          this.$emit('update:modelValue', value);
         }
       },
       formattedQueryResults: {

@@ -112,10 +112,10 @@
                   <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer" :grid="false"
                                  item-text="name" item-value="_id" :items="groupPrinters" itemCols="auto">
                     <template #default="{ toggleSelect, item, index }">
-                      <div class="prop-option" @click="e => { toggleSelect(item) }">{{item.name}}</div>
+                      <div class="prop-option" @click="() => { toggleSelect(item) }">{{item.name}}</div>
                     </template>
                     <template #selected="{ toggleSelect, item, index }">
-                      <div class="prop-option prop-option--active" @click="e => { toggleSelect(item) } ">{{item.name}}</div>
+                      <div class="prop-option prop-option--active" @click="() => { toggleSelect(item) } ">{{item.name}}</div>
                     </template>
                   </g-grid-select>
                 </div>
@@ -173,7 +173,7 @@
     name: 'dialogEditPopupModifiers',
     components: { PosTextfieldNew, DialogFormInput, PosTextField },
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       product: null
     },
     data() {
@@ -195,10 +195,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
       allCategories() {
@@ -390,7 +390,7 @@
           }
         }
       },
-      value: {
+      modelValue: {
         async handler(newVal) {
           if (newVal) {
             await this.reload(() => {

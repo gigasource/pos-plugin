@@ -11,7 +11,7 @@
     name: 'PosTimePicker',
     props: {
       label: String,
-      value: String,
+      modelValue: String,
     },
     data() {
       return {
@@ -25,12 +25,12 @@
         },
         set(value) {
           this.lazyValue = value
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       }
     },
     mounted() {
-      this.value && (this.lazyValue = this.value)
+      this.modelValue && (this.lazyValue = this.modelValue)
     }
   }
 </script>

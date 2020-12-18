@@ -31,7 +31,7 @@
   export default {
     name: 'dialogSelectAvatar',
     props: {
-      value: null,
+      modelValue: null,
     },
     data() {
       return {
@@ -47,10 +47,10 @@
     computed: {
       dialogSelectAvatar: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
     },
@@ -66,7 +66,7 @@
       this.listAvatars = await this.getListAvatar();
     },
     watch: {
-      value: function () {
+      modelValue() {
         let checkEqual = false;
         for (const avatar of this.listAvatars) {
           if (avatar.image === this.selectedUser.avatar) {

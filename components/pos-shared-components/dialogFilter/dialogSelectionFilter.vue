@@ -25,7 +25,7 @@
   export default {
     name: "dialogSelectionFilter",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       multiple: Boolean,
       items: Array,
       label: String,
@@ -39,10 +39,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value || false
+          return this.modelValue || false
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
     },

@@ -11,7 +11,7 @@
           <div>{{ $t('onlineOrder.refundDialog.zipCode') }}: {{order.customer.zipCode}}</div>
         </div>
       </div>
-      
+
       <div class="section-header mt-2">{{ $t('onlineOrder.refundDialog.orderInfo') }}</div>
       <div>
         <div>ID: #{{order.id}}</div>
@@ -40,7 +40,7 @@
   export default {
     name: 'dialogOrderTransactionRefundConfirm',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       order: Object,
       storeLocale: String,
     },
@@ -51,7 +51,7 @@
     },
     methods: {
       close() {
-        this.$emit('input', false)
+        this.$emit('update:modelValue', false)
       },
       submit() {
         this.$emit('submit')

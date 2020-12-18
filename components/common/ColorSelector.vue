@@ -23,7 +23,7 @@
   export default {
     name: 'ColorSelector',
     props: {
-      value: String,
+      modelValue: String,
       colors: {
         type: Array,
         default: () => ['#FBE4EC', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91']
@@ -41,7 +41,7 @@
         default: '#D2D2D2'
       }
     },
-    data: function () {
+    data() {
       const toColorModel = colors => _.map(colors, (c, i) => ({index: i, text: c, value: c}))
       return {
         internalColor: this.value,
@@ -56,7 +56,7 @@
     methods: {
       updateColor(color) {
         this.internalColor = color
-        this.$emit('input', color)
+        this.$emit('update:modelValue', color)
       },
       getColorItemStyle(item) {
         const itemSelected = this.internalColor === item.value

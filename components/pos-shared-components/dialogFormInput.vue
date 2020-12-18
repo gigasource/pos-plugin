@@ -33,7 +33,7 @@
     name: "dialogFormInput",
     injectService: ['PosStore:isMobile'],
     props: {
-      value: null,
+      modelValue: null,
       showKeyboard: {
         type: Boolean,
         default: true
@@ -69,10 +69,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       showButtons() {
@@ -97,7 +97,7 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         if (!val) this.internalKeyboardType = 'alphanumeric'
       },
       keyboardType(val) {

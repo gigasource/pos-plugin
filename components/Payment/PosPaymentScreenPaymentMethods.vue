@@ -72,6 +72,7 @@
 
 <script>
   import isNil from 'lodash/isNil';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'PosPaymentScreenPaymentMethods',
@@ -219,7 +220,7 @@
         if (val) {
           if (!this.currentOrder.tip) this.tipEditValue = '' + this.paymentTotal
           setTimeout(() => {
-            this.$nextTick(() => {
+            nextTick(() => {
               const tipTfRef = this.$refs['tip-textfield'];
               if (tipTfRef) {
                 tipTfRef.$el.click();
@@ -238,7 +239,7 @@
           }
 
           setTimeout(() => {
-            this.$nextTick(() => {
+            nextTick(() => {
               this.$refs['cash-textfield'] && this.$refs['cash-textfield'][0].$el.click()
             })
           }, 500)

@@ -17,6 +17,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue'
+
   export default {
     name: 'PosOrderManualTable',
     props: {
@@ -92,7 +94,7 @@
         }, 200)
       },
       focusTf() {
-        this.$nextTick(() => {
+        nextTick(() => {
           setTimeout(() => {
             const tfComponent = this.$refs['tf']
             tfComponent && tfComponent.$el && tfComponent.$el.click()

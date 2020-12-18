@@ -21,7 +21,7 @@
   export default {
     name: 'dialogConfirmDelete',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       type: String,
       label: String,
     },
@@ -36,8 +36,8 @@
     computed: {
       dialog: {
         get() {
-          if(this.value)
-            return this.value;
+          if (this.modelValue)
+            return this.modelValue;
           else
             return this.internalValue
         },
@@ -46,7 +46,7 @@
             this.internalType = null;
             this.internalLabel = null;
           }
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
           this.internalValue = val;
         }
       },

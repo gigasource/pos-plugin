@@ -10,6 +10,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'PosOrderScreenProductCategoryMenu',
     data() {
@@ -47,7 +49,7 @@
     },
     async mounted() {
       this.menu = await this.$getService('SettingsStore:getAllCategories')()
-      this.$nextTick(() => {
+      nextTick(() => {
         this.select(this.menu[0])
       })
     },

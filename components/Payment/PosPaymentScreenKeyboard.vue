@@ -55,6 +55,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'PosPaymentScreenKeyboard',
     props: {
@@ -164,7 +166,7 @@
 
             if (val.some(i => i.type === 'cash')) {
               setTimeout(() => {
-                this.$nextTick(() => {
+                nextTick(() => {
                   if (this.$refs['cash-textfield'] && this.$refs['cash-textfield'][0]) {
                     this.$refs['cash-textfield'][0].$el.click()
                     const input = this.$refs['cash-textfield'][0].$el.querySelector('input')

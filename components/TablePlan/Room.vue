@@ -34,6 +34,7 @@
   import _ from 'lodash'
   import * as mouseEventUtil from '../../utils/mouseEventUtil'
   import {Touch} from 'pos-vue-framework';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'Room',
@@ -101,7 +102,7 @@
           if(this.$refs && this.$refs['room']) {
             this.$refs['room'].style.zoom = ''
           }
-          this.$nextTick(() => {
+          nextTick(() => {
             const roomEl = this.$refs['room']
 
             const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
