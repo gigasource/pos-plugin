@@ -52,7 +52,10 @@ module.exports = async function (orm) {
 	})
 
 	orm.on('process:commit:changeTable', async function (commit) {
-		if (!(await checkActiveOrder(commit.data.newTable))) {
+		if (!(await checkActiveOrder(commit.data.table))) {
+			await buildDoNothingCommit(commit)
+		}
+		if ((await checkActiveOrder(commit.data.newTable))) {
 			await buildDoNothingCommit(commit)
 		}
 		this.value = commit

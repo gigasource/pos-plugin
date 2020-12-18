@@ -12,6 +12,7 @@ module.exports = async function (cms) {
 	orm.plugin(syncFlow)
 	orm.plugin(syncTransporter)
 	orm.plugin(require('./collection-commit/orderCommit'))
+	orm.plugin(require('./collection-commit/actionCommit'))
 	orm.connect(backupDbConnectionUri, (err) => {
 		if (err) {
 			console.log('Error is:', err)
@@ -65,7 +66,7 @@ module.exports = async function (cms) {
 	})
 
 	cms.dbExists = async (dbName) => {
-		return (await orm('Order').count()) !== 0
+		return (await orm('Order', dbName).count()) !== 0
 	}
 
 	const storesList = await cms.getModel('Store').find({}).lean();
