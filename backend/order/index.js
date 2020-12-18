@@ -60,9 +60,9 @@ module.exports = (cms) => {
       // add print commits
       printLists.addList = Object.assign({}, order, { items: await mapGroupPrinter(printLists.addList) });
       printLists.cancelList = Object.assign({}, order, ({ items: await mapGroupPrinter(printLists.cancelList) }));
-      const printCommits = _.reduce(printLists, (list, listOrder, listName) => {
+      _.reduce(printLists, async (list, listOrder, listName) => {
         if (listOrder && listOrder.items && listOrder.items.length) {
-          list.push(getPrintCommit(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device, oldOrder))
+          await createPrintAction(listName === 'addList' ? 'kitchenAdd' : 'kitchenCancel', listOrder, device, oldOrder)
         }
         return list
       }, [])
@@ -101,9 +101,8 @@ module.exports = (cms) => {
       cb(newOrder)
     })
 
-    socket.on('print-invoice', async (order) => {
-      // todo modify this
-      // await cms.getModel('OrderCommit').addCommits([getPrintCommit('invoice', order, device)])
+    socket.on('print-invoice', async (order, device) => {
+      await createPrintAction('invoice', order, device)
     })
 
     socket.on('update-split-payment', async (_id, payment, cb) => {
@@ -130,12 +129,12 @@ module.exports = (cms) => {
         await getRecentItemCommits(recentItems, recentCancellationItems, order)
         if (recentItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentItems })
-          // actionList.push(getPrintCommit('kitchenAdd', printOrder, device, oldOrder)) // todo fix this
+          await createPrintAction('kitchenAdd', printOrder, device)
         }
 
         if (recentCancellationItems.length) {
           const printOrder = Object.assign({}, mappedOrder, { items: recentCancellationItems })
-          // actionList.push(getPrintCommit('kitchenCancel', printOrder, device, oldOrder)) // todo fix this
+          await createPrintAction('kitchenCancel', printOrder, device)
         }
 
         await orm('Order').findOneAndUpdate({
@@ -192,8 +191,7 @@ module.exports = (cms) => {
         }
 
         if (print) {
-          // await cms.getModel('OrderCommit').addCommits([
-          //   getPrintCommit('invoice', mappedOrder, device, oldOrder)])
+          await createPrintAction('invoice', mappedOrder, device)
         }
 
         cb(newOrder)
@@ -250,8 +248,7 @@ module.exports = (cms) => {
       // commits: print, set sent/printed items
       if (itemsToPrint.length) {
         const printOrder = Object.assign(newOrder, { items: shouldMerge ? mergeOrderItems(itemsToPrint) : itemsToPrint });
-        // await cms.getModel('OrderCommit').addCommits([
-        //   getPrintCommit('kitchenAdd', printOrder)])
+        await createPrintAction('kitchenAdd', printOrder)
       }
       cb(updatedOrder)
     })
@@ -489,13 +486,10 @@ async function getRecentItemCommits(recentItems, recentCancellationItems, order)
   }
 }
 
-function getPrintCommit(printType, order, device, oldOrder) {
-  return {
-    type: 'order',
-    action: 'printOrder',
-    printType: printType,
+async function createPrintAction(printType, order, device, oldOrder) {
+  await cms.orm('Action').create({
+    printType,
     order,
-    device,
-    oldOrder
-  }
+    device
+  }).commit('print')
 }

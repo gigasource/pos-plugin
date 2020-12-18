@@ -107,4 +107,5 @@ module.exports = async function (cms) {
 	await cms.execPostAsync('connectToMaster')
 
 	orm.plugin(require('./orderCommit'))
+	orm.plugin(require('./actionCommit'))
 }

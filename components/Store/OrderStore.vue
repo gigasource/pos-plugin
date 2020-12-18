@@ -550,15 +550,11 @@
             reject()
           }
           try {
-            // await cms.getModel('OrderCommit').addCommits([{
-            //   type: 'report',
-            //   action: 'print',
-            //   data: {
-            //     reportType: 'OrderReport',
-            //     printData: order,
-            //     device: this.device
-            //   }
-            // }])
+            await cms.getModel('Action').create({
+              action: 'print',
+              reportType: 'OrderReport',
+              order
+            }).commit('print')
             resolve()
           } catch (e) {
             reject(e.message)
