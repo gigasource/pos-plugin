@@ -6,15 +6,15 @@
   export default {
     name: 'PosLoginKeyboard',
     props: {
-      value: String
+      modelValue: String
     },
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       }
     },
@@ -33,14 +33,14 @@
           { content: ['0'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: this.append, style: 'grid-area: key0; width: 100%; height: 100%; border: 1px solid #979797;' },
           { content: ['Clear'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: this.clear, style: 'grid-area: keyClear; width: 100%; height: 100%; border: 1px solid #979797;' },
           { content: [''], icon: 'mdi-backspace', classes: 'key-number bg-white ba-blue-9 ba-thin', action: this.delete, style: 'grid-area: keyBack; width: 100%; height: 100%; border: 1px solid #979797;' },
-          { content: [$t('login.key')], classes: 'key-login key-number ba-blue-9 ba-thin', action: this.keyboardLogin, style: 'grid-area: keyLogin; background-color: #2979FF; color: #ffffff; border: none; font-size: 16px;text-transform: capitalize' },
+          { content: [this.$t('login.key')], classes: 'key-login key-number ba-blue-9 ba-thin', action: this.keyboardLogin, style: 'grid-area: keyLogin; background-color: #2979FF; color: #ffffff; border: none; font-size: 16px;text-transform: capitalize' },
         ],
         template: 'grid-template: "key7 key8 key9 keyLogin" "key4 key5 key6 keyLogin" "key1 key2 key3 keyLogin" "keyClear key0 keyBack keyLogin"/ 1fr 1fr 1fr 1fr',
       };
     },
     methods: {
       keyboardLogin() {
-        if (!this.value) return '';
+        if (!this.modelValue) return '';
         this.$emit('login', this.internalValue);
         return this.internalValue
       },

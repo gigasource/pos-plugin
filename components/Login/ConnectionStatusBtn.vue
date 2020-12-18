@@ -10,6 +10,12 @@
   export default {
     name: 'ConnectionStatusBtn',
     injectService: ['PosStore:(webShopConnected,online)'],
+    data() {
+      return {
+        online: true,
+        webShopConnected: true,
+      }
+    },
     mounted() {
       this.online = navigator.onLine
     },

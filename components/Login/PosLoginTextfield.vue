@@ -15,7 +15,7 @@
   export default {
     name: 'PosLoginTextfield',
     props: {
-      value: String,
+      modelValue: String,
       incorrectPasscode: Boolean
     },
     data() {

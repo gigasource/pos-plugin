@@ -22,7 +22,10 @@
   export default {
     name: "PosLoginBtnLanguage",
     props: {
-      locale: String
+      locale: {
+        type: String,
+        default: 'en'
+      }
     },
     data() {
       return {

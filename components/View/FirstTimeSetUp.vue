@@ -4,10 +4,10 @@
       <div class="dialog-title" @click.stop="secretClick">Welcome to Restaurant+ POS</div>
       <g-tabs v-model="tab" :items="items">
         <g-tab-item :item="items[0]" style="height: 230px; padding-top: 4px">
-<!--          <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"-->
-<!--                      keep-menu-on-blur clearable :virtual-event="isIOS" skip-search menu-class="menu-autocomplete-setup"-->
-<!--                      :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">-->
-<!--          </g-combobox>-->
+          <g-combobox class="w-100 mt-1" v-model="placeId" text-field-component="PosTextField" :key="`tab_${tab.title}`"
+                      keep-menu-on-blur clearable :virtual-event="isIOS" skip-search menu-class="menu-autocomplete-setup"
+                      :items="placesSearchResult" @input-click="showKeyboard = true" @update:searchText="debouncedSearch">
+          </g-combobox>
           <pos-textfield-new class="tf-phone" label="Phone number" @click="showKeyboard = true" v-model="phone"/>
           <div v-if="error" class="dialog-message--error">
             <g-icon v-if="offline">icon-no-connection</g-icon>
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-  import DialogCustomUrl from './dialogCustomUrl';
+  import DialogCustomUrl from '../Login/dialogCustomUrl';
   import {v4 as uuidv4} from 'uuid';
   import _ from 'lodash';
   import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";

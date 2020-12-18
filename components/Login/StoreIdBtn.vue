@@ -14,11 +14,15 @@
       async updateSkipPairing() {
         const posSettings = await cms.getModel('PosSetting').findOne()
         this.skipPairing = posSettings.skipPairing
+      },
+      getStoreId() {
+
       }
     },
     data() {
       return {
-        skipPairing: false
+        skipPairing: false,
+        storeId: ''
       }
     },
     async created() {
