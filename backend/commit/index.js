@@ -28,7 +28,7 @@ module.exports = async function (cms) {
 	)
 
 	const setMaster = function (_isMaster) {
-		cms.emit('commit:flow:setMaster', _isMaster)
+		orm.emit('commit:flow:setMaster', _isMaster)
 	}
 	cms.setMaster = setMaster
 	const localIp = function () {
@@ -41,7 +41,7 @@ module.exports = async function (cms) {
 		if (_masterIp && masterIp !== _masterIp) {
 			masterIp = _masterIp
 			await cms.getModel('PosSetting').findOneAndUpdate({}, { masterIp })
-			const _isMaster = cms.getMaster()
+			const _isMaster = orm.getMaster()
 			if (_isMaster) {
 				orm.emit('offMaster')
 			} else {
@@ -54,11 +54,11 @@ module.exports = async function (cms) {
 			if (onlineOrderSocket) onlineOrderSocket.emit('registerMasterDevice', localIp())
 			const masterSocket = cms.io.of('/masterNode')
 			masterSocket.on('connect', socket => {
-				orm.emit('initSocketForMaster', socket)
+				orm.emit('initSyncForMaster', socket)
 			})
 		} else {
 			const clientSocket = socketClient.connect(`http://${masterIp}/masterNode`)
-			orm.emit('initSocketForClient', clientSocket)
+			orm.emit('initSyncForClient', clientSocket)
 			const {value: highestId} = await orm.emit('getHighestCommitId')
 			orm.emit('transport:require-sync', highestId)
 		}
@@ -68,12 +68,12 @@ module.exports = async function (cms) {
 	 -------------------------------------------
 	 */
 	cms.post('onlineOrderSocket', _.once(async function (socket) {
-		const posSettings = await cms.getModel('PosSetting').findOne({}).lean()
-		const { onlineDevice, masterIp } = posSettings
+		const posSettings = await cms.getModel('PosSetting').findOne({})
+		let { onlineDevice, masterIp } = posSettings
 		if (!onlineDevice.store) return
 		const getMasterIp = function () {
 			socket.emit('getMasterIp', onlineDevice.store.alias, async (_masterIp, masterClientId) => {
-				if (masterIp !== _masterIp) {
+				if (_masterIp && masterIp !== _masterIp) {
 					await cms.execPostAsync('connectToMaster', null, [_masterIp, socket])
 				}
 			})
@@ -88,6 +88,7 @@ module.exports = async function (cms) {
 
 		socket.on('setDeviceAsMaster', async function (ack) {
 			ack()
+			masterIp = localIp()
 			await cms.execPostAsync('connectToMaster', null, [localIp(), socket])
 		})
 

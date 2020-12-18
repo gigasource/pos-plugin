@@ -151,7 +151,7 @@ describe("Order commit test", () => {
         }
       )
       .commit("changeTable", { table: 9, newTable: 10 });
-    const orders1 = orm("Order").find();
+    const orders1 = await orm("Order").find();
     expect(orders).toEqual(orders1)
     done();
   });
