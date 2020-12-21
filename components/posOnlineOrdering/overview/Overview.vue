@@ -9,12 +9,12 @@
        </div>
        <div class="row-flex align-items-center mb-1">
          <g-icon size="18" class="mr-3">icon-call</g-icon>
-         <span class="fs-small fw-700 mr-3">Phone</span>
+         <span class="fs-small fw-700 mr-3">{{$t('store.telephone')}}</span>
          <span style="font-size: 14px; color: #1271FF; text-decoration: underline">{{store.phone}}</span>
        </div>
        <div class="row-flex align-items-center">
          <g-icon size="18" class="mr-3">icon-clock</g-icon>
-         <span class="fs-small fw-700 mr-3">Open hours</span>
+         <span class="fs-small fw-700 mr-3">{{$t('store.openHours')}}</span>
        </div>
        <div style="margin-left: 34px; font-size: 14px; margin-top: 4px" v-for="(day, i) in storeWorkingDay" :key="`day_${i}`">
          {{day.wdayString}}: {{day.open}} - {{day.close}}
@@ -88,12 +88,12 @@
        </div>
        <div class="overview-side__info--phone">
          <g-icon class="mr-2" size="18">icon-call</g-icon>
-         <span class="fw-700 fs-small mr-3">Phone</span>
+         <span class="fw-700 fs-small mr-3">{{$t('store.telephone')}}</span>
          <span style="font-size: 14px; color: #1271FF; text-decoration: underline">{{store.phone}}</span>
        </div>
        <div class="row-flex px-2 py-1">
          <g-icon class="mr-2" size="18">icon-clock</g-icon>
-         <span class="fw-700 fs-small">Open hours</span>
+         <span class="fw-700 fs-small">{{$t('store.openHours')}}</span>
        </div>
        <div class="overview-side__info--hour" v-for="(day, i) in storeWorkingDay" :key="`day_${i}`">
          {{day.wdayString}}: {{day.open}} - {{day.close}}

@@ -395,15 +395,3 @@
     }
   }
 </style>
-
-<style lang="scss">
-  .menu-status-notification {
-    transform: translateX(-40%);
-  }
-
-  @media screen and (max-width: 400px) {
-    .menu-status-notification {
-      transform: none;
-    }
-  }
-</style>
