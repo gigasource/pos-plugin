@@ -5,7 +5,7 @@
         <template v-for="(item, index) in computedList">
           <slot name="item">
             <div class="scroll-select__container--item" :key="index" :id="item" @click="chooseItem(item, index)"
-                 :style="{height: computedItemHeight, ...value === item && { color: 'white', fontWeight: '700' }}">
+                 :style="{height: computedItemHeight, ...modelValue === item && { color: 'white', fontWeight: '700' }}">
               {{item}}
             </div>
           </slot>
@@ -56,7 +56,7 @@
         return isNaN(+this.itemHeight) ? 0 : `calc(50% - ${this.itemHeight/2}px)`
       },
       itemSelected() {
-        return !!this.items.find(item => item === this.value)
+        return !!this.items.find(item => item === this.modelValue)
       }
     },
     mounted() {
@@ -71,7 +71,7 @@
         this.$emit('update:modelValue', this.items[index])
       }, 100),
       scrollToValue() {
-        const index = this.items.indexOf(this.value)
+        const index = this.items.indexOf(this.modelValue)
         setTimeout(() => {
           this.$refs.container.scrollTop = this.itemHeight * index
         }, 100)

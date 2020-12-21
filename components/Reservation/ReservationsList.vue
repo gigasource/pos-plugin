@@ -109,13 +109,13 @@
         },
         listStatus: [
           { text: 'All', value: 'all' },
-          { text: $t('onlineOrder.arrived'), value: 'completed' },
-          { text: $t('onlineOrder.notArrived'), value: 'pending' }
+          { text: this.$t('onlineOrder.arrived'), value: 'completed' },
+          { text: this.$t('onlineOrder.notArrived'), value: 'pending' }
         ],
         status: 'all',
         date: new Date(),
         week: [],
-        dayInWeeks: [$t('onlineOrder.weekday.mon'), $t('onlineOrder.weekday.tue'), $t('onlineOrder.weekday.wed'), $t('onlineOrder.weekday.thu'), $t('onlineOrder.weekday.fri'), $t('onlineOrder.weekday.sat'), $t('onlineOrder.weekday.sun')],
+        dayInWeeks: [this.$t('onlineOrder.weekday.mon'), this.$t('onlineOrder.weekday.tue'), this.$t('onlineOrder.weekday.wed'), this.$t('onlineOrder.weekday.thu'), this.$t('onlineOrder.weekday.fri'), this.$t('onlineOrder.weekday.sat'), this.$t('onlineOrder.weekday.sun')],
         edit: false,
         selectedReservation: null
       }
@@ -194,6 +194,7 @@
         return hours
       }
     },
+    emits: ['getReservations', 'updateReservation', 'getReservationSetting', 'removeReservation', 'completeReservation', 'getPendingReservationsLength'],
     methods: {
       genReservations(date = this.date, status = this.status) {
         this.$emit('getReservations', date, status)

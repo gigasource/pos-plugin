@@ -354,6 +354,7 @@
         return this.kitchenOrders
       },
     },
+    emits: ['updateOnlineOrders', 'acceptPendingOrder', 'declineOrder', 'completeOrder', 'getPendingOnlineOrderCounter'],
     methods: {
       getPayment({ _id, payment }) {
         const { value, type } = payment[0];

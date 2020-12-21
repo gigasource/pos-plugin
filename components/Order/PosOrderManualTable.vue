@@ -52,6 +52,7 @@
     activated() {
       this.focusTf()
     },
+    emits: ['setInitOrderProps'],
     methods: {
       async loadRoom() {
         this.rooms = await cms.getModel('Room').find()

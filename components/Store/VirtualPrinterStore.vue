@@ -6,10 +6,10 @@
   const VIRTUAL_REPORT_COLLECTION = 'VirtualReport'
   const GROUP_PRINTER_COLLECTION = 'GroupPrinter'
   const OUT_DATED_VREPORT_TIME_IN_DAYS = 2
-  
+
   // NOTE: clear timer will be remove when cms core added auto clean feature
   const MILLISECONS_PER_DAY = 86400000
-  
+
   export default {
     name: 'VirtualPrinterStore',
     domain: 'VirtualPrinterStore',
@@ -37,7 +37,7 @@
         })
       }, MILLISECONS_PER_DAY)
     },
-    async beforeDestroy() {
+    async beforeUnmount() {
       clearInterval(this.clearVirtualReportTimerId)
     },
     computed: {
@@ -53,7 +53,7 @@
           case 'receipt':
             reports = this.reports.filter(r => r.type === 'invoice' || r.type === 'entireReceipt')
         }
-        
+
         if (this.printerGroupFilter === 'all')
           return reports
         else

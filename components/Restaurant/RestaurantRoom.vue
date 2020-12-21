@@ -37,6 +37,7 @@
       currentOrder: null,
       activeOrders: Array
     },
+    emits: ['setInitOrderProps', 'changeTable', 'resetOrderData'],
     data() {
       return {
         room: null,
@@ -54,7 +55,7 @@
       cms.socket.on('updateRooms', this.loadRoom)
       setInterval(() => this.currentTime = new Date(), 30000)
     },
-    destroyed() {
+    unmounted() {
       cms.socket.off('updateRooms');
     },
     watch: {
@@ -92,7 +93,7 @@
     },
     methods: {
       async loadRoom() {
-        this.$set(this, 'room', await cms.getModel('Room').findOne({ _id: this.id }))
+        this.room = await cms.getModel('Room').findOne({ _id: this.id })
       },
       isTable(roomObj) {
         return roomObj.type === 'table'

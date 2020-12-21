@@ -25,6 +25,7 @@
         key: 0
       }
     },
+    emits: ['update:modelValue'],
     mounted() {
       this.$watch('incorrectPasscode', function (val) {
         this.showErrorMessage = val
