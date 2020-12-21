@@ -46,7 +46,7 @@
 <script>
   // TODO:
   //  - lazy container reload when switch between report type
-  import VirtualPrinterStore from '../Store/virtualPrinterStore';
+  import useVirtualPrinter from '../Store/virtualPrinterStore';
   import LazyLoadContainer from './LazyLoadContainer';
   import { reactive, computed } from 'vue'
   
@@ -81,8 +81,7 @@
         setReports,
         selectMode,
         selectPrinterGroup,
-      } = VirtualPrinterStore.getInstance()
-      
+      } = useVirtualPrinter()
       
       const printerGroupModel = computed(() => {
         return virtualPrinterStoreState.printerGroups.map(v => ({ text: v.name, value: v._id }))
