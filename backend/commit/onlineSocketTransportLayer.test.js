@@ -17,13 +17,11 @@ const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
 const syncTransporter = require('schemahandler/sync/sync-transporter')
 const clientToOnlineSocket = new Socket()
 const clientToOnlineSocketB = new Socket()
-const mockSocket = []
-for (let i = 0; i < 3; i++) {
-	mockSocket.push(new Socket())
-}
+
 const uuid = require('uuid')
 
 global.APP_CONFIG = {
+	deviceIp: 'a.b.c.d'
 }
 
 const mapSocket = {}
@@ -33,7 +31,6 @@ function cmsFactory(orm) {
 	let posSetting = {
 		masterIp: null,
 		onlineDevice: {
-			id: uuid.v4(),
 			store: 'myStore'
 		}
 	}
@@ -80,18 +77,21 @@ function cmsFactory(orm) {
 const cms = cmsFactory(orm)
 const cms1 = cmsFactory(ormB)
 
+// return a abstract object
 jest.mock('socket.io-client', () => {
-	let i = 0
 	return {
-		connect: function (target) {
-			i++
-			mockSocket[i - 1].connect(target, 'mockSocket')
-			return mockSocket[i - 1]
+		connect: function () {
+			return {
+				on: function () {},
+				emit: function () {},
+				removeAllListeners: function () {}
+			}
 		}
 	}
 })
 
-describe('test-flow', function () {
+// Note: This test does not use the default transport layer
+describe('test online socket transport layer', function () {
 	beforeAll(async () => {
 		orm.connect({uri: "mongodb://localhost:27017"}, "myproject");
 		ormA.connect({uri: "mongodb://localhost:27017"}, "myproject1");
@@ -114,12 +114,11 @@ describe('test-flow', function () {
 		}
 
 		onlineOrderIo.on('connect', socket => {
-			ormA.emit('initSyncForMaster', socket)
 			socket.on('getMasterIp', (storeId, ack) => {
 				if (socket.name) {
-					ack(global.APP_CONFIG.deviceIp, null)
+					ack('a.b.c.d', 'orm')
 				} else {
-					ack(onlineOrderIo.masterIp, null)
+					ack('d.e.f.t', 'orm')
 				}
 			})
 			if (socket.name) {
@@ -129,41 +128,24 @@ describe('test-flow', function () {
 			}
 		})
 
-		clientToOnlineSocket.connect('local', 'fromClient')
-		clientToOnlineSocketB.connect('local')
+		clientToOnlineSocket.connect('local?clientId=orm', 'fromMaster')
+		clientToOnlineSocketB.connect('local?clientId=B')
 	})
 
 	it('flow', async (done) => {
-		let countInitSyncForClient = 0
-		let countInitSyncForClientB = 0
-		orm.onCount('initSyncForClient', function (_count) {
-			countInitSyncForClient = _count
-		})
-		ormB.onCount('initSyncForClient', function (_count) {
-			countInitSyncForClientB = _count
-		})
+		const ormSocket = mapSocket['fromMaster']
 		await require('./index')(cms)
-		await delay(50)
-		expect(orm.getMaster()).toEqual(false)
-		expect(countInitSyncForClient).toEqual(0)
-		/*
-		after connect to master for the first time, expect master is false
-		and initSocketForClient hook has not been called
-		 */
 		await cms.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocket])
+		ormSocket.emit('setDeviceAsMaster', () => {})
+		ormSocket.on('transport:cloud:sync', () => {
+			Object.keys(mapSocket).forEach(key => {
+				if (key !== 'fromMaster') {
+					mapSocket[key].emit('transport:cloud:sync', () => {})
+				}
+			})
+		})
+		ormA.emit('initSyncForClient', ormSocket)
 		await delay(50)
-		expect(countInitSyncForClient).toEqual(1)
-		expect(orm._events['transport:toMaster']).not.toBe(undefined)
-
-		/*
-		Do a create query
-		 */
-		await orm('Order').create({ table: 10 })
-		await delay(50)
-		let doc = await orm('Order').find({})
-		let docA = await ormA('Order').find({})
-		expect(doc).toEqual(expect.anything())
-		expect(doc).toEqual(docA)
 
 		/*
 		Pair new orm
@@ -171,62 +153,20 @@ describe('test-flow', function () {
 		await require('./index')(cms1)
 		await cms1.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocketB])
 		await delay(50)
-		expect(countInitSyncForClientB).toBe(1)
-		expect(ormB._events['transport:toMaster']).not.toBe(undefined)
-		expect(ormB.getMaster()).toEqual(false)
-		let docB = await orm('Order').find({})
-		expect(docB).toEqual(doc)
 
 		/*
-		Set master for orm
+		Create a commit
 		 */
-		// set io server for orm
-		cms.getIo().listen('http://q.w.e.r/masterNode')
-		global.APP_CONFIG.deviceIp = 't.e.s.t'
-		const ormSocket = mapSocket['fromClient']
-		ormA.emit('offMaster')
-		ormA.emit('initSyncForClient', ormSocket)
-		const registerDevicePromise = new Promise(resolve => {
-			ormSocket.on('registerMasterDevice', (deviceIp) => {
-				onlineOrderIo.masterIp = 'q.w.e.r' // if deviceIp is set, ormB will have the same ip so both will become master
-				Object.keys(mapSocket).forEach(key => {
-					mapSocket[key].emit('updateMasterDevice', () => {})
-				})
-				resolve(deviceIp)
-			})
-		})
-		await new Promise((resolve) => {
-			ormSocket.emit('setDeviceAsMaster', () => {
-				resolve()
-			})
-		})
-		await delay(50)
-		const ip = await registerDevicePromise
-		expect(orm.getMaster()).toEqual(true)
-		expect(ormB.getMaster()).toEqual(false)
-		expect(ormB._events['transport:toMaster']).not.toBe(undefined)
-		expect(orm._events['transport:toMaster']).toBe(undefined)
-		expect(cms.getCountOf()).toBe(1)
-		expect(cms.getIo().sockets.size).toBe(1)
-
-		/*
-		Flow when master is disconnect and then reconnect
-		and create query can be synced
-		 */
-
-		const toMasterLockB = ormB.getLock('transport:toMaster')
-		await toMasterLockB.acquireAsync()
 
 		await ormB('Order').create({
 			table: 9
 		})
-		docB = await ormB('Order').find({})
+		let docB = await ormB('Order').find({})
 		expect(stringify(docB)).toMatchSnapshot()
-		toMasterLockB.release()
 		await delay(50)
 		docB = await ormB('Order').find({})
-		doc = await orm('Order').find({})
-		docA = await ormA('Order').find({})
+		let doc = await orm('Order').find({})
+		let docA = await ormA('Order').find({})
 		expect(stringify(docB)).toMatchSnapshot()
 		expect(docB).toEqual(doc)
 		expect(docA).toEqual(doc)

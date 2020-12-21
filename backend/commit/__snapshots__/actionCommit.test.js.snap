@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test-action-commit print 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "order": Object {
+      "items": Array [
+        Object {
+          "name": "fanta",
+        },
+      ],
+      "table": 10,
+    },
+    "printType": "kitchenAdd",
+  },
+  Object {
+    "_id": "ObjectID",
+    "order": Object {
+      "items": Array [
+        Object {
+          "name": "fanta",
+        },
+      ],
+      "table": 10,
+    },
+    "printType": "kitchenAdd",
+  },
+]
+`;

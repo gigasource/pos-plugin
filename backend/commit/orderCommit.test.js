@@ -16,6 +16,7 @@ describe("Order commit test", () => {
 
     orm.plugin(syncPlugin);
     orm.plugin(syncFlow);
+    orm.registerCommitBaseCollection('Order')
     orm.plugin(require("./orderCommit"));
     orm.registerCollectionOptions("Order");
     orm.emit("commit:flow:setMaster", true);

@@ -5,6 +5,8 @@ const internalIp = require('internal-ip')
 const socketClient = require('socket.io-client')
 const _ = require('lodash')
 
+let cloudSocket
+
 module.exports = async function (cms) {
 	const { orm } = cms
 	// todo check this later
@@ -35,23 +37,28 @@ module.exports = async function (cms) {
 		return global.APP_CONFIG.deviceIp ? global.APP_CONFIG.deviceIp : internalIp.v4.sync()
 	}
 
-	cms.post('connectToMaster', async function (_masterIp, onlineOrderSocket) {
+	cms.post('connectToMaster', async function (_masterIp, _masterClientId, cloudSocket) {
 		const posSettings = await cms.getModel('PosSetting').findOne({})
 		let { masterIp } = posSettings
+		if (posSettings.onlineDevice)
+			orm.emit('getOnlineDevice', posSettings.onlineDevice)
 		if (_masterIp && masterIp !== _masterIp) {
 			masterIp = _masterIp
-			await cms.getModel('PosSetting').findOneAndUpdate({}, { masterIp })
+			await cms.getModel('PosSetting').findOneAndUpdate({}, { masterIp, masterClientId: _masterClientId })
 			const _isMaster = orm.getMaster()
 			if (_isMaster) {
 				orm.emit('offMaster')
 			} else {
 				orm.emit('offClient')
 			}
+			if (masterIp === localIp()) {
+				setMaster(true)
+			}
+			await orm.emit('setUpCloudSocket', _masterIp, _masterClientId, cloudSocket)
 		}
 		if (!masterIp) return // cloud is master
-		if (masterIp === localIp()) {
-			setMaster(true)
-			if (onlineOrderSocket) onlineOrderSocket.emit('registerMasterDevice', localIp())
+		if (orm.getMaster()) {
+			if (cloudSocket) cloudSocket.emit('registerMasterDevice', localIp())
 			const masterSocket = cms.io.of('/masterNode')
 			masterSocket.on('connect', socket => {
 				orm.emit('initSyncForMaster', socket)
@@ -64,17 +71,39 @@ module.exports = async function (cms) {
 		}
 	})
 
+	orm.on('setUpCloudSocket', async function (masterIp, masterClientId, cloudSocket) {
+		if (!cloudSocket) return
+		if (!masterIp) {
+			orm.emit('initSyncForClient', cloudSocket)
+			const {value: highestId} = await orm.emit('getHighestCommitId')
+			orm.emit('transport:require-sync', highestId)
+		} else {
+			// todo impl case through online
+			orm.setMasterClientIdCloud(masterClientId)
+			if (orm.getMaster()) {
+				orm.emit('initSyncForMaster', cloudSocket)
+				orm.emit('initSyncForMasterCloud', cloudSocket)
+			} else {
+				orm.emit('initSyncForClientCloud', cloudSocket)
+			}
+		}
+	})
+
 	/*
 	 -------------------------------------------
 	 */
-	cms.post('onlineOrderSocket', _.once(async function (socket) {
+	cms.post('onlineOrderSocket', async function (socket) {
+		if (socket === cloudSocket) return
+		cloudSocket = socket
 		const posSettings = await cms.getModel('PosSetting').findOne({})
-		let { onlineDevice, masterIp } = posSettings
+		let { onlineDevice, masterIp, masterClientId } = posSettings
+		if (posSettings.onlineDevice)
+			orm.emit('getOnlineDevice', posSettings.onlineDevice)
 		if (!onlineDevice.store) return
 		const getMasterIp = function () {
 			socket.emit('getMasterIp', onlineDevice.store.alias, async (_masterIp, masterClientId) => {
 				if (_masterIp && masterIp !== _masterIp) {
-					await cms.execPostAsync('connectToMaster', null, [_masterIp, socket])
+					await cms.execPostAsync('connectToMaster', null, [_masterIp, masterClientId, socket])
 				}
 			})
 		}
@@ -89,17 +118,11 @@ module.exports = async function (cms) {
 		socket.on('setDeviceAsMaster', async function (ack) {
 			ack()
 			masterIp = localIp()
-			await cms.execPostAsync('connectToMaster', null, [localIp(), socket])
+			await cms.execPostAsync('connectToMaster', null, [localIp(), onlineDevice.id, socket])
 		})
 
-		if (!masterIp) {
-			orm.emit('initSyncForClient', socket)
-			const {value: highestId} = await orm.emit('getHighestCommitId')
-			orm.emit('transport:require-sync', highestId)
-		} else {
-			// todo impl case through online
-		}
-	}))
+		await orm.emit('setUpCloudSocket', masterIp, masterClientId, socket)
+	})
 
 	/*
 	 -------------------------------------------
@@ -108,4 +131,5 @@ module.exports = async function (cms) {
 
 	orm.plugin(require('./orderCommit'))
 	orm.plugin(require('./actionCommit'))
+	orm.plugin(require('./onlineSocketTransportLayer'))
 }

@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test online socket transport layer flow 1`] = `
+Array [
+  Object {
+    "_fake": true,
+    "_id": "ObjectID",
+    "items": Array [],
+    "table": 9,
+  },
+]
+`;
+
+exports[`test online socket transport layer flow 2`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "items": Array [],
+    "table": 9,
+  },
+]
+`;
