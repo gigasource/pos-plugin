@@ -38,6 +38,7 @@
         template: 'grid-template: "key7 key8 key9 keyLogin" "key4 key5 key6 keyLogin" "key1 key2 key3 keyLogin" "keyClear key0 keyBack keyLogin"/ 1fr 1fr 1fr 1fr',
       };
     },
+    emits: ['login', 'clear', 'append', 'delete', 'update:modelValue'],
     methods: {
       keyboardLogin() {
         if (!this.modelValue) return '';

@@ -10,11 +10,7 @@
          :style="getRoomObjectContainerStyle(roomObject)"
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          v-touch="getTouchHandlers(roomObject)"
-         :class="[
-           ...!editable && !isTableDisabled(roomObject) && isTable(roomObject) && ['waves-effect', 'waves-red'],
-           ...transferTableFrom && transferTableFrom.name === roomObject.name &&
-           ['animated', 'bounce', 'infinite']
-         ]"
+         :class="getRoomClasses(roomObject)"
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
@@ -308,6 +304,16 @@
           this.selectingObj.size.width = this.minimumSize
         if(this.selectingObj.size.height < this.minimumSize)
           this.selectingObj.size.height = this.minimumSize
+      },
+      getRoomClasses(roomObject) {
+        let cls = []
+        if (!this.editable && !this.isTableDisabled(roomObject) && this.isTable(roomObject)) {
+          cls.push('waves-effect', 'waves-red')
+        }
+        if(this.transferTableFrom && this.transferTableFrom.name === roomObject.name ) {
+          cls.push('animated', 'bounce', 'infinite')
+        }
+        return cls
       }
     }
   }

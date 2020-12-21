@@ -111,6 +111,7 @@
       isRefunded: Function,
       getOnlineOrdersWithStatus: Function,
     },
+    emits: ['refundOrder'],
     data() {
       const i18n = this.$i18n;
       const { onlineOrder: { address, amount, customer, delivery, no, received, status, type, refund, refunded } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]

@@ -46,6 +46,7 @@
       defaultPath: null,
       afterMountFn: null
     },
+    emits: ['update:view'],
     data() {
       return {
         now: '',
@@ -67,19 +68,19 @@
     created() {
       this.timerId = setInterval(() => this.now = dayjs().format('HH:mm'), 1000)
     },
-    beforeDestroy() {
+    beforeUnmount() {
       clearInterval(this.timerId)
     },
     mounted() {
       if (this.defaultPath)
         this.sidebar = this.defaultPath // 'item.0.item.0'
       if (typeof(this.afterMountFn) === 'function')
-        this.afterMountFn()
+        this.afterMountFn(this)
 
       const posStore = this.$getService('PosStore')
       posStore.$watch('enabledFeatures', (newVal, oldVal) => {
         if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {
-          this.afterMountFn()
+          this.afterMountFn(this)
           let sidebar = 'item.0' //first item
           if(this.items[0].items && this.items[0].items.length > 0) {
             sidebar += '.item.0'

@@ -60,6 +60,7 @@
         }
       }
     },
+    emits: ['showInfoSnackbar', 'showErrorSnackbar', 'getOnlineDeviceServices', 'updateOnlineDeviceServices'],
     methods: {
       save() {
         // const newDate = dayjs();
