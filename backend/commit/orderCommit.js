@@ -1,9 +1,9 @@
 const _ = require('lodash')
 
 module.exports = async function (orm) {
-	const checkActiveOrder = async function (table) {
+	const checkActiveOrder = async function (table, dbName) {
 		if (!table) return false
-		const activeOrder = await orm('Order').findOne({
+		const activeOrder = await orm('Order', dbName).findOne({
 			table,
 			status: 'inProgress'
 		})
@@ -38,24 +38,24 @@ module.exports = async function (orm) {
 	})
 
 	orm.on('process:commit:createOrder', async function (commit) {
-		if (await checkActiveOrder(commit.data.table)) {
+		if (await checkActiveOrder(commit.data.table, commit.dbName)) {
 			await buildDoNothingCommit(commit)
 		}
 		this.value = commit
 	})
 
 	orm.on('process:commit:updateActiveOrder', async function (commit) {
-		if (!(await checkActiveOrder(commit.data.table))) {
+		if (!(await checkActiveOrder(commit.data.table, commit.dbName))) {
 			await buildDoNothingCommit(commit)
 		}
 		this.value = commit
 	})
 
 	orm.on('process:commit:changeTable', async function (commit) {
-		if (!(await checkActiveOrder(commit.data.table))) {
+		if (!(await checkActiveOrder(commit.data.table, commit.dbName))) {
 			await buildDoNothingCommit(commit)
 		}
-		if ((await checkActiveOrder(commit.data.newTable))) {
+		if (await checkActiveOrder(commit.data.newTable, commit.dbName)) {
 			await buildDoNothingCommit(commit)
 		}
 		this.value = commit

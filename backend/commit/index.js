@@ -89,6 +89,20 @@ module.exports = async function (cms) {
 		}
 	})
 
+	orm.on('commit:handler:finish', function (commit) {
+		if (cms.socket) {
+			if (commit.collectionName === 'Order') {
+				cms.socket.emit('update-table-status')
+			} else if (commit.collectionName === 'Product') {
+				cms.socket.emit('updateProductProps')
+			}	else if (commit.collectionName === 'Room') {
+				cms.socket.emit('updateRooms')
+			} else if (commit.collectionName === 'OrderLayout') {
+				cms.socket.emit('updateOrderLayouts')
+			}
+		}
+	})
+
 	/*
 	 -------------------------------------------
 	 */
