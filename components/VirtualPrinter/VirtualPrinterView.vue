@@ -12,21 +12,26 @@
           <g-btn border-radius="4" :uppercase="false" @click="selectMode('receipt')" class="virtualPrinter__header__btn">Receipt</g-btn>
           <g-select
               text-field-component="GTextFieldBs"
-              :items="zoom.availables"
-              v-model="zoom.current"
+              :items="state.zoom.availables"
+              v-model="state.zoom.current"
               class="virtualPrinter__header__select"
               style="min-width: 76px"/>
           <g-select
               text-field-component="GTextFieldBs"
               :items="printerGroupModel"
-              :value="printerGroupFilter"
+              :value="virtualPrinterStoreState.printerGroupFilter"
               @input="selectPrinterGroup"
               class="virtualPrinter__header__select"
               style="min-width: 80px"/>
           <g-spacer/>
           <g-btn border-radius="4" :uppercase="false" @click="dismiss" class="virtualPrinter__header__btn">Dismiss</g-btn>
         </div>
-        <div :style="previewStyle">
+        <div :style="{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: 'transparent'
+        }">
           <div v-if="imgSrcs && imgSrcs.length" v-for="(imgSrc, i) in imgSrcs" :key="i" :style="imageWrapperStyle">
             <img :src="imgSrc" draggable="false" :style="imgStyle"/>
           </div>
@@ -41,15 +46,16 @@
 <script>
   // TODO:
   //  - lazy container reload when switch between report type
-
+  import VirtualPrinterStore from '../Store/virtualPrinterStore';
   import LazyLoadContainer from './LazyLoadContainer';
+  import { reactive, computed } from 'vue'
+  
   export default {
     name: 'VirtualPrinterView',
     components: { LazyLoadContainer },
-    injectService: ['VirtualPrinterStore:(loading,filteredReports,dismiss,selectMode,printerGroups,selectPrinterGroup,printerGroupFilter,loadReports,loadMoreReports)'],
     props: {},
-    data: function () {
-      return {
+    setup(props, context) {
+      const state = reactive({
         zoom: {
           current: 75,
           availables: [
@@ -59,48 +65,77 @@
             { text: '150%', value: 150 }
           ],
         },
-      }
-    },
-    async created() {
-      await this.loadReports()
-    },
-    computed: {
-      printerGroupModel() {
-        return this.printerGroups.map(v => ({ text: v.name, value: v._id }))
-      },
-      imgSrcs() {
-        return this.filteredReports.map(x => 'data:image/png;base64, ' + x.imageContent)
-      },
-      receiptWidth() {
-        return this.zoom.current * 4;
-      },
-      receiptPadding() {
-        return Math.floor(15 * this.zoom.current / 100)
-      },
-      previewStyle() {
+      })
+      
+      const {
+        // data
+        state: virtualPrinterStoreState,
+        // computed
+        filteredReports,
+        // methods
+        loadReports,
+        loadMoreReports,
+        loadReportCount,
+        loadPrinterGroups,
+        dismiss,
+        setReports,
+        selectMode,
+        selectPrinterGroup,
+      } = VirtualPrinterStore.getInstance()
+      
+      
+      const printerGroupModel = computed(() => {
+        return virtualPrinterStoreState.printerGroups.map(v => ({ text: v.name, value: v._id }))
+      })
+      
+      const imgSrcs = computed(() => {
+        return filteredReports.value.map(x => 'data:image/png;base64, ' + x.imageContent)
+      })
+
+      const receiptWidth = computed(() => {
+        return state.zoom.current * 4;
+      })
+      
+      const receiptPadding = computed(() => {
+        return Math.floor(15 * state.zoom.current / 100)
+      })
+      
+      const imageWrapperStyle = computed(() => {
+        const pd = receiptPadding.value
         return {
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          backgroundColor: 'transparent'
-        }
-      },
-      imageWrapperStyle() {
-        const pd = this.receiptPadding
-        return {
-          maxWidth: this.receiptWidth + pd * 2 + 'px',
+          maxWidth: receiptWidth.value + pd * 2 + 'px',
           background: '#FFF',
           padding: `${pd}px ${pd}px ${pd*2}px ${pd}px`,
           marginTop: '15px',
           marginBottom: '15px',
         }
-      },
-      imgStyle() {
-        return {
-          width: this.receiptWidth + 'px',
-        }
-      },
-    }
+      })
+      
+      const imgStyle = computed(() => ({
+        width: receiptWidth.value + 'px',
+      }))
+      
+      
+      // created
+      loadReports()
+      
+      
+      return {
+        // cpt
+        state,
+        printerGroupModel,
+        imgSrcs,
+        receiptWidth,
+        imageWrapperStyle,
+        imgStyle,
+        // from inject
+        virtualPrinterStoreState,
+        selectMode,
+        loadMoreReports,
+        selectPrinterGroup,
+        dismiss,
+      }
+    },
   }
 </script>
 

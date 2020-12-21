@@ -44,12 +44,6 @@ module.exports = {
       loader: {
         type: 'vue-singleton'
       },
-      path: 'components/Store/VirtualPrinterStore.vue',
-    },
-    {
-      loader: {
-        type: 'vue-singleton'
-      },
       path: 'components/Store/InventoryStore.vue',
     },
     {
