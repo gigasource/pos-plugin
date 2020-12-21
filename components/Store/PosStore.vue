@@ -19,6 +19,15 @@
   import _ from 'lodash';
 
   dayjs.extend(customParseFormat)
+  // global filter
+  hooks.on('app-created', function () {
+    root.config.globalProperties.$filters = {
+      formatCurrency(val, decimals = 2) {
+        if (!val || isNaN(val) || Math.floor(val) === val) return val
+        return val.toFixed(decimals)
+      }
+    }
+  })
 
   export default {
     name: 'PosStore',

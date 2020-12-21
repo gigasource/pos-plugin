@@ -17,18 +17,18 @@
         <g-menu v-model="paymentMethodMenu" v-if="!split" content-class="menu-payment-option">
           <template #activator="{on}">
             <g-btn-bs class="elevation-2" :icon="activeOrderPaymentItem.icon" v-on="on" :disabled="printed">
-              <div>{{activeOrderPaymentItem.text}}</div>
+              <div>{{ activeOrderPaymentItem.text }}</div>
             </g-btn-bs>
           </template>
           <div class="col-flex">
-            <g-btn-bs
-                class="ml-0 mr-0"
-                v-for="(item, index) in paymentMethodMenuItems"
-                :icon="item.icon"
-                :key="`paymentMethodMenuItems-${index}`"
-                @click.stop="setOrderPaymentMethod(item)">
-              <div>{{ item.text }}</div>
-            </g-btn-bs>
+            <template v-for="(item, index) in paymentMethodMenuItems" :key="`paymentMethodMenuItems-${index}`">
+              <g-btn-bs
+                  class="ml-0 mr-0"
+                  :icon="item.icon"
+                  @click.stop="setOrderPaymentMethod(item)">
+                <div>{{ item.text }}</div>
+              </g-btn-bs>
+            </template>
           </div>
         </g-menu>
         <g-spacer/>
@@ -39,20 +39,22 @@
       </g-toolbar>
       <div class="receipt-main">
         <div class="receipt-main__header">
-          <div class="receipt-main__header-title">{{store.name}}</div>
-          <div class="receipt-main__header-subtitle">{{store.address}}</div>
+          <div class="receipt-main__header-title">{{ store.name }}</div>
+          <div class="receipt-main__header-subtitle">{{ store.address }}</div>
           <div class="receipt-main__header-subtitle">
-            <span class="mr-3">Tel: {{store.phone}}</span>
-            <span>VAT Reg No: {{store.vat}}</span>
+            <span class="mr-3">Tel: {{ store.phone }}</span>
+            <span>VAT Reg No: {{ store.vat }}</span>
           </div>
         </div>
-        <div class="receipt-main__title">Table: {{order.table}}</div>
+        <div class="receipt-main__title">Table: {{ order.table }}</div>
         <template v-if="split">
           <div class="receipt-main__item" v-for="(split, i) in order.splits" :key="split._id">
             <div class="row-flex align-items-center">
               <g-menu v-model="menu[i]" nudge-bottom="10" content-class="menu-receipt-action">
                 <template v-slot:activator="{ on }">
-                  <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">Seat {{i + 1}}</div>
+                  <div v-on="on" :class="['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']">
+                    Seat {{ i + 1 }}
+                  </div>
                 </template>
                 <div class="menu-seat-btn">
                   <div class="menu-seat-btn--payment">
@@ -91,13 +93,13 @@
               <g-spacer/>
 
               <div class="receipt-main__item-total" v-for="(p, iP) in split.payment" :key="`payment_${i}_${iP}`">
-                <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
-                <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
+                <g-icon class="mr-1">{{ getIcon(p.type) }}</g-icon>
+                <span>{{ $t('common.currency', storeLocale) }} {{ p.value }}</span>
               </div>
 
               <div v-if="split.tip" class="receipt-main__item-total">
-                <g-icon class="mr-1">{{getIcon('tip')}}</g-icon>
-                <span>{{$t('common.currency', storeLocale)}} {{split.tip}}</span>
+                <g-icon class="mr-1">{{ getIcon('tip') }}</g-icon>
+                <span>{{ $t('common.currency', storeLocale) }} {{ split.tip }}</span>
               </div>
             </div>
             <div class="receipt-main__item-header">
@@ -106,14 +108,14 @@
               <div class="col-2 ta-right">Total</div>
             </div>
             <div class="receipt-main__item-row" v-for="(item, j) in split.items" :key="`item_${i}_${j}`">
-              <div class="col-1">{{item.quantity}}</div>
+              <div class="col-1">{{ item.quantity }}</div>
               <div class="col-9 pl-2">
-                <div>{{item.name}}</div>
+                <div>{{ item.name }}</div>
                 <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
-                  {{formatModifiers(item)}}
+                  {{ formatModifiers(item) }}
                 </div>
               </div>
-              <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+              <div class="col-2 ta-right">{{ $filters.formatCurrency(getProductTotal(item)) }}</div>
             </div>
           </div>
         </template>
@@ -122,8 +124,8 @@
             <div class="row-flex align-items-center">
               <g-spacer/>
               <div class="receipt-main__item-total" v-for="(p, iP) in order.payment" :key="`payment_${iP}`">
-                <g-icon class="mr-1">{{getIcon(p.type)}}</g-icon>
-                <span>{{$t('common.currency', storeLocale)}} {{p.value}}</span>
+                <g-icon class="mr-1">{{ getIcon(p.type) }}</g-icon>
+                <span>{{ $t('common.currency', storeLocale) }} {{ p.value }}</span>
               </div>
             </div>
             <div class="receipt-main__item-header">
@@ -132,14 +134,14 @@
               <div class="col-2 ta-right">Total</div>
             </div>
             <div class="receipt-main__item-row" v-for="item in orderItems" :key="item._id.toString()">
-              <div class="col-1">{{item.quantity}}</div>
+              <div class="col-1">{{ item.quantity }}</div>
               <div class="col-9">
-                <div>{{item.name}}</div>
+                <div>{{ item.name }}</div>
                 <div v-if="item.modifiers && item.modifiers.length" class="receipt-main__item-row__modifier">
-                  {{formatModifiers(item)}}
+                  {{ formatModifiers(item) }}
                 </div>
               </div>
-              <div class="col-2 ta-right">{{getProductTotal(item) | formatMoney}}</div>
+              <div class="col-2 ta-right">{{ $filters.formatCurrency(getProductTotal(item)) }}</div>
             </div>
           </div>
         </template>
@@ -184,11 +186,6 @@
       storeLocale: String,
       split: Boolean,
       total: Number
-    },
-    filters: {
-      formatMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
     },
     data() {
       return {

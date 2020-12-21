@@ -7,23 +7,23 @@
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
             <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">
               <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
-              <span>{{$t('restaurant.viewReceipt')}}</span>
+              <span>{{ $t('restaurant.viewReceipt') }}</span>
             </g-btn-bs>
             <g-spacer v-if="splitOrders.length"/>
             <div v-if="splitOrders.length">
               <span style="font-weight: 700; font-size: 15px">Split: </span>
-              <span style="font-weight: 600; color: #ff4452">{{splitOrders.length}}</span>
+              <span style="font-weight: 600; color: #ff4452">{{ splitOrders.length }}</span>
             </div>
             <g-spacer/>
             <div style="font-weight: 600; color: #ff4452">
-              {{$t('common.currency', storeLocale)}} {{ totalCurrent | convertMoney }}
+              {{ $t('common.currency', storeLocale) }} {{ $filters.formatCurrency(totalCurrent) }}
             </div>
           </div>
           <div class="splitter__header" v-else>
             <div class="blur-overlay" v-if="showPaymentMethodsMenu"/>
             <p>
               Total:
-              <span style="font-size: 18px; color: #ff4452"> {{ totalCurrent | convertMoney }}</span>
+              <span style="font-size: 18px; color: #ff4452"> {{ $filters.formatCurrency(totalCurrent) }}</span>
             </p>
           </div>
           <div class="splitter__content">
@@ -31,25 +31,27 @@
             <div v-for="item in currentSplitOrder" :key="item._id.toString()" class="item">
               <div class="item-detail" @click.stop="returnItem(item)">
                 <div>
-                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id && `${item.id}. `}} {{item.name}}</p>
+                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">
+                    {{ item.id && `${item.id}. ` }} {{ item.name }}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
-                      {{$t('common.currency', storeLocale)}} {{item.originalPrice | convertMoney}}
+                      {{ $t('common.currency', storeLocale) }} {{ $filters.formatCurrency(item.originalPrice) }}
                     </span>
                     <span class="item-detail__price--new" v-if="isItemDiscounted(item)">
-                      {{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}
+                      {{ $t('common.currency', storeLocale) }} {{ $filters.formatCurrency(item.price) }}
                     </span>
                     <span :class="['item-detail__option', 'text-red-accent-2']">
-                      {{getItemSubtext(item)}}
+                      {{ getItemSubtext(item) }}
                     </span>
                   </p>
                 </div>
-                <div class="mr-2 fw-700 row-flex align-items-center" style="font-size: 18px">{{item.quantity}}</div>
+                <div class="mr-2 fw-700 row-flex align-items-center" style="font-size: 18px">{{ item.quantity }}</div>
               </div>
               <div v-if="item.modifiers">
                 <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
                         label small text-color="#616161">
-                  {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
+                  {{ modifier.name }} |
+                  {{ $t('common.currency', storeLocale) }}{{ $filters.formatCurrency(modifier.price) }}
                 </g-chip>
               </div>
             </div>
@@ -81,7 +83,7 @@
               <g-avatar size="36">
                 <img alt :src="avatar">
               </g-avatar>
-              <span class="ml-1 fw-700" style="font-size: 13px">{{username}}</span>
+              <span class="ml-1 fw-700" style="font-size: 13px">{{ username }}</span>
             </div>
             <g-spacer v-if="isMobile"/>
             <g-btn-bs v-if="isMobile" class="elevation-1 btn-back" @click="back">
@@ -89,7 +91,7 @@
             </g-btn-bs>
             <g-spacer/>
             <div style="font-size: 18px; color: #ff4452">
-              {{$t('common.currency', storeLocale)}} {{ totalLeft | convertMoney}}
+              {{ $t('common.currency', storeLocale) }} {{ $filters.formatCurrency(totalLeft) }}
             </div>
           </div>
           <div class="order-detail__content">
@@ -97,25 +99,27 @@
                  @click.stop="addToSplitOrder(item)">
               <div class="item-detail">
                 <div>
-                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">{{item.id && `${item.id}. `}} {{item.name}}</p>
+                  <p class="item-detail__name" :style="[item.printed && { opacity: 0.55 }]">
+                    {{ item.id && `${item.id}. ` }} {{ item.name }}</p>
                   <p>
                     <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">
-                      €{{item.originalPrice | convertMoney}}
+                      €{{ $filters.formatCurrency(item.originalPrice) }}
                     </span>
                     <span class="item-detail__price--new" v-if="isItemDiscounted(item)">
-                      {{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}
+                      {{ $t('common.currency', storeLocale) }} {{ $filters.formatCurrency(item.price) }}
                     </span>
                     <span :class="['item-detail__option', 'text-red-accent-2']">
-                      {{getItemSubtext(item)}}
+                      {{ getItemSubtext(item) }}
                     </span>
                   </p>
                 </div>
-                <div class="mr-2 fw-700 row-flex align-items-center" style="font-size: 18px">{{item.quantity}}</div>
+                <div class="mr-2 fw-700 row-flex align-items-center" style="font-size: 18px">{{ item.quantity }}</div>
               </div>
               <div v-if="item.modifiers">
                 <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
                         label small text-color="#616161" close @close="removeModifier(item, index)">
-                  {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
+                  {{ modifier.name }} |
+                  {{ $t('common.currency', storeLocale) }}{{ $filters.formatCurrency(modifier.price) }}
                 </g-chip>
               </div>
             </div>
@@ -124,10 +128,12 @@
       </div>
 
       <g-toolbar elevation="0" color="#eee" class="toolbar" v-if="!isMobile">
-        <g-btn-bs icon="icon-back" @click.stop="back">{{$t('ui.back')}}</g-btn-bs>
+        <g-btn-bs icon="icon-back" @click.stop="back">{{ $t('ui.back') }}</g-btn-bs>
         <g-spacer/>
-        <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{splitOrders.length}}</span>
-        <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">View receipt</g-btn-bs>
+        <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {{ splitOrders.length }}</span>
+        <g-btn-bs :uppercase="false" background-color="#1271ff" :disabled="!splitOrders.length" @click.stop="showReceipt = true">
+          View receipt
+        </g-btn-bs>
       </g-toolbar>
     </g-dialog>
 
@@ -156,11 +162,6 @@
       user: null,
       storeLocale: String,
       isMobile: Boolean
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) && value > 0 ? value.toFixed(2) : value
-      }
     },
     data() {
       return {

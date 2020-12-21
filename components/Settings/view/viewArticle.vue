@@ -67,8 +67,8 @@
     </g-simple-table>
     <pos-table-pagination @execQueryByPage="updatePagination"
                           :total-document="totalProducts"
-                          :limit.sync="limit"
-                          :current-page.sync="currentPage"
+                          v-model:limit="limit"
+                          v-model:current-page="currentPage"
                           :selected="selectedProductIDs.length"/>
     <dialog-add-filter v-model="dialogAddFilter" @submit="addFilter"/>
   </div>

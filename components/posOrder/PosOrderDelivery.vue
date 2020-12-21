@@ -180,7 +180,7 @@
           <g-icon>icon-back</g-icon>
         </g-btn-bs>
         <g-spacer/>
-        <div class="delivery-detail__total">{{$t('common.currency', storeLocale)}}{{total | convertMoney}}</div>
+        <div class="delivery-detail__total">{{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(total) }}</div>
       </div>
       <div class="delivery-detail__order">
         <div v-for="(item, i) in itemsWithQty" :key="i" class="item">
@@ -188,8 +188,8 @@
             <div>
               <p class="item-detail__name">{{item.id}}. {{item.name}}</p>
               <p>
-                <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
-                <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
+                <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{ $filters.formatCurrency(item.originalPrice) }}</span>
+                <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(item.price)  }}</span>
               </p>
             </div>
             <div class="item-action">
@@ -199,10 +199,13 @@
             </div>
           </div>
           <div v-if="item.modifiers">
-            <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
-                    label small text-color="#616161" close @close="removeModifier(item, index)">
-              {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
-            </g-chip>
+            <template v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`">
+              <g-chip label small text-color="#616161" close @close="removeModifier(item, index)">
+                {{ modifier.name }} | {{ $t('common.currency', storeLocale) }}{{
+                  $filters.formatCurrency(modifier.price)
+                }}
+              </g-chip>
+            </template>
           </div>
         </div>
       </div>
@@ -261,7 +264,7 @@
           </g-btn-bs>
         </div>
         <g-btn-bs :disabled="disabledConfirm" block large background-color="#2979FF" @click="confirmOrder">Confirm -
-          {{$t('common.currency', storeLocale)}}{{total | convertMoney}}
+          {{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(total) }}
         </g-btn-bs>
       </g-card>
     </g-dialog>
@@ -278,16 +281,19 @@
             <div class="dialog-content__choice-option">
               <template v-if="choice.select === 'one' && choice.mandatory">
                 <g-radio-group v-model="modifiers[index]">
-                  <g-radio v-for="option in choice.options" :key="option._id" color="#536DFE" :value="option"
-                           :label="`${option.name} (${$t('common.currency', storeLocale)}${formatMoney(option.price)})`"/>
+                  <template v-for="option in choice.options" :key="option._id">
+                    <g-radio color="#536DFE" :value="option"
+                             :label="`${option.name} (${$t('common.currency', storeLocale)}${ $filters.formatCurrency(option.price)} )`"/>
+                  </template>
                 </g-radio-group>
               </template>
               <template v-else>
-                <g-checkbox v-for="option in choice.options" :key="option._id"
-                            v-model="modifiers[index]"
-                            color="#536DFE"
-                            :value="option"
-                            :label="getCheckboxLabel(option)"/>
+                <template v-for="option in choice.options" :key="option._id">
+                  <g-checkbox v-model="modifiers[index]"
+                              color="#536DFE"
+                              :value="option"
+                              :label="getCheckboxLabel(option)"/>
+                </template>
               </template>
             </div>
           </div>
@@ -331,11 +337,6 @@
       items: Array,
       user: Object,
       storeLocale: String,
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
     },
     injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls )', 'PosStore:isIOS'],
     data() {
@@ -707,10 +708,7 @@
       getCheckboxLabel(option) {
         if (!option.price)
           return option.name
-        return `${option.name} (${$t('common.currency', this.storeLocale)}${this.formatMoney(option.price)})`
-      },
-      formatMoney(value) {
-        return !isNaN(value) && value > 0 ? value.toFixed(2) : value
+        return `${option.name} (${this.$t('common.currency', this.storeLocale)}${this.formatMoney(option.price)})`
       },
       changeQuantity(value) {
         if (this.quantity + value >= 0) {

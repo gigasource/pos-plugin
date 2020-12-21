@@ -2,7 +2,7 @@
   <div class="online-order-list">
     <div class="row-flex align-items-center mb-2">
       <div class="online-order-list__title">
-        {{`${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}`}}
+        {{ `${$t(`onlineOrder.${status}`)} ${$t('onlineOrder.orders')}` }}
       </div>
       <g-spacer/>
       <div class="online-order-list__info">
@@ -12,7 +12,7 @@
         </div>
         <div class="row-flex align-items-center">
           <g-icon class="mr-2" size="20">icon-money-bag</g-icon>
-          <span class="fw-700">{{$t('common.currency', storeLocale)}}{{ totalIncome | formatMoney }}</span>
+          <span class="fw-700">{{ $t('common.currency', storeLocale) }}{{ $filters.formatCurrency(totalIncome) }}</span>
         </div>
       </div>
       <date-range-picker :from="filter.fromDate" :to="filter.toDate" @save="changeFilter"/>
@@ -21,15 +21,15 @@
       <g-table elevation="2" fixed-header>
         <thead>
         <tr>
-          <th style="white-space: nowrap" v-for="header in headers">{{header}}</th>
+          <th style="white-space: nowrap" v-for="header in headers">{{ header }}</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="(item, i) in computedItems" :key="i" @click="openDialogDetail(item)">
           <td class="fw-700">
-            <p style="white-space: nowrap">#{{item.dailyId ? item.dailyId : item.id}}</p>
+            <p style="white-space: nowrap">#{{ item.dailyId ? item.dailyId : item.id }}</p>
             <g-tooltip :open-on-hover="true" color="#616161" transition="0.3" speech-bubble remove-content-on-close>
-              <span><b>From:</b> {{item.forwardedStore}}</span>
+              <span><b>From:</b> {{ item.forwardedStore }}</span>
               <template v-slot:activator="{on}">
                 <div v-on="on" v-if="item.forwardedStore">
                   <g-icon size="16">icon-delivery-forward</g-icon>
@@ -38,31 +38,33 @@
             </g-tooltip>
           </td>
           <td>
-            <p>{{item.customer.name}}</p>
-            <p style="white-space: nowrap">{{item.customer.phone}}</p>
+            <p>{{ item.customer.name }}</p>
+            <p style="white-space: nowrap">{{ item.customer.phone }}</p>
           </td>
           <td>
             <div v-if="item.customer.address">
-              <p style="word-break: break-word">{{item.customer.address}}</p>
-              <p>{{item.customer.zipCode}}</p>
+              <p style="word-break: break-word">{{ item.customer.address }}</p>
+              <p>{{ item.customer.zipCode }}</p>
             </div>
             <div v-else>--</div>
           </td>
           <td>
-            <p class="fw-700" style="white-space: nowrap">{{$t('common.currency', storeLocale)}}{{item.payment[0].value | formatMoney}}</p>
+            <p class="fw-700" style="white-space: nowrap">
+              {{ $t('common.currency', storeLocale) }}{{ $filters.formatCurrency(item.payment[0].value) }}
+            </p>
             <p>
               <img alt :src="getImagePayment(item.payment[0].type)">
             </p>
           </td>
-          <td style="white-space: nowrap">{{item.date | formatDate}}</td>
-          <td style="white-space: nowrap">{{item.deliveryTime}}</td>
+          <td style="white-space: nowrap">{{ item.date | formatDate }}</td>
+          <td style="white-space: nowrap">{{ item.deliveryTime }}</td>
           <td>
             <g-icon v-if="item.type === 'delivery'">icon-delivery-scooter</g-icon>
             <g-icon v-if="item.type === 'pickup'">icon-take-away</g-icon>
           </td>
           <td :class="statusClass">
-            <div style="white-space: nowrap">{{$t(`onlineOrder.${item.status}`)}}</div>
-            <div style="font-size: x-small; margin-top: -5px"> {{ isRefunded(item) ? refundedStr: '' }}</div>
+            <div style="white-space: nowrap">{{ $t(`onlineOrder.${item.status}`) }}</div>
+            <div style="font-size: x-small; margin-top: -5px"> {{ isRefunded(item) ? refundedStr : '' }}</div>
           </td>
           <td>
             <!-- ATM, g-menu only contains 1 action so we set this action state as visibility of entire g-menu -->
@@ -72,7 +74,10 @@
               </template>
               <template #default>
                 <g-card background="white">
-                  <div style="padding: 10px; cursor: pointer" @click="$emit('refundOrder', item, status)">{{ refundStr }}</div>
+                  <div style="padding: 10px; cursor: pointer" @click="$emit('refundOrder', item, status)">{{
+                      refundStr
+                    }}
+                  </div>
                 </g-card>
               </template>
             </g-menu>
@@ -119,15 +124,6 @@
           toDate: ''
         },
         dialog: false
-      }
-    },
-    filters: {
-      formatDate(date) {
-        return dayjs(date).format('HH:mm')
-      },
-      formatMoney(value, decimals = 2) {
-        if (value != null)
-          return !isNaN(value) ? value.toFixed(decimals) : value
       }
     },
     computed: {
@@ -204,7 +200,11 @@
       },
       openDialogDetail(item) {
         this.$refs.dialog.showDialog(item)
-      }
+      },
+      formatDate(date) {
+        if (!date || !dayjs(date).isValid()) return ''
+        return dayjs(date).format('HH:mm')
+      },
     }
   }
 </script>

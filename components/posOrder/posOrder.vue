@@ -62,7 +62,7 @@
               @click.stop="printOrderToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{ $t('common.currency', storeLocale) }} {{ total | convertMoney }}</span>
+                <span>{{ $t('common.currency', storeLocale) }} {{  $filters.formatCurrency(total)  }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -81,7 +81,7 @@
               @click.stop="payToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+                <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -93,15 +93,15 @@
         </template>
         <template v-else>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrderToggle">
-            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
           </g-btn-bs>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="payToggle">
-            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
           </g-btn-bs>
         </template>
       </template>
       <template v-else>
-        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
+        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{  $filters.formatCurrency(total)  }}</span>
       </template>
     </div>
     <div v-if="!editMode" class="order-detail__content" ref="table">
@@ -114,8 +114,8 @@
           <div :style="[item.printed && { opacity: 0.55 }]">
             <p class="item-detail__name">{{item.id && `${item.id}. `}}{{item.name}}</p>
             <p>
-              <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
-              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
+              <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{ $filters.formatCurrency(item.originalPrice) }}</span>
+              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(item.price)  }}</span>
               <span :class="['item-detail__option', item.takeAway ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
             </p>
           </div>
@@ -126,10 +126,13 @@
           </div>
         </div>
         <div v-if="item.modifiers">
-          <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
-                  label small text-color="#616161" close @close="removeModifier(item, index)">
-            {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
-          </g-chip>
+          <template v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`">
+            <g-chip label small text-color="#616161" close @close="removeModifier(item, index)">
+              {{ modifier.name }} | {{ $t('common.currency', storeLocale) }}{{
+                $filters.formatCurrency(modifier.price)
+              }}
+            </g-chip>
+          </template>
         </div>
       </div>
     </div>
@@ -204,11 +207,6 @@
       showOverlay: Boolean,
       scrollabeLayout: Boolean,
       isTakeAwayOrder: Boolean
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
     },
     data() {
       return {

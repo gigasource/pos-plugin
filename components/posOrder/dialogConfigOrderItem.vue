@@ -12,8 +12,8 @@
           </template>
 
           <template v-if="index === 1">
-            <change-value :change-type.sync="changeType" :original-value="originalValue" :new-value-editable="newValueEditable"
-                          :new-value.sync="newValue" />
+            <change-value v-model:change-type="changeType" :original-value="originalValue" :new-value-editable="newValueEditable"
+                          v-model:new-value="newValue" />
           </template>
 
           <template v-if="tabItem.isGlobalMod">

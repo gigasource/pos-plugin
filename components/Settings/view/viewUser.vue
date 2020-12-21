@@ -105,9 +105,9 @@
         </div>
       </div>
     </g-grid-layout>
-    <dialog-user-detail :focusInput.sync="focusInput" v-model="dialogUserDetail"/>
+    <dialog-user-detail v-model:focusInput="focusInput" v-model="dialogUserDetail"/>
     <dialog-select-avatar v-model="dialogSelectAvatar"/>
-    <dialog-user-detail add :focusInput.sync="focusInput" v-model="dialogNewUser"/>
+    <dialog-user-detail add v-model:focusInput="focusInput" v-model="dialogNewUser"/>
   </fragment>
 </template>
 

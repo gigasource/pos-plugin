@@ -6,11 +6,11 @@
     </div>
     <div class="two-head">{{$t('payment.change')}}</div>
     <div class="input two-head">
-      <p class="balance">€ {{paymentTotal | convertMoney}}</p>
-      <p class="amount">€ {{paymentAmountTendered || 0 | convertMoney}}</p>
+      <p class="balance">€ {{ $filters.formatCurrency(paymentTotal) }}</p>
+      <p class="amount">€ {{ $filters.formatCurrency(paymentAmountTendered || 0) }}</p>
     </div>
     <div class="input change">
-      {{$t('common.currency')}} {{paymentChange | convertMoney}}
+      {{$t('common.currency')}} {{ $filters.formatCurrency(paymentChange) }}
     </div>
     <div>
       {{$t('payment.tip')}}
@@ -27,12 +27,7 @@
       'OrderStore:paymentAmountTendered',
       'OrderStore:paymentTip',
       'OrderStore:paymentChange'
-    ],
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? (+value).toFixed(2) : value
-      }
-    }
+    ]
   }
 </script>
 

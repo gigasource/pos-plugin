@@ -59,11 +59,11 @@
             <div class="inventory-report-list-item__unit">{{inventory.unit}}</div>
             <div class="inventory-report-list-item__add">
               <g-icon v-if="inventory.add || inventory.add === 0" size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>
-              {{inventory.add | formatNumber}}
+              {{ $filters.formatCurrency(inventory.add) }}
             </div>
             <div class="inventory-report-list-item__remove">
               <g-icon v-if="inventory.remove || inventory.remove === 0" size="14" class="mr-1">icon-inventory-report-remove</g-icon>
-              {{inventory.remove | formatNumber}}
+              {{ $filters.formatCurrency(inventory.remove) }}
             </div>
           </div>
         </template>
@@ -74,12 +74,12 @@
             <div class="inventory-report-grid-item__detail">
               <div class="inventory-report-grid-item__add">
                 <g-icon v-if="inventory.add || inventory.add === 0" size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>
-                {{inventory.add | formatNumber}}
+                {{ $filters.formatCurrency(inventory.add) }}
               </div>
               <g-spacer/>
               <div class="inventory-report-grid-item__remove">
                 <g-icon v-if="inventory.remove || inventory.remove === 0" size="14" class="mr-1">icon-inventory-report-remove</g-icon>
-                {{inventory.remove | formatNumber}}
+                {{ $filters.formatCurrency(inventory.remove) }}
               </div>
             </div>
           </div>
@@ -103,10 +103,10 @@
            </div>
          </div>
         <div v-for="(item, i) in selectedItem.history" class="dialog-history-item" :key="`history_${i}`">
-          <div class="col-4 pl-2">{{item.date | formatDate}}</div>
+          <div class="col-4 pl-2">{{ formatDate(item.date) }}</div>
           <div class="col-2">
             <g-icon size="12" style="margin-bottom: 2px">{{`icon-inventory-report-${item.type}`}}</g-icon>
-            {{item.amount | formatNumber}}
+            {{ $filters.formatCurrency(item.amount) }}
           </div>
           <div class="col-6">{{item.reason}}</div>
         </div>
@@ -121,16 +121,6 @@
   export default {
     name: "InventoryReport",
     injectService: ['InventoryStore:(inventoryCategories, loadInventoryCategories, loadInventoriesWithChange, loadInventoryHistory)'],
-    filters: {
-      formatDate(value) {
-        return dayjs(value).format('DD/MM/YYYY HH:mm')
-      },
-      formatNumber(number) {
-        if(!number || isNaN(number) || Math.floor(number) === number)
-          return number
-        return number.toFixed(2)
-      }
-    },
     data() {
       return {
         categories: [],
@@ -215,7 +205,11 @@
           history
         }
         this.dialog.detail = true
-      }
+      },
+      formatDate(value) {
+        if (!value || !dayjs(value).isValid()) return ''
+        return dayjs(value).format('DD/MM/YYYY HH:mm')
+      },
     }
   }
 </script>

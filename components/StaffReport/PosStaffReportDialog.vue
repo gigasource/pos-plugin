@@ -12,53 +12,80 @@
               v-model="selectedStaff"
       >
         <g-tab-item :item="item" :key="i" v-for="(item, i) in staffs">
-          <div class="detail-header">{{$t('report.staffName')}}: {{item.name}}</div>
+          <div class="detail-header">{{ $t('report.staffName') }}: {{ item.name }}</div>
           <div v-if="orderSalesByStaff && orderSalesByStaff.user[orderSalesByStaff.name]">
-            <div class="detail-header">{{$t('report.reportDate')}}: {{reportDate}}</div>
-            <div class="detail-time">{{$t('report.firstOrder')}}: {{ getFormattedTime(orderSalesByStaff.user[orderSalesByStaff.name].from)}}</div>
-            <div class="detail-time">{{$t('report.lastOrder')}}: {{ getFormattedTime(orderSalesByStaff.user[orderSalesByStaff.name].to)}}</div>
+            <div class="detail-header">{{ $t('report.reportDate') }}: {{ reportDate }}</div>
+            <div class="detail-time">{{ $t('report.firstOrder') }}:
+              {{ getFormattedTime(orderSalesByStaff.user[orderSalesByStaff.name].from) }}
+            </div>
+            <div class="detail-time">{{ $t('report.lastOrder') }}:
+              {{ getFormattedTime(orderSalesByStaff.user[orderSalesByStaff.name].to) }}
+            </div>
           </div>
 
-          <div class="sales-details-header">{{$t('common.sales')}}</div>
+          <div class="sales-details-header">{{ $t('common.sales') }}</div>
           <div v-if="orderSalesByStaff && orderSalesByStaff.user[orderSalesByStaff.name]">
-            <p><span class="sales-entry sales-type">{{$t('common.total')}}</span> <span class="sales-entry sales-amount">{{(orderSalesByStaff.user[orderSalesByStaff.name].vSum)
-              | formatNumber}}</span></p>
-            <p><span class="sales-entry sales-type">{{$t('common.subtotal')}}</span> <span class="sales-entry sales-amount">{{(orderSalesByStaff.user[orderSalesByStaff.name].net)
-              | formatNumber}}</span></p>
-            <p><span class="sales-entry sales-type">{{$t('common.tax')}}</span> <span class="sales-entry sales-amount">{{(orderSalesByStaff.user[orderSalesByStaff.name].tax)
-              | formatNumber}}</span></p>
+            <p>
+              <span class="sales-entry sales-type">{{ $t('common.total') }}</span>
+              <span class="sales-entry sales-amount">{{
+                  $filters.formatCurrency(orderSalesByStaff.user[orderSalesByStaff.name].vSum)
+                }}</span></p>
+            <p>
+              <span class="sales-entry sales-type">{{ $t('common.subtotal') }}</span>
+              <span class="sales-entry sales-amount">{{
+                  $filters.formatCurrency(orderSalesByStaff.user[orderSalesByStaff.name].net)
+                }}</span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">{{ $t('common.tax') }}</span>
+              <span class="sales-entry sales-amount">{{
+                  $filters.formatCurrency(orderSalesByStaff.user[orderSalesByStaff.name].tax)
+                }}</span></p>
           </div>
 
           <div class="tax-detail">
             <div v-if="orderSalesByStaff && orderSalesByStaff['groupByTax']">
               <div v-for="(entry, key, index) in orderSalesByStaff['groupByTax']">
-                <p class="sales-entry sales-type">{{$t('common.tax')}} {{key}}%:</p>
-                <p><span class="sales-entry sales-type">{{$t('common.total')}}</span> <span class="sales-entry sales-amount">{{entry.gross |
-                  formatNumber}}</span></p>
-                <p><span class="sales-entry sales-type">{{$t('common.subtotal')}}</span> <span class="sales-entry sales-amount">{{entry.net |
-                  formatNumber}}</span></p>
-                <p><span class="sales-entry sales-type">{{$t('common.tax')}}</span> <span class="sales-entry sales-amount">{{entry.salesTax |
-                  formatNumber}}</span></p>
+                <p class="sales-entry sales-type">{{ $t('common.tax') }} {{ key }}%:</p>
+                <p>
+                  <span class="sales-entry sales-type">{{ $t('common.total') }}</span>
+                  <span class="sales-entry sales-amount">{{ $filters.formatCurrency(entry.gross) }}</span>
+                </p>
+                <p>
+                  <span class="sales-entry sales-type">{{ $t('common.subtotal') }}</span>
+                  <span class="sales-entry sales-amount">{{ $filters.formatCurrency(entry.net) }}</span>
+                </p>
+                <p>
+                  <span class="sales-entry sales-type">{{ $t('common.tax') }}</span>
+                  <span class="sales-entry sales-amount">{{ $filters.formatCurrency(entry.salesTax) }}</span>
+                </p>
                 <br/>
               </div>
             </div>
             <div v-if="orderSalesByStaff && orderSalesByStaff.user[orderSalesByStaff.name]">
-              <p><span class="sales-entry sales-type">{{$t('report.vouchersSold')}}</span> <span class="sales-entry sales-amount">0.00</span></p>
-              <p><span class="sales-entry sales-type">{{$t('report.vouchersUsed')}}</span> <span class="sales-entry sales-amount">0.00</span></p>
-              <p><span class="sales-entry sales-type">{{$t('common.discount')}}</span> <span class="sales-entry sales-amount">{{orderSalesByStaff.user[orderSalesByStaff.name].discount
-                | formatNumber}}</span></p>
+              <p><span class="sales-entry sales-type">{{ $t('report.vouchersSold') }}</span>
+                <span class="sales-entry sales-amount">0.00</span></p>
+              <p><span class="sales-entry sales-type">{{ $t('report.vouchersUsed') }}</span>
+                <span class="sales-entry sales-amount">0.00</span></p>
+              <p>
+                <span class="sales-entry sales-type">{{ $t('common.discount') }}</span>
+                <span class="sales-entry sales-amount">{{
+                    $filters.formatCurrency(orderSalesByStaff.user[orderSalesByStaff.name].discount)
+                  }}</span>
+              </p>
             </div>
           </div>
           <div class="sales-details" v-if="orderSalesByStaff && orderSalesByStaff['groupByPayment']">
             <p :key="index" v-for="(sale, key, index) in orderSalesByStaff['groupByPayment']">
-              <span class="sales-entry sales-type">{{key}} {{$t('common.sales')}}: </span><span class="sales-entry">{{sale | formatNumber}}</span>
+              <span class="sales-entry sales-type">{{ key }} {{ $t('common.sales') }}: </span><span class="sales-entry">{{ $filters.formatCurrency(sale) }}</span>
             </p>
-            <p><span class="sales-entry sales-type">{{$t('report.returnedTotal')}}: </span> <span class="sales-entry">{{0 | formatNumber}}</span></p>
+            <p><span class="sales-entry sales-type">{{ $t('report.returnedTotal') }}: </span> <span class="sales-entry">{{ 0 }}</span>
+            </p>
           </div>
         </g-tab-item>
         <template #tab="{item, index}">
           <g-tab :item="item" :key="index" active-text-color="#000000">
-            <p class="tab-username">{{item.name}}</p>
+            <p class="tab-username">{{ item.name }}</p>
           </g-tab>
         </template>
       </g-tabs>
@@ -67,12 +94,12 @@
     <g-toolbar bottom color="#EEEEEE">
       <g-btn :uppercase="false" @click="back" width="94px">
         <g-icon class="mr-2" svg>icon-back</g-icon>
-        {{$t('ui.back')}}
+        {{ $t('ui.back') }}
       </g-btn>
       <g-spacer/>
       <g-btn :uppercase="false" @click="print" background-color="#2979FF" text-color="#FFFFFF">
         <g-icon class="mr-2" svg>icon-print2</g-icon>
-        {{$t('report.printReport')}}
+        {{ $t('report.printReport') }}
       </g-btn>
     </g-toolbar>
   </div>
@@ -137,12 +164,7 @@
       await this.getListUsers();
       this.staffs = this.listUsers;
       this.selectedStaff = this.staffs.length && this.staffs[0]
-    },
-    filters: {
-      formatNumber: (val) => {
-        return isNaN(val) ? '0.00' : val.toFixed(2)
-      }
-    },
+    }
   }
 </script>
 
