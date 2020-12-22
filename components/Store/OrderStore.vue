@@ -76,11 +76,6 @@
         paymentTip: 0,
         lastPayment: 0,
         //order history screen variables
-        orderHistoryOrders: [],
-        orderHistoryFilters: [],
-        orderHistoryCurrentOrder: null,
-        totalOrders: null,
-        orderHistoryPagination: { limit: 15, currentPage: 1 },
         // online order
         pendingOrders: [],
         kitchenOrders: [],
@@ -566,52 +561,6 @@
       //<!--</editor-fold>-->
 
       //<!--<editor-fold desc="Order history screen">-->
-      updateOrderHistoryFilter(filter) {
-        const index = this.orderHistoryFilters.findIndex(f => f.title === filter.title);
-        if (index > -1) {
-          this.orderHistoryFilters.splice(index, 1, filter);
-        } else {
-          this.orderHistoryFilters.unshift(filter);
-        }
-        this.orderHistoryPagination.currentPage = 1;
-      },
-      async getOrderHistory() {
-        const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
-          { ...acc, ...filter['condition'] }),
-          { $or: [{ status: 'paid' }, { status: 'completed' }] });
-        const { limit, currentPage } = this.orderHistoryPagination;
-        const orders = await orderModel.find(condition).sort({ date: -1 }).skip(limit * (currentPage - 1)).limit(limit);
-        this.orderHistoryOrders = orders.map(order => ({
-          ...order,
-          info: order.note,
-          tax: order.vTax ? order.vTax : orderUtil.calOrderTax(order.items),
-          dateTime: dayjs(order.date).format(`${this.dateFormat} ${this.timeFormat}`),
-          amount: order.vSum ? order.vSum : orderUtil.calOrderTotal(order.items),
-          staff: order.user,
-          barcode: '',
-          promotions: [],
-        }));
-        this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-      },
-      async getTotalOrders() {
-        const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
-            { ...acc, ...filter['condition'] }),
-            { $or: [{ status: 'paid' }, { status: 'completed' }] });
-        this.totalOrders = await orderModel.count(condition);
-      },
-      async deleteOrder() {
-        try {
-          const orderModel = cms.getModel('Order');
-          await orderModel.findOneAndUpdate({ '_id': this.orderHistoryCurrentOrder._id }, { status: 'cancelled' });
-          const index = this.orderHistoryOrders.findIndex(o => o._id === this.orderHistoryCurrentOrder._id);
-          this.orderHistoryOrders.splice(index, 1);
-          this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-        } catch (e) {
-          console.error(e)
-        }
-      },
       printOrderReport(order) {
         return new Promise(async (resolve, reject) => {
           if (!order) {
@@ -1527,8 +1476,6 @@
     async created() {
       await this.getScrollWindowProducts()
 
-      const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
-      if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
       this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
       this.bell.addEventListener('play', () => {
         this.bellPlaying = true;
@@ -1576,9 +1523,6 @@
       })
     },
     watch: {
-      'orderHistoryPagination.limit'(newVal) {
-        localStorage.setItem('orderHistoryPageSize', newVal)
-      },
       pendingOrders: {
         async handler(val, oldVal) {
           if (val && val.length) {

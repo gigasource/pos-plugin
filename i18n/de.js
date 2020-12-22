@@ -68,7 +68,7 @@ module.exports = {
       cancel: 'Abbrechen',
       print: 'Drucken',
       notification: 'Notification',
-      ok: 'Drucken',
+      ok: 'OK',
       confirmation: 'Bestätigung',
       reprint: 'Reprint',
       more: 'Mehr',

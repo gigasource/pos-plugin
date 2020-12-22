@@ -6,14 +6,13 @@
 </template>
 
 <script>
+  import { webShopConnected, online } from '../../composition/usePosLogic'
 
   export default {
     name: 'ConnectionStatusBtn',
-    injectService: ['PosStore:(webShopConnected,online)'],
-    data() {
+    setup() {
       return {
-        online: true,
-        webShopConnected: true,
+        webShopConnected, online
       }
     },
     mounted() {
@@ -30,7 +29,7 @@
         }
       },
       status() {
-        if(this.online && this.webShopConnected) {
+        if (this.online && this.webShopConnected) {
           return 'Internet'
         } else if (this.online && !this.webShopConnected) {
           return 'Error'

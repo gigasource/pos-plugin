@@ -77,6 +77,7 @@
 
 		.screen {
 			flex: 1;
+			padding-bottom: 16px;
 		}
 	}
 
