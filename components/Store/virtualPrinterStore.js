@@ -33,16 +33,16 @@ export const filteredReports = function(state) {
 export function loadReports(state) {
   return async function() {
     state.start = 0;
-    console.log('Stores/VirtualPrinterView:loadReports')
+    // console.log('Stores/VirtualPrinterView:loadReports')
     try {
       const vrs = await cms.getModel(VIRTUAL_REPORT_COLLECTION).find({}, {}, { skip: 0, limit: state.take }).sort([['created', -1]])
       if (vrs.length) {
         state.reports = vrs
         state.start = state.reports.length
       }
-      console.log('Stores/VirtualPrinterView:loadReports completed!')
+      // console.log('Stores/VirtualPrinterView:loadReports completed!')
     } catch (e) {
-      console.log('Stores/VirtualPrinterView:loadReports failed!', e)
+      // console.log('Stores/VirtualPrinterView:loadReports failed!', e)
     }
   }
 }
@@ -66,7 +66,6 @@ export function loadMoreReports(state) {
 export function loadReportCount(state) {
   return async function() {
     try {
-      state.reportCount = '...'
       // console.log('Stores/VirtualPrinterView:getVirtualReportCount')
       state.reportCount = await cms.getModel(VIRTUAL_REPORT_COLLECTION).count()
     } catch (e) {
