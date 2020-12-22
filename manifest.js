@@ -5,6 +5,10 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
     { loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     {
+      loader: { type: 'init '},
+      path: 'composition/plugin-init.js'
+    },
+    {
       loader: {
         type: 'vue-singleton'
       },
