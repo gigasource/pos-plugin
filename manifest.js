@@ -6,6 +6,10 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
     {
+      loader: { type: 'init '},
+      path: 'composition/plugin-init.js'
+    },
+    {
       loader: {
         type: 'vue-singleton'
       },
