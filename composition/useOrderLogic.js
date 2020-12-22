@@ -2,17 +2,17 @@ import { computed, reactive, ref, watch } from 'vue'
 import orderUtil from '../components/logic/orderUtil'
 import * as jsonfn from 'json-fn'
 
-export const activeOrders = reactive([])
-export const currentOrder = reactive({ items: [], hasOrderWideDiscount: false, firstInit: false })
-export const printedOrder = reactive({ items: [], hasOrderWideDiscount: false, firstInit: false })
-export const actionList = reactive([])
-export const initOrderProps = reactive({})
+export const activeOrders = ref([])
+export const currentOrder = ref({ items: [], hasOrderWideDiscount: false, firstInit: false })
+export const printedOrder = ref({ items: [], hasOrderWideDiscount: false, firstInit: false })
+export const actionList = ref([])
+export const initOrderProps = ref({})
 // payment
 export const paymentAmountTendered = ref(0)
 // online order
-export const pendingOrders = reactive([])
-export const kitchenOrders = reactive([])
-export const onlineOrders = reactive([])
+export const pendingOrders = ref([])
+export const kitchenOrders = ref([])
+export const onlineOrders = ref([])
 
 export const paymentDiscount = computed(() =>
   currentOrder.value ? orderUtil.calOrderDiscount(currentOrder.value.items) : 0)
