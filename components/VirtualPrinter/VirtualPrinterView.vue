@@ -19,7 +19,7 @@
           <g-select
               text-field-component="GTextFieldBs"
               :items="printerGroupModel"
-              :value="virtualPrinterStoreState.printerGroupFilter"
+              :value="virtualPrinterState.printerGroupFilter"
               @input="selectPrinterGroup"
               class="virtualPrinter__header__select"
               style="min-width: 80px"/>
@@ -46,9 +46,13 @@
 <script>
   // TODO:
   //  - lazy container reload when switch between report type
-  import useVirtualPrinter from '../Store/virtualPrinterStore';
   import LazyLoadContainer from './LazyLoadContainer';
   import { reactive, computed } from 'vue'
+  import { state as virtualPrinterState,
+    filteredReports, loadReports, loadMoreReports,
+    loadReportCount, loadPrinterGroups,
+    dismiss, setReports, selectMode, selectPrinterGroup,
+  } from '../../composition/useVirtualPrinterLogic'
   
   export default {
     name: 'VirtualPrinterView',
@@ -67,24 +71,8 @@
         },
       })
       
-      const {
-        // data
-        state: virtualPrinterStoreState,
-        // computed
-        filteredReports,
-        // methods
-        loadReports,
-        loadMoreReports,
-        loadReportCount,
-        loadPrinterGroups,
-        dismiss,
-        setReports,
-        selectMode,
-        selectPrinterGroup,
-      } = useVirtualPrinter()
-      
       const printerGroupModel = computed(() => {
-        return virtualPrinterStoreState.printerGroups.map(v => ({ text: v.name, value: v._id }))
+        return virtualPrinterState.printerGroups.map(v => ({ text: v.name, value: v._id }))
       })
       
       const imgSrcs = computed(() => {
@@ -128,7 +116,7 @@
         imageWrapperStyle,
         imgStyle,
         // from inject
-        virtualPrinterStoreState,
+        virtualPrinterState,
         selectMode,
         loadMoreReports,
         selectPrinterGroup,
