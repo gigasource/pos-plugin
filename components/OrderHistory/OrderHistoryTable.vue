@@ -92,14 +92,17 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
+
   export default {
     name: 'OrderHistoryTable',
     props: {
-      value: null,
+      orderHistoryOrders: Array,
+      orderHistoryFilters: Object,
+      orderHistoryCurrentOrder: Object,
+      orderHistoryPagination: Object,
+      totalOrders: Number,
     },
-    injectService: [
-      'OrderStore:(orderHistoryOrders,orderHistoryFilters,orderHistoryCurrentOrder,getOrderHistory,orderHistoryPagination,getTotalOrders,totalOrders,updateOrderHistoryFilter)',
-    ],
     data() {
       return {
         dialog: {
@@ -113,39 +116,42 @@
           {text: 'Pick-up', value: 'pickup'},
           {text: 'Dine-in', value: 'dinein'}
         ],
-        paymentMethods: []
+        paymentMethods: [],
       }
     },
+    emits: ['openDialogFilter', 'update:orderHistoryCurrentOrder', 'update:orderHistoryFilters', 'getOrderHistory', 'updateOrderHistoryFilter', 'getTotalOrders', 'update:orderHistoryPagination'],
     methods: {
       openAmountFilter() {
-        this.$getService('orderHistoryAmountFilter:setActive')(true)
+        this.$emit('openDialogFilter', 'amount')
       },
       openBarcodeLookup() {
-        this.$getService('orderHistoryBarcodeLookup:setActive')(true)
+        this.$emit('openDialogFilter', 'barcode')
       },
       openDateTimePicker() {
-        this.$getService('orderHistoryDateTimePicker:setActive')(true)
+        this.$emit('openDialogFilter', 'datetime')
       },
       openStaffFilter() {
-        this.$getService('orderHistoryStaffFilter:setActive')(true)
+        this.$emit('openDialogFilter', 'staff')
       },
       openOrderNumberLookup() {
-        this.$getService('orderHistoryOrderNumberLookup:setActive')(true)
+        this.$emit('openDialogFilter', 'number')
       },
       chooseOrder(order) {
-        this.orderHistoryCurrentOrder = order;
+        this.$emit('update:orderHistoryCurrentOrder', order)
       },
       async removeFilter(filter) {
-        const index = this.orderHistoryFilters.findIndex(f => f.title === filter.title);
-        this.orderHistoryFilters.splice(index, 1);
+        const filters = _.cloneDeep(this.orderHistoryFilters)
+        const index = filters.findIndex(f => f.title === filter.title);
+        filters.splice(index, 1);
+        this.$emit('update:orderHistoryFilters', filters)
         await this.applyFilter()
       },
       async clearFilters() {
-        this.orderHistoryFilters = [];
+        this.$emit('update:orderHistoryFilters', [])
         await this.applyFilter()
       },
       async updatePagination() {
-        await this.getOrderHistory();
+        await this.$emit('getOrderHistory');
       },
       getStaffName(staffs) {
         return staffs ? staffs.map(s => s.name).join(', ') : ''
@@ -180,9 +186,9 @@
         })
       },
       async applyFilter(filter) {
-        filter && this.updateOrderHistoryFilter(filter)
-        await this.getOrderHistory()
-        await this.getTotalOrders()
+        filter && this.$emit('updateOrderHistoryFilter', filter);
+        await this.$emit('getOrderHistory');
+        await this.$emit('getTotalOrders');
       },
       getOrderPayment({ payment }) {
         const payments = payment.filter(i => i.type === 'card' || i.type === 'cash')
@@ -200,27 +206,27 @@
           text: value,
           condition: {'forwardedStore': { '$regex': value, $options: 'i'}}
         }
-        this.updateOrderHistoryFilter(filter);
-        await this.getOrderHistory();
-        await this.getTotalOrders();
+        this.$emit('updateOrderHistoryFilter', filter);
+        await this.$emit('getOrderHistory');
+        await this.$emit('getTotalOrders');
       },
       async updateCurrentPage(val) {
-        this.orderHistoryPagination.currentPage = val
-        await this.getOrderHistory();
+        let orderHistoryPagination = _.cloneDeep(this.orderHistoryPagination)
+        orderHistoryPagination.currentPage = val
+        this.$emit('update:orderHistoryPagination', orderHistoryPagination)
+        await this.$emit('getOrderHistory');
       },
       async updateLimit(val) {
-        this.orderHistoryPagination.limit = val
-        await this.getOrderHistory();
+        let orderHistoryPagination = _.cloneDeep(this.orderHistoryPagination)
+        orderHistoryPagination.limit = val
+        this.$emit('update:orderHistoryPagination', orderHistoryPagination)
+        await this.$emit('getOrderHistory');
       }
     },
     async created() {
-      await this.getOrderHistory();
-      await this.getTotalOrders();
       this.getPaymentMethods()
     },
     async activated() {
-      await this.getOrderHistory();
-      await this.getTotalOrders();
       this.getPaymentMethods()
     }
   }

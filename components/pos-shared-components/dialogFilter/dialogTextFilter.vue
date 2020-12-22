@@ -78,6 +78,7 @@
 		overflow: scroll;
 		display: flex;
 		flex-direction: column;
+		position: relative;
 
 		.icon {
 			position: absolute;

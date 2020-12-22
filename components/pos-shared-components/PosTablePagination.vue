@@ -5,8 +5,8 @@
     <div class="g-pagination-text">{{$t('ui.tblRow')}}:</div>
     <div class="g-pagination-input">
       <g-select :items="computedRowsPerPageItems"
-                :value="selectLimit" menu-class="menu-pagination"
-                @input="changeLimitRow($event)"
+                :modelValue="selectLimit" menu-class="menu-pagination"
+                @update:modelValue="changeLimitRow($event)"
       />
     </div>
     <div class="g-pagination-text">
@@ -49,6 +49,7 @@
     data: () => ({
       computedRowsPerPageItems: [10, 15, 20, 25, 50]
     }),
+    emits: ['update:currentPage', 'update:limit', 'execQueryByPage'],
     methods: {
       nextPage() {
         let page = this.currentPage + 1;

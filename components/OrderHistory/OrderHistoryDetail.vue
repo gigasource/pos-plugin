@@ -100,10 +100,9 @@
 
   export default {
     name: 'OrderHistoryDetail',
-    props: {},
-    injectService: [
-      'OrderStore:orderHistoryCurrentOrder'
-    ],
+    props: {
+      orderHistoryCurrentOrder: Object
+    },
     computed: {
       promotionTotal() {
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.vDiscount;
