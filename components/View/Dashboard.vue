@@ -15,8 +15,6 @@
       <template v-slot:Restaurant="{ id }">
         <restaurant-room
             :id="id"
-            :currentOrder="currentOrder"
-            @resetOrderData="resetOrderData"
             :activeOrders="activeOrders"
             :user="user"
             @setInitOrderProps="setInitOrderProps"
@@ -101,9 +99,9 @@
         'PosStore:(computedDashboardSidebar, defaultSidebarPath, storeLocale, user, showErrorSnackbar, showInfoSnackbar, enabledFeatures, getPendingReservationsLength, isMobile)',
         'OrderStore:(pendingOrders, kitchenOrders, updateOnlineOrders, declineOrder, acceptPendingOrder, completeOrder, activeOrders, setInitOrderProps, ' +
         '            getPendingOnlineOrderCounter, getOnlineOrdersWithStatus, onlineOrders, isRefundable, isRefundFailed, refundOrder, isRefunded,' +
-        '            reservations, getReservations, updateReservation, reservationSetting, getReservationSetting, removeReservation, completeReservation,' +
+        '            reservations, getReservations, updateReservation, removeReservation, completeReservation,' +
         '            currentOrder, resetOrderData, changeTable)',
-        'SettingsStore:(onlineOrderSorting, defaultPrepareTime, getOnlineDeviceServices, updateOnlineDeviceServices)'
+        'SettingsStore:(onlineOrderSorting, defaultPrepareTime, getOnlineDeviceServices, updateOnlineDeviceServices, reservationSetting, getReservationSetting)'
     ],
     data() {
       return {
