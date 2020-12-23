@@ -15,10 +15,17 @@
 <script>
   export default {
     name: 'PosSettingsScreenSidebar',
-    injectService: ['PosStore:user', 'SettingsStore:sidebarData'],
+    injectService: ['PosStore:user'],
     props: {
-      modelValue: null
+      modelValue: null,
+      sidebarData: null
     },
+    data() {
+      return {
+        user: null,
+      }
+    },
+    emits: ['update:modelValue'],
     computed: {
       internalValue: {
         get() {
@@ -37,8 +44,6 @@
 
 <style scoped lang="scss">
   .g-sidebar-wrapper {
-    width: 100% !important;
-    max-width: none !important;
 
     .username {
       word-break: break-all;

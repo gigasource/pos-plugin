@@ -7,6 +7,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
     { loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order', path: '/pos-order/:id?' },
     { loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order-Mobile', path: '/pos-order-mobile/:id?' },
+    { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'

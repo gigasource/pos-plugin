@@ -42,12 +42,12 @@
           </template>
         </pos-time-picker>
       </div>
-      <g-select text-field-component="PosTextField" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
+      <g-select text-field-component="GTextFieldBs" text-field-class="bs-tf__pos" class="mt-2" :items="['tablet', 'mobile']" label="Delivery order mode" v-model="deliveryOrderMode"/>
 
       <div class="row-flex align-items-center justify-between">
         Google Map API Key
       </div>
-      <g-text-field-bs class="google-map-api-input" v-model="googleMapApiKey">
+      <g-text-field-bs class="google-map-api-input bs-tf__pos" v-model="googleMapApiKey">
         <template v-slot:append-inner>
           <g-icon @click="dialog.googleMapApiKey = true">icon-keyboard</g-icon>
         </template>
@@ -246,6 +246,10 @@
         },
         deep: true
       }
+    },
+    methods: {
+      showVirtualPrinterSidebarItem() {},
+      hideVirtualPrinterSidebarItem() {},
     }
   }
 </script>
@@ -298,7 +302,7 @@
   .google-map-api-input {
     margin-left: 0;
     margin-right: 0;
-    width: 100%;
+    width: calc(100% - 10px);
 
     ::v-deep .input {
       flex: 1;

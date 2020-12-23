@@ -15,27 +15,6 @@
       const { sidebar, dashboard: { deliveryMenu } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
 
       return {
-        sidebarData: [
-          { title: sidebar.user, icon: 'person', isView: true, key: 'user'},
-          { title: sidebar.general, icon: 'icon-general_setting', isView: true, key: 'general' },
-          {
-            title: sidebar.advancedSettings, icon: 'icon-switch', svgIcon: true, key: 'advancedSettings',
-            items: [
-              { title: sidebar.companyInfo, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'companyInfo' },
-              { title: sidebar.payment, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'payment' },
-              { title: sidebar.tax, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'tax' },
-            ]
-          },
-          {
-            title: sidebar.onlineOrderSettings, icon: 'icon-general_setting',
-            items: [
-              { title: sidebar.settings, icon: 'radio_button_unchecked', iconType: 'small',  isView: true, key: 'onlineOrderSettings' },
-              { title: deliveryMenu, icon: 'radio_button_unchecked', iconType: 'small', isView: true, key: 'deliveryConfig' },
-            ]
-          },
-          { title: sidebar.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem' },
-          { title: sidebar.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen' },
-        ],
         printerSidebarDefault: [
           {
             title: sidebar.receiptCategory, icon: 'icon-restaurant', displayChild: true, key: 'receiptCategory',

@@ -28,6 +28,12 @@
       'SettingsStore:selectedCategory',
       'SettingsStore:getAllCategories',
     ],
+		data() {
+    	return {
+				listCategories: [],
+				selectedCategory: null
+			}
+		},
     async created() {
       this.listCategories = await this.getAllCategories();
     },
@@ -37,7 +43,8 @@
     methods: {
       select(category) {
         this.selectedCategory = category;
-      }
+      },
+			getAllCategories() {}
     }
   }
 </script>
