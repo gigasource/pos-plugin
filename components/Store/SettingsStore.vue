@@ -322,36 +322,18 @@
       },
       //user view
       async getListUsers() {
-        const setting = await cms.getModel('PosSetting').findOne();
-        this.listUsers = setting.user;
+        this.listUsers = await cms.getModel('PosUser').find().lean();
       },
       async updateUser(oldUserId, newUser) {
-        const settingModel = cms.getModel('PosSetting');
+        const UserModel = cms.getModel('PosUser');
         if (oldUserId && !newUser) {
-          await settingModel.findOneAndUpdate({}, {
-            $pull: {
-              user: {_id: oldUserId}
-            }
-          })
+          await UserModel.deleteOne({ _id: oldUserId })
         } else if (newUser && !oldUserId) {
           const defaultAvatar = await cms.getModel('Avatar').findOne({ name: 'man-1' })
           newUser.avatar = defaultAvatar.image
-          await settingModel.findOneAndUpdate({}, {
-            $push: {
-              user: {...newUser}
-            }
-          })
+          await UserModel.create(newUser)
         } else {
-          await settingModel.findOneAndUpdate(
-              {
-                'user._id': oldUserId
-              },
-              {
-                $set: {
-                  'user.$': newUser,
-                }
-              }
-          )
+          await UserModel.findOneAndUpdate({ '_id': oldUserId }, newUser)
         }
         await this.getListUsers();
         //update currentUser logged in if change

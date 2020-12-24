@@ -256,8 +256,7 @@
       //<!--<editor-fold desc="Login screen">-->
       async login() {
         try {
-          const posSetting = await cms.getModel('PosSetting').findOne();
-          this.user = posSetting.user.find(user => user.passcode === this.loginPassword)
+          this.user = await cms.getModel('PosSetting').findOne({ passcode: this.loginPassword }).lean()
 
           if (this.user) {
             this.loginPassword = ''
@@ -481,16 +480,15 @@
     },
     async created() {
       if (!this.user) {
-        const posSettings = await cms.getModel('PosSetting').findOne()
-        this.user = posSettings.user.find(u => u.name === 'admin')
+        this.user = await cms.getModel('PosUser').findOne({ role: 'admin' }).lean()
       }
 
       window.addEventListener('offline', () => this.online = false)
       window.addEventListener('online', () => this.online = true)
-      window.addEventListener('keydown', (e) => {
+      window.addEventListener('keydown', async e => {
         if (this.$route.path !== '/pos-login') return
         if (e.ctrlKey && e.code === 'KeyL') {
-          this.user = cms.getList('PosSetting')[0].user.find(user => user.role === 'admin')
+          this.user = await cms.getModel('PosUser').findOne({ role: 'admin' }).lean()
           this.$router.push('/pos-dashboard')
         }
       })
