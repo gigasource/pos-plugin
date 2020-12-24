@@ -4,7 +4,7 @@
     <g-btn-bs elevation="2" style="margin: 0 0 12px" @click="dialog = true" icon="select_all">{{$t('ui.choose')}}</g-btn-bs>
     <div class="keyboard-editor__title">{{$t('restaurant.menuEdit.expansionColumn')}}</div>
     <div class="row-flex">
-      <input-number width="148" :value="extraColumns" @input="changeExtraColumns"/>
+      <input-number width="148" :model-value="extraColumns" @update:modelValue="changeExtraColumns"/>
       <g-btn-bs elevation="2" icon="icon-redo" @click="resetKeyboard">{{$t('ui.reset')}}</g-btn-bs>
     </div>
     <g-checkbox v-model="active" label="Active Keyboard"/>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+  
   export default {
     name: "KeyboardEditor",
     props: {
