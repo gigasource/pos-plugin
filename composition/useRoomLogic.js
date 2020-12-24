@@ -2,7 +2,7 @@ import { reactive } from 'vue'
 import _ from 'lodash'
 
 export const state = reactive({
-  rooms: null
+  rooms: []
 })
 
 function orderRooms(rooms) {
