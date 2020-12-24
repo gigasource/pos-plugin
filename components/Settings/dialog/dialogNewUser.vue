@@ -52,6 +52,8 @@
         name: '',
         passcode: '',
         check: 'username',
+        selectedUser: null,
+        listUsers: []
       }
     },
     injectService: [
@@ -106,7 +108,9 @@
         this.name = '';
         this.passcode = '';
         this.selectedAvatar = null;
-      }
+      },
+      updateUser() {},
+      getListAvatar() {}
     },
     async mounted() {
       this.listAvatars = await this.getListAvatar();

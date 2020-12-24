@@ -34,10 +34,9 @@
     props: {
       id: null,
       user: null,
-      currentOrder: null,
       activeOrders: Array
     },
-    emits: ['setInitOrderProps', 'changeTable', 'resetOrderData'],
+    emits: ['setInitOrderProps', 'changeTable'],
     data() {
       return {
         room: null,

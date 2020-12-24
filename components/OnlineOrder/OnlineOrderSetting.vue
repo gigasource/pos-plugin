@@ -132,13 +132,13 @@
         connected: false,
         deliveryTimes: [15, 30, 45, 60],
         orderSorting: [
-          {text: $t('onlineOrder.settings.orderNumber'), value: 'order'},
-          {text: $t('onlineOrder.settings.timeToComplete2'), value: 'time'},
+          {text: this.$t('onlineOrder.settings.orderNumber'), value: 'order'},
+          {text: this.$t('onlineOrder.settings.timeToComplete2'), value: 'time'},
         ],
         soundModes: [
-          {text: $t('onlineOrder.settings.once'), value: 'none'},
-          {text: $t('onlineOrder.settings.twice'), value: 'once'},
-          {text: $t('onlineOrder.settings.untilConfirm'), value: 'repeat'},
+          {text: this.$t('onlineOrder.settings.once'), value: 'none'},
+          {text: this.$t('onlineOrder.settings.twice'), value: 'once'},
+          {text: this.$t('onlineOrder.settings.untilConfirm'), value: 'repeat'},
         ],
         webshopUrl: '',
         webshopAvailable: true,
@@ -152,6 +152,7 @@
         isMasterDevice: false,
       }
     },
+    emits: ['updateOnlineDevice', 'updateDefaultPrepareTime', 'updateOnlineOrderSorting', 'getOnlineDevice'],
     computed: {
       computedDevice: {
         get() {

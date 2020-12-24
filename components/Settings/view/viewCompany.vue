@@ -1,6 +1,5 @@
 <template>
-  <fragment>
-    <div class="main">
+  <div class="main">
       <div class="main__item">
         <g-text-field-bs :label="$t('settings.companyName')" v-model="name" required>
           <template v-slot:append-inner>
@@ -76,7 +75,7 @@
         </div>
       </div>
     </div>
-    <dialog-form-input v-model="dialog" @submit="update">
+  <dialog-form-input v-model="dialog" @submit="update">
       <template #input>
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" :label="$t('settings.companyName')" v-model="name" required/>
@@ -90,7 +89,6 @@
         </div>
       </template>
     </dialog-form-input>
-  </fragment>
 </template>
 
 <script>
