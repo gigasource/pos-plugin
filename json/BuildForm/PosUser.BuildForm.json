@@ -1,0 +1,157 @@
+{
+  "_id": "5fc0d97b41c030a002085c73",
+  "__v": 0,
+  "alwaysLoad": true,
+  "class": null,
+  "extensions": [],
+  "fields": [
+    {
+      "schemaType": "string",
+      "key": "name",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "string",
+      "key": "passcode",
+      "type": "input",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "string",
+      "key": "avatar",
+      "type": "inline-image",
+      "flex": "md4",
+      "onChange": {
+        "_code_": "",
+        "_code_type_": "commonJs"
+      }
+    },
+    {
+      "schemaType": "string",
+      "key": "role",
+      "default": "user",
+      "type": "input@select",
+      "optionsType": "onlyValue",
+      "options": [
+        "admin",
+        "user"
+      ]
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOwnReport",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOtherReport",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "editArticle",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "accessZReport",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "itemCancellation",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "allowTableTakeover",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "itemCancellationReactivePaidTable",
+      "type": "input@switch",
+      "label": "Item Cancellation after Reactive Paid Table",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "allowMoveItem",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "allowTableSwitch",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "reactivePaidTable",
+      "unique": false,
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "openCashdrawerManually",
+      "type": "input@switch",
+      "label": "Open Cashdrawer Manually",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "discount",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "cancelInvoice",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOrder",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOnlineOrderMenu",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOrderHistory",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewOnlineOrderDashboard",
+      "type": "input@switch",
+      "flex": "md4"
+    },
+    {
+      "schemaType": "boolean",
+      "key": "viewReservation",
+      "type": "input@switch"
+    }
+  ],
+  "id": "5c3c8760bf8bf735a35ff29d",
+  "name": "PosUser",
+  "tabs": [],
+  "title": "name",
+  "type": "Collection"
+}
