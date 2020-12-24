@@ -3,6 +3,7 @@
     <pos-order-layout
         class="pos-emc__menu"
         editable
+        :is-mobile="isMobile"
         v-model:view="view"
         v-model:order-layout="orderLayout"
         v-model:selected-category-layout="selectedCategoryLayout"
@@ -54,6 +55,7 @@
   
   export default {
     name: 'EditMenuCard',
+    injectService: ['PosStore:(isMobile)'],
     components: { KeyboardEditor, ProductEditor, CategoryEditor, ContentRender, EditMenuCardToolbar, PosOrderLayout },
     props: {},
     data: function () {
@@ -64,7 +66,8 @@
         selectedProductLayout: null,
         productDblClicked: null,
         keyboardConfig: null,
-        mode: 'basic'
+        mode: 'basic',
+        isMobile: null,
       }
     }
   }
