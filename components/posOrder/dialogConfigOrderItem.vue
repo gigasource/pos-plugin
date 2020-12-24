@@ -1,5 +1,5 @@
 <template>
-  <dialog-form-input v-model="dialogConfigOrderItem" width="90%" eager @submit="submit" :show-keyboard="!tab || !tab.isGlobalMod">
+  <dialog-form-input v-model="dialogConfigOrderItem" width="90%" @submit="submit" :show-keyboard="!tab || !tab.isGlobalMod">
     <template v-slot:input>
       <g-tabs v-model="tab" :items="tabs" text-color="#1d1d26" color="white" active-text-color="#1d1d26"
               slider-color="#1471ff" slider-size="3">
@@ -25,7 +25,7 @@
               <div class="mt-2 mb-3">
                 <g-grid-select :items="tabItem.modifiersByCategory[category._id]" :grid="false" return-object
                                :multiple="!category.selectOne" :mandatory="category.mandatory"
-                               :value="selectedModifiers[category._id]" @input="selectModifier($event, category)"
+                               :model-value="selectedModifiers[category._id]" @update:modelValue="selectModifier($event, category)"
                 >
                   <template #default="{ toggleSelect, item, index }">
                     <g-btn :uppercase="false" border-radius="2" outlined class="mr-3" background-color="#F0F0F0"
@@ -99,6 +99,7 @@
         newValue: 0
       }
     },
+    emits: ['update:modelValue', 'addModifier', 'changePrice'],
     computed: {
       dialogConfigOrderItem: {
         get() {
@@ -173,7 +174,7 @@
         this.dialogConfigOrderItem = false
       },
       selectModifier(value, category) {
-        this.$set(this.selectedModifiers, category._id, value)
+        this.selectedModifiers[category._id] = value
       },
       onClickModifier(modifier, category, select) {
         // not selected
@@ -232,7 +233,8 @@
             this.listModifiers = []
             const { categories } = val
             categories.forEach(cat => {
-              if (!cat.selectOne) this.$set(this.selectedModifiers, cat._id, [])
+              if (!cat.selectOne)
+                this.selectedModifiers[cat._id] = []
             })
           }
         }

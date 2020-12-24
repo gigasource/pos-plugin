@@ -175,6 +175,7 @@
         paying: false,
       }
     },
+    emits: ['update:modelValue', 'saveSplitOrder', 'updateCurrentOrder', 'updatePrintedOrder', 'resetOrderData', 'printOrderReport', 'createOrderCommit'],
     computed: {
       internalValue: {
         get() {

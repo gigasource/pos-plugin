@@ -26,7 +26,7 @@
           <div style="transform: skewX(-15deg)" v-if="productLayout.product && productLayout.product.isModifier">{{ getProductName(productLayout) }}</div>
           <div v-else>{{ getProductName(productLayout) }}</div>
         </div>
-        <pos-order-keyboard v-if="showCalculator" :keyboard-config="keyboardConfig" :mode="editable ? 'edit' : 'active'" @edit:keyboard="opendDialogEdit($event)"/>
+        <pos-order-keyboard v-if="showCalculator" :keyboard-config="keyboardConfig" :mode="editable ? 'edit' : 'active'" @edit:keyboard="opendDialogEdit($event)" @openDialogSearch="dialog.search = true"/>
       </div>
     </div>
     <g-overlay :value="displayOverlay" absolute opacity="0.25" color="rgb(150, 150, 150)">
@@ -34,6 +34,7 @@
     </g-overlay>
     <dialog-text-filter v-model="dialog.value" @submit="changeKeyboardExtension($event)"/>
     <dialog-choose-popup-modifier v-model="popupModifierDialog.value" :product="popupModifierDialog.product" @save="addProductWithModifier"/>
+    <dialog-product-search-result v-model="dialog.search"/>
   </div>
 </template>
 <script>
@@ -42,7 +43,7 @@
 
   export default {
     name: 'PosOrderLayout',
-    injectService:['PosStore:isMobile'],
+    injectService: ['SettingsStore:updateKeyboardConfig'],
     props: {
       editable: {
         type: Boolean,
@@ -66,6 +67,7 @@
       actionMode: String,
       showOverlay: Boolean,
       scrollabeLayout: Boolean,
+      isMobile: null
     },
     data() {
       return {
@@ -76,7 +78,8 @@
         highlightSelectedProduct: false,
         dialog: {
           value: false,
-          position: {}
+          position: {},
+          search: false
         },
         popupModifierDialog: {
           value: false,
@@ -84,6 +87,7 @@
         },
       }
     },
+    emits: ['update:selectedCategoryLayout', 'update:selectedProductLayout', 'update:view', 'update:orderLayout', 'update:keyboardConfig', 'update:productDblClicked', 'addModifierToProduct', 'addProductToOrder'],
     computed: {
       categoryContainerStyle() {
         if(this.category && this.category.type === 'vertical') {
@@ -233,7 +237,7 @@
       await this.loadOrderLayout(type);
       cms.socket.on('updateOrderLayouts', this.loadOrderLayout)
     },
-    beforeDestroy() {
+    beforeUnmount() {
       cms.socket.off('updateOrderLayouts')
     },
     async activated() {
@@ -529,10 +533,11 @@
         this.dialog.position = position
         this.dialog.value = true
       },
+      updateKeyboardConfig() {},
       async changeKeyboardExtension(val) {
         const config = Object.assign({}, this.keyboardConfig)
         _.set(config, ['layout', this.dialog.position.top-1, 'rows', this.dialog.position.left-1], val)
-        await this.$getService('SettingsStore:updateKeyboardConfig')(config)
+        await this.updateKeyboardConfig(config)
         this.$emit('update:keyboardConfig', config)
       }
     }

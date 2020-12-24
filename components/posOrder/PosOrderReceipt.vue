@@ -181,7 +181,7 @@
   export default {
     name: 'PosOrderReceipt',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       order: null,
       storeLocale: String,
       split: Boolean,
@@ -211,6 +211,7 @@
         printed: null
       }
     },
+    emits: ['update:modelValue', 'updatePayment', 'updateCurrentOrder', 'printOrderReport', 'saveRestaurantOrder', 'print', 'complete'],
     computed: {
       internalValue: {
         get() {

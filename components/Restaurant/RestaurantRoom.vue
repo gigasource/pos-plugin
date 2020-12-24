@@ -46,7 +46,9 @@
         userTables: [],
         transferTableFrom: null,
         showNumberOfCustomersDialog: false,
-        currentTime: new Date()
+        currentTime: new Date(),
+        isMobile: null,
+        storeLocale: null
       }
     },
     async created() {
@@ -111,11 +113,7 @@
           this.showNumberOfCustomersDialog = true
         } else {
           setTimeout(() => {
-            if (this.isMobile) {
-              this.$router.push(`/pos-order-3/${roomObj.name}`)
-            } else {
-              this.$router.push(`/pos-order-2/${roomObj.name}`)
-            }
+            this.$router.push(`/pos-order/${roomObj.name}`)
           }, 200)
         }
         // }

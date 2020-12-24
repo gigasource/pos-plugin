@@ -49,6 +49,12 @@
       }
     },
     injectService: ['OrderStore:(productIdQuery,queryProductsById,productIdQueryResults,addProductToOrder,addModifierToProduct)'],
+    data() {
+      return {
+        productIdQuery: null,
+        productIdQueryResults: null,
+      }
+    },
     computed: {
       mainKeyboard() {
         const keyboard = _.cloneDeep(defaultKeyboard)
@@ -173,6 +179,9 @@
       }
     },
     methods: {
+      queryProductsById() {},
+      addProductToOrder() {},
+      addModifierToProduct() {},
       clearScreen() {
         this.productIdQuery = ''
       },
@@ -197,7 +206,7 @@
             }
           }
           nextTick(() => {
-            this.$getService('dialogProductSearchResult:setActive')(true)
+            this.$emit('openDialogSearch')
           })
         }
       },

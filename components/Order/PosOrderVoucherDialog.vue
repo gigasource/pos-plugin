@@ -27,11 +27,12 @@
     },
     data() {
       return {
-        tabs: [{ title: $t('restaurant.createVoucher'), ref: 'createTf' }, { title: $t('restaurant.redeemVoucher'), ref: 'redeemTf' }],
+        tabs: [{ title: this.$t('restaurant.createVoucher'), ref: 'createTf' }, { title: this.$t('restaurant.redeemVoucher'), ref: 'redeemTf' }],
         tab: null,
         voucherValue: ''
       }
     },
+    emits: ['update:modelValue', 'addVoucher', 'redeemVoucher'],
     computed: {
       internalValue: {
         get() {
