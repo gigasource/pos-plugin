@@ -113,7 +113,7 @@ export default {
   name: 'Order',
   components: {PosOrderVoucherDialog, PosOrderMoveItems, PosOrderReceipt, PosOrderSplitOrder, DialogProductSearchResult},
   injectService: [
-      'PosStore:(user, storeLocale)',
+      'PosStore:(user, isMobile, storeLocale)',
       'OrderStore:(addProductToOrder, addModifierToProduct, currentOrder, paymentTotal, printedOrder, addItemQuantity, removeItemQuantity, moveItems, addVoucher,' +
       '            changePrice, updateOrderTable, updateOrderItems, removeProductModifier, updateOrderItem, actionList, isTakeAwayOrder, activeOrders, redeemVoucher,' +
       '            saveTableOrder, resetOrderData, updateCurrentOrder, quickCashRestaurant, createOrderCommit, saveSplitOrder, printOrderReport, updatePrintedOrder)',
@@ -144,7 +144,7 @@ export default {
       scrollableLayout: true,
       //inject
       user: null,
-      isMobile: true,
+      isMobile: null,
       storeLocale: null,
       currentOrder: null,
       paymentTotal: null,
