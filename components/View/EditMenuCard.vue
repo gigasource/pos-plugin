@@ -25,7 +25,7 @@
       <template v-slot:CategoryEditor>
         <category-editor
             v-model:order-layout="orderLayout"
-            v-model:selected-category-layout="selectedProductLayout"
+            v-model:selected-category-layout="selectedCategoryLayout"
         />
       </template>
       <template v-slot:ProductEditor>
