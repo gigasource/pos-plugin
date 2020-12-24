@@ -67,12 +67,12 @@
       </g-row>
 
       <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.sound')}}</b></div>
-      <g-switch :label="$t('onlineOrder.settings.hasSound')" :input-value="computedDevice.sound"
-                @change="updateSound"
+      <g-switch :label="$t('onlineOrder.settings.hasSound')" :model-value="computedDevice.sound"
+                @update:modelValue="updateSound"
       />
 
       <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.playNotificationSound')}}</b></div>
-      <g-grid-select :grid="false" item-cols="4" :items="soundModes" mandatory :value="computedDevice.soundLoop" @input="updateSoundMode">
+      <g-grid-select :grid="false" item-cols="4" :items="soundModes" mandatory :model-value="computedDevice.soundLoop" @update:modelValue="updateSoundMode">
         <template #default="{item, toggleSelect}">
           <g-btn-bs border-color="#e0e0e0" text-color="black" height="30"
                     style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
@@ -156,8 +156,8 @@
     computed: {
       computedDevice: {
         get() {
-          if (!this.internalDevice) return {url: this.webshopUrl}
-          return Object.assign(this.internalDevice, {url: this.webshopUrl})
+          if (!this.internalDevice) return { url: this.webshopUrl }
+          return Object.assign(this.internalDevice, { url: this.webshopUrl })
         },
         set(value) {
           this.$emit('updateOnlineDevice', value)

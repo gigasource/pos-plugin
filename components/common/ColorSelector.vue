@@ -1,5 +1,5 @@
 <template>
-  <g-grid-select :grid="false" :items="values" :value="internalColor" @input="updateColor" style="padding: 5px">
+  <g-grid-select :grid="false" :items="values" :model-value="internalColor" @update:modelValue="updateColor" style="padding: 5px">
 
     <template #default="{toggleSelect, item, index}">
       <div :key="index" :ripple="false" :style="getColorItemStyle(item)" @click="toggleSelect(item)"/>
@@ -41,15 +41,16 @@
         default: '#D2D2D2'
       }
     },
+    emits: ['update:modelValue'],
     data() {
       const toColorModel = colors => _.map(colors, (c, i) => ({index: i, text: c, value: c}))
       return {
-        internalColor: this.value,
+        internalColor: this.modelValue,
         values: toColorModel(this.colors)
       }
     },
     watch: {
-      value(newVal) {
+      modelValue(newVal) {
         this.internalColor = newVal
       }
     },

@@ -1,7 +1,8 @@
 <script>
+  import { isMobile, isIOS } from '../../../composition/usePosLogic';
+
   export default {
     name: "PosTextfieldNew",
-    injectService: ['PosStore:(isMobile, isIOS)'],
     props: {
       modelValue: null,
       label: String,
@@ -22,6 +23,8 @@
       }
     },
     computed: {
+      isMobile() { return isMobile },
+      isIOS() { return isIOS },
       internalValue: {
         get() {
           return '' + this.modelValue
@@ -46,13 +49,13 @@
         return (
             <g-text-field ref="textfield" {...{
               ...{ outlined: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readOnly: this.readonly}, // props
-              ...{ onInput: (val) => this.internalValue = val, ...this.listeners } //listeners
+              ...{ 'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners } //listeners
             }} />
         )
       }
       return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
         ...{ large: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readonly: this.readonly}, //props
-        ...{ onInput: (val) => this.internalValue = val, ...this.listeners } //listeners
+        ...{ 'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners } //listeners
       }} />
     }
   }

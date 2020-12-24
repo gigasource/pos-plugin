@@ -9,21 +9,21 @@
       </template>
       <template v-if="isProductLayout">
         <div>{{$t('article.id')}} </div>
-        <g-text-field-bs :value="selectedProduct.id" @input="$set(selectedProduct, 'id', $event);debouncedUpdateProduct('id', $event)">
+        <g-text-field-bs :value="selectedProduct.id" @input="setProductInfo('id', $event);debouncedUpdateProduct('id', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('id')">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
 
         <div>{{$t('article.name')}} <span style="color: #FF4452">*</span></div>
-        <g-text-field-bs :value="selectedProduct.name" @input="$set(selectedProduct, 'name', $event);debouncedUpdateProduct('name', $event)">
+        <g-text-field-bs :value="selectedProduct.name" @input="setProductInfo('name', $event);debouncedUpdateProduct('name', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('name')">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
 
         <div>{{$t('article.price')}} <span style="color: #FF4452">*</span></div>
-        <g-text-field-bs :value="selectedProduct.price" @input="$set(selectedProduct, 'price', $event);debouncedUpdateProduct('price', $event)">
+        <g-text-field-bs :value="selectedProduct.price" @input="setProductInfo('price', $event);debouncedUpdateProduct('price', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="openDialogInfo('price')">icon-keyboard</g-icon>
           </template>
@@ -44,7 +44,7 @@
 
     <template v-if="isProductLayout">
       <!-- Printer -->
-      <div v-if="!this.selectedProduct.isModifier">
+      <div v-if="!selectedProduct.isModifier">
         <div class="product-editor__prop">
           <span class="product-editor__label">{{$t('restaurant.product.printer')}}</span>
           <span v-if="showAddPrinter2" class="prop-option--printer" @click="isPrinter2Select = true">+2. {{$t('restaurant.product.printer')}}</span>
@@ -104,7 +104,12 @@
       <!-- Color -->
       <div class="mt-2">
         <div class="product-editor__label">{{$t('ui.color')}}</div>
-        <color-selector :value="selectedProductLayout.color" :colors="colors" :item-size="25" @input="updateProductLayout({ color: $event })"/>
+        <color-selector
+            :model-value="selectedProductLayout.color"
+            :colors="colors"
+            :item-size="25"
+            @update:modelValue="updateProductLayout({ color: $event })"
+        />
       </div>
 
       <!-- Happy hour -->
@@ -170,9 +175,7 @@
   import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
-
-  const toGSelectModel = item => ({ text: item, value: item })
-
+  
   export default {
     name: 'ProductEditor',
     components: { DialogEditPopupModifiers, GGridItemSelector, ColorSelector },
@@ -181,12 +184,13 @@
       selectedCategoryLayout: Object,
       selectedProductLayout: Object,
     },
+    emits: ['update:orderLayout'],
     data: function () {
       return {
         colors: '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(','),
         // Product layout types
         type: this.selectedProductLayout.type,
-        types: _.map([ 'Article', 'Div.Article', 'Text', 'Menu' ], toGSelectModel),
+        types: _.map([ 'Article', 'Div.Article', 'Text', 'Menu' ], item => ({ text: item, value: item })),
         dineInTaxes: [],
         takeAwayTaxes: [],
         // indicate whether the +2. Printer button has been clicked or not
@@ -213,12 +217,12 @@
       selectedProduct: {
         get(){
           if (!this.selectedProductLayout.product) {
-            this.$set(this.selectedProductLayout, 'product', createEmptyProductLayout())
+            this.selectedProductLayout.product = createEmptyProductLayout()
           }
           return this.selectedProductLayout.product
         },
         set(value) {
-          this.$set(this.selectedProductLayout, 'product', value)
+          this.selectedProductLayout.product = value
         }
       },
       showAddPrinter2() {
@@ -340,13 +344,13 @@
 
         if (!this.selectedProduct.tax && printer.defaultDineInTax) {
           const taxCategory = printer.defaultDineInTax;
-          this.$set(this.selectedProduct, 'tax', taxCategory)
+          this.selectedProduct.tax = taxCategory
           change.taxCategory = taxCategory
           change.tax = this.dineInTaxes.find(i => i._id.toString() === taxCategory).value
         }
         if (!this.selectedProduct.tax2 && printer.defaultTakeAwayTax) {
           const taxCategory2 = printer.defaultTakeAwayTax;
-          this.$set(this.selectedProduct, 'tax2', taxCategory2)
+          this.selectedProduct.tax2 = taxCategory2
           change.taxCategory2 = taxCategory2
           change.tax2 = this.takeAwayTaxes.find(i => i._id.toString() === taxCategory2).value
         }
@@ -384,7 +388,7 @@
       // update color, update text
       async updateProductLayout(change, forceCreate) {
         console.log('Store change into this.selectedProductLayout')
-        _.each(_.keys(change), k => this.$set(this.selectedProductLayout, k, change[k]))
+        _.each(_.keys(change), k => this.selectedProductLayout[k] = change[k])
 
         if (this.selectedProductLayout._id) {
           console.log('UpdateProductLayout', change)
@@ -452,6 +456,9 @@
       openDialogInfo(focus) {
         this.dialog.focus = focus
         this.dialog.productInfo = true
+      },
+      setProductInfo(propName, propValue) {
+        this.selectedProduct[propName] = propValue
       }
     }
   }

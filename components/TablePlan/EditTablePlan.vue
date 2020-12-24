@@ -128,6 +128,8 @@
   import ColorSelector from '../common/ColorSelector';
   import PosTextField from '../pos-shared-components/POSInput/PosTextField';
   import DialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import { reloadRooms } from '../../composition/useRoomLogic';
+
   const BSON = require('bson')
 
   export default {
@@ -349,7 +351,7 @@
       },
 
       async back() {
-        await this.$getService('RoomStore').reloadRooms()
+        await reloadRooms()
         this.$router.push('/pos-dashboard')
       }
     },
