@@ -30,7 +30,10 @@
 		data(){
     	return {
     	  name: '',
-        passcode: ''
+        passcode: '',
+        selectedUser: null,
+        listUsers: null,
+        isMobile: false
 			}
 		},
 		injectService: [
@@ -58,13 +61,15 @@
       },
     },
 		methods: {
+      updateUser() {},
 			async submit() {
-        if(this.add) {
+        if (this.add) {
           const user = {
             name: this.name,
             passcode: this.passcode,
             viewReservation: true
           };
+          console.log(user)
           await this.updateUser(null, user);
           const newUser = this.listUsers[this.listUsers.length - 1];
           this.selectedUser = {

@@ -106,7 +106,7 @@
           }
         },
         set(val) {
-          this.$set(this.generalSettings, 'barcode', val)
+          this.generalSettings['barcode'] = val
         }
       },
       favoriteArticle: {
@@ -116,7 +116,7 @@
           }
         },
         set(val) {
-          this.$set(this.generalSettings, 'favoriteArticle', val)
+          this.generalSettings['favoriteArticle'] = val
         }
       },
       virtualKeyboard: {
@@ -126,7 +126,7 @@
           }
         },
         set(val) {
-          this.$set(this.generalSettings, 'virtualKeyboard', val)
+          this.generalSettings['virtualKeyboard'] = val
         }
       },
       automaticCashdrawer: {
@@ -136,7 +136,7 @@
           }
         },
         set(val) {
-          this.$set(this.generalSettings, 'automaticCashdrawer', val)
+          this.generalSettings['automaticCashdrawer'] = val
         }
       },
       quickFnRows: {
@@ -146,7 +146,7 @@
           }
         },
         set(val) {
-          this.$set(this.generalSettings, 'quickFnRows', val)
+          this.generalSettings['quickFnRows'] = val
         }
       },
       beginHour: {
@@ -154,7 +154,7 @@
           return (this.generalSettings && this.generalSettings.beginHour) || '00:00'
         },
         set(val) {
-          this.$set(this.generalSettings, 'beginHour', val)
+          this.generalSettings['beginHour'] = val
         }
       },
       printReceiptWithPay: {
@@ -162,7 +162,7 @@
           return (this.generalSettings && this.generalSettings.printReceiptWithPay)
         },
         set(val) {
-          this.$set(this.generalSettings, 'printReceiptWithPay', val)
+          this.generalSettings['printReceiptWithPay'] = val
         }
       },
       quickBtn: {
@@ -170,7 +170,7 @@
           return (this.generalSettings && this.generalSettings.quickBtn)
         },
         set(val) {
-          this.$set(this.generalSettings, 'quickBtn', val)
+          this.generalSettings['quickBtn'] = val
         }
       },
       quickBtnAction: {
@@ -178,7 +178,7 @@
           return (this.generalSettings && this.generalSettings.quickBtnAction) || 'pay';
         },
         set(val) {
-          this.$set(this.generalSettings, 'quickBtnAction', val);
+          this.generalSettings['quickBtnAction'] = val
         },
       },
       onlyCheckoutPrintedItems: {
@@ -186,7 +186,7 @@
           return (this.generalSettings && this.generalSettings.onlyCheckoutPrintedItems) || 'pay';
         },
         set(val) {
-          this.$set(this.generalSettings, 'onlyCheckoutPrintedItems', val);
+          (this.generalSettings['onlyCheckoutPrintedItems'] = val);
         },
       },
       useVirtualPrinter: {
@@ -194,7 +194,7 @@
           return (this.generalSettings && !!this.generalSettings.useVirtualPrinter)
         },
         set(val) {
-          this.$set(this.generalSettings, 'useVirtualPrinter', val)
+          this.generalSettings['useVirtualPrinter'] = val
           if (val) {
             this.showVirtualPrinterSidebarItem()
           } else {
@@ -207,7 +207,7 @@
           return (this.generalSettings && this.generalSettings.deliveryOrderMode) || 'tablet';
         },
         set(val) {
-          this.$set(this.generalSettings, 'deliveryOrderMode', val);
+          this.generalSettings['deliveryOrderMode'] = val
         },
       },
       googleMapApiKey: {
@@ -215,7 +215,7 @@
           return (this.generalSettings && this.generalSettings.googleMapApiKey) || '';
         },
         set(val) {
-          this.$set(this.generalSettings, 'googleMapApiKey', val);
+          this.generalSettings['googleMapApiKey'] = val
         },
       },
       showTutorial: {
@@ -223,7 +223,7 @@
           return (this.generalSettings && this.generalSettings.showTutorial) || false;
         },
         set(val) {
-          this.$set(this.generalSettings, 'showTutorial', val);
+          this.generalSettings['showTutorial'] = val
         },
       }
     },
@@ -233,7 +233,7 @@
 
       // backward compatibility
       if (!this.generalSettings.googleMapApiKey) {
-        this.$set(this.generalSettings, 'googleMapApiKey', setting.call.googleMapApiKey);
+        this.generalSettings['googleMapApiKey'] = setting.call.googleMapApiKey
       }
     },
     watch: {
@@ -241,7 +241,7 @@
         async handler(val) {
           if (val) {
             const settingModel = cms.getModel('PosSetting');
-            await settingModel.findOneAndUpdate({}, { generalSetting: val });
+            await settingModel.findOneAndUpdate({}, { generalSetting: val })
           }
         },
         deep: true
