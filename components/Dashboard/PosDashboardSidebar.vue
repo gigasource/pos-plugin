@@ -35,7 +35,7 @@
 
   export default {
     name: 'PosDashboardSidebar',
-    injectService: [ 'PosStore:user' ],
+    injectService: [ 'PosStore:user', 'PosStore:enabledFeatures' ],
     props: {
       title: {
         type: String,
@@ -52,6 +52,7 @@
         now: '',
         sidebar: '',
         selectedNode: null,
+        enabledFeatures: []
       }
     },
     computed: {
@@ -77,8 +78,23 @@
       if (typeof(this.afterMountFn) === 'function')
         this.afterMountFn(this)
 
-      const posStore = this.$getService('PosStore')
-      posStore.$watch('enabledFeatures', (newVal, oldVal) => {
+      // const posStore = this.$getService('PosStore')
+      // posStore.$watch('enabledFeatures', (newVal, oldVal) => {
+      //   if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {
+      //     this.afterMountFn(this)
+      //     let sidebar = 'item.0' //first item
+      //     if(this.items[0].items && this.items[0].items.length > 0) {
+      //       sidebar += '.item.0'
+      //     }
+      //     this.sidebar = sidebar
+      //   }
+      // })
+    },
+    watch: {
+      defaultPath(val) {
+        this.sidebar = val
+      },
+      enabledFeatures(newVal, oldVal) {
         if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {
           this.afterMountFn(this)
           let sidebar = 'item.0' //first item
@@ -87,12 +103,7 @@
           }
           this.sidebar = sidebar
         }
-      })
-    },
-    watch: {
-      defaultPath(val) {
-        this.sidebar = val
-      },
+      }
     },
     methods: {
       itemChildren(node) {
