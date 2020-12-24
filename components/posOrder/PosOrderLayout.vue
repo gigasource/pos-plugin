@@ -39,10 +39,10 @@
 <script>
   import _ from 'lodash'
   import { createEmptyProductLayout } from './util'
+  import { isMobile } from '../../composition/usePosLogic';
 
   export default {
     name: 'PosOrderLayout',
-    injectService:['PosStore:isMobile'],
     props: {
       editable: {
         type: Boolean,
@@ -67,6 +67,16 @@
       showOverlay: Boolean,
       scrollabeLayout: Boolean,
     },
+    emits: [
+      'update:view',
+      'update:orderLayout',
+      'update:selectedCategoryLayout',
+      'update:selectedProductLayout',
+      'update:keyboardConfig',
+      'update:productDblClicked',
+      'addModifierToProduct',
+      'addProductToOrder'
+    ],
     data() {
       return {
         // touch helper
@@ -222,7 +232,8 @@
       },
       displayOverlay() {
         return this.showOverlay && this.actionMode !== 'none'
-      }
+      },
+      isMobile() { return isMobile }
     },
     async created() {
       await this.loadKeyboardConfig();
@@ -233,7 +244,7 @@
       await this.loadOrderLayout(type);
       cms.socket.on('updateOrderLayouts', this.loadOrderLayout)
     },
-    beforeDestroy() {
+    beforeUnmount() {
       cms.socket.off('updateOrderLayouts')
     },
     async activated() {

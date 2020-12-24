@@ -16,6 +16,7 @@ export const enabledFeatures = ref([])
 export const pendingReservationsLength = ref(0)
 export const reservationBell = ref(null)
 export const isMobile = mobileCheck()
+export const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad')
 
 export async function login() {
   try {

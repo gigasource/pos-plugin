@@ -67,6 +67,7 @@
       orderLayout: Object,
       selectedCategoryLayout: Object,
     },
+    emits: ['update:orderLayout'],
     data() {
       return {
         colors: ['#FFFFFF', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91'],

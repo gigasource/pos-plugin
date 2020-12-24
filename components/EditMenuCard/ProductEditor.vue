@@ -181,6 +181,7 @@
       selectedCategoryLayout: Object,
       selectedProductLayout: Object,
     },
+    emits: ['update:orderLayout'],
     data: function () {
       return {
         colors: '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(','),

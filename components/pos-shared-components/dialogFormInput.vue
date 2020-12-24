@@ -29,9 +29,10 @@
 </template>
 
 <script>
+  import { isMobile} from '../../composition/usePosLogic';
+
   export default {
     name: "dialogFormInput",
-    injectService: ['PosStore:isMobile'],
     props: {
       modelValue: null,
       showKeyboard: {
@@ -86,7 +87,8 @@
           this.internalKeyboardType = val
           this.$emit('change-keyboard-type', val)
         }
-      }
+      },
+      isMobile() { return isMobile }
     },
     methods: {
       changeKeyboardType(val) {

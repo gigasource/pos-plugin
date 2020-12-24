@@ -1,7 +1,8 @@
 <script>
+  import { isMobile, isIOS } from '../../../composition/usePosLogic';
+
   export default {
     name: "PosTextfieldNew",
-    injectService: ['PosStore:(isMobile, isIOS)'],
     props: {
       modelValue: null,
       label: String,
@@ -22,6 +23,8 @@
       }
     },
     computed: {
+      isMobile() { return isMobile },
+      isIOS() { return isIOS },
       internalValue: {
         get() {
           return '' + this.modelValue

@@ -48,6 +48,7 @@
     injectService: [
       'SettingsStore:(getPosSetting, updateKeyboardConfig)'
     ],
+    emits: ['update:keyboardConfig'],
     data() {
       return {
         dialog: false,

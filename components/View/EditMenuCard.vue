@@ -2,12 +2,14 @@
   <div class="pos-emc">
     <pos-order-layout
         class="pos-emc__menu"
+        editable
         v-model:view="view"
         v-model:order-layout="orderLayout"
         v-model:selected-category-layout="selectedCategoryLayout"
         v-model:selected-product-layout="selectedProductLayout"
         v-model:product-dbl-clicked="productDblClicked"
         v-model:keyboard-config="keyboardConfig"
+        v-model:mode="mode"
     />
     <edit-menu-card-toolbar
         class="pos-emc__toolbar"
