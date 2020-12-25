@@ -169,14 +169,31 @@
           id: '',
           category: '',
           stock: [0, 0],
-        }
+        },
+        // inject
+        inventories: [],
+        inventoryFilters: [],
+        inventoryCategories: [],
+        selectedInventory: null,
+        selectedInventoryIDs: [],
+        inventoryPagination: { limit: 15, currentPage: 1 },
+        totalInventories: null
       }
     },
     async created() {
-      await this.loadInventories()
-      await this.loadInventoryCategories()
+      // it's take time to injectService so we need delay the invocation
+      // TODO: find better solution
+      setTimeout(async () => {
+        try {
+          await this.loadInventories()
+          await this.loadInventoryCategories()
+        } catch (e) {
+          console.error(e)
+        }
+      }, 100)
     },
     async activated() {
+      console.log('activated')
       await this.loadInventories()
       await this.loadInventoryCategories()
     },
@@ -338,6 +355,15 @@
         if (!date || !dayjs(date).isValid()) return ''
         return dayjs(date).format('DD/MM/YYYY HH:mm')
       },
+      // inject
+      loadInventories() { console.log("injectService.InventoryStore::loadInventories not injected")  },
+      removeFilter() { console.log("injectService.InventoryStore::removeFilter not injected")  },
+      clearFilter() { console.log("injectService.InventoryStore::clearFilter not injected")  },
+      createInventory() { console.log("injectService.InventoryStore::createInventory not injected")  },
+      updateInventory() { console.log("injectService.InventoryStore::updateInventory not injected")  },
+      deleteInventory() { console.log("injectService.InventoryStore::deleteInventory not injected")  },
+      updateInventoryHistory() { console.log("injectService.InventoryStore::updateInventoryHistory not injected")  },
+      loadInventoryCategories() { console.log("injectService.InventoryStore::loadInventoryCategories not injected")  },
     }
   }
 </script>
