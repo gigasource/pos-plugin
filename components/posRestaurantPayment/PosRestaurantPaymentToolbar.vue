@@ -35,6 +35,7 @@
         return paid < this.paymentTotal
       }
     },
+    emits: ['pay', 'promotion'],
     methods: {
       back() {
         this.$router.go(-1)
