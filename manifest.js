@@ -134,12 +134,12 @@ module.exports = {
       },
       path: 'style/pos.css'
     },
-    {
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/initDemoData/initDemoData.js'
-    },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/initDemoData/initDemoData.js'
+    // },
     {
       loader: {
         type: 'backend-api'
@@ -158,6 +158,12 @@ module.exports = {
       },
       path: 'backend/order/inventory.js'
     },
+    /*{
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/tse/tse.js'
+    },*/
     {
       loader: {
         type: 'backend-api'
@@ -174,7 +180,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/master-node/index.js'
+      path: 'backend/commit/index.js'
     },
     {
       loader: {
@@ -182,11 +188,17 @@ module.exports = {
       },
       path: 'backend/demo-data/socket-handler.js'
     },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/usb-printer/usb-printer.js'
+    // },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/usb-printer/usb-printer.js'
+      path: 'backend/handle-version/handle-version.js'
     },
     {
       loader: {

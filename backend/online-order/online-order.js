@@ -6,7 +6,7 @@ const ProxyClient = require('@gigasource/nodejs-proxy-server/libs/client.js');
 const axios = require('axios');
 const dayjs = require('dayjs');
 const schedule = require('node-schedule');
-const { initSocket, handleNewMasterId } = require('../master-node');
+// const { initSocket, handleNewMasterId } = require('../master-node');
 const { importDemoData } = require('../demo-data/socket-handler');
 const rnBridge = require('../rn-bridge/app-rn-bridge')
 const fs = require('fs')
@@ -480,15 +480,6 @@ module.exports = async cms => {
       }
       cb && cb()
     });
-    socket.on('updateMasterDevice', async (masterClientId, ack) => {
-      // set masterClientId
-      // newMasterClientId is always different from the old one
-      await cms.getModel("PosSetting").findOneAndUpdate({}, { masterClientId });
-      cms.socket.emit('getMasterDevice', masterClientId)
-      if (ack) ack();
-      //await cms.execPostAsync('load:syncDbHook'); //todo uncomment
-      await handleNewMasterId(socket);
-    })
 
     socket.on('updateProducts', async (data) => {
       const { products } = data
@@ -582,7 +573,7 @@ module.exports = async cms => {
           id: null,
           store: {}
         },
-        'signInRequest.status': 'notApproved',
+        'signInRequest': null,
       }
     })
   }
@@ -599,13 +590,15 @@ module.exports = async cms => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
-          await initSocket(onlineOrderSocket);
+          await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+          // await initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
-        await initSocket(onlineOrderSocket);
+        await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+        // await initSocket(onlineOrderSocket);
       }
     });
   }
@@ -733,7 +726,7 @@ module.exports = async cms => {
 
     try {
       const data = {
-        appName: 'POS_Android',
+        appName: global.APP_CONFIG.appName,
         appVersion: require('../../package').version,
         hardware: global.APP_CONFIG.deviceName,
         hardwareId: global.APP_CONFIG.hardwareID,
@@ -769,10 +762,7 @@ module.exports = async cms => {
       requestBody.hardwareId = global.APP_CONFIG.hardwareID
       requestBody.release = require('../../package').release
       requestBody.osName = global.APP_CONFIG.osName
-      const pkgPath = path.resolve(__dirname, '../../pkg/pos-restaurant-react-native/.git/HEAD')
-      if (fs.existsSync(pkgPath)) {
-        requestBody.appBaseVersion = fs.readFileSync(pkgPath, 'utf8').trim()
-      }
+      requestBody.appBaseVersion = global.APP_CONFIG.buildNumber
       const response = await axios.post(pairingApiUrl, requestBody)
       const { deviceId, storeId, storeAlias: alias, storeName: name, storeLocale: locale, isFirstDevice } = response.data
       await cms.getModel('PosSetting').findOneAndUpdate({}, {

@@ -172,6 +172,16 @@
         }
       }
     },
+    filters: {
+      formatDate(date) {
+        return dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
+      formatNumber(number) {
+        if(!number || isNaN(number) || Math.floor(number) === number)
+          return number
+        return parseFloat(number).toFixed(2);
+      }
+    },
     async created() {
       await this.loadInventories()
       await this.loadInventoryCategories()
