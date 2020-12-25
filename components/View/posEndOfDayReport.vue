@@ -1,20 +1,16 @@
 <template>
   <div class="pos-eod-report">
-    <template #report>
-      <pos-end-of-day-details class="pos-eod-report__report"/>
-    </template>
-    <template #toolbar>
-      <pos-end-of-day-toolbar class="pos-eod-report__toolbar"/>
-    </template>
-    <template #calendar>
-      <pos-end-of-day-main class="pos-eod-report__calendar"/>
-    </template>
+    <pos-end-of-day-details class="pos-eod-report__report"/>
+    <pos-end-of-day-toolbar class="pos-eod-report__toolbar"/>
+    <pos-end-of-day-main class="pos-eod-report__calendar"/>
   </div>
 </template>
+
 <script>
   import PosEndOfDayDetails from '../EndOfDay/PosEndOfDayDetails';
   import PosEndOfDayToolbar from '../EndOfDay/PosEndOfDayToolbar';
   import PosEndOfDayMain from '../EndOfDay/PosEndOfDayMain';
+  
   export default {
     name: 'posEndOfDayReport',
     components: { PosEndOfDayMain, PosEndOfDayToolbar, PosEndOfDayDetails },
@@ -26,9 +22,12 @@
     methods: {}
   }
 </script>
+
 <style scoped lang="scss">
   .pos-eod-report {
-    grid-area: -1 / -1 / -1 / -1;  display: grid; grid-template-columns:  75% 25%; grid-template-rows:  1fr 64px; grid-gap: 0px 0px;
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-rows:  1fr 64px;
     height: 100%;
     
     &__report {

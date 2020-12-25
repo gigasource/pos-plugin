@@ -48,7 +48,10 @@
     data() {
       return {
         showEndOfDayConfirmDialog: false,
-        showPendingEndOfDayConfirmDialog: false
+        showPendingEndOfDayConfirmDialog: false,
+        // inject.ReportsStore
+        selectedReportDate: null,
+        listOfDatesWithReports: []
       }
     },
     computed: {

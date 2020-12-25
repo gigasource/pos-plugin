@@ -29,6 +29,7 @@ export default {
       try {
         let result = await cms.processData('OrderEODCalendar', {from, to});
         result = jsonfn.clone(result, true, true);
+        debugger
         return result.ordersByDate
       } catch (e) {
         console.error(e)
@@ -42,6 +43,7 @@ export default {
         const endDate = currentDate.add(1, 'month')
 
         const dates = await this.getEodReports(currentDate, endDate)
+        debugger
         this.reportsFromMonth = dates
 
         eventDates = _.map(dates, (value, key) => {

@@ -5,7 +5,7 @@ const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
 const mongoose = require('mongoose');
-const updateCommit = require('../master-node/updateCommit');
+// const updateCommit = require('../master-node/updateCommit');
 
 module.exports = (cms) => {
   const { orm } = cms

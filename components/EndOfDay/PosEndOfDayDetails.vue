@@ -51,7 +51,12 @@
     data() {
       return {
         model: {},
-        zNumberReports: []
+        zNumberReports: [],
+        // inject.ReportsStore
+        selectedReportDate: null,
+        // inject.PosStore
+        timeFormat: '',
+        dateFormat: ''
       }
     },
     computed: {
@@ -71,27 +76,25 @@
         }
       }
     },
-    created() {
-      const reportsStore = this.$getService('ReportsStore')
-
-      this.unwatch = reportsStore.$watch('selectedReportDate', newVal => {
-        if (newVal.reports && newVal.reports.length) {
-          this.zNumberReports = newVal.reports.map(report => ({
-            begin: dayjs(report.begin).format(this.timeFormat),
-            end: dayjs(report.end).format(this.timeFormat),
-            sum: report.sum,
-            z: report.z
-          }))
-
-          this.model = this.zNumberReports[this.zNumberReports.length - 1]
-        } else {
-          this.zNumberReports = []
-          this.model = null
-        }
-      }, { deep: true })
-    },
-    beforeDestroy() {
-      this.unwatch()
+    watch: {
+      selectedReportDate: {
+        handler: function (newVal) {
+          if (newVal.reports && newVal.reports.length) {
+            this.zNumberReports = newVal.reports.map(report => ({
+              begin: dayjs(report.begin).format(this.timeFormat),
+              end: dayjs(report.end).format(this.timeFormat),
+              sum: report.sum,
+              z: report.z
+            }))
+      
+            this.model = this.zNumberReports[this.zNumberReports.length - 1]
+          } else {
+            this.zNumberReports = []
+            this.model = null
+          }
+        },
+        deep: true
+      }
     }
   }
 </script>

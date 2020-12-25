@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import { computed } from 'vue'
+  import { computed, withModifiers } from 'vue'
   import { _computedDatesInMonthCustom } from './computedDateInMonth';
   import { setBackgroundColor, setTextColor, GDatePickerUtil, GPicker } from 'pos-vue-framework';
 
@@ -105,7 +105,7 @@
         return (
           <div class={cptDatePickerTitleClass.value}>
             <div class='g-picker__title__btn g-date-picker-title__year'
-                 v-on:click_stop={e => titleModel.value.on.yearClicked(titleModel.value.year)}>
+                 onClick={withModifiers(e => titleModel.value.on.yearClicked(titleModel.value.year), ['stop'])}>
               {titleModel.value.year}
             </div>
             <div class='g-picker__title__btn g-date-picker-title__date'>
@@ -122,7 +122,7 @@
             <li
               key={year}
               class={{ 'active': parseInt(yearModel.value.selectedYear) === year }}
-              v-on:click_stop={() => yearModel.value.on.yearClicked(year)}>
+              onClick={withModifiers(() => yearModel.value.on.yearClicked(year), ['stop'])}>
               {year}
             </li>
           ))
@@ -153,12 +153,12 @@
             <div class='g-date-picker-header-container'>
               <button class="g-date-picker-header__prev-button"
                       disabled={!headerModel.value.canGoPrev}
-                      v-on:click_stop={goPrev}></button>
+                      onClick={withModifiers(goPrev, ['stop'])}></button>
               <div class={cptHeaderValueClass.value}>
                 <div key={headerModel.value.content}>
                   <button style="width: 208px"
                           disabled={props.monthSelectDisabled}
-                          v-on:click_stop={headerModel.value.on.headerClicked}
+                          onClick={withModifiers(headerModel.value.on.headerClicked, ['stop'])}
                   >
                     {headerModel.value.content}
                   </button>
@@ -167,7 +167,7 @@
 
               <button class="g-date-picker-header__next-button"
                       disabled={!headerModel.value.canGoNext}
-                      v-on:click_stop={goNext}></button>
+                      onClick={withModifiers(goNext, ['stop'])}></button>
             </div>
           </div>
         )
@@ -252,8 +252,8 @@
           class={['g-table-item', dateItem.class]}
           style={[dateItem.style]}
           disabled={!dateItem.isAllowed}
-          v-on:click_stop={() => dateTableModel.value.on.onDateClicked(dateItem)}
-          v-on:dblclick_stop={() => dateTableModel.value.on.onDateDoubleClicked(dateItem)}>
+          onClick={withModifiers(() => dateTableModel.value.on.onDateClicked(dateItem), ['stop'])}
+          onDblclick={withModifiers(() => dateTableModel.value.on.onDateDoubleClicked(dateItem), ['stop'])}>
           <div class="g-table-item__content">{dateItem.formattedValue}</div>
           <div class="g-date-picker-table__events">
             {
@@ -279,7 +279,7 @@
 
       function dateTableRenderFn() {
         return (
-          <div class='g-date-picker-table g-date-picker-table--date' v-on:wheel_stop={onWheelHandler}>
+          <div class='g-date-picker-table g-date-picker-table--date' onWheel={withModifiers(onWheelHandler, ['stop'])}>
             <table key={state.viewportDate}>
               <thead>
               <tr>{dateTableModel.value.dayNames.map(dayName => <th>{dayName}</th>)}</tr>
@@ -315,7 +315,7 @@
       }
 
       function monthTableRenderFn() {
-        return (<div class='g-date-picker-table g-date-picker-table--month' v-on:wheel={onWheelHandler}>
+        return (<div class='g-date-picker-table g-date-picker-table--month' onWheel={onWheelHandler}>
           <table key={state.viewportDate}>
             <tbody>
             {
@@ -329,8 +329,8 @@
                           class={['g-table-item', monthItem.class]}
                           style={monthItem.style}
                           disabled={!monthItem.isAllowed}
-                          v-on:click_stop={() => monthTableModel.value.on.monthClicked(monthItem)}
-                          v-on:dblclick_stop={() => monthTableModel.value.on.monthDoubleClicked(monthItem)}
+                          onClick={withModifiers(() => monthTableModel.value.on.monthClicked(monthItem), ['stop'])}
+                          onDblclick={withModifiers(() => monthTableModel.value.on.monthDoubleClicked(monthItem), ['stop'])}
                         >
                           <div class="g-table-item__content">
                             {monthItem.formattedValue}

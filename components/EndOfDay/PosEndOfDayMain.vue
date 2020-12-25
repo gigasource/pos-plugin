@@ -20,10 +20,13 @@
   export default {
     name: 'PosEndOfDayMain',
     components: { PosEndOfDayDatePicker },
-    injectService: ['ReportsStore:(selectedReportDate,listOfDatesWithReports)'],
+    injectService: ['ReportsStore:(selectedReportDate,listOfDatesWithReports,getDailyReports,getDatesWithReports)'],
     data: () => ({
       date: null,
-      eventDates: []
+      eventDates: [],
+      // inject.ReportsStore
+      selectedReportDate: null,
+      listOfDatesWithReports: []
     }),
     methods: {
       getDay(date) {
@@ -35,22 +38,31 @@
         if (!this.selectedReportDate || !value) this.selectedReportDate = {}
         if (this.selectedReportDate && this.selectedReportDate.date === value) return
         this.date = value
-
-        this.$getService('ReportsStore:getDailyReports')(dayjs(value, 'YYYY-MM-DD').toDate())
+        this.getDailyReports(dayjs(value, 'YYYY-MM-DD').toDate())
       },
       async getDatesWithReport(date) {
-        this.eventDates = await this.$getService('ReportsStore:getDatesWithReports')(date)
+        this.eventDates = await this.getDatesWithReports(date)
+      },
+      getDailyReports() {
+        console.error('ReportsStore:getDailyReports wasn\'t not injected')
+      },
+      getDatesWithReports() {
+        console.error('ReportsStore:getDatesWithReports wasn\'t not injected')
       }
     },
     async mounted() {
-      const currentDate = dayjs().format('YYYY-MM-DD');
-      await this.getDatesWithReport(currentDate)
-      await this.selectDate(currentDate)
+      setTimeout(async() => {
+        const currentDate = dayjs().format('YYYY-MM-DD');
+        await this.getDatesWithReport(currentDate)
+        await this.selectDate(currentDate)
+      }, 100)
     },
     async activated() {
-      const currentDate = dayjs().format('YYYY-MM-DD');
-      await this.getDatesWithReport(currentDate)
-      await this.selectDate(currentDate)
+      setTimeout(async () => {
+        const currentDate = dayjs().format('YYYY-MM-DD');
+        await this.getDatesWithReport(currentDate)
+        await this.selectDate(currentDate)
+      }, 100)
     }
   }
 </script>
