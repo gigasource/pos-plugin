@@ -180,6 +180,16 @@
         totalInventories: null
       }
     },
+    filters: {
+      formatDate(date) {
+        return dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
+      formatNumber(number) {
+        if(!number || isNaN(number) || Math.floor(number) === number)
+          return number
+        return parseFloat(number).toFixed(2);
+      }
+    },
     async created() {
       // it's take time to injectService so we need delay the invocation
       // TODO: find better solution

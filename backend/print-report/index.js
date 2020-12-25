@@ -13,7 +13,8 @@ module.exports = async function (cms) {
   cms.on('bridge:inited', function () {
     cms.bridge.on('endOfDay', async function (report, cb) {
       report = JsonFn.clone(report)
-      let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
+      await cms.execPostAsync('run:endOfDay', null, [report]);
+      /*let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
       vDateOrders = JsonFn.clone(vDateOrders, true, true);
 
       const ordersToUpdate = vDateOrders.filter(order => report.begin <= order.date && order.date <= report.end).map(i => i._id)
@@ -31,7 +32,7 @@ module.exports = async function (cms) {
       }])
 
       await EndOfDay.create(report)
-      await printHandler('ZReport', report)
+      await printHandler('ZReport', report)*/
       cb();
     });
 
