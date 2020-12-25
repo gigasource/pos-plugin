@@ -10,5 +10,5 @@ function orderRooms(rooms) {
 }
 
 export async function reloadRooms() {
-  state.rooms.splice(0, this.rooms.length, ...orderRooms(await cms.getModel('Room').find({})))
+  state.rooms.splice(0, state.rooms.length, ...orderRooms(await cms.getModel('Room').find({})))
 }
