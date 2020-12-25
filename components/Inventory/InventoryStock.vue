@@ -11,28 +11,28 @@
         <g-icon color="white">add</g-icon>
       </div>
       <g-spacer/>
-      <span class="fs-small">{{$t('inventory.products')}}: </span>
-      <span class="fs-large text-red ml-1">{{items.length}}</span>
+      <span class="fs-small">{{ $t('inventory.products') }}: </span>
+      <span class="fs-large text-red ml-1">{{ items.length }}</span>
     </div>
     <g-simple-table striped fixed-header style="flex: 1">
       <thead>
       <tr>
         <th>Product ID</th>
         <th>Name</th>
-        <th>{{$t('article.category')}}</th>
-        <th>{{$t('inventory.unit')}}</th>
-        <th>{{$t('inventory.currentStock')}}</th>
-        <th>{{$t('inventory.addedStock')}}</th>
+        <th>{{ $t('article.category') }}</th>
+        <th>{{ $t('inventory.unit') }}</th>
+        <th>{{ $t('inventory.currentStock') }}</th>
+        <th>{{ $t('inventory.addedStock') }}</th>
         <th></th>
       </tr>
       </thead>
       <tr v-for="(inventory, i) in items" :key="i" :class="selectedItem && selectedItem._id === inventory._id && 'row--selected'">
-        <td @click="openDialogAdd(inventory)">{{inventory.id}}</td>
-        <td @click="openDialogAdd(inventory)">{{inventory.name}}</td>
-        <td @click="openDialogAdd(inventory)">{{inventory.category.name}}</td>
-        <td @click="openDialogAdd(inventory)">{{inventory.unit}}</td>
-        <td @click="openDialogAdd(inventory)">{{inventory.stock | formatNumber}}</td>
-        <td class="fw-700 text-blue" @click="openDialogAdd(inventory)">{{inventory.added}}</td>
+        <td @click="openDialogAdd(inventory)">{{ inventory.id }}</td>
+        <td @click="openDialogAdd(inventory)">{{ inventory.name }}</td>
+        <td @click="openDialogAdd(inventory)">{{ inventory.category.name }}</td>
+        <td @click="openDialogAdd(inventory)">{{ inventory.unit }}</td>
+        <td @click="openDialogAdd(inventory)">{{ $filters.formatCurrency(inventory.stock) }}</td>
+        <td class="fw-700 text-blue" @click="openDialogAdd(inventory)">{{ inventory.added }}</td>
         <td @click="removeItem(i)">
           <g-icon color="red">cancel</g-icon>
         </td>
@@ -42,15 +42,15 @@
       <g-toolbar color="#eeeeee">
         <g-btn :uppercase="false" style="margin-right: 5px" @click="back">
           <g-icon small style="margin-right: 5px">icon-back</g-icon>
-          {{$t('ui.back')}}
+          {{ $t('ui.back') }}
         </g-btn>
         <g-btn :uppercase="false" @click="dialog.low = true">
-          {{$t('inventory.importLowStock')}}
+          {{ $t('inventory.importLowStock') }}
         </g-btn>
         <g-spacer/>
         <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF" @click="complete">
           <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
-          {{$t('inventory.complete')}}
+          {{ $t('inventory.complete') }}
         </g-btn>
       </g-toolbar>
     </div>
@@ -94,13 +94,6 @@
     components: {PosKeyboardFull},
     injectService: ['InventoryStore:(updateInventory, updateInventoryHistory)'],
     props: {},
-    filters: {
-      formatNumber(number) {
-        if (!number || isNaN(number) || Math.floor(number) === number)
-          return number
-        return number.toFixed(2)
-      }
-    },
     data() {
       return {
         items: [],

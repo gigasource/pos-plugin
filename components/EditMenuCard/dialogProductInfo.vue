@@ -13,12 +13,13 @@
 <script>
   import {log} from "../../../../backoffice/public/js/monaco-editor-core/esm/vs/editor/standalone/common/monarch/monarchCommon";
   import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import { nextTick } from 'vue';
 
   export default {
     name: "dialogProductInfo",
     components: { PosTextfieldNew },
     props: {
-      value: null,
+      modelValue: null,
       focus: {
         type: String,
         default: 'id'
@@ -39,10 +40,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       isValid() {
@@ -59,7 +60,7 @@
             this.name = this.product.name
             this.price = this.product.price
           }
-          this.$nextTick(() => {
+          nextTick(() => {
             setTimeout(() => {
               this.$refs[this.focus].$refs.textfield.onFocus()
             }, 200)

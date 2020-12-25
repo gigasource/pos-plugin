@@ -25,7 +25,7 @@
                   <span class="date-range-picker__date">{{ formattedFromDate }}</span>
                 </div>
               </template>
-              <g-date-picker :max="toDate" type="date" no-title @input="onFromDateSelected"/>
+              <g-date-picker :max="toDate" type="date" no-title @update:modelValue="onFromDateSelected"/>
             </g-menu>
           </div>
 
@@ -39,7 +39,7 @@
                   <span class="date-range-picker__date">{{ formattedToDate }}</span>
                 </div>
               </template>
-              <g-date-picker :min="fromDate" :max="today" type="date" no-title @input="onToDateSelected"/>
+              <g-date-picker :min="fromDate" :max="today" type="date" no-title @update:modelValue="onToDateSelected"/>
             </g-menu>
           </div>
         </div>

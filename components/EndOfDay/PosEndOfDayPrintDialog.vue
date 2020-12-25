@@ -3,28 +3,30 @@
     <slot :close="close" :open="open" name="activator"></slot>
     <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model="dialog" width="70%">
       <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
-        <p class="eod-header">{{$t('report.xReport')}}</p>
+        <p class="eod-header">{{ $t('report.xReport') }}</p>
         <div style="height: calc(100% - 145px); overflow-y: auto;">
           <div class="eod-dialog-main">
             <div class="eod-dialog-content" v-if="xReport">
-              <p class="section-title eod-title">{{$t('common.sales')}}</p>
+              <p class="section-title eod-title">{{ $t('common.sales') }}</p>
               <div class="eod-details">
                 <div class="details-content" v-for="(paymentValue, paymentName) in xReport.sumByPayment">
-                  <p>{{paymentName}}</p>
-                  <p>€ {{paymentValue | formatMoney}}</p>
+                  <p>{{ paymentName }}</p>
+                  <p>€ {{ $filters.formatCurrency(paymentValue) }}</p>
                 </div>
                 <div class="total-content">
-                  <p class="eod-subtitle">{{$t('common.total')}}</p>
-                  <p style="text-decoration: underline; font-weight: 800;">€ {{getSum(xReport.sumByPayment) | formatMoney}}</p>
+                  <p class="eod-subtitle">{{ $t('common.total') }}</p>
+                  <p style="text-decoration: underline; font-weight: 800;">€
+                    {{ $filters.formatCurrency(getSum(xReport.sumByPayment)) }}</p>
                 </div>
               </div>
 
-              <p class="section-title eod-title">{{$t('report.productSold')}}</p>
+              <p class="section-title eod-title">{{ $t('report.productSold') }}</p>
               <div class="eod-details">
                 <div v-for="(items, category) in xReport.groupItemsByCategory">
-                  <p class="eod-subtitle">{{category || 'No category'}} (€{{xReport.sumByCategory[category] | formatMoney}})</p>
+                  <p class="eod-subtitle">{{ category || 'No category' }}
+                    (€{{ $filters.formatCurrency(xReport.sumByCategory[category]) }})</p>
                   <div class="eod-sales-detail">
-                    <p v-for="(quantity, name) in items">{{quantity}} x {{name}}</p>
+                    <p v-for="(quantity, name) in items">{{ quantity }} x {{ name }}</p>
                   </div>
                 </div>
               </div>
@@ -34,11 +36,11 @@
           <g-toolbar bottom color="#eee">
             <g-spacer/>
             <g-btn :uppercase="false" @click="close" class="mr-2">
-              {{$t('ui.cancel')}}
+              {{ $t('ui.cancel') }}
             </g-btn>
             <g-btn :uppercase="false" background-color="#2979FF" text-color="#fff" @click.stop="print">
               <g-icon class="mr-2" svg>icon-print</g-icon>
-              {{$t('ui.print')}}
+              {{ $t('ui.print') }}
             </g-btn>
           </g-toolbar>
         </div>
@@ -57,11 +59,6 @@
       return {
         xReport: null,
         date: null
-      }
-    },
-    filters: {
-      formatMoney(val) {
-        return val.toFixed(2)
       }
     },
     props: {

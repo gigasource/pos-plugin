@@ -6,7 +6,7 @@
 					? $t('settings.editPayment')
 					: $t('settings.createPayment')  }}
 				</p>
-				<pos-text-field style="width: 268px" label="Name" placeholder="Payment name" @click.stop="showKeyboard = !showKeyboard" v-model="name"/>
+				<g-text-field-bs class="bs-tf__pos" style="width: 268px" label="Name" placeholder="Payment name" @click.stop="showKeyboard = !showKeyboard" v-model="name"/>
 				<pos-file-input-image label="Icon" v-model="src"/>
 			</div>
 			<div v-if="showKeyboard" class="keyboard-wrapper">
@@ -41,7 +41,8 @@
 				src: null,
 				isEditPayment: false,
 				internalValue: false,
-				showKeyboard: false
+				showKeyboard: false,
+				selectedPayment: null
       }
     },
     props: {
@@ -91,6 +92,7 @@
 				}
 				this.back();
 			},
+			updatePayment() {}
 		},
   }
 </script>

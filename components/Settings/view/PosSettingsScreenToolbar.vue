@@ -1,5 +1,5 @@
 <template>
-  <g-toolbar area="toolbar" color="grey lighten 3" height="100%" style="z-index: 204">
+  <g-toolbar area="toolbar" color="grey lighten 3" style="z-index: 204">
     <g-btn :uppercase="false" background-color="white" text-color="#1d1d26" class="mr-2" @click="back">
       <g-icon class="mr-2" svg>
         icon-back
@@ -16,14 +16,14 @@
   export default {
     name: 'PosSettingsScreenToolbar',
     props: {
-      value: String
+      value: String,
+      sidebar: null
     },
     computed: {
       internalValue() {
-        const sidebarData = this.$getService('SettingsStore:sidebarData');
-        if (!this.value) return sidebarData[0].key
+        if (!this.value) return this.sidebar[0].key
         const activeItemPath = this.value.split('.').slice(1).join('.')
-        const activeItem = _.get(sidebarData, activeItemPath)
+        const activeItem = _.get(this.sidebar, activeItemPath)
         if (activeItem.isView) return activeItem.key
       }
     },

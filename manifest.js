@@ -1,6 +1,21 @@
 module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
+    { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
+    { loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
+    { loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
+    { loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
+    { loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order', path: '/pos-order/:id?' },
+    { loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order-Mobile', path: '/pos-order-mobile/:id?' },
+    { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
+    { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
+    { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
+    { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
+    { loader: { type: 'route' }, filePath: 'components/Tutorial/Tutorial.vue', name: 'Tutorial', path: '/pos-tutorial' },
+    {
+      loader: { type: 'init '},
+      path: 'composition/plugin-init.js'
+    },
     {
       loader: {
         type: 'vue-singleton'
@@ -36,12 +51,6 @@ module.exports = {
         type: 'vue-singleton'
       },
       path: 'components/Store/RoomStore.vue',
-    },
-    {
-      loader: {
-        type: 'vue-singleton'
-      },
-      path: 'components/Store/VirtualPrinterStore.vue',
     },
     {
       loader: {

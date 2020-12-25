@@ -91,7 +91,7 @@
         'SettingsStore:findCategoryByName', 'PosStore:storeLocale'
     ],
     props: {
-      value: Boolean,
+      modelValue: Boolean,
     },
     data() {
       return {
@@ -113,7 +113,7 @@
     computed: {
       dialogAddFilter: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
           this.productId = ''
@@ -122,7 +122,7 @@
           this.category = ''
           this.barcode = ''
           this.tab = this.tabItems[0]
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },

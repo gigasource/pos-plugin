@@ -33,6 +33,8 @@
 <script>
   //todo on/off timer (awaiting redesign/conceptualization)
 
+  import { nextTick } from 'vue';
+
   export default {
     name: 'OnlineOrderServices',
     data() {
@@ -58,6 +60,7 @@
         }
       }
     },
+    emits: ['showInfoSnackbar', 'showErrorSnackbar', 'getOnlineDeviceServices', 'updateOnlineDeviceServices'],
     methods: {
       save() {
         // const newDate = dayjs();
@@ -100,12 +103,12 @@
       }
     },
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.getServices()
       })
     },
     activated() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.getServices()
       })
     }

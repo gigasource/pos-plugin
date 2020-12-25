@@ -13,7 +13,7 @@
       </div>
       <g-spacer/>
       <span class="order-detail__header-title">Total</span>
-      <span class="order-detail__header-value text-red">€{{total | convertMoney}}</span>
+      <span class="order-detail__header-value text-red">€{{ $filters.formatCurrency(total) }}</span>
     </div>
     <div class="order-detail__content">
       <div v-for="(item, i) in items" :key="i" class="item">
@@ -21,8 +21,8 @@
           <div>
             <p class="item-detail__name">{{item.name}}</p>
             <p>
-              <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
-              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">€ {{item.price | convertMoney}}</span>
+              <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{ $filters.formatCurrency(item.originalPrice) }}</span>
+              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">€ {{ $filters.formatCurrency(item.price) }}</span>
               <span :class="['item-detail__option', item.option === 'Take away' ? 'text-green-accent-3' : 'text-red-accent-2']">{{item.option}}</span>
             </p>
           </div>
@@ -31,10 +31,11 @@
           </div>
         </div>
         <div v-if="item.modifiers">
-          <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
-                  label small text-color="#616161">
-            {{modifier.name}} | €{{modifier.price | convertMoney}}
-          </g-chip>
+          <template v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`">
+            <g-chip label small text-color="#616161">
+              {{ modifier.name }} | €{{ $filters.formatCurrency(modifier.price) }}
+            </g-chip>
+          </template>
         </div>
       </div>
     </div>
@@ -49,11 +50,6 @@
       total: 0,
       currentOrder: null,
       user: null
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
     },
     data() {
       return {

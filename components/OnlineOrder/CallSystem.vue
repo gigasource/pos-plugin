@@ -61,7 +61,7 @@
     <dialog-text-filter
         v-model="dialog.ip"
         label="Call System IP"
-        :default-value="ipAddresses[this.currentCallSystemMode]"
+        :default-value="ipAddresses[currentCallSystemMode]"
         @submit="changeIp"/>
   </div>
 </template>

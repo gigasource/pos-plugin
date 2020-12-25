@@ -1,17 +1,17 @@
 <template>
   <div>
     <div class="report-column">
-      <span>{{$t('common.discount')}} ({{$t('common.currency')}})</span>
-      <span class="number">{{paymentDiscount | formatNumber}}</span>
-      <span>{{$t('common.tax')}} ({{$t('common.currency')}})</span>
-      <span class="number">{{paymentTax | formatNumber}}</span>
+      <span>{{ $t('common.discount') }} ({{ $t('common.currency') }})</span>
+      <span class="number">{{ $filters.formatCurrency(paymentDiscount) }}</span>
+      <span>{{ $t('common.tax') }} ({{ $t('common.currency') }})</span>
+      <span class="number">{{ $filters.formatCurrency(paymentTax) }}</span>
     </div>
     <g-divider inset vertical color="#979797"/>
     <div class="report-column">
-      <span>{{$t('common.subtotal')}} ({{$t('common.currency')}})</span>
-      <span class="number">{{paymentSubTotal | formatNumber}}</span>
-      <span>{{$t('common.total')}} ({{$t('common.currency')}})</span>
-      <span class="number__important">{{paymentTotal | formatNumber}}</span>
+      <span>{{ $t('common.subtotal') }} ({{ $t('common.currency') }})</span>
+      <span class="number">{{ $filters.formatCurrency(paymentSubTotal) }}</span>
+      <span>{{ $t('common.total') }} ({{ $t('common.currency') }})</span>
+      <span class="number__important">{{ $filters.formatCurrency(paymentTotal) }}</span>
     </div>
   </div>
 </template>
@@ -19,14 +19,6 @@
 <script>
   export default {
     name: 'PosPaymentScreenReport',
-    filters: {
-      formatNumber: (val) => {
-        if (val && typeof (val) === 'number') {
-          return val.toFixed(2)
-        }
-        return 0
-      },
-    },
     injectService: [
       'OrderStore:paymentDiscount',
       'OrderStore:paymentTax',

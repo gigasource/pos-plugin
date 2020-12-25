@@ -62,6 +62,7 @@
       productDblClicked: null,
       mode: String
     },
+    emits: ['update:orderLayout'],
     data: function () {
       return {
         targetLayout: null, // category or product

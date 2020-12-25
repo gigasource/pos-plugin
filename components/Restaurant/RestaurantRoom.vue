@@ -34,9 +34,9 @@
     props: {
       id: null,
       user: null,
-      currentOrder: null,
       activeOrders: Array
     },
+    emits: ['setInitOrderProps', 'changeTable'],
     data() {
       return {
         room: null,
@@ -46,7 +46,9 @@
         userTables: [],
         transferTableFrom: null,
         showNumberOfCustomersDialog: false,
-        currentTime: new Date()
+        currentTime: new Date(),
+        isMobile: null,
+        storeLocale: null
       }
     },
     async created() {
@@ -54,7 +56,7 @@
       cms.socket.on('updateRooms', this.loadRoom)
       setInterval(() => this.currentTime = new Date(), 30000)
     },
-    destroyed() {
+    unmounted() {
       cms.socket.off('updateRooms');
     },
     watch: {
@@ -92,7 +94,7 @@
     },
     methods: {
       async loadRoom() {
-        this.$set(this, 'room', await cms.getModel('Room').findOne({ _id: this.id }))
+        this.room = await cms.getModel('Room').findOne({ _id: this.id })
       },
       isTable(roomObj) {
         return roomObj.type === 'table'
@@ -111,11 +113,7 @@
           this.showNumberOfCustomersDialog = true
         } else {
           setTimeout(() => {
-            if (this.isMobile) {
-              this.$router.push(`/pos-order-3/${roomObj.name}`)
-            } else {
-              this.$router.push(`/pos-order-2/${roomObj.name}`)
-            }
+            this.$router.push(`/pos-order/${roomObj.name}`)
           }, 200)
         }
         // }

@@ -17,6 +17,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue'
+
   export default {
     name: 'PosOrderManualTable',
     props: {
@@ -50,6 +52,7 @@
     activated() {
       this.focusTf()
     },
+    emits: ['setInitOrderProps'],
     methods: {
       async loadRoom() {
         this.rooms = await cms.getModel('Room').find()
@@ -92,7 +95,7 @@
         }, 200)
       },
       focusTf() {
-        this.$nextTick(() => {
+        nextTick(() => {
           setTimeout(() => {
             const tfComponent = this.$refs['tf']
             tfComponent && tfComponent.$el && tfComponent.$el.click()

@@ -5,7 +5,7 @@
         <template v-for="(item, index) in computedList">
           <slot name="item">
             <div class="scroll-select__container--item" :key="index" :id="item" @click="chooseItem(item, index)"
-                 :style="{height: computedItemHeight, ...value === item && { color: 'white', fontWeight: '700' }}">
+                 :style="{height: computedItemHeight, ...modelValue === item && { color: 'white', fontWeight: '700' }}">
               {{item}}
             </div>
           </slot>
@@ -19,6 +19,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'ScrollSelect',
     props: {
@@ -30,7 +32,7 @@
         type: Number,
         default: 100
       },
-      value: null,
+      modelValue: null,
       items: {
         type: Array,
         default: () => ['item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9']
@@ -54,11 +56,11 @@
         return isNaN(+this.itemHeight) ? 0 : `calc(50% - ${this.itemHeight/2}px)`
       },
       itemSelected() {
-        return !!this.items.find(item => item === this.value)
+        return !!this.items.find(item => item === this.modelValue)
       }
     },
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.scrollToValue()
       })
     },
@@ -66,17 +68,17 @@
       handleScroll: _.debounce(function (event) {
         const precision = ('' + this.itemHeight).length - 1
         const index = _.round(event.target.scrollTop / this.itemHeight, precision)
-        this.$emit('input', this.items[index])
+        this.$emit('update:modelValue', this.items[index])
       }, 100),
       scrollToValue() {
-        const index = this.items.indexOf(this.value)
+        const index = this.items.indexOf(this.modelValue)
         setTimeout(() => {
           this.$refs.container.scrollTop = this.itemHeight * index
         }, 100)
       },
       chooseItem(item, index) {
         if (!item) return
-        this.$emit('input', item)
+        this.$emit('update:modelValue', item)
         this.$refs.container.scroll({top: this.itemHeight * (index - 2), behavior: 'smooth'})
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <g-toolbar height="100%" elevation="0" color="#eee">
+  <g-toolbar elevation="0" color="#eee">
     <g-btn-bs icon="icon-back" @click="back">{{$t('ui.back')}}</g-btn-bs>
     <g-menu top nudge-top="5" v-model="showMenu">
       <template v-slot:activator="{toggleContent}">
@@ -91,16 +91,16 @@
         this.$emit('quickCash')
       },
       splitOrder() {
-        this.$getService('PosOrderSplitOrder:setActive')(true)
+        this.$emit('openDialog', 'split')
       },
       print() {
         this.$emit('saveTableOrder')
       },
       moveItems() {
-        this.$getService('PosOrderMoveItems:setActive')(true)
+        this.$emit('openDialog', 'move')
       },
       showVoucherDialog() {
-        this.$getService('PosOrderVoucherDialog:setActive')(true)
+        this.$emit('openDialog', 'voucher')
       },
       toggleTakeAwayOrder() {
         this.$emit('updateCurrentOrder', 'takeAway', !this.currentOrder.takeAway, true)

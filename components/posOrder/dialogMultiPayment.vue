@@ -54,10 +54,12 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'dialogMultiPayment',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       total: [Number, String],
       storeLocale: String,
       cardValue: [Number, String],
@@ -103,10 +105,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       disableConfirmMulti() {
@@ -144,13 +146,13 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         if (val) {
           this.cashEditValue = this.cashValue ? '' + this.cashValue : '';
           this.cardEditValue = this.cardValue ? '' + this.cardValue : '';
 
           setTimeout(() => {
-            this.$nextTick(() => this.click('cash-textfield'))
+            nextTick(() => this.click('cash-textfield'))
           }, 1000)
         }
       }

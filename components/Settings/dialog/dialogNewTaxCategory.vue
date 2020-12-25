@@ -4,9 +4,9 @@
       <g-icon @click="dialogNewTaxCategory = false" svg size="20" class="icon">icon-close</g-icon>
       <div class="form">
         <div class="input">
-          <pos-textfield-new @click="check = 'letter'" large label="Name" v-model="name" suffix="%"/>
-          <pos-textfield-new @click="check = 'tax'" large :label="$t('common.tax')" v-model="tax" :rules="[rules.number, rules.range]" suffix="%"/>
-          <pos-textfield-new @click="check = 'letter'" large label="Type" v-model="type"/>
+          <g-text-field-bs class="bs-tf__pos" @click="check = 'letter'" label="Name" v-model="name" suffix="%"/>
+          <g-text-field-bs class="bs-tf__pos"  @click="check = 'tax'" :label="$t('common.tax')" v-model="tax" :rules="[rules.number, rules.range]" suffix="%"/>
+          <g-text-field-bs class="bs-tf__pos"  @click="check = 'letter'" label="Type" v-model="type"/>
         </div>
         <div v-if="!isMobile" class="action">
           <g-btn :uppercase="false" outlined class="mr-3" width="120" @click="dialogNewTaxCategory = false">{{$t('ui.cancel')}}</g-btn>
@@ -42,7 +42,9 @@
         rules: {
           number: val => !isNaN(val) || 'Must be a number',
           range: val => isNaN(val) || (val <= 100 && val >= 0) || 'Tax Range: 0 - 100'
-        }
+        },
+        selectedTaxCategory: null,
+        isMobile: null
       }
     },
     computed: {
@@ -92,7 +94,8 @@
         }
         this.check = 'tax';
         this.dialogNewTaxCategory = true;
-      }
+      },
+      updateTaxCategory() {}
     },
   }
 </script>

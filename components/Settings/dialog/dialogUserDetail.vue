@@ -23,14 +23,17 @@
   export default {
     name: 'dialogUserDetail',
     props: {
-      value: null,
+      modelValue: null,
 			focusInput: String,
       add: Boolean
     },
 		data(){
     	return {
     	  name: '',
-        passcode: ''
+        passcode: '',
+        selectedUser: null,
+        listUsers: null,
+        isMobile: false
 			}
 		},
 		injectService: [
@@ -42,10 +45,10 @@
     computed: {
       dialogUserDetail: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
       check: {
@@ -58,13 +61,15 @@
       },
     },
 		methods: {
+      updateUser() {},
 			async submit() {
-        if(this.add) {
+        if (this.add) {
           const user = {
             name: this.name,
             passcode: this.passcode,
             viewReservation: true
           };
+          console.log(user)
           await this.updateUser(null, user);
           const newUser = this.listUsers[this.listUsers.length - 1];
           this.selectedUser = {
@@ -80,7 +85,7 @@
 			}
 		},
 		watch: {
-      value: function(val) {
+      modelValue(val) {
         setTimeout(() => {
           const textfield = this.$refs[this.focusInput];
           if (textfield && textfield.$refs && textfield.$refs.textfield)

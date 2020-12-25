@@ -29,11 +29,12 @@
 </template>
 
 <script>
+  import { isMobile} from '../../composition/usePosLogic';
+
   export default {
     name: "dialogFormInput",
-    injectService: ['PosStore:isMobile'],
     props: {
-      value: null,
+      modelValue: null,
       showKeyboard: {
         type: Boolean,
         default: true
@@ -69,10 +70,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       showButtons() {
@@ -86,7 +87,8 @@
           this.internalKeyboardType = val
           this.$emit('change-keyboard-type', val)
         }
-      }
+      },
+      isMobile() { return isMobile }
     },
     methods: {
       changeKeyboardType(val) {
@@ -97,7 +99,7 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         if (!val) this.internalKeyboardType = 'alphanumeric'
       },
       keyboardType(val) {

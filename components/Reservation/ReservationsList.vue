@@ -90,6 +90,7 @@
 
 <script>
   import isBetween from 'dayjs/plugin/isBetween'
+  import { nextTick } from 'vue';
   dayjs.extend(isBetween)
 
   export default {
@@ -108,13 +109,13 @@
         },
         listStatus: [
           { text: 'All', value: 'all' },
-          { text: $t('onlineOrder.arrived'), value: 'completed' },
-          { text: $t('onlineOrder.notArrived'), value: 'pending' }
+          { text: this.$t('onlineOrder.arrived'), value: 'completed' },
+          { text: this.$t('onlineOrder.notArrived'), value: 'pending' }
         ],
         status: 'all',
         date: new Date(),
         week: [],
-        dayInWeeks: [$t('onlineOrder.weekday.mon'), $t('onlineOrder.weekday.tue'), $t('onlineOrder.weekday.wed'), $t('onlineOrder.weekday.thu'), $t('onlineOrder.weekday.fri'), $t('onlineOrder.weekday.sat'), $t('onlineOrder.weekday.sun')],
+        dayInWeeks: [this.$t('onlineOrder.weekday.mon'), this.$t('onlineOrder.weekday.tue'), this.$t('onlineOrder.weekday.wed'), this.$t('onlineOrder.weekday.thu'), this.$t('onlineOrder.weekday.fri'), this.$t('onlineOrder.weekday.sat'), this.$t('onlineOrder.weekday.sun')],
         edit: false,
         selectedReservation: null
       }
@@ -130,7 +131,7 @@
       })
     },
     mounted() {
-      this.$nextTick(() => {
+      nextTick(() => {
         const firstReservation = _.minBy(this.reservations, r => r.date)
         if(firstReservation) {
           const hour = dayjs(firstReservation.date).format('HH')
@@ -153,7 +154,7 @@
         if (!val) this.edit = false
       },
       reservations(val) {
-        this.$nextTick(() => {
+        nextTick(() => {
           const firstReservation = _.minBy(val, r => r.date)
           if(firstReservation) {
             const hour = dayjs(firstReservation.date).format('HH')
@@ -193,6 +194,7 @@
         return hours
       }
     },
+    emits: ['getReservations', 'updateReservation', 'getReservationSetting', 'removeReservation', 'completeReservation', 'getPendingReservationsLength'],
     methods: {
       genReservations(date = this.date, status = this.status) {
         this.$emit('getReservations', date, status)

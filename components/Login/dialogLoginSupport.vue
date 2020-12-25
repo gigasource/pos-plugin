@@ -2,11 +2,11 @@
   <g-dialog v-model="dialogLoginSupport" width="100%" eager>
     <g-card width="100%">
       <g-grid-layout :layout="layout" style="height: 100%; width: 100%">
-        <p area="version" class="support-item"><b>{{ $t("login.version") }}: </b>{{this.version}}</p>
-        <p area="network" class="support-item"><b>{{ $t("login.network") }}: </b>{{this.network}}</p>
-        <p area="internet" class="support-item"><b>{{ $t("login.internet") }}: </b>{{this.internet}}</p>
-        <p area="ssid" class="support-item"><b>SSID: </b>{{this.ssID}}</p>
-        <p area="ip" class="support-item"><b>IP: </b>{{this.ip}}</p>
+        <p area="version" class="support-item"><b>{{ $t("login.version") }}: </b>{{version}}</p>
+        <p area="network" class="support-item"><b>{{ $t("login.network") }}: </b>{{network}}</p>
+        <p area="internet" class="support-item"><b>{{ $t("login.internet") }}: </b>{{internet}}</p>
+        <p area="ssid" class="support-item"><b>SSID: </b>{{ssID}}</p>
+        <p area="ip" class="support-item"><b>IP: </b>{{ip}}</p>
 
         <div area="keyboard_input" class="text-field-section">
           <g-text-field clear-icon="cancel" clearable outlined style="color: #1d1d26; width: 85%; margin-right: 10px;" v-model="supportMessage"></g-text-field>
@@ -32,15 +32,16 @@
   export default {
     name: 'dialogLoginSupport',
     props: {
-      value: null
+      modelValue: null
     },
+    emits: ['update:modelValue'],
     computed: {
       dialogLoginSupport: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(value) {
-          this.$emit('input', value);
+          this.$emit('update:modelValue', value);
         }
       }
     },

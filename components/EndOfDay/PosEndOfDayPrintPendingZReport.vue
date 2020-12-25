@@ -3,16 +3,16 @@
     <slot :close="close" :open="open" name="activator"></slot>
     <g-dialog eager v-model="dialog" width="45%" overlay-color="#6B6F82" overlay-opacity="0.95">
       <div class="print-confirm-dialog">
-        <p class="title">{{$t('ui.notification')}}</p>
+        <p class="title">{{ $t('ui.notification') }}</p>
         <div class="confirmation-content">
-          <p>{{$t('report.pendingPrintLine1', {date: pendingReport && pendingReport.date | formatDate})}}</p>
-          <p>{{$t('report.pendingPrintLine2', {date: pendingReport && pendingReport.date | formatDate})}}</p></div>
+          <p>{{ $t('report.pendingPrintLine1', { date: formatDate(pendingReport && pendingReport.date) }) }}</p>
+          <p>{{ $t('report.pendingPrintLine2', { date: formatDate(pendingReport && pendingReport.date) }) }}</p></div>
         <div class="confirmation-buttons">
           <g-btn @click="close()" :uppercase="false" background-color="#fff" class="mr-2" flat style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
-            {{$t('ui.cancel')}}
+            {{ $t('ui.cancel') }}
           </g-btn>
           <g-btn @click="close(true)" :uppercase="false" background-color="#E57373" class="mr-2" flat text-color="#FFFFFF" width="120px">
-            {{$t('ui.ok')}}
+            {{ $t('ui.ok') }}
           </g-btn>
         </div>
       </div>
@@ -22,7 +22,7 @@
 
 <script>
   import { getInternalValue } from 'pos-vue-framework';
-  import { ref } from '@vue/composition-api';
+  import { ref } from 'vue';
   import _ from 'lodash'
 
   export default {
@@ -30,11 +30,6 @@
     injectService: ['PosStore:dateFormat'],
     props: {
       value: null
-    },
-    filters: {
-      formatDate(date) {
-        return dayjs(date).format(this.dateFormat)
-      }
     },
     setup() {
       const dialog = getInternalValue(...arguments);
@@ -55,6 +50,10 @@
             pending: !key
           }))
         )
+      },
+      formatDate(date) {
+        if (!date || !dayjs(date).isValid()) return ''
+        return dayjs(date).format(this.dateFormat)
       }
     },
     watch: {

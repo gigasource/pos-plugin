@@ -30,30 +30,30 @@
               {{item.name}}
               <span class="i text-grey">{{getExtraInfo(item)}}</span>
             </div>
-            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency', storeLocale)}} {{getItemPrice(item) | formatMoney}}</div>
+            <div class="col-2 fs-small-2 ta-right">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(getItemPrice(item)) }}</div>
           </div>
         </div>
 
         <div class="dashed-gradient"/>
         <div class="row-flex justify-between mt-2">
           <div>{{$t('onlineOrder.total')}} <b>{{orderQuantity}}</b> {{$t('onlineOrder.items')}}</div>
-          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{subTotal | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(subTotal) }}</div>
         </div>
         <div class="row-flex justify-between" v-if="order.type === 'delivery'">
           <div>{{$t('onlineOrder.shippingFee')}}:</div>
-          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{getShippingFee() | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(getShippingFee()) }}</div>
         </div>
         <div class="row-flex justify-between" v-for="discount in order.discounts">
           <div>
             <span>{{discount.coupon ? 'Coupon ' : discount.name}}</span>
             <span style="color: #757575; font-style: italic"  v-if="discount.coupon">({{discount.coupon}})</span>:
           </div>
-          <div class="ta-right">-{{$t('common.currency', storeLocale)}}{{discount.value | formatMoney(decimals)}}</div>
+          <div class="ta-right">-{{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(discount.value, decimals) }}</div>
         </div>
         <div class="dashed-gradient mt-2"/>
         <div class="row-flex justify-between mt-2" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>{{$t('onlineOrder.total')}}</div>
-          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{order.vSum | formatMoney}}</div>
+          <div class="ta-right">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(order.vSum) }}</div>
         </div>
         <div class="row-flex justify-between mt-1" style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
           <div>Payment</div>
@@ -80,7 +80,7 @@
   export default {
     name: 'dialogCompleteOrder',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       disabledBtn: Boolean
     },
     injectService: ['PosStore:storeLocale'],
@@ -90,22 +90,13 @@
         decimals: 2,
       }
     },
-    filters: {
-      formatDate(date) {
-        return dayjs(date).format('HH:mm')
-      },
-      formatMoney(value, decimals = 2) {
-        if (value != null)
-          return !isNaN(value) ? value.toFixed(decimals) : value
-      }
-    },
     computed: {
       dialog: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         },
       },
       subTotal() {

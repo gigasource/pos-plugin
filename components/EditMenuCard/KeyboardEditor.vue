@@ -4,7 +4,7 @@
     <g-btn-bs elevation="2" style="margin: 0 0 12px" @click="dialog = true" icon="select_all">{{$t('ui.choose')}}</g-btn-bs>
     <div class="keyboard-editor__title">{{$t('restaurant.menuEdit.expansionColumn')}}</div>
     <div class="row-flex">
-      <input-number width="148" :value="extraColumns" @input="changeExtraColumns"/>
+      <input-number width="148" :model-value="extraColumns" @update:modelValue="changeExtraColumns"/>
       <g-btn-bs elevation="2" icon="icon-redo" @click="resetKeyboard">{{$t('ui.reset')}}</g-btn-bs>
     </div>
     <g-checkbox v-model="active" label="Active Keyboard"/>
@@ -15,10 +15,9 @@
         <div class="dialog-title">{{$t('restaurant.menuEdit.keyboardPosition')}}</div>
         <div class="dialog-content" :style="getDialogStyles()">
           <template v-for="row in selectedCategoryLayout.rows">
-            <template v-for="column in selectedCategoryLayout.columns">
+            <template v-for="column in selectedCategoryLayout.columns" :key="`${column}_${row}`">
               <div class="dialog-content__cell"
                    :style="getCellStyles(column, row)"
-                   :key="`${column}_${row}`"
                    @mousedown="(e) => onmousedown(e, column, row)"
                    @touchstart="(e) => onmousedown(e, column, row)"
                    @mouseenter="() => mouseenter(column, row)"
@@ -40,6 +39,7 @@
 </template>
 
 <script>
+  
   export default {
     name: "KeyboardEditor",
     props: {
@@ -49,6 +49,7 @@
     injectService: [
       'SettingsStore:(getPosSetting, updateKeyboardConfig)'
     ],
+    emits: ['update:keyboardConfig'],
     data() {
       return {
         dialog: false,

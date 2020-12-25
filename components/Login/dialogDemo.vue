@@ -16,10 +16,10 @@
             the system <span class="i text-grey-darken-1 fw-200">(Optional)</span>
           </div>
           <div class="dialog-grid">
-            <template v-for="(demo, i) in listDemo">
+            <template v-for="(demo, i) in listDemo" :key="i">
               <div :class="['dialog-grid__item', selectedDemo === demo && 'dialog-grid__item--selected']"
                    :style="getBackgroundImage(demo)"
-                   :key="i" @click="selectDemo(demo)">
+                   @click="selectDemo(demo)">
                 <div class="dialog-grid__item-title">{{demo.storeName}}</div>
               </div>
             </template>
@@ -65,7 +65,7 @@
   export default {
     name: "dialogDemo",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       mode: {
         type: String,
         default: 'demo'
@@ -82,7 +82,7 @@
       }
     },
     watch: {
-      value(val) {
+      modelValue(val) {
         if (val) {
           this.step = this.mode === 'demo' ? 1 : 2
 
@@ -100,10 +100,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       title() {
@@ -126,14 +126,14 @@
         }
       },
       selectDemo(demo) {
-        if(this.selectedDemo === demo) {
+        if (this.selectedDemo === demo) {
           this.selectedDemo = ''
         } else {
           this.selectedDemo = demo
         }
       },
       back() {
-        if(this.step === 3 || (this.step === 2 && this.mode === 'demo')) {
+        if (this.step === 3 || (this.step === 2 && this.mode === 'demo')) {
           this.step --
         } else {
           this.internalValue = false

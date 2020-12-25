@@ -67,12 +67,12 @@
       </g-row>
 
       <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.sound')}}</b></div>
-      <g-switch :label="$t('onlineOrder.settings.hasSound')" :input-value="computedDevice.sound"
-                @change="updateSound"
+      <g-switch :label="$t('onlineOrder.settings.hasSound')" :model-value="computedDevice.sound"
+                @update:modelValue="updateSound"
       />
 
       <div style="margin-top: 16px;"><b>{{$t('onlineOrder.settings.playNotificationSound')}}</b></div>
-      <g-grid-select :grid="false" item-cols="4" :items="soundModes" mandatory :value="computedDevice.soundLoop" @input="updateSoundMode">
+      <g-grid-select :grid="false" item-cols="4" :items="soundModes" mandatory :model-value="computedDevice.soundLoop" @update:modelValue="updateSoundMode">
         <template #default="{item, toggleSelect}">
           <g-btn-bs border-color="#e0e0e0" text-color="black" height="30"
                     style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
@@ -115,6 +115,7 @@
   import ValuePicker from './ValuePicker';
   import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import axios from 'axios';
+  import { nextTick } from 'vue';
 
   export default {
     name: "OnlineOrderSetting",
@@ -131,13 +132,13 @@
         connected: false,
         deliveryTimes: [15, 30, 45, 60],
         orderSorting: [
-          {text: $t('onlineOrder.settings.orderNumber'), value: 'order'},
-          {text: $t('onlineOrder.settings.timeToComplete2'), value: 'time'},
+          {text: this.$t('onlineOrder.settings.orderNumber'), value: 'order'},
+          {text: this.$t('onlineOrder.settings.timeToComplete2'), value: 'time'},
         ],
         soundModes: [
-          {text: $t('onlineOrder.settings.once'), value: 'none'},
-          {text: $t('onlineOrder.settings.twice'), value: 'once'},
-          {text: $t('onlineOrder.settings.untilConfirm'), value: 'repeat'},
+          {text: this.$t('onlineOrder.settings.once'), value: 'none'},
+          {text: this.$t('onlineOrder.settings.twice'), value: 'once'},
+          {text: this.$t('onlineOrder.settings.untilConfirm'), value: 'repeat'},
         ],
         webshopUrl: '',
         webshopAvailable: true,
@@ -151,11 +152,12 @@
         isMasterDevice: false,
       }
     },
+    emits: ['updateOnlineDevice', 'updateDefaultPrepareTime', 'updateOnlineOrderSorting', 'getOnlineDevice'],
     computed: {
       computedDevice: {
         get() {
-          if (!this.internalDevice) return {url: this.webshopUrl}
-          return Object.assign(this.internalDevice, {url: this.webshopUrl})
+          if (!this.internalDevice) return { url: this.webshopUrl }
+          return Object.assign(this.internalDevice, { url: this.webshopUrl })
         },
         set(value) {
           this.$emit('updateOnlineDevice', value)
@@ -240,14 +242,14 @@
         }
       });
 
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('getOnlineDevice')
       })
 
       this.isMasterDevice = await this.getMasterStatus()
     },
     activated() {
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('getOnlineDevice')
       })
     }

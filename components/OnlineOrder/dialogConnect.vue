@@ -32,7 +32,7 @@
   export default {
     name: "dialogConnect",
     props: {
-      value: null,
+      modelValue: null,
       error: null,
       pairing: false,
     },
@@ -45,11 +45,11 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
           this.code = ''
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },

@@ -20,7 +20,7 @@
       </div>
     </div>
     <g-divider inset/>
-    
+
     <!-- Printer config -->
     <template v-if="selectedPrinterType">
       <div v-if="selectedPrinterType.value === 'ip'" class="config row-flex align-items-end">
@@ -51,7 +51,7 @@
         </g-btn-bs>
       </div>
     </template>
-    
+
     <div v-if="type === 'entire'" class="receipt-config">
       <g-switch :label="$t('settings.onlyTakeAway')" v-model="onlyTakeAway"/>
       <div class="title">Include:</div>
@@ -152,6 +152,7 @@
 
 <script>
   import DialogFormInput from '../pos-shared-components/dialogFormInput';
+  import { nextTick } from 'vue';
   export default {
     name: "PosPrinterSetting",
     components: { DialogFormInput },
@@ -421,11 +422,11 @@
             printerType: type.value
           }
         }
-        
+
         if (type ==='usb') {
           await this.loadUsbPrinters();
         }
-        
+
         await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
       },
       async resetPrinter() {
@@ -447,7 +448,7 @@
       },
       openDialog(ref) {
         this.showDialog = true
-        this.$nextTick(() => {
+        nextTick(() => {
           setTimeout(() => {
             this.$refs[ref].onFocus()
           }, 200)
@@ -542,7 +543,7 @@
           background: #E3F2FD;
         }
       }
-      
+
       &__usb-printer-paths {
         ::v-deep {
           .bs-tf-wrapper {

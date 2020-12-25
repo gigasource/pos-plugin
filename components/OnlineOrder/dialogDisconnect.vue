@@ -18,15 +18,15 @@
   export default {
     name: "dialogDisconnect",
     props: {
-      value: null
+      modelValue: null
     },
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },

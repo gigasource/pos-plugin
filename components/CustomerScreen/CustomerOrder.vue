@@ -3,10 +3,10 @@
     <div class="image col-6"></div>
     <div class="customer-order col-6">
       <div class="customer-order__top">
-        <div class="customer-order__top--title">{{companyName}}</div>
+        <div class="customer-order__top--title">{{ companyName }}</div>
         <div>
-          <p>{{date}}</p>
-          <p class="ta-right" style="font-weight: normal">{{time}}</p>
+          <p>{{ date }}</p>
+          <p class="ta-right" style="font-weight: normal">{{ time }}</p>
         </div>
       </div>
       <div class="customer-order__table">
@@ -22,24 +22,25 @@
           <tbody>
           <tr v-for="product in items" :key="product._id">
             <td>
-              <p>{{product.name}}</p>
+              <p>{{ product.name }}</p>
               <!--              <p v-if="product.promotion" class="promotion ml-3">{{product.promotion}}</p>-->
               <div>
                 <g-chip v-for="(modifier, index) in product.modifiers" :key="`${product._id}_${index}`"
                         label small text-color="#616161">
-                  {{modifier.name}}
+                  {{ modifier.name }}
                 </g-chip>
               </div>
             </td>
-            <td>{{product.quantity}}</td>
+            <td>{{ product.quantity }}</td>
             <td>
-              <p>{{getItemPrice(product) | convertMoney}}</p>
-              <p v-if="hasPromotion(product)" class="promotion line-through">{{getItemPrice(product, true) | convertMoney}}</p>
+              <p>{{ getItemPrice(product) | convertMoney }}</p>
+              <p v-if="hasPromotion(product)" class="promotion line-through">
+                {{ getItemPrice(product, true) | convertMoney }}</p>
             </td>
             <td>
-              <p class="fw-700">{{getItemTotal(product) | convertMoney}}</p>
+              <p class="fw-700">{{ getItemTotal(product) | convertMoney }}</p>
               <p v-if="hasPromotion(product)" class="promotion line-through">
-                {{getItemTotal(product, true) | convertMoney}}
+                {{ getItemTotal(product, true) | convertMoney }}
               </p>
             </td>
           </tr>
@@ -55,31 +56,31 @@
       <div class="customer-order__bottom">
         <div class="customer-order__bottom--left">
           <p>Discount (€)</p>
-          <p class="ta-right">- {{discount | convertMoney}}</p>
+          <p class="ta-right">- {{ $filters.formatCurrency(discount) }}</p>
           <p>Tax (€)</p>
-          <p class="ta-right">{{tax | convertMoney}}</p>
+          <p class="ta-right">{{ $filters.formatCurrency(tax) }}</p>
           <p>Sub-total (€)</p>
-          <p class="fw-700 ta-right">{{subTotal | convertMoney}}</p>
+          <p class="fw-700 ta-right">{{ $filters.formatCurrency(subTotal) }}</p>
           <p class="fw-700">Total (€)</p>
-          <p class="fw-700 fs-large-3 ta-right" style="color: #1271FF">{{total | convertMoney}}</p>
+          <p class="fw-700 fs-large-3 ta-right" style="color: #1271FF">{{ $filters.formatCurrency(total) }}</p>
         </div>
         <g-divider vertical/>
         <div class="customer-order__bottom--right">
           <div class="row-flex justify-between align-items-center">
             <p>Payment method:</p>
-            <p class="fw-700">{{payment}}</p>
+            <p class="fw-700">{{ payment }}</p>
           </div>
           <div class="row-flex justify-between align-items-center">
             <p>Received (€)</p>
-            <p class="fw-700">{{receive | convertMoney}}</p>
+            <p class="fw-700">{{ $filters.formatCurrency(receive) }}</p>
           </div>
           <div class="row-flex justify-between align-items-center">
             <p>Tip (€)</p>
-            <p class="fw-700">{{tip | convertMoney}}</p>
+            <p class="fw-700">{{ $filters.formatCurrency(tip) }}</p>
           </div>
           <div class="row-flex justify-between align-items-center">
             <p>Change due (€)</p>
-            <p class="fw-700 fs-large-3" style="color: #1271FF">{{change | convertMoney}}</p>
+            <p class="fw-700 fs-large-3" style="color: #1271FF">{{ $filters.formatCurrency(change) }}</p>
           </div>
         </div>
       </div>
@@ -92,11 +93,6 @@
 
   export default {
     name: 'CustomerOrder',
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
-    },
     data() {
       return {
         productList: [

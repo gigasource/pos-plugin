@@ -27,7 +27,7 @@
   export default {
     name: 'dialogCustomUrl',
     props: {
-      value: Boolean
+      modelValue: Boolean
     },
     data() {
       return {
@@ -39,10 +39,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
       url() {

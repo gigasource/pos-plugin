@@ -18,8 +18,8 @@
     </g-scroll-window>
     <g-item-group :items="productWindows" :return-object="false" area="delimiter" mandatory v-model="activeWindow">
       <template v-slot:default="{ toggle, active }">
-        <template v-for="(item, index) in productWindows">
-          <g-item :is-active="active(item)" :item="item" :key="index">
+        <template v-for="(item, index) in productWindows" :key="index">
+          <g-item :is-active="active(item)" :item="item">
             <g-btn :uppercase="false" @click="toggle(item)" border-radius="50%"></g-btn>
           </g-item>
         </template>

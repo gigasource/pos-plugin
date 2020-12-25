@@ -22,41 +22,36 @@
   export default {
     name: 'dialogDateTimePicker',
     props: {
-      value: null
+      modelValue: null,
+      orderHistoryFilters: null,
     },
-    injectService: [
-      'OrderStore:(orderHistoryFilters, getOrderHistory, getTotalOrders)',
-      'PosStore:isMobile'
-    ],
+    injectService: ['PosStore:isMobile'],
     data: () => ({
-      selectedDatetime: []
+      selectedDatetime: [],
+      isMobile: null
     }),
+    emits: ['update:modelValue', 'updateOrderHistoryFilter', 'getOrderHistory', 'getTotalOrders'],
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       }
     },
     methods: {
       async submit() {
-        const index = this.orderHistoryFilters.findIndex(f => f.title === 'Datetime');
         const datetimeFilter = {
           title: 'Datetime',
           text: this.selectedDatetime[0] + ' - ' + this.selectedDatetime[1],
           condition: { date: { '$gte': new Date(this.selectedDatetime[0] + ' 00:00:00'), '$lte': new Date(this.selectedDatetime[1] + ' 23:59:59') }}
         };
-        if (index > -1) {
-          this.orderHistoryFilters.splice(index, 1, datetimeFilter);
-        } else {
-          this.orderHistoryFilters.unshift(datetimeFilter);
-        }
+        this.$emit('updateOrderHistoryFilter', datetimeFilter)
         this.internalValue = false;
-        await this.getOrderHistory();
-        await this.getTotalOrders();
+        await this.$emit('getOrderHistory');
+        await this.$emit('getTotalOrders');
       }
     }
     ,

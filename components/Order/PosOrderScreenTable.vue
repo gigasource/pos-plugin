@@ -34,6 +34,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'PosOrderScreenTable',
     injectService: ['OrderStore:(currentOrder)', 'PosStore:storeLocale'],
@@ -96,9 +98,8 @@
         }
       })
 
-      orderStore.updateTableRows = (() => {this.$nextTick(() => {
-        this.viewportRows = Math.floor(this.$el.querySelector('.table-wrapper').clientHeight / 44)
-      })})
+      orderStore.updateTableRows = (() =>
+          nextTick(() => this.viewportRows = Math.floor(this.$el.querySelector('.table-wrapper').clientHeight / 44)))
 
       orderStore.updateTableRows()
     }

@@ -14,7 +14,7 @@
           <p class="title">{{$t('settings.selectAvatar')}}</p>
           <g-item-group :items="listAvatars" v-model="selectedAvatar">
             <template v-slot:item="{item, toggle, active}">
-              <g-badge v-model="active" overlay>
+              <g-badge :value="active" overlay>
                 <template v-slot:badge>
                   <g-icon style="font-size: 20px; font-weight: bold">done</g-icon>
                 </template>
@@ -43,7 +43,7 @@
   export default {
     name: 'dialogNewUser',
     props: {
-      value: null
+      modelValue: null
     },
     data() {
       return {
@@ -52,6 +52,8 @@
         name: '',
         passcode: '',
         check: 'username',
+        selectedUser: null,
+        listUsers: []
       }
     },
     injectService: [
@@ -63,10 +65,10 @@
     computed: {
       dialogNewUser: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
       keyboard: {
@@ -106,7 +108,9 @@
         this.name = '';
         this.passcode = '';
         this.selectedAvatar = null;
-      }
+      },
+      updateUser() {},
+      getListAvatar() {}
     },
     async mounted() {
       this.listAvatars = await this.getListAvatar();

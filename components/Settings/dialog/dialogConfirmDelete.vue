@@ -10,8 +10,8 @@
         <b v-if="computedLabel">"{{computedLabel}}"</b>?
       </g-card-text>
       <g-card-actions>
-        <g-btn :uppercase="false" outlined @click="dialog = false">{{$t('ui.cancel')}}</g-btn>
-        <g-btn :uppercase="false" flat background-color="red lighten 2" text-color="white" @click="submit">{{$t('ui.ok')}}</g-btn>
+        <g-btn-bs border-color="#1d1d26" @click="dialog = false">{{$t('ui.cancel')}}</g-btn-bs>
+        <g-btn-bs background-color="red lighten 2" text-color="white" @click="submit">{{$t('ui.delete')}}</g-btn-bs>
       </g-card-actions>
     </g-card>
   </g-dialog>
@@ -21,9 +21,9 @@
   export default {
     name: 'dialogConfirmDelete',
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       type: String,
-      label: String,
+      label: [String, Number],
     },
     data() {
       return {
@@ -33,11 +33,12 @@
         internalValue: null,
       }
     },
+    emits: ['update:modelValue', 'submit'],
     computed: {
       dialog: {
         get() {
-          if(this.value)
-            return this.value;
+          if (this.modelValue)
+            return this.modelValue;
           else
             return this.internalValue
         },
@@ -46,7 +47,7 @@
             this.internalType = null;
             this.internalLabel = null;
           }
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
           this.internalValue = val;
         }
       },

@@ -15,7 +15,7 @@
   export default {
     name: 'PosLoginTextfield',
     props: {
-      value: String,
+      modelValue: String,
       incorrectPasscode: Boolean
     },
     data() {
@@ -25,6 +25,7 @@
         key: 0
       }
     },
+    emits: ['update:modelValue'],
     mounted() {
       this.$watch('incorrectPasscode', function (val) {
         this.showErrorMessage = val

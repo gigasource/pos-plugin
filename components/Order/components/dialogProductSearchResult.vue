@@ -38,7 +38,7 @@
                 <div style="display: flex; justify-content: center; align-items: center;">
                   <g-item-group :items="product.unit" v-model="product.selectedUnit">
                     <template v-slot:item="{item, toggle, active}">
-                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" v-model="active" badge-size="14">
+                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" :model-value="active" badge-size="14">
                         <template v-slot:badge>
                           <g-icon style="font-size: 13px ;font-weight: bold">done</g-icon>
                         </template>
@@ -63,7 +63,7 @@
                                 v-model="product.selectedAttributes[key]"
                   >
                     <template v-slot:item="{item, toggle, active}">
-                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" v-model="active" badge-size="14">
+                      <g-badge overlay style="margin: 12px 12px 12px 0 !important" :model-value="active" badge-size="14">
                         <template v-slot:badge>
                           <g-icon style="font-size: 13px ;font-weight: bold">done</g-icon>
                         </template>
@@ -81,7 +81,7 @@
                 <g-btn :uppercase="false" :disabled="!isValidItem(product)"
                        background-color="blue darken-1"
                        text-color="white"
-                       @click.stop="addProductToOrder(product)"
+                       @click.stop="_addProductToOrder(product)"
                 >
                   <g-icon class="mr-1" size="20">add_circle</g-icon>
                   Add
@@ -102,20 +102,23 @@
   export default {
     name: 'dialogProductSearchResult',
     props: {
-      value: null
+      modelValue: null
     },
-    injectService: ['OrderStore:(productIdQuery,productIdQueryResults)'],
+    injectService: ['OrderStore:(productIdQuery,productIdQueryResults,addModifierToProduct,addProductToOrder)'],
     data: () => ({
       activeClass: 'active-attribute',
-      queryResults: []
+      queryResults: [],
+      productIdQuery: null,
+      productIdQueryResults: null
     }),
+    emits: ['update:modelValue'],
     computed: {
       dialogProductSearch: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(value) {
-          this.$emit('input', value);
+          this.$emit('update:modelValue', value);
         }
       },
       formattedQueryResults: {
@@ -160,14 +163,16 @@
         if (unit) return !!selectedUnit;
         return true
       },
-      addProductToOrder(product) {
+      addModifierToProduct() {},
+      addProductToOrder() {},
+      _addProductToOrder(product) {
         const _product = _.clone(this.productIdQueryResults.find(i => i._id === product._id))
         _product.unit = product.selectedUnit
         _product.attributes = _.values(product.selectedAttributes)
         if (_product.isModifier) {
-          this.$getService('OrderStore:addModifierToProduct')(_product)
+          this.addModifierToProduct(_product)
         } else {
-          this.$getService('OrderStore:addProductToOrder')(_product)
+          this.addProductToOrder(_product)
         }
         this.dialogProductSearch = false
         this.productIdQuery = ''

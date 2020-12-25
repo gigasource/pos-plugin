@@ -3,7 +3,7 @@
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
-				<pos-text-field v-model="screenValue" large :label="label" readOnly ref="textfield" :virtual-event="isIOS"/>
+				<g-text-field-bs class="bs-tf__pos" v-model="screenValue" large :label="label" readOnly ref="textfield" :virtual-event="isIOS"/>
 				<div v-if="!isMobile" class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
@@ -21,11 +21,13 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'dialogTextFilter',
     props: {
       label: null,
-      value: null,
+      modelValue: null,
 			defaultValue: {
       	type: String,
 				default: ''
@@ -40,10 +42,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value || false
+          return this.modelValue || false
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
     },
@@ -57,7 +59,7 @@
 			internalValue: function(val) {
 				if(val) {
 					this.screenValue = this.defaultValue;
-					this.$nextTick(() => {
+					nextTick(() => {
 						setTimeout(() => {
 							this.$refs['textfield'].onFocus()
 						}, 200)
@@ -76,6 +78,7 @@
 		overflow: scroll;
 		display: flex;
 		flex-direction: column;
+		position: relative;
 
 		.icon {
 			position: absolute;

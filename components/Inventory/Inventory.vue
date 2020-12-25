@@ -6,16 +6,16 @@
         <th></th>
         <th>ID</th>
         <th>
-          {{$t('article.name')}}
+          {{ $t('article.name') }}
           <g-icon size="12">mdi-filter</g-icon>
         </th>
-        <th>{{$t('inventory.lastUpdate')}}</th>
+        <th>{{ $t('inventory.lastUpdate') }}</th>
         <th>
-          {{$t('article.category')}}
+          {{ $t('article.category') }}
           <g-icon size="12">mdi-magnify</g-icon>
         </th>
-        <th>{{$t('inventory.unit')}}</th>
-        <th>{{$t('inventory.stock')}}</th>
+        <th>{{ $t('inventory.unit') }}</th>
+        <th>{{ $t('inventory.stock') }}</th>
       </tr>
       </thead>
       <!-- Filter row -->
@@ -31,20 +31,21 @@
         </td>
         <td colspan="6" class="filter-wrapper">
           <div class="filter">
-            {{$t('settings.filter')}}
+            {{ $t('settings.filter') }}
             <div class="group-chip">
               <g-chip v-for="(filter, i) in inventoryFilters" :key="filter.title" label small background-color="white"
                       close class="ma-1" @close="removeFilter(filter)">
                 <div>
-                  <span class="chip-title">{{filter.title}}: </span>
-                  <span class="chip-content">{{filter.text}}</span>
+                  <span class="chip-title">{{ filter.title }}: </span>
+                  <span class="chip-content">{{ filter.text }}</span>
                 </div>
               </g-chip>
             </div>
-            <g-btn-bs v-if="inventoryFilters && inventoryFilters.length > 0" @click="clearFilter"><u>{{$t('settings.clearAll')}}</u>
+            <g-btn-bs v-if="inventoryFilters && inventoryFilters.length > 0" @click="clearFilter">
+              <u>{{ $t('settings.clearAll') }}</u>
             </g-btn-bs>
             <g-spacer/>
-            <div class="btn-add-filter" @click="dialog.filter = true">+ {{$t('inventory.addFilter')}}</div>
+            <div class="btn-add-filter" @click="dialog.filter = true">+ {{ $t('inventory.addFilter') }}</div>
           </div>
         </td>
       </tr>
@@ -53,14 +54,14 @@
         <td>
           <g-checkbox v-model="selectedInventoryIDs" :value="inventory._id" @change="getFirstSelectedInventory"/>
         </td>
-        <td @click="editInventory(inventory)">{{inventory.id}}</td>
-        <td @click="editInventory(inventory)">{{inventory.name}}</td>
-        <td @click="editInventory(inventory)">{{inventory.lastUpdateTimestamp | formatDate}}</td>
-        <td @click="editInventory(inventory)">{{inventory.category.name}}</td>
-        <td @click="editInventory(inventory)">{{inventory.unit}}</td>
+        <td @click="editInventory(inventory)">{{ inventory.id }}</td>
+        <td @click="editInventory(inventory)">{{ inventory.name }}</td>
+        <td @click="editInventory(inventory)">{{ formatDate(inventory.lastUpdateTimestamp) }}</td>
+        <td @click="editInventory(inventory)">{{ inventory.category.name }}</td>
+        <td @click="editInventory(inventory)">{{ inventory.unit }}</td>
         <td @click="openDialogStock(inventory)">
           <div class="row-flex justify-between">
-            {{inventory.stock | formatNumber}}
+            {{ $filters.formatCurrency(inventory.stock) }}
             <g-icon size="18" color="#757575">edit</g-icon>
           </div>
         </td>
@@ -74,31 +75,31 @@
       <g-toolbar color="#eeeeee" elevation="0">
         <g-btn :uppercase="false" style="margin-right: 5px" @click="back">
           <g-icon small style="margin-right: 5px">icon-back</g-icon>
-          {{$t('ui.back')}}
+          {{ $t('ui.back') }}
         </g-btn>
         <g-btn :uppercase="false" @click="goToReportPage">
           <g-icon small style="margin-right: 5px">icon-inventory-report</g-icon>
-          {{$t('inventory.report')}}
+          {{ $t('inventory.report') }}
         </g-btn>
         <g-spacer/>
         <g-btn :uppercase="false" style="margin-right: 5px" @click="goToStockPage">
           <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
-          {{$t('inventory.newStock')}}
+          {{ $t('inventory.newStock') }}
         </g-btn>
         <g-btn :uppercase="false" style="margin-right: 5px" @click="dialog.category = true">
           <g-icon small style="margin-right: 5px">icon-inventory-category</g-icon>
-          {{$t('article.category')}}
+          {{ $t('article.category') }}
         </g-btn>
         <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="removeInventory">
           <g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
-          {{$t('ui.delete')}}
+          {{ $t('ui.delete') }}
         </g-btn>
         <g-btn :disabled="selectedInventoryIDs.length === 0" :uppercase="false" style="margin-right: 5px" @click="openDialogInventory('edit')">
           <g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
-          {{$t('ui.edit')}}
+          {{ $t('ui.edit') }}
         </g-btn>
         <g-btn :uppercase="false" background-color="#4CAF50" text-color="#FFF" @click="openDialogInventory('add')">
-          <span style="font-size: 14px !important">+ {{$t('inventory.newProduct')}}</span>
+          <span style="font-size: 14px !important">+ {{ $t('inventory.newProduct') }}</span>
         </g-btn>
       </g-toolbar>
     </div>
@@ -139,6 +140,7 @@
     </dialog-form-input>
   </div>
 </template>
+
 <script>
   import {units} from './unit'
   import _ from 'lodash'
@@ -257,7 +259,6 @@
         await this.loadInventories()
       },
       async submitInventory() {
-        console.log('123');
         if(!this.name || !this.category || !this.unit || !this.stock || isNaN(this.stock)) return
         const inventory = {
           name: this.name,
@@ -342,7 +343,11 @@
       editInventory(inventory) {
         this.selectedInventory = inventory
         this.openDialogInventory('edit')
-      }
+      },
+      formatDate(date) {
+        if (!date || !dayjs(date).isValid()) return ''
+        return dayjs(date).format('DD/MM/YYYY HH:mm')
+      },
     }
   }
 </script>

@@ -23,22 +23,23 @@
   export default {
     name: 'PosOrderVoucherDialog',
     props: {
-      value: Boolean
+      modelValue: Boolean
     },
     data() {
       return {
-        tabs: [{ title: $t('restaurant.createVoucher'), ref: 'createTf' }, { title: $t('restaurant.redeemVoucher'), ref: 'redeemTf' }],
+        tabs: [{ title: this.$t('restaurant.createVoucher'), ref: 'createTf' }, { title: this.$t('restaurant.redeemVoucher'), ref: 'redeemTf' }],
         tab: null,
         voucherValue: ''
       }
     },
+    emits: ['update:modelValue', 'addVoucher', 'redeemVoucher'],
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       }
     },

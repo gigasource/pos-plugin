@@ -3,7 +3,7 @@
 		<div class="wrapper">
 			<g-icon @click="internalValue = false" svg size="20" class="icon">icon-close</g-icon>
 			<div class="screen">
-				<pos-text-field v-model="screenValue" large :label="label" :rules="rules" readOnly :virtual-event="isIOS"/>
+				<g-text-field-bs class="bs-tf__pos" v-model="screenValue" large :label="label" :rules="rules" readOnly :virtual-event="isIOS"/>
 				<div class="buttons">
 					<g-btn :uppercase="false" text @click="internalValue = false" outlined width="120" class="mr-2">
 						{{$t('ui.cancel')}}
@@ -26,7 +26,7 @@
     name: 'dialogNumberFilter',
     props: {
       label: null,
-      value: null,
+      modelValue: null,
 			rules: Array,
     },
 		injectService: ['PosStore:(isMobile, isIOS)'],
@@ -38,10 +38,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value || false
+          return this.modelValue || false
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
     },
@@ -77,6 +77,7 @@
 
 		.screen {
 			flex: 1;
+			padding-bottom: 16px;
 		}
 	}
 

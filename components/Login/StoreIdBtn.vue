@@ -4,25 +4,30 @@
 </template>
 
 <script>
+  import { storeId, getStoreId } from '../../composition/usePosLogic';
+  import { useRouter } from 'vue-router'
+  import { ref } from 'vue';
+
   export default {
     name: 'StoreIdBtn',
-    injectService: ['PosStore:(storeId, getStoreId)'],
-    methods: {
-      pair() {
-        this.$router.push('/pos-setup')
-      },
-      async updateSkipPairing() {
+    setup() {
+      const router = useRouter()
+      const skipPairing = ref(false)
+
+      function pair() {
+        router.push('/pos-setup')
+      }
+
+      async function updateSkipPairing() {
         const posSettings = await cms.getModel('PosSetting').findOne()
-        this.skipPairing = posSettings.skipPairing
+        skipPairing.value = posSettings.skipPairing
       }
-    },
-    data() {
+
+      updateSkipPairing()
+
       return {
-        skipPairing: false
+        skipPairing, storeId, getStoreId, pair, updateSkipPairing
       }
-    },
-    async created() {
-      await this.updateSkipPairing()
     },
     mounted() {
       this.getStoreId()

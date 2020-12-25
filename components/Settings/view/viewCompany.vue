@@ -1,6 +1,5 @@
 <template>
-  <fragment>
-    <div class="main">
+  <div class="main">
       <div class="main__item">
         <g-text-field-bs :label="$t('settings.companyName')" v-model="name" required>
           <template v-slot:append-inner>
@@ -59,7 +58,7 @@
       </div>
       <div class="main__item">
         <p class="item-label">{{$t('settings.logo')}}</p>
-        <g-file-input outlined filled dense prependInnerIcon="icon-upload" svg-icon v-model="file" @change="convertImg" accept="image/*" placeholder="Upload"></g-file-input>
+        <g-file-input outlined filled dense prepend-inner-icon="icon-upload" svg-icon v-model="file" accept="image/*" placeholder="Upload"/>
       </div>
       <div class="main__item">
         <p class="item-label">{{$t('settings.logoSize')}}</p>
@@ -76,7 +75,7 @@
         </div>
       </div>
     </div>
-    <dialog-form-input v-model="dialog" @submit="update">
+  <dialog-form-input v-model="dialog" @submit="update">
       <template #input>
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" :label="$t('settings.companyName')" v-model="name" required/>
@@ -90,7 +89,6 @@
         </div>
       </template>
     </dialog-form-input>
-  </fragment>
 </template>
 
 <script>
@@ -105,6 +103,7 @@
       return {
         file: null,
         dialog: false,
+        companyInfo: {}
       }
     },
     computed: {
@@ -114,7 +113,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'name', val)
+          (this.companyInfo['name'] = val)
         }
       },
       address: {
@@ -123,7 +122,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'address', val)
+          (this.companyInfo['address'] = val)
         }
       },
       address2: {
@@ -132,7 +131,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'address2', val)
+          (this.companyInfo['address2'] = val)
         }
       },
       zipCode: {
@@ -141,7 +140,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'zipCode', val)
+          (this.companyInfo['zipCode'] = val)
         }
       },
       city: {
@@ -150,7 +149,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'city', val)
+          (this.companyInfo['city'] = val)
         }
       },
       telephone: {
@@ -159,7 +158,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'telephone', val)
+          (this.companyInfo['telephone'] = val)
         }
       },
       taxNumber: {
@@ -168,7 +167,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'taxNumber', val)
+          (this.companyInfo['taxNumber'] = val)
         }
       },
       ustId: {
@@ -177,7 +176,7 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'ustId', val)
+          (this.companyInfo['ustId'] = val)
         }
       },
       logo: {
@@ -186,16 +185,16 @@
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'logo', val)
+          (this.companyInfo['logo'] = val)
         }
       },
       logoSize: {
         get() {
-          if (this.companyInfo) return this.companyInfo.logoSize || '';
+          if (this.companyInfo) return this.companyInfo.logoSize || '1';
           return ''
         },
         set(val) {
-          this.$set(this.companyInfo, 'logoSize', val)
+          (this.companyInfo['logoSize'] = val)
         }
       },
       imgStyle() {
@@ -209,17 +208,22 @@
     async created() {
       await this.getCompanyInfo();
     },
+    watch: {
+      file(val) {
+        if (val) {
+          const reader = new FileReader();
+          reader.onload = async () => {
+            this.logo = reader.result
+            console.log(reader.result)
+            await this.updateCompanyInfo();
+          }
+          if (this.file) {
+            reader.readAsDataURL(this.file);
+          }
+        }
+      }
+    },
     methods: {
-      convertImg() {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          this.logo = reader.result
-          await this.updateCompanyInfo();
-        }
-        if (this.file) {
-          reader.readAsDataURL(this.file);
-        }
-      },
       async update() {
         this.dialog = false
         await this.updateCompanyInfo()
@@ -227,7 +231,9 @@
       async changeLogoSize(size) {
         this.logoSize = size;
         await this.updateCompanyInfo();
-      }
+      },
+      getCompanyInfo() {},
+      updateCompanyInfo() {},
     }
   }
 </script>
@@ -296,6 +302,7 @@
     ::v-deep fieldset {
       border-color: #ced4da !important;
       border-radius: 2px !important;
+      margin-right: 8px;
     }
 
     &:focus-within ::v-deep fieldset {

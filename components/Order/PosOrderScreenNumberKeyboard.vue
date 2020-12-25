@@ -13,6 +13,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'PosOrderScreenNumberKeyboard',
     injectService: ['OrderStore:(productIdQuery,queryProductsById,productIdQueryResults,addProductToOrder)'],
@@ -106,7 +108,7 @@
               this.addProductToOrder(onlyResult)
               return
             }
-            this.$nextTick(() => {
+            nextTick(() => {
               this.$getService('dialogProductSearchResult:setActive')(true)
             })
           }

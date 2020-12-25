@@ -3,8 +3,8 @@
     <g-dialog fullscreen v-model="internalValue">
       <div class="col-flex flex-grow-1" style="background: #fff">
         <div class="header">
-          <template v-for="group in allGroups">
-            <g-btn outlined :uppercase="false" background-color="#F0F0F0" :key="group._id"
+          <template v-for="group in allGroups" :key="group._id">
+            <g-btn outlined :uppercase="false" background-color="#F0F0F0"
                    :class="['mb-2', ...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
                    @click="setActiveGroup(group)">
               {{group.name}}
@@ -17,16 +17,16 @@
         </div>
         <div class="content row-flex">
           <div class="content--main col-flex align-items-start">
-            <template v-for="category in allCategories">
-              <g-btn flat :uppercase="false" :key="category._id"
+            <template v-for="category in allCategories" :key="category._id">
+              <g-btn flat :uppercase="false"
                      :class="['mb-2', ...activeEditItem && activeEditItem._id === category._id && ['active-btn', 'edit-btn']]"
                      @click="setActiveCategory(category)">
                 {{category.name}}
               </g-btn>
               <div class="mb-3">
                 <g-icon>keyboard_arrow_right</g-icon>
-                <template v-for="mod in modifiersByCategory[category._id]">
-                  <g-btn flat :uppercase="false" :key="mod._id"
+                <template v-for="mod in modifiersByCategory[category._id]" :key="mod._id">
+                  <g-btn flat :uppercase="false"
                          :class="[...activeEditItem && activeEditItem._id === mod._id && ['active-btn', 'edit-btn']]"
                          @click="setActiveModifier(mod)">
                     {{mod.name}}
@@ -112,10 +112,10 @@
                   <g-grid-select class="ml-1 mr-1 mb-2" v-model="activeEditItem.printer" :grid="false"
                                  item-text="name" item-value="_id" :items="groupPrinters" itemCols="auto">
                     <template #default="{ toggleSelect, item, index }">
-                      <div class="prop-option" @click="e => { toggleSelect(item) }">{{item.name}}</div>
+                      <div class="prop-option" @click="() => { toggleSelect(item) }">{{item.name}}</div>
                     </template>
                     <template #selected="{ toggleSelect, item, index }">
-                      <div class="prop-option prop-option--active" @click="e => { toggleSelect(item) } ">{{item.name}}</div>
+                      <div class="prop-option prop-option--active" @click="() => { toggleSelect(item) } ">{{item.name}}</div>
                     </template>
                   </g-grid-select>
                 </div>
@@ -173,7 +173,7 @@
     name: 'dialogEditPopupModifiers',
     components: { PosTextfieldNew, DialogFormInput, PosTextField },
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       product: null
     },
     data() {
@@ -195,10 +195,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
       allCategories() {
@@ -390,7 +390,7 @@
           }
         }
       },
-      value: {
+      modelValue: {
         async handler(newVal) {
           if (newVal) {
             await this.reload(() => {

@@ -64,7 +64,7 @@
         },
         set(val) {
           if (this.thermalPrinter) {
-            this.$set(this.thermalPrinter, 'ip', val)
+            this.thermalPrinter['ip'] = val
           } else {
             this.thermalPrinter = {
               printerType: 'ip',

@@ -5,9 +5,15 @@
 <script>
   export default {
     name: "SupportBtn",
+    emits: ['open'],
     methods: {
       openDialogSupport() {
-        this.$getService('dialogLoginSupport:setActive')(true)
+        const fn = this.$getService('dialogLoginSupport:setActive')
+        if(fn && typeof fn === 'function') {
+          fn(true)
+        } else {
+          this.$emit('open')
+        }
       }
     }
   }

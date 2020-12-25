@@ -2,66 +2,66 @@
   <div v-if="orderHistoryCurrentOrder" class="order-detail">
     <div class="order-detail__header">
       <div class="flex-grow-1">
-        <div class="order-title">{{$t('orderHistory.orderNo')}}</div>
-        <div class="order-id">{{orderHistoryCurrentOrder.id}}</div>
+        <div class="order-title">{{ $t('orderHistory.orderNo') }}</div>
+        <div class="order-id">{{ orderHistoryCurrentOrder.id }}</div>
       </div>
       <div class="pl-2 flex-grow-1" v-if="orderHistoryCurrentOrder.table">
         <div class="order-title">Table No</div>
-        <div class="order-id">{{orderHistoryCurrentOrder.table}}</div>
+        <div class="order-id">{{ orderHistoryCurrentOrder.table }}</div>
       </div>
     </div>
     <g-divider/>
     <div class="order-detail__info">
       <div class="row-flex">
         <div class="flex-grow-1" style="opacity: 0.5">Created time</div>
-        <div>{{orderHistoryCurrentOrder.date | formatDate}}</div>
+        <div>{{ formatDate(orderHistoryCurrentOrder.date) }}</div>
       </div>
       <template v-if="orderHistoryCurrentOrder.staff && orderHistoryCurrentOrder.staff.length">
         <div class="row-flex">
           <div class="flex-grow-1" style="opacity: 0.5">Created by</div>
-          <span class="ta-right">{{getCreatedUser(orderHistoryCurrentOrder)}}</span>
+          <span class="ta-right">{{ getCreatedUser(orderHistoryCurrentOrder) }}</span>
         </div>
         <div class="row-flex">
           <div class="flex-grow-1" style="opacity: 0.5">Cashier</div>
-          <span class="ta-right">{{getCashierUser(orderHistoryCurrentOrder)}}</span>
+          <span class="ta-right">{{ getCashierUser(orderHistoryCurrentOrder) }}</span>
         </div>
       </template>
     </div>
     <g-divider/>
     <g-simple-table striped>
       <tr v-for="product in orderHistoryCurrentOrder.items">
-        <td>{{product.quantity}}x</td>
+        <td>{{ product.quantity }}x</td>
         <td>
-          {{product.id && `${product.id}.`}} {{product.name}}
-          <span class="i text-grey-darken-1">{{getExtraInfo(product)}}</span>
+          {{ product.id && `${product.id}.` }} {{ product.name }}
+          <span class="i text-grey-darken-1">{{ getExtraInfo(product) }}</span>
         </td>
-        <td class="ta-right">€ {{getItemPrice(product) | formatNumber}}</td>
+        <td class="ta-right">€ {{ $filters.formatCurrency(getItemPrice(product)) }}</td>
       </tr>
       <tr v-if="orderHistoryCurrentOrder.type">
         <td></td>
         <td>Shipping Fee</td>
-        <td class="ta-right">€ {{orderHistoryCurrentOrder.shippingFee | formatNumber}}</td>
+        <td class="ta-right">€ {{ $filters.formatCurrency(orderHistoryCurrentOrder.shippingFee) }}</td>
       </tr>
     </g-simple-table>
     <g-divider/>
     <div class="order-info my-2">
-      <span class="fw-700">{{$t('orderHistory.promotionalApplied')}}</span>
-      <span class="order-info-number">-{{promotionTotal > 0 ? (' € ' + promotionTotal.toFixed(2) ) : ''}}</span>
+      <span class="fw-700">{{ $t('orderHistory.promotionalApplied') }}</span>
+      <span class="order-info-number">-{{ promotionTotal > 0 ? (' € ' + promotionTotal.toFixed(2)) : '' }}</span>
     </div>
     <g-divider/>
     <div class="order-info mt-2">
-      <span>{{$t('common.subtotal')}}</span>
-      <span class="order-info-number">€ {{subTotal | formatNumber}}</span>
+      <span>{{ $t('common.subtotal') }}</span>
+      <span class="order-info-number">€ {{ $filters.formatCurrency(subTotal) }}</span>
     </div>
     <div class="order-info mb-2">
-      <span>{{$t('common.tax')}}</span>
-      <span class="order-info-number">€ {{orderHistoryCurrentOrder.tax | formatNumber}}</span>
+      <span>{{ $t('common.tax') }}</span>
+      <span class="order-info-number">€ {{ $filters.formatCurrency(orderHistoryCurrentOrder.tax) }}</span>
     </div>
     <g-divider/>
     <div class="total">
       <div class="row-flex align-items-center" style="justify-content: space-between">
-        <span>{{$t('common.total')}} </span>
-        <span class="total__important">€ {{orderHistoryCurrentOrder.amount | formatNumber}}</span>
+        <span>{{ $t('common.total') }} </span>
+        <span class="total__important">€ {{ $filters.formatCurrency(orderHistoryCurrentOrder.amount) }}</span>
       </div>
       <div class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
         <span>Payment</span>
@@ -70,7 +70,7 @@
             <g-icon size="24" class="mr-2">icon-multi_payment</g-icon>
             <div v-for="(p, index) in payment" class="row-flex align-items-center">
               <span :style="{ color: p.type === 'cash' ? '#25D778' : '#FFCB3A' }">
-                {{p.value | formatNumber}}
+                {{ $filters.formatCurrency(p.value) }}
               </span>
               <g-divider vertical v-if="!index" class="ml-1 mr-1"/>
             </div>
@@ -79,13 +79,13 @@
         <template v-else>
           <div class="row-flex align-items-center">
             <img :src="payment[0].icon" v-if="payment[0].icon" style="height: 16px" class="mr-2">
-            <span>{{payment[0].value | formatNumber}}</span>
+            <span>{{ $filters.formatCurrency(payment[0].value) }}</span>
           </div>
         </template>
       </div>
       <div v-if="tip" class="row-flex align-items-center" style="justify-content: space-between; text-transform: capitalize">
         <span>Tip</span>
-        <span>€ {{tip | formatNumber}}</span>
+        <span>€ {{ $filters.formatCurrency(tip) }}</span>
       </div>
     </div>
   </div>
@@ -97,19 +97,11 @@
 
 <script>
   import orderUtil from '../logic/orderUtil'
-  import { formatNumber } from '../logic/commonUtils'
 
   export default {
     name: 'OrderHistoryDetail',
-    props: {},
-    injectService: [
-      'OrderStore:orderHistoryCurrentOrder'
-    ],
-    filters: {
-      formatNumber,
-      formatDate(val) {
-        return dayjs(val).format('DD MMM YY, HH:mm')
-      }
+    props: {
+      orderHistoryCurrentOrder: Object
     },
     computed: {
       promotionTotal() {
@@ -148,6 +140,10 @@
       },
       getExtraInfo(item) {
         return orderUtil.getExtraInfo(item)
+      },
+      formatDate(val) {
+        if (!val) return ''
+        return dayjs(val).format('DD MMM YY, HH:mm')
       }
     }
   }

@@ -13,7 +13,7 @@
     props: {
       min: [String, Number],
       max: [String, Number],
-      value: Array,
+      modelValue: Array,
       prefix: {
         type: String,
         default: '€'
@@ -22,10 +22,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       }
     }

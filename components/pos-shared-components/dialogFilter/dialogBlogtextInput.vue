@@ -22,11 +22,13 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   export default {
     name: 'dialogBlogtextInput',
     props: {
       label: null,
-      value: null,
+      modelValue: null,
       defaultValue: {
         type: String,
         default: ''
@@ -44,10 +46,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value || false
+          return this.modelValue || false
         },
         set(value) {
-          this.$emit('input', value)
+          this.$emit('update:modelValue', value)
         }
       },
     },
@@ -69,10 +71,10 @@
       }
     },
     watch: {
-      internalValue: function(val) {
-        if(val) {
+      internalValue(val) {
+        if (val) {
           this.screenValue = this.defaultValue;
-          this.$nextTick(() => {
+          nextTick(() => {
             setTimeout(() => {
               this.$refs['textarea'].onFocus()
             }, 200)

@@ -13,7 +13,7 @@
           </template>
         </g-badge>
 
-        <g-spacer />
+        <g-spacer/>
         <span v-if="modemDeviceConnected === false"
               style="color: #D32F2F">
           Modem not connected
@@ -23,18 +23,18 @@
         <template v-if="(!internalOrders || !internalOrders.length) && calls.length === 0 && missedCalls.length === 0">
           <div class="pending-orders--empty">
             <img alt src="/plugins/pos-plugin/assets/pending_order.svg"/>
-            <p>{{$t('onlineOrder.noPending')}}</p>
+            <p>{{ $t('onlineOrder.noPending') }}</p>
           </div>
         </template>
         <template v-else-if="(!internalOrders || !internalOrders.length) && (calls.length > 0 || missedCalls.length > 0)">
-          <template v-for="(call, i) in calls">
-            <div :class="['pending-orders--call', call.type === 'missed' && 'b-red']" :key="`call_${i}`">
+          <template v-for="(call, i) in calls" :key="`call_${i}`">
+            <div :class="['pending-orders--call', call.type === 'missed' && 'b-red']">
               <div class="pending-orders--call-title">
-                <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+                <div>{{ call.customer.name }} <span>-</span> {{ call.customer.phone }}</div>
                 <g-spacer/>
                 <g-icon size="20">icon-call</g-icon>
               </div>
-              <p class="fs-small-2 text-grey-darken-1">{{call.type === 'missed' ? 'Missed' : 'Incoming'}} call</p>
+              <p class="fs-small-2 text-grey-darken-1">{{ call.type === 'missed' ? 'Missed' : 'Incoming' }} call</p>
               <div class="pending-orders--call-buttons">
                 <g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" @click="deleteCall(i, call)">
                   <g-icon size="16">icon-cross-red</g-icon>
@@ -53,7 +53,7 @@
           </template>
           <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`missed_call_${i}`">
             <div class="pending-orders--call-title">
-              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <div>{{ call.customer.name }} <span>-</span> {{ call.customer.phone }}</div>
               <g-spacer/>
               <g-icon size="20">icon-missed-call</g-icon>
             </div>
@@ -77,7 +77,7 @@
         <template v-else>
           <div class="pending-orders--call" v-for="(call, i) in calls" :key="`call_${i}`">
             <div class="pending-orders--call-title">
-              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <div>{{ call.customer.name }} <span>-</span> {{ call.customer.phone }}</div>
               <g-spacer/>
               <g-icon>icon-call</g-icon>
             </div>
@@ -100,11 +100,11 @@
           <div class="pending-orders--call b-red" v-for="(call, i) in missedCalls" :key="`call_${i}`"
                v-touch="getTouchHandlers(i)">
             <div class="pending-orders--call-title">
-              <div>{{call.customer.name}} <span>-</span> {{call.customer.phone}}</div>
+              <div>{{ call.customer.name }} <span>-</span> {{ call.customer.phone }}</div>
               <g-spacer/>
               <g-icon size="20">icon-missed-call</g-icon>
             </div>
-            <p class="fs-small-2 text-grey-darken-1">Missed call - {{calcDiffTime(call.date)}}</p>
+            <p class="fs-small-2 text-grey-darken-1">Missed call - {{ calcDiffTime(call.date) }}</p>
             <p class="mt-1 fs-small text-grey-darken-1 fw-700">
               Swipe right to dismiss
               <g-icon color="grey darken-1" size="16">double_arrow</g-icon>
@@ -116,50 +116,55 @@
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
                 <div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
-                  <span class="fs-small fw-700 text-indigo-accent-2">#{{order.dailyId}}</span>
-                  {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+                  <span class="fs-small fw-700 text-indigo-accent-2">#{{ order.dailyId }}</span>
+                  {{ order.customer ? order.customer.name : 'No customer name' }} -
+                  {{ order.customer ? order.customer.phone : 'No customer phone' }}
                 </div>
               </div>
               <div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
-                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">{{order.deliveryTime}}</span>
+                <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">{{ order.deliveryTime }}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
-                  <div class="progress-remaining">{{timeoutProgress[order._id].remaining}}</div>
+                  <div class="progress-remaining">{{ timeoutProgress[order._id].remaining }}</div>
                 </template>
               </div>
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
-                {{$t('onlineOrder.note')}}: {{order.note}}
+                {{ $t('onlineOrder.note') }}: {{ order.note }}
               </div>
               <div class="row-flex" v-if="order.type === 'delivery'">
                 <div style="flex: 0 0 25px">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
-                <div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
+                <div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">
+                  {{ `${order.customer.address} ${order.customer.zipCode}` }}
+                </div>
               </div>
               <div v-if="order.items">
                 <div class="row-flex align-items-start" v-for="item in order.items">
-                  <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{item.quantity}}x</div>
+                  <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">{{ item.quantity }}x</div>
                   <div class="flex-equal fs-small-2 pl-1" style="word-break: break-all">
-                    {{item.id && `${item.id}.`}} {{item.name}}
-                    <span class="i text-grey">{{getExtraInfo(item)}}</span>
+                    {{ item.id && `${item.id}.` }} {{ item.name }}
+                    <span class="i text-grey">{{ getExtraInfo(item) }}</span>
                   </div>
-                  <div class="fs-small-2 ta-right">€{{ getItemPrice(item) | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2 ta-right">€{{ $filters.formatCurrency(getItemPrice(item), decimals) }}</div>
                 </div>
               </div>
               <div v-if="order.type === 'delivery'" class="row-flex">
-                <div class="flex-equal fw-700">{{$t('onlineOrder.shippingFee')}}</div>
-                <div class="fs-small-2 ta-right">€{{order.shippingFee | formatMoney(decimals)}}</div>
+                <div class="flex-equal fw-700">{{ $t('onlineOrder.shippingFee') }}</div>
+                <div class="fs-small-2 ta-right">€{{ $filters.formatCurrency(order.shippingFee, decimals) }}</div>
               </div>
               <div v-if="order.discounts && order.discounts.length">
                 <div class="row-flex align-items-start" v-for="discount in order.discounts">
                   <div>
-                    <span>{{discount.coupon ? `Coupon ` : discount.name}}</span>
-                    <span style="color: #757575; font-style: italic" v-if="discount.coupon">({{discount.coupon}})</span>
+                    <span>{{ discount.coupon ? `Coupon ` : discount.name }}</span>
+                    <span style="color: #757575; font-style: italic" v-if="discount.coupon">({{ discount.coupon }})</span>
                   </div>
                   <g-spacer/>
-                  <div class="fs-small-2">-{{$t('common.currency', storeLocale)}}{{discount.value | formatMoney(decimals)}}</div>
+                  <div class="fs-small-2">
+                    -{{ $t('common.currency', storeLocale) }}{{ $filters.formatCurrency(discount.value, decimals) }}
+                  </div>
                 </div>
               </div>
             </g-card-text>
@@ -173,7 +178,7 @@
             <g-card-actions v-if="order.confirmStep2
               && ((order.type === 'delivery' && order.deliveryTime === 'asap') || (order.type === 'pickup'))">
               <div class="w-100">
-                <p class="ml-2 mb-1">{{$t('onlineOrder.settings.timeToComplete2')}} (min)</p>
+                <p class="ml-2 mb-1">{{ $t('onlineOrder.settings.timeToComplete2') }} (min)</p>
                 <value-picker :values="[15, 30, 45, 60]" :default-value="defaultPrepareTime || 30" allow-custom v-model="order.prepareTime"></value-picker>
               </div>
             </g-card-actions>
@@ -182,19 +187,21 @@
                 <g-icon size="14">icon-cross-red</g-icon>
               </g-btn-bs>
               <g-btn-bs v-if="order.confirmStep2 || order.declineStep2" height="54" width="60" border-color="#C4C4C4" text-color="black" @click.stop="onBack(order)">
-                {{$t('onlineOrder.back')}}
+                {{ $t('onlineOrder.back') }}
               </g-btn-bs>
               <g-btn-bs v-if="order.declineStep2" height="54" background-color="#E0E0E0" text-color="black" style="flex: 1" @click="declineOrder(order)">
                 Confirm
               </g-btn-bs>
               <g-btn-bs v-else height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
                 <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" style="height: 16px" class="mr-2"/>
-                <span v-else class="mr-2">{{order.payment.type}}</span>
-                <span>{{$t('common.currency', storeLocale)}}{{order.payment.value | formatMoney(decimals)}}</span>
+                <span v-else class="mr-2">{{ order.payment.type }}</span>
+                <span>{{ $t('common.currency', storeLocale) }}{{
+                    $filters.formatCurrency(order.payment.value, decimals)
+                  }}</span>
               </g-btn-bs>
             </g-card-actions>
             <g-card-actions v-if="order.forwardedStore" class="pending-orders--forward-store">
-              <b class="mr-1">From:</b> {{order.forwardedStore}}
+              <b class="mr-1">From:</b> {{ order.forwardedStore }}
             </g-card-actions>
           </g-card>
         </template>
@@ -202,21 +209,21 @@
     </div>
     <div class="kitchen-orders pl-2">
       <div class="header">
-        {{$t('onlineOrder.sentToKitchen')}}
+        {{ $t('onlineOrder.sentToKitchen') }}
         <g-badge v-if="sortedKitchenOrders && sortedKitchenOrders.length"
                  class="ml-1"
                  inline
                  :value="true"
                  color="#F9A825">
           <template v-slot:badge>
-            <div class="px-2">{{sortedKitchenOrders.length}}</div>
+            <div class="px-2">{{ sortedKitchenOrders.length }}</div>
           </template>
         </g-badge>
       </div>
       <div class="content">
         <template v-if="!sortedKitchenOrders || !sortedKitchenOrders.length">
           <div class="kitchen-orders--empty">
-            <p>{{$t('onlineOrder.noKitchen')}}</p>
+            <p>{{ $t('onlineOrder.noKitchen') }}</p>
           </div>
         </template>
         <template v-else>
@@ -224,25 +231,26 @@
                   :style="[getPendingOrderKitchenTime(order) < 10 && {border: '1px solid #FF4452'}]">
             <g-card-title>
               <div class="fs-small-2 ml-1" style="max-width: calc(100% - 96px); line-height: 1.2">
-                <span class="fs-small fw-700 text-indigo-accent-2">#{{order.dailyId ? order.dailyId : order.id}}</span>
-                {{order.customer ? order.customer.name : 'No customer name'}} - {{order.customer ? order.customer.phone : 'No customer phone'}}
+                <span class="fs-small fw-700 text-indigo-accent-2">#{{ order.dailyId ? order.dailyId : order.id }}</span>
+                {{ order.customer ? order.customer.name : 'No customer name' }} -
+                {{ order.customer ? order.customer.phone : 'No customer phone' }}
               </div>
               <g-spacer/>
               <div class="kitchen-orders__timer" @click.stop="openDialog(order)">
                 <g-icon v-if="order.type === 'delivery'">icon-delivery-scooter</g-icon>
                 <g-icon v-if="order.type === 'pickup'">icon-take-away</g-icon>
-                <span class="fw-700 fs-small ml-2">{{order.deliveryTime}}</span>
+                <span class="fw-700 fs-small ml-2">{{ order.deliveryTime }}</span>
               </div>
             </g-card-title>
             <g-card-text>
               <div v-if="order.note" class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
-                Note: {{order.note}}
+                Note: {{ order.note }}
               </div>
               <div class="row-flex" v-if="order.type === 'delivery'">
                 <div class="col-1">
                   <g-icon color="#9E9E9E" size="20">icon-place</g-icon>
                 </div>
-                <div class="col-11 text-grey-darken-1">{{`${order.customer.address} ${order.customer.zipCode}`}}</div>
+                <div class="col-11 text-grey-darken-1">{{ `${order.customer.address} ${order.customer.zipCode}` }}</div>
               </div>
               <div class="row-flex" v-if="order.items">
                 <div class="col-1" style="line-height: 20px">
@@ -250,10 +258,10 @@
                 </div>
                 <div style="padding-top: 2px">
                   <span v-for="item in order.items">
-                    <span class="fw-700">{{item.quantity}}x </span>
+                    <span class="fw-700">{{ item.quantity }}x </span>
                     <span class="mr-3" style="word-break: break-all">
-                      {{item.id && `${item.id}.`}} {{item.name}}
-                      <span class="i text-grey fs-small-2">{{getExtraInfo(item)}}</span>
+                      {{ item.id && `${item.id}.` }} {{ item.name }}
+                      <span class="i text-grey fs-small-2">{{ getExtraInfo(item) }}</span>
                     </span>
                   </span>
                 </div>
@@ -262,7 +270,7 @@
                 <div class="col-1 row-flex align-items-center">
                   <g-icon color="#9E9E9E" size="17">icon-double-arrow-right</g-icon>
                 </div>
-                <div>{{order.forwardedStore}}</div>
+                <div>{{ order.forwardedStore }}</div>
               </div>
             </g-card-text>
           </g-card>
@@ -281,6 +289,7 @@
   import orderUtil from '../logic/orderUtil'
   import { Touch } from 'pos-vue-framework'
   import {CALL_SYSTEM_MODES} from '../constants';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'OnlineOrderMain',
@@ -296,15 +305,6 @@
       kitchenOrders: Array,
       defaultPrepareTime: Number,
       onlineOrderSorting: String
-    },
-    filters: {
-      formatDate(date) {
-        return dayjs(date).format('HH:mm')
-      },
-      formatMoney(value, decimals = 2) {
-        if (value != null)
-          return !isNaN(value) ? value.toFixed(decimals) : value
-      }
     },
     data() {
       return {
@@ -354,6 +354,7 @@
         return this.kitchenOrders
       },
     },
+    emits: ['updateOnlineOrders', 'acceptPendingOrder', 'declineOrder', 'completeOrder', 'getPendingOnlineOrderCounter'],
     methods: {
       getPayment({ _id, payment }) {
         const { value, type } = payment[0];
@@ -500,13 +501,13 @@
     },
     mounted() {
       this.decimals = this.$t('common.currencyDecimal')
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('updateOnlineOrders')
       })
     },
     activated() {
       cms.socket.emit('get-call-system-status', this.updateModemDeviceStatus);
-      this.$nextTick(() => {
+      nextTick(() => {
         this.$emit('updateOnlineOrders')
       })
     },

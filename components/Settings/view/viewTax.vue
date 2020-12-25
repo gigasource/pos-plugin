@@ -24,15 +24,22 @@
         'SettingsStore:selectedTaxCategory',
         'SettingsStore:listTaxCategories',
     ],
+    data() {
+      return {
+        listTaxCategories: [],
+        selectedTaxCategory: null
+      }
+    },
     methods: {
       select(tax) {
         this.selectedTaxCategory = tax;
-      }
+      },
+      getAllTaxCategory() {}
     },
     async created() {
       this.listTaxCategories = await this.getAllTaxCategory();
     },
-    beforeDestroy() {
+    beforeUnmount() {
       this.selectedTaxCategory = null
     }
   }

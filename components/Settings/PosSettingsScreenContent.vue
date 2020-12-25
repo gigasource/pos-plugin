@@ -9,14 +9,14 @@
   export default {
     name: 'PosSettingsScreenContent',
     props: {
-      value: String
+      value: String,
+      sidebar: null
     },
     computed: {
       internalValue() {
-        const sidebarData = this.$getService('SettingsStore:sidebarData');
-        if (!this.value) return sidebarData[0].key
+        if (!this.value) return this.sidebar[0].key
         const activeItemPath = this.value.split('.').slice(1).join('.')
-        const activeItem = _.get(sidebarData, activeItemPath)
+        const activeItem = _.get(this.sidebar, activeItemPath)
         if (activeItem.isView) return activeItem.key
       }
     }

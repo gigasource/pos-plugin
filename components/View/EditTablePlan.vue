@@ -22,12 +22,11 @@
 
         <!-- Room info -->
         <div v-if="room && !roomObj" class="card-info">
-          <pos-text-field v-model="room.name" label="Room name *:"
-                          @input="changeRoomName">
+          <g-text-field-bs :model-value="room.name" label="Room name *:" @update:modelValue="changeRoomName">
             <template v-slot:append-inner>
               <g-icon style="cursor: pointer" @click="dialog.showRoomNameKbd = true">icon-keyboard</g-icon>
             </template>
-          </pos-text-field>
+          </g-text-field-bs>
           <div style="display: flex; margin-left: 5px; margin-right: 5px; justify-content: space-between;">
             <g-btn @click="moveRoomUp" style="width: 20px; min-width: 20px !important">
               <g-icon small>icon-arrow-up</g-icon>
@@ -43,19 +42,21 @@
         <div v-if="roomObj" class="card-info">
           <!-- table -->
           <template v-if="isTable(roomObj)">
-            <pos-text-field v-model="roomObj.name" label="Table name: "
-                            @input="changeTableName"
-                            @click="dialog.showTableNameKbd = true">
+            <g-text-field-bs
+                label="Table name: "
+                :model-value="roomObj.name"
+                @update:modelValue="changeTableName"
+                @click="dialog.showTableNameKbd = true">
               <template v-slot:append-inner>
                 <g-icon svg color="#F00">icon-keyboard-red</g-icon>
               </template>
-            </pos-text-field>
+            </g-text-field-bs>
             <div style="margin: 5px">
               <div> {{$t('ui.color')}}:</div>
-              <color-selector key="table" :value="roomObj.bgColor" :colors="tableColors" @input="_updateRoomObject({ bgColor: $event || '#FFFFFF' })" :item-size="18" :badge-size="12"/>
+              <color-selector key="table" :model-value="roomObj.bgColor" :colors="tableColors" @update:modelValue="_updateRoomObject({ bgColor: $event || '#FFFFFF' })" :item-size="18" :badge-size="12"/>
               <div style="display: flex; align-items: center">
                 <span style="margin-right: 10px">{{$t('restaurant.takeAway')}}:</span>
-                <g-switch v-model="roomObj.takeAway" @change="_updateRoomObject({ takeAway: $event })"/>
+                <g-switch :model-value="roomObj.takeAway" @update:modelValue="_updateRoomObject({ takeAway: $event })"/>
               </div>
             </div>
           </template>
@@ -64,7 +65,7 @@
           <template v-else-if="isWall(roomObj)">
             <div style="margin: 5px">
               <div> {{$t('ui.color')}}:</div>
-              <color-selector key="wall" :value="roomObj.bgColor" :colors="wallColors" @input="_updateRoomObject({ bgColor: $event || 'black' })" :item-size="18" :badge-size="12"/>
+              <color-selector key="wall" :model-value="roomObj.bgColor" :colors="wallColors" @update:modelValue="_updateRoomObject({ bgColor: $event || 'black' })" :item-size="18" :badge-size="12"/>
             </div>
           </template>
           <div style="display: flex; margin: 5px; justify-content: space-between">
@@ -121,19 +122,21 @@
 </template>
 <script>
   import _ from 'lodash';
-  import Room from './Room';
+  import Room from '../TablePlan/Room';
   import PosDashboardSidebar from '../Dashboard/PosDashboardSidebar';
   import DialogChangeValue from '../pos-shared-components/dialogChangeValue';
   import GButtonMerger from '../FnButton/components/GButtonMerger';
   import ColorSelector from '../common/ColorSelector';
   import PosTextField from '../pos-shared-components/POSInput/PosTextField';
   import DialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import { reloadRooms } from '../../composition/useRoomLogic';
+
   const BSON = require('bson')
 
   export default {
     name: 'EditTablePlan',
     components: { DialogTextFilter, PosTextField, ColorSelector, GButtonMerger, DialogChangeValue, PosDashboardSidebar, Room },
-    injectService: ['PosStore:user'],
+    // injectService: ['PosStore:user'],
     props: {},
     data: function () {
       return {
@@ -149,7 +152,8 @@
         },
         defaultPath: 'item.0.item.0',
         tableNameExistedErrorMsg: '',
-        showSnackBar: false
+        showSnackBar: false,
+        user: { username: 'admin' }
       }
     },
     computed: {
@@ -349,7 +353,7 @@
       },
 
       async back() {
-        await this.$getService('RoomStore').reloadRooms()
+        await reloadRooms()
         this.$router.push('/pos-dashboard')
       }
     },
@@ -361,7 +365,7 @@
         await this.loadRooms()
       })
     },
-    beforeDestroy() {
+    beforeUnmount() {
       cms.socket.off('updateRooms');
       clearInterval(this.timeInterval)
     },

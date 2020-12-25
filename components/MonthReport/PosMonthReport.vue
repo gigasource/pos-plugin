@@ -5,12 +5,12 @@
         <div class="title">Sales</div>
         <g-divider dashed color="black"/>
         <div class="detail" v-for="(amount, payment) in salesByPayment" :key="`sales${payment}`">
-          <span>{{payment}}</span>
-          <span>€ {{amount | convertMoney}}</span>
+          <span>{{ payment }}</span>
+          <span>€ {{ $filters.formatCurrency(amount) }}</span>
         </div>
         <div class="total">
-          <span>{{$t('common.total')}}</span>
-          <span><u>€ {{total | convertMoney}}</u></span>
+          <span>{{ $t('common.total') }}</span>
+          <span><u>€ {{ $filters.formatCurrency(total) }}</u></span>
         </div>
       </div>
       <div v-show="showAllZNumber" class="report__z-number">
@@ -19,24 +19,24 @@
           <tr v-for="(z, i) in zNumbers" :key="`zNumber${i}`" class="z-number">
             <td>
               <div class="row-flex justify-between">
-                <span>{{$t('report.zNumber')}} {{z.z}}:</span>
-                <span class="ml-2">€ {{z.sum | convertMoney}}</span>
+                <span>{{ $t('report.zNumber') }} {{ z.z }}:</span>
+                <span class="ml-2">€ {{ $filters.formatCurrency(z.sum) }}</span>
               </div>
             </td>
-            <td class="pl-3">{{$t('common.date')}}: {{z.date}}</td>
+            <td class="pl-3">{{ $t('common.date') }}: {{ z.date }}</td>
           </tr>
         </table>
         <g-divider dashed color="black"/>
       </div>
       <div v-if="showProductSold" class="report__product">
-        <div class="title">{{$t('report.productSold')}}</div>
+        <div class="title">{{ $t('report.productSold') }}</div>
         <g-divider dashed color="black"/>
         <div v-for="({products, sum}, category) in salesByCategory" :key="`category${category}`">
           <p class="category">
-            {{category || 'No category'}} (€ {{sum | convertMoney}})
+            {{ category || 'No category' }} (€ {{ $filters.formatCurrency(sum) }})
           </p>
           <p class="product" v-for="{product, quantity} in products" :key="`item${product}`">
-            {{quantity}} x {{product}}
+            {{ quantity }} x {{ product }}
           </p>
         </div>
       </div>
@@ -54,11 +54,6 @@
         salesByCategory: null,
         salesByPayment: null,
         zNumbers: null,
-      }
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
       }
     },
     async created() {

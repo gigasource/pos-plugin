@@ -10,11 +10,7 @@
          :style="getRoomObjectContainerStyle(roomObject)"
          @click.prevent.stop="e => onMouseDown(e, roomObject, actions.move)"
          v-touch="getTouchHandlers(roomObject)"
-         :class="[
-           ...!editable && !isTableDisabled(roomObject) && isTable(roomObject) && ['waves-effect', 'waves-red'],
-           ...transferTableFrom && transferTableFrom.name === roomObject.name &&
-           ['animated', 'bounce', 'infinite']
-         ]"
+         :class="getRoomClasses(roomObject)"
     >
       <div :style="getRoomObjectStyle(roomObject)">
         <slot name="room-object" v-bind:roomObject="roomObject"/>
@@ -34,6 +30,7 @@
   import _ from 'lodash'
   import * as mouseEventUtil from '../../utils/mouseEventUtil'
   import {Touch} from 'pos-vue-framework';
+  import { nextTick } from 'vue';
 
   export default {
     name: 'Room',
@@ -101,7 +98,7 @@
           if(this.$refs && this.$refs['room']) {
             this.$refs['room'].style.zoom = ''
           }
-          this.$nextTick(() => {
+          nextTick(() => {
             const roomEl = this.$refs['room']
 
             const zoomVerticalRatio = roomEl.clientHeight / roomEl.scrollHeight
@@ -307,6 +304,16 @@
           this.selectingObj.size.width = this.minimumSize
         if(this.selectingObj.size.height < this.minimumSize)
           this.selectingObj.size.height = this.minimumSize
+      },
+      getRoomClasses(roomObject) {
+        let cls = []
+        if (!this.editable && !this.isTableDisabled(roomObject) && this.isTable(roomObject)) {
+          cls.push('waves-effect', 'waves-red')
+        }
+        if(this.transferTableFrom && this.transferTableFrom.name === roomObject.name ) {
+          cls.push('animated', 'bounce', 'infinite')
+        }
+        return cls
       }
     }
   }

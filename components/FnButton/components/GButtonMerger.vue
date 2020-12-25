@@ -28,7 +28,7 @@
     name: 'GButtonMerger',
     //components: { GGridItemSelector },
     props: {
-      value: null,
+      modelValue: null,
       items: {
         type: Array,
         default: () => []
@@ -50,10 +50,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(value) {
-          this.$emit('input', value);
+          this.$emit('update:modelValue', value);
         }
       },
       internalNewItems: {

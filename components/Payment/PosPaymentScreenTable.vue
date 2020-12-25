@@ -21,7 +21,7 @@
                :class="{'row-flex': true, ...product.edited ? {'text__edited': true} : null}"
           >
             <div class="flex-grow-1 pa-2 ta-left" style="font-size: 15px; width: 52.5%; max-width: 52.5%">
-              <p>{{product.name}}
+              <p>{{product.name}}</p>
               <p v-if="product.attributes" class="promotion">{{product.attributes}}</p>
             </div>
             <div class="w-10 pa-2 ta-center">{{product.unit}}</div>

@@ -62,7 +62,7 @@
               @click.stop="printOrderToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{ $t('common.currency', storeLocale) }} {{ total | convertMoney }}</span>
+                <span>{{ $t('common.currency', storeLocale) }} {{  $filters.formatCurrency(total)  }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -81,7 +81,7 @@
               @click.stop="payToggle">
             <transition name="front">
               <div v-if="actionMode === 'none'" class="animation-wrapper">
-                <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+                <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
               </div>
             </transition>
             <transition name="back">
@@ -93,45 +93,49 @@
         </template>
         <template v-else>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-print" background-color="#1271FF" v-if="showPrint" :disabled="disablePrintBtn" @click.stop="printOrderToggle">
-            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
           </g-btn-bs>
           <g-btn-bs width="104" style="font-size: 14px; padding: 4px 0" icon="icon-wallet" background-color="#1271FF" v-else @click.stop="payToggle">
-            <span>{{$t('common.currency', storeLocale)}} {{total | convertMoney}}</span>
+            <span>{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(total) }}</span>
           </g-btn-bs>
         </template>
       </template>
       <template v-else>
-        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{ total | convertMoney }}</span>
+        <span class="order-detail__header-value text-red">{{ $t('common.currency', storeLocale) }}{{  $filters.formatCurrency(total)  }}</span>
       </template>
     </div>
     <div v-if="!editMode" class="order-detail__content" ref="table">
-      <div v-for="item in items" :key="item._id.toString()"
-           v-if="item.quantity || (item.quantityModified && item.printed)"
-           class="item"
-           :style="[item.separate && {borderBottom: '2px solid red'}]"
-           @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
-        <div class="item-detail">
-          <div :style="[item.printed && { opacity: 0.55 }]">
-            <p class="item-detail__name">{{item.id && `${item.id}. `}}{{item.name}}</p>
-            <p>
-              <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{item.originalPrice | convertMoney}}</span>
-              <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{item.price | convertMoney }}</span>
-              <span :class="['item-detail__option', item.takeAway ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
-            </p>
+      <template v-for="item in items" :key="item._id.toString()">
+        <div v-if="item.quantity || (item.quantityModified && item.printed)"
+            class="item"
+            :style="[item.separate && {borderBottom: '2px solid red'}]"
+            @click.stop="openConfigDialog(item)" v-touch="getTouchHandlers(item)">
+          <div class="item-detail">
+            <div :style="[item.printed && { opacity: 0.55 }]">
+              <p class="item-detail__name">{{item.id && `${item.id}. `}}{{item.name}}</p>
+              <p>
+                <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{ $filters.formatCurrency(item.originalPrice) }}</span>
+                <span class="item-detail__price--new" v-if="isItemDiscounted(item)">{{$t('common.currency', storeLocale)}} {{ $filters.formatCurrency(item.price)  }}</span>
+                <span :class="['item-detail__option', item.takeAway ? 'text-green-accent-3' : 'text-red-accent-2']">{{getItemSubtext(item)}}</span>
+              </p>
+            </div>
+            <div class="item-action">
+              <g-icon @click.stop="removeItem(item)" :color="item.printed ? '#FF4452' : '#000'">remove_circle_outline</g-icon>
+              <span class="ml-1 mr-1">{{item.quantity}}</span>
+              <g-icon @click.stop="addItem(item)" :style="[item.printed && { opacity: 0.5 }]">add_circle_outline</g-icon>
+            </div>
           </div>
-          <div class="item-action">
-            <g-icon @click.stop="removeItem(item)" :color="item.printed ? '#FF4452' : '#000'">remove_circle_outline</g-icon>
-            <span class="ml-1 mr-1">{{item.quantity}}</span>
-            <g-icon @click.stop="addItem(item)" :style="[item.printed && { opacity: 0.5 }]">add_circle_outline</g-icon>
+          <div v-if="item.modifiers">
+            <template v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`">
+              <g-chip label small text-color="#616161" close @close="removeModifier(item, index)">
+                {{ modifier.name }} | {{ $t('common.currency', storeLocale) }}{{
+                $filters.formatCurrency(modifier.price)
+                }}
+              </g-chip>
+            </template>
           </div>
         </div>
-        <div v-if="item.modifiers">
-          <g-chip v-for="(modifier, index) in item.modifiers" :key="`${item._id}_${index}`"
-                  label small text-color="#616161" close @close="removeModifier(item, index)">
-            {{modifier.name}} | {{$t('common.currency', storeLocale)}}{{modifier.price | convertMoney}}
-          </g-chip>
-        </div>
-      </div>
+      </template>
     </div>
     <div class="blur-overlay" v-show="menu"/>
     <div v-if="editMode" class="order-detail__setting">
@@ -143,8 +147,8 @@
       </div>
       <g-btn-bs small style="margin-left: 0" class="elevation-1" @click="changeCategory">Change category mode</g-btn-bs>
       <div style="text-transform: capitalize">Mode: {{category.type}}</div>
-      <g-checkbox :disabled="category.type !== 'horizontal'" :input-value="category.singleRow" label="Single Row Category" @change="v => changeCategoryStyle('singleRow', v)"/>
-      <g-checkbox :disabled="!((category.type === 'vertical') || (category.type === 'horizontal' && category.singleRow))" :input-value="category.differentSize"
+      <g-checkbox :disabled="category.type !== 'horizontal'" :model-value="category.singleRow" label="Single Row Category" @change="v => changeCategoryStyle('singleRow', v)"/>
+      <g-checkbox :disabled="!((category.type === 'vertical') || (category.type === 'horizontal' && category.singleRow))" :model-value="category.differentSize"
                   :label="`Different ${category.type === 'vertical' ? 'Height' : 'Width'}`" @change="v => changeCategoryStyle('differentSize', v)"/>
       <div class="row-flex align-items-center">
         <span class="mr-1">Category size</span>
@@ -158,15 +162,15 @@
         <span>{{category.fontSize}}</span>
         <g-icon @click="changeCategoryFontSize(0.5)">add_circle</g-icon>
       </div>
-      <g-checkbox :input-value="minimumTextRow" label="Minimize only text row" @change="changeTextRow"/>
-      <g-checkbox :input-value="hideTextRow" label="Hide text row" @change="hideText"/>
-      <g-checkbox :input-value="collapseBlankColumn" label="Narrow empty column" @change="changeBlankCol"/>
-      <g-checkbox :input-value="hideBlankColumn" label="Hide empty column" @change="hideCol"/>
-      <g-checkbox :input-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
-      <g-checkbox :input-value="showOverlay" label="Show overlay in action" @change="toggleOverlay"/>
-      <g-checkbox :input-value="showSplitBtn" label="Show split button in action" @change="toggleSplitBtn"/>
-      <g-checkbox :input-value="smallSidebar" label="Small sidebar" @change="toggleSmallSidebar"/>
-      <g-checkbox :input-value="scrollabeLayout" label="Scrollable layout" @change="toggleScrollabeLayout"/>
+      <g-checkbox :model-value="minimumTextRow" label="Minimize only text row" @change="changeTextRow"/>
+      <g-checkbox :model-value="hideTextRow" label="Hide text row" @change="hideText"/>
+      <g-checkbox :model-value="collapseBlankColumn" label="Narrow empty column" @change="changeBlankCol"/>
+      <g-checkbox :model-value="hideBlankColumn" label="Hide empty column" @change="hideCol"/>
+      <g-checkbox :model-value="collapseText" label="Shrink product title" @change="changeCollapseText"/>
+      <g-checkbox :model-value="showOverlay" label="Show overlay in action" @change="toggleOverlay"/>
+      <g-checkbox :model-value="showSplitBtn" label="Show split button in action" @change="toggleSplitBtn"/>
+      <g-checkbox :model-value="smallSidebar" label="Small sidebar" @change="toggleSmallSidebar"/>
+      <g-checkbox :model-value="scrollableLayout" label="Scrollable layout" @change="toggleScrollabeLayout"/>
       <g-btn-bs width="100" small style="margin-left: calc(90% - 100px)" background-color="#1271FF" @click="saveSetting">Save</g-btn-bs>
     </div>
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
@@ -178,13 +182,13 @@
 
 <script>
   import { Touch } from 'pos-vue-framework';
+  import { nextTick } from 'vue';
 
   export default {
     name: "posOrder",
     directives: {
       Touch
     },
-    injectService:['PosStore:isMobile'],
     props: {
       total: Number,
       items: Array,
@@ -201,13 +205,9 @@
       hideBlankColumn: Boolean,
       actionMode: String,
       showOverlay: Boolean,
-      scrollabeLayout: Boolean,
-      isTakeAwayOrder: Boolean
-    },
-    filters: {
-      convertMoney(value) {
-        return !isNaN(value) ? value.toFixed(2) : value
-      }
+      scrollableLayout: Boolean,
+      isTakeAwayOrder: Boolean,
+      isMobile: null
     },
     data() {
       return {
@@ -229,6 +229,9 @@
         overlay: false
       }
     },
+    emits: ['addItemQuantity', 'removeItemQuantity', 'removeProductModifier', 'addModifierToProduct', 'changePrice', 'updateOrderItem', 'resetOrderData', 'updateOrderTable', 'update:actionMode',
+      'quickCash', 'openDialog', 'updateCurrentOrder', 'saveTableOrder', 'update:fontSize', 'update:category', 'update:minimumTextRow', 'update:collapseBlankColumn', 'update:hideTextRow',
+      'update:collapseText', 'update:showOverlay', 'update:scrollableLayout', 'updateCurrentOrder'],
     computed: {
       username() {
         return this.user ? this.user.name : ''
@@ -391,14 +394,14 @@
         this.$emit('quickCash')
       },
       splitOrder() {
-        this.$getService('PosOrderSplitOrder:setActive')(true)
+        this.$emit('openDialog', 'split')
       },
       moveItems() {
-        this.$getService('PosOrderMoveItems:setActive')(true)
+        this.$emit('openDialog', 'move')
       },
       showOrderReceipt() {
         this.$emit('updateCurrentOrder', 'payment', [{ type: 'cash', value: this.total }])
-        this.$getService('PosOrderReceipt:setActive')(true)
+        this.$emit('openDialog', 'receipt')
       },
       printOrder() {
         this.menu = false
@@ -476,13 +479,13 @@
         this.$emit('update:showOverlay', !!value)
       },
       toggleSplitBtn(value) {
-        this.$set(this, 'showSplitBtn', !!value)
+        this.showSplitBtn = !!value
       },
       toggleSmallSidebar(value) {
-        this.$set(this, 'smallSidebar', !!value)
+        this.smallSidebar = !!value
       },
       toggleScrollabeLayout(value) {
-        this.$emit('update:scrollabeLayout', !!value)
+        this.$emit('update:scrollableLayout', !!value)
       },
       changeCategoryStyle(key, value) {
         let change = {}
@@ -499,7 +502,7 @@
           showOverlay: this.showOverlay,
           showSplitBtn: this.showSplitBtn,
           smallSidebar: this.smallSidebar,
-          scrollabeLayout: this.scrollabeLayout
+          scrollableLayout: this.scrollableLayout
         }
         localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
         this.edit = false
@@ -507,7 +510,7 @@
       loadSetting() {
         const setting = localStorage.getItem('OrderScreenSetting')
         if (setting) {
-          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn, smallSidebar, scrollabeLayout} = JSON.parse(setting)
+          const {fontSize, category, minimumTextRow, collapseBlankColumn, collapseText, showOverlay, showSplitBtn, smallSidebar, scrollableLayout} = JSON.parse(setting)
           if(!category.fontSize) category.fontSize = '13px'
           this.$emit('update:fontSize', fontSize)
           this.$emit('update:category', category)
@@ -515,13 +518,13 @@
           this.$emit('update:collapseBlankColumn', collapseBlankColumn)
           this.$emit('update:collapseText', collapseText)
           this.$emit('update:showOverlay', showOverlay)
-          this.$emit('update:scrollabeLayout', scrollabeLayout)
-          this.$set(this, 'showSplitBtn', showSplitBtn)
-          this.$set(this, 'smallSidebar', smallSidebar)
+          this.$emit('update:scrollableLayout', scrollableLayout)
+          this.showSplitBtn = showSplitBtn
+          this.smallSidebar = smallSidebar
         }
       },
       showVoucherDialog() {
-        this.$getService('PosOrderVoucherDialog:setActive')(true)
+        this.$emit('openDialog', 'voucher')
       },
       toggleTakeAwayOrder() {
         this.$emit('updateCurrentOrder', 'takeAway', !this.isTakeAwayOrder, true)
@@ -564,7 +567,7 @@
     watch: {
       items(val) {
         if(val && this.$refs) {
-          this.$nextTick(() => {
+          nextTick(() => {
             const table = this.$refs.table
             table.scroll({top: table.scrollHeight, behavior: 'smooth'})
           })

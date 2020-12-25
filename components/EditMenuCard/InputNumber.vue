@@ -10,7 +10,7 @@
     name: 'InputNumber',
     props: {
       label: String,
-      value: {
+      modelValue: {
         type: Number,
         default: 0
       },
@@ -26,7 +26,7 @@
     },
     data: function () {
       return {
-        internalValue: this.value || 0
+        internalValue: this.modelValue || 0
       }
     },
     computed: {
@@ -38,12 +38,12 @@
       }
     },
     watch: {
-      value(newVal) {
+      modelValue(newVal) {
         this.internalValue = newVal
       }
     },
     created() {
-      if (this.value < this.min || this.value > this.max)
+      if (this.modelValue < this.min || this.modelValue > this.max)
         throw 'Value out of range'
     },
     methods: {
@@ -58,7 +58,7 @@
         this.emitChange()
       },
       emitChange() {
-        this.$emit('input', this.internalValue)
+        this.$emit('update:modelValue', this.internalValue)
       }
     }
   }

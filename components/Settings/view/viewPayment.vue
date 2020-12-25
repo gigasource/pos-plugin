@@ -27,7 +27,10 @@
       'SettingsStore:selectedPayment',
     ],
     data() {
-      return {}
+      return {
+        listPayments: [],
+        selectedPayment: null
+      }
     },
     async created() {
       await this.getListPayments();
@@ -35,9 +38,10 @@
     methods: {
       select(payment) {
         this.selectedPayment = payment
-      }
+      },
+      getListPayments() {}
     },
-    beforeDestroy() {
+    beforeUnmount() {
       this.selectedPayment = null;
     }
   }

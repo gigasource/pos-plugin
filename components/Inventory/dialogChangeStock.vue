@@ -5,8 +5,8 @@
       <g-icon size="16" class="dialog-icon--close" @click="internalValue = false">icon-close</g-icon>
       <div class="dialog-content">
         <p><b>{{$t('inventory.item')}}: </b> {{name}}</p>
-        <p><b>{{$t('inventory.currentStock')}}: </b> {{stock | formatNumber}}</p>
-        <p><b>{{$t('inventory.newStock')}}: </b> <span :style="{...mode === 'add' && {color: '#1271FF'}, ...mode === 'remove' && {color: '#FF4452'}}">{{newStock | formatNumber}}</span></p>
+        <p><b>{{$t('inventory.currentStock')}}: </b> {{ $filters.formatCurrency(stock) }}</p>
+        <p><b>{{$t('inventory.newStock')}}: </b> <span :style="{...mode === 'add' && {color: '#1271FF'}, ...mode === 'remove' && {color: '#FF4452'}}">{{ $filters.formatCurrency(newStock) }}</span></p>
         <div class="dialog-content__action">
           <div :class="['btn', mode === 'add' && 'btn--blue']" @click="mode = 'add'">
             <g-icon color="white" >add</g-icon>
@@ -30,20 +30,13 @@
   export default {
     name: "dialogChangeStock",
     props: {
-      value: Boolean,
+      modelValue: Boolean,
       name: String,
       stock: Number,
       removeable: {
         type: Boolean,
         default: true
       },
-    },
-    filters: {
-      formatNumber(number) {
-        if(!number || isNaN(number) || Math.floor(number) === number)
-          return number
-        return number.toFixed(2)
-      }
     },
     data() {
       return {
@@ -56,19 +49,19 @@
     computed: {
       internalValue: {
         get() {
-          return this.value
+          return this.modelValue
         },
         set(val) {
-          if(!val) {
+          if (!val) {
             this.mode = ''
             this.change = 0
             this.reason = ''
           }
-          this.$emit('input', val)
+          this.$emit('update:modelValue', val)
         }
       },
       newStock() {
-        if(this.mode === 'add')
+        if (this.mode === 'add')
           return this.stock + this.change
         else if (this.mode === 'remove')
           return (this.stock - this.change) > 0 ? (this.stock - this.change) : 0
@@ -89,7 +82,7 @@
     },
     watch: {
       internalValue(val) {
-        if(val) {
+        if (val) {
           this.mode = 'add'
           setTimeout(() => {
               this.$refs.textfield.$refs.input.focus()

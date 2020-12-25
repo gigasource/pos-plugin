@@ -51,6 +51,7 @@
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
   import * as jsonfn from 'json-fn';
+  import _ from 'lodash';
   const socketIntervals = {}
 
   export default {
@@ -76,11 +77,6 @@
         paymentTip: 0,
         lastPayment: 0,
         //order history screen variables
-        orderHistoryOrders: [],
-        orderHistoryFilters: [],
-        orderHistoryCurrentOrder: null,
-        totalOrders: null,
-        orderHistoryPagination: { limit: 15, currentPage: 1 },
         // online order
         pendingOrders: [],
         kitchenOrders: [],
@@ -225,15 +221,15 @@
         if (!this.currentOrder || !product) return
         if (!this.currentOrder._id) {
           const takeAway = !this.currentOrder.table;
-          this.$set(this.currentOrder, 'takeAway', takeAway)
+          this.currentOrder['takeAway'] = takeAway
           this.actionList = [this.genCreateOrderChain()]
-        } else this.$set(this.currentOrder, 'firstInit', false);
+        } else this.currentOrder['firstInit'] = false
 
         const latestProduct = _.last(this.currentOrder.items);
 
         const mappedProduct = this.mapProduct(product);
         if (!latestProduct) {
-          this.$set(this.currentOrder, 'items', [mappedProduct])
+          this.currentOrder['items'] = [mappedProduct]
           // create order with product
           this.actionList.push(cms.getModel('Order').findOneAndUpdate({
             _id: this.currentOrder._id
@@ -296,14 +292,13 @@
       updateOrderItem(_id, update) {
         const item = this.currentOrder.items.find(i => i._id === _id)
         _.forEach(update, (val, key) => {
-          this.$set(item, key, val)
+          item[key] = val
         })
 
         const updates = _.reduce(update, (acc, val, key) => {
           acc[`items.$.${key}`] = val
           return acc
         }, {})
-        console.log('updates', updates)
         this.actionList.push(cms.getModel('Order').findOneAndUpdate({
           _id: this.currentOrder._id,
           'items._id': item._id
@@ -322,18 +317,18 @@
           newPrice = +newPrice.toFixed(2)
 
           if (update) {
-            this.$set(this.activeProduct, 'price', newPrice)
-            this.$set(this.activeProduct, 'discountUnit', changeType === 'percentage' ? 'percent' : 'amount')
-            this.$set(this.activeProduct, 'vDiscount', originalPrice - newPrice)
+            this.activeProduct['price'] = newPrice
+            this.activeProduct['discountUnit'] = (changeType === 'percentage' ? 'percent' : 'amount')
+            this.activeProduct['vDiscount'] = originalPrice - newPrice
           }
           return newPrice
         }
       },
       updateNewPrice({ difference, type, value }) {
         if (this.activeProduct) {
-          this.$set(this.activeProduct, 'price', value)
-          this.$set(this.activeProduct, 'discountUnit', type === 'percentage' ? 'percent' : 'amount')
-          this.$set(this.activeProduct, 'vDiscount', difference)
+          this.activeProduct['price'] = value
+          this.activeProduct['discountUnit'] = (type === 'percentage' ? 'percent' : 'amount')
+          this.activeProduct['vDiscount'] = difference
         }
       },
       queryProductsById() {
@@ -478,18 +473,18 @@
       },
       discountCurrentOrder(change) {
         const items = this.currentOrder.items.filter(i => i.quantity);
-        this.$set(this.currentOrder, 'items', orderUtil.applyDiscountForOrder(items, change));
-        this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
-        this.$set(this.currentOrder, 'discount', change)
+        this.currentOrder['items'] = orderUtil.applyDiscountForOrder(items, change);
+        this.currentOrder['hasOrderWideDiscount'] = true;
+        this.currentOrder['discount'] = change
         this.currentOrder.items.forEach(item => this.setNewPrice(item.price, item))
         this.addOrderCommits([
           { hasOrderWideDiscount: true, discount: change }
         ])
       },
       resetOrderDiscount() {
-        this.$set(this.currentOrder, 'items', orderUtil.resetDiscount(this.compactOrder(this.currentOrder.items)));
-        this.$set(this.currentOrder, 'hasOrderWideDiscount', true);
-        this.$set(this.currentOrder, 'discount', null)
+        this.currentOrder['items'] = orderUtil.resetDiscount(this.compactOrder(this.currentOrder.items));
+        this.currentOrder['hasOrderWideDiscount'] = true;
+        this.currentOrder['discount'] = null
         this.currentOrder.items.forEach(item => this.setNewPrice(item.price, item))
         this.addOrderCommits([
           { hasOrderWideDiscount: true, discount: null }
@@ -498,52 +493,6 @@
       //<!--</editor-fold>-->
 
       //<!--<editor-fold desc="Order history screen">-->
-      updateOrderHistoryFilter(filter) {
-        const index = this.orderHistoryFilters.findIndex(f => f.title === filter.title);
-        if (index > -1) {
-          this.orderHistoryFilters.splice(index, 1, filter);
-        } else {
-          this.orderHistoryFilters.unshift(filter);
-        }
-        this.orderHistoryPagination.currentPage = 1;
-      },
-      async getOrderHistory() {
-        const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
-          { ...acc, ...filter['condition'] }),
-          { $or: [{ status: 'paid' }, { status: 'completed' }] });
-        const { limit, currentPage } = this.orderHistoryPagination;
-        const orders = await orderModel.find(condition).sort({ date: -1 }).skip(limit * (currentPage - 1)).limit(limit);
-        this.orderHistoryOrders = orders.map(order => ({
-          ...order,
-          info: order.note,
-          tax: order.vTax ? order.vTax : orderUtil.calOrderTax(order.items),
-          dateTime: dayjs(order.date).format(`${this.dateFormat} ${this.timeFormat}`),
-          amount: order.vSum ? order.vSum : orderUtil.calOrderTotal(order.items),
-          staff: order.user,
-          barcode: '',
-          promotions: [],
-        }));
-        this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-      },
-      async getTotalOrders() {
-        const orderModel = cms.getModel('Order');
-        const condition = this.orderHistoryFilters.reduce((acc, filter) => (
-            { ...acc, ...filter['condition'] }),
-            { $or: [{ status: 'paid' }, { status: 'completed' }] });
-        this.totalOrders = await orderModel.count(condition);
-      },
-      async deleteOrder() {
-        try {
-          const orderModel = cms.getModel('Order');
-          await orderModel.findOneAndUpdate({ '_id': this.orderHistoryCurrentOrder._id }, { status: 'cancelled' });
-          const index = this.orderHistoryOrders.findIndex(o => o._id === this.orderHistoryCurrentOrder._id);
-          this.orderHistoryOrders.splice(index, 1);
-          this.orderHistoryCurrentOrder = this.orderHistoryOrders[0];
-        } catch (e) {
-          console.error(e)
-        }
-      },
       printOrderReport(order) {
         return new Promise(async (resolve, reject) => {
           if (!order) {
@@ -653,7 +602,7 @@
         if (product.modifiers) {
           product.modifiers.push(modifier)
         } else {
-          this.$set(product, 'modifiers', [modifier])
+          product['modifiers'] = [modifier]
         }
         this.actionList.push(cms.getModel('Order').findOneAndUpdate({
           _id: this.currentOrder._id,
@@ -745,18 +694,18 @@
           }
         })
         cms.socket.emit('print-to-kitchen', this.device, this.currentOrder, this.printedOrder, this.actionList, (order) => {
-          this.actionList = []
-          this.$set(this.currentOrder, 'status', order.status || 'inProgress')
-          if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+          this.actionList = [];
+          this.currentOrder['status'] = order.status || 'inProgress'
+          if (!this.currentOrder.user) this.currentOrder['user'] = []
           this.currentOrder.user.unshift({ name: this.user.name })
           this.$router.go(-1)
           // this.currentOrder = { items: [], hasOrderWideDiscount: false }
         })
       },
       setNewPrice(price, product) {
-        this.$set(product, 'price', price)
+        product['price'] = price
         const vDiscount = product.originalPrice - price;
-        this.$set(product, 'vDiscount', vDiscount)
+        product['vDiscount'] = vDiscount
         this.actionList.push(cms.getModel('Order').findOneAndUpdate({
           _id: this.currentOrder._id,
           'items._id': product._id
@@ -776,19 +725,19 @@
         }
       },
       updateOrderTable(table) {
-        this.$set(this.currentOrder, 'table', table)
+        this.currentOrder.table = table
       },
       updateOrderItems(items) {
-        this.$set(this.currentOrder, 'items', items)
+        this.currentOrder.items = items
       },
       updateCurrentOrder(key, val, commit) {
-        this.$set(this.currentOrder, key, val)
+        this.currentOrder[key] = val
         if (commit) {
           this.addOrderCommits([{ [key]: val }])
         }
       },
       updatePrintedOrder(key, val) {
-        this.$set(this.printedOrder, key, val)
+        this.printedOrder[key] = val
       },
       async moveItems(table, newItems, currentOrderItems, cb = () => null) {
         const clientId = await this.getOnlineOrderDeviceId()
@@ -797,7 +746,7 @@
         cms.socket.emit('move-items', table, newItems, this.currentOrder, currentOrderItems, this.user, updatedOrder => {
           console.debug(sentryTags, `5. POS frontend: event ack`)
           if (updatedOrder) {
-            this.$set(this.currentOrder, 'status', updatedOrder.status)
+            this.currentOrder['status'] = updatedOrder.status
           }
           cb()
         })
@@ -888,8 +837,8 @@
               }
             })
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, fromPayBtn, async newOrder => {
-              this.$set(this.currentOrder, 'status', 'paid')
-              if (!this.currentOrder.user) this.$set(this.currentOrder, 'user', [])
+              this.currentOrder['status'] = 'paid'
+              if (!this.currentOrder.user) this.currentOrder['user'] = []
               this.currentOrder.user.unshift({ name: this.user.name })
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
@@ -1136,7 +1085,7 @@
           const isRefundError = this.isRefundFailed(responseData)
           if (isRefundError) {
             this.dialog.refundFailed.show = true
-            this.$set(this.dialog.refundFailed, 'captureResponses', order.paypalOrderDetail.captureResponses)
+            this.dialog.refundFailed['captureResponses'] = order.paypalOrderDetail.captureResponses
             this.dialog.refundFailed.refundResponses.splice(0, this.dialog.refundFailed.refundResponses.length, ...responseData)
           } else {
             this.dialog.refundSucceeded.show = true
@@ -1343,19 +1292,19 @@
       }, 1000),
       mapToCurrentOrder(order, table) {
         if (order) {
-          this.$set(this.currentOrder, '_id', order._id)
-          this.$set(this.currentOrder, 'user', _.cloneDeep(order.user))
-          this.$set(this.currentOrder, 'items', _.cloneDeep(order.items))
-          this.$set(this.currentOrder, 'manual', order.manual)
-          this.$set(this.currentOrder, 'discount', order.discount)
-          this.$set(this.currentOrder, 'takeAway', order.takeAway)
-          order.splitId && this.$set(this.currentOrder, 'splitId', order.splitId)
-          order.numberOfCustomers && this.$set(this.currentOrder, 'numberOfCustomers', order.numberOfCustomers)
-          order.tseMethod && this.$set(this.currentOrder, 'tseMethod', order.tseMethod)
+          this.currentOrder['_id'] = order._id
+          this.currentOrder['user'] = _.cloneDeep(order.user)
+          this.currentOrder['items'] = _.cloneDeep(order.items)
+          this.currentOrder['manual'] =  order.manual
+          this.currentOrder['discount'] =  order.discount
+          this.currentOrder['takeAway'] = order.takeAway
+          order.splitId && (this.currentOrder['splitId'] = order.splitId)
+          order.numberOfCustomers && (this.currentOrder['numberOfCustomers'] = order.numberOfCustomers)
+          order.tseMethod && (this.currentOrder['tseMethod'] = order.tseMethod)
           this.printedOrder = _.cloneDeep(this.currentOrder)
         } else {
           this.currentOrder = { items: [], hasOrderWideDiscount: false, tseMethod: 'auto' }
-          if (table) this.$set(this.currentOrder, 'table', table)
+          if (table) this.currentOrder['table'] = table
           this.printedOrder = _.cloneDeep(this.currentOrder)
         }
       },
@@ -1366,8 +1315,6 @@
     async created() {
       await this.getScrollWindowProducts()
 
-      const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
-      if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
       this.bell = new Audio('/plugins/pos-plugin/assets/sounds/bell.mp3')
       this.bell.addEventListener('play', () => {
         this.bellPlaying = true;
@@ -1388,11 +1335,11 @@
         const order = await this.getTempOrder();
         if (!order) return;
         const tempItems = this.currentOrder.items.filter(i => !i.printed)
-        this.$set(this.currentOrder, '_id', order._id)
-        this.$set(this.currentOrder, 'user', order.user)
-        this.$set(this.currentOrder, 'id', order.id)
+        this.currentOrder['_id'] = order._id
+        this.currentOrder['user'] = order.user
+        this.currentOrder['id'] = order.id
         const newItems = [...order.items, ...tempItems];
-        this.$set(this.currentOrder, 'items', _.uniqBy(newItems, '_id'))
+        this.currentOrder['items'] = _.uniqBy(newItems, '_id')
         this.printedOrder = _.cloneDeep(order)
       })
       await this.getReservations()
@@ -1415,9 +1362,6 @@
       })
     },
     watch: {
-      'orderHistoryPagination.limit'(newVal) {
-        localStorage.setItem('orderHistoryPageSize', newVal)
-      },
       pendingOrders: {
         async handler(val, oldVal) {
           if (val && val.length) {
@@ -1440,7 +1384,7 @@
           if (this.initOrderProps) {
             for (const prop in this.initOrderProps) {
               if (this.initOrderProps.hasOwnProperty(prop)) {
-                this.$set(this.currentOrder, prop, this.initOrderProps[prop])
+                this.currentOrder[prop] = this.initOrderProps[prop]
               }
             }
             this.setInitOrderProps({})

@@ -9,6 +9,8 @@
 </template>
 
 <script>
+  import { nextTick } from 'vue';
+
   const actionMap = {
     insert: (value, append) => (value + append),
     delete: (value) => value.substring(0, value.length - 1),
@@ -47,6 +49,12 @@
       }
     },
     injectService: ['OrderStore:(productIdQuery,queryProductsById,productIdQueryResults,addProductToOrder,addModifierToProduct)'],
+    data() {
+      return {
+        productIdQuery: null,
+        productIdQueryResults: null,
+      }
+    },
     computed: {
       mainKeyboard() {
         const keyboard = _.cloneDeep(defaultKeyboard)
@@ -171,6 +179,9 @@
       }
     },
     methods: {
+      queryProductsById() {},
+      addProductToOrder() {},
+      addModifierToProduct() {},
       clearScreen() {
         this.productIdQuery = ''
       },
@@ -194,8 +205,8 @@
               return
             }
           }
-          this.$nextTick(() => {
-            this.$getService('dialogProductSearchResult:setActive')(true)
+          nextTick(() => {
+            this.$emit('openDialogSearch')
           })
         }
       },

@@ -223,7 +223,7 @@
       }
     },
     props: {
-      value: null,
+      modelValue: null,
       type: {
         type: String,
         default: 'alphanumeric' //numeric, alpha, alphanumeric, symbol
@@ -239,10 +239,10 @@
     computed: {
       internalValue: {
         get() {
-          return this.value;
+          return this.modelValue;
         },
         set(val) {
-          this.$emit('input', val);
+          this.$emit('update:modelValue', val);
         }
       },
       computedType: {
