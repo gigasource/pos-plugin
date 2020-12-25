@@ -11,6 +11,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
     { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
+    { loader: { type: 'route' }, filePath: 'components/Tutorial/Tutorial.vue', name: 'Tutorial', path: '/pos-tutorial' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
