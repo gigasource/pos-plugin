@@ -62,8 +62,8 @@
       },
       // category
       async loadInventoryCategories() {
-        const inventoryCates = await cms.getModel(INVENTORY_CATEGORY_COL).find({})
-        this.$set(this, 'inventoryCategories', inventoryCates)
+        console.log('InventoryStore:loadInventoryCategories')
+        this.inventoryCategories = await cms.getModel(INVENTORY_CATEGORY_COL).find({})
       },
       async loadCategoriesWithItem() {
         const categories = await cms.getModel(INVENTORY_CATEGORY_COL).find()
@@ -124,6 +124,7 @@
       },
       // inventory
       async loadInventories() {
+        console.log('InventoryStore::loadInventories')
         const condition = this.inventoryFilters.reduce((acc, filter) => ({...acc, ...filter['condition']}), {});
         const inventories = await cms.getModel(INVENTORY_COL).find(condition);
         const categories = await cms.getModel(INVENTORY_CATEGORY_COL).find();
@@ -134,8 +135,7 @@
         this.inventoriesLoadTimestamp = new Date().getTime()
       },
       async loadInventoryUnits() {
-        const inventoryUnits = await cms.getModel(INVENTORY_UNIT_COL).find({})
-        this.$set(this, 'inventoryUnits', inventoryUnits)
+        this.inventoryUnits = await cms.getModel(INVENTORY_UNIT_COL).find({})
       },
       async createInventory(inventory) {
         const inventories = await cms.getModel(INVENTORY_COL).find()
@@ -199,7 +199,7 @@
             lowStockItems.push({...inventory, added: 0})
           }
         }
-        this.$set(this, 'importingInventories', [...this.importingInventories, ...lowStockItems])
+        this.importingInventories = [...this.importingInventories, ...lowStockItems]
       },
       async importNewStock() {
         // TODO: Check this.user._id again

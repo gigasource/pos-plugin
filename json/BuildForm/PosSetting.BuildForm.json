@@ -1173,6 +1173,11 @@
       "schemaType": "string",
       "key": "hardwareID",
       "type": "input"
+    },
+    {
+      "schemaType": "string",
+      "key": "installUUID",
+      "type": "input"
     }
   ],
   "id": "5ddb985ff26bb37e5ccc5c43",

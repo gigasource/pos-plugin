@@ -43,7 +43,7 @@
         change: 0,
         mode: !this.removeable ? 'add' : '',
         reason: '',
-        reasons: [$t('inventory.expiredIngredient'), $t('inventory.updateToMatch')]
+        reasons: [this.$t('inventory.expiredIngredient'), this.$t('inventory.updateToMatch')]
       }
     },
     computed: {

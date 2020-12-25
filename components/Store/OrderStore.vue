@@ -205,54 +205,41 @@
           taxes: [p.tax, p.tax2]
         }
       },
+      genCreateOrderChain() {
+        const _id = this.genObjectId()
+        const takeAway = !this.currentOrder.table
+        this.currentOrder._id = _id
+        return cms.getModel('Order').create({
+          _id,
+          table: this.currentOrder.table,
+          items: this.currentOrder.items ? this.currentOrder.items : [],
+          status: 'inProgress',
+          takeAway
+        }).commit('createOrder', {table: this.currentOrder.table}).chain
+      },
       addProductToOrder(product) {
         if (!this.currentOrder || !product) return
-        if (!this.currentOrder._id && !this.actionList.some(i => i.type === 'order')) {
-          this.currentOrder['firstInit'] = true
+        if (!this.currentOrder._id) {
           const takeAway = !this.currentOrder.table;
           this.currentOrder['takeAway'] = takeAway
-          this.actionList.push({
-            type: 'order',
-            action: 'createOrder',
-            where: null,
-            data: {
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'create',
-              query: jsonfn.stringify({
-                table: this.currentOrder.table,
-                items: [],
-                status: 'inProgress',
-                takeAway
-              })
-            }
-          })
-        } else this.currentOrder['firstInit'] = false;
+          this.actionList = [this.genCreateOrderChain()]
+        } else this.currentOrder['firstInit'] = false
 
         const latestProduct = _.last(this.currentOrder.items);
 
         const mappedProduct = this.mapProduct(product);
         if (!latestProduct) {
-          // create order with product
-          this.actionList.push({
-            type: 'order',
-            action: 'addItem',
-            where: jsonfn.stringify({ _id: !this.currentOrder.firstInit ? this.currentOrder._id : null }),
-            data: {
-              table: this.currentOrder.table,
-            },
-            orderId: this.currentOrder.id,
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({
-                $push: {
-                  'items': { ...mappedProduct }
-                }
-              })
-            }
-          })
           this.currentOrder['items'] = [mappedProduct]
+          // create order with product
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $push: {
+              items: {
+                ...mappedProduct
+              }
+            }
+          }).commit('updateActiveOrder', {table: this.currentOrder.table}).chain)
         } else {
           const isSameItem = _.isEqualWith(product, latestProduct, (product, latestProduct) => {
             return latestProduct.product === product._id &&
@@ -262,79 +249,45 @@
           } )
 
           if (isSameItem) return this.addItemQuantity(latestProduct)
-          // else add product to arr
-          this.actionList.push({
-            type: 'order',
-            action: 'addItem',
-            where: jsonfn.stringify({
-              _id: !this.currentOrder.firstInit ? this.currentOrder._id : null
-            }),
-            data: {
-              orderId: this.currentOrder.id,
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({
-                $push: {
-                  'items': { ...mappedProduct }
-                }
-              })
-            }
-          })
           this.currentOrder.items.push(mappedProduct)
+          // else add product to arr
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $push: {
+              items: {
+                ...mappedProduct
+              }
+            }
+          }).commit('updateActiveOrder', {table: this.currentOrder.table}).chain)
         }
       },
       addItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
-        this.actionList.push({
-          type: 'order',
-          action: 'changeItemQuantity',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': itemToUpdate._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $inc: {
-                'items.$.quantity': 1
-              }
-            })
-          }
-        })
         itemToUpdate.quantity++
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': itemToUpdate._id
+        }, {
+          $set: {
+            'items.$.quantity': itemToUpdate.quantity
+          }
+        }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentTable }).chain)
       },
       removeItemQuantity(item) {
         // $set qty
         const itemToUpdate = this.currentOrder.items.find(i => i === item)
         if (itemToUpdate.quantity === 0) return
-        this.actionList.push({
-          type: 'order',
-          action: 'changeItemQuantity',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': itemToUpdate._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $inc: {
-                'items.$.quantity': -1
-              }
-            })
-          }
-        })
         itemToUpdate.quantity--
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': itemToUpdate._id
+        }, {
+          $set: {
+            'items.$.quantity': itemToUpdate.quantity
+          }
+        }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentTable }).chain)
       },
       updateOrderItem(_id, update) {
         const item = this.currentOrder.items.find(i => i._id === _id)
@@ -346,23 +299,10 @@
           acc[`items.$.${key}`] = val
           return acc
         }, {})
-        console.log('updates', updates)
-        this.actionList.push({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': item._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify(updates)
-          }
-        })
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': item._id
+        }, updates).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentTable }).chain)
       },
       calculateNewPrice(changeType, amount, update = false) {
         if (this.activeProduct) {
@@ -524,21 +464,12 @@
         return resultArr
       },
       addOrderCommits(changes) {
-        this.actionList.push(...changes.map(change => ({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify(change)
-          }
-        })))
+        // this function must be called after everything is set
+        this.actionList.push(...changes.mao(change => {
+          return cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, change).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain
+        }))
       },
       discountCurrentOrder(change) {
         const items = this.currentOrder.items.filter(i => i.quantity);
@@ -568,15 +499,11 @@
             reject()
           }
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
+            await cms.getModel('Action').create({
               action: 'print',
-              data: {
-                reportType: 'OrderReport',
-                printData: order,
-                device: this.device
-              }
-            }])
+              reportType: 'OrderReport',
+              order
+            }).commit('print')
             resolve()
           } catch (e) {
             reject(e.message)
@@ -665,7 +592,6 @@
 
       //<!--<editor-fold desc="Restaurant functions">-->
       async addModifierToProduct(modifier, product) {
-        console.log(modifier)
         if (!this.currentOrder || !this.currentOrder.items || !this.currentOrder.items.length) return
         product = product
           ? _.find(this.currentOrder.items, item => item === product)
@@ -673,125 +599,76 @@
 
         if (!product || product.sent || product.printed) return
         modifier._id = this.genObjectId();
-        this.actionList.push({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': product._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $push: {
-                'items.$.modifiers': {...modifier}
-              }
-            })
-          }
-        })
-
         if (product.modifiers) {
           product.modifiers.push(modifier)
         } else {
           product['modifiers'] = [modifier]
         }
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': product._id
+        }, {
+          $push: {
+            'items.$.modifiers': {...modifier}
+          }
+        }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain)
       },
       async removeProductModifier(product, modIndex) {
         const modifier = product.modifiers[modIndex]
-        this.actionList.push({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': product._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $pull: {
-                'items.$.modifiers': {
-                  _id: modifier._id
-                }
-              }
-            })
-          }
-        })
         product.modifiers.splice(modIndex, 1)
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': product._id
+        }, {
+          $pull: {
+            'items.$.modifiers': {
+              _id: modifier._id
+            }
+          }
+        }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain)
       },
       getExtraCommits() {
         if (!this.actionList) this.actionList = []
         if (this.currentOrder.numberOfCustomers) {
-          this.actionList.push({
-            type: 'order',
-            action: 'update',
-            where: jsonfn.stringify({ _id: this.currentOrder._id }),
-            data: {
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({$set: {numberOfCustomers: this.currentOrder.numberOfCustomers}})
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $set: {
+              numberOfCustomers: this.currentOrder.numberOfCustomers
             }
-          })
+          }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
         }
 
         if (this.currentOrder.tseMethod) {
-          this.actionList.push({
-            type: 'order',
-            action: 'update',
-            where: jsonfn.stringify({ _id: this.currentOrder._id }),
-            data: {
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({$set: {tseMethod: this.currentOrder.tseMethod}})
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $set: {
+              tseMethod: this.currentOrder.tseMethod
             }
-          })
+          }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
         }
 
         if (this.currentOrder.manual) {
-          this.actionList.push({
-            type: 'order',
-            action: 'update',
-            where: jsonfn.stringify({ _id: this.currentOrder._id }),
-            data: {
-              table: this.currentOrder.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({ $set: { manual: true } })
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $set: {
+              manual: true
             }
-          })
+          }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
         }
 
-        this.actionList.push({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({ _id: this.currentOrder._id }),
-          data: {
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $push: {
-                user: {
-                  $each: [{ name: this.user.name, date: new Date() }],
-                  $position: 0
-                }
-              }
-            })
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id
+        }, {
+          $push: {
+            user: {
+              $each: [{ name: this.user.name, date: new Date() }],
+              $position: 0
+            }
           }
-        })
+        }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
@@ -829,27 +706,15 @@
         product['price'] = price
         const vDiscount = product.originalPrice - price;
         product['vDiscount'] = vDiscount
-        this.actionList.push({
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({
-            _id: !this.currentOrder.firstInit ? this.currentOrder._id : null,
-            'items._id': product._id
-          }),
-          data: {
-            orderId: this.currentOrder.id,
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({
-              $set: {
-                'items.$.price': price,
-                'items.$.vDiscount': vDiscount
-              }
-            })
+        this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id,
+          'items._id': product._id
+        }, {
+          $set: {
+            'items.$.price': price,
+            'items.$.vDiscount': vDiscount
           }
-        })
+        }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain)
       },
       setOrderDiscount() {
         if (this.currentOrder.items.some(i => i.price !== i.originalPrice) && !this.currentOrder.hasOrderWideDiscount) {
@@ -932,18 +797,13 @@
           return Promise.all(commits.map(this.createOrderCommit))
       },
       async createOrderCommit(commit) { // key-value pair
-        return await cms.getModel('OrderCommit').addCommits([{
-          type: 'order',
-          action: 'update',
-          where: jsonfn.stringify({ _id: this.currentOrder._id }),
-          data: {
-            table: this.currentOrder.table,
-          },
-          update: {
-            method: 'findOneAndUpdate',
-            query: jsonfn.stringify({$set: {[commit.key]: commit.value}})
+        return await cms.getModel('Order').findOneAndUpdate({
+          _id: this.currentOrder._id
+        }, {
+          $set: {
+            [commit.key]: commit.value
           }
-        }]);
+        }).commit('updateActiveOrder', { table: this.currentOrder.table })
       },
       saveRestaurantOrder(paymentMethod, resetOrder = true, shouldPrint = false, fromPayBtn, cb = () => null) {
         return new Promise(async (resolve, reject) => {
@@ -995,35 +855,13 @@
         await this.saveRestaurantOrder({ type: 'cash', value: this.paymentTotal });
       },
       async changeTable(order, newTable, cb) {
-        await cms.getModel('OrderCommit').addCommits([
-          {
-            type: 'order',
-            where: jsonfn.stringify({ _id: order._id }),
-            action: 'update',
-            data: {
-              orderId: order.id,
-              table: order.table,
-            },
-            update: {
-              method: 'findOneAndUpdate',
-              query: jsonfn.stringify({
-                $set: {
-                  table: newTable
-                }
-              })
-            }
-          },
-          {
-            type: 'order',
-            action: 'changeTable',
-            where: jsonfn.stringify({ _id: order._id }),
-            data: {
-              table: order.table,
-              orderId: order._id
-            },
-            update: newTable
+        await cms.getModel('Order').findOneAndUpdate({
+          _id: order._id
+        }, {
+          $set: {
+            table: newTable
           }
-        ])
+        }).commit('updateActiveOrder', { orderId: order._id, table: order.table, newTable })
         cb()
       },
       //<!--</editor-fold>-->
@@ -1044,15 +882,15 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
-              action: 'print',
-              data: {
-                reportType: 'OnlineOrderReport',
-                printData: { orderId },
-                device: this.device
-              }
-            }])
+            // await cms.getModel('OrderCommit').addCommits([{
+            //   type: 'report',
+            //   action: 'print',
+            //   data: {
+            //     reportType: 'OnlineOrderReport',
+            //     printData: { orderId },
+            //     device: this.device
+            //   }
+            // }])
             resolve()
           } catch(e) {
             reject(e.message)
@@ -1063,15 +901,15 @@
         return new Promise(async (resolve, reject) => {
           if (_.isNil(orderId)) reject()
           try {
-            await cms.getModel('OrderCommit').addCommits([{
-              type: 'report',
-              action: 'print',
-              data: {
-                reportType: 'OnlineOrderKitchen',
-                printData: { orderId },
-                device: this.device
-              }
-            }])
+            // await cms.getModel('OrderCommit').addCommits([{
+            //   type: 'report',
+            //   action: 'print',
+            //   data: {
+            //     reportType: 'OnlineOrderKitchen',
+            //     printData: { orderId },
+            //     device: this.device
+            //   }
+            // }])
             resolve()
           } catch(e) {
             reject(e.message)

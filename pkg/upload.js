@@ -50,9 +50,7 @@ module.exports = function uploader({ domain, apiBaseUrl }) {
     const fileName = path.parse(filePath).base
 
     // prepare
-    if (type == 'PATCH') {
-      await prepareUploadAppFolder(version)
-    }
+    await prepareUploadAppFolder(version)
 
     // upload file to file-explorer
     const folderPath = `${uploadPath}/${version}`;
