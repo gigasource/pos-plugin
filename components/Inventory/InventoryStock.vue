@@ -1,7 +1,7 @@
 <template>
   <div class="inventory-stock">
     <div class="inventory-stock__header">
-      <g-autocomplete text-field-component="GTextFieldBs" @input="selectItem" clearable keep-menu-on-blur
+      <g-autocomplete text-field-component="GTextFieldBs" @update:modelValue="selectItem" clearable keep-menu-on-blur
                       :items="inventories" return-object menu-class="menu-inventory-stock">
         <template v-slot:append-inner>
           <g-icon @click="showKeyboard = true">icon-keyboard</g-icon>
@@ -62,7 +62,7 @@
                           class="inventory-stock-select" :key="dialog.inventory"
                           :items="inventories" item-text="name" item-value="_id" keep-menu-on-blur
                           menu-class="menu-select-inventory"
-                          @input="chooseItem"/>
+                          @update:modelValue="chooseItem"/>
           <pos-textfield-new readonly style="width: 48%" v-model="category" :label="$t('article.category')"/>
           <pos-textfield-new readonly style="width: 48%" v-model="unit" :label="$t('inventory.unit')"/>
           <pos-textfield-new readonly style="width: 48%" v-model="stock" :label="$t('inventory.currentStock')"/>
