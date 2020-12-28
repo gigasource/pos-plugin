@@ -125,11 +125,7 @@
           tseMethod: tseMethod || 'auto'
         })
         setTimeout(() => {
-          if (this.isMobile) {
-            this.$router.push(`/pos-order-3/${this.roomObj.name}`)
-          } else {
-            this.$router.push(`/pos-order-2/${this.roomObj.name}`)
-          }
+          this.$router.push(`/pos-order/${this.roomObj.name}`)
         }, 200)
       },
       setTransferTableFrom(roomObj) {
