@@ -9,8 +9,8 @@
       <template v-slot:printer="{id, type, name}">
         <pos-printer-setting :id="id" :type="type" :name="name"/>
       </template>
-      <template v-slot:multiple="{id, type}">
-        <pos-printer-setting-for-multiple :id="id" :type="type"/>
+      <template v-slot:multiple="{id, type, name}">
+        <pos-printer-setting-for-multiple :id="id" :type="type" :name="name"/>
       </template>
       <template v-slot:general>
         <pos-printer-setting-general />

@@ -28,7 +28,7 @@
   export default {
     name: "PosPrinterSettingGeneral",
     props: {},
-    injectService: ['SettingsStore:(getPrinterGeneralSetting, printerGeneralSetting, updatePrinterGeneralSetting, addEntirePrinter, removeEntirePrinter, getPosSetting, updatePosSetting)'],
+    injectService: ['SettingsStore:(getPrinterGeneralSetting, printerGeneralSetting, updatePrinterGeneralSetting, addEntirePrinter, removeEntirePrinter, getPosSetting, updatePosSetting, setSinglePrinter)'],
     data() {
       return {
         listNoEntireReceipt: [0, 1, 2, 3, 4],
@@ -51,7 +51,7 @@
         },
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForKitchenPrinter = val
-          if (!val) this.$emit('setSinglePrinter', 'kitchen')
+          if (!val) this.setSinglePrinter('kitchen')
         }
       },
       useMultiPrinterForInvoicePrinter: {
@@ -62,7 +62,7 @@
         },
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForInvoicePrinter = val
-          if (!val) this.$emit('setSinglePrinter', 'invoice')
+          if (!val) this.setSinglePrinter('invoice')
         }
       },
       useMultiPrinterForEntirePrinter: {
@@ -73,7 +73,7 @@
         },
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForEntirePrinter = val
-          if (!val) this.$emit('setSinglePrinter', 'entire')
+          if (!val) this.setSinglePrinter('entire')
         }
       },
       mergeAfterPrint: {
@@ -118,6 +118,9 @@
         await this.removeEntirePrinter(this.dialog.lower, this.dialog.upper)
         this.printerGeneralSetting.entireReceipt = this.entireReceipt
         await this.updatePrinterGeneralSetting()
+      },
+      setSinglePrinter() {
+        console.error('SettingsStore:setSinglePrinter was not injected')
       }
     },
     async created() {
