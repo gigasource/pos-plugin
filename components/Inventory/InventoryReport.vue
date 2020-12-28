@@ -143,14 +143,20 @@
           unit: '',
           history: []
         },
+        // inject
+        inventoryCategories: [],
+        
+        
       }
     },
-    async created() {
-      this.dateFilter.fromDate = dayjs().format('YYYY-MM-DD')
-      this.dateFilter.toDate = dayjs().format('YYYY-MM-DD')
-      this.selectedCategory = 'all'
-      await this.loadInventoryCategories()
-      await this.loadData()
+    created() {
+      setTimeout(async () => {
+        this.dateFilter.fromDate = dayjs().format('YYYY-MM-DD')
+        this.dateFilter.toDate = dayjs().format('YYYY-MM-DD')
+        this.selectedCategory = 'all'
+        await this.loadInventoryCategories()
+        await this.loadData()
+      }, 50)
     },
     async activated() {
       this.dateFilter.fromDate = dayjs().format('YYYY-MM-DD')
@@ -180,9 +186,9 @@
         })
       },
       async loadData() {
-        const filter = {
-          category: typeof this.selectedCategory === 'object' ? this.selectedCategory._id : null,
-          date: this.dateFilter
+        let filter = { date: this.dateFilter }
+        if (this.selectedCategory) {
+          filter.category = typeof this.selectedCategory === 'object' ? this.selectedCategory._id : null
         }
         this.inventories = await this.loadInventoriesWithChange(filter)
       },
@@ -210,6 +216,16 @@
         if (!value || !dayjs(value).isValid()) return ''
         return dayjs(value).format('DD/MM/YYYY HH:mm')
       },
+      // inject
+      loadInventoryCategories() {
+        console.error('InventoryStore:loadInventoryCategories was not injected')
+      },
+      loadInventoriesWithChange() {
+        console.error('InventoryStore:loadInventoriesWithChange was not injected')
+      },
+      loadInventoryHistory() {
+        console.error('InventoryStore:loadInventoryHistory was not injected')
+      }
     }
   }
 </script>

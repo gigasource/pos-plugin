@@ -13,6 +13,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
     { loader: { type: 'route' }, filePath: 'components/Tutorial/Tutorial.vue', name: 'Tutorial', path: '/pos-tutorial' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
+    { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport.vue', name: 'Inventory', path: '/pos-inventory-report' },
     { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
     { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
