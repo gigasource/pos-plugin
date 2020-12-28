@@ -50,6 +50,7 @@
 </template>
 
 <script>
+  // TODO: setActive
   export default {
     name: "PosPrinterSettingSidebar",
     props: {
@@ -57,10 +58,19 @@
     },
     injectService: [
       'PosStore:(systemDate, user)',
-      'SettingsStore:(getPrinterGeneralSetting, printerGeneralSetting, createGroupPrinter, deleteGroupPrinter, genPrinterSidebar, printerSidebar, selectedPrinterMenu)'
+      'SettingsStore:(getPrinterGeneralSetting, printerGeneralSetting, createGroupPrinter, deleteGroupPrinter, genPrinterSidebar, printerSidebar, selectedPrinterMenu)',
+      'dialogConfirmDeletePrinterCategory:setActive'
     ],
     data() {
-      return {}
+      return {
+        // PosStore inject
+        systemDate: null,
+        user: null,
+        // SettingsStore inject
+        printerGeneralSetting: null,
+        printerSidebar: [],
+        selectedPrinterMenu: null,
+      }
     },
     computed: {
       userName() {
@@ -145,20 +155,28 @@
         this.selectedPrinterMenu = this.printerSidebar[0].items[0]
       },
       deleteMenu() {
-        this.$getService('dialogConfirmDeletePrinterCategory:setActive')(true)
+        this.$emit('deleteMenu', true)
       },
       back() {
         this.$router.push({path: '/pos-dashboard'});
       },
+      // inject
+      getPrinterGeneralSetting() { console.error("SettingsStore:getPrinterGeneralSetting was not injected")},
+      createGroupPrinter() {console.error("SettingsStore:createGroupPrinter was not injected") },
+      deleteGroupPrinter() {console.error("SettingsStore:deleteGroupPrinter was not injected") },
+      genPrinterSidebar() {console.error("SettingsStore:genPrinterSidebar was not injected") },
+      setActive() { console.error("dialogConfirmDeletePrinterCategory:setActive was not injected")}
     },
     async created() {
-      await this.getPrinterGeneralSetting()
-      await this.genPrinterSidebar()
+      setTimeout(async () => {
+        await this.getPrinterGeneralSetting()
+        await this.genPrinterSidebar()
 
-      const settingsStore = this.$getService('SettingsStore')
-      settingsStore.$watch('selectedPrinterMenu', async val => {
-        await this.selectMenu(val)
-      })
+        const settingsStore = this.$getService('SettingsStore')
+        settingsStore.$watch('selectedPrinterMenu', async val => {
+          await this.selectMenu(val)
+        })
+      }, 100)
     }
   }
 </script>
