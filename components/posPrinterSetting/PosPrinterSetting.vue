@@ -1,7 +1,7 @@
 <template>
   <div class="configuration">
     <div v-if="type === 'kitchen'" class="config">
-      <g-text-field-bs :label="$t('settings.name')" v-model="editableName">
+      <g-text-field-bs :label="$t('settings.name')" :model-value="editableName" @update:modelValue="v => editableName = v">
         <template #append-inner>
           <g-icon style="cursor: pointer" @click="openDialog('nameInput')">icon-keyboard</g-icon>
         </template>
@@ -151,6 +151,10 @@
 </template>
 
 <script>
+  
+  // TODO:
+  // - g-grid-select doesn't highlight selected item
+  
   import DialogFormInput from '../pos-shared-components/dialogFormInput';
   import { nextTick } from 'vue';
   export default {
@@ -210,7 +214,7 @@
         async set(val) {
           this.editIp = val
           if (this.printer) {
-            this.$set(this.printer, 'ip', val)
+            this.printer.ip = val
           } else {
             this.printer = {
               printerType: 'ip',
@@ -229,7 +233,7 @@
         },
         async set(val) {
           if (this.printer) {
-            this.$set(this.printer, 'onlyTakeAway', val)
+            this.printer.onlyTakeAway = val
           } else {
             this.printer = {
               onlyTakeAway: val
@@ -247,7 +251,7 @@
         },
         async set(val) {
           if (this.printer) {
-            this.$set(this.printer, 'includes', val)
+            this.printer.includes = val
           } else {
             this.printer = {
               includes: val
@@ -265,7 +269,7 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'oneReceiptForOneArticle', val)
+            this.printer.oneReceiptForOneArticle = val
           else {
             this.printer = {
               oneReceiptForOneArticle: val
@@ -283,7 +287,7 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'groupArticles', val)
+            this.printer.groupArticles= val
           else
             this.printer = {
               groupArticles: val
@@ -300,11 +304,9 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'sound', val)
+            this.printer.sound = val
           else
-            this.printer = {
-              sound: val
-            }
+            this.printer = { sound: val }
           await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
@@ -317,11 +319,9 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'escPOS', val)
+            this.printer.escPOS = val
           else
-            this.printer = {
-              escPOS: val
-            }
+            this.printer = { escPOS: val }
           await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
@@ -333,10 +333,12 @@
           return false
         },
         async set(val) {
-          if(this.printer)
-            this.$set(this.printer, 'tscPOS', val)
-          else
-            this.$set(this, 'printer', { tscPOS: val })
+          // TODO: Assign tsc pos doesn't work
+          if(this.printer) {
+            this.printer.tscPOS =  val
+          } else {
+            this.printer = { tscPOS: val }
+          }
           await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
@@ -348,7 +350,7 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'fontSize', val)
+            this.printer.fontSize = val
           else
             this.printer = {
               fontSize: val
@@ -364,7 +366,7 @@
         },
         async set(val) {
           if(this.printer)
-            this.$set(this.printer, 'marginTop', val)
+            this.printer.marginTop = val
           else
             this.printer = {
               marginTop: val
@@ -466,9 +468,9 @@
       async setUsbPrinter(value) {
         console.log("PosPrinterSetting:setUsbPrinter", value)
         if (this.printer) {
-          this.$set(this.printer, 'usb', value);
+          this.printer.usb = value
         } else {
-          this.$set(this, 'printer', { usb: value });
+          this.printer = { usb: value }
         }
         await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
       }
@@ -496,11 +498,13 @@
       }
     },
     async created() {
-      await this.setupPrinter()
-      const receipts = await this.getGroupPrintersByType('kitchen')
-      this.listReceipt = receipts.map(r => r.name)
-      this.listTaxCategories = await this.getAllTaxCategory()
-      this.groupPrinter = await this.getGroupPrinterById(this.id)
+      setTimeout(async () => {
+        await this.setupPrinter()
+        const receipts = await this.getGroupPrintersByType('kitchen')
+        this.listReceipt = receipts.map(r => r.name)
+        this.listTaxCategories = await this.getAllTaxCategory()
+        this.groupPrinter = await this.getGroupPrinterById(this.id)
+      }, 100)
     },
   }
 </script>

@@ -27,9 +27,7 @@
 <script>
   export default {
     name: "PosPrinterSettingGeneral",
-    props: {
-
-    },
+    props: {},
     injectService: ['SettingsStore:(getPrinterGeneralSetting, printerGeneralSetting, updatePrinterGeneralSetting, addEntirePrinter, removeEntirePrinter, getPosSetting, updatePosSetting)'],
     data() {
       return {
@@ -52,7 +50,7 @@
           }
         },
         set(val) {
-          this.$set(this.printerGeneralSetting, 'useMultiPrinterForKitchenPrinter', val)
+          this.printerGeneralSetting.useMultiPrinterForKitchenPrinter = val
           if (!val) this.$emit('setSinglePrinter', 'kitchen')
         }
       },
@@ -63,7 +61,7 @@
           }
         },
         set(val) {
-          this.$set(this.printerGeneralSetting, 'useMultiPrinterForInvoicePrinter', val)
+          this.printerGeneralSetting.useMultiPrinterForInvoicePrinter = val
           if (!val) this.$emit('setSinglePrinter', 'invoice')
         }
       },
@@ -74,7 +72,7 @@
           }
         },
         set(val) {
-          this.$set(this.printerGeneralSetting, 'useMultiPrinterForEntirePrinter', val)
+          this.printerGeneralSetting.useMultiPrinterForEntirePrinter = val
           if (!val) this.$emit('setSinglePrinter', 'entire')
         }
       },
@@ -85,7 +83,7 @@
           }
         },
         set(val) {
-          this.$set(this.printerGeneralSetting, 'mergeAfterPrint', val)
+          this.printerGeneralSetting.mergeAfterPrint = val
           this.updatePosSetting('printerGeneralSetting.mergeAfterPrint', val)
         }
       },
@@ -99,12 +97,12 @@
         this.entireReceipt = number
         if(!this.printerGeneralSetting.entireReceipt) {
           await this.addEntirePrinter(0, this.entireReceipt)
-          this.$set(this.printerGeneralSetting, 'entireReceipt', this.entireReceipt)
+          this.printerGeneralSetting.entireReceipt = this.entireReceipt
           await this.updatePrinterGeneralSetting()
         }
         if(this.entireReceipt > this.printerGeneralSetting.entireReceipt) {
           await this.addEntirePrinter(this.printerGeneralSetting.entireReceipt, this.entireReceipt)
-          this.$set(this.printerGeneralSetting, 'entireReceipt', this.entireReceipt)
+          this.printerGeneralSetting.entireReceipt = this.entireReceipt
           await this.updatePrinterGeneralSetting()
         }
         if(this.entireReceipt < this.printerGeneralSetting.entireReceipt) {
@@ -118,7 +116,7 @@
       async _removeEntireReceipt() {
         this.entireReceipt = this.dialog.lower
         await this.removeEntirePrinter(this.dialog.lower, this.dialog.upper)
-        this.$set(this.printerGeneralSetting, 'entireReceipt', this.entireReceipt)
+        this.printerGeneralSetting.entireReceipt = this.entireReceipt
         await this.updatePrinterGeneralSetting()
       }
     },
