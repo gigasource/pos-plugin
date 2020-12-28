@@ -20,6 +20,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components/Customer/PosCustomer', name: 'posCustomer', path: '/pos-customer' },
+    { loader: { type: 'route' }, filePath: 'components/StaffReport/PosStaffReportDialog.vue', name: 'StaffReport', path: '/pos-staff-report' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
