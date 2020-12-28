@@ -86,11 +86,7 @@
       },
       routeToOrder(table) {
         setTimeout(() => {
-          if (this.isMobile) {
-            this.$router.push(`/pos-order-3/${table || this.trimmedText}`)
-          } else {
-            this.$router.push(`/pos-order-2/${table || this.trimmedText}`)
-          }
+          this.$router.push(`/pos-order/${table || this.trimmedText}`)
           this.text = ''
         }, 200)
       },

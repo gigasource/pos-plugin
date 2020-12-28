@@ -14,6 +14,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/Tutorial/Tutorial.vue', name: 'Tutorial', path: '/pos-tutorial' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
     { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
+    { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
@@ -136,12 +137,12 @@ module.exports = {
       },
       path: 'style/pos.css'
     },
-    // {
-    //   loader: {
-    //     type: 'backend-api'
-    //   },
-    //   path: 'backend/initDemoData/initDemoData.js'
-    // },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/initDemoData/initDemoData.js'
+    },
     {
       loader: {
         type: 'backend-api'
@@ -160,12 +161,6 @@ module.exports = {
       },
       path: 'backend/order/inventory.js'
     },
-    /*{
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/tse/tse.js'
-    },*/
     {
       loader: {
         type: 'backend-api'
@@ -182,7 +177,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/commit/index.js'
+      path: 'backend/master-node/index.js'
     },
     {
       loader: {
@@ -190,17 +185,11 @@ module.exports = {
       },
       path: 'backend/demo-data/socket-handler.js'
     },
-    // {
-    //   loader: {
-    //     type: 'backend-api'
-    //   },
-    //   path: 'backend/usb-printer/usb-printer.js'
-    // },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/handle-version/handle-version.js'
+      path: 'backend/usb-printer/usb-printer.js'
     },
     {
       loader: {

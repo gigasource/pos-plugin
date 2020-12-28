@@ -1,10 +1,10 @@
 <template>
   <div class="pos-payment-keyboard">
-    <div style="position: relative">
+    <div style="position: relative" class="col-6">
       <pos-keyboard-full :template="keyboardTemplate" :items="keyboardItems" gap="4px" style="height: 100%"/>
       <div class="keyboard-overlay" v-if="disableKeyboard" />
     </div>
-    <div :class="['col-flex', isMobile && 'payment-table--mobile']" style="height: 100%">
+    <div :class="['col-flex', isMobile && 'payment-table--mobile']" style="height: 100%; margin-left: 8px; flex: 1">
       <div class="payment-table__header">
         <span>{{$t('onlineOrder.total')}}</span>
         <g-spacer/>
@@ -96,6 +96,7 @@
         keyboardValue: null,
       }
     },
+    emits: ['savePaidOrder', 'openSnackbarError', 'openDialogDiscount', 'updateCurrentOrder'],
     methods: {
       async pay() {
         await this.$router.push({ path: '/pos-order' })
@@ -103,10 +104,10 @@
       },
       discount() {
         if (this.currentOrder.items.find(i => i.vDiscount > 0) && !this.currentOrder.isDiscountInTotal) {
-          this.$getService('alertDiscount:setActive')(true);
+          this.$emit('openSnackbarError');
         } else {
           const originalTotal = this.currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-          this.$getService('dialogDiscount:open')('percentage', originalTotal);
+          this.$emit('openDialogDiscount', 'percentage', originalTotal);
         }
       },
       removePaymentItem(index) {
@@ -167,9 +168,9 @@
             if (val.some(i => i.type === 'cash')) {
               setTimeout(() => {
                 nextTick(() => {
-                  if (this.$refs['cash-textfield'] && this.$refs['cash-textfield'][0]) {
-                    this.$refs['cash-textfield'][0].$el.click()
-                    const input = this.$refs['cash-textfield'][0].$el.querySelector('input')
+                  if (this.$refs['cash-textfield']) {
+                    this.$refs['cash-textfield'].$el.click()
+                    const input = this.$refs['cash-textfield'].$el.querySelector('input')
                     input && input.select()
                   }
                 })
@@ -188,6 +189,7 @@
     background-image: url('../../assets/pos-payment-method-screen-bg.png');
     background-repeat: repeat;
     padding: 8px !important;
+    display: flex;
 
     .keyboard-overlay {
       position: absolute;

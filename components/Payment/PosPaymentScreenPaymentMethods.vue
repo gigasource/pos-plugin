@@ -71,7 +71,7 @@
 </template>
 
 <script>
-  import isNil from 'lodash/isNil';
+  import _ from 'lodash';
   import { nextTick } from 'vue';
 
   export default {
@@ -138,7 +138,7 @@
         this.$emit('updateCurrentOrder', 'payment', [])
         const newItem = {
           type: item.type,
-          value: isNil(item.value)
+          value: _.isNil(item.value)
             ? (this.paymentTotal - this.paidValue)
             : +item.value,
         }
