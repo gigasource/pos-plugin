@@ -117,15 +117,15 @@
               remove: this.getTotalAmount(item.history, 'remove'),
             }))
         const inventories = await cms.getModel('Inventory').find()
-        return histories.map(item => ({
-          ...item,
-          ...inventories.find(i => i._id.toString() === item.inventory)
-        }))
+        return histories.filter(item => !!inventories.find(i => i._id.toString() === item.inventory))
+                        .map(item => ({
+                            ...item,
+                            ...inventories.find(i => i._id.toString() === item.inventory)
+                          }))
       },
       // inventory
-      async loadInventories() {
-        console.log('InventoryStore::loadInventories')
-        const condition = this.inventoryFilters.reduce((acc, filter) => ({...acc, ...filter['condition']}), {});
+      async loadInventories(filters = []) {
+        const condition = filters.reduce((acc, filter) => ({...acc, ...filter['condition']}), {});
         const inventories = await cms.getModel(INVENTORY_COL).find(condition);
         const categories = await cms.getModel(INVENTORY_CATEGORY_COL).find();
         this.inventories = inventories.map(item => ({
@@ -217,19 +217,6 @@
           }
         }]
         await cms.getModel(COMMIT_COL).commit(updateData)
-      },
-
-      //
-      async removeFilter(filter) {
-        const index = this.inventoryFilters.findIndex(f => f.title === filter.title);
-        this.inventoryFilters.splice(index, 1);
-        this.inventoryPagination.currentPage = 1;
-        await this.loadInventories();
-      },
-      async clearFilter() {
-        this.inventoryFilters = [];
-        this.inventoryPagination.currentPage = 1;
-        await this.loadInventories();
       },
       updatePagination() {
 
