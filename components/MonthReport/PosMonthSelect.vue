@@ -19,7 +19,7 @@
         // inject
         monthReportFrom: null,
         monthReportTo: null,
-        selectedMonth: null,
+        selectedMonth: dayjs(),
         dateFormat: null
       }
     },
@@ -61,7 +61,9 @@
     },
     async created() {
       this.selectedMonth = dayjs();
-      await this.updateMonth();
+      setTimeout(async () => {
+        await this.updateMonth();
+      }, 100);
     }
   }
 </script>

@@ -6,7 +6,10 @@
         <span class="ml-2">Back</span>
       </g-btn>
       <g-spacer/>
-      <g-btn background-color="#1271FF" text-color="#FFFFFF" @click="printReport"></g-btn>
+      <g-btn background-color="#1271FF" text-color="#FFFFFF" @click="printReport">
+        <g-icon>icon-printer_2</g-icon>
+        <span class="ml-2">Print report</span>
+      </g-btn>
     </g-toolbar>
     <pos-month-report-setting class="pos-month-report__setting"/>
     <pos-month-select class="pos-month-report__month-select"/>
@@ -53,7 +56,7 @@
           };
           await this.$getService('ReportsStore:printMonthlyReport')(report);
         } catch(e) {
-        console.error(e)
+          console.error(e)
         }
       },
       // inject service

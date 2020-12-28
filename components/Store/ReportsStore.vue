@@ -15,7 +15,7 @@ export default {
       listOfDatesWithReports: [],
       reportsFromMonth: [],
       //month report screen
-      selectedMonth: null,
+      selectedMonth: dayjs(),
       monthReportFrom: null,
       monthReportTo: null,
       showProductSold: true,

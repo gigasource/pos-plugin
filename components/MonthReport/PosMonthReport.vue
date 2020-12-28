@@ -56,6 +56,8 @@
         zNumbers: null,
         // inject service
         monthReport: null,
+        showAllZNumber: null,
+        showProductSold: null,
       }
     },
     created() {
