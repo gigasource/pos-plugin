@@ -1,17 +1,17 @@
 const _ = require('lodash')
 
 module.exports = async function (orm) {
-	const checkActiveOrder = async function (table) {
+	const checkActiveOrder = async function (table, dbName) {
 		if (!table) return false
-		const activeOrder = await orm('Order').findOne({
+		const activeOrder = await orm('Order', dbName).findOne({
 			table,
 			status: 'inProgress'
 		})
 		return activeOrder ? activeOrder : false
 	}
 
-	const buildDoNothingCommit = async function (commit) {
-		commit.id = (await orm.emit('getHighestCommitId')).value + 1
+	const buildDoNothingCommit = async function (commit, dbName) {
+		commit.id = (await orm.emit('getHighestCommitId', dbName)).value + 1
 		commit.approved = false
 		delete commit.chain
 	}
@@ -38,25 +38,25 @@ module.exports = async function (orm) {
 	})
 
 	orm.on('process:commit:createOrder', async function (commit) {
-		if (await checkActiveOrder(commit.data.table)) {
-			await buildDoNothingCommit(commit)
+		if (await checkActiveOrder(commit.data.table, commit.dbName)) {
+			await buildDoNothingCommit(commit, commit.dbName)
 		}
 		this.value = commit
 	})
 
 	orm.on('process:commit:updateActiveOrder', async function (commit) {
-		if (!(await checkActiveOrder(commit.data.table))) {
-			await buildDoNothingCommit(commit)
+		if (!(await checkActiveOrder(commit.data.table, commit.dbName))) {
+			await buildDoNothingCommit(commit, commit.dbName)
 		}
 		this.value = commit
 	})
 
 	orm.on('process:commit:changeTable', async function (commit) {
-		if (!(await checkActiveOrder(commit.data.table))) {
-			await buildDoNothingCommit(commit)
+		if (!(await checkActiveOrder(commit.data.table, commit.dbName))) {
+			await buildDoNothingCommit(commit, commit.dbName)
 		}
-		if ((await checkActiveOrder(commit.data.newTable))) {
-			await buildDoNothingCommit(commit)
+		if (await checkActiveOrder(commit.data.newTable, commit.dbName)) {
+			await buildDoNothingCommit(commit, commit.dbName)
 		}
 		this.value = commit
 	})

@@ -768,7 +768,7 @@ module.exports = async function (cms) {
     socket.on('unwatchDeviceStatus', clientIdList => clientIdList.forEach(clientId => socket.leave(`${WATCH_DEVICE_STATUS_ROOM_PREFIX}${clientId}`)));
 
     socket.on('updateMasterDevice', async (storeId, masterDeviceId) => {
-      await externalSocketIOServer.emitToPersistent(masterDeviceId, 'setDeviceAsMaster')
+      await cms.execPostAsync('setDeviceAsMaster', masterDeviceId)
     })
 
     socket.on('updateAppFeature', async (deviceId, features, cb) => {
