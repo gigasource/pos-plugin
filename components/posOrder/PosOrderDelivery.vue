@@ -180,7 +180,7 @@
           <g-icon>icon-back</g-icon>
         </g-btn-bs>
         <g-spacer/>
-        <div class="delivery-detail__total">{{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(total) }}</div>
+        <div class="delivery-detail__total">{{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(paymentTotal) }}</div>
       </div>
       <div class="delivery-detail__order">
         <div v-for="(item, i) in itemsWithQty" :key="i" class="item">
@@ -264,7 +264,7 @@
           </g-btn-bs>
         </div>
         <g-btn-bs :disabled="disabledConfirm" block large background-color="#2979FF" @click="confirmOrder">Confirm -
-          {{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(total) }}
+          {{$t('common.currency', storeLocale)}}{{ $filters.formatCurrency(paymentTotal) }}
         </g-btn-bs>
       </g-card>
     </g-dialog>
@@ -333,12 +333,12 @@
       Touch
     },
     props: {
-      total: Number,
-      items: Array,
-      user: Object,
-      storeLocale: String,
     },
-    injectService: ['OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls )', 'PosStore:isIOS'],
+    injectService: [
+      'OrderStore:( selectedCustomer, orderType, createCallInOrder, createCustomer, updateCustomer, calls, missedCalls, currentOrder, paymentTotal, ' +
+      '             resetOrderData, addProductToOrder, removeProductModifier, addItemQuantity, removeItemQuantity)',
+      'PosStore:(isIOS, user, storeLocale)'
+    ],
     data() {
       return {
         favorites: [],
@@ -377,7 +377,12 @@
         keyboardConfig: [],
         menuMissed: false,
         missedIndex: null,
-        deliveryOrderMode: 'tablet'
+        deliveryOrderMode: 'tablet',
+        //inject
+        paymentTotal: 0,
+        currentOrder: null,
+        user: {},
+        storeLocale: 'en',
       }
     },
     async created() {
@@ -401,7 +406,7 @@
         return this.user ? this.user.avatar : ''
       },
       itemsWithQty() {
-        if (this.items) return this.items.filter(i => i.quantity > 0)
+        if (this.currentOrder && this.currentOrder.items) return this.currentOrder.items.filter(i => i.quantity > 0)
         return []
       },
       unavailableToAdd() {
@@ -438,7 +443,7 @@
         this.keyboardConfig = setting && setting['keyboardDeliveryConfig']
       },
       back() {
-        this.$emit('resetOrderData')
+        this.resetOrderData()
         this.$router.push({
           path: '/pos-dashboard'
         })
@@ -493,13 +498,13 @@
         return item.originalPrice !== item.price
       },
       addItem(item) {
-        this.$emit('addItemQuantity', item)
+        this.addItemQuantity(item)
       },
       removeItem(item) {
-        this.$emit('removeItemQuantity', item)
+        this.removeItemQuantity(item)
       },
       removeModifier(item, index) {
-        this.$emit('removeProductModifier', item, index)
+        this.removeProductModifier(item, index)
       },
       selectOption(choice, option) {
         const modifiers = _.cloneDeep(this.modifiers) || []
@@ -538,7 +543,7 @@
           modifiers: this.modifiers,
           quantity: this.quantity || 1,
         }
-        this.$emit('addProductToOrder', product)
+        this.addProductToOrder(product)
         this.selectedProduct = null
         this.modifiers = []
         this.quantity = 1
@@ -613,7 +618,7 @@
               this.selectedProduct = product
               this.dialog.choice = true
             } else {
-              this.$emit('addProductToOrder', {
+              this.addProductToOrder({
                 ...product,
                 quantity,
                 modifiers: []
@@ -699,7 +704,7 @@
         this.selectedProduct = this.products[index]
       },
       selectFavoriteProduct(product) {
-        this.$emit('addProductToOrder', {
+        this.addProductToOrder({
           ...product,
           modifiers: [],
           quantity: 1,
@@ -789,7 +794,12 @@
             menu.isActive = false
           }
         }
-      }
+      },
+      resetOrderData() {},
+      addProductToOrder() {},
+      removeProductModifier() {},
+      addItemQuantity() {},
+      removeItemQuantity() {}
     },
     async activated() {
       await this.loadProduct()
