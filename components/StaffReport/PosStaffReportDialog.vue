@@ -124,6 +124,13 @@
       selectedStaff: null,
       staffs: [],
       orderSalesByStaff: null,
+      // PosStore: inject
+      systemDate: null,
+      dateFormat: null,
+      timeFormat: null,
+      // SettingsStore inject
+      listUsers: [],
+      
     }),
     computed: {
       reportDate() {
@@ -153,12 +160,25 @@
       },
       getFormattedTime(val) {
         return val ? dayjs(val).format(`${this.dateFormat} ${this.timeFormat}`) : ''
+      },
+      // inject service
+      getListUsers() {
+        console.error('SettingsStore:getListUsers was not injected')
+      },
+      getOrderSalesByStaff() {
+        console.error('ReportsStore:getOrderSalesByStaff was not injected')
+      },
+      printStaffReport() {
+        console.error('ReportsStore:printStaffReport was not injected')
       }
+      
     },
     async mounted() {
-      await this.getListUsers();
-      this.staffs = this.listUsers;
-      this.selectedStaff = this.staffs.length && this.staffs[0]
+      setTimeout(async () => {
+        await this.getListUsers();
+        this.staffs = this.listUsers;
+        this.selectedStaff = this.staffs.length && this.staffs[0]
+      }, 100)
     },
     async activated() {
       await this.getListUsers();

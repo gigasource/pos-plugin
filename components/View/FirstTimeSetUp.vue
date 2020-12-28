@@ -158,7 +158,7 @@
       connect() {
         this.pairing = true
 
-        this.$emit('registerOnlineOrder', this.code, (error, deviceId, isFirstDevice) => {
+        cms.socket.emit('registerOnlineOrderDevice', this.code, (error, deviceId, isFirstDevice) => {
           if (error) {
             this.error = true
             this.errorMessage = 'Pair failed. Please try again.'
@@ -167,7 +167,8 @@
           } else {
             this.error = false
             this.code = ''
-            this.$emit('completeSetup')
+            this.$router.push('/pos-login')
+            cms.socket.emit('getWebshopName')
           }
           this.pairing = false
         })
