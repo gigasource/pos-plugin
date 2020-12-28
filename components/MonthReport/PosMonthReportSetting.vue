@@ -11,6 +11,16 @@
   export default {
     name: 'PosMonthReportSetting',
     injectService: ['ReportsStore:(selectedMonth,monthReportFrom,monthReportTo,showProductSold,showAllZNumber,getMonthReport)'],
+    data() {
+      return {
+        // inject
+        selectedMonth: null,
+        monthReportFrom: null,
+        monthReportTo: null,
+        showProductSold: null,
+        showAllZNumber: null
+      }
+    },
     computed: {
       from: {
         get() {
@@ -41,6 +51,10 @@
           this.selectedMonth = dayjs()
         }
         await this.getMonthReport()
+      },
+      // inject
+      getMonthReport() {
+        console.error('ReportsStore:getMonthReport was not injected.')
       }
     }
   }

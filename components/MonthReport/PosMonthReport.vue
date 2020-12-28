@@ -54,11 +54,17 @@
         salesByCategory: null,
         salesByPayment: null,
         zNumbers: null,
+        // inject service
+        monthReport: null,
       }
     },
-    async created() {
-      const reportsStore = this.$getService('ReportsStore')
-      this.unwatch = reportsStore.$watch('monthReport', newVal => {
+    created() {
+      setTimeout(async () => {
+        await this.getMonthReport()
+      }, 50)
+    },
+    watch: {
+      monthReport(newVal) {
         if (newVal) {
           const { total, salesByCategory, salesByPayment, zNumbers } = newVal
           this.total = total
@@ -66,16 +72,16 @@
           this.salesByPayment = salesByPayment
           this.zNumbers = zNumbers
         }
-      })
-
-      await reportsStore.getMonthReport()
+      }
+    },
+    methods: {
+      getMonthReport() {
+        console.error('ReportsStore:getMonthReport was not injected')
+      }
     },
     async activated() {
       await this.getMonthReport()
     },
-    beforeDestroy() {
-      this.unwatch()
-    }
   }
 </script>
 

@@ -14,6 +14,15 @@
   export default {
     name: 'PosMonthSelect',
     injectService: ['ReportsStore:(monthReportFrom,monthReportTo,selectedMonth,getMonthReport)', 'PosStore:(dateFormat)'],
+    data() {
+      return {
+        // inject
+        monthReportFrom: null,
+        monthReportTo: null,
+        selectedMonth: null,
+        dateFormat: null
+      }
+    },
     computed: {
       month() {
         if (this.monthReportFrom && this.monthReportTo) {
@@ -44,6 +53,10 @@
           ? dayjs().format('YYYY-MM-DD')
           : this.selectedMonth.endOf('month').format('YYYY-MM-DD');
         await this.getMonthReport();
+      },
+      // inject
+      getMonthReport() {
+        console.error('ReportsStore:getMonthReport was not injected')
       }
     },
     async created() {
