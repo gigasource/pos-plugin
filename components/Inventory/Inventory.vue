@@ -147,7 +147,7 @@
 
   export default {
     name: 'Inventory',
-    injectService: ['InventoryStore:(inventories, loadInventories, inventoryFilters, removeFilter, clearFilter, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
+    injectService: ['InventoryStore:(inventories, loadInventories, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
                                     'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
     props: {},
     data: function () {
@@ -178,16 +178,6 @@
         selectedInventoryIDs: [],
         inventoryPagination: { limit: 15, currentPage: 1 },
         totalInventories: null
-      }
-    },
-    filters: {
-      formatDate(date) {
-        return dayjs(date).format('DD/MM/YYYY HH:mm')
-      },
-      formatNumber(number) {
-        if(!number || isNaN(number) || Math.floor(number) === number)
-          return number
-        return parseFloat(number).toFixed(2);
       }
     },
     async created() {
@@ -273,6 +263,7 @@
       async loadData() {
         this.selectedInventory = null
         this.selectedInventoryIDs = []
+        this.inventoryFilters = []
         await this.loadInventories()
       },
       async submitInventory() {
@@ -341,7 +332,7 @@
         }
         if(this.filter.id) {
           filters.push({
-            title: 'Product ID',
+            title: 'ID',
             text: `'${this.filter.id}'`,
             condition: {id: this.filter.id}
           })
@@ -354,7 +345,7 @@
           })
         }
         this.inventoryFilters = filters
-        await this.loadInventories()
+        await this.loadInventories(this.inventoryFilters)
         this.dialog.filter = false
       },
       editInventory(inventory) {
@@ -365,10 +356,30 @@
         if (!date || !dayjs(date).isValid()) return ''
         return dayjs(date).format('DD/MM/YYYY HH:mm')
       },
+      async removeFilter(filter) {
+        const index = this.inventoryFilters.findIndex(f => f.title === filter.title);
+        this.inventoryFilters.splice(index, 1);
+        if(filter.title.toLowerCase() === 'stock') {
+          this.filter.stock = [0, 0]
+        } else {
+          this.filter[filter.title.toLowerCase()] = ''
+        }
+        this.inventoryPagination.currentPage = 1;
+        await this.loadInventories(this.inventoryFilters);
+      },
+      async clearFilter() {
+        this.inventoryFilters = [];
+        this.inventoryPagination.currentPage = 1;
+        this.filter = {
+          name: '',
+          id: '',
+          category: '',
+          stock: [0, 0],
+        }
+        await this.loadInventories();
+      },
       // inject
       loadInventories() { console.log("injectService.InventoryStore::loadInventories not injected")  },
-      removeFilter() { console.log("injectService.InventoryStore::removeFilter not injected")  },
-      clearFilter() { console.log("injectService.InventoryStore::clearFilter not injected")  },
       createInventory() { console.log("injectService.InventoryStore::createInventory not injected")  },
       updateInventory() { console.log("injectService.InventoryStore::updateInventory not injected")  },
       deleteInventory() { console.log("injectService.InventoryStore::deleteInventory not injected")  },
