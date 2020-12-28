@@ -15,6 +15,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
     { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
     { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
+    { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
@@ -173,24 +174,24 @@ module.exports = {
       },
       path: 'backend/rn-bridge/app-rn-bridge.js'
     },
-    {
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/master-node/index.js'
-    },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/master-node/index.js'
+    // },
     {
       loader: {
         type: 'backend-api'
       },
       path: 'backend/demo-data/socket-handler.js'
     },
-    {
-      loader: {
-        type: 'backend-api'
-      },
-      path: 'backend/usb-printer/usb-printer.js'
-    },
+    // {
+    //   loader: {
+    //     type: 'backend-api'
+    //   },
+    //   path: 'backend/usb-printer/usb-printer.js'
+    // },
     {
       loader: {
         type: 'i18n'
