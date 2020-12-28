@@ -29,7 +29,7 @@
             <g-icon style="cursor: pointer" @click="openDialog('ipInput')">icon-keyboard</g-icon>
           </template>
         </g-text-field-bs>
-        <g-btn-bs background-color="blue accent 3" style="padding: 6px; flex: 1; transition: none" @click="$emit('testPrinter', printer)">
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px; flex: 1; transition: none" @click="testPrinter(printer)">
           {{$t('settings.testPrinter')}}
         </g-btn-bs>
       </div>
@@ -41,12 +41,12 @@
             :value="printer.usb"
             @input="setUsbPrinter"
             textFieldComponent="GTextFieldBs"/>
-        <g-btn-bs background-color="blue accent 3" style="padding: 6px; transition: none" @click="$emit('testPrinter', printer)">
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px; transition: none" @click="testPrinter(printer)">
           {{$t('settings.testPrinter')}}
         </g-btn-bs>
       </div>
       <div v-else class="config">
-        <g-btn-bs background-color="blue accent 3" style="padding: 6px 16px; transition: none" @click="$emit('testPrinter', printer)">
+        <g-btn-bs background-color="blue accent 3" style="padding: 6px 16px; transition: none" @click="testPrinter(printer)">
           {{$t('settings.testPrinter')}}
         </g-btn-bs>
       </div>
@@ -167,7 +167,7 @@
       index: Number
     },
     injectService: [
-      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter, usbPrinters, loadUsbPrinters)',
+      'SettingsStore:(printer, getPrinterById, updateGroupPrinterName, updatePrinter, getGroupPrintersByType, getAllTaxCategory, getGroupPrinterById, updateGroupPrinter, usbPrinters, loadUsbPrinters,testPrinter)',
     ],
     data() {
       return {
@@ -473,6 +473,9 @@
           this.printer = { usb: value }
         }
         await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
+      },
+      testPrinter() {
+        console.error('SettingStore:testPrinter was not injected')
       }
     },
     watch: {
