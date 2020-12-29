@@ -480,7 +480,7 @@
     },
     async created() {
       if (!this.user) {
-        this.user = await cms.getModel('PosUser').findOne({ role: 'admin' }).lean()
+        this.user = await cms.getModel('PosUser').findOne({ role: 'admin' })
       }
 
       window.addEventListener('offline', () => this.online = false)
@@ -488,7 +488,7 @@
       window.addEventListener('keydown', async e => {
         if (this.$route.path !== '/pos-login') return
         if (e.ctrlKey && e.code === 'KeyL') {
-          this.user = await cms.getModel('PosUser').findOne({ role: 'admin' }).lean()
+          this.user = await cms.getModel('PosUser').findOne({ role: 'admin' })
           this.$router.push('/pos-dashboard')
         }
       })

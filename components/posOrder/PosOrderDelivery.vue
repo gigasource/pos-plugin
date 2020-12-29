@@ -483,7 +483,7 @@
           this.isNewCustomer = false
         }
         if (this.dialogMode === 'edit') {
-          this.$set(this.selectedCustomer, 'name', this.name)
+          this.selectedCustomer['name'] = this.name
           this.selectedCustomer.addresses.splice(this.selectedAddress, 1, {
             address: this.address,
             zipcode: this.zipcode,
@@ -529,7 +529,7 @@
             modifiers.push(option)
           }
         }
-        this.$set(this, 'modifiers', modifiers)
+        this.modifiers = modifiers
       },
       isModifierSelect(option) {
         if (!this.modifiers) return false
@@ -751,7 +751,7 @@
               city: this.city
             }]
           }
-          this.$set(this, 'selectedCustomer', customer)
+          this.selectedCustomer = customer
           this.selectedAddress = customer.addresses.length - 1
           this.isNewCustomer = false
         }

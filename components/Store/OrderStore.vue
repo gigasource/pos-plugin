@@ -214,7 +214,8 @@
           table: this.currentOrder.table,
           items: this.currentOrder.items ? this.currentOrder.items : [],
           status: 'inProgress',
-          takeAway
+          takeAway,
+          date: new Date()
         }).commit('createOrder', {table: this.currentOrder.table}).chain
       },
       addProductToOrder(product) {
@@ -447,6 +448,7 @@
         const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, false, async newOrder => {
           callback(newOrder);
+          this.getActiveOrders()
         })
       },
       compactOrder(products) {
@@ -669,6 +671,19 @@
             }
           }
         }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
+
+        if (!this.currentOrder.date) {
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
+            _id: this.currentOrder._id
+          }, {
+            $push: {
+              user: {
+                $each: [{ name: this.user.name, date: new Date() }],
+                $position: 0
+              }
+            }
+          }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
+        }
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
@@ -700,6 +715,7 @@
           this.currentOrder.user.unshift({ name: this.user.name })
           this.$router.go(-1)
           // this.currentOrder = { items: [], hasOrderWideDiscount: false }
+          this.getActiveOrders()
         })
       },
       setNewPrice(price, product) {
@@ -740,6 +756,7 @@
         this.printedOrder[key] = val
       },
       async moveItems(table, newItems, currentOrderItems, cb = () => null) {
+        console.log('moveItems')
         const clientId = await this.getOnlineOrderDeviceId()
         const sentryTags = `sentry:eventType=moveItems,clientId=${clientId},orderId=${this.currentOrder._id}`;
         console.debug(sentryTags, `1. POS frontend: emit moveItems to table ${table}`)
@@ -749,6 +766,7 @@
             this.currentOrder['status'] = updatedOrder.status
           }
           cb()
+          this.getActiveOrders()
         })
       },
       addVoucher(value) {
@@ -843,6 +861,7 @@
               if (resetOrder) this.currentOrder = { items: [], hasOrderWideDiscount: false }
               cb(newOrder)
               resolve(newOrder)
+              this.getActiveOrders()
             })
           } catch (e) {
             reject(e)

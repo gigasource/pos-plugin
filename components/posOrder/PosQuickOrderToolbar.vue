@@ -52,7 +52,7 @@
     data() {
       return {
         showMenu: false,
-        onlyCheckoutPrintedItems: true
+        onlyCheckoutPrintedItems: true,
       }
     },
     computed: {
@@ -66,14 +66,18 @@
         return !this.currentOrder.items.length
       },
       disablePay() {
-        if (!this.currentOrder.table) return false
-        if (!this.currentOrder.items.some(i => i.quantity)) return true
-        if (this.onlyCheckoutPrintedItems) {
-          return this.currentOrder.items.some(i => !i.printed && i.quantity)
+        if (this.currentOrder && this.currentOrder.items) {
+          if (!this.currentOrder.table) return false
+          if (!this.currentOrder.items.some(i => i.quantity)) return true
+          if (this.onlyCheckoutPrintedItems) {
+            return this.currentOrder.items.some(i => !i.printed && i.quantity)
+          }
         }
       },
       disableTakeAway() {
-        return !this.currentOrder.items.some(i => i.quantity)
+        if (this.currentOrder && this.currentOrder.items) {
+          return !this.currentOrder.items.some(i => i.quantity)
+        }
       }
     },
     methods: {

@@ -151,7 +151,7 @@
         }
       },
       selectModifier(value, category) {
-        this.$set(this.selectedModifiers, category._id, value)
+        this.selectedModifiers[category._id] = value
       },
       getModifierQty(_id) {
         return this.listModifiers2.filter(mod => mod._id === _id).length;
@@ -178,7 +178,7 @@
           this.selectedModifiers = {}
           this.listModifiers2 = []
           this.categories.forEach(cat => {
-            if (!cat.selectOne) this.$set(this.selectedModifiers, cat._id, [])
+            if (!cat.selectOne) this.selectedModifiers[cat._id] = []
           })
         }
       },
