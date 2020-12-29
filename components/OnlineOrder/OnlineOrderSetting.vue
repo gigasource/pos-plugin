@@ -81,7 +81,7 @@
         </template>
         <template #selected="{item}">
           <g-btn-bs border-color="#90CAF9" text-color="black" height="30" background-color="#E3F2FD"
-                    style="margin-top: 8px; white-space: nowrap" @click.stop="toggleSelect(item)"
+                    style="margin-top: 8px; white-space: nowrap"
           >{{item.text}}
           </g-btn-bs>
         </template>

@@ -77,29 +77,29 @@
       <g-switch label="TSC POS" v-model="tscPOS"/>
     </div>
     <div class="title" style="margin-left: 12px">{{$t('settings.receiptFontSize')}}</div>
-    <g-grid-select mandatory item-cols="auto" :items="listFontSize" v-model="fontSize" style="margin-left: 12px; padding-top: 4px">
+    <g-grid-select mandatory :grid="false" :items="listFontSize" v-model="fontSize" style="margin-left: 12px; padding-top: 4px">
       <template v-slot:default="{ toggleSelect, item }">
-        <div class="option" @click="toggleSelect(item)">
+        <g-btn-bs class="option" @click="toggleSelect(item)">
           {{item}}
-        </div>
+        </g-btn-bs>
       </template>
-      <template v-slot:selected="{ toggleSelect, item }">
-        <div class="option option--selected">
+      <template v-slot:selected="{ item }">
+        <g-btn-bs class="option option--selected">
           {{item}}
-        </div>
+        </g-btn-bs>
       </template>
     </g-grid-select>
     <div class="title" style="margin-left: 12px">{{$t('settings.receiptTopMargin')}}</div>
-    <g-grid-select mandatory item-cols="auto" :items="listMarginSize" v-model="marginTop" style="margin-left: 12px; padding-top: 4px">
+    <g-grid-select mandatory :grid="false" :items="listMarginSize" v-model="marginTop" style="margin-left: 12px; padding-top: 4px">
       <template v-slot:default="{ toggleSelect, item }">
-        <div class="option" @click="toggleSelect(item)">
+        <g-btn-bs class="option" @click="toggleSelect(item)">
           + {{item}} Cm
-        </div>
+        </g-btn-bs>
       </template>
       <template v-slot:selected="{ toggleSelect, item }">
-        <div class="option option--selected">
+        <g-btn-bs class="option option--selected">
           + {{item}} Cm
-        </div>
+        </g-btn-bs>
       </template>
     </g-grid-select>
     <template v-if="groupPrinter && groupPrinter.type === 'kitchen'">
@@ -151,10 +151,10 @@
 </template>
 
 <script>
-  
+
   // TODO:
   // - g-grid-select doesn't highlight selected item
-  
+
   import DialogFormInput from '../pos-shared-components/dialogFormInput';
   import { nextTick } from 'vue';
   export default {
@@ -184,7 +184,7 @@
         editName: '',
         editIp: '',
         showDialog: false,
-        printer: null,
+        printer: {},
         listTaxCategories: [],
         groupPrinter: null
       }
@@ -342,34 +342,20 @@
       },
       fontSize: {
         get() {
-          if(this.printer) {
-            return this.printer.fontSize
-          }
+          if (this.printer) return this.printer.fontSize
         },
-        async set(val) {
-          if(this.printer)
-            this.printer.fontSize = val
-          else
-            this.printer = {
-              fontSize: val
-            }
-          await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
+        set(val) {
+          if (this.printer) this.printer.fontSize = val
+          this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
       marginTop: {
         get() {
-          if(this.printer) {
-            return this.printer.marginTop
-          }
+          if (this.printer) return this.printer.marginTop
         },
-        async set(val) {
-          if(this.printer)
-            this.printer.marginTop = val
-          else
-            this.printer = {
-              marginTop: val
-            }
-          await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
+        set(val) {
+          if (this.printer) this.printer.marginTop = val
+          this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
       dineInTax: {
@@ -606,7 +592,9 @@
       border-radius: 2px;
       border: 1px solid #E0E0E0;
       min-width: 50px;
-      margin-right: 4px;
+      margin-right: 8px;
+      margin-left: 0;
+      height: 24px;
 
       &--selected {
         border-color: #90CAF9;
