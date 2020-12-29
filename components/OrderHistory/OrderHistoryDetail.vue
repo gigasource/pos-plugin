@@ -152,7 +152,8 @@
 <style scoped lang="scss">
   .order-detail {
     padding: 16px 7px;
-    box-shadow: -1px 0px 6px rgba(0, 0, 0, 0.25);
+    border-left: 1px solid #e0e0e0;
+    // box-shadow: -1px 0px 6px rgba(0, 0, 0, 0.25);
     overflow: auto;
     z-index: 2;
     display: flex;
