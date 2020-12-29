@@ -29,8 +29,13 @@
         }
       }
     },
-    mounted() {
-      this.modelValue && (this.lazyValue = this.modelValue)
+    watch: {
+      modelValue: {
+        handler(val) {
+          if (val) this.lazyValue = val
+        },
+        immediate: true
+      }
     }
   }
 </script>

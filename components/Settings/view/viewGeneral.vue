@@ -36,7 +36,7 @@
     </div>
     <div class="flex-grow-1 offset-1">
       <div class="row-flex align-items-center justify-center">
-        <pos-time-picker :label="$t('settings.beginHour')" :value="beginHour" @input="beginHour = $event">
+        <pos-time-picker :label="$t('settings.beginHour')" v-model="beginHour">
           <template v-slot:append>
             <g-icon>access_time</g-icon>
           </template>

@@ -20,7 +20,10 @@
     ],
     data() {
       return {
-        dialogConfirmDelete: false
+        dialogConfirmDelete: false,
+        user: null,
+        selectedUser: null,
+        listUsers: null
       }
     },
     computed: {
@@ -30,6 +33,7 @@
       }
     },
     methods: {
+      updateUser() {},
       openDialogDelete() {
         this.dialogConfirmDelete = true;
       },
