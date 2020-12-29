@@ -328,17 +328,15 @@
       tscPOS: {
         get() {
           if(this.printer) {
-            return this.printer.tscPOS
+            return this.printer.tscPos
           }
           return false
         },
         async set(val) {
-          // TODO: Assign tsc pos doesn't work
-          if(this.printer) {
-            this.printer.tscPOS =  val
-          } else {
-            this.printer = { tscPOS: val }
-          }
+          if(this.printer)
+            this.printer.tscPos =  val
+          else
+            this.printer = { tscPos: val }
           await this.updatePrinter(this.printer._id, this.printer, this.id, this.index)
         }
       },
