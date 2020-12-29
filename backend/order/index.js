@@ -5,7 +5,6 @@ const { printInvoiceHandler } = require('../print-report')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
 const mongoose = require('mongoose');
-// const updateCommit = require('../master-node/updateCommit');
 
 module.exports = (cms) => {
   const { orm } = cms
@@ -159,8 +158,9 @@ module.exports = (cms) => {
           }).commit('splitOrder')
         } else {
           const excludes = ['_id', 'table', 'id', 'splitId', 'status']
+          const excluded = _.omit(mappedOrder, excludes)
 
-          _(mappedOrder).omit(excludes).map(async (value, key) => {
+          _.forEach(excluded, async (value, key) => {
             await orm('Order').findOneAndUpdate({
               _id: mappedOrder._id
             }, {
@@ -169,6 +169,7 @@ module.exports = (cms) => {
               }
             }).commit('updateActiveOrder', { table: mappedOrder.table })
           })
+
           await orm('Order').findOneAndUpdate({
             _id: mappedOrder._id
           }, {
@@ -187,8 +188,8 @@ module.exports = (cms) => {
               recentCancellationItems: [], recentItems: []
             }
           }).commit({ table: mappedOrder.table })
-          newOrder = await orm('Order').findById(mappedOrder._id)
         }
+        newOrder = await orm('Order').findById(mappedOrder._id)
 
         if (print) {
           await createPrintAction('invoice', mappedOrder, device)
@@ -237,8 +238,8 @@ module.exports = (cms) => {
       console.debug(sentryTags, `4. POS backend: finished commit, ack cb to frontend`)
 
       // print new items
-      const newOrder = await updateCommit.getMethod('order', 'buildTempOrder')(table);
-      let itemsToPrint = newItems.filter(i => !i.printed)
+      const newOrder = await cms.getModel('Order').findOne({ table, status: 'inProgress' })
+      const itemsToPrint = newItems.filter(i => !i.printed);
       // merge if needed
       const shouldMerge = await getMergeOrderSettings()
       if (shouldMerge) {
