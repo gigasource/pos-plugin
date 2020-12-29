@@ -143,13 +143,13 @@ export default {
       showOverlay: true,
       scrollableLayout: true,
       //inject
-      user: null,
+      user: {},
       isMobile: null,
       storeLocale: null,
-      currentOrder: null,
+      currentOrder: {},
       paymentTotal: null,
       printedOrder: null,
-      actionList: null,
+      actionList: [],
       isTakeAwayOrder: null,
       activeOrders: null,
       //dialog

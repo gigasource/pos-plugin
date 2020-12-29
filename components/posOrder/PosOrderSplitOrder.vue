@@ -302,7 +302,7 @@
           split.payment = payment
 
           // TODO: tip is not saved on backend yet
-          this.$set(split, 'tip', tip)
+          split['tip'] = tip
         })
       },
       complete() {

@@ -533,22 +533,9 @@
     created() {
       this.loadSetting()
     },
-    mounted() {
-      const orderStore = this.$getService('OrderStore')
-
-      orderStore.$watch('currentOrder.items', (items, oldItems) => {
-        if (this.$el) {
-          if (!items) return
-          const tableEl = this.$el.querySelector('.order-detail__content')
-          if (items.filter(i => i.quantity).length > oldItems.filter(i => i.quantity).length) {
-            tableEl.scrollTop = tableEl.scrollHeight
-          }
-        }
-      }, { deep: true })
-    },
     async activated() {
-      if (this.$router.currentRoute.params && this.$router.currentRoute.params.name) {
-        this.table = this.$route.params.name
+      if (this.$route.params.id) {
+        this.table = this.$route.params.id
         this.$emit('updateOrderTable', this.table)
       } else this.table = ''
 
@@ -562,11 +549,10 @@
       }
 
       this.loadSetting()
-
     },
     watch: {
       items(val) {
-        if(val && this.$refs) {
+        if (val && this.$refs) {
           nextTick(() => {
             const table = this.$refs.table
             table.scroll({top: table.scrollHeight, behavior: 'smooth'})
