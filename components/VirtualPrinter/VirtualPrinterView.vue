@@ -19,8 +19,8 @@
           <g-select
               text-field-component="GTextFieldBs"
               :items="printerGroupModel"
-              :value="virtualPrinterState.printerGroupFilter"
-              @input="selectPrinterGroup"
+              :model-value="virtualPrinterState.printerGroupFilter"
+              @update:modelValue="selectPrinterGroup"
               class="virtualPrinter__header__select"
               style="min-width: 80px"/>
           <g-spacer/>
