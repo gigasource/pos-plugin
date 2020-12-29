@@ -591,7 +591,8 @@
     padding: 0 8px;
     background: white;
     color: #1d1d26;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    border-left: 1px solid #e0e0e0;
+    // box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
     position: relative;
