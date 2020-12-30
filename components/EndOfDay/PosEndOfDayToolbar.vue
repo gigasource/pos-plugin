@@ -42,8 +42,7 @@
     name: 'PosEndOfDayToolbar',
     components: { PosEndOfDayReprintZReport, PosEndOfDayPrintPendingZReport, PosEndOfDayPrintDialog, PosEndOfDayPrintZReport },
     injectService: [
-      'ReportsStore:selectedReportDate',
-      'ReportsStore:listOfDatesWithReports',
+      'ReportsStore:(selectedReportDate,listOfDatesWithReports,getOldestPendingReport,finalizeReport,getDatesWithReports,getDailyReports)'
     ],
     data() {
       return {
@@ -70,7 +69,7 @@
         this.$router.push({ path: '/pos-dashboard' })
       },
       async runEndOfDay() {
-        const oldestPendingReport = await this.$getService('ReportsStore:getOldestPendingReport')()
+        const oldestPendingReport = await this.getOldestPendingReport()
         if (oldestPendingReport && oldestPendingReport.date < this.selectedReportDate.date) {
           this.showPendingEndOfDayConfirmDialog = true
           return
@@ -79,9 +78,21 @@
       },
       async save(reports) {
         const date = this.selectedReportDate.date || new Date()
-        await this.$getService('ReportsStore:finalizeReport')(reports)
-        await this.$getService('ReportsStore:getDatesWithReports')(date)
-        this.$getService('ReportsStore:getDailyReports')(date)
+        await this.finalizeReport(reports)
+        await this.getDatesWithReports(date)
+        this.getDailyReports(date)
+      },
+      getOldestPendingReport() {
+        console.error('ReportsStore:getOldestPendingReport was not injected')
+      },
+      finalizeReport() {
+        console.error('ReportsStore:finalizeReport was not injected')
+      },
+      getDatesWithReports() {
+        console.error('ReportsStore:getDatesWithReports was not injected')
+      },
+      getDailyReports() {
+        console.error('ReportsStore:getDailyReports was not injected')
       }
     }
   }

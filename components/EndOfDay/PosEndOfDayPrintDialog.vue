@@ -69,7 +69,7 @@
       async open(date) {
         this.dialog = true;
         this.date = date;
-        this.xReport = this.getXReport(date)
+        this.xReport = await this.getXReport(date)
       },
       close() {
         this.dialog = false
