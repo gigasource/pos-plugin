@@ -1,5 +1,5 @@
 <template>
-  <g-sidebar medium style="height: 100vh">
+  <g-sidebar medium style="height: 100vh; z-index: 2">
     <template v-slot:header>
       <div class="sidebar-header">
         <g-avatar size="40">

@@ -49,7 +49,7 @@
                   <g-combobox style="width: 100%" label="Address" v-model="placeId" outlined dense clearable :virtual-event="isIOS" skip-search
                               :items="autocompleteAddresses" @update:searchText="debouceSearchAddress" ref="autocomplete"
                               @input-click="showKeyboard = true" keep-menu-on-blur menu-class="menu-autocomplete-address"
-                              @input="selectAutocompleteAddress"/>
+                              @update:modelValue="selectAutocompleteAddress"/>
                 </div>
                 <div class="flex-grow-1 ml-1">
                   <g-text-field outlined dense v-model="house" label="Nr" @click="showKeyboard = true" :virtual-event="isIOS"/>
@@ -145,8 +145,8 @@
                           ref="autocomplete" return-object
                           :filter="(itemText, text) => {return itemText.toLowerCase().includes(text.toLowerCase())}"/>
           <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos quantity" v-model="quantity" label="Quantity"/>
-          <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :value="selectedProduct.price" label="Price"
-                           @input="debouceUpdatePrice"/>
+          <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" :model-value="selectedProduct.price" label="Price"
+                           @update:modelValue="debouceUpdatePrice"/>
           <g-text-field-bs v-if="selectedProduct" class="bs-tf__pos" v-model="selectedProduct.note" label="Note"/>
           <template v-if="selectedProduct && selectedProduct.choices && selectedProduct.choices.length > 0">
             <div v-for="(choice, iC) in selectedProduct.choices" class="delivery-order__choice" :key="`choice_${iC}`">
@@ -219,9 +219,9 @@
         <div class="row-flex flex-wrap justify-around">
           <pos-textfield-new style="width: 48%" label="Name" v-model="name"/>
           <pos-textfield-new style="width: 48%" label="Phone" v-model="phone"/>
-          <g-combobox style="width: 98%" label="Address" :value="placeId" clearable :virtual-event="isIOS" skip-search
+          <g-combobox style="width: 98%" label="Address" :model-value="placeId" clearable :virtual-event="isIOS" skip-search
                       :items="autocompleteAddresses" @update:searchText="debouceSearchAddress"
-                      @input="selectAutocompleteAddress"/>
+                      @update:modelValue="selectAutocompleteAddress"/>
           <pos-textfield-new style="width: 23%" label="Street" placeholder="Street name (Autofill)"
                              v-model="street"/>
           <pos-textfield-new style="width: 23%" label="House no." placeholder="House number (Autofill)"
@@ -713,7 +713,7 @@
       getCheckboxLabel(option) {
         if (!option.price)
           return option.name
-        return `${option.name} (${this.$t('common.currency', this.storeLocale)}${this.formatMoney(option.price)})`
+        return `${option.name} (${this.$t('common.currency', this.storeLocale)}${this.$filters.formatCurrency(option.price)})`
       },
       changeQuantity(value) {
         if (this.quantity + value >= 0) {

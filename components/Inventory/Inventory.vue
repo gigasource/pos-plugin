@@ -129,7 +129,7 @@
         <div class="row-flex flex-wrap justify-around mt-2">
           <pos-textfield-new style="width: 30%" label="Product ID" v-model="filter.id" clearable/>
           <pos-textfield-new style="width: 30%" label="Name" v-model="filter.name" clearable/>
-          <g-select menu-class="menu-select-inventory" outlined style="width: 30%" :label="$t('article.category')" clearable
+          <g-select menu-class="menu-select-inventory" text-field-component="PosTextfieldNew" outlined style="width: 30%" :label="$t('article.category')" clearable
                     :items="inventoryCategories" item-text="name" return-object v-model="filter.category"/>
           <div class="col-12 row-flex">
             <p style="margin-top: 35px; margin-left: 16px">Stock Range:</p>
