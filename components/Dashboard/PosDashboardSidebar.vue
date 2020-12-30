@@ -63,7 +63,7 @@
         return this.user ? this.user.avatar : ''
       },
       computedItems() {
-        return this.mapTitle(this.items)
+        return this.mapTitle(this.items || [])
       }
     },
     created() {
@@ -73,11 +73,6 @@
       clearInterval(this.timerId)
     },
     mounted() {
-      if (this.defaultPath)
-        this.sidebar = this.defaultPath // 'item.0.item.0'
-      if (typeof(this.afterMountFn) === 'function')
-        this.afterMountFn(this)
-
       // const posStore = this.$getService('PosStore')
       // posStore.$watch('enabledFeatures', (newVal, oldVal) => {
       //   if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {
@@ -91,8 +86,10 @@
       // })
     },
     watch: {
-      defaultPath(val) {
-        this.sidebar = val
+      defaultPath(newVal, oldVal) {
+        this.sidebar = newVal
+
+        if (!oldVal && newVal && typeof this.afterMountFn === 'function') this.afterMountFn(this)
       },
       enabledFeatures(newVal, oldVal) {
         if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {

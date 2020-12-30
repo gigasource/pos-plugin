@@ -85,7 +85,7 @@
             return false
         },
         set(val) {
-          this.$set(this.reservationSetting, 'activeReservation', val)
+          this.reservationSetting.activeReservation = val
           this.updateReservationSetting()
         }
       },
@@ -97,7 +97,7 @@
             return false
         },
         set(val) {
-          this.$set(this.reservationSetting, 'soundNotification', val)
+          this.reservationSetting.soundNotification = val
           this.updateReservationSetting()
         }
       },
@@ -109,7 +109,7 @@
             return false
         },
         set(val) {
-          this.$set(this.reservationSetting, 'hideEmpty', val)
+          this.reservationSetting.hideEmpty = val
           this.updateReservationSetting()
         }
       },
@@ -121,10 +121,9 @@
             return 0
         },
         set(val) {
-          if(val === 'Do not delete')
-            this.$set(this.reservationSetting, 'removeOverdueAfter', 0)
-          else
-            this.$set(this.reservationSetting, 'removeOverdueAfter', val)
+          if(val === 'Do not delete') this.reservationSetting.removeOverdueAfter = 0
+          else this.reservationSetting.removeOverdueAfter = val
+
           this.updateReservationSetting()
         }
       },
@@ -136,7 +135,7 @@
             return 0
         },
         set(val) {
-          this.$set(this.reservationSetting, 'maxGuest', val)
+          this.reservationSetting.maxGuest = val
           this.updateReservationSetting()
         }
       },
@@ -148,7 +147,7 @@
             return 0
         },
         set(val) {
-          this.$set(this.reservationSetting, 'maxDay', val)
+          this.reservationSetting.maxDay = val
           this.updateReservationSetting()
         }
       },
@@ -161,7 +160,7 @@
             this.errorHour.open = true
           } else {
             this.errorHour.open = false
-            this.$set(this.reservationSetting, 'openTime', time)
+            this.reservationSetting.openTime = time
             this.updateReservationSetting()
           }
         }
@@ -171,7 +170,7 @@
             this.errorHour.close = true
           } else {
             this.errorHour.close = false
-            this.$set(this.reservationSetting, 'closeTime', time)
+            this.reservationSetting.closeTime = time
             this.updateReservationSetting()
           }
         }

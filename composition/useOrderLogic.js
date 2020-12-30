@@ -155,12 +155,12 @@ const getActiveOrders = _.throttle(async function () {
 
 function mapToCurrentOrder(order, table) {
   if (order) {
-    (currentOrder.value['_id'] = order._id)
-    (currentOrder.value['user'] = _.cloneDeep(order.user))
-    (currentOrder.value['items'] = _.cloneDeep(order.items))
-    (currentOrder.value['manual'] = order.manual)
-    (currentOrder.value['discount'] = order.discount)
-    (currentOrder.value['takeAway'] = order.takeAway)
+    currentOrder.value['_id'] = order._id
+    currentOrder.value['user'] = _.cloneDeep(order.user)
+    currentOrder.value['items'] = _.cloneDeep(order.items)
+    currentOrder.value['manual'] = order.manual
+    currentOrder.value['discount'] = order.discount
+    currentOrder.value['takeAway'] = order.takeAway
     order.splitId && (currentOrder.value['splitId'] = order.splitId)
     order.numberOfCustomers && (currentOrder.value['numberOfCustomers'] = order.numberOfCustomers)
     order.tseMethod && (currentOrder.value['tseMethod'] = order.tseMethod)
