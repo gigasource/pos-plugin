@@ -88,8 +88,8 @@
         console.error('ReportsStore:printXReport was not injected')
       }
     },
-    setup() {
-      const dialog = getInternalValue(...arguments);
+    setup(props, context) {
+      const dialog = getInternalValue(props, context);
       return { dialog };
     },
   }
