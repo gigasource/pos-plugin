@@ -412,10 +412,10 @@
 
         let foundItem = this.findSelectedButton(this.selectedButtons[0]);
         if (foundItem) {
-          this.$set(foundItem, 'style', {
+          foundItem.style = {
             ...this.selectedColor && {backgroundColor: this.selectedColor.value},
             textColor: this.selectedColor && ['#73F8F8', '#FFFFFF'].includes(this.selectedColor.value) ? '#000000' : '#FFFFFF'
-          })
+          };
 
           try {
             this.updatePosSettings(foundItem, 'paymentFunctionButtons', this.mergeMap)

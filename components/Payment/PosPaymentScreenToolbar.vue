@@ -22,11 +22,12 @@
     methods: {
       back() {
         if(this.currentOrder.isDiscountInTotal) {
-          this.$set(this.currentOrder, 'items', this.currentOrder.items.map(item => ({
+          this.currentOrder.items = this.currentOrder.items.map(item => ({
             ..._.omit(item, ['discount', 'discountUnit', 'vDiscount']),
             price: item.originalPrice,
-          })))
-          this.$set(this.currentOrder, 'isDiscountInTotal', false);
+          }))
+
+          this.currentOrder.isDiscountInTotal = false
         }
         this.$router.push({path: '/pos-order'})
       }

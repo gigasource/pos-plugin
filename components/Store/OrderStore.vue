@@ -972,7 +972,7 @@
             deliveryDateTime = dayjs(order.deliveryTime, 'HH:mm')
           }
           const status = 'kitchen'
-          const acceptResponse = $t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
+          const acceptResponse = this.$t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
             0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
 

@@ -131,7 +131,7 @@
       await this.getRequest()
 
       cms.socket.on('denySignIn', () => {
-        if (this.signInRequest) this.$set(this.signInRequest, 'status', 'notApproved')
+        if (this.signInRequest) this.signInRequest.status = 'notApproved'
         else this.getRequest()
       })
     },
