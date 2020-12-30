@@ -12,7 +12,7 @@
         <div class="mb-2 fw-600">Delivery keyboard</div>
         <div class="row-flex align-items-center mb-2">
           <p class="mr-2">External rows</p>
-          <input-number width="148" :value="keyboardConfig.length" @input="changeExtraRows"/>
+          <input-number width="148" :model-value="keyboardConfig.length" @update:modelValue="changeExtraRows"/>
         </div>
       </div>
       <div class="col-6 col-flex h-100">
