@@ -4,7 +4,9 @@
                                 :first-day-of-week="1"
                                 :month-select-disabled="true"
                                 :weekday-format="getDay"
-                                color="#fff" full-width no-title
+                                color="#fff"
+                                full-width
+                                no-title
                                 :value="date"
                                 @input="selectDate"
                                 @click:prev="getDatesWithReport"
@@ -26,13 +28,21 @@
       eventDates: [],
       // inject.ReportsStore
       selectedReportDate: null,
-      listOfDatesWithReports: []
+      listOfDatesWithReports: [],
+      daysOfWeek: [
+          'onlineOrder.weekday.sun',
+          'onlineOrder.weekday.mon',
+          'onlineOrder.weekday.tue',
+          'onlineOrder.weekday.wed',
+          'onlineOrder.weekday.thu',
+          'onlineOrder.weekday.fri',
+          'onlineOrder.weekday.sat',
+      ]
     }),
     methods: {
       getDay(date) {
-        const daysOfWeek = this.$t('dates.daysOfWeek');
         let i = new Date(date).getDay();
-        return daysOfWeek[i]
+        return this.$t(this.daysOfWeek[i])
       },
       selectDate(value) {
         if (!this.selectedReportDate || !value) this.selectedReportDate = {}

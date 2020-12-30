@@ -1,6 +1,6 @@
 <script>
-  import _ from 'lodash'
-  import { computed, withModifiers } from 'vue'
+  import _ from 'lodash';
+  import { computed, withModifiers, withScopeId, getCurrentInstance } from 'vue';
   import { _computedDatesInMonthCustom } from './computedDateInMonth';
   import { setBackgroundColor, setTextColor, GDatePickerUtil, GPicker } from 'pos-vue-framework';
 
@@ -353,6 +353,10 @@
 
       // datepicker render function
       function datePickerRenderFn() {
+        const slots = {
+          title: () => datePickerTitleRenderFn(),
+          actions: () => context.slots.default && context.slots.default()
+        }
         return (
           <g-picker
             color={props.headerColor || props.color || DEFAULT_COLOR}
@@ -360,14 +364,9 @@
             landscape={props.landscape}
             width={props.width >= MINIMUM_WIDTH ? props.width : MINIMUM_WIDTH}
             noTitle={props.noTitle}
-            disabled={props.disabled}>
-            <template slot="title">
-              {datePickerTitleRenderFn()}
-            </template>
+            disabled={props.disabled}
+            vSlots={slots}>
             {datePickerBodyRenderFn()}
-            <template slot="actions">
-              {context.slots.default && context.slots.default()}
-            </template>
           </g-picker>
         )
       }
@@ -383,7 +382,8 @@
       }
     },
     render() {
-      return this.datePickerRenderFn()
+      const { type } = getCurrentInstance();
+      return withScopeId(type.__scopeId)(this.datePickerRenderFn)()
     }
   }
 </script>
@@ -399,7 +399,7 @@
     outline: none;
   }
 
-  table {
+  :deep(table) {
     border-collapse: collapse;
   }
 
@@ -467,7 +467,7 @@
   }
 
   /*HEADER*/
-  .g-date-picker-header {
+  :deep(.g-date-picker-header) {
     padding: 8px 0 8px 0;
     margin-left: 12px;
     margin-right: 12px;
@@ -544,7 +544,7 @@
   }
 
   /*TABLE*/
-  .g-date-picker-table {
+  :deep(.g-date-picker-table) {
     position: relative;
     padding: 0 16px;
     height: 100%;
@@ -604,7 +604,7 @@
       box-shadow: none;
     }
 
-    &--date .g-table-item {
+    .g-date-picker-table--date .g-table-item {
       height: 32px;
       width: auto;
     }
