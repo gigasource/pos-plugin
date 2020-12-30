@@ -2,11 +2,11 @@
   <div class="setting">
     <div class="checkbox-group">
       <g-checkbox color="#1271FF" :label="$t('settings.multipleKitchenPrinter')"
-                  v-model="useMultiPrinterForKitchenPrinter" @change="changeSetting"/>
+                  v-model="useMultiPrinterForKitchenPrinter"/>
       <g-checkbox color="#1271FF" :label="$t('settings.multipleInvoicePrinter')"
-                  v-model="useMultiPrinterForInvoicePrinter" @change="changeSetting"/>
+                  v-model="useMultiPrinterForInvoicePrinter"/>
       <g-checkbox color="#1271FF" :label="$t('settings.multipleEntirePrinter')"
-                  v-model="useMultiPrinterForEntirePrinter" @change="changeSetting"/>
+                  v-model="useMultiPrinterForEntirePrinter"/>
       <g-checkbox color="#1271FF" :label="$t('settings.showDineInTax')"
                   v-model="showDineInTax"/>
       <g-checkbox color="#1271FF" label="Merge items after printing to kitchen"
@@ -52,6 +52,7 @@
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForKitchenPrinter = val
           if (!val) this.setSinglePrinter('kitchen')
+          this.changeSetting()
         }
       },
       useMultiPrinterForInvoicePrinter: {
@@ -63,6 +64,7 @@
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForInvoicePrinter = val
           if (!val) this.setSinglePrinter('invoice')
+          this.changeSetting()
         }
       },
       useMultiPrinterForEntirePrinter: {
@@ -74,6 +76,7 @@
         set(val) {
           this.printerGeneralSetting.useMultiPrinterForEntirePrinter = val
           if (!val) this.setSinglePrinter('entire')
+          this.changeSetting()
         }
       },
       mergeAfterPrint: {

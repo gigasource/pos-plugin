@@ -445,7 +445,14 @@
         }
 
         // create order
-        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
+        const order = {
+          items,
+          payment,
+          splitId: this.currentOrder.splitId,
+          table: this.currentOrder.table,
+          _id: this.genObjectId(),
+          id: await orderUtil.getLatestOrderId()
+        }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, false, async newOrder => {
           callback(newOrder);
           this.getActiveOrders()
@@ -629,7 +636,7 @@
           }
         }).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain)
       },
-      getExtraCommits() {
+      async getExtraCommits(withId = false) {
         if (!this.actionList) this.actionList = []
         if (this.currentOrder.numberOfCustomers) {
           this.actionList.push(cms.getModel('Order').findOneAndUpdate({
@@ -648,7 +655,7 @@
             $set: {
               tseMethod: this.currentOrder.tseMethod
             }
-          }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
+          }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
         }
 
         if (this.currentOrder.manual) {
@@ -658,7 +665,7 @@
             $set: {
               manual: true
             }
-          }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
+          }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
         }
 
         this.actionList.push(cms.getModel('Order').findOneAndUpdate({
@@ -670,24 +677,21 @@
               $position: 0
             }
           }
-        }).commit('updateActiveOrder', { table: this.currentOrder.table}).chain)
+        }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
 
-        if (!this.currentOrder.date) {
-          this.actionList.push(cms.getModel('Order').findOneAndUpdate({
-            _id: this.currentOrder._id
-          }, {
-            $push: {
-              user: {
-                $each: [{ name: this.user.name, date: new Date() }],
-                $position: 0
-              }
-            }
-          }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
+        if (withId) {
+          let id = await orderUtil.getLatestOrderId();
+          console.log('genId', id)
+          this.actionList.push(cms.getModel('Order').findOneAndUpdate(
+              { _id: this.currentOrder._id },
+              {
+                $set: { id }
+              }).commit('updateActiveOrder', { table: this.currentOrder.table }).chain)
         }
       },
       async saveTableOrder() {
         if (!this.actionList.length) return;
-        this.getExtraCommits()
+        await this.getExtraCommits()
 
         if (!this.currentOrder._id) this.currentOrder._id = this.genObjectId();
         this.actionList.forEach(actionInfo => {
@@ -832,28 +836,15 @@
               ...this.currentOrder,
               payment,
             }
-            this.getExtraCommits()
+
+            await this.getExtraCommits(true)
             if (this.actionList.length && this.actionList[0].action === 'createOrder' && !order._id) {
               order._id = this.genObjectId();
               const query = jsonfn.parse(this.actionList[0].update.query);
               query._id = order._id;
               this.actionList[0].update.query = jsonfn.stringify(query);
             }
-            this.actionList.forEach(actionInfo => {
-              if (actionInfo.action !== 'createOrder') {
-                if (actionInfo.where) {
-                  const condition = jsonfn.parse(actionInfo.where);
-                  if (!condition._id) {
-                    condition._id = order._id;
-                    actionInfo.where = jsonfn.stringify(condition);
-                  } else {
-                    if (condition._id != order._id) {
-                      console.error('Different object id');
-                    }
-                  }
-                }
-              }
-            })
+
             cms.socket.emit('pay-order', order, this.user, this.device, false, this.actionList, shouldPrint, fromPayBtn, async newOrder => {
               this.currentOrder['status'] = 'paid'
               if (!this.currentOrder.user) this.currentOrder['user'] = []

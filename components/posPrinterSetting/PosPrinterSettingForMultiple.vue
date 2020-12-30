@@ -84,11 +84,15 @@
         if (groupPrinter && groupPrinter.printers.length === 0) {
           this.tabs = [{ title: this.newTabTitle, id: 1, hardwares: [] }]
         } else {
-          this.tabs = groupPrinter.printers.map(p => ({
-            title: p.hardwares.length === 0 ? this.newTabTitle : p.hardwares.join('-'),
-            id: p._id,
-            hardwares: p.hardwares
-          }))
+          this.tabs = groupPrinter.printers.map(p => {
+            const hardwares = p.hardwares || []
+
+            return {
+              title: hardwares.length === 0 ? this.newTabTitle : hardwares.join('-'),
+              id: p._id,
+              hardwares
+            };
+          })
         }
         this.tab = this.tabs[this.index]
       }
