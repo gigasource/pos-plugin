@@ -13,9 +13,6 @@
           :current-order="currentOrder"
           :payment-total="paymentTotal"
           @updateCurrentOrder="updateCurrentOrder"
-          @savePaidOrder="savePaidOrder"
-          @openSnackbarError="openSnackbar"
-          @openDialogDiscount="openDialog"
       />
     </div>
     <pos-restaurant-payment-order-detail
@@ -58,7 +55,7 @@
     },
     injectService: [
         'PosStore:(storeLocale, isMobile, user)',
-        'OrderStore: (discountCurrentOrder, updateCurrentOrder, currentOrder, paymentTotal, savePaidOrder, compactOrder, saveRestaurantOrder, paymentAmountTendered, setOrderDiscount)'
+        'OrderStore: (discountCurrentOrder, updateCurrentOrder, currentOrder, paymentTotal, compactOrder, saveRestaurantOrder, paymentAmountTendered, setOrderDiscount)'
     ],
     data() {
       return {
@@ -82,7 +79,6 @@
       },
       discountCurrentOrder() {},
       updateCurrentOrder() {},
-      savePaidOrder() {},
       saveRestaurantOrder() {},
       setOrderDiscount() {}
     }

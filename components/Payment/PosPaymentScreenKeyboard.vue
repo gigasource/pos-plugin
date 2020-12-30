@@ -96,20 +96,8 @@
         keyboardValue: null,
       }
     },
-    emits: ['savePaidOrder', 'openSnackbarError', 'openDialogDiscount', 'updateCurrentOrder'],
+    emits: ['updateCurrentOrder'],
     methods: {
-      async pay() {
-        await this.$router.push({ path: '/pos-order' })
-        await this.$emit('savePaidOrder')
-      },
-      discount() {
-        if (this.currentOrder.items.find(i => i.vDiscount > 0) && !this.currentOrder.isDiscountInTotal) {
-          this.$emit('openSnackbarError');
-        } else {
-          const originalTotal = this.currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-          this.$emit('openDialogDiscount', 'percentage', originalTotal);
-        }
-      },
       removePaymentItem(index) {
         const offset = this.currentOrder.payment[index].value
         this.currentOrder.payment.splice(index, 1)

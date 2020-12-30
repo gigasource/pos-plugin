@@ -121,6 +121,7 @@ module.exports = (cms) => {
 
     socket.on('pay-order', async (order, user, device, isSplit = false, actionList = [], print = true, fromPayBtn, cb = () => null) => {
       try {
+        await execAllChain(actionList, 'Order')
         const mappedOrder = await mapOrder(order, user)
         const oldOrder = await cms.getModel('Order').findById(order._id)
         const oldItems = (oldOrder && oldOrder.items) || []
