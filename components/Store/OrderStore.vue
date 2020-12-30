@@ -445,7 +445,14 @@
         }
 
         // create order
-        const order = { items, payment, splitId: this.currentOrder.splitId, table: this.currentOrder.table, _id: this.genObjectId() }
+        const order = {
+          items,
+          payment,
+          splitId: this.currentOrder.splitId,
+          table: this.currentOrder.table,
+          _id: this.genObjectId(),
+          id: await orderUtil.getLatestOrderId()
+        }
         cms.socket.emit('pay-order', order, this.user, this.device, true, [], false, false, async newOrder => {
           callback(newOrder);
           this.getActiveOrders()
