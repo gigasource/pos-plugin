@@ -55,6 +55,7 @@
 
   export default {
     name: 'PosEndOfDayPrintDialog',
+    injectService: ['ReportsStore:(getXReport,printXReport)'],
     data() {
       return {
         xReport: null,
@@ -68,7 +69,7 @@
       async open(date) {
         this.dialog = true;
         this.date = date;
-        this.xReport = await this.$getService('ReportsStore:getXReport')(date)
+        this.xReport = await this.getXReport(date)
       },
       close() {
         this.dialog = false
@@ -78,11 +79,17 @@
         return _.reduce(paymentTypes, (res, value) => res + value, 0)
       },
       async print() {
-        await this.$getService('ReportsStore:printXReport')(this.date)
+        await this.printXReport(this.date)
+      },
+      getXReport() {
+        console.error('ReportsStore:getXReport was not injected')
+      },
+      printXReport() {
+        console.error('ReportsStore:printXReport was not injected')
       }
     },
-    setup() {
-      const dialog = getInternalValue(...arguments);
+    setup(props, context) {
+      const dialog = getInternalValue(props, context);
       return { dialog };
     },
   }

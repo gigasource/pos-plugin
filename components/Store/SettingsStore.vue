@@ -650,7 +650,7 @@
       async updateGroupPrinterName(_id, name) {
         await cms.getModel('GroupPrinter').findOneAndUpdate({_id}, {name})
         const item = this.printerSidebar[0].items.find(item => item.id === _id)
-        this.$set(item, 'title', name)
+        item.title = name
         this.selectedPrinterMenu = item
       },
       async updatePrinter(printerId, printer, groupId, index) {

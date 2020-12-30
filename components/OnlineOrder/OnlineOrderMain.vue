@@ -379,21 +379,21 @@
       onClickAccept(order) {
         if (order.deliveryTime !== 'asap') return this.acceptOrder(order)
 
-        if (order.declineStep2) this.$set(order, 'declineStep2', false)
-        if (!order.confirmStep2) return this.$set(order, 'confirmStep2', true)
+        if (order.declineStep2) order.declineStep2 = false
+        if (!order.confirmStep2) return order.confirmStep2 = true
         if (!order.prepareTime) order.prepareTime = this.defaultPrepareTime
         this.acceptOrder(order)
       },
       onClickDecline(order) {
-        if (order.confirmStep2) return this.$set(order, 'confirmStep2', false)
-        if (!order.declineStep2) return this.$set(order, 'declineStep2', true)
+        if (order.confirmStep2) return order.confirmStep2 = false
+        if (!order.declineStep2) return order.declineStep2 = true
       },
       openDialog(order) {
         this.$refs.dialog.showDialog(order)
       },
       onBack(order) {
-        this.$set(order, 'declineStep2', false)
-        this.$set(order, 'confirmStep2', false)
+        order.declineStep2 = false
+        order.confirmStep2 = false
       },
       openDialogReason(order) {
         this.dialog.order = order
@@ -401,7 +401,7 @@
       },
       submitReason(reason) {
         const order = this.internalOrders.find(o => o._id === this.dialog.order._id)
-        this.$set(order, 'declineReason', reason)
+        order.declineReason = reason
       },
       getDeliveryDate(order) {
         return dayjs(order.date).add(order.prepareTime, 'minute').toDate()
@@ -422,15 +422,14 @@
             const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
             if (diff <= 0){
               this.$emit('getPendingOnlineOrderCounter')
-              return this.$set(this.timeoutProgress, order._id, { progress: 0, remaining: 0 })
+              return this.timeoutProgress[order._id] = { progress: 0, remaining: 0 }
             }
 
             const x = (timeout - diff) / timeout
             const progress = 100 * (1 - Math.sin((x * Math.PI) / 2))
 
-            this.$set(order, 'timeoutProgress', progress)
-            this.$set(this.timeoutProgress, order._id, { progress, remaining: diff.toFixed(0) })
-
+            order.timeoutProgress = progress
+            this.timeoutProgress[order._id] = { progress, remaining: diff.toFixed(0) }
             this.timeoutInterval[order._id] = setTimeout(calc, 250)
           })
         }
