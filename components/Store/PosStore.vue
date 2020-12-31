@@ -256,7 +256,7 @@
       //<!--<editor-fold desc="Login screen">-->
       async login() {
         try {
-          this.user = await cms.getModel('PosSetting').findOne({ passcode: this.loginPassword }).lean()
+          this.user = await cms.getModel('PosUser').findOne({ passcode: this.loginPassword }).lean()
 
           if (this.user) {
             this.loginPassword = ''

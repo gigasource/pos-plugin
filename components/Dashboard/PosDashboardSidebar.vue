@@ -73,6 +73,9 @@
       clearInterval(this.timerId)
     },
     mounted() {
+      // Need to fix injectService first, defaultPath is currently injected AFTER mounted
+      if (this.defaultPath) this.afterMountFn(this)
+
       // const posStore = this.$getService('PosStore')
       // posStore.$watch('enabledFeatures', (newVal, oldVal) => {
       //   if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {
@@ -86,10 +89,8 @@
       // })
     },
     watch: {
-      defaultPath(newVal, oldVal) {
-        this.sidebar = newVal
-
-        if (!oldVal && newVal && typeof this.afterMountFn === 'function') this.afterMountFn(this)
+      defaultPath(val) {
+        this.sidebar = val
       },
       enabledFeatures(newVal, oldVal) {
         if (_.xorWith(newVal, oldVal, _.isEqual).length !== 0 && typeof(this.afterMountFn) === 'function') {

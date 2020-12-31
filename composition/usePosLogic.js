@@ -20,8 +20,7 @@ export const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAge
 
 export async function login() {
   try {
-    const posSetting = await cms.getModel('PosSetting').findOne()
-    user.value = posSetting.user.find(user => user.passcode === loginPassword.value)
+    user.value = await cms.getModel('PosUser').findOne()
 
     if (user.value) {
       loginPassword.value = ''
@@ -30,6 +29,7 @@ export async function login() {
   } catch (e) {
     console.error(e)
   }
+
   incorrectPasscode.value = true
 }
 
