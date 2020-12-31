@@ -52,6 +52,7 @@
         ],
         selectedPrinterType: null,
         showKeyboard: false,
+        thermalPrinter: null,
       }
     },
     computed: {
@@ -94,22 +95,30 @@
             printerType: null
           }
         }
+      },
+      getThermalPrinter() {
+        console.error('SettingsStore:getThermalPrinter was not injected')
+      },
+      updateThermalPrinter() {
+        console.error('SettingsStore:updateThermalPrinter was not injected')
       }
     },
-    async created() {
-      await this.getThermalPrinter();
-      if (this.thermalPrinter) {
-        this.selectedPrinterType = this.printerTypes.find(t => t.value === this.thermalPrinter.printerType)
-      }
-
-      const settingsStore = this.$getService('SettingsStore')
-      this.unwatch = settingsStore.$watch('thermalPrinter', async newVal => {
-        await this.updateThermalPrinter(newVal._id, newVal)
-      }, { deep: true })
+    created() {
+      setTimeout(async () => {
+        await this.getThermalPrinter();
+        if (this.thermalPrinter) {
+          this.selectedPrinterType = this.printerTypes.find(t => t.value === this.thermalPrinter.printerType)
+        }
+      }, 100)
     },
-    beforeDestroy() {
-      this.unwatch()
-    }
+    watch: {
+      thermalPrinter: {
+        handler(newVal) {
+          this.updateThermalPrinter(newVal._id, newVal).then(res => {})
+        },
+        deep: true
+      }
+    },
   }
 </script>
 
