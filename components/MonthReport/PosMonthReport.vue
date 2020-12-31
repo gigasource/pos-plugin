@@ -82,7 +82,9 @@
       }
     },
     async activated() {
-      await this.getMonthReport()
+      setTimeout(async () => {
+        await this.getMonthReport()
+      }, 50)
     },
   }
 </script>
