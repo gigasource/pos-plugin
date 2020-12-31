@@ -3,5 +3,6 @@
   "duration": "1:00",
   "thumbnail": "/plugins/pos-plugin/assets/image/tutorial/basic-3.png",
   "title": "How to order & payment",
-  "url": "https://www.youtube.com/embed/snA-m43gJNs"
+  "url": "https://www.youtube.com/embed/snA-m43gJNs",
+  "position": 3
 }

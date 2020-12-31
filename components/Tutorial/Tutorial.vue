@@ -62,7 +62,7 @@
       }
     },
     async created() {
-      this.videos = await cms.getModel('Tutorial').find()
+      this.videos = (await cms.getModel('Tutorial').find()).sort((a, b) => (a.position - b.position))
       this.width = window.innerWidth * 0.9
       this.height = window.innerHeight * 0.9
     },

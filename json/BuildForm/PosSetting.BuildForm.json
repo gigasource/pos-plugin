@@ -614,6 +614,11 @@
           "schemaType": "boolean",
           "key": "onlyCheckoutPrintedItems",
           "type": "input@switch"
+        },
+        {
+          "schemaType": "boolean",
+          "key": "showTutorial",
+          "type": "input@switch"
         }
       ],
       "type": "object"
