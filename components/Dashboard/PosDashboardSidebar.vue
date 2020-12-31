@@ -52,7 +52,8 @@
         now: '',
         sidebar: '',
         selectedNode: null,
-        enabledFeatures: []
+        enabledFeatures: [],
+        user: null,
       }
     },
     computed: {
