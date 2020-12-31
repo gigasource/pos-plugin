@@ -973,7 +973,7 @@
           }
           const status = 'kitchen'
           const acceptResponse = this.$t(order.type === 'delivery' ? 'onlineOrder.deliveryIn' : 'onlineOrder.pickUpIn', this.storeLocale, {
-            0: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
+            msg: dayjs(deliveryDateTime).diff(dayjs(order.date), 'minute')
           })
 
           // validate prepaid (paypal, etc) before update status

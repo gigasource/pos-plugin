@@ -130,7 +130,7 @@
       timeFormat: null,
       // SettingsStore inject
       listUsers: [],
-      
+
     }),
     computed: {
       reportDate() {
@@ -171,7 +171,7 @@
       printStaffReport() {
         console.error('ReportsStore:printStaffReport was not injected')
       }
-      
+
     },
     async mounted() {
       setTimeout(async () => {
@@ -283,6 +283,10 @@
             background-color: #ffffff;
           }
 
+        }
+
+        .g-tabs-slider {
+          z-index: 2;
         }
       }
 
