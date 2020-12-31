@@ -5,12 +5,10 @@
                                 :month-select-disabled="true"
                                 :weekday-format="getDay"
                                 color="#fff" full-width no-title
-                                :value="date"
-                                @input="selectDate"
+                                :model-value="date"
+                                @update:modelValue="selectDate"
                                 @click:prev="getDatesWithReport"
-                                @click:next="getDatesWithReport"
-    >
-    </pos-end-of-day-date-picker>
+                                @click:next="getDatesWithReport"/>
   </div>
 </template>
 

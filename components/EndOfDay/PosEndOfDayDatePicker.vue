@@ -24,7 +24,7 @@
         default: () => null,
       },
       // Default value of date-picker
-      value: [Array, String],
+      modelValue: [Array, String],
 
       //// Groups: Color
       color: {
@@ -85,6 +85,7 @@
         default: () => ([]),
       },
     },
+    emits: ['update:modelValue'],
     setup(props, context) {
       const {
         titleModel,
