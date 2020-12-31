@@ -58,9 +58,7 @@ export default {
     },
     getDailyReports(date) {
       try {
-        const reports = this.reportsFromMonth[dayjs(date).toISOString()]
-        if (!reports) return
-
+        const reports = this.reportsFromMonth[dayjs(date).toISOString()] || []
         const sortedReports = _.map(reports, (value, key) => ({
           z: key ? key : this.getHighestZNumber(),
           begin: value.from,
@@ -68,12 +66,10 @@ export default {
           sum: value.vSum,
           pending: !key
         })).sort((cur, next) => cur.begin - next.begin);
-
         this.selectedReportDate = Object.assign({}, this.selectedReportDate, {
           date,
           reports: sortedReports
         })
-
         return sortedReports
       } catch (e) {
         console.error(e)
