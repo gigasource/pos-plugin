@@ -31,6 +31,12 @@
       "schemaType": "string",
       "key": "type",
       "type": "input"
+    },
+    {
+      "_id": "5fed4194923cae065580e55c",
+      "schemaType": "number",
+      "key": "position",
+      "type": "input@number"
     }
   ],
   "tabs": [],
