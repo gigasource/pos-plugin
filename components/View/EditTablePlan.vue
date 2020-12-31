@@ -258,12 +258,10 @@
         if (i > 0) {
           const curRoom = this.rooms[i]
           const preRoom = this.rooms[i - 1]
-          console.log(`Move room ${curRoom.name} from order ${curRoom.order} to order ${preRoom.order}`)
-          console.log(`Move room ${preRoom.name} from order ${preRoom.order} to order ${curRoom.order}`)
-          await cms.getModel('Room').bulkWrite([
-            { updateOne: { filter: { _id: curRoom._id }, update: { order: preRoom.order } } },
-            { updateOne: { filter: { _id: preRoom._id }, update: { order: curRoom.order } } },
-          ])
+          // console.log(`Move room ${curRoom.name} from order ${curRoom.order} to order ${preRoom.order}`)
+          // console.log(`Move room ${preRoom.name} from order ${preRoom.order} to order ${curRoom.order}`)
+          await cms.getModel('Room').updateOne({ _id: curRoom._id }, { order: preRoom.order });
+          await cms.getModel('Room').updateOne({ _id: preRoom._id }, { order: curRoom.order });
           await this.loadRooms()
         }
         this.defaultPath = `item.0.item.${i - 1 + down}`
