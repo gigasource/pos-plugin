@@ -326,7 +326,7 @@
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
       getCategoryAreaStyle(cateItem) {
-        if (this.category.type === 'horizontal') {
+        if (this.category && this.category.type === 'horizontal') {
           return this.getAreaStyle(cateItem)
         } else {
           return this.getAreaStyle(cateItem, true)
