@@ -12,6 +12,7 @@ const rnBridge = require('../rn-bridge/app-rn-bridge')
 const fs = require('fs')
 const path = require('path')
 const url = require('url')
+const BSON = require('bson')
 
 let webshopUrl;
 let storeName;
@@ -194,6 +195,12 @@ module.exports = async cms => {
     pendingReservations.forEach(res => {
       scheduleRemoveReservationJob(res)
     })
+  }
+
+  function getGroupPrintersId(groupPrinters, name) {
+    if (BSON.ObjectID.isValid(name)) return name
+    const groupPrinter = groupPrinters.find(gp => gp.name === name)
+    return groupPrinter ? groupPrinter._id : null
   }
 
   function createOnlineOrderListeners(socket, deviceId) {
@@ -485,6 +492,7 @@ module.exports = async cms => {
       const { products } = data
       if(!products || !Array.isArray(products)) return
       const ProductModel = cms.getModel('Product')
+      const groupPrinters = await cms.getModel('GroupPrinter').find()
       await ProductModel.deleteMany({
         type: 'delivery'
       })
@@ -494,8 +502,8 @@ module.exports = async cms => {
         option: {
           favorite: !!p.mark.favorite
         },
-        groupPrinter: p.groupPrinters[0],
-        groupPrinter2: p.groupPrinters[1],
+        groupPrinter: getGroupPrintersId(groupPrinters, p.groupPrinters[0]),
+        groupPrinter2: getGroupPrintersId(groupPrinters, p.groupPrinters[1]),
       })))
     })
 
@@ -1012,6 +1020,7 @@ module.exports = async cms => {
 
     socket.on('getDeliveryProducts', async (cb) => {
       const deviceId = await getDeviceId()
+      const groupPrinters = await cms.getModel('GroupPrinter').find()
       onlineOrderSocket.emit('getDeliveryProducts', deviceId, async products => {
         await cms.getModel('Product').deleteMany({
           type: 'delivery'
@@ -1022,8 +1031,8 @@ module.exports = async cms => {
           option: {
             favorite: !!(p.mark && p.mark.favorite)
           },
-          groupPrinter: p.groupPrinters[0],
-          groupPrinter2: p.groupPrinters[1],
+          groupPrinter: getGroupPrintersId(groupPrinters, p.groupPrinters[0]),
+          groupPrinter2: getGroupPrintersId(groupPrinters, p.groupPrinters[1]),
         })))
         cb && cb()
       })
