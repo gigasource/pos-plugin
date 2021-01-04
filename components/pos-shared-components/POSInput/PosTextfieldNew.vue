@@ -1,5 +1,6 @@
 <script>
-  import { isMobile, isIOS } from '../../../composition/usePosLogic';
+  import {isMobile, isIOS} from '../../../composition/usePosLogic';
+  import { getCurrentInstance, withScopeId } from 'vue'
 
   export default {
     name: "PosTextfieldNew",
@@ -23,8 +24,12 @@
       }
     },
     computed: {
-      isMobile() { return isMobile },
-      isIOS() { return isIOS },
+      isMobile() {
+        return isMobile
+      },
+      isIOS() {
+        return isIOS
+      },
       internalValue: {
         get() {
           return '' + this.modelValue
@@ -41,22 +46,26 @@
         clearable: this.clearable,
         required: this.required,
         rules: this.rules,
-        value: this.internalValue,
+        modelValue: this.internalValue,
         disabled: this.disabled
       }
-
-      if (this.isMobile) {
-        return (
-            <g-text-field ref="textfield" {...{
-              ...{ outlined: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readOnly: this.readonly}, // props
-              ...{ 'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners } //listeners
-            }} />
-        )
+      function renderFn () {
+        if (this.isMobile) {
+          return (
+              <g-text-field ref="textfield" {...{
+                ...{outlined: true, ...props, ...this.isIOS && {virtualEvent: this.isIOS}, readOnly: this.readonly}, // props
+                ...{'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners} //listeners
+              }} />
+          )
+        }
+        return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
+          ...{large: true, ...props, ...this.isIOS && {virtualEvent: this.isIOS}, readonly: this.readonly}, //props
+          ...{'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners} //listeners
+        }} />
       }
-      return <g-text-field-bs ref="textfield" class="bs-tf__pos" {...{
-        ...{ large: true, ...props, ...this.isIOS && { virtualEvent: this.isIOS }, readonly: this.readonly}, //props
-        ...{ 'onUpdate:modelValue': (val) => this.internalValue = val, ...this.listeners } //listeners
-      }} />
+
+      const { type } = getCurrentInstance();
+      return withScopeId(type.__scopeId)(renderFn.bind(this))()
     }
   }
 </script>
@@ -68,16 +77,14 @@
     margin-left: 4px;
     margin-bottom: 8px;
 
-    ::v-deep {
-      fieldset {
-        border-color: #C9C9C9;
-        border-radius: 2px;
-      }
+    :deep(fieldset) {
+      border-color: #C9C9C9;
+      border-radius: 2px;
+    }
 
-      .g-tf-label {
-        font-weight: bold;
-        color: #1D1D26;
-      }
+    :deep(.g-tf-label) {
+      font-weight: bold;
+      color: #1D1D26;
     }
   }
 </style>

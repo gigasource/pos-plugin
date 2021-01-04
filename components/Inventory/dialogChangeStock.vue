@@ -14,7 +14,7 @@
           <div :class="['btn', mode === 'remove' && 'btn--red', !removeable && 'disabled']" @click="mode = 'remove'">
             <g-icon color="white">remove</g-icon>
           </div>
-          <g-text-field-bs ref="textfield" :rules="rules" :value="change" @input="changeValue"/>
+          <g-text-field-bs ref="textfield" :rules="rules" :model-value="change" @update:modelValue="changeValue"/>
         </div>
         <g-select v-if="mode === 'remove'" class="dialog-content__reason" text-field-component="GTextFieldBs" :items="reasons" v-model="reason" placeholder="Reason (Optional)"/>
         <div v-else class="dialog-content__reason" style="height: 38px"></div>
@@ -46,6 +46,7 @@
         reasons: [this.$t('inventory.expiredIngredient'), this.$t('inventory.updateToMatch')]
       }
     },
+    emits: ['update:modelValue', 'submit'],
     computed: {
       internalValue: {
         get() {

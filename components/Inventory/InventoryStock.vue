@@ -210,7 +210,7 @@
         const item = this.inventories.find(item => item._id === _id)
         this.category = _.cloneDeep(item.category.name)
         this.unit = _.cloneDeep(item.unit)
-        this.stock = item.stock && (_.cloneDeep(item.stock)).toFixed(2)
+        this.stock = item.stock && +(_.cloneDeep(item.stock)).toFixed(2)
         this.added = ''
       },
       selectItem(item) {
