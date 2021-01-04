@@ -39,7 +39,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { createEmptyProductLayout } from './util'
+  import { createEmptyCategoryLayout, createEmptyLayout, createEmptyProductLayout, isSameArea } from './util'
 
   export default {
     name: 'PosOrderLayout',
@@ -257,7 +257,7 @@
     watch: {
       orderLayout() {
         if (this.selectedCategoryLayout) {
-          const cateLayout = _.find(this.orderLayout.categories, c => this.isSameArea(this.selectedCategoryLayout, c))
+          const cateLayout = _.find(this.orderLayout.categories, c => isSameArea(this.selectedCategoryLayout, c))
           if (!cateLayout)
             return
           // update category layout
@@ -265,7 +265,7 @@
           if (!this.view || this.view.name !== 'ProductEditor' || !this.selectedProductLayout)
             return
           // update product layout
-          const prodLayout = _.find(cateLayout.products, pl => this.isSameArea(this.selectedProductLayout, pl))
+          const prodLayout = _.find(cateLayout.products, pl => isSameArea(this.selectedProductLayout, pl))
           if (prodLayout)
             this.$emit('update:selectedProductLayout', prodLayout)
           else if (this.editable) {
@@ -304,14 +304,14 @@
         const allAreas = [];
         for (let row = 0; row < rows; row++) {
           for (let column = 0; column < columns; column++) {
-            let empty = this.createEmptyLayout(row, column);
+            let empty = createEmptyLayout(row, column);
             if (isCategory) {
-              if (this.selectedCategoryLayout && this.isSameArea(empty, this.selectedCategoryLayout))
+              if (this.selectedCategoryLayout && isSameArea(empty, this.selectedCategoryLayout))
                 empty = this.selectedCategoryLayout;
               else
-                empty = {...empty, ...this.createEmptyCategoryLayout()}
+                empty = {...empty, ...createEmptyCategoryLayout()}
             } else {
-              if (this.selectedProductLayout && this.isSameArea(empty, this.selectedProductLayout))
+              if (this.selectedProductLayout && isSameArea(empty, this.selectedProductLayout))
                 empty = this.selectedProductLayout
               else
                 empty = {...empty, ...createEmptyProductLayout()}
@@ -319,25 +319,9 @@
             allAreas.push(empty)
           }
         }
-        return this.removeOuterAreas(_.unionWith(areas, allAreas, (area1, area2) => this.isSameArea(area1, area2)), columns, rows)
+        return this.removeOuterAreas(_.unionWith(areas, allAreas, (area1, area2) => isSameArea(area1, area2)), columns, rows)
       },
-      createEmptyLayout(row, column) {
-        return {
-          top: row,
-          left: column,
-          name: ''
-        }
-      },
-      createEmptyCategoryLayout() {
-        return {
-          rows: 10,
-          columns: 6,
-          color: '#FFF'
-        }
-      },
-      isSameArea(area1, area2) {
-        return area1.top === area2.top && area1.left === area2.left
-      },
+      
       removeOuterAreas(areas, columns, rows) {
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
@@ -350,7 +334,7 @@
         }
       },
       getCategoryStyle(category) {
-        const isCategorySelected = this.selectedCategoryLayout && this.isSameArea(this.selectedCategoryLayout, category);
+        const isCategorySelected = this.selectedCategoryLayout && isSameArea(this.selectedCategoryLayout, category);
         return {
           backgroundColor: category.color,
           color: '#000',
@@ -361,7 +345,7 @@
         }
       },
       getProductItemStyle(product) {
-        const isProductSelected = this.selectedProductLayout && this.isSameArea(this.selectedProductLayout, product);
+        const isProductSelected = this.selectedProductLayout && isSameArea(this.selectedProductLayout, product);
         const style = {
           backgroundColor: product.color,
           color: '#000',
