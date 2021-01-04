@@ -763,8 +763,8 @@
             console.warn(`Pair status: ${error}`)
             const posSettings = await this.getPosSetting()
 
-            if (!posSettings.skipPairing && this.$router.currentRoute.path !== '/admin') {
-              this.$router.currentRoute.path !== '/pos-setup' && this.$router.push('/pos-setup')
+            if (!posSettings.skipPairing && this.$route.path !== '/admin') {
+              this.$route.path !== '/pos-setup' && this.$router.push('/pos-setup')
             }
           }
         })

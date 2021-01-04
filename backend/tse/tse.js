@@ -1,7 +1,7 @@
 const _ = require('lodash');
 let tse;
 let tseReady;
-process.env.NO_SETUP_TSE = 'true';
+//process.env.NO_SETUP_TSE = 'true';
 process.env.mockMode = 'true'
 
 const TseClient = require('nodejs-tse-client')
@@ -16,17 +16,6 @@ const {makeKassenBelegFinish} = require("./makeProcessDataLib");
 const numeral = require('numeral');
 const orderUtil = require("../../components/logic/orderUtil");
 const {makeQr} = require("./makeProcessDataLib");
-//const orderUtil = require("");
-
-/*JsonFn.addHandler((k,v) => {
-  return v instanceof mongoose.Types.ObjectId;
-}, (k,v) => {
-  return v.startsWith('__object_id__');
-}, (k,v) => {
-  return '__object_id__' + v.toString();
-}, (k,v) => {
-  return mongoose.Types.ObjectId(v.slice(13));
-})*/
 
 module.exports = async (cms) => {
   const AsyncEventEmitter = require('asynchronous-emitter');
@@ -43,15 +32,23 @@ module.exports = async (cms) => {
   const EndOfDay = cms.getModel('EndOfDay')
   let OrderCommit;
 
-  cms.app.get('/api/deleteAll', async function (req, res) {
+  cms.on('/api/deleteAll', async function () {
     await Order.remove({})
     await cms.getModel('OrderCommit').remove({})
     await EndOfDay.remove({})
     await TseTransaction.remove({});
     await OrderTseTemp.remove({});
     await OrderTseContent.remove({});
-    res.send('ok');
   })
+
+  if (process.env.NODE_ENV !== 'test') {
+    cms.app.get('/api/deleteAll', async function (req, res) {
+      cms.emit('/api/deleteAll');
+      res.send('ok');
+    })
+  } else {
+    cms.emit('/api/deleteAll');
+  }
 
   await initTse();
 
@@ -66,7 +63,7 @@ module.exports = async (cms) => {
     return item.groupPrinter !== 'Bar' && item.groupPrinter !== 'Getränk';
   }
 
-  cms.post('run:print', async (commit) => {
+  cms.on('run:print', async (commit) => {
     if (`${commit.action}@${commit.type}` === 'print@report') {
       await tseInvoicePrintHandler(commit);
     }
@@ -75,8 +72,9 @@ module.exports = async (cms) => {
     const items = commit.order.items.filter(i => !i.isVoucher);
     const allItems = commit.oldOrder ? commit.oldOrder.items.concat(items) : items;
     const order = commit.order;
+    const oldOrder = commit.oldOrder;
 
-    const {passthroughTse, passthroughTseComplete, updateOrderTseTemp} = await checkPassthroughTse(posSetting, commit.order);
+    const {passthroughTse, passthroughTseComplete, updateOrderTseTemp} = await checkPassthroughTse(posSetting, order);
     if ((order.tseMethod === 'passthrough' && passthroughTse) || passthroughTseComplete) {
       order.tseMethod = 'passthrough';
       items.forEach(i => i.tseMethod = 'passthrough');
@@ -90,7 +88,7 @@ module.exports = async (cms) => {
         // check numberOfCustomers
 
         if (passthroughTse) {
-          let hasItemAtLastTime = commit.oldOrder && commit.oldOrder.items.length > 0;
+          let hasItemAtLastTime = oldOrder && oldOrder.items.length > 0;
           let hasFood = !!items.find(i => isFood(i));
 
           if (order.numberOfCustomers === 1) {
@@ -168,7 +166,7 @@ module.exports = async (cms) => {
     }
   }
 
-  cms.post('run:endOfDay', async (report) => {
+  cms.on('run:endOfDay', async (report) => {
     let startId = 0;
     if (tseConfig.tseEnable && tseConfig.passthroughEnable) {
       const date = dayjs(report.begin).startOf('day').toDate();
@@ -246,7 +244,7 @@ module.exports = async (cms) => {
     }
   }
 
-  cms.post('run:closeOrder', tseHandler);
+  cms.on('run:closeOrder', tseHandler);
 
   async function tseHandler(commit, order) {
     //if (order.splitId)
@@ -583,16 +581,16 @@ module.exports = async (cms) => {
           clientId,
         });
         console.log('Tse init successful !!!')
-        cms.io.emit('tseReady', {tseReady: true});
+        cms.emit('tseReady', {tseReady: true});
         tseReady = true;
       } catch (e) {
         console.warn(e);
-        cms.io.emit('tseReady', {tseReady: false});
+        cms.emit('tseReady', {tseReady: false});
       }
     } else {
       await tse.loginAdminUser('12345');
       await tse.updateTime();
-      cms.io.emit('tseReady', {tseReady: true});
+      cms.emit('tseReady', {tseReady: true});
       tseReady = true;
     }
 
