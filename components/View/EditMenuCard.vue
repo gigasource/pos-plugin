@@ -19,6 +19,7 @@
         v-model:selected-product-layout="selectedProductLayout"
         v-model:order-layout="orderLayout"
         v-model:product-dbl-clicked="productDblClicked"
+        v-model:mode="mode"
     />
     <content-render
         class="pos-emc__editor"
@@ -42,6 +43,11 @@
           v-model:selected-category-layout="selectedCategoryLayout"
         />
       </template>
+      <template v-slot:IngredientEditor>
+        <ingredient-editor
+            :layout="selectedProductLayout"
+            v-model:order-layout="orderLayout"/>
+      </template>
     </content-render>
   </div>
 </template>
@@ -52,11 +58,12 @@
   import CategoryEditor from '../EditMenuCard/CategoryEditor';
   import ProductEditor from '../EditMenuCard/ProductEditor';
   import KeyboardEditor from '../EditMenuCard/KeyboardEditor';
-  
+  import IngredientEditor from "../EditMenuCard/IngredientEditor";
+
   export default {
     name: 'EditMenuCard',
     injectService: ['PosStore:(isMobile)'],
-    components: { KeyboardEditor, ProductEditor, CategoryEditor, ContentRender, EditMenuCardToolbar, PosOrderLayout },
+    components: {IngredientEditor, KeyboardEditor, ProductEditor, CategoryEditor, ContentRender, EditMenuCardToolbar, PosOrderLayout },
     props: {},
     data: function () {
       return {
@@ -79,19 +86,19 @@
     grid-template-rows: 1fr 60px;
     grid-gap: 0 0;
     height: 100%;
-    
+
     &__menu {
       grid-area: 1 / 1 / 2 / 2;
     }
-    
+
     &__toolbar {
       grid-area: 2 / 1 / 3 / 2;
     }
-    
-    
+
+
     &__editor {
       grid-area: 1 / 2 / 3 / 3;
     }
   }
-  
+
 </style>
