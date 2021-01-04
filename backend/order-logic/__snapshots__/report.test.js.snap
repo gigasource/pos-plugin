@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pos-logic case 0 b: test pivot 1`] = `
+Object {
+  "dineIn": Object {
+    "19": 3,
+    "7": 2,
+  },
+  "takeAway": Object {
+    "19": 1,
+    "7": 3,
+  },
+}
+`;
+
+exports[`pos-logic case 0: test pivot 1`] = `
+Object {
+  "G1": Object {
+    "19": 1,
+    "7": 4,
+  },
+  "G2": Object {
+    "19": 3,
+    "7": 1,
+  },
+}
+`;
