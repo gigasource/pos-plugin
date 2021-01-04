@@ -326,10 +326,10 @@
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
       getCategoryAreaStyle(cateItem) {
-        if (this.category && this.category.type === 'horizontal') {
-          return this.getAreaStyle(cateItem)
-        } else {
+        if (this.category && this.category.type === 'vertical') {
           return this.getAreaStyle(cateItem, true)
+        } else {
+          return this.getAreaStyle(cateItem)
         }
       },
       getAreaStyle(item, rotate) {
