@@ -8,7 +8,7 @@
         <div v-for="(category, index) in categories"
              :class="['pol__cate']"
              :key="index"
-             :style="[getCategoryStyle(category), getAreaStyle(category)]"
+             :style="[getCategoryStyle(category), getCategoryAreaStyle(category)]"
              @click="selectCategory(category)">
           {{ getCategoryName(category) }}
         </div>
@@ -325,13 +325,27 @@
       removeOuterAreas(areas, columns, rows) {
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
-      getAreaStyle(item) {
+      getCategoryAreaStyle(cateItem) {
+        if (this.category.type === 'horizontal') {
+          return this.getAreaStyle(cateItem)
+        } else {
+          return this.getAreaStyle(cateItem, true)
+        }
+      },
+      getAreaStyle(item, rotate) {
         if(!item.top && item.top !== 0) {
           return
         }
-        return {
-          'grid-area': `${item.top + 1} / ${item.left + 1} / ${item.top + 2} / ${item.left + 2}`
+        if (rotate) {
+          return {
+            'grid-area': `${item.left + 1} / ${item.top + 1} / ${item.left + 2} / ${item.top + 2}`
+          }
+        } else {
+          return {
+            'grid-area': `${item.top + 1} / ${item.left + 1} / ${item.top + 2} / ${item.left + 2}`
+          }
         }
+        
       },
       getCategoryStyle(category) {
         const isCategorySelected = this.selectedCategoryLayout && isSameArea(this.selectedCategoryLayout, category);
