@@ -1,24 +1,26 @@
 <template>
   <g-dialog v-model="dialogLoginSupport" width="100%" eager>
     <g-card width="100%">
-      <g-grid-layout :layout="layout" style="height: 100%; width: 100%">
-        <p area="version" class="support-item"><b>{{ $t("login.version") }}: </b>{{version}}</p>
-        <p area="network" class="support-item"><b>{{ $t("login.network") }}: </b>{{network}}</p>
-        <p area="internet" class="support-item"><b>{{ $t("login.internet") }}: </b>{{internet}}</p>
-        <p area="ssid" class="support-item"><b>SSID: </b>{{ssID}}</p>
-        <p area="ip" class="support-item"><b>IP: </b>{{ip}}</p>
+      <div class="grid" style="height: 100%; width: 100%">
+        <p class="version support-item"><b>{{ $t("login.version") }}: </b>{{version}}</p>
+        <p class="network support-item"><b>{{ $t("login.network") }}: </b>{{network}}</p>
+        <p class="internet support-item"><b>{{ $t("login.internet") }}: </b>{{internet}}</p>
+        <p class="ssid support-item"><b>SSID: </b>{{ssID}}</p>
+        <p class="ip support-item"><b>IP: </b>{{ip}}</p>
 
-        <div area="keyboard_input" class="text-field-section">
+        <div class="input text-field-section">
           <g-text-field clear-icon="cancel" clearable outlined style="color: #1d1d26; width: 85%; margin-right: 10px;" v-model="supportMessage"></g-text-field>
           <g-btn-bs width="15%" background-color="blue" text-color="white">SEND</g-btn-bs>
         </div>
 
-        <div area="keyboard" class="keyboard-wrapper">
+        <div class="keyboard keyboard-wrapper">
           <pos-keyboard-full v-model="supportMessage"/>
         </div>
-      </g-grid-layout>
+      </div>
 
-      <g-btn :uppercase="false" @click="dialogLoginSupport = !dialogLoginSupport" class="overlay-close-icon" icon style="position: absolute; top: 5px; right: 5px;">
+      <g-btn :uppercase="false" @click="dialogLoginSupport = !dialogLoginSupport"
+             class="overlay-close-icon" icon
+             style="position: absolute; top: 5px; right: 5px;">
         <g-icon>mdi-close</g-icon>
       </g-btn>
     </g-card>
@@ -35,6 +37,7 @@
       modelValue: null
     },
     emits: ['update:modelValue'],
+    injectService: ['PosStore:(version)'],
     computed: {
       dialogLoginSupport: {
         get() {
@@ -59,6 +62,41 @@
 </script>
 
 <style lang="scss" scoped>
+  .grid {
+    display: grid;
+    grid-template-rows: minmax(auto, 60px) minmax(auto, 60px) 1fr minmax(60px, auto) minmax(140px, auto);
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    .keyboard {
+      grid-area: 5/1/6/5;
+      align-self: flex-end;
+    }
+
+    .version {
+      grid-area: 1/1/2/2;
+    }
+
+    .network {
+      grid-area: 1/2/2/3;
+    }
+
+    .internet {
+      grid-area: 1/3/2/4;
+    }
+
+    .ssid {
+      grid-area: 1/4/2/5;
+    }
+
+    .ip {
+      grid-area: 2/1/3/2;
+    }
+
+    .input {
+      grid-area: 4/1/5/5;
+    }
+  }
+
   .support-item {
     margin-top: 24px;
     margin-left: 16px;

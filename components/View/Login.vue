@@ -13,14 +13,14 @@
       </div>
       <div class="login-keyboard">
         <pos-login-keyboard v-model="loginPassword"
-                            @login="userLogin"
+                            @login="login"
                             @clear="resetIncorrectPasscodeFlag"
                             @delete="resetIncorrectPasscodeFlag"
                             @append="resetIncorrectPasscodeFlag"/>
       </div>
       <div class="login-btn">
         <connection-status-btn/>
-        <pos-login-btn-language :locale="locale" @change-locale="updateLocale"/>
+        <pos-login-btn-language :locale="locale" @changeLocale="changeLocale"/>
         <version-btn :version="version"/>
         <store-id-btn/>
         <support-btn @open="openDialog"/>
@@ -31,43 +31,25 @@
 </template>
 
 <script>
-  import PosLoginTextfield from "../Login/PosLoginTextfield";
-  import PosLoginKeyboard from "../pos-shared-components/POSInput/PosLoginKeyboard";
-  import ConnectionStatusBtn from "../Login/ConnectionStatusBtn";
-  import PosLoginBtnLanguage from "../Login/PosLoginBtnLanguage";
-  import VersionBtn from "../Login/VersionBtn";
-  import StoreIdBtn from "../Login/StoreIdBtn";
-  import SupportBtn from "../Login/SupportBtn";
-  import DialogLoginSupport from "../Login/dialogLoginSupport";
-  import { login, loginPassword, incorrectPasscode, locale, version, resetIncorrectPasscodeFlag, changeLocale } from '../../composition/usePosLogic';
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-
   export default {
     name: "Login",
-    components: {DialogLoginSupport, SupportBtn, StoreIdBtn, VersionBtn, PosLoginBtnLanguage, ConnectionStatusBtn, PosLoginKeyboard, PosLoginTextfield},
-    setup() {
-      const dialog = ref(false)
-      const router = useRouter()
-
-      function openDialog() {
-        dialog.value = true
-      }
-
-      async function userLogin() {
-        const loginSuccess = await login()
-        loginSuccess && router.push({ path: `/pos-dashboard` })
-      }
-
-      async function updateLocale(locale) {
-        await changeLocale(locale)
-        router.go()
-      }
-
+    injectService: ['PosStore:(loginPassword, incorrectPasscode, login, resetIncorrectPasscodeFlag, locale, changeLocale, version)'],
+    data() {
       return {
-        dialog, loginPassword, incorrectPasscode, locale, version,
-        userLogin, resetIncorrectPasscodeFlag, updateLocale, openDialog
+        dialog: false,
+        version: null,
+        loginPassword: '',
+        incorrectPasscode: null,
+        locale: 'en'
       }
+    },
+    methods: {
+      openDialog() {
+        this.dialog = true
+      },
+      login() {},
+      resetIncorrectPasscodeFlag() {},
+      changeLocale() {}
     }
   }
 </script>
