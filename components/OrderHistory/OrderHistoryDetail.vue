@@ -29,7 +29,7 @@
     </div>
     <g-divider/>
     <g-simple-table striped>
-      <tr v-for="product in orderHistoryCurrentOrder.items">
+      <tr v-for="product in items">
         <td>{{ product.quantity }}x</td>
         <td>
           {{ product.id && `${product.id}.` }} {{ product.name }}
@@ -124,6 +124,9 @@
       },
       tip() {
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.tip
+      },
+      items() {
+        return this.orderHistoryCurrentOrder ? this.orderHistoryCurrentOrder.items.filter(item => !!item.quantity) : []
       }
     },
     methods: {
