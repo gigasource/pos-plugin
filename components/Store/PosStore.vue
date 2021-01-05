@@ -509,10 +509,9 @@
       }
       this.masterClientId = posSettings.masterClientId
 
-      if (this.$router && this.$router.currentRoute) {
-        const {currentRoute} = this.$router
-        if (currentRoute.path === '/pos-login' && currentRoute.query.device) {
-          this.device = currentRoute.query.device
+      if (this.$route) {
+        if (this.$route.path === '/pos-login' && this.$route.query.device) {
+          this.device = this.$route.query.device
         }
       }
       await this.getEnabledFeatures()

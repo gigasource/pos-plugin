@@ -383,6 +383,11 @@
         currentOrder: null,
         user: {},
         storeLocale: 'en',
+        isIOS: null,
+        orderType: null,
+        calls: [],
+        missedCalls: [],
+        selectedCustomer: null,
       }
     },
     async created() {
@@ -808,9 +813,6 @@
       this.name = this.selectedCustomer.name === 'New customer' ? '' : this.selectedCustomer.name
       this.phone = this.selectedCustomer.phone
       this.type = 'default'
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        this.type = this.$router.currentRoute.query.type
-      }
       this.note = ''
       this.time = 30
       const setting = (await cms.getModel('PosSetting').findOne())

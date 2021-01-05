@@ -231,8 +231,8 @@
     async created() {
       await this.loadKeyboardConfig();
       let type = 'default'
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        type = this.$router.currentRoute.query.type
+      if (this.$route.query && this.$route.query.type) {
+        type = this.$route.query.type
       }
       await this.loadOrderLayout(type);
       cms.socket.on('updateOrderLayouts', this.loadOrderLayout)
@@ -243,8 +243,8 @@
     async activated() {
       await this.loadKeyboardConfig();
       let type = 'default'
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        type = this.$router.currentRoute.query.type
+      if (this.$route.query && this.$route.query.type) {
+        type = this.$route.query.type
       }
       await this.loadOrderLayout(type);
       cms.socket.on('updateProductProps', async () => {
@@ -321,7 +321,7 @@
         }
         return this.removeOuterAreas(_.unionWith(areas, allAreas, (area1, area2) => isSameArea(area1, area2)), columns, rows)
       },
-      
+
       removeOuterAreas(areas, columns, rows) {
         return _.filter(areas, area => area.top < rows && area.left < columns)
       },
@@ -345,7 +345,7 @@
             'grid-area': `${item.top + 1} / ${item.left + 1} / ${item.top + 2} / ${item.left + 2}`
           }
         }
-        
+
       },
       getCategoryStyle(category) {
         const isCategorySelected = this.selectedCategoryLayout && isSameArea(this.selectedCategoryLayout, category);

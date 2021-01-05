@@ -789,7 +789,7 @@
         const posSettings = await this.getPosSetting()
         if (!posSettings) return
 
-        if (posSettings.onlineDevice && this.$router.currentRoute.path === '/pos-login') {
+        if (posSettings.onlineDevice && this.$route.path === '/pos-login') {
           this.onlineDevice = posSettings.onlineDevice
           const { id } = posSettings.onlineDevice;
           if (!id && !posSettings.skipPairing) this.$router.push('/pos-setup')
@@ -802,7 +802,7 @@
             store: {}
           })
           await this.updateOnlineDevice(this.onlineDevice)
-          if (this.$router.currentRoute.path !== '/pos-setup' && this.$router.currentRoute.path !== '/admin')
+          if (this.$route.path !== '/pos-setup' && this.$route.path !== '/admin')
             this.$router.push('/pos-setup')
         })
 
