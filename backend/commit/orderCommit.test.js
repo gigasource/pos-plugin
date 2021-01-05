@@ -16,7 +16,7 @@ describe("Order commit test", () => {
 
     orm.plugin(syncPlugin);
     orm.plugin(syncFlow);
-    orm.registerCommitBaseCollection('Order')
+    orm.registerCommitBaseCollection("Order");
     orm.plugin(require("./orderCommit"));
     orm.registerCollectionOptions("Order");
     orm.emit("commit:flow:setMaster", true);
@@ -153,7 +153,65 @@ describe("Order commit test", () => {
       )
       .commit("changeTable", { table: 9, newTable: 10 });
     const orders1 = await orm("Order").find();
-    expect(orders).toEqual(orders1)
+    expect(orders).toEqual(orders1);
+    done();
+  });
+
+  it("Test close order", async function(done) {
+    const order = await orm("Order")
+      .create({ table: 10, items: [], status: "inProgress" })
+      .commit("createOrder");
+    await orm("Order")
+      .findOneAndUpdate(
+        {
+          _id: order._id
+        },
+        {
+          status: "paid"
+        }
+      )
+      .commit("updateActiveOrder", "closeOrder", { table: 10, _id: order._id });
+    const commits = await orm("Commit").find({});
+    expect(stringify(commits)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "approved": false,
+          "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"table\\":10,\\"items\\":[],\\"status\\":\\"inProgress\\",\\"_id\\":\\"ObjectID\\"}]}]",
+          "collectionName": "Order",
+          "condition": null,
+          "data": Object {
+            "docId": "ObjectID",
+            "table": 10,
+          },
+          "fromMaster": true,
+          "id": 1,
+          "tags": Array [
+            "createOrder",
+          ],
+          "uuid": "uuid-v1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "approved": false,
+          "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"status\\":\\"paid\\"}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+          "collectionName": "Order",
+          "condition": "{\\"_id\\":\\"5ff40fb770751f887f1bb409\\"}",
+          "data": Object {
+            "_id": "ObjectID",
+            "docId": "ObjectID",
+            "table": 10,
+          },
+          "fromMaster": true,
+          "id": 2,
+          "tags": Array [
+            "updateActiveOrder",
+            "closeOrder",
+          ],
+          "uuid": "uuid-v1",
+        },
+      ]
+    `);
     done();
   });
 });

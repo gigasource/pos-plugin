@@ -177,7 +177,8 @@ module.exports = (cms) => {
             $set: {
               status: 'paid'
             }
-          }).commit('updateActiveOrder', {
+          }).commit('updateActiveOrder', 'closeOrder', {
+            _id: mappedOrder._id,
             table: mappedOrder.table,
             mutate: true,
             fromPayBtn
