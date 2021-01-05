@@ -56,7 +56,7 @@
               <img alt :src="getImagePayment(item.payment[0].type)">
             </p>
           </td>
-          <td style="white-space: nowrap">{{ item.date | formatDate }}</td>
+          <td style="white-space: nowrap">{{ formatDate(item.date) }}</td>
           <td style="white-space: nowrap">{{ item.deliveryTime }}</td>
           <td>
             <g-icon v-if="item.type === 'delivery'">icon-delivery-scooter</g-icon>
@@ -183,21 +183,8 @@
         this.filter = range
       },
       getImagePayment(type) {
-        let src = '/plugins/pos-plugin/assets/'
-        switch (type.toLowerCase()) {
-          case 'cash':
-            src += 'cash.svg';
-            break;
-          case 'card':
-            src += 'credit_card.svg';
-            break;
-          case 'paypal':
-            src += 'paypal2.svg';
-            break;
-          default:
-            break;
-        }
-        return src
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+        return paymentMethod && paymentMethod.icon
       },
       openDialogDetail(item) {
         this.$refs.dialog.showDialog(item)
