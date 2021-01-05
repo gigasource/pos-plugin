@@ -39,7 +39,14 @@ module.exports = async function (options) {
 				},
 				{
 					test: /\.js?$/,
-					loader: "babel-loader"
+					loader: "babel-loader",
+					options: {
+						plugins: [
+							[
+								"@babel/plugin-proposal-class-properties"
+							]
+						]
+					}
 				},
 				{
 					test: /\.css$/,
