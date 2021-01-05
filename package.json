@@ -37,7 +37,8 @@
     "uuid": "^3.4.0",
     "nodejs-tse-client": "github:gigasource/nodejs-tse-client",
     "numeral": "^2.0.6",
-    "asynchronous-emitter": "^0.1.0"
+    "asynchronous-emitter": "^0.1.0",
+    "schemahandler": "github:gigasource/schemaHandler#1.0.86"
   },
   "babel": {
     "plugins": [
