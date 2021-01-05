@@ -3,6 +3,7 @@ import InputNumber from '../InputNumber';
 import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
 import useCategoryEditorLogic from './CategoryEditorLogic'
 import { useI18n } from 'vue-i18n'
+import Hooks from 'schemahandler/hooks/hooks'
 
 const categoryEditorFactory = () => {
   const hooks = new Hooks()
@@ -113,7 +114,7 @@ const categoryEditorFactory = () => {
             defaultValue={props.selectedCategoryLayout.name}
             v-model={state.dialog.showCategoryNameKbd}
             onSubmit={value => updateCategory({ name: value}, value)}/>
-        <g-snackbar v-model="showSnackbar" top right color="#1976d2" timeout={1000}>
+        <g-snackbar v-model={showSnackbar} top right color="#1976d2" timeout={1000}>
           {state.notifyContent}
         </g-snackbar>
       </>
@@ -146,6 +147,7 @@ const categoryEditorFactory = () => {
       return this.renderCategoryEditor()
     }
   })
+  return { hooks, fn }
 }
 
 export default categoryEditorFactory
