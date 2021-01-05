@@ -19,7 +19,7 @@ let storeName;
 let storeAlias;
 let reservationJobs = {};
 
-let {webshopUrl: webshopUrlFromConfig, port: backendPort} = global.APP_CONFIG;
+let {webshopUrl: webshopUrlFromConfig, port: backendPort, mapsApiKey} = global.APP_CONFIG;
 let onlineOrderSocket = null;
 let proxyClient = null;
 let activeProxies = 0;
@@ -681,7 +681,7 @@ module.exports = async cms => {
   async function searchForPlace(text, token, language = 'en', country = 'DE') {
     let searchResult = []
     const posSettings = await cms.getModel('PosSetting').findOne();
-    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey;
+    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey || mapsApiKey;
 
     const autocompleteApiUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
     const { data: autocompleteResult } = await axios.get(autocompleteApiUrl, {
@@ -704,7 +704,7 @@ module.exports = async cms => {
     const url = 'https://maps.googleapis.com/maps/api/place/details/json'
 
     const posSettings = await cms.getModel('PosSetting').findOne();
-    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey;
+    const apiKey = posSettings.generalSetting.googleMapApiKey || posSettings.call.googleMapApiKey || mapsApiKey;
 
     const { data } = await axios.get(url, {
       params: {
