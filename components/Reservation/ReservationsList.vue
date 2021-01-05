@@ -175,7 +175,7 @@
           this.reservationSetting.openHours.forEach(({dayInWeeks, closeTime, openTime}) => {
             if(dayInWeeks[weekday]) {
               if(start === 0 || +openTime.split(':')[0] < start) start = +openTime.split(':')[0]
-              if(end === 24 || +closeTime.split(':')[0] > end) end = +closeTime.split(':')[0]
+              if(end === 24 || +closeTime.split(':')[0] > end) end = +closeTime.split(':')[0] + (+closeTime.split(':')[2] > 0 ? 1 : 0)
             }
           })
         }
