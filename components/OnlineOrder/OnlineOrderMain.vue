@@ -193,10 +193,10 @@
                 Confirm
               </g-btn-bs>
               <g-btn-bs v-else height="54" background-color="#E0E0E0" class="pending-orders--btn-price" text-color="black" style="flex: 1" @click.stop="onClickAccept(order)">
-                <img v-if="order.payment.icon" :src="order.payment.icon" :alt="order.payment.type" style="height: 16px" class="mr-2"/>
-                <span v-else class="mr-2">{{ order.payment.type }}</span>
+                <img v-if="getPaymentIcon(order.payment)" :src="getPaymentIcon(order.payment)" :alt="order.payment[0].type" style="height: 16px" class="mr-2"/>
+                <span v-else class="mr-2">{{ order.payment[0].type }}</span>
                 <span>{{ $t('common.currency', storeLocale) }}{{
-                    $filters.formatCurrency(order.payment.value, decimals)
+                    $filters.formatCurrency(order.payment[0].value, decimals)
                   }}</span>
               </g-btn-bs>
             </g-card-actions>
@@ -328,7 +328,7 @@
         this.internalOrders = val.map(order => Object.assign({}, order, {
           ...order.deliveryTime ? {deliveryTime: order.deliveryTime.toString()} : {},
           shippingFee: this.getShippingFee(order),
-          payment: this.getPayment(order),
+          payment: order.payment,
           confirmStep2: false,
           declineStep2: false,
           prepareTime: null,
@@ -356,14 +356,9 @@
     },
     emits: ['updateOnlineOrders', 'acceptPendingOrder', 'declineOrder', 'completeOrder', 'getPendingOnlineOrderCounter'],
     methods: {
-      getPayment({ _id, payment }) {
-        const { value, type } = payment[0];
-        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type) || {}
-        return {
-          ...paymentMethod,
-          value,
-          type
-        }
+      getPaymentIcon(payment) {
+        let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === payment[0].type)
+        return paymentMethod && paymentMethod.icon
       },
       declineOrder(order) {
         this.$emit('declineOrder', order)
