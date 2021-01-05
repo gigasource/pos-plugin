@@ -198,7 +198,7 @@
         this.companyName = posSettings.companyInfo.name || ''
       }
     },
-    beforeDestroy() {
+    beforeUnmount() {
       if (this.getDateInterval) {
         clearInterval(this.getDateInterval)
         this.getDateInterval = null
