@@ -101,6 +101,9 @@ module.exports = async function (cms) {
 				cms.socket.emit('updateOrderLayouts')
 			}
 		}
+		if (commit.collectionName === 'Order' && commit.tags.includes('closeOrder')) {
+			cms.execPostAsync('run:closeOrder', null, [])
+		}
 	})
 
 	/*
