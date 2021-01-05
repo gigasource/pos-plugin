@@ -3,7 +3,7 @@
     <div class="date-range-picker__nav left" @click="goPrev">
       <g-icon>chevron_left</g-icon>
     </div>
-    <g-menu v-model="showMenu" :min-width="100" :max-width="333" nudge-bottom="10" nudge-left="70" :close-on-click="true" :close-on-item-click="true" :content-fill-width="false" content-class="aw-date-range-picker-content">
+    <g-menu v-model="showMenu" :min-width="100" :max-width="333" nudge-bottom="10" nudge-left="70" :close-on-click="true" :content-fill-width="false" content-class="aw-date-range-picker-content">
       <!-- activator - button which show date -->
       <template #activator="{on}">
         <div :class="['value', showMenu && 'value--active']" @click="on.click"> {{ formattedRange }}</div>
@@ -107,6 +107,7 @@
         return dayjs(this.toDate).format(DATE_FORMAT)
       },
     },
+    emits: ['save'],
     methods: {
       onFromDateSelected(dateValue) {
         this.fromDate = dateValue

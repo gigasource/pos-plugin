@@ -175,7 +175,7 @@
   import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
-  
+
   export default {
     name: 'ProductEditor',
     components: { DialogEditPopupModifiers, GGridItemSelector, ColorSelector },
@@ -277,8 +277,8 @@
       await this.loadTaxes()
       await this.loadPopupModifierGroups()
 
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        this.layoutType = this.$router.currentRoute.query.type
+      if (this.$route && this.$route.query && this.$route.query.type) {
+        this.layoutType = this.$route.query.type
       } else {
         this.layoutType = 'default'
       }
@@ -288,8 +288,8 @@
       }, 300)
     },
     activated() {
-      if (this.$router.currentRoute.query && this.$router.currentRoute.query.type) {
-        this.layoutType = this.$router.currentRoute.query.type
+      if (this.$route && this.$route.query && this.$route.query.type) {
+        this.layoutType = this.$route.query.type
       } else {
         this.layoutType = 'default'
       }
