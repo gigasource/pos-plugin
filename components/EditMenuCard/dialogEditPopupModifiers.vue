@@ -5,7 +5,7 @@
         <div class="header">
           <template v-for="group in allGroups" :key="group._id">
             <g-btn outlined :uppercase="false" background-color="#F0F0F0"
-                   :class="['mb-2', ...activeEditItem && activeEditItem._id === group._id && ['active-btn', 'edit-btn']]"
+                   :class="['mb-2', ...(activeEditItem && activeEditItem._id === group._id) ? ['active-btn', 'edit-btn'] : []]"
                    @click="setActiveGroup(group)">
               {{group.name}}
             </g-btn>
@@ -19,7 +19,7 @@
           <div class="content--main col-flex align-items-start">
             <template v-for="category in allCategories" :key="category._id">
               <g-btn flat :uppercase="false"
-                     :class="['mb-2', ...activeEditItem && activeEditItem._id === category._id && ['active-btn', 'edit-btn']]"
+                     :class="['mb-2', ...(activeEditItem && activeEditItem._id === category._id) ? ['active-btn', 'edit-btn'] : []]"
                      @click="setActiveCategory(category)">
                 {{category.name}}
               </g-btn>
@@ -27,7 +27,7 @@
                 <g-icon>keyboard_arrow_right</g-icon>
                 <template v-for="mod in modifiersByCategory[category._id]" :key="mod._id">
                   <g-btn flat :uppercase="false"
-                         :class="[...activeEditItem && activeEditItem._id === mod._id && ['active-btn', 'edit-btn']]"
+                         :class="[...(activeEditItem && activeEditItem._id === mod._id) ? ['active-btn', 'edit-btn'] : []]"
                          @click="setActiveModifier(mod)">
                     {{mod.name}}
                   </g-btn>

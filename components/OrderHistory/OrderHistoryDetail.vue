@@ -76,7 +76,7 @@
             </div>
           </div>
         </template>
-        <template v-else>
+        <template v-else-if="payment.length === 1">
           <div class="row-flex align-items-center">
             <img :src="payment[0].icon" v-if="payment[0].icon" style="height: 16px" class="mr-2">
             <span>{{ $filters.formatCurrency(payment[0].value) }}</span>
@@ -111,16 +111,19 @@
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.amount - this.orderHistoryCurrentOrder.tax;
       },
       payment() {
-        let paymentMethods = cms.getList('PosSetting')[0].payment
-        return this.orderHistoryCurrentOrder.payment
-        .filter(i => paymentMethods.some(m => m.name === i.type))
-        .map(i => {
-          const method = paymentMethods.find(m => m.name === i.type)
-          return {
-            ...method,
-            ...i
-          }
-        })
+        const paymentMethods = cms.getList('PosSetting')[0].payment;
+        if (this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.payment) {
+          return this.orderHistoryCurrentOrder.payment
+          .filter(i => paymentMethods.some(m => m.name === i.type))
+          .map(i => {
+            const method = paymentMethods.find(m => m.name === i.type)
+            return {
+              ...method,
+              ...i
+            }
+          })
+        }
+        return []
       },
       tip() {
         return this.orderHistoryCurrentOrder && this.orderHistoryCurrentOrder.tip

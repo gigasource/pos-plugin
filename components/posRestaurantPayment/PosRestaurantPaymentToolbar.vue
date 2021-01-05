@@ -7,7 +7,9 @@
 <!--    <g-btn-bs icon="icon-split_check_2">{{$t('fnBtn.paymentFunctions.splitCheck')}}</g-btn-bs>-->
 <!--    <g-btn-bs icon="icon-red_bill">{{$t('fnBtn.paymentFunctions.redBill')}}</g-btn-bs>-->
     <g-spacer/>
-    <g-btn-bs icon="icon-print2" @click.stop="pay(false)">{{$t('fnBtn.paymentFunctions.bill')}}</g-btn-bs>
+    <g-btn-bs icon="icon-print2" @click.stop="pay(false)" :disabled="isPayBtnDisabled">
+      {{ $t('fnBtn.paymentFunctions.bill') }}
+    </g-btn-bs>
     <g-btn-bs class="col-2" background-color="#2979FF" @click.stop="pay(true)" :disabled="isPayBtnDisabled">
       <template v-if="processing"><g-progress-circular indeterminate/></template>
       <template v-else>{{$t('fnBtn.paymentFunctions.pay')}}</template>
@@ -48,10 +50,8 @@
           shouldPrint = generalSettings && generalSettings.printReceiptWithPay
         }
         this.$emit('pay', null, false, shouldPrint, isPayBtn, () => {
-          const backToDashboard = !!this.currentOrder.table
           this.processing = false
-          if (backToDashboard) this.$router.push({ path: '/pos-dashboard' })
-          else this.$router.go(-1)
+          this.$router.push({ path: '/pos-dashboard' })
         })
       },
       promotion() {
