@@ -7,9 +7,10 @@ import {
   moveOrderToNewTable,
   activeTables,
   isBusyTable,
-  fetchInProgressTables
+  fetchInProgressTables,
+  makeTakeAway
 } from "./room-logic";
-
+import _ from 'lodash'
 import {
   createOrder,
   addItem as addOrderItem,
@@ -92,6 +93,7 @@ describe("room-logic", function() {
     addRoomObject(room, table1);
     addRoomObject(room, table2);
     removeRoomObject(room, table1);
+    expect(room.roomObjects.length).toEqual(1)
     expect(room).toMatchInlineSnapshot(`
       Object {
         "roomObjects": Array [
@@ -109,6 +111,10 @@ describe("room-logic", function() {
         ],
       }
     `);
+    removeRoomObject(room, table1)
+    expect(room.roomObjects.length).toEqual(1)
+    removeRoomObject(room, table2)
+    expect(room.roomObjects.length).toEqual(0)
   });
   it("zoom should equal 1", async () => {
     const { room, zoom, viewH, viewW, w1, h1 } = createRoom();
@@ -193,4 +199,10 @@ describe("room-logic", function() {
       .findOne({ _id: orderInDb._id });
     expect(newOrderInDb.table).toEqual("table 2");
   });
+  it("should set table type to take away", () => {
+    const _table1 = _.cloneDeep(table1)
+    expect(_table1.takeAway).toBeFalsy()
+    makeTakeAway(_table1)
+    expect(_table1.takeAway).toBeTruthy()
+  })
 });
