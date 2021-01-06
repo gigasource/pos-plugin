@@ -1,12 +1,13 @@
-const { reactive, watchEffect, ref, toRaw } = require('vue')
-const _ = require('lodash')
+import { reactive, watchEffect, ref } from 'vue'
+import _ from 'lodash'
 
-const Hooks = require('schemahandler/hooks/hooks');
-const hooks = new Hooks();
+import { computed } from 'vue';
 
-const { computed } = require('vue');
-
-const orm = require('schemahandler')
+const cms = {
+  getModel(col) {
+    return orm(col)
+  }
+}
 
 const createRoom = function (_roomObjects) {
   let room = _.assign({
@@ -78,8 +79,8 @@ const moveOrderToNewTable = async function (fromTable, toTable) {
     // invalid action
     return
   }
-  const order = await orm('Order').findOne({table: fromTable.name})
-  await orm('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
+  const order = await cms.getModel('Order').findOne({table: fromTable.name})
+  await cms.getModel('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
 }
 
 const activeOrders = reactive([]);
@@ -89,7 +90,7 @@ const activeTables = computed(() => {
 })
 
 const fetchInProgressTables = async function () {
-  activeOrders.value = await orm('Order').find({status: 'inProgress'})
+  activeOrders.value = await cms.getModel('Order').find({status: 'inProgress'})
 }
 
 const isBusyTable = function (table) {

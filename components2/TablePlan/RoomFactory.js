@@ -14,11 +14,19 @@ const RoomFactory = () => {
       const { createRoom, isBusyTable, fetchInProgressTables } = roomLogics
       const { room, viewW, viewH } = createRoom(props.roomObjects)
       hooks.emit('room', room, e => eval(e))
-      const roomRenderFn = () => <div>
-        {room.items.map((item) => <div>
+      const style = (item) => ({
+        position: 'absolute',
+        left: item.realLocation.x + "px",
+        top: item.realLocation.y + "px",
+        width: item.realSize.width + "px",
+        height: item.realSize.height + "px",
+        background: "green"
+      })
+      const roomRenderFn = () => <div style={{position: 'relative'}}>
+        {room.items.map((item) => <div style={style(item)} >
           <p> {item.name} </p>
-          <p> {item.realLocation.x} </p>
-        </div>)}
+        </div>)
+        }
       </div>
 
       hooks.emit('r:updateRoomRenderFn',

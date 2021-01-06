@@ -1,7 +1,6 @@
 //region declare
-import { nextTick } from 'vue';
+import { nextTick } from "vue"
 
-const _ = require('lodash');
 const {
   createRoom,
   addRoomItem,
@@ -10,34 +9,34 @@ const {
   activeTables,
   isBusyTable,
   fetchInProgressTables
-} = require('./room-logic');
+} = require("./room-logic");
 
 const {
   createOrder,
   addItem: addOrderItem,
   makePaid
-} = require('../../backend/order-logic/pos-logic');
+} = require("../../backend/order-logic/pos-logic");
 
-const orm = require('schemahandler');
+const orm = require("schemahandler");
 
 const table1 = {
-  name: 'table 1',
+  name: "table 1",
   location: { x: 5, y: 10 },
   size: { width: 10, height: 10 }
 };
 const table2 = {
-  name: 'table 2',
+  name: "table 2",
   location: { x: 50, y: 50 },
   size: { width: 10, height: 10 }
 };
 const wall1 = {
-  name: 'wall 1',
+  name: "wall 1",
   location: { x: 30, y: 10 },
   size: { width: 10, height: 2 }
 };
-const cola = { name: 'Cola', price: 1.3, quantity: 1, ...drinkTax };
 const drinkTax = { taxes: [16, 32] };
 
+const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
 
 const cms = {
   getModel(col) {
@@ -48,8 +47,8 @@ const cms = {
 const VIEW_W = 100;
 const VIEW_H = 100;
 
-orm.connect('mongodb://localhost:27017', 'roomTest');
-const Room = cms.getModel('Room');
+orm.connect("mongodb://localhost:27017", "roomTest");
+const Room = cms.getModel("Room");
 
 async function prepareDb() {
   await Room.remove({});
@@ -75,14 +74,14 @@ beforeAll(async () => {
 });
 //endregion
 
-describe('room-logic', function () {
-  it('createRoom should work', () => {
+describe("room-logic", function() {
+  it("createRoom should work", () => {
     const { room } = createRoom();
     addRoomItem(room, table1);
     addRoomItem(room, table2);
     expect(room.items.length).toEqual(2);
   });
-  it('remove item should work', () => {
+  it("remove item should work", () => {
     const { room } = createRoom();
     addRoomItem(room, table1);
     addRoomItem(room, table2);
@@ -105,7 +104,7 @@ describe('room-logic', function () {
       }
     `);
   });
-  it('zoom should equal 1', async () => {
+  it("zoom should equal 1", async () => {
     const { room, zoom, viewH, viewW, w1, h1 } = createRoom();
     await nextTick();
     expect(zoom.value).toEqual(1);
@@ -125,8 +124,8 @@ describe('room-logic', function () {
     `);
     expect(room.items[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "x": 50,
-        "y": 50,
+        "height": 50,
+        "width": 50,
       }
     `);
     addRoomItem(room, table2);
@@ -142,49 +141,50 @@ describe('room-logic', function () {
     `);
     expect(room.items[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "x": 16.666666666666668,
-        "y": 16.666666666666668,
+        "height": 16.666666666666668,
+        "width": 16.666666666666668,
       }
     `);
     expect(zoom.value).toEqual(100 / 60);
   });
 
-  it('should fetch all active orders correctly', async() => {
-    const Order = cms.getModel('Order');
+  it("should fetch all active orders correctly", async () => {
+    const Order = cms.getModel("Order");
     await Order.remove({});
-    const order = createOrder({ table: 'table 1' });
+    const order = createOrder({ table: "table 1" });
     addOrderItem(order, cola);
-    const order1 = createOrder({table: 'table 2'});
+    const order1 = createOrder({ table: "table 2" });
     addOrderItem(order1, cola);
     await Order.create(order);
-    await Order.create(order1)
+    await Order.create(order1);
     await nextTick();
-    await fetchInProgressTables()
-    expect(activeTables.value.length).toEqual(2)
-    expect(isBusyTable(table2)).toEqual(true)
-    makePaid(order1)
-    await cms.getModel('Order').updateOne({table: 'table 2'}, order1)
-    await fetchInProgressTables()
-    expect(activeTables.value.length).toEqual(1)
-    expect(isBusyTable(table2)).toEqual(false)
-  })
+    await fetchInProgressTables();
+    expect(activeTables.value.length).toEqual(2);
+    expect(isBusyTable(table2)).toEqual(true);
+    makePaid(order1);
+    await cms.getModel("Order").updateOne({ table: "table 2" }, order1);
+    await fetchInProgressTables();
+    expect(activeTables.value.length).toEqual(1);
+    expect(isBusyTable(table2)).toEqual(false);
+  });
 
-  it('should move order', async () => {
-
+  it("should move order", async () => {
     const { room } = createRoom();
     addRoomItem(room, table1);
     addRoomItem(room, table2);
     await nextTick();
-    const Order = cms.getModel('Order');
+    const Order = cms.getModel("Order");
     await Order.remove({});
-    const order = createOrder({ table: 'table 1' });
+    const order = createOrder({ table: "table 1" });
     addOrderItem(order, cola);
     await nextTick();
     await Order.create(order);
-    const orderInDb = await cms.getModel('Order').findOne({ table: 'table 1' });
-    expect(orderInDb.table).toEqual('table 1')
-    await moveOrderToNewTable(table1, table2)
-    const newOrderInDb = await cms.getModel('Order').findOne({ _id: orderInDb._id });
-    expect(newOrderInDb.table).toEqual('table 2')
-  })
+    const orderInDb = await cms.getModel("Order").findOne({ table: "table 1" });
+    expect(orderInDb.table).toEqual("table 1");
+    await moveOrderToNewTable(table1, table2);
+    const newOrderInDb = await cms
+      .getModel("Order")
+      .findOne({ _id: orderInDb._id });
+    expect(newOrderInDb.table).toEqual("table 2");
+  });
 });
