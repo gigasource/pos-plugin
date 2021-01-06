@@ -63,7 +63,7 @@
   import InputNumber from './InputNumber';
   import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
   import { reactive, computed, toRefs } from 'vue'
-  
+  const BSON = require('bson')
   export default {
     name: 'CategoryEditor',
     components: { PosKeyboardFull, InputNumber, ColorSelector },
@@ -120,7 +120,7 @@
             console.log('Create new categoryLayout', props.selectedCategoryLayout)
             const orderLayout = await cms.getModel('OrderLayout').findOneAndUpdate(
                 { _id: props.orderLayout._id },
-                { $push: { categories: props.selectedCategoryLayout } },
+                { $push: { categories: {...props.selectedCategoryLayout, _id: new BSON.ObjectID() } } },
                 { new: true });
             showNotify()
             context.emit('update:orderLayout', orderLayout)
