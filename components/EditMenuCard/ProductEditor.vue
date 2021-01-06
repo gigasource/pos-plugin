@@ -175,7 +175,6 @@
   import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
-  const BSON = require('bson')
 
   export default {
     name: 'ProductEditor',
@@ -439,7 +438,6 @@
 
       async createNewProductLayout(productId, extraInfo) {
         const productLayout = {
-          _id: new BSON.ObjectID(),
           product: productId,
           ..._.pick(this.selectedProductLayout, ['top', 'left', 'color', 'type', 'text']),
           ...extraInfo
