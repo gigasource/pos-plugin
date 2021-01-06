@@ -1,0 +1,20 @@
+<script>
+  import RoomFactory from './RoomFactory';
+  const { fn, hooks } = RoomFactory()
+  const ui2RenderFn = (room, fetchInProgressTables, isBusyTable) =>
+    <div>
+      {room.items.map(item => {
+          <div> {item.name} </div>
+      })}
+    </div>
+  let room
+  hooks.on('room', _room => {
+    room = _room
+  })
+  hooks.on('r:updateRoomRenderFn', (
+    roomRenderFn,
+    room,
+    fetchInProgressTables,
+    isBusyTable) => { this.update(roomRenderFn, ui2RenderFn(room, fetchInProgressTables, isBusyTable))})
+  export default fn()
+</script>
