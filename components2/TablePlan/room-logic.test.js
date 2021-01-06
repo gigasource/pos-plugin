@@ -16,7 +16,7 @@ const {
   createOrder,
   addItem: addOrderItem,
   makePaid
-} = require('./../../backend/order-logic/pos-logic');
+} = require('../../backend/order-logic/pos-logic');
 
 const orm = require('schemahandler');
 
