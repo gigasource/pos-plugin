@@ -68,8 +68,8 @@ const addRoomObject = function (room, obj) {
 }
 
 const removeRoomObject = function (room, obj) {
-  const _obj = room.roomObjects.find(i => i.name === obj.name);
-  room.roomObjects.splice(room.roomObjects.indexOf(_obj), 1);
+  const idx = _.findIndex(room.roomObjects, i => i.name === obj.name)
+  if (idx !== -1) room.roomObjects.splice(idx, 1);
 }
 
 const moveOrderToNewTable = async function (fromTable, toTable) {
