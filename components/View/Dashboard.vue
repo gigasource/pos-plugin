@@ -96,9 +96,9 @@
       OnlineOrderMain,
       RestaurantRoom, PosDashboardFunction, PosOrderManualTable, ContentRender, PosDashboardSidebar},
     injectService: [
-        'PosStore:(computedDashboardSidebar, defaultSidebarPath, storeLocale, user, showErrorSnackbar, showInfoSnackbar, enabledFeatures, getPendingReservationsLength, isMobile)',
+        'PosStore:(computedDashboardSidebar, defaultSidebarPath, storeLocale, user, showErrorSnackbar, showInfoSnackbar, enabledFeatures, getPendingReservationsLength, getPendingOnlineOrderCounter, isMobile)',
         'OrderStore:(pendingOrders, kitchenOrders, updateOnlineOrders, declineOrder, acceptPendingOrder, completeOrder, activeOrders, setInitOrderProps, ' +
-        '            getPendingOnlineOrderCounter, getOnlineOrdersWithStatus, onlineOrders, isRefundable, isRefundFailed, refundOrder, isRefunded,' +
+        '            getOnlineOrdersWithStatus, onlineOrders, isRefundable, isRefundFailed, refundOrder, isRefunded,' +
         '            reservations, getReservations, updateReservation, removeReservation, completeReservation,' +
         '            currentOrder, resetOrderData, changeTable)',
         'SettingsStore:(onlineOrderSorting, defaultPrepareTime, getOnlineDeviceServices, updateOnlineDeviceServices, reservationSetting, getReservationSetting)'

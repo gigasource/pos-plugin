@@ -54,7 +54,8 @@
           date: [this.$t('onlineOrder.today'), this.$t('onlineOrder.tomorrow')],
           people: ['1 Guest'],
         },
-        reservations: []
+        reservations: [],
+        reservationSetting: null
       }
     },
     async created() {
