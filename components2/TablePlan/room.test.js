@@ -2,7 +2,7 @@ import { nextTick } from "vue";
 
 import RoomFactory from "./RoomFactory";
 import { mount } from "@vue/test-utils";
-import { removeRoomItem } from "./room-logic";
+import { removeRoomObject } from "./room-logic";
 describe("test room ui 1", () => {
   it("should render room", async () => {
     const { fn, hooks } = RoomFactory();
@@ -10,6 +10,7 @@ describe("test room ui 1", () => {
     hooks.on("room", _room => {
       room = _room;
     });
+
     const table1 = {
       name: "table 1",
       location: { x: 5, y: 10 },
@@ -34,13 +35,13 @@ describe("test room ui 1", () => {
     });
     await nextTick();
     expect(wrapper.html()).toMatchInlineSnapshot(
-      `"<div><div><p> table 1 </p><p> 8.333333333333334 </p></div><div><p> table 2 </p><p> 83.33333333333334 </p></div><div><p> wall 1 </p><p> 50 </p></div></div>"`
+      `"<div style=\\"position: relative;\\"><div style=\\"position: absolute; left: 5px; top: 10px; background: green;\\"><p> table 1 </p></div><div style=\\"position: absolute; left: 50px; top: 50px; background: green;\\"><p> table 2 </p></div><div style=\\"position: absolute; left: 30px; top: 10px; background: green;\\"><p> wall 1 </p></div></div>"`
     );
 
-    removeRoomItem(room, room.items[0]);
+    removeRoomObject(room, room.roomObjects[0]);
     await nextTick();
     expect(wrapper.html()).toMatchInlineSnapshot(
-      `"<div><div><p> table 2 </p><p> 83.33333333333334 </p></div><div><p> wall 1 </p><p> 50 </p></div></div>"`
+      `"<div style=\\"position: relative;\\"><div style=\\"position: absolute; left: 50px; top: 50px; background: green;\\"><p> table 2 </p></div><div style=\\"position: absolute; left: 30px; top: 10px; background: green;\\"><p> wall 1 </p></div></div>"`
     );
   });
 });

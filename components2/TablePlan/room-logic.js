@@ -9,9 +9,9 @@ const cms = {
   }
 }
 
-const createRoom = function (_roomObjects) {
-  let room = _.assign({
-    items: _roomObjects || [],
+const createRoom = function (_room) {
+  let room = _.assign(_room, {
+    roomObjects: (_room && _room.roomObjects) || [],
   })
 
   room = reactive(room)
@@ -20,12 +20,12 @@ const createRoom = function (_roomObjects) {
   let viewW = ref(0), viewH = ref(0);
 
   const maxX = computed(() => {
-    const item = _.maxBy(room.items, (item) => item.location.x + item.size.width)
-    return item.location.x + item.size.width
+    const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
+    return obj.location.x + obj.size.width
   })
   const maxY = computed(() => {
-    const item =  _.maxBy(room.items, (item) => item.location.y + item.size.height)
-    return item.location.y + item.size.height
+    const obj =  _.maxBy(room.roomObjects, (obj) => obj.location.y + obj.size.height)
+    return obj.location.y + obj.size.height
   })
 
   const w1 = computed(() => {
@@ -45,16 +45,16 @@ const createRoom = function (_roomObjects) {
     } else zoom.value = 1
   })
 
-  //room.zoom => item.realLocation & item.realSize
+  //room.zoom => obj.realLocation & obj.realSize
   watchEffect(() => {
-    for (const item of room.items) {
-      item.realLocation = {
-        x: item.location.x * zoom.value,
-        y: item.location.y * zoom.value
+    for (const obj of room.roomObjects) {
+      obj.realLocation = {
+        x: obj.location.x * zoom.value,
+        y: obj.location.y * zoom.value
       }
-      item.realSize = {
-        x: item.size.width * zoom.value,
-        y: item.size.height * zoom.value
+      obj.realSize = {
+        x: obj.size.width * zoom.value,
+        y: obj.size.height * zoom.value
       }
     }
   })
@@ -62,14 +62,14 @@ const createRoom = function (_roomObjects) {
   return { room, viewH, viewW, zoom, w1, h1 }
 }
 
-const addRoomItem = function (room, item) {
-  const _item = _.cloneDeep(item)
-  room.items.push(_item)
+const addRoomObject = function (room, obj) {
+  const _obj = _.cloneDeep(obj)
+  room.roomObjects.push(_obj)
 }
 
-const removeRoomItem = function (room, _item) {
-  const __item = room.items.find(i => i.name === _item.name);
-  room.items.splice(room.items.indexOf(__item), 1);
+const removeRoomObject = function (room, obj) {
+  const _obj = room.roomObjects.find(i => i.name === obj.name);
+  room.roomObjects.splice(room.roomObjects.indexOf(_obj), 1);
 }
 
 const moveOrderToNewTable = async function (fromTable, toTable) {
@@ -97,12 +97,17 @@ const isBusyTable = function (table) {
   return activeTables.value.includes(table.name)
 }
 
-module.exports = {
+const makeTakeAway = function (table) {
+  table.takeAway = true
+}
+
+export {
   createRoom,
-  addRoomItem,
-  removeRoomItem,
+  addRoomObject,
+  removeRoomObject,
   moveOrderToNewTable,
   activeTables,
   isBusyTable,
-  fetchInProgressTables
+  fetchInProgressTables,
+  makeTakeAway
 }

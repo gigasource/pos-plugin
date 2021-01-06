@@ -1,21 +1,20 @@
 //region declare
-import { nextTick } from "vue"
-
-const {
+import { nextTick } from "vue";
+import {
   createRoom,
-  addRoomItem,
-  removeRoomItem,
+  addRoomObject,
+  removeRoomObject,
   moveOrderToNewTable,
   activeTables,
   isBusyTable,
   fetchInProgressTables
-} = require("./room-logic");
+} from "./room-logic";
 
-const {
+import {
   createOrder,
-  addItem: addOrderItem,
+  addItem as addOrderItem,
   makePaid
-} = require("../../backend/order-logic/pos-logic");
+} from "../../backend/order-logic/pos-logic";
 
 const orm = require("schemahandler");
 
@@ -61,11 +60,11 @@ async function prepareDb() {
   }
 
   await makeRoom(async room => {
-    addRoomItem(room, table1);
+    addRoomObject(room, table1);
 
-    addRoomItem(room, table2);
+    addRoomObject(room, table2);
 
-    addRoomItem(room, wall1);
+    addRoomObject(room, wall1);
   });
 }
 
@@ -77,18 +76,25 @@ beforeAll(async () => {
 describe("room-logic", function() {
   it("createRoom should work", () => {
     const { room } = createRoom();
-    addRoomItem(room, table1);
-    addRoomItem(room, table2);
-    expect(room.items.length).toEqual(2);
+    addRoomObject(room, table1);
+    addRoomObject(room, table2);
+    expect(room.itroomObjectsems.length).toEqual(2);
   });
-  it("remove item should work", () => {
+  it("createRoom should keep attributes", () => {
+    const { room } = createRoom({ name: "room1", roomObjects: [table1], order: 10})
+    expect(room.name).toEqual("room1")
+    expect(room.order).toEqual(10)
+    expect(room.roomObjects.length).toEqual(1)
+    expect(room.roomObjects[0].name).toEqual("table 1")
+  })
+  it("remove room object should work", () => {
     const { room } = createRoom();
-    addRoomItem(room, table1);
-    addRoomItem(room, table2);
-    removeRoomItem(room, table1);
+    addRoomObject(room, table1);
+    addRoomObject(room, table2);
+    removeRoomObject(room, table1);
     expect(room).toMatchInlineSnapshot(`
       Object {
-        "items": Array [
+        "roomObjects": Array [
           Object {
             "location": Object {
               "x": 50,
@@ -111,38 +117,38 @@ describe("room-logic", function() {
 
     viewW.value = VIEW_W;
     viewH.value = VIEW_H;
-    addRoomItem(room, table1);
+    addRoomObject(room, table1);
     await nextTick();
     expect(w1.value).toEqual(15);
     expect(h1.value).toEqual(20);
     expect(zoom.value).toEqual(5);
-    expect(room.items[0].realLocation).toMatchInlineSnapshot(`
+    expect(room.roomObjects[0].realLocation).toMatchInlineSnapshot(`
       Object {
         "x": 25,
         "y": 50,
       }
     `);
-    expect(room.items[0].realSize).toMatchInlineSnapshot(`
+    expect(room.roomObjects[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "height": 50,
-        "width": 50,
+        "x": 50,
+        "y": 50,
       }
     `);
-    addRoomItem(room, table2);
-    addRoomItem(room, wall1);
+    addRoomObject(room, table2);
+    addRoomObject(room, wall1);
     await nextTick();
     expect(h1.value).toEqual(60);
     expect(w1.value).toEqual(60);
-    expect(room.items[0].realLocation).toMatchInlineSnapshot(`
+    expect(room.roomObjects[0].realLocation).toMatchInlineSnapshot(`
       Object {
         "x": 8.333333333333334,
         "y": 16.666666666666668,
       }
     `);
-    expect(room.items[0].realSize).toMatchInlineSnapshot(`
+    expect(room.roomObjects[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "height": 16.666666666666668,
-        "width": 16.666666666666668,
+        "x": 16.666666666666668,
+        "y": 16.666666666666668,
       }
     `);
     expect(zoom.value).toEqual(100 / 60);
@@ -170,8 +176,8 @@ describe("room-logic", function() {
 
   it("should move order", async () => {
     const { room } = createRoom();
-    addRoomItem(room, table1);
-    addRoomItem(room, table2);
+    addRoomObject(room, table1);
+    addRoomObject(room, table2);
     await nextTick();
     const Order = cms.getModel("Order");
     await Order.remove({});

@@ -1,4 +1,4 @@
-import roomLogics from './room-logic'
+import {createRoom, isBusyTable, fetchInProgressTables } from './room-logic'
 import Hooks from 'schemahandler/hooks/hooks'
 import { computed, onMounted } from 'vue'
 const RoomFactory = () => {
@@ -11,8 +11,7 @@ const RoomFactory = () => {
       }
     },
     setup(props) {
-      const { createRoom, isBusyTable, fetchInProgressTables } = roomLogics
-      const { room, viewW, viewH } = createRoom(props.roomObjects)
+      const { room, viewW, viewH } = createRoom({roomObjects: props.roomObjects})
       hooks.emit('room', room, e => eval(e))
       const style = (item) => ({
         position: 'absolute',
@@ -23,7 +22,7 @@ const RoomFactory = () => {
         background: "green"
       })
       const roomRenderFn = () => <div style={{position: 'relative'}}>
-        {room.items.map((item) => <div style={style(item)} >
+        {room.roomObjects.map((item) => <div style={style(item)} >
           <p> {item.name} </p>
         </div>)
         }
