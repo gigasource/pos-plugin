@@ -561,9 +561,11 @@
         }))
       },
       changePrice() {
+        // TODO: Correct impl: Seem like not use anywhere (or maybe injected in ComponentBuilder ???)
         this.$getService('dialogChangePrice:open')('new', this.activeProduct ? this.activeProduct.originalPrice : 0)
       },
       discountSingleItemDialog() {
+        // TODO: Correct impl: Seem like not use anywhere (or maybe injected in ComponentBuilder ???)
         this.$getService('dialogChangePrice:open')('percentage', this.activeProduct ? this.activeProduct.originalPrice : 0)
       },
       discountSingleItemByAmount(value) {
@@ -573,6 +575,7 @@
         this.calculateNewPrice('percentage', value, true)
       },
       productLookup() {
+        // TODO: Correct impl -- it's seem like this function is not used anywhere (injected in ComponentBuilder ????)
         this.$getService('dialogProductLookup:setActive')(true)
       },
       async saveOrder() {
