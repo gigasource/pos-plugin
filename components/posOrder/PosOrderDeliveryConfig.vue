@@ -12,12 +12,12 @@
         <div class="mb-2 fw-600">Delivery keyboard</div>
         <div class="row-flex align-items-center mb-2">
           <p class="mr-2">External rows</p>
-          <input-number width="148" :model-value="keyboardConfig.length" @update:modelValue="changeExtraRows"/>
+          <input-number width="148" :model-value="keyboardDeliveryConfig.length" @update:modelValue="changeExtraRows"/>
         </div>
       </div>
       <div class="col-6 col-flex h-100">
         <g-spacer/>
-        <pos-order-delivery-keyboard :key="dialog" mode="edit" :keyboard-config="keyboardConfig" @edit:keyboard="openDialogEdit"/>
+        <pos-order-delivery-keyboard :key="dialog" mode="edit" :keyboard-config="keyboardDeliveryConfig" @edit:keyboard="openDialogEdit"/>
       </div>
     </div>
     <dialog-text-filter v-model="dialog" label="Enter key" @submit="changeKeyboardExtension"/>
@@ -26,20 +26,24 @@
 
 <script>
   import _ from 'lodash'
+  import inputNumber from '../EditMenuCard/InputNumber'
+  import posOrderDeliveryKeyboard from './posOrderDeliveryKeyboard';
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 
   export default {
     name: "PosOrderDeliveryConfig",
     injectService: ['Snackbar:(showSnackbar)'],
+    components: {posOrderDeliveryKeyboard, inputNumber, dialogTextFilter},
     data() {
       return {
-        keyboardConfig: [],
+        keyboardDeliveryConfig: [],
         position: {},
         dialog: false
       }
     },
     async created() {
       const setting = await cms.getModel('PosSetting').findOne()
-      this.keyboardConfig = (setting && setting['keyboardDeliveryConfig']) || []
+      this.keyboardDeliveryConfig = (setting && setting.keyboardDeliveryConfig) || []
     },
     methods: {
       fetchMenu() {
@@ -53,10 +57,10 @@
         })
       },
       changeExtraRows(val) {
-        if(val > this.keyboardConfig.length) {
-          this.keyboardConfig.unshift([' ', ' ', ' '])
+        if(val > this.keyboardDeliveryConfig.length) {
+          this.keyboardDeliveryConfig.unshift([' ', ' ', ' '])
         } else {
-          this.keyboardConfig.shift()
+          this.keyboardDeliveryConfig.shift()
         }
       },
       openDialogEdit(position) {
@@ -64,13 +68,8 @@
         this.dialog = true
       },
       async changeKeyboardExtension(val) {
-        _.set(this.keyboardConfig, [this.position.top, this.position.left], val)
-        await cms.getModel('PosSetting').findOneAndUpdate(
-            {},
-            {
-              keyboardDeliveryConfig: this.keyboardConfig
-            }
-        )
+        _.set(this.keyboardDeliveryConfig, [this.position.top, this.position.left], val)
+        await cms.getModel('PosSetting').findOneAndUpdate({}, { keyboardDeliveryConfig: this.keyboardDeliveryConfig })
       }
     }
   }

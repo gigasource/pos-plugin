@@ -299,7 +299,12 @@
       },
       async loadKeyboardConfig() {
         const setting = await cms.getModel('PosSetting').findOne()
-        this.$emit('update:keyboardConfig', setting.keyboardConfig)
+        const keyboardConfig = setting.keyboardConfig
+        // work-around: Fixing error keyboardConfig is null
+        // TODO: Find what is the purpose of keyboardConfig layout
+        if (!keyboardConfig.layout)
+          keyboardConfig.layout = []
+        this.$emit('update:keyboardConfig', keyboardConfig)
       },
       //
       fillMissingAreas(areas, columns, rows, isCategory) {
