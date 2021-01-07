@@ -43,12 +43,22 @@
         :order="dialog.refundConfirm.order"
         :store-locale="storeLocale"
         @submit="doRefundOrder(dialog.refundConfirm.order, dialog.refundConfirm.status)"/>
+    
+    <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"></dialog-change-value>
+    
+    <g-snackbar v-model="showDiscountMessage" color=#FFC107" :timeout="2000" top>
+      <div :style="{color: '#ff4552',  display: 'flex','align-items': 'center'}">
+        <g-icon style="margin-right: 8px; color: #ff4552;">warning</g-icon>
+        <div>This order has already applied discount in items</div>
+      </div>
+    </g-snackbar>
   </div>
 </template>
 
 <script>
   import orderUtil from '../logic/orderUtil';
   import dialogCommon from './OrderStoreDialogs/dialogCommon';
+  import dialogChangeValue from '../pos-shared-components/dialogChangeValue';
   import dialogOrderTransactionRefundConfirm from './OrderStoreDialogs/dialogOrderTransactionRefundConfirm';
   import dialogOrderTransactionRefundFailed from './OrderStoreDialogs/dialogOrderTransactionRefundFailed';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
@@ -60,7 +70,7 @@
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
-    components: {dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed},
+    components: {dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {
@@ -119,7 +129,8 @@
         calls: [],
         selectedCustomer: {},
         orderType: '',
-        missedCalls: []
+        missedCalls: [],
+        showDiscountMessage: false,
       }
     },
     computed: {
@@ -742,10 +753,10 @@
       },
       setOrderDiscount() {
         if (this.currentOrder.items.some(i => i.price !== i.originalPrice) && !this.currentOrder.hasOrderWideDiscount) {
-          this.$getService('alertDiscount:setActive')(true);
+          this.showDiscountMessage = true
         } else {
           const originalTotal = this.currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-          this.$getService('dialogDiscount:open')(originalTotal, this.currentOrder.discount);
+          this.$refs.dlgDiscount.open(originalTotal, this.currentOrder.discount)
         }
       },
       updateOrderTable(table) {
