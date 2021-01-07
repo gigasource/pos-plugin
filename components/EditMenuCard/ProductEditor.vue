@@ -172,13 +172,12 @@
 <script>
   import _ from 'lodash';
   import ColorSelector from '../common/ColorSelector';
-  import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
 
   export default {
     name: 'ProductEditor',
-    components: { DialogEditPopupModifiers, GGridItemSelector, ColorSelector },
+    components: { DialogEditPopupModifiers, ColorSelector },
     props: {
       orderLayout: Object,
       selectedCategoryLayout: Object,

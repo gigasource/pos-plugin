@@ -125,7 +125,6 @@
   import Room from '../TablePlan/Room';
   import PosDashboardSidebar from '../Dashboard/PosDashboardSidebar';
   import DialogChangeValue from '../pos-shared-components/dialogChangeValue';
-  import GButtonMerger from '../FnButton/components/GButtonMerger';
   import ColorSelector from '../common/ColorSelector';
   import PosTextField from '../pos-shared-components/POSInput/PosTextField';
   import DialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
@@ -135,7 +134,7 @@
 
   export default {
     name: 'EditTablePlan',
-    components: { DialogTextFilter, PosTextField, ColorSelector, GButtonMerger, DialogChangeValue, PosDashboardSidebar, Room },
+    components: { DialogTextFilter, PosTextField, ColorSelector, DialogChangeValue, PosDashboardSidebar, Room },
     // injectService: ['PosStore:user'],
     props: {},
     data: function () {
