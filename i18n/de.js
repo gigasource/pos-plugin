@@ -9,6 +9,7 @@ module.exports = {
       errorPasscode: 'Passcode is incorrect',
       english: 'English',
       german: 'German',
+      vietnam: 'Vietnam',
       key: 'Einloggen',
       loginMess: 'Geben Sie Passcode ein, um sich einzuloggen'
     },

@@ -218,6 +218,12 @@ module.exports = {
         type: 'i18n'
       },
       path: 'i18n/de-DE.js'
+    },
+    {
+      loader: {
+        type: 'i18n'
+      },
+      path: 'i18n/vn.js'
     }
   ]
 };

@@ -1,7 +1,9 @@
 <template>
   <div class="user">
     <div class="user-list">
-      <g-list :items="listOfUsers" @click="label = 'Edit User'" active-class="item__active" divider elevation="0"
+      <g-list :items="listOfUsers"
+              @click="label = 'Edit User'"
+              active-class="item__active" divider elevation="0"
               item-text="name" mandatory prepend-type="avatar" return-object selectable v-model="selectedUser">
         <template v-slot:append>
           <div></div>

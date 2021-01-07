@@ -516,6 +516,14 @@ body::-webkit-scrollbar {
   background-position: center;
 }
 
+.icon-vietnam {
+  background-image: url("../assets/vietnam.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+
 .icon-wlan {
   background-image: url("../assets/wlan.svg");
   background-repeat: no-repeat;
