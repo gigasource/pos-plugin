@@ -22,10 +22,12 @@
 </template>
 
 <script>
-
+	import PosRangeSlider from '../POSInput/PosRangeSlider';
+	
   export default {
     name: 'dialogRangeFilter',
 		injectService: ['PosStore:(storeLocale, isMobile)'],
+		components: {PosRangeSlider},
     props: {
       label: null,
       min: {

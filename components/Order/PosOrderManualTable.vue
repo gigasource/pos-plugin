@@ -18,9 +18,13 @@
 
 <script>
   import { nextTick } from 'vue'
-
+  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  import NumberOfCustomersDialog from '../Restaurant/NumberOfCustomersDialog';
+  
   export default {
     name: 'PosOrderManualTable',
+    components: { NumberOfCustomersDialog, PosTextfieldNew, PosKeyboardFull },
     props: {
       isMobile: Boolean,
       activeOrders: Array

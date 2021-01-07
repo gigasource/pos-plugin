@@ -182,6 +182,7 @@
 
 <script>
   import { Touch } from 'pos-vue-framework';
+  import dialogConfigOrderItem from './dialogConfigOrderItem';
   import { nextTick } from 'vue';
 
   export default {
@@ -189,6 +190,7 @@
     directives: {
       Touch
     },
+    components: {dialogConfigOrderItem},
     props: {
       total: Number,
       items: Array,

@@ -21,9 +21,11 @@
 </template>
 
 <script>
-
+	import PosNumpad from '../PosNumpad';
+	
   export default {
     name: 'dialogNumberFilter',
+		components: {PosNumpad},
     props: {
       label: null,
       modelValue: null,

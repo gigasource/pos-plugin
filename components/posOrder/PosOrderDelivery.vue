@@ -323,12 +323,15 @@
 </template>
 
 <script>
+  // TODO: un-used, new
   import _ from 'lodash'
   import {Touch} from 'pos-vue-framework';
   import {v4 as uuidv4} from 'uuid'
+  import posOrderDeliveryKeyboard from './posOrderDeliveryKeyboard';
 
   export default {
     name: "PosOrderDelivery",
+    components: {posOrderDeliveryKeyboard},
     directives: {
       Touch
     },

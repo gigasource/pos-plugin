@@ -117,10 +117,13 @@
 
 <script>
   import _ from 'lodash'
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dateRangePicker from '../OnlineOrder/dateRangePicker';
 
   export default {
     name: "InventoryReport",
     injectService: ['InventoryStore:(inventoryCategories, loadInventoryCategories, loadInventoriesWithChange, loadInventoryHistory)'],
+    components: {dateRangePicker, dialogTextFilter},
     data() {
       return {
         categories: [],

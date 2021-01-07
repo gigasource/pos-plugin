@@ -73,6 +73,7 @@
 </template>
 
 <script>
+  import DialogDemo from '../Login/dialogDemo'
   import DialogCustomUrl from '../Login/dialogCustomUrl';
   import {v4 as uuidv4} from 'uuid';
   import _ from 'lodash';
@@ -81,7 +82,7 @@
 
   export default {
     name: 'FirstTimeSetUp',
-    components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl},
+    components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl, DialogDemo},
     injectService: ['PosStore:(toggleOverlay, isIOS)'],
     data() {
       return {

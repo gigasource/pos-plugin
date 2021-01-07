@@ -33,6 +33,9 @@
 </template>
 
 <script>
+  import ScrollSelect from './ScrollSelect';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  
   export default {
     name: 'NewReservationDialog',
     props: {
@@ -41,6 +44,7 @@
       edit: Boolean,
       receivedPhone: [Number, String]
     },
+    components: {ScrollSelect, PosKeyboardFull},
     injectService: ['SettingsStore:(reservationSetting, getReservationSetting)', 'OrderStore:(createReservation, updateReservation)'],
     data() {
       return {

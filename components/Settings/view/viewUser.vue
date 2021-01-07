@@ -110,6 +110,10 @@
 </template>
 
 <script>
+  import dialogSelectAvatar from '../dialog/dialogSelectAvatar';
+  import dialogUserDetail from '../dialog/dialogUserDetail';
+  import PosSwitch from '../../pos-shared-components/PosSwitch';
+  
   import layout from './layoutUserView';
   export default {
     name: 'viewUser',
@@ -120,6 +124,7 @@
       'SettingsStore:getListUsers',
       'SettingsStore:updateUser',
     ],
+    components: {dialogSelectAvatar, dialogUserDetail, PosSwitch},
     data() {
       return {
         layout: layout,

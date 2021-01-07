@@ -48,6 +48,9 @@
 
 <script>
   import orderUtil from '../logic/orderUtil';
+  import dialogCommon from './OrderStoreDialogs/dialogCommon';
+  import dialogOrderTransactionRefundConfirm from './OrderStoreDialogs/dialogOrderTransactionRefundConfirm';
+  import dialogOrderTransactionRefundFailed from './OrderStoreDialogs/dialogOrderTransactionRefundFailed';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
   import * as jsonfn from 'json-fn';
@@ -57,6 +60,7 @@
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
+    components: {dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {

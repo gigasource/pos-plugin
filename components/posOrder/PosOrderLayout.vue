@@ -39,11 +39,16 @@
 </template>
 <script>
   import _ from 'lodash'
+  import posOrderKeyboard from '../../components/posOrder/PosOrderKeyboard'
+  import dialogChoosePopupModifier from './dialogChoosePopupModifier';
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogProductSearchResult from '../Order/components/dialogProductSearchResult';
   import { createEmptyCategoryLayout, createEmptyLayout, createEmptyProductLayout, isSameArea } from './util'
 
   export default {
     name: 'PosOrderLayout',
     injectService: ['SettingsStore:updateKeyboardConfig'],
+    components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, posOrderKeyboard},
     props: {
       editable: {
         type: Boolean,
