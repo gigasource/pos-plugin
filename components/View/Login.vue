@@ -25,7 +25,7 @@
         <store-id-btn/>
         <support-btn @open="openDialog"/>
       </div>
-      <dialog-login-support v-model="dialog"/>
+      <dialog-login-support v-model="dialog.loginSupport"/>
     </div>
   </div>
 </template>
@@ -45,7 +45,9 @@
     components: { PosLoginTextfield, ConnectionStatusBtn, PosLoginBtnLanguage, VersionBtn, StoreIdBtn, SupportBtn, DialogLoginSupport},
     data() {
       return {
-        dialog: false,
+        dialog: {
+          loginSupport: false
+        },
         version: null,
         loginPassword: '',
         incorrectPasscode: null,
@@ -54,7 +56,7 @@
     },
     methods: {
       openDialog() {
-        this.dialog = true
+        this.dialog.loginSupport = true
       },
       login() {},
       resetIncorrectPasscodeFlag() {},
