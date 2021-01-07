@@ -33,6 +33,9 @@
 </template>
 
 <script>
+  import dialogSort from '../../pos-shared-components/dialogSort';
+  import dialogConfirmDelete from '../dialog/dialogConfirmDelete';
+  
   export default {
     name: 'viewArticleToolbar',
     injectService: [
@@ -41,6 +44,7 @@
         'SettingsStore:productSortCondition',
         'SettingsStore:getListProducts',
     ],
+    components: { dialogSort, dialogConfirmDelete },
     data() {
       return {
         dialogConfirmDelete: false,
