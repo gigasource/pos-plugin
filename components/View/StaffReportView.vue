@@ -1,5 +1,5 @@
 <template>
-  <div class="staff-report-dialog">
+  <div class="staff-report-view">
     <div class="staff-report-content">
       <g-tabs :items="staffs"
               :show-arrows="false"
@@ -111,7 +111,7 @@
   import dayjs from 'dayjs'
 
   export default {
-    name: 'PosStaffReportDialog',
+    name: 'StaffReportView',
     props: {
       value: null
     },
@@ -189,7 +189,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .staff-report-dialog {
+  .staff-report-view {
     width: 100%;
     background-color: #fff;
     position: relative;

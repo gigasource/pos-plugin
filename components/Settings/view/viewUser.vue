@@ -110,6 +110,9 @@
 </template>
 
 <script>
+  import dialogSelectAvatar from '../dialog/dialogSelectAvatar';
+  import dialogUserDetail from '../dialog/dialogUserDetail';
+  
   import layout from './layoutUserView';
   export default {
     name: 'viewUser',
@@ -120,6 +123,7 @@
       'SettingsStore:getListUsers',
       'SettingsStore:updateUser',
     ],
+    components: {dialogSelectAvatar, dialogUserDetail},
     data() {
       return {
         layout: layout,

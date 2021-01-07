@@ -26,8 +26,7 @@
               @updateOnlineDevice="updateOnlineDevice"
               @updateDefaultPrepareTime="updateDefaultPrepareTime"
               @updateOnlineOrderSorting="updateOnlineOrderSorting"
-              @getOnlineDevice="getOnlineDevice"
-          />
+              @getOnlineDevice="getOnlineDevice"/>
         </template>
         <template v-slot:callSystem>
           <call-system/>
@@ -55,11 +54,23 @@
 </template>
 
 <script>
+  import viewCompany from '../Settings/view/viewCompany';
+  import viewGeneral from '../Settings/view/viewGeneral';
+  import viewPayment from '../Settings/view/viewPayment';
+  import viewPaymentToolbar from '../Settings/view/viewPaymentToolbar';
+  import viewTax from '../Settings/view/viewTax';
+  import viewTaxToolbar from '../Settings/view/viewTaxToolbar';
+  import viewUser from '../Settings/view/viewUser';
+  import viewUserToolbar from '../Settings/view/viewUserToolbar';
+  import PosSettingsScreenContent from '../Settings/PosSettingsScreenContent'
+  import PosSettingsScreenToolbar from '../Settings/view/PosSettingsScreenToolbar';
+
   export default {
     name: "Settings",
     injectService: [
         'SettingsStore:(onlineDevice, defaultPrepareTime, onlineOrderSorting, updateOnlineDevice, updateDefaultPrepareTime, updateOnlineOrderSorting, getOnlineDevice)'
     ],
+    components: { viewCompany, viewGeneral, viewPayment, viewPaymentToolbar, viewTax, viewTaxToolbar, viewUser, viewUserToolbar, PosSettingsScreenContent, PosSettingsScreenToolbar },
     data() {
       const i18n = this.$i18n;
       const { sidebar, dashboard: { deliveryMenu } } = i18n.messages[i18n.locale] || i18n.messages[i18n.fallbackLocale]
