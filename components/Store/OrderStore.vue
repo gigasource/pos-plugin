@@ -46,7 +46,7 @@
     
     <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"></dialog-change-value>
     
-    <g-snackbar v-model="showDiscountMessage" color=#FFC107" :timeout="2000" top>
+    <g-snackbar v-model="showDiscountMessage" color="#FFC107" :timeout="2000" top>
       <div :style="{color: '#ff4552',  display: 'flex','align-items': 'center'}">
         <g-icon style="margin-right: 8px; color: #ff4552;">warning</g-icon>
         <div>This order has already applied discount in items</div>
