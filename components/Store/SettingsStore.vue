@@ -94,8 +94,8 @@
       await this.loadUsbPrinters()
       await this.getOnlineDevice()
       await this.registerHardware()
-      await this.setupPairDevice()
-      await this.getPairStatus()
+      // await this.setupPairDevice()
+      // await this.getPairStatus()
       await this.getWebshopName()
 
     },

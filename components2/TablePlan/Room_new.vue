@@ -1,32 +1,28 @@
 <script>
   import RoomFactory from './RoomFactory';
-  import { addRoomItem } from './room-logic'
+  import { addRoomObject } from './room-logic'
   const { fn, hooks } = RoomFactory()
 
-  let room
-  const table1 = {
-    name: 't1',
-    location: { x: 5, y: 10 },
-    size: { width: 10, height: 10 }
-  };
-  const table2 = {
-    name: 't2',
-    location: { x: 50, y: 50 },
-    size: { width: 10, height: 10 }
-  };
-  const wall1 = {
-    name: 'w1',
-    location: { x: 30, y: 10 },
-    size: { width: 10, height: 2 }
-  };
+  // let room
+  // const table1 = {
+  //   name: 't1',
+  //   location: { x: 5, y: 10 },
+  //   size: { width: 30, height: 30 },
+  //   bgColor: 'red'
+  // };
+  // const table2 = {
+  //   name: 't2',
+  //   location: { x: 100, y: 70 },
+  //   size: { width: 40, height: 40 },
+  //   bgColor: 'red'
+  // };
+  // const wall1 = {
+  //   name: 'w1',
+  //   location: { x: 30, y: 10 },
+  //   size: { width: 100, height: 2 },
+  //   bgColor: 'black'
+  // };
   //
-
-  hooks.on('room', _room => {
-    room = _room
-    addRoomItem(room, table1)
-    addRoomItem(room, table2)
-    addRoomItem(room, wall1)
-  })
 
   // const ui2RenderFn = (room, fetchInProgressTables, isBusyTable) => <div>
   //   {room.items.length}

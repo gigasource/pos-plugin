@@ -5,12 +5,11 @@ import {
   addRoomObject,
   removeRoomObject,
   moveOrderToNewTable,
-  activeTables,
-  isBusyTable,
-  fetchInProgressTables,
-  makeTakeAway
+  makeTakeAway,
+  updateRoomObjects,
+  updateRoomObject
 } from "./room-logic";
-import _ from 'lodash'
+import _ from "lodash";
 import {
   createOrder,
   addItem as addOrderItem,
@@ -79,21 +78,25 @@ describe("room-logic", function() {
     const { room } = createRoom();
     addRoomObject(room, table1);
     addRoomObject(room, table2);
-    expect(room.itroomObjectsems.length).toEqual(2);
+    expect(room.roomObjects.length).toEqual(2);
   });
   it("createRoom should keep attributes", () => {
-    const { room } = createRoom({ name: "room1", roomObjects: [table1], order: 10})
-    expect(room.name).toEqual("room1")
-    expect(room.order).toEqual(10)
-    expect(room.roomObjects.length).toEqual(1)
-    expect(room.roomObjects[0].name).toEqual("table 1")
-  })
+    const { room } = createRoom({
+      name: "room1",
+      roomObjects: [table1],
+      order: 10
+    });
+    expect(room.name).toEqual("room1");
+    expect(room.order).toEqual(10);
+    expect(room.roomObjects.length).toEqual(1);
+    expect(room.roomObjects[0].name).toEqual("table 1");
+  });
   it("remove room object should work", () => {
     const { room } = createRoom();
     addRoomObject(room, table1);
     addRoomObject(room, table2);
     removeRoomObject(room, table1);
-    expect(room.roomObjects.length).toEqual(1)
+    expect(room.roomObjects.length).toEqual(1);
     expect(room).toMatchInlineSnapshot(`
       Object {
         "roomObjects": Array [
@@ -111,12 +114,12 @@ describe("room-logic", function() {
         ],
       }
     `);
-    removeRoomObject(room, table1)
-    expect(room.roomObjects.length).toEqual(1)
-    removeRoomObject(room, table2)
-    expect(room.roomObjects.length).toEqual(0)
+    removeRoomObject(room, table1);
+    expect(room.roomObjects.length).toEqual(1);
+    removeRoomObject(room, table2);
+    expect(room.roomObjects.length).toEqual(0);
   });
-  it("zoom should equal 1", async () => {
+  it("zoom should change", async () => {
     const { room, zoom, viewH, viewW, w1, h1 } = createRoom();
     await nextTick();
     expect(zoom.value).toEqual(1);
@@ -136,8 +139,8 @@ describe("room-logic", function() {
     `);
     expect(room.roomObjects[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "x": 50,
-        "y": 50,
+        "height": 50,
+        "width": 50,
       }
     `);
     addRoomObject(room, table2);
@@ -153,31 +156,11 @@ describe("room-logic", function() {
     `);
     expect(room.roomObjects[0].realSize).toMatchInlineSnapshot(`
       Object {
-        "x": 16.666666666666668,
-        "y": 16.666666666666668,
+        "height": 16.666666666666668,
+        "width": 16.666666666666668,
       }
     `);
     expect(zoom.value).toEqual(100 / 60);
-  });
-
-  it("should fetch all active orders correctly", async () => {
-    const Order = cms.getModel("Order");
-    await Order.remove({});
-    const order = createOrder({ table: "table 1" });
-    addOrderItem(order, cola);
-    const order1 = createOrder({ table: "table 2" });
-    addOrderItem(order1, cola);
-    await Order.create(order);
-    await Order.create(order1);
-    await nextTick();
-    await fetchInProgressTables();
-    expect(activeTables.value.length).toEqual(2);
-    expect(isBusyTable(table2)).toEqual(true);
-    makePaid(order1);
-    await cms.getModel("Order").updateOne({ table: "table 2" }, order1);
-    await fetchInProgressTables();
-    expect(activeTables.value.length).toEqual(1);
-    expect(isBusyTable(table2)).toEqual(false);
   });
 
   it("should move order", async () => {
@@ -200,9 +183,95 @@ describe("room-logic", function() {
     expect(newOrderInDb.table).toEqual("table 2");
   });
   it("should set table type to take away", () => {
-    const _table1 = _.cloneDeep(table1)
-    expect(_table1.takeAway).toBeFalsy()
-    makeTakeAway(_table1)
-    expect(_table1.takeAway).toBeTruthy()
-  })
+    const _table1 = _.cloneDeep(table1);
+    expect(_table1.takeAway).toBeFalsy();
+    makeTakeAway(_table1);
+    expect(_table1.takeAway).toBeTruthy();
+  });
+
+  it("should update a single room object data", async () => {
+    const { room, viewH, viewW } = createRoom();
+    addRoomObject(room, table1);
+    addRoomObject(room, table2);
+    expect(table1.name).toBe("table 1");
+    const newObj = updateRoomObject(room, table1, {
+      name: "new name",
+      bgColor: "red"
+    });
+    expect(newObj.name).toBe("new name");
+    expect(newObj.bgColor).toBe("red");
+  });
+  it("should update room objects", async () => {
+    const { room, viewW, viewH } = createRoom();
+    addRoomObject(room, table1);
+    addRoomObject(room, table2);
+
+    viewW.value = VIEW_W;
+    viewH.value = VIEW_H;
+    const newRoomObjects = [table1, table2, wall1];
+    updateRoomObjects(room, newRoomObjects);
+    await nextTick();
+    expect(room.roomObjects.length).toBe(3);
+    expect(room.roomObjects).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "location": Object {
+            "x": 5,
+            "y": 10,
+          },
+          "name": "table 1",
+          "realLocation": Object {
+            "x": 8.333333333333334,
+            "y": 16.666666666666668,
+          },
+          "realSize": Object {
+            "height": 16.666666666666668,
+            "width": 16.666666666666668,
+          },
+          "size": Object {
+            "height": 10,
+            "width": 10,
+          },
+        },
+        Object {
+          "location": Object {
+            "x": 50,
+            "y": 50,
+          },
+          "name": "table 2",
+          "realLocation": Object {
+            "x": 83.33333333333334,
+            "y": 83.33333333333334,
+          },
+          "realSize": Object {
+            "height": 16.666666666666668,
+            "width": 16.666666666666668,
+          },
+          "size": Object {
+            "height": 10,
+            "width": 10,
+          },
+        },
+        Object {
+          "location": Object {
+            "x": 30,
+            "y": 10,
+          },
+          "name": "wall 1",
+          "realLocation": Object {
+            "x": 50,
+            "y": 16.666666666666668,
+          },
+          "realSize": Object {
+            "height": 3.3333333333333335,
+            "width": 16.666666666666668,
+          },
+          "size": Object {
+            "height": 2,
+            "width": 10,
+          },
+        },
+      ]
+    `);
+  });
 });
