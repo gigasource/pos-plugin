@@ -495,7 +495,7 @@
       },
       addOrderCommits(changes) {
         // this function must be called after everything is set
-        this.actionList.push(...changes.mao(change => {
+        this.actionList.push(...changes.map(change => {
           return cms.getModel('Order').findOneAndUpdate({
             _id: this.currentOrder._id
           }, change).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain
