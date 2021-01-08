@@ -116,4 +116,8 @@ describe("should render edit table plan view", () => {
     await saveEl.trigger('click')
     expect(wrapper.find("#table2").exists()).toBeTruthy()
   })
+
+  it("name should be unique", async () => {
+    //todo:
+  })
 });
