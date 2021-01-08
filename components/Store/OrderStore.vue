@@ -44,8 +44,10 @@
         :store-locale="storeLocale"
         @submit="doRefundOrder(dialog.refundConfirm.order, dialog.refundConfirm.status)"/>
     
-    <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"></dialog-change-value>
+    <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"/>
+    <dialog-change-value ref="dlgChangePrice" :new-value-editable="true" @submit="onChangePriceSubmit"/>
     
+    <dialog-product-lookup ref="dlgProductLookup" v-model="dialog.productLookup.show"/>
     <g-snackbar v-model="showDiscountMessage" color="#FFC107" :timeout="2000" top>
       <div :style="{color: '#ff4552',  display: 'flex','align-items': 'center'}">
         <g-icon style="margin-right: 8px; color: #ff4552;">warning</g-icon>
@@ -65,12 +67,13 @@
   import { getProvided } from '../logic/commonUtils';
   import * as jsonfn from 'json-fn';
   import _ from 'lodash';
+  import DialogProductLookup from '../Order/components/dialogProductLookup';
   const socketIntervals = {}
 
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
-    components: {dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
+    components: { DialogProductLookup, dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {
@@ -124,6 +127,9 @@
           refundSucceeded: {
             show: false,
           },
+          productLookUp: {
+            show: false
+          }
         },
         //call in order
         calls: [],
@@ -561,12 +567,13 @@
         }))
       },
       changePrice() {
-        // TODO: Correct impl: Seem like not use anywhere (or maybe injected in ComponentBuilder ???)
-        this.$getService('dialogChangePrice:open')('new', this.activeProduct ? this.activeProduct.originalPrice : 0)
+        this.$refs.dlgChangePrice.open('new', this.activeProduct ? this.activeProduct.originalPrice : 0)
+      },
+      onChangePriceSubmit(val) {
+        this.$getService('PosStore:updateNewPrice')(val)
       },
       discountSingleItemDialog() {
-        // TODO: Correct impl: Seem like not use anywhere (or maybe injected in ComponentBuilder ???)
-        this.$getService('dialogChangePrice:open')('percentage', this.activeProduct ? this.activeProduct.originalPrice : 0)
+        this.$refs.dlgChangePrice.open('percentage', this.activeProduct ? this.activeProduct.originalPrice : 0)
       },
       discountSingleItemByAmount(value) {
         this.calculateNewPrice('amount', value, true)
@@ -575,8 +582,7 @@
         this.calculateNewPrice('percentage', value, true)
       },
       productLookup() {
-        // TODO: Correct impl -- it's seem like this function is not used anywhere (injected in ComponentBuilder ????)
-        this.$getService('dialogProductLookup:setActive')(true)
+        this.dialog.productLookUp.show = true
       },
       async saveOrder() {
         if (!this.currentOrder || !this.currentOrder.items.length) return
