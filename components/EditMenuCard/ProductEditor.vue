@@ -34,7 +34,7 @@
       </template>
       <template v-else>
         <div>{{$t('article.name')}} <span style="color: #ff4552">*</span></div>
-        <g-text-field v-model="selectedProductLayout.text">
+        <g-text-field :model-value="selectedProductLayout.text" @update:modelValue="debounceUpdateTextLayout('text', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="dialog.showTextKbd = true">icon-keyboard</g-icon>
           </template>
@@ -208,7 +208,8 @@
         notifyContent: null,
         popupModifierGroups: [],
         layoutType: '',
-        debouncedUpdateProduct: () => null
+        debouncedUpdateProduct: () => null,
+        debounceUpdateTextLayout: () => null,
       }
     },
     computed: {
@@ -286,6 +287,10 @@
 
       this.debouncedUpdateProduct = _.debounce(function (key, val) {
         this.updateProduct({ [key]: val }, !this.selectedProduct._id)
+      }, 300)
+      
+      this.debounceUpdateTextLayout = _.debounce(function(key, val) {
+        this.updateTextLayout({ [key]: val }, !this.selectedProduct._id)
       }, 300)
     },
     activated() {
@@ -396,7 +401,7 @@
 
       // update color, update text
       async updateProductLayout(change, forceCreate) {
-        console.log('Store change into this.selectedProductLayout')
+        console.log('Save change', change, 'to selectedProductLayout')
         _.each(_.keys(change), k => this.selectedProductLayout[k] = change[k])
 
         if (this.selectedProductLayout._id) {
@@ -452,6 +457,7 @@
           ...extraInfo
         }
 
+        console.log('createNewProductLayout', productLayout)
         const result = await cms.getModel('OrderLayout').findOneAndUpdate(
             {
               type: this.layoutType,
@@ -461,6 +467,12 @@
             { new: true });
         this.$emit('update:orderLayout', result)
       },
+      
+      async updateTextLayout(change) {
+        const forceCreate = !this.selectedProductLayout._id;
+        await this.updateProductLayout(change, forceCreate)
+      },
+      
       openDialogInfo(focus) {
         this.dialog.focus = focus
         this.dialog.productInfo = true
