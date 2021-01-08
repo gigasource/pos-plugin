@@ -23,6 +23,7 @@
             <p>
               <span :class="['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']">€{{ $filters.formatCurrency(item.originalPrice) }}</span>
               <span class="item-detail__price--new" v-if="isItemDiscounted(item)">€ {{ $filters.formatCurrency(item.price) }}</span>
+              <!-- TODO: item.option now is an object, we also have .takeAway boolean value in item -->
               <span :class="['item-detail__option', item.option === 'Take away' ? 'text-green-accent-3' : 'text-red-accent-2']">{{item.option}}</span>
             </p>
           </div>
