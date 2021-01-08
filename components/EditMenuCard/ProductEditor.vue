@@ -264,7 +264,10 @@
     },
     watch: {
       selectedProductLayout(value) {
-        this.type = value.type
+        if (value)
+          this.type = value.type
+        else
+          this.type = null
       },
       'dialog.popupModifiers'() {
         this.loadPopupModifierGroups()

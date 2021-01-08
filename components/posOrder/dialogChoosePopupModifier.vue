@@ -14,9 +14,12 @@
             <span v-if="category.mandatory" style="color: #FF4452;">*</span>
           </div>
           <div class="mt-2 mb-3">
-            <g-grid-select :items="modifiers[category._id]" :grid="false" return-object
-                           :multiple="!category.selectOne" :mandatory="category.mandatory"
-                           :model-value="selectedModifiers[category._id]"
+            <g-grid-select :items="modifiers[category._id]"
+                           :grid="false"
+                           return-object
+                           :multiple="!category.selectOne"
+                           :mandatory="category.mandatory"
+                           :model-value="gGridSelectModifierModel[category._id]"
                            @update:modelValue="selectModifier($event, category)">
               <template #default="{ toggleSelect, item, index }">
                 <g-btn :uppercase="false" border-radius="2" outlined class="mr-3 mb-2" background-color="#F0F0F0"
@@ -69,8 +72,39 @@
         activeModifierGroup: null,
         categories: [],
         modifiers: [],
-        selectedModifiers: {},
-        listModifiers2: []
+        // gGridSelectModifierModel, selectingModifiers seem similar too each other
+        // but they have difference meaning
+        
+        // gGridSelectModifierModel { modifierCategory: modifierValue(s) }:
+        //  is an object which it's keys (or properties) is modifierCategoryId and corresponding value is selected modifier(s)
+        //  we using this variable to store selectedState of each g-grid-select component
+        gGridSelectModifierModel: {},
+        
+        // mean while, selectingModifiers [modifierValue, modifierValue, ...] is an array which store selecting modifiers
+        selectingModifiers: []
+        
+        // Example:
+        // gGridSelectModifierModel: {
+        //     'modifierCateA_id': [
+        //          {_id: modifier_1, ...},
+        //          {_id: modifier_2, ...}
+        //     ],
+        //     'modifierCateB_id': [
+        //          {_id: modifier_3, ...}
+        //     ]
+        // }
+        
+        // if the user want to add modifier_1 2 times, modifier_2 3 times, and modifier_3 only 1 times
+        // then selectingModifiers will look like that:
+        // [
+        //  { _id:modifier_1, ... },
+        //  { _id:modifier_1, ... },
+        //  { _id:modifier_2, ... },
+        //  { _id:modifier_2, ... },
+        //  { _id:modifier_2, ... },
+        //  { _id:modifier_3, ... },
+        // ]
+        
       }
     },
     computed: {
@@ -84,8 +118,7 @@
       },
       listModifiers() {
         let list = []
-        const modifiersByCategories = _.groupBy(this.listModifiers2, 'category')
-
+        const modifiersByCategories = _.groupBy(this.selectingModifiers, 'category')
         _.forEach(modifiersByCategories, (mods, catId) => {
           const { freeItems } = this.categories.find(c => c._id === catId)
 
@@ -113,8 +146,8 @@
         const mandatoryCategories = this.categories.filter(cat => cat.mandatory)
         return _.every(mandatoryCategories, cat => {
           if (cat.selectOne)
-            return !!this.selectedModifiers[cat._id]
-          return this.selectedModifiers[cat._id] && this.selectedModifiers[cat._id].length > 0
+            return !!this.gGridSelectModifierModel[cat._id]
+          return this.gGridSelectModifierModel[cat._id] && this.gGridSelectModifierModel[cat._id].length > 0
         })
       }
     },
@@ -126,72 +159,80 @@
       selectModifierGroup(group) {
         this.activeModifierGroup = group
       },
-      onClickModifier(modifier, category, select) {
-        // not selected
-        if (!this.listModifiers2.some(mod => mod._id === modifier._id)) {
-          if (category.selectOne) {
-            this.listModifiers2 = [modifier]
-          } else {
-            this.listModifiers2.push(modifier)
-          }
-
-          return select(modifier)
+      onClickModifier(modifier, category, toggleSelect) {
+        // if modifier was not added then add it and return immediately
+        if (!this.selectingModifiers.some(mod => mod._id === modifier._id)) {
+          this.selectingModifiers.push(modifier)
+          toggleSelect(modifier)
+          return
+        }
+        
+        // otherwise, check if quantity of current modifier is > max
+        const qty = this.selectingModifiers.filter(mod => mod._id === modifier._id).length;
+        const qtyAllowed = modifier.max || 1
+        
+        // if not exceed maximum, then add (don't toggle to keep selected state)
+        if (qty < qtyAllowed) {
+          this.selectingModifiers.push(modifier)
+          return
         }
 
-        const length = this.listModifiers2.filter(mod => mod._id === modifier._id).length;
-        if (length >= 1) {
-          const maxItems = modifier.max || 1
-          // selected, at max qty
-          if (length >= maxItems) {
-            if (category.mandatory) {
-              if (!category.selectOne && this.selectedModifiers[category._id].length > 1) {
-                this.listModifiers2 = this.listModifiers2.filter(mod => mod._id !== modifier._id)
-              }
-            } else {
-              this.listModifiers2 = this.listModifiers2.filter(mod => mod._id !== modifier._id)
-            }
-            return select(modifier)
-          }
-          // selected, can add more
-          return this.listModifiers2.push(modifier)
+        // maximum exceed, if category is not mandatory then wipe out current modifier from selecting list
+        if (!category.mandatory) {
+          this.selectingModifiers = this.selectingModifiers.filter(mod => mod._id !== modifier._id)
+          toggleSelect(modifier)
+          return
         }
+
+        // modifier is mandatory (we need select at least 1 item)
+        // so we can only wipe out current modifier if we also
+        // select another modifier in the same category
+        // (to keep GUI consistence for g-grid-select)
+        if (!category.selectOne && this.gGridSelectModifierModel[category._id].length > 1) {
+          this.selectingModifiers = this.selectingModifiers.filter(mod => mod._id !== modifier._id)
+        }
+
+        toggleSelect(modifier)
       },
       selectModifier(value, category) {
-        this.selectedModifiers[category._id] = value
+        this.gGridSelectModifierModel[category._id] = value
       },
       getModifierQty(_id) {
-        return this.listModifiers2.filter(mod => mod._id === _id).length;
+        return this.selectingModifiers.filter(mod => mod._id === _id).length;
       }
     },
     watch: {
       product: {
         async handler(val) {
           if (val) {
-            if (!this.product.activePopupModifierGroup) return
+            if (!this.product.activePopupModifierGroup)
+              return
             this.modifierGroups = await cms.getModel('PosModifierGroup').find({ _id: this.product.activePopupModifierGroup })
-            this.selectModifierGroup(this.modifierGroups[0])
+            if (this.modifierGroups && this.modifierGroups.length)
+              this.selectModifierGroup(this.modifierGroups[0])
           }
         },
         immediate: true
       },
       activeModifierGroup: {
         async handler(val) {
-          if (!val || !this.product._id) return
+          if (!val || !this.product._id)
+            return
           const filter = { modifierGroup: val._id }
           this.categories = await cms.getModel('PosModifierCategory').find(filter).lean()
           const modifiers = await cms.getModel('PosPopupModifier').find(filter).lean()
           this.modifiers = _.groupBy(modifiers, 'category')
-          this.selectedModifiers = {}
-          this.listModifiers2 = []
+          this.gGridSelectModifierModel = {}
+          this.selectingModifiers = []
           this.categories.forEach(cat => {
-            if (!cat.selectOne) this.selectedModifiers[cat._id] = []
+            if (!cat.selectOne) this.gGridSelectModifierModel[cat._id] = []
           })
         }
       },
       internalValue(val) {
         if (!val) return this.selectModifierGroup({})
-        this.selectedModifiers = {}
-        this.listModifiers2 = []
+        this.gGridSelectModifierModel = {}
+        this.selectingModifiers = []
         this.selectModifierGroup(this.modifierGroups[0])
       }
     }
