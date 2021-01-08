@@ -8,7 +8,7 @@
         </div>
       </g-card-title>
       <g-card-text>
-        <template v-for="category in categories">
+        <template v-for="(category, cIndex) in categories">
           <div>
             <span>{{category.name}}</span>
             <span v-if="category.mandatory" style="color: #FF4452;">*</span>
@@ -16,28 +16,33 @@
           <div class="mt-2 mb-3">
             <g-grid-select :items="modifiers[category._id]" :grid="false" return-object
                            :multiple="!category.selectOne" :mandatory="category.mandatory"
-                           :value="selectedModifiers[category._id]" @input="selectModifier($event, category)">
+                           :model-value="selectedModifiers[category._id]"
+                           @update:modelValue="selectModifier($event, category)">
               <template #default="{ toggleSelect, item, index }">
                 <g-btn :uppercase="false" border-radius="2" outlined class="mr-3 mb-2" background-color="#F0F0F0"
                        style="border: 1px solid #C9C9C9"
+                       :key="`${cIndex}_${index}`"
                        @click="onClickModifier(item, category, toggleSelect)">
                   {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
                 </g-btn>
               </template>
+              
               <template #selected="{ toggleSelect, item, index }">
-                <g-badge v-if="getModifierQty(item._id) > 1" overlay color="#FF4452" class="mr-3 mb-2">
-                  <template #badge>
-                    <div>{{getModifierQty(item._id)}}</div>
-                  </template>
-                  <g-btn :uppercase="false" border-radius="2" flat background-color="#2979FF" text-color="#fff"
+                <span :key="`${cIndex}_${index}_selected`">
+                  <g-badge v-if="getModifierQty(item._id) > 1" overlay color="#FF4452" class="mr-3 mb-2">
+                    <template #badge>
+                      <div>{{getModifierQty(item._id)}}</div>
+                    </template>
+                    <g-btn :uppercase="false" border-radius="2" flat background-color="#2979FF" text-color="#fff"
+                           @click="onClickModifier(item, category, toggleSelect)">
+                      {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
+                    </g-btn>
+                  </g-badge>
+                  <g-btn v-else :uppercase="false" border-radius="2" flat class="mr-3 mb-2" background-color="#2979FF" text-color="#fff"
                          @click="onClickModifier(item, category, toggleSelect)">
                     {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
                   </g-btn>
-                </g-badge>
-                <g-btn v-else :uppercase="false" border-radius="2" flat class="mr-3 mb-2" background-color="#2979FF" text-color="#fff"
-                       @click="onClickModifier(item, category, toggleSelect)">
-                  {{item.name}} - {{$t('common.currency', storeLocale)}}{{item.price}}
-                </g-btn>
+                </span>
               </template>
             </g-grid-select>
           </div>
@@ -107,7 +112,8 @@
       enableSaveBtn() {
         const mandatoryCategories = this.categories.filter(cat => cat.mandatory)
         return _.every(mandatoryCategories, cat => {
-          if (cat.selectOne) return !!this.selectedModifiers[cat._id]
+          if (cat.selectOne)
+            return !!this.selectedModifiers[cat._id]
           return this.selectedModifiers[cat._id] && this.selectedModifiers[cat._id].length > 0
         })
       }
