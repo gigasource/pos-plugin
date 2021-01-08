@@ -172,7 +172,6 @@
 <script>
   import _ from 'lodash';
   import ColorSelector from '../common/ColorSelector';
-  import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
 
   export default {
@@ -216,7 +215,7 @@
       selectedProduct: {
         get(){
           if (!this.selectedProductLayout.product) {
-            this.selectedProductLayout.product = createEmptyProductLayout()
+            this.selectedProductLayout.product = {}
           }
           return this.selectedProductLayout.product
         },
