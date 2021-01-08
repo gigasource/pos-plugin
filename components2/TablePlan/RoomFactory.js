@@ -1,5 +1,5 @@
 import { createRoom, updateRoomObjects } from './room-logic'
-import { isBusyTable, getTableOrderInfo, onSelectObject } from '../View/EditTablePlan/room-state'
+import { isBusyTable, getTableOrderInfo, onSelectObject, isSelectingObject } from '../View/EditTablePlan/room-state'
 import Hooks from 'schemahandler/hooks/hooks'
 import { ref, onMounted, computed, watch, toRaw } from 'vue'
 import {getDiffTime} from '../../utils/commons';
@@ -27,7 +27,7 @@ const RoomFactory = () => {
         top: item.realLocation.y + 'px',
         width: item.realSize.width + 'px',
         height: item.realSize.height + 'px',
-        background: isBusyTable(item) ? 'red' : item.bgColor
+        background:  (isBusyTable(item) ? 'red' : item.bgColor)
       })
 
       const roomContainerStyle = () => ({

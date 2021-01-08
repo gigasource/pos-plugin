@@ -135,6 +135,10 @@ const newObjectName = computed(() => {
   return 0
 })
 
+const isSelectingObject = function(object) {
+  return selectingObject.value ? object.name === selectingObject.value.name : false
+}
+
 
 export {
   rooms,
@@ -158,5 +162,6 @@ export {
   updateSelectingObjectInSelectingRoom,
   onChangeObjectName,
   newObjectName,
-  currentInputValue
+  currentInputValue,
+  isSelectingObject
 }
