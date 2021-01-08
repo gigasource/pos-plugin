@@ -15,7 +15,7 @@ module.exports = {
     },
     //dashboard
     dashboard: {
-      dashboard: 'Dashboard',
+      dashboard: 'Tổng quan',
       retail: 'Bán lẻ',
       welcome: 'Xin chào!',
       cashRegister: 'Cash Register',
@@ -82,7 +82,7 @@ module.exports = {
       duplicate: 'Tạo bản sao',
       change: 'Thay đổi',
       sort: 'Lọc',
-      switch: 'Chuyển đổi',
+      switch: 'Đổi vị trí',
       copy: 'Sao chép',
       color: 'Màu',
       reset: 'Cài lại',
@@ -105,14 +105,14 @@ module.exports = {
 
     fnBtn: {
       btnName: 'Button Name',
-      fillText: 'Fill your text',
-      clearBtn: 'Clear Button',
+      fillText: 'Điền văn bản',
+      clearBtn: 'Xoá',
       fns: 'Chức năng',
       select: 'Chọn',
-      buyback: 'Buyback',
+      buyback: 'Nhập lại',
       value: 'Giá trị',
       price: 'Giá',
-      fillValue: 'Fill your value',
+      fillValue: 'Điền giá trị',
       color: 'Màu',
       selectBtn: 'Chọn nút để cài đặt',
       selectMergeBtns: 'Chọn nhiều nút để gộp',
@@ -137,10 +137,10 @@ module.exports = {
         pay: 'Thanh toán',
         discount: 'Giảm giá',
         cashDrawer: 'Cashier drawer',
-        splitCheck: 'Split check',
+        splitCheck: 'Tách hoá đơn',
         redBill: 'Hoá đơn đỏ',
         bill: 'Hoá đơn',
-        promotion: 'Promotion'
+        promotion: 'Giảm giá'
       }
     },
 
@@ -152,7 +152,7 @@ module.exports = {
       currency: '$',
       currencyDecimal: '2',
       discount: 'Giảm giá',
-      tax: 'Thuê',
+      tax: 'Thuế',
       subtotal: 'Tổng phụ',
     },
 
@@ -178,8 +178,8 @@ module.exports = {
       to: 'Đến',
       //staff
       staffName: 'Tên nhân viên',
-      vouchersSold: 'Vouchers Sold',
-      vouchersUsed: 'Vouchers Used',
+      vouchersSold: 'Phiếu giảm giá đã bán',
+      vouchersUsed: 'Phiếu giảm giá đã sử dụng',
       returnedTotal: 'Returned Total',
     },
 
@@ -197,10 +197,10 @@ module.exports = {
 
     orderHistory: {
       dateTimeSelection: 'Chọn thời gian',
-      orderNo: 'Order No.',
+      orderNo: 'Số đơn hàng',
       promotionalApplied: 'Đã áp dụng chương trình',
       barcode: 'Mã vạch',
-      amount: 'Amount',
+      amount: 'Giá trị',
       staff: 'Nhân viên',
       info: 'Thông tin',
       filter: 'Bộ lọc',
@@ -228,7 +228,7 @@ module.exports = {
       createPayment: 'Tạo phương thức mới',
       createProduct: 'Tạo sản phẩm mới',
       favourite: 'Yêu thích',
-      itemIsVoucher: 'Item is a voucher',
+      itemIsVoucher: 'Sản phẩm là phiếu giảm giá',
       active: 'Kích hoạt',
       nonRefundable: 'Không hoàn trả lại',
       showOnOrderScreen: 'Hiện trên màn thanh toán',
@@ -252,7 +252,7 @@ module.exports = {
       passcode: 'Mã đăng nhập',
       selectAvatar: 'Chọn hình đại diện',
       filter: 'Bộ lọc',
-      clearAll: 'Clear All',
+      clearAll: 'Xoá tất cả',
       viewOwnReport: 'Xem báo cáo của bản thân',
       viewOtherReport: 'Xem báo cáo khác',
       editArticle: 'Cài đặt vị trí món',
@@ -262,7 +262,7 @@ module.exports = {
       accessZReport: 'Access Z-Report',
       itemCancellation: 'Huỷ đồ',
       iBtn: 'Employee iButton Key',
-      registered: 'Registered!',
+      registered: 'Đã đăng ký!',
       accessStaffReport: 'Xem báo cáo nhân viên',
       editTablePlan: 'Cài đặt bàn',
       viewOrder: 'Xem đơn hoàn thành/huỷ',
@@ -353,7 +353,7 @@ module.exports = {
       payment: 'Thanh toán',
       tax: 'Thuế',
       license: 'Bản quyền',
-      receiptCategory: 'Receipt Category',
+      receiptCategory: 'Các máy in',
       invoiceReport: 'Hoá đơn, báo cáo',
       entireReceipt: 'Toàn bộ hoá đơn',
       onlineOrderSettings: 'Đồ đặt online',
@@ -382,16 +382,16 @@ module.exports = {
       viewReceipt: 'Xem hoá đơn',
 
       menuEdit: {
-        categoriesNo: 'Số danh mục',
-        rowsNo: 'Số hàng',
-        columnsNo: 'Số cột',
+        categoriesNo: 'Số nhóm',
+        rowsNo: 'Số hàng trong trang',
+        columnsNo: 'Số cột trong trang',
         categoryName: 'Tên danh mục',
         editKeyboard: 'Chỉnh sửa bàn phím',
         keyboardTop: 'Bàn phím phía trên',
         keyboardLeft: 'bàn phím bên trái',
         keyboardWidth: 'chiều rộng bàn phím',
         keyboardHeight: 'chiều cao bàn phím',
-        expansionColumn: 'cột mở rộng',
+        expansionColumn: 'Cột mở rộng',
         keyboardPosition: 'Vị trí bàn phím',
         rows: 'Hàng',
         columns: 'Cột'
@@ -473,12 +473,12 @@ module.exports = {
         message: 'Yêu cầu hoàn tiền này đã được xử lý.'
       },
       captureFailedDialog: {
-        title: 'Capture transaction failed',
+        title: 'Xác nhận thông tin không thành công',
         details: 'Chi tiết',
       },
       capturingDialog: {
-        title: 'Capturing transaction',
-        message: "Chúng tôi đang xác nhận tiền cho đơn  hàng này. Vui lòng chờ đợi..."
+        title: 'Xác nhận thông tin giao dịch',
+        message: "Chúng tôi đang xác nhận tiền cho đơn hàng này. Vui lòng chờ đợi..."
       },
 
       settings: {
@@ -492,7 +492,7 @@ module.exports = {
         timeToComplete: 'Thời gian mặc định để hoàn thành đơn hàng',
         sorting: 'Tùy chọn sắp xếp đơn hàng',
         connected: 'Đã kết nối',
-        notPaired: 'Not paired',
+        notPaired: 'Chưa ghép nối',
         hasSound: 'Âm thanh thông báo đơn hàng đến',
         cancelAndDecline: 'Hủy và chuyển đến các đơn hàng đã bị từ chối',
         sound: 'Âm thanh',
@@ -501,7 +501,7 @@ module.exports = {
         twice: 'Hai lần',
         untilConfirm: 'Cho đến khi được xác nhận',
         orderNumber: 'Số đơn hàng',
-        timeToComplete2: 'Thời gian để hoàn thành',
+        timeToComplete2: 'Thời gian hoàn thành',
       },
 
       noteToCustomer: 'Lời nhắn cho khách hàng',
@@ -560,29 +560,29 @@ module.exports = {
 
     inventory: {
       basicMode: 'Chế độ cơ bản',
-      basicNote: 'Thay đổi cài đặt cơ bản bao gồm tên, giá, máy in, etc',
+      basicNote: 'Thay đổi cài đặt cơ bản bao gồm tên món ăn, giá, máy in, etc',
       ingredientMode: 'Chế độ thành phần',
-      ingredientNote: 'Sửa đổi các thành phần của một món ăn. Chức năng này là một phần của kiếm soát  kho hàng',
+      ingredientNote: 'Sửa đổi các thành phần của món ăn. Tính năng này dùng để kiếm soát kho hàng',
       clickDismiss: 'Nhấp vào bất kì đâu để ẩn thông báo này',
       ingredient: 'Thành phần',
       swipeRight: 'Vuốt sang phải để xóa',
       lastUpdate: 'Cập nhật lần cuối',
       unit: 'Đơn vị',
-      stock: 'Hàng tồn kho',
+      stock: 'Hàng trong kho',
       report: 'Báo cáo',
       newStock: 'Nhập hàng',
       newProduct: 'Tạo hàng mới',
       piece: 'cái',
       clearAll: 'Xóa tất cả',
       addFilter: 'Thêm bộ lọc',
-      addRemoveStock: 'Thêm/Xóa hàng tồn kho',
+      addRemoveStock: 'Thêm/Xóa hàng trong kho',
       item: 'Item',
       currentStock: 'Số lượng hiện tại',
       expiredIngregient: 'Hàng hóa bị hỏng/hết hạn',
-      updateToMatch: 'Cập nhât để khớp với sộ lượng hiện tại',
+      updateToMatch: 'Cập nhât để khớp với số lượng hiện tại',
       complete: 'Hoàn thành',
       products: 'Sản phẩm',
-      addedStock: 'Hàng tồn kho đã thêm vào',
+      addedStock: 'Hàng đã thêm vào',
       importLowStock: 'Nhập các mặt hàng còn ít',
       onlyEmpty: 'Chỉ có thể xóa các nhóm trống',
       all: 'Tất cả',
@@ -602,4 +602,3 @@ module.exports = {
     }
   }
 }
-
