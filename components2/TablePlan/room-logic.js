@@ -1,16 +1,19 @@
-const { reactive, watchEffect, ref, toRaw } = require('vue')
-const _ = require('lodash')
+import { reactive, watchEffect, ref } from 'vue'
+import _ from 'lodash'
 
-const Hooks = require('schemahandler/hooks/hooks');
-const hooks = new Hooks();
+import { computed } from 'vue';
 
-const { computed } = require('vue');
+import { isBusyTable } from '../View/EditTablePlan/room-state'
 
-const orm = require('schemahandler')
+const cms = {
+  getModel(col) {
+    return orm(col)
+  }
+}
 
-const createRoom = function (_roomObjects) {
-  let room = _.assign({
-    items: _roomObjects || [],
+const createRoom = function (_room) {
+  let room = _.assign(_room, {
+    roomObjects: (_room && _room.roomObjects) || [],
   })
 
   room = reactive(room)
@@ -19,12 +22,12 @@ const createRoom = function (_roomObjects) {
   let viewW = ref(0), viewH = ref(0);
 
   const maxX = computed(() => {
-    const item = _.maxBy(room.items, (item) => item.location.x + item.size.width)
-    return item.location.x + item.size.width
+    const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
+    return obj ? obj.location.x + obj.size.width : 0
   })
   const maxY = computed(() => {
-    const item =  _.maxBy(room.items, (item) => item.location.y + item.size.height)
-    return item.location.y + item.size.height
+    const obj =  _.maxBy(room.roomObjects, (obj) => obj.location.y + obj.size.height)
+    return obj ? obj.location.y + obj.size.height : 0
   })
 
   const w1 = computed(() => {
@@ -37,71 +40,84 @@ const createRoom = function (_roomObjects) {
   //viewW, viewH, w1, h1 => zoom
   watchEffect(() => {
     const isRoomElInitialized = (viewW.value > 0 && viewH.value > 0)
-    if (isRoomElInitialized) {
+    if (isRoomElInitialized && h1.value > 0 && w1.value > 0) {
       const zoomVerticalRatio = viewH.value / h1.value
       const zoomHorizontalRatio = viewW.value / w1.value
       zoom.value = Math.min(zoomVerticalRatio, zoomHorizontalRatio)
     } else zoom.value = 1
   })
 
-  //room.zoom => item.realLocation & item.realSize
+  //room.zoom => obj.realLocation & obj.realSize
   watchEffect(() => {
-    for (const item of room.items) {
-      item.realLocation = {
-        x: item.location.x * zoom.value,
-        y: item.location.y * zoom.value
+    for (const obj of room.roomObjects) {
+      if (obj.location) obj.realLocation = {
+        x: obj.location.x * zoom.value,
+        y: obj.location.y * zoom.value
       }
-      item.realSize = {
-        x: item.size.width * zoom.value,
-        y: item.size.height * zoom.value
+      if (obj.size) obj.realSize = {
+        width: obj.size.width * zoom.value,
+        height: obj.size.height * zoom.value
       }
     }
   })
+  const updateObjectLocation = function(object, newLocation) {
+    if (zoom.value) {
+      object.location.x = newLocation.x / zoom.value
+      object.location.y = newLocation.y / zoom.value
+    }
+  }
 
-  return { room, viewH, viewW, zoom, w1, h1 }
+  const updateObjectSize = function(object, newSize) {
+    if (zoom.value) {
+      object.size.width = newSize.width / zoom.value
+      object.size.height = newSize.height / zoom.value
+    }
+  }
+
+  return { room, viewH, viewW, zoom, w1, h1, updateObjectLocation, updateObjectSize }
 }
 
-const addRoomItem = function (room, item) {
-  const _item = _.cloneDeep(item)
-  room.items.push(_item)
+const addRoomObject = function (room, obj) {
+  const _obj = _.cloneDeep(obj)
+  room.roomObjects.push(_obj)
 }
 
-const removeRoomItem = function (room, _item) {
-  const __item = room.items.find(i => i.name === _item.name);
-  room.items.splice(room.items.indexOf(__item), 1);
+const removeRoomObject = function (room, obj) {
+  const idx = _.findIndex(room.roomObjects, i => i.name === obj.name)
+  if (idx !== -1) room.roomObjects.splice(idx, 1);
+}
+
+const updateRoomObject = function (room, obj, newObj) {
+  const idx = _.findIndex(room.roomObjects, i => i.name === obj.name)
+  if (idx !== -1) {
+    room.roomObjects[idx] = _.assign({}, room.roomObjects[idx], newObj)
+    return room.roomObjects[idx]
+  } else return null
 }
 
 const moveOrderToNewTable = async function (fromTable, toTable) {
-  // todo: swap order
-  await fetchInProgressTables()
   if (isBusyTable(toTable) || !isBusyTable(fromTable)) {
     // invalid action
     return
   }
-  const order = await orm('Order').findOne({table: fromTable.name})
-  await orm('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
+  const order = await cms.getModel('Order').findOne({table: fromTable.name})
+  await cms.getModel('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
 }
 
-const activeOrders = reactive([]);
-
-const activeTables = computed(() => {
-  return activeOrders.value.map(order => order.table)
-})
-
-const fetchInProgressTables = async function () {
-  activeOrders.value = await orm('Order').find({status: 'inProgress'})
+const makeTakeAway = function (table) {
+  table.takeAway = true
 }
 
-const isBusyTable = function (table) {
-  return activeTables.value.includes(table.name)
+const updateRoomObjects = function(room, newRoomObjects) {
+  room.roomObjects = newRoomObjects
 }
 
-module.exports = {
+export {
   createRoom,
-  addRoomItem,
-  removeRoomItem,
+  addRoomObject,
+  removeRoomObject,
+  updateRoomObject,
   moveOrderToNewTable,
-  activeTables,
-  isBusyTable,
-  fetchInProgressTables
+  makeTakeAway,
+  updateRoomObjects
 }

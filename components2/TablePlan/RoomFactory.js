@@ -1,6 +1,9 @@
-import roomLogics from './room-logic'
+import { createRoom, updateRoomObjects } from './room-logic'
+import { isBusyTable, getTableOrderInfo, onSelectObject } from '../View/EditTablePlan/room-state'
 import Hooks from 'schemahandler/hooks/hooks'
-import { computed, onMounted } from 'vue'
+import { ref, onMounted, computed, watch, toRaw } from 'vue'
+import {getDiffTime} from '../../utils/commons';
+
 const RoomFactory = () => {
   const hooks = new Hooks()
   const fn = () => ({
@@ -11,22 +14,61 @@ const RoomFactory = () => {
       }
     },
     setup(props) {
-      const { createRoom, isBusyTable, fetchInProgressTables } = roomLogics
-      const { room, viewW, viewH } = createRoom(props.roomObjects)
+      const { room, viewW, viewH, zoom, updateObjectLocation, updateObjectSize } = createRoom({ roomObjects: props.roomObjects })
+      const curTime = ref(new Date())
+      const selectingObject = ref(null)
+      watch(() => props.roomObjects, (newV, oldV) => {
+        updateRoomObjects(room, newV)
+      }, { deep: true })
       hooks.emit('room', room, e => eval(e))
-      const roomRenderFn = () => <div>
-        {room.items.map((item) => <div>
+      const style = (item) => ({
+        position: 'absolute',
+        left: item.realLocation.x + 'px',
+        top: item.realLocation.y + 'px',
+        width: item.realSize.width + 'px',
+        height: item.realSize.height + 'px',
+        background: isBusyTable(item) ? 'red' : item.bgColor
+      })
+
+      const roomContainerStyle = () => ({
+        fontSize: `${zoom.value *15}px`,
+        position: 'relative',
+        // zoom: `${zoom.value * 100}%`,
+        width: '1000px',
+        height: '500px',
+        background: 'green',
+      })
+
+      const roomContainer = ref(null)
+      onMounted(() => {
+        viewW.value = roomContainer.value.offsetWidth
+        viewH.value = roomContainer.value.offsetHeight
+
+        setInterval(() => {
+          curTime.value = new Date()
+        }, 30000)
+      })
+
+      const objectInfoRenderFn = (item) => {
+        const isActiveTable = item.type === 'table' && isBusyTable(item)
+        const tableOrderInfo = getTableOrderInfo(item)
+        return <div>
           <p> {item.name} </p>
-          <p> {item.realLocation.x} </p>
-        </div>)}
+          {isActiveTable ?
+            <div> {getDiffTime(tableOrderInfo.date, curTime.value)} mins </div> : null}
+        </div>
+      }
+      const roomRenderFn = () => <div id="room" ref={roomContainer} style={roomContainerStyle()}>
+        {room.roomObjects.map((item) => <div id = {item.name} style={style(item)} onClick={() => onSelectObject(item)}>
+          {objectInfoRenderFn(item)}
+        </div>)
+        }
       </div>
 
       hooks.emit('r:updateRoomRenderFn',
         roomRenderFn,
         room,
-        fetchInProgressTables,
-        isBusyTable,
-      e => eval(e))
+        e => eval(e))
       return () => <>
         {roomRenderFn()}
       </>
