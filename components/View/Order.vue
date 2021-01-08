@@ -104,14 +104,21 @@
 
 <script>
 
+import posOrder from '../posOrder/posOrder';
+import posOrderLayout from '../posOrder/PosOrderLayout'
 import DialogProductSearchResult from "../Order/components/dialogProductSearchResult";
 import PosOrderSplitOrder from "../posOrder/PosOrderSplitOrder";
 import PosOrderReceipt from "../posOrder/PosOrderReceipt";
 import PosOrderMoveItems from "../posOrder/PosOrderMoveItems";
 import PosOrderVoucherDialog from "../Order/PosOrderVoucherDialog";
+import PosQuickOrderToolbar from '../posOrder/PosQuickOrderToolbar';
+
 export default {
   name: 'Order',
-  components: {PosOrderVoucherDialog, PosOrderMoveItems, PosOrderReceipt, PosOrderSplitOrder, DialogProductSearchResult},
+  components: {
+    posOrder,
+    posOrderLayout,
+    PosOrderVoucherDialog, PosOrderMoveItems, PosOrderReceipt, PosOrderSplitOrder, DialogProductSearchResult, PosQuickOrderToolbar},
   injectService: [
       'PosStore:(user, isMobile, storeLocale)',
       'OrderStore:(addProductToOrder, addModifierToProduct, currentOrder, paymentTotal, printedOrder, addItemQuantity, removeItemQuantity, moveItems, addVoucher,' +

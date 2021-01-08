@@ -93,7 +93,11 @@
 </template>
 <script>
   import _ from 'lodash'
-
+  import dialogSelectionFilter from '../pos-shared-components/dialogFilter/dialogSelectionFilter';
+  import dialogNumberFilter from '../pos-shared-components/dialogFilter/dialogNumberFilter';
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import posTablePagination from '../pos-shared-components/PosTablePagination';
+  
   export default {
     name: 'OrderHistoryTable',
     props: {
@@ -103,6 +107,7 @@
       orderHistoryPagination: Object,
       totalOrders: Number,
     },
+    components: {dialogSelectionFilter, dialogNumberFilter, dialogTextFilter, posTablePagination},
     data() {
       return {
         dialog: {

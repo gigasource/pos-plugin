@@ -59,8 +59,7 @@
                           :card-value="cardEditValue"
                           :cash-value="cashEditValue"
                           :is-mobile="isMobile"
-                          @submit="saveMulti"
-    />
+                          @submit="saveMulti"/>
 
     <dialog-form-input width="40%" v-model="showAddTipDialog" keyboard-type="numeric" @submit="saveTip" keyboard-width="100%">
       <template #input>
@@ -73,9 +72,13 @@
 <script>
   import _ from 'lodash';
   import { nextTick } from 'vue';
+  import dialogMultiPayment from '../posOrder/dialogMultiPayment';
+  import dialogFormInput from '../pos-shared-components/dialogFormInput';
+  import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew'
 
   export default {
     name: 'PosPaymentScreenPaymentMethods',
+    components: {dialogMultiPayment, dialogFormInput, PosTextfieldNew},
     props: {
       currentOrder: null,
       paymentTotal: Number,

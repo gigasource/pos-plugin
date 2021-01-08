@@ -63,7 +63,6 @@
   import InputNumber from './InputNumber';
   import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
   import { reactive, computed, toRefs } from 'vue'
-  
   export default {
     name: 'CategoryEditor',
     components: { PosKeyboardFull, InputNumber, ColorSelector },

@@ -287,6 +287,9 @@
 
 <script>
   import orderUtil from '../logic/orderUtil'
+  import dialogCompleteOrder from './dialogCompleteOrder';
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import NewReservationDialog from '../Reservation/NewReservationDialog';
   import { Touch } from 'pos-vue-framework'
   import {CALL_SYSTEM_MODES} from '../constants';
   import { nextTick } from 'vue';
@@ -296,6 +299,7 @@
     directives: {
       Touch
     },
+    components: {dialogCompleteOrder, dialogTextFilter, NewReservationDialog},
     injectService: [
         'PosStore:(storeLocale, getPendingReservationsLength, isMobile)',
         'OrderStore:(calls, selectedCustomer, orderType, getCustomerInfo, missedCalls)'

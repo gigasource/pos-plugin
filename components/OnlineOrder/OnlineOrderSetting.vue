@@ -113,13 +113,12 @@
 
 <script>
   import ValuePicker from './ValuePicker';
-  import GGridItemSelector from '../FnButton/components/GGridItemSelector';
   import axios from 'axios';
   import { nextTick } from 'vue';
 
   export default {
     name: "OnlineOrderSetting",
-    components: { GGridItemSelector, ValuePicker},
+    components: { ValuePicker},
     injectService: ['PosStore:(showErrorSnackbar,showInfoSnackbar)'],
     props: {
       onlineDevice: null,
