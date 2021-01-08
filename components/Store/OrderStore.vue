@@ -127,7 +127,7 @@
           refundSucceeded: {
             show: false,
           },
-          productLookUp: {
+          productLookup: {
             show: false
           }
         },
@@ -582,7 +582,7 @@
         this.calculateNewPrice('percentage', value, true)
       },
       productLookup() {
-        this.dialog.productLookUp.show = true
+        this.dialog.productLookup.show = true
       },
       async saveOrder() {
         if (!this.currentOrder || !this.currentOrder.items.length) return
