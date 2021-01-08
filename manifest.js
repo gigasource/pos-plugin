@@ -1,8 +1,10 @@
 module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
-    // { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos-login2' },
-    // { loader: { type: 'route' }, filePath: 'components2/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
+    { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos-login2' },
+    { loader: { type: 'route' }, filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos-edit-table-plan-2' },
+    { loader: { type: 'route' }, filePath: 'components2/TablePlan/Room_new.vue', name: 'TablePlan', path: '/room' },
+    { loader: { type: 'route' }, filePath: 'components/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
     { loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
     { loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
@@ -13,7 +15,6 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
     { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
-    { loader: { type: 'route' }, filePath: 'components/View/TutorialView.vue', name: 'Tutorial', path: '/pos-tutorial' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
@@ -21,8 +22,6 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
-    { loader: { type: 'route' }, filePath: 'components/View/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report' },
-    { loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery', path: '/pos-order-delivery' },
     { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     {
@@ -218,12 +217,6 @@ module.exports = {
         type: 'i18n'
       },
       path: 'i18n/de-DE.js'
-    },
-    {
-      loader: {
-        type: 'i18n'
-      },
-      path: 'i18n/vn.js'
     }
   ]
 };
