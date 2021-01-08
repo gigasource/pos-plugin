@@ -162,6 +162,9 @@
       onClickModifier(modifier, category, toggleSelect) {
         // if modifier was not added then add it and return immediately
         if (!this.selectingModifiers.some(mod => mod._id === modifier._id)) {
+          // wipe out another modifier in the same category
+          if (category.selectOne)
+            this.selectingModifiers = this.selectingModifiers.filter(m => m.category !== category._id)
           this.selectingModifiers.push(modifier)
           toggleSelect(modifier)
           return
