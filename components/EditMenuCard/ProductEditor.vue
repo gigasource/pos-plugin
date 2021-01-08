@@ -189,7 +189,7 @@
         colors: '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(','),
         // Product layout types
         type: this.selectedProductLayout.type,
-        types: _.map([ 'Article', 'Div.Article', 'Text', 'Menu' ], item => ({ text: item, value: item })),
+        types: _.map([ 'Article', 'Div.Article', 'Text'], item => ({ text: item, value: item })),
         dineInTaxes: [],
         takeAwayTaxes: [],
         // indicate whether the +2. Printer button has been clicked or not
