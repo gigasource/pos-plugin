@@ -8,7 +8,11 @@ module.exports = {
   transform: {
     '^.*\\.vue$': "vue-jest",
     '^.+\\.js$': "<rootDir>/node_modules/babel-jest",
+    ".+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2)$": "<rootDir>/node_modules/jest-transform-stub"
   },
-  "snapshotSerializers": ["jest-serializer-html"],
-  setupFiles: ['./jest.setup.js']
+  transformIgnorePatterns: [
+    "<rootDir>/node_modules/(?!pos-vue-framework)",
+  ],
+  snapshotSerializers: ["jest-serializer-html"],
+  //setupFiles: ['./jest.setup.js'],
 }
