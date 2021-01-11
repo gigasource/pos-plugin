@@ -20,7 +20,7 @@ function loginTextFieldFactory() {
         return <Portal to="login-text-field">
           <GTextField type="password" v-model={passcode.value} {...attrs}>
             {{
-              'input-message': () => !isValidPassword.value && (
+              'input-message': () => !isValidPasscode.value && (
                 <div class="invalid-passcode-message">
                   <GIcon color="red" size="16px" style="margin-right: 8px">mdi-close-circle</GIcon>
                   <p style="color: #F44336;"/>
