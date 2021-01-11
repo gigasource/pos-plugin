@@ -44,7 +44,7 @@
     },
     computed: {
       computedList() {
-        return ['','',...this.items,'','']
+        return ['', '',...this.items,'', '']
       },
       computedItemHeight() {
         return isNaN(+this.itemHeight) ? 0 : `${this.itemHeight}px`
@@ -77,7 +77,8 @@
         }, 100)
       },
       chooseItem(item, index) {
-        if (!item) return
+        if (!item)
+          return
         this.$emit('update:modelValue', item)
         this.$refs.container.scroll({top: this.itemHeight * (index - 2), behavior: 'smooth'})
       }
