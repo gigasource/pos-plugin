@@ -153,9 +153,11 @@
 <script>
   import orderUtil from '../logic/orderUtil';
   import { v4 as uuidv4 } from 'uuid';
+  import dialogMultiPayment from './dialogMultiPayment';
 
   export default {
     name: 'PosOrderSplitOrder',
+    components: {dialogMultiPayment},
     props: {
       modelValue: Boolean,
       currentOrder: null,

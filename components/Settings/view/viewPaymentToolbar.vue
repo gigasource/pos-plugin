@@ -22,8 +22,11 @@
 </template>
 
 <script>
+  import dialogNewPayment from '../dialog/dialogNewPayment';
+  
   export default {
     name: 'viewPaymentToolbar',
+    components: {dialogNewPayment},
     injectService: [
       'SettingsStore:selectedPayment',
       'SettingsStore:updatePayment'

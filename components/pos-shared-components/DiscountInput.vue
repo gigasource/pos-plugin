@@ -31,9 +31,12 @@
 </template>
 
 <script>
+  import ScrollSelect from '../Reservation/ScrollSelect';
+  
   export default {
     name: 'DiscountInput',
     injectService: ['PosStore:storeLocale'],
+    components: {ScrollSelect},
     data() {
       return {
         percent: '',

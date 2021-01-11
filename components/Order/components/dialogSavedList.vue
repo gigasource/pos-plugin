@@ -116,17 +116,17 @@
 <style scoped lang="scss">
   .g-table {
     height: calc(100% - 64px);
-
+    
     thead tr th {
       font-size: inherit;
       background-color: white;
     }
-
+    
     .g-btn {
       margin: 0 8px;
     }
   }
-
+  
   .g-card {
     .g-card-title,
     .g-card-text {
@@ -134,17 +134,17 @@
       text-align: center;
       color: #1d1d26;
     }
-
+    
     .g-card-text {
       padding: 32px 64px;
     }
-
+    
     .g-card-actions {
       justify-content: flex-end;
-
+      
       .g-btn {
         min-width: 120px !important;
-
+        
         &.g-btn__outlined {
           border: 1px solid #979797;
           color: #1d1d26;

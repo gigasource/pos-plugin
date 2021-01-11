@@ -39,11 +39,16 @@
 </template>
 <script>
   import _ from 'lodash'
+  import posOrderKeyboard from '../../components/posOrder/PosOrderKeyboard'
+  import dialogChoosePopupModifier from './dialogChoosePopupModifier';
+  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogProductSearchResult from '../Order/components/dialogProductSearchResult';
   import { createEmptyCategoryLayout, createEmptyLayout, createEmptyProductLayout, isSameArea } from './util'
 
   export default {
     name: 'PosOrderLayout',
     injectService: ['SettingsStore:updateKeyboardConfig'],
+    components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, posOrderKeyboard},
     props: {
       editable: {
         type: Boolean,
@@ -294,7 +299,12 @@
       },
       async loadKeyboardConfig() {
         const setting = await cms.getModel('PosSetting').findOne()
-        this.$emit('update:keyboardConfig', setting.keyboardConfig)
+        const keyboardConfig = setting.keyboardConfig
+        // work-around: Fixing error keyboardConfig is null
+        // TODO: Find what is the purpose of keyboardConfig layout
+        if (!keyboardConfig.layout)
+          keyboardConfig.layout = []
+        this.$emit('update:keyboardConfig', keyboardConfig)
       },
       //
       fillMissingAreas(areas, columns, rows, isCategory) {

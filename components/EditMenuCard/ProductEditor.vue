@@ -34,7 +34,7 @@
       </template>
       <template v-else>
         <div>{{$t('article.name')}} <span style="color: #ff4552">*</span></div>
-        <g-text-field v-model="selectedProductLayout.text">
+        <g-text-field :model-value="selectedProductLayout.text" @update:modelValue="debounceUpdateTextLayout('text', $event)">
           <template #append-inner>
             <g-icon style="cursor: pointer" @click="dialog.showTextKbd = true">icon-keyboard</g-icon>
           </template>
@@ -145,11 +145,11 @@
       </div>
       <div>
         <g-grid-select v-model="selectedProduct.activePopupModifierGroup" item-text="name" item-value="_id" :items="popupModifierGroups" itemCols="auto">
-          <template #default="{ toggleSelect, item, index }">
-            <div class="prop-option" @click="toggleSelect(item); changePopupModifierGroup(item)">{{item.name}}</div>
+          <template v-slot:default="{ toggleSelect, item, index }">
+            <div class="prop-option" :key="`${index}-default`" @click="addPopupModifierGroup(toggleSelect, item)">{{item.name}}</div>
           </template>
-          <template #selected="{ toggleSelect, item, index }">
-            <div class="prop-option prop-option--1" @click="toggleSelect(item); changePopupModifierGroup(null)">{{item.name}}</div>
+          <template v-slot:selected="{ toggleSelect, item, index }">
+            <div class="prop-option prop-option--1" :key="`${index}-selected`" @click="clearPopupModifierGroup(toggleSelect, item)">{{item.name}}</div>
           </template>
         </g-grid-select>
       </div>
@@ -172,13 +172,11 @@
 <script>
   import _ from 'lodash';
   import ColorSelector from '../common/ColorSelector';
-  import GGridItemSelector from '../FnButton/components/GGridItemSelector';
-  import { createEmptyProductLayout } from '../posOrder/util'
   import DialogEditPopupModifiers from './dialogEditPopupModifiers';
 
   export default {
     name: 'ProductEditor',
-    components: { DialogEditPopupModifiers, GGridItemSelector, ColorSelector },
+    components: { DialogEditPopupModifiers, ColorSelector },
     props: {
       orderLayout: Object,
       selectedCategoryLayout: Object,
@@ -190,7 +188,7 @@
         colors: '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(','),
         // Product layout types
         type: this.selectedProductLayout.type,
-        types: _.map([ 'Article', 'Div.Article', 'Text', 'Menu' ], item => ({ text: item, value: item })),
+        types: _.map([ 'Article', 'Div.Article', 'Text'], item => ({ text: item, value: item })),
         dineInTaxes: [],
         takeAwayTaxes: [],
         // indicate whether the +2. Printer button has been clicked or not
@@ -210,14 +208,15 @@
         notifyContent: null,
         popupModifierGroups: [],
         layoutType: '',
-        debouncedUpdateProduct: () => null
+        debouncedUpdateProduct: () => null,
+        debounceUpdateTextLayout: () => null,
       }
     },
     computed: {
       selectedProduct: {
         get(){
           if (!this.selectedProductLayout.product) {
-            this.selectedProductLayout.product = createEmptyProductLayout()
+            this.selectedProductLayout.product = {}
           }
           return this.selectedProductLayout.product
         },
@@ -265,7 +264,10 @@
     },
     watch: {
       selectedProductLayout(value) {
-        this.type = value.type
+        if (value)
+          this.type = value.type
+        else
+          this.type = null
       },
       'dialog.popupModifiers'() {
         this.loadPopupModifierGroups()
@@ -285,6 +287,10 @@
 
       this.debouncedUpdateProduct = _.debounce(function (key, val) {
         this.updateProduct({ [key]: val }, !this.selectedProduct._id)
+      }, 300)
+      
+      this.debounceUpdateTextLayout = _.debounce(function(key, val) {
+        this.updateTextLayout({ [key]: val }, !this.selectedProduct._id)
       }, 300)
     },
     activated() {
@@ -384,10 +390,18 @@
       changePopupModifierGroup(group) {
         return this.updateProduct({ activePopupModifierGroup: group && group._id })
       },
+      addPopupModifierGroup(toggleSelect, item) {
+        toggleSelect(item)
+        this.changePopupModifierGroup(item)
+      },
+      clearPopupModifierGroup(toggleSelect, item) {
+        toggleSelect(item)
+        this.changePopupModifierGroup(null)
+      },
 
       // update color, update text
       async updateProductLayout(change, forceCreate) {
-        console.log('Store change into this.selectedProductLayout')
+        console.log('Save change', change, 'to selectedProductLayout')
         _.each(_.keys(change), k => this.selectedProductLayout[k] = change[k])
 
         if (this.selectedProductLayout._id) {
@@ -443,6 +457,7 @@
           ...extraInfo
         }
 
+        console.log('createNewProductLayout', productLayout)
         const result = await cms.getModel('OrderLayout').findOneAndUpdate(
             {
               type: this.layoutType,
@@ -452,6 +467,12 @@
             { new: true });
         this.$emit('update:orderLayout', result)
       },
+      
+      async updateTextLayout(change) {
+        const forceCreate = !this.selectedProductLayout._id;
+        await this.updateProductLayout(change, forceCreate)
+      },
+      
       openDialogInfo(focus) {
         this.dialog.focus = focus
         this.dialog.productInfo = true

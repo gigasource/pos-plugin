@@ -1,7 +1,9 @@
 <template>
   <div class="user">
     <div class="user-list">
-      <g-list :items="listOfUsers" @click="label = 'Edit User'" active-class="item__active" divider elevation="0"
+      <g-list :items="listOfUsers"
+              @click="label = 'Edit User'"
+              active-class="item__active" divider elevation="0"
               item-text="name" mandatory prepend-type="avatar" return-object selectable v-model="selectedUser">
         <template v-slot:append>
           <div></div>
@@ -110,6 +112,10 @@
 </template>
 
 <script>
+  import dialogSelectAvatar from '../dialog/dialogSelectAvatar';
+  import dialogUserDetail from '../dialog/dialogUserDetail';
+  import PosSwitch from '../../pos-shared-components/PosSwitch';
+  
   import layout from './layoutUserView';
   export default {
     name: 'viewUser',
@@ -120,6 +126,7 @@
       'SettingsStore:getListUsers',
       'SettingsStore:updateUser',
     ],
+    components: {dialogSelectAvatar, dialogUserDetail, PosSwitch},
     data() {
       return {
         layout: layout,

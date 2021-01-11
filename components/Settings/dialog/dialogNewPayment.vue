@@ -29,12 +29,15 @@
 </template>
 
 <script>
+	import PosFileInputImage from '../../pos-shared-components/POSInput/PosFileInputImage';
+	
   export default {
     name: 'dialogNewPayment',
 		injectService: [
 			'SettingsStore:selectedPayment',
 			'SettingsStore:updatePayment',
 		],
+		components: {PosFileInputImage},
     data() {
       return {
 				name: '',

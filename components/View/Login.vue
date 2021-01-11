@@ -25,18 +25,29 @@
         <store-id-btn/>
         <support-btn @open="openDialog"/>
       </div>
-      <dialog-login-support v-model="dialog"/>
+      <dialog-login-support v-model="dialog.loginSupport"/>
     </div>
   </div>
 </template>
 
 <script>
+  import PosLoginTextfield from '../Login/PosLoginTextfield';
+  import ConnectionStatusBtn from '../Login/ConnectionStatusBtn';
+  import PosLoginBtnLanguage from '../Login/PosLoginBtnLanguage';
+  import VersionBtn from '../Login/VersionBtn';
+  import StoreIdBtn from '../Login/StoreIdBtn';
+  import SupportBtn from '../Login/SupportBtn';
+  import DialogLoginSupport from '../Login/dialogLoginSupport'
+  
   export default {
     name: "Login",
     injectService: ['PosStore:(loginPassword, incorrectPasscode, login, resetIncorrectPasscodeFlag, locale, changeLocale, version)'],
+    components: { PosLoginTextfield, ConnectionStatusBtn, PosLoginBtnLanguage, VersionBtn, StoreIdBtn, SupportBtn, DialogLoginSupport},
     data() {
       return {
-        dialog: false,
+        dialog: {
+          loginSupport: false
+        },
         version: null,
         loginPassword: '',
         incorrectPasscode: null,
@@ -45,7 +56,7 @@
     },
     methods: {
       openDialog() {
-        this.dialog = true
+        this.dialog.loginSupport = true
       },
       login() {},
       resetIncorrectPasscodeFlag() {},

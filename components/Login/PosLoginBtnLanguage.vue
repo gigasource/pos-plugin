@@ -33,6 +33,7 @@
         languages: [
           { icon: 'icon-germany', title: this.$t('login.german'), locale: 'de'},
           { icon: 'icon-english', title: this.$t('login.english'), locale: 'en'},
+          { icon: 'icon-vietnam', title: this.$t('login.vietnam'), locale: 'vn'},
         ]
       }
     },

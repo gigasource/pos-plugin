@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import loginSupportDialog from './loginSupportDialog'
+  import loginSupportDialog from './loginSupportDialog.json'
 
   export default {
     name: 'dialogLoginSupport',

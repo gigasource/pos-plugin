@@ -90,6 +90,8 @@
 
 <script>
   import isBetween from 'dayjs/plugin/isBetween'
+  import NewReservationDialog from './NewReservationDialog';
+  
   import { nextTick } from 'vue';
   dayjs.extend(isBetween)
 
@@ -99,6 +101,7 @@
       reservations: Array,
       reservationSetting: null,
     },
+    components: {NewReservationDialog},
     injectService: ['OrderStore: checkReservationDay'],
     data() {
       return {

@@ -43,20 +43,37 @@
         :order="dialog.refundConfirm.order"
         :store-locale="storeLocale"
         @submit="doRefundOrder(dialog.refundConfirm.order, dialog.refundConfirm.status)"/>
+    
+    <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"/>
+    <dialog-change-value ref="dlgChangePrice" :new-value-editable="true" @submit="onChangePriceSubmit"/>
+    
+    <dialog-product-lookup ref="dlgProductLookup" v-model="dialog.productLookup.show"/>
+    <g-snackbar v-model="showDiscountMessage" color="#FFC107" :timeout="2000" top>
+      <div :style="{color: '#ff4552',  display: 'flex','align-items': 'center'}">
+        <g-icon style="margin-right: 8px; color: #ff4552;">warning</g-icon>
+        <div>This order has already applied discount in items</div>
+      </div>
+    </g-snackbar>
   </div>
 </template>
 
 <script>
   import orderUtil from '../logic/orderUtil';
+  import dialogCommon from './OrderStoreDialogs/dialogCommon';
+  import dialogChangeValue from '../pos-shared-components/dialogChangeValue';
+  import dialogOrderTransactionRefundConfirm from './OrderStoreDialogs/dialogOrderTransactionRefundConfirm';
+  import dialogOrderTransactionRefundFailed from './OrderStoreDialogs/dialogOrderTransactionRefundFailed';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';
   import { getProvided } from '../logic/commonUtils';
   import * as jsonfn from 'json-fn';
   import _ from 'lodash';
+  import DialogProductLookup from '../Order/components/dialogProductLookup';
   const socketIntervals = {}
 
   export default {
     name: 'OrderStore',
     domain: 'OrderStore',
+    components: { DialogProductLookup, dialogCommon, dialogOrderTransactionRefundConfirm, dialogOrderTransactionRefundFailed, dialogChangeValue},
     injectService: ['PosStore:(user, timeFormat, dateFormat, device, storeLocale)'],
     data() {
       return {
@@ -110,12 +127,16 @@
           refundSucceeded: {
             show: false,
           },
+          productLookup: {
+            show: false
+          }
         },
         //call in order
         calls: [],
         selectedCustomer: {},
         orderType: '',
-        missedCalls: []
+        missedCalls: [],
+        showDiscountMessage: false,
       }
     },
     computed: {
@@ -474,7 +495,7 @@
       },
       addOrderCommits(changes) {
         // this function must be called after everything is set
-        this.actionList.push(...changes.mao(change => {
+        this.actionList.push(...changes.map(change => {
           return cms.getModel('Order').findOneAndUpdate({
             _id: this.currentOrder._id
           }, change).commit('updateActiveOrder', { orderId: this.currentOrder._id, table: this.currentOrder.table }).chain
@@ -546,10 +567,13 @@
         }))
       },
       changePrice() {
-        this.$getService('dialogChangePrice:open')('new', this.activeProduct ? this.activeProduct.originalPrice : 0)
+        this.$refs.dlgChangePrice.open('new', this.activeProduct ? this.activeProduct.originalPrice : 0)
+      },
+      onChangePriceSubmit(val) {
+        this.$getService('PosStore:updateNewPrice')(val)
       },
       discountSingleItemDialog() {
-        this.$getService('dialogChangePrice:open')('percentage', this.activeProduct ? this.activeProduct.originalPrice : 0)
+        this.$refs.dlgChangePrice.open('percentage', this.activeProduct ? this.activeProduct.originalPrice : 0)
       },
       discountSingleItemByAmount(value) {
         this.calculateNewPrice('amount', value, true)
@@ -558,7 +582,7 @@
         this.calculateNewPrice('percentage', value, true)
       },
       productLookup() {
-        this.$getService('dialogProductLookup:setActive')(true)
+        this.dialog.productLookup.show = true
       },
       async saveOrder() {
         if (!this.currentOrder || !this.currentOrder.items.length) return
@@ -738,10 +762,10 @@
       },
       setOrderDiscount() {
         if (this.currentOrder.items.some(i => i.price !== i.originalPrice) && !this.currentOrder.hasOrderWideDiscount) {
-          this.$getService('alertDiscount:setActive')(true);
+          this.showDiscountMessage = true
         } else {
           const originalTotal = this.currentOrder.items.reduce((acc, item) => (acc + (item.discountResistance ? 0 : item.quantity * item.originalPrice)), 0);
-          this.$getService('dialogDiscount:open')(originalTotal, this.currentOrder.discount);
+          this.$refs.dlgDiscount.open(originalTotal, this.currentOrder.discount)
         }
       },
       updateOrderTable(table) {

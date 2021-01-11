@@ -144,11 +144,13 @@
 <script>
   import {units} from './unit'
   import _ from 'lodash'
+  import PosRangeSlider from '../pos-shared-components/POSInput/PosRangeSlider';
 
   export default {
     name: 'Inventory',
     injectService: ['InventoryStore:(inventories, loadInventories, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
                                     'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
+    components: {PosRangeSlider},
     props: {},
     data: function () {
       return {

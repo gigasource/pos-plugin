@@ -34,6 +34,7 @@
   //todo on/off timer (awaiting redesign/conceptualization)
 
   import { nextTick } from 'vue';
+  import dialogBlogtextInput from '../pos-shared-components/dialogFilter/dialogBlogtextInput';
 
   export default {
     name: 'OnlineOrderServices',
@@ -60,6 +61,7 @@
         }
       }
     },
+    components: { dialogBlogtextInput },
     emits: ['showInfoSnackbar', 'showErrorSnackbar', 'getOnlineDeviceServices', 'updateOnlineDeviceServices'],
     methods: {
       save() {

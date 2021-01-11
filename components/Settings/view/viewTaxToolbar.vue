@@ -22,12 +22,15 @@
 </template>
 
 <script>
+  import dialogNewTaxCategory from '../dialog/dialogNewTaxCategory';
+  
   export default {
     name: 'viewTaxToolbar',
     injectService: [
       'SettingsStore:selectedTaxCategory',
       'SettingsStore:updateTaxCategory',
     ],
+    components: {dialogNewTaxCategory},
     data() {
       return {
         dialogConfirmDelete: false,
