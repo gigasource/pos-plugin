@@ -222,7 +222,7 @@ module.exports = {
       loader: {
         type: 'i18n'
       },
-      path: 'i18n/vi.js'
+      path: 'i18n/vn.js'
     }
   ]
 };
