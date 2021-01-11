@@ -4,20 +4,18 @@ const path = require('path')
 
 const listComponent = {}
 
-function getAllVueComponent(curPath) {
-	const files = fs.readdirSync(curPath)
-	for (let file of files) {
-		const filePath = path.join(curPath, file)
-		const stat = fs.lstatSync(filePath)
-		if (stat.isDirectory()) {
-			getAllVueComponent(filePath)
-		} else if (filePath.endsWith('.vue')) {
-			listComponent[`./${file}`] = filePath
+function getAllVueComponent(manifestPath) {
+	const manifest = require(manifestPath)
+	manifest.files.forEach(file => {
+		if (file.loader.type === 'route') {
+			listComponent[file.loadPath] = path.resolve(manifestPath, '..', file.filePath)
 		}
-	}
+	})
 }
 
-getAllVueComponent(path.resolve(__dirname, 'components2'))
+getAllVueComponent(path.resolve(__dirname, path.resolve(__dirname, './manifest.js')))
+
+console.log(listComponent)
 
 module.exports = {
 	publicPath: '/plugins',
