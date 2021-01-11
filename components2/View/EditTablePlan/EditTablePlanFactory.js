@@ -55,6 +55,8 @@ const EditablePlanFactory = () => {
         let cur = 0
         await fetchRooms()
         selectingRoom.value = rooms.value[0]
+        //todo: should update selecting object to null
+        selectingObject.value = null
         // setInterval(() => {
         //   selectingRoom.value = rooms.value[cur++]
         //   cur %= rooms.value.length
