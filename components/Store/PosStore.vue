@@ -1,6 +1,6 @@
 <template>
   <div>
-    <g-snackbar :value="showMasterDevSnackbar" color="#E57373" absolute timeout="0" class="master-device-snackbar">
+    <g-snackbar :model-value="showMasterDevSnackbar" color="#E57373" absolute timeout="0" class="master-device-snackbar">
       <div class="col-flex align-items-center mb-2 mt-2" style="margin: 0 auto">
         <div class="mb-3" style="font-size: 16px; font-weight: 700">No master device set!</div>
         <g-btn-bs background-color="#1271ff" @click.stop="setMasterDevice">SET THIS DEVICE AS MASTER</g-btn-bs>

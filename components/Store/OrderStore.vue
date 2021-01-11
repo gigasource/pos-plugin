@@ -2,24 +2,24 @@
   <div>
     <!-- Capture order -->
     <dialog-common
-        :value="dialog.captureFailed.show"
-        @input="dialog.captureFailed.show = false"
+        :model-value="dialog.captureFailed.show"
+        @update:modelValue="dialog.captureFailed.show = false"
         :title="$t('onlineOrder.captureFailedDialog.title')">
       <div>{{ $t('onlineOrder.captureFailedDialog.details') }}:</div>
       <div>{{dialog.captureFailed.error}}</div>
     </dialog-common>
 
     <dialog-common
-        :value="dialog.capturing.show"
-        @input="dialog.capturing.show = false"
+        :model-value="dialog.capturing.show"
+        @update:modelValue="dialog.capturing.show = false"
         :title="$t('onlineOrder.capturingDialog.title')">
       {{ $t('onlineOrder.capturingDialog.message') }}
     </dialog-common>
 
     <!-- Refund order -->
     <dialog-common
-        :value="dialog.refunding.show"
-        @input="dialog.refunding.show = false"
+        :model-value="dialog.refunding.show"
+        @update:modelValue="dialog.refunding.show = false"
         :title="$t('onlineOrder.refundingDialog.title')">
       {{ $t('onlineOrder.refundingDialog.message') }}
     </dialog-common>
@@ -31,9 +31,9 @@
         :refund-responses="dialog.refundFailed.refundResponses"/>
 
     <dialog-common
-        :value="dialog.refundSucceeded.show"
+        :model-value="dialog.refundSucceeded.show"
         :title="$t('onlineOrder.refundSucceededDialog.title')"
-        @input="dialog.refundSucceeded.show = false">
+        @update:modelValue="dialog.refundSucceeded.show = false">
       {{ $t('onlineOrder.refundSucceededDialog.message') }}
     </dialog-common>
 

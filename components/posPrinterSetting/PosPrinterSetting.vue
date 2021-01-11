@@ -38,8 +38,8 @@
             class="config__usb-printer-paths"
             :style="{ flex: 1 }"
             :items="usbPrinterSelectModel"
-            :value="printer.usb"
-            @input="setUsbPrinter"
+            :model-value="printer.usb"
+            @update:modelValue="setUsbPrinter"
             textFieldComponent="GTextFieldBs"/>
         <g-btn-bs background-color="blue accent 3" style="padding: 6px; transition: none" @click="testPrinter(printer)">
           {{$t('settings.testPrinter')}}

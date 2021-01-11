@@ -21,6 +21,7 @@
       <!-- Filter row -->
       <tr>
         <td class="bg-grey-lighten-1">
+          <!-- TODO: using :value or :model-value? -->
           <g-checkbox v-if="inventories && inventories.length !== 0" v-model="selectedInventoryIDs" :value="listIDs"
                       multiple>
             <template v-slot:label>
@@ -52,6 +53,7 @@
       <!-- Data row -->
       <tr v-for="(inventory, i) in inventories" :key="i">
         <td>
+          <!-- TODO: using :value or :model-value? -->
           <g-checkbox v-model="selectedInventoryIDs" :value="inventory._id" @change="getFirstSelectedInventory"/>
         </td>
         <td @click="editInventory(inventory)">{{ inventory.id }}</td>
