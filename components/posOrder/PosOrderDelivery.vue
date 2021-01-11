@@ -17,6 +17,7 @@
                 :class="['delivery-info__customer-address', selectedAddress === i && 'delivery-info__customer-address--selected']"
                 v-for="(item, i) in selectedCustomer.addresses" @click="selectAddress(i)">
               <div class="row-flex align-items-center">
+                <!-- TODO: using :value or :model-value? -->
                 <g-radio small v-model="selectedAddress" :value="i" :label="`Address ${i+1}`" color="#536DFE"/>
                 <g-spacer/>
                 <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
@@ -282,6 +283,7 @@
               <template v-if="choice.select === 'one' && choice.mandatory">
                 <g-radio-group v-model="modifiers[index]">
                   <template v-for="option in choice.options" :key="option._id">
+                    <!-- TODO: using :value or :model-value? -->
                     <g-radio color="#536DFE" :value="option"
                              :label="`${option.name} (${$t('common.currency', storeLocale)}${ $filters.formatCurrency(option.price)} )`"/>
                   </template>
@@ -289,10 +291,8 @@
               </template>
               <template v-else>
                 <template v-for="option in choice.options" :key="option._id">
-                  <g-checkbox v-model="modifiers[index]"
-                              color="#536DFE"
-                              :value="option"
-                              :label="getCheckboxLabel(option)"/>
+                  <!-- TODO: value or model-value??? -->
+                  <g-checkbox v-model="modifiers[index]" color="#536DFE" :value="option" :label="getCheckboxLabel(option)"/>
                 </template>
               </template>
             </div>

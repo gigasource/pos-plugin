@@ -4,11 +4,11 @@
       <div class="header">
         <div class="header-side">
           <p style="padding-bottom: 9px">{{$t('dialogs.original')}}</p>
-          <g-text-field read-only outlined :value="`€ ${originalValue}`"></g-text-field>
+          <g-text-field read-only outlined :model-value="`€ ${originalValue}`"></g-text-field>
         </div>
         <div class="header-side">
           <p style="padding-bottom: 9px">{{$t('dialogs.effective')}}</p>
-          <g-text-field read-only outlined class="tf__effective" :value="`€ ${computedValue}`"></g-text-field>
+          <g-text-field read-only outlined class="tf__effective" :model-value="`€ ${computedValue}`"></g-text-field>
         </div>
       </div>
       <g-radio-group name="basic" v-model="internalChangeType">

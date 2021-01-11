@@ -9,7 +9,7 @@
         </g-btn-bs>
       </slot>
     </template>
-    <g-text-field-bs ref="input" v-if="allowCustom" :placeholder="$t('onlineOrder.customTime')" :value="inputValue" @input="pickCustomValue">
+    <g-text-field-bs ref="input" v-if="allowCustom" :placeholder="$t('onlineOrder.customTime')" :model-value="inputValue" @update:modelValue="pickCustomValue">
       <template v-slot:append-inner>
         <g-icon style="cursor: pointer" @click="dialog = true">icon-keyboard</g-icon>
       </template>

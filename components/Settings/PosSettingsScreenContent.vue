@@ -5,6 +5,8 @@
 </template>
 
 <script>
+  // - Consider to change props.value to modelValue
+  
   import _ from 'lodash'
   export default {
     name: 'PosSettingsScreenContent',

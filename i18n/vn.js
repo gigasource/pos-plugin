@@ -595,10 +595,10 @@ module.exports = {
 
     discount: {
       percent: 'Phần trăm',
-      amount: 'Khối lượng',
+      amount: 'Giá trị',
       discount: 'Giảm giá',
       custom: 'Tuỳ chỉnh',
-      quickDiscount: 'Giảm giá nhanh'
+      quickDiscount: 'Lịch sử giảm giá'
     }
   }
 }
