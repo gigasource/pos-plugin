@@ -179,9 +179,15 @@
       }
     },
     methods: {
-      queryProductsById() {},
-      addProductToOrder() {},
-      addModifierToProduct() {},
+      queryProductsById() {
+        console.error('queryProductsById not impl')
+      },
+      addProductToOrder() {
+        console.error('addProductToOrder not impl')
+      },
+      addModifierToProduct() {
+        console.error('addModifierToProduct not impl')
+      },
       clearScreen() {
         this.productIdQuery = ''
       },
@@ -193,7 +199,7 @@
           await this.queryProductsById()
           if (this.productIdQueryResults.length === 1) {
             const onlyResult = this.productIdQueryResults[0];
-            if (onlyResult.attributes.length === 0 || onlyResult.attributes.keys().length === onlyResult.attributes.length) {
+            if (onlyResult.attributes && (onlyResult.attributes.length === 0 || onlyResult.attributes.keys().length === onlyResult.attributes.length)) {
               if(onlyResult.isModifier) {
                 onlyResult.product = onlyResult._id.toString()
                 onlyResult.quantity = onlyResult.quantity || 1
@@ -205,7 +211,7 @@
               return
             }
           }
-          nextTick(() => {
+          await nextTick(() => {
             this.$emit('openDialogSearch')
           })
         }
