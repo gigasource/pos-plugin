@@ -3,8 +3,6 @@ import _ from 'lodash';
 import { createRoom, addRoomObject, removeRoomObject, updateRoomObject } from '../../TablePlan/room-logic';
 import { appHooks } from '../../AppSharedStates';
 
-import cms from 'cms';
-
 const rooms = ref([]);
 
 const selectingObject = ref(null)

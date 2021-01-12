@@ -54,8 +54,6 @@ const drinkTax = { taxes: [16, 32] };
 
 const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
 
-import cms from 'cms'
-
 const VIEW_W = 100;
 const VIEW_H = 100;
 

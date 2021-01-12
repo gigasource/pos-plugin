@@ -2,7 +2,6 @@ import orm from 'schemahandler';
 import { addRoomObject, createRoom } from '../../TablePlan/room-logic';
 import { nextTick } from 'vue';
 import { addItem as addOrderItem, createOrder, makePaid } from '../../../backend/order-logic/pos-logic';
-import cms from 'cms'
 
 const prepareDb = async function() {
   const table1 = {

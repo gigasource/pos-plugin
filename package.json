@@ -35,12 +35,12 @@
     "numeral": "^2.0.6",
     "pngjs": "^3.4.0",
     "queue": "^6.0.1",
+    "schemahandler": "github:gigasource/schemaHandler#1.0.87",
     "serialport": "^8.0.7",
     "tscprinter": "github:gigasource/tsc-printer",
     "usb": "^1.6.2",
     "usbserial": "0.0.2",
-    "uuid": "^3.4.0",
-    "schemahandler": "github:gigasource/schemaHandler#1.0.87"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
@@ -49,8 +49,8 @@
     "@babel/plugin-syntax-import-meta": "^7.2.0",
     "@babel/plugin-transform-modules-commonjs": "^7.4.0",
     "@babel/preset-env": "^7.7.4",
-    "@vue/cli-plugin-babel": "^5.0.0-alpha.0",
     "@vue/babel-plugin-jsx": "1.0.0-rc.3",
+    "@vue/cli-plugin-babel": "^5.0.0-alpha.0",
     "@vue/cli-service": "5.0.0-alpha.0",
     "@vue/compiler-sfc": "3.0.4",
     "@vue/server-renderer": "^3.0.4",
