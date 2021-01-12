@@ -1,5 +1,5 @@
 import { reactive, watch, computed, onActivated } from 'vue'
-import { createEmptyProductLayout } from '../../posOrder/util';
+import { createEmptyProduct } from '../utils';
 import _ from 'lodash'
 
 const useProductEditorLogic = async (props, context) => {
@@ -7,7 +7,7 @@ const useProductEditorLogic = async (props, context) => {
     colors: '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(',') ,
     // Product layout types
     type: props.selectedProductLayout.type,
-    types: _.map([ 'Article', 'Div.Article', 'Text', 'Menu' ], item => ({ text: item, value: item })),
+    types: _.map([ 'Article', 'Div.Article', 'Text'], item => ({ text: item, value: item })),
     dineInTaxes: [],
     takeAwayTaxes: [],
     // indicate whether the +2. Printer button has been clicked or not
@@ -31,8 +31,12 @@ const useProductEditorLogic = async (props, context) => {
 
   let selectedProduct = computed({
     get: () => {
+      // if no product layout selected, then return null
+      if (!props.selectedProductLayout)
+        return null
+      // otherwise, init new product object if current product layout is empty
       if (!props.selectedProductLayout.product) {
-        props.selectedProductLayout.product = createEmptyProductLayout()
+        props.selectedProductLayout.product = createEmptyProduct()
       }
       return props.selectedProductLayout.product
     },

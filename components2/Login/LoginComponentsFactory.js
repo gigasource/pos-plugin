@@ -50,7 +50,7 @@ function loginKeyboardFactory() {
 
       async function _login(passcode) {
         const result = await login(passcode)
-        if (result) router.push('/pos-dashboard')
+        if (result) router.push('/pos2-dashboard')
       }
 
       // add render hooks to theme/customize ui

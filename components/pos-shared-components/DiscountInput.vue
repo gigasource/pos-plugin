@@ -3,13 +3,13 @@
     <div class="discount-content">
       <div class="w-10 mx-2">
         <div class="fw-700 ta-center fs-small">{{$t('discount.percent')}} (%)</div>
-        <scroll-select ref="scroll-percentage" :value="percent" :items="listPercent" :height="200" :class="percent && 'scroll--selected'"
-                       :item-height="40" selected-color="#1271FF" @input="selectPercent"/>
+        <scroll-select ref="scroll-percentage" :model-value="percent" :items="listPercent" :height="200" :class="percent && 'scroll--selected'"
+                       :item-height="40" selected-color="#1271FF" @update:modelValue="selectPercent"/>
       </div>
       <div class="w-10 mx-2">
         <div class="fw-700 ta-center fs-small">{{$t('discount.amount')}} ({{$t('common.currency', storeLocale)}})</div>
-        <scroll-select ref="scroll-amount" :value="amount" :items="listAmount" :height="200" :class="amount && 'scroll--selected'"
-                       :item-height="40" selected-color="#1271FF" @input="selectAmount"/>
+        <scroll-select ref="scroll-amount" :model-value="amount" :items="listAmount" :height="200" :class="amount && 'scroll--selected'"
+                       :item-height="40" selected-color="#1271FF" @update:modelValue="selectAmount"/>
       </div>
       <div class="flex-grow-1 ml-3">
         <div class="fw-700 ml-1">{{$t('discount.discount')}}</div>
@@ -31,6 +31,9 @@
 </template>
 
 <script>
+  // TODO:
+  //  - Consider to change props value to modelValue?
+  
   import ScrollSelect from '../Reservation/ScrollSelect';
   import PosKeyboardFull from './PosKeyboardFull';
   

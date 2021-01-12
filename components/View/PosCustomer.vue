@@ -62,7 +62,7 @@
             <div class="row-flex">
               <g-combobox :label="`Address ${i+1}`" :key="`address_${i}`" v-model="placeId[i]" clearable keep-menu-on-blur class="col-8" menu-class="menu-autocomplete-address"
                           :items="autocompleteAddresses[i]" @update:searchText="e => debouceSearchAddress(e, i)" :virtual-event="isIOS" outlined
-                          @input="e => selectAutocompleteAddress(e, i)"/>
+                          @update:modelValue="e => selectAutocompleteAddress(e, i)"/>
               <g-text-field :label="`House ${i+1}`" :key="`house_${i}`" v-model="item.house" :virtual-event="isIOS" outlined/>
             </div>
             <div class="row-flex">

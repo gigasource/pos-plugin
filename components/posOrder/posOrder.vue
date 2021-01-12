@@ -176,7 +176,7 @@
     <dialog-config-order-item v-model="dialogConfigOrderItem.value" :original-value="dialogConfigOrderItem.originalPrice"
                               :product="dialogConfigOrderItem.product"
                               @addModifier="addModifier" @changePrice="changePrice"/>
-    <g-overlay :value="overlay" absolute opacity="0.7" color="rgba(255, 255, 255)" style="top: 54px"></g-overlay>
+    <g-overlay :model-value="overlay" absolute opacity="0.7" color="rgba(255, 255, 255)" style="top: 54px"></g-overlay>
   </div>
 </template>
 
