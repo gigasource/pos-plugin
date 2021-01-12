@@ -1,8 +1,15 @@
 <script>
   import categoryEditorFactory from './CategoryEditorFactory'
   const { hooks, fn } = categoryEditorFactory()
+  // moving renderToolbar to toolbar portal
+  hooks.on('renderToolbar', function(orderLayout, showAddLayoutDialog, createLayout, setAction, switchable, renderToolbar) {
+    return <portal to="toolbar">
+      {renderToolbar()}
+    </portal>
+  })
   export default fn()
 </script>
+
 <style scoped lang="scss">
   .category-editor {
     padding-left: 20px;
