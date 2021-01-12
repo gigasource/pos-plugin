@@ -26,9 +26,11 @@
 
 <script>
   import _ from 'lodash'
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: "dialogInventoryCategory",
+    components: {PosKeyboardFull},
     injectService: ['InventoryStore:(loadCategoriesWithItem, updateInventoryCategory, loadInventoryCategories, deleteInventoryCategory)'],
     props: {
       modelValue: Boolean

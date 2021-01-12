@@ -29,10 +29,12 @@
 </template>
 
 <script>
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
   import loginSupportDialog from './loginSupportDialog.json'
 
   export default {
     name: 'dialogLoginSupport',
+    components: {PosKeyboardFull},
     props: {
       modelValue: null
     },

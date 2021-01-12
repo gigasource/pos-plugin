@@ -29,6 +29,7 @@
 </template>
 
 <script>
+	import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
 	import PosFileInputImage from '../../pos-shared-components/POSInput/PosFileInputImage';
 	
   export default {
@@ -37,7 +38,7 @@
 			'SettingsStore:selectedPayment',
 			'SettingsStore:updatePayment',
 		],
-		components: {PosFileInputImage},
+		components: {PosFileInputImage, PosKeyboardFull},
     data() {
       return {
 				name: '',

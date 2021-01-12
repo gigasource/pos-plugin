@@ -291,7 +291,7 @@
   }
 
   .pos-payment-method {
-    background-image: url('../../assets/pos-payment-method-screen-bg.png');
+    background-image: url('../../public/pos-plugin/assets/pos-payment-method-screen-bg.png');
     background-repeat: repeat;
   }
 

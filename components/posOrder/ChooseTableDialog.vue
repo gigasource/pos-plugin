@@ -34,8 +34,12 @@
 </template>
 
 <script>
+  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  
   export default {
     name: 'ChooseTableDialog',
+    components: {PosTextfieldNew, PosKeyboardFull},
     props: {
       modelValue: Boolean,
       table: String,

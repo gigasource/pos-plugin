@@ -22,8 +22,11 @@
 </template>
 
 <script>
+  import PosKeyboardFull from '../PosKeyboardFull';
+  
   export default {
     name: "dialogSelectionFilter",
+    components: {PosKeyboardFull},
     props: {
       modelValue: Boolean,
       multiple: Boolean,

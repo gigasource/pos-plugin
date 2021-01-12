@@ -29,10 +29,12 @@
 </template>
 
 <script>
-  import { isMobile} from '../../composition/usePosLogic';
+  import { isMobile } from '../../composition/usePosLogic';
+  import PosKeyboardFull from './PosKeyboardFull';
 
   export default {
     name: "dialogFormInput",
+    components: {PosKeyboardFull},
     props: {
       modelValue: null,
       showKeyboard: {

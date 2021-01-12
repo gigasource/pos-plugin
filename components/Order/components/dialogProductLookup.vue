@@ -73,10 +73,12 @@
 
 <script>
   import { getInternalValue, Intersect } from 'pos-vue-framework';
+  import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: 'dialogProductLookup',
     injectService: ['OrderStore:(productNameQuery,productNameQueryResults,queryProductsByName,addProductToOrder)'],
+    components: {PosKeyboardFull},
     props: {
       value: Boolean,
     },

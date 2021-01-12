@@ -22,6 +22,7 @@
 
 <script>
   import {Touch} from 'pos-vue-framework';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
   import _ from 'lodash'
 
   export default {
@@ -29,6 +30,7 @@
     directives: {
       Touch
     },
+    components: {PosKeyboardFull},
     props: {
       layout: null,
       orderLayout: null

@@ -31,6 +31,7 @@
 </template>
 
 <script>
+  import PosLoginKeyboard from '../pos-shared-components/POSInput/PosLoginKeyboard';
   import PosLoginTextfield from '../Login/PosLoginTextfield';
   import ConnectionStatusBtn from '../Login/ConnectionStatusBtn';
   import PosLoginBtnLanguage from '../Login/PosLoginBtnLanguage';
@@ -42,7 +43,7 @@
   export default {
     name: "Login",
     injectService: ['PosStore:(loginPassword, incorrectPasscode, login, resetIncorrectPasscodeFlag, locale, changeLocale, version)'],
-    components: { PosLoginTextfield, ConnectionStatusBtn, PosLoginBtnLanguage, VersionBtn, StoreIdBtn, SupportBtn, DialogLoginSupport},
+    components: { PosLoginKeyboard, PosLoginTextfield, ConnectionStatusBtn, PosLoginBtnLanguage, VersionBtn, StoreIdBtn, SupportBtn, DialogLoginSupport},
     data() {
       return {
         dialog: {

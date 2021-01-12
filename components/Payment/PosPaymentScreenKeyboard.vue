@@ -56,9 +56,11 @@
 
 <script>
   import { nextTick } from 'vue';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: 'PosPaymentScreenKeyboard',
+    components: {PosKeyboardFull},
     props: {
       paymentTotal: Number,
       currentOrder: null,
@@ -174,7 +176,7 @@
 
 <style scoped lang="scss">
   .pos-payment-keyboard {
-    background-image: url('../../assets/pos-payment-method-screen-bg.png');
+    background-image: url('../../public/pos-plugin/assets/pos-payment-method-screen-bg.png');
     background-repeat: repeat;
     padding: 8px !important;
     display: flex;

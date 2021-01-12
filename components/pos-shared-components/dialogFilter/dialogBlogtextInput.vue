@@ -23,9 +23,11 @@
 
 <script>
   import { nextTick } from 'vue';
+  import PosKeyboardFull from '../PosKeyboardFull';
 
   export default {
     name: 'dialogBlogtextInput',
+    components: {PosKeyboardFull},
     props: {
       label: null,
       modelValue: null,

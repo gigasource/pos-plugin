@@ -2,9 +2,9 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     { loader: { type: 'route' }, loadPath: './PosLogin.vue', filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos-login2' },
-    { loader: { type: 'route' }, loadPath: './EditTablePlan2.vue', filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos-edit-table-plan-2' },
-    { loader: { type: 'route' }, loadPath: './Room_new.vue', filePath: 'components2/TablePlan/Room_new.vue', name: 'TablePlan', path: '/room' },
-    { loader: { type: 'route' }, loadPath: './PosDashboard.vue', filePath: 'components/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
+    // { loader: { type: 'route' }, loadPath: './EditTablePlan2.vue', filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos-edit-table-plan-2' },
+    // { loader: { type: 'route' }, loadPath: './Room_new.vue', filePath: 'components2/TablePlan/Room_new.vue', name: 'TablePlan', path: '/room' },
+    // { loader: { type: 'route' }, loadPath: './PosDashboard.vue', filePath: 'components/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     { loader: { type: 'route' }, loadPath: './FirstTimeSetUp.vue', filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
     { loader: { type: 'route' }, loadPath: './Login.vue', filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
     { loader: { type: 'route' }, loadPath: './Dashboard.vue', filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
@@ -140,12 +140,12 @@ module.exports = {
       path: 'backend/print-utils/virtual-printer.js',
       type: 'backend'
     },
-    {
-      loader: {
-        type: 'css-loader'
-      },
-      path: 'style/pos.css'
-    },
+    // {
+    //   loader: {
+    //     type: 'css-loader'
+    //   },
+    //   path: 'style/pos.css'
+    // },
     {
       loader: {
         type: 'backend-api'

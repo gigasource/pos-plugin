@@ -55,9 +55,11 @@
 
 <script>
   import { nextTick } from 'vue';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: 'dialogMultiPayment',
+    components: {PosKeyboardFull},
     props: {
       modelValue: Boolean,
       total: [Number, String],

@@ -32,11 +32,12 @@
 
 <script>
   import ScrollSelect from '../Reservation/ScrollSelect';
+  import PosKeyboardFull from './PosKeyboardFull';
   
   export default {
     name: 'DiscountInput',
     injectService: ['PosStore:storeLocale'],
-    components: {ScrollSelect},
+    components: {ScrollSelect, PosKeyboardFull},
     data() {
       return {
         percent: '',

@@ -27,8 +27,11 @@
 </template>
 
 <script>
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  
   export default {
     name: "dialogChangeStock",
+    components: {PosKeyboardFull},
     props: {
       modelValue: Boolean,
       name: String,

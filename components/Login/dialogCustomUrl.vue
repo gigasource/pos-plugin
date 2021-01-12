@@ -24,8 +24,11 @@
 </template>
 
 <script>
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  
   export default {
     name: 'dialogCustomUrl',
+    components: {PosKeyboardFull},
     props: {
       modelValue: Boolean
     },

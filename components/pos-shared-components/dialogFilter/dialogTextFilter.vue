@@ -22,9 +22,11 @@
 
 <script>
   import { nextTick } from 'vue';
+  import PosKeyboardFull from '../PosKeyboardFull';
 
   export default {
     name: 'dialogTextFilter',
+		components: {PosKeyboardFull},
     props: {
       label: null,
       modelValue: null,

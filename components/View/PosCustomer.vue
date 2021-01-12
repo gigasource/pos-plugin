@@ -87,10 +87,12 @@
 <script>
   import _ from 'lodash'
   import {v4 as uuidv4} from 'uuid'
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: "PosCustomer",
     injectService: ['OrderStore:(getCustomers, updateCustomer, deleteCustomer, createCustomer)', 'PosStore:isIOS'],
+    components: {PosKeyboardFull},
     data() {
       return {
         customers: [],

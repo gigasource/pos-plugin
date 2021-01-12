@@ -21,8 +21,11 @@
 </template>
 
 <script>
+  import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
+  
   export default {
     name: 'dialogNewTaxCategory',
+    components: {PosKeyboardFull},
     props: {
       value: null,
     },

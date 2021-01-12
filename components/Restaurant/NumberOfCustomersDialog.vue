@@ -65,9 +65,11 @@
 
 <script>
   import isNil from 'lodash/isNil';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: 'NumberOfCustomersDialog',
+    components: {PosKeyboardFull},
     props: {
       modelValue: Boolean
     },

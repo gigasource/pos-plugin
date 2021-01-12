@@ -328,10 +328,11 @@
   import {Touch} from 'pos-vue-framework';
   import {v4 as uuidv4} from 'uuid'
   import posOrderDeliveryKeyboard from './posOrderDeliveryKeyboard';
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 
   export default {
     name: "PosOrderDelivery",
-    components: {posOrderDeliveryKeyboard},
+    components: {posOrderDeliveryKeyboard, PosKeyboardFull},
     directives: {
       Touch
     },
