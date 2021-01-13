@@ -62,7 +62,7 @@
       </g-tabs>
     </div>
     <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl"
-                       @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
+                       @getServerUrl="async cb => await getServerUrl(cb)"></dialog-custom-url>
     <g-btn style="position: absolute; top: 10px; right: 10px" @click="openDialogDemo">Skip to Demo</g-btn>
     <div v-if="showKeyboard" class="keyboard-wrapper">
       <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
@@ -82,7 +82,7 @@
   export default {
     name: 'FirstTimeSetUp',
     components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl, DialogDemo},
-    injectService: ['PosStore:(toggleOverlay, isIOS, skipPairing)'],
+    injectService: ['PosStore:(toggleOverlay, isIOS, skipPairing,updateServerUrl,getServerUrl)'],
     data() {
       return {
         dialog: {
@@ -181,7 +181,10 @@
         }
       },
       updateServerUrl(url) {
-        this.$emit('updateServerUrl', url)
+        console.error('PosStore:updateServerUrl was not injected')
+      },
+      async getServerUrl(cb) {
+        console.error('PosStore:getServerUrl was not injected')
       },
       searchPlace(text) {
         if (!text || text.length < 4) {
