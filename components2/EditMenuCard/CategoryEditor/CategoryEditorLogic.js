@@ -26,6 +26,12 @@ export function useOrderLayoutLogic(props, context) {
     emitUpdateOrderLayout(result)
   }
 
+  // delete
+  const canDelete = computed(() => {
+    const cateExist = props.selectedCategoryLayout && props.selectedCategoryLayout._id
+    const cateHasItem = cateExist && _.filter(props.selectedCategoryLayout.products, pLayout => pLayout.product && pLayout.product._id).length > 0
+    return cateExist && !cateHasItem
+  })
   async function deleteCategory() {
     const result = await orderLayoutApi.deleteCategory(props.orderLayout._id, props.selectedCategoryLayout._id)
     showNotify()
@@ -62,12 +68,15 @@ export function useOrderLayoutLogic(props, context) {
   })
 
   // actions implement
+  // switch
   const canSwitch = computed(() => this.selectedCategoryLayout && this.selectedCategoryLayout._id)
   async function switchCategory() {
     const result = await orderLayoutApi.switchCategory(actionTarget.value, props.selectedCategoryLayout)
     emitUpdateOrderLayout(result)
   }
 
+
+  //
   const categoryRows = computed(() => props.orderLayout && props.orderLayout.rows)
   const categoryColumns = computed(() => props.orderLayout && props.orderLayout.columns)
 
@@ -81,7 +90,8 @@ export function useOrderLayoutLogic(props, context) {
     deleteCategory,
     setAction,
     // impl act
-    canSwitch
+    canSwitch,
+    canDelete
   }
 }
 
