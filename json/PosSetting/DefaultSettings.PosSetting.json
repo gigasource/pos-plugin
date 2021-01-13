@@ -911,5 +911,15 @@
   "call": {
     "mode": "off",
     "ipAddresses": {}
+  },
+  "keyboardConfig": {
+    "active": false,
+    "onlyShowInFirstPage": false,
+    "x": false,
+    "top": 8,
+    "left": 4,
+    "width": 3,
+    "height": 3,
+    "layout": []
   }
 }
