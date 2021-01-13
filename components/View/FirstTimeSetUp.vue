@@ -64,7 +64,6 @@
     <dialog-custom-url v-model="showCustomUrlDialog" @confirm="updateServerUrl"
                        @getServerUrl="$emit('getServerUrl', $event)"></dialog-custom-url>
     <g-btn style="position: absolute; top: 10px; right: 10px" @click="openDialogDemo">Skip to Demo</g-btn>
-<!--    <g-btn style="position: absolute; top: 10px; right: 10px" @click="$emit('skipPairing')">Skip pairing</g-btn>-->
     <div v-if="showKeyboard" class="keyboard-wrapper">
       <pos-keyboard-full type="alpha-number" @enter-pressed="enterPress"/>
     </div>
@@ -83,7 +82,7 @@
   export default {
     name: 'FirstTimeSetUp',
     components: {PosTextfieldNew, PosKeyboardFull, DialogCustomUrl, DialogDemo},
-    injectService: ['PosStore:(toggleOverlay, isIOS)'],
+    injectService: ['PosStore:(toggleOverlay, isIOS, skipPairing)'],
     data() {
       return {
         dialog: {
@@ -185,7 +184,6 @@
         this.$emit('updateServerUrl', url)
       },
       searchPlace(text) {
-        console.log('searching')
         if (!text || text.length < 4) {
           this.placesSearchResult = []
           return
@@ -254,10 +252,13 @@
           if (paired) {
             this.start()
           } else {
-            this.$emit('skipPairing')
+            this.skipPairing()
           }
           this.toggleOverlay()
         })
+      },
+      skipPairing() {
+        console.error('PosStore:skipPairing was not injected')
       }
     },
     watch: {
