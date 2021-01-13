@@ -276,7 +276,8 @@
         this.$router.push('/pos-login')
         cms.socket.emit('getWebshopName')
       },
-      skipPairing() {
+      async skipPairing() {
+        await cms.getModel('PosSetting').update( { skipPairing: true })
         this.$router.go(-1)
       },
       async getEnabledFeatures() {
