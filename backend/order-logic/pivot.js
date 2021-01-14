@@ -1,4 +1,26 @@
 const _ = require('lodash');
+const Hooks = require('schemahandler/hooks/hooks');
+const hooks = new Hooks();
+const dayjs = require('dayjs');
+
+hooks.on('mapCol', function (r) {
+  if (_.startsWith(r, '@date')) {
+    const _r = r.split(':')[1];
+    const format = r.split(':')[0].slice(4);
+    let _format = _.get(format.match(/\[(.*)\]/), 1);
+    this.ok = true;
+    this.value = {
+      label: r,
+      fn: i => {
+        const result = _.get(i, _r);
+        if (result) {
+          if (_format) return dayjs(result).format(_format);
+          return result.toISOString();
+        }
+      }
+    }
+  }
+})
 
 function reducerMap(r) {
   if (typeof r === 'string') {
@@ -20,6 +42,37 @@ function reducerMap(r) {
   return r;
 }
 
+/**
+ *
+ * @param pivot
+ * @param items
+ * @returns {*}
+ * @example
+ * {
+ *  rows: ["tax"],
+ *  columns: [
+ *    {
+ *      label: "takeAway",
+ *      fn: i => (i.takeAway ? "takeAway" : "dineIn")
+ *    }
+ *  ],
+ *  reducers: [
+ *      "@sum[2]:vSum",
+ *      {
+ *        label: "from",
+ *        fn(_from, order) {
+ *          if (_from === undefined) return order.date;
+ *          if (_from > order.date) return order.date;
+ *          return _from;
+ *        },
+ *        initValue: "undefined"
+ *      }
+ *    ]
+ * }
+ *
+ * initValue default : 0
+ *
+ */
 function renderPivotTable(pivot, items) {
   const result = {data: items};
 
@@ -31,6 +84,8 @@ function renderPivotTable(pivot, items) {
   result.reducerType = pivot.reducers[0].resultType;
 
   const mapCol = r => {
+    const {ok, value} = hooks.emit('mapCol', r);
+    if (ok) return value;
     if (typeof r === 'string') {
       return {
         label: r,
@@ -40,8 +95,8 @@ function renderPivotTable(pivot, items) {
       return r;
     }
   }
-  result.rowFields = pivot.rows.map(mapCol);
-  result.colFields = pivot.columns.map(mapCol);
+  result.rowFields = (pivot.rows || []).map(mapCol);
+  result.colFields = (pivot.columns || []).map(mapCol);
   if (pivot.filter) {
     result.filter = pivot.filter;
   }
