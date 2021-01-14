@@ -9,6 +9,7 @@ import {
   makeTakeAway
 } from "../../TablePlan/room-logic";
 
+import {ObjectID} from 'bson';
 import {
   rooms,
   selectingRoom,
@@ -23,9 +24,8 @@ import {
   addRoom,
   removeRoom,
   getTableOrderInfo,
-  newObjectName
-} from "./room-state";
-
+  newObjectName, onSelectObject, selectingObject, updateSelectingRoomName, updateRoomName
+} from './room-state';
 
 import {
   createOrder,
@@ -38,12 +38,14 @@ import { appHooks } from "../../AppSharedStates";
 const table1 = {
   name: "table 1",
   location: { x: 5, y: 10 },
-  size: { width: 10, height: 10 }
+  size: { width: 10, height: 10 },
+  _id: new ObjectID()
 };
 const table2 = {
   name: "table 2",
   location: { x: 50, y: 50 },
-  size: { width: 10, height: 10 }
+  size: { width: 10, height: 10 },
+  _id: new ObjectID()
 };
 const wall1 = {
   name: "wall 1",
@@ -54,11 +56,10 @@ const drinkTax = { taxes: [16, 32] };
 
 const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
 
-import cms from 'cms'
+import cms from "cms";
 
 const VIEW_W = 100;
 const VIEW_H = 100;
-
 
 const Room = cms.getModel("Room");
 const Order = cms.getModel("Order");
@@ -169,66 +170,90 @@ describe("test room states", function() {
   });
   it("should be able to add/remove room", async () => {
     await fetchRooms();
-    addRoom({ name: "room3" });
+    const createdRoom = await addRoom({ name: "room3" });
+    let roomsInDb = await cms.getModel('Room').find({})
+    expect(roomsInDb.length).toEqual(3)
     expect(rooms.value.length).toBe(3);
-    removeRoom({ name: "room1" });
+    await removeRoom(createdRoom );
     expect(rooms.value.length).toBe(2);
+    roomsInDb = await cms.getModel('Room').find({})
+    expect(roomsInDb.length).toEqual(2)
+    expect(createdRoom.name).toEqual('room3')
+    expect(createdRoom._id).toBeTruthy()
   });
   it("should be able to get order info for a table", async () => {
     await fetchRooms();
     await appHooks.emit("orderChange");
     const orderInf = getTableOrderInfo(table1);
-    expect(orderInf).toMatchInlineSnapshot(`
-      Object {
-        "_id": "5ff7cb9e02969b935fd13e72",
-        "cancellationItems": Array [],
-        "items": Array [
-          Object {
-            "name": "Cola",
-            "price": 1.3,
-            "quantity": 1,
-            "tax": 16,
-            "taxes": Array [
-              16,
-              32,
-            ],
-            "vSum": 1.3,
-            "vTakeAway": false,
-            "vTaxSum": Object {
-              "16": Object {
-                "gross": 1.3,
-                "net": 1.12,
-                "tax": 0.18,
-              },
-            },
-          },
-        ],
-        "name": "order 1",
-        "status": "inProgress",
-        "table": "table 1",
-        "takeAway": false,
-        "vSum": 1.3,
-        "vTaxSum": Object {
-          "16": Object {
-            "gross": 1.3,
-            "net": 1.12,
-            "tax": 0.18,
-          },
-        },
-      }
-    `);
+    expect(orderInf).toBeTruthy()
   });
-  it("should be able to decide new name for object", async() => {
-    await fetchRooms();
+  it("should be able to add new room object", async() => {
+    await fetchRooms()
     selectingRoom.value = rooms.value[0]
-    await addNewRoomObjectToSelectingRoom({name: "1"})
-    await addNewRoomObjectToSelectingRoom({name: "2"})
     await nextTick()
-    expect(newObjectName.value).toEqual("3")
-    await addNewRoomObjectToSelectingRoom({name: "5"})
-    expect(newObjectName.value).toEqual("3")
-    await addNewRoomObjectToSelectingRoom({name: "4"})
-    await addNewRoomObjectToSelectingRoom({name: "3"})
-    expect(newObjectName.value).toEqual("6")
+    let selectingRoomInDb = await cms.getModel('Room').findOne({_id: selectingRoom.value._id})
+    expect(selectingRoomInDb.roomObjects.length).toEqual(1)
+    const createdObject = await addNewRoomObjectToSelectingRoom({ name: "123", _id: new ObjectID()})
+    expect(createdObject.name).toEqual('123')
+    expect(createdObject._id).toBeTruthy()
+    selectingRoomInDb = await cms.getModel('Room').findOne({_id: selectingRoom.value._id})
+    expect(selectingRoomInDb.roomObjects.length).toEqual(2)
+  })
+
+  it("should be able to remove room object", async() => {
+    await fetchRooms()
+    selectingRoom.value = rooms.value[0]
+    await nextTick()
+    let selectingRoomInDb = await cms.getModel('Room').findOne({_id: selectingRoom.value._id})
+    expect(selectingRoomInDb.roomObjects.length).toEqual(1)
+    expect(objectsInSelectingRoom.value.length).toEqual(1)
+    await removeAnObjectFromSelectingRoom(table1)
+    selectingRoomInDb = await cms.getModel('Room').findOne({_id: selectingRoom.value._id})
+    expect(selectingRoomInDb.roomObjects.length).toEqual(0)
+    expect(objectsInSelectingRoom.value.length).toEqual(0)
+  })
+
+  it("should be able to decide new name for object", async () => {
+    await fetchRooms();
+    selectingRoom.value = rooms.value[0];
+    await addNewRoomObjectToSelectingRoom({ name: "1" });
+    await addNewRoomObjectToSelectingRoom({ name: "2" });
+    await nextTick();
+    expect(newObjectName.value).toEqual("3");
+    await addNewRoomObjectToSelectingRoom({ name: "5" });
+    expect(newObjectName.value).toEqual("3");
+    await addNewRoomObjectToSelectingRoom({ name: "4" });
+    await addNewRoomObjectToSelectingRoom({ name: "3" });
+    expect(newObjectName.value).toEqual("6");
+  });
+  it("should be able to update object data", async () => {
+    await fetchRooms()
+    selectingRoom.value = rooms.value[0]
+    onSelectObject(table1)
+    await nextTick()
+    let table1InDb = (await cms.getModel('Room').findOne({_id: selectingRoom.value._id})).roomObjects[0]
+    expect(table1InDb.location.x).toEqual(5)
+    expect(table1InDb.location.y).toEqual(10)
+    let table1Md = objectsInSelectingRoom.value[0]
+    expect(table1Md.location.x).toEqual(5)
+    expect(table1Md.location.y).toEqual(10)
+    await updateObjectInSelectingRoom(table1, { location: {x: 15, y: 20}, size: {width: 4, height: 7}})
+    table1Md = objectsInSelectingRoom.value[0]
+    expect(table1Md.location.x).toEqual(15)
+    expect(table1Md.location.y).toEqual(20)
+    table1InDb = (await cms.getModel('Room').findOne({_id: selectingRoom.value._id})).roomObjects[0]
+    expect(table1InDb.location.x).toEqual(15)
+    expect(table1InDb.location.y).toEqual(20)
+    expect(selectingObject.value.location.x).toEqual(15)
+    expect(selectingObject.value.location.y).toEqual(20)
+  })
+
+  it("should be able to change room name", async() => {
+    await fetchRooms()
+    selectingRoom.value = rooms.value[0]
+    await updateRoomName({ _id: selectingRoom.value._id, name: "new name"})
+    const newRoomInf = await cms.getModel('Room').findOne({_id: selectingRoom.value._id})
+    expect(newRoomInf.name).toEqual("new name")
+
   })
 });

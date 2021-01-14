@@ -124,25 +124,41 @@ describe("room-logic", function() {
     await nextTick();
     expect(zoom.value).toEqual(1);
 
-    viewW.value = VIEW_W;
-    viewH.value = VIEW_H;
+    [viewW.value, viewH.value] = [VIEW_W, VIEW_H];
     addRoomObject(room, table1);
     await nextTick();
-    expect(w1.value).toEqual(15);
-    expect(h1.value).toEqual(20);
-    expect(zoom.value).toEqual(5);
-    expect(room.roomObjects[0].realLocation).toMatchInlineSnapshot(`
-      Object {
-        "x": 25,
-        "y": 50,
-      }
+    expect([
+      "w1",
+      w1.value,
+      "h1",
+      h1.value,
+      "zoom",
+      zoom.value,
+      "realLocation",
+      room.roomObjects[0].realLocation,
+      "realSize",
+      room.roomObjects[0].realSize
+    ]).toMatchInlineSnapshot(`
+      Array [
+        "w1",
+        15,
+        "h1",
+        20,
+        "zoom",
+        5,
+        "realLocation",
+        Object {
+          "x": 25,
+          "y": 50,
+        },
+        "realSize",
+        Object {
+          "height": 50,
+          "width": 50,
+        },
+      ]
     `);
-    expect(room.roomObjects[0].realSize).toMatchInlineSnapshot(`
-      Object {
-        "height": 50,
-        "width": 50,
-      }
-    `);
+
     addRoomObject(room, table2);
     addRoomObject(room, wall1);
     await nextTick();

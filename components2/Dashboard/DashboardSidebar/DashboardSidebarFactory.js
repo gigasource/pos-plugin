@@ -1,36 +1,30 @@
 import Hooks from 'schemahandler/hooks/hooks'
-import {
-  withScopeId,
-  ref,
-  onMounted,
-  computed,
-  watch,
-  Fragment,
-  onUnmounted,
-  onBeforeUnmount,
-  getCurrentInstance
-} from 'vue'
-import _ from 'lodash'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { user } from '../../AppSharedStates'
 import { login } from '../../Login/LoginLogic'
-import { GAvatar, GImg, GSidebar, GSpacer, GSideBarTreeView, GBtn } from '../../../../../backoffice/pos-vue-framework';
+import { GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer } from '../../../../../backoffice/pos-vue-framework';
 import { useI18n } from 'vue-i18n'
 import { DashboardSidebarItemsFactory } from './DashboardSidebarItems'
-import { getScopeAttrs, getScopeId } from '../../../utils/helpers';
+import { getScopeAttrs } from '../../../utils/helpers';
 
 const DashboardSidebarFactory = () => {
   const hooks = new Hooks()
   const fn = () => ({
     name: 'PosDashboardSidebar',
     components: [GImg, GAvatar, GSidebar, GSpacer, GSideBarTreeView, GBtn],
-    setup() {
+    props: {
+      items: Array
+    },
+    emit: ['toggle'],
+    setup(props, { slots, emit }) {
+
       const { t: $t } = useI18n()
 
       const { refactoredDashboardSidebarItems } = DashboardSidebarItemsFactory($t)
       let timerInterval = ref(null)
       const now = ref(dayjs().format('HH:mm'))
-      onMounted(async function() {
+      onMounted(async function () {
         if (!user.value) await login('0000')
         timerInterval.value = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
         console.log(refactoredDashboardSidebarItems.value)
@@ -71,8 +65,15 @@ const DashboardSidebarFactory = () => {
         node.onClick()
       }
 
+      const footerDefaultRenderFn = () =>  <g-btn uppercase={false} large text background-color="white" text-color="#424242" width="100%" onClick={(e) => {
+        e.stopPropagation();
+        logout()
+        }}>
+        <g-icon svg>icon-logout</g-icon>
+        <span className="ml-2">{$t('sidebar.logOut')}</span>
+      </g-btn>
       const sidebarSlots = {
-        header: () => <div class={['sidebar-header']} {...getScopeAttrs() }>
+        header: () => <div class={['sidebar-header']} {...getScopeAttrs()}>
           <g-avatar size="40">
             <g-img src={imgSrc.value}></g-img>
           </g-avatar>
@@ -80,16 +81,26 @@ const DashboardSidebarFactory = () => {
           <g-spacer/>
           <span>{now.value}</span>
         </div>,
-        default: () => <g-side-bar-tree-view
-          {...getScopeAttrs()}
-          data = { mapTitle(refactoredDashboardSidebarItems.value)}
-          onNodeSelected = { onNodeSelected }
-        >
-        </g-side-bar-tree-view>
+        default: () => <>
+          { slots['above-tree-view'] ? slots['above-tree-view']() : null}
+          <g-side-bar-tree-view
+            {...getScopeAttrs()}
+            data={props.items}
+            onNodeSelected={onNodeSelected}
+            onNodeExpansionToggled={() => emit('toggle')}
+          >
+          </g-side-bar-tree-view>
+          <slot name="above-spacer"/>
+          { slots['above-spacer'] ? slots['above-spacer']() : null}
+          <g-spacer></g-spacer>
+          { slots['below-spacer'] ? slots['below-spacer']() : null}
+          { slots['footer'] ? slots['footer']() : footerDefaultRenderFn() }
+        </>
       }
-      const renderFn = () => <g-sidebar medium style="height: 100vh; z-index: 2" v-slots={sidebarSlots} {...getScopeAttrs()}>
+      return () => <g-sidebar medium style="height: 100vh; z-index: 2"
+                              v-slots={sidebarSlots}
+                              {...getScopeAttrs()}>
       </g-sidebar>
-      return renderFn
     }
   })
 

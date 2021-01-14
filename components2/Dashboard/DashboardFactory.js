@@ -1,38 +1,41 @@
 import Hooks from 'schemahandler/hooks/hooks'
 import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
 import {activeScreen} from './DashboardSharedStates';
-import { getCurrentInstance, onMounted, withScopeId } from 'vue';
+import { onMounted } from 'vue';
 import {fetchRooms} from '../View/EditTablePlan/room-state';
 import {appHooks} from '../AppSharedStates'
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
+import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
+import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
 import { objectsInSelectingRoom } from '../View/EditTablePlan/room-state';
-import Room from './../TablePlan/Room_new';
-import { getScopeId } from '../../utils/helpers';
-
+import EditTablePlanSidebar from '../View/EditTablePlan/EditTablePlanSidebar';
+import { getScopeAttrs } from '../../utils/helpers';
+import {DashboardSidebarItemsFactory} from './DashboardSidebar/DashboardSidebarItems'
 const DashboardFactory = () => {
   const hooks = new Hooks()
   const fn = () => ({
     name: 'Dashboard',
-    components: [PosDashboardSidebar, PortalTarget, Room],
+    components: [RestaurantRoom, EditableRoom, PosDashboardSidebar, PortalTarget],
     setup() {
-
-      const { type} = getCurrentInstance()
-      const scopeId = type.__scopeId
-      const attrs = {
-        ...scopeId ? { [scopeId]: '' } : {}
-      }
       onMounted(async() => {
         await fetchRooms()
         await appHooks.emit('orderChange')
-        activeScreen.value = 'active-screen'
+        activeScreen.value = 'restaurant-room'
       })
+
+      const { refactoredDashboardSidebarItems} = DashboardSidebarItemsFactory()
       const sidebarPortal = () => <portal to="sidebar">
-        <PosDashboardSidebar>
+        <PosDashboardSidebar
+          items={refactoredDashboardSidebarItems.value}
+          {...getScopeAttrs()}>
         </PosDashboardSidebar>
       </portal>
 
-      const activeScreenPortal = (attrs) => <portal to = "restaurant-room">
-        <Room roomObjects={objectsInSelectingRoom.value} {...attrs}> </Room>
+      const activeScreenPortal = () => <portal to = "restaurant-room">
+        <RestaurantRoom roomObjects={objectsInSelectingRoom.value} {...getScopeAttrs()}> </RestaurantRoom>
+      </portal>
+      const editTablePlan = () => <portal to = "edit-table-plan">
+        <EditableRoom roomObjects={objectsInSelectingRoom.value} {...getScopeAttrs()}> </EditableRoom>
       </portal>
       const sidebarTargetPortal = () => <portal-target name="sidebar"> </portal-target>
       const activeScreenTargetPortal = () => <portal-target name={activeScreen.value}> </portal-target>
@@ -40,10 +43,11 @@ const DashboardFactory = () => {
         <div class="row-flex">
         {sidebarPortal()}
         {activeScreenPortal()}
+        {editTablePlan()}
         {sidebarTargetPortal()}
         {activeScreenTargetPortal()}
        </div>
-      return () => withScopeId(getScopeId())(renderFn)()
+      return renderFn
     }
   })
   return {hooks, fn}

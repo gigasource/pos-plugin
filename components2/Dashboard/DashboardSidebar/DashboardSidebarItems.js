@@ -3,10 +3,10 @@ import _ from 'lodash';
 
 import { user } from '../../AppSharedStates'
 
-import {rooms} from '../../View/EditTablePlan/room-state'
+import { rooms, selectingRoom } from '../../View/EditTablePlan/room-state'
 import { activeScreen } from '../DashboardSharedStates';
 import { onSelectRoom} from '../../View/EditTablePlan/room-state';
-
+import { useI18n} from 'vue-i18n'
 //todo: move locale to AppSharedStates
 const locale = ref('')
 
@@ -21,8 +21,8 @@ const changeLocale = async function (newLocale) {
   //should reload login page to apply locale change
 }
 
-const DashboardSidebarItemsFactory = ($t) => {
-
+const DashboardSidebarItemsFactory = () => {
+  const { t: $t} = useI18n()
   const dashboardSidebarItems = computed(() => [
     {
       icon: 'icon-restaurant',
@@ -31,7 +31,6 @@ const DashboardSidebarItemsFactory = ($t) => {
         icon: 'radio_button_unchecked',
         iconType: 'small',
         onClick() {
-          console.log('asdfasdf')
           activeScreen.value = 'restaurant-room'
           onSelectRoom(room)
         }
@@ -87,6 +86,14 @@ const DashboardSidebarItemsFactory = ($t) => {
     {
       icon: 'icon-functions',
       title: $t('sidebar.functions')
+    },
+    {
+      icon: 'icon-functions',
+      title: 'edit table plan',
+      onClick() {
+        activeScreen.value = 'edit-table-plan'
+        // selectingRoom.value =
+      }
     }
   ])
 

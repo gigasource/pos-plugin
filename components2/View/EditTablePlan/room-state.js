@@ -1,175 +1,102 @@
-import { reactive, ref, watchEffect, watch, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import _ from 'lodash';
-import { createRoom, addRoomObject, removeRoomObject, updateRoomObject } from '../../TablePlan/room-logic';
-import { appHooks } from '../../AppSharedStates';
-
+import { createRoom} from '../../TablePlan/room-logic';
 import cms from 'cms';
 
-const rooms = ref([]);
+export const rooms = ref([]);
 
-const selectingObject = ref(null)
-
-const currentInputValue = ref("")
-
-const onSelectObject = function(item) {
-  const isSelected = false  //todo: check if this object is selected or not
-  if (!isSelected) {
-    selectingObject.value = item
-    currentInputValue.value = item.name
-  }
-}
-
-
-const fetchRooms = async function() {
+export const fetchRooms = async function () {
   let _rooms = await cms.getModel('Room').find({})
-  _rooms =  _rooms.map(r => createRoom(r).room);
+  _rooms = _.sortBy(_rooms.map(r => createRoom(r).room), r => r.order)
   rooms.value = _rooms;
 }
 
-const addRoom = function(room) {
-  rooms.value.push(room)
-  //todo: add new Room to db
+export const addRoom = async function (room) {
+  const createdRoom = await cms.getModel('Room').create(room)
+  rooms.value.push(createRoom(createdRoom).room)
+  return createdRoom
 }
 
-const removeRoom = function(room) {
-  const idx = _.findIndex(rooms.value, r => r.name === room.name)
-  if (idx !== -1) rooms.value.splice(idx, 1)
-  //todo: remove room in db
-}
-
-const selectingRoom = ref(null);
-
-const onSelectRoom = function(newSelectingRoom) {
-  console.log('select room', newSelectingRoom)
-  if (selectingRoom.value && selectingRoom.value.name !== newSelectingRoom.name) {
-    console.log('assign selectingObject')
-    selectingObject.value = null //should reset selecting object when change room
+export const removeRoom = async function (room) {
+  const idx = _.findIndex(rooms.value, r => r._id ===room._id)
+  if (idx !== -1) {
+    rooms.value.splice(idx, 1)
+    await cms.getModel('Room').remove({ _id: room._id })
   }
+}
+
+//w
+
+export const removeSelectingRoom = async function() {
+  await removeRoom(selectingRoom.value)
+  //todo: auto change selecting room
+  if (rooms.value.length > 0) {
+    selectingRoom.value = rooms.value[0]
+  }
+}
+export const selectingRoom = ref(null);
+
+watch(() => rooms.value, (newV) => {
+  if (selectingRoom.value) {
+    selectingRoom.value = _.find(rooms.value, r => r._id === selectingRoom.value._id)
+  }
+}, { deep: true})
+
+export const onSelectRoom = function (newSelectingRoom) {
   selectingRoom.value = newSelectingRoom
 }
 
-const objectsInSelectingRoom = computed(() => (selectingRoom && selectingRoom.value) ? selectingRoom.value.roomObjects : [])
+export const objectsInSelectingRoom = computed(() => (selectingRoom && selectingRoom.value) ? selectingRoom.value.roomObjects : [])
 
-const addNewRoomObjectToSelectingRoom = async function(object) {
-  if (selectingRoom.value) {
-    addRoomObject(selectingRoom.value, object)
-    //todo: add room object to db
-  }
-}
-const onChangeObjectName = async function (newName) {
-  await updateSelectingObjectInSelectingRoom({name: newName})
-}
-
-const removeAnObjectFromSelectingRoom = async function(object) {
-  if (selectingRoom.value) {
-    removeRoomObject(selectingRoom.value, object)
-    //todo: remove object in db
-  }
-}
-
-const updateObjectInSelectingRoom = async function(object, newObject) {
-  if (selectingRoom.value) {
-    updateRoomObject(selectingRoom.value, object, newObject)
-    //todo: update object in db
-  }
-}
-
-const createAndAddNewRoomObjectToSelectingRoom = async function() {
-  const newObject = {
-    location: {
-      x: 0,
-      y: 0
-    },
-    size: {
-      width: 30,
-      height: 30
-    },
-    name: newObjectName.value,
-    // bgColor: '' todo: add remain attribute: bgColor, takeAway, type, rotate
-  }
-
-  await addNewRoomObjectToSelectingRoom(newObject)
-}
-
-const removeSelectingObjectFromSelectingRoom = async function() {
-  if (selectingRoom.value) {
-    removeRoomObject(selectingRoom.value, selectingObject.value)
-    //todo: remove object in db
-  }
-}
-
-const updateSelectingObjectInSelectingRoom = async function(newObject) {
-
-  //todo: validate new object 's name
-  if (selectingRoom.value) {
-    selectingObject.value = updateRoomObject(selectingRoom.value, selectingObject.value, newObject)
-    //todo: update object in db
-  }
-}
-
-const activeOrders = ref([]);
-
-
-appHooks.on('orderChange', async function () {
-  activeOrders.value = await cms.getModel('Order').find({status: 'inProgress'});
+const roomsName = computed(() => {
+  return rooms.value.map(r => r.name)
 })
 
-const inProgressTables = computed(() => {
-  return _.compact(activeOrders.value.map(order => order.table))
+
+export const newRoomName = computed(() => {
+  let res = 1
+  while (roomsName.value.includes('' + res)) res++
+  return res
 })
 
-const isBusyTable = function(table) {
-  return inProgressTables.value ? inProgressTables.value.includes(table.name) : false
+const nextOrder = computed(() => {
+  return _.maxBy(rooms.value, r => r.order) + 1
+})
+export const addNewRoom = async function() {
+  const newName = newRoomName.value
+
+  const newRoom = {name: newName , order: nextOrder.value}
+  await addRoom(newRoom)
 }
 
-const getTableOrderInfo = function(table) {
-  const idx = _.findIndex(activeOrders.value, order => order.table === table.name)
-  return idx === -1 ? null : activeOrders.value[idx]
+export const updateRoomName = async function(room) {
+  await cms.getModel('Room').findOneAndUpdate({_id: room._id}, {$set: {name: room.name}})
 }
 
-//objects 's name
+export const updateSelectingRoomName = async function(newName) {
+  selectingRoom.value.name = newName
+  await updateRoomName(selectingRoom.value)
+}
 
-const newObjectName = computed(() => {
-  if (objectsInSelectingRoom.value) {
-    const curObjectsName = objectsInSelectingRoom.value.map(object => object.name)
-    let res = 1
-    while (curObjectsName.includes("" + res)) res++
-    return ""+res
+
+export const swapSelectingRoomOrderWithTheRoomBefore = async function() {
+  const idx = _.findIndex(rooms.value, r => r._id === selectingRoom.value._id)
+  if (idx > 0) {
+    const order = (await cms.getModel('Room').findOne({_id: rooms.value[idx - 1]._id})).order
+    const order1 = (await cms.getModel('Room').findOne({_id: rooms.value[idx]._id})).order
+    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx - 1]._id}, {$set: {order: order1}})
+    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx]._id}, {$set: {order: order}})
+    await fetchRooms()
   }
-  return 0
-})
-
-const isSelectingObject = function(object) {
-  return selectingObject.value ? object.name === selectingObject.value.name : false
 }
 
-const isTable = (item) => {
-  return item.type === 'table'
-}
-
-export {
-  rooms,
-  selectingRoom,
-  objectsInSelectingRoom,
-  createAndAddNewRoomObjectToSelectingRoom,
-  addNewRoomObjectToSelectingRoom,
-  removeAnObjectFromSelectingRoom,
-  updateObjectInSelectingRoom,
-  inProgressTables,
-  isBusyTable,
-  isTable,
-  fetchRooms,
-  activeOrders,
-  addRoom,
-  removeRoom,
-  getTableOrderInfo,
-  selectingObject,
-  onSelectObject,
-  onSelectRoom,
-  removeSelectingObjectFromSelectingRoom,
-  updateSelectingObjectInSelectingRoom,
-  onChangeObjectName,
-  newObjectName,
-  currentInputValue,
-  isSelectingObject
+export const swapSelectingRoomOrderWithTheRoomBehind = async function() {
+  const idx = _.findIndex(rooms.value, r => r._id === selectingRoom.value._id)
+  if (idx < rooms.value.length - 1 && idx !== -1) {
+    const order = (await cms.getModel('Room').findOne({_id: rooms.value[idx]._id})).order
+    const order1 = (await cms.getModel('Room').findOne({_id: rooms.value[idx + 1]._id})).order
+    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx]._id}, {$set: {order: order1}})
+    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx + 1]._id}, {$set: {order: order}})
+    await fetchRooms()
+  }
 }

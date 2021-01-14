@@ -1,69 +1,37 @@
-import { ref, onMounted, nextTick } from 'vue'
-
-import {
-  onChangeObjectName,
-  rooms,
-  fetchRooms,
-  selectingRoom,
-  objectsInSelectingRoom,
-  createAndAddNewRoomObjectToSelectingRoom,
-  onSelectRoom,
-  removeSelectingObjectFromSelectingRoom,
-  selectingObject,
-  currentInputValue,
-} from './room-state';
 import Hooks from 'schemahandler/hooks/hooks'
-import Room from './../../TablePlan/Room_new'
-import { appHooks } from '../../AppSharedStates'
+import EditableRoom from '../../TablePlan/EditableRoom/EditableRoom';
+import EditTablePlanSidebar from './EditTablePlanSidebar';
+import { onBeforeMount } from 'vue';
+import { fetchRooms, objectsInSelectingRoom, selectingRoom } from './room-state';
+import { getScopeAttrs } from '../../../utils/helpers';
+import { isSelectingARoom, isSelectingARoomObject, selectingObject } from './EditTablePlanLogics';
+import dialogTextFilter from '../../../components/pos-shared-components/dialogFilter/dialogTextFilter';
+import GSnackbar from '../../../../../backoffice/pos-vue-framework/src/components/GSnackbar/GSnackbar';
+import { onUpdateSelectingRoomName } from './EditTablePlanLogics'
 
 const EditablePlanFactory = () => {
   const hooks = new Hooks()
   const fn = () => ({
     name: 'EditTablePlan',
-    components: [Room],
+    components: [EditTablePlanSidebar, EditableRoom, dialogTextFilter, GSnackbar],
     setup() {
-      appHooks.emit('orderChange')
-      const renderRoomList = () => <div id="room-list">
-        {rooms.value.map(room =>
-          <div onClick={() => onSelectRoom(room)} id={room.name}>
-            {room.name}
-          </div>
-        )}
-      </div>
+      const sidebarRenderFn = () => <EditTablePlanSidebar {...getScopeAttrs()} >
+      </EditTablePlanSidebar>
+      const roomRenderFn = () =>
+        <EditableRoom roomObjects={objectsInSelectingRoom.value} {...getScopeAttrs()}> </EditableRoom>
 
-      const renderOperations = () => {
-        return <div>
-          {renderRoomList()}
-          <div>
-            <input id="input" type="text" v-model={currentInputValue.value}/>
-            <div id="add-object" onClick={createAndAddNewRoomObjectToSelectingRoom}> add Object</div>
-            <div id="rem-object" onClick={() => removeSelectingObjectFromSelectingRoom()}> remove Object</div>
-            <div id="save" onClick={() => onChangeObjectName(currentInputValue.value)}> save</div>
-            {/*  /!*<div id="#copyObject"> copy Object  </div>*!/*/}
-          </div>
-        </div>;
-      }
-
-
-      const renderFn = () => <div>
-        {renderOperations()}
-
-        <Room roomObjects={objectsInSelectingRoom.value}> </Room>
-      </div>
-
-      onMounted(async () => {
-        let cur = 0
+      // const dialogsRenderFn = () => <>
+      // {isSelectingARoom.value  ? <dialog-text-filter label="Room name" default-value={selectingRoom.value.name} v-model={dialog.value.showRoomNameKbd} onSubmit={onUpdateSelectingRoomName}/> : null}
+      //   {isSelectingARoomObject.value  ? <dialog-text-filter label="Table name" default-value={selectingObject.value.name} v-model={dialog.value.showTableNameKbd} onSubmit={onUpdateTableName}/> : null}
+      // <g-snackbar v-model={showSnackBar.value} time-out="3000">{ tableNameExistedErrorMsg }</g-snackbar>
+    // </>
+      onBeforeMount(async () => {
         await fetchRooms()
-        selectingRoom.value = rooms.value[0]
-        //todo: should update selecting object to null
-        selectingObject.value = null
-        // setInterval(() => {
-        //   selectingRoom.value = rooms.value[cur++]
-        //   cur %= rooms.value.length
-        // }, 5000)
       })
-
-      return () => renderFn()
+      return () => <div class="row-flex">
+        {sidebarRenderFn()}
+        {roomRenderFn()}
+      </div>
     }
   })
   return {
