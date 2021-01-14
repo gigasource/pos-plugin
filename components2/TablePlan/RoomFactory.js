@@ -1,6 +1,6 @@
 import { createRoom, updateRoomObjects } from './room-logic'
 import Hooks from 'schemahandler/hooks/hooks'
-import { ref, onMounted, watch, Fragment, onBeforeUnmount } from 'vue'
+import { ref, onMounted, watch, Fragment, onBeforeUnmount, withModifiers } from 'vue'
 import { isTable } from './room-logic'
 import { getScopeAttrs } from '../../utils/helpers';
 import RoomStyleFactory from './RoomStyles';
@@ -38,26 +38,14 @@ const RoomFactory = () => {
           </> : null}
         </div>
       }
-      const roomContainerEventHandlers = {
-        onMousemove(e) {
-          e.preventDefault()
-          e.stopPropagation()
-        },
-        onMouseup(e) {
-          e.preventDefault()
-          e.stopPropagation()
-        },
-        onTouchmove(e) {
-          e.preventDefault()
-          e.stopPropagation()
-        },
-        onTouchend(e) {
-          e.preventDefault()
-          e.stopPropagation()
-        }
-      }
+      const preventStop = withModifiers(()=>{}, ['prevent', 'stop'])
       const roomRenderFn = () =>
-        <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle(zoom)} {...roomContainerEventHandlers} {...getScopeAttrs()}>
+        <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle(zoom)}
+             onMousemove={preventStop}
+             onMouseup={preventStop}
+             onTouchmove={preventStop}
+             onTouchend={preventStop}
+             {...getScopeAttrs()}>
           {room.roomObjects.map((obj) => {
             return slots['room-object'] ? slots['room-object'](obj) : null
           })

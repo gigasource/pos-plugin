@@ -12,7 +12,8 @@ const RoomStyleFactory = () => {
       border: '1px solid transparent',
       transition: 'none',
       fontWeight: '700',
-      background: object.bgColor
+      background: object.bgColor,
+      // zIndex: -1
     }
     if (isTable(object)) {
       res.borderRadius = `5px`;

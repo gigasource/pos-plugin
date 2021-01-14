@@ -3,7 +3,7 @@
 import RoomFactory from '../RoomFactory'
 
 const { hooks, fn } = RoomFactory()
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
 import { isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
@@ -20,13 +20,13 @@ hooks.on('provideZoom', ({ zoom }) => {
   watch(() => zoom.value, () => {
     globalZoom.value = zoom.value
   })
-
 })
 const Component = fn()
 const _roomObjectContainerStyle = (obj) => {
   const style = roomObjectContainerStyle(obj)
   if (isSelectingObject(obj)) {
     style.border = '1px solid #1271FF'
+    style.zIndex = 50
   }
   return style
 }
@@ -40,7 +40,7 @@ export default {
       {isTable(obj) ? obj.name : ''}
     </div>
 
-    const style = {
+    const style = computed(() => ({
       width: `${globalZoom.value * 20}px`,
       height: `${globalZoom.value * 20}px`,
       'border-radius': '100%',
@@ -52,12 +52,19 @@ export default {
       display: 'flex',
       'justify-content': 'center',
       'align-items': 'center',
-    }
+      zIndex: 100
+    }))
+
+    const arrowStyle = computed(() => ({
+      width: `${13 * globalZoom.value}px`,
+      height: `${13 * globalZoom.value}px`,
+    }))
+
     const resizeButtonRenderFn = obj => isSelectingObject(obj) ?
-        <div className="room__object__resizer" style={style} {...getScopeAttrs()}
+        <div style={style.value} {...getScopeAttrs()}
              {...e(obj)}
         >
-          <img alt style={`width: ${13 * globalZoom.value}px; height: ${13 * globalZoom.value}px`} src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
+          <img alt style={arrowStyle.value} src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
         </div>
         : null
     return () => <Component v-slots={

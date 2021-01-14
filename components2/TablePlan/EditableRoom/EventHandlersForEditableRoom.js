@@ -85,26 +85,7 @@ const EditableRoomEventHandlersFactory = () => {
       onMouseDown(e, obj, 'resize')
     }
   })
-
-  const roomContainerEventHandlers = {
-    onMousemove(e) {
-      e.preventDefault()
-      e.stopPropagation()
-    },
-    onMouseup(e) {
-      e.preventDefault()
-      e.stopPropagation()
-    },
-    onTouchmove(e) {
-      e.preventDefault()
-      e.stopPropagation()
-    },
-    onTouchend(e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }
-  return { touchHandlers, resizeRoomObjectEvenHandler, roomContainerEventHandlers }
+  return { touchHandlers, resizeRoomObjectEvenHandler }
 }
 
 export default EditableRoomEventHandlersFactory
