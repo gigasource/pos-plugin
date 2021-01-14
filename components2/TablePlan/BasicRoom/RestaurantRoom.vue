@@ -52,11 +52,14 @@ export default {
         </> : null}
       </div>
     }
+
+    const classes = (obj) => isTable(obj) ? ['waves-effect', 'waves-red'] : []
     return () => <Component v-slots={
       {
         'room-object': (obj) => {
           return <div key={obj._id} id={obj.name}
-                      style={_roomObjectContainerStyle(obj)}>
+                      style={_roomObjectContainerStyle(obj)}
+                      class={classes(obj)}>
             {objectRenderFn(obj)}
           </div>
         }
