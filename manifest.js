@@ -26,6 +26,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery', path: '/pos-order-delivery' },
     { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     { loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
+    { loader: { type: 'route' }, filePath: 'components/View/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
