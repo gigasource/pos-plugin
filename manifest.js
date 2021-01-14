@@ -25,6 +25,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery', path: '/pos-order-delivery' },
     { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
+    { loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'
