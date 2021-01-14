@@ -10,7 +10,7 @@ import { globalZoom} from '../../View/EditTablePlan/EditTablePlanLogics';
 import _ from 'lodash';
 import { ref } from 'vue'
 import { updateObjectLocation, updateObjectSize } from '../room-logic';
-import { selectingRoom } from '../../View/EditTablePlan/room-state';
+import { selectingRoom } from '../room-state';
 
 const EditableRoomEventHandlersFactory = () => {
   const action = ref('')

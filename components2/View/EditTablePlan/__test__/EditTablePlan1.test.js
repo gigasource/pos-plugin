@@ -1,9 +1,9 @@
-import { mount } from "@vue/test-utils";
-import EditTablePlan from "./EditTablePlanFactory";
-import { nextTick } from "vue";
-import delay from "delay";
-import prepareDb from "./test-setup-db";
-import {selectingObject, currentInputValue} from './room-state'
+import { mount } from '@vue/test-utils';
+import EditTablePlan from '../EditTablePlanFactory';
+import { nextTick } from 'vue';
+import delay from 'delay';
+import prepareDb from '../../../TablePlan/__test__/test-setup-db';
+import { currentInputValue } from '../../../TablePlan/room-state'
 
 beforeAll(async () => {
   await prepareDb();

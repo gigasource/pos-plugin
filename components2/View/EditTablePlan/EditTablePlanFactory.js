@@ -2,12 +2,10 @@ import Hooks from 'schemahandler/hooks/hooks'
 import EditableRoom from '../../TablePlan/EditableRoom/EditableRoom';
 import EditTablePlanSidebar from './EditTablePlanSidebar';
 import { onBeforeMount } from 'vue';
-import { fetchRooms, objectsInSelectingRoom, selectingRoom } from './room-state';
+import { fetchRooms, objectsInSelectingRoom } from '../../TablePlan/room-state';
 import { getScopeAttrs } from '../../../utils/helpers';
-import { isSelectingARoom, isSelectingARoomObject, selectingObject } from './EditTablePlanLogics';
 import dialogTextFilter from '../../../components/pos-shared-components/dialogFilter/dialogTextFilter';
 import GSnackbar from '../../../../../backoffice/pos-vue-framework/src/components/GSnackbar/GSnackbar';
-import { onUpdateSelectingRoomName } from './EditTablePlanLogics'
 
 const EditablePlanFactory = () => {
   const hooks = new Hooks()

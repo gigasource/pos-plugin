@@ -1,9 +1,9 @@
-import { createRoom, updateRoomObjects } from './room-logic'
+import { createRoom, isTable, updateRoomObjects } from './room-logic'
 import Hooks from 'schemahandler/hooks/hooks'
-import { ref, onMounted, watch, Fragment, onBeforeUnmount, withModifiers } from 'vue'
-import { isTable } from './room-logic'
+import { Fragment, onMounted, ref, watch, withModifiers } from 'vue'
 import { getScopeAttrs } from '../../utils/helpers';
 import RoomStyleFactory from './RoomStyles';
+
 const RoomFactory = () => {
   const hooks = new Hooks()
   const fn = () => ({
@@ -17,7 +17,7 @@ const RoomFactory = () => {
     setup(props, { slots }) {
       const { room, viewW, viewH, zoom} = createRoom({ roomObjects: props.roomObjects })
       hooks.emit('provideZoom', { zoom })
-      const { roomObjectContainerStyle, roomObjectStyle, roomContainerStyle } = RoomStyleFactory()
+      const { roomContainerStyle } = RoomStyleFactory()
       watch(() => props.roomObjects, (newV, oldV) => {
         updateRoomObjects(room, newV)
       }, { deep: true })
@@ -27,19 +27,8 @@ const RoomFactory = () => {
         viewH.value = roomContainer.value.offsetHeight * 0.9
       })
 
-      const renderOrderInfo = (obj) => null
-      const roomObjectRenderFn = (obj) => {
-        return <div style={roomObjectStyle(obj)}>
-          {isTable(obj) ? <>
-            <div>
-              <div> {obj.name} </div>
-            </div>
-            {renderOrderInfo(obj)}
-          </> : null}
-        </div>
-      }
       const preventStop = withModifiers(()=>{}, ['prevent', 'stop'])
-      const roomRenderFn = () =>
+      return () =>
         <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle(zoom)}
              onMousemove={preventStop}
              onMouseup={preventStop}
@@ -51,7 +40,6 @@ const RoomFactory = () => {
           })
           }
         </div>
-      return roomRenderFn
     }
   })
   return { hooks, fn }

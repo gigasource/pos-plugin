@@ -2,12 +2,12 @@ import Hooks from 'schemahandler/hooks/hooks'
 import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
 import {activeScreen} from './DashboardSharedStates';
 import { onMounted } from 'vue';
-import {fetchRooms} from '../View/EditTablePlan/room-state';
+import {fetchRooms} from '../TablePlan/room-state';
 import {appHooks} from '../AppSharedStates'
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
 import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
-import { objectsInSelectingRoom } from '../View/EditTablePlan/room-state';
+import { objectsInSelectingRoom } from '../TablePlan/room-state';
 import EditTablePlanSidebar from '../View/EditTablePlan/EditTablePlanSidebar';
 import { getScopeAttrs } from '../../utils/helpers';
 import {DashboardSidebarItemsFactory} from './DashboardSidebar/DashboardSidebarItems'

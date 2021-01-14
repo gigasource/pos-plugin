@@ -1,30 +1,33 @@
 <script>
-import {
-  GBtn,
-  GSpacer, GSwitch,
-  GTextFieldBs
-} from '../../../../../backoffice/pos-vue-framework';
+import { GBtn, GSwitch, GTextFieldBs } from '../../../../../backoffice/pos-vue-framework';
 import PosDashboardSidebar2 from '../../Dashboard/DashboardSidebar/PosDashboardSidebar2';
 import { useI18n } from 'vue-i18n'
 import {
-  isSelectingRoomOnly,
-  updateTableName,
-  onAddNewRoom,
-  selectingObject,
-  tableColors,
-  wallColors,
-  updateSelectingObjectInSelectingRoom,
-  onRemoveRoom,
-  showAddNewRoomBtn, isSelectingARoomObject,
-  sidebarData,
-  toggle,
-  onUpdateSelectingRoomName, onMoveRoomDown, onMoveRoomUp,
   dialog,
   isSelectingARoom,
-  onAddNewTable, onAddNewWall, onDuplicateRoomObj, onRemoveRoomObj, onBack
+  isSelectingARoomObject,
+  isSelectingRoomOnly,
+  onAddNewRoom,
+  onAddNewTable,
+  onAddNewWall,
+  onBack,
+  onDuplicateRoomObj,
+  onMoveRoomDown,
+  onMoveRoomUp,
+  onRemoveRoom,
+  onRemoveRoomObj,
+  onUpdateSelectingRoomName,
+  selectingObject,
+  showAddNewRoomBtn,
+  sidebarData,
+  tableColors,
+  toggle,
+  updateSelectingObjectInSelectingRoom,
+  updateTableName,
+  wallColors
 } from './EditTablePlanLogics';
-import { selectingRoom } from './room-state';
-import { isTable, isWall } from '../../TablePlan/room-logic';
+import { selectingRoom } from '../../TablePlan/room-state';
+import { isTable } from '../../TablePlan/room-logic';
 import { getScopeAttrs } from '../../../utils/helpers';
 
 export default {

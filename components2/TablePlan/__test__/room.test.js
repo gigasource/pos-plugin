@@ -1,9 +1,9 @@
 import { nextTick } from "vue";
 
-import RoomFactory from "./RoomFactory";
+import RoomFactory from "../RoomFactory";
 import { mount } from "@vue/test-utils";
-import { removeRoomObject } from "./room-logic";
-import { onSelectObject, selectingObject} from './../View/EditTablePlan/room-state'
+import { removeRoomObject } from "../room-logic";
+import { onSelectObject, selectingObject} from '../room-state'
 describe("test room ui 1", () => {
   it("should render room", async () => {
     const { fn, hooks } = RoomFactory();

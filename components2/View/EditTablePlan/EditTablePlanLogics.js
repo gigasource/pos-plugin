@@ -4,7 +4,7 @@ import {
   objectsInSelectingRoom, onSelectRoom, removeSelectingRoom,
   selectingRoom,
   rooms, updateSelectingRoomName, swapSelectingRoomOrderWithTheRoomBefore, swapSelectingRoomOrderWithTheRoomBehind
-} from './room-state';
+} from '../../TablePlan/room-state';
 import _ from 'lodash';
 import cms from 'cms';
 import { ObjectID} from 'bson';

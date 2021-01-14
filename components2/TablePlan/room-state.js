@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue';
 import _ from 'lodash';
-import { createRoom} from '../../TablePlan/room-logic';
+import { createRoom} from './room-logic';
 import cms from 'cms';
 
 export const rooms = ref([]);
@@ -62,6 +62,7 @@ export const newRoomName = computed(() => {
 const nextOrder = computed(() => {
   return _.maxBy(rooms.value, r => r.order) + 1
 })
+
 export const addNewRoom = async function() {
   const newName = newRoomName.value
 

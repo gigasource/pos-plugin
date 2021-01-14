@@ -3,9 +3,9 @@ import _ from 'lodash';
 
 import { user } from '../../AppSharedStates'
 
-import { rooms, selectingRoom } from '../../View/EditTablePlan/room-state'
+import { rooms, selectingRoom } from '../../TablePlan/room-state'
 import { activeScreen } from '../DashboardSharedStates';
-import { onSelectRoom} from '../../View/EditTablePlan/room-state';
+import { onSelectRoom} from '../../TablePlan/room-state';
 import { useI18n} from 'vue-i18n'
 //todo: move locale to AppSharedStates
 const locale = ref('')

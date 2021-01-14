@@ -8,13 +8,13 @@ import {
   makeTakeAway,
   updateRoomObjects,
   updateRoomObject
-} from "./room-logic";
+} from "../room-logic";
 import _ from "lodash";
 import {
   createOrder,
   addItem as addOrderItem,
   makePaid
-} from "../../backend/order-logic/pos-logic";
+} from "../../../backend/order-logic/pos-logic";
 
 const orm = require("schemahandler");
 

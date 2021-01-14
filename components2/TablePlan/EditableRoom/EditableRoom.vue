@@ -1,16 +1,15 @@
 <script>
 
 import RoomFactory from '../RoomFactory'
-
-const { hooks, fn } = RoomFactory()
-import { ref, watch, computed } from 'vue'
+import { computed, watch } from 'vue'
 import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
-import { isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
+import { globalZoom, isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
 import RoomStyleFactory from '../RoomStyles';
 import Touch from '../../../../../../pos-vue-framework/src/directives/touch/touch'
 import { isTable } from '../room-logic';
-import {globalZoom} from '../../View/EditTablePlan/EditTablePlanLogics';
+
+const { hooks, fn } = RoomFactory()
 
 const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 

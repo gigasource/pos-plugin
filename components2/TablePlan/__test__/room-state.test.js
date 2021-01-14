@@ -7,7 +7,7 @@ import {
   removeRoomObject,
   moveOrderToNewTable,
   makeTakeAway
-} from "../../TablePlan/room-logic";
+} from "../room-logic";
 
 import {ObjectID} from 'bson';
 import {
@@ -25,7 +25,7 @@ import {
   removeRoom,
   getTableOrderInfo,
   newObjectName, onSelectObject, selectingObject, updateSelectingRoomName, updateRoomName
-} from './room-state';
+} from '../room-state';
 
 import {
   createOrder,

@@ -1,16 +1,15 @@
 <script>
 
 import RoomFactory from '../RoomFactory'
-
-const { hooks, fn } = RoomFactory()
-
 import { getTableOrderInfo, isBusyTable } from './RestaurantRoomLogics'
 import { isTable } from '../room-logic'
 import { getDiffTime } from '../../../utils/commons'
 import { ref, watch } from 'vue';
 import { globalZoom } from '../../View/EditTablePlan/EditTablePlanLogics';
 import RoomStyleFactory from '../RoomStyles'
-import { getScopeAttrs } from '../../../utils/helpers';
+
+const { hooks, fn } = RoomFactory()
+
 const curTime = ref(new Date())
 
 const timerInterval = setInterval(() => {
