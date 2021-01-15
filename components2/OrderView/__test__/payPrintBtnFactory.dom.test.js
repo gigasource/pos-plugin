@@ -51,11 +51,6 @@ const delay = require("delay");
 
 //</editor-fold>
 
-//<editor-fold desc="component">
-
-beforeAll(() => (config.renderStubDefaultSlot = true));
-//</editor-fold>
-
 describe("PrintButton test", function () {
   beforeAll(() => {
     component = {
