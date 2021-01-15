@@ -3,15 +3,11 @@ import {useI18n} from "vue-i18n";
 import {nextTick, reactive, ref, watchEffect} from "vue";
 import {getCurrentOrder, itemQuantityChangeCheck} from "./pos-logic-be";
 import {addItem, addModifier, changeCourse, removeItem, removeModifier, updateItem} from "./pos-logic";
-import {getItemSubtext} from "./pos-ui-shared";
+import {getItemSubtext, isItemDiscounted} from "./pos-ui-shared";
 
 export function orderRightSideItemsTable() {
   let {$t, locale} = useI18n();
   const order = getCurrentOrder();
-
-  function isItemDiscounted(item) {
-    return item.originalPrice !== item.price
-  }
 
   const dialogConfigOrderItem = reactive({
     value: false,

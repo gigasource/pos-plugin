@@ -1,27 +1,27 @@
 <template>
   <div class="order">
     <div class="order-main">
-      <pos-order-layout style="flex: 1"
-                        v-model:selectedCategoryLayout="selectedCategoryLayout"
-                        v-model:selectedProductLayout="selectedProductLayout"
-                        v-model:productDblClicked="productDblClicked"
-                        v-model:orderLayout="orderLayout"
-                        v-model:keyboardConfig="keyboardConfig"
-                        v-model:fontSize="fontSize"
-                        v-model:category="category"
-                        v-model:minimumTextRow="minimumTextRow"
-                        v-model:collapseBlankColumn="collapseBlankColumn"
-                        v-model:hideTextRow="hideTextRow"
-                        v-model:hideBlankColumn="hideBlankColumn"
-                        v-model:collapseText="collapseText"
-                        v-model:actionMode="actionMode"
-                        v-model:showOverlay="showOverlay"
-                        v-model:scrollableLayout="scrollableLayout"
-                        :is-mobile="isMobile"
-                        :store-locale="storeLocale"
-                        @addProductToOrder="addProductToOrder"
-                        @addModifierToProduct="addModifierToProduct"
-                        @getKeyboardSetting="getKeyboardSetting"
+      <pos-order-layout2 style="flex: 1"
+                         v-model:selectedCategoryLayout="selectedCategoryLayout"
+                         v-model:selectedProductLayout="selectedProductLayout"
+                         v-model:productDblClicked="productDblClicked"
+                         v-model:orderLayout="orderLayout"
+                         v-model:keyboardConfig="keyboardConfig"
+                         v-model:fontSize="fontSize"
+                         v-model:category="category"
+                         v-model:minimumTextRow="minimumTextRow"
+                         v-model:collapseBlankColumn="collapseBlankColumn"
+                         v-model:hideTextRow="hideTextRow"
+                         v-model:hideBlankColumn="hideBlankColumn"
+                         v-model:collapseText="collapseText"
+                         v-model:actionMode="actionMode"
+                         v-model:showOverlay="showOverlay"
+                         v-model:scrollableLayout="scrollableLayout"
+                         :is-mobile="isMobile"
+                         :store-locale="storeLocale"
+                         @addProductToOrder="addProductToOrder"
+                         @addModifierToProduct="addModifierToProduct"
+                         @getKeyboardSetting="getKeyboardSetting"
       />
       <pos-order :style="!isMobile && {flex: '0 0 25%'}"
                  v-model:fontSize="fontSize"
@@ -107,6 +107,7 @@
 import PosOrder2 from "./PosOrder2";
 import PosOrderLayout2 from "./PosOrderLayout2";
 import PosQuickOrderToolbar2 from "./Helper/PosQuickOrderToolbar2";
+import {isMobile} from "../AppSharedStates";
 
 export default {
   name: 'Order2',
@@ -116,7 +117,54 @@ export default {
     PosQuickOrderToolbar2,
   },
   setup() {
+    //todo: put style in components
 
+    const render = () => (<>
+      <div class="order">
+        <div class="order-main">
+          <pos-order-layout2 style="flex: 1"/>
+          <pos-order style={!isMobile.value && {flex: '0 0 25%'}}/>
+        </div>
+        <pos-quick-order-toolbar
+            v-if="!isMobile"
+            currentOrder="currentOrder"
+            actionList={actionList}
+            updateCurrentOrder={updateCurrentOrder}
+            resetOrderData={resetOrderData}
+            quickCash={quickCashRestaurant}
+            saveTableOrder={saveTableOrder}
+            openDialog={openDialog}
+        />
+      </div>
+      <pos-order-split-order
+          v-model={dialog.split}
+          is-mobile={isMobile}
+          user={user}
+          store-locale={storeLocale}
+          current-order={currentOrder}
+          updateCurrentOrder={updateCurrentOrder}
+          createOrderCommit={createOrderCommit}
+          saveSplitOrder={saveSplitOrder}
+          resetOrderData={resetOrderData}
+          printOrderReport={printOrderReport}
+          updatePrintedOrder={updatePrintedOrder}
+      />
+      <pos-order-receipt
+          v-model={dialog.receipt}
+      />
+      <pos-order-move-items
+          v-model={dialog.move}
+          user={user}
+          current-order={currentOrder}
+          active-orders={activeOrders}
+          moveItems={moveItems}
+      />
+      <pos-order-voucher-dialog
+          v-model={dialog.voucher}
+          addVoucher={addVoucher}
+          redeemVoucher={redeemVoucher}
+      />
+    </>)
   },
   data() {
     return {
@@ -162,30 +210,51 @@ export default {
     }
   },
   methods: {
-    addProductToOrder() {},
-    addModifierToProduct() {},
-    getKeyboardSetting() {},
-    addItemQuantity() {},
-    removeItemQuantity() {},
-    changePrice() {},
-    updateOrderTable() {},
-    updateOrderItems() {},
-    removeProductModifier() {},
-    updateOrderItem() {},
-    saveTableOrder() {},
-    resetOrderData() {},
-    updateCurrentOrder() {},
-    quickCashRestaurant() {},
+    addProductToOrder() {
+    },
+    addModifierToProduct() {
+    },
+    getKeyboardSetting() {
+    },
+    addItemQuantity() {
+    },
+    removeItemQuantity() {
+    },
+    changePrice() {
+    },
+    updateOrderTable() {
+    },
+    updateOrderItems() {
+    },
+    removeProductModifier() {
+    },
+    updateOrderItem() {
+    },
+    saveTableOrder() {
+    },
+    resetOrderData() {
+    },
+    updateCurrentOrder() {
+    },
+    quickCashRestaurant() {
+    },
     openDialog(name) {
       this.dialog[name] = true
     },
-    createOrderCommit() {},
-    saveSplitOrder() {},
-    printOrderReport() {},
-    updatePrintedOrder() {},
-    moveItems() {},
-    addVoucher() {},
-    redeemVoucher() {}
+    createOrderCommit() {
+    },
+    saveSplitOrder() {
+    },
+    printOrderReport() {
+    },
+    updatePrintedOrder() {
+    },
+    moveItems() {
+    },
+    addVoucher() {
+    },
+    redeemVoucher() {
+    }
   }
 }
 </script>

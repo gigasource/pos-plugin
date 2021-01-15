@@ -1,4 +1,4 @@
-import {reactive, ref, watchEffect} from 'vue';
+import {computed, reactive, ref, watchEffect} from 'vue';
 import {
   createEmptyCategoryLayout,
   createEmptyLayout,
@@ -102,4 +102,64 @@ export function getItemSubtext({course, takeAway, separate}) {
   if (separate) return
   if (takeAway) return 'Take-away'
   if (course && course > 1) return `Course: ${course}`
+}
+
+export function isItemDiscounted(item) {
+  return item.originalPrice !== item.price
+}
+
+export function itemsWithQtyFactory() {
+  const remainingItems = ref([]);
+  const itemsWithQty = computed(() => {
+    if (remainingItems) return remainingItems.filter(i => i.quantity > 0)
+    return [];
+  })
+  const itemsToMove = ref([]);
+
+  function addToMoveItems(item) {
+    if (item.quantity > 1) {
+      const existingItem = itemsToMove.value.find(i => i._id === item._id)
+      if (existingItem) {
+        existingItem.quantity++
+      } else {
+        itemsToMove.value.push({...item, quantity: 1})
+      }
+      item.quantity--
+      return
+    }
+    const existingItem = itemsToMove.value.find(i => i._id === item._id)
+    if (existingItem) {
+      existingItem.quantity++
+    } else {
+      itemsToMove.value.push({...item, quantity: 1})
+    }
+    remainingItems.value.splice(remainingItems.value.indexOf(item), 1)
+  }
+
+  function returnItem(item) {
+    if (item.quantity > 1) {
+      const existingItem = remainingItems.value.find(i => i._id === item._id)
+      if (existingItem) {
+        existingItem.quantity++
+      } else {
+        remainingItems.value.push({...item, quantity: 1})
+      }
+      item.quantity--
+      return
+    }
+    const existingItem = remainingItems.value.find(i => i._id === item._id)
+    if (existingItem) {
+      existingItem.quantity++
+    } else {
+      remainingItems.value.push({...item, quantity: 1})
+    }
+    itemsToMove.value.splice(itemsToMove.value.indexOf(item), 1)
+  }
+
+  return {
+    remainingItems,
+    itemsWithQty,
+    addToMoveItems,
+    returnItem
+  }
 }

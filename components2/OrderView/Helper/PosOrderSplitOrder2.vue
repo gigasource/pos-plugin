@@ -6,8 +6,9 @@ import {computed} from "vue";
 import {$filters, avatar, isMobile, username} from "../../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {getCurrentOrder} from "../pos-logic-be";
-import {getItemSubtext} from "../pos-ui-shared";
+import {getItemSubtext, isItemDiscounted, itemsWithQtyFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
+import {internalValueFactory} from "../../utils";
 
 export default {
   name: 'PosOrderSplitOrder2',
@@ -19,11 +20,8 @@ export default {
   setup(props, {emit}) {
     const order = getCurrentOrder();
     const {i18n, locale} = useI18n();
-    const internalValue = computed({
-      get: () => props.modelValue,
-      set: (val) => emit('update:modelValue', val)
-    })
-    const remainingItems = ref([]);
+    const internalValue = internalValueFactory(props, {emit});
+    const {itemsWithQty, remainingItems, returnItem, addToMoveItems} = itemsWithQtyFactory()
     const splitOrders = ref([]);
     const currentSplitOrder = ref([]);
     const showPaymentMethodsMenu = ref(false);
@@ -31,10 +29,6 @@ export default {
     const showReceipt = ref(false);
     const splitId = ref();
     const paying = ref(false);
-    const itemsWithQty = computed(() => {
-      if (remainingItems) return remainingItems.filter(i => i.quantity > 0)
-      return [];
-    })
 
     //fixme
     function getTotal(items) {
@@ -57,50 +51,6 @@ export default {
 
     function back() {
       internalValue.value = false;
-    }
-
-    function isItemDiscounted(item) {
-      return item.originalPrice > item.price
-    }
-
-    function addToSplitOrder(item) {
-      if (item.quantity > 1) {
-        const existingItem = currentSplitOrder.value.find(i => i._id === item._id)
-        if (existingItem) {
-          existingItem.quantity++
-        } else {
-          currentSplitOrder.value.push({...item, quantity: 1})
-        }
-        item.quantity--
-        return
-      }
-      const existingItem = currentSplitOrder.value.find(i => i._id === item._id)
-      if (existingItem) {
-        existingItem.quantity++
-      } else {
-        currentSplitOrder.value.push({...item, quantity: 1})
-      }
-      remainingItems.value.splice(remainingItems.value.indexOf(item), 1)
-    }
-
-    function returnItem(item) {
-      if (item.quantity > 1) {
-        const existingItem = remainingItems.value.find(i => i._id === item._id)
-        if (existingItem) {
-          existingItem.quantity++
-        } else {
-          remainingItems.value.push({...item, quantity: 1})
-        }
-        item.quantity--
-        return
-      }
-      const existingItem = remainingItems.value.find(i => i._id === item._id)
-      if (existingItem) {
-        existingItem.quantity++
-      } else {
-        remainingItems.value.push({...item, quantity: 1})
-      }
-      currentSplitOrder.value.splice(currentSplitOrder.value.indexOf(item), 1)
     }
 
     function saveMultiPayment(payment) {

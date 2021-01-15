@@ -25,7 +25,7 @@ function calItemNet(item, price) {
   return +(calNet(unitGross * item.quantity, item.tax || 0)).toFixed(2);
 }
 
-function calItemVSum(item, price) {
+export function calItemVSum(item, price) {
   const unitGross = (price || item.price) + _.sumBy(item.modifiers, m => m.quantity * m.price);
   return +(unitGross * item.quantity).toFixed(2);
 }
@@ -381,6 +381,12 @@ export function addPayment(order, payment) {
   hooks.emit('post:order:update', order);
 }
 
+export function updateOrderWithHooks(order, cb) {
+  hooks.emit('pre:order:update', order);
+  cb();
+  hooks.emit('post:order:update', order);
+}
+
 export function clearPayment(order) {
   hooks.emit('pre:order:update', order);
   order.payment.length = 0;
@@ -463,6 +469,26 @@ export function changeCourse(order, query, add = 1) {
   } else {
     [item.takeAway, item.seperate] = [false, false];
   }
+  hooks.emit('post:order:update', order);
+}
+
+export function addVoucher(order, value) {
+  hooks.emit('pre:order:update', order);
+  addItem(order, {
+    name: 'Voucher',
+    price: +value,
+    isVoucher: true
+  })
+  hooks.emit('post:order:update', order);
+}
+
+export function redeemVoucher(order, value) {
+  hooks.emit('pre:order:update', order);
+  addItem(order, {
+    name: 'Voucher',
+    price: -value,
+    isVoucher: true
+  })
   hooks.emit('post:order:update', order);
 }
 
