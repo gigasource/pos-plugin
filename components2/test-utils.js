@@ -83,8 +83,8 @@ export let component, wrapper;
 export function setComponent(_component) {
   component = _component;
 }
-export const makeWrapper = () => {
-  wrapper = mount(component, {
+export const makeWrapper = (_component) => {
+  wrapper = mount(component || _component, {
     props: {},
     shallow: true,
     global: {
