@@ -7,7 +7,7 @@ import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated} fr
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
 import {loadKeyboardConfig} from "./order-layout-keyboard";
-import {editable, mode, orderLayout} from "./pos-ui-shared";
+import {editable, mode, orderLayout, view} from "./pos-ui-shared";
 import {payPrintMode, showIcon} from "./pos-logic-be";
 import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";

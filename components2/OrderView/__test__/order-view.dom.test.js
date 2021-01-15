@@ -55,7 +55,7 @@ const delay = require("delay");
 
 describe("PrintButton test", function() {
   beforeAll(() => {
-    makeWrapper(Order2);
+    makeWrapper(Order2, {shallow: false});
   });
 
   it("case 1 render big sidebar print", async function() {

@@ -1,4 +1,5 @@
 import "../jest.setup";
+import _ from 'lodash';
 import {config, mount} from "@vue/test-utils";
 import {hooks} from "./OrderView/pos-logic";
 import {disablePay, payBtnClickable, payPrintMode, showIcon} from "./OrderView/pos-logic-be";
@@ -83,8 +84,16 @@ export let component, wrapper;
 export function setComponent(_component) {
   component = _component;
 }
-export const makeWrapper = (_component) => {
-  wrapper = mount(component || _component, {
+
+/**
+ *
+ * @param _component
+ * @param options
+ * @returns {*}
+ * example: makeWrapper(Order2, {shallow: false});
+ */
+export const makeWrapper = (_component, options) => {
+  wrapper = mount(component || _component, _.defaults(options, {
     props: {},
     shallow: true,
     global: {
@@ -109,7 +118,7 @@ export const makeWrapper = (_component) => {
         }
       }
     }
-  });
+  }));
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));
