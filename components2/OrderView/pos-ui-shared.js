@@ -17,6 +17,10 @@ export function updateOrderLayout(newLayout) {
   orderLayout.value = newLayout
 }
 
+export function updateSelectedCategoryLayout(newCategoryLayout) {
+  selectedCategoryLayout.value = newCategoryLayout
+}
+
 watchEffect(() => {
   if (selectedCategoryLayout.value) {
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))

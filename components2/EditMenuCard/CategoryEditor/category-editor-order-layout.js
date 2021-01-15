@@ -5,7 +5,8 @@ import _ from 'lodash'
 import {
   selectedCategoryLayout,
   orderLayout,
-  updateOrderLayout
+  updateOrderLayout,
+  updateSelectedCategoryLayout
 } from '../../OrderView/pos-ui-shared'
 
 export const hasOrderLayout = computed(() => orderLayout.value)
@@ -37,7 +38,7 @@ export const canDelete = computed(() => {
 export async function deleteCategory() {
   const result = await orderLayoutApi.deleteCategory(orderLayout.value._id, selectedCategoryLayout.value._id)
   showNotify()
-  context.emit('update:selectedCategoryLayout', null)
+  updateSelectedCategoryLayout(null)
   updateOrderLayout(result)
 }
 

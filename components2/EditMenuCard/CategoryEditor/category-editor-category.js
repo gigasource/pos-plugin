@@ -5,7 +5,8 @@ import orderLayoutApi from '../orderLayoutApi';
 import {
   orderLayout,
   selectedCategoryLayout,
-  updateOrderLayout
+  updateOrderLayout,
+  updateSelectedCategoryLayout
 } from '../../OrderView/pos-ui-shared'
 
 // provide methods to modify specified category layout
@@ -20,7 +21,7 @@ export const debouncedUpdateCategory = _.debounce(change => {
 
 async function _updateCategory(change, forceCreate) {
   // assign change
-  _.assign(selectedCategoryLayout.value, change)
+  updateSelectedCategoryLayout(Object.assign(selectedCategoryLayout.value, change))
 
   // if selected product layout is not empty then update it
   // in case of update, because we already update the selectCategoryLayout so we don't need
