@@ -5,7 +5,7 @@ import { user } from '../../AppSharedStates'
 import { login } from '../../Login/LoginLogic'
 import { GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer } from '../../../../../backoffice/pos-vue-framework';
 import { useI18n } from 'vue-i18n'
-import { DashboardSidebarItemsFactory } from './DashboardSidebarItems'
+import DashboardSidebarItemsFactory from './DashboardSidebarItems'
 import { getScopeAttrs } from '../../../utils/helpers';
 
 const DashboardSidebarFactory = () => {

@@ -26,7 +26,7 @@ import {
   updateTableName,
   wallColors
 } from './EditTablePlanLogics';
-import { selectingRoom } from '../../TablePlan/room-state';
+import { selectingRoomStates } from '../../TablePlan/room-state';
 import { isTable } from '../../TablePlan/room-logic';
 import { getScopeAttrs } from '../../../utils/helpers';
 
@@ -48,7 +48,7 @@ export default {
           </g-btn>
         </div> : null
     const roomToolbarRenderFn = () => isSelectingRoomOnly.value ? <div class="card-info">
-      <g-text-field-bs modelValue={selectingRoom.value.name} label="Room name *:" onUpdate:modelValue={onUpdateSelectingRoomName} v-slots=
+      <g-text-field-bs modelValue={selectingRoomStates.value.room.name} label="Room name *:" onUpdate:modelValue={onUpdateSelectingRoomName} v-slots=
           {{
             'append-inner': () =>
                 <g-icon style="cursor: pointer"

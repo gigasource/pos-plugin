@@ -2,8 +2,8 @@ import { computed, ref, watch } from 'vue';
 import {
   addNewRoom,
   objectsInSelectingRoom, onSelectRoom, removeSelectingRoom,
-  selectingRoom,
-  rooms, updateSelectingRoomName, swapSelectingRoomOrderWithTheRoomBefore, swapSelectingRoomOrderWithTheRoomBehind
+  selectingRoomStates,
+  roomsStates, updateSelectingRoomName, swapSelectingRoomOrderWithTheRoomBefore, swapSelectingRoomOrderWithTheRoomBehind
 } from '../../TablePlan/room-state';
 import _ from 'lodash';
 import cms from 'cms';
@@ -23,7 +23,7 @@ export const onSelectObject = function (item) {
 }
 
 watch(() => objectsInSelectingRoom.value, (newV) => {
-  if (selectingObject.value && selectingRoom.value) {
+  if (selectingObject.value && selectingRoomStates.value) {
     selectingObject.value = _.find(objectsInSelectingRoom.value, i => i._id === selectingObject.value._id)
   }
 
@@ -31,13 +31,13 @@ watch(() => objectsInSelectingRoom.value, (newV) => {
 
 
 export const addNewRoomObjectToSelectingRoom = async function (object) {
-  if (selectingRoom.value) {
+  if (selectingRoomStates.value) {
 
-    const editedRoom = await cms.getModel('Room').findOneAndUpdate({ _id: selectingRoom.value._id },
+    const editedRoom = await cms.getModel('Room').findOneAndUpdate({ _id: selectingRoomStates.value.room._id },
       { $push: { roomObjects: object } },
       { new: true })
     const createdObject = _.last(editedRoom.roomObjects)
-    addRoomObject(selectingRoom.value, createdObject)
+    addRoomObject(selectingRoomStates.value.room, createdObject)
     return createdObject
   }
 }
@@ -47,9 +47,9 @@ export const onChangeObjectName = async function (newName) {
 }
 
 export const removeAnObjectFromSelectingRoom = async function (object) {
-  if (selectingRoom.value) {
-    removeRoomObject(selectingRoom.value, object)
-    await cms.getModel('Room').findOneAndUpdate({ _id: selectingRoom.value._id },
+  if (selectingRoomStates.value) {
+    removeRoomObject(selectingRoomStates.value.room, object)
+    await cms.getModel('Room').findOneAndUpdate({ _id: selectingRoomStates.value.room._id },
       {
         $pull: { roomObjects: { _id: object._id } }
       })
@@ -57,8 +57,8 @@ export const removeAnObjectFromSelectingRoom = async function (object) {
 }
 
 export const updateObjectInSelectingRoom = async function (object, newObject) {
-  if (selectingRoom.value) {
-    const updatedObject = updateRoomObject(selectingRoom.value, object, newObject)
+  if (selectingRoomStates.value) {
+    const updatedObject = updateRoomObject(selectingRoomStates.value.room, object, newObject)
     if (object._id === (selectingObject.value || {})._id) {
       selectingObject.value = updatedObject
     }
@@ -112,7 +112,7 @@ export const createAndAddNewWallToSelectingRoom = async function () {
 }
 
 export const removeSelectingObjectFromSelectingRoom = async function () {
-  if (selectingRoom.value) {
+  if (selectingRoomStates.value) {
     await removeAnObjectFromSelectingRoom(selectingObject.value)
   }
 }
@@ -120,15 +120,15 @@ export const removeSelectingObjectFromSelectingRoom = async function () {
 export const updateSelectingObjectInSelectingRoom = async function (newObject) {
 
   //todo: validate new object 's name
-  if (selectingRoom.value) {
+  if (selectingRoomStates.value) {
     await updateObjectInSelectingRoom(selectingObject.value, newObject)
   }
 }
 
 const newObjectName = computed(() => {
   let allObjects = []
-  rooms.value.forEach(r => {
-    allObjects = allObjects.concat(r.roomObjects)
+  roomsStates.value.forEach(r => {
+    allObjects = allObjects.concat(r.room.roomObjects)
   })
   const allObjectsName = allObjects.map(object => object.name)
   let res = 1
@@ -146,7 +146,7 @@ export const wallColors = ['#FFFFFF', '#CCCCCC', '#4D0019', '#404040', '#86592D'
 
 export const showAddNewRoomBtn = ref(false)
 
-export const isSelectingARoom = computed(() => !!selectingRoom.value)
+export const isSelectingARoom = computed(() => !!selectingRoomStates.value)
 export const isSelectingARoomObject = computed(() => !!selectingObject.value)
 export const isSelectingRoomOnly = computed(() => {
   return isSelectingARoom.value && !isSelectingARoomObject.value
@@ -166,8 +166,8 @@ export const onRemoveRoom = async function () {
 
 export const sidebarData = computed(() => [{
   title: 'Restaurant', icon: 'icon-restaurant',
-  items: _.map(rooms.value, r => ({
-    title: r.name,
+  items: _.map(roomsStates.value, r => ({
+    title: r.room.name,
     icon: 'radio_button_unchecked',
     iconType: 'small',
     onClick: () => {
@@ -233,4 +233,3 @@ export const onBack = function() {
 
 const tableNameExistedErrorMsg = ref('')
 
-export const globalZoom = ref(1)

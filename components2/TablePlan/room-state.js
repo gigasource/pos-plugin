@@ -3,24 +3,24 @@ import _ from 'lodash';
 import { createRoom} from './room-logic';
 import cms from 'cms';
 
-export const rooms = ref([]);
+export const roomsStates = ref([]);
 
 export const fetchRooms = async function () {
   let _rooms = await cms.getModel('Room').find({})
-  _rooms = _.sortBy(_rooms.map(r => createRoom(r).room), r => r.order)
-  rooms.value = _rooms;
+  _rooms = _.sortBy(_rooms.map(r => createRoom(r)), r => r.room.order)
+  roomsStates.value = _rooms;
 }
 
 export const addRoom = async function (room) {
   const createdRoom = await cms.getModel('Room').create(room)
-  rooms.value.push(createRoom(createdRoom).room)
+  roomsStates.value.push(createRoom(createdRoom))
   return createdRoom
 }
 
 export const removeRoom = async function (room) {
-  const idx = _.findIndex(rooms.value, r => r._id ===room._id)
+  const idx = _.findIndex(roomsStates.value, r => r.room._id ===room._id)
   if (idx !== -1) {
-    rooms.value.splice(idx, 1)
+    roomsStates.value.splice(idx, 1)
     await cms.getModel('Room').remove({ _id: room._id })
   }
 }
@@ -28,28 +28,22 @@ export const removeRoom = async function (room) {
 //w
 
 export const removeSelectingRoom = async function() {
-  await removeRoom(selectingRoom.value)
+  await removeRoom(selectingRoomStates.value.room)
   //todo: auto change selecting room
-  if (rooms.value.length > 0) {
-    selectingRoom.value = rooms.value[0]
+  if (roomsStates.value.length > 0) {
+    selectingRoomStates.value = roomsStates.value[0]
   }
 }
-export const selectingRoom = ref(null);
-
-watch(() => rooms.value, (newV) => {
-  if (selectingRoom.value) {
-    selectingRoom.value = _.find(rooms.value, r => r._id === selectingRoom.value._id)
-  }
-}, { deep: true})
+export const selectingRoomStates = ref(null);
 
 export const onSelectRoom = function (newSelectingRoom) {
-  selectingRoom.value = newSelectingRoom
+  selectingRoomStates.value = newSelectingRoom
 }
 
-export const objectsInSelectingRoom = computed(() => (selectingRoom && selectingRoom.value) ? selectingRoom.value.roomObjects : [])
+export const objectsInSelectingRoom = computed(() => (selectingRoomStates.value) ? selectingRoomStates.value.room.roomObjects : [])
 
 const roomsName = computed(() => {
-  return rooms.value.map(r => r.name)
+  return roomsStates.value.map(r => r.room.name)
 })
 
 
@@ -60,7 +54,7 @@ export const newRoomName = computed(() => {
 })
 
 const nextOrder = computed(() => {
-  return _.maxBy(rooms.value, r => r.order) + 1
+  return _.maxBy(roomsStates.value, r => r.room.order) + 1
 })
 
 export const addNewRoom = async function() {
@@ -75,29 +69,30 @@ export const updateRoomName = async function(room) {
 }
 
 export const updateSelectingRoomName = async function(newName) {
-  selectingRoom.value.name = newName
-  await updateRoomName(selectingRoom.value)
+  selectingRoomStates.value.room.name = newName
+  await updateRoomName(selectingRoomStates.value.room.name)
 }
 
 
 export const swapSelectingRoomOrderWithTheRoomBefore = async function() {
-  const idx = _.findIndex(rooms.value, r => r._id === selectingRoom.value._id)
+  //todo: check if is selecting an object or not
+  const idx = _.findIndex(roomsStates.value, r => r.room._id === selectingRoomStates.value.room._id)
   if (idx > 0) {
-    const order = (await cms.getModel('Room').findOne({_id: rooms.value[idx - 1]._id})).order
-    const order1 = (await cms.getModel('Room').findOne({_id: rooms.value[idx]._id})).order
-    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx - 1]._id}, {$set: {order: order1}})
-    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx]._id}, {$set: {order: order}})
+    const order = (await cms.getModel('Room').findOne({_id: roomsStates.value[idx - 1].room._id})).order
+    const order1 = (await cms.getModel('Room').findOne({_id: roomsStates.value[idx].room._id})).order
+    await cms.getModel('Room').findOneAndUpdate({_id: roomsStates.value[idx - 1].room._id}, {$set: {order: order1}})
+    await cms.getModel('Room').findOneAndUpdate({_id: roomsStates.value[idx].room._id}, {$set: {order: order}})
     await fetchRooms()
   }
 }
 
 export const swapSelectingRoomOrderWithTheRoomBehind = async function() {
-  const idx = _.findIndex(rooms.value, r => r._id === selectingRoom.value._id)
-  if (idx < rooms.value.length - 1 && idx !== -1) {
-    const order = (await cms.getModel('Room').findOne({_id: rooms.value[idx]._id})).order
-    const order1 = (await cms.getModel('Room').findOne({_id: rooms.value[idx + 1]._id})).order
-    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx]._id}, {$set: {order: order1}})
-    await cms.getModel('Room').findOneAndUpdate({_id: rooms.value[idx + 1]._id}, {$set: {order: order}})
+  const idx = _.findIndex(roomsStates.value, r => r.room._id === selectingRoomStates.value.room._id)
+  if (idx < roomsStates.value.length - 1 && idx !== -1) {
+    const order = (await cms.getModel('Room').findOne({_id: roomsStates.value[idx].room._id})).order
+    const order1 = (await cms.getModel('Room').findOne({_id: roomsStates.value[idx + 1].room._id})).order
+    await cms.getModel('Room').findOneAndUpdate({_id: roomsStates.value[idx].room._id}, {$set: {order: order1}})
+    await cms.getModel('Room').findOneAndUpdate({_id: roomsStates.value[idx + 1].room._id}, {$set: {order: order}})
     await fetchRooms()
   }
 }

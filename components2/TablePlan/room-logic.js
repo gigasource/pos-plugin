@@ -2,6 +2,9 @@ import { reactive, watchEffect, ref } from 'vue'
 import _ from 'lodash'
 import { computed } from 'vue';
 
+export const viewW = ref(0)
+export const viewH = ref(0);
+
 const createRoom = function (_room) {
   let room = _.assign(_room, {
     roomObjects: (_room && _room.roomObjects) || [],
@@ -10,7 +13,7 @@ const createRoom = function (_room) {
   room = reactive(room)
   const zoom = ref(1);
 
-  let viewW = ref(0), viewH = ref(0);
+
 
   const maxX = computed(() => {
     const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
@@ -53,22 +56,22 @@ const createRoom = function (_room) {
   })
 
 
-  return { room, viewH, viewW, zoom, w1, h1}
+  return { room, zoom}
 }
 
 export const updateObjectLocation = function(room, object, newLocation, zoom) {
   const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
-  if (zoom.value && idx !== -1) {
-    room.roomObjects[idx].location.x = newLocation.x / zoom.value
-    room.roomObjects[idx].location.y = newLocation.y / zoom.value
+  if (zoom && idx !== -1) {
+    room.roomObjects[idx].location.x = newLocation.x / zoom
+    room.roomObjects[idx].location.y = newLocation.y / zoom
   }
 }
 
 export const updateObjectSize = function(room, object, newSize, zoom) {
   const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
-  if (zoom.value && idx !== -1) {
-    room.roomObjects[idx].size.width = newSize.width / zoom.value
-    room.roomObjects[idx].size.height = newSize.height / zoom.value
+  if (zoom && idx !== -1) {
+    room.roomObjects[idx].size.width = newSize.width / zoom
+    room.roomObjects[idx].size.height = newSize.height / zoom
   }
 }
 

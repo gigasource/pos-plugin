@@ -4,24 +4,19 @@ import RoomFactory from '../RoomFactory'
 import { getTableOrderInfo, isBusyTable } from './RestaurantRoomLogics'
 import { isTable } from '../room-logic'
 import { getDiffTime } from '../../../utils/commons'
-import { ref, watch } from 'vue';
-import { globalZoom } from '../../View/EditTablePlan/EditTablePlanLogics';
+import { ref } from 'vue';
 import RoomStyleFactory from '../RoomStyles'
+import { selectingRoomStates } from '../room-state';
 
+const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 const { hooks, fn } = RoomFactory()
 
 const curTime = ref(new Date())
 
+//todo: clear timer
 const timerInterval = setInterval(() => {
   curTime.value = new Date()
 }, 30000)
-
-const { roomObjectStyle, roomObjectContainerStyle } = RoomStyleFactory()
-hooks.on('provideZoom', ({ zoom }) => {
-  watch(() => zoom.value, () => {
-    globalZoom.value = zoom.value
-  })
-})
 
 
 const _roomObjectContainerStyle = (obj) => {
@@ -35,18 +30,18 @@ const Component = fn()
 
 export default {
   setup() {
-
     const objectRenderFn = (obj) => {
       const isActiveTable = obj.type === 'table' && isBusyTable(obj)
       const tableOrderInfo = getTableOrderInfo(obj)
+      const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
       return <div style={roomObjectStyle(obj)}>
         {isTable(obj) ? <>
-          <div style={`font-size: ${10 * globalZoom.value}px ;position: absolute; top: 2px`}> </div>
+          <div style={`font-size: ${10 * zoom}px ;position: absolute; top: 2px`}> </div>
           <div>
             <div> {obj.name} </div>
           </div>
           {isActiveTable ?
-              <div style={`font-size: ${10 * globalZoom.value}px; position: absolute; bottom: 2px`}>
+              <div style={`font-size: ${10 * zoom}px; position: absolute; bottom: 2px`}>
                 {`${getDiffTime(tableOrderInfo.date, curTime.value)} mins`} </div> : null}
         </> : null}
       </div>

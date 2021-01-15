@@ -1,4 +1,6 @@
 import { isTable } from './room-logic';
+import { selectingRoomStates } from './room-state';
+import { computed } from 'vue'
 
 const RoomStyleFactory = () => {
 
@@ -13,7 +15,6 @@ const RoomStyleFactory = () => {
       transition: 'none',
       fontWeight: '700',
       background: object.bgColor,
-      // zIndex: -1
     }
     if (isTable(object)) {
       res.borderRadius = `5px`;
@@ -44,12 +45,12 @@ const RoomStyleFactory = () => {
     return style
   }
 
-  const roomContainerStyle = (zoom) => ({
-    fontSize: `${zoom.value * 20}px`,
+  const roomContainerStyle = computed(() => ({
+    fontSize: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
     position: 'relative',
     width: '100%',
     height: '100%',
-  })
+  }))
 
   return {roomObjectContainerStyle, roomObjectStyle, roomContainerStyle}
 }

@@ -1,13 +1,14 @@
 <script>
 
 import RoomFactory from '../RoomFactory'
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
-import { globalZoom, isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
+import { isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
 import RoomStyleFactory from '../RoomStyles';
 import Touch from '../../../../../../pos-vue-framework/src/directives/touch/touch'
 import { isTable } from '../room-logic';
+import { selectingRoomStates } from '../room-state';
 
 const { hooks, fn } = RoomFactory()
 
@@ -15,11 +16,7 @@ const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 
 const { resizeRoomObjectEvenHandler: e, roomContainerEventHandlers:r, touchHandlers:t } = EditableRoomEventHandlersFactory()
 
-hooks.on('provideZoom', ({ zoom }) => {
-  watch(() => zoom.value, () => {
-    globalZoom.value = zoom.value
-  })
-})
+
 const Component = fn()
 const _roomObjectContainerStyle = (obj) => {
   const style = roomObjectContainerStyle(obj)
@@ -40,8 +37,8 @@ export default {
     </div>
 
     const style = computed(() => ({
-      width: `${globalZoom.value * 20}px`,
-      height: `${globalZoom.value * 20}px`,
+      width: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
+      height: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
       'border-radius': '100%',
       'background-color': '#2979FF',
       position: 'absolute',
@@ -55,8 +52,8 @@ export default {
     }))
 
     const arrowStyle = computed(() => ({
-      width: `${13 * globalZoom.value}px`,
-      height: `${13 * globalZoom.value}px`,
+      width: `${13 * selectingRoomStates.value.zoom}px`,
+      height: `${13 * selectingRoomStates.value.zoom}px`,
     }))
 
     const resizeButtonRenderFn = obj => isSelectingObject(obj) ?

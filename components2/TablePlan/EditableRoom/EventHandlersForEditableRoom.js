@@ -5,12 +5,10 @@ import {
   updateSelectingObjectInSelectingRoom
 } from '../../View/EditTablePlan/EditTablePlanLogics'
 
-import { globalZoom} from '../../View/EditTablePlan/EditTablePlanLogics';
-
 import _ from 'lodash';
 import { ref } from 'vue'
 import { updateObjectLocation, updateObjectSize } from '../room-logic';
-import { selectingRoom } from '../room-state';
+import { selectingRoomStates } from '../room-state';
 
 const EditableRoomEventHandlersFactory = () => {
   const action = ref('')
@@ -31,19 +29,19 @@ const EditableRoomEventHandlersFactory = () => {
     }
     if (action.value === 'move') {
       const curPosition = selectingObject.value.realLocation
-      updateObjectLocation(selectingRoom.value, selectingObject.value, {
+      updateObjectLocation(selectingRoomStates.value.room, selectingObject.value, {
         x: curPosition.x + change.offsetX,
         y: curPosition.y + change.offsetY
-      }, globalZoom)
+      }, selectingRoomStates.value.zoom)
     } else {
       const curSize = selectingObject.value.realSize
-      updateObjectSize(selectingRoom.value, selectingObject.value, {
+      updateObjectSize(selectingRoomStates.value.room, selectingObject.value, {
         width: curSize.width + change.offsetX,
         height: curSize.height + change.offsetY
-      }, globalZoom)
+      }, selectingRoomStates.value.zoom)
     }
     lastPos.value = { x: e.clientX, y: e.clientY }
-  }, 16)
+  }, 30)
 
   const onMouseMove = function (e) {
     mouseEventUtil.normalizeEvent(e);
