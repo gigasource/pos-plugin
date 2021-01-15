@@ -6,7 +6,7 @@ import {
   categoryName,
   categoryColor,
   debouncedUpdateCategory
-} from './category-editor-category'
+} from '../category-editor-category'
 
 import {
   hasOrderLayout,
@@ -19,7 +19,9 @@ import {
   deleteCategory,
   setAction,
   canSwitch
-} from './category-editor-order-layout'
+} from '../category-editor-order-layout'
+
+import orderLayout from '../../orderLayoutApi'
 
 describe('Logic:CategoryEditor', () => {
   let _cms
@@ -40,9 +42,6 @@ describe('Logic:CategoryEditor', () => {
       warn: jest.fn(function() { _warn(...arguments) }),
       error: jest.fn(function() { _error(...arguments) }),
     }
-
-    // mock contexgt
-    context = { emit: jest.fn(x => x) }
   })
   afterEach(() => {
     global.cms = _cms

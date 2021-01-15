@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
+import orderLayoutApi from '../orderLayoutApi';
 import {
   selectedCategoryLayout,
   updateOrderLayout
@@ -24,20 +25,12 @@ async function _updateCategory(change, forceCreate) {
   // in case of update, because we already update the selectCategoryLayout so we don't need
   // emit any events.
   if (selectedCategoryLayout.value._id) {
-    const qry = { 'categories._id': selectedCategoryLayout.value._id }
-    const set = _.reduce(change, (result, value, key) => {
-      result[`categories.$.${key}`] = value;
-      return result
-    }, {}) ;
-    await cms.getModel('OrderLayout').findOneAndUpdate(qry, { $set: set });
+    await orderLayoutApi.updateCategoryLayout(selectedCategoryLayout.value._id, change)
     showNotify();
   } else if (forceCreate)  {
     // otherwise, create new if forceCreate
     // in case of create new, we need to emit an event to update category layout _id
-    const orderLayout = await cms.getModel('OrderLayout').findOneAndUpdate(
-        { _id: props.orderLayout._id },
-        { $push: { categories: selectedCategoryLayout.value } },
-        { new: true });
+    const orderLayout = await orderLayoutApi.createCategoryLayout(orderLayout.value._id, selectedCategoryLayout.value)
     showNotify();
     updateOrderLayout(orderLayout)
   }

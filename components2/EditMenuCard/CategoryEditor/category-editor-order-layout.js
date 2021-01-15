@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import { showNotify } from '../../AppSharedStates';
-import orderLayoutApi from '../api'
+import orderLayoutApi from '../orderLayoutApi'
 import _ from 'lodash'
 import {
   selectedCategoryLayout,
@@ -12,7 +12,7 @@ export const hasOrderLayout = computed(() => orderLayout.value)
 
 // provide methods to modify OrderLayout
 export async function createLayout(columns, rows) {
-  const result = orderLayoutApi.createLayout(columns, rows)
+  const result = orderLayoutApi.createOrderLayout(columns, rows)
   updateOrderLayout(result)
 }
 
