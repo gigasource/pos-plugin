@@ -3,6 +3,7 @@ import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import {
   selectedCategoryLayout,
+  updateOrderLayout
 } from '../../OrderView/pos-ui-shared'
 
 // provide methods to modify specified category layout
@@ -38,6 +39,6 @@ async function _updateCategory(change, forceCreate) {
         { $push: { categories: selectedCategoryLayout.value } },
         { new: true });
     showNotify();
-    context.emit('update:orderLayout', orderLayout)
+    updateOrderLayout(orderLayout)
   }
 }

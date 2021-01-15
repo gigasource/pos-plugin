@@ -5,11 +5,8 @@ import _ from 'lodash'
 import {
   selectedCategoryLayout,
   orderLayout,
+  updateOrderLayout
 } from '../../OrderView/pos-ui-shared'
-
-function updateOrderLayout(newLayout) {
-  orderLayout.value = newLayout
-}
 
 export const hasOrderLayout = computed(() => orderLayout.value)
 
