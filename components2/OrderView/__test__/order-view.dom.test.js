@@ -37,6 +37,9 @@ import { orderRightSideHeader } from "../orderRightSideHeaderFactory";
 import { orderRightSideItemsTable } from "../orderRightSideItemsTable";
 import PosOrder2 from "../PosOrder2";
 import Order2 from "../Order2";
+import { orderLayout } from "../pos-ui-shared";
+import { demoData } from "./demoData";
+import PosOrderLayout2 from "../PosOrderLayout2";
 
 const { stringify } = require("schemahandler/utils");
 
@@ -53,70 +56,36 @@ const delay = require("delay");
 
 //</editor-fold>
 
-describe("PrintButton test", function() {
-  beforeAll(() => {
-    makeWrapper(Order2, {shallow: false});
+describe("order-view test", function() {
+  beforeAll(async () => {
+    await orm("PosSetting").remove({});
+    await orm("PosSetting").create(demoData.PosSetting[0]);
+    await orm("OrderLayout").remove({});
+    await orm("OrderLayout").create(demoData.OrderLayout[0]);
   });
-
-  it("case 1 render big sidebar print", async function() {
+  it("case 1 integration", async function() {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
     addProduct(order, mockProduct);
+    orderLayout.value = demoData.OrderLayout[0];
+    makeWrapper(Order2, { shallow: false });
     await nextTick();
-    expect(wrapper.html()).toMatchInlineSnapshot(`
-      <div class="order">
-        <div class="order-main">
-          <pos-order-layout2-stub style="flex: 1;"
-                                  fontsize="14px"
-                                  category="[object Object]"
-                                  minimumtextrow="true"
-                                  collapseblankcolumn="true"
-                                  hidetextrow="false"
-                                  hideblankcolumn="false"
-                                  collapsetext="true"
-                                  actionmode="none"
-                                  showoverlay="true"
-                                  scrollablelayout="true"
-          >
-          </pos-order-layout2-stub>
-          <pos-order style="flex: 0 0 25%;"
-                     fontsize="14px"
-                     category="[object Object]"
-                     minimumtextrow="true"
-                     collapseblankcolumn="true"
-                     hidetextrow="false"
-                     hideblankcolumn="false"
-                     collapsetext="true"
-                     actionmode="none"
-                     showoverlay="true"
-                     scrollablelayout="true"
-                     user="[object Object]"
-                     actionlist
-          >
-          </pos-order>
-        </div>
-        <pos-quick-order-toolbar currentorder="[object Object]"
-                                 actionlist
-        >
-        </pos-quick-order-toolbar>
-      </div>
-      <pos-order-split-order modelvalue="false"
-                             user="[object Object]"
-                             current-order="[object Object]"
-      >
-      </pos-order-split-order>
-      <pos-order-receipt modelvalue="false"
-                         order="[object Object]"
-      >
-      </pos-order-receipt>
-      <pos-order-move-items modelvalue="false"
-                            user="[object Object]"
-                            current-order="[object Object]"
-      >
-      </pos-order-move-items>
-      <pos-order-voucher-dialog modelvalue="false">
-      </pos-order-voucher-dialog>
-    `);
+    await delay(50);
+    expect(wrapper.html()).toMatchSnapshot();
   }, 80000);
+
+  it("case 2 orderLayout", async function() {
+    //order have 1 sent item, add one item -> should display print,
+    prepareOrder(mockOrder);
+    let order = getCurrentOrder();
+    addProduct(order, mockProduct);
+    orderLayout.value = demoData.OrderLayout[0];
+    makeWrapper(PosOrderLayout2, { shallow: true });
+    await nextTick();
+    await delay(50);
+    expect(wrapper.html()).toMatchSnapshot()
+  }, 80000);
+
+
 });

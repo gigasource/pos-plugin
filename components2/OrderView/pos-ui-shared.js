@@ -46,6 +46,17 @@ watchEffect(() => {
   }
 })
 
+export const products = computed(() => {
+  if (editable.value) {
+    return fillMissingAreas(
+      selectedCategoryLayout.value.products,
+      selectedCategoryLayout.value.columns,
+      selectedCategoryLayout.value.rows);
+  }
+  // remove product layout which is not text but doesn't link to any product
+  return  _.filter(selectedCategoryLayout.value && selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
+})
+
 export const mode = ref();
 
 export const highlightSelectedProduct = ref(false);
@@ -163,3 +174,11 @@ export function itemsWithQtyFactory() {
     returnItem
   }
 }
+
+export const orderViewDialog = ref({
+  search: false,
+  split: false,
+  move: false,
+  voucher: false,
+  receipt: false
+});

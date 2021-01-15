@@ -1,4 +1,4 @@
-{
+export const demoData = {
   "PosSetting": [
     {
       "_id": "5e1d89db00971c2ac29fccc9",

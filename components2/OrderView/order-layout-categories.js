@@ -22,7 +22,8 @@ export function orderLayoutCategoriesFactory() {
         orderLayout.rows,
         true);
     }
-    return [...orderLayout.categories]
+    const a = orderLayout;
+    return [...orderLayout.value.categories]
   });
 
   const categoryContainerStyle = computed(() => {

@@ -18,7 +18,7 @@ export async function loadKeyboardConfig() {
   // TODO: Find what is the purpose of keyboardConfig layout
   if (_keyboardConfig && !_keyboardConfig.layout)
     _keyboardConfig.layout = []
-  keyboardConfig.value = _keyboardConfig;
+  keyboardConfig.value = _keyboardConfig || {layout: []};
 }
 
 const showCalculator = computed(() => {
