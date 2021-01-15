@@ -1,4 +1,15 @@
+//<editor-fold desc="declare">
 import { nextTick } from "vue";
+import {
+  addPayment,
+  cancelOrder,
+  clearPayment,
+  removeItem
+} from "../pos-logic";
+import expect from "expect";
+import { changeCourse } from "../pos-logic";
+const dayjs = require("dayjs");
+import { stringify } from "../../../utils/test-utils";
 
 const {
   makeDiscount,
@@ -7,18 +18,21 @@ const {
   addItem,
   createOrder,
   makeLastItemDiscount
-} = require("./pos-logic");
+} = require("../pos-logic");
 
 const delay = require("delay");
 
+const foodTax = { taxes: [5, 10] };
+const drinkTax = { taxes: [16, 32] };
+
+const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
+const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
+const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
+const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
+//</editor-fold>
+
 describe("pos-logic", function() {
   it("case 1: test item-tax", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 10);
     addItem(order, fanta, 20);
@@ -68,6 +82,7 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "status": "inProgress",
         "takeAway": false,
         "vSum": 53,
         "vTaxSum": Object {
@@ -83,17 +98,11 @@ describe("pos-logic", function() {
   });
 
   it("case 2: test item-tax modifiers", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     /*addItem(order, cola, 10);
     addItem(order, fanta, 20);*/
     addItem(order, rice, 1);
-    addModifier(order, { name: "Add Ketchup", price: 3, quantity: 1 });
+    addModifier(order, ketchup);
 
     await delay(10);
 
@@ -123,19 +132,20 @@ describe("pos-logic", function() {
             "vTaxSum": Object {
               "5": Object {
                 "gross": 13,
-                "net": 12.52,
-                "tax": 3.48,
+                "net": 12.38,
+                "tax": 0.62,
               },
             },
           },
         ],
+        "status": "inProgress",
         "takeAway": false,
         "vSum": 13,
         "vTaxSum": Object {
           "5": Object {
             "gross": 13,
-            "net": 12.52,
-            "tax": 3.48,
+            "net": 12.38,
+            "tax": 0.62,
           },
         },
       }
@@ -144,12 +154,6 @@ describe("pos-logic", function() {
   });
 
   it("case 3: test discount item", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 1);
     makeLastItemDiscount(order, "40%");
@@ -200,12 +204,6 @@ describe("pos-logic", function() {
   });
 
   it("case 3 b: test discount item - number", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 1);
     makeLastItemDiscount(order, "0.5");
@@ -256,12 +254,6 @@ describe("pos-logic", function() {
   });
 
   it("case 3c: test discount item modifier", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, rice, 1);
     addModifier(order, { name: "Add Ketchup", price: 3, quantity: 1 });
@@ -322,12 +314,6 @@ describe("pos-logic", function() {
   });
 
   it("case 4: test discount order", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 1);
     makeDiscount(order, "50%");
@@ -379,12 +365,6 @@ describe("pos-logic", function() {
   });
 
   it("case 4: test discount order - number", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 1);
     addItem(order, fanta, 2);
@@ -442,6 +422,7 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "status": "inProgress",
         "takeAway": false,
         "vDiscount": 2,
         "vSum": 3.3,
@@ -508,6 +489,7 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "status": "inProgress",
         "takeAway": false,
         "vDiscount": 1,
         "vSum": 4.3,
@@ -523,12 +505,6 @@ describe("pos-logic", function() {
   });
 
   it("case 5: vTaxSum", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     let order = createOrder();
     addItem(order, cola, 1);
     addItem(order, fanta, 2);
@@ -619,12 +595,6 @@ describe("pos-logic", function() {
   });
 
   it("case 5a: vTaxSum", async function() {
-    const foodTax = { taxes: [5, 10] };
-    const drinkTax = { taxes: [16, 32] };
-
-    const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-    const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-    const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
     const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
     let order = createOrder();
     //addItem(order, cola, 1);
@@ -851,4 +821,335 @@ describe("pos-logic", function() {
     `);
     //</editor-fold>
   });
+
+  it("case7: test payment", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+
+    addPayment(order, "cash");
+
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(order.payment).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "type": "cash",
+          "value": 53,
+        },
+      ]
+    `);
+    //</editor-fold>
+
+    clearPayment(order);
+    addPayment(order, { type: "cash", value: 10 });
+    addPayment(order, { type: "card" });
+    await nextTick();
+    expect(order.payment).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "type": "cash",
+          "value": 10,
+        },
+        Object {
+          "type": "card",
+          "value": 43,
+        },
+      ]
+    `);
+
+    clearPayment(order);
+    addPayment(order, [{ type: "cash", value: 10 }, { type: "card" }]);
+    await nextTick();
+    expect(order.payment).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "type": "cash",
+          "value": 10,
+        },
+        Object {
+          "type": "card",
+          "value": 43,
+        },
+      ]
+    `);
+  });
+
+  it("case 8: cancellationItems", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+    removeItem(order, 0, 3);
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(order).toMatchInlineSnapshot(`
+      Object {
+        "cancellationItems": Array [
+          Object {
+            "name": "Cola",
+            "price": 1.3,
+            "quantity": 3,
+            "taxes": Array [
+              16,
+              32,
+            ],
+          },
+        ],
+        "items": Array [
+          Object {
+            "name": "Cola",
+            "price": 1.3,
+            "quantity": 7,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 9.1,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 9.1,
+                "net": 7.84,
+                "tax": 1.26,
+              },
+            },
+          },
+          Object {
+            "name": "Fanta",
+            "price": 2,
+            "quantity": 20,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 40,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 40,
+                "net": 34.48,
+                "tax": 5.52,
+              },
+            },
+          },
+        ],
+        "payment": Array [],
+        "status": "inProgress",
+        "takeAway": false,
+        "vSum": 49.1,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 49.1,
+            "net": 42.31999999999999,
+            "tax": 6.779999999999999,
+          },
+        },
+      }
+    `);
+    //</editor-fold>
+  });
+
+  it("case 8b: cancellationItems remove all quantity", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+    removeItem(order, 0, 10);
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(order).toMatchInlineSnapshot(`
+      Object {
+        "cancellationItems": Array [
+          Object {
+            "name": "Cola",
+            "price": 1.3,
+            "quantity": 10,
+            "taxes": Array [
+              16,
+              32,
+            ],
+          },
+        ],
+        "items": Array [
+          Object {
+            "name": "Fanta",
+            "price": 2,
+            "quantity": 20,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 40,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 40,
+                "net": 34.48,
+                "tax": 5.52,
+              },
+            },
+          },
+        ],
+        "payment": Array [],
+        "status": "inProgress",
+        "takeAway": false,
+        "vSum": 40,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 40,
+            "net": 34.48,
+            "tax": 5.52,
+          },
+        },
+      }
+    `);
+    //</editor-fold>
+  });
+
+  it("case 9: cancel order", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+    cancelOrder(order);
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(order).toMatchInlineSnapshot(`
+      Object {
+        "cancellationItems": Array [],
+        "items": Array [
+          Object {
+            "name": "Cola",
+            "price": 1.3,
+            "quantity": 10,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 13,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 13,
+                "net": 11.21,
+                "tax": 1.79,
+              },
+            },
+          },
+          Object {
+            "name": "Fanta",
+            "price": 2,
+            "quantity": 20,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 40,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 40,
+                "net": 34.48,
+                "tax": 5.52,
+              },
+            },
+          },
+        ],
+        "payment": Array [],
+        "status": "cancelled",
+        "takeAway": false,
+        "vSum": 53,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 53,
+            "net": 45.69,
+            "tax": 7.31,
+          },
+        },
+      }
+    `);
+    //</editor-fold>
+  });
+
+  it("case 10: vDate", async function() {
+    let order = createOrder();
+    order.date = dayjs("01.01.2021 11:11:11", "DD.MM.YYYY HH:");
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(order).toMatchInlineSnapshot(`
+      Object {
+        "cancellationItems": Array [],
+        "date": "2021-01-01T04:11:11.000Z",
+        "items": Array [],
+        "payment": Array [],
+        "status": "inProgress",
+        "takeAway": false,
+        "vDate": 2020-12-31T17:00:00.000Z,
+        "vSum": 0,
+        "vTaxSum": Object {},
+      }
+    `);
+    //</editor-fold>
+  });
+
+  it("case 11: course", async function() {
+    let order = createOrder();
+    addItem(order, cola, 1);
+    changeCourse(order, 0, -1);
+    //should be takeAway
+    await nextTick();
+
+    changeCourse(order, 0, 1);
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect(stringify(order)).toMatchInlineSnapshot(`
+      Object {
+        "_id": "ObjectID",
+        "cancellationItems": Array [],
+        "items": Array [
+          Object {
+            "_id": "ObjectID",
+            "course": 1,
+            "name": "Cola",
+            "price": 1.3,
+            "quantity": 1,
+            "takeAway": false,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 1.3,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 1.3,
+                "net": 1.12,
+                "tax": 0.18,
+              },
+            },
+          },
+        ],
+        "payment": Array [],
+        "status": "inProgress",
+        "takeAway": false,
+        "user": Array [],
+        "vDate": "2021-01-10T17:00:00.000Z",
+        "vSum": 1.3,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 1.3,
+            "net": 1.12,
+            "tax": 0.18,
+          },
+        },
+      }
+    `);
+    //</editor-fold>
+  });
+
+
 });
