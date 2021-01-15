@@ -1,9 +1,10 @@
 <script>
 import {useI18n} from 'vue-i18n'
 import {internalValueFactory} from "../../utils";
+import {addVoucher, redeemVoucher} from "../pos-logic";
 
 export default {
-  name: 'PosOrderVoicherDialog2',
+  name: 'PosOrderVoucherDialog2',
   props: {
     modelValue: Boolean
   },
@@ -24,9 +25,9 @@ export default {
       //todo: singleton
       if (isNaN(voucherValue.value) || !voucherValue.value) return
       if (create) {
-        emit('addVoucher', voucherValue.value)
+        addVoucher(order, voucherValue.value);
       } else {
-        emit('redeemVoucher', voucherValue.value)
+        redeemVoucher(order, voucherValue.value);
       }
       internalValue.value = false;
     }
