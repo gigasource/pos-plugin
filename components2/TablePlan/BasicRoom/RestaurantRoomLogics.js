@@ -1,13 +1,7 @@
-import { computed, ref } from 'vue';
-import { appHooks } from '../../AppSharedStates';
+import { computed } from 'vue';
 import cms from 'cms';
 import _ from 'lodash';
-
-const activeOrders = ref([]);
-
-appHooks.on('orderChange', async function () {
-  activeOrders.value = await cms.getModel('Order').find({ status: 'inProgress' });
-})
+import { activeOrders } from '../../AppSharedStates';
 
 const inProgressTables = computed(() => {
   return _.compact(activeOrders.value.map(order => order.table))

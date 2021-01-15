@@ -1,23 +1,18 @@
 <script>
-
-import RoomFactory from '../RoomFactory'
+import RoomUI from '../RoomUI'
 import { computed } from 'vue'
 import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
 import { isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
 import RoomStyleFactory from '../RoomStyles';
-import Touch from '../../../../../../pos-vue-framework/src/directives/touch/touch'
-import { isTable } from '../room-logic';
-import { selectingRoomStates } from '../room-state';
-
-const { hooks, fn } = RoomFactory()
+import { isTable } from '../RoomLogics';
+import { selectingRoomStates } from '../RoomState';
 
 const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 
-const { resizeRoomObjectEvenHandler: e, roomContainerEventHandlers:r, touchHandlers:t } = EditableRoomEventHandlersFactory()
+const { resizeRoomObjectEvenHandler, touchHandlers } = EditableRoomEventHandlersFactory()
 
 
-const Component = fn()
 const _roomObjectContainerStyle = (obj) => {
   const style = roomObjectContainerStyle(obj)
   if (isSelectingObject(obj)) {
@@ -27,57 +22,49 @@ const _roomObjectContainerStyle = (obj) => {
   return style
 }
 
-export default {
-  directives: {Touch},
-  setup() {
+const objectRenderFn = (obj) => <div style={roomObjectStyle(obj)}>
 
-    const roomObjectRenderFn = (obj) => <div style={roomObjectStyle(obj)}>
+  {isTable(obj) ? obj.name : ''}
+</div>
 
-      {isTable(obj) ? obj.name : ''}
+const style = computed(() => ({
+  width: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
+  height: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
+  'border-radius': '100%',
+  'background-color': '#2979FF',
+  position: 'absolute',
+  right: 0,
+  bottom: 0,
+  transform: `translate(100%, 100%)`,
+  display: 'flex',
+  'justify-content': 'center',
+  'align-items': 'center',
+  zIndex: 100
+}))
+
+const arrowStyle = computed(() => ({
+  width: `${13 * selectingRoomStates.value.zoom}px`,
+  height: `${13 * selectingRoomStates.value.zoom}px`,
+}))
+
+const resizeButtonRenderFn = obj => isSelectingObject(obj) &&
+    <div style={style.value} {...getScopeAttrs()}
+         {...resizeRoomObjectEvenHandler(obj)}
+    >
+      <img alt style={arrowStyle.value} src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
     </div>
 
-    const style = computed(() => ({
-      width: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
-      height: `${(selectingRoomStates.value ? selectingRoomStates.value.zoom : 1) * 20}px`,
-      'border-radius': '100%',
-      'background-color': '#2979FF',
-      position: 'absolute',
-      right: 0,
-      bottom: 0,
-      transform: `translate(100%, 100%)`,
-      display: 'flex',
-      'justify-content': 'center',
-      'align-items': 'center',
-      zIndex: 100
-    }))
-
-    const arrowStyle = computed(() => ({
-      width: `${13 * selectingRoomStates.value.zoom}px`,
-      height: `${13 * selectingRoomStates.value.zoom}px`,
-    }))
-
-    const resizeButtonRenderFn = obj => isSelectingObject(obj) ?
-        <div style={style.value} {...getScopeAttrs()}
-             {...e(obj)}
-        >
-          <img alt style={arrowStyle.value} src="/plugins/pos-plugin/assets/resize.svg" draggable="false"/>
-        </div>
-        : null
-    return () => <Component v-slots={
-      {
-        'room-object': (obj) => {
-          return <div key={obj._id} id={obj.name}
-                      v-touch={t(obj)}
-                      style={_roomObjectContainerStyle(obj)}
-          >
-            {roomObjectRenderFn(obj)}
-            {resizeButtonRenderFn(obj, getScopeAttrs())}
-          </div>
-        }
-      }
-    }> </Component>
-  }
+const roomObjectRenderFn = (obj) => {
+  return <div key={obj._id} id={obj.name}
+              v-touch={touchHandlers(obj)}
+              style={_roomObjectContainerStyle(obj)}
+  >
+    {objectRenderFn(obj)}
+    {resizeButtonRenderFn(obj, getScopeAttrs())}
+  </div>
 }
+const { hooks, fn } = RoomUI({roomObjectRenderFn})
+export default fn()
 </script>
 <style scoped lang="scss">
 .room {

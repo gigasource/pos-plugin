@@ -9,12 +9,8 @@ const createRoom = function (_room) {
   let room = _.assign(_room, {
     roomObjects: (_room && _room.roomObjects) || [],
   })
-
   room = reactive(room)
   const zoom = ref(1);
-
-
-
   const maxX = computed(() => {
     const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
     return obj ? obj.location.x + obj.size.width : 0
@@ -27,7 +23,6 @@ const createRoom = function (_room) {
   const w1 = computed(() => {
     return maxX.value
   });
-
   const h1 = computed(() => {
     return maxY.value
   });
@@ -93,10 +88,6 @@ const updateRoomObject = function (room, obj, newObj) {
   } else return null
 }
 
-const updateRoomObjects = function(room, newRoomObjects) {
-  room.roomObjects = newRoomObjects
-}
-
 export const isTable = (item) => {
   return item.type === 'table'
 }
@@ -110,5 +101,4 @@ export {
   addRoomObject,
   removeRoomObject,
   updateRoomObject,
-  updateRoomObjects,
 }

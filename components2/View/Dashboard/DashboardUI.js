@@ -2,15 +2,15 @@ import Hooks from 'schemahandler/hooks/hooks'
 import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
 import { activeScreen } from './DashboardSharedStates';
 import { onMounted } from 'vue';
-import { fetchRooms, objectsInSelectingRoom } from '../TablePlan/room-state';
-import { appHooks } from '../AppSharedStates'
+import { fetchRooms } from '../../TablePlan/RoomState';
+import { appHooks } from '../../AppSharedStates'
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
-import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
-import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
-import { getScopeAttrs } from '../../utils/helpers';
+import EditableRoom from '../../TablePlan/EditableRoom/EditableRoom';
+import RestaurantRoom from '../../TablePlan/BasicRoom/RestaurantRoom';
+import { getScopeAttrs } from '../../../utils/helpers';
 import DashboardSidebarItemsFactory from './DashboardSidebar/DashboardSidebarItems'
 
-const DashboardFactory = () => {
+const DashboardUI = () => {
   const hooks = new Hooks()
   const fn = () => ({
     name: 'Dashboard',
@@ -18,6 +18,7 @@ const DashboardFactory = () => {
     setup() {
       onMounted(async() => {
         await fetchRooms()
+        // todo: should not exit orderChange here
         await appHooks.emit('orderChange')
         activeScreen.value = 'restaurant-room'
       })
@@ -51,5 +52,5 @@ const DashboardFactory = () => {
   return {hooks, fn}
 }
 
-export default DashboardFactory
+export default DashboardUI
 

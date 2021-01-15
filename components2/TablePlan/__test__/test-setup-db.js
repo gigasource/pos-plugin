@@ -1,5 +1,5 @@
 import orm from 'schemahandler';
-import { addRoomObject, createRoom } from '../room-logic';
+import { addRoomObject, createRoom } from '../RoomLogics';
 import { nextTick } from 'vue';
 import { addItem as addOrderItem, createOrder, makePaid } from '../../../backend/order-logic/pos-logic';
 import cms from 'cms'

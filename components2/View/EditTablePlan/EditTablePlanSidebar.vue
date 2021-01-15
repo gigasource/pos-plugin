@@ -1,6 +1,6 @@
 <script>
 import { GBtn, GSwitch, GTextFieldBs } from '../../../../../backoffice/pos-vue-framework';
-import PosDashboardSidebar2 from '../../Dashboard/DashboardSidebar/PosDashboardSidebar2';
+import PosDashboardSidebar2 from '../Dashboard/DashboardSidebar/PosDashboardSidebar2';
 import { useI18n } from 'vue-i18n'
 import {
   dialog,
@@ -26,8 +26,8 @@ import {
   updateTableName,
   wallColors
 } from './EditTablePlanLogics';
-import { selectingRoomStates } from '../../TablePlan/room-state';
-import { isTable } from '../../TablePlan/room-logic';
+import { selectingRoomStates } from '../../TablePlan/RoomState';
+import { isTable } from '../../TablePlan/RoomLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
 
 export default {
@@ -139,9 +139,8 @@ export default {
       </>,
       'footer': footerSlot
     }
-    const renderFn = () => <PosDashboardSidebar2 onToggle={toggle} items={sidebarData.value} v-slots={slots}>
+    return () => <PosDashboardSidebar2 onToggle={toggle} items={sidebarData.value} v-slots={slots}>
     </PosDashboardSidebar2>
-    return renderFn
   }
 }
 </script>

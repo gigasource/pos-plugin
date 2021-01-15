@@ -1,14 +1,14 @@
 import Hooks from 'schemahandler/hooks/hooks'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onBeforeMount, ref } from 'vue'
 
-import { user } from '../../AppSharedStates'
-import { login } from '../../Login/LoginLogic'
-import { GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer } from '../../../../../backoffice/pos-vue-framework';
-import { useI18n } from 'vue-i18n'
+import { user } from '../../../AppSharedStates'
+import { login } from '../../../Login/LoginLogic'
+import { GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer } from '../../../../../../backoffice/pos-vue-framework';
 import DashboardSidebarItemsFactory from './DashboardSidebarItems'
-import { getScopeAttrs } from '../../../utils/helpers';
+import { getScopeAttrs } from '../../../../utils/helpers';
+import { useI18n } from 'vue-i18n'
 
-const DashboardSidebarFactory = () => {
+const DashboardSidebarUI = () => {
   const hooks = new Hooks()
   const fn = () => ({
     name: 'PosDashboardSidebar',
@@ -18,13 +18,12 @@ const DashboardSidebarFactory = () => {
     },
     emit: ['toggle'],
     setup(props, { slots, emit }) {
-
-      const { t: $t } = useI18n()
-
-      const { refactoredDashboardSidebarItems } = DashboardSidebarItemsFactory($t)
+      const { t: $t} = useI18n()
+      const { refactoredDashboardSidebarItems } = DashboardSidebarItemsFactory()
       let timerInterval = ref(null)
       const now = ref(dayjs().format('HH:mm'))
-      onMounted(async function () {
+      onBeforeMount(async function () {
+        //todo: remove auto login
         if (!user.value) await login('0000')
         timerInterval.value = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
         console.log(refactoredDashboardSidebarItems.value)
@@ -39,27 +38,6 @@ const DashboardSidebarFactory = () => {
       const userName = computed(() => {
         return user.value ? user.value.name : ''
       })
-
-      const sidebar = ref('')
-
-      const mapTitle = (items) => {
-        // return items.map(item => {
-        //   if (typeof item.title === 'function') {
-        //     return Object.assign({}, item, {
-        //       title: item.title(),
-        //       ...item.items && {items: this.mapTitle(item.items) }
-        //     })
-        //   }
-        //   return item
-        // })
-        // return items.map(item => ({
-        //   title: item.title,
-        //   icon: item.icon,
-        //   items: item.items,
-        //   onClick: i
-        // }))
-        return items
-      }
 
       const onNodeSelected = (node) => {
         node.onClick()
@@ -91,9 +69,9 @@ const DashboardSidebarFactory = () => {
           >
           </g-side-bar-tree-view>
           <slot name="above-spacer"/>
-          { slots['above-spacer'] ? slots['above-spacer']() : null}
-          <g-spacer></g-spacer>
-          { slots['below-spacer'] ? slots['below-spacer']() : null}
+          { slots['above-spacer'] && slots['above-spacer']()}
+          <g-spacer> </g-spacer>
+          { slots['below-spacer'] && slots['below-spacer']()}
           { slots['footer'] ? slots['footer']() : footerDefaultRenderFn() }
         </>
       }
@@ -107,4 +85,4 @@ const DashboardSidebarFactory = () => {
   return { hooks, fn }
 }
 
-export default DashboardSidebarFactory
+export default DashboardSidebarUI

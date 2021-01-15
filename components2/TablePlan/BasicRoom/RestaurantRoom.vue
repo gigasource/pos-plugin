@@ -1,15 +1,15 @@
 <script>
 
-import RoomFactory from '../RoomFactory'
+import RoomUI from '../RoomUI'
 import { getTableOrderInfo, isBusyTable } from './RestaurantRoomLogics'
-import { isTable } from '../room-logic'
+import { isTable } from '../RoomLogics'
 import { getDiffTime } from '../../../utils/commons'
 import { ref } from 'vue';
 import RoomStyleFactory from '../RoomStyles'
-import { selectingRoomStates } from '../room-state';
+import { selectingRoomStates } from '../RoomState';
 
 const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
-const { hooks, fn } = RoomFactory()
+
 
 const curTime = ref(new Date())
 
@@ -18,6 +18,23 @@ const timerInterval = setInterval(() => {
   curTime.value = new Date()
 }, 30000)
 
+const objectRenderFn = (obj) => {
+  const isActiveTable = obj.type === 'table' && isBusyTable(obj)
+  const tableOrderInfo = getTableOrderInfo(obj)
+  const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
+  return <div style={roomObjectStyle(obj)}>
+    {isTable(obj) ? <>
+      <div style={`font-size: ${10 * zoom}px ;position: absolute; top: 2px`}> </div>
+      <div>
+        <div> {obj.name} </div>
+      </div>
+      {isActiveTable ?
+          <div style={`font-size: ${10 * zoom}px; position: absolute; bottom: 2px`}>
+            {`${getDiffTime(tableOrderInfo.date, curTime.value)} mins`} </div> : null}
+    </> : null}
+  </div>
+}
+const classes = (obj) => isTable(obj) ? ['waves-effect', 'waves-red'] : []
 
 const _roomObjectContainerStyle = (obj) => {
   const style = roomObjectContainerStyle(obj)
@@ -25,44 +42,16 @@ const _roomObjectContainerStyle = (obj) => {
   return style
 }
 
-const Component = fn()
-
-
-export default {
-  setup() {
-    const objectRenderFn = (obj) => {
-      const isActiveTable = obj.type === 'table' && isBusyTable(obj)
-      const tableOrderInfo = getTableOrderInfo(obj)
-      const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
-      return <div style={roomObjectStyle(obj)}>
-        {isTable(obj) ? <>
-          <div style={`font-size: ${10 * zoom}px ;position: absolute; top: 2px`}> </div>
-          <div>
-            <div> {obj.name} </div>
-          </div>
-          {isActiveTable ?
-              <div style={`font-size: ${10 * zoom}px; position: absolute; bottom: 2px`}>
-                {`${getDiffTime(tableOrderInfo.date, curTime.value)} mins`} </div> : null}
-        </> : null}
-      </div>
-    }
-
-    const classes = (obj) => isTable(obj) ? ['waves-effect', 'waves-red'] : []
-    return () => <Component v-slots={
-      {
-        'room-object': (obj) => {
-          return <div key={obj._id} id={obj.name}
-                      style={_roomObjectContainerStyle(obj)}
-                      class={classes(obj)}>
-            {objectRenderFn(obj)}
-          </div>
-        }
-      }
-    }>
-
-    </Component>
-  }
+const roomObjectRenderFn = (obj) => {
+  return <div key={obj._id} id={obj.name}
+              style={_roomObjectContainerStyle(obj)}
+              class={classes(obj)}>
+    {objectRenderFn(obj)}
+  </div>
 }
+const { hooks, fn } = RoomUI({ roomObjectRenderFn})
+
+export default fn()
 </script>
 <style scoped lang="scss">
 .room {

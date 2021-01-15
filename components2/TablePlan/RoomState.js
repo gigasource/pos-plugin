@@ -1,6 +1,6 @@
-import { ref, computed, watch } from 'vue';
+import { computed, ref } from 'vue';
 import _ from 'lodash';
-import { createRoom} from './room-logic';
+import { createRoom } from './RoomLogics';
 import cms from 'cms';
 
 export const roomsStates = ref([]);
@@ -18,7 +18,7 @@ export const addRoom = async function (room) {
 }
 
 export const removeRoom = async function (room) {
-  const idx = _.findIndex(roomsStates.value, r => r.room._id ===room._id)
+  const idx = _.findIndex(roomsStates.value, r => r.room._id.toString() ===room._id.toString())
   if (idx !== -1) {
     roomsStates.value.splice(idx, 1)
     await cms.getModel('Room').remove({ _id: room._id })
@@ -37,7 +37,7 @@ export const removeSelectingRoom = async function() {
 export const selectingRoomStates = ref(null);
 
 export const onSelectRoom = function (newSelectingRoom) {
-  selectingRoomStates.value = newSelectingRoom
+  selectingRoomStates.value = _.find(roomsStates.value, r => r.room._id.toString() === newSelectingRoom.room._id)
 }
 
 export const objectsInSelectingRoom = computed(() => (selectingRoomStates.value) ? selectingRoomStates.value.room.roomObjects : [])
@@ -50,11 +50,11 @@ const roomsName = computed(() => {
 export const newRoomName = computed(() => {
   let res = 1
   while (roomsName.value.includes('' + res)) res++
-  return res
+  return "" + res
 })
 
-const nextOrder = computed(() => {
-  return _.maxBy(roomsStates.value, r => r.room.order) + 1
+export const nextOrder = computed(() => {
+  return (_.maxBy(roomsStates.value, r => r.room.order).room.order + 1)
 })
 
 export const addNewRoom = async function() {
@@ -70,7 +70,7 @@ export const updateRoomName = async function(room) {
 
 export const updateSelectingRoomName = async function(newName) {
   selectingRoomStates.value.room.name = newName
-  await updateRoomName(selectingRoomStates.value.room.name)
+  await updateRoomName(selectingRoomStates.value.room)
 }
 
 

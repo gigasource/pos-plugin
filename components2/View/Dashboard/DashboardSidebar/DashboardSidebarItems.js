@@ -1,12 +1,11 @@
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import _ from 'lodash';
 
-import { user } from '../../AppSharedStates'
+import { user } from '../../../AppSharedStates'
 
-import { roomsStates, selectingRoomStates } from '../../TablePlan/room-state'
+import { onSelectRoom, roomsStates } from '../../../TablePlan/RoomState'
 import { activeScreen } from '../DashboardSharedStates';
-import { onSelectRoom} from '../../TablePlan/room-state';
-import { useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 
 const DashboardSidebarItemsFactory = () => {
   const { t: $t} = useI18n()

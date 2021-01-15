@@ -4,34 +4,34 @@ import {
   createRoom,
   addRoomObject,
   removeRoomObject,
-  moveOrderToNewTable,
-  makeTakeAway,
   updateRoomObjects,
   updateRoomObject
-} from "../room-logic";
-import _ from "lodash";
-import {
-  createOrder,
-  addItem as addOrderItem,
-  makePaid
-} from "../../../backend/order-logic/pos-logic";
+} from "../roomLogics";
+
+import { viewH, viewW } from "../RoomLogics";
+
+import { ObjectId } from "bson";
+
+import { stringify } from "schemahandler/utils";
 
 const orm = require("schemahandler");
-
 const table1 = {
   name: "table 1",
   location: { x: 5, y: 10 },
-  size: { width: 10, height: 10 }
+  size: { width: 10, height: 10 },
+  _id: new ObjectId().toString()
 };
 const table2 = {
   name: "table 2",
   location: { x: 50, y: 50 },
-  size: { width: 10, height: 10 }
+  size: { width: 10, height: 10 },
+  _id: new ObjectId().toString()
 };
 const wall1 = {
   name: "wall 1",
   location: { x: 30, y: 10 },
-  size: { width: 10, height: 2 }
+  size: { width: 10, height: 2 },
+  _id: new ObjectId().toString()
 };
 const drinkTax = { taxes: [16, 32] };
 
@@ -97,10 +97,11 @@ describe("room-logic", function() {
     addRoomObject(room, table2);
     removeRoomObject(room, table1);
     expect(room.roomObjects.length).toEqual(1);
-    expect(room).toMatchInlineSnapshot(`
+    expect(stringify(room)).toMatchInlineSnapshot(`
       Object {
         "roomObjects": Array [
           Object {
+            "_id": "ObjectID",
             "location": Object {
               "x": 50,
               "y": 50,
@@ -120,7 +121,7 @@ describe("room-logic", function() {
     expect(room.roomObjects.length).toEqual(0);
   });
   it("zoom should change", async () => {
-    const { room, zoom, viewH, viewW, w1, h1 } = createRoom();
+    const { room, zoom } = createRoom();
     await nextTick();
     expect(zoom.value).toEqual(1);
 
@@ -128,10 +129,6 @@ describe("room-logic", function() {
     addRoomObject(room, table1);
     await nextTick();
     expect([
-      "w1",
-      w1.value,
-      "h1",
-      h1.value,
       "zoom",
       zoom.value,
       "realLocation",
@@ -140,10 +137,6 @@ describe("room-logic", function() {
       room.roomObjects[0].realSize
     ]).toMatchInlineSnapshot(`
       Array [
-        "w1",
-        15,
-        "h1",
-        20,
         "zoom",
         5,
         "realLocation",
@@ -162,8 +155,6 @@ describe("room-logic", function() {
     addRoomObject(room, table2);
     addRoomObject(room, wall1);
     await nextTick();
-    expect(h1.value).toEqual(60);
-    expect(w1.value).toEqual(60);
     expect(room.roomObjects[0].realLocation).toMatchInlineSnapshot(`
       Object {
         "x": 8.333333333333334,
@@ -179,31 +170,26 @@ describe("room-logic", function() {
     expect(zoom.value).toEqual(100 / 60);
   });
 
-  it("should move order", async () => {
-    const { room } = createRoom();
-    addRoomObject(room, table1);
-    addRoomObject(room, table2);
-    await nextTick();
-    const Order = cms.getModel("Order");
-    await Order.remove({});
-    const order = createOrder({ table: "table 1" });
-    addOrderItem(order, cola);
-    await nextTick();
-    await Order.create(order);
-    const orderInDb = await cms.getModel("Order").findOne({ table: "table 1" });
-    expect(orderInDb.table).toEqual("table 1");
-    await moveOrderToNewTable(table1, table2);
-    const newOrderInDb = await cms
-      .getModel("Order")
-      .findOne({ _id: orderInDb._id });
-    expect(newOrderInDb.table).toEqual("table 2");
-  });
-  it("should set table type to take away", () => {
-    const _table1 = _.cloneDeep(table1);
-    expect(_table1.takeAway).toBeFalsy();
-    makeTakeAway(_table1);
-    expect(_table1.takeAway).toBeTruthy();
-  });
+  // todo: move this test to correct place
+  // it("should move order", async () => {
+  //   const { room } = createRoom();
+  //   addRoomObject(room, table1);
+  //   addRoomObject(room, table2);
+  //   await nextTick();
+  //   const Order = cms.getModel("Order");
+  //   await Order.remove({});
+  //   const order = createOrder({ table: "table 1" });
+  //   addOrderItem(order, cola);
+  //   await nextTick();
+  //   await Order.create(order);
+  //   const orderInDb = await cms.getModel("Order").findOne({ table: "table 1" });
+  //   expect(orderInDb.table).toEqual("table 1");
+  //   await moveOrderToNewTable(table1, table2);
+  //   const newOrderInDb = await cms
+  //     .getModel("Order")
+  //     .findOne({ _id: orderInDb._id });
+  //   expect(newOrderInDb.table).toEqual("table 2");
+  // });
 
   it("should update a single room object data", async () => {
     const { room, viewH, viewW } = createRoom();
@@ -216,78 +202,5 @@ describe("room-logic", function() {
     });
     expect(newObj.name).toBe("new name");
     expect(newObj.bgColor).toBe("red");
-  });
-  it("should update room objects", async () => {
-    const { room, viewW, viewH } = createRoom();
-    addRoomObject(room, table1);
-    addRoomObject(room, table2);
-
-    viewW.value = VIEW_W;
-    viewH.value = VIEW_H;
-    const newRoomObjects = [table1, table2, wall1];
-    updateRoomObjects(room, newRoomObjects);
-    await nextTick();
-    expect(room.roomObjects.length).toBe(3);
-    expect(room.roomObjects).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "location": Object {
-            "x": 5,
-            "y": 10,
-          },
-          "name": "table 1",
-          "realLocation": Object {
-            "x": 8.333333333333334,
-            "y": 16.666666666666668,
-          },
-          "realSize": Object {
-            "height": 16.666666666666668,
-            "width": 16.666666666666668,
-          },
-          "size": Object {
-            "height": 10,
-            "width": 10,
-          },
-        },
-        Object {
-          "location": Object {
-            "x": 50,
-            "y": 50,
-          },
-          "name": "table 2",
-          "realLocation": Object {
-            "x": 83.33333333333334,
-            "y": 83.33333333333334,
-          },
-          "realSize": Object {
-            "height": 16.666666666666668,
-            "width": 16.666666666666668,
-          },
-          "size": Object {
-            "height": 10,
-            "width": 10,
-          },
-        },
-        Object {
-          "location": Object {
-            "x": 30,
-            "y": 10,
-          },
-          "name": "wall 1",
-          "realLocation": Object {
-            "x": 50,
-            "y": 16.666666666666668,
-          },
-          "realSize": Object {
-            "height": 3.3333333333333335,
-            "width": 16.666666666666668,
-          },
-          "size": Object {
-            "height": 2,
-            "width": 10,
-          },
-        },
-      ]
-    `);
   });
 });

@@ -3,7 +3,7 @@ import EditTablePlan from '../EditTablePlanFactory';
 import { nextTick } from 'vue';
 import delay from 'delay';
 import prepareDb from '../../../TablePlan/__test__/test-setup-db';
-import { currentInputValue } from '../../../TablePlan/room-state'
+import { currentInputValue } from '../../../TablePlan/RoomState'
 
 beforeAll(async () => {
   await prepareDb();

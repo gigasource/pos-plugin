@@ -1,5 +1,5 @@
-import { isTable } from './room-logic';
-import { selectingRoomStates } from './room-state';
+import { isTable } from './RoomLogics';
+import { selectingRoomStates } from './RoomState';
 import { computed } from 'vue'
 
 const RoomStyleFactory = () => {

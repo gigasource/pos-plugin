@@ -7,8 +7,8 @@ import {
 
 import _ from 'lodash';
 import { ref } from 'vue'
-import { updateObjectLocation, updateObjectSize } from '../room-logic';
-import { selectingRoomStates } from '../room-state';
+import { updateObjectLocation, updateObjectSize } from '../RoomLogics';
+import { selectingRoomStates } from '../RoomState';
 
 const EditableRoomEventHandlersFactory = () => {
   const action = ref('')

@@ -1,29 +1,30 @@
-import { nextTick } from "vue";
+import { nextTick } from 'vue';
 
-import RoomFactory from "../RoomFactory";
-import { mount } from "@vue/test-utils";
-import { removeRoomObject } from "../room-logic";
-import { onSelectObject, selectingObject} from '../room-state'
-describe("test room ui 1", () => {
-  it("should render room", async () => {
-    const { fn, hooks } = RoomFactory();
+import RoomUI from '../RoomUI';
+import { mount } from '@vue/test-utils';
+import { removeRoomObject } from '../RoomLogics';
+import { selectingObject } from '../RoomState'
+
+describe('test room ui 1', () => {
+  it('should render room', async () => {
+    const { fn, hooks } = RoomUI();
     let room;
-    hooks.on("room", _room => {
+    hooks.on('room', _room => {
       room = _room;
     });
 
     const table1 = {
-      name: "table 1",
+      name: 'table 1',
       location: { x: 5, y: 10 },
       size: { width: 10, height: 10 }
     };
     const table2 = {
-      name: "table 2",
+      name: 'table 2',
       location: { x: 50, y: 50 },
       size: { width: 10, height: 10 }
     };
     const wall1 = {
-      name: "wall 1",
+      name: 'wall 1',
       location: { x: 30, y: 10 },
       size: { width: 10, height: 2 }
     };
@@ -46,25 +47,25 @@ describe("test room ui 1", () => {
     );
   });
 
-  it("should change selecting object when click on an object", async() => {
-    const { fn, hooks } = RoomFactory();
+  it('should change selecting object when click on an object', async () => {
+    const { fn, hooks } = RoomUI();
     let room;
-    hooks.on("room", _room => {
+    hooks.on('room', _room => {
       room = _room;
     });
 
     const table1 = {
-      name: "table1",
+      name: 'table1',
       location: { x: 5, y: 10 },
       size: { width: 10, height: 10 }
     };
     const table2 = {
-      name: "table2",
+      name: 'table2',
       location: { x: 50, y: 50 },
       size: { width: 10, height: 10 }
     };
     const wall1 = {
-      name: "wall1",
+      name: 'wall1',
       location: { x: 30, y: 10 },
       size: { width: 10, height: 2 }
     };
@@ -76,8 +77,8 @@ describe("test room ui 1", () => {
       }
     });
     expect(selectingObject.value).toBeFalsy()
-    const table1El = wrapper.get("#table1")
-    await table1El.trigger("click")
-    expect(selectingObject.value.name).toBe("table1")
+    const table1El = wrapper.get('#table1')
+    await table1El.trigger('click')
+    expect(selectingObject.value.name).toBe('table1')
   })
 });
