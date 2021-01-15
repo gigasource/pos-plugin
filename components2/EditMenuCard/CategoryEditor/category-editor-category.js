@@ -3,6 +3,7 @@ import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import orderLayoutApi from '../orderLayoutApi';
 import {
+  orderLayout,
   selectedCategoryLayout,
   updateOrderLayout
 } from '../../OrderView/pos-ui-shared'
@@ -14,7 +15,7 @@ export const categoryName = computed(() => selectedCategoryLayout.value && selec
 export const categoryColor = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value.color)
 
 export const debouncedUpdateCategory = _.debounce(change => {
-  _updateCategory(change, !selectedCategoryLayout.value._id).then()
+  _updateCategory(change, !selectedCategoryLayout.value._id).then(() => {})
 }, 300)
 
 async function _updateCategory(change, forceCreate) {
@@ -30,8 +31,8 @@ async function _updateCategory(change, forceCreate) {
   } else if (forceCreate)  {
     // otherwise, create new if forceCreate
     // in case of create new, we need to emit an event to update category layout _id
-    const orderLayout = await orderLayoutApi.createCategoryLayout(orderLayout.value._id, selectedCategoryLayout.value)
+    const result = await orderLayoutApi.createCategoryLayout(orderLayout.value._id, selectedCategoryLayout.value)
     showNotify();
-    updateOrderLayout(orderLayout)
+    updateOrderLayout(result)
   }
 }

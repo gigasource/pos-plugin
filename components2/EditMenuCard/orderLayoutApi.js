@@ -1,5 +1,5 @@
-import { selectedCategoryLayout } from '../OrderView/pos-ui-shared';
 import _ from 'lodash';
+import cms from 'cms';
 
 const colName = 'OrderLayout'
 
