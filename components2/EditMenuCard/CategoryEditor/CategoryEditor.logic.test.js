@@ -1,5 +1,25 @@
 const { reactive } = require('vue')
-const CategoryEditorLogic = require('./CategoryEditorLogic').default
+// TODO: update test
+import {
+  productRows,
+  productCols,
+  categoryName,
+  categoryColor,
+  debouncedUpdateCategory
+} from './category-editor-category'
+
+import {
+  hasOrderLayout,
+  categoryRows,
+  categoryColumns,
+  //
+  createLayout,
+  changeCategoryColumn,
+  changeCategoryRow,
+  deleteCategory,
+  setAction,
+  canSwitch
+} from './category-editor-order-layout'
 
 describe('Logic:CategoryEditor', () => {
   let _cms
