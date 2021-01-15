@@ -13,7 +13,7 @@ import {
 } from "./pos-logic-be";
 
 export function payPrintBtnFactory() {
-  let {$t, locale} = useI18n();
+  let {t: $t, locale} = useI18n();
   const showQuickBtn = ref(true);
   const order = getCurrentOrder();
 

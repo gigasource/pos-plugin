@@ -10,7 +10,7 @@ export default {
   setup(props, {emit}) {
     const order = getCurrentOrder();
     const showMenu = ref(false);
-    const {$t, locale} = useI18n();
+    const {t: $t, locale} = useI18n();
     const disableTakeAway = computed(() => {
       if (order && order.items) {
         return !order.items.some(i => i.quantity)

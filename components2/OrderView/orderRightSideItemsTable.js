@@ -6,7 +6,7 @@ import {addItem, addModifier, changeCourse, removeItem, removeModifier, updateIt
 import {getItemSubtext, isItemDiscounted} from "./pos-ui-shared";
 
 export function orderRightSideItemsTable() {
-  let {$t, locale} = useI18n();
+  let {t: $t, locale} = useI18n();
   const order = getCurrentOrder();
 
   const dialogConfigOrderItem = reactive({
@@ -81,7 +81,8 @@ export function orderRightSideItemsTable() {
                           color={item.sent ? '#FF4452' : '#000'}>remove_circle_outline
                   </g-icon>
                   <span class="ml-1 mr-1">{item.quantity}</span>
-                  <g-icon onClick_stop={() => _addItem(order, item)} style={[item.sent && {opacity: 0.5}]}>add_circle_outline
+                  <g-icon onClick_stop={() => _addItem(order, item)}
+                          style={[item.sent && {opacity: 0.5}]}>add_circle_outline
                   </g-icon>
                 </div>
               </div>

@@ -7,7 +7,7 @@ jest.mock("vue-i18n", () => {
   return {
     useI18n() {
       return {
-        $t(t) {
+        t(t) {
           return t;
         },
         locale: "en"
@@ -80,6 +80,9 @@ export let expectArray = () => [
 
 //<editor-fold desc="component">
 export let component, wrapper;
+export function setComponent(_component) {
+  component = _component;
+}
 export const makeWrapper = () => {
   wrapper = mount(component, {
     props: {},
@@ -96,6 +99,7 @@ export const makeWrapper = () => {
         "g-avatar": true
       },
       mocks: {
+        t: a => a,
         $t: a => a,
         $filters: {
           formatCurrency(val, decimals = 2) {

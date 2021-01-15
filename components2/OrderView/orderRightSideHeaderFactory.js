@@ -7,7 +7,7 @@ import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 
 export function orderRightSideHeader(props, {emit}) {
-  let {$t, locale} = useI18n();
+  let {t: $t, locale} = useI18n();
   const order = getCurrentOrder();
   const menu = ref(false);
 

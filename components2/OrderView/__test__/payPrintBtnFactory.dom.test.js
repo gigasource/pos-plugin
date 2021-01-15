@@ -1,4 +1,19 @@
 //<editor-fold desc="declare">
+import {
+  actions,
+  cola,
+  drinkTax,
+  expectArray,
+  fanta,
+  foodTax,
+  ketchup,
+  rice,
+  component,
+  wrapper,
+  makeWrapper,
+  orm, setComponent
+} from "../../test-utils";
+
 import {config, mount} from "@vue/test-utils";
 
 import {nextTick} from "vue";
@@ -21,20 +36,6 @@ import {smallSidebar} from "../order-layout-setting-logic";
 import {orderRightSideHeader} from "../orderRightSideHeaderFactory";
 import {orderRightSideItemsTable} from "../orderRightSideItemsTable";
 import PosOrder2 from "../PosOrder2";
-import {
-  actions,
-  cola,
-  drinkTax,
-  expectArray,
-  fanta,
-  foodTax,
-  ketchup,
-  rice,
-  component,
-  wrapper,
-  makeWrapper,
-  orm
-} from "../../test-utils";
 
 const {stringify} = require("schemahandler/utils");
 
@@ -53,12 +54,12 @@ const delay = require("delay");
 
 describe("PrintButton test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
         const {renderPayBtn} = payPrintBtnFactory();
         return () => renderPayBtn();
       }
-    };
+    })
     makeWrapper();
   });
 
@@ -205,12 +206,12 @@ describe("PrintButton test", function () {
 
 describe("header test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
         const {renderHeader} = orderRightSideHeader({}, {emit: () => null});
         return () => renderHeader();
       }
-    };
+    })
     makeWrapper();
   });
 
@@ -264,7 +265,7 @@ describe("header test", function () {
 
 describe("item table test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
         const {renderItemsTable} = orderRightSideItemsTable(
           {},
@@ -272,7 +273,7 @@ describe("item table test", function () {
         );
         return () => renderItemsTable();
       }
-    };
+    })
     makeWrapper();
   });
 
@@ -362,7 +363,7 @@ describe("item table test", function () {
 
 describe("PosOrderRight intergration", function () {
   beforeAll(() => {
-    component = PosOrder2;
+    setComponent(PosOrder2)
     makeWrapper();
   });
 
