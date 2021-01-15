@@ -14,7 +14,7 @@ import {
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,
   selectedProductLayout,
-  mode, editable, productDblClicked
+  mode, editable, productDblClicked, products
 } from "./pos-ui-shared";
 import {isSameArea} from "../../components/posOrder/util";
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
@@ -28,17 +28,6 @@ export function orderLayoutProductFactory() {
   const isTouchEventHandled = ref();
   const doubleClicked = ref(false);
   const lastSelectMoment = ref();
-
-  const products = computed(() => {
-    if (editable) {
-      return fillMissingAreas(
-        selectedCategoryLayout.products,
-        selectedCategoryLayout.columns,
-        selectedCategoryLayout.rows);
-    }
-    // remove product layout which is not text but doesn't link to any product
-    return _.filter(selectedCategoryLayout.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
-  })
 
   const popupModifierDialog = reactive({
     value: false,
@@ -132,13 +121,14 @@ export function orderLayoutProductFactory() {
   }
 
   function getProductListeners(productLayout) {
+    //todo: manual test here
     return editable.value
       ? {
-        click: () => onClick(productLayout),
-        touchstart: () => onTouchStart(productLayout)
+        onClick: () => onClick(productLayout),
+        onTouchstart: () => onTouchStart(productLayout)
       }
       : {
-        click: () => {
+        onClick: () => {
           if (productLayout.type === 'Text') return
           const {product} = productLayout;
           if (product.activePopupModifierGroup) return showPopupModifierDialog(productLayout)
@@ -271,7 +261,7 @@ export function orderLayoutProductFactory() {
               <div
                 class={['pol__prod', !editable.value && 'darken-effect', isMobile.value && collapseText.value && 'collapsed']}
                 style={[getAreaStyle(productLayout), getProductItemStyle(productLayout)]}
-                vOn={getProductListeners(productLayout)}>
+                {...getProductListeners(productLayout)}>
                 {productLayout.icon && <g-icon class="mr-1">{productLayout.icon}</g-icon>}
                 {productLayout.product && productLayout.product.isModifier ?
                   <div style="transform: skewX(-15deg)">{getProductName(productLayout)}</div> :

@@ -21,7 +21,7 @@ export default {
   },
   emits: ['addItemQuantity', 'removeItemQuantity', 'removeProductModifier',
     'addModifierToProduct', 'changePrice', 'updateOrderItem', 'resetOrderData',
-    'updateOrderTable', 'update:actionMode', 'quickCash', 'openDialog',
+    'updateOrderTable', 'update:actionMode', 'quickCash',
     'updateCurrentOrder', 'saveTableOrder'],
   setup(props, {emit}) {
     //todo: edit ??

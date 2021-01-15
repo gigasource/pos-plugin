@@ -11,6 +11,7 @@ import {editable, mode, orderLayout, view} from "./pos-ui-shared";
 import {payPrintMode, showIcon} from "./pos-logic-be";
 import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";
+import cms from 'cms';
 
 export default {
   name: 'PosOrderLayout2',
@@ -42,6 +43,7 @@ export default {
         type = route.query.type
       }
       await loadOrderLayout(type);
+      //todo: test use mock socket io
       cms.socket.on('updateProductProps', async () => {
         await loadOrderLayout(type);
       })

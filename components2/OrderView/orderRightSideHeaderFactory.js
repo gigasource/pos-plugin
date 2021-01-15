@@ -5,6 +5,7 @@ import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} f
 import {hooks} from './pos-logic'
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
+import {orderViewDialog} from "./pos-ui-shared";
 
 export function orderRightSideHeader(props, {emit}) {
   let {t: $t, locale} = useI18n();
@@ -12,11 +13,11 @@ export function orderRightSideHeader(props, {emit}) {
   const menu = ref(false);
 
   function splitOrder() {
-    emit('openDialog', 'split')
+    orderViewDialog.value['split'] = true;
   }
 
   function showVoucherDialog() {
-    emit('openDialog', 'voucher')
+    orderViewDialog.value['voucher'] = true;
   }
 
   hooks.on('printOrder', () => menu.value = false);
@@ -32,7 +33,7 @@ export function orderRightSideHeader(props, {emit}) {
 
   //todo: fix
   function moveItems() {
-    emit('openDialog', 'move')
+    orderViewDialog.value['move'] = true;
   }
 
   function toggleTakeAwayOrder() {

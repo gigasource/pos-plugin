@@ -17,6 +17,18 @@ jest.mock("vue-i18n", () => {
   };
 });
 
+jest.mock("vue-router", () => {
+  return {
+    useRoute() {
+      return {
+        query: {
+          type: 'default'
+        }
+      };
+    }
+  };
+});
+
 const dayjs = require("dayjs");
 export const orm = require("schemahandler");
 const syncFlow = require("schemahandler/sync/sync-flow");
@@ -105,7 +117,27 @@ export const makeWrapper = (_component, options) => {
         "g-icon": true,
         "dialog-config-order-item": true,
         "g-overlay": true,
-        "g-avatar": true
+        "g-avatar": true,
+        'pos-order': true,
+        'pos-quick-order-toolbar': true,
+        'pos-order-split-order': true,
+        'pos-order-receipt': true,
+        'pos-order-move-items': true,
+        'pos-order-voucher-dialog': true,
+        'pos-order-keyboard': true,
+        'dialog-choose-popup-modifier': true,
+        'g-text-field-bs': true,
+        'g-btn': true,
+        'pos-keyboard-full': true,
+        'g-dialog': true,
+        'dialog-text-filter': true,
+        'dialog-product-search-result': true,
+        'g-card-title': true,
+        'g-badge': true,
+        'g-item-group': true,
+        'g-simple-table': true,
+        'g-card': true,
+
       },
       mocks: {
         t: a => a,

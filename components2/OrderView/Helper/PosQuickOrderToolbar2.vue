@@ -4,6 +4,7 @@ import {useI18n} from "vue-i18n";
 import {hooks, makeTakeaway} from "../pos-logic";
 import {computed, onActivated} from "vue";
 import {useRoute, useRouter} from "vue-router";
+import {orderViewDialog} from "../pos-ui-shared";
 
 export default {
   name: "PosQuickOrderToolbar2",
@@ -37,7 +38,7 @@ export default {
     }
 
     function splitOrder() {
-      emit('openDialog', 'split')
+      orderViewDialog.value['split'] = true;
     }
 
     function print() {
@@ -45,11 +46,11 @@ export default {
     }
 
     function moveItems() {
-      emit('openDialog', 'move')
+      orderViewDialog.value['move'] = true;
     }
 
     function showVoucherDialog() {
-      emit('openDialog', 'voucher')
+      orderViewDialog.value['voucher'] = true;
     }
     function toggleTakeAwayOrder() {
       emit('updateCurrentOrder', 'takeAway', !order.takeAway, true)
