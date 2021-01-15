@@ -16,7 +16,7 @@ const EditablePlanFactory = () => {
       const sidebarRenderFn = () => <EditTablePlanSidebar {...getScopeAttrs()} >
       </EditTablePlanSidebar>
       const roomRenderFn = () =>
-        <EditableRoom roomObjects={objectsInSelectingRoom.value} {...getScopeAttrs()}> </EditableRoom>
+        <EditableRoom {...getScopeAttrs()}> </EditableRoom>
 
       // const dialogsRenderFn = () => <>
       // {isSelectingARoom.value  ? <dialog-text-filter label="Room name" default-value={selectingRoom.value.name} v-model={dialog.value.showRoomNameKbd} onSubmit={onUpdateSelectingRoomName}/> : null}
