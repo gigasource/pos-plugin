@@ -79,7 +79,7 @@ hooks.on('pre:order:update', function (order) {
 
 hooks.on('post:order:update', async function (order) {
   let _order = toRaw(order);
-  await nextTick();
+  await Promise.resolve();
 
 
   processItems(_order.items, itemsSnapshot, 'items');

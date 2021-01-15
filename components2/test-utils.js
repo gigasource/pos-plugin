@@ -25,6 +25,12 @@ jest.mock("vue-router", () => {
           type: 'default'
         }
       };
+    },
+    useRouter() {
+      return {
+        push() {
+        }
+      };
     }
   };
 });
@@ -120,7 +126,7 @@ export const makeWrapper = (_component, options) => {
         "g-avatar": true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
-        'pos-order-split-order': true,
+        //'pos-order-split-order': true,
         'pos-order-receipt': true,
         'pos-order-move-items': true,
         'pos-order-voucher-dialog': true,
@@ -137,7 +143,12 @@ export const makeWrapper = (_component, options) => {
         'g-item-group': true,
         'g-simple-table': true,
         'g-card': true,
-
+        'g-spacer': true,
+        'g-toolbar': true,
+        'dialog-multi-payment': true,
+        'dialog-form-input': true,
+        'g-menu': true,
+        'choose-table-dialog': true
       },
       mocks: {
         t: a => a,

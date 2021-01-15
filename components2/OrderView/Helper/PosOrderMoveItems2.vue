@@ -6,9 +6,14 @@ import {useI18n} from "vue-i18n";
 import {getItemSubtext, isItemDiscounted, itemsWithQtyFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {removeModifier} from "../pos-logic";
+import {ref} from 'vue';
 
 //finish
 export default {
+  props: {
+    modelValue: Boolean,
+  },
+  emits: ['update:modelValue'],
   setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
     const order = getCurrentOrder();

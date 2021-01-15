@@ -2,6 +2,7 @@
 import {useI18n} from 'vue-i18n'
 import {internalValueFactory} from "../../utils";
 import {addVoucher, redeemVoucher} from "../pos-logic";
+import {ref} from 'vue';
 
 export default {
   name: 'PosOrderVoucherDialog2',

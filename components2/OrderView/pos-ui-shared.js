@@ -122,7 +122,7 @@ export function isItemDiscounted(item) {
 export function itemsWithQtyFactory() {
   const remainingItems = ref([]);
   const itemsWithQty = computed(() => {
-    if (remainingItems) return remainingItems.filter(i => i.quantity > 0)
+    if (remainingItems.value) return remainingItems.value.filter(i => i.quantity > 0)
     return [];
   })
   const itemsToMove = ref([]);
@@ -175,7 +175,7 @@ export function itemsWithQtyFactory() {
   }
 }
 
-export const orderViewDialog = ref({
+export const orderViewDialog = reactive({
   search: false,
   split: false,
   move: false,
