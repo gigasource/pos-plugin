@@ -26,7 +26,7 @@ export default {
       <pos-order-receipt v-model={orderViewDialog.value.receipt}/>
       <pos-order-move-items v-model={orderViewDialog.value.move}/>
       <pos-order-voucher-dialog v-model={orderViewDialog.value.voucher}/>
-    </>)x
+    </>)
   }
 }
 </script>
