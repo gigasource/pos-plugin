@@ -20,15 +20,15 @@ import {
 import {isMobile} from "../AppSharedStates";
 
 export function renderOLSetting() {
-  if (!editModeOL) return;
+  if (!editModeOL.value) return;
   return (<>
     <div class="row-flex align-items-center">
       <span class="mr-1">Product font size:</span>
-      <g-icon onClick={changeSize(-0.5)}>remove_circle</g-icon>
+      <g-icon onClick={() => changeSize(-0.5)}>remove_circle</g-icon>
       <span>{{fontSize}}</span>
-      <g-icon onClick={changeSize(0.5)}>add_circle</g-icon>
+      <g-icon onClick={() => changeSize(0.5)}>add_circle</g-icon>
     </div>
-    <g-btn-bs small style="margin-left: 0" class="elevation-1" onClick={changeCategory()}>
+    <g-btn-bs small style="margin-left: 0" class="elevation-1" onClick={() => changeCategory()}>
       Change category mode
     </g-btn-bs>
     <div style="text-transform: capitalize">Mode: {category.type}</div>
@@ -40,15 +40,15 @@ export function renderOLSetting() {
       label={`Different ${category.type === 'vertical' ? 'Height' : 'Width'}`}/>
     <div class="row-flex align-items-center">
       <span class="mr-1">Category size</span>
-      <g-icon onClick={changeCategorySize(-4)}>remove_circle</g-icon>
+      <g-icon onClick={() => changeCategorySize(-4)}>remove_circle</g-icon>
       <span>{category.size}</span>
-      <g-icon onClick={changeCategorySize(4)}>add_circle</g-icon>
+      <g-icon onClick={() => changeCategorySize(4)}>add_circle</g-icon>
     </div>
     <div class="row-flex align-items-center">
       <span class="mr-1">Category font size</span>
-      <g-icon onClick={changeCategoryFontSize(-0.5)}>remove_circle</g-icon>
+      <g-icon onClick={() => changeCategoryFontSize(-0.5)}>remove_circle</g-icon>
       <span>{category.fontSize}</span>
-      <g-icon onClick={changeCategoryFontSize(0.5)}>add_circle</g-icon>
+      <g-icon onClick={() => changeCategoryFontSize(0.5)}>add_circle</g-icon>
     </div>
     <g-checkbox v-model={minimumTextRow.value} label="Minimize only text row"/>
     <g-checkbox v-model={hideTextRow.value} label="Hide text row" />

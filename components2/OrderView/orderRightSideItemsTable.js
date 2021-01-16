@@ -1,6 +1,6 @@
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {nextTick, reactive, ref, watchEffect, withModifiers} from "vue";
+import {nextTick, reactive, ref, watchEffect, withModifiers, watch} from "vue";
 import {getCurrentOrder, itemQuantityChangeCheck} from "./pos-logic-be";
 import {
   addItem,
@@ -54,7 +54,7 @@ export function orderRightSideItemsTable() {
   }
 
   const tableRef = ref();
-  watchEffect(() => {
+  watch(() => order.items.length, () => {
     nextTick(() => tableRef.value.scroll && tableRef.value.scroll({top: tableRef.value.scrollHeight, behavior: 'smooth'}))
   })
 
@@ -62,9 +62,10 @@ export function orderRightSideItemsTable() {
     return (
       <>
         <div class="order-detail__content" ref={tableRef}>
-          {order.items.map(item => (
+          {order.items.map((item, k) => (
             showItem(item) &&
             <div class="item"
+                 key={item._id}
                  style={[item.separate && {borderBottom: '2px solid red'}]}
                  onClick={withModifiers(() => openConfigDialog(item), ['stop'])} v-touch={getTouchHandlers(item)}>
               <div class="item-detail">
@@ -96,8 +97,8 @@ export function orderRightSideItemsTable() {
               </div>
               {item.modifiers &&
               <div>
-                {item.modifiers.map(modifier => (
-                  <g-chip label small text-color="#616161" close onClose={() => removeModifier(order, item, modifier)}>
+                {item.modifiers.map((modifier, index) => (
+                  <g-chip label small key={index} text-color="#616161" close onClose={() => removeModifier(order, item, index)}>
                     {modifier.name} | {$t('common.currency', locale)}
                     {$filters.formatCurrency(modifier.price)}
                   </g-chip>

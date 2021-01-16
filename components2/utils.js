@@ -8,5 +8,8 @@ export const internalValueFactory = (props, {emit}) => {
 }
 
 export function genScopeId(render) {
-  return withScopeId(getCurrentInstance().type['__scopeId'])(render);
+  if (render) {
+    return withScopeId(getCurrentInstance().type['__scopeId'])(render);
+  }
+  return {[getCurrentInstance().type['__scopeId']]: ''};
 }

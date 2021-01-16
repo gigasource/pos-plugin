@@ -38,6 +38,7 @@ export default {
             <pos-order-layout2 style="flex: 1"/>
             <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
           </div>
+          {!isMobile.value && <pos-quick-order-toolbar2/>}
         </div>
     ))
   }

@@ -7,6 +7,7 @@ import {computed, ref, withModifiers} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
 import {payPrintBtnFactory} from "./payPrintBtnFactory";
+import {genScopeId} from "../utils";
 
 export function orderRightSideHeader(props, {emit}) {
   let {t: $t, locale} = useI18n();
@@ -14,11 +15,11 @@ export function orderRightSideHeader(props, {emit}) {
   const menu = ref(false);
 
   function splitOrder() {
-    orderViewDialog.value['split'] = true;
+    orderViewDialog['split'] = true;
   }
 
   function showVoucherDialog() {
-    orderViewDialog.value['voucher'] = true;
+    orderViewDialog['voucher'] = true;
   }
 
   hooks.on('printOrder', () => menu.value = false);
@@ -34,7 +35,7 @@ export function orderRightSideHeader(props, {emit}) {
 
   //todo: fix
   function moveItems() {
-    orderViewDialog.value['move'] = true;
+    orderViewDialog['move'] = true;
   }
 
   function toggleTakeAwayOrder() {
@@ -72,7 +73,7 @@ export function orderRightSideHeader(props, {emit}) {
               </div>),
 
               default: () => <g-expand-x-transition>
-                <div class="order-detail__menu">
+                <div {...genScopeId()} class="order-detail__menu">
                   <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
                   <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{$t('order.voucher')}</g-btn-bs>
                   <g-btn-bs icon="icon-move-items" onClick={moveItems}>{$t('order.moveItem')}</g-btn-bs>

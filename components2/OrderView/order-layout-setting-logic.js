@@ -29,6 +29,7 @@ export function saveOrderLayoutSetting() {
     hideTextRow, hideBlankColumn
   }
   localStorage.setItem('OrderScreenSetting', JSON.stringify(setting))
+  editModeOL.value = false;
 }
 
 export function loadOrderLayoutSetting() {

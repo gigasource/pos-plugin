@@ -22,14 +22,14 @@ const run = async () => {
 //fixme: move to lifecycle
 run();
 
-watch(() => user.value, value => {
+/*watch(() => user.value, value => {
   if (value) console.log('user watcher', value)
-}, { deep: true })
+}, { deep: true })*/
 
 export let isMobile = ref(mobileCheck());
 
 //fixme: remove by production
-isMobile.value = true;
+//isMobile.value = true;
 
 export const $filters = {
   formatCurrency(val, decimals = 2) {
