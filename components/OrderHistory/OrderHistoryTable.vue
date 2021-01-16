@@ -75,7 +75,7 @@
           </template>
         </td>
         <td>
-          <p class="staff-name">{{getStaffName(order.staff)}}</p>
+          <p class="staff-name">{{getStaffName(order.staff, order)}}</p>
         </td>
       </tr>
     </g-simple-table>
@@ -158,8 +158,17 @@
       async updatePagination() {
         await this.$emit('getOrderHistory');
       },
-      getStaffName(staffs) {
-        return staffs ? staffs.map(s => s.name).join(', ') : ''
+      getStaffName(staffs, order) {
+        // [NOTE] order.staff of an online order is object (not an array of object)
+        // [Work-around]
+        // TODO: unique the data format
+        if (staffs) {
+          if (Array.isArray(staffs)) {
+            return staffs.map(s => s.name).join(', ')
+          } else {
+            return staffs.name
+          }
+        } else return ''
       },
       async setTypeFilter(type) {
         const filter = {

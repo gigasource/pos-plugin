@@ -6,9 +6,14 @@ import {useI18n} from "vue-i18n";
 import {getItemSubtext, isItemDiscounted, itemsWithQtyFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {removeModifier} from "../pos-logic";
+import {ref} from 'vue';
 
 //finish
 export default {
+  props: {
+    modelValue: Boolean,
+  },
+  emits: ['update:modelValue'],
   setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
     const order = getCurrentOrder();
@@ -46,7 +51,7 @@ export default {
         <div>
           <g-dialog v-model={internalValue.value} transition={false} content-class="move-items-dialog">
             <div class="row-flex justify-end w-100">
-              <div class="splitter" style={isMobile ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}}>
+              <div class="splitter" style={isMobile.value ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}}>
                 <div class="splitter__header row-flex align-items-center">
                   {itemsToMove.value.length &&
                   <div>

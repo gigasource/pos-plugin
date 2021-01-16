@@ -13,6 +13,14 @@ export const view = ref();
 export const editable = ref(false);
 export const productDblClicked = ref(false);
 
+export function updateOrderLayout(newLayout) {
+  orderLayout.value = newLayout
+}
+
+export function updateSelectedCategoryLayout(newCategoryLayout) {
+  selectedCategoryLayout.value = newCategoryLayout
+}
+
 watchEffect(() => {
   if (selectedCategoryLayout.value) {
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
@@ -44,6 +52,17 @@ watchEffect(() => {
         view.value = {name: 'CategoryEditor'}
     }
   }
+})
+
+export const products = computed(() => {
+  if (editable.value) {
+    return fillMissingAreas(
+      selectedCategoryLayout.value.products,
+      selectedCategoryLayout.value.columns,
+      selectedCategoryLayout.value.rows);
+  }
+  // remove product layout which is not text but doesn't link to any product
+  return  _.filter(selectedCategoryLayout.value && selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
 })
 
 export const mode = ref();
@@ -105,13 +124,13 @@ export function getItemSubtext({course, takeAway, separate}) {
 }
 
 export function isItemDiscounted(item) {
-  return item.originalPrice !== item.price
+  return item.originalPrice && item.originalPrice !== item.price
 }
 
 export function itemsWithQtyFactory() {
   const remainingItems = ref([]);
   const itemsWithQty = computed(() => {
-    if (remainingItems) return remainingItems.filter(i => i.quantity > 0)
+    if (remainingItems.value) return remainingItems.value.filter(i => i.quantity > 0)
     return [];
   })
   const itemsToMove = ref([]);
@@ -163,3 +182,11 @@ export function itemsWithQtyFactory() {
     returnItem
   }
 }
+
+export const orderViewDialog = reactive({
+  search: false,
+  split: false,
+  move: false,
+  voucher: false,
+  receipt: false
+});

@@ -40,6 +40,7 @@
   * [_] actionMode: test/mock-db
 * [_] split order
   * [_] test backend
+* [_] move items
 * [_] test thu cho khi ghep vao no se nhu the nao ?
 
 ```jsx

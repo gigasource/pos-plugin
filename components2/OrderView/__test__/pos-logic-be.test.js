@@ -183,7 +183,7 @@ describe("pos-logic", function() {
     expect(stringify(actionList.value)).toMatchSnapshot();
   });
 
-  //todo: test intergration discount -> backend -> query snapshot
+  //todo: test integration discount -> backend -> query snapshot
   it("case 4: discount", async function() {
     prepareOrder("10");
     const order = getCurrentOrder();

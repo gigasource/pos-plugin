@@ -40,7 +40,11 @@ const removeRoom = function(room) {
 const selectingRoom = ref(null);
 
 const onSelectRoom = function(newSelectingRoom) {
-  console.log('select room')
+  console.log('select room', newSelectingRoom)
+  if (selectingRoom.value && selectingRoom.value.name !== newSelectingRoom.name) {
+    console.log('assign selectingObject')
+    selectingObject.value = null //should reset selecting object when change room
+  }
   selectingRoom.value = newSelectingRoom
 }
 
@@ -98,7 +102,7 @@ const updateSelectingObjectInSelectingRoom = async function(newObject) {
 
   //todo: validate new object 's name
   if (selectingRoom.value) {
-    updateRoomObject(selectingRoom.value, selectingObject.value, newObject)
+    selectingObject.value = updateRoomObject(selectingRoom.value, selectingObject.value, newObject)
     //todo: update object in db
   }
 }
@@ -139,6 +143,9 @@ const isSelectingObject = function(object) {
   return selectingObject.value ? object.name === selectingObject.value.name : false
 }
 
+const isTable = (item) => {
+  return item.type === 'table'
+}
 
 export {
   rooms,
@@ -150,6 +157,7 @@ export {
   updateObjectInSelectingRoom,
   inProgressTables,
   isBusyTable,
+  isTable,
   fetchRooms,
   activeOrders,
   addRoom,

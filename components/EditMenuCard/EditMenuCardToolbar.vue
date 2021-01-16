@@ -8,6 +8,7 @@
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" @click="showDeleteConfirmDialog" :disabled="!deletable">{{$t('ui.delete')}}</g-btn-bs>
       <g-spacer/>
       <g-btn-bs elevation="2" icon="fas fa-calculator" @click="showKeyboardEditor">{{$t('restaurant.menuEdit.editKeyboard')}}</g-btn-bs>
+      <!-- switch mode button -->
       <g-btn-bs v-if="mode === 'basic'" elevation="2" icon="icon-basic-mode" @click="changeToIngredientMode">{{$t('inventory.basicMode')}}</g-btn-bs>
       <g-btn-bs v-else-if="mode === 'ingredient'" elevation="2" icon="icon-ingredient-mode" @click="changeToBasicMode">{{$t('inventory.ingredientMode')}}</g-btn-bs>
     </g-toolbar>
@@ -16,16 +17,17 @@
         v-model="dialog.confirmDeleteProductLayout"
         :type="deleteProductLayoutMessage"
         @submit="deleteItem(), hideDeleteConfirmDialog()"/>
-    <g-dialog v-model="dialog.mode" eager width="448">
-      <div class="dialog" @click="dialog.mode = false">
-        <div class="dialog-content">
+    
+    <g-dialog v-model="dialog.switchEditMode.show" eager width="448">
+      <div class="dialog">
+        <div class="dialog-content" @click="closeSwitchDialogMode(), changeToBasicMode()">
           <g-icon>icon-basic-mode</g-icon>
           <div style="flex: 1; margin-left: 16px">
             <p class="dialog-content__title">{{$t('inventory.basicMode')}}</p>
             <p class="dialog-content__detail">{{$t('inventory.basicNote')}}</p>
           </div>
         </div>
-        <div class="dialog-content">
+        <div class="dialog-content" @click="closeSwitchDialogMode(), changeToIngredientMode()">
           <g-icon>icon-ingredient-mode</g-icon>
           <div style="flex: 1; margin-left: 16px">
             <p class="dialog-content__title">{{$t('inventory.ingredientMode')}}</p>
@@ -37,6 +39,7 @@
         </div>
       </div>
     </g-dialog>
+    
     <dialog-form-input v-model="dialog.add" @submit="createLayout">
       <template v-slot:input>
         <div class="row-flex flex-wrap justify-around mt-2">
@@ -76,7 +79,10 @@
         deleteProductLayoutMessage: ' this product',
         dialog: {
           confirmDeleteProductLayout: false,
-          mode: false,
+          switchEditMode: {
+            show: false, // indicate whether this dialog should show or not
+            hasShown: false, // indicate whether this dialog has been shown or not
+          },
           add: false
         },
         column: 4,
@@ -313,10 +319,19 @@
       showKeyboardEditor() {
         this.$emit('update:view', { name: 'KeyboardEditor'})
       },
+      openSwitchModeDialogIfNeeded() {
+        if (!this.dialog.switchEditMode.hasShown) {
+          this.dialog.switchEditMode.show = true
+          this.dialog.switchEditMode.hasShown = true
+        }
+      },
+      closeSwitchDialogMode() {
+        this.dialog.switchEditMode.show = false
+      },
       changeToIngredientMode() {
-        this.$emit('update:view', { name: 'IngredientEditor'})
+        this.openSwitchModeDialogIfNeeded()
         this.$emit('update:mode', 'ingredient')
-        this.dialog.mode = true
+        this.$emit('update:view', { name: 'IngredientEditor'})
       },
       changeToBasicMode() {
         this.$emit('update:mode', 'basic')

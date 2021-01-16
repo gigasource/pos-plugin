@@ -99,8 +99,8 @@
         }
       },
       extraColumns() {
-        if(this.keyboardConfig) {
-          return _.max(this.keyboardConfig.layout.map(layout => layout.rows.length)) || 0
+        if(this.keyboardConfig && this.keyboardConfig.layout) {
+          return _.max(this.keyboardConfig.layout.map(layout => layout && layout.rows && layout.rows.length)) || 0
         }
         return 0
       },

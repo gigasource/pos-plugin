@@ -25,7 +25,7 @@
   export default {
     name: 'PosEndOfDayPrintZReport',
     props: {
-      value: null
+      modelValue: null
     },
     methods: {
       open() {
@@ -36,8 +36,8 @@
         if (confirmed) this.$emit('confirmed')
       }
     },
-    setup() {
-      const dialog = getInternalValue(...arguments);
+    setup(props, context) {
+      const dialog = getInternalValue(props, context);
       return { dialog };
     },
   }

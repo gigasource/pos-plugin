@@ -2,15 +2,29 @@
   <div v-if="layout && layout.product && layout.product._id" class="ingredient-editor">
     <g-btn-bs style="margin: 0" block background-color="#1271FF" icon="add@16" @click="addIngredient">{{$t('inventory.ingredient')}}</g-btn-bs>
     <div v-for="(ingredient, i) in ingredients" v-touch="getTouchHandler(i)" class="ingredient-editor__input" :key="i">
-      <g-autocomplete text-field-component="GTextFieldBs" class="ingredient-editor__input--left"
-                      @input-click="showKeyboard = true" @update:modelValue="updateProductIngredient"
-                      virtual-event menu-class="menu-select-inventory" :key="`auto_${ingredients.length - i}`"
-                      :rules="rules" :items="inventories" :arrow="false" v-model="ingredient.inventory"/>
-      <g-text-field-bs :rules="[val => !isNaN(val) || '']" class="ingredient-editor__input--right"
-                       @click="showKeyboard = true" @update:modelValue="debounceUpdateAmount"
-                       virtual-event v-model="ingredient.amount"/>
+      <g-autocomplete
+          class="ingredient-editor__input--left"
+          text-field-component="GTextFieldBs"
+          virtual-event menu-class="menu-select-inventory"
+          :key="`auto_${ingredients.length - i}`"
+          :rules="rules"
+          :items="inventories"
+          :arrow="false"
+          v-model="ingredient.inventory"
+          @input-click="showKeyboard = true"
+          @update:modelValue="updateProductIngredient"/>
+      <g-text-field-bs
+          :rules="[val => !isNaN(val) || '']"
+          class="ingredient-editor__input--right"
+          virtual-event
+          v-model="ingredient.amount"
+          @click="showKeyboard = true"
+          @update:modelValue="debounceUpdateAmount"/>
     </div>
-    <div class="ingredient-editor__message">{{$t('inventory.swipeRight')}} <g-icon style="margin-bottom: 2px" color="#757575" size="16">fas fa-angle-double-right</g-icon></div>
+    <div class="ingredient-editor__message">
+      {{$t('inventory.swipeRight')}}
+      <g-icon style="margin-bottom: 2px" color="#757575" size="16">fas fa-angle-double-right</g-icon>
+    </div>
     <div v-if="showKeyboard" class="ingredient-editor__keyboard">
       <div class="ingredient-editor__overlay" @click="showKeyboard = false"></div>
       <div class="ingredient-editor__keyboard-wrapper">
@@ -18,9 +32,13 @@
       </div>
     </div>
   </div>
+  <div v-else style="display: flex; align-items: center; justify-content: center; height: 100%">
+    Select product to edit ingredient
+  </div>
 </template>
 
 <script>
+  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
   import {Touch} from 'pos-vue-framework';
   import _ from 'lodash'
 
@@ -29,8 +47,9 @@
     directives: {
       Touch
     },
+    components: { PosKeyboardFull },
     props: {
-      layout: null,
+      layout: null, // a.k.a selected product layout
       orderLayout: null
     },
     data() {

@@ -15,18 +15,20 @@ import {isSameArea} from "../../components/posOrder/util";
 
 export function orderLayoutCategoriesFactory() {
   const categories = computed(() => {
+    console.log('editable : ', editable.value)
     if (editable.value) {
       return fillMissingAreas(
-        orderLayout.categories,
-        orderLayout.columns,
-        orderLayout.rows,
+        orderLayout.value.categories,
+        orderLayout.value.columns,
+        orderLayout.value.rows,
         true);
     }
-    return [...orderLayout.categories]
+    console.log(orderLayout.value.categories);
+    return [...orderLayout.value.categories]
   });
 
   const categoryContainerStyle = computed(() => {
-    if (category && category.type === 'vertical') {
+    if (category.type === 'vertical') {
       if (category.differentSize) {
         return {
           display: 'block',
@@ -61,30 +63,30 @@ export function orderLayoutCategoriesFactory() {
     }
     return {
       display: 'grid',
-      'grid-template-columns': getGridTemplateFromNumber(orderLayout.columns),
-      'grid-template-rows': getGridTemplateFromNumber(orderLayout.rows),
+      'grid-template-columns': getGridTemplateFromNumber(orderLayout.value.columns),
+      'grid-template-rows': getGridTemplateFromNumber(orderLayout.value.rows),
       'grid-gap': '5px',
-      height: category ? category.size : `${40 * orderLayout.rows}px`
+      height: category ? category.size : `${40 * orderLayout.value.rows}px`
     }
   })
 
-  function getCategoryStyle(category) {
-    const isCategorySelected = selectedCategoryLayout && isSameArea(selectedCategoryLayout, category);
+  function getCategoryStyle(_category) {
+    const isCategorySelected = selectedCategoryLayout.value && isSameArea(selectedCategoryLayout.value, _category);
     return {
-      backgroundColor: category.color,
+      backgroundColor: _category.color,
       color: '#000',
       border: `1px solid ${isCategorySelected ? '#1271FF' : 'transparent'}`,
       boxShadow: isCategorySelected ? '1px 0px 3px rgba(18, 113, 255, 0.36)' : 'none',
-      ...category && category.differentSize && (category.type === 'horizontal' ? {marginRight: "5px"} : {marginBottom: "5px"}),
-      ...category && category.fontSize && {fontSize: category.fontSize}
+      ...category.differentSize && (category.type === 'horizontal' ? {marginRight: "5px"} : {marginBottom: "5px"}),
+      ...category.fontSize && {fontSize: category.fontSize}
     }
   }
 
-  function getCategoryAreaStyle(cateItem) {
-    if (category && category.type === 'vertical') {
-      return getAreaStyle(cateItem, true)
+  function getCategoryAreaStyle(_category) {
+    if (category.type === 'vertical') {
+      return getAreaStyle(_category, true)
     } else {
-      return getAreaStyle(cateItem)
+      return getAreaStyle(_category)
     }
   }
 
@@ -104,17 +106,16 @@ export function orderLayoutCategoriesFactory() {
 
   const renderCategories = () => (
     <div
-      style={{padding: '4px', 'background-color': '#E0E0E0', ...!editable.value && {position: 'sticky', top: 0, 'z-index': 1}}}>
-      <div style={categoryContainerStyle}>
-        {
-          categories.value.map(category => (
-            <div class='pol__cate'
-                 style={[getCategoryStyle(category), getCategoryAreaStyle(category)]}
-                 onClick={() => selectCategory(category)}>
-              {getCategoryName(category)}
-            </div>
-          ))
-        }
+      style={{padding: '4px', 'background-color': 'rgb(224, 224, 224, 0.7)', ...!editable.value && {position: 'sticky', top: 0, 'z-index': 1}}}>
+      <div style={categoryContainerStyle.value}>
+        {categories.value.map((_category, index) => (
+          <div class='pol__cate'
+               key={index}
+               style={[getCategoryStyle(_category), getCategoryAreaStyle(_category)]}
+               onClick={() => selectCategory(_category)}>
+            {getCategoryName(_category)}
+          </div>
+        ))}
       </div>
     </div>
   )

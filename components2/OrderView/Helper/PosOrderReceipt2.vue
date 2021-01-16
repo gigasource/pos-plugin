@@ -2,10 +2,11 @@
 import {internalValueFactory} from "../../utils";
 import {getCurrentOrder} from "../pos-logic-be";
 import {useI18n} from "vue-i18n";
-import {computed, nextTick, watch} from "vue";
+import {computed, nextTick, watch, ref} from "vue";
 import {calItemVSum, updateOrderWithHooks} from "../pos-logic";
 import {$filters} from "../../AppSharedStates";
 import {useRouter} from "vue-router";
+import _ from 'lodash';
 
 export default {
   name: 'PosOrderReceipt2',
@@ -15,7 +16,7 @@ export default {
   },
   //fixme
   emits: ['update:modelValue', 'updatePayment', 'updateCurrentOrder', 'printOrderReport', 'saveRestaurantOrder', 'print', 'complete'],
-  setup(props, {emits}) {
+  setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
     const order = getCurrentOrder();
     const {t: $t, locale} = useI18n();
@@ -67,7 +68,7 @@ export default {
 
     const orderItems = computed(() => {
       if (!props.split && order.items) {
-        return compactOrder(this.order.items.filter(i => i.quantity > 0))
+        return compactOrder(order.items.filter(i => i.quantity > 0))
       }
       return []
     })
@@ -214,19 +215,19 @@ export default {
               <p>Receipt</p>
             </div>
           </g-btn-bs>
-          {!slit &&
-          <g-menu v-model={paymentMethodMenu} content-class="menu-payment-option">
+          {!props.split &&
+          <g-menu v-model={paymentMethodMenu.value} content-class="menu-payment-option">
             {{
               activator(on) {
                 return (<>
-                  <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.icon} v-on={on} disabled={printed}>
+                  <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.icon} {...on} disabled={printed}>
                     <div>{activeOrderPaymentItem.text}</div>
                   </g-btn-bs>
                 </>)
               },
               default() {
                 return (<div className="col-flex">
-                  {paymentMethodMenuItems.map((item, index) =>
+                  {paymentMethodMenuItems.value.map((item, index) =>
                       <g-btn-bs
                           className="ml-0 mr-0"
                           icon={item.icon}
@@ -255,7 +256,7 @@ export default {
             </div>
           </div>
           <div class="receipt-main__title">Table: {order.table}</div>
-          {split ? <>
+          {props.split ? <>
                 {order.splits.map((split, i) => <>
                   <div class="receipt-main__item" key={split._id}>
                     <div class="row-flex align-items-center">
@@ -351,7 +352,7 @@ export default {
                   <div class="col-9">Item name</div>
                   <div class="col-2 ta-right">Total</div>
                 </div>
-                {orderItems.map(item =>
+                {orderItems.value.map(item =>
                     <div class="receipt-main__item-row" key={item._id.toString()}>
                       <div class="col-1">{item.quantity}</div>
                       <div class="col-9">
@@ -372,7 +373,7 @@ export default {
           rotate
           v-model={dialog.value.multi}
           store-locale={locale}
-          total={split ? tempSplit.vSum : order.vSum}
+          total={props.split ? tempSplit.vSum : order.vSum}
           onSubmit={saveMultiPayment}/>
 
       <dialog-form-input

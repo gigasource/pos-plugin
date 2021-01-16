@@ -33,7 +33,7 @@ export const currentTable = computed(() => order.table);
 
 function mapProduct(p) {
   return {
-    groupPrinter: p.groupPrinter.name,
+    groupPrinter: _.get(p, 'groupPrinter.name', ''),
     ..._.pick(p, ['id', 'name', 'price']),
     product: p._id,
     taxes: [p.tax, p.tax2]
@@ -79,7 +79,7 @@ hooks.on('pre:order:update', function (order) {
 
 hooks.on('post:order:update', async function (order) {
   let _order = toRaw(order);
-  await nextTick();
+  await Promise.resolve();
 
 
   processItems(_order.items, itemsSnapshot, 'items');
@@ -131,7 +131,15 @@ hooks.on('pre:prepareOrder', function (order) {
   }
 })
 
-hooks.on('resetOrderData', () => Object.keys(order).forEach(k => delete order[k]));
+hooks.on('resetOrderData', () => {
+  _.forEach(order, (v,k) => {
+    if (Array.isArray(v)) {
+      v.length = 0;
+    } else {
+      delete order[k]
+    }
+  })
+});
 
 /**
  *
@@ -142,7 +150,7 @@ export function prepareOrder(__order) {
   if (typeof __order === 'string') {
     __order = {table: __order};
   }
-  Object.keys(order).forEach(k => delete order[k]);
+  hooks.emit('resetOrderData');
   order = createOrder(_.assign(order, __order));
   let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
   const action = Order.create(_order).commit('createOrder', {table: order.table}).chain
@@ -166,14 +174,14 @@ export const hasOrderChange = computed(() => {
   const _hooks = new Hooks();
   ['add-item', 'remove-item', 'change-item']
     .forEach(e => _hooks.on(e, () => result = true));
-  processItems(order.items, beItemsSnapshot, 'items', _hooks);
+  processItems(order.items, beItemsSnapshot.value, 'items', _hooks);
   return result;
 })
 
 export function itemQuantityChangeCheck(item) {
   if (!item.sent) return false;
   //todo: get item
-  const snapshotItem = _.find(beItemsSnapshot, {_id: item._id});
+  const snapshotItem = _.find(beItemsSnapshot.value, {_id: item._id});
   return snapshotItem.quantity !== item.quantity;
 }
 

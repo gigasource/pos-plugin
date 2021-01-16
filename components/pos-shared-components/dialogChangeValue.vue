@@ -3,7 +3,7 @@
     <div class="dialog-change w-100" :style="[{background: 'white'}]">
       <g-icon class="dialog-change--close" @click="dialog = false">close</g-icon>
       <discount-input v-if="dialog" :type="changeType" :value="change" @submit="submit" @remove-discount="removeDiscount"/>
-      <g-snackbar :value="showSnackBar" timeout="2000" color="#FF4552">
+      <g-snackbar :model-value="showSnackBar" timeout="2000" color="#FF4552">
         <div>Discount exceeds order value!</div>
       </g-snackbar>
     </div>

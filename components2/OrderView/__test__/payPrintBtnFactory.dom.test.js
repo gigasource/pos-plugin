@@ -1,65 +1,43 @@
 //<editor-fold desc="declare">
-import "../../../jest.setup";
-jest.mock("vue-i18n", () => {
-  return {
-    useI18n() {
-      return {
-        $t(t) {
-          return t;
-        },
-        locale: "en"
-      };
-    }
-  };
-});
-
-import { mount } from "@vue/test-utils";
-import { config } from "@vue/test-utils";
-
-import { nextTick } from "vue";
-import { payPrintBtnFactory } from "../payPrintBtnFactory";
-
-import _ from "lodash";
 import {
-  addPayment,
-  cancelOrder,
-  changeCourse,
-  clearPayment,
-  removeItem,
-  removeModifier,
-  updateItem,
-  hooks,
-  simulateBackendPrint,
-  changeItemQuantity
-} from "../pos-logic";
+  actions,
+  cola,
+  drinkTax,
+  expectArray,
+  fanta,
+  foodTax,
+  ketchup,
+  rice,
+  component,
+  wrapper,
+  makeWrapper,
+  orm, setComponent
+} from "../../test-utils";
+
+import {config, mount} from "@vue/test-utils";
+
+import {nextTick} from "vue";
+import {payPrintBtnFactory} from "../payPrintBtnFactory";
+
 import {
-  actionList,
   addProduct,
-  currentTable,
   disablePay,
   getCurrentOrder,
-  onlyCheckoutPrintedItems,
   payBtnClickable,
   payPrintMode,
   prepareOrder,
-  quickBtnAction,
   showIcon,
   togglePayPrintBtn
 } from "../pos-logic-be";
-import { mockProduct } from "./mock_product";
-import { ObjectID } from "bson";
-import { mockOrder } from "./mock-order";
-import { smallSidebar } from "../order-layout-setting-logic";
-import { orderRightSideHeader } from "../orderRightSideHeaderFactory";
-import { orderRightSideItemsTable } from "../orderRightSideItemsTable";
+
+import {mockProduct} from "./mock_product";
+import {mockOrder} from "./mock-order";
+import {smallSidebar} from "../order-layout-setting-logic";
+import {orderRightSideHeader} from "../orderRightSideHeaderFactory";
+import {orderRightSideItemsTable} from "../orderRightSideItemsTable";
 import PosOrder2 from "../PosOrder2";
-const dayjs = require("dayjs");
-const orm = require("schemahandler");
-const syncFlow = require("schemahandler/sync/sync-flow");
-const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
-const { stringify } = require("schemahandler/utils");
-//jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
-require("mockdate").set(new Date("2021-01-01").getTime());
+
+const {stringify} = require("schemahandler/utils");
 
 const {
   makeDiscount,
@@ -72,103 +50,20 @@ const {
 
 const delay = require("delay");
 
-const foodTax = { taxes: [5, 10] };
-const drinkTax = { taxes: [16, 32] };
-
-const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
-const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
-
-beforeAll(async () => {
-  orm.connect({ uri: "mongodb://localhost:27017" }, "myproject");
-  orm.registerSchema("Order", {
-    inProgress: Boolean,
-    items: [{}],
-    table: Number
-  });
-  await orm("Order").deleteMany();
-  await orm("Commit").deleteMany();
-
-  orm.plugin(syncPlugin);
-  orm.plugin(syncFlow);
-  orm.registerCommitBaseCollection("Order");
-  orm.plugin(require("../../../backend/commit/orderCommit"));
-  orm.registerCollectionOptions("Order");
-  orm.emit("commit:flow:setMaster", true);
-});
-
-afterEach(async () => {
-  await orm("Order")
-    .deleteMany()
-    .direct();
-  await orm("Commit")
-    .deleteMany()
-    .direct();
-});
-
-let actions = [];
-["showOrderReceipt", "pay", "printOrder"].forEach(e =>
-  hooks.on(e, () => actions.push(e))
-);
-let expectArray = () => [
-  "payBtnClickable",
-  payBtnClickable.value,
-  "payPrintMode",
-  payPrintMode.value,
-  "showIcon",
-  showIcon.value,
-  "disablePay",
-  disablePay.value,
-  actions
-];
 //</editor-fold>
 
-//<editor-fold desc="component">
-let component, wrapper;
-const makeWrapper = () => {
-  wrapper = mount(component, {
-    props: {},
-    shallow: true,
-    global: {
-      directives: {
-        touch: true
-      },
-      stubs: {
-        "g-btn-bs": true,
-        "g-icon": true,
-        "dialog-config-order-item": true,
-        "g-overlay": true,
-        "g-avatar": true
-      },
-      mocks: {
-        $t: a => a,
-        $filters: {
-          formatCurrency(val, decimals = 2) {
-            if (!val || isNaN(val) || Math.floor(val) === val) return val;
-            return val.toFixed(decimals);
-          }
-        }
-      }
-    }
-  });
-};
-
-beforeAll(() => (config.renderStubDefaultSlot = true));
-//</editor-fold>
-
-describe("PrintButton test", function() {
+describe("PrintButton test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
-        const { renderPayBtn } = payPrintBtnFactory();
+        const {renderPayBtn} = payPrintBtnFactory();
         return () => renderPayBtn();
       }
-    };
+    })
     makeWrapper();
   });
 
-  it("case 1 render big sidebar print", async function() {
+  it("case 1 render big sidebar print", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -193,7 +88,7 @@ describe("PrintButton test", function() {
     `);
   }, 80000);
 
-  it("case 2 render big sidebar pay", async function() {
+  it("case 2 render big sidebar pay", async function () {
     //order have 1 sent item -> should display pay,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -217,7 +112,7 @@ describe("PrintButton test", function() {
     `);
   }, 80000);
 
-  it("case 3 render small sidebar print", async function() {
+  it("case 3 render small sidebar print", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -246,7 +141,7 @@ describe("PrintButton test", function() {
     `);
   }, 80000);
 
-  it("case 4 render small sidebar pay", async function() {
+  it("case 4 render small sidebar pay", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -277,7 +172,7 @@ describe("PrintButton test", function() {
     `);
   }, 80000);
 
-  it("case 5 render header", async function() {
+  it("case 5 render header", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -309,18 +204,18 @@ describe("PrintButton test", function() {
   }, 80000);
 });
 
-describe("header test", function() {
+describe("header test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
-        const { renderHeader } = orderRightSideHeader({}, { emit: () => null });
+        const {renderHeader} = orderRightSideHeader({}, {emit: () => null});
         return () => renderHeader();
       }
-    };
+    })
     makeWrapper();
   });
 
-  it("case 5 render header", async function() {
+  it("case 5 render header", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -368,21 +263,21 @@ describe("header test", function() {
   }, 80000);
 });
 
-describe("item table test", function() {
+describe("item table test", function () {
   beforeAll(() => {
-    component = {
+    setComponent({
       setup() {
-        const { renderItemsTable } = orderRightSideItemsTable(
+        const {renderItemsTable} = orderRightSideItemsTable(
           {},
-          { emit: () => null }
+          {emit: () => null}
         );
         return () => renderItemsTable();
       }
-    };
+    })
     makeWrapper();
   });
 
-  it("case 5 render table", async function() {
+  it("case 5 render table", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();
@@ -466,13 +361,13 @@ describe("item table test", function() {
   }, 80000);
 });
 
-describe("PosOrderRight intergration", function() {
+describe("PosOrderRight intergration", function () {
   beforeAll(() => {
-    component = PosOrder2;
+    setComponent(PosOrder2)
     makeWrapper();
   });
 
-  it("case 6 render right side", async function() {
+  it("case 6 render right side", async function () {
     //order have 1 sent item, add one item -> should display print,
     prepareOrder(mockOrder);
     let order = getCurrentOrder();

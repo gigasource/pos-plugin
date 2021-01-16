@@ -5,7 +5,7 @@
         <span>{{ $t('onlineOrder.pendingOrders') }}</span>
         <g-badge class="ml-1"
                  inline
-                 :value="true"
+                 :model-value="true"
                  color="#4CAF50"
                  v-if="internalOrders && internalOrders.length">
           <template v-slot:badge>
@@ -124,6 +124,7 @@
               <div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
                 <span v-if="order.deliveryTime" class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">{{ order.deliveryTime }}</span>
                 <template v-if="order.timeoutDate && timeoutProgress[order._id]">
+                  <!-- TODO: GProgessCircular not update to vue 3.0 -->
                   <g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373" :value="timeoutProgress[order._id].progress"/>
                   <div class="progress-remaining">{{ timeoutProgress[order._id].remaining }}</div>
                 </template>
@@ -213,7 +214,7 @@
         <g-badge v-if="sortedKitchenOrders && sortedKitchenOrders.length"
                  class="ml-1"
                  inline
-                 :value="true"
+                 :model-value="true"
                  color="#F9A825">
           <template v-slot:badge>
             <div class="px-2">{{ sortedKitchenOrders.length }}</div>

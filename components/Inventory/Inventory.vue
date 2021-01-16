@@ -21,6 +21,7 @@
       <!-- Filter row -->
       <tr>
         <td class="bg-grey-lighten-1">
+          <!-- TODO: using :value or :model-value? -->
           <g-checkbox v-if="inventories && inventories.length !== 0" v-model="selectedInventoryIDs" :value="listIDs"
                       multiple>
             <template v-slot:label>
@@ -52,6 +53,7 @@
       <!-- Data row -->
       <tr v-for="(inventory, i) in inventories" :key="i">
         <td>
+          <!-- TODO: using :value or :model-value? -->
           <g-checkbox v-model="selectedInventoryIDs" :value="inventory._id" @change="getFirstSelectedInventory"/>
         </td>
         <td @click="editInventory(inventory)">{{ inventory.id }}</td>
@@ -145,12 +147,16 @@
   import {units} from './unit'
   import _ from 'lodash'
   import PosRangeSlider from '../pos-shared-components/POSInput/PosRangeSlider';
+  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import dialogFormInput from '../pos-shared-components/dialogFormInput';
+  import dialogChangeStock from './dialogChangeStock';
+  import dialogInventoryCategory from './dialogInventoryCategory';
 
   export default {
     name: 'Inventory',
     injectService: ['InventoryStore:(inventories, loadInventories, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
                                     'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
-    components: {PosRangeSlider},
+    components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
     props: {},
     data: function () {
       return {
@@ -304,7 +310,11 @@
         this.dialog.stock = true
       },
       async updateStock({type, change, value, reason}) {
-        await this.updateInventory({...this.selectedInventory, stock: value})
+        await this.updateInventory({
+          ...this.selectedInventory,
+          category: this.selectedInventory.category._id,
+          stock: value
+        })
         const history = {
           inventory: this.selectedInventory._id,
           category: this.selectedInventory.category._id,

@@ -278,12 +278,12 @@ export function addItem(order, item, quantity) {
   return {merge, updatedItem: _item}
 }
 
-export function updateItem(order, index, update) {
+export function updateItem(order, query, update) {
   let item;
-  if (typeof index === 'number') {
-    item = order.items[index];
+  if (typeof query === 'number') {
+    item = order.items[query];
   } else {
-    item = _.find(order.items, index);
+    item = _.find(order.items, query);
   }
 
   hooks.emit('pre:order:update', order);
@@ -297,9 +297,15 @@ const isSameItem = (item1, item2) => {
     item1.price === item2.price && !item2.sent
 }
 
-export function changeItemQuantity(order, index, change) {
+export function changeItemQuantity(order, query, change) {
+  let item;
+  if (typeof query === 'number') {
+    item = order.items[query];
+  } else {
+    item = _.find(order.items, query);
+  }
+
   hooks.emit('pre:order:update', order);
-  const item = order.items[index];
   item.quantity += change;
   hooks.emit('post:order:update', order);
 }
@@ -463,11 +469,11 @@ export function changeCourse(order, query, add = 1) {
     item.course += add;
   }
   if (item.course === 0) {
-    [item.takeAway, item.seperate] = [true, false];
+    [item.takeAway, item.separate] = [true, false];
   } else if (item.course === -1) {
-    [item.takeAway, item.seperate] = [false, true];
+    [item.takeAway, item.separate] = [false, true];
   } else {
-    [item.takeAway, item.seperate] = [false, false];
+    [item.takeAway, item.separate] = [false, false];
   }
   hooks.emit('post:order:update', order);
 }
