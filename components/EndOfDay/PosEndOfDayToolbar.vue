@@ -27,8 +27,8 @@
       {{$t('report.runEndOfDay')}}
     </g-btn>
 
-    <pos-end-of-day-print-pending-z-report @confirmed="save" v-model="showPendingEndOfDayConfirmDialog"></pos-end-of-day-print-pending-z-report>
-    <pos-end-of-day-print-z-report @confirmed="save(selectedReportDate.reports)" v-model="showEndOfDayConfirmDialog"></pos-end-of-day-print-z-report>
+    <pos-end-of-day-print-pending-z-report @confirmed="save" v-model="showPendingEndOfDayConfirmDialog"/>
+    <pos-end-of-day-print-z-report @confirmed="save(selectedReportDate.reports)" v-model="showEndOfDayConfirmDialog"/>
   </g-toolbar>
 </template>
 

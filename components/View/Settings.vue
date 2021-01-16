@@ -109,16 +109,25 @@
           { title: sidebar.callSystem, icon: 'icon-telephone', isView: true, key: 'callSystem' },
           { title: sidebar.customerScreen, icon: 'icon-screen', isView: true, key: 'customerScreen' },
         ],
+        // inject
         onlineDevice: null,
         defaultPrepareTime: null,
         onlineOrderSorting: null
       }
     },
     methods: {
-      updateOnlineDevice() {},
-      updateDefaultPrepareTime() {},
-      updateOnlineOrderSorting() {},
-      getOnlineDevice() {}
+      updateOnlineDevice() {
+        console.error('SettingsStore:updateOnlineDevice was not injected')
+      },
+      updateDefaultPrepareTime() {
+        console.error('SettingsStore:updateDefaultPrepareTime was not injected')
+      },
+      updateOnlineOrderSorting() {
+        console.error('SettingsStore:updateOnlineOrderSorting was not injected')
+      },
+      getOnlineDevice() {
+        console.error('SettingsStore:getOnlineDevice was not injected')
+      }
     }
   }
 </script>

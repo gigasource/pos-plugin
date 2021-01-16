@@ -276,7 +276,8 @@
         this.$router.push('/pos-login')
         cms.socket.emit('getWebshopName')
       },
-      skipPairing() {
+      async skipPairing() {
+        await cms.getModel('PosSetting').update( { skipPairing: true })
         this.$router.go(-1)
       },
       async getEnabledFeatures() {
@@ -313,6 +314,9 @@
         })
 
         cms.socket.on('ringReservationBell', async () => {
+          // note that reservationBell can be null if soundNotification is not set
+          if (!this.reservationBell)
+            return
           try {
             await this.reservationBell.play()
           } catch (e) {
@@ -430,6 +434,7 @@
       },
       async setupReservationBell() {
         const setting = await cms.getModel('PosSetting').findOne()
+        // [Note] soundNotification is flag which will be set from online-order website
         if(setting.reservation && setting.reservation.soundNotification) {
           this.reservationBell = new Audio('/plugins/pos-plugin/assets/sounds/reservation-bell.mp3')
         } else {

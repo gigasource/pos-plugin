@@ -1,10 +1,12 @@
-import orm from 'schemahandler'
+//orm.connect("mongodb://localhost:27017", "roomTest");
 
-orm.connect("mongodb://localhost:27017", "roomTest");
-
-const cms = {
-  getModel(col) {
-    return orm(col)
+jest.mock('cms', () => {
+  const orm = require('schemahandler');
+  const {Socket} = require('schemahandler/io/io')
+  return {
+    getModel(col) {
+      return orm(col)
+    },
+    socket: new Socket()
   }
-}
-jest.mock('cms', () => cms)
+})

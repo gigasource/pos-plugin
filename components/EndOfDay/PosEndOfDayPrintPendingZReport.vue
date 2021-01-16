@@ -29,10 +29,10 @@
     name: 'PosEndOfDayPrintPendingZReport',
     injectService: ['PosStore:dateFormat'],
     props: {
-      value: null
+      modelValue: null
     },
-    setup() {
-      const dialog = getInternalValue(...arguments);
+    setup(props, context) {
+      const dialog = getInternalValue(props, context);
       const pendingReport = ref(null)
       return { dialog, pendingReport };
     },

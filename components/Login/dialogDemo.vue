@@ -85,7 +85,6 @@
       modelValue(val) {
         if (val) {
           this.step = this.mode === 'demo' ? 1 : 2
-
           cms.socket.emit('get-demo-stores', this.mode === 'paired', (stores, error) => {
             if (error) {
               console.log(error)
@@ -126,6 +125,7 @@
         }
       },
       selectDemo(demo) {
+        console.log('selectDemo', demo)
         if (this.selectedDemo === demo) {
           this.selectedDemo = ''
         } else {

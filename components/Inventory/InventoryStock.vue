@@ -91,7 +91,7 @@
 
   export default {
     name: "InventoryStock",
-    components: {PosKeyboardFull},
+    components: {PosKeyboardFull, DialogChangeStock},
     injectService: ['InventoryStore:(updateInventory, updateInventoryHistory)'],
     props: {},
     data() {

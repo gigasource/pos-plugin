@@ -199,7 +199,7 @@
           await this.queryProductsById()
           if (this.productIdQueryResults.length === 1) {
             const onlyResult = this.productIdQueryResults[0];
-            if (onlyResult.attributes && (onlyResult.attributes.length === 0 || onlyResult.attributes.keys().length === onlyResult.attributes.length)) {
+            if (onlyResult.attributes == null || (onlyResult.attributes.length === 0 || onlyResult.attributes.keys().length === onlyResult.attributes.length)) {
               if(onlyResult.isModifier) {
                 onlyResult.product = onlyResult._id.toString()
                 onlyResult.quantity = onlyResult.quantity || 1

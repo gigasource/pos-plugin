@@ -630,10 +630,13 @@ module.exports = async cms => {
         const { deviceId } = await registerWithCode(pairingCode)
         return deviceId
       } else {
-        const { deviceId } = await registerDevice()
-        if (deviceId) {
-          console.log('deviceId', deviceId)
-          return deviceId
+        const registerDeviceResult = await registerDevice()
+        if (registerDeviceResult) {
+          const { deviceId } = resgiterDeviceResult
+          if (deviceId) {
+            console.log('deviceId', deviceId)
+            return deviceId
+          }
         }
       }
     }
@@ -755,7 +758,7 @@ module.exports = async cms => {
         return { deviceId }
       }
     } catch (error) {
-      console.error('Error registering device', error)
+      console.error('online-order.js::registerDevice: exception message: \n    ', error.message)
       cb({ error })
     }
   }, 5000, { leading: true, trailing: false })

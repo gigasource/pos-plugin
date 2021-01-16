@@ -170,30 +170,72 @@ export default {
     }
   },
   methods: {
-    addProductToOrder() {},
-    addModifierToProduct() {},
-    getKeyboardSetting() {},
-    addItemQuantity() {},
-    removeItemQuantity() {},
-    changePrice() {},
-    updateOrderTable() {},
-    updateOrderItems() {},
-    removeProductModifier() {},
-    updateOrderItem() {},
-    saveTableOrder() {},
-    resetOrderData() {},
-    updateCurrentOrder() {},
-    quickCashRestaurant() {},
+    addProductToOrder() {
+      console.error('SettingStores:addProductToOrder was not injected')
+    },
+    addModifierToProduct() {
+      console.error('SettingStores:addModifierToProduct was not injected')
+    },
+    getKeyboardSetting() {
+      console.error('SettingStores:getKeyboardSetting was not injected')
+    },
+    addItemQuantity() {
+      console.error('SettingStores:addItemQuantity was not injected')
+    },
+    removeItemQuantity() {
+      console.error('SettingStores:removeItemQuantity was not injected')
+    },
+    changePrice() {
+      console.error('SettingStores:changePrice was not injected')
+    },
+    updateOrderTable() {
+      console.error('SettingStores:updateOrderTable was not injected')
+    },
+    updateOrderItems() {
+      console.error('SettingStores:updateOrderItems was not injected')
+    },
+    removeProductModifier() {
+      console.error('SettingStores:removeProductModifier was not injected')
+    },
+    updateOrderItem() {
+      console.error('SettingStores:updateOrderItem was not injected')
+    },
+    saveTableOrder() {
+      console.error('SettingStores:saveTableOrder was not injected')
+    },
+    resetOrderData() {
+      console.error('SettingStores:resetOrderData was not injected')
+    },
+    updateCurrentOrder() {
+      console.error('SettingStores:updateCurrentOrder was not injected')
+    },
+    quickCashRestaurant() {
+      console.error('SettingStores:quickCashRestaurant was not injected')
+    },
     openDialog(name) {
       this.dialog[name] = true
     },
-    createOrderCommit() {},
-    saveSplitOrder() {},
-    printOrderReport() {},
-    updatePrintedOrder() {},
-    moveItems() {},
-    addVoucher() {},
-    redeemVoucher() {}
+    createOrderCommit() {
+      console.error('SettingStores:createOrderCommit was not injected')
+    },
+    saveSplitOrder() {
+      console.error('SettingStores:saveSplitOrder was not injected')
+    },
+    printOrderReport() {
+      console.error('SettingStores:printOrderReport was not injected')
+    },
+    updatePrintedOrder() {
+      console.error('SettingStores:updatePrintedOrder was not injected')
+    },
+    moveItems() {
+      console.error('SettingStores:moveItems was not injected')
+    },
+    addVoucher() {
+      console.error('SettingStores:addVoucher was not injected')
+    },
+    redeemVoucher() {
+      console.error('SettingStores:redeemVoucher was not injected')
+    }
   }
 }
 </script>

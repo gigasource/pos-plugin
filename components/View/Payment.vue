@@ -77,10 +77,18 @@
       openDialog(originalValue, discount) {
         this.$refs.dialog.open(originalValue, discount)
       },
-      discountCurrentOrder() {},
-      updateCurrentOrder() {},
-      saveRestaurantOrder() {},
-      setOrderDiscount() {}
+      discountCurrentOrder() {
+        console.log('OrderStore:discountCurrentOrder was not injected')
+      },
+      updateCurrentOrder() {
+        console.log('OrderStore:updateCurrentOrder was not injected')
+      },
+      saveRestaurantOrder() {
+        console.log('OrderStore:saveRestaurantOrder was not injected')
+      },
+      setOrderDiscount() {
+        console.log('OrderStore:setOrderDiscount was not injected')
+      }
     }
   }
 </script>

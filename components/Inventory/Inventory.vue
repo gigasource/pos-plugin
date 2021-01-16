@@ -147,12 +147,16 @@
   import {units} from './unit'
   import _ from 'lodash'
   import PosRangeSlider from '../pos-shared-components/POSInput/PosRangeSlider';
+  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import dialogFormInput from '../pos-shared-components/dialogFormInput';
+  import dialogChangeStock from './dialogChangeStock';
+  import dialogInventoryCategory from './dialogInventoryCategory';
 
   export default {
     name: 'Inventory',
     injectService: ['InventoryStore:(inventories, loadInventories, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
                                     'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
-    components: {PosRangeSlider},
+    components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
     props: {},
     data: function () {
       return {
@@ -306,7 +310,11 @@
         this.dialog.stock = true
       },
       async updateStock({type, change, value, reason}) {
-        await this.updateInventory({...this.selectedInventory, stock: value})
+        await this.updateInventory({
+          ...this.selectedInventory,
+          category: this.selectedInventory.category._id,
+          stock: value
+        })
         const history = {
           inventory: this.selectedInventory._id,
           category: this.selectedInventory.category._id,
