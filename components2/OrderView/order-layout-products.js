@@ -114,7 +114,7 @@ export function orderLayoutProductFactory() {
     if (product.product && product.product.isModifier) {
       style.fontStyle = 'italic'
     }
-    if (isMobile) {
+    if (isMobile.value) {
       style.fontSize = fontSize.value
     }
     return style;
@@ -144,9 +144,8 @@ export function orderLayoutProductFactory() {
     if (!product || !product._id)
       return
     if (product.isModifier) {
-      addModifier(order, _.omit(product, ['name', 'price']));
+      addModifier(order, _.pick(product, ['name', 'price']));
     } else {
-      console.log(product);
       addProduct(order, product);
     }
   }
@@ -269,7 +268,7 @@ export function orderLayoutProductFactory() {
               </div>
             ))
           }
-          {renderKeyboard()}
+          {{/*renderKeyboard()*/}}
         </div>
       </div>
     }

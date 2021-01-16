@@ -39,22 +39,22 @@ const dayjs = require("dayjs");
 export const orm = require("schemahandler");
 const syncFlow = require("schemahandler/sync/sync-flow");
 const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
-const { stringify } = require("schemahandler/utils");
+const {stringify} = require("schemahandler/utils");
 //jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
 require("mockdate").set(new Date("2021-01-01").getTime());
 
 const delay = require("delay");
 
-export const foodTax = { taxes: [5, 10] };
-export const drinkTax = { taxes: [16, 32] };
+export const foodTax = {taxes: [5, 10]};
+export const drinkTax = {taxes: [16, 32]};
 
-export const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-export const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-export const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
-export const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
+export const cola = {name: "Cola", price: 1.3, quantity: 1, ...drinkTax};
+export const fanta = {name: "Fanta", price: 2, quantity: 1, ...drinkTax};
+export const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
+export const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
 
 beforeAll(async () => {
-  orm.connect({ uri: "mongodb://localhost:27017" }, "myproject");
+  orm.connect({uri: "mongodb://localhost:27017"}, "myproject");
   orm.registerSchema("Order", {
     inProgress: Boolean,
     items: [{}],
@@ -99,6 +99,7 @@ export let expectArray = () => [
 
 //<editor-fold desc="component">
 export let component, wrapper;
+
 export function setComponent(_component) {
   component = _component;
 }
@@ -148,7 +149,11 @@ export const makeWrapper = (_component, options) => {
         'dialog-multi-payment': true,
         'dialog-form-input': true,
         'g-menu': true,
-        'choose-table-dialog': true
+        'choose-table-dialog': true,
+        'g-tabs': true,
+        'g-tab-item': true,
+        'pos-textfield-new': true,
+
       },
       mocks: {
         t: a => a,

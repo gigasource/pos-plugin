@@ -9,6 +9,7 @@ import {getCurrentOrder} from "../pos-logic-be";
 import {getItemSubtext, isItemDiscounted, itemsWithQtyFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {internalValueFactory} from "../../utils";
+import {removeModifier} from "../pos-logic";
 
 export default {
   name: 'PosOrderSplitOrder2',
@@ -145,7 +146,7 @@ export default {
     //todo: removeModifier
     return () => {
       return (
-          <div>
+          <>
             <g-dialog v-model={internalValue.value} transition={false} content-class="split-order-dialog">
               <div class="row-flex justify-end w-100">
                 <div class="splitter" style={splitterStyle}>
@@ -253,12 +254,12 @@ export default {
                     </div>
                     {isMobile.value && <g-spacer/>}
                     {isMobile.value &&
-                    <g-btn-bs class="elevation-1 btn-back" onClick="back">
+                    <g-btn-bs class="elevation-1 btn-back" onClick={back}>
                       <g-icon>icon-back</g-icon>
                     </g-btn-bs>}
                     <g-spacer/>
                     <div style="font-size: 18px; color: #ff4452">
-                      {$t('common.currency', locale)} {$filters.formatCurrency(totalLeft)}
+                      {$t('common.currency', locale)} {$filters.formatCurrency(totalLeft.value)}
                     </div>
                   </div>
                   <div class="order-detail__content">
@@ -306,7 +307,7 @@ export default {
               {isMobile.value && <g-toolbar elevation="0" color="#eee" class="toolbar">
                 <g-btn-bs icon="icon-back" onClick_stop={back}>{$t('ui.back')}</g-btn-bs>
                 <g-spacer/>
-                <span class="ml-2 mr-2" v-if="splitOrders.length">Split: {splitOrders.value.length}</span>
+                {splitOrders.value.length && <span class="ml-2 mr-2">Split: {splitOrders.value.length}</span>}
                 <g-btn-bs uppercase={false} background-color="#1271ff" disabled={!splitOrders.value.length}
                           onClick_stop={() => showReceipt.value = true}>
                   View receipt
@@ -325,7 +326,7 @@ export default {
                                onUpdatePayment={updateSplitPayment}
                                onComplete={complete}
                                onPrint={printReceipt}/>
-          </div>
+          </>
       );
     }
   }

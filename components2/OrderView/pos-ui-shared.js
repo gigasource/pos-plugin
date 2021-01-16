@@ -124,7 +124,7 @@ export function getItemSubtext({course, takeAway, separate}) {
 }
 
 export function isItemDiscounted(item) {
-  return item.originalPrice !== item.price
+  return item.originalPrice && item.originalPrice !== item.price
 }
 
 export function itemsWithQtyFactory() {

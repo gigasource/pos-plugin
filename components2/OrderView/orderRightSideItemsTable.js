@@ -1,8 +1,16 @@
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {nextTick, reactive, ref, watchEffect} from "vue";
+import {nextTick, reactive, ref, watchEffect, withModifiers} from "vue";
 import {getCurrentOrder, itemQuantityChangeCheck} from "./pos-logic-be";
-import {addItem, addModifier, changeCourse, removeItem, removeModifier, updateItem} from "./pos-logic";
+import {
+  addItem,
+  addModifier,
+  changeCourse,
+  changeItemQuantity,
+  removeItem,
+  removeModifier,
+  updateItem
+} from "./pos-logic";
 import {getItemSubtext, isItemDiscounted} from "./pos-ui-shared";
 
 export function orderRightSideItemsTable() {
@@ -36,8 +44,8 @@ export function orderRightSideItemsTable() {
   }
 
   function _addItem(order, item) {
-    if (item.printed) return
-    addItem(order, item);
+    if (item.sent) return;
+    changeItemQuantity(order, item, 1)
   }
 
   function showItem(item) {
@@ -58,18 +66,18 @@ export function orderRightSideItemsTable() {
             showItem(item) &&
             <div class="item"
                  style={[item.separate && {borderBottom: '2px solid red'}]}
-                 onClick_stop={() => openConfigDialog(item)} v-touch={getTouchHandlers(item)}>
+                 onClick={withModifiers(() => openConfigDialog(item), ['stop'])} v-touch={getTouchHandlers(item)}>
               <div class="item-detail">
                 <div style={[item.sent && {opacity: 0.55}]}>
                   <p class="item-detail__name">{item.id && `${item.id}. `}{item.name}</p>
                   <p>
                   <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
-                    {$t('common.currency', locale)}{$filters.formatCurrency(item.originalPrice)}
+                    {$t('common.currency', locale)}{$filters.formatCurrency(isItemDiscounted(item) ? item.originalPrice : item.price)}
                   </span>
                     {isItemDiscounted(item) &&
-                    <span class="item-detail__price--new">{$t('common.currency', locale)}
-                      {$filters.formatCurrency(item.price)}</span>
-                    }
+                    <span class="item-detail__price--new">
+                      {$t('common.currency', locale)}{$filters.formatCurrency(item.price)}
+                    </span>}
                     <span
                       class={['item-detail__option', item.takeAway ? 'text-green-accent-3' : 'text-red-accent-2']}>
                     {getItemSubtext(item)}
@@ -77,11 +85,11 @@ export function orderRightSideItemsTable() {
                   </p>
                 </div>
                 <div class="item-action">
-                  <g-icon onClick_stop={() => removeItem(order, item)}
+                  <g-icon onClick={withModifiers(() => removeItem(order, item), ['stop'])}
                           color={item.sent ? '#FF4452' : '#000'}>remove_circle_outline
                   </g-icon>
                   <span class="ml-1 mr-1">{item.quantity}</span>
-                  <g-icon onClick_stop={() => _addItem(order, item)}
+                  <g-icon onClick={withModifiers(() => _addItem(order, item), ['stop'])}
                           style={[item.sent && {opacity: 0.5}]}>add_circle_outline
                   </g-icon>
                 </div>
@@ -89,7 +97,7 @@ export function orderRightSideItemsTable() {
               {item.modifiers &&
               <div>
                 {item.modifiers.map(modifier => (
-                  <g-chip label small text-color="#616161" close onClose={removeModifier(order, item, modifier)}>
+                  <g-chip label small text-color="#616161" close onClose={() => removeModifier(order, item, modifier)}>
                     {modifier.name} | {$t('common.currency', locale)}
                     {$filters.formatCurrency(modifier.price)}
                   </g-chip>

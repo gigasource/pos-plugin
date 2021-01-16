@@ -9,6 +9,8 @@ import PosOrderSplitOrder2 from "./Helper/PosOrderSplitOrder2";
 import PosOrderReceipt2 from "./Helper/PosOrderReceipt2";
 import PosOrderMoveItems2 from "./Helper/PosOrderMoveItems2";
 import PosOrderVoucherDialog2 from "./Helper/PosOrderVoucherDialog2";
+import {getCurrentInstance} from "vue";
+import {genScopeId} from "../utils";
 
 
 export default {
@@ -27,19 +29,17 @@ export default {
       <pos-order-split-order2 v-model={orderViewDialog.split}/>
       <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
       <pos-order-move-items2 v-model={orderViewDialog.move}/>
-
       <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
     </>
-    return () => (<>
-      <div class="order">
-        <div class="order-main">
-          <pos-order-layout2 /*style="flex: 1"*//>
-          <pos-order /*style={!isMobile.value && {flex: '0 0 25%'}}*//>
+
+    return genScopeId(() => (
+        <div class="order">
+          <div class="order-main">
+            <pos-order-layout2 style="flex: 1"/>
+            <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
+          </div>
         </div>
-        {isMobile.value && <pos-quick-order-toolbar/>}
-      </div>
-      <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
-    </>)
+    ))
   }
 }
 </script>
