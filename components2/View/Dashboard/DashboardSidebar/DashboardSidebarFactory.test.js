@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import DashboardSidebarFactory from './DashboardSidebarFactory'
+import DashboardSidebarUI from './DashboardSidebarUI'
 import _ from "lodash";
 import { nextTick } from "vue";
 import delay from "delay";
@@ -75,7 +75,7 @@ describe("Test dashboard sidebar factory", () => {
     `);
   });
   it("www", () => {
-    const { fn, hooks } = DashboardSidebarFactory();
+    const { fn, hooks } = DashboardSidebarUI();
 
     // hooks
     const component = fn();

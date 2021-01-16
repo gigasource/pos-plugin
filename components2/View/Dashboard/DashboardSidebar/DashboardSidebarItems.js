@@ -1,39 +1,24 @@
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import _ from 'lodash';
 
-import { user } from '../../AppSharedStates'
+import { user } from '../../../AppSharedStates'
 
-import {rooms} from '../../View/EditTablePlan/room-state'
+import { onSelectRoom, roomsStates } from '../../../TablePlan/RoomState'
 import { activeScreen } from '../DashboardSharedStates';
-import { onSelectRoom} from '../../View/EditTablePlan/room-state';
+import { useI18n } from 'vue-i18n'
 
-//todo: move locale to AppSharedStates
-const locale = ref('')
-
-const fetchLocales = async function () {
-  const config = await cms.getModel('SystemConfig').findOne({ type: 'I18n' })
-  locale.value = (config && config.content && config.content.locale) ? config.content.locale : 'en'
-}
-
-const changeLocale = async function (newLocale) {
-  locale.value = newLocale
-  await cms.getModel('SystemConfig').updateOne({ type: 'I18n' }, { 'content.locale': newLocale }, { upsert: true })
-  //should reload login page to apply locale change
-}
-
-const DashboardSidebarItemsFactory = ($t) => {
-
+const DashboardSidebarItemsFactory = () => {
+  const { t: $t} = useI18n()
   const dashboardSidebarItems = computed(() => [
     {
       icon: 'icon-restaurant',
-      items: rooms.value.map((room) => ({
-        title: room.name,
+      items: roomsStates.value.map((r) => ({
+        title: r.room.name,
         icon: 'radio_button_unchecked',
         iconType: 'small',
         onClick() {
-          console.log('asdfasdf')
           activeScreen.value = 'restaurant-room'
-          onSelectRoom(room)
+          onSelectRoom(r)
         }
       })),
       title: $t('sidebar.restaurant'),
@@ -87,6 +72,14 @@ const DashboardSidebarItemsFactory = ($t) => {
     {
       icon: 'icon-functions',
       title: $t('sidebar.functions')
+    },
+    {
+      icon: 'icon-functions',
+      title: 'edit table plan',
+      onClick() {
+        activeScreen.value = 'edit-table-plan'
+        // selectingRoom.value =
+      }
     }
   ])
 
@@ -106,25 +99,6 @@ const DashboardSidebarItemsFactory = ($t) => {
         sidebar = sidebar.filter(s => s.feature !== 'reservation' || s.key !== 'Reservation')
       }
     }
-    // if (user.value && this.enabledFeatures) {
-    //   sidebar = sidebar.filter(item => {
-    //     if (!item.feature) return true
-    //     return this.enabledFeatures.includes(item.feature)
-    //   })
-    // }
-
-    // if (this.showVirtualReportInSidebar) {
-    //   sidebar.push({
-    //     icon: 'icon-printer',
-    //     onClick() {
-    //       this.$emit('update:view', {
-    //         name: 'VirtualPrinter',
-    //         params: ''
-    //       })
-    //     },
-    //     title: 'Virtual Printer'
-    //   })
-    // }
 
     const tmp = sidebar.map(item => {
       switch (item.key) {
@@ -158,7 +132,4 @@ const DashboardSidebarItemsFactory = ($t) => {
   }
 }
 
-export {
-  DashboardSidebarItemsFactory,
-  locale
-}
+export default DashboardSidebarItemsFactory
