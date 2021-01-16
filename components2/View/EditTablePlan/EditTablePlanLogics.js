@@ -12,21 +12,15 @@ import { addRoomObject, removeRoomObject, updateRoomObject } from '../../TablePl
 
 export const selectingObject = ref(null)
 
-export const currentInputValue = ref('')
 
 export const onSelectObject = function (item) {
-  const isSelected = selectingObject._id === item._id
-  if (!isSelected) {
-    selectingObject.value = item
-    currentInputValue.value = item.name
-  }
+  selectingObject.value = _.find(objectsInSelectingRoom.value, i => i._id.toString() === item._id.toString())
 }
 
 watch(() => objectsInSelectingRoom.value, (newV) => {
   if (selectingObject.value && selectingRoomStates.value) {
-    selectingObject.value = _.find(objectsInSelectingRoom.value, i => i._id === selectingObject.value._id)
+    selectingObject.value = _.find(objectsInSelectingRoom.value, i => i._id.toString() === selectingObject.value._id.toString())
   }
-
 }, { deep: true })
 
 
