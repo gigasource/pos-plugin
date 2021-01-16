@@ -1,12 +1,13 @@
 <script>
 
 import RoomUI from '../RoomUI'
-import { getTableOrderInfo, isBusyTable } from './RestaurantRoomLogics'
-import { isTable } from '../RoomLogics'
+import { getTableOrderInfo } from './RestaurantRoomLogics'
 import { getDiffTime } from '../../../utils/commons'
 import { ref } from 'vue';
 import RoomStyleFactory from '../RoomStyles'
 import { selectingRoomStates } from '../RoomState';
+import { isBusyTable } from '../RoomShared';
+import { isTable } from '../RoomShared';
 
 const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 
@@ -23,6 +24,7 @@ const objectRenderFn = (obj) => {
   const tableOrderInfo = getTableOrderInfo(obj)
   const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
   return <div style={roomObjectStyle(obj)}>
+
     {isTable(obj) ? <>
       <div style={`font-size: ${10 * zoom}px ;position: absolute; top: 2px`}> </div>
       <div>

@@ -1,6 +1,6 @@
-import { isTable } from './RoomLogics';
 import { selectingRoomStates } from './RoomState';
 import { computed } from 'vue'
+import { isTable } from './RoomShared';
 
 const RoomStyleFactory = () => {
 

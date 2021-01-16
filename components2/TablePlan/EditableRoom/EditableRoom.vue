@@ -5,8 +5,8 @@ import EditableRoomEventHandlersFactory from './EventHandlersForEditableRoom'
 import { isSelectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
 import { getScopeAttrs } from '../../../utils/helpers';
 import RoomStyleFactory from '../RoomStyles';
-import { isTable } from '../RoomLogics';
 import { selectingRoomStates } from '../RoomState';
+import { isTable } from '../RoomShared';
 
 const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory()
 
@@ -23,7 +23,6 @@ const _roomObjectContainerStyle = (obj) => {
 }
 
 const objectRenderFn = (obj) => <div style={roomObjectStyle(obj)}>
-
   {isTable(obj) ? obj.name : ''}
 </div>
 

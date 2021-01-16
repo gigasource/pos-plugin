@@ -1,15 +1,8 @@
-import { computed } from 'vue';
 import cms from 'cms';
 import _ from 'lodash';
+
+import { isBusyTable } from '../RoomShared';
 import { activeOrders } from '../../AppSharedStates';
-
-const inProgressTables = computed(() => {
-  return _.compact(activeOrders.value.map(order => order.table))
-})
-
-export const isBusyTable = function (table) {
-  return (inProgressTables.value || []).includes(table.name)
-}
 
 export const getTableOrderInfo = function (table) {
   const idx = _.findIndex(activeOrders.value, order => order.table === table.name)

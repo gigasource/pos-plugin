@@ -88,14 +88,6 @@ const updateRoomObject = function (room, obj, newObj) {
   } else return null
 }
 
-export const isTable = (item) => {
-  return item.type === 'table'
-}
-
-export const isWall = (item) => {
-  return item.type === 'wall'
-}
-
 export {
   createRoom,
   addRoomObject,

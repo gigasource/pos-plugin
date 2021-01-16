@@ -1,18 +1,34 @@
 <script>
-import { internalValueFactory } from '../../utils';
+import { internalValueFactory } from '../../utils'
+import { computed, withModifiers } from 'vue';
+import { selectingObject } from '../../View/EditTablePlan/EditTablePlanLogics';
+import { isTable, inProgressTables, isWall } from '../../TablePlan/RoomShared';
+import { useI18n } from 'vue-i18n';
+
 
 export default {
   setup(props, { emit }) {
-    // const chooseTableInput = ref('')
-    // const tabs = ref([])
-    // const tab = ref(null)
-    // const internalValue = internalValueFactory(props, { emit })
+    const { t: $t } = useI18n()
+    const chooseTableInput = ref('')
+    const tabs = ref([])
+    const tab = ref(null)
+    const internalValue = internalValueFactory(props, { emit })
+    const disabledTables = computed(() => {
+      return (selectingObject.value && isTable(selectingObject.value)) ? [selectingObject.value] : []
+    })
+    const submit = function () {
+      emit('submit', chooseTableInput.value)
+    }
+    const close = function () {
+      internalValue.value = false
+    }
+
     return () =>
-        <g-dialog v-model={internalValue} fullscreen content-class="choose-table-dialog">
+        <g-dialog v-model={internalValue.value} fullscreen content-class="choose-table-dialog">
           <g-card style="display: flex; flex-direction: column">
             <g-card-text style="flex: 1 0 0">
               <g-tabs v-model={tab} items={tabs} vertical style="height: 100%">
-                {tabs.map(item =>
+                {tabs.value.map(item =>
                     <g-tab-item item={item} class="pl-2 h-100" key={item.title}>
                       {item.title === 'Manual' ?
                           <>
@@ -23,12 +39,11 @@ export default {
                             </div>
                           </> :
                           <room roomObjects={item.room} v-if="tab === item"
-                                inProgressTable={inProgressTable}
-                                disabledTables={disabledTables}
-                                onSelectRoomObject={selectRoomObj}>
+                                inProgressTable={inProgressTables.value}
+                                disabledTables={disabledTables.value}
+                                onSelectRoomObject={selectingObject.value}>
                             {{
-                              'room-object': (obj) => <div v-if="isTable(roomObject) || !isWall(roomObject)">
-
+                              'room-object': (obj) => (isTable(obj) || !isWall(obj)) && <div>
                                 <div>{obj.name}</div>
                               </div>
                             }}
@@ -39,7 +54,7 @@ export default {
             <g-btn-bs style="position: absolute; left: 0; bottom: 0"
                       class="ml-3 mb-2"
                       icon="icon-back"
-                      onClick_stop={close}>
+                      onClick={withModifiers(close, ['stop'])}>
               {$t('ui.back')}
             </g-btn-bs>
           </g-card>

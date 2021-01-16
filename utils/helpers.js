@@ -1,17 +1,16 @@
-import {getCurrentInstance} from 'vue'
+import { getCurrentInstance, withModifiers } from 'vue'
 
-const getScopeId = function() {
+export const getScopeId = function() {
   const instance = getCurrentInstance()
   const {type} = instance
   return type ? type.__scopeId : ''
 }
 
-const getScopeAttrs = () => {
+export const getScopeAttrs = () => {
   const scopeId = getScopeId()
   return { ...scopeId ? { [scopeId]: '' } : {} }
 }
 
-export {
-  getScopeId,
-  getScopeAttrs
-}
+export const onCLick_Stop = (listener) => withModifiers(listener, ['stop'])
+export const onCLick__Prevent_Stop = (listener) => withModifiers(listener, ['prevent', 'stop'])
+
