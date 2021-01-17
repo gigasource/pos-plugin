@@ -142,7 +142,7 @@ describe('test-flow', function () {
 		after connect to master for the first time, expect master is false
 		and initSocketForClient hook has not been called
 		 */
-		await cms.emit('onlineOrderSocket', null, [clientToOnlineSocket])
+		await cms.emit('onlineOrderSocket', clientToOnlineSocket)
 		await delay(50)
 		expect(countInitSyncForClient).toEqual(1)
 		expect(orm._events['transport:toMaster']).not.toBe(undefined)
@@ -161,7 +161,7 @@ describe('test-flow', function () {
 		Pair new orm
 		 */
 		await require('./index')(cms1)
-		await cms1.emit('onlineOrderSocket', null, [clientToOnlineSocketB])
+		await cms1.emit('onlineOrderSocket', clientToOnlineSocketB)
 		await delay(50)
 		expect(countInitSyncForClientB).toBe(1)
 		expect(ormB._events['transport:toMaster']).not.toBe(undefined)

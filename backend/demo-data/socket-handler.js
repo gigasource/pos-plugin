@@ -129,7 +129,7 @@ module.exports = cms => {
     socket.on('set-demo-store', async (store, paired, cb) => {
       if (!paired) {
         global.APP_CONFIG.isMaster = true
-        await cms.execPostAsync('load:handler')
+        await cms.emit('load:handler')
       }
       if (!store) return cb()
       const { fileName } = store

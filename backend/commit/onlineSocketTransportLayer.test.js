@@ -19,6 +19,7 @@ const clientToOnlineSocket = new Socket()
 const clientToOnlineSocketB = new Socket()
 
 const uuid = require('uuid')
+const Hooks = require("schemahandler/hooks/hooks");
 
 global.APP_CONFIG = {
 	deviceIp: 'a.b.c.d'

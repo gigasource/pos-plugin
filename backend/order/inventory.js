@@ -14,7 +14,7 @@ function compact(arr) {
 
 module.exports = cms => {
   //update inventory after finishing order
-  cms.post('run:closeOrder', async (commit, order) => {
+  cms.on('run:closeOrder', async (commit, order) => {
     const { items } = order
     const ids = items.map(item => {
       if(item.modifiers && item.modifiers.length > 0) {

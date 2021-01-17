@@ -216,7 +216,7 @@ module.exports = async cms => {
         : console.debug(sentryTags, 'onlineOrderSocket disconnected'));
     socket.on('reconnecting', numberOfAttempt => console.debug(sentryTags, `onlineOrderSocket reconnecting, attempt: ${numberOfAttempt}`));
     socket.on('reconnect', () => console.debug(sentryTags, 'onlineOrderSocket reconnected'));
-    socket.on('reconnect_error', err => console.debug(sentryTags, `onlineOrderSocket reconnect error: ` + err.stack));
+    socket.on('reconnect_error', err => console.debug(sentryTags, `onlineOrderSocket reconnect error: ` /*+ err.stack*/));
     socket.on('connection-established', socketId => {
       socket.serverSocketId = socketId;
       console.debug(sentryTags + `,socketId=${socket.serverSocketId}`, '1b. onlineOrderSocket connected');
@@ -562,7 +562,7 @@ module.exports = async cms => {
       ack()
     })
     // register device which is installed from store
-    cms.post('run:registerAppFromStore', () => {
+    cms.on('run:registerAppFromStore', () => {
       socket.emit('registerAppFromStore');
     })
   }
@@ -598,14 +598,14 @@ module.exports = async cms => {
           onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
           onlineOrderSocket.once('connect', resolve);
           createOnlineOrderListeners(onlineOrderSocket, deviceId);
-          await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+          await cms.emit('onlineOrderSocket', onlineOrderSocket)
           // await initSocket(onlineOrderSocket);
         }, 2000);
       } else {
         onlineOrderSocket = io(`${webshopUrl}?clientId=${deviceId}`, {forceNew: true});
         onlineOrderSocket.once('connect', resolve);
         createOnlineOrderListeners(onlineOrderSocket, deviceId);
-        await cms.execPostAsync('onlineOrderSocket', null, [onlineOrderSocket])
+        await cms.emit('onlineOrderSocket', null, onlineOrderSocket)
         // await initSocket(onlineOrderSocket);
       }
     });

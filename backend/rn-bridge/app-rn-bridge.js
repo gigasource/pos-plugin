@@ -6,7 +6,7 @@ try {
 }
 
 module.exports = (cms) => {
-	cms.post('load:afterServerListen', () => {
+	cms.on('load:afterServerListen', () => {
 		// Inform react-native node is initialized.
 		setTimeout(() => {
 			console.log('Sending start message');
@@ -14,7 +14,7 @@ module.exports = (cms) => {
 		}, 1000);
 	})
 
-	cms.post('run:internalSocketConnected', (socket) => {
+	cms.on('run:internalSocketConnected', (socket) => {
 		socket.on('screen-loaded', () => {
 			rn_bridge.channel.send('ScreenLoaded');
 		})
@@ -25,10 +25,10 @@ module.exports = (cms) => {
 		switch (data.type) {
 			case 'ipAddress':
 				console.log('Update ipAddress', data.value);
-				await cms.execPostAsync('load:masterIp', null, [data.value]);
+				await cms.emit('load:masterIp',data.value);
 				break;
 			case 'onResume':
-				await cms.execPostAsync('run:requireSync');
+				await cms.emit('run:requireSync');
 				break;
 			case 'mouse':
 			case 'keyboard':
@@ -37,7 +37,7 @@ module.exports = (cms) => {
 				break;
 			case 'installationSource':
 				if (msg.value) {
-					await cms.execPostAsync('run:registerAppFromStore');
+					await cms.emit('run:registerAppFromStore');
 				}
 				break;
 			case 'deviceInfo':
@@ -48,7 +48,7 @@ module.exports = (cms) => {
 					global.APP_CONFIG.hardwareID = data.hardwareID;
 					await cms.getModel('PosSetting').findOneAndUpdate({}, {hardwareID: data.hardwareID});
 				}
-				cms.execPostSync('load:hardwareID', null, [global.APP_CONFIG.hardwareID]);
+				cms.emit('load:hardwareID', global.APP_CONFIG.hardwareID);
 				break;
 		}
 	})

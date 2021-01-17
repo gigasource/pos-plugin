@@ -80,11 +80,11 @@ async function printHandler(order, device) {
       const printerInfo = printer.printers
 
       if (useVirtualPrinter)
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_ENTIRE_RECEIPT, null, [{
+        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_ENTIRE_RECEIPT, {
           printCanvas,
           props,
           printerInfo
-        }]);
+        });
 
       const {escPOS} = printerInfo;
       const escPrinter = await getEscPrinter(printerInfo);
