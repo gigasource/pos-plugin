@@ -33,13 +33,16 @@ export default {
     </>
 
     return genScopeId(() => (
-        <div class="order">
-          <div class="order-main">
-            <pos-order-layout2 style="flex: 1"/>
-            <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
+        <>
+          <div class="order">
+            <div class="order-main">
+              <pos-order-layout2 style="flex: 1"/>
+              <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
+            </div>
+            {!isMobile.value && <pos-quick-order-toolbar2/>}
           </div>
-          {!isMobile.value && <pos-quick-order-toolbar2/>}
-        </div>
+          <pos-order-split-order2 v-model={orderViewDialog.split}/>
+        </>
     ))
   }
 }

@@ -7,7 +7,6 @@ Array [
       "args": Array [
         Object {
           "_id": "ObjectID",
-          "beforeSent": true,
           "cancellationItems": Array [],
           "items": Array [],
           "payment": Array [],
@@ -35,7 +34,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$push": Object {
             "items": Object {
@@ -81,7 +82,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 40,
@@ -944,6 +947,727 @@ Array [
           "$set": Object {
             "vSum": 0,
             "vTaxSum": Object {},
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+]
+`;
+
+exports[`pos-logic case 11: factory test 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+          "cancellationItems": Array [],
+          "items": Array [],
+          "payment": Array [],
+          "status": "inProgress",
+          "table": "10",
+          "takeAway": false,
+          "user": Array [],
+          "vDate": "2020-12-31T17:00:00.000Z",
+          "vSum": 0,
+          "vTaxSum": Object {},
+        },
+      ],
+      "fn": "create",
+    },
+    Object {
+      "args": Array [
+        "createOrder",
+        Object {
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$push": Object {
+            "items": Object {
+              "_id": "ObjectID",
+              "course": 1,
+              "groupPrinter": "Bar",
+              "id": "48",
+              "name": "Whiskey",
+              "price": 40,
+              "product": "ObjectID",
+              "quantity": 1,
+              "tax": 19,
+              "taxes": Array [
+                19,
+                7,
+              ],
+              "vSum": 40,
+              "vTakeAway": false,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vSum": 40,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 40,
+                "net": 33.61,
+                "tax": 6.39,
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+]
+`;
+
+exports[`pos-logic case 12 a: split order one time snapshot 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+          "cancellationItems": Array [],
+          "items": Array [],
+          "payment": Array [],
+          "splitId": "4a784001-4bc4-11eb-bbfc-fb848d2c0894",
+          "status": "inProgress",
+          "table": "10",
+          "takeAway": false,
+          "user": Array [],
+          "vDate": "2020-12-31T17:00:00.000Z",
+          "vSum": 0,
+          "vTaxSum": Object {},
+        },
+      ],
+      "fn": "create",
+    },
+    Object {
+      "args": Array [
+        "createOrder",
+        Object {
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$push": Object {
+            "items": Object {
+              "_id": "ObjectID",
+              "course": 1,
+              "groupPrinter": "Bar",
+              "id": "48",
+              "name": "Whiskey",
+              "price": 40,
+              "product": "ObjectID",
+              "quantity": 2,
+              "tax": 19,
+              "taxes": Array [
+                19,
+                7,
+              ],
+              "vSum": 80,
+              "vTakeAway": false,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 80,
+                  "net": 67.23,
+                  "tax": 12.77,
+                },
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vSum": 80,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 80,
+                "net": 67.23,
+                "tax": 12.77,
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+]
+`;
+
+exports[`pos-logic case 12 b: split order 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 40,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 40,
+            "net": 33.61,
+            "tax": 6.39,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "splitId": "4a784001-4bc4-11eb-ac65-830994817053",
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 40,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 40,
+        "net": 33.61,
+        "tax": 6.39,
+      },
+    },
+  },
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [],
+    "payment": Array [],
+    "splitId": "4a784001-4bc4-11eb-ac65-830994817053",
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 0,
+    "vTaxSum": Object {},
+  },
+]
+`;
+
+exports[`pos-logic case 12 b: split order 2`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+          "cancellationItems": Array [],
+          "items": Array [],
+          "payment": Array [],
+          "splitId": "4a784001-4bc4-11eb-ac65-830994817053",
+          "status": "inProgress",
+          "table": "10",
+          "takeAway": false,
+          "user": Array [],
+          "vDate": "2020-12-31T17:00:00.000Z",
+          "vSum": 0,
+          "vTaxSum": Object {},
+        },
+      ],
+      "fn": "create",
+    },
+    Object {
+      "args": Array [
+        "createOrder",
+        Object {
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$push": Object {
+            "items": Object {
+              "_id": "ObjectID",
+              "course": 1,
+              "groupPrinter": "Bar",
+              "id": "48",
+              "name": "Whiskey",
+              "price": 40,
+              "product": "ObjectID",
+              "quantity": 1,
+              "tax": 19,
+              "taxes": Array [
+                19,
+                7,
+              ],
+              "vSum": 40,
+              "vTakeAway": false,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vSum": 40,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 40,
+                "net": 33.61,
+                "tax": 6.39,
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$pull": Object {
+            "items": Object {
+              "_id": "ObjectID",
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vSum": 0,
+            "vTaxSum": Object {},
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+]
+`;
+
+exports[`pos-logic case 12: split order: cancel 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 3,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 120,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 120,
+            "net": 100.84,
+            "tax": 19.16,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "splitId": "4a784001-4bc4-11eb-bd0d-413665d061ac",
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 40,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 40,
+        "net": 33.61,
+        "tax": 6.39,
+      },
+    },
+  },
+  Object {
+    "cancellationItems": Array [],
+    "items": Array [],
+    "payment": Array [],
+    "user": Array [],
+  },
+]
+`;
+
+exports[`pos-logic case 13 a: move items : inProgress order 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 4,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 160,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 160,
+            "net": 134.45,
+            "tax": 25.55,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "15",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 160,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 160,
+        "net": 134.45,
+        "tax": 25.55,
+      },
+    },
+  },
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 3,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 120,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 120,
+            "net": 100.84,
+            "tax": 19.16,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 40,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 40,
+            "net": 33.61,
+            "tax": 6.39,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 160,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 160,
+        "net": 134.45,
+        "tax": 25.55,
+      },
+    },
+  },
+]
+`;
+
+exports[`pos-logic case 13 a: move items : inProgress order 2`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$push": Object {
+            "items": Object {
+              "_id": "ObjectID",
+              "course": 1,
+              "groupPrinter": "Bar",
+              "id": "48",
+              "name": "Whiskey",
+              "price": 40,
+              "product": "ObjectID",
+              "quantity": 1,
+              "tax": 19,
+              "taxes": Array [
+                19,
+                7,
+              ],
+              "vSum": 40,
+              "vTakeAway": false,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vSum": 160,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 160,
+                "net": 134.45,
+                "tax": 25.55,
+              },
+            },
           },
         },
       ],

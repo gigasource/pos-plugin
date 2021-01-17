@@ -36,7 +36,7 @@ export default {
     }
 
     function splitOrder() {
-      orderViewDialog.value['split'] = true;
+      orderViewDialog['split'] = true;
     }
 
     function print() {
@@ -44,11 +44,11 @@ export default {
     }
 
     function moveItems() {
-      orderViewDialog.value['move'] = true;
+      orderViewDialog['move'] = true;
     }
 
     function showVoucherDialog() {
-      orderViewDialog.value['voucher'] = true;
+      orderViewDialog['voucher'] = true;
     }
 
     function toggleTakeAwayOrder() {
@@ -73,7 +73,7 @@ export default {
             ),
             default: () => (
                 <div class="col-flex bg-white">
-                  <g-btn-bs icon="icon-move-items" onClick_stop={withModifiers(moveItems, ['stop'])}
+                  <g-btn-bs icon="icon-move-items" onClick={withModifiers(moveItems, ['stop'])}
                             disabled={disableMoveItemsBtn}>{$t('order.moveItem')}</g-btn-bs>
                   <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{$t('order.voucher')}</g-btn-bs>
                 </div>
@@ -85,21 +85,21 @@ export default {
           <g-spacer/>
           {order.table && <g-btn-bs background-color="#1271ff" text-color="#fff"
                                     disabled={disablePrint.value} icon="icon-print"
-                                    onClick_stop={print}>
+                                    onClick={print}>
             {$t('ui.print')}
           </g-btn-bs>}
 
           {order.table ? <g-btn-bs disabled={!disablePay.value} icon="icon-split_check_2"
-                                   onClick_stop={splitOrder}>
+                                   onClick={splitOrder}>
                 {$t('order.splitOrder')}
               </g-btn-bs> :
               <>
                 <g-btn-bs class="col-2" background-color="#4CAF50" disabled={!disablePay.value}
-                          onClick_stop={() => quickCash(false)}>
+                          onClick={() => quickCash(false)}>
                   {$t('restaurant.cashAndDineIn')}
                 </g-btn-bs>
                 <g-btn-bs class="col-2" background-color="#4CAF50" disabled={!disablePay.value}
-                          onClick_stop={() => quickCash(true)}>
+                          onClick={() => quickCash(true)}>
                   {$t('restaurant.cashAndTakeAway')}
                 </g-btn-bs>
               </>

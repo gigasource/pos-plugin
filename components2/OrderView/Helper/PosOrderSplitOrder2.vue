@@ -1,5 +1,4 @@
 <script>
-import orderUtil from '../../../components/logic/orderUtil';
 import {v4 as uuidv4} from 'uuid';
 import dialogMultiPayment from '../../../components/posOrder/dialogMultiPayment';
 import {computed, ref, watch} from "vue";
@@ -8,9 +7,10 @@ import {useI18n} from "vue-i18n";
 import {getCurrentOrder} from "../pos-logic-be";
 import {getItemSubtext, isItemDiscounted, itemsWithQtyFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
-import {internalValueFactory} from "../../utils";
-import {removeModifier} from "../pos-logic";
+import {genScopeId, internalValueFactory} from "../../utils";
+import {calItemVSum, removeModifier} from "../pos-logic";
 
+//todo: make run with new logic
 export default {
   name: 'PosOrderSplitOrder2',
   components: {dialogMultiPayment},
@@ -22,9 +22,8 @@ export default {
     const order = getCurrentOrder();
     const {t: $t, locale} = useI18n();
     const internalValue = internalValueFactory(props, {emit});
-    const {itemsWithQty, remainingItems, returnItem, addToMoveItems} = itemsWithQtyFactory()
+    const {itemsWithQty, remainingItems, returnItem, addToMoveItems: addToSplitOrder, itemsToMove: currentSplitOrder} = itemsWithQtyFactory()
     const splitOrders = ref([]);
-    const currentSplitOrder = ref([]);
     const showPaymentMethodsMenu = ref(false);
     const showMultiPaymentdialog = ref(false);
     const showReceipt = ref(false);
@@ -34,7 +33,7 @@ export default {
     //fixme
     function getTotal(items) {
       if (!items) return 0
-      return orderUtil.calOrderTotal(items) + orderUtil.calOrderModifier(items)
+      return _.sumBy(items, item => calItemVSum(item));
     }
 
     const totalLeft = computed(() => {
@@ -125,7 +124,7 @@ export default {
       remainingItems.value = _.cloneDeep(order.items)
       paying.value = false
 
-      if (val) {
+      if (props.modelValue) {
         if (order.splitId) {
           splitId.value = order.splitId
         } else {
@@ -144,191 +143,194 @@ export default {
 
     const splitterStyle = isMobile.value ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}
     //todo: removeModifier
-    return () => {
-      return (
-          <>
-            <g-dialog v-model={internalValue.value} transition={false} content-class="split-order-dialog">
-              <div class="row-flex justify-end w-100">
-                <div class="splitter" style={splitterStyle}>
-                  {isMobile.value ?
-                      <div class="splitter__header row-flex align-items-center">
-                        {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
-                        <g-btn-bs uppercase={false}
-                                  background-color="#1271ff" disabled={!splitOrders.value.length}
-                                  onClick_stop={() => showReceipt.value = true}>
-                          <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
-                          <span>{$t('restaurant.viewReceipt')}</span>
-                        </g-btn-bs>
-                        {splitOrders.value.length && <g-spacer/>}
-                        {splitOrders.value.length && <div>
-                          <span style="font-weight: 700; font-size: 15px">Split: </span>
-                          <span style="font-weight: 600; color: #ff4452">{splitOrders.value.length}</span>
-                        </div>}
-                        <g-spacer/>
-                        <div style="font-weight: 600; color: #ff4452">
-                          {$t('common.currency', locale)} {$filters.formatCurrency(totalCurrent.value)}
-                        </div>
-                      </div>
-                      :
-                      <div class="splitter__header">
-                        {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
-                        <p>
-                          Total:
-                          <span style="font-size: 18px; color: #ff4452">
-                            {$filters.formatCurrency(totalCurrent.value)}
-                          </span>
-                        </p>
-                      </div>
-                  }
 
-                  <div class="splitter__content">
-                    {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
-                    {currentSplitOrder.value.map(item => (
-                        <>
-                          <div class="item">
-                            <div class="item-detail" onClick_stop={() => returnItem(item)}>
-                              <div>
-                                <p class="item-detail__name" style={[item.printed && {opacity: 0.55}]}>
-                                  {item.id && `${item.id}. `}{item.name}</p>
-                                <p>
-                                  <span
-                                      class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
-                                    {$t('common.currency', locale)}{$filters.formatCurrency(item.originalPrice)}
-                                  </span>
-                                  {isItemDiscounted(item) &&
-                                  <span class="item-detail__price--new">
-                                    {$t('common.currency', locale)} {$filters.formatCurrency(item.price)}
-                                  </span>
-                                  }
-                                  <span class={['item-detail__option', 'text-red-accent-2']}>
-                                    {getItemSubtext(item)}
-                                  </span>
-                                </p>
-                              </div>
-                              <div class="mr-2 fw-700 row-flex align-items-center"
-                                   style="font-size: 18px">{item.quantity}</div>
-                            </div>
-                            {item.modifiers && <div>
-                              {item.modifiers.map(modifier => (
-                                  <g-chip label small text-color="#616161">
-                                    {modifier.name} |
-                                    {$t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
-                                  </g-chip>
-                              ))}
 
-                            </div>}
-                          </div>
-                        </>
-                    ))}
 
-                  </div>
-                  <div class="splitter__actions">
-                    <g-btn-bs class="splitter__actions-btn" background-color="#046EFF" disabled={disablePayment}
-                              style="border-radius: 0 0 0 6px"
-                              onClick_stop={() => _createOrder([{type: 'cash', value: totalCurrent}])}>
-                      <g-icon size="36">icon-cash</g-icon>
-                    </g-btn-bs>
-                    <g-btn-bs class="splitter__actions-btn" background-color="#0EA76F" disabled={disablePayment}
-                              onClick_stop={() => _createOrder([{type: 'card', value: totalCurrent}])}>
-                      <g-icon size="36">icon-credit_card</g-icon>
-                    </g-btn-bs>
-                    <g-btn-bs class="splitter__actions-btn" background-color="#795548" disabled={disablePayment}
-                              style="border-radius: 0 0 6px 0"
-                              onClick_stop={() => showMultiPaymentdialog.value = true}>
-                      <g-icon size="36">icon-multi_payment</g-icon>
-                    </g-btn-bs>
-                  </div>
-                </div>
-
-                <g-icon class="mr-4 ml-4" size="40" color="#fff" style="height: calc(100% - 64px)">keyboard_backspace
-                </g-icon>
-
-                <div class="order-detail" style={isMobile.value ? {height: '100%'} : {height: 'calc(100% - 64px)'}}>
-                  {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
-                  <div class="order-detail__header row-flex align-items-center">
-                    <div>
-                      <g-avatar size="36">
-                        <img alt src={avatar.value}/>
-                      </g-avatar>
-                      <span class="ml-1 fw-700" style="font-size: 13px">{username.value}</span>
-                    </div>
-                    {isMobile.value && <g-spacer/>}
-                    {isMobile.value &&
-                    <g-btn-bs class="elevation-1 btn-back" onClick={back}>
-                      <g-icon>icon-back</g-icon>
-                    </g-btn-bs>}
-                    <g-spacer/>
-                    <div style="font-size: 18px; color: #ff4452">
-                      {$t('common.currency', locale)} {$filters.formatCurrency(totalLeft.value)}
-                    </div>
-                  </div>
-                  <div class="order-detail__content">
-                    {itemsWithQty.value.map(item => (
-                        <div class="item" onClick_stop={addToSplitOrder(item)}>
-                          <div class="item-detail">
-                            <div>
-                              <p class="item-detail__name" style={[item.printed && {opacity: 0.55}]}>
-                                {item.id && `${item.id}. `} {item.name}</p>
-                              <p>
-                                <span
-                                    class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
-                                  {$t('common.currency', locale)} {$filters.formatCurrency(item.originalPrice)}
-                                </span>
-                                {isItemDiscounted(item) &&
-                                <span class="item-detail__price--new">
-                                  {$t('common.currency', locale)} {$filters.formatCurrency(item.price)}
-                                </span>}
-                                <span class={['item-detail__option', 'text-red-accent-2']}>
-                                  {getItemSubtext(item)}
-                                </span>
-                              </p>
-                            </div>
-                            <div class="mr-2 fw-700 row-flex align-items-center"
-                                 style="font-size: 18px">{item.quantity}</div>
-                          </div>
-                          {item.modifiers && <div>
-                            {
-                              item.modifiers.map(modifier => (
-                                  <g-chip label small text-color="#616161" close
-                                          onClose={() => removeModifier(order, item, index)}>
-                                    {modifier.name} |
-                                    {$t('common.currency', locale)}{$filters.formatCurrency(modifier.price)}
-                                  </g-chip>
-                              ))
-                            }
-                            }
-                          </div>}
-                        </div>
-                    ))}
-                  </div>
+    const contentRender = genScopeId(() => (<>
+      <div class="row-flex justify-end w-100">
+        <div class="splitter" style={splitterStyle}>
+          {isMobile.value ?
+              <div class="splitter__header row-flex align-items-center">
+                {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
+                <g-btn-bs uppercase={false}
+                          background-color="#1271ff" disabled={!splitOrders.value.length}
+                          onClick={() => showReceipt.value = true}>
+                  <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
+                  <span>{$t('restaurant.viewReceipt')}</span>
+                </g-btn-bs>
+                {splitOrders.value.length && <g-spacer/>}
+                {splitOrders.value.length && <div>
+                  <span style="font-weight: 700; font-size: 15px">Split: </span>
+                  <span style="font-weight: 600; color: #ff4452">{splitOrders.value.length}</span>
+                </div>}
+                <g-spacer/>
+                <div style="font-weight: 600; color: #ff4452">
+                  {$t('common.currency', locale)} {$filters.formatCurrency(totalCurrent.value)}
                 </div>
               </div>
+              :
+              <div class="splitter__header">
+                {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
+                <p>
+                  Total:
+                  <span style="font-size: 18px; color: #ff4452">
+                              {$filters.formatCurrency(totalCurrent.value)}
+                            </span>
+                </p>
+              </div>
+          }
 
-              {isMobile.value && <g-toolbar elevation="0" color="#eee" class="toolbar">
-                <g-btn-bs icon="icon-back" onClick_stop={back}>{$t('ui.back')}</g-btn-bs>
-                <g-spacer/>
-                {splitOrders.value.length && <span class="ml-2 mr-2">Split: {splitOrders.value.length}</span>}
-                <g-btn-bs uppercase={false} background-color="#1271ff" disabled={!splitOrders.value.length}
-                          onClick_stop={() => showReceipt.value = true}>
-                  View receipt
-                </g-btn-bs>
-              </g-toolbar>}
-            </g-dialog>
+          <div class="splitter__content">
+            {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
+            {currentSplitOrder.value.map(item => (
+                <>
+                  <div class="item" key={item._id.toString()}>
+                    <div class="item-detail" onClick={() => returnItem(item)}>
+                      <div>
+                        <p class="item-detail__name" style={[item.sent && {opacity: 0.55}]}>
+                          {item.id && `${item.id}. `}{item.name}</p>
+                        <p>
+                                    <span
+                                        class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
+                                      {$t('common.currency', locale)}{$filters.formatCurrency(item.originalPrice)}
+                                    </span>
+                          {isItemDiscounted(item) &&
+                          <span class="item-detail__price--new">
+                                      {$t('common.currency', locale)} {$filters.formatCurrency(item.price)}
+                                    </span>
+                          }
+                          <span class={['item-detail__option', 'text-red-accent-2']}>
+                                      {getItemSubtext(item)}
+                                    </span>
+                        </p>
+                      </div>
+                      <div class="mr-2 fw-700 row-flex align-items-center"
+                           style="font-size: 18px">{item.quantity}</div>
+                    </div>
+                    {item.modifiers && <div>
+                      {item.modifiers.map(modifier => (
+                          <g-chip label small text-color="#616161">
+                            {modifier.name} |
+                            {$t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
+                          </g-chip>
+                      ))}
 
-            <dialog-multi-payment v-model={showMultiPaymentdialog.value}
-                                  total={totalCurrent.value}
-                                  store-locale={locale}
-                                  onSubmit={saveMultiPayment}
-            />
+                    </div>}
+                  </div>
+                </>
+            ))}
 
-            <pos-order-receipt v-model={showReceipt.value} order={orderWithSplits.value}
-                               store-locale={locale} split
-                               onUpdatePayment={updateSplitPayment}
-                               onComplete={complete}
-                               onPrint={printReceipt}/>
-          </>
-      );
-    }
+          </div>
+          <div class="splitter__actions">
+            <g-btn-bs class="splitter__actions-btn" background-color="#046EFF" disabled={disablePayment.value}
+                      style="border-radius: 0 0 0 6px"
+                      onClick={() => _createOrder([{type: 'cash', value: totalCurrent}])}>
+              <g-icon size="36">icon-cash</g-icon>
+            </g-btn-bs>
+            <g-btn-bs class="splitter__actions-btn" background-color="#0EA76F" disabled={disablePayment.value}
+                      onClick={() => _createOrder([{type: 'card', value: totalCurrent}])}>
+              <g-icon size="36">icon-credit_card</g-icon>
+            </g-btn-bs>
+            <g-btn-bs class="splitter__actions-btn" background-color="#795548" disabled={disablePayment.value}
+                      style="border-radius: 0 0 6px 0"
+                      onClick={() => showMultiPaymentdialog.value = true}>
+              <g-icon size="36">icon-multi_payment</g-icon>
+            </g-btn-bs>
+          </div>
+        </div>
+
+        <g-icon class="mr-4 ml-4" size="40" color="#fff" style="height: calc(100% - 64px)">
+          keyboard_backspace
+        </g-icon>
+
+        <div class="order-detail" style={isMobile.value ? {height: '100%'} : {height: 'calc(100% - 64px)'}}>
+          {showPaymentMethodsMenu.value && <div class="blur-overlay"/>}
+          <div class="order-detail__header row-flex align-items-center">
+            <div>
+              <g-avatar size="36">
+                <img alt src={avatar.value}/>
+              </g-avatar>
+              <span class="ml-1 fw-700" style="font-size: 13px">{username.value}</span>
+            </div>
+            {isMobile.value && <g-spacer/>}
+            {isMobile.value &&
+            <g-btn-bs class="elevation-1 btn-back" onClick={back}>
+              <g-icon>icon-back</g-icon>
+            </g-btn-bs>}
+            <g-spacer/>
+            <div style="font-size: 18px; color: #ff4452">
+              {$t('common.currency', locale)} {$filters.formatCurrency(totalLeft.value)}
+            </div>
+          </div>
+          <div class="order-detail__content">
+            {itemsWithQty.value.map(item => (
+                <div class="item" onClick={() => addToSplitOrder(item)}>
+                  <div class="item-detail">
+                    <div>
+                      <p class="item-detail__name" style={[item.printed && {opacity: 0.55}]}>
+                        {item.id && `${item.id}. `} {item.name}</p>
+                      <p>
+                                  <span
+                                      class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
+                                    {$t('common.currency', locale)} {$filters.formatCurrency(item.originalPrice)}
+                                  </span>
+                        {isItemDiscounted(item) &&
+                        <span class="item-detail__price--new">
+                                    {$t('common.currency', locale)} {$filters.formatCurrency(item.price)}
+                                  </span>}
+                        <span class={['item-detail__option', 'text-red-accent-2']}>
+                                    {getItemSubtext(item)}
+                                  </span>
+                      </p>
+                    </div>
+                    <div class="mr-2 fw-700 row-flex align-items-center"
+                         style="font-size: 18px">{item.quantity}</div>
+                  </div>
+                  {item.modifiers && <div>{
+                    item.modifiers.map(modifier => (
+                        <g-chip label small text-color="#616161" close
+                                onClose={() => removeModifier(order, item, index)}>
+                          {modifier.name} |
+                          {$t('common.currency', locale)}{$filters.formatCurrency(modifier.price)}
+                        </g-chip>
+                    ))
+                  }}</div>}
+                </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {!isMobile.value && <g-toolbar elevation="0" color="#eee" class="toolbar">
+        <g-btn-bs icon="icon-back" onClick={back}>{$t('ui.back')}</g-btn-bs>
+        <g-spacer/>
+        {splitOrders.value.length && <span class="ml-2 mr-2">Split: {splitOrders.value.length}</span>}
+        <g-btn-bs uppercase={false} background-color="#1271ff" disabled={!splitOrders.value.length}
+                  onClick={() => showReceipt.value = true}>
+          View receipt
+        </g-btn-bs>
+      </g-toolbar>}
+    </>))
+
+    return genScopeId(() => (
+        <>
+          <g-dialog v-model={internalValue.value} transition={false} content-class="split-order-dialog">
+            {contentRender()}
+          </g-dialog>
+
+          <dialog-multi-payment v-model={showMultiPaymentdialog.value}
+                                total={totalCurrent.value}
+                                store-locale={locale}
+                                onSubmit={saveMultiPayment}
+          />
+
+          <pos-order-receipt v-model={showReceipt.value} order={orderWithSplits.value}
+                             store-locale={locale} split
+                             onUpdatePayment={updateSplitPayment}
+                             onComplete={complete}
+                             onPrint={printReceipt}/>
+        </>
+    ))
   }
 }
 </script>

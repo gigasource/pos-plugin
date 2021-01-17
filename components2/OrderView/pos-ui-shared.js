@@ -1,4 +1,4 @@
-import {computed, reactive, ref, watchEffect} from 'vue';
+import {computed, nextTick, reactive, ref, watchEffect} from 'vue';
 import {
   createEmptyCategoryLayout,
   createEmptyLayout,
@@ -6,6 +6,8 @@ import {
   isSameArea
 } from "../../components/posOrder/util";
 import _ from "lodash";
+import {addItem} from "./pos-logic";
+import {addProduct, getCurrentOrder} from "./pos-logic-be";
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
 export const orderLayout = ref({categories: []});
@@ -64,6 +66,26 @@ export const products = computed(() => {
   // remove product layout which is not text but doesn't link to any product
   return  _.filter(selectedCategoryLayout.value && selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
 })
+
+//fixme: only for dev
+const order = getCurrentOrder();
+watchEffect(() => {
+  if (order.items.length === 0 && products.value.length > 0) {
+    addProduct(order, products.value[0].product);
+    addProduct(order, products.value[0].product);
+    addProduct(order, products.value[1].product);
+    addProduct(order, products.value[1].product);
+
+    orderViewDialog.split = true;
+  }
+})
+
+/*async function run() {
+  await nextTick();
+}
+run();*/
+
+
 
 export const mode = ref();
 
@@ -134,6 +156,7 @@ export function itemsWithQtyFactory() {
     return [];
   })
   const itemsToMove = ref([]);
+  const currentSplitOrder = ref([]);
 
   function addToMoveItems(item) {
     if (item.quantity > 1) {
@@ -179,7 +202,8 @@ export function itemsWithQtyFactory() {
     remainingItems,
     itemsWithQty,
     addToMoveItems,
-    returnItem
+    returnItem,
+    itemsToMove
   }
 }
 

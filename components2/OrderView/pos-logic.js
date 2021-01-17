@@ -291,13 +291,17 @@ export function updateItem(order, query, update) {
   hooks.emit('post:order:update', order);
 }
 
-const isSameItem = (item1, item2) => {
+const isSameItem = (item1, item2, countSentProp = true) => {
   if (item2.modifiers && item2.modifiers.length > 0) return false;
+  if (item1.modifiers && item1.modifiers.length > 0) return false;
+
+  if (countSentProp && item2.sent) return false;
   return item2.product === item1.product &&
-    item1.price === item2.price && !item2.sent
+    item2.name === item1.name &&
+    item1.price === item2.price
 }
 
-export function changeItemQuantity(order, query, change) {
+export function changeItemQuantity(order, query, change, shouldRemoveWhenZero = false) {
   let item;
   if (typeof query === 'number') {
     item = order.items[query];
@@ -307,6 +311,9 @@ export function changeItemQuantity(order, query, change) {
 
   hooks.emit('pre:order:update', order);
   item.quantity += change;
+  if (shouldRemoveWhenZero && item.quantity === 0) {
+    order.items.splice(order.items.indexOf(item), 1);
+  }
   hooks.emit('post:order:update', order);
 }
 
@@ -504,5 +511,24 @@ export function simulateBackendPrint(order) {
     i.printed = true;
   })
 }
+
+export function mergeSameItems(order) {
+  const items = order.items.reduce((list, item) => {
+    let shouldAdd = true;
+    for (const _item of list) {
+      if (isSameItem(_item, item, false)) {
+        shouldAdd = false;
+        _item.quantity += item.quantity;
+      }
+    }
+    if (shouldAdd) {
+      list.push(item);
+    }
+    return list;
+  }, [])
+  order.items = items;
+}
+
+//todo: recent items
 
 //</editor-fold>

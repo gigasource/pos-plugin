@@ -33,15 +33,22 @@
 * [_] posOrder2 test snapshot trước -> easy hơn
 * [x] pos layout -> convert now
 * [x] pos layout
-  * [_] snapshot for ui
+  * [x] snapshot for ui
   * [x] singleton setting ui
-  * [_] categories: test/mock-db
-  * [_] products: test/mock-db
-  * [_] actionMode: test/mock-db
+  * [x] categories: test/mock-db
+  * [x] products: test/mock-db
+  * [x] actionMode: test/mock-db
+
 * [_] split order
   * [_] test backend
 * [_] move items
+
 * [_] test thu cho khi ghep vao no se nhu the nao ?
+* [x] compact order
+
+* [_] use reactive to gen mongo commit
+* [_] new concept for buildform
+
 
 ```jsx
 //addVoucher
