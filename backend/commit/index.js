@@ -37,7 +37,7 @@ module.exports = async function (cms) {
 		return global.APP_CONFIG.deviceIp ? global.APP_CONFIG.deviceIp : internalIp.v4.sync()
 	}
 
-	cms.post('connectToMaster', async function (_masterIp, _masterClientId, cloudSocket) {
+	cms.on('connectToMaster', async function (_masterIp, _masterClientId, cloudSocket) {
 		const posSettings = await cms.getModel('PosSetting').findOne({})
 		let { masterIp } = posSettings
 		if (posSettings.onlineDevice)
@@ -102,7 +102,7 @@ module.exports = async function (cms) {
 			}
 		}
 		if (commit.collectionName === 'Order' && commit.tags.includes('closeOrder')) {
-			cms.execPostAsync('run:closeOrder', null, [])
+			cms.emit('run:closeOrder')
 		}
 	})
 
@@ -120,7 +120,7 @@ module.exports = async function (cms) {
 		const getMasterIp = function () {
 			socket.emit('getMasterIp', onlineDevice.store.alias, async (_masterIp, masterClientId) => {
 				if (_masterIp && masterIp !== _masterIp) {
-					await cms.execPostAsync('connectToMaster', null, [_masterIp, masterClientId, socket])
+					await cms.emit('connectToMaster', _masterIp, masterClientId, socket)
 				}
 			})
 		}
@@ -135,7 +135,7 @@ module.exports = async function (cms) {
 		socket.on('setDeviceAsMaster', async function (ack) {
 			ack()
 			masterIp = localIp()
-			await cms.execPostAsync('connectToMaster', null, [localIp(), onlineDevice.id, socket])
+			await cms.emit('connectToMaster', null, [localIp(), onlineDevice.id, socket])
 		})
 
 		await orm.emit('setUpCloudSocket', masterIp, masterClientId, socket)
@@ -144,7 +144,7 @@ module.exports = async function (cms) {
 	/*
 	 -------------------------------------------
 	 */
-	await cms.execPostAsync('connectToMaster')
+	await cms.emit('connectToMaster')
 
 	orm.plugin(require('./orderCommit'))
 	orm.plugin(require('./actionCommit'))

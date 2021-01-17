@@ -1,6 +1,6 @@
 const { Socket, Io } = require('schemahandler/io/io')
 const _ = require('lodash')
-const Kareem = require('kareem');
+const Hooks = require('schemahandler/hooks/hooks');
 const delay = require('delay')
 const onlineOrderIo = new Io()
 onlineOrderIo.listen('local')
@@ -65,15 +65,7 @@ function cmsFactory(orm) {
 			}
 		}
 	}
-	_.extend(cms, new Kareem())
-	cms.execPostAsync = async function(name, context, args) {
-		const posts = this._posts.get(name) || [];
-		const numPosts = posts.length;
-
-		for (let i = 0; i < numPosts; ++i) {
-			await posts[i].fn.bind(context)(...(args || []));
-		}
-	};
+	_.extend(cms, new Hooks())
 	return cms
 }
 
@@ -150,7 +142,7 @@ describe('test-flow', function () {
 		after connect to master for the first time, expect master is false
 		and initSocketForClient hook has not been called
 		 */
-		await cms.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocket])
+		await cms.emit('onlineOrderSocket', null, [clientToOnlineSocket])
 		await delay(50)
 		expect(countInitSyncForClient).toEqual(1)
 		expect(orm._events['transport:toMaster']).not.toBe(undefined)
@@ -169,7 +161,7 @@ describe('test-flow', function () {
 		Pair new orm
 		 */
 		await require('./index')(cms1)
-		await cms1.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocketB])
+		await cms1.emit('onlineOrderSocket', null, [clientToOnlineSocketB])
 		await delay(50)
 		expect(countInitSyncForClientB).toBe(1)
 		expect(ormB._events['transport:toMaster']).not.toBe(undefined)
