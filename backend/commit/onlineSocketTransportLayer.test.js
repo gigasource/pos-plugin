@@ -1,6 +1,6 @@
 const { Socket, Io } = require('schemahandler/io/io')
 const _ = require('lodash')
-const Kareem = require('kareem');
+const Hooks = require('schemahandler/hooks/hooks');
 const delay = require('delay')
 const onlineOrderIo = new Io()
 onlineOrderIo.listen('local')
@@ -62,15 +62,7 @@ function cmsFactory(orm) {
 			}
 		}
 	}
-	_.extend(cms, new Kareem())
-	cms.execPostAsync = async function(name, context, args) {
-		const posts = this._posts.get(name) || [];
-		const numPosts = posts.length;
-
-		for (let i = 0; i < numPosts; ++i) {
-			await posts[i].fn.bind(context)(...(args || []));
-		}
-	};
+	_.extend(cms, new Hooks())
 	return cms
 }
 
@@ -135,7 +127,7 @@ describe('test online socket transport layer', function () {
 	it('flow', async (done) => {
 		const ormSocket = mapSocket['fromMaster']
 		await require('./index')(cms)
-		await cms.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocket])
+		await cms.emit('onlineOrderSocket', clientToOnlineSocket)
 		ormSocket.emit('setDeviceAsMaster', () => {})
 		ormSocket.on('transport:cloud:sync', () => {
 			Object.keys(mapSocket).forEach(key => {
@@ -151,7 +143,7 @@ describe('test online socket transport layer', function () {
 		Pair new orm
 		 */
 		await require('./index')(cms1)
-		await cms1.execPostAsync('onlineOrderSocket', null, [clientToOnlineSocketB])
+		await cms1.emit('onlineOrderSocket', clientToOnlineSocketB)
 		await delay(50)
 
 		/*
