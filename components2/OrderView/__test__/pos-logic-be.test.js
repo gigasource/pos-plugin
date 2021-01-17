@@ -140,6 +140,7 @@ describe("pos-logic", function() {
     await nextTick();
     addProduct(order, mockProduct);
     await nextTick();
+    console.log(actionList)
     expect(stringify(actionList.value)).toMatchSnapshot();
   });
 

@@ -25,10 +25,10 @@ module.exports = (cms) => {
 		switch (data.type) {
 			case 'ipAddress':
 				console.log('Update ipAddress', data.value);
-				await cms.execPostAsync('load:masterIp', null, [data.value]);
+				await cms.emit('load:masterIp', [data.value]);
 				break;
 			case 'onResume':
-				await cms.execPostAsync('run:requireSync');
+				await cms.emit('run:requireSync');
 				break;
 			case 'mouse':
 			case 'keyboard':
