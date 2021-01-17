@@ -335,7 +335,7 @@ describe("pos-logic", function() {
     prepareSecondOrder("10");
     const order = getSecondOrder();
     await nextTick();
-    addProductToSecondOrder(order, mockProduct);
+    addProduct(order, mockProduct);
     await nextTick();
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
@@ -432,6 +432,5 @@ describe("pos-logic", function() {
 
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
-
 
 });

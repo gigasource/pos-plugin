@@ -9,7 +9,6 @@ import PosOrderSplitOrder2 from "./Helper/PosOrderSplitOrder2";
 import PosOrderReceipt2 from "./Helper/PosOrderReceipt2";
 import PosOrderMoveItems2 from "./Helper/PosOrderMoveItems2";
 import PosOrderVoucherDialog2 from "./Helper/PosOrderVoucherDialog2";
-import {getCurrentInstance} from "vue";
 import {genScopeId} from "../utils";
 
 
@@ -42,6 +41,9 @@ export default {
             {!isMobile.value && <pos-quick-order-toolbar2/>}
           </div>
           <pos-order-split-order2 v-model={orderViewDialog.split}/>
+          <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
+          <pos-order-move-items2 v-model={orderViewDialog.move}/>
+          <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
         </>
     ))
   }

@@ -42,9 +42,12 @@
 * [_] split order
   * [_] test backend
 * [_] move items
+* [_] move items -> test backend
+* [_] tip
 
 * [_] test thu cho khi ghep vao no se nhu the nao ?
 * [x] compact order
+* [_] case modifiers
 
 * [_] use reactive to gen mongo commit
 * [_] new concept for buildform
