@@ -51,3 +51,16 @@ export function showNotify(content) {
   notifyState.content = content || 'Saved'
   notifyState.show = true
 }
+
+
+export const activeOrders = ref([]);
+
+appHooks.on('orderChange', async function () {
+  activeOrders.value = await cms.getModel('Order').find({ status: 'inProgress' });
+})
+
+
+export const setting = ref({})
+appHooks.on('settingChange', async function() {
+  setting.value = await cms.getModel('PosSetting').findOne()
+})

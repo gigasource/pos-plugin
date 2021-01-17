@@ -1,6 +1,40 @@
 <script>
+import { computed } from 'vue';
+import { setting } from '../../AppSharedStates';
+import _ from 'lodash';
+import { cms } from 'cms'
 export default {
+
   setup() {
+    const keyboardDeliveryConfig = ref(setting.value && setting.value.keyboardDeliveryConfig) || []
+    const position = ref({})
+    const dialog = ref(false)
+    const fetchMenu = function() {
+      cms.socket.emit('getDeliveryProducts', () => {
+        const contentFn = () => (
+            <div style="margin: 0 auto">
+              <span>Fetch menu successfully!</span>
+            </div>);
+        //todo: show snack bar
+        // showSnackbar(contentFn, '#536dfe', 3000)
+      })
+    }
+    const changeExtraRows = function(val) {
+      if(val > keyboardDeliveryConfig.length) {
+        keyboardDeliveryConfig.unshift([' ', ' ', ' '])
+      } else {
+        keyboardDeliveryConfig.shift()
+      }
+    }
+    const openDialogEdit = function(position) {
+      position.value = position
+      dialog.value = true
+    }
+    const changeKeyboardExtension = async function(val) {
+      _.set(keyboardDeliveryConfig.value, [position.value.top, position.value.left], val)
+      await cms.getModel('PosSetting').findOneAndUpdate({}, { keyboardDeliveryConfig: keyboardDeliveryConfig })
+    }
+
     return () => <div class="delivery-config">
       <div class="delivery-config__title">
         Configuration
@@ -19,10 +53,10 @@ export default {
         </div>
         <div class="col-6 col-flex h-100">
           <g-spacer/>
-          <pos-order-delivery-keyboard key={dialog} mode="edit" keyboardConfig={keyboardDeliveryConfig} onEdit:keyboard={openDialogEdit}/>
+          <pos-order-delivery-keyboard key={dialog.value} mode="edit" keyboardConfig={keyboardDeliveryConfig.value} onEdit:keyboard={openDialogEdit}/>
         </div>
       </div>
-      <dialog-text-filter v-model={dialog} label="Enter key" onSubmit={changeKeyboardExtension}/>
+      <dialog-text-filter v-model={dialog.value} label="Enter key" onSubmit={changeKeyboardExtension}/>
     </div>
   }
 }

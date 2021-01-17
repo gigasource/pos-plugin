@@ -1,7 +1,7 @@
 <script>
-import DashboardSidebarFactory from './DashboardSidebarFactory'
+import DashboardSidebarUI from './DashboardSidebarUI'
 
-const { hooks, fn } = DashboardSidebarFactory()
+const { hooks, fn } = DashboardSidebarUI()
 
 export default fn()
 </script>
