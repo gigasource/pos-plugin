@@ -27,16 +27,26 @@ import {
   prepareOrder, prepareSecondOrder,
   quickBtnAction, returnItem,
   showIcon, startOnetimeSnapshot,
-  togglePayPrintBtn
+  togglePayPrintBtn, createPrintAction
 } from "../pos-logic-be";
 import { mockProduct } from "./mock_product";
-import { ObjectID } from "bson";
+const { Socket, Io } = require('schemahandler/io/io')
 import { mockOrder } from "./mock-order";
-const dayjs = require("dayjs");
-const orm = require("schemahandler");
 const syncFlow = require("schemahandler/sync/sync-flow");
 const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
 const { stringify } = require("schemahandler/utils");
+const Hooks = require('schemahandler/hooks/hooks')
+const { cmsFactory } = require('../../../test-utils')
+
+// These requires must be after globalHooks initialization
+const {
+  prepareActionCommitTest
+} = require('../../../backend/commit/actionCommit.prepare.test')
+const {
+  prepareOrderTest,
+  checkOrderCreated
+} = require('../../../backend/order/order.prepare.test')
+
 //jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
 require("mockdate").set(new Date("2021-01-01").getTime());
 
@@ -49,6 +59,10 @@ const {
   makeLastItemDiscount
 } = require("../pos-logic");
 
+const cms = cmsFactory('posLogicBe')
+global.cms = cms
+const { orm } = cms
+
 const delay = require("delay");
 
 const foodTax = { taxes: [5, 10] };
@@ -59,8 +73,9 @@ const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
 const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
 const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
 
+const feSocket = new Socket()
+
 beforeAll(async () => {
-  orm.connect({ uri: "mongodb://localhost:27017" }, "myproject");
   orm.registerSchema("Order", {
     items: [{}]
   });
@@ -73,6 +88,9 @@ beforeAll(async () => {
   orm.plugin(require("../../../backend/commit/orderCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
+  prepareActionCommitTest(cms)
+  prepareOrderTest(cms)
+  feSocket.connect('frontend')
 });
 
 afterEach(async () => {
@@ -433,4 +451,22 @@ describe("pos-logic", function() {
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
 
+  it("case 14a: create Order + addProduct + togglePrint", async function(done) {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProduct);
+    await nextTick();
+    console.log(actionList.value)
+    expect(stringify(actionList.value)).toMatchSnapshot();
+    createPrintAction('kitchenAdd', order.value, actionList.value)
+    cms.once('run:print', function (commit) {
+      expect(stringify(actionList.value)).toMatchSnapshot();
+      expect(stringify(commit)).toMatchSnapshot()
+      checkOrderCreated(cms.orm)
+      done()
+    })
+    //todo: add code to frontend
+    feSocket.emit('print-to-kitchen', actionList.value)
+  });
 });

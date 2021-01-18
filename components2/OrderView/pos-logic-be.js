@@ -11,16 +11,22 @@ const Order = cms.getModel('Order');
 
 function addItemAction(order, actionList, item, update) {
   update = _.cloneDeep(update);
-  actionList.value.push(cms.getModel('Order')
-    .findOneAndUpdate({_id: order._id, 'items._id': item._id}, update)
-    .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain)
+  actionList.value.push({
+    modelName: 'Order', // todo: review
+    action: cms.getModel('Order')
+      .findOneAndUpdate({_id: order._id, 'items._id': item._id}, update)
+      .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain
+  })
 }
 
 function addOrderAction(order, actionList, update) {
   update = _.cloneDeep(update);
-  actionList.value.push(cms.getModel('Order')
-    .findOneAndUpdate({_id: order._id}, update)
-    .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain)
+  actionList.value.push({
+    modelName: 'Order', // todo: review
+    action: cms.getModel('Order')
+      .findOneAndUpdate({_id: order._id}, update)
+      .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain
+  })
 }
 
 function diff(o1, o2 = {}) {
@@ -163,7 +169,10 @@ function orderBeFactory(id = 0) {
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
     if (_new) {
       const action = Order.create(_order).commit('createOrder', {table: order.table}).chain
-      actionList.value.push(action);
+      actionList.value.push({
+        modelName: 'Order', // todo: review
+        action
+      });
     }
   }
 
@@ -323,6 +332,29 @@ export const disablePrint = computed(() => {
 
 export const showIcon = ref(false);
 let actionTimeout;
+
+/**
+ *
+ * @param printType
+ * @param order
+ * @example
+ * cms.once('run:print', function (commit) {
+ *    expect(stringify(actionList.value)).toMatchSnapshot();
+ *    expect(stringify(commit)).toMatchSnapshot()
+ *    global.globalHooks.emit('check:orderCreated', cms.orm)
+ *    done()
+ *  })
+ *
+ */
+export function createPrintAction(printType, order, actionList) { // todo: review
+  actionList.push({
+    modelName: 'Action',
+    action: cms.getModel('Action').create({
+      printType,
+      order
+    }).commit('print').chain
+  })
+}
 
 export function togglePayPrintBtn() {
   if (!showIcon.value) {
