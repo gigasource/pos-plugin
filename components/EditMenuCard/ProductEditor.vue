@@ -2,11 +2,14 @@
   <div class="product-editor">
     <!-- Product basic info -->
     <div class="product-editor__prop-grid">
+      <!-- type -->
       <template v-if="types">
         <div>{{$t('article.type')}}</div>
         <g-select :disabled="!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)" skip-search
                   text-field-component="GTextFieldBs" v-model="type" :items="types" @update:modelValue="changeType"/>
       </template>
+
+      <!-- basic info -->
       <template v-if="isProductLayout">
         <div>{{$t('article.id')}} </div>
         <g-text-field-bs :model-value="selectedProduct.id" @update:modelValue="setProductInfo('id', $event);debouncedUpdateProduct('id', $event)">
@@ -32,6 +35,7 @@
         <g-switch :model-value="selectedProduct.isModifier" @update:modelValue="updateProduct({ isModifier: $event })" />
         <div style="font-size: 13px">{{$t('article.isModifier')}}</div>
       </template>
+      <!-- text -->
       <template v-else>
         <div>{{$t('article.name')}} <span style="color: #ff4552">*</span></div>
         <g-text-field :model-value="selectedProductLayout.text" @update:modelValue="debounceUpdateTextLayout('text', $event)">
@@ -166,7 +170,6 @@
         @submit="updateProductLayout({ text: $event, type: 'Text' }, $event)"/>
     <dialog-edit-popup-modifiers v-model="dialog.popupModifiers" :product="selectedProduct" />
     <g-snackbar v-model="showSnackbar" top right color="#1976d2" timeout="1000">{{notifyContent}}</g-snackbar>
-
   </div>
 </template>
 <script>
@@ -288,7 +291,7 @@
       this.debouncedUpdateProduct = _.debounce(function (key, val) {
         this.updateProduct({ [key]: val }, !this.selectedProduct._id)
       }, 300)
-      
+
       this.debounceUpdateTextLayout = _.debounce(function(key, val) {
         this.updateTextLayout({ [key]: val }, !this.selectedProduct._id)
       }, 300)
@@ -467,12 +470,12 @@
             { new: true });
         this.$emit('update:orderLayout', result)
       },
-      
+
       async updateTextLayout(change) {
         const forceCreate = !this.selectedProductLayout._id;
         await this.updateProductLayout(change, forceCreate)
       },
-      
+
       openDialogInfo(focus) {
         this.dialog.focus = focus
         this.dialog.productInfo = true

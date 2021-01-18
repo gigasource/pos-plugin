@@ -21,7 +21,7 @@ export const debouncedUpdateCategory = _.debounce(change => {
 
 async function _updateCategory(change, forceCreate) {
   // assign change
-  updateSelectedCategoryLayout(Object.assign(selectedCategoryLayout.value, change))
+  updateSelectedCategoryLayout({...selectedCategoryLayout.value, ...change})
 
   // if selected product layout is not empty then update it
   // in case of update, because we already update the selectCategoryLayout so we don't need
