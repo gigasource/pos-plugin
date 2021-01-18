@@ -1,32 +1,14 @@
 import { reactive, watch, computed, onActivated } from 'vue'
 import { showNotify } from '../../AppSharedStates';
-import { createEmptyProduct } from '../utils';
 import _ from 'lodash'
 import cms from 'cms';
 import {
-  orderLayout, selectedCategoryLayout, selectedProductLayout,
+  orderLayout, selectedCategoryLayout, selectedProductLayout, selectedProduct,
+  updateView,
   updateOrderLayout,
   updateSelectedProductLayout
 } from '../../OrderView/pos-ui-shared';
 import orderLayoutApi from '../orderLayoutApi';
-
-//
-export const selectedProduct = computed({
-  get: () => {
-    // if no product layout selected, then return null
-    if (!selectedProductLayout.value) {
-      return null
-    }
-    // otherwise, init new product object if current product layout is empty
-    if (!selectedProductLayout.value.product) {
-      selectedProductLayout.value.product = createEmptyProduct()
-    }
-    return selectedProductLayout.value.product
-  },
-  set: (value) => {
-    selectedProductLayout.value.product = value
-  }
-})
 
 //// <editor-fold desc="product layout type">
 // TODO: rename to more meaning name (productLayoutType for example)/**/
@@ -191,22 +173,12 @@ export const getPrinterClass = (printer) => {
 
 export async function updateProductLayout(change, forceCreate) {
   updateSelectedProductLayout({ ...selectedProductLayout.value, ...change })
-
   if (selectedProductLayout.value._id) {
-    console.log('UpdateProductLayout', change)
-    console.log('Update product layout with id', selectedProductLayout.value._id)
-    const qry = {
-      type: layoutType.value,
-      'categories.products._id': selectedProductLayout.value._id
-    }
-    const set = {
-      $set: _.reduce(change, (result, value, key) => {
-        result[`categories.$[cate].products.$[product].${key}`] = value
-        return result
-      }, {})
-    };
-    const filter = [{ 'cate._id': selectedCategoryLayout.value._id }, { 'product._id': selectedProductLayout.value._id }]
-    await cms.getModel('OrderLayout').findOneAndUpdate(qry, set, { arrayFilters: filter, new: true });
+    await orderLayoutApi.updateProductLayout(
+        layoutType.value,
+        selectedCategoryLayout.value._id,
+        selectedProductLayout.value._id,
+        change)
     showNotify()
   } else if (forceCreate) {
     await createNewProductLayout(null, change)
@@ -239,7 +211,7 @@ export async function createNewProductLayout(productId, extraInfo) {
     ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
     ...extraInfo
   }
-  const result = await orderLayoutApi.createNewProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
+  const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
   updateOrderLayout(result)
 }
 
@@ -259,7 +231,7 @@ async function updateTextLayout(change) {
 }
 
 export const debounceUpdateTextLayout = _.debounce(function(key, val) {
-  updateTextLayout({ [key]: val }, !this.selectedProduct._id).then(res => res())
+  updateTextLayout({ [key]: val }, !selectedProduct.value._id).then(res => res())
 }, 300)
 
 export const addPopupModifierGroup = (toggleSelect, item) => {
@@ -270,4 +242,130 @@ export const addPopupModifierGroup = (toggleSelect, item) => {
 export const clearPopupModifierGroup = (toggleSelect, item) => {
   toggleSelect(item)
   changePopupModifierGroup(null).then(resolve => resolve())
+}
+
+// delete
+export const canDelete = computed(() => selectedProductLayout.value && selectedProductLayout.value._id)
+export async function deleteProductLayout() {
+  // delete linked product
+  if (selectedProductLayout.value.product._id)
+    await orderLayoutApi.deleteProduct(selectedProductLayout.value.product._id)
+
+  const orderLayout = await orderLayoutApi.deleteProductLayout(selectedCategoryLayout.value._id, selectedProductLayout.value._id)
+  updateOrderLayout(orderLayout)
+  updateView('CategoryEditor')
+  updateSelectedProductLayout(null)
+}
+
+// actions
+const supportedActions = ['switch', 'copy']
+let _action = null
+let actionTarget = null // selectedProductLayout at the time set action is called
+let actionCategoryTarget = null // selectedCategoryLayout at the time set action is called
+export function setAction(action) {
+  if (!_.includes(supportedActions, action))
+    throw `Action ${action} is not supported!`
+  _action = action
+  actionTarget = selectedProductLayout
+  actionCategoryTarget = selectedCategoryLayout
+}
+function _clearAction() {
+  _action = null
+  actionTarget = null
+  actionCategoryTarget = null
+}
+async function _execAction() {
+  switch(_action) {
+    case 'switch':
+      await switchProduct()
+      break;
+    case 'copy':
+      await copyProduct()
+      break;
+  }
+  _clearAction()
+}
+
+// watch product layout change to trigger product layout action automatically
+// side-effect: in-case the user select action then switch to another category
+// Do we need to clear action if the user change category ???
+watch(() => selectedProductLayout, async () => {
+  if (_action)
+    await _execAction()
+})
+
+// copy action
+export const canCopy = computed(() => selectedProductLayout.value && selectedProductLayout.value._id)
+async function copyProduct() {
+  if (selectedProductLayout.value._id) {
+    console.log('Product existed in selected position. Skip copy.')
+    return;
+  }
+  const product = await cms.getModel('Product').create({
+    ...copyProductInfo(actionTarget.value.product)
+  });
+  const productLayout = {
+    product: product._id,
+    ..._.pick(selectedProductLayout.value, ['top', 'left']),
+    ..._.pick(actionTarget.value, ['color', 'type', 'text'])
+  }
+  const result = await cms.getModel('OrderLayout').findOneAndUpdate(
+      { 'categories._id' : selectedCategoryLayout.value._id },
+      { $push: { 'categories.$.products' : productLayout } },
+      { new: true });
+  updateOrderLayout(result)
+}
+function copyProductInfo(product) {
+  if (!product)
+    return
+  const clone = { ...product, id: createNewProductId(product.id) }
+  delete clone._id
+  return clone
+}
+function createNewProductId(id) {
+  const idRegex = /^(?<digit>\d+)(?<alpha>\w)?$/g
+  const result = idRegex.exec(id)
+  if (!result)
+    return id
+  if (!result.groups.alpha)
+    return Number(result.groups.digit) + 1
+  return `${result.groups.digit}${String.fromCharCode(result.groups.alpha.charCodeAt(0) + 1) }`
+}
+
+// switch action
+export const canSwitch = computed(() => selectedProductLayout.value && selectedProductLayout.value._id)
+async function switchProduct() {
+  if (actionCategoryTarget.value._id === selectedCategoryLayout.value._id) {
+    console.log('switch product in same category')
+    // TODO: Bulk update
+    let result = await changeProductLayoutPosInTheSameCate(
+        actionTarget.value,
+        _.pick(selectedProductLayout.value, ['top', 'left']),
+        actionCategoryTarget.value)
+
+    if (selectedProductLayout.value._id)
+      result = await changeProductLayoutPosInTheSameCate(
+          selectedProductLayout.value,
+          _.pick(actionTarget.value, ['top', 'left']),
+          actionCategoryTarget.value)
+
+    updateOrderLayout(result)
+  } else {
+    // switch in 2 categories
+    console.log('TODO: switching products between category is not implemented')
+  }
+}
+async function changeProductLayoutPosInTheSameCate(productLayout, { top, left }, categoryLayout) {
+  return await cms.getModel('OrderLayout').findOneAndUpdate(
+      { 'categories.products._id': productLayout._id },
+      {
+        $set: {
+          ['categories.$[cate].products.$[product].top']: top,
+          ['categories.$[cate].products.$[product].left']: left,
+        }
+      },
+      {
+        arrayFilters: [{ 'cate._id': categoryLayout._id }, { 'product._id': productLayout._id }],
+        new: true
+      });
 }

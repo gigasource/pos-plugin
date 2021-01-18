@@ -1,0 +1,45 @@
+<script>
+import { orderLayout, updateOrderLayout } from '../OrderView/pos-ui-shared';
+import { ref } from 'vue'
+import orderLayoutApi from './orderLayoutApi';
+import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew';
+import dialogFormInput from '../../components/pos-shared-components/dialogFormInput';
+import { useI18n } from 'vue-i18n'
+
+export default {
+  name: 'OrderLayoutEditor2',
+  components: {PosTextfieldNew, dialogFormInput},
+  props: {},
+  setup() {
+    const { t } = useI18n()
+    const column = ref(4)
+    const row = ref(2)
+    const showAddOrderLayoutDialog = ref(false)
+
+    async function createLayout() {
+      updateOrderLayout(await orderLayoutApi.createOrderLayout(column.value, row.value))
+      showAddOrderLayoutDialog.value = false
+    }
+
+    return () => <>
+      <portal to="toolbar-buttons-left">
+        { (!orderLayout.value) && <g-btn-bs
+            text-color="#1271FF" elevation="2" icon="add_circle"
+            onClick={showAddOrderLayoutDialog.value = true}>{t('ui.add')}</g-btn-bs>}
+      </portal>
+
+      <dialog-form-input v-model={showAddOrderLayoutDialog.value} onSubmit={createLayout} v-slots={{
+        'input': () => <>
+          <div class="row-flex flex-wrap justify-around mt-2">
+            <pos-textfield-new style="width: 48%" label="Column" v-model={column.value} clearable></pos-textfield-new>
+            <pos-textfield-new style="width: 48%" label="Row" v-model={row.value} clearable></pos-textfield-new>
+          </div>
+        </>
+        ,
+      }}></dialog-form-input>
+    </>
+  }
+}
+</script>
+<style scoped>
+</style>

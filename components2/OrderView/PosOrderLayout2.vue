@@ -15,7 +15,7 @@ import {
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
 import {loadKeyboardConfig} from "./order-layout-keyboard";
-import {editable, mode, orderLayout, view} from "./pos-ui-shared";
+import {editable, orderLayout} from "./pos-ui-shared";
 import {payPrintMode, showIcon} from "./pos-logic-be";
 import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";
@@ -29,15 +29,11 @@ export default {
     editable: {
       type: Boolean,
       default: false,
-    },
-    view: null,
-    mode: String,
+    }
   },
   emits: ['update:selectedCategoryLayout', 'update:selectedProductLayout', 'update:view', 'update:orderLayout', 'update:keyboardConfig', 'update:productDblClicked', 'addModifierToProduct', 'addProductToOrder'],
   setup(props) {
     editable.value = props.editable;
-    view.value = props.view;
-    mode.value = props.mode;
 
     async function loadOrderLayout(type = 'default') {
       orderLayout.value = await cms.getModel('OrderLayout').findOne({type});

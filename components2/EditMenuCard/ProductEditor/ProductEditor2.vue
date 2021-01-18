@@ -1,13 +1,19 @@
 <script>
 import {
+  mode, selectedProduct, updateProductEditMode, updateView,
+} from '../../OrderView/pos-ui-shared';
+
+import {
   type,
   layoutType,
-  selectedProduct,
   debounceUpdateTextLayout,
   debouncedUpdateProduct,
   dialog,
   isPrinter2Select,
   isProductLayout,
+  canDelete,
+  canSwitch,
+  canCopy,
   getPrinterClass,
   updateProduct,
   setProductInfo,
@@ -15,13 +21,15 @@ import {
   updateProductLayout,
   addPopupModifierGroup,
   clearPopupModifierGroup,
-  loadPrinters, loadCategories, loadTaxes, loadPopupModifierGroups,
+  deleteProductLayout,
+  setAction,
+  loadPrinters, loadCategories, loadTaxes, loadPopupModifierGroups
 } from './ProductEditorLogic'
-
+import constants from '../EditMenuCardToolbar/constants';
 import useI18n from 'vue-i18n'
 import { useRouter } from 'vue-router'
-
 import { onActivated } from 'vue';
+
 
 const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(',')
 
@@ -29,7 +37,6 @@ export default {
   name: 'ProductEditor2.vue',
   props: {},
   setup() {
-
     const { t } = useI18n()
     const router = useRouter()
 
@@ -284,6 +291,87 @@ export default {
       return <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct}/>
     }
 
+    //// toolbar
+    // delete button
+    const showDeleteConfirmDialog = ref(false)
+    function renderDeleteProductToolbarButton() {
+      return <>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
+        <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this product' onSubmit={() => {
+          deleteProductLayout();
+          showDeleteConfirmDialog.value = false;
+        }}></dialog-confirm-delete>
+      </>
+    }
+
+    const showSwitchEditModeDialog = ref(false)
+    const shouldShowSwitchEditModeDialog = ref(true)
+    function openSwitchModeDialogIfNeeded() {
+      if (shouldShowSwitchEditModeDialog.value) {
+        showSwitchEditModeDialog.value = true
+        shouldShowSwitchEditModeDialog.value = false
+      }
+    }
+    function closeSwitchDialogMode() {
+      showSwitchEditModeDialog.value = false
+    }
+    function changeToIngredientMode() {
+      openSwitchModeDialogIfNeeded()
+      updateProductEditMode('ingredient')
+      updateView('IngredientEditor')
+    }
+    function changeToBasicMode() {
+      updateProductEditMode('basic')
+      updateView('CategoryEditor')
+    }
+    function renderSwitchProductEditModeButton() {
+      return <>
+        {
+          mode.value === 'ingredient'
+              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={changeToBasicMode}>{t('inventory.ingredientMode')} </g-btn-bs>
+              : <g-btn-bs elevation="2" icon="icon-basic-mode" onClick={changeToIngredientMode}>{t('inventory.basicMode')} </g-btn-bs>
+        }
+        <g-dialog v-model={dialog.switchEditMode.show} eager width="448">
+          <div className="dialog">
+            <div className="dialog-content" onClick={() => {
+              closeSwitchDialogMode();
+              changeToBasicMode()
+            }}>
+              <g-icon>icon-basic-mode</g-icon>
+              <div style="flex: 1; margin-left: 16px">
+                <p className="dialog-content__title">{t('inventory.basicMode')}</p>
+                <p className="dialog-content__detail">{t('inventory.basicNote')}</p>
+              </div>
+            </div>
+            <div className="dialog-content" onClick={() => {
+              closeSwitchDialogMode();
+              changeToIngredientMode()
+            }}>
+              <g-icon>icon-ingredient-mode</g-icon>
+              <div style="flex: 1; margin-left: 16px">
+                <p className="dialog-content__title">{t('inventory.ingredientMode')}</p>
+                <p className="dialog-content__detail">{t('inventory.ingredientNote')}</p>
+              </div>
+            </div>
+            <div className="dialog-message">{t('inventory.clickDismiss')}</div>
+          </div>
+        </g-dialog>
+      </>
+    }
+
+    function renderToolbarButtons() {
+      return <>
+        <portal to={constants.portalLeftButtons}>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={setAction('copy')} disabled={!canCopy}>{t('ui.copy')}</g-btn-bs>
+          { renderDeleteProductToolbarButton() }
+        </portal>
+        <portal to={constants.portalRightButtons}>
+          { renderSwitchProductEditModeButton() }
+        </portal>
+      </>
+    }
+
     return () => {
       return isProductLayout ? <>
         {renderLayoutType()}
@@ -291,14 +379,16 @@ export default {
         {renderPrinterSetting()}
         {renderTax()}
         {renderColor()}
-        {renderPopupModifier}
-        {renderDialogProductInfo}
-        {renderTextFilter}
-        {renderPopupModifierDialog}
+        {renderPopupModifier()}
+        {renderDialogProductInfo()}
+        {renderTextFilter()}
+        {renderPopupModifierDialog()}
+        {renderToolbarButtons()}
       </> : <>
         {renderLayoutType()}
         {renderTextLayout()}
         {renderPopupModifier()}
+        {renderToolbarButtons()}
       </>
     }
   }

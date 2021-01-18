@@ -11,7 +11,6 @@ import {
 } from '../category-editor-category'
 
 import {
-  hasOrderLayout,
   categoryRows,
   categoryColumns,
   //

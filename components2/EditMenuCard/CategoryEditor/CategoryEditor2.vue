@@ -3,55 +3,54 @@ import ColorSelector from '../../../components/common/ColorSelector';
 import InputNumber from '../../../components/EditMenuCard/InputNumber';
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
 import { useI18n } from 'vue-i18n'
+import constants from '../EditMenuCardToolbar/constants';
 
 import {
   productRows,
   productCols,
   categoryName,
   categoryColor,
-  debouncedUpdateCategory
+  debouncedUpdateCategory,
+  deleteCategory,
+  setAction,
+  canSwitch,
+  canDelete
 } from './category-editor-category'
 
 import {
-  hasOrderLayout,
   categoryRows,
   categoryColumns,
-  //
-  createLayout,
   changeCategoryColumn,
   changeCategoryRow,
-  deleteCategory,
-  setAction,
-  canSwitch
 } from './category-editor-order-layout'
 
 export  default {
   name: 'CategoryEditor2',
   components: { PosKeyboardFull, InputNumber, ColorSelector },
   setup() {
-    const { t: $t } = useI18n()
+    const { t } = useI18n()
 
-    // table layout setting
-    let renderCategoryLayoutSetting = () => (<>
-      <div class="category-editor__label">{$t('restaurant.menuEdit.categoriesNo')}</div>
+    // table layout setting: TODO: Move to order-layout-editor
+    let renderCategoryLayoutSetting = () => <>
+      <div class="category-editor__label">{t('restaurant.menuEdit.categoriesNo')}</div>
       <div class="row-flex align-items-center justify-between">
-        <div class="fw-700 fs-small mr-2">{$t('restaurant.menuEdit.columns')}:</div>
+        <div class="fw-700 fs-small mr-2">{t('restaurant.menuEdit.columns')}:</div>
         <input-number
             modelValue={categoryColumns.value} min={1} max={8} width={148}
             onUpdate:modelValue={changeCategoryColumn}/>
       </div>
       <div class="row-flex align-items-center justify-between mt-1">
-        <div class="fw-700 fs-small mr-2">{$t('restaurant.menuEdit.rows')}:</div>
+        <div class="fw-700 fs-small mr-2">{t('restaurant.menuEdit.rows')}:</div>
         <input-number
             modelValue={categoryRows.value} min={1} max={3} width={148}
             onUpdate:modelValue={changeCategoryRow}/>
       </div>
-    </>)
+    </>
 
     // name setting
     const showCategoryNameKbd = ref(false)
     let renderCateNameSetting = () => (<>
-      <div class="category-editor__label">{$t('ui.name')}</div>
+      <div class="category-editor__label">{t('ui.name')}</div>
       <g-text-field-bs
           border-color="#979797"
           modelValue={categoryName.value}
@@ -65,7 +64,7 @@ export  default {
     // color setting
     const colors = ['#FFFFFF', '#CE93D8', '#B2EBF2', '#C8E6C9', '#DCE775', '#FFF59D', '#FFCC80', '#FFAB91']
     let renderCateColorSetting = () => (<>
-      <div class="category-editor__label">{$t('ui.color')}</div>
+      <div class="category-editor__label">{t('ui.color')}</div>
       <color-selector
           modelValue={categoryColor.value}
           colors={colors}
@@ -75,14 +74,14 @@ export  default {
 
     // product layout setting
     let renderRowSetting = () => <>
-      <div class="category-editor__label">{$t('restaurant.menuEdit.rowsNo')}</div>
+      <div class="category-editor__label">{t('restaurant.menuEdit.rowsNo')}</div>
       <input-number
           modelValue={productRows} min={4} max={10}
           width={148}
           onUpdate:modelValue={newRow => debouncedUpdateCategory({rows: newRow})}/>
     </>
     let renderColsSetting = () => <>
-      <div class="category-editor__label">{$t('restaurant.menuEdit.columnsNo')}</div>
+      <div class="category-editor__label">{t('restaurant.menuEdit.columnsNo')}</div>
       <input-number
           modelValue={productCols} min={3} max={6}
           width={148}
@@ -97,27 +96,27 @@ export  default {
     // pop-up
     let renderPopUp = () => <>
       <dialog-text-filter
-          label={$t('restaurant.menuEdit.categoryName')}
+          label={t('restaurant.menuEdit.categoryName')}
           defaultValue={categoryName.value}
           v-model={showCategoryNameKbd.value}
           onSubmit={newName => debouncedUpdateCategory({ name: newName}, newName /*forceCreate*/)}/>
     </>
 
-    // render toolbar
-    const showAddLayoutDialog = ref(null)
-    let renderToolbar = () => <portal to="order-layout-toolbar-function-buttons">
-      {
-        !hasOrderLayout.value
-            ? <>
-              <dialog-form-input v-model={showAddLayoutDialog.value} onSubmit={createLayout}></dialog-form-input>
-              <g-btn-bs text-color="#1271FF" elevation="2" icon="add_circle"
-                        onClick={showAddLayoutDialog.value = true}>{$t('ui.add')}></g-btn-bs>
-            </>
-            : null
-      }
-      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch"
-                onClick={setAction('switch')}
-                disabled={!canSwitch}>{$t('ui.switch')}</g-btn-bs>
+    //// render toolbar buttons
+    // delete button
+    const showDeleteConfirmDialog = ref(false)
+    let renderDeleteCategoryToolbarButton = () => {
+      return <>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
+        <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this category' onSubmit={() => {
+          deleteCategory();
+          showDeleteConfirmDialog.value = false;
+        }}></dialog-confirm-delete>
+      </>
+    }
+    let renderToolbarButtons = () => <portal to={constants.portalLeftButtons}>
+      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+      { renderDeleteCategoryToolbarButton() }
     </portal>
 
     // entire render
@@ -127,7 +126,7 @@ export  default {
       {renderCateColorSetting()}
       {renderCateProductLayoutSetting()}
       {renderPopUp()}
-      {renderToolbar()}
+      {renderToolbarButtons()}
     </>
 
     return {

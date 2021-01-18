@@ -39,7 +39,7 @@ const showCalculator = computed(() => {
   return show
 })
 
-async function updateKeyboardConfig(keyboardConfig) {
+export async function updateKeyboardConfig(keyboardConfig) {
   await cms.getModel('PosSetting').findOneAndUpdate({}, {$set: {keyboardConfig}})
 }
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import cms from 'cms';
-import { selectedCategoryLayout } from '../OrderView/pos-ui-shared';
+import { selectedCategoryLayout, selectedProductLayout } from '../OrderView/pos-ui-shared';
 import { layoutType, selectedProduct } from './ProductEditor/ProductEditorLogic';
 
 const colName = 'OrderLayout'
@@ -74,7 +74,7 @@ async function createCategoryLayout(orderLayoutId, categoryLayout) {
 
 
 // product api
-async function createNewProductLayout(layoutType, categoryLayoutId, productLayout) {
+async function createProductLayout(layoutType, categoryLayoutId, productLayout) {
   return await cms.getModel('OrderLayout').findOneAndUpdate(
       {
         type: layoutType,
@@ -84,6 +84,26 @@ async function createNewProductLayout(layoutType, categoryLayoutId, productLayou
       { new: true });
 }
 
+async function updateProductLayout(layoutType, categoryLayoutId, productLayoutId, change) {
+  console.log('UpdateProductLayout', change)
+  console.log('Update product layout with id', selectedProductLayout.value._id)
+  const qry = { type: layoutType, 'categories.products._id': productLayoutId }
+  const set = {
+    $set: _.reduce(change, (result, value, key) => {
+      result[`categories.$[cate].products.$[product].${key}`] = value
+      return result
+    }, {})
+  };
+  const filter = [{ 'cate._id': categoryLayoutId }, { 'product._id': productLayoutId }]
+  return await cms.getModel('OrderLayout').findOneAndUpdate(qry, set, { arrayFilters: filter, new: true });
+}
+
+async function deleteProductLayout(categoryId, productLayoutId) {
+  return await cms.getModel('OrderLayout').findOneAndUpdate(
+      { 'categories._id': categoryId },
+      { $pull: { 'categories.$.products': { _id: productLayoutId } } },
+      { new: true })
+}
 
 // product api (MOVE TO ANOTHER FILE???)
 async function updateProduct(productId, change) {
@@ -95,6 +115,11 @@ async function createProduct(product) {
   return await cms.getModel('Product').create({ ...product });
 }
 
+async function deleteProduct(productId) {
+  return await cms.getModel('Product').remove({_id: productId})
+}
+
+
 export default {
   createOrderLayout,
   changeCategoryColumn,
@@ -105,10 +130,13 @@ export default {
   updateCategoryLayout,
   createCategoryLayout,
   // product layout
-  createNewProductLayout,
+  createProductLayout,
+  updateProductLayout,
+  deleteProductLayout,
 
   // product
   createProduct,
   updateProduct,
+  deleteProduct
 
 }
