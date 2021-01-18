@@ -13,6 +13,7 @@ const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
 const syncTranspoter = require('schemahandler/sync/sync-transporter')
 const clientToOnlineSocket = new Socket()
 const uuid = require('uuid')
+const Hooks = require("schemahandler/hooks/hooks");
 const ObjectID = require('bson').ObjectID
 
 let socketToOrm

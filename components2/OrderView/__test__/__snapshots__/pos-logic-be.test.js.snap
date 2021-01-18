@@ -121,7 +121,6 @@ Array [
       "args": Array [
         Object {
           "_id": "ObjectID",
-          "beforeSent": true,
           "cancellationItems": Array [],
           "items": Array [],
           "payment": Array [],
@@ -149,7 +148,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$push": Object {
             "items": Object {
@@ -195,7 +196,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 40,
@@ -231,13 +234,15 @@ Array [
         },
         Object {
           "$set": Object {
-            "quantity": 2,
-            "vSum": 80,
-            "vTaxSum": Object {
-              "19": Object {
-                "gross": 80,
-                "net": 67.23,
-                "tax": 12.77,
+            "items.$": Object {
+              "quantity": 2,
+              "vSum": 80,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 80,
+                  "net": 67.23,
+                  "tax": 12.77,
+                },
               },
             },
           },
@@ -259,7 +264,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 80,
@@ -300,19 +307,21 @@ Array [
         },
         Object {
           "$set": Object {
-            "modifiers": Array [
-              Object {
-                "name": "Add Ketchup",
-                "price": 3,
-                "quantity": 1,
-              },
-            ],
-            "vSum": 43,
-            "vTaxSum": Object {
-              "19": Object {
-                "gross": 43,
-                "net": 36.13,
-                "tax": 6.87,
+            "items.$": Object {
+              "modifiers": Array [
+                Object {
+                  "name": "Add Ketchup",
+                  "price": 3,
+                  "quantity": 1,
+                },
+              ],
+              "vSum": 43,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 43,
+                  "net": 36.13,
+                  "tax": 6.87,
+                },
               },
             },
           },
@@ -334,7 +343,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 43,
@@ -375,13 +386,15 @@ Array [
         },
         Object {
           "$set": Object {
-            "modifiers": Array [],
-            "vSum": 40,
-            "vTaxSum": Object {
-              "19": Object {
-                "gross": 40,
-                "net": 33.61,
-                "tax": 6.39,
+            "items.$": Object {
+              "modifiers": Array [],
+              "vSum": 40,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
               },
             },
           },
@@ -403,7 +416,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 40,
@@ -444,14 +459,16 @@ Array [
         },
         Object {
           "$set": Object {
-            "course": 3,
-            "quantity": 10,
-            "vSum": 400,
-            "vTaxSum": Object {
-              "19": Object {
-                "gross": 400,
-                "net": 336.13,
-                "tax": 63.87,
+            "items.$": Object {
+              "course": 3,
+              "quantity": 10,
+              "vSum": 400,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 400,
+                  "net": 336.13,
+                  "tax": 63.87,
+                },
               },
             },
           },
@@ -473,7 +490,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 400,
@@ -713,7 +732,7 @@ Object {
   ],
   "payment": Array [],
   "status": "inProgress",
-  "table": 10,
+  "table": "10",
   "takeAway": false,
   "user": Array [],
   "vDate": "2020-12-31T17:00:00.000Z",
@@ -736,7 +755,6 @@ Array [
       "args": Array [
         Object {
           "_id": "ObjectID",
-          "beforeSent": true,
           "cancellationItems": Array [],
           "items": Array [],
           "payment": Array [],
@@ -764,7 +782,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$push": Object {
             "items": Object {
@@ -810,7 +830,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 40,
@@ -846,7 +868,51 @@ Array [
         },
         Object {
           "$set": Object {
-            "course": 0,
+            "items.$": Object {
+              "course": 0,
+              "separate": false,
+              "takeAway": true,
+              "tax": 7,
+              "vTakeAway": true,
+              "vTaxSum": Object {
+                "7": Object {
+                  "gross": 40,
+                  "net": 37.38,
+                  "tax": 2.62,
+                },
+              },
+            },
+          },
+        },
+      ],
+      "fn": "findOneAndUpdate",
+    },
+    Object {
+      "args": Array [
+        "updateActiveOrder",
+        Object {
+          "orderId": "ObjectID",
+          "table": "10",
+        },
+      ],
+      "fn": "commit",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "_id": "ObjectID",
+        },
+        Object {
+          "$set": Object {
+            "vTaxSum": Object {
+              "7": Object {
+                "gross": 40,
+                "net": 37.38,
+                "tax": 2.62,
+              },
+            },
           },
         },
       ],
@@ -871,7 +937,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$pull": Object {
             "items": Object {
@@ -896,7 +964,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$push": Object {
             "cancellationItems": Object {
@@ -942,7 +1012,9 @@ Array [
   Array [
     Object {
       "args": Array [
-        Object {},
+        Object {
+          "_id": "ObjectID",
+        },
         Object {
           "$set": Object {
             "vSum": 0,

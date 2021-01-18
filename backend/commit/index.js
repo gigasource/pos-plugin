@@ -109,7 +109,7 @@ module.exports = async function (cms) {
 	/*
 	 -------------------------------------------
 	 */
-	cms.post('onlineOrderSocket', async function (socket) {
+	cms.on('onlineOrderSocket', async function (socket) {
 		if (socket === cloudSocket) return
 		cloudSocket = socket
 		const posSettings = await cms.getModel('PosSetting').findOne({})
@@ -135,7 +135,7 @@ module.exports = async function (cms) {
 		socket.on('setDeviceAsMaster', async function (ack) {
 			ack()
 			masterIp = localIp()
-			await cms.emit('connectToMaster', null, [localIp(), onlineDevice.id, socket])
+			await cms.emit('connectToMaster', localIp(), onlineDevice.id, socket)
 		})
 
 		await orm.emit('setUpCloudSocket', masterIp, masterClientId, socket)

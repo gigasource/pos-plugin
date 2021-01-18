@@ -9,7 +9,7 @@ module.exports = async (cms) => {
 	if (global.APP_CONFIG.hardwareID) {
 		global.APP_CONFIG.appUUID = `${global.APP_CONFIG.hardwareID}:${installUUID}`;
 	}
-	cms.post('load:hardwareId', (hardwareID) => {
+	cms.on('load:hardwareId', (hardwareID) => {
 		global.APP_CONFIG.appUUID = `${hardwareID}:${installUUID}`;
 	})
 }

@@ -160,13 +160,14 @@ function orderBeFactory(id = 0) {
    */
   function prepareOrder(__order) {
     hooks.emit(`pre:prepareOrder:${id}`, __order);
+    let _new = typeof __order !== 'object' || !__order._id;
     if (typeof __order === 'string') {
       __order = {table: __order};
     }
     clearOrder();
     order = createOrder(_.assign(order, __order));
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
-    if (typeof __order !== 'object') {
+    if (_new) {
       const action = Order.create(_order).commit('createOrder', {table: order.table}).chain
       actionList.value.push({
         modelName: 'Order', // todo: review
@@ -198,7 +199,7 @@ export const {
   finishOnetimeSnapshot
 } = orderBeFactory(0);
 
-//todo: actionList2: onetime compare
+//<editor-fold desc="Split order, move items">
 export const {
   actionList: actionList2,
   getCurrentOrder: getSecondOrder,
@@ -245,6 +246,7 @@ export function finishMoveItemsOrder(_order) {
 }
 
 export function cancelSplitOrder() {
+  delete order.splitId;
   clearSecondOrder();
   //restore
   order.items.splice(0, order.items.length, ...tempItemsSnapshot);
@@ -279,10 +281,10 @@ export function returnItem(query) {
     addItem(order, _item, 1);
   }
 }
-
-//todo: compact items
-//todo: case cancel :
 //todo: case order.items -> empty not accept (prevent by frontend)
+
+//</editor-fold>
+
 
 //ui logic
 
