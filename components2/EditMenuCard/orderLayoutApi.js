@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import cms from 'cms';
+import { selectedCategoryLayout } from '../OrderView/pos-ui-shared';
+import { layoutType, selectedProduct } from './ProductEditor/ProductEditorLogic';
 
 const colName = 'OrderLayout'
 
@@ -70,6 +72,29 @@ async function createCategoryLayout(orderLayoutId, categoryLayout) {
       { new: true });
 }
 
+
+// product api
+async function createNewProductLayout(layoutType, categoryLayoutId, productLayout) {
+  return await cms.getModel('OrderLayout').findOneAndUpdate(
+      {
+        type: layoutType,
+        'categories._id': categoryLayoutId
+      },
+      { $push: { 'categories.$.products': productLayout } },
+      { new: true });
+}
+
+
+// product api (MOVE TO ANOTHER FILE???)
+async function updateProduct(productId, change) {
+  console.log(`updateProduct\n\tProduct Id:${productId}\n\tChange: `, change)
+  return await cms.getModel('Product').findOneAndUpdate({ _id: productId }, change)
+}
+
+async function createProduct(product) {
+  return await cms.getModel('Product').create({ ...product });
+}
+
 export default {
   createOrderLayout,
   changeCategoryColumn,
@@ -78,5 +103,12 @@ export default {
   switchCategory,
   //
   updateCategoryLayout,
-  createCategoryLayout
+  createCategoryLayout,
+  // product layout
+  createNewProductLayout,
+
+  // product
+  createProduct,
+  updateProduct,
+
 }

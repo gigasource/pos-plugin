@@ -8,6 +8,7 @@ import {
   updateOrderLayout,
   updateSelectedProductLayout
 } from '../../OrderView/pos-ui-shared';
+import orderLayoutApi from '../orderLayoutApi';
 
 //
 export const selectedProduct = computed({
@@ -34,9 +35,8 @@ export const type = computed(() => selectedProductLayout.value && selectedProduc
 export const isProductLayout = computed(() => type.value !== 'Text')
 
 export async function changeType(type) {
-  if (selectedProductLayout.value.type === type) {
+  if (selectedProductLayout.value.type === type)
     return
-  }
   const articleTypes = ['Article', 'Div.Article']
   // Art, Div.Art -> Div.Art, Art
   if (_.includes(articleTypes, selectedProductLayout.value.type) && _.includes(articleTypes, type)) {
@@ -219,13 +219,11 @@ export async function updateProduct(change, forceCreate) {
   selectedProduct.set({ ...selectedProduct, ...change })
 
   if (selectedProduct._id) {
-    console.log('updateProduct', change)
-    await cms.getModel('Product').findOneAndUpdate({ _id: selectedProduct._id }, change)
+    await orderLayoutApi.updateProduct(selectedProduct._id, change)
     showNotify()
   } else {
     if (forceCreate) {
-      console.log('Create new Product')
-      const product = await cms.getModel('Product').create({ ...selectedProduct });
+      const product = await orderLayoutApi.createProduct(selectedProduct.value);
       console.log('Create new ProductLayout linked to Product with id: ', product._id)
       await createNewProductLayout(product._id)
       showNotify()
@@ -241,15 +239,7 @@ export async function createNewProductLayout(productId, extraInfo) {
     ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
     ...extraInfo
   }
-
-  const result = await cms.getModel('OrderLayout').findOneAndUpdate(
-      {
-        type: layoutType.value,
-        'categories._id': selectedCategoryLayout.value._id
-      },
-      { $push: { 'categories.$.products': productLayout } },
-      { new: true });
-
+  const result = await orderLayoutApi.createNewProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
   updateOrderLayout(result)
 }
 

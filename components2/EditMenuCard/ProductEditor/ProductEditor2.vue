@@ -30,7 +30,7 @@ export default {
   props: {},
   setup() {
 
-    const { t: $t } = useI18n()
+    const { t } = useI18n()
     const router = useRouter()
 
     (async () => {
@@ -54,7 +54,7 @@ export default {
 
     function renderLayoutType() {
       return <>
-        <div>{$t('article.type')}</div>
+        <div>{t('article.type')}</div>
         <g-select
             disabled={!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)}
             skip-search
@@ -73,7 +73,7 @@ export default {
 
       return <>
         <div>
-          {$t('article.name')}
+          {t('article.name')}
           <span style="color: #ff4552">*</span>
         </div>
         <g-text-field
@@ -101,32 +101,28 @@ export default {
       }
 
       return <>
-        <div>{$t('article.id')} </div>
-        <!-- product id -->
+        <div>{t('article.id')} </div>
         <g-text-field-bs
             model-value={selectedProduct.id}
             onUpdate:modelValue={updateProductInfo('id', $event)}
             v-slots={productIdSlots}/>
 
-        <!-- product name -->
-        <div>{$t('article.name')}<span style="color: #FF4452">*</span></div>
+        <div>{t('article.name')}<span style="color: #FF4452">*</span></div>
         <g-text-field-bs
             model-value={selectedProduct.name}
             onUpdate:modelValue={updateProductInfo('name', $event)}
             v-slots={productNameSlots}/>
 
-        <!-- price -->
-        <div>{$t('article.price')} <span style="color: #FF4452">*</span></div>
+        <div>{t('article.price')} <span style="color: #FF4452">*</span></div>
         <g-text-field-bs
             model-value={selectedProduct.price}
             onUpdate:modelValue={updateProductInfo('price', $event)}
             v-slots={priceSlots}/>
 
-        <!-- is modifier -->
         <g-switch
             model-value={selectedProduct.isModifier}
             onUpdate:modelValue={updateProduct({ isModifier: $event })}/>
-        <div style="font-size: 13px">{$t('article.isModifier')}</div>
+        <div style="font-size: 13px">{t('article.isModifier')}</div>
       </>
     }
 
@@ -135,10 +131,10 @@ export default {
         return (
             <div>
               <div class="product-editor__prop">
-                <span class="product-editor__label">{$t('restaurant.product.printer')}</span>
+                <span class="product-editor__label">{t('restaurant.product.printer')}</span>
                 {showAddPrinter2.value
                     ?
-                    <span className="prop-option--printer" onClick={isPrinter2Select.value = true}>+2. {$t('restaurant.product.printer')}</span>
+                    <span className="prop-option--printer" onClick={isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span>
                     : null
                 }
               </div>
@@ -149,7 +145,7 @@ export default {
                     {isPrinter2Select.value
                         ? null
                         :
-                        <span className={noPrintClasses} onClick="setAsNoPrint">{$t('restaurant.product.noPrinter')}</span>}
+                        <span className={noPrintClasses} onClick="setAsNoPrint">{t('restaurant.product.noPrinter')}</span>}
                   </>)
                 }
               </div>
@@ -202,17 +198,17 @@ export default {
       return <>
         <div class="row-flex mt-2 product-editor__tax">
           <div class="col-6">
-            <div class="product-editor__label">{$t('restaurant.product.dineInTax')}</div>
+            <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
             <g-grid-select
                 mandatory
-                v-model="selectedProduct.taxCategory"
+                v-model={selectedProduct.taxCategory}
                 item-value="_id"
                 items={dineInTaxes} itemCols="auto"
                 v-slot={dineInTaxSlots}/>
           </div>
 
           <div class="col-6">
-            <div class="product-editor__label">{$t('restaurant.product.takeAwayTax')}</div>
+            <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
             <g-grid-select
                 mandatory
                 v-model={selectedProduct.taxCategory2}
@@ -228,7 +224,7 @@ export default {
     function renderColor() {
       return <>
         <div class="mt-2">
-          <div class="product-editor__label">{$t('ui.color')}</div>
+          <div class="product-editor__label">{t('ui.color')}</div>
           <color-selector
               model-value={selectedProductLayout.color}
               colors={colors}
@@ -267,7 +263,7 @@ export default {
     function renderDialogProductInfo() {
       return (
           <dialog-product-info
-              v-model="dialog.productInfo"
+              v-model={dialog.productInfo}
               product={selectedProduct}
               focus={dialog.focus}
               onSubmit={updateProduct}/>
