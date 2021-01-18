@@ -4,14 +4,18 @@ const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer')
 
 module.exports = async function (cms) {
-  cms.socket.on('connect', socket => {
-    socket.on('printKitchen', printKitchen);
-    socket.on('printKitchenCancel', printKitchenCancel)
-  });
+  cms.on('run:print', async function (commit) {
+    if (commit.printType === 'kitchenAdd') {
+      await printKitchen({
+        order: commit.order
+      })
+    } else if (commit.printType === 'kitchenCancel') {
+      await printKitchenCancel({
+        order: commit.order
+      })
+    }
+  })
 }
-
-module.exports.printKitchen = printKitchen
-module.exports.printKitchenCancel = printKitchenCancel
 
 function createPureImagePrinter(escPrinter) {
   return new PureImagePrinter(560, {
@@ -406,3 +410,6 @@ function callbackWithError(callback, error) {
     message: error.toString()
   })
 }
+
+module.exports.printKitchen = printKitchen
+module.exports.printKitchenCancel = printKitchenCancel
