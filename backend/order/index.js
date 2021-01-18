@@ -7,8 +7,8 @@ module.exports = (cms) => {
   const { orm } = cms
   cms.socket.on('connect', async (socket) => {
 
-    socket.on('print-to-kitchen', async (device, order, actionList) => {
-      await execAllChain(actionList, 'Order')
+    socket.on('print-to-kitchen', async (actionList) => {
+      await execAllChain(actionList)
     })
 
     socket.on('cancel-order', cancelOrder)
@@ -34,17 +34,4 @@ module.exports = (cms) => {
     //   await printInvoiceHandler(data.reportType, data.printData, data.device);
     // }
   })
-}
-
-async function execAllChain(chains, collectionName) {
-  const { orm } = cms
-  let finalResult
-  for (let chain of chains) {
-    let result = orm(collectionName)
-    chain.forEach(({ fn, args }) => {
-      result = result[fn](...args)
-    })
-    finalResult = result = await result
-  }
-  return finalResult
 }

@@ -1,10 +1,11 @@
 const Hooks = require('schemahandler/hooks/hooks')
+const { stringify } = require("schemahandler/utils");
 
-if (!global.hooks) {
-  global.hooks = new Hooks()
+if (!global.globalHooks) {
+  global.globalHooks = new Hooks()
 }
 
-hooks.on('prepare:Order', function (cms) {
+global.globalHooks.on('prepare:Order', function (cms) {
   require('./index')(cms)
 })
 
@@ -13,11 +14,11 @@ hooks.on('prepare:Order', function (cms) {
  * hook@param orm: orm instance of current test
  * 2 expectations
  */
-hooks.on('check:orderCreated', async function (orm) {
+global.globalHooks.on('check:orderCreated', async function (orm) {
   const ordersList = await orm('Order').find({})
   const commitList = await orm('Commit').find({})
-  expect(ordersList).toMatchSnapshot()
-  expect(commitList).toMatchSnapshot()
+  expect(stringify(ordersList)).toMatchSnapshot()
+  expect(stringify(commitList)).toMatchSnapshot()
 })
 
 
