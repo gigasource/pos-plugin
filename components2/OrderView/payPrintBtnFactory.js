@@ -1,7 +1,7 @@
 import {smallSidebar} from "./order-layout-setting-logic";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {onActivated, ref} from "vue";
+import {onActivated, ref, withModifiers} from "vue";
 import {
   getCurrentOrder,
   onlyCheckoutPrintedItems,
@@ -35,14 +35,14 @@ export function payPrintBtnFactory() {
       'text-color': "#FFF",
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick_stop: togglePayPrintBtn
+      onClick: withModifiers(togglePayPrintBtn, ['stop'])
     }
     const bigBtnAttrs = {
       width: '104',
       style: 'font-size: 14px; padding: 4px 0',
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick_stop: togglePayPrintBtn
+      onClick: withModifiers(togglePayPrintBtn, ['stop'])
     }
 
     if (showQuickBtn.value) {

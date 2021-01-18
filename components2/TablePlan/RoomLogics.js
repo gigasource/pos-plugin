@@ -1,26 +1,16 @@
 import { reactive, watchEffect, ref } from 'vue'
 import _ from 'lodash'
-
 import { computed } from 'vue';
 
-import { isBusyTable } from '../View/EditTablePlan/room-state'
-
-const cms = {
-  getModel(col) {
-    return orm(col)
-  }
-}
+export const viewW = ref(0)
+export const viewH = ref(0);
 
 const createRoom = function (_room) {
   let room = _.assign(_room, {
     roomObjects: (_room && _room.roomObjects) || [],
   })
-
   room = reactive(room)
   const zoom = ref(1);
-
-  let viewW = ref(0), viewH = ref(0);
-
   const maxX = computed(() => {
     const obj = _.maxBy(room.roomObjects, (obj) => obj.location.x + obj.size.width)
     return obj ? obj.location.x + obj.size.width : 0
@@ -33,7 +23,6 @@ const createRoom = function (_room) {
   const w1 = computed(() => {
     return maxX.value
   });
-
   const h1 = computed(() => {
     return maxY.value
   });
@@ -60,21 +49,25 @@ const createRoom = function (_room) {
       }
     }
   })
-  const updateObjectLocation = function(object, newLocation) {
-    if (zoom.value) {
-      object.location.x = newLocation.x / zoom.value
-      object.location.y = newLocation.y / zoom.value
-    }
-  }
 
-  const updateObjectSize = function(object, newSize) {
-    if (zoom.value) {
-      object.size.width = newSize.width / zoom.value
-      object.size.height = newSize.height / zoom.value
-    }
-  }
 
-  return { room, viewH, viewW, zoom, w1, h1, updateObjectLocation, updateObjectSize }
+  return { room, zoom}
+}
+
+export const updateObjectLocation = function(room, object, newLocation, zoom) {
+  const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
+  if (zoom && idx !== -1) {
+    room.roomObjects[idx].location.x = newLocation.x / zoom
+    room.roomObjects[idx].location.y = newLocation.y / zoom
+  }
+}
+
+export const updateObjectSize = function(room, object, newSize, zoom) {
+  const idx = _.findIndex(room.roomObjects, i => i._id === object._id)
+  if (zoom && idx !== -1) {
+    room.roomObjects[idx].size.width = newSize.width / zoom
+    room.roomObjects[idx].size.height = newSize.height / zoom
+  }
 }
 
 const addRoomObject = function (room, obj) {
@@ -83,33 +76,16 @@ const addRoomObject = function (room, obj) {
 }
 
 const removeRoomObject = function (room, obj) {
-  const idx = _.findIndex(room.roomObjects, i => i.name === obj.name)
+  const idx = _.findIndex(room.roomObjects, i => i._id === obj._id)
   if (idx !== -1) room.roomObjects.splice(idx, 1);
 }
 
 const updateRoomObject = function (room, obj, newObj) {
-  const idx = _.findIndex(room.roomObjects, i => i.name === obj.name)
+  const idx = _.findIndex(room.roomObjects, i => i._id === obj._id)
   if (idx !== -1) {
-    room.roomObjects[idx] = _.assign({}, room.roomObjects[idx], newObj)
+    room.roomObjects[idx] = _.assign(room.roomObjects[idx], newObj)
     return room.roomObjects[idx]
   } else return null
-}
-
-const moveOrderToNewTable = async function (fromTable, toTable) {
-  if (isBusyTable(toTable) || !isBusyTable(fromTable)) {
-    // invalid action
-    return
-  }
-  const order = await cms.getModel('Order').findOne({table: fromTable.name})
-  await cms.getModel('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
-}
-
-const makeTakeAway = function (table) {
-  table.takeAway = true
-}
-
-const updateRoomObjects = function(room, newRoomObjects) {
-  room.roomObjects = newRoomObjects
 }
 
 export {
@@ -117,7 +93,4 @@ export {
   addRoomObject,
   removeRoomObject,
   updateRoomObject,
-  moveOrderToNewTable,
-  makeTakeAway,
-  updateRoomObjects
 }

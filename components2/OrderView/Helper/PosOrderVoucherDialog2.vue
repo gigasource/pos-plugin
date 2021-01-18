@@ -2,6 +2,7 @@
 import {useI18n} from 'vue-i18n'
 import {internalValueFactory} from "../../utils";
 import {addVoucher, redeemVoucher} from "../pos-logic";
+import {ref, watch} from 'vue';
 
 export default {
   name: 'PosOrderVoucherDialog2',
@@ -12,9 +13,9 @@ export default {
   setup(props, {emit}) {
     const {t: $t} = useI18n()
     const tabs = ref([{
-      title: $t('restaurant.createVoucher'), ref: 'createTf'
+      title: $t('restaurant.createVoucher')/*, ref: 'createTf'*/
     }, {
-      title: $t('restaurant.redeemVoucher'), ref: 'redeemTf'
+      title: $t('restaurant.redeemVoucher')/*, ref: 'redeemTf'*/
     }]);
 
     const tab = ref();
@@ -60,7 +61,7 @@ export default {
           </g-tab-item>
           <g-tab-item item={tabs.value[1]}>
             <pos-textfield-new class="mb-3 mt-4" label={$t('restaurant.voucherValue')} placeholder="Voucher value"
-                               v-model={voucherValue.value} ref={tabs.value[1]}/>
+                               v-model={voucherValue.value} ref={tabs.value[1].ref}/>
             <div class="row-flex justify-center">
               <pos-keyboard-full class="keyboard" width="100%" type="numeric" onEnterPressed={() => submit(false)}/>
             </div>

@@ -4,7 +4,9 @@ import {
   addPayment,
   cancelOrder,
   clearPayment,
-  removeItem
+  mergeSameItems,
+  removeItem,
+  simulateBackendPrint
 } from "../pos-logic";
 import expect from "expect";
 import { changeCourse } from "../pos-logic";
@@ -1151,5 +1153,89 @@ describe("pos-logic", function() {
     //</editor-fold>
   });
 
+  it("case 12: compact order", async function() {
+    let order = createOrder();
+    addItem(order, cola, 5);
+    await nextTick();
+    addItem(order, fanta, 10);
+    await nextTick();
 
+    simulateBackendPrint(order);
+    await nextTick();
+    addItem(order, cola, 5);
+    await nextTick();
+    //compact
+    mergeSameItems(order);
+    await nextTick();
+
+    //<editor-fold desc="order-expect">
+    expect(stringify(order)).toMatchInlineSnapshot(`
+      Object {
+        "_id": "ObjectID",
+        "cancellationItems": Array [],
+        "items": Array [
+          Object {
+            "_id": "ObjectID",
+            "course": 1,
+            "name": "Cola",
+            "price": 1.3,
+            "printed": true,
+            "quantity": 10,
+            "sent": true,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 13,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 13,
+                "net": 11.21,
+                "tax": 1.79,
+              },
+            },
+          },
+          Object {
+            "_id": "ObjectID",
+            "course": 1,
+            "name": "Fanta",
+            "price": 2,
+            "printed": true,
+            "quantity": 10,
+            "sent": true,
+            "tax": 16,
+            "taxes": Array [
+              16,
+              32,
+            ],
+            "vSum": 20,
+            "vTakeAway": false,
+            "vTaxSum": Object {
+              "16": Object {
+                "gross": 20,
+                "net": 17.24,
+                "tax": 2.76,
+              },
+            },
+          },
+        ],
+        "payment": Array [],
+        "status": "inProgress",
+        "takeAway": false,
+        "user": Array [],
+        "vDate": "2021-01-16T17:00:00.000Z",
+        "vSum": 33,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 33,
+            "net": 28.45,
+            "tax": 4.55,
+          },
+        },
+      }
+    `);
+    //</editor-fold>
+  });
 });

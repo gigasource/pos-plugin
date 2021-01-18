@@ -278,12 +278,12 @@ export function addItem(order, item, quantity) {
   return {merge, updatedItem: _item}
 }
 
-export function updateItem(order, index, update) {
+export function updateItem(order, query, update) {
   let item;
-  if (typeof index === 'number') {
-    item = order.items[index];
+  if (typeof query === 'number') {
+    item = order.items[query];
   } else {
-    item = _.find(order.items, index);
+    item = _.find(order.items, query);
   }
 
   hooks.emit('pre:order:update', order);
@@ -291,16 +291,29 @@ export function updateItem(order, index, update) {
   hooks.emit('post:order:update', order);
 }
 
-const isSameItem = (item1, item2) => {
+const isSameItem = (item1, item2, countSentProp = true) => {
   if (item2.modifiers && item2.modifiers.length > 0) return false;
+  if (item1.modifiers && item1.modifiers.length > 0) return false;
+
+  if (countSentProp && item2.sent) return false;
   return item2.product === item1.product &&
-    item1.price === item2.price && !item2.sent
+    item2.name === item1.name &&
+    item1.price === item2.price
 }
 
-export function changeItemQuantity(order, index, change) {
+export function changeItemQuantity(order, query, change, shouldRemoveWhenZero = false) {
+  let item;
+  if (typeof query === 'number') {
+    item = order.items[query];
+  } else {
+    item = _.find(order.items, query);
+  }
+
   hooks.emit('pre:order:update', order);
-  const item = order.items[index];
   item.quantity += change;
+  if (shouldRemoveWhenZero && item.quantity === 0) {
+    order.items.splice(order.items.indexOf(item), 1);
+  }
   hooks.emit('post:order:update', order);
 }
 
@@ -463,11 +476,11 @@ export function changeCourse(order, query, add = 1) {
     item.course += add;
   }
   if (item.course === 0) {
-    [item.takeAway, item.seperate] = [true, false];
+    [item.takeAway, item.separate] = [true, false];
   } else if (item.course === -1) {
-    [item.takeAway, item.seperate] = [false, true];
+    [item.takeAway, item.separate] = [false, true];
   } else {
-    [item.takeAway, item.seperate] = [false, false];
+    [item.takeAway, item.separate] = [false, false];
   }
   hooks.emit('post:order:update', order);
 }
@@ -498,5 +511,24 @@ export function simulateBackendPrint(order) {
     i.printed = true;
   })
 }
+
+export function mergeSameItems(order) {
+  const items = order.items.reduce((list, item) => {
+    let shouldAdd = true;
+    for (const _item of list) {
+      if (isSameItem(_item, item, false)) {
+        shouldAdd = false;
+        _item.quantity += item.quantity;
+      }
+    }
+    if (shouldAdd) {
+      list.push(item);
+    }
+    return list;
+  }, [])
+  order.items = items;
+}
+
+//todo: recent items
 
 //</editor-fold>

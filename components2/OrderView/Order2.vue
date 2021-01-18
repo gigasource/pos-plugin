@@ -5,6 +5,12 @@ import PosOrderLayout2 from "./PosOrderLayout2";
 import PosQuickOrderToolbar2 from "./Helper/PosQuickOrderToolbar2";
 import {isMobile} from "../AppSharedStates";
 import {orderViewDialog} from "./pos-ui-shared";
+import PosOrderSplitOrder2 from "./Helper/PosOrderSplitOrder2";
+import PosOrderReceipt2 from "./Helper/PosOrderReceipt2";
+import PosOrderMoveItems2 from "./Helper/PosOrderMoveItems2";
+import PosOrderVoucherDialog2 from "./Helper/PosOrderVoucherDialog2";
+import {genScopeId} from "../utils";
+
 
 export default {
   name: 'Order2',
@@ -12,21 +18,34 @@ export default {
     PosOrder2,
     PosOrderLayout2,
     PosQuickOrderToolbar2,
+    PosOrderSplitOrder2,
+    PosOrderReceipt2,
+    PosOrderMoveItems2,
+    PosOrderVoucherDialog2
   },
   setup() {
-    return () => (<>
-      <div class="order">
-        <div class="order-main">
-          <pos-order-layout2 style="flex: 1"/>
-          <pos-order style={!isMobile.value && {flex: '0 0 25%'}}/>
-        </div>
-        {isMobile.value && <pos-quick-order-toolbar/>}
-      </div>
-      <pos-order-split-order v-model={orderViewDialog.value.split}/>
-      <pos-order-receipt v-model={orderViewDialog.value.receipt}/>
-      <pos-order-move-items v-model={orderViewDialog.value.move}/>
-      <pos-order-voucher-dialog v-model={orderViewDialog.value.voucher}/>
-    </>)
+    const a = () => <>
+      <pos-order-split-order2 v-model={orderViewDialog.split}/>
+      <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
+      <pos-order-move-items2 v-model={orderViewDialog.move}/>
+      <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
+    </>
+
+    return genScopeId(() => (
+        <>
+          <div class="order">
+            <div class="order-main">
+              <pos-order-layout2 style="flex: 1"/>
+              <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
+            </div>
+            {!isMobile.value && <pos-quick-order-toolbar2/>}
+          </div>
+          <pos-order-split-order2 v-model={orderViewDialog.split}/>
+          <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
+          <pos-order-move-items2 v-model={orderViewDialog.move}/>
+          <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
+        </>
+    ))
   }
 }
 </script>

@@ -13,7 +13,7 @@ module.exports = async function (cms) {
   cms.on('bridge:inited', function () {
     cms.bridge.on('endOfDay', async function (report, cb) {
       report = JsonFn.clone(report)
-      await cms.execPostAsync('run:endOfDay', null, [report]);
+      await cms.emit('run:endOfDay', report);
       /*let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
       vDateOrders = JsonFn.clone(vDateOrders, true, true);
 
@@ -133,7 +133,7 @@ async function printHandler(reportType, reportData, device, callback = () => nul
 
     for (const printerInfo of printers) {
       if (useVirtualPrinter) {
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, null, [{report, printData, printerInfo, type}])
+        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, {report, printData, printerInfo, type})
       }
 
       const {escPOS} = printerInfo

@@ -40,6 +40,7 @@ import Order2 from "../Order2";
 import { orderLayout } from "../pos-ui-shared";
 import { demoData } from "./demoData";
 import PosOrderLayout2 from "../PosOrderLayout2";
+import {isMobile, setMobile} from "../../AppSharedStates";
 
 const { stringify } = require("schemahandler/utils");
 
@@ -69,6 +70,7 @@ describe("order-view test", function() {
     let order = getCurrentOrder();
     addProduct(order, mockProduct);
     orderLayout.value = demoData.OrderLayout[0];
+    isMobile.value = true;
     makeWrapper(Order2, { shallow: false });
     await nextTick();
     await delay(50);

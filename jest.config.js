@@ -15,5 +15,6 @@ module.exports = {
     "<rootDir>/node_modules/(?!pos-vue-framework)",
   ],
   snapshotSerializers: ["jest-serializer-html"],
-  //setupFiles: ['./jest.setup.js'],
+  //todo: remove setupFiles
+  setupFiles: ['./jest.setup.js'],
 }

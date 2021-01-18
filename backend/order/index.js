@@ -354,7 +354,7 @@ module.exports = (cms) => {
     return onlineDevice.id === masterClientId
   }
 
-  cms.post('run:print', async (commit) => {
+  cms.on('run:print', async (commit) => {
     if (commit.printType === 'kitchenAdd') {
       await printKitchen({ order: commit.order, device: commit.device });
     } else if (commit.printType === 'kitchenCancel') {

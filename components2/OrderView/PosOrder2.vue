@@ -8,6 +8,7 @@ import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
 import {getCurrentOrder, overlay} from "./pos-logic-be";
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
+import {genScopeId} from "../utils";
 
 export default {
   name: "posOrder2",
@@ -39,7 +40,8 @@ export default {
 
     const root = (children) => <div class='order-detail' style={getRootStyle()}>{children}</div>
 
-    const renderRightOverLay = () => <g-overlay value={overlay} absolute opacity="0.7" color="rgba(255, 255, 255)" style="top: 54px"/>
+    const renderRightOverLay = () => <g-overlay modelValue={overlay.value} absolute opacity="0.7" color="rgba(255, 255, 255)"
+                                                style="top: 54px"/>
 
     let {renderItemsTable} = orderRightSideItemsTable();
     //item list + edit menu
@@ -55,13 +57,13 @@ export default {
     }
 
     const {renderHeader, overlayRender} = orderRightSideHeader(props, {emit});
-    return () => (
+    return genScopeId(() => (
         root(<>
           {renderHeader()}
           {contentRender()}
           {renderRightOverLay()}
         </>)
-    )
+    ))
 
   }
 }

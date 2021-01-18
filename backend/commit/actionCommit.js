@@ -10,9 +10,9 @@ module.exports = async function (orm) {
 
 		orm.on('commit:handler:finish:Action', async function (action, commit) {
 			if (commit.data.printFromClient && onlineDevice && commit.from === onlineDevice.id) {
-				await cms.execPostAsync('run:print', null, [action])
+				await cms.emit('run:print', action)
 			} else if (commit.data.printFromMaster) {
-				await cms.execPostAsync('run:print', null, [action])
+				await cms.emit('run:print', action)
 			}
 		})
 

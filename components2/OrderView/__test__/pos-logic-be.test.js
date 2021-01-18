@@ -15,18 +15,18 @@ import {
   changeItemQuantity
 } from "../pos-logic";
 import {
-  actionList,
-  addProduct,
+  actionList, actionList2,
+  addProduct, addProductToSecondOrder, cancelSplitOrder,
   currentTable,
-  disablePay,
-  getCurrentOrder,
-  itemQuantityChangeCheck,
-  onlyCheckoutPrintedItems,
+  disablePay, finishMoveItemsOrder, finishSplitOrder,
+  getCurrentOrder, getSecondOrder,
+  itemQuantityChangeCheck, makeSplitOrder, moveItemToSecondOrder,
+  onlyCheckoutPrintedItems, order2,
   payBtnClickable,
-  payPrintMode,
-  prepareOrder,
-  quickBtnAction,
-  showIcon,
+  payPrintMode, prepareMoveItemsOrder,
+  prepareOrder, prepareSecondOrder,
+  quickBtnAction, returnItem,
+  showIcon, startOnetimeSnapshot,
   togglePayPrintBtn
 } from "../pos-logic-be";
 import { mockProduct } from "./mock_product";
@@ -330,4 +330,107 @@ describe("pos-logic", function() {
       ]
     `);
   });
+
+  it("case 11: factory test", async function() {
+    prepareSecondOrder("10");
+    const order = getSecondOrder();
+    await nextTick();
+    addProduct(order, mockProduct);
+    await nextTick();
+    expect(stringify(actionList2.value)).toMatchSnapshot();
+  });
+
+  //todo: move items
+  //todo: split order
+  it("case 12: split order: cancel", async function() {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProduct);
+    await nextTick();
+    changeItemQuantity(order, 0, 2);
+    await nextTick();
+
+    //todo: clone order:
+    makeSplitOrder();
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    cancelSplitOrder()
+    expect(stringify([order, order2])).toMatchSnapshot();
+  });
+
+  it("case 12 a: split order one time snapshot", async function() {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProduct);
+    await nextTick();
+    changeItemQuantity(order, 0, 2);
+    await nextTick();
+
+    actionList.value.length = 0;
+    //begin split
+    makeSplitOrder();
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    finishSplitOrder();
+    await nextTick()
+    expect(stringify(actionList2.value)).toMatchSnapshot();
+  });
+
+  it("case 12 b: split order", async function() {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProduct);
+    await nextTick();
+    //changeItemQuantity(order, 0, 2);
+    await nextTick();
+
+    //todo: clone order:
+    makeSplitOrder();
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    const a = order2;
+    returnItem(0)
+    await nextTick();
+    expect(stringify([order, order2])).toMatchSnapshot();
+
+    expect(stringify(actionList2.value)).toMatchSnapshot();
+  });
+
+  it("case 13 a: move items : inProgress order", async function() {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProduct, 3);
+    await nextTick();
+    simulateBackendPrint(order);
+    const orderTable10 = _.cloneDeep(order);
+
+    prepareOrder("15");
+    addProduct(order, mockProduct, 5);
+
+    //todo: clone order:
+    //problems: can not use items here ->
+    prepareMoveItemsOrder();
+    await nextTick();
+    moveItemToSecondOrder(0);
+    await nextTick();
+    //returnItem(0)
+    await nextTick();
+    finishMoveItemsOrder(orderTable10)
+    await nextTick();
+    expect(stringify([order, order2])).toMatchSnapshot();
+
+    expect(stringify(actionList2.value)).toMatchSnapshot();
+  });
+
 });

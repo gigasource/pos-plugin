@@ -30,13 +30,13 @@ function createPureImageVirtualPrinter(printerInfo, type) {
 
 module.exports = (cms) => {
 
-  cms.post(PRINT_VIRTUAL_REPORT, async ({report, printData, printerInfo, type}) => {
+  cms.on(PRINT_VIRTUAL_REPORT, async ({report, printData, printerInfo, type}) => {
     const canvasPrinter = createPureImageVirtualPrinter(printerInfo, type)
     await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
     await canvasPrinter.cleanup();
   })
 
-  cms.post(PRINT_VIRTUAL_KITCHEN, async ({printCanvas, printData, printerInfo}) => {
+  cms.on(PRINT_VIRTUAL_KITCHEN, async ({printCanvas, printData, printerInfo}) => {
     if (typeof (printCanvas) !== "function") {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_KITCHEN:printCanvas is not a function')
       return;
@@ -51,7 +51,7 @@ module.exports = (cms) => {
     await canvasPrinter.cleanup();
   })
 
-  cms.post(PRINT_VIRTUAL_ENTIRE_RECEIPT, async ({printCanvas, props, printerInfo}) => {
+  cms.on(PRINT_VIRTUAL_ENTIRE_RECEIPT, async ({printCanvas, props, printerInfo}) => {
     if (typeof (printCanvas) !== "function") {
       console.log('printReport:VirtualPrinter:PRINT_VIRTUAL_ENTIRE_RECEIPT:printCanvas is not a function')
       return;

@@ -1,4 +1,4 @@
-import {computed, reactive, ref, watchEffect} from 'vue';
+import {computed, nextTick, reactive, ref, watchEffect} from 'vue';
 import {
   createEmptyCategoryLayout,
   createEmptyLayout,
@@ -6,6 +6,10 @@ import {
   isSameArea
 } from "../../components/posOrder/util";
 import _ from "lodash";
+import {addItem} from "./pos-logic";
+import {addProduct, getCurrentOrder} from "./pos-logic-be";
+import {$filters} from "../AppSharedStates";
+import {useI18n} from "vue-i18n";
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
 export const orderLayout = ref({categories: []});
@@ -69,6 +73,27 @@ export const products = computed(() => {
   return  _.filter(selectedCategoryLayout.value && selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
 })
 
+//fixme: only for dev
+const order = getCurrentOrder();
+const once = _.once(() => {
+  addProduct(order, products.value[0].product);
+  addProduct(order, products.value[0].product);
+  addProduct(order, products.value[1].product);
+  addProduct(order, products.value[1].product);
+
+  orderViewDialog.receipt = true;
+})
+watchEffect(() => {
+  if (order.items.length === 0 && products.value.length > 0) {
+    once();
+  }
+})
+
+/*async function run() {
+  await nextTick();
+}
+run();*/
+
 export const mode = ref();
 
 export const highlightSelectedProduct = ref(false);
@@ -128,69 +153,52 @@ export function getItemSubtext({course, takeAway, separate}) {
 }
 
 export function isItemDiscounted(item) {
-  return item.originalPrice !== item.price
+  return item.originalPrice && item.originalPrice !== item.price
 }
 
-export function itemsWithQtyFactory() {
-  const remainingItems = ref([]);
-  const itemsWithQty = computed(() => {
-    if (remainingItems) return remainingItems.filter(i => i.quantity > 0)
-    return [];
-  })
-  const itemsToMove = ref([]);
-
-  function addToMoveItems(item) {
-    if (item.quantity > 1) {
-      const existingItem = itemsToMove.value.find(i => i._id === item._id)
-      if (existingItem) {
-        existingItem.quantity++
-      } else {
-        itemsToMove.value.push({...item, quantity: 1})
-      }
-      item.quantity--
-      return
-    }
-    const existingItem = itemsToMove.value.find(i => i._id === item._id)
-    if (existingItem) {
-      existingItem.quantity++
-    } else {
-      itemsToMove.value.push({...item, quantity: 1})
-    }
-    remainingItems.value.splice(remainingItems.value.indexOf(item), 1)
-  }
-
-  function returnItem(item) {
-    if (item.quantity > 1) {
-      const existingItem = remainingItems.value.find(i => i._id === item._id)
-      if (existingItem) {
-        existingItem.quantity++
-      } else {
-        remainingItems.value.push({...item, quantity: 1})
-      }
-      item.quantity--
-      return
-    }
-    const existingItem = remainingItems.value.find(i => i._id === item._id)
-    if (existingItem) {
-      existingItem.quantity++
-    } else {
-      remainingItems.value.push({...item, quantity: 1})
-    }
-    itemsToMove.value.splice(itemsToMove.value.indexOf(item), 1)
-  }
-
-  return {
-    remainingItems,
-    itemsWithQty,
-    addToMoveItems,
-    returnItem
-  }
-}
-
-export const orderViewDialog = ref({
+export const orderViewDialog = reactive({
   search: false,
   split: false,
   move: false,
   voucher: false,
   receipt: false
 });
+
+export function itemsRenderFactory() {
+  const {t, locale} = useI18n();
+  const itemsRender = (items, onClick) => items.map(item => (
+    <div class="item" key={item._id.toString()}>
+      <div class="item-detail" onClick={() => onClick(item)}>
+        <div>
+          <p class="item-detail__name" style={[item.sent && {opacity: 0.55}]}>
+            {item.id && `${item.id}. `}{item.name}</p>
+          <p>
+            <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
+              {t('common.currency', locale)}{$filters.formatCurrency(item.originalPrice)}
+            </span>
+            {isItemDiscounted(item) &&
+            <span class="item-detail__price--new">
+              {t('common.currency', locale)} {$filters.formatCurrency(item.price)}
+            </span>
+            }
+            <span class={['item-detail__option', 'text-red-accent-2']}>
+              {getItemSubtext(item)}
+            </span>
+          </p>
+        </div>
+        <div class="mr-2 fw-700 row-flex align-items-center"
+             style="font-size: 18px">{item.quantity}</div>
+      </div>
+      {item.modifiers && <div>
+        {item.modifiers.map(modifier => (
+          <g-chip label small text-color="#616161">
+            {modifier.name} |
+            {t('common.currency', locale)} {$filters.formatCurrency(modifier.price)}
+          </g-chip>
+        ))}
+
+      </div>}
+    </div>
+  ))
+  return itemsRender;
+}

@@ -1,23 +1,35 @@
 import Hooks from 'schemahandler/hooks/hooks'
 import { computed, ref, watch, reactive } from 'vue';
 import {mobileCheck} from "../components/logic/commonUtils";
+import cms from 'cms';
 
 export const appHooks = new Hooks()
 
 export const user = ref(null)
 
-export const avatar = computed(() => user ? user.avatar : '');
-export const username = computed(() => user ? user.name : '');
+export const avatar = computed(() => user.value ? user.value.avatar : '');
+export const username = computed(() => user.value ? user.value.name : '');
 
 appHooks.on('updateUser', function (value) {
   user.value = value
 })
 
-watch(() => user.value, value => {
-  if (value) console.log('user watcher', value)
-}, { deep: true })
+const run = async () => {
+  const users = await cms.getModel('PosUser').find();
+  user.value = users.find(u => u.name === 'admin');
+}
 
-export const isMobile = mobileCheck();
+//fixme: move to lifecycle
+run();
+
+/*watch(() => user.value, value => {
+  if (value) console.log('user watcher', value)
+}, { deep: true })*/
+
+export let isMobile = ref(mobileCheck());
+
+//fixme: remove by production
+//isMobile.value = true;
 
 export const $filters = {
   formatCurrency(val, decimals = 2) {
@@ -39,3 +51,16 @@ export function showNotify(content) {
   notifyState.content = content || 'Saved'
   notifyState.show = true
 }
+
+
+export const activeOrders = ref([]);
+
+appHooks.on('orderChange', async function () {
+  activeOrders.value = await cms.getModel('Order').find({ status: 'inProgress' });
+})
+
+
+export const setting = ref({})
+appHooks.on('settingChange', async function() {
+  setting.value = await cms.getModel('PosSetting').findOne()
+})

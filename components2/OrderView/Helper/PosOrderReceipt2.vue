@@ -1,11 +1,12 @@
 <script>
-import {internalValueFactory} from "../../utils";
+import {genId, genScopeId, internalValueFactory} from "../../utils";
 import {getCurrentOrder} from "../pos-logic-be";
 import {useI18n} from "vue-i18n";
-import {computed, nextTick, watch} from "vue";
+import {computed, nextTick, watch, ref} from "vue";
 import {calItemVSum, updateOrderWithHooks} from "../pos-logic";
 import {$filters} from "../../AppSharedStates";
 import {useRouter} from "vue-router";
+import _ from 'lodash';
 
 export default {
   name: 'PosOrderReceipt2',
@@ -15,10 +16,10 @@ export default {
   },
   //fixme
   emits: ['update:modelValue', 'updatePayment', 'updateCurrentOrder', 'printOrderReport', 'saveRestaurantOrder', 'print', 'complete'],
-  setup(props, {emits}) {
+  setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
     const order = getCurrentOrder();
-    const {t: $t, locale} = useI18n();
+    const {t, locale} = useI18n();
     const store = ref({
       name: 'Lotteria Nguyen Khanh Toan',
       address: '103 DN11, Nguyen Khanh Toan, Quan Hoa, Cau Giay, Ha Noi',
@@ -38,8 +39,9 @@ export default {
     const printed = ref(null);
 
     const blurReceipt = computed(() => menu.value.some(i => i === true))
+    //const blurReceipt = computed(() => false)
     const activeOrderPaymentItem = computed(() => {
-      if (!order.payment) return paymentMethods.find(i => i.type === 'cash')
+      if (!order.payment || order.payment.length === 0) return paymentMethods.find(i => i.type === 'cash')
       if (order.payment.length > 1) return this.paymentMethods.find(i => i.type === 'multi')
       else if (!order.payment.length) return {}
       return paymentMethods.find(i => i.type === order.payment[0].type)
@@ -67,7 +69,7 @@ export default {
 
     const orderItems = computed(() => {
       if (!props.split && order.items) {
-        return compactOrder(this.order.items.filter(i => i.quantity > 0))
+        return compactOrder(order.items.filter(i => i.quantity > 0))
       }
       return []
     })
@@ -134,7 +136,7 @@ export default {
 
     function savePayment(split, payment) {
       //fixme
-      emit('updatePayment', split._id, [{ type: payment, value: split.vSum }])
+      emit('updatePayment', split._id, [{type: payment, value: split.vSum}])
     }
 
     async function print(order) {
@@ -172,7 +174,7 @@ export default {
       if (item.type === 'multi') {
         return openMultiDialog()
       }
-      emit('updateCurrentOrder', 'payment', [{ type: item.type, value: order.vSum }])
+      emit('updateCurrentOrder', 'payment', [{type: item.type, value: order.vSum}])
     }
 
     function showTipDialog(split) {
@@ -181,7 +183,7 @@ export default {
     }
 
     function saveTip() {
-      const tip = split.value ? (+tipEditValue.value) -tempSplit.value.vSum : (+tipEditValue.value) - order.vSum
+      const tip = split.value ? (+tipEditValue.value) - tempSplit.value.vSum : (+tipEditValue.value) - order.vSum
 
       if (tip <= 0) {
         return
@@ -189,61 +191,61 @@ export default {
 
       if (split.value) {
         tipEditValue.value = ''
-        emit('updatePayment', tempSplit.value._id, [{ type: 'card', value: tempSplit.value.vSum }], tip.value)
+        emit('updatePayment', tempSplit.value._id, [{type: 'card', value: tempSplit.value.vSum}], tip.value)
         tempSplit.value = {}
       } else {
         emit('updateCurrentOrder', 'tip', tip.value)
-        emit('updateCurrentOrder', 'payment', [{ name: 'card', value: +tipEditValue.value }])
+        emit('updateCurrentOrder', 'payment', [{name: 'card', value: +tipEditValue.value}])
       }
 
       this.dialog.tip = false
     }
 
-    return () => <g-dialog fullscreen v-model={internalValue.value}>
+    const contentRender = genScopeId(() => (<>
       <div class="receipt">
         <g-toolbar color="#EFEFEF">
-          <g-btn-bs width="120" icon="icon-back" class="elevation-2" onClick={back}>
-            Back
-          </g-btn-bs>
-          <g-btn-bs width="120" icon="icon-print" class="elevation-2" onClick_stop={() => print()}>
-            Print
-          </g-btn-bs>
-          <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
-            <div style="line-height: 0.9">
-              <p>Company</p>
-              <p>Receipt</p>
-            </div>
-          </g-btn-bs>
-          {!slit &&
-          <g-menu v-model={paymentMethodMenu} content-class="menu-payment-option">
-            {{
-              activator(on) {
-                return (<>
-                  <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.icon} v-on={on} disabled={printed}>
-                    <div>{activeOrderPaymentItem.text}</div>
+          {genScopeId(() => <>
+            <g-btn-bs width="120" icon="icon-back" class="elevation-2" onClick={back}>
+              Back
+            </g-btn-bs>
+            <g-btn-bs width="120" icon="icon-print" class="elevation-2" onClick_stop={() => print()}>
+              Print
+            </g-btn-bs>
+            <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
+              <div style="line-height: 0.9">
+                <p>Company</p>
+                <p>Receipt</p>
+              </div>
+            </g-btn-bs>
+            {!props.split &&
+            <g-menu v-model={paymentMethodMenu.value} content-class="menu-payment-option" v-slots={{
+              activator: ({on}) => genScopeId(() =>
+                  <g-btn-bs className="elevation-2" icon={activeOrderPaymentItem.icon} onClick={on.click}>
+                    <div>abc{activeOrderPaymentItem.text}</div>
                   </g-btn-bs>
-                </>)
-              },
-              default() {
-                return (<div className="col-flex">
-                  {paymentMethodMenuItems.map((item, index) =>
-                      <g-btn-bs
-                          className="ml-0 mr-0"
-                          icon={item.icon}
-                          onClick_stop={() => setOrderPaymentMethod(item)}
-                          key={`paymentMethodMenuItems-${index}`}
-                      >
-                        <div>{item.text}</div>
-                      </g-btn-bs>)}
-                </div>)
-              }
-            }}
-          </g-menu>}
-          <g-spacer/>
-          <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
-                    onClick_stop={complete}>
-            Complete
-          </g-btn-bs>
+              )()
+              ,
+              default: () => genScopeId(() =>
+                  <div className="col-flex">
+                    {paymentMethodMenuItems.value.map((item, index) =>
+                        <g-btn-bs
+                            className="ml-0 mr-0"
+                            icon={item.icon}
+                            onClick_stop={() => setOrderPaymentMethod(item)}
+                            key={`paymentMethodMenuItems-${index}`}
+                        >
+                          <div>{item.text}</div>
+                        </g-btn-bs>)}
+                  </div>
+              )()
+            }}>
+            </g-menu>}
+            <g-spacer/>
+            <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
+                      onClick_stop={complete}>
+              Complete
+            </g-btn-bs>
+          </>)()}
         </g-toolbar>
         <div class="receipt-main">
           <div class="receipt-main__header">
@@ -255,7 +257,7 @@ export default {
             </div>
           </div>
           <div class="receipt-main__title">Table: {order.table}</div>
-          {split ? <>
+          {props.split ? <>
                 {order.splits.map((split, i) => <>
                   <div class="receipt-main__item" key={split._id}>
                     <div class="row-flex align-items-center">
@@ -266,37 +268,37 @@ export default {
                             Seat {i + 1}
                           </div>),
                           default: () => (
-                              <div className="menu-seat-btn">
-                                <div className="menu-seat-btn--payment">
-                                  <g-btn-bs width="100" icon="icon-print" className="elevation-2"
+                              <div class="menu-seat-btn">
+                                <div class="menu-seat-btn--payment">
+                                  <g-btn-bs width="100" icon="icon-print" class="elevation-2"
                                             onClick_stop={() => print(split)}>
                                     Print
                                   </g-btn-bs>
-                                  <g-btn-bs width="100" className="elevation-2">
+                                  <g-btn-bs width="100" class="elevation-2">
                                     Bewirtung
                                   </g-btn-bs>
                                 </div>
-                                <div className="menu-seat-btn--payment">
+                                <div class="menu-seat-btn--payment">
                                   <g-btn-bs width="100" icon="icon-credit_card"
                                             background-color={getPaymentColor(split.payment, 'card')}
-                                            className="elevation-2" onClick_stop={() => savePayment(split, 'card')}>
+                                            class="elevation-2" onClick_stop={() => savePayment(split, 'card')}>
                                     Card
                                   </g-btn-bs>
                                   <g-btn-bs width="100" icon="icon-cash"
                                             background-color={getPaymentColor(split.payment, 'cash')}
-                                            className="elevation-2" onClick_stop={() => savePayment(split, 'cash')}>
+                                            class="elevation-2" onClick_stop={() => savePayment(split, 'cash')}>
                                     Cash
                                   </g-btn-bs>
                                   <g-btn-bs width="100" icon="icon-multi_payment"
                                             background-color={getPaymentColor(split.payment, 'multi')}
-                                            className="elevation-2" onClick_stop={() => openMultiDialog(split)}>
+                                            class="elevation-2" onClick_stop={() => openMultiDialog(split)}>
                                     Multi
                                   </g-btn-bs>
                                 </div>
-                                <g-btn-bs width="100" icon="icon-email" className="elevation-2">
+                                <g-btn-bs width="100" icon="icon-email" class="elevation-2">
                                   Email
                                 </g-btn-bs>
-                                <g-btn-bs width="100" icon="icon-coin-box" className="elevation-2"
+                                <g-btn-bs width="100" icon="icon-coin-box" class="elevation-2"
                                           onClick_stop={() => showTipDialog(split)}>
                                   Trinkgeld
                                 </g-btn-bs>
@@ -309,12 +311,12 @@ export default {
                       {split.payment.map((p, iP) =>
                           <div class="receipt-main__item-total" key={`payment_${i}_${iP}`}>
                             <g-icon class="mr-1">{getIcon(p.type)}</g-icon>
-                            <span>{$t('common.currency', locale)} {p.value}</span>
+                            <span>{t('common.currency', locale)} {p.value}</span>
                           </div>)}
                       {split.tip ?
                           <div class="receipt-main__item-total">
                             <g-icon class="mr-1">{getIcon('tip')}</g-icon>
-                            <span>{$t('common.currency', locale)} {split.tip}</span>
+                            <span>{t('common.currency', locale)} {split.tip}</span>
                           </div> : null}
                     </div>
                     <div class="receipt-main__item-header">
@@ -343,7 +345,7 @@ export default {
                   {order.payment.map((p, iP) =>
                       <div class="receipt-main__item-total" key={`payment_${iP}`}>
                         <g-icon class="mr-1">{getIcon(p.type)}</g-icon>
-                        <span>{$t('common.currency', locale)} {p.value}</span>
+                        <span>{t('common.currency', locale)} {p.value}</span>
                       </div>)}
                 </div>
                 <div class="receipt-main__item-header">
@@ -351,7 +353,7 @@ export default {
                   <div class="col-9">Item name</div>
                   <div class="col-2 ta-right">Total</div>
                 </div>
-                {orderItems.map(item =>
+                {orderItems.value.map(item =>
                     <div class="receipt-main__item-row" key={item._id.toString()}>
                       <div class="col-1">{item.quantity}</div>
                       <div class="col-9">
@@ -366,13 +368,13 @@ export default {
               </div>}
         </div>
       </div>
-      <div class="blur-overlay" v-show={blurReceipt}/>
+      <div class="blur-overlay" v-show={blurReceipt.value}/>
 
       <dialog-multi-payment
           rotate
           v-model={dialog.value.multi}
           store-locale={locale}
-          total={split ? tempSplit.vSum : order.vSum}
+          total={props.split ? tempSplit.vSum : order.vSum}
           onSubmit={saveMultiPayment}/>
 
       <dialog-form-input
@@ -392,7 +394,11 @@ export default {
           )
         }}
       </dialog-form-input>
-    </g-dialog>
+    </>))
+
+    return genScopeId(() => <g-dialog fullscreen v-model={internalValue.value}>
+      {contentRender()}
+    </g-dialog>)
   }
 }
 </script>

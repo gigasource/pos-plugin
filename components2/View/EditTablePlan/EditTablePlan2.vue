@@ -1,7 +1,7 @@
 <script>
-import EditablePlanFactory from './EditTablePlanFactory'
+import EditablePlanUI from './EditTablePlanUI'
 
-const { hooks, fn } = EditablePlanFactory()
+const { hooks, fn } = EditablePlanUI()
 
 export default fn()
 </script>

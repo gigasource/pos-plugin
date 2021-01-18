@@ -1,16 +1,15 @@
-import { mount } from "@vue/test-utils";
-import EditTablePlan from "./EditTablePlanFactory";
-import { nextTick } from "vue";
-import delay from "delay";
-import prepareDb from "./test-setup-db";
-import {selectingObject, currentInputValue} from './room-state'
+import { mount } from '@vue/test-utils';
+import EditTablePlanUI from '../EditTablePlanUI';
+import { nextTick } from 'vue';
+import delay from 'delay';
+import prepareDb from '../../../TablePlan/__test__/test-setup-db';
 
 beforeAll(async () => {
   await prepareDb();
 });
 describe("should render edit table plan view", () => {
   it("should render room list", async () => {
-    const { fn, hooks } = EditTablePlan();
+    const { fn, hooks } = EditTablePlanUI();
 
     // hooks
     const component = fn();
@@ -110,7 +109,6 @@ describe("should render edit table plan view", () => {
     const inputEl = wrapper.find("#input")
     await inputEl.setValue("table2")
     await delay(50)
-    expect(currentInputValue.value).toEqual("table2")
     const saveEl = wrapper.get("#save")
     expect(wrapper.find("#table2").exists()).toBeFalsy()
     await saveEl.trigger('click')

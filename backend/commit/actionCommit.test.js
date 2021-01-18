@@ -1,6 +1,6 @@
 const { Socket, Io } = require('schemahandler/io/io')
 const _ = require('lodash')
-const Kareem = require('kareem');
+const Hooks = require('schemahandler/hooks/hooks');
 const delay = require('delay')
 const onlineOrderIo = new Io()
 onlineOrderIo.listen('local')
@@ -13,6 +13,7 @@ const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
 const syncTranspoter = require('schemahandler/sync/sync-transporter')
 const clientToOnlineSocket = new Socket()
 const uuid = require('uuid')
+const Hooks = require("schemahandler/hooks/hooks");
 const ObjectID = require('bson').ObjectID
 
 let socketToOrm
@@ -38,15 +39,7 @@ const cms = {
 		}
 	}
 }
-_.extend(cms, new Kareem())
-cms.execPostAsync = async function(name, context, args) {
-	const posts = this._posts.get(name) || [];
-	const numPosts = posts.length;
-
-	for (let i = 0; i < numPosts; ++i) {
-		await posts[i].fn.bind(context)(...(args || []));
-	}
-};
+_.extend(cms, new Hooks())
 global.cms = cms
 
 describe('test-action-commit', function () {
@@ -92,7 +85,7 @@ describe('test-action-commit', function () {
 	it('print', async (done) => {
 		let count = 0;
 		let actions = []
-		cms.post('run:print', (action) => {
+		cms.on('run:print', (action) => {
 			actions.push(action)
 			count++
 		})

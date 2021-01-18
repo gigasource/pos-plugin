@@ -41,11 +41,11 @@ async function printKitchen({order, device}, callback = () => null) {
       const printData = await getPrintData(receiptsForPrinter, order, printerInfo);
 
       if (useVirtualPrinter)
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{
+        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, {
           printCanvas,
           printData,
           printerInfo
-        }])
+        })
 
       const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {
@@ -89,11 +89,11 @@ async function printKitchenCancel({order, device}, callback = () => null) {
       const printData = await getPrintData(receiptsForPrinter, order, printerInfo);
 
       if (useVirtualPrinter)
-        await cms.execPostAsync(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, null, [{
+        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_KITCHEN, {
           printCanvas,
           printData,
           printerInfo
-        }])
+        })
 
       const escPrinter = await getEscPrinter(printerInfo);
       if (escPOS) {

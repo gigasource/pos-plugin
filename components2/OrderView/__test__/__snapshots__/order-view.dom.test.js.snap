@@ -1,0 +1,459 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`order-view test case 1 integration 1`] = `
+<div class="order">
+  <div class="order-main">
+    <div class="pol"
+         style="flex-direction: column; background-size: contain; overflow: hidden; background: url(/plugins/pos-plugin/assets/out.png);"
+    >
+      <div style="padding: 4px; background-color: rgb(224, 224, 224); position: sticky; top: 0px; z-index: 1;">
+        <div>
+          <div class="pol__cate"
+               style="background-color: rgb(178, 235, 242); color: rgb(0, 0, 0); box-shadow: none; grid-area: 1 / 1 / 2 / 2; border: 1px solid transparent;"
+          >
+            Drink
+          </div>
+        </div>
+      </div>
+      <div style="padding: 4px; flex: 1;">
+        <div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 1 / 1 / 2 / 2; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+          >
+            <div>
+              Soft Drink
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 2 / 1 / 3 / 2; background-color: rgb(178, 235, 242); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 1 / 2 / 2 / 3; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+          >
+            <div>
+              Wine
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 2 / 2 / 3 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 3 / 2 / 4 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 4 / 2 / 5 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 5 / 2 / 6 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 2 / 3 / 3 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 3 / 3 / 4 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 4 / 3 / 5 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 5 / 3 / 6 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 2 / 4 / 3 / 5; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 6 / 1 / 7 / 2; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+          >
+            <div>
+              Other
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 7 / 1 / 8 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 8 / 1 / 9 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 9 / 1 / 10 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 10 / 1 / 11 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 1 / 6 / 2 / 7; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+          >
+            <div>
+              Topping
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 2 / 6 / 3 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 3 / 6 / 4 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 4 / 6 / 5 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 8 / 2 / 9 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 9 / 2 / 10 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <div class="pol__prod darken-effect"
+               style="grid-area: 10 / 2 / 11 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+          >
+            <div>
+            </div>
+          </div>
+          <pos-order-keyboard-stub>
+          </pos-order-keyboard-stub>
+          <dialog-text-filter-stub>
+          </dialog-text-filter-stub>
+          <dialog-product-search-result-stub>
+          </dialog-product-search-result-stub>
+        </div>
+      </div>
+      <dialog-choose-popup-modifier-stub>
+      </dialog-choose-popup-modifier-stub>
+      <g-overlay-stub value="false"
+                      absolute="true"
+                      opacity="0.25"
+                      color="rgb(150, 150, 150)"
+      >
+        <g-icon-stub size="120">
+          icon-print
+        </g-icon-stub>
+      </g-overlay-stub>
+    </div>
+    <pos-order-stub>
+    </pos-order-stub>
+  </div>
+</div>
+<div>
+  <g-dialog-stub modelvalue="false"
+                 transition="false"
+                 content-class="move-items-dialog"
+  >
+    <div class="row-flex justify-end w-100">
+      <div class="splitter"
+           style="height: calc(100% - 84px);"
+      >
+        <div class="splitter__header row-flex align-items-center">
+          0
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <g-btn-bs-stub uppercase="false"
+                         disabled="true"
+                         icon="icon-move-items"
+                         background-color="#1271ff"
+          >
+            <span>
+              Move Items
+            </span>
+          </g-btn-bs-stub>
+        </div>
+        <div class="splitter__content">
+        </div>
+      </div>
+      <g-icon-stub class="mr-4 ml-4"
+                   size="40"
+                   color="#fff"
+                   style="height: calc(100% - 64px);"
+      >
+        keyboard_backspace
+      </g-icon-stub>
+      <div class="order-detail"
+           style="height: calc(100% - 64px);"
+      >
+        <div class="order-detail__header row-flex align-items-center">
+          <div class="row-flex align-items-center">
+            <g-avatar-stub size="36">
+              <img alt="true">
+            </g-avatar-stub>
+            <div class="ml-1 fw-700"
+                 style="font-size: 13px;"
+            >
+              <div>
+              </div>
+              <div>
+                <span style="font-weight: 600; font-size: 11px; color: rgb(158, 158, 158);">
+                  Table
+                </span>
+                <span class="ml-2"
+                      style="font-weight: 600; font-size: 13px;"
+                >
+                  10
+                </span>
+              </div>
+            </div>
+          </div>
+          <g-spacer-stub>
+          </g-spacer-stub>
+        </div>
+        <div class="order-detail__content">
+        </div>
+      </div>
+    </div>
+    <g-toolbar-stub elevation="0"
+                    color="#eee"
+                    class="toolbar"
+    >
+      <g-btn-bs-stub icon="icon-back">
+        ui.back
+      </g-btn-bs-stub>
+      <g-spacer-stub>
+      </g-spacer-stub>
+    </g-toolbar-stub>
+  </g-dialog-stub>
+  <choose-table-dialog-stub table="10"
+                            active-orders
+                            modelvalue="false"
+  >
+  </choose-table-dialog-stub>
+</div>
+`;
+
+exports[`order-view test case 2 orderLayout 1`] = `
+<div class="pol"
+     style="flex-direction: column; background-size: contain; overflow: hidden; background: url(/plugins/pos-plugin/assets/out.png);"
+>
+  <div style="padding: 4px; background-color: rgb(224, 224, 224); position: sticky; top: 0px; z-index: 1;">
+    <div>
+      <div class="pol__cate"
+           style="background-color: rgb(178, 235, 242); color: rgb(0, 0, 0); box-shadow: none; grid-area: 1 / 1 / 2 / 2; border: 1px solid transparent;"
+      >
+        Drink
+      </div>
+    </div>
+  </div>
+  <div style="padding: 4px; flex: 1;">
+    <div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 1 / 1 / 2 / 2; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+      >
+        <div>
+          Soft Drink
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 2 / 1 / 3 / 2; background-color: rgb(178, 235, 242); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 1 / 2 / 2 / 3; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+      >
+        <div>
+          Wine
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 2 / 2 / 3 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 3 / 2 / 4 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 4 / 2 / 5 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 5 / 2 / 6 / 3; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 2 / 3 / 3 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 3 / 3 / 4 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 4 / 3 / 5 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 5 / 3 / 6 / 4; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 2 / 4 / 3 / 5; background-color: rgb(200, 230, 201); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 6 / 1 / 7 / 2; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+      >
+        <div>
+          Other
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 7 / 1 / 8 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 8 / 1 / 9 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 9 / 1 / 10 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 10 / 1 / 11 / 2; background-color: rgb(255, 245, 157); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 1 / 6 / 2 / 7; background-color: transparent; color: rgb(33, 33, 33); border-radius: 2px; font-weight: 400; line-height: 1.2;"
+      >
+        <div>
+          Topping
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 2 / 6 / 3 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 3 / 6 / 4 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 4 / 6 / 5 / 7; background-color: rgb(206, 147, 216); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 8 / 2 / 9 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 9 / 2 / 10 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <div class="pol__prod darken-effect"
+           style="grid-area: 10 / 2 / 11 / 3; background-color: rgb(255, 171, 145); color: rgb(0, 0, 0); border-radius: 2px;"
+      >
+        <div>
+        </div>
+      </div>
+      <pos-order-keyboard-stub>
+      </pos-order-keyboard-stub>
+      <dialog-text-filter-stub>
+      </dialog-text-filter-stub>
+      <dialog-product-search-result-stub>
+      </dialog-product-search-result-stub>
+    </div>
+  </div>
+  <dialog-choose-popup-modifier-stub>
+  </dialog-choose-popup-modifier-stub>
+  <g-overlay-stub value="false"
+                  absolute="true"
+                  opacity="0.25"
+                  color="rgb(150, 150, 150)"
+  >
+    <g-icon-stub size="120">
+      icon-print
+    </g-icon-stub>
+  </g-overlay-stub>
+</div>
+`;
