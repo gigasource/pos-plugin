@@ -333,8 +333,21 @@ export const disablePrint = computed(() => {
 export const showIcon = ref(false);
 let actionTimeout;
 
-export function createPrintAction(printType, order) { // todo: review
-  actionList.value.push({
+/**
+ *
+ * @param printType
+ * @param order
+ * @example
+ * cms.once('run:print', function (commit) {
+ *    expect(stringify(actionList.value)).toMatchSnapshot();
+ *    expect(stringify(commit)).toMatchSnapshot()
+ *    global.globalHooks.emit('check:orderCreated', cms.orm)
+ *    done()
+ *  })
+ *
+ */
+export function createPrintAction(printType, order, actionList) { // todo: review
+  actionList.push({
     modelName: 'Action',
     action: cms.getModel('Action').create({
       printType,

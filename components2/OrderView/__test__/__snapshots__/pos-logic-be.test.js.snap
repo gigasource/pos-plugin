@@ -1767,6 +1767,38 @@ Array [
         "args": Array [
           Object {
             "_id": "ObjectID",
+            "cancellationItems": Array [],
+            "items": Array [],
+            "payment": Array [],
+            "status": "inProgress",
+            "table": "10",
+            "takeAway": false,
+            "user": Array [],
+            "vDate": "2020-12-31T17:00:00.000Z",
+            "vSum": 0,
+            "vTaxSum": Object {},
+          },
+        ],
+        "fn": "create",
+      },
+      Object {
+        "args": Array [
+          "createOrder",
+          Object {
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
           },
           Object {
             "$push": Object {
@@ -1853,6 +1885,38 @@ Array [
 
 exports[`pos-logic case 14a: create Order + addProduct + togglePrint 2`] = `
 Array [
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
+            "cancellationItems": Array [],
+            "items": Array [],
+            "payment": Array [],
+            "status": "inProgress",
+            "table": "10",
+            "takeAway": false,
+            "user": Array [],
+            "vDate": "2020-12-31T17:00:00.000Z",
+            "vSum": 0,
+            "vTaxSum": Object {},
+          },
+        ],
+        "fn": "create",
+      },
+      Object {
+        "args": Array [
+          "createOrder",
+          Object {
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
   Object {
     "action": Array [
       Object {
@@ -1969,32 +2033,80 @@ Object {
 }
 `;
 
-exports[`pos-logic case 14a: create Order + addProduct + togglePrint 4`] = `Array []`;
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 4`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Bar",
+        "id": "48",
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 40,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 40,
+            "net": 33.61,
+            "tax": 6.39,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 40,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 40,
+        "net": 33.61,
+        "tax": 6.39,
+      },
+    },
+  },
+]
+`;
 
 exports[`pos-logic case 14a: create Order + addProduct + togglePrint 5`] = `
 Array [
   Object {
     "_id": "ObjectID",
     "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{}}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"5fee6600c1f0f41cf65dff75\\"}",
+    "condition": "null",
     "data": Object {
       "docId": "ObjectID",
-      "orderId": "ObjectID",
       "table": "10",
     },
     "fromMaster": true,
     "id": 1,
     "tags": Array [
-      "updateActiveOrder",
+      "createOrder",
     ],
     "uuid": "uuid-v1",
   },
   Object {
     "_id": "ObjectID",
     "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"Bar\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":40,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"5fee6600c1f0f41cf65dff75\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -2010,14 +2122,32 @@ Array [
   Object {
     "_id": "ObjectID",
     "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"_id\\":\\"ObjectID\\",\\"vSum\\":40,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
     "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"printType\\":\\"kitchenAdd\\"}]}]",
     "collectionName": "Action",
-    "condition": null,
+    "condition": "null",
     "data": Object {
       "printFromMaster": true,
     },
     "fromMaster": true,
-    "id": 3,
+    "id": 4,
     "tags": Array [
       "print",
     ],

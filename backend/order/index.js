@@ -22,7 +22,20 @@ module.exports = (cms) => {
     cb()
   }
 
-  cms.post('run:print', async (commit) => {
+  async function execAllChain(actionList) {
+    const { orm } = cms
+    let finalResult
+    for (let { action, modelName} of actionList) {
+      let result = orm(modelName)
+      for (let { fn, args } of action) {
+        result = result[fn](...args)
+      }
+      finalResult = result = await result
+    }
+    return finalResult
+  }
+
+  cms.on('run:print', async (commit) => {
     // if (commit.printType === 'kitchenAdd') {
     //   await printKitchen({ order: commit.order, device: commit.device });
     // } else if (commit.printType === 'kitchenCancel') {

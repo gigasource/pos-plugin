@@ -38,12 +38,14 @@ const { stringify } = require("schemahandler/utils");
 const Hooks = require('schemahandler/hooks/hooks')
 const { cmsFactory } = require('../../../test-utils')
 
-if (!global.globalHooks) {
-  global.globalHooks = new Hooks()
-}
 // These requires must be after globalHooks initialization
-require('../../../backend/commit/actionCommit.prepare.test')
-require('../../../backend/order/order.prepare.test')
+const {
+  prepareActionCommitTest
+} = require('../../../backend/commit/actionCommit.prepare.test')
+const {
+  prepareOrderTest,
+  checkOrderCreated
+} = require('../../../backend/order/order.prepare.test')
 
 //jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
 require("mockdate").set(new Date("2021-01-01").getTime());
@@ -86,8 +88,8 @@ beforeAll(async () => {
   orm.plugin(require("../../../backend/commit/orderCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
-  global.globalHooks.emit('prepare:ActionCommit', cms)
-  global.globalHooks.emit('prepare:Order', cms)
+  prepareActionCommitTest(cms)
+  prepareOrderTest(cms)
   feSocket.connect('frontend')
 });
 
@@ -449,12 +451,7 @@ describe("pos-logic", function() {
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
 
-  it("case 14a: create Order + addProduct + togglePrint", async function() {
-    const runPrintPromise = new Promise(resolve => {
-      cms.once('run:print', function (commit) {
-        resolve(commit)
-      })
-    })
+  it("case 14a: create Order + addProduct + togglePrint", async function(done) {
     prepareOrder("10");
     const order = getCurrentOrder();
     await nextTick();
@@ -462,11 +459,14 @@ describe("pos-logic", function() {
     await nextTick();
     console.log(actionList.value)
     expect(stringify(actionList.value)).toMatchSnapshot();
-    createPrintAction('kitchenAdd', order.value)
+    createPrintAction('kitchenAdd', order.value, actionList.value)
+    cms.once('run:print', function (commit) {
+      expect(stringify(actionList.value)).toMatchSnapshot();
+      expect(stringify(commit)).toMatchSnapshot()
+      checkOrderCreated(cms.orm)
+      done()
+    })
+    //todo: add code to frontend
     feSocket.emit('print-to-kitchen', actionList.value)
-    const commit = await runPrintPromise
-    expect(stringify(actionList.value)).toMatchSnapshot();
-    expect(stringify(commit)).toMatchSnapshot()
-    global.globalHooks.emit('check:orderCreated', cms.orm)
   });
 });
