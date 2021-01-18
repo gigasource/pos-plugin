@@ -14,6 +14,9 @@ module.exports = {
   transformIgnorePatterns: [
     "<rootDir>/node_modules/(?!pos-vue-framework)",
   ],
+  moduleNameMapper: {
+    "vue-router": "<rootDir>/../../backoffice/node_modules/vue-router"
+  },
   snapshotSerializers: ["jest-serializer-html"],
   //todo: remove setupFiles
   setupFiles: ['./jest.setup.js'],
