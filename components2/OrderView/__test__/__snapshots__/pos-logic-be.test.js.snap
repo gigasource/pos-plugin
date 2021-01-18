@@ -1758,3 +1758,270 @@ Array [
   ],
 ]
 `;
+
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 1`] = `
+Array [
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
+          },
+          Object {
+            "$push": Object {
+              "items": Object {
+                "_id": "ObjectID",
+                "course": 1,
+                "groupPrinter": "Bar",
+                "id": "48",
+                "name": "Whiskey",
+                "price": 40,
+                "product": "ObjectID",
+                "quantity": 1,
+                "tax": 19,
+                "taxes": Array [
+                  19,
+                  7,
+                ],
+                "vSum": 40,
+                "vTakeAway": false,
+                "vTaxSum": Object {
+                  "19": Object {
+                    "gross": 40,
+                    "net": 33.61,
+                    "tax": 6.39,
+                  },
+                },
+              },
+            },
+          },
+        ],
+        "fn": "findOneAndUpdate",
+      },
+      Object {
+        "args": Array [
+          "updateActiveOrder",
+          Object {
+            "orderId": "ObjectID",
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
+          },
+          Object {
+            "$set": Object {
+              "_id": "ObjectID",
+              "vSum": 40,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
+              },
+            },
+          },
+        ],
+        "fn": "findOneAndUpdate",
+      },
+      Object {
+        "args": Array [
+          "updateActiveOrder",
+          Object {
+            "orderId": "ObjectID",
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+]
+`;
+
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 2`] = `
+Array [
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
+          },
+          Object {
+            "$push": Object {
+              "items": Object {
+                "_id": "ObjectID",
+                "course": 1,
+                "groupPrinter": "Bar",
+                "id": "48",
+                "name": "Whiskey",
+                "price": 40,
+                "product": "ObjectID",
+                "quantity": 1,
+                "tax": 19,
+                "taxes": Array [
+                  19,
+                  7,
+                ],
+                "vSum": 40,
+                "vTakeAway": false,
+                "vTaxSum": Object {
+                  "19": Object {
+                    "gross": 40,
+                    "net": 33.61,
+                    "tax": 6.39,
+                  },
+                },
+              },
+            },
+          },
+        ],
+        "fn": "findOneAndUpdate",
+      },
+      Object {
+        "args": Array [
+          "updateActiveOrder",
+          Object {
+            "orderId": "ObjectID",
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "_id": "ObjectID",
+          },
+          Object {
+            "$set": Object {
+              "_id": "ObjectID",
+              "vSum": 40,
+              "vTaxSum": Object {
+                "19": Object {
+                  "gross": 40,
+                  "net": 33.61,
+                  "tax": 6.39,
+                },
+              },
+            },
+          },
+        ],
+        "fn": "findOneAndUpdate",
+      },
+      Object {
+        "args": Array [
+          "updateActiveOrder",
+          Object {
+            "orderId": "ObjectID",
+            "table": "10",
+          },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {
+            "printType": "kitchenAdd",
+          },
+        ],
+        "fn": "create",
+      },
+      Object {
+        "args": Array [
+          "print",
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Action",
+  },
+]
+`;
+
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 3`] = `
+Object {
+  "_id": "ObjectID",
+  "printType": "kitchenAdd",
+}
+`;
+
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 4`] = `Array []`;
+
+exports[`pos-logic case 14a: create Order + addProduct + togglePrint 5`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"5fee6600c1f0f41cf65dff75\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 1,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"5fee6600c1f0f41cf65dff75\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 2,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"printType\\":\\"kitchenAdd\\"}]}]",
+    "collectionName": "Action",
+    "condition": null,
+    "data": Object {
+      "printFromMaster": true,
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "print",
+    ],
+    "uuid": "uuid-v1",
+  },
+]
+`;
