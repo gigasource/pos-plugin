@@ -178,8 +178,7 @@ async function updateTextLayout(change) {
 // product
 export async function updateProduct(change, forceCreate) {
   console.log('storing', change, 'to internal variable selectedProduct')
-  selectedProduct.set({ ...selectedProduct, ...change })
-
+  selectedProduct.value = { ...selectedProduct.value, ...change }
   if (selectedProduct._id) {
     await orderLayoutApi.updateProduct(selectedProduct._id, change)
     showNotify()

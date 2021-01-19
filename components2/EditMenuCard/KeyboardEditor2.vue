@@ -5,7 +5,7 @@ import {selectedCategoryLayout} from '../OrderView/pos-ui-shared';
 import {keyboardConfig, updateKeyboardConfig} from '../OrderView/order-layout-keyboard';
 import {reactive, computed} from 'vue';
 import { useI18n } from 'vue-i18n'
-import { getScopeId } from '../../utils/helpers';
+import { genScopeId } from '../utils';
 
 export default {
   name: 'KeyboardEditor2.vue',
@@ -172,7 +172,7 @@ export default {
       state.dialog = false
     }
 
-    return getScopeId(() => <>
+    return genScopeId(() => <>
       <div class="keyboard-editor">
         <div class="keyboard-editor__title">{t('restaurant.menuEdit.keyboardPosition')}</div>
         <g-btn-bs elevation="2" style="margin: 0 0 12px" onClick={() => state.dialog = true} icon="select_all">{t('ui.choose')}</g-btn-bs>
