@@ -125,20 +125,20 @@ export const products = computed(() => {
 })
 
 //fixme: only for dev
-const order = getCurrentOrder();
-const once = _.once(() => {
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[1].product);
-  addProduct(order, products.value[1].product);
-
-  orderViewDialog.receipt = true;
-})
-watchEffect(() => {
-  if (order.items.length === 0 && products.value.length > 0) {
-    once();
-  }
-})
+// const order = getCurrentOrder();
+// const once = _.once(() => {
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[1].product);
+//   addProduct(order, products.value[1].product);
+//
+//   orderViewDialog.receipt = true;
+// })
+// watchEffect(() => {
+//   if (order.items.length === 0 && products.value.length > 0) {
+//     once();
+//   }
+// })
 
 /*async function run() {
   await nextTick();
