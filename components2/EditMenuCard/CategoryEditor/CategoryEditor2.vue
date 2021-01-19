@@ -56,7 +56,7 @@ export  default {
           modelValue={categoryName.value}
           onUpdate:modelValue={newName => debouncedUpdateCategory({ name: newName })}>
         <template v-slot:append-inner>
-          <g-icon style="cursor: pointer" onClick={showCategoryNameKbd.value = true}>icon-keyboard</g-icon>
+          <g-icon style="cursor: pointer" onClick={() => showCategoryNameKbd.value = true}>icon-keyboard</g-icon>
         </template>
       </g-text-field-bs>
     </>)
@@ -107,7 +107,7 @@ export  default {
     const showDeleteConfirmDialog = ref(false)
     let renderDeleteCategoryToolbarButton = () => {
       return <>
-        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
         <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this category' onSubmit={() => {
           deleteCategory();
           showDeleteConfirmDialog.value = false;
@@ -115,7 +115,7 @@ export  default {
       </>
     }
     let renderToolbarButtons = () => <portal to={constants.portalLeftButtons}>
-      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
       { renderDeleteCategoryToolbarButton() }
     </portal>
 

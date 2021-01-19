@@ -24,6 +24,7 @@ import {
   clearPopupModifierGroup,
   deleteProductLayout,
   setAction,
+  selectPrinter,
   loadPrinters, loadCategories, loadTaxes, loadPopupModifierGroups
 } from './ProductEditorLogic'
 import constants from '../EditMenuCardToolbar/constants';
@@ -119,7 +120,7 @@ export default {
             modelValue={selectedProductLayout.value.text}
             onUpdate:modelValue={debounceUpdateTextLayout('text', $event)}
             v-slot={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={dialog.showTextKbd = true}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => dialog.showTextKbd = true}>icon-keyboard</g-icon>
             }}/>
       </>
     }
@@ -136,7 +137,7 @@ export default {
             model-value={selectedProduct.value.id}
             onUpdate:modelValue={updateProductInfo('id', $event)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('id')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('id')}>icon-keyboard</g-icon>
             }}/>
 
         <div>{t('article.name')}<span style="color: #FF4452">*</span></div>
@@ -144,7 +145,7 @@ export default {
             model-value={selectedProduct.value.name}
             onUpdate:modelValue={updateProductInfo('name', $event)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('name')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('name')}>icon-keyboard</g-icon>
             }}/>
 
         <div>{t('article.price')} <span style="color: #FF4452">*</span></div>
@@ -152,7 +153,7 @@ export default {
             model-value={selectedProduct.value.price}
             onUpdate:modelValue={updateProductInfo('price', $event)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('price')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('price')}>icon-keyboard</g-icon>
             }}/>
 
         <g-switch
@@ -170,18 +171,18 @@ export default {
                 <span class="product-editor__label">{t('restaurant.product.printer')}</span>
                 {showAddPrinter2.value
                     ?
-                    <span className="prop-option--printer" onClick={isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span>
+                    <span className="prop-option--printer" onClick={() => isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span>
                     : null
                 }
               </div>
               <div>
                 {
                   printers.map((item, index) => <>
-                    <span key={index} class={getPrinterClass(item._id)} onClick="selectPrinter(item._id)">{item.name}</span>
+                    <span key={index} class={getPrinterClass(item._id)} onClick={() => selectPrinter(item._id)}>{item.name}</span>
                     {isPrinter2Select.value
                         ? null
                         :
-                        <span className={noPrintClasses} onClick="setAsNoPrint">{t('restaurant.product.noPrinter')}</span>}
+                        <span className={noPrintClasses} onClick={setAsNoPrint}>{t('restaurant.product.noPrinter')}</span>}
                   </>)
                 }
               </div>
@@ -273,16 +274,16 @@ export default {
     function renderPopupModifier() {
       const popupModifierSlots = {
         default: (toggleSelect, item, index) =>
-            <div class="prop-option" key={`${index}-default`} onClick={addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
+            <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
         selected: (toggleSelect, item, index) =>
-            <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
+            <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={() => clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
       }
 
       return <>
         <div class="mt-2">
           <div class="row-flex justify-between">
             <div class="product-editor__label">Popup modifiers</div>
-            <g-icon size="16" onClick={dialog.popupModifiers = true}>icon-edit_modifiers</g-icon>
+            <g-icon size="16" onClick={() => dialog.popupModifiers = true}>icon-edit_modifiers</g-icon>
           </div>
           <div>
             <g-grid-select
@@ -324,8 +325,8 @@ export default {
     function renderToolbarButtons() {
       return <>
         <portal to={constants.portalLeftButtons}>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={setAction('copy')} disabled={!canCopy}>{t('ui.copy')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={() => setAction('copy')} disabled={!canCopy}>{t('ui.copy')}</g-btn-bs>
           { renderDeleteProductToolbarButton() }
         </portal>
         <portal to={constants.portalRightButtons}>
@@ -338,7 +339,7 @@ export default {
     const showDeleteConfirmDialog = ref(false)
     function renderDeleteProductToolbarButton() {
       return <>
-        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
         <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this product' onSubmit={() => {
           deleteProductLayout();
           showDeleteConfirmDialog.value = false;
@@ -363,11 +364,11 @@ export default {
       return <>
         {
           view.value.mode === ProductEditModes.ingredient
-              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={updateProductEditMode(ProductEditModes.basic)}>{t('inventory.ingredientMode')} </g-btn-bs>
+              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={() => updateProductEditMode(ProductEditModes.basic)}>{t('inventory.ingredientMode')} </g-btn-bs>
               : <g-btn-bs elevation="2" icon="icon-basic-mode" onClick={changeToIngredientMode}>{t('inventory.basicMode')} </g-btn-bs>
         }
         <g-dialog v-model={showSwitchEditModeDialog.value} eager width="448">
-          <div class="dialog" onClick={showSwitchEditModeDialog.value = false}>
+          <div class="dialog" onClick={() => showSwitchEditModeDialog.value = false}>
             <div class="dialog-content">
               <g-icon>icon-basic-mode</g-icon>
               <div style="flex: 1; margin-left: 16px">

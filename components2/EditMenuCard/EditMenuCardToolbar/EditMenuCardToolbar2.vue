@@ -22,7 +22,7 @@
         return <>
           <portal-target name={constants.portalLeftButtons}></portal-target>
           <g-spacer></g-spacer>
-          <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={() => updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
           <portal-target name={constants.portalRightButtons}></portal-target>
         </>
       }
