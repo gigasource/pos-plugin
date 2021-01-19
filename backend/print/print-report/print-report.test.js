@@ -22,8 +22,17 @@ describe('Test print report', function () {
 		await preparePrintReport(cms)
 		await prepareDb(cms.orm)
 	})
+
 	it('Case 1: Test EOD report printer', async () => {
 		const result = printInvoiceHandler('ZReport')
 		expect(stringify(result)).toMatchSnapshot()
+	})
+
+	it('Case 2: Month report', async () => {
+		const result = printInvoiceHandler('MonthlyReport')
+	})
+
+	it('Case 3: Staff report', async () => {
+
 	})
 })

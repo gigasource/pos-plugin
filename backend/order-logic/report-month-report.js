@@ -41,8 +41,16 @@ async function monthReport(from, to) {
     payment
   );
 
-  //salesByCategory
   const salesByCategory = renderPivotTable(
+    {
+      columns: ["category"],
+      reducers: ["@sum[2]:vSum", "@sum:quantity"]
+    },
+    items
+  );
+
+  //salesByCategory
+  const salesByCategoryName = renderPivotTable(
     {
       rows: ["name"],
       columns: ["category"],
@@ -65,6 +73,7 @@ async function monthReport(from, to) {
     total,
     salesByPayment,
     salesByCategory,
+    salesByCategoryName,
     zNumbers
   }
 }
