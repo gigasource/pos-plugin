@@ -16,7 +16,8 @@ module.exports = {
   ],
   moduleNameMapper: {
     "vue-router": "<rootDir>/../../backoffice/node_modules/vue-router",
-    "vue-i18n":"<rootDir>/../../backoffice/node_modules/vue-i18n"
+    "vue-i18n":"<rootDir>/../../backoffice/node_modules/vue-i18n",
+    "portal-vue":"<rootDir>/../../backoffice/node_modules/portal-vue",
   },
   snapshotSerializers: ["jest-serializer-html"],
   //todo: remove setupFiles

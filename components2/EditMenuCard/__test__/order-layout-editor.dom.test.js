@@ -19,13 +19,14 @@ import { updateOrderLayout } from '../../OrderView/pos-ui-shared';
 import constants from '../EditMenuCardToolbar/constants'
 import OrderLayoutEditor2 from '../OrderLayoutEditor2';
 import { genScopeId } from '../../utils';
+import { Portal } from 'portal-vue'
 
 describe('order-layout-editor', () => {
   it('should show if orderLayout is not initialize', async () => {
     updateOrderLayout(null)
     const Root = {
       name: 'Root',
-      components: {OrderLayoutEditor2},
+      components: {OrderLayoutEditor2, Portal},
       setup() {
         return genScopeId(() => <div>
           <order-layout-editor2></order-layout-editor2>
@@ -36,7 +37,7 @@ describe('order-layout-editor', () => {
     makeWrapper(Root, {
       global: {
         stubs: {
-          'order-layout-editor2': true
+          'order-layout-editor2-stub': false
         }
       }
     })
