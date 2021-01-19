@@ -1,10 +1,12 @@
 //<editor-fold desc="declare">
 import { nextTick } from "vue";
 import {
+  addMultiPayment,
   addPayment,
   addSinglePayment,
   cancelOrder,
   clearPayment,
+  getRestTotal,
   mergeSameItems,
   removeItem,
   simulateBackendPrint,
@@ -833,7 +835,8 @@ describe("pos-logic", function() {
     addItem(order, fanta, 20);
 
     await nextTick();
-    addSinglePayment(order, { type: "cash", value: 60 });
+    addSinglePayment(order, { type: "cash", value: 53 });
+    addPayment(order, { type: "Sodexo", value: 5 });
 
     await nextTick();
     //<editor-fold desc="order-expect">
@@ -842,14 +845,18 @@ describe("pos-logic", function() {
         Array [
           Object {
             "type": "cash",
-            "value": 60,
+            "value": 53,
+          },
+          Object {
+            "type": "Sodexo",
+            "value": 5,
           },
         ],
-        7,
+        undefined,
       ]
     `);
     //</editor-fold>
-    updateSinglePayment(order, { type: "cash", value: 70 });
+    updateSinglePayment(order, { type: "cash" });
     await nextTick();
 
     expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
@@ -857,33 +864,77 @@ describe("pos-logic", function() {
         Array [
           Object {
             "type": "cash",
-            "value": 70,
+            "value": 48,
+          },
+          Object {
+            "type": "Sodexo",
+            "value": 5,
           },
         ],
-        17,
+        undefined,
       ]
     `);
   });
 
-  it("case7a : test multi payment", async function() {
+  it("case7a : test multi payment tip", async function() {
     let order = createOrder();
     addItem(order, cola, 10);
     addItem(order, fanta, 20);
 
     await nextTick();
-    addSinglePayment(order, "cash", 60);
+    addMultiPayment(order, { type: "cash", value: 10 });
+    await nextTick();
+    addMultiPayment(order, { type: "card", value: 50 });
 
+    //auto add tip
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
       Array [
         Array [
           Object {
             "type": "cash",
-            "value": 60,
+            "value": 10,
+          },
+          Object {
+            "type": "card",
+            "value": 50,
           },
         ],
+        undefined,
         7,
+      ]
+    `);
+    //</editor-fold>
+  });
+
+  it("case7b : test multi payment", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+
+    await nextTick();
+    addMultiPayment(order, { type: "cash", value: 10 });
+    await nextTick();
+    addMultiPayment(order, { type: "card", value: getRestTotal(order) });
+
+    //auto add tip
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "type": "cash",
+            "value": 10,
+          },
+          Object {
+            "type": "card",
+            "value": 43,
+          },
+        ],
+        undefined,
+        undefined,
       ]
     `);
     //</editor-fold>
