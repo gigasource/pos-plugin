@@ -1,12 +1,13 @@
 <script>
   import { updateView } from '../../OrderView/pos-ui-shared';
+  import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
   import { useRouter } from 'vue-router'
 
   import constants from './constants'
 
   export default {
     name: 'EditMenuCardToolbar2',
-    components: { dialogConfirmDelete },
+    components: { dialogConfirmDelete, PortalTarget },
     props: {},
     setup() {
       const router = useRouter()
@@ -17,10 +18,10 @@
       // TODO: Figure how to bring keyboardConfig, product edit mode (basic, ingredient) stuff to another file
       function renderToolbarButtons() {
         return <>
-          <portal target={constants.portalLeftButtons}></portal>
+          <portal-target name={constants.portalLeftButtons}></portal-target>
           <g-spacer></g-spacer>
           <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
-          <portal target={constants.portalRightButtons}></portal>
+          <portal-target name={constants.portalRightButtons}></portal-target>
         </>
       }
 

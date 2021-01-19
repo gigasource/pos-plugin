@@ -1,5 +1,7 @@
 <script>
 import { orderLayout, updateOrderLayout } from '../OrderView/pos-ui-shared';
+import { Portal } from 'portal-vue/dist/portal-vue.esm'
+import constants from './EditMenuCardToolbar/constants';
 import { ref } from 'vue'
 import orderLayoutApi from './orderLayoutApi';
 import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew';
@@ -9,7 +11,7 @@ import { getScopeId } from '../../utils/helpers';
 
 export default {
   name: 'OrderLayoutEditor2',
-  components: {PosTextfieldNew, dialogFormInput},
+  components: {PosTextfieldNew, dialogFormInput, Portal},
   props: {},
   setup() {
     const { t } = useI18n()
@@ -23,11 +25,13 @@ export default {
     }
 
     return getScopeId(() => <>
-      <portal to="toolbar-buttons-left">
-        { (!orderLayout.value) && <g-btn-bs
+      <Portal to={constants.portalLeftButtons}>
+        {
+          (!orderLayout.value) && <g-btn-bs
             text-color="#1271FF" elevation="2" icon="add_circle"
-            onClick={showAddOrderLayoutDialog.value = true}>{t('ui.add')}</g-btn-bs>}
-      </portal>
+            onClick={showAddOrderLayoutDialog.value = true}>{t('ui.add')}</g-btn-bs>
+        }
+      </Portal>
 
       <dialog-form-input v-model={showAddOrderLayoutDialog.value} onSubmit={createLayout} v-slots={{
         input: () => <>

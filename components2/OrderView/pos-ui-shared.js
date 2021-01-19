@@ -74,6 +74,9 @@ export function updateSelectedProductLayout(newProductLayout) {
 }
 
 watchEffect(() => {
+  if (!orderLayout.value)
+    return
+
   if (selectedCategoryLayout.value) {
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
     if (!cateLayout)
