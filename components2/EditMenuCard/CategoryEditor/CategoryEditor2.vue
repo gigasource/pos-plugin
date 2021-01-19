@@ -4,6 +4,7 @@ import InputNumber from '../../../components/EditMenuCard/InputNumber';
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
 import { useI18n } from 'vue-i18n'
 import constants from '../EditMenuCardToolbar/constants';
+import { ref } from 'vue'
 
 import {
   productRows,
@@ -130,9 +131,8 @@ export  default {
     </>
 
     return {
-      state,
-      cateRows,
-      cateCols,
+      showDeleteConfirmDialog,
+      showCategoryNameKbd,
       renderCategoryEditor
     }
   },
