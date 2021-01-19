@@ -40,7 +40,7 @@ export default {
       }
     })
 
-    const x = computed({
+    const showXButton = computed({
       get() {
         if(keyboardConfig.value) {
           return keyboardConfig.value.x
@@ -183,7 +183,7 @@ export default {
         </div>
         <g-checkbox v-model={active.value} label="Active Keyboard"/>
         <g-checkbox v-model={onlyShowInFirstPage.value} label="Show Keyboard only in first page"/>
-        <g-checkbox v-model={x.value} label="Show 'x' Button"/>
+        <g-checkbox v-model={showXButton.value} label="Show 'x' Button"/>
         <g-dialog v-model={state.dialog} width="90%" height="90%" eager>
           <div class="dialog">
             <div class="dialog-title">{t('restaurant.menuEdit.keyboardPosition')}</div>

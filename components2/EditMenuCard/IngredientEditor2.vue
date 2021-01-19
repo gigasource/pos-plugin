@@ -4,6 +4,7 @@ import { onActivated } from 'vue';
 import { Touch } from 'pos-vue-framework';
 import PosKeyboardFull from '../../components/pos-shared-components/PosKeyboardFull';
 import _ from 'lodash';
+import { getScopeId } from '../../utils/helpers';
 
 export default {
   name: 'IngredientEditor2',
@@ -19,7 +20,7 @@ export default {
       if (selectedProductExisted.value) {
         return selectedProduct.value.ingredients.map(item => ({
           inventory: item.inventory,
-          amount: ''+item.amount
+          amount: Number(item.amount)
         }))
       } else {
         return []
@@ -32,9 +33,10 @@ export default {
         value: item._id
       }))
     }
-    onActivated(async() => await reloadInventories)
+    onActivated(async() => await reloadInventories())
     /*onCreated*/ await reloadInventories()
 
+    // TODO: meaning name
     const rules = computed(() => {
       let rules = []
       const inventories = ingredients.value.map(item => {
@@ -63,7 +65,7 @@ export default {
     async function  updateProductIngredient() {
       const _ingredients = ingredients.value.map(item => ({
         inventory: item.inventory,
-        amount: +item.amount
+        amount: Number(item.amount)
       }))
 
       if(_.some(_.countBy(_ingredients, 'inventory'), item => item > 1))
@@ -75,7 +77,7 @@ export default {
 
     const debounceUpdateAmount = _.debounce(updateProductIngredient, 300)
 
-    return () => <>
+    return getScopeId(() => <>
       {
         (selectedProductExisted.value) ?
             <div class="ingredient-editor" >
@@ -103,7 +105,7 @@ export default {
                         onUpdate:modelValue={debounceUpdateAmount}></g-text-field-bs>
                   </div>
               )}
-              <div class="ingredient-editor__message" >
+              <div class="ingredient-editor__message">
                 {t('inventory.swipeRight')}
                 <g-icon style="margin-bottom: 2px" color="#757575" size="16">fas fa-angle-double-right</g-icon>
               </div>
@@ -119,11 +121,11 @@ export default {
               }
             </div>
             :
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%" >
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%">
               Select product to edit ingredient
             </div>
       }
-    </>
+    </>)
   }
 }
 </script>

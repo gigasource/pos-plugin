@@ -1,7 +1,5 @@
 import _ from 'lodash';
 import cms from 'cms';
-import { selectedCategoryLayout, selectedProductLayout } from '../OrderView/pos-ui-shared';
-import { layoutType, selectedProduct } from './ProductEditor/ProductEditorLogic';
 
 const colName = 'OrderLayout'
 
@@ -85,8 +83,7 @@ async function createProductLayout(layoutType, categoryLayoutId, productLayout) 
 }
 
 async function updateProductLayout(layoutType, categoryLayoutId, productLayoutId, change) {
-  console.log('UpdateProductLayout', change)
-  console.log('Update product layout with id', selectedProductLayout.value._id)
+  console.log('Update product layout id=', productLayoutId, ' with change', change)
   const qry = { type: layoutType, 'categories.products._id': productLayoutId }
   const set = {
     $set: _.reduce(change, (result, value, key) => {

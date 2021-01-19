@@ -14,8 +14,8 @@ import {
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,
   selectedProductLayout,
-  mode, editable, productDblClicked, products
-} from "./pos-ui-shared";
+  editable, productDblClicked, products, updateView
+} from './pos-ui-shared';
 import {isSameArea} from "../../components/posOrder/util";
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {addModifier} from "./pos-logic";
@@ -208,11 +208,7 @@ export function orderLayoutProductFactory() {
   async function selectProduct(productLayout) {
     if (editable.value) {
       if (selectedCategoryLayout._id) {
-        if (mode.value === 'ingredient') {
-          view.value = {name: 'IngredientEditor'};
-        } else {
-          view.value = {name: 'ProductEditor'};
-        }
+        updateView('ProductEditor')
         selectedProductLayout.value = productLayout;
       }
     } else {

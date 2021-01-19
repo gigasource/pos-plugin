@@ -5,6 +5,7 @@ import orderLayoutApi from './orderLayoutApi';
 import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew';
 import dialogFormInput from '../../components/pos-shared-components/dialogFormInput';
 import { useI18n } from 'vue-i18n'
+import { getScopeId } from '../../utils/helpers';
 
 export default {
   name: 'OrderLayoutEditor2',
@@ -21,7 +22,7 @@ export default {
       showAddOrderLayoutDialog.value = false
     }
 
-    return () => <>
+    return getScopeId(() => <>
       <portal to="toolbar-buttons-left">
         { (!orderLayout.value) && <g-btn-bs
             text-color="#1271FF" elevation="2" icon="add_circle"
@@ -29,7 +30,7 @@ export default {
       </portal>
 
       <dialog-form-input v-model={showAddOrderLayoutDialog.value} onSubmit={createLayout} v-slots={{
-        'input': () => <>
+        input: () => <>
           <div class="row-flex flex-wrap justify-around mt-2">
             <pos-textfield-new style="width: 48%" label="Column" v-model={column.value} clearable></pos-textfield-new>
             <pos-textfield-new style="width: 48%" label="Row" v-model={row.value} clearable></pos-textfield-new>
@@ -37,7 +38,7 @@ export default {
         </>
         ,
       }}></dialog-form-input>
-    </>
+    </>)
   }
 }
 </script>
