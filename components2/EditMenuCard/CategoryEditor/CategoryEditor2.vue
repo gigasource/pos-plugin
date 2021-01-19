@@ -77,14 +77,14 @@ export  default {
     let renderRowSetting = () => <>
       <div class="category-editor__label">{t('restaurant.menuEdit.rowsNo')}</div>
       <input-number
-          modelValue={productRows} min={4} max={10}
+          modelValue={productRows.value} min={4} max={10}
           width={148}
           onUpdate:modelValue={newRow => debouncedUpdateCategory({rows: newRow})}/>
     </>
     let renderColsSetting = () => <>
       <div class="category-editor__label">{t('restaurant.menuEdit.columnsNo')}</div>
       <input-number
-          modelValue={productCols} min={3} max={6}
+          modelValue={productCols.value} min={3} max={6}
           width={148}
           onUpdate:modelValue={newCol => debouncedUpdateCategory({columns:newCol})}/>
     </>
@@ -108,17 +108,17 @@ export  default {
     const showDeleteConfirmDialog = ref(false)
     let renderDeleteCategoryToolbarButton = () => {
       return <>
-        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete}>{t('ui.delete')}</g-btn-bs>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete.value}>{t('ui.delete')}</g-btn-bs>
         <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this category' onSubmit={() => {
           deleteCategory();
           showDeleteConfirmDialog.value = false;
         }}></dialog-confirm-delete>
       </>
     }
-    let renderToolbarButtons = () => <portal to={constants.portalLeftButtons}>
-      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+    let renderToolbarButtons = () => <Portal to={constants.portalLeftButtons}>
+      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch.value}>{t('ui.switch')}</g-btn-bs>
       { renderDeleteCategoryToolbarButton() }
-    </portal>
+    </Portal>
 
     // entire render
     let renderCategoryEditor = () => <>

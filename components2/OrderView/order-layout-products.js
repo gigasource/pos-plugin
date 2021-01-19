@@ -207,7 +207,7 @@ export function orderLayoutProductFactory() {
 
   async function selectProduct(productLayout) {
     if (editable.value) {
-      if (selectedCategoryLayout._id) {
+      if (selectedCategoryLayout.value._id) {
         updateView('ProductEditor')
         selectedProductLayout.value = productLayout;
       }

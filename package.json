@@ -32,7 +32,6 @@
     "node-thermal-printer": "^1.0.3",
     "numeral": "^2.0.6",
     "pngjs": "^3.4.0",
-    "portal-vue": "github:gigasource/portal-vue#giga-next",
     "queue": "^6.0.1",
     "recursive-diff": "^1.0.8",
     "serialport": "^8.0.7",
@@ -69,8 +68,6 @@
     "typescript": "^4.1.3",
     "vue": "^3.0.4",
     "vue-jest": "5.0.0-alpha.7",
-    "vue-router": "^4.0.2",
-    "webpack-manifest-plugin": "^3.0.0",
-    "vue-i18n": "^9.0.0-beta.12"
+    "webpack-manifest-plugin": "^3.0.0"
   }
 }

@@ -1,6 +1,5 @@
 <script>
   import { updateView } from '../../OrderView/pos-ui-shared';
-  import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n'
 
@@ -8,7 +7,7 @@
 
   export default {
     name: 'EditMenuCardToolbar2',
-    components: { PortalTarget },
+    components: { },
     props: {},
     setup() {
       const { t } = useI18n()

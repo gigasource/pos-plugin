@@ -1,6 +1,5 @@
 <script>
 import { orderLayout, updateOrderLayout } from '../OrderView/pos-ui-shared';
-import { Portal } from 'portal-vue/dist/portal-vue.esm'
 import constants from './EditMenuCardToolbar/constants';
 import { ref } from 'vue'
 import orderLayoutApi from './orderLayoutApi';
@@ -11,7 +10,7 @@ import { getScopeId } from '../../utils/helpers';
 
 export default {
   name: 'OrderLayoutEditor2',
-  components: {PosTextfieldNew, dialogFormInput, Portal},
+  components: {PosTextfieldNew, dialogFormInput},
   props: {},
   setup() {
     const { t } = useI18n()
