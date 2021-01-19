@@ -109,11 +109,11 @@ const once = _.once(() => {
 
   orderViewDialog.receipt = true;
 })
-watchEffect(() => {
+/*watchEffect(() => {
   if (order.items.length === 0 && products.value.length > 0) {
     once();
   }
-})
+})*/
 
 /*async function run() {
   await nextTick();
