@@ -9,7 +9,7 @@ jest.mock("vue-i18n", () => {
     useI18n() {
       return {
         t(t) {
-          return t;
+          return t; // [Consider] return `t('${t}')` to indicate that i18n has been used
         },
         locale: "en"
       };
@@ -108,11 +108,12 @@ export function setComponent(_component) {
  *
  * @param _component
  * @param options
+ * @param useDefaults indicate whether _.defaults will be use for options
  * @returns {*}
  * example: makeWrapper(Order2, {shallow: false});
  */
-export const makeWrapper = (_component, options) => {
-  wrapper = mount(component || _component, _.defaults(options, {
+export const makeWrapper = (_component, options, useDefaults = true) => {
+  const defaultOption = {
     props: {},
     shallow: true,
     global: {
@@ -153,7 +154,6 @@ export const makeWrapper = (_component, options) => {
         'g-tabs': true,
         'g-tab-item': true,
         'pos-textfield-new': true,
-
       },
       mocks: {
         t: a => a,
@@ -166,7 +166,9 @@ export const makeWrapper = (_component, options) => {
         }
       }
     }
-  }));
+  }
+  const optionResult = useDefaults ? _.defaults(options, defaultOption) : _.merge(defaultOption, options)
+  wrapper = mount(component || _component, optionResult);
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));
