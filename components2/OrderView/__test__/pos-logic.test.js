@@ -835,7 +835,7 @@ describe("pos-logic", function() {
     addItem(order, fanta, 20);
 
     await nextTick();
-    addSinglePayment(order, { type: "cash" });
+    addSinglePayment(order, { type: "cash", value: 53 });
     addPayment(order, { type: "Sodexo", value: 5 });
 
     await nextTick();
@@ -856,7 +856,7 @@ describe("pos-logic", function() {
       ]
     `);
     //</editor-fold>
-    updateSinglePayment(order, { type: "cash", value: 70 });
+    updateSinglePayment(order, { type: "cash" });
     await nextTick();
 
     expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
@@ -864,14 +864,14 @@ describe("pos-logic", function() {
         Array [
           Object {
             "type": "cash",
-            "value": 70,
+            "value": 48,
           },
           Object {
             "type": "Sodexo",
             "value": 5,
           },
         ],
-        22,
+        undefined,
       ]
     `);
   });
