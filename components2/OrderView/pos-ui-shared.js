@@ -11,6 +11,7 @@ import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
+export const orderLayout = ref(null);
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
 export const selectedProduct = computed({
@@ -33,11 +34,31 @@ export const selectedProductExisted = computed(() => {
   return !!(selectedProduct.value && selectedProduct.value._id)
 })
 
-export const orderLayout = ref({categories: []});
-
 // editor view
-export const view = ref();
-export const updateView = name => view.value = { name }
+export const view = ref({});
+/**
+ * Update editor display
+ * @param name CategoryEditor | ProductEditor | KeyboardEditor
+ * @param mode basic, ingredient
+ */
+export const updateView = (name, mode) => {
+  mode = mode || (view.value && view.value.mode) // keep mode persistent
+
+  // fallback to basic mode
+  // we may see some thing weird like { name: CategoryEditor, mode: 'basic' }
+  // but it's ok
+  if (!mode)
+    mode = 'basic'
+
+  view.value = { name, mode }
+}
+export const ProductEditModes = {
+  basic: 'basic',
+  ingredient: 'ingredient'
+}
+export function updateProductEditMode(newMode) {
+  view.value.mode = newMode
+}
 
 export const editable = ref(false);
 export const productDblClicked = ref(false);
@@ -53,6 +74,9 @@ export function updateSelectedProductLayout(newProductLayout) {
 }
 
 watchEffect(() => {
+  if (!orderLayout.value)
+    return
+
   if (selectedCategoryLayout.value) {
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
     if (!cateLayout)
@@ -85,6 +109,7 @@ watchEffect(() => {
   }
 })
 
+// TODO: rename -> productLayouts
 export const products = computed(() => {
   if (!selectedCategoryLayout.value)
     return
@@ -119,14 +144,6 @@ const once = _.once(() => {
   await nextTick();
 }
 run();*/
-
-// basic <-> ingredient
-// [Consider] rename to displayMode
-export const mode = ref('basic');
-export function updateProductEditMode(newMode) {
-  // console.log('switch mode', newMode)
-  mode.value = newMode
-}
 
 export const highlightSelectedProduct = ref(false);
 

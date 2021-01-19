@@ -121,19 +121,6 @@ export async function changeCategory(category) {
   await updateProduct({ category: category._id })
 }
 
-// TODO: move to uI
-export const dialog = ref({
-  productInfo: false,
-  popupModifiers: false,
-  focus: 'id',
-  showTextKbd: false,
-})
-
-export function openDialogInfo(focus) {
-  dialog.value.focus = focus
-  dialog.value.productInfo = true
-}
-
 // todo: meaning??
 export const layoutType = ref('default')
 
@@ -145,30 +132,6 @@ export const loadPopupModifierGroups = async () => {
 
 export function changePopupModifierGroup(group) {
   return updateProduct({ activePopupModifierGroup: group && group._id })
-}
-
-watch(() => dialog.value.popupModifiers, async (val) => {
-  await loadPopupModifierGroups()
-})
-
-// styles
-// todo: move to ui
-export const noPrintClasses = computed(() => ({
-  'prop-option': true,
-  'prop-option--1': selectedProduct.isNoPrint,
-}))
-
-export const itemNoteClasses = computed(() => ({
-  'prop-option': true,
-  'prop-option--1': selectedProduct.isItemNote,
-}))
-
-export const getPrinterClass = (printer) => {
-  return {
-    'prop-option': true,
-    'prop-option--1': selectedProduct.groupPrinter && selectedProduct.groupPrinter._id === printer,
-    'prop-option--2': selectedProduct.groupPrinter2 && selectedProduct.groupPrinter2._id === printer,
-  }
 }
 
 export async function updateProductLayout(change, forceCreate) {

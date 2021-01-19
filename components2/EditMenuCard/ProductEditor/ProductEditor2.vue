@@ -1,6 +1,10 @@
 <script>
 import {
-  mode, selectedProduct, updateProductEditMode, updateView,
+  view,
+  selectedProductLayout,
+  selectedProduct,
+  ProductEditModes,
+  updateProductEditMode,
 } from '../../OrderView/pos-ui-shared';
 
 import {
@@ -8,16 +12,13 @@ import {
   layoutType,
   debounceUpdateTextLayout,
   debouncedUpdateProduct,
-  dialog,
   isPrinter2Select,
   isProductLayout,
   canDelete,
   canSwitch,
   canCopy,
-  getPrinterClass,
   updateProduct,
   setProductInfo,
-  openDialogInfo,
   updateProductLayout,
   addPopupModifierGroup,
   clearPopupModifierGroup,
@@ -28,7 +29,7 @@ import {
 import constants from '../EditMenuCardToolbar/constants';
 import useI18n from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { onActivated } from 'vue';
+import { computed, onActivated, reactive, watch } from 'vue';
 
 
 const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(',')
@@ -40,12 +41,48 @@ export default {
     const { t } = useI18n()
     const router = useRouter()
 
+    const dialog = reactive({
+      productInfo: false,
+      popupModifiers: false,
+      focus: 'id',
+      showTextKbd: false,
+    })
+
+    export function openDialogInfo(focus) {
+      dialog.focus = focus
+      dialog.productInfo = true
+    }
+
+    watch(() => dialog.value.popupModifiers, async (val) => {
+      await loadPopupModifierGroups()
+    })
+
     (async () => {
       await loadPrinters()
       await loadCategories()
       await loadTaxes()
       await loadPopupModifierGroups()
     })()
+
+
+    // styles
+    export const noPrintClasses = computed(() => ({
+      'prop-option': true,
+      'prop-option--1': selectedProduct.value.isNoPrint,
+    }))
+
+    export const itemNoteClasses = computed(() => ({
+      'prop-option': true,
+      'prop-option--1': selectedProduct.value.isItemNote,
+    }))
+
+    export const getPrinterClass = (printer) => {
+      return {
+        'prop-option': true,
+        'prop-option--1': selectedProduct.value.groupPrinter && selectedProduct.value.groupPrinter._id === printer,
+        'prop-option--2': selectedProduct.value.groupPrinter2 && selectedProduct.value.groupPrinter2._id === printer,
+      }
+    }
 
     // set layout type by route
     function setLayoutTypeByRouteQuery() {
@@ -63,7 +100,7 @@ export default {
       return <>
         <div>{t('article.type')}</div>
         <g-select
-            disabled={!!(type && selectedProduct.id && selectedProduct.name && selectedProduct.price)}
+            disabled={!!(type && selectedProduct.value.id && selectedProduct.value.name && selectedProduct.value.price)}
             skip-search
             text-field-component="GTextFieldBs"
             v-model={type}
@@ -73,35 +110,21 @@ export default {
     }
 
     function renderTextLayout() {
-      const slots = {
-        'append-inner': () =>
-            <g-icon style="cursor: pointer" onClick={dialog.value.showTextKbd = true}>icon-keyboard</g-icon>
-      }
-
       return <>
         <div>
           {t('article.name')}
           <span style="color: #ff4552">*</span>
         </div>
         <g-text-field
-            modelValue={selectedProductLayout.text}
-            onUpdate:modelValue={debounceUpdateTextLayout('text', $event)} v-slot={slots}/>
+            modelValue={selectedProductLayout.value.text}
+            onUpdate:modelValue={debounceUpdateTextLayout('text', $event)}
+            v-slot={{
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={dialog.showTextKbd = true}>icon-keyboard</g-icon>
+            }}/>
       </>
     }
 
     function renderProductLayout() {
-      const productIdSlots = {
-        'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('id')}>icon-keyboard</g-icon>
-      }
-
-      const productNameSlots = {
-        'append-inner': () => <g-icon style="cursor: pointer" onCick={openDialogInfo('name')}>icon-keyboard</g-icon>
-      }
-
-      const priceSlots = {
-        'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('price')}>icon-keyboard</g-icon>
-      }
-
       function updateProductInfo(prop, value) {
         setProductInfo(prop, value);
         debouncedUpdateProduct(prop, value);
@@ -110,31 +133,37 @@ export default {
       return <>
         <div>{t('article.id')} </div>
         <g-text-field-bs
-            model-value={selectedProduct.id}
+            model-value={selectedProduct.value.id}
             onUpdate:modelValue={updateProductInfo('id', $event)}
-            v-slots={productIdSlots}/>
+            v-slots={{
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('id')}>icon-keyboard</g-icon>
+            }}/>
 
         <div>{t('article.name')}<span style="color: #FF4452">*</span></div>
         <g-text-field-bs
-            model-value={selectedProduct.name}
+            model-value={selectedProduct.value.name}
             onUpdate:modelValue={updateProductInfo('name', $event)}
-            v-slots={productNameSlots}/>
+            v-slots={{
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('name')}>icon-keyboard</g-icon>
+            }}/>
 
         <div>{t('article.price')} <span style="color: #FF4452">*</span></div>
         <g-text-field-bs
-            model-value={selectedProduct.price}
+            model-value={selectedProduct.value.price}
             onUpdate:modelValue={updateProductInfo('price', $event)}
-            v-slots={priceSlots}/>
+            v-slots={{
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={openDialogInfo('price')}>icon-keyboard</g-icon>
+            }}/>
 
         <g-switch
-            model-value={selectedProduct.isModifier}
+            model-value={selectedProduct.value.isModifier}
             onUpdate:modelValue={updateProduct({ isModifier: $event })}/>
         <div style="font-size: 13px">{t('article.isModifier')}</div>
       </>
     }
 
     function renderPrinterSetting() {
-      if (selectedProduct && !selectedProduct.isModifier) {
+      if (selectedProduct.value && !selectedProduct.value.isModifier) {
         return (
             <div>
               <div class="product-editor__prop">
@@ -208,7 +237,7 @@ export default {
             <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
             <g-grid-select
                 mandatory
-                v-model={selectedProduct.taxCategory}
+                v-model={selectedProduct.value.taxCategory}
                 item-value="_id"
                 items={dineInTaxes} itemCols="auto"
                 v-slot={dineInTaxSlots}/>
@@ -218,7 +247,7 @@ export default {
             <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
             <g-grid-select
                 mandatory
-                v-model={selectedProduct.taxCategory2}
+                v-model={selectedProduct.value.taxCategory2}
                 item-value="_id"
                 items={takeAwayTaxes}
                 itemCols="auto"
@@ -233,7 +262,7 @@ export default {
         <div class="mt-2">
           <div class="product-editor__label">{t('ui.color')}</div>
           <color-selector
-              model-value={selectedProductLayout.color}
+              model-value={selectedProductLayout.value.color}
               colors={colors}
               item-size="25"
               onUpdate:modelValue={updateProductLayout({ color: $event })}/>
@@ -257,7 +286,7 @@ export default {
           </div>
           <div>
             <g-grid-select
-                v-model={selectedProduct.activePopupModifierGroup}
+                v-model={selectedProduct.value.activePopupModifierGroup}
                 item-text="name"
                 item-value="_id"
                 items={popupModifierGroups}
@@ -271,7 +300,7 @@ export default {
       return (
           <dialog-product-info
               v-model={dialog.productInfo}
-              product={selectedProduct}
+              product={selectedProduct.value}
               focus={dialog.focus}
               onSubmit={updateProduct}/>
       )
@@ -281,17 +310,30 @@ export default {
       return (
           <dialog-text-filter
               label="Text"
-              default-value={selectedProductLayout.text}
+              default-value={selectedProductLayout.value.text}
               v-model={dialog.showTextKbd}
               onSubmit={updateProductLayout({ text: $event, type: 'Text' }, $event)}/>
       )
     }
 
     function renderPopupModifierDialog() {
-      return <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct}/>
+      return <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct.value}/>
     }
 
     //// toolbar
+    function renderToolbarButtons() {
+      return <>
+        <portal to={constants.portalLeftButtons}>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={setAction('copy')} disabled={!canCopy}>{t('ui.copy')}</g-btn-bs>
+          { renderDeleteProductToolbarButton() }
+        </portal>
+        <portal to={constants.portalRightButtons}>
+          { renderSwitchProductEditModeButton() }
+        </portal>
+      </>
+    }
+
     // delete button
     const showDeleteConfirmDialog = ref(false)
     function renderDeleteProductToolbarButton() {
@@ -304,6 +346,7 @@ export default {
       </>
     }
 
+    // render switch product editor mode
     const showSwitchEditModeDialog = ref(false)
     const shouldShowSwitchEditModeDialog = ref(true)
     function openSwitchModeDialogIfNeeded() {
@@ -312,63 +355,36 @@ export default {
         shouldShowSwitchEditModeDialog.value = false
       }
     }
-    function closeSwitchDialogMode() {
-      showSwitchEditModeDialog.value = false
-    }
     function changeToIngredientMode() {
       openSwitchModeDialogIfNeeded()
-      updateProductEditMode('ingredient')
-      updateView('IngredientEditor')
-    }
-    function changeToBasicMode() {
-      updateProductEditMode('basic')
-      updateView('CategoryEditor')
+      updateProductEditMode(ProductEditModes.ingredient)
     }
     function renderSwitchProductEditModeButton() {
       return <>
         {
-          mode.value === 'ingredient'
-              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={changeToBasicMode}>{t('inventory.ingredientMode')} </g-btn-bs>
+          view.value.mode === ProductEditModes.ingredient
+              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={updateProductEditMode(ProductEditModes.basic)}>{t('inventory.ingredientMode')} </g-btn-bs>
               : <g-btn-bs elevation="2" icon="icon-basic-mode" onClick={changeToIngredientMode}>{t('inventory.basicMode')} </g-btn-bs>
         }
-        <g-dialog v-model={dialog.switchEditMode.show} eager width="448">
-          <div className="dialog">
-            <div className="dialog-content" onClick={() => {
-              closeSwitchDialogMode();
-              changeToBasicMode()
-            }}>
+        <g-dialog v-model={showSwitchEditModeDialog.value} eager width="448">
+          <div class="dialog" onClick={showSwitchEditModeDialog.value = false}>
+            <div class="dialog-content">
               <g-icon>icon-basic-mode</g-icon>
               <div style="flex: 1; margin-left: 16px">
-                <p className="dialog-content__title">{t('inventory.basicMode')}</p>
-                <p className="dialog-content__detail">{t('inventory.basicNote')}</p>
+                <p class="dialog-content__title">{t('inventory.basicMode')}</p>
+                <p class="dialog-content__detail">{t('inventory.basicNote')}</p>
               </div>
             </div>
-            <div className="dialog-content" onClick={() => {
-              closeSwitchDialogMode();
-              changeToIngredientMode()
-            }}>
+            <div class="dialog-content">
               <g-icon>icon-ingredient-mode</g-icon>
               <div style="flex: 1; margin-left: 16px">
-                <p className="dialog-content__title">{t('inventory.ingredientMode')}</p>
-                <p className="dialog-content__detail">{t('inventory.ingredientNote')}</p>
+                <p class="dialog-content__title">{t('inventory.ingredientMode')}</p>
+                <p class="dialog-content__detail">{t('inventory.ingredientNote')}</p>
               </div>
             </div>
-            <div className="dialog-message">{t('inventory.clickDismiss')}</div>
+            <div class="dialog-message">{t('inventory.clickDismiss')}</div>
           </div>
         </g-dialog>
-      </>
-    }
-
-    function renderToolbarButtons() {
-      return <>
-        <portal to={constants.portalLeftButtons}>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={setAction('switch')} disabled={!canSwitch}>{t('ui.switch')}</g-btn-bs>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={setAction('copy')} disabled={!canCopy}>{t('ui.copy')}</g-btn-bs>
-          { renderDeleteProductToolbarButton() }
-        </portal>
-        <portal to={constants.portalRightButtons}>
-          { renderSwitchProductEditModeButton() }
-        </portal>
       </>
     }
 
