@@ -101,7 +101,7 @@ export default {
                         class="ingredient-editor__input--right"
                         virtual-event
                         v-model={ingredient.amount}
-                        onClick={showKeyboard.value = true}
+                        onClick={() => showKeyboard.value = true}
                         onUpdate:modelValue={debounceUpdateAmount}></g-text-field-bs>
                   </div>
               )}
@@ -112,7 +112,7 @@ export default {
               {
                 (showKeyboard.value) && <>
                   <div class="ingredient-editor__keyboard">
-                    <div class="ingredient-editor__overlay" onClick={showKeyboard.value = false}></div>
+                    <div class="ingredient-editor__overlay" onClick={() => showKeyboard.value = false}></div>
                     <div class="ingredient-editor__keyboard-wrapper">
                       <pos-keyboard-full onEnterPressed={showKeyboard.value = false}></pos-keyboard-full>
                     </div>

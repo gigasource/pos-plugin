@@ -16,6 +16,7 @@
     props: {},
     setup() {
       function renderContextEditor() {
+        console.log('renderContextEditor', view.value.name)
         switch (view.value.name) {
           case 'CategoryEditor':
             return <category-editor2/>

@@ -3,20 +3,22 @@
 import InputNumber2 from './InputNumber2';
 import {selectedCategoryLayout} from '../OrderView/pos-ui-shared';
 import {keyboardConfig, updateKeyboardConfig} from '../OrderView/order-layout-keyboard';
-import {reactive} from 'vue';
+import {reactive, computed} from 'vue';
+import { useI18n } from 'vue-i18n'
+import { getScopeId } from '../../utils/helpers';
 
 export default {
   name: 'KeyboardEditor2.vue',
   components: {InputNumber2},
   props: {},
   setup() {
+    const { t } = useI18n()
     const state = reactive({
       dialog: false,
       mouseDownCell: { x: 0, y: 0 },
       mouseCurrentCell: { x: 0, y: 0 },
       selecting: false
     })
-
     const active = computed({
       get: () => {
         if(keyboardConfig.value)
@@ -27,7 +29,6 @@ export default {
         _updateKeyboardConfig({active: val})
       }
     })
-
     const onlyShowInFirstPage = computed({
       get() {
         if(keyboardConfig.value) {
@@ -171,11 +172,10 @@ export default {
       state.dialog = false
     }
 
-    // template
-    return () => <>
+    return getScopeId(() => <>
       <div class="keyboard-editor">
         <div class="keyboard-editor__title">{t('restaurant.menuEdit.keyboardPosition')}</div>
-        <g-btn-bs elevation="2" style="margin: 0 0 12px" onClick={state.dialog = true} icon="select_all">{t('ui.choose')}</g-btn-bs>
+        <g-btn-bs elevation="2" style="margin: 0 0 12px" onClick={() => state.dialog = true} icon="select_all">{t('ui.choose')}</g-btn-bs>
         <div class="keyboard-editor__title">{t('restaurant.menuEdit.expansionColumn')} </div>
         <div class="row-flex">
           <input-number2 width="148" modelValue={extraColumns.value} onUpdate:modelvalue={changeExtraColumns}></input-number2>
@@ -212,7 +212,7 @@ export default {
           </div>
         </g-dialog>
       </div>
-    </>
+    </>)
   }
 }
 </script>

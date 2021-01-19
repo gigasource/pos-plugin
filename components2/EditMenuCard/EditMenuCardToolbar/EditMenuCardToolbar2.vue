@@ -1,15 +1,16 @@
 <script>
   import { updateView } from '../../OrderView/pos-ui-shared';
-  import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
   import { useRouter } from 'vue-router'
+  import { useI18n } from 'vue-i18n'
 
   import constants from './constants'
 
   export default {
     name: 'EditMenuCardToolbar2',
-    components: { dialogConfirmDelete, PortalTarget },
+    components: { },
     props: {},
     setup() {
+      const { t } = useI18n()
       const router = useRouter()
       function back() {
         router.push({ path: '/pos-dashboard' })
@@ -20,7 +21,7 @@
         return <>
           <portal-target name={constants.portalLeftButtons}></portal-target>
           <g-spacer></g-spacer>
-          <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
+          <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={() => updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
           <portal-target name={constants.portalRightButtons}></portal-target>
         </>
       }

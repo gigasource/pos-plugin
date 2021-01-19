@@ -1,4 +1,4 @@
-import { reactive, watch, computed, onActivated } from 'vue'
+import { reactive, watch, computed, onActivated, ref } from 'vue'
 import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import cms from 'cms';
@@ -52,7 +52,7 @@ export async function loadTaxes() {
 
 
 //// <editor-fold desc="Printer stuff">
-export const printers = ref(null)
+export const printers = ref([])
 export const isPrinter2Select = ref(false)
 // boolean value indicate whether "+2. printer" button should be shown
 export const showAddPrinter2 = computed(() => (
@@ -112,28 +112,38 @@ export async function setAsNoPrint() {
 }
 
 // categories // what???
-export const categories = ref(null)
+export const categories = ref([])
 export const loadCategories = async () => {
   categories.value = await cms.getModel('Category').find()
 }
-
 export async function changeCategory(category) {
   await updateProduct({ category: category._id })
 }
 
+
 // todo: meaning??
 export const layoutType = ref('default')
+
 
 // modifier
 export const popupModifierGroups = ref([])
 export const loadPopupModifierGroups = async () => {
   popupModifierGroups.value = await cms.getModel('PosModifierGroup').find()
 }
-
 export function changePopupModifierGroup(group) {
   return updateProduct({ activePopupModifierGroup: group && group._id })
 }
+export const addPopupModifierGroup = (toggleSelect, item) => {
+  toggleSelect(item)
+  changePopupModifierGroup(item).then(resolve => resolve())
+}
+export const clearPopupModifierGroup = (toggleSelect, item) => {
+  toggleSelect(item)
+  changePopupModifierGroup(null).then(resolve => resolve())
+}
 
+
+// product layout
 export async function updateProductLayout(change, forceCreate) {
   updateSelectedProductLayout({ ...selectedProductLayout.value, ...change })
   if (selectedProductLayout.value._id) {
@@ -148,7 +158,24 @@ export async function updateProductLayout(change, forceCreate) {
     showNotify()
   }
 }
+export async function createNewProductLayout(productId, extraInfo) {
+  const productLayout = {
+    product: productId,
+    ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
+    ...extraInfo
+  }
+  const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
+  updateOrderLayout(result)
+}
+export const debounceUpdateTextLayout = _.debounce(function(key, val) {
+  updateTextLayout({ [key]: val }, !selectedProduct.value._id).then(res => res())
+}, 300)
+async function updateTextLayout(change) {
+  const forceCreate = !selectedProductLayout._id;
+  await updateProductLayout(change, forceCreate)
+}
 
+// product
 export async function updateProduct(change, forceCreate) {
   console.log('storing', change, 'to internal variable selectedProduct')
   selectedProduct.set({ ...selectedProduct, ...change })
@@ -167,45 +194,13 @@ export async function updateProduct(change, forceCreate) {
     }
   }
 }
-
-export async function createNewProductLayout(productId, extraInfo) {
-  const productLayout = {
-    product: productId,
-    ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
-    ...extraInfo
-  }
-  const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
-  updateOrderLayout(result)
-}
-
-
 export function setProductInfo(propName, propValue) {
   selectedProduct[propName] = propValue
 }
-
 export const debouncedUpdateProduct = _.debounce((key, val) => {
   updateProduct({ [key]: val }, !selectedProduct._id).then(res => res())
 }, 300)
 
-
-async function updateTextLayout(change) {
-  const forceCreate = !selectedProductLayout._id;
-  await updateProductLayout(change, forceCreate)
-}
-
-export const debounceUpdateTextLayout = _.debounce(function(key, val) {
-  updateTextLayout({ [key]: val }, !selectedProduct.value._id).then(res => res())
-}, 300)
-
-export const addPopupModifierGroup = (toggleSelect, item) => {
-  toggleSelect(item)
-  changePopupModifierGroup(item).then(resolve => resolve())
-}
-
-export const clearPopupModifierGroup = (toggleSelect, item) => {
-  toggleSelect(item)
-  changePopupModifierGroup(null).then(resolve => resolve())
-}
 
 // delete
 export const canDelete = computed(() => selectedProductLayout.value && selectedProductLayout.value._id)

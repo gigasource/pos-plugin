@@ -11,7 +11,7 @@ import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
-export const orderLayout = ref(null);
+export const orderLayout = ref({ categories: [] });
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
 export const selectedProduct = computed({
