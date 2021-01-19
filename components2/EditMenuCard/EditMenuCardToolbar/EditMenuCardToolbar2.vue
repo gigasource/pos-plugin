@@ -2,14 +2,16 @@
   import { updateView } from '../../OrderView/pos-ui-shared';
   import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
   import { useRouter } from 'vue-router'
+  import { useI18n } from 'vue-i18n'
 
   import constants from './constants'
 
   export default {
     name: 'EditMenuCardToolbar2',
-    components: { dialogConfirmDelete, PortalTarget },
+    components: { PortalTarget },
     props: {},
     setup() {
+      const { t } = useI18n()
       const router = useRouter()
       function back() {
         router.push({ path: '/pos-dashboard' })

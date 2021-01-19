@@ -3,13 +3,16 @@
 import InputNumber2 from './InputNumber2';
 import {selectedCategoryLayout} from '../OrderView/pos-ui-shared';
 import {keyboardConfig, updateKeyboardConfig} from '../OrderView/order-layout-keyboard';
-import {reactive} from 'vue';
+import {reactive, computed} from 'vue';
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'KeyboardEditor2.vue',
   components: {InputNumber2},
   props: {},
   setup() {
+    const { t } = useI18n()
+
     const state = reactive({
       dialog: false,
       mouseDownCell: { x: 0, y: 0 },
