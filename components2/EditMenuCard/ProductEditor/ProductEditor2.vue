@@ -48,7 +48,7 @@ export default {
       showTextKbd: false,
     })
 
-    export function openDialogInfo(focus) {
+    function openDialogInfo(focus) {
       dialog.focus = focus
       dialog.productInfo = true
     }
@@ -66,17 +66,17 @@ export default {
 
 
     // styles
-    export const noPrintClasses = computed(() => ({
+    const noPrintClasses = computed(() => ({
       'prop-option': true,
       'prop-option--1': selectedProduct.value.isNoPrint,
     }))
 
-    export const itemNoteClasses = computed(() => ({
+    const itemNoteClasses = computed(() => ({
       'prop-option': true,
       'prop-option--1': selectedProduct.value.isItemNote,
     }))
 
-    export const getPrinterClass = (printer) => {
+    const getPrinterClass = (printer) => {
       return {
         'prop-option': true,
         'prop-option--1': selectedProduct.value.groupPrinter && selectedProduct.value.groupPrinter._id === printer,
