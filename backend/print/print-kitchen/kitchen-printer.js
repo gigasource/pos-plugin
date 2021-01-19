@@ -2,6 +2,7 @@ const _ = require('lodash')
 const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils')
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer')
+const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
   cms.on('run:print', async function (commit) {
@@ -37,7 +38,7 @@ async function printKitchen({order, device}, callback = () => null) {
     const receipts = getReceiptsFromOrder(order);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
-    const {useVirtualPrinter} = posSetting.generalSetting
+    const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo
@@ -85,7 +86,7 @@ async function printKitchenCancel({order, device}, callback = () => null) {
     const receipts = getReceiptsFromOrder(order);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
-    const {useVirtualPrinter} = posSetting.generalSetting
+    const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo

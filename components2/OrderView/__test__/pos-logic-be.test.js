@@ -46,6 +46,9 @@ const {
   prepareOrderTest,
   checkOrderCreated
 } = require('../../../backend/order/order.prepare.test')
+const {
+  prepareKitchenPrinter
+} = require('../../../backend/print/print-kitchen/kitchen-printer.prepare.test')
 
 //jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
 require("mockdate").set(new Date("2021-01-01").getTime());
@@ -76,6 +79,7 @@ const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
 const feSocket = new Socket()
 
 beforeAll(async () => {
+  await cms.init()
   orm.registerSchema("Order", {
     items: [{}]
   });
@@ -90,6 +94,7 @@ beforeAll(async () => {
   orm.emit("commit:flow:setMaster", true);
   prepareActionCommitTest(cms)
   prepareOrderTest(cms)
+  prepareKitchenPrinter(cms)
   feSocket.connect('frontend')
 });
 
@@ -451,15 +456,17 @@ describe("pos-logic", function() {
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
 
-  it("case 14a: create Order + addProduct + togglePrint", async function(done) {
+  it("case 14a: create Order + addProduct + togglePrint + printToKitchen", async function(done) {
     prepareOrder("10");
     const order = getCurrentOrder();
     await nextTick();
-    addProduct(order, mockProduct);
+    const _mockProduct = _.cloneDeep(mockProduct)
+    _mockProduct.groupPrinter.name = "Kitchen"
+    addProduct(order, _mockProduct);
     await nextTick();
     console.log(actionList.value)
     expect(stringify(actionList.value)).toMatchSnapshot();
-    createPrintAction('kitchenAdd', order.value, actionList.value)
+    createPrintAction('kitchenAdd', order, actionList.value)
     cms.once('run:print', function (commit) {
       expect(stringify(actionList.value)).toMatchSnapshot();
       expect(stringify(commit)).toMatchSnapshot()
