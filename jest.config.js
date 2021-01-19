@@ -15,7 +15,8 @@ module.exports = {
     "<rootDir>/node_modules/(?!pos-vue-framework)",
   ],
   moduleNameMapper: {
-    "vue-router": "<rootDir>/../../backoffice/node_modules/vue-router"
+    "vue-router": "<rootDir>/../../backoffice/node_modules/vue-router",
+    "vue-i18n":"<rootDir>/../../backoffice/node_modules/vue-i18n"
   },
   snapshotSerializers: ["jest-serializer-html"],
   //todo: remove setupFiles

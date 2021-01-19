@@ -17,20 +17,20 @@ const delay = require("delay");
 import {nextTick} from 'vue'
 import { updateOrderLayout } from '../../OrderView/pos-ui-shared';
 import constants from '../EditMenuCardToolbar/constants'
-import { Portal } from 'portal-vue/dist/portal-vue.esm'
 import OrderLayoutEditor2 from '../OrderLayoutEditor2';
+import { genScopeId } from '../../utils';
 
 describe('order-layout-editor', () => {
   it('should show if orderLayout is not initialize', async () => {
     updateOrderLayout(null)
     const Root = {
       name: 'Root',
-      components: {OrderLayoutEditor2, Portal},
+      components: {OrderLayoutEditor2},
       setup() {
-        return () => <>
+        return genScopeId(() => <div>
           <order-layout-editor2></order-layout-editor2>
-          <Portal to={constants.portalLeftButtons}></Portal>
-        </>
+          <portal to={constants.portalLeftButtons}></portal>
+        </div>)
       }
     }
     makeWrapper(Root, {

@@ -101,7 +101,7 @@ export default {
         <g-text-field
             modelValue={selectedProductLayout.value.text}
             onUpdate:modelValue={e => debounceUpdateTextLayout('text', e)}
-            v-slot={{
+            v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer" onClick={() => dialog.showTextKbd = true}>icon-keyboard</g-icon>
             }}/>
       </>
@@ -195,7 +195,7 @@ export default {
       }
 
       const takeAwayTaxSlots = {
-        default: (toggleSelect, item, index) => <>
+        default: ({toggleSelect, item, index}) => <>
           <div class="prop-option" onClick={e => {
             toggleSelect(item);
             updateProduct({ tax2: item.value, taxCategory2: item._id })
@@ -203,7 +203,7 @@ export default {
             {item.text} ({item.value}%)
           </div>
         </>,
-        selected: (toggleSelect, item, index) => <>
+        selected: ({toggleSelect, item, index}) => <>
           <div class="prop-option prop-option--1" onClick={e => {
             toggleSelect(item);
             updateProduct({ tax2: item.value, taxCategory2: item._id })
@@ -223,7 +223,7 @@ export default {
                 v-model={selectedProduct.value.taxCategory}
                 item-value="_id"
                 items={dineInTaxes.value} itemCols="auto"
-                v-slot={dineInTaxSlots}/>
+                v-slots={dineInTaxSlots}/>
           </div>
 
           <div class="col-6">
@@ -254,13 +254,6 @@ export default {
     }
 
     function renderPopupModifier() {
-      const popupModifierSlots = {
-        default: (toggleSelect, item, index) =>
-            <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
-        selected: (toggleSelect, item, index) =>
-            <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={() => clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
-      }
-
       return <>
         <div class="mt-2">
           <div class="row-flex justify-between">
@@ -273,7 +266,12 @@ export default {
                 item-text="name"
                 item-value="_id"
                 items={popupModifierGroups.value}
-                itemCols="auto" v-slots={popupModifierSlots}/>
+                itemCols="auto" v-slots={{
+                  default: ({toggleSelect, item, index}) =>
+                      <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
+                  selected: ({toggleSelect, item, index}) =>
+                      <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={() => clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
+                }}/>
           </div>
         </div>
       </>
@@ -381,7 +379,6 @@ export default {
     }
 
     setLayoutTypeByRouteQuery()
-
     onActivated(() => setLayoutTypeByRouteQuery())
     async function _created() {
       await loadPrinters()
