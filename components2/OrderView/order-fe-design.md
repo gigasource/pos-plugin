@@ -43,7 +43,8 @@
   * [_] test backend
 * [_] move items
 * [_] move items -> test backend
-* [_] tip
+* [_] tip -> vSum 
+* [_] cashback -> payment > vSum -> cashback
 
 * [_] test thu cho khi ghep vao no se nhu the nao ?
 * [x] compact order

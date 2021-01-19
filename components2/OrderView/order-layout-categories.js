@@ -6,13 +6,9 @@ import {
   getGridTemplateFromNumber,
   orderLayout,
   selectedCategoryLayout,
-  selectedLayoutType,
-  selectedProductLayout,
   updateSelectedCategoryLayout,
-  updateSelectedLayoutType,
   updateSelectedProductLayout,
-  updateView,
-  view
+  updateView
 } from './pos-ui-shared';
 import {category} from "./order-layout-setting-logic";
 import {isSameArea} from "../../components/posOrder/util";
