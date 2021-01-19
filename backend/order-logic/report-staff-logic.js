@@ -6,8 +6,10 @@ const _ = require('lodash');
 
 async function staffReport(from, to) {
   const query = {
-    ...from && {from},
-    ...to && {to}
+    date: {
+      ...from && {$gte: from},
+      ...to && {$lte: to},
+    }
   };
 
   let orders = await Order.find(query);

@@ -1,5 +1,6 @@
 const { stringify } = require('schemahandler/utils')
 const { cmsFactory } = require('../../../test-utils')
+const moment = require('moment')
 const {
 	preparePrintReport
 } = require('./print-report.prepare.test')
@@ -33,6 +34,6 @@ describe('Test print report', function () {
 	})
 
 	it('Case 3: Staff report', async () => {
-
+		const result = printInvoiceHandler('StaffReport', {staffName: 'Waiter 1', from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('06.01.2021', 'DD.MM.YYYY').toDate()})
 	})
 })
