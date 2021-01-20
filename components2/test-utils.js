@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {config, mount} from "@vue/test-utils";
 import {hooks} from "./OrderView/pos-logic";
 import {disablePay, payBtnClickable, payPrintMode, showIcon} from "./OrderView/pos-logic-be";
+import StubFactory from './StubFactory';
 
 jest.mock("vue-i18n", () => {
   return {
@@ -16,7 +17,6 @@ jest.mock("vue-i18n", () => {
     }
   };
 });
-
 jest.mock("vue-router", () => {
   return {
     useRoute() {
@@ -154,6 +154,7 @@ export const makeWrapper = (_component, options, useDefaults = true) => {
         'g-tabs': true,
         'g-tab-item': true,
         'pos-textfield-new': true,
+        'g-grid-select': StubFactory('g-grid-select')
       },
       mocks: {
         t: a => a,

@@ -38,6 +38,7 @@ const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'
 export default {
   name: 'ProductEditor2.vue',
   props: {},
+  components: {}, // TODO: update component
   setup() {
     const { t } = useI18n()
     const router = useRouter()
@@ -175,46 +176,45 @@ export default {
 
     function renderTax() {
       const dineInTaxSlots = {
-        default: ({ toggleSelect, item, index }) => <>
-          <div class="prop-option"
-               onClick={e => {
-                 toggleSelect(item);
-                 updateProduct({ tax: item.value, taxCategory: item._id })
-               }}>
+        default: ({ toggleSelect, item, index }) => (
+           <div class="prop-option"
+                      onClick={e => {
+                        toggleSelect(item);
+                        updateProduct({ tax: item.value, taxCategory: item._id })
+                      }}>
             {item.text} ({item.value}%)
           </div>
-        </>,
-        selected: ({ toggleSelect, item, index }) => <>
+        ),
+        selected: ({ toggleSelect, item, index }) => (
           <div class="prop-option prop-option--1"
                onClick={e => {
                  toggleSelect(item);
                  updateProduct({ tax: item.value, taxCategory: item._id })
                }}>{item.text} ({item.value}%)
           </div>
-        </>
+        )
       }
 
       const takeAwayTaxSlots = {
-        default: ({toggleSelect, item, index}) => <>
+        default: ({toggleSelect, item, index}) => (
           <div class="prop-option" onClick={e => {
             toggleSelect(item);
             updateProduct({ tax2: item.value, taxCategory2: item._id })
           }}>
             {item.text} ({item.value}%)
           </div>
-        </>,
-        selected: ({toggleSelect, item, index}) => <>
+        ),
+        selected: ({toggleSelect, item, index}) => (
           <div class="prop-option prop-option--1" onClick={e => {
             toggleSelect(item);
             updateProduct({ tax2: item.value, taxCategory2: item._id })
           }}>
             {item.text} ({item.value}%)
           </div>
-        </>
-
+        )
       }
 
-      return <>
+      return (
         <div class="row-flex mt-2 product-editor__tax">
           <div class="col-6">
             <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
@@ -222,7 +222,8 @@ export default {
                 mandatory
                 v-model={selectedProduct.value.taxCategory}
                 item-value="_id"
-                items={dineInTaxes.value} itemCols="auto"
+                items={dineInTaxes.value}
+                itemCols="auto"
                 v-slots={dineInTaxSlots}/>
           </div>
 
@@ -237,7 +238,7 @@ export default {
                 v-slots={takeAwayTaxSlots}/>
           </div>
         </div>
-      </>
+      )
     }
 
     function renderColor() {

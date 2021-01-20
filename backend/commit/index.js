@@ -147,6 +147,6 @@ module.exports = async function (cms) {
 	await cms.emit('connectToMaster')
 
 	orm.plugin(require('./orderCommit'))
-	orm.plugin(require('./actionCommit'))
+	orm.plugin(require('./actionCommit'), cms)
 	orm.plugin(require('./onlineSocketTransportLayer'))
 }

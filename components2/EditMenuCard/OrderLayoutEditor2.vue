@@ -32,7 +32,7 @@ export default {
         }
       </portal>
       <dialog-form-input v-model={showAddOrderLayoutDialog.value} onSubmit={createLayout} v-slots={{
-        default: () => <>
+        input: () => <>
           <div class="row-flex flex-wrap justify-around mt-2">
             <pos-textfield-new style="width: 48%" label="Column" v-model={column.value} clearable></pos-textfield-new>
             <pos-textfield-new style="width: 48%" label="Row" v-model={row.value} clearable></pos-textfield-new>

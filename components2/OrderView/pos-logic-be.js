@@ -98,7 +98,7 @@ export function addProduct(order, product, quantity) {
 
 //</editor-fold>
 
-function orderBeFactory(id = 0) {
+export function orderBeFactory(id = 0) {
   let order = createOrder();
   orderMap.set(order, id);
 
@@ -139,7 +139,6 @@ function orderBeFactory(id = 0) {
   hooks.on(`pre:prepareOrder:${id}`, function (order) {
     [beItemsSnapshot.value.length, beCancellationItemsSnapshot.value.length] = [0, 0];
     if (typeof order === 'object') {
-      console.log(id, order);
       [beItemsSnapshot.value, beCancellationItemsSnapshot.value] = [_.cloneDeep(order).items || [], _.cloneDeep(order).cancellationItems || []];
     }
   })
@@ -187,11 +186,16 @@ function orderBeFactory(id = 0) {
     hooks.emit(`post:order:update:${id}`, order, true);
   }
 
-  return {
-    actionList, getCurrentOrder, currentTable, prepareOrder,
-    order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
-    startOnetimeSnapshot, finishOnetimeSnapshot
+  async function setNewOrder(newOrder) {
+    if (newOrder.table != order.table) return
+    actionList.value = []
+    hooks.emit(`pre:order:update:${id}`, newOrder, true)
+    hooks.emit(`post:order:update:${id}`, order, true)
   }
+
+  return {actionList, getCurrentOrder, currentTable, prepareOrder,
+    order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
+    startOnetimeSnapshot, finishOnetimeSnapshot, setNewOrder}
 }
 
 export const {

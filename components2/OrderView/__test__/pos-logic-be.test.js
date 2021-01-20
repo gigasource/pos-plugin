@@ -59,11 +59,14 @@ const {cmsFactory} = require("../../../test-utils");
 // These requires must be after globalHooks initialization
 const {
   prepareActionCommitTest
-} = require("../../../backend/commit/actionCommit.prepare.test");
+} = require('../../../backend/commit/actionCommit.prepare.test')
 const {
   prepareOrderTest,
   checkOrderCreated
-} = require("../../../backend/order/order.prepare.test");
+} = require('../../../backend/order/order.prepare.test')
+const {
+  prepareKitchenPrinter
+} = require('../../../backend/print/print-kitchen/kitchen-printer.prepare.test')
 
 //jest.useFakeTimers("modern").setSystemTime(new Date("2021-01-01").getTime());
 require("mockdate").set(new Date("2021-01-01").getTime());
@@ -77,23 +80,25 @@ const {
   makeLastItemDiscount
 } = require("../pos-logic");
 
-const cms = cmsFactory("posLogicBe");
-global.cms = cms;
-const {orm} = cms;
+const cms = cmsFactory('posLogicBe')
+global.cms = cms
+const { orm, feSocket } = cms
 
 const delay = require("delay");
 
-const foodTax = {taxes: [5, 10]};
-const drinkTax = {taxes: [16, 32]};
+const foodTax = { taxes: [5, 10] };
+const drinkTax = { taxes: [16, 32] };
 
-const cola = {name: "Cola", price: 1.3, quantity: 1, ...drinkTax};
-const fanta = {name: "Fanta", price: 2, quantity: 1, ...drinkTax};
-const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
-const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
+const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
+const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
+const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
+const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
 
 const feSocket = new Socket();
+jest.setTimeout(60000)
 
 beforeAll(async () => {
+  await cms.init()
   orm.registerSchema("Order", {
     items: [{}]
   });
@@ -106,9 +111,10 @@ beforeAll(async () => {
   orm.plugin(require("../../../backend/commit/orderCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
-  prepareActionCommitTest(cms);
-  prepareOrderTest(cms);
-  feSocket.connect("frontend");
+  prepareActionCommitTest(cms)
+  prepareOrderTest(cms)
+  prepareKitchenPrinter(cms)
+  cms.triggerFeConnect()
 });
 
 afterEach(async () => {
@@ -593,15 +599,17 @@ describe("pos-logic", function () {
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
 
-  it("case 14a: create Order + addProduct + togglePrint", async function (done) {
+  it("case 14a: create Order + addProduct + togglePrint + printToKitchen", async function(done) {
     prepareOrder("10");
     const order = getCurrentOrder();
     await nextTick();
-    addProduct(order, mockProduct);
+    const _mockProduct = _.cloneDeep(mockProduct)
+    _mockProduct.groupPrinter.name = "Kitchen"
+    addProduct(order, _mockProduct);
     await nextTick();
     console.log(actionList.value)
     expect(stringify(actionList.value)).toMatchSnapshot();
-    createPrintAction('kitchenAdd', order.value, actionList.value)
+    createPrintAction('kitchenAdd', order, actionList.value)
     cms.once('run:print', function (commit) {
       expect(stringify(actionList.value)).toMatchSnapshot();
       expect(stringify(commit)).toMatchSnapshot()

@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-module.exports = async function (orm) {
+module.exports = async function (orm, cms) {
 	if (orm.mode !== 'multi') {
 		let onlineDevice
 
@@ -9,10 +9,13 @@ module.exports = async function (orm) {
 		}))
 
 		orm.on('commit:handler:finish:Action', async function (action, commit) {
-			if (commit.data.printFromClient && onlineDevice && commit.from === onlineDevice.id) {
-				await cms.emit('run:print', action)
-			} else if (commit.data.printFromMaster) {
-				await cms.emit('run:print', action)
+			try {
+				if (commit.data.printFromClient && onlineDevice && commit.from === onlineDevice.id) {
+					await cms.emit('run:print', action)
+				} else if (commit.data.printFromMaster) {
+					await cms.emit('run:print', action)
+				}
+			} catch (e) {
 			}
 		})
 

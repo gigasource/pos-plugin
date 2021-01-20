@@ -1,68 +1,60 @@
 const _ = require('lodash');
+const {
+  eodReport
+} = require('../../order-logic/report-eod-logic')
+const dayjs = require('dayjs')
 
-async function makePrintData(cms, {z}) {
+async function makePrintData(cms, z) {
   const posSetting = await cms.getModel('PosSetting').findOne({});
-  const endOfDayReport = await cms.getModel('EndOfDay').findOne({z});
+  const endOfDayReport = await eodReport(z)
+  const {
+    report,
+    reportByPayment,
+    cancelledReport,
+    paidOrders
+  } = endOfDayReport
 
   if (!endOfDayReport) throw new Error(`z report number ${z} not found`);
 
-  const {begin} = endOfDayReport;
+  const {from} = report;
 
-  let reportData = await new Promise((resolve, reject) => {
-    cms.api.processData('OrderEOD', {z}, result => {
-      if (typeof result === 'string') reject(result);
-      else resolve(result);
-    })
-  });
-
-  const sortedOrders = _.sortBy(reportData.paidOrders, 'date')
+  const sortedOrders = _.sortBy(paidOrders, 'date')
   const firstOrderDate = _.first(sortedOrders).date
   const lastOrderDate = _.last(sortedOrders).date
 
   const {name: companyName, address: companyAddress, telephone: companyTel, taxNumber: companyVatNumber} = posSetting.companyInfo
-  const reportDate = dayjs(begin).format('DD.MM.YYYY')
+  const reportDate = dayjs(from).format('DD.MM.YYYY')
   const firstOrderDateString = dayjs(firstOrderDate).format('DD.MM.YYYY HH:mm')
   const lastOrderDateString = dayjs(lastOrderDate).format('DD.MM.YYYY HH:mm')
-  const {net: subTotal, tax: taxTotal, sum: sumTotal, discount} = reportData.report
-  const {reportByPayment} = reportData
-
-  const reportGroups = _.groupBy(Object.keys(reportData.report), key => {
-    const taxGroup2Chars = key.slice(key.length - 2, key.length) // 2 characters tax - for example 23%
-    const taxGroup1Char = key.slice(key.length - 1, key.length) // 1 character tax - for example 5%
-
-    if (!isNaN(Number.parseInt(taxGroup2Chars))) return taxGroup2Chars
-    if (!isNaN(Number.parseInt(taxGroup1Char))) {
-      return taxGroup1Char
-    } else {
-      return 'other'
-    }
-  })
-
-  delete reportGroups.other
-
-  // put sum, net, total in groups (for example: 0%, 7%, 19%)
-  Object.keys(reportGroups).forEach(percentage => {
-    if (_.isNil(percentage)) return
-
-    const obj = {}
-    reportGroups[percentage].forEach(data => {
-      // data is sum, net, total, ...
-      obj[data] = _.get(reportData.report, data)
-    })
-
-    reportGroups[percentage] = obj
-  })
 
   return {
-    companyName, companyAddress, companyTel, companyVatNumber, reportDate, firstOrderDateString, lastOrderDateString,
-    subTotal, taxTotal, sumTotal, discount: discount || 0, reportByPayment, reportGroups, z
+    companyName,
+    companyAddress,
+    companyTel,
+    companyVatNumber,
+    reportDate,
+    firstOrderDateString,
+    lastOrderDateString,
+    vTaxSum: report.vTaxSum,
+    discount: report.vDiscount || 0,
+    reportByPayment,
+    z
   }
 }
 
 async function printEscPos(escPrinter, printData) {
   const {
-    companyName, companyAddress, companyTel, companyVatNumber, reportDate, firstOrderDateString, lastOrderDateString,
-    subTotal, taxTotal, sumTotal, discount, reportByPayment, reportGroups, z,
+    companyName,
+    companyAddress,
+    companyTel,
+    companyVatNumber,
+    reportDate,
+    firstOrderDateString,
+    lastOrderDateString,
+    vTaxSum,
+    discount,
+    reportByPayment,
+    z
   } = printData;
 
   function convertMoney(value) {
@@ -98,18 +90,18 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.println('Sales');
   escPrinter.bold(false);
-  escPrinter.leftRight("Total", convertMoney(sumTotal));
-  escPrinter.leftRight("Sub-total", convertMoney(subTotal));
-  escPrinter.leftRight("Tax", convertMoney(taxTotal));
+  escPrinter.leftRight("Total", convertMoney(vTaxSum.gross));
+  escPrinter.leftRight("Sub-total", convertMoney(vTaxSum.net));
+  escPrinter.leftRight("Tax", convertMoney(vTaxSum.tax));
   escPrinter.bold(true);
   escPrinter.drawLine();
 
   escPrinter.bold(false);
-  Object.keys(reportGroups).forEach(key => {
+  Object.keys(vTaxSum.vTaxSum).forEach(key => {
     escPrinter.println(`Tax (${key}%)`);
-    escPrinter.leftRight('Total', convertMoney(reportGroups[key][`sum${key}`]));
-    escPrinter.leftRight('Sub-total', convertMoney(reportGroups[key][`net${key}`]));
-    escPrinter.leftRight('Tax', convertMoney(reportGroups[key][`tax${key}`]));
+    escPrinter.leftRight('Total', convertMoney(vTaxSum.vTaxSum[key]['gross']));
+    escPrinter.leftRight('Sub-total', convertMoney(vTaxSum.vTaxSum[key]['net']));
+    escPrinter.leftRight('Tax', convertMoney(vTaxSum.vTaxSum[key]['tax']));
     escPrinter.newLine();
   });
 
@@ -128,8 +120,17 @@ async function printEscPos(escPrinter, printData) {
 
 async function printCanvas(canvasPrinter, printData) {
   const {
-    companyName, companyAddress, companyTel, companyVatNumber, reportDate, firstOrderDateString, lastOrderDateString,
-    subTotal, taxTotal, sumTotal, discount, reportByPayment, reportGroups, z,
+    companyName,
+    companyAddress,
+    companyTel,
+    companyVatNumber,
+    reportDate,
+    firstOrderDateString,
+    lastOrderDateString,
+    vTaxSum,
+    discount,
+    reportByPayment,
+    z
   } = printData;
 
   function convertMoney(value) {
@@ -163,21 +164,21 @@ async function printCanvas(canvasPrinter, printData) {
 
   await canvasPrinter.println('Sales');
   await canvasPrinter.bold(false);
-  await canvasPrinter.leftRight("Total", convertMoney(sumTotal));
-  await canvasPrinter.leftRight("Sub-total", convertMoney(subTotal));
-  await canvasPrinter.leftRight("Tax", convertMoney(taxTotal));
+  await canvasPrinter.leftRight("Total", convertMoney(vTaxSum.gross));
+  await canvasPrinter.leftRight("Sub-total", convertMoney(vTaxSum.net));
+  await canvasPrinter.leftRight("Tax", convertMoney(vTaxSum.tax));
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
 
-  const groupTypes = Object.keys(reportGroups);
+  const groupTypes = Object.keys(vTaxSum.vTaxSum);
   for (let i = 0; i < groupTypes.length; i++) {
     const groupType = groupTypes[i];
     await canvasPrinter.println(`Tax (${groupType}%)`);
-    await canvasPrinter.leftRight('Total', convertMoney(reportGroups[groupType][`sum${groupType}`]));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(reportGroups[groupType][`net${groupType}`]));
-    await canvasPrinter.leftRight('Tax', convertMoney(reportGroups[groupType][`tax${groupType}`]));
+    await canvasPrinter.leftRight('Total', convertMoney(vTaxSum.vTaxSum[groupType]['gross']));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(vTaxSum.vTaxSum[groupType]['net']));
+    await canvasPrinter.leftRight('Tax', convertMoney(vTaxSum.vTaxSum[groupType]['tax']));
     await canvasPrinter.newLine();
   }
 

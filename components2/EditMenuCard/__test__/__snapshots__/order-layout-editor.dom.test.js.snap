@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`order-layout-editor should hide add button if orderLayout is initialized 1`] = `
+<div>
+  <portal-stub to="portal-left-buttons">
+  </portal-stub>
+  <dialog-form-input-stub>
+  </dialog-form-input-stub>
+</div>
+`;
+
+exports[`order-layout-editor should show add button if orderLayout is not initialized with predefined dialog { column=4, row=2 } 1`] = `
+<div>
+  <portal-stub to="portal-left-buttons">
+  </portal-stub>
+  <g-dialog-stub modelvalue="false"
+                 width="90%"
+                 eager="true"
+                 fullscreen="false"
+  >
+    <div class="dialog-input col-flex">
+      <g-icon-stub class="close-icon">
+        icon-close@20
+      </g-icon-stub>
+      <div class=" col-flex flex-grow-1 overflow-y pb-3">
+        <div class="flex-grow-1">
+          <div class="row-flex flex-wrap justify-around mt-2">
+            <g-text-field-bs-stub class="bs-tf__pos"
+                                  large="true"
+                                  label="Column"
+                                  clearable="true"
+                                  required="false"
+                                  modelvalue="4"
+                                  disabled="false"
+                                  style="width: 48%;"
+            >
+            </g-text-field-bs-stub>
+            <g-text-field-bs-stub class="bs-tf__pos"
+                                  large="true"
+                                  label="Row"
+                                  clearable="true"
+                                  required="false"
+                                  modelvalue="2"
+                                  disabled="false"
+                                  style="width: 48%;"
+            >
+            </g-text-field-bs-stub>
+          </div>
+        </div>
+      </div>
+      <div style="max-height: 50%;">
+        <div class="keyboard">
+          <pos-keyboard-full-stub type="alphanumeric">
+          </pos-keyboard-full-stub>
+        </div>
+      </div>
+    </div>
+  </g-dialog-stub>
+</div>
+`;
+
+exports[`order-layout-editor should show add order layout if orderLayout is not initialize 1`] = `
+<div>
+  <portal-stub to="portal-left-buttons">
+    <g-btn-bs-stub text-color="#1271FF"
+                   elevation="2"
+                   icon="add_circle"
+    >
+      ui.add
+    </g-btn-bs-stub>
+  </portal-stub>
+  <dialog-form-input-stub>
+  </dialog-form-input-stub>
+</div>
+`;
