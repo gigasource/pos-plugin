@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-module.exports = async function (orm) {
+module.exports = async function (orm, cms) {
 	if (orm.mode !== 'multi') {
 		let onlineDevice
 

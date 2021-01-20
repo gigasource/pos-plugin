@@ -64,7 +64,7 @@ const {
 
 const cms = cmsFactory('posLogicBe')
 global.cms = cms
-const { orm } = cms
+const { orm, feSocket } = cms
 
 const delay = require("delay");
 
@@ -76,7 +76,7 @@ const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
 const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
 const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
 
-const feSocket = new Socket()
+jest.setTimeout(60000)
 
 beforeAll(async () => {
   await cms.init()
@@ -95,7 +95,7 @@ beforeAll(async () => {
   prepareActionCommitTest(cms)
   prepareOrderTest(cms)
   prepareKitchenPrinter(cms)
-  feSocket.connect('frontend')
+  cms.triggerFeConnect()
 });
 
 afterEach(async () => {

@@ -2,11 +2,28 @@ const orderUtil = require('../../components/logic/orderUtil')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
 const mongoose = require('mongoose');
+const AwaitLock = require('await-lock').default
 
 module.exports = (cms) => {
+  let feSocket = null
   const { orm } = cms
-  cms.socket.on('connect', async (socket) => {
+  const feSocketLock = new AwaitLock()
 
+  orm.on('commit:handler:finish:Order', async function (result, commit) {
+    if (!feSocketLock.tryAcquire()) return
+    setTimeout(async () => {
+      feSocketLock.release()
+      const order = await orm('Order').findOne({
+        table: commit.data.table,
+        status: 'inProgress'
+      })
+      if (feSocket && order)
+        feSocket.emit('update-table', order)
+    }, 500)
+  })
+
+  cms.socket.on('connect', async (socket) => {
+    feSocket = socket
     socket.on('print-to-kitchen', async (actionList) => {
       await execAllChain(actionList)
     })
