@@ -11,6 +11,7 @@
             </div>
           </div>
         </template>
+
         <div class="delivery-info__customer">
           <template v-if="!isNewCustomer">
             <div
@@ -82,23 +83,29 @@
             </p>
             <p class="fs-small text-grey-darken-1">{{calls[0].customer.name}}</p>
           </div>
+
           <div :class="['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']"
                @click="chooseCustomer('pickup')">
             <g-icon size="20">icon-take-away</g-icon>
           </div>
+
           <div :class="['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']"
                @click="chooseCustomer('delivery')">
             <g-icon size="20">icon-delivery-scooter</g-icon>
           </div>
+
           <div class="delivery-info__call-btn--cancel" @click="deleteCall()">
             <g-icon color="white">clear</g-icon>
           </div>
+
         </div>
         <template v-else>
+          <!-- no pendings -->
           <div class="delivery-info__call--empty">
             <p class="fw-700">Empty</p>
             <p class="text-grey-darken-1">No pending calls</p>
           </div>
+          <!-- miss call -->
           <g-menu v-model="menuMissed" v-if="missedCalls && missedCalls.length > 0" top left nudge-top="5">
             <template v-slot:activator="{on}">
               <div v-on="on"
@@ -109,6 +116,7 @@
                 </div>
               </div>
             </template>
+
             <div class="menu-missed">
               <div class="menu-missed__call" v-for="(call, i) in missedCalls" :key="`missed_${i}`">
                 <div class="menu-missed__call--info">
@@ -135,6 +143,7 @@
         </template>
       </div>
     </div>
+
     <div class="delivery-order">
       <template v-if="deliveryOrderMode === 'mobile'">
         <g-spacer/>
@@ -170,6 +179,7 @@
         </g-btn-bs>
       </template>
     </div>
+
     <div class="delivery-detail">
       <div class="delivery-detail__info">
         <g-avatar size="36">
@@ -233,6 +243,7 @@
         </div>
       </template>
     </dialog-form-input>
+
     <g-dialog v-model="dialog.order" width="500" eager>
       <g-card class="dialog r">
         <g-icon class="dialog-icon--close" @click="closeDialogConfirm" size="20">icon-close</g-icon>
@@ -269,6 +280,7 @@
         </g-btn-bs>
       </g-card>
     </g-dialog>
+
     <g-dialog v-model="dialog.choice" eager width="500">
       <g-card class="dialog r">
         <g-icon class="dialog-icon--close" @click="dialog.choice = false" size="20">icon-close</g-icon>
@@ -312,7 +324,9 @@
         </div>
       </g-card>
     </g-dialog>
+
     <dialog-text-filter v-model="dialog.note" label="Delivery note" @submit="e => { note = e }"/>
+
     <div v-if="showKeyboard" class="keyboard">
       <div class="keyboard-overlay" @click="hideKeyboard"></div>
       <div class="keyboard-wrapper">
