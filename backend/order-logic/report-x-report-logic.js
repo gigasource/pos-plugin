@@ -6,8 +6,10 @@ const _ = require('lodash');
 
 async function xReport(from, to) {
   const query = {
-    ...from && {from},
-    ...to && {to},
+    date: {
+      ...from && {$gte: from},
+      ...to && {$lte: to},
+    },
     status: "paid"
   };
 

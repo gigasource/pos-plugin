@@ -25,7 +25,7 @@ import {
   changeCategoryRow,
 } from './category-editor-order-layout'
 
-export  default {
+export default {
   name: 'CategoryEditor2',
   components: { PosKeyboardFull, InputNumber, ColorSelector },
   setup() {
@@ -55,10 +55,10 @@ export  default {
       <g-text-field-bs
           border-color="#979797"
           modelValue={categoryName.value}
-          onUpdate:modelValue={newName => debouncedUpdateCategory({ name: newName })}>
-        <template v-slot:append-inner>
-          <g-icon style="cursor: pointer" onClick={() => showCategoryNameKbd.value = true}>icon-keyboard</g-icon>
-        </template>
+          onUpdate:modelValue={newName => debouncedUpdateCategory({ name: newName })}
+          v-slots={{
+            'append-inner': () => <g-icon style="cursor: pointer" onClick={() => showCategoryNameKbd.value = true}>icon-keyboard</g-icon>
+          }}>
       </g-text-field-bs>
     </>)
 
@@ -115,10 +115,10 @@ export  default {
         }}></dialog-confirm-delete>
       </>
     }
-    let renderToolbarButtons = () => <Portal to={constants.portalLeftButtons}>
+    let renderToolbarButtons = () => <portal to={constants.portalLeftButtons}>
       <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch.value}>{t('ui.switch')}</g-btn-bs>
       { renderDeleteCategoryToolbarButton() }
-    </Portal>
+    </portal>
 
     // entire render
     let renderCategoryEditor = () => <>

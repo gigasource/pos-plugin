@@ -1,4 +1,4 @@
-import {mergeVTaxGroup} from "./pos-logic";
+import {mergeVTaxGroup} from "../../components2/OrderView/pos-logic";
 const _ = require('lodash');
 
 let fromReducer = {

@@ -1,9 +1,14 @@
-async function makePrintData(cms, args) {
-  return args;
+const { monthReport } = require('../../order-logic/report-month-report')
+const dayjs = require('dayjs')
+
+async function makePrintData(cms) {
+  return Object.assign(await monthReport(), {
+    date: new Date()
+  });
 }
 
 async function printEscPos(escPrinter, printData) {
-  const {date, salesByCategory, salesByPayment, zNumbers, total} = printData;
+  const {date, salesByCategory, salesByPayment, zNumbers, total, salesByCategoryName} = printData;
 
   function convertMoney(value) {
     return !isNaN(value) ? value.toFixed(2) : value
@@ -12,7 +17,7 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.alignCenter();
   escPrinter.setTextQuadArea();
   escPrinter.bold(true);
-  escPrinter.println(date);
+  escPrinter.println(dayjs(date).format('MM.YYYY'));
   escPrinter.newLine();
 
   escPrinter.alignLeft();
@@ -35,10 +40,11 @@ async function printEscPos(escPrinter, printData) {
   if (zNumbers) {
     escPrinter.bold(false);
     escPrinter.drawLine();
-    zNumbers.forEach(z => {
+    Object.keys(zNumbers).forEach(date => {
+      const z = Object.keys(zNumbers[date])[0]
       escPrinter.tableCustom([
-        {text: `Z-Number ${z.z}: ${convertMoney(z.sum)}`, align: 'LEFT', width: 0.48},
-        {text: `Date: ${z.date}`, align: 'LEFT', width: 0.48},
+        {text: `Z-Number ${z}: ${convertMoney(zNumbers[date][z])}`, align: 'LEFT', width: 0.48},
+        {text: `Date: ${date}`, align: 'LEFT', width: 0.48},
       ]);
     });
     escPrinter.bold(true);
@@ -53,13 +59,13 @@ async function printEscPos(escPrinter, printData) {
 
     Object.keys(salesByCategory).forEach(category => {
       escPrinter.newLine();
-      const {products, sum} = salesByCategory[category];
+      const products = salesByCategoryName[category];
 
       escPrinter.bold(true);
-      escPrinter.println(`${category || 'No category'} (${convertMoney(sum)})`);
+      escPrinter.println(`${category || 'No category'} (${convertMoney(salesByCategory[category].vSum)})`);
       escPrinter.bold(false);
-      products.forEach(({product, quantity}) => {
-        escPrinter.println(` ${quantity} x ${product}`);
+      Object.keys(products).forEach(product => {
+        escPrinter.println(` ${products[product].quantity} x ${product} (${products[product].vSum})`);
       });
     })
   }
@@ -68,7 +74,7 @@ async function printEscPos(escPrinter, printData) {
 }
 
 async function printCanvas(canvasPrinter, printData) {
-  const {date, salesByCategory, salesByPayment, zNumbers, total} = printData;
+  const {date, salesByCategory, salesByPayment, zNumbers, total, salesByCategoryName} = printData;
 
   function convertMoney(value) {
     return !isNaN(value) ? value.toFixed(2) : value
@@ -77,7 +83,7 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.alignCenter();
   await canvasPrinter.setFontSize(36);
   await canvasPrinter.bold(true);
-  await canvasPrinter.println(date);
+  await canvasPrinter.println(dayjs(date).format('MM.YYYY'));
   await canvasPrinter.newLine();
 
   await canvasPrinter.alignLeft();
@@ -102,12 +108,11 @@ async function printCanvas(canvasPrinter, printData) {
   if (zNumbers) {
     await canvasPrinter.bold(false);
     await canvasPrinter.drawLine();
-
-    for (let i = 0; i < zNumbers.length; i++) {
-      const z = zNumbers[i];
+    for (let date in zNumbers) {
+      const z = Object.keys(zNumbers[date])[0];
       await canvasPrinter.tableCustom([
-        {text: `Z-Number ${z.z}: ${convertMoney(z.sum)}`, align: 'LEFT', width: 0.48},
-        {text: `Date: ${z.date}`, align: 'LEFT', width: 0.48},
+        {text: `Z-Number ${z}: ${convertMoney(zNumbers[date][z])}`, align: 'LEFT', width: 0.48},
+        {text: `Date: ${date}`, align: 'LEFT', width: 0.48},
       ]);
     }
 
@@ -121,19 +126,16 @@ async function printCanvas(canvasPrinter, printData) {
     await canvasPrinter.println('Product Sold');
     await canvasPrinter.drawLine();
 
-    const saleCategories = Object.keys(salesByCategory);
-    for (let i = 0; i < saleCategories.length; i++) {
-      const category = saleCategories[i];
+    for (let category in salesByCategory) {
       await canvasPrinter.newLine();
-      const {products, sum} = salesByCategory[category];
+      const products = salesByCategoryName[category];
 
       await canvasPrinter.bold(true);
-      await canvasPrinter.println(`${category || 'No category'} (${convertMoney(sum)})`);
+      await canvasPrinter.println(`${category || 'No category'} (${convertMoney(salesByCategory[category])})`);
       await canvasPrinter.bold(false);
 
-      for (let j = 0; j < products.length; j++) {
-        const {product, quantity} = products[j];
-        await canvasPrinter.println(` ${quantity} x ${product}`);
+      for (let product in products) {
+        await canvasPrinter.println(` ${products[product].quantity} x ${product} (${products[product].vSum})`);
       }
     }
   }

@@ -3,20 +3,20 @@ import _ from 'lodash';
 import {config, mount} from "@vue/test-utils";
 import {hooks} from "./OrderView/pos-logic";
 import {disablePay, payBtnClickable, payPrintMode, showIcon} from "./OrderView/pos-logic-be";
+import StubFactory from './StubFactory';
 
 jest.mock("vue-i18n", () => {
   return {
     useI18n() {
       return {
         t(t) {
-          return t;
+          return t; // [Consider] return `t('${t}')` to indicate that i18n has been used
         },
         locale: "en"
       };
     }
   };
 });
-
 jest.mock("vue-router", () => {
   return {
     useRoute() {
@@ -108,11 +108,12 @@ export function setComponent(_component) {
  *
  * @param _component
  * @param options
+ * @param useDefaults indicate whether _.defaults will be use for options
  * @returns {*}
  * example: makeWrapper(Order2, {shallow: false});
  */
-export const makeWrapper = (_component, options) => {
-  wrapper = mount(component || _component, _.defaults(options, {
+export const makeWrapper = (_component, options, useDefaults = true) => {
+  const defaultOption = {
     props: {},
     shallow: true,
     global: {
@@ -153,6 +154,7 @@ export const makeWrapper = (_component, options) => {
         'g-tabs': true,
         'g-tab-item': true,
         'pos-textfield-new': true,
+        'g-grid-select': StubFactory('g-grid-select')
         'pos-payment-screen-payment-methods2': true,
         'pos-payment-screen-keyboard2': true,
         'pos-restaurant-payment-order-detail2': true,
@@ -175,7 +177,9 @@ export const makeWrapper = (_component, options) => {
         }
       }
     }
-  }));
+  }
+  const optionResult = useDefaults ? _.defaults(options, defaultOption) : _.merge(defaultOption, options)
+  wrapper = mount(component || _component, optionResult);
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));

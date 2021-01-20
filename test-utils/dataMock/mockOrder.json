@@ -1,0 +1,585 @@
+{
+  "_id": "5fe07b1ee1a1b8a39b1f9de0",
+  "table": "2",
+  "items": [
+    {
+      "_id": "5fe07b1ee1a1b8a39b1f9de1",
+      "type": null,
+      "id": "",
+      "name": "PRIME BEEF",
+      "price": 11,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b2968"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b2967",
+      "modifiers": [],
+      "originalPrice": 11,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ae3ba9db465364b134",
+      "taxes": [
+        null,
+        null
+      ],
+      "groupPrinter": "Kitchen",
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe07c1098a83bad01d3f453",
+      "type": null,
+      "id": "",
+      "name": "SINGAPORE STYLE SEAFOOD",
+      "price": 10,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b296d"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b296c",
+      "modifiers": [],
+      "originalPrice": 10,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ce3ba9db465364b177",
+      "taxes": [
+        null,
+        null
+      ],
+      "groupPrinter": "Kitchen",
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe07cbde60dd6c5c941c3d8",
+      "type": null,
+      "id": "",
+      "name": "PRIME BEEF",
+      "price": 11,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b2968"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b2967",
+      "modifiers": [],
+      "originalPrice": 11,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ae3ba9db465364b134",
+      "taxes": [
+        null,
+        null
+      ],
+      "groupPrinter": "Kitchen",
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe0807aea7bae211212d089",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe080dbea7bae211212d08a",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe08116ea7bae211212d08b",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe08139ea7bae211212d08c",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe08156ea7bae211212d08d",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe08164ea7bae211212d08e",
+      "type": null,
+      "id": "",
+      "name": "SINGAPORE STYLE SEAFOOD",
+      "price": 10,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b296d"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b296c",
+      "modifiers": [],
+      "originalPrice": 10,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ce3ba9db465364b177",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe081bbea7bae211212d08f",
+      "type": null,
+      "id": "",
+      "name": "SINGAPORE STYLE SEAFOOD",
+      "price": 10,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b296d"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b296c",
+      "modifiers": [],
+      "originalPrice": 10,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ce3ba9db465364b177",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe081fdea7bae211212d090",
+      "type": null,
+      "id": "",
+      "name": "SINGAPORE STYLE SEAFOOD",
+      "price": 10,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b296d"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b296c",
+      "modifiers": [],
+      "originalPrice": 10,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ce3ba9db465364b177",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe0827fdaa4bad0766031ba",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe082a8daa4bad0766031bb",
+      "type": null,
+      "id": "",
+      "name": "SINGAPORE STYLE SEAFOOD",
+      "price": 10,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b296d"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b296c",
+      "modifiers": [],
+      "originalPrice": 10,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ce3ba9db465364b177",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    },
+    {
+      "_id": "5fe08471c87ce60e167828a5",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ],
+      "printed": true,
+      "sent": true
+    }
+  ],
+  "status": "inProgress",
+  "takeAway": false,
+  "user": [
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:18:11.528Z",
+      "_id": "5fe08473effc6cd0961f7e80"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:09:52.479Z",
+      "_id": "5fe08280ccd6c481b9d5afcf"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:06:36.075Z",
+      "_id": "5fe081bce243cec098672b5a"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:05:09.361Z",
+      "_id": "5fe08165e243cec098672b55"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:03:56.651Z",
+      "_id": "5fe0811ce243cec098672b3e"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:02:52.267Z",
+      "_id": "5fe080dce243cec098672b35"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T11:01:16.406Z",
+      "_id": "5fe08095e243cec098672b2c"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T10:42:25.264Z",
+      "_id": "5fe07c11c3f3059c9c79283f"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T10:40:37.062Z",
+      "_id": "5fe07ba55f756f0e519569f4"
+    },
+    {
+      "name": "admin",
+      "date": "2020-12-21T10:38:29.723Z",
+      "_id": "5fe07b25c3f3059c9c792838"
+    }
+  ],
+  "payment": [],
+  "discount": {
+    "_id": "5fe07b25c3f3059c9c79282f"
+  },
+  "customer": {
+    "_id": "5fe07b25c3f3059c9c792830"
+  },
+  "commits": [],
+  "vTaxGroups": [],
+  "printer": [],
+  "discounts": [],
+  "paypalOrderDetail": {
+    "_id": "5fe07b25c3f3059c9c792831",
+    "captureResponses": {
+      "_id": "5fe07b25c3f3059c9c792832"
+    },
+    "refundResponses": {
+      "_id": "5fe07b25c3f3059c9c792833"
+    }
+  },
+  "recentItems": [
+    {
+      "_id": "5fe08471c87ce60e167828a5",
+      "type": null,
+      "id": "",
+      "name": "PIZZAMIN SEA",
+      "price": 9,
+      "groupPrinter": null,
+      "groupPrinter2": null,
+      "isNoPrint": null,
+      "isItemNote": null,
+      "tax": null,
+      "tax2": null,
+      "category": null,
+      "isDivArticle": null,
+      "attributes": [],
+      "choices": [],
+      "ingredients": [],
+      "option": {
+        "_id": "5fe07afa00d5f92ae67b297c"
+      },
+      "activePopupModifierGroup": "5fe07afa00d5f92ae67b297b",
+      "modifiers": [],
+      "originalPrice": 9,
+      "quantity": 1,
+      "course": 1,
+      "product": "5faba6ec3ba9db465364b1a7",
+      "taxes": [
+        null,
+        null
+      ]
+    }
+  ],
+  "recentCancellationItems": {
+    "_id": "5fe07b25c3f3059c9c792835"
+  },
+  "cancellationItems": {
+    "_id": "5fe07b25c3f3059c9c792836"
+  },
+  "tseMethod": "auto"
+}

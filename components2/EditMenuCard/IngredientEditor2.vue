@@ -4,7 +4,7 @@ import { onActivated } from 'vue';
 import { Touch } from 'pos-vue-framework';
 import PosKeyboardFull from '../../components/pos-shared-components/PosKeyboardFull';
 import _ from 'lodash';
-import { getScopeId } from '../../utils/helpers';
+import { genScopeId } from '../utils';
 
 export default {
   name: 'IngredientEditor2',
@@ -77,7 +77,7 @@ export default {
 
     const debounceUpdateAmount = _.debounce(updateProductIngredient, 300)
 
-    return getScopeId(() => <>
+    return genScopeId(() => <>
       {
         (selectedProductExisted.value) ?
             <div class="ingredient-editor" >

@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`category-editor should show correct 1`] = `
+<div class="category-editor__label">
+  restaurant.menuEdit.categoriesNo
+</div>
+<div class="row-flex align-items-center justify-between">
+  <div class="fw-700 fs-small mr-2">
+    restaurant.menuEdit.columns:
+  </div>
+  <input-number-stub modelvalue="4"
+                     min="1"
+                     max="8"
+                     width="148"
+  >
+  </input-number-stub>
+</div>
+<div class="row-flex align-items-center justify-between mt-1">
+  <div class="fw-700 fs-small mr-2">
+    restaurant.menuEdit.rows:
+  </div>
+  <input-number-stub modelvalue="2"
+                     min="1"
+                     max="3"
+                     width="148"
+  >
+  </input-number-stub>
+</div>
+<div class="category-editor__label">
+  ui.name
+</div>
+<g-text-field-bs-stub border-color="#979797"
+                      modelvalue="Wine"
+>
+</g-text-field-bs-stub>
+<div class="category-editor__label">
+  ui.color
+</div>
+<color-selector-stub modelvalue="#FFF"
+                     colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                     itemsize="25"
+>
+</color-selector-stub>
+<div class="category-editor__label">
+  restaurant.menuEdit.rowsNo
+</div>
+<input-number-stub modelvalue="4"
+                   min="4"
+                   max="10"
+                   width="148"
+>
+</input-number-stub>
+<div class="category-editor__label">
+  restaurant.menuEdit.columnsNo
+</div>
+<input-number-stub modelvalue="6"
+                   min="3"
+                   max="6"
+                   width="148"
+>
+</input-number-stub>
+<dialog-text-filter-stub label="restaurant.menuEdit.categoryName"
+                         defaultvalue="Wine"
+                         modelvalue="false"
+>
+</dialog-text-filter-stub>
+<portal-stub to="portal-left-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-switch"
+                 disabled="true"
+  >
+    ui.switch
+  </g-btn-bs-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-delete"
+                 disabled="true"
+  >
+    ui.delete
+  </g-btn-bs-stub>
+  <dialog-confirm-delete-stub modelvalue="false"
+                              type=" this category"
+  >
+  </dialog-confirm-delete-stub>
+</portal-stub>
+`;
