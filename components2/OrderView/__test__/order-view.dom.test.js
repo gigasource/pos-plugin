@@ -1,46 +1,17 @@
 //<editor-fold desc="declare">
-import {
-  actions,
-  cola,
-  drinkTax,
-  expectArray,
-  fanta,
-  foodTax,
-  ketchup,
-  rice,
-  component,
-  wrapper,
-  makeWrapper,
-  orm,
-  setComponent
-} from "../../test-utils";
-import { config, mount } from "@vue/test-utils";
+import {makeWrapper, orm, wrapper} from "../../test-utils";
 
-import { nextTick } from "vue";
-import { payPrintBtnFactory } from "../payPrintBtnFactory";
+import {nextTick} from "vue";
 
-import {
-  addProduct,
-  disablePay,
-  getCurrentOrder,
-  payBtnClickable,
-  payPrintMode,
-  prepareOrder,
-  showIcon,
-  togglePayPrintBtn
-} from "../pos-logic-be";
+import {addProduct, getCurrentOrder, prepareOrder} from "../pos-logic-be";
 
-import { mockProduct } from "./mock_product";
-import { mockOrder } from "./mock-order";
-import { smallSidebar } from "../order-layout-setting-logic";
-import { orderRightSideHeader } from "../orderRightSideHeaderFactory";
-import { orderRightSideItemsTable } from "../orderRightSideItemsTable";
-import PosOrder2 from "../PosOrder2";
+import {mockProduct} from "./mock_product";
+import {mockOrder} from "./mock-order";
 import Order2 from "../Order2";
-import { orderLayout } from "../pos-ui-shared";
-import { demoData } from "./demoData";
+import {orderLayout} from "../pos-ui-shared";
+import {demoData} from "./demoData";
 import PosOrderLayout2 from "../PosOrderLayout2";
-import {isMobile, setMobile} from "../../AppSharedStates";
+import {isMobile} from "../../AppSharedStates";
 
 const { stringify } = require("schemahandler/utils");
 

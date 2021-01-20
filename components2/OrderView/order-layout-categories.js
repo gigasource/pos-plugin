@@ -16,7 +16,6 @@ import {isSameArea} from "../../components/posOrder/util";
 
 export function orderLayoutCategoriesFactory() {
   const categories = computed(() => {
-    console.log('editable : ', editable.value)
     if (editable.value) {
       return fillMissingAreas(
         orderLayout.value.categories,
@@ -24,7 +23,6 @@ export function orderLayoutCategoriesFactory() {
         orderLayout.value.rows,
         true);
     }
-    console.log(orderLayout.value.categories);
     return [...orderLayout.value.categories]
   });
 

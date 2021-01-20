@@ -132,10 +132,10 @@ const once = _.once(() => {
   addProduct(order, products.value[1].product);
   addProduct(order, products.value[1].product);
 
-  orderViewDialog.receipt = true;
+  //orderViewDialog.receipt = true;
 })
 /*watchEffect(() => {
-  if (order.items.length === 0 && products.value.length > 0) {
+  if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();
   }
 })*/

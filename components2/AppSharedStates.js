@@ -27,6 +27,7 @@ run();
 }, { deep: true })*/
 
 export let isMobile = ref(mobileCheck());
+export const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad')
 
 //fixme: remove by production
 //isMobile.value = true;

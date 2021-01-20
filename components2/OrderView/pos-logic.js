@@ -47,6 +47,9 @@ export function mergeVTaxGroup(objValue, itemValue) {
 
 export const createOrder = function (_order) {
   const _uuid = uuid();
+  if (_order && _order.items && _order.items.length > 0) {
+    _order.items.forEach(i => i.originalQuantity = i.quantity);
+  }
   let order = _.defaults(_order, {
     _id: new ObjectID(),
     items: [], cancellationItems: [], takeAway: false, status: 'inProgress',
@@ -323,6 +326,12 @@ export function makeTakeaway(order, takeAway = true) {
   hooks.emit('post:order:update', order);
 }
 
+export function toggleTakeaway(order) {
+  hooks.emit('pre:order:update', order);
+  order.takeAway = !(!!order.takeAway)
+  hooks.emit('post:order:update', order);
+}
+
 export function addModifier(order, modifier) {
   hooks.emit('pre:order:update', order);
   const _modifier = _.cloneDeep(modifier);
@@ -415,6 +424,8 @@ export function addPayment(order, payment) {
 }
 
 export function updateSinglePayment(order, payment) {
+  order.cashback = 0;
+  order.tip = 0;
   order.payment.splice(0, 1);
   addSinglePayment(order, payment);
 }
@@ -484,10 +495,13 @@ export function removeItem(order, query, quantity = 1) {
     _item = _.assign(_.cloneDeep(item), {quantity});
     item.quantity -= quantity;
   } else {
-    _item = _.assign(_.cloneDeep(item));
+    _item = _.assign(_.cloneDeep(item), {quantity});
     order.items.splice(query, 1);
   }
-  order.cancellationItems.push(_item);
+  //todo: sent or not
+  if (item.sent && item.originalQuantity > item.quantity - quantity) {
+    order.cancellationItems.push(_item);
+  }
   hooks.emit('post:order:update', order);
 }
 

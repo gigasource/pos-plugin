@@ -13,7 +13,6 @@ const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
 const syncTranspoter = require('schemahandler/sync/sync-transporter')
 const clientToOnlineSocket = new Socket()
 const uuid = require('uuid')
-const Hooks = require("schemahandler/hooks/hooks");
 const ObjectID = require('bson').ObjectID
 
 let socketToOrm
@@ -40,7 +39,6 @@ const cms = {
 	}
 }
 _.extend(cms, new Hooks())
-global.cms = cms
 
 describe('test-action-commit', function () {
 	beforeAll(async () => {
@@ -55,7 +53,7 @@ describe('test-action-commit', function () {
 		orm.plugin(syncPlugin)
 		orm.plugin(syncFlow)
 		orm.plugin(syncTranspoter)
-		orm.plugin(require('./actionCommit'))
+		orm.plugin(require('./actionCommit'), cms)
 		orm.registerCommitBaseCollection('Action')
 
 		onlineOrderIo.on('connect', socket => {

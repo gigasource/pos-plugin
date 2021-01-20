@@ -98,7 +98,7 @@ export function addProduct(order, product, quantity) {
 
 //</editor-fold>
 
-function orderBeFactory(id = 0) {
+export function orderBeFactory(id = 0) {
   let order = createOrder();
   orderMap.set(order, id);
 
@@ -139,7 +139,7 @@ function orderBeFactory(id = 0) {
   hooks.on(`pre:prepareOrder:${id}`, function (order) {
     [beItemsSnapshot.value.length, beCancellationItemsSnapshot.value.length] = [0, 0];
     if (typeof order === 'object') {
-      [beItemsSnapshot.value, beCancellationItemsSnapshot.value] = [_.cloneDeep(order).items, _.cloneDeep(order).cancellationItems];
+      [beItemsSnapshot.value, beCancellationItemsSnapshot.value] = [_.cloneDeep(order).items || [], _.cloneDeep(order).cancellationItems || []];
     }
   })
 
@@ -186,9 +186,16 @@ function orderBeFactory(id = 0) {
     hooks.emit(`post:order:update:${id}`, order, true);
   }
 
+  async function setNewOrder(newOrder) {
+    if (newOrder.table != order.table) return
+    actionList.value = []
+    hooks.emit(`pre:order:update:${id}`, newOrder, true)
+    hooks.emit(`post:order:update:${id}`, order, true)
+  }
+
   return {actionList, getCurrentOrder, currentTable, prepareOrder,
     order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
-    startOnetimeSnapshot, finishOnetimeSnapshot}
+    startOnetimeSnapshot, finishOnetimeSnapshot, setNewOrder}
 }
 
 export const {
@@ -198,6 +205,28 @@ export const {
   startOnetimeSnapshot,
   finishOnetimeSnapshot
 } = orderBeFactory(0);
+
+//should run on backenc
+export const getRecentItems = function () {
+  const result = [];
+  //list added item
+  result.push(..._.filter(order.items, i => !i.sent));
+  //list changed quantity item
+  let beItems = _.cloneDeep(_.filter(order.items, i => i.sent));
+  beItems = _.compact(beItems.map(item => {
+    const found = _.find(beItemsSnapshot.value, _item => _item._id === item._id);
+    if (found.quantity === item.quantity) return item;
+    const _item = _.cloneDeep(item);
+    _item.quantity = item.quantity - found.quantity;
+    if (_item.quantity > 0) return _item;
+  }))
+  result.push(...beItems);
+  return result;
+}
+
+export const getRecentCancellationItems = function () {
+  return order.cancellationItems.filter((i, k) => k > beCancellationItemsSnapshot.value.length - 1);
+}
 
 //<editor-fold desc="Split order, move items">
 export const {
@@ -212,6 +241,7 @@ export const {
 } = orderBeFactory(1);
 
 let tempItemsSnapshot = [], tempCancellationItemsSnapshot = [];
+
 export function makeSplitOrder() {
   clearSecondOrder();
   order.splitId = order.splitId || v1();
@@ -230,7 +260,7 @@ export function prepareMoveItemsOrder() {
 }
 
 export function finishSplitOrder() {
-  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[],[]];
+  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[], []];
   finishOnetimeSnapshot();
   finishOnetimeSnapshot2();
 }
@@ -251,7 +281,7 @@ export function cancelSplitOrder() {
   //restore
   order.items.splice(0, order.items.length, ...tempItemsSnapshot);
   order.cancellationItems.splice(0, order.cancellationItems.length, ...tempCancellationItemsSnapshot);
-  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[],[]];
+  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[], []];
 }
 
 export function cancelMoveItemsOrder() {
@@ -281,6 +311,7 @@ export function returnItem(query) {
     addItem(order, _item, 1);
   }
 }
+
 //todo: case order.items -> empty not accept (prevent by frontend)
 
 //</editor-fold>

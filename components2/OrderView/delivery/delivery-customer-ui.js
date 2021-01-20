@@ -1,0 +1,401 @@
+import {$filters} from "../AppSharedStates";
+import {useI18n} from "vue-i18n";
+import {onActivated, ref, withModifiers} from "vue";
+import {isIOS} from "../../AppSharedStates";
+import {
+  deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
+  name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses
+} from "./delivery-shared";
+import _ from "lodash";
+import {v4 as uuidv4} from "uuid";
+import cms from 'cms';
+import {addProduct} from "../pos-logic-be";
+
+
+export function deliveryCustomerUiFactory() {
+  let {t, locale} = useI18n();
+
+  const isNewCustomer = ref(false)
+
+  function getRandomColor(i) {
+    const colors = ['#FBE4EC', '#84FFFF', '#80D8FF', '#FFF59D', '#B2FF59', '#E1BEE7', '#FFAB91', '#B39DDB', '#BCAAA4', '#1DE9B6']
+    return 'background-color: ' + colors[i]
+  }
+
+  function selectFavoriteProduct(product) {
+    addProduct({
+      ...product,
+      modifiers: [],
+      quantity: 1,
+    })
+  }
+
+  isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+
+  function removeAddress(index) {
+    if (selectedCustomer.value.addresses.length === 1) {
+      isNewCustomer.value = true
+    }
+    selectedCustomer.value.addresses.splice(index, 1)
+  }
+
+  let debounceSearchAddress = _.debounce(searchAddress, 300);
+
+  async function searchAddress(text) {
+    if (!text || text.length < 4) return
+    token.value = uuidv4()
+    cms.socket.emit('searchPlace', text, token.value, places => {
+      autocompleteAddresses.value = places.map(p => ({
+        text: p.description,
+        value: p.place_id,
+      }))
+    })
+  }
+
+  const calls = ref([])
+  const missedCalls = ref([])
+  const orderType = ref();
+
+  function deleteCall(index) {
+    //index => missed call || first call
+    if (index) {
+      missedCalls.value.splice(index, 1)
+    } else {
+      calls.value.splice(0, 1)
+    }
+  }
+
+  function chooseCustomer(type) {
+    orderType.value = type
+    selectedCustomer.value = calls.value[0].customer
+    isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+    name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
+    phone.value = selectedCustomer.value.phone
+  }
+
+  function chooseMissedCustomer(index, type) {
+    orderType.value = type
+    const call = {
+      ...missedCalls.value[index],
+      type: 'missed'
+    }
+    calls.value.unshift(call)
+    missedCalls.value.splice(index, 1)
+    selectedCustomer.value = call.customer
+    isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
+    name.value = selectedCustomer.value.name === 'New customer' ? '' : selectedCustomer.value.name
+    phone.value = selectedCustomer.value.phone
+  }
+
+  async function selectAutocompleteAddress(place_id) {
+    placeId.value = place_id
+    if (autocompleteAddresses.value.find(item => item.value === place_id)) {
+      cms.socket.emit('getPlaceDetail', place_id, token.value, data => {
+        if (!_.isEmpty(data)) {
+          for (const component of data.address_components) {
+            if (component.types.includes('street_number')) {
+              house.value = component.long_name
+            }
+            if (component.types.includes('route')) {
+              street.value = component.long_name
+            }
+            if (component.types.includes('postal_code')) {
+              zipcode.value = component.long_name
+            }
+            if (component.types.includes('locality')) {
+              city.value = component.long_name
+            }
+          }
+          address.value = data.name
+        }
+      })
+    }
+  }
+
+  const menuMissed = ref(false)
+
+  function addNewCustomer() {
+    if (dialogMode.value === 'add') {
+      Object.assign(selectedCustomer.value, {
+        name: name.value,
+        phone: phone.value,
+        addresses: [
+          ...!!selectedCustomer.value.addresses ? _.cloneDeep(selectedCustomer.value.addresses) : [],
+          {
+            address: address.value,
+            zipcode: zipcode.value,
+            house: house.value,
+            street: street.value,
+            city: city.value
+          }
+        ]
+      })
+      selectedAddress.value = selectedCustomer.value.addresses.length - 1
+      isNewCustomer.value = false
+    }
+    if (dialogMode === 'edit') {
+      selectedCustomer.value['name'] = name.value
+      selectedCustomer.value.addresses.splice(selectedAddress.value, 1, {
+        address: address.value,
+        zipcode: zipcode.value,
+        house: house.value,
+        street: street.value,
+        city: city.value
+      })
+    }
+    dialog.value.input = false
+  }
+
+  function hideKeyboard() {
+    showKeyboard.value = false
+    const _autocomplete = autocomplete.value
+    if (_autocomplete) {
+      const menu = _autocomplete.$refs && _autocomplete.$refs.menu
+      if (menu) {
+        menu.isActive = false
+      }
+    }
+  }
+
+  function submitCustomer() {
+    if (name.value && phone.value && placeId.value && autocompleteAddresses.value.find(item => item.value === placeId.value) && house.value) {
+      //get exact address + zip code
+      token.value = uuidv4();
+      cms.socket.emit('getZipcode', `${street.value} ${house.value} ${city.value}`, token.value, (_address, _zipcode) => {
+        address.value = _address
+        zipcode.value = _zipcode
+      })
+      let customer = {}
+      customer.name = name.value
+      customer.phone = phone.value
+      if (selectedCustomer.value.addresses) {
+        customer.addresses = [
+          ...selectedCustomer.value.addresses,
+          {
+            address: address.value,
+            zipcode: zipcode.value,
+            house: house.value,
+            street: street.value,
+            city: city.value
+          }
+        ]
+      } else {
+        customer.addresses = [{
+          address: address.value,
+          zipcode: zipcode.value,
+          house: house.value,
+          street: street.value,
+          city: city.value
+        }]
+      }
+      selectedCustomer.value = customer
+      selectedAddress.value = customer.addresses.length - 1
+      isNewCustomer.value = false
+    }
+    hideKeyboard()
+  }
+
+  const customerUiRender = () => (
+    <div className="delivery-info">
+      <div className="delivery-info--upper">
+        {(deliveryOrderMode.value === 'tablet' || !showKeyboard.value) &&
+        <div className="delivery-info__favorite">
+          {favorites.value.map((f, i) =>
+            <div style={getRandomColor(i)} className="delivery-info__favorite-item"
+                 onClick={() => selectFavoriteProduct(f)}
+                 key={`favorite_${i}`}>
+              {f.name}
+            </div>)}
+        </div>}
+
+
+        <div className="delivery-info__customer">
+          {!isNewCustomer.value ?
+            <>
+              {selectedCustomer.value.addresses.map((item, i) =>
+                <div
+                  className={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
+                  onClick={() => selectedAddress.value = i}>
+                  <div className="row-flex align-items-center">
+                    <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
+                             color="#536DFE"/>
+                    <g-spacer/>
+                    <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
+                              onClick={() => openDialog('edit', item.address, item.zipcode, i)}>
+                      <g-icon size="15">icon-reservation_modify</g-icon>
+                    </g-btn-bs>
+                    <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
+                              onClick={() => removeAddress(i)}>
+                      <g-icon size="15">icon-delete</g-icon>
+                    </g-btn-bs>
+                  </div>
+                  <p>{item.address}</p>
+                  <p className="text-grey fs-small">{item.zipcode}</p>
+                  <p className="text-grey fs-small">{item.city}</p>
+                </div>)}
+              <g-icon size="40" color="#1271FF" onClick={() => openDialog('add')}>add_circle</g-icon>
+            </> :
+            (deliveryOrderMode.value === 'mobile' ?
+              <>
+                <div className="row-flex mt-3 w-100">
+                  <div style="flex: 1; margin-right: 2px">
+                    <g-text-field outlined dense v-model={phone.value} label="Phone"
+                                  onClick={() => showKeyboard.value = true}
+                                  virtualEvent={isIOS.value}/>
+                  </div>
+                  <div style="flex: 1; margin-left: 2px">
+                    <g-text-field outlined dense v-model={name} label="Name"
+                                  onClick={() => showKeyboard.value = true}
+                                  virtualEvent={isIOS.value}/>
+                  </div>
+                </div>
+                <div className="row-flex">
+                  <div className="col-9">
+                    <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
+                                clearable
+                                virtualEvent={isIOS.value} skip-search
+                                items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
+                                ref="autocomplete"
+                                onInputClick={() => showKeyboard.value = true} keep-menu-on-blur
+                                menu-class="menu-autocomplete-address"
+                                onUpdate:modelValue={selectAutocompleteAddress}/>
+                  </div>
+                  <div className="flex-grow-1 ml-1">
+                    <g-text-field outlined dense v-model={house.value} label="Nr"
+                                  onClick={() => showKeyboard.value = true}
+                                  virtualEvent={isIOS.value}/>
+                  </div>
+                </div>
+              </> :
+              <>
+                <g-text-field-bs className="bs-tf__pos" label="Name" v-model={name.valuee}
+                                 onClick={() => openDialog('add')}>
+                  {{
+                    'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+                  }}
+                </g-text-field-bs>
+                <g-text-field-bs className="bs-tf__pos" label="Address" v-model={address.value}
+                                 onClick={() => openDialog('add')}>
+                  {{
+                    'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+                  }}
+                </g-text-field-bs>
+              </>)}
+        </div>
+      </div>
+      <div className="delivery-info--lower">
+        {(calls.value && calls.value.length > 0) ?
+          <div
+            className={['delivery-info__call', calls && calls[0] && calls[0].type === 'missed' ? 'b-red' : 'b-grey']}>
+            <div className="delivery-info__call--info">
+              <p className="fw-700 fs-small">
+                <g-icon size="16" className="mr-1">icon-call</g-icon>
+                {calls.value[0].customer.phone}
+              </p>
+              <p className="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
+            </div>
+            <div
+              className={['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']}
+              onClick={() => chooseCustomer('pickup')}>
+              <g-icon size="20">icon-take-away</g-icon>
+            </div>
+            <div
+              className={['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']}
+              onClick={() => chooseCustomer('delivery')}>
+              <g-icon size="20">icon-delivery-scooter</g-icon>
+            </div>
+            <div className="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
+              <g-icon color="white">clear</g-icon>
+            </div>
+          </div> :
+          <>
+            <div className="delivery-info__call--empty">
+              <p className="fw-700">Empty</p>
+              <p className="text-grey-darken-1">No pending calls</p>
+            </div>
+            {(missedCalls.value && missedCalls.value.length > 0) &&
+            <g-menu v-model={menuMissed.value} top left nudge-top="5"
+                    v-slots={{
+                      activator: ({on}) =>
+                        <div vClick={on.click}
+                             className={['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']}>
+                          <b>Missed</b>
+                          <div className="delivery-info__call--missed-num">
+                            {missedCalls.length}
+                          </div>
+                        </div>
+                    }}>
+              <div className="menu-missed">
+                {missedCalls.map((call, i) =>
+                  <div className="menu-missed__call" key={`missed_${i}`}>
+                    <div className="menu-missed__call--info">
+                      <p className="fw-700 fs-small">
+                        <g-icon size="16" className="mr-1">icon-call</g-icon>
+                        {call.customer.phone}
+                      </p>
+                      <p className="fs-small text-grey-darken-1">{call.customer.name}</p>
+                    </div>
+                    <div className={['delivery-info__call-btn']}
+                         onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                      <g-icon size="20">icon-take-away</g-icon>
+                    </div>
+                    <div className={['delivery-info__call-btn']}
+                         onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                      <g-icon size="20">icon-delivery-scooter</g-icon>
+                    </div>
+                    <div className="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                      <g-icon color="white">clear</g-icon>
+                    </div>
+                  </div>)}
+              </div>
+            </g-menu>}
+          </>}
+      </div>
+    </div>
+  )
+
+  const renderDialogs = () => (<>
+    <dialog-form-input v-model={dialog.value.input} onSubmit={addNewCustomer}
+                       eager={false}
+                       v-slots={{
+                         input: () =>
+                           <div className="row-flex flex-wrap justify-around">
+                             <pos-textfield-new style="width: 48%" label="Name"
+                                                v-model={name.value}/>
+                             <pos-textfield-new style="width: 48%" label="Phone"
+                                                v-model={phone.value}/>
+                             <g-combobox style="width: 98%" label="Address"
+                                         modelValue={placeId.value} clearable
+                                         virtualEvent={isIOS.value}
+                                         skip-search
+                                         items={autocompleteAddresses.value}
+                                         onUpdate:searchText={debounceSearchAddress.value}
+                                         onUpdate:modelValue={selectAutocompleteAddress}/>
+                             <pos-textfield-new style="width: 23%" label="Street"
+                                                placeholder="Street name (Autofill)"
+                                                v-model={street.value}/>
+                             <pos-textfield-new style="width: 23%" label="House no."
+                                                placeholder="House number (Autofill)"
+                                                v-model={house.value}/>
+                             <pos-textfield-new style="width: 23%" label="Zipcode"
+                                                placeholder="Zipcode (Autofill)"
+                                                v-model={zipcode.value}/>
+                             <pos-textfield-new style="width: 23%" label="City"
+                                                placeholder="City (Autofill)"
+                                                v-model={city.value}/>
+                           </div>
+                       }}
+    />
+    <dialog-text-filter v-model={dialog.value.note} label="Delivery note" onSubmit={e => {
+      note.value = e
+    }}/>
+    {showKeyboard.value && <div class="keyboard">
+      <div class="keyboard-overlay" onClick={hideKeyboard}></div>
+      <div class="keyboard-wrapper">
+        <pos-keyboard-full type="alpha-number" onEnterPressed={submitCustomer}/>
+      </div>
+    </div>}
+  </>);
+
+  return {customerUiRender, renderDialogs}
+}

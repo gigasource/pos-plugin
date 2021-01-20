@@ -4,6 +4,7 @@ import {computed, ref, watch} from "vue";
 import {$filters, avatar, isMobile, username} from "../../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {
+  cancelSplitOrder,
   finishSplitOrder,
   getCurrentOrder,
   makeSplitOrder,
@@ -35,7 +36,10 @@ export default {
 
     const disablePayment = computed(() => paying.value || !order2.vSum)
 
-    const back = () => internalValue.value = false;
+    const back = () => {
+      cancelSplitOrder();
+      internalValue.value = false;
+    }
 
     function saveMultiPayment(payment) {
       //fixme: maybe remove it later
