@@ -1,32 +1,27 @@
+const { xReport } = require('../../order-logic/report-x-report-logic')
 const dayjs = require('dayjs');
 
 async function makePrintData(cms, {from, to}) {
-  const report = await new Promise((resolve, reject) => {
-    cms.api.processData('OrderXReport', {from, to}, result => {
-      if (typeof result === 'string') reject(result);
-      else resolve(result);
-    });
-  });
-
-  const reportDate = dayjs(from);
-  const xReport = {
-    ...report.report,
-    ...report.dayReport[reportDate.format('DD-MM-YYYY')]
-  };
-
   const posSettings = await cms.getModel('PosSetting').findOne();
   const companyInfo = posSettings && posSettings.companyInfo;
   return {
     ...companyInfo,
-    ...xReport,
-    date: reportDate.format('DD/MM/YYYY')
+    ...(await xReport(from, to)),
+    from,
+    to
   };
 }
 
 async function printEscPos(escPrinter, printData) {
   const {
-    name, address, telephone, taxNumber, date, from, to, sum, net, tax, discount, sumByPayment,
-    sum0, net0, tax0, sum7, net7, tax7, sum19, net19, tax19
+    name,
+    address,
+    telephone,
+    taxNumber,
+    date,
+    from, to,
+    report,
+    sumByPayment
   } = printData;
 
   function getDateTimeString(date) {
@@ -66,54 +61,47 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.println('Sales');
   escPrinter.bold(false);
-  escPrinter.leftRight('Total', convertMoney(sum));
-  escPrinter.leftRight('Sub-total', convertMoney(net));
-  escPrinter.leftRight('Tax', convertMoney(tax));
+  escPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
+  escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
+  escPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
   escPrinter.bold(true);
   escPrinter.drawLine();
 
   escPrinter.bold(false);
 
-  if (sum0) {
-    escPrinter.println('Tax 0%:');
-    escPrinter.leftRight('Total', convertMoney(sum0));
-    escPrinter.leftRight('Sub-total', convertMoney(net0));
-    escPrinter.leftRight('Total', convertMoney(tax0));
+  Object.keys(report.vTaxSum.vTaxSum).forEach(key => {
+    escPrinter.println(`Tax ${key}%:`);
+    escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
+    escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
+    escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
     escPrinter.newLine();
-  }
+  })
 
-  if (sum7) {
-    escPrinter.println('Tax 7%:');
-    escPrinter.leftRight('Total', convertMoney(sum7));
-    escPrinter.leftRight('Sub-total', convertMoney(net7));
-    escPrinter.leftRight('Total', convertMoney(tax7));
-    escPrinter.newLine();
-  }
-
-  if (sum19) {
-    escPrinter.println('Tax 19%:');
-    escPrinter.leftRight('Total', convertMoney(sum19));
-    escPrinter.leftRight('Sub-total', convertMoney(net19));
-    escPrinter.leftRight('Total', convertMoney(tax19));
-    escPrinter.newLine();
-  }
-
-  escPrinter.leftRight('Discount', convertMoney(discount));
+  escPrinter.leftRight('Discount', convertMoney(report.discount));
   escPrinter.bold(true);
   escPrinter.drawLine();
 
-  Object.keys(sumByPayment).forEach(paymentType => {
-    const paymentAmount = sumByPayment[paymentType];
-    escPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
-  });
+  /**
+   * todo: fix this
+   */
+  // Object.keys(sumByPayment).forEach(paymentType => {
+  //   const paymentAmount = sumByPayment[paymentType];
+  //   escPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
+  // });
 
   await escPrinter.print();
 }
 
 async function printCanvas(canvasPrinter, printData) {
   const {
-    name, address, telephone, taxNumber, date, from, to, sum, net, tax, discount, sumByPayment,
-    sum0, net0, tax0, sum7, net7, tax7, sum19, net19, tax19
+    name,
+    address,
+    telephone,
+    taxNumber,
+    date,
+    from, to,
+    report,
+    sumByPayment
   } = printData;
 
   function getDateTimeString(date) {
@@ -153,35 +141,19 @@ async function printCanvas(canvasPrinter, printData) {
 
   await canvasPrinter.println('Sales');
   await canvasPrinter.bold(false);
-  await canvasPrinter.leftRight('Total', convertMoney(sum));
-  await canvasPrinter.leftRight('Sub-total', convertMoney(net));
-  await canvasPrinter.leftRight('Tax', convertMoney(tax));
+  await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
+  await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
+  await canvasPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
   await canvasPrinter.bold(false);
 
-  if (sum0) {
-    await canvasPrinter.println('Tax 0%:');
-    await canvasPrinter.leftRight('Total', convertMoney(sum0));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(net0));
-    await canvasPrinter.leftRight('Total', convertMoney(tax0));
-    await canvasPrinter.newLine();
-  }
-
-  if (sum7) {
-    await canvasPrinter.println('Tax 7%:');
-    await canvasPrinter.leftRight('Total', convertMoney(sum7));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(net7));
-    await canvasPrinter.leftRight('Total', convertMoney(tax7));
-    await canvasPrinter.newLine();
-  }
-
-  if (sum19) {
-    await canvasPrinter.println('Tax 19%:');
-    await canvasPrinter.leftRight('Total', convertMoney(sum19));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(net19));
-    await canvasPrinter.leftRight('Total', convertMoney(tax19));
+  for (let key in report.vTaxSum.vTaxSum) {
+    await canvasPrinter.println(`Tax ${key}%:`);
+    await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
+    await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
     await canvasPrinter.newLine();
   }
 
@@ -189,12 +161,15 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
-  const paymentTypes = Object.keys(sumByPayment);
-  for (let i = 0; i < paymentTypes.length; i++) {
-    const paymentType = paymentTypes[i];
-    const paymentAmount = sumByPayment[paymentType];
-    await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
-  }
+  /**
+   * todo: fix this
+   */
+  // const paymentTypes = Object.keys(sumByPayment);
+  // for (let i = 0; i < paymentTypes.length; i++) {
+  //   const paymentType = paymentTypes[i];
+  //   const paymentAmount = sumByPayment[paymentType];
+  //   await canvasPrinter.println(`${paymentType.charAt(0).toUpperCase() + paymentType.slice(1)}: ${convertMoney(paymentAmount)}`);
+  // }
 
   await canvasPrinter.print();
 }

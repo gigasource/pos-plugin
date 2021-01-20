@@ -25,15 +25,19 @@ describe('Test print report', function () {
 	})
 
 	it('Case 1: Test EOD report printer', async () => {
-		const result = printInvoiceHandler('ZReport')
-		expect(stringify(result)).toMatchSnapshot()
+		printInvoiceHandler('ZReport')
 	})
 
 	it('Case 2: Month report', async () => {
-		const result = printInvoiceHandler('MonthlyReport')
+		printInvoiceHandler('MonthlyReport')
 	})
 
 	it('Case 3: Staff report', async () => {
-		const result = printInvoiceHandler('StaffReport', {staffName: 'Waiter 1', from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('06.01.2021', 'DD.MM.YYYY').toDate()})
+		printInvoiceHandler('StaffReport', {staffName: 'Waiter 1', from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('06.01.2021', 'DD.MM.YYYY').toDate()})
+	})
+
+	// todo: Finish x report
+	it('Case 4: X report', async () => {
+		printInvoiceHandler('XReport', {from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('06.01.2021', 'DD.MM.YYYY').toDate()})
 	})
 })
