@@ -6,60 +6,51 @@ const fs = require('fs');
 const path = require('path');
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer')
+const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
+  const { orm } = cms
   const Order = cms.getModel('Order')
   const EndOfDay = cms.getModel('EndOfDay');
-  cms.on('bridge:inited', function () {
-    cms.bridge.on('endOfDay', async function (report, cb) {
-      report = JsonFn.clone(report)
-      await cms.emit('run:endOfDay', report);
-      /*let vDateOrders = await Order.find({status: 'paid', vDate: dayjs(report.begin).startOf('day').toDate()})
-      vDateOrders = JsonFn.clone(vDateOrders, true, true);
+  const Action = cms.getModel('Action')
 
-      const ordersToUpdate = vDateOrders.filter(order => report.begin <= order.date && order.date <= report.end).map(i => i._id)
-      await cms.getModel('OrderCommit').addCommits([{
-        type: 'order',
-        action: 'update',
-        where: JSON.stringify({ _id: { $in: ordersToUpdate } }),
-        data: {
-          allowMutateInactiveOrder: true
-        },
-        update: {
-          method: 'updateMany',
-          query: JSON.stringify({ $set: { z: report.z } })
-        }
-      }])
+  /**
+   * Handle action for endOfDay
+   * Action is acted iff this is master
+   */
+  orm.on('commit:handler:finish:Action', async function (action, commit) {
+    if (!commit.tags.includes('endOfDay') || !orm.isMaster) return
+    const { z } = action
+    cms.emit('run:endOfDay', z)
+    await printHandler('ZReport', z)
+  })
 
-      await EndOfDay.create(report)
-      await printHandler('ZReport', report)*/
-      cb();
-    });
+  orm.on('commit:handler:finish:Action', async function (action, commit) {
+    if (!commit.tags.includes('printReport') || !orm.isMaster) return
+    if (action.reportType === 'XReport') {
+      const from = dayjs(action.data).startOf('day').toDate()
+      const to = dayjs(action.data).add(1, 'day').toDate()
+      action.data = { from, to }
+    } else {
+      action.data = JsonFn.clone(action.data)
+    }
 
-    cms.bridge.on('printReport', async (reportType, data, cb) => {
-      if (reportType === 'XReport') {
-        const from = dayjs(data).startOf('day').toDate()
-        const to = dayjs(data).add(1, 'day').toDate()
-        data = { from, to }
-      } else {
-        data = JsonFn.clone(data)
-      }
-
-      await printHandler(reportType, data)
-      cb()
-    })
+    await printHandler(action.reportType, action.data)
   })
 
   cms.socket.on('connect', (socket) => {
-    socket.on('endOfDay', async function (report, cb) {
-      cms.bridge.emitToMaster('endOfDay', report, () => {
-        typeof cb === 'function' && cb();
-      });
+    socket.on('endOfDay', async function (z, cb) {
+      Action.create({
+        z
+      }).commit('endOfDay')
+      cb()
     })
     socket.on('printReport', (reportType, data, cb) => {
-      cms.bridge.emitToMaster('printReport', reportType, data, () => {
-        typeof cb === 'function' && cb()
-      })
+      Action.create({
+        reportType,
+        data
+      }).commit('printReport')
+      cb()
     })
   })
 }
@@ -73,12 +64,12 @@ async function getLocale() {
   if (posSettings) {
     if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) locale = posSettings.onlineDevice.store.locale
   }
-  const localeFilePath = `../../i18n/${locale}.js`
+  const localeFilePath = `../../../i18n/${locale}.js`
   const isLocaleFileExist = fs.existsSync(path.resolve(__dirname, localeFilePath))
   if (isLocaleFileExist) {
     return require(localeFilePath)[locale]
   }
-  return require(`../../i18n/en.js`).en
+  return require(`../../../i18n/en.js`).en
 }
 
 async function printHandler(reportType, reportData, device, callback = () => null) {
@@ -127,10 +118,8 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       groupPrinter: group.name,
       groupPrinterId: group._id
     })));
-
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
-    const {useVirtualPrinter} = posSetting.generalSetting
-
+    const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
     for (const printerInfo of printers) {
       if (useVirtualPrinter) {
         await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, {report, printData, printerInfo, type})

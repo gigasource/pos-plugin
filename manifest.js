@@ -93,28 +93,28 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print-report/index.js',
+      path: 'backend/print/print-report/index.js',
       type: 'backend'
     },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print-kitchen/kitchen-printer.js',
+      path: 'backend/print/print-kitchen/kitchen-printer.js',
       type: 'backend'
     },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print-entire-receipt/entire-receipt-printer.js',
+      path: 'backend/print/print-entire-receipt/entire-receipt-printer.js',
       type: 'backend'
     },
     {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/test-printer/test-printer.js',
+      path: 'backend/print/test-printer/test-printer.js',
       type: 'backend'
     },
     {
@@ -142,7 +142,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print-utils/virtual-printer.js',
+      path: 'backend/print/print-utils/virtual-printer.js',
       type: 'backend'
     },
     {

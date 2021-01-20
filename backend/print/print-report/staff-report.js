@@ -1,11 +1,16 @@
+const { staffReport } = require('../../order-logic/report-staff-logic')
 const dayjs = require('dayjs');
 
-async function makePrintData(cms, args) {
-  return {orderSalesByStaff: args}
+async function makePrintData(cms, {staffName, from, to}) {
+  const report = await staffReport(from, to)
+  report.staffName = staffName
+  report.from = from
+  report.to = to
+  return report
 }
 
 async function printEscPos(escPrinter, printData) {
-  const {orderSalesByStaff: {name, user, from, groupByTax, groupByPayment}} = printData;
+  const {userSales, groupByStatus, groupByPayment, staffName, from, to} = printData;
 
   function convertMoney(value) {
     return !isNaN(value) ? value.toFixed(2) : value
@@ -17,45 +22,46 @@ async function printEscPos(escPrinter, printData) {
 
   escPrinter.bold(true);
   escPrinter.alignLeft();
-  escPrinter.println(`Staff name: ${name}`);
+  escPrinter.println(`Staff name: ${staffName}`);
 
-  if (user[name]) {
+  if (userSales[staffName]) {
     escPrinter.println(`Report Date: ${formatDate(from)}`);
     escPrinter.bold(false);
-    escPrinter.println(`First Order: ${formatDate(user[name].from)}`);
-    escPrinter.println(`Last Order: ${formatDate(user[name].to)}`);
+    escPrinter.println(`First Order: ${formatDate(userSales[staffName].from)}`);
+    escPrinter.println(`Last Order: ${formatDate(userSales[staffName].to)}`);
   }
 
   escPrinter.bold(true);
   escPrinter.drawLine();
   escPrinter.println('Sales');
 
-  if (user[name]) {
+  if (userSales[staffName]) {
     escPrinter.bold(false);
-    escPrinter.leftRight('Total', convertMoney(user[name].vSum));
-    escPrinter.leftRight('Sub-total', convertMoney(user[name].net));
-    escPrinter.leftRight('Tax', convertMoney(user[name].tax));
+    escPrinter.leftRight('Total', convertMoney(userSales[staffName].vTaxSum.gross));
+    escPrinter.leftRight('Sub-total', convertMoney(userSales[staffName].vTaxSum.net));
+    escPrinter.leftRight('Tax', convertMoney(userSales[staffName].vTaxSum.tax));
   }
 
   escPrinter.drawLine();
 
+  const groupByTax = userSales[staffName] ? userSales[staffName].vTaxSum.vTaxSum : null
   if (groupByTax) {
     escPrinter.bold(false);
     Object.keys(groupByTax).forEach(taxGroup => {
-      const {gross, net, salesTax} = groupByTax[taxGroup];
+      const {gross, net, tax} = groupByTax[taxGroup];
 
       escPrinter.println(`Tax ${taxGroup}%:`);
       escPrinter.leftRight('Total', convertMoney(gross));
       escPrinter.leftRight('Sub-total', convertMoney(net));
-      escPrinter.leftRight('Tax', convertMoney(salesTax));
+      escPrinter.leftRight('Tax', convertMoney(tax));
       escPrinter.newLine();
     });
   }
 
-  if (user[name]) {
+  if (userSales[staffName]) {
     escPrinter.leftRight('Vouchers Sold', convertMoney(0));
     escPrinter.leftRight('Vouchers Used', convertMoney(0));
-    escPrinter.leftRight('Discount', convertMoney(user[name].discount));
+    escPrinter.leftRight('Discount', convertMoney(userSales[staffName].vDiscount));
   }
 
   escPrinter.bold(true);

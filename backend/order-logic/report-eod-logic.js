@@ -39,7 +39,8 @@ async function eodReport(z) {
   return {
     report,
     reportByPayment,
-    cancelledReport
+    cancelledReport,
+    paidOrders
   }
 }
 
