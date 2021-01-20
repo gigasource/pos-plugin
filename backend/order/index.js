@@ -24,8 +24,9 @@ module.exports = (cms) => {
 
   cms.socket.on('connect', async (socket) => {
     feSocket = socket
-    socket.on('print-to-kitchen', async (actionList) => {
+    socket.on('print-to-kitchen', async (actionList, order) => {
       await execAllChain(actionList)
+      await cms.emit('post:print-to-kitchen');
     })
 
     socket.on('cancel-order', cancelOrder)

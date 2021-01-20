@@ -65,6 +65,10 @@ beforeEach(async () => {
 	}
 })
 
+/**
+ * cms[0] ~ orderMaster
+ * cms[1] ~ orderClient
+ */
 describe('Pos logic sync', function () {
 	it('Case 1: Create order + addProduct in master', async (done) => {
 		orderMaster.prepareOrder('10')
@@ -74,7 +78,7 @@ describe('Pos logic sync', function () {
 		cms[1].feSocket.on('update-table', async function (order) {
 			await checkOrderCreated(cms[0].orm)
 			await checkOrderCreated(cms[1].orm)
-			await orderClient.setNewOrder(order)
+			await orderClient.syncOrderChange(order)
 			expect(stringify(orderMaster.getCurrentOrder())).toMatchSnapshot()
 			expect(stringify(orderClient.getCurrentOrder())).toMatchSnapshot()
 			expect(stringify(orderClient.actionList.value)).toMatchSnapshot()
@@ -87,7 +91,8 @@ describe('Pos logic sync', function () {
 		expect(stringify(orderMaster.actionList.value)).toMatchSnapshot()
 		expect(stringify(orderClient.actionList.value)).toMatchSnapshot()
 		await nextTick()
-		cms[0].feSocket.emit('print-to-kitchen', orderMaster.actionList.value)
+		simulateBackendPrint(order2)
+		cms[0].feSocket.emit('print-to-kitchen', orderMaster.actionList.value, order1);
 		await nextTick()
 	})
 })
