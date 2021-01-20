@@ -376,22 +376,76 @@ export function makePaid(order) {
   hooks.emit('post:order:update', order);
 }
 
-//type: cash/card; value: 251
-//string, obj, arr
+//design addPayment : value, tip, cashback,
+//addSinglePayment -> auto fill vSum, cashback (cash), tip ->
+//addMultiPayment -> auto fill the rest total
+
+/**
+ *
+ * @param order
+ * @param payment [type: ['cash', 'card'], value]
+ */
+export function addSinglePayment(order, payment) {
+  hooks.emit('pre:order:update', order);
+
+  if (!payment.value) {
+    payment.value = order.vSum + (order.cashback || 0) - getPaymentTotal(order);
+  } else if (payment.type === 'cash' && payment.value + getPaymentTotal(order) > order.vSum) {
+    order.cashback = payment.value + getPaymentTotal(order) - order.vSum;
+  } else if (payment.type !== 'cash' && payment.value > order.vSum) {
+    order.tip = payment.value + getPaymentTotal(order) - order.vSum;
+  }
+
+  order.payment.splice(0, 0, payment)
+  hooks.emit('post:order:update', order);
+}
+
+/*hooks.on('createOrder', order => {
+  watchEffect(() => {
+    if (!order.multiPayment && order.payment[0] && order.payment[0] === 'cash') {
+      order.payment[0].value = order.vSum + (order.cashback || 0) - getPaymentTotal(order);
+    }
+  })
+})*/
+
 export function addPayment(order, payment) {
   hooks.emit('pre:order:update', order);
-  if (typeof payment === 'string') {
-    if (order.payment.length === 0) {
-      order.payment.push({
-        type: payment
-      })
-    }
-  } else if (typeof payment === 'object' && !Array.isArray(payment)) {
-    order.payment.push(payment);
-  } else if (Array.isArray(payment)) {
-    order.payment.push(...payment);
-  }
+  order.payment.push(payment);
   hooks.emit('post:order:update', order);
+}
+
+export function updateSinglePayment(order, payment) {
+  order.payment.splice(0, 1);
+  addSinglePayment(order, payment);
+}
+
+export function updatePayment(order, index, payment) {
+  order[index] = payment;
+}
+
+export function getRestTotal(order) {
+  return order.vSum - getPaymentTotal(order);
+}
+
+export function addMultiPayment(order, payment) {
+  order.multiPayment = true;
+  addPayment(order, payment);
+}
+
+hooks.on('createOrder', order => {
+  watchEffect(() => {
+    if (order.multiPayment && _.find(order.payment, p => p.type === 'card')) {
+      if (getPaymentTotal(order) > order.vSum + (order.tip || 0)) {
+        order.tip = getPaymentTotal(order) - order.vSum;
+      }
+    }
+  })
+})
+
+//todo: update payment
+
+export function getPaymentTotal(order) {
+  return _.sumBy(order.payment, 'value');
 }
 
 export function updateOrderWithHooks(order, cb) {
@@ -402,21 +456,11 @@ export function updateOrderWithHooks(order, cb) {
 
 export function clearPayment(order) {
   hooks.emit('pre:order:update', order);
+  order.cashback = 0;
+  order.tip = 0;
   order.payment.length = 0;
   hooks.emit('post:order:update', order);
 }
-
-hooks.on('createOrder', order => {
-  watchEffect(() => {
-    if (order.payment.length === 1) {
-      order.payment[0].value = order.vSum;
-    } else if (order.payment.length > 1) {
-      const payment = [...order.payment];
-      const last = payment.pop();
-      last.value = _.round(order.vSum - _.sumBy(payment, p => p.value), 2);
-    }
-  })
-})
 
 /**
  *
@@ -512,7 +556,7 @@ export function simulateBackendPrint(order) {
   })
 }
 
-export function mergeSameItems(order) {
+export function mergeSameItems(order, mutate = true) {
   const items = order.items.reduce((list, item) => {
     let shouldAdd = true;
     for (const _item of list) {
@@ -526,7 +570,8 @@ export function mergeSameItems(order) {
     }
     return list;
   }, [])
-  order.items = items;
+  if (mutate) order.items = items;
+  return items;
 }
 
 //todo: recent items

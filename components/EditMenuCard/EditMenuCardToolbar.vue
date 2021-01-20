@@ -17,7 +17,7 @@
         v-model="dialog.confirmDeleteProductLayout"
         :type="deleteProductLayoutMessage"
         @submit="deleteItem(), hideDeleteConfirmDialog()"/>
-    
+
     <g-dialog v-model="dialog.switchEditMode.show" eager width="448">
       <div class="dialog">
         <div class="dialog-content" @click="closeSwitchDialogMode(), changeToBasicMode()">
@@ -39,7 +39,7 @@
         </div>
       </div>
     </g-dialog>
-    
+
     <dialog-form-input v-model="dialog.add" @submit="createLayout">
       <template v-slot:input>
         <div class="row-flex flex-wrap justify-around mt-2">
@@ -268,7 +268,6 @@
         delete clone._id
         return clone
       },
-
       createNewProductId(id) {
         const idRegex = /^(?<digit>\d+)(?<alpha>\w)?$/g
         const result = idRegex.exec(id)
@@ -277,7 +276,8 @@
         if (!result.groups.alpha)
           return Number(result.groups.digit) + 1
         return `${result.groups.digit}${String.fromCharCode(result.groups.alpha.charCodeAt(0) + 1) }`
-      },
+      }
+      ,
 
       clearProductAction() {
         console.log('clear product action')

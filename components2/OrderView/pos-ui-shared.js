@@ -10,37 +10,88 @@ import {addItem} from "./pos-logic";
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
+import { createEmptyProduct } from '../EditMenuCard/utils';
+export const orderLayout = ref(null);
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
-export const orderLayout = ref({categories: []});
-export const view = ref();
+export const selectedProduct = computed({
+  get: () => {
+    // if no product layout selected, then return null
+    if (!selectedProductLayout.value)
+      return null
+
+    // otherwise, init new product object if current product layout is empty
+    if (!selectedProductLayout.value.product)
+      selectedProductLayout.value.product = createEmptyProduct()
+
+    return selectedProductLayout.value.product
+  },
+  set: (value) => {
+    selectedProductLayout.value.product = value
+  }
+})
+export const selectedProductExisted = computed(() => {
+  return !!(selectedProduct.value && selectedProduct.value._id)
+})
+
+// editor view
+export const view = ref({});
+/**
+ * Update editor display
+ * @param name CategoryEditor | ProductEditor | KeyboardEditor
+ * @param mode basic, ingredient
+ */
+export const updateView = (name, mode) => {
+  mode = mode || (view.value && view.value.mode) // keep mode persistent
+
+  // fallback to basic mode
+  // we may see some thing weird like { name: CategoryEditor, mode: 'basic' }
+  // but it's ok
+  if (!mode)
+    mode = 'basic'
+
+  view.value = { name, mode }
+}
+export const ProductEditModes = {
+  basic: 'basic',
+  ingredient: 'ingredient'
+}
+export function updateProductEditMode(newMode) {
+  view.value.mode = newMode
+}
+
 export const editable = ref(false);
 export const productDblClicked = ref(false);
 
 export function updateOrderLayout(newLayout) {
   orderLayout.value = newLayout
 }
-
 export function updateSelectedCategoryLayout(newCategoryLayout) {
   selectedCategoryLayout.value = newCategoryLayout
 }
+export function updateSelectedProductLayout(newProductLayout) {
+  selectedProductLayout.value = newProductLayout
+}
 
 watchEffect(() => {
+  if (!orderLayout.value)
+    return
+
   if (selectedCategoryLayout.value) {
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
     if (!cateLayout)
       return
     // update category layout
-    selectedCategoryLayout.value = cateLayout;
+    updateSelectedCategoryLayout(cateLayout)
     if (!view.value || view.value.name !== 'ProductEditor' || !selectedProductLayout.value)
       return
     // update product layout
     const prodLayout = _.find(cateLayout.products, pl => isSameArea(selectedProductLayout.value, pl))
     if (prodLayout)
-      selectedProductLayout.value = prodLayout
+      updateSelectedProductLayout(prodLayout)
     else if (editable) {
-      view.value = {name: 'CategoryEditor'};
-      selectedProductLayout.value = null;
+      updateView('CategoryEditor')
+      updateSelectedProductLayout(null)
     }
   } else {
     // automatically select first category
@@ -48,17 +99,21 @@ watchEffect(() => {
       // find tab-product at 0-0
       const topLeftCategory = _.find(orderLayout.value.categories, c => c.top === 0 && c.left === 0)
       if (topLeftCategory)
-        selectedCategoryLayout.value = topLeftCategory
+        updateSelectedCategoryLayout(topLeftCategory)
       else
-        selectedCategoryLayout.value = _.first(orderLayout.value.categories)
+        updateSelectedCategoryLayout(_.first(orderLayout.value.categories))
 
       if (editable.value && (!view.value || view.value.name !== 'CategoryEditor'))
-        view.value = {name: 'CategoryEditor'}
+        updateView('CategoryEditor')
     }
   }
 })
 
+// TODO: rename -> productLayouts
 export const products = computed(() => {
+  if (!selectedCategoryLayout.value)
+    return
+
   if (editable.value) {
     return fillMissingAreas(
       selectedCategoryLayout.value.products,
@@ -66,7 +121,7 @@ export const products = computed(() => {
       selectedCategoryLayout.value.rows);
   }
   // remove product layout which is not text but doesn't link to any product
-  return  _.filter(selectedCategoryLayout.value && selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
+  return  _.filter(selectedCategoryLayout.value.products, p => p.type === 'Text' || (p.type !== 'Text' && p.product))
 })
 
 //fixme: only for dev
@@ -79,18 +134,16 @@ const once = _.once(() => {
 
   orderViewDialog.receipt = true;
 })
-watchEffect(() => {
+/*watchEffect(() => {
   if (order.items.length === 0 && products.value.length > 0) {
     once();
   }
-})
+})*/
 
 /*async function run() {
   await nextTick();
 }
 run();*/
-
-export const mode = ref();
 
 export const highlightSelectedProduct = ref(false);
 

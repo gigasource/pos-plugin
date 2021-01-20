@@ -1,8 +1,10 @@
 module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
+    // components 2
     { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos2-login' },
     { loader: { type: 'route' }, filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos2-edit-table-plan' },
+    { loader: { type: 'route' }, filePath: 'components2/EditMenuCard/EditMenuCard2.vue', name: 'EditMenuCard2', path: '/pos2-edit-menu-card' },
     // { loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     { loader: { type: 'route' }, filePath: 'components2/Dashboard/PosDashboard.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },

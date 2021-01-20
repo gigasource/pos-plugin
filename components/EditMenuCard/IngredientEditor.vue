@@ -12,14 +12,14 @@
           :arrow="false"
           v-model="ingredient.inventory"
           @input-click="showKeyboard = true"
-          @update:modelValue="updateProductIngredient"/>
+          @update:modelValue="updateProductIngredient"></g-autocomplete>
       <g-text-field-bs
           :rules="[val => !isNaN(val) || '']"
           class="ingredient-editor__input--right"
           virtual-event
           v-model="ingredient.amount"
           @click="showKeyboard = true"
-          @update:modelValue="debounceUpdateAmount"/>
+          @update:modelValue="debounceUpdateAmount"></g-text-field-bs>
     </div>
     <div class="ingredient-editor__message">
       {{$t('inventory.swipeRight')}}
@@ -28,7 +28,7 @@
     <div v-if="showKeyboard" class="ingredient-editor__keyboard">
       <div class="ingredient-editor__overlay" @click="showKeyboard = false"></div>
       <div class="ingredient-editor__keyboard-wrapper">
-        <pos-keyboard-full @enter-pressed="showKeyboard = false"/>
+        <pos-keyboard-full @enter-pressed="showKeyboard = false"></pos-keyboard-full>
       </div>
     </div>
   </div>

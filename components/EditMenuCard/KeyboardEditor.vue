@@ -4,12 +4,12 @@
     <g-btn-bs elevation="2" style="margin: 0 0 12px" @click="dialog = true" icon="select_all">{{$t('ui.choose')}}</g-btn-bs>
     <div class="keyboard-editor__title">{{$t('restaurant.menuEdit.expansionColumn')}}</div>
     <div class="row-flex">
-      <input-number width="148" :model-value="extraColumns" @update:modelValue="changeExtraColumns"/>
+      <input-number width="148" :model-value="extraColumns" @update:modelValue="changeExtraColumns"></input-number>
       <g-btn-bs elevation="2" icon="icon-redo" @click="resetKeyboard">{{$t('ui.reset')}}</g-btn-bs>
     </div>
-    <g-checkbox v-model="active" label="Active Keyboard"/>
-    <g-checkbox v-model="onlyShowInFirstPage" label="Show Keyboard only in first page"/>
-    <g-checkbox v-model="x" label="Show 'x' Button"/>
+    <g-checkbox v-model="active" label="Active Keyboard"></g-checkbox>
+    <g-checkbox v-model="onlyShowInFirstPage" label="Show Keyboard only in first page"></g-checkbox>
+    <g-checkbox v-model="x" label="Show 'x' Button"></g-checkbox>
     <g-dialog v-model="dialog" width="90%" height="90%" eager>
       <div class="dialog">
         <div class="dialog-title">{{$t('restaurant.menuEdit.keyboardPosition')}}</div>
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-  
+
   export default {
     name: "KeyboardEditor",
     props: {

@@ -70,6 +70,53 @@ async function createCategoryLayout(orderLayoutId, categoryLayout) {
       { new: true });
 }
 
+
+// product api
+async function createProductLayout(layoutType, categoryLayoutId, productLayout) {
+  return await cms.getModel('OrderLayout').findOneAndUpdate(
+      {
+        type: layoutType,
+        'categories._id': categoryLayoutId
+      },
+      { $push: { 'categories.$.products': productLayout } },
+      { new: true });
+}
+
+async function updateProductLayout(layoutType, categoryLayoutId, productLayoutId, change) {
+  console.log('Update product layout id=', productLayoutId, ' with change', change)
+  const qry = { type: layoutType, 'categories.products._id': productLayoutId }
+  const set = {
+    $set: _.reduce(change, (result, value, key) => {
+      result[`categories.$[cate].products.$[product].${key}`] = value
+      return result
+    }, {})
+  };
+  const filter = [{ 'cate._id': categoryLayoutId }, { 'product._id': productLayoutId }]
+  return await cms.getModel('OrderLayout').findOneAndUpdate(qry, set, { arrayFilters: filter, new: true });
+}
+
+async function deleteProductLayout(categoryId, productLayoutId) {
+  return await cms.getModel('OrderLayout').findOneAndUpdate(
+      { 'categories._id': categoryId },
+      { $pull: { 'categories.$.products': { _id: productLayoutId } } },
+      { new: true })
+}
+
+// product api (MOVE TO ANOTHER FILE???)
+async function updateProduct(productId, change) {
+  console.log(`updateProduct\n\tProduct Id:${productId}\n\tChange: `, change)
+  return await cms.getModel('Product').findOneAndUpdate({ _id: productId }, change)
+}
+
+async function createProduct(product) {
+  return await cms.getModel('Product').create({ ...product });
+}
+
+async function deleteProduct(productId) {
+  return await cms.getModel('Product').remove({_id: productId})
+}
+
+
 export default {
   createOrderLayout,
   changeCategoryColumn,
@@ -78,5 +125,15 @@ export default {
   switchCategory,
   //
   updateCategoryLayout,
-  createCategoryLayout
+  createCategoryLayout,
+  // product layout
+  createProductLayout,
+  updateProductLayout,
+  deleteProductLayout,
+
+  // product
+  createProduct,
+  updateProduct,
+  deleteProduct
+
 }

@@ -1,15 +1,20 @@
 //<editor-fold desc="declare">
 import { nextTick } from "vue";
 import {
+  addMultiPayment,
   addPayment,
+  addSinglePayment,
   cancelOrder,
   clearPayment,
+  getRestTotal,
   mergeSameItems,
   removeItem,
-  simulateBackendPrint
+  simulateBackendPrint,
+  updateSinglePayment
 } from "../pos-logic";
 import expect from "expect";
 import { changeCourse } from "../pos-logic";
+
 const dayjs = require("dayjs");
 import { stringify } from "../../../utils/test-utils";
 
@@ -824,57 +829,115 @@ describe("pos-logic", function() {
     //</editor-fold>
   });
 
-  it("case7: test payment", async function() {
+  it("case7: test single payment", async function() {
     let order = createOrder();
     addItem(order, cola, 10);
     addItem(order, fanta, 20);
 
-    addPayment(order, "cash");
+    await nextTick();
+    addSinglePayment(order, { type: "cash" });
+    addPayment(order, { type: "Sodexo", value: 5 });
 
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect(order.payment).toMatchInlineSnapshot(`
+    expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
       Array [
-        Object {
-          "type": "cash",
-          "value": 53,
-        },
+        Array [
+          Object {
+            "type": "cash",
+            "value": 53,
+          },
+          Object {
+            "type": "Sodexo",
+            "value": 5,
+          },
+        ],
+        undefined,
       ]
     `);
     //</editor-fold>
-
-    clearPayment(order);
-    addPayment(order, { type: "cash", value: 10 });
-    addPayment(order, { type: "card" });
+    updateSinglePayment(order, { type: "cash", value: 70 });
     await nextTick();
-    expect(order.payment).toMatchInlineSnapshot(`
+
+    expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
       Array [
-        Object {
-          "type": "cash",
-          "value": 10,
-        },
-        Object {
-          "type": "card",
-          "value": 43,
-        },
+        Array [
+          Object {
+            "type": "cash",
+            "value": 70,
+          },
+          Object {
+            "type": "Sodexo",
+            "value": 5,
+          },
+        ],
+        22,
       ]
     `);
+  });
 
-    clearPayment(order);
-    addPayment(order, [{ type: "cash", value: 10 }, { type: "card" }]);
+  it("case7a : test multi payment tip", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+
     await nextTick();
-    expect(order.payment).toMatchInlineSnapshot(`
+    addMultiPayment(order, { type: "cash", value: 10 });
+    await nextTick();
+    addMultiPayment(order, { type: "card", value: 50 });
+
+    //auto add tip
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
       Array [
-        Object {
-          "type": "cash",
-          "value": 10,
-        },
-        Object {
-          "type": "card",
-          "value": 43,
-        },
+        Array [
+          Object {
+            "type": "cash",
+            "value": 10,
+          },
+          Object {
+            "type": "card",
+            "value": 50,
+          },
+        ],
+        undefined,
+        7,
       ]
     `);
+    //</editor-fold>
+  });
+
+  it("case7b : test multi payment", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+
+    await nextTick();
+    addMultiPayment(order, { type: "cash", value: 10 });
+    await nextTick();
+    addMultiPayment(order, { type: "card", value: getRestTotal(order) });
+
+    //auto add tip
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "type": "cash",
+            "value": 10,
+          },
+          Object {
+            "type": "card",
+            "value": 43,
+          },
+        ],
+        undefined,
+        undefined,
+      ]
+    `);
+    //</editor-fold>
   });
 
   it("case 8: cancellationItems", async function() {
