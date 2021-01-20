@@ -2,16 +2,21 @@ const _ = require('lodash')
 const {getEscPrinter, getGroupPrinterInfo} = require('../print-utils/print-utils')
 const PureImagePrinter = require('@gigasource/pureimage-printer-renderer');
 const virtualPrinter = require('../print-utils/virtual-printer')
+const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
-  cms.socket.on('connect', socket => {
-    socket.on('printKitchen', printKitchen);
-    socket.on('printKitchenCancel', printKitchenCancel)
-  });
+  cms.on('run:print', async function (commit) {
+    if (commit.printType === 'kitchenAdd') {
+      await printKitchen({
+        order: commit.order
+      })
+    } else if (commit.printType === 'kitchenCancel') {
+      await printKitchenCancel({
+        order: commit.order
+      })
+    }
+  })
 }
-
-module.exports.printKitchen = printKitchen
-module.exports.printKitchenCancel = printKitchenCancel
 
 function createPureImagePrinter(escPrinter) {
   return new PureImagePrinter(560, {
@@ -33,7 +38,7 @@ async function printKitchen({order, device}, callback = () => null) {
     const receipts = getReceiptsFromOrder(order);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
-    const {useVirtualPrinter} = posSetting.generalSetting
+    const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo
@@ -81,7 +86,7 @@ async function printKitchenCancel({order, device}, callback = () => null) {
     const receipts = getReceiptsFromOrder(order);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
-    const {useVirtualPrinter} = posSetting.generalSetting
+    const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
 
     for (const printerInfo of printerInfos) {
       const {escPOS} = printerInfo
@@ -406,3 +411,6 @@ function callbackWithError(callback, error) {
     message: error.toString()
   })
 }
+
+module.exports.printKitchen = printKitchen
+module.exports.printKitchenCancel = printKitchenCancel
