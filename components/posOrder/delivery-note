@@ -114,3 +114,11 @@ async updatePrice(price) {
   await this.loadProduct()
   this.selectedProduct = this.products[index]
 },
+
+
+
+// TODO:
+// 0. fill du lieu mock data (vi du cuoc dien thoai goi den, google api key -> hien auto complete cho)
+// 1. snapshot customer UI
+// 2. logic test customer UI
+// 3.

@@ -7,14 +7,12 @@ import { ref } from 'vue'
 // PosOrderDelivery.vue
 const selectedCustomer = ref(null)
 
-
 const posSettingMock = {
   generalSetting: {
     keyboardDeliveryConfig: [], // can be empty // TODO: sample data
     deliveryOrderMode: 'tablet' // tablet || 'mobile'
   }
 }
-
 
 // TODO:
 const mockProducts = [
