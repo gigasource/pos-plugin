@@ -133,7 +133,7 @@ export function deliveryCustomerUiFactory() {
       selectedAddress.value = selectedCustomer.value.addresses.length - 1
       isNewCustomer.value = false
     }
-    if (dialogMode === 'edit') {
+    if (dialogMode.value === 'edit') {
       selectedCustomer.value['name'] = name.value
       selectedCustomer.value.addresses.splice(selectedAddress.value, 1, {
         address: address.value,
@@ -196,12 +196,12 @@ export function deliveryCustomerUiFactory() {
   }
 
   const customerUiRender = () => (
-    <div className="delivery-info">
-      <div className="delivery-info--upper">
+    <div class="delivery-info">
+      <div class="delivery-info--upper">
         {(deliveryOrderMode.value === 'tablet' || !showKeyboard.value) &&
-        <div className="delivery-info__favorite">
+        <div class="delivery-info__favorite">
           {favorites.value.map((f, i) =>
-            <div style={getRandomColor(i)} className="delivery-info__favorite-item"
+            <div style={getRandomColor(i)} class="delivery-info__favorite-item"
                  onClick={() => selectFavoriteProduct(f)}
                  key={`favorite_${i}`}>
               {f.name}
@@ -209,14 +209,14 @@ export function deliveryCustomerUiFactory() {
         </div>}
 
 
-        <div className="delivery-info__customer">
+        <div class="delivery-info__customer">
           {!isNewCustomer.value ?
             <>
               {selectedCustomer.value.addresses.map((item, i) =>
                 <div
-                  className={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
+                  class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
                   onClick={() => selectedAddress.value = i}>
-                  <div className="row-flex align-items-center">
+                  <div class="row-flex align-items-center">
                     <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
                              color="#536DFE"/>
                     <g-spacer/>
@@ -230,14 +230,14 @@ export function deliveryCustomerUiFactory() {
                     </g-btn-bs>
                   </div>
                   <p>{item.address}</p>
-                  <p className="text-grey fs-small">{item.zipcode}</p>
-                  <p className="text-grey fs-small">{item.city}</p>
+                  <p class="text-grey fs-small">{item.zipcode}</p>
+                  <p class="text-grey fs-small">{item.city}</p>
                 </div>)}
               <g-icon size="40" color="#1271FF" onClick={() => openDialog('add')}>add_circle</g-icon>
             </> :
             (deliveryOrderMode.value === 'mobile' ?
               <>
-                <div className="row-flex mt-3 w-100">
+                <div class="row-flex mt-3 w-100">
                   <div style="flex: 1; margin-right: 2px">
                     <g-text-field outlined dense v-model={phone.value} label="Phone"
                                   onClick={() => showKeyboard.value = true}
@@ -249,8 +249,8 @@ export function deliveryCustomerUiFactory() {
                                   virtualEvent={isIOS.value}/>
                   </div>
                 </div>
-                <div className="row-flex">
-                  <div className="col-9">
+                <div class="row-flex">
+                  <div class="col-9">
                     <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
                                 clearable
                                 virtualEvent={isIOS.value} skip-search
@@ -260,7 +260,7 @@ export function deliveryCustomerUiFactory() {
                                 menu-class="menu-autocomplete-address"
                                 onUpdate:modelValue={selectAutocompleteAddress}/>
                   </div>
-                  <div className="flex-grow-1 ml-1">
+                  <div class="flex-grow-1 ml-1">
                     <g-text-field outlined dense v-model={house.value} label="Nr"
                                   onClick={() => showKeyboard.value = true}
                                   virtualEvent={isIOS.value}/>
@@ -268,13 +268,13 @@ export function deliveryCustomerUiFactory() {
                 </div>
               </> :
               <>
-                <g-text-field-bs className="bs-tf__pos" label="Name" v-model={name.valuee}
+                <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.valuee}
                                  onClick={() => openDialog('add')}>
                   {{
                     'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
                   }}
                 </g-text-field-bs>
-                <g-text-field-bs className="bs-tf__pos" label="Address" v-model={address.value}
+                <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
                                  onClick={() => openDialog('add')}>
                   {{
                     'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
@@ -283,67 +283,67 @@ export function deliveryCustomerUiFactory() {
               </>)}
         </div>
       </div>
-      <div className="delivery-info--lower">
+      <div class="delivery-info--lower">
         {(calls.value && calls.value.length > 0) ?
           <div
-            className={['delivery-info__call', calls && calls[0] && calls[0].type === 'missed' ? 'b-red' : 'b-grey']}>
-            <div className="delivery-info__call--info">
-              <p className="fw-700 fs-small">
-                <g-icon size="16" className="mr-1">icon-call</g-icon>
+            class={['delivery-info__call', calls && calls[0] && calls[0].type === 'missed' ? 'b-red' : 'b-grey']}>
+            <div class="delivery-info__call--info">
+              <p class="fw-700 fs-small">
+                <g-icon size="16" class="mr-1">icon-call</g-icon>
                 {calls.value[0].customer.phone}
               </p>
-              <p className="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
+              <p class="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
             </div>
             <div
-              className={['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']}
+              class={['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']}
               onClick={() => chooseCustomer('pickup')}>
               <g-icon size="20">icon-take-away</g-icon>
             </div>
             <div
-              className={['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']}
+              class={['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']}
               onClick={() => chooseCustomer('delivery')}>
               <g-icon size="20">icon-delivery-scooter</g-icon>
             </div>
-            <div className="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
+            <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
               <g-icon color="white">clear</g-icon>
             </div>
           </div> :
           <>
-            <div className="delivery-info__call--empty">
-              <p className="fw-700">Empty</p>
-              <p className="text-grey-darken-1">No pending calls</p>
+            <div class="delivery-info__call--empty">
+              <p class="fw-700">Empty</p>
+              <p class="text-grey-darken-1">No pending calls</p>
             </div>
             {(missedCalls.value && missedCalls.value.length > 0) &&
             <g-menu v-model={menuMissed.value} top left nudge-top="5"
                     v-slots={{
                       activator: ({on}) =>
                         <div vClick={on.click}
-                             className={['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']}>
+                             class={['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']}>
                           <b>Missed</b>
-                          <div className="delivery-info__call--missed-num">
+                          <div class="delivery-info__call--missed-num">
                             {missedCalls.length}
                           </div>
                         </div>
                     }}>
-              <div className="menu-missed">
+              <div class="menu-missed">
                 {missedCalls.map((call, i) =>
-                  <div className="menu-missed__call" key={`missed_${i}`}>
-                    <div className="menu-missed__call--info">
-                      <p className="fw-700 fs-small">
-                        <g-icon size="16" className="mr-1">icon-call</g-icon>
+                  <div class="menu-missed__call" key={`missed_${i}`}>
+                    <div class="menu-missed__call--info">
+                      <p class="fw-700 fs-small">
+                        <g-icon size="16" class="mr-1">icon-call</g-icon>
                         {call.customer.phone}
                       </p>
-                      <p className="fs-small text-grey-darken-1">{call.customer.name}</p>
+                      <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
                     </div>
-                    <div className={['delivery-info__call-btn']}
+                    <div class={['delivery-info__call-btn']}
                          onClick={() => chooseMissedCustomer(i, 'pickup')}>
                       <g-icon size="20">icon-take-away</g-icon>
                     </div>
-                    <div className={['delivery-info__call-btn']}
+                    <div class={['delivery-info__call-btn']}
                          onClick={() => chooseMissedCustomer(i, 'delivery')}>
                       <g-icon size="20">icon-delivery-scooter</g-icon>
                     </div>
-                    <div className="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                    <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
                       <g-icon color="white">clear</g-icon>
                     </div>
                   </div>)}
@@ -359,7 +359,7 @@ export function deliveryCustomerUiFactory() {
                        eager={false}
                        v-slots={{
                          input: () =>
-                           <div className="row-flex flex-wrap justify-around">
+                           <div class="row-flex flex-wrap justify-around">
                              <pos-textfield-new style="width: 48%" label="Name"
                                                 v-model={name.value}/>
                              <pos-textfield-new style="width: 48%" label="Phone"
