@@ -153,6 +153,15 @@ export const makeWrapper = (_component, options) => {
         'g-tabs': true,
         'g-tab-item': true,
         'pos-textfield-new': true,
+        'pos-payment-screen-payment-methods2': true,
+        'pos-payment-screen-keyboard2': true,
+        'pos-restaurant-payment-order-detail2': true,
+        'pos-restaurant-payment-toolbar2': true,
+        'dialog-multi-payment2': true,
+        'g-snackbar': true,
+        'dialog-change-value': true,
+        'g-table': true,
+        'g-divider': true
 
       },
       mocks: {

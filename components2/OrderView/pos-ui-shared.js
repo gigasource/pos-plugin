@@ -7,10 +7,11 @@ import {
 } from "../../components/posOrder/util";
 import _ from "lodash";
 import {addItem} from "./pos-logic";
-import {addProduct, getCurrentOrder} from "./pos-logic-be";
+import { addProduct, getCurrentOrder, prepareOrder } from './pos-logic-be';
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
+import cms from 'cms';
 export const orderLayout = ref({ categories: [] });
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
@@ -125,6 +126,8 @@ export const products = computed(() => {
 })
 
 //fixme: only for dev
+
+prepareOrder();
 const order = getCurrentOrder();
 const once = _.once(() => {
   addProduct(order, products.value[0].product);
@@ -134,16 +137,17 @@ const once = _.once(() => {
 
   orderViewDialog.receipt = true;
 })
-/*watchEffect(() => {
-  if (order.items.length === 0 && products.value.length > 0) {
+watchEffect(() => {
+  if (order && order.items.length === 0 && products.value && products.value.length > 0) {
     once();
   }
-})*/
+})
 
-/*async function run() {
+async function run() {
+  orderLayout.value = await cms.getModel('OrderLayout').findOne();
   await nextTick();
 }
-run();*/
+run();
 
 export const highlightSelectedProduct = ref(false);
 

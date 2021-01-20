@@ -2,6 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+    { loader: { type: 'route' }, filePath: 'components2/View/Payment/Payment2.vue', name: 'Payment2', path: '/pos2-payment' },
     { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos2-login' },
     { loader: { type: 'route' }, filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos2-edit-table-plan' },
     { loader: { type: 'route' }, filePath: 'components2/EditMenuCard/EditMenuCard2.vue', name: 'EditMenuCard2', path: '/pos2-edit-menu-card' },
@@ -22,7 +23,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
     { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
-    { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
+    // { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery', path: '/pos-order-delivery' },

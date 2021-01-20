@@ -387,7 +387,7 @@ export function makePaid(order) {
  */
 export function addSinglePayment(order, payment) {
   hooks.emit('pre:order:update', order);
-
+  order.multiPayment = false
   if (!payment.value) {
     payment.value = order.vSum + (order.cashback || 0) - getPaymentTotal(order);
   } else if (payment.type === 'cash' && payment.value + getPaymentTotal(order) > order.vSum) {
@@ -399,6 +399,15 @@ export function addSinglePayment(order, payment) {
   order.payment.splice(0, 0, payment)
   hooks.emit('post:order:update', order);
 }
+
+
+hooks.on('createOrder', order => {
+  watchEffect(() => {
+    if (!order.multiPayment && order.payment[0] && order.payment[0] === 'cash') {
+      order.cashback = Math.max(getPaymentTotal(order) - order.vSum, 0)
+    }
+  }, { onTrigger: () => console.log('trigger')})
+})
 
 /*hooks.on('createOrder', order => {
   watchEffect(() => {
@@ -415,6 +424,8 @@ export function addPayment(order, payment) {
 }
 
 export function updateSinglePayment(order, payment) {
+  order.tip = 0
+  order.cashback = 0
   order.payment.splice(0, 1);
   addSinglePayment(order, payment);
 }
@@ -434,11 +445,22 @@ export function addMultiPayment(order, payment) {
 
 hooks.on('createOrder', order => {
   watchEffect(() => {
-    if (order.multiPayment && _.find(order.payment, p => p.type === 'card')) {
-      if (getPaymentTotal(order) > order.vSum + (order.tip || 0)) {
-        order.tip = getPaymentTotal(order) - order.vSum;
-      }
+    const cardPayment = _.find(order.payment, p => p.type === 'card')
+    const cashPayment = _.find(order.payment, p => p.type === 'cash')
+    const cardValue = (cardPayment ? cardPayment.value : 0)
+    const cashValue = (cashPayment ? cashPayment.value : 0)
+    const remainValue = getPaymentTotal(order) - cashValue - cardValue
+    let tip = 0
+    let change = 0
+    let newCardValue = cardValue
+
+    if (cardValue + remainValue > order.vSum) {
+      newCardValue = Math.max(0, order.vSum - remainValue)
+      tip = cardValue - newCardValue
     }
+    change = cashValue + newCardValue + remainValue - order.vSum
+    order.tip = tip
+    order.cashback = change
   })
 })
 

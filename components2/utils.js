@@ -13,3 +13,16 @@ export function genScopeId(render) {
   }
   return {[getCurrentInstance().type['__scopeId']]: ''};
 }
+
+export const parseNumber = function(number) {
+  const res = parseFloat(number)
+  if (isNaN(res)) return 0
+  else return res
+}
+
+export const VModel_number = (obj, field = 'value') => {
+  return computed({
+    get: () => obj[field],
+    set: (val) => obj[field] = parseNumber(val)
+  })
+}
