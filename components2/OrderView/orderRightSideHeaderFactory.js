@@ -2,7 +2,7 @@ import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-s
 import {avatar, isMobile, user, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} from "./pos-logic-be";
-import {hooks} from './pos-logic'
+import {hooks, makeTakeaway, toggleTakeaway} from './pos-logic'
 import {computed, ref, withModifiers} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
@@ -39,7 +39,7 @@ export function orderRightSideHeader(props, {emit}) {
   }
 
   function toggleTakeAwayOrder() {
-    emit('updateCurrentOrder', 'takeAway', !props.isTakeAwayOrder, true)
+    toggleTakeaway(order);
   }
 
   function pay() {
@@ -47,10 +47,6 @@ export function orderRightSideHeader(props, {emit}) {
   }
 
   const {renderPayBtn} = payPrintBtnFactory();
-
-  const debug = (on, e) => {
-    on.on.click(e);
-  }
 
   const renderHeader = () => (
     <div class="order-detail__header">
@@ -66,7 +62,7 @@ export function orderRightSideHeader(props, {emit}) {
         <div class="row-flex align-items-center flex-grow-1">
           {isMobile.value ?
             <g-menu v-model={menu.value} close-on-content-click v-slots={{
-              activator: (on) => (<div onClick={on.on.click} class="waves-effect br-100">
+              activator: ({on}) => (<div onClick={on.click} class="waves-effect br-100">
                 <g-avatar size="36">
                   <img alt src={avatar.value}/>
                 </g-avatar>
