@@ -60,24 +60,26 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.drawLine();
 
   escPrinter.println('Sales');
-  escPrinter.bold(false);
-  escPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
-  escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
-  escPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
-  escPrinter.bold(true);
-  escPrinter.drawLine();
+  if (report) {
+    escPrinter.bold(false);
+    escPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
+    escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
+    escPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
+    escPrinter.bold(true);
+    escPrinter.drawLine();
 
-  escPrinter.bold(false);
+    escPrinter.bold(false);
 
-  Object.keys(report.vTaxSum.vTaxSum).forEach(key => {
-    escPrinter.println(`Tax ${key}%:`);
-    escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
-    escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
-    escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
-    escPrinter.newLine();
-  })
+    Object.keys(report.vTaxSum.vTaxSum).forEach(key => {
+      escPrinter.println(`Tax ${key}%:`);
+      escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
+      escPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
+      escPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
+      escPrinter.newLine();
+    })
 
-  escPrinter.leftRight('Discount', convertMoney(report.discount));
+    escPrinter.leftRight('Discount', convertMoney(report.discount));
+  }
   escPrinter.bold(true);
   escPrinter.drawLine();
 
@@ -140,24 +142,26 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.drawLine();
 
   await canvasPrinter.println('Sales');
-  await canvasPrinter.bold(false);
-  await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
-  await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
-  await canvasPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
-  await canvasPrinter.bold(true);
-  await canvasPrinter.drawLine();
+  if (report) {
+    await canvasPrinter.bold(false);
+    await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.gross));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.net));
+    await canvasPrinter.leftRight('Tax', convertMoney(report.vTaxSum.tax));
+    await canvasPrinter.bold(true);
+    await canvasPrinter.drawLine();
 
-  await canvasPrinter.bold(false);
+    await canvasPrinter.bold(false);
 
-  for (let key in report.vTaxSum.vTaxSum) {
-    await canvasPrinter.println(`Tax ${key}%:`);
-    await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
-    await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
-    await canvasPrinter.newLine();
+    for (let key in report.vTaxSum.vTaxSum) {
+      await canvasPrinter.println(`Tax ${key}%:`);
+      await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].gross));
+      await canvasPrinter.leftRight('Sub-total', convertMoney(report.vTaxSum.vTaxSum[key].net));
+      await canvasPrinter.leftRight('Total', convertMoney(report.vTaxSum.vTaxSum[key].tax));
+      await canvasPrinter.newLine();
+    }
+
+    await canvasPrinter.leftRight('Discount', convertMoney(report.discount));
   }
-
-  await canvasPrinter.leftRight('Discount', convertMoney(discount));
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 

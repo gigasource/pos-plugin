@@ -38,6 +38,6 @@ describe('Test print report', function () {
 
 	// todo: Finish x report
 	it('Case 4: X report', async () => {
-		printInvoiceHandler('XReport', {from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('06.01.2021', 'DD.MM.YYYY').toDate()})
+		printInvoiceHandler('XReport', {from: moment('04.01.2021', 'DD.MM.YYYY').toDate(), to: moment('07.01.2021', 'DD.MM.YYYY').toDate()})
 	})
 })
