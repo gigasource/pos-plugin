@@ -18,6 +18,7 @@ import {
 	orderBeFactory
 } from '../pos-logic-be'
 import {mockProducts} from "./mock_products";
+import _ from 'lodash';
 
 const orderMaster = orderBeFactory(2)
 const orderClient = orderBeFactory(3)
@@ -73,12 +74,17 @@ describe('Pos logic sync', function () {
 	it('Case 1: Create order + addProduct in master', async (done) => {
 		orderMaster.prepareOrder('10')
 		const order1 = orderMaster.getCurrentOrder()
-		orderClient.prepareOrder('10')
+		addProduct(order1, mockProducts[2]);
+		simulateBackendPrint(order1);
+		orderClient.prepareOrder(_.cloneDeep(order1));
 		const order2 = orderClient.getCurrentOrder()
 		cms[1].feSocket.on('update-table', async function (order) {
+			order2._id;
+			order._id;
 			await checkOrderCreated(cms[0].orm)
 			await checkOrderCreated(cms[1].orm)
 			await orderClient.syncOrderChange(order)
+			//todo: fix condition :uuid
 			expect(stringify(orderMaster.getCurrentOrder())).toMatchSnapshot()
 			expect(stringify(orderClient.getCurrentOrder())).toMatchSnapshot()
 			expect(stringify(orderClient.actionList.value)).toMatchSnapshot()
@@ -86,12 +92,13 @@ describe('Pos logic sync', function () {
 		})
 		await nextTick()
 		addProduct(order1, mockProducts[0])
+		changeItemQuantity(order2, 0, 2);
 		addProduct(order2, mockProducts[1])
 		await nextTick()
 		expect(stringify(orderMaster.actionList.value)).toMatchSnapshot()
 		expect(stringify(orderClient.actionList.value)).toMatchSnapshot()
 		await nextTick()
-		simulateBackendPrint(order2)
+		simulateBackendPrint(order1)
 		cms[0].feSocket.emit('print-to-kitchen', orderMaster.actionList.value, order1);
 		await nextTick()
 	})
