@@ -295,12 +295,13 @@ export default {
     }
 
     function resetOrderData() {
+      //fixme: OrderStore:resetOrderData
       console.warn('PosOrderDelivery2:resetOrderData was not implemented')
     }
 
     function addProductToOrder(product) {
       console.warn('PosOrderDelivery2:addProductToOrder was not implemented')
-      // TODO: Implement
+      //fixme: OrderStore:addProductToOrder
       // the code below is temporary logic to migrate ui
       function genObjectId(id) {
         const BSON = require('bson');
@@ -322,14 +323,17 @@ export default {
     }
 
     function removeProductModifier() {
+      //fixme OrderStore:removeProductModifier
       console.warn('PosOrderDelivery2:removeProductModifier was not implemented')
     }
 
     function addItemQuantity() {
+      //fixme OrderStore:addItemQuantity
       console.warn('PosOrderDelivery2:addItemQuantity was not implemented')
     }
 
     function removeItemQuantity() {
+      //fixme OrderStore:removeItemQuantity
       console.warn('PosOrderDelivery2:removeItemQuantity was not implemented')
     }
 
