@@ -1,0 +1,720 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`order-delivery favorites should render favorites in mobile mode but does't show keyboard 1`] = `
+<div class="delivery-info__favorite">
+</div>
+`;
+
+exports[`order-delivery favorites should render favorites in mobile mode when keyboard hide 1`] = `
+<div class="delivery-info__favorite">
+  <div style="background-color: rgb(251, 228, 236);"
+       class="delivery-info__favorite-item"
+  >
+    Cola
+  </div>
+  <div style="background-color: rgb(132, 255, 255);"
+       class="delivery-info__favorite-item"
+  >
+    Pepsi
+  </div>
+  <div style="background-color: rgb(128, 216, 255);"
+       class="delivery-info__favorite-item"
+  >
+    Water
+  </div>
+  <div style="background-color: rgb(255, 245, 157);"
+       class="delivery-info__favorite-item"
+  >
+    Baijiu
+  </div>
+  <div style="background-color: rgb(178, 255, 89);"
+       class="delivery-info__favorite-item"
+  >
+    Whiskey
+  </div>
+  <div style="background-color: rgb(225, 190, 231);"
+       class="delivery-info__favorite-item"
+  >
+    Pudding
+  </div>
+  <div style="background-color: rgb(255, 171, 145);"
+       class="delivery-info__favorite-item"
+  >
+    Olive
+  </div>
+</div>
+`;
+
+exports[`order-delivery favorites should render favorites in tablet 1`] = `
+<div class="delivery-info__favorite">
+  <div style="background-color: rgb(251, 228, 236);"
+       class="delivery-info__favorite-item"
+  >
+    Cola
+  </div>
+  <div style="background-color: rgb(132, 255, 255);"
+       class="delivery-info__favorite-item"
+  >
+    Pepsi
+  </div>
+  <div style="background-color: rgb(128, 216, 255);"
+       class="delivery-info__favorite-item"
+  >
+    Water
+  </div>
+  <div style="background-color: rgb(255, 245, 157);"
+       class="delivery-info__favorite-item"
+  >
+    Baijiu
+  </div>
+  <div style="background-color: rgb(178, 255, 89);"
+       class="delivery-info__favorite-item"
+  >
+    Whiskey
+  </div>
+  <div style="background-color: rgb(225, 190, 231);"
+       class="delivery-info__favorite-item"
+  >
+    Pudding
+  </div>
+  <div style="background-color: rgb(255, 171, 145);"
+       class="delivery-info__favorite-item"
+  >
+    Olive
+  </div>
+</div>
+`;
+
+exports[`order-delivery in mobile should render correct for new customer 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__favorite">
+      <div style="background-color: rgb(251, 228, 236);"
+           class="delivery-info__favorite-item"
+      >
+        Cola
+      </div>
+      <div style="background-color: rgb(132, 255, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Pepsi
+      </div>
+      <div style="background-color: rgb(128, 216, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Water
+      </div>
+      <div style="background-color: rgb(255, 245, 157);"
+           class="delivery-info__favorite-item"
+      >
+        Baijiu
+      </div>
+      <div style="background-color: rgb(178, 255, 89);"
+           class="delivery-info__favorite-item"
+      >
+        Whiskey
+      </div>
+      <div style="background-color: rgb(225, 190, 231);"
+           class="delivery-info__favorite-item"
+      >
+        Pudding
+      </div>
+      <div style="background-color: rgb(255, 171, 145);"
+           class="delivery-info__favorite-item"
+      >
+        Olive
+      </div>
+    </div>
+    <div class="delivery-info__customer">
+      <div class="row-flex mt-3 w-100">
+        <div style="flex: 1; margin-right: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="084.999.8888"
+                             label="Phone"
+          >
+          </g-text-field-stub>
+        </div>
+        <div style="flex: 1; margin-left: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="[object Object]"
+                             label="Name"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+      <div class="row-flex">
+        <div class="col-9">
+          <g-combobox-stub style="width: 100%;"
+                           label="Address"
+                           modelvalue
+                           outlined="true"
+                           dense="true"
+                           clearable="true"
+                           skip-search="true"
+                           items
+                           keep-menu-on-blur="true"
+                           menu-class="menu-autocomplete-address"
+          >
+          </g-combobox-stub>
+        </div>
+        <div class="flex-grow-1 ml-1">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue
+                             label="Nr"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`order-delivery in mobile should render correct for selected customer 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__favorite">
+      <div style="background-color: rgb(251, 228, 236);"
+           class="delivery-info__favorite-item"
+      >
+        Cola
+      </div>
+      <div style="background-color: rgb(132, 255, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Pepsi
+      </div>
+      <div style="background-color: rgb(128, 216, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Water
+      </div>
+      <div style="background-color: rgb(255, 245, 157);"
+           class="delivery-info__favorite-item"
+      >
+        Baijiu
+      </div>
+      <div style="background-color: rgb(178, 255, 89);"
+           class="delivery-info__favorite-item"
+      >
+        Whiskey
+      </div>
+      <div style="background-color: rgb(225, 190, 231);"
+           class="delivery-info__favorite-item"
+      >
+        Pudding
+      </div>
+      <div style="background-color: rgb(255, 171, 145);"
+           class="delivery-info__favorite-item"
+      >
+        Olive
+      </div>
+    </div>
+    <div class="delivery-info__customer">
+      <div class="row-flex mt-3 w-100">
+        <div style="flex: 1; margin-right: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="084.999.8888"
+                             label="Phone"
+          >
+          </g-text-field-stub>
+        </div>
+        <div style="flex: 1; margin-left: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="[object Object]"
+                             label="Name"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+      <div class="row-flex">
+        <div class="col-9">
+          <g-combobox-stub style="width: 100%;"
+                           label="Address"
+                           modelvalue
+                           outlined="true"
+                           dense="true"
+                           clearable="true"
+                           skip-search="true"
+                           items
+                           keep-menu-on-blur="true"
+                           menu-class="menu-autocomplete-address"
+          >
+          </g-combobox-stub>
+        </div>
+        <div class="flex-grow-1 ml-1">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue
+                             label="Nr"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`order-delivery in mobile should show keyboard 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__customer">
+      <div class="row-flex mt-3 w-100">
+        <div style="flex: 1; margin-right: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="084.999.8888"
+                             label="Phone"
+          >
+          </g-text-field-stub>
+        </div>
+        <div style="flex: 1; margin-left: 2px;">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue="[object Object]"
+                             label="Name"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+      <div class="row-flex">
+        <div class="col-9">
+          <g-combobox-stub style="width: 100%;"
+                           label="Address"
+                           modelvalue
+                           outlined="true"
+                           dense="true"
+                           clearable="true"
+                           skip-search="true"
+                           items
+                           keep-menu-on-blur="true"
+                           menu-class="menu-autocomplete-address"
+          >
+          </g-combobox-stub>
+        </div>
+        <div class="flex-grow-1 ml-1">
+          <g-text-field-stub outlined="true"
+                             dense="true"
+                             modelvalue
+                             label="Nr"
+          >
+          </g-text-field-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`order-delivery in tablet should render correct for new customer 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__favorite">
+      <div style="background-color: rgb(251, 228, 236);"
+           class="delivery-info__favorite-item"
+      >
+        Cola
+      </div>
+      <div style="background-color: rgb(132, 255, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Pepsi
+      </div>
+      <div style="background-color: rgb(128, 216, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Water
+      </div>
+      <div style="background-color: rgb(255, 245, 157);"
+           class="delivery-info__favorite-item"
+      >
+        Baijiu
+      </div>
+      <div style="background-color: rgb(178, 255, 89);"
+           class="delivery-info__favorite-item"
+      >
+        Whiskey
+      </div>
+      <div style="background-color: rgb(225, 190, 231);"
+           class="delivery-info__favorite-item"
+      >
+        Pudding
+      </div>
+      <div style="background-color: rgb(255, 171, 145);"
+           class="delivery-info__favorite-item"
+      >
+        Olive
+      </div>
+    </div>
+    <div class="delivery-info__customer">
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Name"
+      >
+      </g-text-field-bs-stub>
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Address"
+                            modelvalue
+      >
+      </g-text-field-bs-stub>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`order-delivery in tablet should render correct for selected customer 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__favorite">
+      <div style="background-color: rgb(251, 228, 236);"
+           class="delivery-info__favorite-item"
+      >
+        Cola
+      </div>
+      <div style="background-color: rgb(132, 255, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Pepsi
+      </div>
+      <div style="background-color: rgb(128, 216, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Water
+      </div>
+      <div style="background-color: rgb(255, 245, 157);"
+           class="delivery-info__favorite-item"
+      >
+        Baijiu
+      </div>
+      <div style="background-color: rgb(178, 255, 89);"
+           class="delivery-info__favorite-item"
+      >
+        Whiskey
+      </div>
+      <div style="background-color: rgb(225, 190, 231);"
+           class="delivery-info__favorite-item"
+      >
+        Pudding
+      </div>
+      <div style="background-color: rgb(255, 171, 145);"
+           class="delivery-info__favorite-item"
+      >
+        Olive
+      </div>
+    </div>
+    <div class="delivery-info__customer">
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Name"
+      >
+      </g-text-field-bs-stub>
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Address"
+                            modelvalue
+      >
+      </g-text-field-bs-stub>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`order-delivery missed calls should render missed calls 1`] = `
+<div class="delivery-info">
+  <div class="delivery-info--upper">
+    <div class="delivery-info__favorite">
+      <div style="background-color: rgb(251, 228, 236);"
+           class="delivery-info__favorite-item"
+      >
+        Cola
+      </div>
+      <div style="background-color: rgb(132, 255, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Pepsi
+      </div>
+      <div style="background-color: rgb(128, 216, 255);"
+           class="delivery-info__favorite-item"
+      >
+        Water
+      </div>
+      <div style="background-color: rgb(255, 245, 157);"
+           class="delivery-info__favorite-item"
+      >
+        Baijiu
+      </div>
+      <div style="background-color: rgb(178, 255, 89);"
+           class="delivery-info__favorite-item"
+      >
+        Whiskey
+      </div>
+      <div style="background-color: rgb(225, 190, 231);"
+           class="delivery-info__favorite-item"
+      >
+        Pudding
+      </div>
+      <div style="background-color: rgb(255, 171, 145);"
+           class="delivery-info__favorite-item"
+      >
+        Olive
+      </div>
+    </div>
+    <div class="delivery-info__customer">
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Name"
+      >
+      </g-text-field-bs-stub>
+      <g-text-field-bs-stub class="bs-tf__pos"
+                            label="Address"
+                            modelvalue
+      >
+      </g-text-field-bs-stub>
+    </div>
+  </div>
+  <div class="delivery-info--lower">
+    <div class="delivery-info__call--empty">
+      <p class="fw-700">
+        Empty
+      </p>
+      <p class="text-grey-darken-1">
+        No pending calls
+      </p>
+    </div>
+    <g-menu-stub modelvalue="false"
+                 top="true"
+                 left="true"
+                 nudge-top="5"
+    >
+      <div class="menu-missed">
+        <div class="menu-missed__call">
+          <div class="menu-missed__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon-stub size="16"
+                           class="mr-1"
+              >
+                icon-call
+              </g-icon-stub>
+              0123456678
+            </p>
+            <p class="fs-small text-grey-darken-1">
+              Miss Customer 1
+            </p>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-take-away
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-delivery-scooter
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn--cancel">
+            <g-icon-stub color="white">
+              clear
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="menu-missed__call">
+          <div class="menu-missed__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon-stub size="16"
+                           class="mr-1"
+              >
+                icon-call
+              </g-icon-stub>
+              0123456678
+            </p>
+            <p class="fs-small text-grey-darken-1">
+              Miss Customer 2
+            </p>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-take-away
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-delivery-scooter
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn--cancel">
+            <g-icon-stub color="white">
+              clear
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="menu-missed__call">
+          <div class="menu-missed__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon-stub size="16"
+                           class="mr-1"
+              >
+                icon-call
+              </g-icon-stub>
+              0123456678
+            </p>
+            <p class="fs-small text-grey-darken-1">
+              Miss Customer 3
+            </p>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-take-away
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn">
+            <g-icon-stub size="20">
+              icon-delivery-scooter
+            </g-icon-stub>
+          </div>
+          <div class="delivery-info__call-btn--cancel">
+            <g-icon-stub color="white">
+              clear
+            </g-icon-stub>
+          </div>
+        </div>
+      </div>
+    </g-menu-stub>
+  </div>
+</div>
+`;
+
+exports[`order-delivery selected customer should render selected customer with selected address is the 2nd address 1`] = `
+<div class="delivery-info__customer-address">
+  <div class="row-flex align-items-center">
+    <g-radio-stub small="true"
+                  modelvalue="1"
+                  value="0"
+                  label="Address 1"
+                  color="#536DFE"
+    >
+    </g-radio-stub>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <g-btn-bs-stub small="true"
+                   style="margin: 0px 2px; padding: 4px;"
+                   background-color="#F9A825"
+    >
+      <g-icon-stub size="15">
+        icon-reservation_modify
+      </g-icon-stub>
+    </g-btn-bs-stub>
+    <g-btn-bs-stub small="true"
+                   style="margin: 0px 2px; padding: 4px;"
+                   background-color="#FF4452"
+    >
+      <g-icon-stub size="15">
+        icon-delete
+      </g-icon-stub>
+    </g-btn-bs-stub>
+  </div>
+  <p>
+    address val 1
+  </p>
+  <p class="text-grey fs-small">
+    zipcode val 1
+  </p>
+  <p class="text-grey fs-small">
+    city val 1
+  </p>
+</div>
+<div class="delivery-info__customer-address delivery-info__customer-address--selected">
+  <div class="row-flex align-items-center">
+    <g-radio-stub small="true"
+                  modelvalue="1"
+                  value="1"
+                  label="Address 2"
+                  color="#536DFE"
+    >
+    </g-radio-stub>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <g-btn-bs-stub small="true"
+                   style="margin: 0px 2px; padding: 4px;"
+                   background-color="#F9A825"
+    >
+      <g-icon-stub size="15">
+        icon-reservation_modify
+      </g-icon-stub>
+    </g-btn-bs-stub>
+    <g-btn-bs-stub small="true"
+                   style="margin: 0px 2px; padding: 4px;"
+                   background-color="#FF4452"
+    >
+      <g-icon-stub size="15">
+        icon-delete
+      </g-icon-stub>
+    </g-btn-bs-stub>
+  </div>
+  <p>
+    address val 2
+  </p>
+  <p class="text-grey fs-small">
+    zipcode val 2
+  </p>
+  <p class="text-grey fs-small">
+    city val 2
+  </p>
+</div>
+<g-icon-stub size="40"
+             color="#1271FF"
+>
+  add_circle
+</g-icon-stub>
+`;
