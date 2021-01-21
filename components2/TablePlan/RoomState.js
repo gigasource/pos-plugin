@@ -37,10 +37,12 @@ export const removeSelectingRoom = async function() {
 export const selectingRoomStates = ref(null);
 
 export const onSelectRoom = function (newSelectingRoom) {
-  selectingRoomStates.value = _.find(roomsStates.value, r => r.room._id.toString() === newSelectingRoom.room._id)
+  selectingRoomStates.value = _.find(roomsStates.value, r => r.room._id.toString() === newSelectingRoom.room._id.toString())
 }
 
-export const objectsInSelectingRoom = computed(() => (selectingRoomStates.value) ? selectingRoomStates.value.room.roomObjects : [])
+export const objectsInSelectingRoom = computed(() => {
+  return (selectingRoomStates.value) ? selectingRoomStates.value.room.roomObjects : [];
+})
 
 const roomsName = computed(() => {
   return roomsStates.value.map(r => r.room.name)

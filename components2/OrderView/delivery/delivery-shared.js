@@ -3,7 +3,7 @@ import {ref} from "vue";
 export const deliveryOrderMode = ref('tablet');
 export const showKeyboard = ref(false); // only show in mobile mode
 export const favorites = ref([]);
-export const selectedCustomer = ref();
+export const selectedCustomer = ref({});
 export const selectedAddress = ref(0);
 
 export const name = ref('');
@@ -13,7 +13,7 @@ export const zipcode = ref('');
 export const street = ref('')
 export const house = ref('')
 export const city = ref('')
-const dialog = ref({
+export const dialog = ref({
   input: false,
   order: false,
   choice: false,

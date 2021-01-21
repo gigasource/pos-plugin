@@ -1,14 +1,14 @@
-import { computed } from 'vue';
+import {computed} from 'vue';
 import _ from 'lodash';
 
-import { user } from '../../../AppSharedStates'
+import {user} from '../../../AppSharedStates'
 
-import { onSelectRoom, roomsStates } from '../../../TablePlan/RoomState'
-import { activeScreen } from '../DashboardSharedStates';
-import { useI18n } from 'vue-i18n'
+import {onSelectRoom, roomsStates} from '../../../TablePlan/RoomState'
+import {activeScreen} from '../DashboardSharedStates';
+import {useI18n} from 'vue-i18n'
 
 const DashboardSidebarItemsFactory = () => {
-  const { t: $t} = useI18n()
+  const {t} = useI18n()
   const dashboardSidebarItems = computed(() => [
     {
       icon: 'icon-restaurant',
@@ -21,12 +21,12 @@ const DashboardSidebarItemsFactory = () => {
           onSelectRoom(r)
         }
       })),
-      title: $t('sidebar.restaurant'),
+      title: t('sidebar.restaurant'),
       feature: 'tablePlan'
     },
     {
       icon: 'icon-manual-table',
-      title: $t('sidebar.manualTable'),
+      title: t('sidebar.manualTable'),
       feature: 'manualTable',
       onClick() {
         console.log('click manual table')
@@ -34,7 +34,7 @@ const DashboardSidebarItemsFactory = () => {
     },
     {
       icon: 'icon-delivery',
-      title: $t('onlineOrder.onlineOrders'),
+      title: t('onlineOrder.onlineOrders'),
       feature: 'onlineOrdering',
       key: 'Dashboard',
       items: [
@@ -42,22 +42,22 @@ const DashboardSidebarItemsFactory = () => {
           icon: 'radio_button_unchecked',
           iconType: 'small',
 
-          title: $t('onlineOrder.dashboard'),
+          title: t('onlineOrder.dashboard'),
           key: 'Orders'
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: $t('onlineOrder.completedOrders')
+          title: t('onlineOrder.completedOrders')
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: $t('onlineOrder.declinedOrders')
+          title: t('onlineOrder.declinedOrders')
         },
         {
           icon: 'icon-services',
-          title: $t('sidebar.services'),
+          title: t('sidebar.services'),
           feature: 'onlineOrdering',
           key: 'Service'
         }
@@ -65,13 +65,13 @@ const DashboardSidebarItemsFactory = () => {
     },
     {
       icon: 'icon-reservation',
-      title: $t('sidebar.reservation'),
+      title: t('sidebar.reservation'),
       feature: 'reservation',
       key: 'Reservation'
     },
     {
       icon: 'icon-functions',
-      title: $t('sidebar.functions')
+      title: t('sidebar.functions')
     },
     {
       icon: 'icon-functions',
@@ -100,19 +100,19 @@ const DashboardSidebarItemsFactory = () => {
       }
     }
 
-    const tmp = sidebar.map(item => {
+    return sidebar.map(item => {
       switch (item.key) {
         case 'Reservation':
           return {
             ...item,
-            ...{ badge: '1' + '', badgeColor: '#FF5252' }
+            ...{badge: '1' + '', badgeColor: '#FF5252'}
           }
         case 'Dashboard':
           const items = item.items.map(i => {
             if (i.key === 'Orders') {
               return {
                 ...i,
-                ...{ badge: '2' + '', badgeColor: '#FF5252' }
+                ...{badge: '2' + '', badgeColor: '#FF5252'}
               }
             }
             return i
@@ -125,7 +125,6 @@ const DashboardSidebarItemsFactory = () => {
           return item;
       }
     })
-    return tmp
   })
   return {
     refactoredDashboardSidebarItems

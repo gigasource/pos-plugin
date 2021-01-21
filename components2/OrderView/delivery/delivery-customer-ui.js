@@ -4,13 +4,17 @@ import {isIOS} from "../../AppSharedStates";
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
-  calls, missedCalls
+  calls, missedCalls, dialog, dialogMode
 } from "./delivery-shared";
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
 import cms from 'cms';
 import {addProduct} from "../pos-logic-be";
 
+// test
+import { mockMissedCalls } from '../__test__/mock_delivery_data';
+missedCalls.value = mockMissedCalls
+// end test
 
 // TODO: split customerUiRender function into ->
 //  1. render selected customer
@@ -38,10 +42,18 @@ export function deliveryCustomerUiFactory() {
   isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
 
   function removeAddress(index) {
-    if (selectedCustomer.value.addresses.length === 1) {
+    selectedCustomer.value.addresses.splice(index, 1) // remove customer address
+
+    if (selectedCustomer.value.addresses.length === 0) { // if no address then set new customer flag
       isNewCustomer.value = true
+      selectedAddress.value = -1
+    } else if (selectedAddress.value >= index) { // otherwise, correct selected address index
+      selectedAddress.value -= 1
+
+      // in case the 1st address has been removed, then move to new first address line
+      if (selectedAddress.value < 0)
+        selectedAddress.value = 0
     }
-    selectedCustomer.value.addresses.splice(index, 1)
   }
 
   let debounceSearchAddress = _.debounce(searchAddress, 300);
@@ -273,17 +285,15 @@ export function deliveryCustomerUiFactory() {
   }
   const renderNewCustomerForNonMobile = () => {
     return <>
-      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.valuee}
-                       onClick={() => openDialog('add')}>
-        {{
-          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-        }}
+      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.value}
+                       onClick={() => openDialog('add')} v-slots={{
+        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+      }}>
       </g-text-field-bs>
       <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
-                       onClick={() => openDialog('add')}>
-        {{
-          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-        }}
+                       onClick={() => openDialog('add')} v-slots={{
+        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+      }}>
       </g-text-field-bs>
     </>
   }
@@ -338,41 +348,49 @@ export function deliveryCustomerUiFactory() {
     if (!missedCalls.value || missedCalls.value.length < 1)
       return
 
+    // return <div>
+    //   { missedCalls.value.map((call, i) => <div> { call.customer.name } </div>) }
+    // </div>
+
     return (
         <g-menu v-model={menuMissed.value} top left nudge-top="5"
                 v-slots={{
-                  activator: ({ on }) =>
-                      <div vClick={on.click}
+                  default: () => (
+                      <div class="menu-missed">
+                        {missedCalls.value.map((call, i) => (
+                            <div class="menu-missed__call" key={`missed_${i}`}>
+                              <div class="menu-missed__call--info">
+                                <p class="fw-700 fs-small">
+                                  <g-icon size="16" class="mr-1">icon-call</g-icon>
+                                  {call.customer.phone}
+                                </p>
+                                <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                              </div>
+                              <div class={['delivery-info__call-btn']}
+                                   onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                                <g-icon size="20">icon-take-away</g-icon>
+                              </div>
+                              <div class={['delivery-info__call-btn']}
+                                   onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                                <g-icon size="20">icon-delivery-scooter</g-icon>
+                              </div>
+                              <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                                <g-icon color="white">clear</g-icon>
+                              </div>
+                            </div>
+                        ))}
+                      </div>
+                  ),
+                  activator: ({ on }) => (
+                      <div onClick={on.click}
                            class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
                         <b>Missed</b>
                         <div class="delivery-info__call--missed-num">
-                          {missedCalls.length}
+                          {missedCalls.value.length}
                         </div>
                       </div>
+                  )
                 }}>
-          <div class="menu-missed">
-            {missedCalls.value.map((call, i) =>
-                <div class="menu-missed__call" key={`missed_${i}`}>
-                  <div class="menu-missed__call--info">
-                    <p class="fw-700 fs-small">
-                      <g-icon size="16" class="mr-1">icon-call</g-icon>
-                      {call.customer.phone}
-                    </p>
-                    <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
-                  </div>
-                  <div class={['delivery-info__call-btn']}
-                       onClick={() => chooseMissedCustomer(i, 'pickup')}>
-                    <g-icon size="20">icon-take-away</g-icon>
-                  </div>
-                  <div class={['delivery-info__call-btn']}
-                       onClick={() => chooseMissedCustomer(i, 'delivery')}>
-                    <g-icon size="20">icon-delivery-scooter</g-icon>
-                  </div>
-                  <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
-                    <g-icon color="white">clear</g-icon>
-                  </div>
-                </div>)}
-          </div>
         </g-menu>
     )
   }
