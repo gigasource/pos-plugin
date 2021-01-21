@@ -147,6 +147,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-radio': true,
         'g-simple-table': true,
         'g-spacer': true,
+        'g-switch': true,
         'g-table': true,
         'g-tabs': true,
         'g-tab-item': true,

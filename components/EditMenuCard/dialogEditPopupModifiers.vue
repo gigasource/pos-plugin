@@ -240,7 +240,7 @@
           freeItems: 0
         }
         this.setActiveCategory(this.newCategory)
-         const newItem = await this.save()
+        const newItem = await this.save()
         this.setActiveCategory(newItem)
       },
       async addGroup() {

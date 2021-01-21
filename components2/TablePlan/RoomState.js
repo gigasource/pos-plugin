@@ -27,11 +27,11 @@ export async function removeRoom(room) {
   }
 }
 
-export function roomsFactory({roomId} = {}) {
+export function roomsFactory(props) {
   let selectingRoomStates;
-  if (roomId) {
+  if (props) {
     selectingRoomStates = computed(() => {
-      return roomsStates.value.find(s => s.room._id.toString() === roomId);
+      return roomsStates.value.find(s => s.room._id.toString() === props.roomId);
     });
   } else {
     selectingRoomStates = ref();
