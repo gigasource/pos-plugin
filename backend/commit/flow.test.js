@@ -21,6 +21,7 @@ const mockSocket = []
 for (let i = 0; i < 3; i++) {
 	mockSocket.push(new Socket())
 }
+const ObjectId = require('bson').ObjectId
 const uuid = require('uuid')
 
 global.APP_CONFIG = {
@@ -150,7 +151,10 @@ describe('test-flow', function () {
 		/*
 		Do a create query
 		 */
-		await orm('Order').create({ table: 10 })
+		await orm('Order').create({
+			_id: new ObjectId(),
+			table: 10
+		})
 		await delay(50)
 		let doc = await orm('Order').find({})
 		let docA = await ormA('Order').find({})
@@ -210,6 +214,7 @@ describe('test-flow', function () {
 		await toMasterLockB.acquireAsync()
 
 		await ormB('Order').create({
+			_id: new ObjectId(),
 			table: 9
 		})
 		docB = await ormB('Order').find({})

@@ -253,7 +253,7 @@ export const {
   prepareOrder, order, clearOrder,
   beItemsSnapshot, beCancellationItemsSnapshot,
   startOnetimeSnapshot,
-  finishOnetimeSnapshot
+  finishOnetimeSnapshot, syncOrderChange
 } = orderBeFactory(0);
 
 //should run on backend
@@ -444,6 +444,10 @@ hooks.on('togglePayPrintBtn:step2', () => {
   } else {
     hooks.emit('printOrder');
   }
+})
+
+hooks.on('printOrder', function () {
+  cms.socket.emit('print-to-kitchen', actionList.value, order)
 })
 
 export const disablePay = computed(() => {

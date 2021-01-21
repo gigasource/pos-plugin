@@ -4,10 +4,11 @@ const syncTransporter = require('schemahandler/sync/sync-transporter')
 const internalIp = require('internal-ip')
 const socketClient = require('socket.io-client')
 const _ = require('lodash')
-
-let cloudSocket
+const argv  = require('yargs').argv
 
 module.exports = async function (cms) {
+	let cloudSocket
+
 	const { orm } = cms
 	// todo check this later
 	orm.plugin(syncPlugin)
@@ -51,16 +52,17 @@ module.exports = async function (cms) {
 			} else {
 				orm.emit('offClient')
 			}
-			if (masterIp === localIp()) {
-				setMaster(true)
-			}
 			await orm.emit('setUpCloudSocket', _masterIp, _masterClientId, cloudSocket)
+		}
+		if (masterIp === localIp()) {
+			setMaster(true)
 		}
 		if (!masterIp) return // cloud is master
 		if (orm.getMaster()) {
 			if (cloudSocket) cloudSocket.emit('registerMasterDevice', localIp())
 			const masterSocket = cms.io.of('/masterNode')
 			masterSocket.on('connect', socket => {
+				console.log('New client connect to Master')
 				orm.emit('initSyncForMaster', socket)
 			})
 		} else {
@@ -144,7 +146,19 @@ module.exports = async function (cms) {
 	/*
 	 -------------------------------------------
 	 */
-	await cms.emit('connectToMaster')
+	/**
+	 * If this is dev env, use config to
+	 * define which device is master
+	 */
+	if (argv.mode === 'dev') {
+		if (global.APP_CONFIG.setMaster) {
+			await cms.emit('connectToMaster', localIp())
+		} else if (global.APP_CONFIG.masterIp) {
+			await cms.emit('connectToMaster', global.APP_CONFIG.masterIp)
+		}
+	} else {
+		await cms.emit('connectToMaster')
+	}
 
 	orm.plugin(require('./orderCommit'))
 	orm.plugin(require('./actionCommit'), cms)

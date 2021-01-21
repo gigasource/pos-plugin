@@ -1,0 +1,90 @@
+{
+  "user": [
+    {
+      "name": {},
+      "date": {}
+    }
+  ],
+  "payment": [
+    {
+      "type": {},
+      "value": {}
+    }
+  ],
+  "items": [
+    {
+      "id": {},
+      "name": {},
+      "price": {},
+      "tax": {},
+      "showPrice": {},
+      "printed": {},
+      "taxes": [
+        {}
+      ],
+      "date": {},
+      "course": {},
+      "groupPrinter": {},
+      "groupPrinter2": {},
+      "uuid": {},
+      "originalPrice": {},
+      "takeAway": {},
+      "modifiers": [
+        {
+          "name": {},
+          "price": {},
+          "quantity": {},
+          "originalPrice": {},
+          "product": {}
+        }
+      ],
+      "quantity": {},
+      "cancellationQuantity": {},
+      "type": {},
+      "vDiscount": {},
+      "discount": {},
+      "discountUnit": {},
+      "discountResistance": {},
+      "category": {},
+      "excludedFromSales": {},
+      "taxPart": {},
+      "product": {
+        "ref": "Product",
+        "autopopulate": false
+      },
+      "unit": {},
+      "attributes": [
+        {
+          "key": {},
+          "value": {}
+        }
+      ],
+      "separate": {},
+      "image": {},
+      "desc": {},
+      "note": {},
+      "sent": {},
+      "tseMethod": {},
+      "isVoucher": {}
+    }
+  ],
+  "vTaxGroups": [
+    {
+      "taxType": {},
+      "tax": {},
+      "sum": {}
+    }
+  ],
+  "printer": [
+    {}
+  ],
+  "discounts": [
+    {
+      "name": {},
+      "type": {},
+      "coupon": {},
+      "value": {}
+    }
+  ],
+  "cancellationItems": [{}]
+}

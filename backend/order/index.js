@@ -9,6 +9,16 @@ module.exports = (cms) => {
   const {orm} = cms
   const feSocketLock = new AwaitLock()
 
+  // Register manually orderSchema instead of using buildform
+  const schema = require('./orderSchema.json')
+  orm.registerSchema('Order', schema)
+  cms.Types['Order'] = {
+    schema,
+    name: 'Order',
+    Model: orm('Order'),
+    info: {}
+  }
+
   orm.on('commit:handler:finish:Order', async function (result, commit) {
     if (!feSocketLock.tryAcquire()) return
     setTimeout(async () => {

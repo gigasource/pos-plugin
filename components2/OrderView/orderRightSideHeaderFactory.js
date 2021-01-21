@@ -30,7 +30,7 @@ export function orderRightSideHeader(props, {emit}) {
   function back() {
     hooks.emit('resetOrderData');
     saveOrderLayoutSetting()
-    router.push({path: '/pos-dashboard'})
+    router.go(-1)
   }
 
   //todo: fix
