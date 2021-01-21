@@ -2,7 +2,7 @@
 import { onBeforeMount, withModifiers } from 'vue';
 import { fetchModifiers, isSelecting } from './modifier-ui-logics';
 import { modifiers, onSelect, categories, onCreateItem, currentGroupIdx, duplicate, activeItem, deleteItem } from './modifier-ui-logics';
-
+import { ref } from 'vue'
 export default {
   setup() {
     onBeforeMount(async () => {
