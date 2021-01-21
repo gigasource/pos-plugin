@@ -7,10 +7,11 @@ import {
 } from "../../components/posOrder/util";
 import _ from "lodash";
 import {addItem} from "./pos-logic";
-import {addProduct, getCurrentOrder} from "./pos-logic-be";
+import { addProduct, getCurrentOrder, prepareOrder } from './pos-logic-be';
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
+import cms from 'cms';
 export const orderLayout = ref({ categories: [] });
 export const selectedCategoryLayout = ref();
 export const selectedProductLayout = ref();
@@ -125,6 +126,8 @@ export const products = computed(() => {
 })
 
 //fixme: only for dev
+
+prepareOrder();
 const order = getCurrentOrder();
 const once = _.once(() => {
   addProduct(order, products.value[0].product);

@@ -831,8 +831,8 @@ describe("pos-logic", function() {
 
   it("case7: test single payment", async function() {
     let order = createOrder();
-    addItem(order, cola, 10);
-    addItem(order, fanta, 20);
+    addItem(order, cola, 1);
+    addItem(order, fanta, 2);
 
     await nextTick();
     addSinglePayment(order, { type: "cash", value: 53 });
@@ -852,26 +852,46 @@ describe("pos-logic", function() {
             "value": 5,
           },
         ],
-        undefined,
+        47.7,
       ]
     `);
     //</editor-fold>
-    updateSinglePayment(order, { type: "cash" });
+
+    updateSinglePayment(order, { type: "card", value: 100 });
     await nextTick();
 
-    expect([order.payment, order.cashback]).toMatchInlineSnapshot(`
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
       Array [
         Array [
           Object {
-            "type": "cash",
-            "value": 48,
+            "type": "card",
+            "value": 100,
           },
           Object {
             "type": "Sodexo",
             "value": 5,
           },
         ],
-        undefined,
+        0,
+        99.7,
+      ]
+    `);
+    updateSinglePayment(order, { type: "cash", value: 50 });
+    await nextTick();
+    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
+      Array [
+        Array [
+          Object {
+            "type": "cash",
+            "value": 50,
+          },
+          Object {
+            "type": "Sodexo",
+            "value": 5,
+          },
+        ],
+        49.7,
+        0,
       ]
     `);
   });
@@ -884,13 +904,15 @@ describe("pos-logic", function() {
     await nextTick();
     addMultiPayment(order, { type: "cash", value: 10 });
     await nextTick();
-    addMultiPayment(order, { type: "card", value: 50 });
+    addMultiPayment(order, { type: "card", value: 60 });
 
     //auto add tip
     await nextTick();
     //<editor-fold desc="order-expect">
-    expect([order.payment, order.cashback, order.tip]).toMatchInlineSnapshot(`
+    expect([order.vSum, order.payment, order.cashback, order.tip])
+      .toMatchInlineSnapshot(`
       Array [
+        53,
         Array [
           Object {
             "type": "cash",
@@ -898,10 +920,10 @@ describe("pos-logic", function() {
           },
           Object {
             "type": "card",
-            "value": 50,
+            "value": 60,
           },
         ],
-        undefined,
+        10,
         7,
       ]
     `);
@@ -935,6 +957,40 @@ describe("pos-logic", function() {
         ],
         undefined,
         undefined,
+      ]
+    `);
+    //</editor-fold>
+  });
+
+  it("case7c : test multi payment cashback", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+
+    await nextTick();
+    addMultiPayment(order, { type: "cash", value: 10 });
+    await nextTick();
+    addMultiPayment(order, { type: "card", value: 50 });
+
+    //auto add tip
+    await nextTick();
+    //<editor-fold desc="order-expect">
+    expect([order.vSum, order.payment, order.cashback, order.tip])
+      .toMatchInlineSnapshot(`
+      Array [
+        53,
+        Array [
+          Object {
+            "type": "cash",
+            "value": 10,
+          },
+          Object {
+            "type": "card",
+            "value": 50,
+          },
+        ],
+        7,
+        0,
       ]
     `);
     //</editor-fold>

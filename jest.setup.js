@@ -10,3 +10,34 @@ jest.mock('cms', () => {
     socket: new Socket()
   }
 })
+
+jest.mock('vue-i18n', () => {
+  return {
+    useI18n() {
+      return {
+        t: x => x,
+        locale: {
+          value: 'en'
+        }
+      }
+    }
+  }
+})
+
+jest.mock("vue-router", () => {
+  return {
+    useRoute() {
+      return {
+        query: {
+          type: 'default'
+        }
+      };
+    },
+    useRouter() {
+      return {
+        push() {
+        }
+      };
+    }
+  };
+});

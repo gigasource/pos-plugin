@@ -1,0 +1,209 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PosOrderDelivery2 should render 1`] = `
+<div class="delivery">
+  <div class="delivery-info">
+    <div class="delivery-info--upper">
+      <div class="delivery-info__favorite">
+      </div>
+      <div class="delivery-info__customer">
+        <g-text-field-bs-stub class="bs-tf__pos"
+                              label="Name"
+                              modelvalue
+        >
+        </g-text-field-bs-stub>
+        <g-text-field-bs-stub class="bs-tf__pos"
+                              label="Address"
+                              modelvalue
+        >
+        </g-text-field-bs-stub>
+      </div>
+    </div>
+    <div class="delivery-info--lower">
+      <div class="delivery-info__call--empty">
+        <p class="fw-700">
+          Empty
+        </p>
+        <p class="text-grey-darken-1">
+          No pending calls
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="delivery-order">
+    <div class="delivery-order__content">
+      <g-autocomplete-stub text-field-component="GTextFieldBs"
+                           items
+                           return-object="true"
+                           filter="(itemText, text) => itemText.toLowerCase().includes(text.toLowerCase())"
+      >
+      </g-autocomplete-stub>
+    </div>
+    <g-btn-bs-stub block="true"
+                   large="true"
+                   class="elevation-2"
+                   icon="icon-kitchen"
+                   background-color="#0EA76F"
+                   disabled="true"
+    >
+      Add to order list
+    </g-btn-bs-stub>
+  </div>
+  <div class="delivery-detail">
+    <div class="delivery-detail__info">
+      <g-avatar-stub size="36">
+        <img alt="true"
+             src
+        >
+      </g-avatar-stub>
+      <div class="delivery-detail__info-username">
+      </div>
+      <g-spacer-stub>
+      </g-spacer-stub>
+      <g-btn-bs-stub class="elevation-1"
+                     style="border-radius: 50%; padding: 6px;"
+      >
+        <g-icon-stub>
+          icon-back
+        </g-icon-stub>
+      </g-btn-bs-stub>
+      <g-spacer-stub>
+      </g-spacer-stub>
+      <div class="delivery-detail__total">
+        common.currency
+      </div>
+    </div>
+    <div class="delivery-detail__order">
+    </div>
+    <g-btn-bs-stub block="true"
+                   large="true"
+                   class="elevation-2"
+                   icon="icon-print"
+                   background-color="#2979FF"
+    >
+      Send to kitchen
+    </g-btn-bs-stub>
+  </div>
+  <g-dialog-stub modelvalue="false"
+                 width="500"
+                 eager="true"
+  >
+    <g-card-stub class="dialog r">
+      <g-icon-stub class="dialog-icon--close"
+                   size="20"
+      >
+        icon-close
+      </g-icon-stub>
+      <div class="mx-2">
+        <b>
+          Name:
+        </b>
+      </div>
+      <div class="mx-2">
+        <b>
+          Phone:
+        </b>
+      </div>
+      <div class="mx-2">
+        <b>
+          Address:
+        </b>
+      </div>
+      <g-text-field-bs-stub label="Delivery note:"
+                            modelvalue
+      >
+      </g-text-field-bs-stub>
+      <div class="ma-2">
+        Time to complete (minute)
+      </div>
+      <div class="mb-3">
+        <g-btn-bs-stub class="elevation-1"
+                       backgroundcolor="white"
+        >
+          15
+        </g-btn-bs-stub>
+        <g-btn-bs-stub class="elevation-1"
+                       backgroundcolor="#BBDEFB"
+        >
+          30
+        </g-btn-bs-stub>
+        <g-btn-bs-stub class="elevation-1"
+                       backgroundcolor="white"
+        >
+          45
+        </g-btn-bs-stub>
+        <g-btn-bs-stub class="elevation-1"
+                       backgroundcolor="white"
+        >
+          60
+        </g-btn-bs-stub>
+      </div>
+      <g-btn-bs-stub disabled="true"
+                     block="true"
+                     large="true"
+                     background-color="#2979FF"
+      >
+        Confirm -common.currency
+      </g-btn-bs-stub>
+    </g-card-stub>
+  </g-dialog-stub>
+  <g-dialog-stub modelvalue="false"
+                 eager="true"
+                 width="500"
+  >
+    <g-card-stub class="dialog r">
+      <g-icon-stub class="dialog-icon--close"
+                   size="20"
+      >
+        icon-close
+      </g-icon-stub>
+      <div class="dialog-title">
+        Select options
+      </div>
+      <div class="dialog-action">
+        <div class="row-flex align-items-center"
+             style="line-height: 2;"
+        >
+          <g-icon-stub color="#424242"
+                       size="28"
+          >
+            remove_circle_outline
+          </g-icon-stub>
+          <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center;">
+          </span>
+          <g-icon-stub color="#424242"
+                       size="28"
+          >
+            add_circle
+          </g-icon-stub>
+        </div>
+        <g-spacer-stub>
+        </g-spacer-stub>
+        <g-btn-bs-stub min-width="80"
+                       height="100%"
+                       text-color="#424242"
+        >
+          Cancel
+        </g-btn-bs-stub>
+        <g-btn-bs-stub width="80"
+                       height="100%"
+                       rounded="true"
+                       text-color="#FFFFFF"
+                       background-color="#536DFE"
+                       disabled="true"
+        >
+          OK
+        </g-btn-bs-stub>
+      </div>
+    </g-card-stub>
+  </g-dialog-stub>
+  <dialog-form-input-stub modelvalue="false"
+                          eager="false"
+  >
+  </dialog-form-input-stub>
+  <dialog-text-filter-stub modelvalue="false"
+                           label="Delivery note"
+  >
+  </dialog-text-filter-stub>
+</div>
+`;

@@ -61,7 +61,7 @@ appHooks.on('orderChange', async function () {
 })
 
 
-export const setting = ref({})
+export const posSettings = ref({})
 appHooks.on('settingChange', async function() {
-  setting.value = await cms.getModel('PosSetting').findOne()
+  posSettings.value = await cms.getModel('PosSetting').findOne()
 })
