@@ -11,7 +11,10 @@ export const mockProducts = [
 				"device": "pos"
 			}
 		],
-		"id": 1
+		"id": 1,
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"category": "5df6f31ba037304c8b0df66c",
@@ -25,7 +28,10 @@ export const mockProducts = [
 				"device": "pos"
 			}
 		],
-		"id": 2
+		"id": 2,
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"_id": "5e784d7786e3ec0997b5e341",
@@ -41,7 +47,10 @@ export const mockProducts = [
 			}
 		],
 		"id": "3",
-		"isNoPrint": true
+		"isNoPrint": true,
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"_id": "5e784d7786e3ec0997b5e343",
@@ -681,7 +690,9 @@ export const mockProducts = [
 		"id": "47",
 		"groupPrinter": "5e7864c486e3ec0997b5e492",
 		"tax2": 7,
-		"option": {}
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"_id": "5e784d7786e3ec0997b5e39b",
@@ -700,7 +711,9 @@ export const mockProducts = [
 		"id": "48",
 		"groupPrinter": "5e7864b186e3ec0997b5e48e",
 		"tax2": 7,
-		"option": {}
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"category": "5df6f5dd7854273fa4fd989e",
@@ -820,7 +833,10 @@ export const mockProducts = [
 		"name": "Pudding",
 		"price": 1,
 		"isModifier": true,
-		"id": "101"
+		"id": "101",
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"_id": "5e79cfc75028531d08009ca5",
@@ -829,7 +845,9 @@ export const mockProducts = [
 		"name": "Olive",
 		"price": 1,
 		"id": "100",
-		"option": {}
+		"option": {
+			"favorite": true
+		}
 	},
 	{
 		"_id": "5e79d0205028531d08009cab",

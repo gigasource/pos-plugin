@@ -1,16 +1,21 @@
-import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {onActivated, ref, withModifiers} from "vue";
 import {isIOS} from "../../AppSharedStates";
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
-  name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses
+  name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
+  calls, missedCalls
 } from "./delivery-shared";
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
 import cms from 'cms';
 import {addProduct} from "../pos-logic-be";
 
+
+// TODO: split customerUiRender function into ->
+//  1. render selected customer
+//  2. render new for mobile
+//  3. render new customer for table
 
 export function deliveryCustomerUiFactory() {
   let {t, locale} = useI18n();
@@ -52,8 +57,6 @@ export function deliveryCustomerUiFactory() {
     })
   }
 
-  const calls = ref([])
-  const missedCalls = ref([])
   const orderType = ref();
 
   function deleteCall(index) {
@@ -111,8 +114,6 @@ export function deliveryCustomerUiFactory() {
       })
     }
   }
-
-  const menuMissed = ref(false)
 
   function addNewCustomer() {
     if (dialogMode.value === 'add') {
@@ -195,161 +196,201 @@ export function deliveryCustomerUiFactory() {
     hideKeyboard()
   }
 
+  // renders functions
+  const renderFavorites = () => {
+    if (deliveryOrderMode.value === 'tablet' || !showKeyboard.value)
+      return (
+          <div class="delivery-info__favorite">
+            {favorites.value.map((f, i) =>
+                <div style={getRandomColor(i)} class="delivery-info__favorite-item"
+                     onClick={() => selectFavoriteProduct(f)}
+                     key={`favorite_${i}`}>
+                  {f.name}
+                </div>)}
+          </div>
+      )
+  }
+  const renderSelectedCustomer = () => {
+    return <>
+      {
+        selectedCustomer.value.addresses.map((item, i) =>
+          <div
+              class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
+              onClick={() => selectedAddress.value = i}>
+            <div class="row-flex align-items-center">
+              <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
+                       color="#536DFE"/>
+              <g-spacer/>
+              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
+                        onClick={() => openDialog('edit', item.address, item.zipcode, i)}>
+                <g-icon size="15">icon-reservation_modify</g-icon>
+              </g-btn-bs>
+              <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
+                        onClick={() => removeAddress(i)}>
+                <g-icon size="15">icon-delete</g-icon>
+              </g-btn-bs>
+            </div>
+            <p>{item.address}</p>
+            <p class="text-grey fs-small">{item.zipcode}</p>
+            <p class="text-grey fs-small">{item.city}</p>
+          </div>)
+      }
+      <g-icon size="40" color="#1271FF" onClick={() => openDialog('add')}>add_circle</g-icon>
+    </>
+  }
+  const renderNewCustomerForMobile = () => {
+    return  <>
+      <div class="row-flex mt-3 w-100">
+        <div style="flex: 1; margin-right: 2px">
+          <g-text-field outlined dense v-model={phone.value} label="Phone"
+                        onClick={() => showKeyboard.value = true}
+                        virtualEvent={isIOS.value}/>
+        </div>
+        <div style="flex: 1; margin-left: 2px">
+          <g-text-field outlined dense v-model={name} label="Name"
+                        onClick={() => showKeyboard.value = true}
+                        virtualEvent={isIOS.value}/>
+        </div>
+      </div>
+      <div class="row-flex">
+        <div class="col-9">
+          <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
+                      clearable
+                      virtualEvent={isIOS.value} skip-search
+                      items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
+                      ref="autocomplete"
+                      onInputClick={() => showKeyboard.value = true} keep-menu-on-blur
+                      menu-class="menu-autocomplete-address"
+                      onUpdate:modelValue={selectAutocompleteAddress}/>
+        </div>
+        <div class="flex-grow-1 ml-1">
+          <g-text-field outlined dense v-model={house.value} label="Nr"
+                        onClick={() => showKeyboard.value = true}
+                        virtualEvent={isIOS.value}/>
+        </div>
+      </div>
+    </>
+  }
+  const renderNewCustomerForNonMobile = () => {
+    return <>
+      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.valuee}
+                       onClick={() => openDialog('add')}>
+        {{
+          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+        }}
+      </g-text-field-bs>
+      <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
+                       onClick={() => openDialog('add')}>
+        {{
+          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+        }}
+      </g-text-field-bs>
+    </>
+  }
+  const renderCustomerDeliveryInfo = () => {
+    return (
+        <div class="delivery-info__customer">
+          {
+            !isNewCustomer.value
+                ? renderSelectedCustomer()
+                : (deliveryOrderMode.value === 'mobile'
+                  ? renderNewCustomerForMobile()
+                  : renderNewCustomerForNonMobile())
+          }
+        </div>
+    )
+  }
+  const renderPendingCalls = () => {
+    return (
+        <div class={['delivery-info__call', calls.value[0] && calls.value[0].type === 'missed' ? 'b-red' : 'b-grey']}>
+          <div class="delivery-info__call--info">
+            <p class="fw-700 fs-small">
+              <g-icon size="16" class="mr-1">icon-call</g-icon>
+              {calls.value[0].customer.phone}
+            </p>
+            <p class="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
+          </div>
+          <div class={['delivery-info__call-btn', orderType.value === 'pickup' && 'delivery-info__call-btn--selected']}
+              onClick={() => chooseCustomer('pickup')}>
+            <g-icon size="20">icon-take-away</g-icon>
+          </div>
+          <div class={['delivery-info__call-btn', orderType.value === 'delivery' && 'delivery-info__call-btn--selected']}
+              onClick={() => chooseCustomer('delivery')}>
+            <g-icon size="20">icon-delivery-scooter</g-icon>
+          </div>
+          <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
+            <g-icon color="white">clear</g-icon>
+          </div>
+        </div>
+    )
+  }
+  const renderNoPendingCalls = () => {
+    return (
+        <div class="delivery-info__call--empty">
+          <p class="fw-700">Empty</p>
+          <p class="text-grey-darken-1">No pending calls</p>
+        </div>
+    )
+  }
+  // when -- how activate ??
+  const menuMissed = ref(false)
+  const renderMissedCalls = () => {
+    if (!missedCalls.value || missedCalls.value.length < 1)
+      return
+
+    return (
+        <g-menu v-model={menuMissed.value} top left nudge-top="5"
+                v-slots={{
+                  activator: ({ on }) =>
+                      <div vClick={on.click}
+                           class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                        <b>Missed</b>
+                        <div class="delivery-info__call--missed-num">
+                          {missedCalls.length}
+                        </div>
+                      </div>
+                }}>
+          <div class="menu-missed">
+            {missedCalls.value.map((call, i) =>
+                <div class="menu-missed__call" key={`missed_${i}`}>
+                  <div class="menu-missed__call--info">
+                    <p class="fw-700 fs-small">
+                      <g-icon size="16" class="mr-1">icon-call</g-icon>
+                      {call.customer.phone}
+                    </p>
+                    <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                  </div>
+                  <div class={['delivery-info__call-btn']}
+                       onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                    <g-icon size="20">icon-take-away</g-icon>
+                  </div>
+                  <div class={['delivery-info__call-btn']}
+                       onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                    <g-icon size="20">icon-delivery-scooter</g-icon>
+                  </div>
+                  <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                    <g-icon color="white">clear</g-icon>
+                  </div>
+                </div>)}
+          </div>
+        </g-menu>
+    )
+  }
+
+  //
   const customerUiRender = () => (
     <div class="delivery-info">
       <div class="delivery-info--upper">
-        {(deliveryOrderMode.value === 'tablet' || !showKeyboard.value) &&
-        <div class="delivery-info__favorite">
-          {favorites.value.map((f, i) =>
-            <div style={getRandomColor(i)} class="delivery-info__favorite-item"
-                 onClick={() => selectFavoriteProduct(f)}
-                 key={`favorite_${i}`}>
-              {f.name}
-            </div>)}
-        </div>}
-
-
-        <div class="delivery-info__customer">
-          {!isNewCustomer.value ?
-            <>
-              {selectedCustomer.value.addresses.map((item, i) =>
-                <div
-                  class={['delivery-info__customer-address', selectedAddress.value === i && 'delivery-info__customer-address--selected']}
-                  onClick={() => selectedAddress.value = i}>
-                  <div class="row-flex align-items-center">
-                    <g-radio small v-model={selectedAddress.value} value={i} label={`Address ${i + 1}`}
-                             color="#536DFE"/>
-                    <g-spacer/>
-                    <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#F9A825"
-                              onClick={() => openDialog('edit', item.address, item.zipcode, i)}>
-                      <g-icon size="15">icon-reservation_modify</g-icon>
-                    </g-btn-bs>
-                    <g-btn-bs small style="margin: 0 2px; padding: 4px;" background-color="#FF4452"
-                              onClick={() => removeAddress(i)}>
-                      <g-icon size="15">icon-delete</g-icon>
-                    </g-btn-bs>
-                  </div>
-                  <p>{item.address}</p>
-                  <p class="text-grey fs-small">{item.zipcode}</p>
-                  <p class="text-grey fs-small">{item.city}</p>
-                </div>)}
-              <g-icon size="40" color="#1271FF" onClick={() => openDialog('add')}>add_circle</g-icon>
-            </> :
-            (deliveryOrderMode.value === 'mobile' ?
-              <>
-                <div class="row-flex mt-3 w-100">
-                  <div style="flex: 1; margin-right: 2px">
-                    <g-text-field outlined dense v-model={phone.value} label="Phone"
-                                  onClick={() => showKeyboard.value = true}
-                                  virtualEvent={isIOS.value}/>
-                  </div>
-                  <div style="flex: 1; margin-left: 2px">
-                    <g-text-field outlined dense v-model={name} label="Name"
-                                  onClick={() => showKeyboard.value = true}
-                                  virtualEvent={isIOS.value}/>
-                  </div>
-                </div>
-                <div class="row-flex">
-                  <div class="col-9">
-                    <g-combobox style="width: 100%" label="Address" v-model={placeId.value} outlined dense
-                                clearable
-                                virtualEvent={isIOS.value} skip-search
-                                items={autocompleteAddresses.value} onUpdate:searchText={debounceSearchAddress}
-                                ref="autocomplete"
-                                onInputClick={() => showKeyboard.value = true} keep-menu-on-blur
-                                menu-class="menu-autocomplete-address"
-                                onUpdate:modelValue={selectAutocompleteAddress}/>
-                  </div>
-                  <div class="flex-grow-1 ml-1">
-                    <g-text-field outlined dense v-model={house.value} label="Nr"
-                                  onClick={() => showKeyboard.value = true}
-                                  virtualEvent={isIOS.value}/>
-                  </div>
-                </div>
-              </> :
-              <>
-                <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.valuee}
-                                 onClick={() => openDialog('add')}>
-                  {{
-                    'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-                  }}
-                </g-text-field-bs>
-                <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
-                                 onClick={() => openDialog('add')}>
-                  {{
-                    'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-                  }}
-                </g-text-field-bs>
-              </>)}
-        </div>
+        { renderFavorites() }
+        { renderCustomerDeliveryInfo() }
       </div>
+
       <div class="delivery-info--lower">
-        {(calls.value && calls.value.length > 0) ?
-          <div
-            class={['delivery-info__call', calls && calls[0] && calls[0].type === 'missed' ? 'b-red' : 'b-grey']}>
-            <div class="delivery-info__call--info">
-              <p class="fw-700 fs-small">
-                <g-icon size="16" class="mr-1">icon-call</g-icon>
-                {calls.value[0].customer.phone}
-              </p>
-              <p class="fs-small text-grey-darken-1">{calls.value[0].customer.name}</p>
-            </div>
-            <div
-              class={['delivery-info__call-btn', orderType === 'pickup' && 'delivery-info__call-btn--selected']}
-              onClick={() => chooseCustomer('pickup')}>
-              <g-icon size="20">icon-take-away</g-icon>
-            </div>
-            <div
-              class={['delivery-info__call-btn', orderType === 'delivery' && 'delivery-info__call-btn--selected']}
-              onClick={() => chooseCustomer('delivery')}>
-              <g-icon size="20">icon-delivery-scooter</g-icon>
-            </div>
-            <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall()}>
-              <g-icon color="white">clear</g-icon>
-            </div>
-          </div> :
-          <>
-            <div class="delivery-info__call--empty">
-              <p class="fw-700">Empty</p>
-              <p class="text-grey-darken-1">No pending calls</p>
-            </div>
-            {(missedCalls.value && missedCalls.value.length > 0) &&
-            <g-menu v-model={menuMissed.value} top left nudge-top="5"
-                    v-slots={{
-                      activator: ({on}) =>
-                        <div vClick={on.click}
-                             class={['delivery-info__call--missed', menuMissed && 'delivery-info__call--missed--selected']}>
-                          <b>Missed</b>
-                          <div class="delivery-info__call--missed-num">
-                            {missedCalls.length}
-                          </div>
-                        </div>
-                    }}>
-              <div class="menu-missed">
-                {missedCalls.map((call, i) =>
-                  <div class="menu-missed__call" key={`missed_${i}`}>
-                    <div class="menu-missed__call--info">
-                      <p class="fw-700 fs-small">
-                        <g-icon size="16" class="mr-1">icon-call</g-icon>
-                        {call.customer.phone}
-                      </p>
-                      <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
-                    </div>
-                    <div class={['delivery-info__call-btn']}
-                         onClick={() => chooseMissedCustomer(i, 'pickup')}>
-                      <g-icon size="20">icon-take-away</g-icon>
-                    </div>
-                    <div class={['delivery-info__call-btn']}
-                         onClick={() => chooseMissedCustomer(i, 'delivery')}>
-                      <g-icon size="20">icon-delivery-scooter</g-icon>
-                    </div>
-                    <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
-                      <g-icon color="white">clear</g-icon>
-                    </div>
-                  </div>)}
-              </div>
-            </g-menu>}
-          </>}
+        {
+          (calls.value && calls.value.length > 0)
+              ? renderPendingCalls()
+              : [ renderNoPendingCalls(), renderMissedCalls() ]
+        }
       </div>
     </div>
   )
@@ -386,9 +427,11 @@ export function deliveryCustomerUiFactory() {
                            </div>
                        }}
     />
-    <dialog-text-filter v-model={dialog.value.note} label="Delivery note" onSubmit={e => {
-      note.value = e
-    }}/>
+
+    <dialog-text-filter v-model={dialog.value.note}
+                        label="Delivery note"
+                        onSubmit={e => note.value = e}/>
+
     {showKeyboard.value && <div class="keyboard">
       <div class="keyboard-overlay" onClick={hideKeyboard}></div>
       <div class="keyboard-wrapper">
@@ -397,5 +440,23 @@ export function deliveryCustomerUiFactory() {
     </div>}
   </>);
 
-  return {customerUiRender, renderDialogs}
+  return {
+    calls,
+    missedCalls,
+    orderType,
+
+    // partial render
+    renderFavorites,
+    renderSelectedCustomer,
+    renderNewCustomerForMobile,
+    renderNewCustomerForNonMobile,
+    renderCustomerDeliveryInfo,
+    renderPendingCalls,
+    renderNoPendingCalls,
+    renderMissedCalls,
+    renderDialogs,
+
+    // entire render
+    customerUiRender
+  }
 }

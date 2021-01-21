@@ -1,7 +1,7 @@
 import {ref} from "vue";
 
 export const deliveryOrderMode = ref('tablet');
-export const showKeyboard = ref(false);
+export const showKeyboard = ref(false); // only show in mobile mode
 export const favorites = ref([]);
 export const selectedCustomer = ref();
 export const selectedAddress = ref(0);
@@ -45,3 +45,7 @@ export function openDialog(mode, _address, _zipcode, index) {
 }
 
 export const autocompleteAddresses = ref([]);
+
+
+export const calls = ref([])
+export const missedCalls = ref([]) // this.missedCalls.unshift({customer, date}); OrderStore
