@@ -1,64 +1,53 @@
 <script>
   import PosOrderLayout2 from '../OrderView/PosOrderLayout2';
   import CategoryEditor2 from './CategoryEditor/CategoryEditor2';
-  import ProductEditor2 from './ProductEditor/ProductEditor2';
   import OrderLayoutEditor2 from './OrderLayoutEditor2';
   import EditMenuCardToolbar2 from './EditMenuCardToolbar/EditMenuCardToolbar2';
   import KeyboardEditor2 from './KeyboardEditor2';
-  import IngredientEditor2 from './IngredientEditor2';
+  // product
+  import ProductEditor2 from './ProductEditor/ProductEditor2';
+  import IngredientEditor2 from './ProductEditor/IngredientEditor2';
+  import ProductEditorToolbarButtons from './ProductEditor/ProductEditorToolbarButtons';
 
   import { view } from '../OrderView/pos-ui-shared'
   import { genScopeId } from '../utils';
 
   export default {
     name: 'EditMenuCard',
-    components: { OrderLayoutEditor2, PosOrderLayout2, CategoryEditor2, ProductEditor2, IngredientEditor2, KeyboardEditor2, EditMenuCardToolbar2},
+    components: {
+      OrderLayoutEditor2,
+      PosOrderLayout2,
+      CategoryEditor2,
+      KeyboardEditor2,
+      EditMenuCardToolbar2,
+      ProductEditor2, IngredientEditor2, ProductEditorToolbarButtons,
+    },
     props: {},
     setup() {
       function renderContextEditor() {
-        console.log('renderContextEditor', view.value.name)
         switch (view.value.name) {
           case 'CategoryEditor':
             return <category-editor2/>
           case 'ProductEditor':
-            if (view.value.mode === 'ingredient')
-              return <ingredient-editor2/>
-            else
-              return <product-editor2/>
+            return (view.value.mode === 'ingredient')
+                ? [ <ingredient-editor2/>, <product-editor-toolbar-buttons/> ]
+                : [ <product-editor2/>, <product-editor-toolbar-buttons/> ]
           case 'KeyboardEditor':
             return <keyboard-editor2/>
         }
       }
 
       function renderEditor() {
-        if (!view.value)
-          return <order-layout-editor2/>
-
-        return <>
-          <order-layout-editor2/>
-          { renderContextEditor() }
-        </>
+        return [ <order-layout-editor2/>, view.value && renderContextEditor()]
       }
 
-      return genScopeId(() => <>
+      return genScopeId(() =>
         <div class="pos-emc">
           <pos-order-layout2 class="pos-emc__menu" editable/>
           <div class="pos-emc__editor">{ renderEditor() }</div>
           <edit-menu-card-toolbar2 class="pos-emc__toolbar"/>
         </div>
-      </>)
-    },
-    data: function () {
-      return {
-        view: null,
-        orderLayout: null,
-        selectedCategoryLayout: null,
-        selectedProductLayout: null,
-        productDblClicked: null,
-        keyboardConfig: null,
-        mode: 'basic',
-        isMobile: null,
-      }
+      )
     }
   }
 </script>

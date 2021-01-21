@@ -223,8 +223,8 @@ export function setAction(action) {
   if (!_.includes(supportedActions, action))
     throw `Action ${action} is not supported!`
   _action = action
-  actionTarget = selectedProductLayout
-  actionCategoryTarget = selectedCategoryLayout
+  actionTarget = selectedProductLayout.value
+  actionCategoryTarget = selectedCategoryLayout.value
 }
 function _clearAction() {
   _action = null
@@ -246,7 +246,8 @@ async function _execAction() {
 // watch product layout change to trigger product layout action automatically
 // side-effect: in-case the user select action then switch to another category
 // Do we need to clear action if the user change category ???
-watch(() => selectedProductLayout, async () => {
+watch(() => selectedProductLayout.value, async (newVal, oldValue) => {
+  console.log('watch selectedProductLayout.value',  newVal, oldValue)
   if (_action)
     await _execAction()
 })
@@ -258,18 +259,18 @@ async function copyProduct() {
     console.log('Product existed in selected position. Skip copy.')
     return;
   }
-  const product = await cms.getModel('Product').create({
-    ...copyProductInfo(actionTarget.value.product)
-  });
+  console.log('copyProduct:copying product...')
+  const product = await orderLayoutApi.createProduct(copyProductInfo(actionTarget.product));
   const productLayout = {
     product: product._id,
     ..._.pick(selectedProductLayout.value, ['top', 'left']),
-    ..._.pick(actionTarget.value, ['color', 'type', 'text'])
+    ..._.pick(actionTarget, ['color', 'type', 'text'])
   }
-  const result = await cms.getModel('OrderLayout').findOneAndUpdate(
-      { 'categories._id' : selectedCategoryLayout.value._id },
-      { $push: { 'categories.$.products' : productLayout } },
-      { new: true });
+  const result = await orderLayoutApi.createProductLayout(
+      layoutType.value,
+      selectedCategoryLayout.value._id,
+      productLayout
+  );
   updateOrderLayout(result)
 }
 function copyProductInfo(product) {
@@ -296,14 +297,14 @@ async function switchProduct() {
     console.log('switch product in same category')
     // TODO: Bulk update
     let result = await changeProductLayoutPosInTheSameCate(
-        actionTarget.value,
+        actionTarget,
         _.pick(selectedProductLayout.value, ['top', 'left']),
         actionCategoryTarget.value)
 
     if (selectedProductLayout.value._id)
       result = await changeProductLayoutPosInTheSameCate(
           selectedProductLayout.value,
-          _.pick(actionTarget.value, ['top', 'left']),
+          _.pick(actionTarget, ['top', 'left']),
           actionCategoryTarget.value)
 
     updateOrderLayout(result)

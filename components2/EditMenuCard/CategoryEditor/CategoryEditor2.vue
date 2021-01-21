@@ -24,6 +24,7 @@ import {
   changeCategoryColumn,
   changeCategoryRow,
 } from './category-editor-order-layout'
+import { genScopeId } from '../../utils';
 
 export default {
   name: 'CategoryEditor2',
@@ -108,7 +109,9 @@ export default {
     const showDeleteConfirmDialog = ref(false)
     let renderDeleteCategoryToolbarButton = () => {
       return <>
-        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete.value}>{t('ui.delete')}</g-btn-bs>
+        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete"
+                  onClick={() => showDeleteConfirmDialog.value = true}
+                  disabled={!canDelete.value}>{t('ui.delete')}</g-btn-bs>
         <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this category' onSubmit={() => {
           deleteCategory();
           showDeleteConfirmDialog.value = false;
@@ -116,19 +119,25 @@ export default {
       </>
     }
     let renderToolbarButtons = () => <portal to={constants.portalLeftButtons}>
-      <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch.value}>{t('ui.switch')}</g-btn-bs>
-      { renderDeleteCategoryToolbarButton() }
+      {
+        genScopeId(() => <>
+          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch"
+                    onClick={() => setAction('switch')}
+                    disabled={!canSwitch.value}>{t('ui.switch')}</g-btn-bs>
+          { renderDeleteCategoryToolbarButton() }
+        </>)()
+      }
     </portal>
 
     // entire render
-    let renderCategoryEditor = () => <>
+    let renderCategoryEditor = genScopeId(() => <div class="category-editor">
       {renderCategoryLayoutSetting()}
       {renderCateNameSetting()}
       {renderCateColorSetting()}
       {renderCateProductLayoutSetting()}
       {renderPopUp()}
       {renderToolbarButtons()}
-    </>
+    </div>)
 
     return {
       showDeleteConfirmDialog,
@@ -182,4 +191,6 @@ export default {
       }
     }
   }
+
+  @import "../EditMenuCardToolbar/emc-button";
 </style>

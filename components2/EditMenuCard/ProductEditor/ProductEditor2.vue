@@ -241,8 +241,7 @@ export default {
       )
     }
 
-    function renderColor() {
-      return <>
+    const renderColor = () => (
         <div class="mt-2">
           <div class="product-editor__label">{t('ui.color')}</div>
           <color-selector
@@ -251,11 +250,9 @@ export default {
               item-size="25"
               onUpdate:modelValue={e => updateProductLayout({ color: e })}/>
         </div>
-      </>
-    }
+    )
 
-    function renderPopupModifier() {
-      return <>
+    const renderPopupModifier = () => (
         <div class="mt-2">
           <div class="row-flex justify-between">
             <div class="product-editor__label">Popup modifiers</div>
@@ -268,107 +265,32 @@ export default {
                 item-value="_id"
                 items={popupModifierGroups.value}
                 itemCols="auto" v-slots={{
-                  default: ({toggleSelect, item, index}) =>
-                      <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
-                  selected: ({toggleSelect, item, index}) =>
-                      <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={() => clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
-                }}/>
+              default: ({ toggleSelect, item, index }) =>
+                  <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
+              selected: ({ toggleSelect, item, index }) =>
+                  <div class="prop-option prop-option--1" key={`${index}-selected`} onClick={() => clearPopupModifierGroup(toggleSelect, item)}>{item.name}</div>
+            }}/>
           </div>
         </div>
-      </>
-    }
+    )
 
-    function renderDialogProductInfo() {
-      return (
-          <dialog-product-info
-              v-model={dialog.productInfo}
-              product={selectedProduct.value}
-              focus={dialog.focus}
-              onSubmit={updateProduct}/>
-      )
-    }
+    const renderDialogProductInfo = () => (
+        <dialog-product-info
+            v-model={dialog.productInfo}
+            product={selectedProduct.value}
+            focus={dialog.focus}
+            onSubmit={updateProduct}/>
+    )
 
-    function renderTextFilter() {
-      return (
-          <dialog-text-filter
-              label="Text"
-              default-value={selectedProductLayout.value.text}
-              v-model={dialog.showTextKbd}
-              onSubmit={e => updateProductLayout({ text: e, type: 'Text' }, e)}/>
-      )
-    }
+    const renderTextFilter = () => (
+        <dialog-text-filter
+          label="Text"
+          default-value={selectedProductLayout.value.text}
+          v-model={dialog.showTextKbd}
+          onSubmit={e => updateProductLayout({ text: e, type: 'Text' }, e)}/>
+    )
 
-    function renderPopupModifierDialog() {
-      return <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct.value}/>
-    }
-
-    //// toolbar
-    function renderToolbarButtons() {
-      return <>
-        <portal to={constants.portalLeftButtons}>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-switch" onClick={() => setAction('switch')} disabled={!canSwitch.value}>{t('ui.switch')}</g-btn-bs>
-          <g-btn-bs elevation="2" icon="icon-edit-menu-card-copy" onClick={() => setAction('copy')} disabled={!canCopy.value}>{t('ui.copy')}</g-btn-bs>
-          { renderDeleteProductToolbarButton() }
-        </portal>
-        <portal to={constants.portalRightButtons}>
-          { renderSwitchProductEditModeButton() }
-        </portal>
-      </>
-    }
-
-    // delete button
-    const showDeleteConfirmDialog = ref(false)
-    function renderDeleteProductToolbarButton() {
-      return <>
-        <g-btn-bs elevation="2" icon="icon-edit-menu-card-delete" onClick={() => showDeleteConfirmDialog.value = true} disabled={!canDelete.value}>{t('ui.delete')}</g-btn-bs>
-        <dialog-confirm-delete v-model={showDeleteConfirmDialog.value} type=' this product' onSubmit={() => {
-          deleteProductLayout();
-          showDeleteConfirmDialog.value = false;
-        }}></dialog-confirm-delete>
-      </>
-    }
-
-    // render switch product editor mode
-    const showSwitchEditModeDialog = ref(false)
-    const shouldShowSwitchEditModeDialog = ref(true)
-    function openSwitchModeDialogIfNeeded() {
-      if (shouldShowSwitchEditModeDialog.value) {
-        showSwitchEditModeDialog.value = true
-        shouldShowSwitchEditModeDialog.value = false
-      }
-    }
-    function changeToIngredientMode() {
-      openSwitchModeDialogIfNeeded()
-      updateProductEditMode(ProductEditModes.ingredient)
-    }
-    function renderSwitchProductEditModeButton() {
-      return <>
-        {
-          view.value.mode === ProductEditModes.ingredient
-              ? <g-btn-bs elevation="2" icon="icon-ingredient-mode" onClick={() => updateProductEditMode(ProductEditModes.basic)}>{t('inventory.ingredientMode')} </g-btn-bs>
-              : <g-btn-bs elevation="2" icon="icon-basic-mode" onClick={changeToIngredientMode}>{t('inventory.basicMode')} </g-btn-bs>
-        }
-        <g-dialog v-model={showSwitchEditModeDialog.value} eager width="448">
-          <div class="dialog" onClick={() => showSwitchEditModeDialog.value = false}>
-            <div class="dialog-content">
-              <g-icon>icon-basic-mode</g-icon>
-              <div style="flex: 1; margin-left: 16px">
-                <p class="dialog-content__title">{t('inventory.basicMode')}</p>
-                <p class="dialog-content__detail">{t('inventory.basicNote')}</p>
-              </div>
-            </div>
-            <div class="dialog-content">
-              <g-icon>icon-ingredient-mode</g-icon>
-              <div style="flex: 1; margin-left: 16px">
-                <p class="dialog-content__title">{t('inventory.ingredientMode')}</p>
-                <p class="dialog-content__detail">{t('inventory.ingredientNote')}</p>
-              </div>
-            </div>
-            <div class="dialog-message">{t('inventory.clickDismiss')}</div>
-          </div>
-        </g-dialog>
-      </>
-    }
+    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct.value}/>
 
     // set layout type by route
     function setLayoutTypeByRouteQuery() {
@@ -391,23 +313,28 @@ export default {
     _created()
 
     return genScopeId(() => {
-      return isProductLayout.value ? <>
-        {renderLayoutType()}
-        {renderProductLayout()}
-        {renderPrinterSetting()}
-        {renderTax()}
-        {renderColor()}
-        {renderPopupModifier()}
-        {renderDialogProductInfo()}
-        {renderTextFilter()}
-        {renderPopupModifierDialog()}
-        {renderToolbarButtons()}
-      </> : <>
-        {renderLayoutType()}
-        {renderTextLayout()}
-        {renderPopupModifier()}
-        {renderToolbarButtons()}
-      </>
+      return <div class="product-editor">
+        { isProductLayout.value ? <>
+            <div class="product-editor__prop-grid">
+              {renderLayoutType()}
+              {renderProductLayout()}
+            </div>
+            {renderPrinterSetting()}
+            {renderTax()}
+            {renderColor()}
+            {renderPopupModifier()}
+            {renderDialogProductInfo()}
+            {renderTextFilter()}
+            {renderPopupModifierDialog()}
+          </> : <>
+            <div class="product-editor__prop-grid">
+              {renderLayoutType()}
+              {renderTextLayout()}
+            </div>
+            {renderPopupModifier()}
+          </>
+        }
+      </div>
     })
   }
 }

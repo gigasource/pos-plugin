@@ -7,11 +7,11 @@ export const internalValueFactory = (props, {emit}) => {
   })
 }
 
-export function genScopeId(render) {
+export function genScopeId(render, currentInstance) {
   if (render) {
-    return withScopeId(getCurrentInstance().type['__scopeId'])(render);
+    return withScopeId((currentInstance || getCurrentInstance()).type['__scopeId'])(render);
   }
-  return {[getCurrentInstance().type['__scopeId']]: ''};
+  return {[(currentInstance || getCurrentInstance()).type['__scopeId']]: ''};
 }
 
 export const parseNumber = function(number) {

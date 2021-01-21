@@ -1,0 +1,14 @@
+.g-btn-bs {
+  background-color: white;
+  font-size: 14px;
+}
+
+@media screen and (max-width: 1279px) {
+  .g-btn-bs {
+    font-size: 0;
+
+    ::v-deep .g-icon {
+      margin-right: 0 !important;
+    }
+  }
+}

@@ -73,6 +73,7 @@ async function createCategoryLayout(orderLayoutId, categoryLayout) {
 
 // product api
 async function createProductLayout(layoutType, categoryLayoutId, productLayout) {
+  console.log('orderLayoutApi:createProductLayout', layoutType, categoryLayoutId, productLayout)
   return await cms.getModel('OrderLayout').findOneAndUpdate(
       {
         type: layoutType,
