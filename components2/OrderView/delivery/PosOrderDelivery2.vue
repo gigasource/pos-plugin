@@ -80,7 +80,7 @@ export default {
         if (choice.mandatory) {
           let flag = true
           for (const option of choice.options) {
-            const modifiers = this.modifiers
+            const modifiers = modifiers.value
             if (modifiers && modifiers.find(m => m._id === option._id)) {
               flag = false
             }
@@ -111,7 +111,7 @@ export default {
     const router = useRouter();
 
     function back() {
-      this.resetOrderData()
+      resetOrderData()
       router.push({
         path: '/pos-dashboard'
       })
