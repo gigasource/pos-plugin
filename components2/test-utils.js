@@ -112,7 +112,7 @@ export function setComponent(_component) {
  * @returns {*}
  * example: makeWrapper(Order2, {shallow: false});
  */
-export const makeWrapper = (_component, options, useDefaults = true) => {
+export const makeWrapper = (_component, options, useDefaults = false) => {
   const defaultOption = {
     props: {},
     shallow: true,

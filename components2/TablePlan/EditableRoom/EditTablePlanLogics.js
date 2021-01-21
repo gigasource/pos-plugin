@@ -4,11 +4,11 @@ import {
   objectsInSelectingRoom, onSelectRoom, removeSelectingRoom,
   selectingRoomStates,
   roomsStates, updateSelectingRoomName, swapSelectingRoomOrderWithTheRoomBefore, swapSelectingRoomOrderWithTheRoomBehind
-} from '../../TablePlan/RoomState';
+} from '../RoomState';
 import _ from 'lodash';
 import cms from 'cms';
 import { ObjectID} from 'bson';
-import { addRoomObject, removeRoomObject, updateRoomObject } from '../../TablePlan/RoomLogics';
+import { addRoomObject, removeRoomObject, updateRoomObject } from '../RoomLogics';
 
 export const selectingObject = ref(null)
 
