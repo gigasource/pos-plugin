@@ -1,6 +1,6 @@
 <script>
 import { useI18n } from 'vue-i18n';
-import { internalValueFactory } from '../../utils'
+import { genScopeId, internalValueFactory } from '../../utils'
 import { computed } from 'vue';
 
 export default {
@@ -8,8 +8,7 @@ export default {
     const product = props.product
     const internalValue = internalValueFactory(props, { emit })
 
-    const { t: $t, locale } = useI18n()
-    const modifierGroups = ref([])
+    const { t, locale } = useI18n()
     const activeModifierGroup = ref(null)
     const categories = ref([])
     const modifiers = ref([])
@@ -49,12 +48,12 @@ export default {
       })
     })
 
-    const save = function() {
+    const save = function () {
       emit('save', product, listModifiers.value)
       internalValue.value = false
     }
 
-    const selectModifierGroup = function(group) {
+    const selectModifierGroup = function (group) {
       activeModifierGroup.value = group
     }
     const onClickModifier = function (modifier, category, toggleSelect) {
@@ -95,14 +94,14 @@ export default {
 
       toggleSelect(modifier)
     }
-    const selectModifier = function(value, category) {
+    const selectModifier = function (value, category) {
       gGridSelectModifierModel.value[category._id] = value
     }
-    const getModifierQty = function(_id) {
+    const getModifierQty = function (_id) {
       return selectingModifiers.value.filter(mod => mod._id === _id).length;
     }
 
-    return () => <g-dialog v-model={internalValue} width="60%">
+    return genScopeId(() => <g-dialog v-model={internalValue} width="60%">
       <g-card class="pt-3 pr-4 pb-3 pl-4">
         <g-card-title>
           <div class="row-flex flex-grow-1">
@@ -123,17 +122,17 @@ export default {
                   <g-grid-select
                       items={modifiers.value[category._id]}
                       grid={false}
-                      return-object
+                      return-object={true}
                       multiple={!category.selectOne}
                       mandatory={category.mandatory}
                       modelValue={gGridSelectModifierModel.value[category._id]}
                       onUpdate:modelValue={(newV) => selectModifier(newV, category)}>
                     {{
                       default: (toggleSelect, item, index) =>
-                          <g-btn uppercase={false} border-radius="2" outlined class="mr-3 mb-2" background-color="#F0F0F0"
+                          <g-btn uppercase={false} border-radius="2" outlined={true} class="mr-3 mb-2" background-color="#F0F0F0"
                                  style="border: 1px solid #C9C9C9" key={`${cIndex}_${index}`}
                                  onClick={() => onClickModifier(item, category, toggleSelect)}>
-                            {item.name} - {$t('common.currency', locale.value)}{item.price}
+                            {item.name} - {t('common.currency', locale.value)}{item.price}
                           </g-btn>,
                       selected: (toggleSelect, item, index) => <>
                         <span key={`${cIndex}_${index}_selected`}>
@@ -144,7 +143,7 @@ export default {
                                   default: () => <g-btn
                                       uppercase={false} border-radius="2" flat background-color="#2979FF" text-color="#fff"
                                       onClick={() => onClickModifier(item, category, toggleSelect)}>
-                                    {item.name} - {$t('common.currency', locale.value)}{item.price}
+                                    {item.name} - {t('common.currency', locale.value)}{item.price}
                                   </g-btn>
                                 }}
                               </g-badge> :
@@ -153,7 +152,7 @@ export default {
                                   onClick={() => onClickModifier(item, category, toggleSelect)}>
                                 {item.name}
                                 -
-                                {$t('common.currency', locale.value)}
+                                {t('common.currency', locale.value)}
                                 {item.price}
                               </g-btn>}
                         </span>
@@ -169,7 +168,7 @@ export default {
           </g-btn>
         </g-card-actions>
       </g-card>
-    </g-dialog>
+    </g-dialog>)
   }
 }
 </script>

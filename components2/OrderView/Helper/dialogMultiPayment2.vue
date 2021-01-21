@@ -1,14 +1,17 @@
 <script>
 import { useI18n } from 'vue-i18n';
-import { internalValueFactory } from '../../utils'
-import { computed } from 'vue';
+import { internalValueFactory, VModel_number } from '../../utils'
+import { computed, ref } from 'vue';
 import { onCLick_Stop } from '../../../utils/helpers';
+import { getCurrentOrder } from '../pos-logic-be';
 
 export default {
+  name: 'dialogMultiPayment2',
   setup(props, { emit }) {
-    const { t: $t, locale } = useI18n()
+    const { t, locale } = useI18n()
+    const currentOrder = getCurrentOrder()
     const internalValue = internalValueFactory(props, { emit })
-    const { cardValue, cashValue, rotate, total } = props
+    const {  rotate } = props
     const keyboardTemplate = ref('grid-template-areas: " key7 key7 key8 key8 key9 key9" ' +
         '"key4 key4 key5 key5 key6 key6" ' +
         '"key1 key1 key2 key2 key3 key3" ' +
@@ -36,7 +39,7 @@ export default {
       }
     ])
 
-    const listPayments = ref([
+    const defaultPaymentList = ref([
       { type: 'cash', icon: 'icon-cash' },
       { type: 'card', icon: 'icon-credit_card' },
     ])
@@ -54,14 +57,15 @@ export default {
       const number = (+cashEditValue.value) + (+cardEditValue.value);
       return isNaN(+cashEditValue.value) ||
           isNaN(+cardEditValue.value) ||
-          number < total
+          number < currentOrder.vSum
     })
 
     const getRemainingValue = function () {
       if (cashEditValue.value && cardEditValue.value) return 0
-      if (+cashEditValue.value > total || +cardEditValue.value > total) return 0
-      if (cashEditValue.value && !isNaN(+cashEditValue.value)) return cardEditValue.value = total - (+cashEditValue.value)
-      if (cardEditValue.value && !isNaN(+cardEditValue.value)) cashEditValue.value = total - (+cardEditValue.value)
+      if (+cashEditValue.value > currentOrder.vSum || +cardEditValue.value > currentOrder.vSum) return 0
+      console.log(cashEditValue.value)
+      if (cashEditValue.value && !isNaN(+cashEditValue.value)) return cardEditValue.value = currentOrder.vSum - (+cashEditValue.value)
+      if (cardEditValue.value && !isNaN(+cardEditValue.value)) cashEditValue.value = currentOrder.vSum - (+cardEditValue.value)
     }
     const submit = function () {
       emit('submit', {
@@ -92,11 +96,11 @@ export default {
           <g-spacer/>
           <span class="mr-1">Total:</span>
           <span class="dialog-multi-payment__header-number">
-            {$t('common.currency', locale.value)} {total}
+            {t('common.currency', locale.value)} {currentOrder.vSum}
           </span>
         </div>
         <div class="dialog-multi-payment__screen">
-          {listPayments.map(item =>
+          {defaultPaymentList.value.map(item =>
               <div class="mt-1 mb-2 row-flex align-items-center">
                 <g-btn-bs backgroundColor={getBackgroundColor(item)} border-radius="2px"
                           style="border: 1px solid #bdbdbd"
@@ -106,20 +110,22 @@ export default {
                 </g-btn-bs>
                 {item.type === "card" ?
                     <pos-textfield-new clearable ref={cardTextfieldRef}
-                                       v-model={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)}/> :
+                                       v-model={VModel_number(cardEditValue).value}
+                                       onClick={onCLick_Stop(getRemainingValue)}/> :
                     <pos-textfield-new clearable ref={cashTextfieldRef}
-                                       v-model={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)}/>}
+                                       v-model={VModel_number(cashEditValue).value}
+                                       onClick={onCLick_Stop(getRemainingValue)}/>}
               </div>)}
         </div>
         <div class="dialog-multi-payment__screen--mobile">
-          <g-text-field clearable ref={cardTextfieldRef} outlined label={$t('payment.cash')} class="mr-1"
-                        v-model={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
+          <g-text-field clearable ref={cardTextfieldRef} outlined label={t('payment.cash')} class="mr-1"
+                        v-model_number={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
             {{
               'prepend-inner': () => <g-icon>icon-cash</g-icon>
             }}
           </g-text-field>
-          <g-text-field clearable ref={cashTextfieldRef} outlined label={$t('payment.card')}
-                        v-model={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
+          <g-text-field clearable ref={cashTextfieldRef} outlined label={t('payment.card')}
+                        v-model_number={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
             {{
               'prepend-inner': () => <g-icon>icon-credit_card</g-icon>
             }}

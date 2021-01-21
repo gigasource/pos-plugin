@@ -232,6 +232,7 @@ export function orderLayoutProductFactory() {
       return _addProductToOrder({product})
     }
 
+    console.log('show popup')
     _.assign(popupModifierDialog, {
       value: true,
       product

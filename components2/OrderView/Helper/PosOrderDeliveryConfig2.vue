@@ -1,12 +1,12 @@
 <script>
 import { computed } from 'vue';
-import { setting } from '../../AppSharedStates';
+import { posSettings } from '../../AppSharedStates';
 import _ from 'lodash';
 import { cms } from 'cms'
 export default {
 
   setup() {
-    const keyboardDeliveryConfig = ref(setting.value && setting.value.keyboardDeliveryConfig) || []
+    const keyboardDeliveryConfig = ref(posSettings.value && posSettings.value.keyboardDeliveryConfig) || []
     const position = ref({})
     const dialog = ref(false)
     const fetchMenu = function() {

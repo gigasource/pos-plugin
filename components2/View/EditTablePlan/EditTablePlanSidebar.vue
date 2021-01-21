@@ -27,7 +27,7 @@ import {
   wallColors
 } from './EditTablePlanLogics';
 import { selectingRoomStates } from '../../TablePlan/RoomState';
-import { isTable } from '../../TablePlan/RoomLogics';
+import { isTable } from '../../TablePlan/RoomShared';
 import { getScopeAttrs } from '../../../utils/helpers';
 
 export default {
