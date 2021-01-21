@@ -348,51 +348,51 @@ export function deliveryCustomerUiFactory() {
     if (!missedCalls.value || missedCalls.value.length < 1)
       return
 
-    return <div>
-      { missedCalls.value.map((call, i) => <div> { call.customer.name } </div>) }
-    </div>
+    // return <div>
+    //   { missedCalls.value.map((call, i) => <div> { call.customer.name } </div>) }
+    // </div>
 
-    // return (
-    //     <g-menu v-model={menuMissed.value} top left nudge-top="5"
-    //             v-slots={{
-    //               default: () => (
-    //                   <div class="menu-missed">
-    //                     {missedCalls.value.map((call, i) => (
-    //                         <div class="menu-missed__call" key={`missed_${i}`}>
-    //                           <div class="menu-missed__call--info">
-    //                             <p class="fw-700 fs-small">
-    //                               <g-icon size="16" class="mr-1">icon-call</g-icon>
-    //                               {call.customer.phone}
-    //                             </p>
-    //                             <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
-    //                           </div>
-    //                           <div class={['delivery-info__call-btn']}
-    //                                onClick={() => chooseMissedCustomer(i, 'pickup')}>
-    //                             <g-icon size="20">icon-take-away</g-icon>
-    //                           </div>
-    //                           <div class={['delivery-info__call-btn']}
-    //                                onClick={() => chooseMissedCustomer(i, 'delivery')}>
-    //                             <g-icon size="20">icon-delivery-scooter</g-icon>
-    //                           </div>
-    //                           <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
-    //                             <g-icon color="white">clear</g-icon>
-    //                           </div>
-    //                         </div>
-    //                     ))}
-    //                   </div>
-    //               ),
-    //               activator: ({ on }) => (
-    //                   <div vClick={on.click}
-    //                        class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
-    //                     <b>Missed</b>
-    //                     <div class="delivery-info__call--missed-num">
-    //                       {missedCalls.value.length}
-    //                     </div>
-    //                   </div>
-    //               )
-    //             }}>
-    //     </g-menu>
-    // )
+    return (
+        <g-menu v-model={menuMissed.value} top left nudge-top="5"
+                v-slots={{
+                  default: () => (
+                      <div class="menu-missed">
+                        {missedCalls.value.map((call, i) => (
+                            <div class="menu-missed__call" key={`missed_${i}`}>
+                              <div class="menu-missed__call--info">
+                                <p class="fw-700 fs-small">
+                                  <g-icon size="16" class="mr-1">icon-call</g-icon>
+                                  {call.customer.phone}
+                                </p>
+                                <p class="fs-small text-grey-darken-1">{call.customer.name}</p>
+                              </div>
+                              <div class={['delivery-info__call-btn']}
+                                   onClick={() => chooseMissedCustomer(i, 'pickup')}>
+                                <g-icon size="20">icon-take-away</g-icon>
+                              </div>
+                              <div class={['delivery-info__call-btn']}
+                                   onClick={() => chooseMissedCustomer(i, 'delivery')}>
+                                <g-icon size="20">icon-delivery-scooter</g-icon>
+                              </div>
+                              <div class="delivery-info__call-btn--cancel" onClick={() => deleteCall(i)}>
+                                <g-icon color="white">clear</g-icon>
+                              </div>
+                            </div>
+                        ))}
+                      </div>
+                  ),
+                  activator: ({ on }) => (
+                      <div onClick={on.click}
+                           class={['delivery-info__call--missed', menuMissed.value && 'delivery-info__call--missed--selected']}>
+                        <b>Missed</b>
+                        <div class="delivery-info__call--missed-num">
+                          {missedCalls.value.length}
+                        </div>
+                      </div>
+                  )
+                }}>
+        </g-menu>
+    )
   }
 
   //
