@@ -79,21 +79,10 @@ watchEffect(() => {
     return
 
   if (selectedCategoryLayout.value) {
+    // update category layout to force re-render after product action executed
     const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
-    if (!cateLayout)
-      return
-    // update category layout
-    updateSelectedCategoryLayout(cateLayout)
-    if (!view.value || view.value.name !== 'ProductEditor' || !selectedProductLayout.value)
-      return
-    // update product layout
-    const prodLayout = _.find(cateLayout.products, pl => isSameArea(selectedProductLayout.value, pl))
-    if (prodLayout)
-      updateSelectedProductLayout(prodLayout)
-    else if (editable) {
-      updateView('CategoryEditor')
-      updateSelectedProductLayout(null)
-    }
+    if (cateLayout)
+      updateSelectedCategoryLayout(cateLayout)
   } else {
     // automatically select first category
     if (orderLayout.value.categories.length > 0) {

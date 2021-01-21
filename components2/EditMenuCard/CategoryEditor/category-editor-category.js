@@ -59,7 +59,7 @@ export function setAction(action) {
   if (!_.includes(supportedActions, action))
     throw `Action ${action} is not supported!`
   _action = action
-  actionTarget = selectedCategoryLayout
+  actionTarget = selectedCategoryLayout.value
 }
 function _clearAction() {
   _action = null
@@ -73,7 +73,7 @@ async function _execAction() {
 }
 
 // watch category layout change then trigger category layout action automatically
-watch(() => selectedCategoryLayout, async () => {
+watch(() => selectedCategoryLayout.value, async () => {
   if (_action) {
     await _execAction()
   }
@@ -83,6 +83,6 @@ watch(() => selectedCategoryLayout, async () => {
 // switch
 export const canSwitch = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value._id)
 async function switchCategory() {
-  const result = await orderLayoutApi.switchCategory(actionTarget.value, selectedCategoryLayout.value)
+  const result = await orderLayoutApi.switchCategory(actionTarget, selectedCategoryLayout.value)
   updateOrderLayout(result)
 }
