@@ -124,13 +124,13 @@ const once = _.once(() => {
   addProduct(order, products.value[1].product);
   addProduct(order, products.value[1].product);
 
-  //orderViewDialog.receipt = true;
+  orderViewDialog.move = true;
 })
-/*watchEffect(() => {
+watchEffect(() => {
   if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();
   }
-})*/
+})
 
 /*async function run() {
   await nextTick();

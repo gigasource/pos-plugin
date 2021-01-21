@@ -1,6 +1,6 @@
 import { nextTick } from 'vue';
 
-import RoomUI from '../RoomUI';
+import RoomUI from '../RoomUi';
 import { mount } from '@vue/test-utils';
 import { removeRoomObject } from '../RoomLogics';
 import { selectingObject } from '../RoomState'

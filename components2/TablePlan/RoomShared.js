@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { activeOrders } from '../AppSharedStates';
+import _ from 'lodash';
 
 export const inProgressTables = computed(() => {
   return _.compact(activeOrders.value.map(order => order.table))
