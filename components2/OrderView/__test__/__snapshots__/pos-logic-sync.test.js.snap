@@ -587,7 +587,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2021-01-20T17:00:00.000Z\\",\\"vTaxSum\\":{}}]}]",
     "collectionName": "Order",
-    "condition": null,
+    "condition": "null",
     "data": Object {
       "docId": "ObjectID",
       "table": "10",
@@ -604,7 +604,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"3\\",\\"name\\":\\"Water\\",\\"price\\":67,\\"product\\":\\"ObjectID\\",\\"taxes\\":[7,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"sent\\":true,\\"printed\\":true,\\"vSum\\":67,\\"vTakeAway\\":false,\\"tax\\":7,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -622,7 +622,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":67,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -640,7 +640,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":1,\\"name\\":\\"Cola\\",\\"price\\":98,\\"taxes\\":[19,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":98,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -658,7 +658,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":165,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -676,7 +676,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$[].sent\\":true,\\"items.$[].printed\\":true,\\"cancellationItems.$[].sent\\":true,\\"cancellationItems.$[].printed\\":true}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
     },
@@ -776,7 +776,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2021-01-20T17:00:00.000Z\\",\\"vTaxSum\\":{}}]}]",
     "collectionName": "Order",
-    "condition": null,
+    "condition": "null",
     "data": Object {
       "docId": "ObjectID",
       "table": "10",
@@ -794,7 +794,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"3\\",\\"name\\":\\"Water\\",\\"price\\":67,\\"product\\":\\"ObjectID\\",\\"taxes\\":[7,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"sent\\":true,\\"printed\\":true,\\"vSum\\":67,\\"vTakeAway\\":false,\\"tax\\":7,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -813,7 +813,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":67,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -832,7 +832,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":1,\\"name\\":\\"Cola\\",\\"price\\":98,\\"taxes\\":[19,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":98,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -851,7 +851,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":165,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -870,7 +870,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$[].sent\\":true,\\"items.$[].printed\\":true,\\"cancellationItems.$[].sent\\":true,\\"cancellationItems.$[].printed\\":true}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"6008ceba5aefd13a4ae68b10\\"}",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
     "data": Object {
       "docId": "ObjectID",
     },
