@@ -1,22 +1,21 @@
 * [x] isMobile: pos-order -> share
-* [_] currentOrder
+* [x] currentOrder
 
 * [x] isolate editMode -> another file (use PortalVue)
-* [_] storeLocale
+* [x] storeLocale
 
-* [_] createOrder
-* [_] addProduct
-* [_] changeItemQuantity
-* [_] lần đầu create trên frontend : how to know ??
-* [_]
+* [x] createOrder
+* [x] addProduct
+* [x] changeItemQuantity
+* [x] lần đầu create trên frontend : how to know ??
 
 * [x] takeAway logic
 * [_] date logic
 * [x] course:
     * [x] logic: 0: takeAway, 1: default
 * [x] modifiers
-* [_] tiền trả lại cashback
-* [_] separate
+* [x] tiền trả lại cashback
+* [x] separate
 
 * [_] table truyền vào như thế nào ?
 * voucher:
@@ -38,36 +37,30 @@
   * [x] categories: test/mock-db
   * [x] products: test/mock-db
   * [x] actionMode: test/mock-db
+  
 
-* [_] voucher
+* [x] voucher
+* [_] binding order-ui to work with backend
 * [_] split order
   * [_] test backend
 * [_] move items
 * [_] move items -> test backend
-* [_] tip -> vSum 
-* [_] cashback -> payment > vSum -> cashback
+* [x] tip -> vSum 
+* [x] cashback -> payment > vSum -> cashback
 
+* [_] report
 * [_] test thu cho khi ghep vao no se nhu the nao ?
 * [x] compact order
 * [_] case modifiers
 
-* [_] use reactive to gen mongo commit
+* [_] use reactive to gen mongo commit (snapshot base)
+  * [_] use rdiff
+  * [_] should use schema to make commit to one item in array ??
+  
 * [_] new concept for buildform
 
-
 ```jsx
-//addVoucher
-this.addProductToOrder({
-  name: 'Voucher',
-  price: +value,
-  isVoucher: true
-})
-//redeemVoucher
-this.addProductToOrder({
-  name: 'Redeemed Voucher',
-  price: -value,
-  isVoucher: true
-})
+
 ```
 
 
