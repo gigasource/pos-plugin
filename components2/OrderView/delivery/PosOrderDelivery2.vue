@@ -2,7 +2,7 @@
 import {Touch} from "pos-vue-framework";
 import _ from "lodash";
 import {$filters, avatar, isIOS, isMobile, username} from "../../AppSharedStates";
-import {computed, withModifiers} from "vue";
+import {computed, withModifiers, ref} from "vue";
 import {useRouter} from 'vue-router';
 import {v4 as uuidv4} from "uuid";
 import {isItemDiscounted} from "../pos-ui-shared";
@@ -14,8 +14,12 @@ import {
   openDialog,
   selectedAddress,
   selectedCustomer,
-  showKeyboard
+  showKeyboard,
+  dialog
 } from "./delivery-shared";
+
+import { deliveryCustomerUiFactory } from './delivery-customer-ui'
+import { genScopeId } from '../../utils';
 
 export default {
   name: "PosOrderDelivery2",
@@ -60,8 +64,12 @@ export default {
 
     created();
 
-    //refactore
-    let itemsWithQty;
+    const itemsWithQty = computed(() => {
+      if (currentOrder.value && currentOrder.value.items)
+        return currentOrder.value.items.filter(i => i.quantity > 0)
+      return []
+    });
+
 
     const unavailableToAdd = computed(() => {
       if (!selectedProduct.value) return true
@@ -179,8 +187,6 @@ export default {
       dialog.value.choice = false
     }
 
-
-
     function closeDialogConfirm() {
       note.value = ''
       time.value = 30
@@ -265,8 +271,6 @@ export default {
       }
     }
 
-
-
     async function updatePrice(price) {
       const index = products.value.findIndex(p => p._id === selectedProduct.value._id)
       await cms.getModel('Product').findOneAndUpdate({
@@ -289,206 +293,238 @@ export default {
     }
 
     function resetOrderData() {
+      console.error('PosOrderDelivery2:resetOrderData was not implemented')
     }
 
     function addProductToOrder() {
+      console.error('PosOrderDelivery2:addProductToOrder was not implemented')
     }
 
     function removeProductModifier() {
+      console.error('PosOrderDelivery2:removeProductModifier was not implemented')
     }
 
     function addItemQuantity() {
+      console.error('PosOrderDelivery2:addItemQuantity was not implemented')
     }
 
     function removeItemQuantity() {
+      console.error('PosOrderDelivery2:removeItemQuantity was not implemented')
     }
 
-    return () => <div class="delivery">
-
-      <div class="delivery-order">
-        {(deliveryOrderMode.value === 'mobile') ?
-            <>
-              <g-spacer/>
-              <pos-order-delivery-keyboard mode="active" keyboardConfig={keyboardConfig.value}
-                                           onSubmit={chooseProduct}/>
-            </> :
-            <>
-              <div class="delivery-order__content">
-                <g-autocomplete text-field-component="GTextFieldBs" v-model={selectedProduct.value}
-                                items={products.value}
-                                ref="autocomplete" return-object
-                                filter={(itemText, text) => itemText.toLowerCase().includes(text.toLowerCase())}/>
-                {selectedProduct.value && <>
-                  <g-text-field-bs class="bs-tf__pos quantity" v-model={quantity.value} label="Quantity"/>
-                  <g-text-field-bs class="bs-tf__pos" modelValue={selectedProduct.value.price} label="Price"
-                                   onUpdate:modelValue={debounceUpdatePrice}/>
-                  <g-text-field-bs class="bs-tf__pos" v-model={selectedProduct.value.note} label="Note"/>
+    const { customerUiRender, renderDialogs } =  deliveryCustomerUiFactory()
+    const renderDeliveryOrder = () => {
+      return (
+          <div class="delivery-order">
+            {(deliveryOrderMode.value === 'mobile') ?
+                <>
+                  <g-spacer/>
+                  <pos-order-delivery-keyboard mode="active" keyboardConfig={keyboardConfig.value}
+                                               onSubmit={chooseProduct}/>
+                </> :
+                <>
+                  <div class="delivery-order__content">
+                    <g-autocomplete text-field-component="GTextFieldBs" v-model={selectedProduct.value}
+                                    items={products.value}
+                                    ref="autocomplete" return-object
+                                    filter={(itemText, text) => itemText.toLowerCase().includes(text.toLowerCase())}/>
+                    {selectedProduct.value && <>
+                      <g-text-field-bs class="bs-tf__pos quantity" v-model={quantity.value} label="Quantity"/>
+                      <g-text-field-bs class="bs-tf__pos" modelValue={selectedProduct.value.price} label="Price"
+                                       onUpdate:modelValue={debounceUpdatePrice}/>
+                      <g-text-field-bs class="bs-tf__pos" v-model={selectedProduct.value.note} label="Note"/>
+                    </>}
+                    {(selectedProduct.value && selectedProduct.value.choices && selectedProduct.value.choices.length > 0) &&
+                    selectedProduct.value.choices.map((choice, iC) =>
+                        <div class="delivery-order__choice" key={`choice_${iC}`}>
+                          <p class="delivery-order__choice-title">
+                            {choice.name}
+                            {choice.mandatory && <span class="text-red">*</span>}
+                          </p>
+                          <div class="delivery-order__options">
+                            {choice.options.map((option, i0) =>
+                                <div key={`option_${iC}_ ${iO}`}
+                                     onClick={withModifiers(() => selectOption(choice, option), ['stop'])}
+                                     class={['delivery-order__option', isModifierSelect(option) && 'delivery-order__option--selected']}>
+                                  {option.name} - {t('common.currency', locale)}{option.price}
+                                </div>
+                            )}
+                          </div>
+                        </div>)}
+                  </div>
+                  <g-btn-bs block large class="elevation-2" icon="icon-kitchen" background-color="#0EA76F"
+                            disabled={unavailableToAdd.value} onClick={addProduct}>Add to order list
+                  </g-btn-bs>
                 </>}
-                {(selectedProduct.value && selectedProduct.value.choices && selectedProduct.value.choices.length > 0) &&
-                selectedProduct.value.choices.map((choice, iC) =>
-                    <div class="delivery-order__choice" key={`choice_${iC}`}>
-                      <p class="delivery-order__choice-title">
-                        {choice.name}
-                        {choice.mandatory && <span class="text-red">*</span>}
-                      </p>
-                      <div class="delivery-order__options">
-                        {choice.options.map((option, i0) =>
-                            <div key={`option_${iC}_ ${iO}`}
-                                 onClick={withModifiers(() => selectOption(choice, option), ['stop'])}
-                                 class={['delivery-order__option', isModifierSelect(option) && 'delivery-order__option--selected']}>
-                              {option.name} - {t('common.currency', locale)}{option.price}
-                            </div>
-                        )}
+          </div>
+      )
+    }
+    const renderDeliveryDetail = () => {
+      return (
+          <div class="delivery-detail">
+            <div class="delivery-detail__info">
+              <g-avatar size="36">
+                <img alt src={avatar.value}/>
+              </g-avatar>
+              <div class="delivery-detail__info-username">{username.value}</div>
+              <g-spacer/>
+              <g-btn-bs class="elevation-1" onClick={back} style="border-radius: 50%; padding: 6px">
+                <g-icon>icon-back</g-icon>
+              </g-btn-bs>
+              <g-spacer/>
+              <div
+                  class="delivery-detail__total">{t('common.currency', locale)}{$filters.formatCurrency(paymentTotal)}</div>
+            </div>
+            <div class="delivery-detail__order">
+              {itemsWithQty.value.map((item, i) =>
+                  <div key={i} class="item">
+                    <div class="item-detail">
+                      <div>
+                        <p class="item-detail__name">{item.id}. {item.name}</p>
+                        <p>
+                          <span
+                              class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>{$filters.formatCurrency(item.originalPrice)}</span>
+                          {isItemDiscounted(item) &&
+                          <span
+                              class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
+                        </p>
+                      </div>
+                      <div class="item-action">
+                        <g-icon onClick={withModifiers(() => removeItem(item), ['stop'])}>remove_circle_outline</g-icon>
+                        <span>{item.quantity}</span>
+                        <g-icon onClick={withModifiers(() => addItem(item), ['stop'])}>add_circle_outline</g-icon>
+                      </div>
+                    </div>
+                    {item.modifiers && <div> {item.modifiers.map((modifier, index) =>
+                        <div key={`${item._id}_${index}`}>
+                          <g-chip label small text-color="#616161" close onClose={() => removeModifier(item, index)}>
+                            {modifier.name} | {t('common.currency', locale)}{
+                            $filters.formatCurrency(modifier.price)
+                          }
+                          </g-chip>
+                        </div>)}
+                    </div>}
+                  </div>)}
+            </div>
+            <g-btn-bs block large class="elevation-2" icon="icon-print" background-color="#2979FF"
+                      onClick={() => dialog.value.order = true}>
+              Send to kitchen
+            </g-btn-bs>
+          </div>
+      )
+    }
+
+    const selectedCustomerAddress = computed(() => {
+      if (!selectedCustomer.value || !selectedCustomer.value.addresses || selectedCustomer.value.addresses.length < 1)
+        return
+
+      const addressLine = selectedCustomer.value.addresses[selectedAddress.value]
+      return `${addressLine.address} ${addressLine.zipcode}`
+    })
+    const renderOrderDialog = () => {
+      return (
+          <g-dialog v-model={dialog.value.order} width="500" eager>
+            <g-card class="dialog r">
+              <g-icon class="dialog-icon--close" onClick={closeDialogConfirm} size="20">icon-close</g-icon>
+              <div class="mx-2">
+                <b>Name: </b> {selectedCustomer.value && selectedCustomer.value.name}
+              </div>
+              <div class="mx-2">
+                <b>Phone: </b> {selectedCustomer.value && selectedCustomer.value.phone}
+              </div>
+              <div class="mx-2">
+                <b>Address: </b> {selectedCustomerAddress.value}
+              </div>
+              <g-text-field-bs label="Delivery note:" v-model={note.value}>
+                {{
+                  'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
+                }}
+              </g-text-field-bs>
+              <div class="ma-2">Time to complete (minute)</div>
+              <div class="mb-3">
+                <g-btn-bs class="elevation-1" backgroundColor={time.value === 15 ? '#BBDEFB' : 'white'}
+                          onClick={() => time.value = 15}>15
+                </g-btn-bs>
+                <g-btn-bs class="elevation-1" backgroundColor={time.value === 30 ? '#BBDEFB' : 'white'}
+                          onClick={() => time.value = 30}>30
+                </g-btn-bs>
+                <g-btn-bs class="elevation-1" backgroundColor={time.value === 45 ? '#BBDEFB' : 'white'}
+                          onClick={() => time.value = 45}>45
+                </g-btn-bs>
+                <g-btn-bs class="elevation-1" backgroundColor={time.value === 60 ? '#BBDEFB' : 'white'}
+                          onClick={() => time.value = 60}>60
+                </g-btn-bs>
+              </div>
+              <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
+                        onClick={confirmOrder.value}>Confirm
+                -
+                {t('common.currency', locale)}{$filters.formatCurrency(paymentTotal)}
+              </g-btn-bs>
+            </g-card>
+          </g-dialog>
+      )
+    }
+    const renderChoiceDialog = () => {
+      return (
+          <g-dialog v-model={dialog.value.choice} eager width="500">
+            <g-card class="dialog r">
+              <g-icon class="dialog-icon--close" onClick={() => dialog.value.choice = false} size="20">icon-close</g-icon>
+              <div class="dialog-title">Select options</div>
+              {(selectedProduct.value && selectedProduct.value.choices) &&
+              <div class="dialog-content" key={dialog.value.choice}>
+                {selectedProduct.value.choices.map((choice, index) =>
+                    <div class="dialog-content__choice" key={index}>
+                      <div class="dialog-content__choice-name">
+                        <span class="fw-700">{choice.name}</span>
+                        <span class="text-red ml-1">{choice.mandatory ? '*' : ''}</span>
+                      </div>
+                      <div class="dialog-content__choice-option">
+                        {(choice.select === 'one' && choice.mandatory) ?
+                            <g-radio-group v-model={modifiers[index]}>
+                              {choice.options.map(option =>
+                                  <g-radio color="#536DFE" value={option} key={option._id}
+                                           label={`${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)} )`}/>)}
+                            </g-radio-group>
+                            : choice.options.map(option =>
+                                <g-checkbox v-model={modifiers[index]}
+                                            color="#536DFE"
+                                            value={option}
+                                            label={getCheckboxLabel(option)}
+                                            key={option._id}
+                                />
+                            )}
                       </div>
                     </div>)}
-              </div>
-              <g-btn-bs block large class="elevation-2" icon="icon-kitchen" background-color="#0EA76F"
-                        disabled={unavailableToAdd.value} onClick={addProduct.value}>Add to order list
-              </g-btn-bs>
-            </>}
-      </div>
-      <div class="delivery-detail">
-        <div class="delivery-detail__info">
-          <g-avatar size="36">
-            <img alt src={avatar.value}/>
-          </g-avatar>
-          <div class="delivery-detail__info-username">{username.value}</div>
-          <g-spacer/>
-          <g-btn-bs class="elevation-1" onClick={back} style="border-radius: 50%; padding: 6px">
-            <g-icon>icon-back</g-icon>
-          </g-btn-bs>
-          <g-spacer/>
-          <div
-              class="delivery-detail__total">{t('common.currency', locale)}{$filters.formatCurrency(paymentTotal)}</div>
-        </div>
-        <div class="delivery-detail__order">
-          {itemsWithQty.map((item, i) =>
-              <div key={i} class="item">
-                <div class="item-detail">
-                  <div>
-                    <p class="item-detail__name">{item.id}. {item.name}</p>
-                    <p>
-                      <span
-                          class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>{$filters.formatCurrency(item.originalPrice)}</span>
-                      {isItemDiscounted(item) &&
-                      <span
-                          class="item-detail__price--new">{t('common.currency', locale)} {$filters.formatCurrency(item.price)}</span>}
-                    </p>
-                  </div>
-                  <div class="item-action">
-                    <g-icon onClick={withModifiers(() => removeItem(item), ['stop'])}>remove_circle_outline</g-icon>
-                    <span>{item.quantity}</span>
-                    <g-icon onClick={withModifiers(() => addItem(item), ['stop'])}>add_circle_outline</g-icon>
-                  </div>
+              </div>}
+              <div class="dialog-action">
+                <div class="row-flex align-items-center" style="line-height: 2">
+                  <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242"
+                          size="28">remove_circle_outline
+                  </g-icon>
+                  <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{quantity}</span>
+                  <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
                 </div>
-                {item.modifiers && <div> {item.modifiers.map((modifier, index) =>
-                    <div key={`${item._id}_${index}`}>
-                      <g-chip label small text-color="#616161" close onClose={() => removeModifier(item, index)}>
-                        {modifier.name} | {t('common.currency', locale)}{
-                        $filters.formatCurrency(modifier.price)
-                      }
-                      </g-chip>
-                    </div>)}
-                </div>}
-              </div>)}
-        </div>
-        <g-btn-bs block large class="elevation-2" icon="icon-print" background-color="#2979FF"
-                  onClick={() => dialog.value.order = true}>
-          Send to kitchen
-        </g-btn-bs>
-      </div>
+                <g-spacer/>
+                <g-btn-bs min-width="80" height="100%" text-color="#424242"
+                          onClick={() => dialog.value.choice = false}>Cancel
+                </g-btn-bs>
+                <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
+                          disabled={unavailableToAdd.value} onClick={addProduct}>OK
+                </g-btn-bs>
+              </div>
+            </g-card>
+          </g-dialog>
+      )
+    }
 
-      <g-dialog v-model={dialog.value.order} width="500" eager>
-        <g-card class="dialog r">
-          <g-icon class="dialog-icon--close" onClick={closeDialogConfirm} size="20">icon-close</g-icon>
-          <div class="mx-2">
-            <b>Name: </b> {selectedCustomer.value.name}
-          </div>
-          <div class="mx-2">
-            <b>Phone: </b> {selectedCustomer.value.phone}
-          </div>
-          <div class="mx-2">
-            <b>Address: </b> {selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0 &&
-          selectedCustomer.value.addresses[selectedAddress.value].address}
-            {selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0 &&
-            selectedCustomer.value.addresses[selectedAddress.value].zipcode}
-          </div>
-          <g-text-field-bs label="Delivery note:" v-model={note.value}>
-            {{
-              'append-inner': () => <g-icon onClick={() => dialog.value.note = true}>icon-keyboard</g-icon>
-            }}
-          </g-text-field-bs>
-          <div class="ma-2">Time to complete (minute)</div>
-          <div class="mb-3">
-            <g-btn-bs class="elevation-1" backgroundColor={time.value === 15 ? '#BBDEFB' : 'white'}
-                      onClick={() => time.value = 15}>15
-            </g-btn-bs>
-            <g-btn-bs class="elevation-1" backgroundColor={time.value === 30 ? '#BBDEFB' : 'white'}
-                      onClick={() => time.value = 30}>30
-            </g-btn-bs>
-            <g-btn-bs class="elevation-1" backgroundColor={time.value === 45 ? '#BBDEFB' : 'white'}
-                      onClick={() => time.value = 45}>45
-            </g-btn-bs>
-            <g-btn-bs class="elevation-1" backgroundColor={time.value === 60 ? '#BBDEFB' : 'white'}
-                      onClick={() => time.value = 60}>60
-            </g-btn-bs>
-          </div>
-          <g-btn-bs disabled={disabledConfirm.value} block large background-color="#2979FF"
-                    onClick={confirmOrder.value}>Confirm
-            -
-            {t('common.currency', locale)}{$filters.formatCurrency(paymentTotal)}
-          </g-btn-bs>
-        </g-card>
-      </g-dialog>
-      <g-dialog v-model={dialog.value.choice} eager width="500">
-        <g-card class="dialog r">
-          <g-icon class="dialog-icon--close" onClick={() => dialog.value.choice = false} size="20">icon-close</g-icon>
-          <div class="dialog-title">Select options</div>
-          {(selectedProduct.value && selectedProduct.value.choices) &&
-          <div class="dialog-content" key={dialog.value.choice}>
-            {selectedProduct.value.choices.map((choice, index) =>
-                <div class="dialog-content__choice" key={index}>
-                  <div class="dialog-content__choice-name">
-                    <span class="fw-700">{choice.name}</span>
-                    <span class="text-red ml-1">{choice.mandatory ? '*' : ''}</span>
-                  </div>
-                  <div class="dialog-content__choice-option">
-                    {(choice.select === 'one' && choice.mandatory) ?
-                        <g-radio-group v-model={modifiers[index]}>
-                          {choice.options.map(option =>
-                              <g-radio color="#536DFE" value={option} key={option._id}
-                                       label={`${option.name} (${t('common.currency', locale)}${$filters.formatCurrency(option.price)} )`}/>)}
-                        </g-radio-group>
-                        : choice.options.map(option =>
-                            <g-checkbox v-model={modifiers[index]}
-                                        color="#536DFE"
-                                        value={option}
-                                        label={getCheckboxLabel(option)}
-                                        key={option._id}
-                            />
-                        )}
-                  </div>
-                </div>)}
-          </div>}
-          <div class="dialog-action">
-            <div class="row-flex align-items-center" style="line-height: 2">
-              <g-icon onClick={withModifiers(() => changeQuantity(-1), ['stop'])} color="#424242"
-                      size="28">remove_circle_outline
-              </g-icon>
-              <span style="margin-left: 4px; margin-right: 4px; min-width: 20px; text-align: center">{quantity}</span>
-              <g-icon onClick={withModifiers(() => changeQuantity(1), ['stop'])} color="#424242" size="28">add_circle</g-icon>
-            </div>
-            <g-spacer/>
-            <g-btn-bs min-width="80" height="100%" text-color="#424242"
-                      onClick={() => dialog.value.choice = false}>Cancel
-            </g-btn-bs>
-            <g-btn-bs width="80" height="100%" rounded text-color="#FFFFFF" background-color="#536DFE"
-                      disabled={unavailableToAdd.value} onClick={addProduct}>OK
-            </g-btn-bs>
-          </div>
-        </g-card>
-      </g-dialog>
-    </div>
+    return genScopeId(() => <div class="delivery">
+      { customerUiRender() }
+      { renderDeliveryOrder() }
+      { renderDeliveryDetail() }
+      { renderOrderDialog() }
+      { renderChoiceDialog() }
+      { renderDialogs() }
+    </div>)
   }
 }
 </script>

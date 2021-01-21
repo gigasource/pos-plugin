@@ -4,7 +4,7 @@ import {isIOS} from "../../AppSharedStates";
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
-  calls, missedCalls
+  calls, missedCalls, dialog, dialogMode
 } from "./delivery-shared";
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
@@ -38,10 +38,18 @@ export function deliveryCustomerUiFactory() {
   isNewCustomer.value = !(selectedCustomer.value && selectedCustomer.value.addresses && selectedCustomer.value.addresses.length > 0)
 
   function removeAddress(index) {
-    if (selectedCustomer.value.addresses.length === 1) {
+    selectedCustomer.value.addresses.splice(index, 1) // remove customer address
+
+    if (selectedCustomer.value.addresses.length === 0) { // if no address then set new customer flag
       isNewCustomer.value = true
+      selectedAddress.value = -1
+    } else if (selectedAddress.value >= index) { // otherwise, correct selected address index
+      selectedAddress.value -= 1
+
+      // in case the 1st address has been removed, then move to new first address line
+      if (selectedAddress.value < 0)
+        selectedAddress.value = 0
     }
-    selectedCustomer.value.addresses.splice(index, 1)
   }
 
   let debounceSearchAddress = _.debounce(searchAddress, 300);
@@ -273,17 +281,15 @@ export function deliveryCustomerUiFactory() {
   }
   const renderNewCustomerForNonMobile = () => {
     return <>
-      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.valuee}
-                       onClick={() => openDialog('add')}>
-        {{
-          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-        }}
+      <g-text-field-bs class="bs-tf__pos" label="Name" v-model={name.value}
+                       onClick={() => openDialog('add')} v-slots={{
+        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+      }}>
       </g-text-field-bs>
       <g-text-field-bs class="bs-tf__pos" label="Address" v-model={address.value}
-                       onClick={() => openDialog('add')}>
-        {{
-          'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
-        }}
+                       onClick={() => openDialog('add')} v-slots={{
+        'append-inner': () => <g-icon onClick={() => openDialog('add')}>icon-keyboard</g-icon>
+      }}>
       </g-text-field-bs>
     </>
   }

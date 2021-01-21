@@ -7,6 +7,7 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components2/EditMenuCard/EditMenuCard2.vue', name: 'EditMenuCard2', path: '/pos2-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components2/OrderView/Order2.vue', name: 'Order2', path: '/pos-order/:id?' },
     { loader: { type: 'route' }, filePath: 'components2/Dashboard/PosDashboard.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
+    { loader: { type: 'route' }, filePath: 'components2/OrderView/delivery/PosOrderDelivery2.vue', name: 'posOrderDelivery2', path: '/pos2-order-delivery' },
     // { loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
     { loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
