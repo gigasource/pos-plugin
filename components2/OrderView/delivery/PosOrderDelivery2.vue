@@ -42,7 +42,8 @@ export default {
     const quantity = ref(1)
     const keyboardConfig = ref([])
     const paymentTotal = ref(0)
-    const currentOrder = ref()
+    // TODO: Refactor
+    const currentOrder = ref({ items: [], hasOrderWideDiscount: false, firstInit: false })
     const user = ref({})
 
 
@@ -293,23 +294,42 @@ export default {
     }
 
     function resetOrderData() {
-      console.error('PosOrderDelivery2:resetOrderData was not implemented')
+      console.warn('PosOrderDelivery2:resetOrderData was not implemented')
     }
 
-    function addProductToOrder() {
-      console.error('PosOrderDelivery2:addProductToOrder was not implemented')
+    function addProductToOrder(product) {
+      console.warn('PosOrderDelivery2:addProductToOrder was not implemented')
+      // TODO: Implement
+      // the code below is temporary logic to migrate ui
+      function genObjectId(id) {
+        const BSON = require('bson');
+        if (id) return new BSON.ObjectID(id)
+        return new BSON.ObjectID();
+      }
+      function mapProduct(p) {
+        return {
+          ...p,
+          ...!p.originalPrice && { originalPrice: p.price },
+          ...!p.quantity && { quantity: 1 },
+          ...!p.course && { course: 1 },
+          product: p._id,
+          _id: genObjectId(),
+          taxes: [p.tax, p.tax2]
+        }
+      }
+      currentOrder.value.items.push(mapProduct(product))
     }
 
     function removeProductModifier() {
-      console.error('PosOrderDelivery2:removeProductModifier was not implemented')
+      console.warn('PosOrderDelivery2:removeProductModifier was not implemented')
     }
 
     function addItemQuantity() {
-      console.error('PosOrderDelivery2:addItemQuantity was not implemented')
+      console.warn('PosOrderDelivery2:addItemQuantity was not implemented')
     }
 
     function removeItemQuantity() {
-      console.error('PosOrderDelivery2:removeItemQuantity was not implemented')
+      console.warn('PosOrderDelivery2:removeItemQuantity was not implemented')
     }
 
     const { customerUiRender, renderDialogs } =  deliveryCustomerUiFactory()
