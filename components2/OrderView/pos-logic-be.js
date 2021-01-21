@@ -136,11 +136,15 @@ export function orderBeFactory(id = 0) {
     orderSnapshot = undefined;
   })
 
-  hooks.on(`pre:prepareOrder:${id}`, function (order) {
+  function initBeSnapshot(order) {
     [beItemsSnapshot.value.length, beCancellationItemsSnapshot.value.length] = [0, 0];
     if (typeof order === 'object') {
       [beItemsSnapshot.value, beCancellationItemsSnapshot.value] = [_.cloneDeep(order).items || [], _.cloneDeep(order).cancellationItems || []];
     }
+  }
+
+  hooks.on(`pre:prepareOrder:${id}`, function (order) {
+    initBeSnapshot(order)
   })
 
   const clearOrder = () => {
@@ -186,16 +190,62 @@ export function orderBeFactory(id = 0) {
     hooks.emit(`post:order:update:${id}`, order, true);
   }
 
-  async function setNewOrder(newOrder) {
-    if (newOrder.table != order.table) return
-    actionList.value = []
-    hooks.emit(`pre:order:update:${id}`, newOrder, true)
-    hooks.emit(`post:order:update:${id}`, order, true)
+  /**
+   * when receive new order should apply patch to new order
+   * @param newOrder
+   * @returns {Promise<void>}
+   */
+  async function syncOrderChange(newOrder) {
+    if (newOrder._id.toString() != order._id.toString()) return
+    //add items
+    //diff to get patch
+    const items = getRecentItems();
+    const cancellationItems = getRecentCancellationItems();
+
+    //change to newOrder
+    prepareOrder(newOrder);
+    //apply to order
+    for (const item of items) {
+      if (!item.sent) {
+        order.items.push(item);
+      } else {
+        const found = _.find(order.items, _item => _item._id.toString() === item._id.toString());
+        found.quantity += item.quantity;
+      }
+    }
+
+    //todo: apply takeAway, discount v.v
+
+    //actionList.value = []
+    /*hooks.emit(`pre:order:update:${id}`, newOrder, true)
+    hooks.emit(`post:order:update:${id}`, order, true)*/
+  }
+
+  const getRecentItems = function () {
+    const result = [];
+    //list added item
+    result.push(..._.filter(order.items, i => !i.sent));
+    //list changed quantity item
+    let beItems = _.cloneDeep(_.filter(order.items, i => i.sent));
+    beItems = _.compact(beItems.map(item => {
+      const found = _.find(beItemsSnapshot.value, _item => _item._id.toString() === item._id.toString());
+      const _item = _.cloneDeep(item);
+      _item.quantity = item.quantity - found.quantity;
+      if (_item.quantity > 0) return _item;
+    }))
+    result.push(...beItems);
+    return result;
+  }
+
+  const getRecentCancellationItems = function () {
+    return order.cancellationItems.filter((i, k) => k > beCancellationItemsSnapshot.value.length - 1);
   }
 
   return {actionList, getCurrentOrder, currentTable, prepareOrder,
     order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
-    startOnetimeSnapshot, finishOnetimeSnapshot, setNewOrder}
+    startOnetimeSnapshot, finishOnetimeSnapshot, syncOrderChange,
+    getRecentItems, getRecentCancellationItems
+  }
 }
 
 export const {
@@ -206,27 +256,7 @@ export const {
   finishOnetimeSnapshot
 } = orderBeFactory(0);
 
-//should run on backenc
-export const getRecentItems = function () {
-  const result = [];
-  //list added item
-  result.push(..._.filter(order.items, i => !i.sent));
-  //list changed quantity item
-  let beItems = _.cloneDeep(_.filter(order.items, i => i.sent));
-  beItems = _.compact(beItems.map(item => {
-    const found = _.find(beItemsSnapshot.value, _item => _item._id === item._id);
-    if (found.quantity === item.quantity) return item;
-    const _item = _.cloneDeep(item);
-    _item.quantity = item.quantity - found.quantity;
-    if (_item.quantity > 0) return _item;
-  }))
-  result.push(...beItems);
-  return result;
-}
-
-export const getRecentCancellationItems = function () {
-  return order.cancellationItems.filter((i, k) => k > beCancellationItemsSnapshot.value.length - 1);
-}
+//should run on backend
 
 //<editor-fold desc="Split order, move items">
 export const {

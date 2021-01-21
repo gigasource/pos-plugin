@@ -617,6 +617,6 @@ describe("pos-logic", function () {
       done()
     })
     //todo: add code to frontend
-    feSocket.emit('print-to-kitchen', actionList.value)
+    feSocket.emit('print-to-kitchen', actionList.value, order)
   });
 });
