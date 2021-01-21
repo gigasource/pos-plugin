@@ -1,14 +1,17 @@
 const { Socket, Io } = require('schemahandler/io/io')
-const orm = require('schemahandler/orm')
+const Orm = require('schemahandler/orm')
 const Hooks = require('schemahandler/hooks/hooks')
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
 
 function cmsFactory(testName) {
+  const orm = new Orm()
+  orm.name = testName
   orm.connect({uri: "mongodb://localhost:27017"}, testName);
   const socketToFrontend = new Io()
-  socketToFrontend.listen('frontend')
+  socketToFrontend.listen(`frontend:${testName}`)
+  const feSocket = new Socket()
   const cms = {
     init: async function () {
       await this.initDemoData()
@@ -30,6 +33,10 @@ function cmsFactory(testName) {
     socket: socketToFrontend,
     getModel: function (modelName) {
       return orm(modelName)
+    },
+    feSocket,
+    triggerFeConnect: function () {
+      feSocket.connect(`frontend:${testName}`)
     }
   }
   _.extend(cms, new Hooks())

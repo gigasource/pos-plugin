@@ -135,19 +135,18 @@ const once = _.once(() => {
   addProduct(order, products.value[1].product);
   addProduct(order, products.value[1].product);
 
-  orderViewDialog.receipt = true;
+  //orderViewDialog.receipt = true;
 })
-watchEffect(() => {
-  if (order && order.items.length === 0 && products.value && products.value.length > 0) {
+/*watchEffect(() => {
+  if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();
   }
-})
+})*/
 
-async function run() {
-  orderLayout.value = await cms.getModel('OrderLayout').findOne();
+/*async function run() {
   await nextTick();
 }
-run();
+run();*/
 
 export const highlightSelectedProduct = ref(false);
 

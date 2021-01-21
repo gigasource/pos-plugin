@@ -2338,7 +2338,6 @@ Array [
           },
           Object {
             "$set": Object {
-              "_id": "ObjectID",
               "vSum": 40,
               "vTaxSum": Object {
                 "19": Object {
@@ -2462,7 +2461,6 @@ Array [
           },
           Object {
             "$set": Object {
-              "_id": "ObjectID",
               "vSum": 40,
               "vTaxSum": Object {
                 "19": Object {
@@ -2662,7 +2660,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{}}]}]",
     "collectionName": "Order",
-    "condition": "null",
+    "condition": null,
     "data": Object {
       "docId": "ObjectID",
       "table": "10",
@@ -2679,7 +2677,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":40,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "condition": "{\\"_id\\":\\"5fee6600e73d92ca19e37e42\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -2695,9 +2693,9 @@ Array [
   Object {
     "_id": "ObjectID",
     "approved": false,
-    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"_id\\":\\"ObjectID\\",\\"vSum\\":40,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":40,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
-    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "condition": "{\\"_id\\":\\"5fee6600e73d92ca19e37e42\\"}",
     "data": Object {
       "docId": "ObjectID",
       "orderId": "ObjectID",
@@ -2715,7 +2713,7 @@ Array [
     "approved": false,
     "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"printType\\":\\"kitchenAdd\\",\\"order\\":{\\"items\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":40,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":40,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.39,\\"net\\":33.61,\\"gross\\":40}}}}]}]",
     "collectionName": "Action",
-    "condition": "null",
+    "condition": null,
     "data": Object {
       "printFromMaster": true,
     },

@@ -39,6 +39,7 @@
   * [x] products: test/mock-db
   * [x] actionMode: test/mock-db
 
+* [_] voucher
 * [_] split order
   * [_] test backend
 * [_] move items

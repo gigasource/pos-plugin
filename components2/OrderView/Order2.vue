@@ -24,13 +24,6 @@ export default {
     PosOrderVoucherDialog2
   },
   setup() {
-    const a = () => <>
-      <pos-order-split-order2 v-model={orderViewDialog.split}/>
-      <pos-order-receipt2 v-model={orderViewDialog.receipt}/>
-      <pos-order-move-items2 v-model={orderViewDialog.move}/>
-      <pos-order-voucher-dialog2 v-model={orderViewDialog.voucher}/>
-    </>
-
     return genScopeId(() => (
         <>
           <div class="order">

@@ -2,19 +2,43 @@ const orderUtil = require('../../components/logic/orderUtil')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
 const mongoose = require('mongoose');
+const AwaitLock = require('await-lock').default
 
 module.exports = (cms) => {
-  const { orm } = cms
-  cms.socket.on('connect', async (socket) => {
+  let feSocket = null
+  const {orm} = cms
+  const feSocketLock = new AwaitLock()
 
-    socket.on('print-to-kitchen', async (actionList) => {
+  orm.on('commit:handler:finish:Order', async function (result, commit) {
+    if (!feSocketLock.tryAcquire()) return
+    setTimeout(async () => {
+      feSocketLock.release()
+      const order = await orm('Order').findOne({
+        table: commit.data.table,
+        status: 'inProgress'
+      })
+      if (feSocket && order)
+        feSocket.emit('update-table', order)
+    }, 500)
+  })
+
+  cms.socket.on('connect', async (socket) => {
+    feSocket = socket
+    socket.on('print-to-kitchen', async (actionList, order) => {
       await execAllChain(actionList)
+      await orm('Order').updateOne({_id: order._id}, {
+        $set: {
+          'items.$[].sent': true, 'items.$[].printed': true,
+          'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
+        }
+      });
+      await cms.emit('post:print-to-kitchen');
     })
 
     socket.on('cancel-order', cancelOrder)
   })
 
-  async function cancelOrder ({ _id, table }, cb = () => null) {
+  async function cancelOrder({_id, table}, cb = () => null) {
     if (!_id) return cb()
 
     await orm('Order').deleteOne({_id}).commit({table})
@@ -23,11 +47,11 @@ module.exports = (cms) => {
   }
 
   async function execAllChain(actionList) {
-    const { orm } = cms
+    const {orm} = cms
     let finalResult
-    for (let { action, modelName} of actionList) {
+    for (let {action, modelName} of actionList) {
       let result = orm(modelName)
-      for (let { fn, args } of action) {
+      for (let {fn, args} of action) {
         result = result[fn](...args)
       }
       finalResult = result = await result
