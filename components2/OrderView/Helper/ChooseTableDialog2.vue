@@ -5,7 +5,7 @@ import {selectingObject} from '../../TablePlan/EditableRoom/EditTablePlanLogics'
 import {isTable, inProgressTables, isWall} from '../../TablePlan/RoomShared';
 import {useI18n} from 'vue-i18n';
 import {activeOrders} from "../../AppSharedStates";
-import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom";
+import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom2";
 
 
 export default {
