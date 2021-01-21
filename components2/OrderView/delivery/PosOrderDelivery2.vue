@@ -18,6 +18,7 @@ import {
   dialog
 } from "./delivery-shared";
 
+import cms from 'cms'
 import { deliveryCustomerUiFactory } from './delivery-customer-ui'
 import { genScopeId } from '../../utils';
 
