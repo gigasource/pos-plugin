@@ -49,7 +49,7 @@ import {
   addNewRoomObjectToSelectingRoom, onChangeObjectName,
   onSelectObject,
   selectingObject
-} from '../EditTablePlanLogics';
+} from '../../../TablePlan/EditableRoom/EditTablePlanLogics';
 
 const VIEW_W = 100;
 const VIEW_H = 100;

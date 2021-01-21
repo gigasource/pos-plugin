@@ -3,7 +3,7 @@ import {
   onSelectObject,
   selectingObject,
   updateSelectingObjectInSelectingRoom
-} from '../../View/EditTablePlan/EditTablePlanLogics'
+} from './EditTablePlanLogics'
 
 import _ from 'lodash';
 import { ref } from 'vue'

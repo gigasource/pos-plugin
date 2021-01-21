@@ -25,7 +25,7 @@ import {
   updateSelectingObjectInSelectingRoom,
   updateTableName,
   wallColors
-} from './EditTablePlanLogics';
+} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
 import { selectingRoomStates } from '../../TablePlan/RoomState';
 import { isTable } from '../../TablePlan/RoomShared';
 import { getScopeAttrs } from '../../../utils/helpers';
