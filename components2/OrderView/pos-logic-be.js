@@ -446,10 +446,6 @@ hooks.on('togglePayPrintBtn:step2', () => {
   }
 })
 
-hooks.on('printOrder', function () {
-  cms.socket.emit('print-to-kitchen', actionList.value, order)
-})
-
 export const disablePay = computed(() => {
   if (!order.table) return false
   if (!order.items.some(i => i.quantity)) return true
