@@ -13,10 +13,10 @@ export function roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsIn
   const preventStop = withModifiers(() => null, ['prevent', 'stop'])
   const renderRoom = genScopeId(() =>
     <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle.value}
-         onMousemove={preventStop}
+         /*onMousemove={preventStop}
          onMouseup={preventStop}
          onTouchmove={preventStop}
-         onTouchend={preventStop}>
+         onTouchend={preventStop}*/>
       {objectsInSelectingRoom.value.map((obj) => {
         return roomObjectRenderFn && roomObjectRenderFn(obj)
       })}

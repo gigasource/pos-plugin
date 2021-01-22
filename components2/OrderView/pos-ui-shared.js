@@ -116,7 +116,7 @@ export const products = computed(() => {
 
 //fixme: only for dev
 
-prepareOrder();
+//prepareOrder();
 const order = getCurrentOrder();
 const once = _.once(() => {
   addProduct(order, products.value[0].product);
@@ -126,11 +126,11 @@ const once = _.once(() => {
 
   orderViewDialog.move = true;
 })
-watchEffect(() => {
+/*watchEffect(() => {
   if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();
   }
-})
+})*/
 
 /*async function run() {
   await nextTick();

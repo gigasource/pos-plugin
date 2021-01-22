@@ -9,6 +9,7 @@ import {hooks} from './pos-logic'
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
+import {activeOrders} from "../AppSharedStates";
 
 export default {
   name: "posOrder2",
@@ -47,7 +48,8 @@ export default {
 
     const root = (children) => <div class='order-detail' style={getRootStyle()}>{children}</div>
 
-    const renderRightOverLay = () => <g-overlay modelValue={overlay.value} absolute opacity="0.7" color="rgba(255, 255, 255)"
+    const renderRightOverLay = () => <g-overlay modelValue={overlay.value} absolute opacity="0.7"
+                                                color="rgba(255, 255, 255)"
                                                 style="top: 54px"/>
 
     let {renderItemsTable} = orderRightSideItemsTable();

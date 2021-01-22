@@ -6,6 +6,8 @@ export const inProgressTables = computed(() => {
   return _.compact(activeOrders.value.map(order => order.table))
 })
 
+window.inProgressTables = inProgressTables;
+
 export const isBusyTable = function (table) {
   return (inProgressTables.value || []).includes(table.name)
 }
