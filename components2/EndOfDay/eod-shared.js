@@ -1,10 +1,19 @@
+import dayjs from 'dayjs'
 import {ref} from "vue";
 import * as jsonfn from "json-fn";
+import cms from 'cms'
 export const listOfDatesWithReports = ref([])
+import _ from 'lodash'
 
-async function getEodReports(from, to) {
+async function getEodReportsCalender(from, to) {
   try {
-    let result = await cms.processData('OrderEODCalendar', {from, to});
+    // let result = await cms.processData('OrderEODCalendar', {from, to});
+    let result = await new Promise((resolve, reject) => {
+      cms.socket.emit('get-eod-report-calender', from.toDate(), to.toDate(), (eodReport) => {
+        resolve(eodReport)
+      })
+    })
+
     result = jsonfn.clone(result, true, true);
     return result.ordersByDate
   } catch (e) {
@@ -19,8 +28,7 @@ export async function getDatesWithReports(month) {
     let currentDate = dayjs(month).startOf('month')
     const endDate = currentDate.add(1, 'month')
 
-    const dates = await getEodReports(currentDate, endDate)
-    this.reportsFromMonth = dates
+    const dates = await getEodReportsCalender(currentDate, endDate)
 
     eventDates = _.map(dates, (value, key) => {
       const color = Object.keys(value).includes('') ? '#00E676' : '#EF9A9A'
@@ -31,7 +39,6 @@ export async function getDatesWithReports(month) {
     })
   }
 
-  this.listOfDatesWithReports = eventDates
   return eventDates
 }
 
@@ -42,8 +49,7 @@ export async function getDailyReports(month) {
     let currentDate = dayjs(month).startOf('month')
     const endDate = currentDate.add(1, 'month')
 
-    const dates = await getEodReports(currentDate, endDate)
-    this.reportsFromMonth = dates
+    const dates = await getEodReportsCalender(currentDate, endDate)
 
     eventDates = _.map(dates, (value, key) => {
       const color = Object.keys(value).includes('') ? '#00E676' : '#EF9A9A'
@@ -54,6 +60,5 @@ export async function getDailyReports(month) {
     })
   }
 
-  this.listOfDatesWithReports = eventDates
   return eventDates
 }

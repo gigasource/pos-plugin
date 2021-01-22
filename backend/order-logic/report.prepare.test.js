@@ -87,6 +87,11 @@ async function prepareDb(orm) {
   });
 }
 
+async function prepareReportTest(cms) {
+  require('./report-init-cms')(cms)
+}
+
 module.exports = {
-  prepareDb
+  prepareDb,
+  prepareReportTest
 }

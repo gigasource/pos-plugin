@@ -194,6 +194,12 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/order-logic/report-init-cms.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/commit/index.js'
     },
     // {

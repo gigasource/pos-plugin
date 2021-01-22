@@ -2,7 +2,8 @@
 import {useI18n} from 'vue-i18n'
 import { onMounted, onActivated, ref } from 'vue'
 import PosEndOfDayDatePicker from "./PosEndOfDayDatePicker";
-import {getDailyReports, listOfDatesWithReports} from "./eod-shared";
+import dayjs from 'dayjs'
+import {getDailyReports, listOfDatesWithReports, getDatesWithReports} from "./eod-shared";
 
 export default {
   components:{PosEndOfDayDatePicker},
@@ -38,20 +39,17 @@ export default {
       eventDates.value = await getDatesWithReports(date)
     }
 
-    onMounted(() => {
-      setTimeout(async() => {
-        const currentDate = dayjs().format('YYYY-MM-DD');
-        await getDatesWithReport(currentDate)
-        await selectDate(currentDate)
-      }, 100)
+    onMounted(async () => {
+      const currentDate = dayjs().format('YYYY-MM-DD');
+      await getDatesWithReport(currentDate)
+      await selectDate(currentDate)
+
     })
 
-    onActivated(() => {
-      setTimeout(async () => {
-        const currentDate = dayjs().format('YYYY-MM-DD');
-        await getDatesWithReport(currentDate)
-        await selectDate(currentDate)
-      }, 100)
+    onActivated(async () => {
+      const currentDate = dayjs().format('YYYY-MM-DD');
+      await getDatesWithReport(currentDate)
+      await selectDate(currentDate)
     })
 
     return () => <>
