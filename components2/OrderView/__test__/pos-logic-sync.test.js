@@ -39,6 +39,7 @@ const {
 const {
   prepareOrderCommit
 } = require('../../../backend/commit/orderCommit.prepare.test')
+require("mockdate").set(new Date("2021-01-01").getTime());
 //</editor-fold>
 
 let cms
