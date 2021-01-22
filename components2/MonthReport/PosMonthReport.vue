@@ -1,8 +1,48 @@
 <script>
 import { $filters } from '../AppSharedStates';
+import { ref, onCreated, onActivated } from 'vue'
 
 export default {
+  name: 'PosMonthReport',
   setup() {
+    const total = ref(0)
+    const salesByCategory = ref(null)
+    const salesByPayment = ref(null)
+    const zNumbers = ref(null)
+    const monthReport = ref(null)
+    const showAllZNumber = ref(null)
+    const showProductSold = ref(null)
+
+    onCreated(() => {
+      setTimeout(async () => {
+        await getMonthReport()
+      }, 50)
+    })
+
+    watch(() => monthReport.value, (newVal) => {
+      if (newVal) {
+        const {
+          total: _total,
+          salesByCategory: _salesByCategory,
+          salesByPayment: _salesByPayment,
+          zNumbers: _zNumbers } = newVal
+        total.value = _total
+        salesByCategory.value = _salesByCategory
+        salesByPayment.value = _salesByPayment
+        zNumbers.value = _zNumbers
+      }
+    }, { deep: true })
+
+    const getMonthReport = function () {
+      console.error('ReportsStore:getMonthReport was not injected')
+    }
+
+    onActivated(() => {
+      setTimeout(async () => {
+        await getMonthReport()
+      }, 50)
+    })
+
     return () => <>
       <div class="report-wrapper">
         <div class="report-content">
@@ -12,7 +52,7 @@ export default {
             </div>
             <g-divider dashed color="black">
             </g-divider>
-            {salesByPayment.map((amount, payment) =>
+            {salesByPayment.value.map((amount, payment) =>
                 <div class="detail" key={`sales${payment}`}>
                   <span> {payment} </span>
                   <span>€{$filters.formatCurrency(amount)} </span>
@@ -23,15 +63,15 @@ export default {
                 {t('common.total')} </span>
               <span>
                 <u>
-                  € {$filters.formatCurrency(total)} </u>
+                  € {$filters.formatCurrency(total.value)} </u>
               </span>
             </div>
           </div>
-          <div v-show="showAllZNumber" class="report__z-number">
+          <div v-show="showAllZNumber.value" class="report__z-number">
             <g-divider dashed color="black">
             </g-divider>
             <table>
-              {zNumbers.map((z, i) =>
+              {zNumbers.value.map((z, i) =>
                   <tr key={`zNumber${i}`} class="z-number">
                     <td>
                       <div class="row-flex justify-between">
@@ -49,13 +89,13 @@ export default {
             </g-divider>
           </div>
           {
-            (showProductSold) &&
+            (showProductSold.value) &&
             <div class="report__product">
               <div class="title">
                 {t('report.productSold')} </div>
               <g-divider dashed color="black">
               </g-divider>
-              {salesByCategory.map(({ products, sum }, category) =>
+              {salesByCategory.value.map(({ products, sum }, category) =>
                   <div key={`category${category}`}>
                     <p class="category">
                       {category || 'No category'} (€ {$filters.formatCurrency(sum)})
