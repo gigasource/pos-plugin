@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": {},
+      "categories": [
+        {
+          "name": {},
+          "mandatory": {},
+          "selectOne": {},
+          "freeItems": {},
+          "items": [
+            {
+              "name": {},
+              "price": {},
+              "max": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

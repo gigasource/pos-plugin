@@ -966,12 +966,10 @@ describe("pos-logic", function() {
     let order = createOrder();
     addItem(order, cola, 10);
     addItem(order, fanta, 20);
-
     await nextTick();
     addMultiPayment(order, { type: "cash", value: 10 });
     await nextTick();
     addMultiPayment(order, { type: "card", value: 50 });
-
     //auto add tip
     await nextTick();
     //<editor-fold desc="order-expect">
@@ -994,6 +992,28 @@ describe("pos-logic", function() {
       ]
     `);
     //</editor-fold>
+  });
+
+  it("case7d: tip and cashback should be 0 when total payment lower than vSum", async function() {
+    let order = createOrder();
+    addItem(order, cola, 10);
+    addItem(order, fanta, 20);
+    await nextTick();
+    addSinglePayment(order, { type: "cash", value: 10 });
+    expect([order.vSum, order.payment, order.cashback, order.tip])
+      .toMatchInlineSnapshot(`
+      Array [
+        53,
+        Array [
+          Object {
+            "type": "cash",
+            "value": 10,
+          },
+        ],
+        0,
+        0,
+      ]
+    `);
   });
 
   it("case 8: cancellationItems", async function() {
