@@ -1,15 +1,59 @@
 <script>
-import { useI18n } from 'vue-i18n';
+import dayjs from 'dayjs'
+import { useI18n, computed } from 'vue-i18n';
 
 export default {
+  name: 'PosMonthReportSetting',
   setup() {
+    const selectedMonth = ref(null)
+    const monthReportFrom = ref(null)
+    const monthReportTo = ref(null)
+    const showProductSold = ref(null)
+    const showAllZNumber = ref(null)
+
+    const from = computed({
+      get: function () {
+        return monthReportFrom
+      },
+      set: function (val) {
+        monthReportFrom.value = val
+        updateMonth()
+      }
+    })
+
+    const to = computed({
+      get: function () {
+        return monthReportTo
+      },
+      set: function (val) {
+        monthReportTo.value = val
+        updateMonth()
+      }
+    })
+
+    const updateMonth = async function () {
+      const start = dayjs(monthReportFrom.value)
+      const end = dayjs(monthReportTo.value)
+
+      if (start.isSame(end, 'month')) {
+        selectedMonth.value = start.endOf('month')
+      } else {
+        selectedMonth.value = dayjs()
+      }
+      await getMonthReport()
+    }
+
+    const getMonthReport = function () {
+      console.error('ReportsStore:getMonthReport was not injected.')
+    }
+
     const { t } = useI18n()
     return () => <>
       <div class="setting-wrapper">
-        <g-date-picker-input label={t('report.from')} v-model={from} class="mt-5"> </g-date-picker-input>
-        <g-date-picker-input label={t('report.to')} v-model={to}> </g-date-picker-input>
-        <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold}> </pos-switch>
-        <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber} class="mt-5"> </pos-switch>
+        <g-date-picker-input label={t('report.from')} v-model={from.value} class="mt-5"> </g-date-picker-input>
+        <g-date-picker-input label={t('report.to')} v-model={to.value}> </g-date-picker-input>
+        <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold.value}> </pos-switch>
+        <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber.value} class="mt-5"> </pos-switch>
       </div>
     </>
   }

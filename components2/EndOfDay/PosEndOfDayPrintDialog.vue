@@ -6,6 +6,9 @@ import {internalValueFactory} from "../utils";
 
 export default {
   name: 'PosEndOfDayPrintDialog',
+  props: {
+    value: null,
+  },
   setup(props, {emit}) {
     const xReport = ref(null)
     const date = ref(null)
