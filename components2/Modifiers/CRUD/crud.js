@@ -18,8 +18,10 @@ export const CRUdFactory = function(obj, path) {
   const update = function(updObj, newV) {
     const data = _.get(obj, path)
     const idx = _.findIndex(data, i => i._id.toString() === updObj._id.toString())
-    if (idx !== -1) _.assign(data[idx], newV)
-    return data[idx]
+    if (idx !== -1) {
+      _.assign(data[idx], newV)
+      return data[idx]
+    } else return null
   }
   return {
     create, remove, update

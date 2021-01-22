@@ -1,27 +1,48 @@
 <script>
 import { onBeforeMount, withModifiers } from 'vue';
-import { fetchModifiers, isSelecting } from './modifier-ui-logics';
-import { modifiers, onSelect, categories, onCreateItem, currentGroupIdx, duplicate, activeItem, deleteItem } from './modifier-ui-logics';
-import { ref } from 'vue'
+import { fetchModifiers, isSelecting, onUpdateItem } from './modifier-ui-logics';
+import {
+  onSelect,
+  categories,
+  onCreateItem,
+  currentGroupIdx,
+  duplicate,
+  activeItem,
+  deleteActiveItem,
+  groups,
+  onUpdateActiveItem,
+  currentGroup
+} from './modifier-ui-logics';
+import { getScopeAttrs } from '../../utils/helpers';
+
+import { ref, watch } from 'vue'
+import { genScopeId, internalValueFactory, intervalLog } from '../utils';
+
 export default {
-  setup() {
+  setup(props, { emit }) {
+    //todo:
+    const internalValue = internalValueFactory({ modelValue: true }, { emit })
     onBeforeMount(async () => {
       await fetchModifiers()
     })
     const showDialog = ref(false)
-    return () => <>
-      <div>
-        <g-dialog fullscreen v-model={internalValue}>
-          <div class="col-flex flex-grow-1" style="background: #fff">
-            <div class="header">
-              {modifiers.value.groups.map(group =>
+
+    watch(() => activeItem.value, () => {
+      onUpdateActiveItem()
+    }, { deep: true, onTrigger: () => console.log('trigger') })
+
+    // console.log(getScopeAttrs())
+    return genScopeId(() => <div>
+        <g-dialog fullscreen v-model={internalValue.value} {...getScopeAttrs()}>
+          <div class="col-flex flex-grow-1" style="background: #fff" {...getScopeAttrs()}>
+            <div class="header" {...getScopeAttrs()}>
+              {groups.value.map(group =>
                   <g-btn key={group._id}
                          outlined
                          uppercase={false}
                          background-color="#F0F0F0"
                          class={['mb-2', ...(isSelecting(group)) ? ['active-btn', 'edit-btn'] : []]}
-                         onClick={() => onSelect(group, 'group')}>
-
+                         onClick={() => onSelect(group, 'group')} {...getScopeAttrs()}>
                     {group.name}
                   </g-btn>
               )}
@@ -30,7 +51,6 @@ export default {
                      background-color="#1271ff"
                      text-color="#fff"
                      uppercase={false}
-                     v-show="!newGroup"
                      onClick={async () => await onCreateItem(`groups`, 'group')}>
                 <g-icon color="#fff"
                         size="18"
@@ -40,13 +60,15 @@ export default {
                 <span> Group </span>
               </g-btn>
             </div>
-            <div class="content row-flex">
-              <div class="content--main col-flex align-items-start">
+            <div class="content row-flex" {...getScopeAttrs()}>
+              <div class="content--main col-flex align-items-start" {...getScopeAttrs()}>
                 {categories.value.map((category, idx) =>
                     <>
                       <g-btn key={category._id} flat uppercase={false}
                              class={['mb-2', ...(isSelecting(category)) ? ['active-btn', 'edit-btn'] : []]}
-                             onClick={() => onSelect({ ...category, groupIdx: currentGroupIdx.value} , 'category')}>
+                             onClick={() => onSelect({ ...category, groupIdx: currentGroupIdx.value }, 'category')}
+                             {...getScopeAttrs()}
+                      >
                         {category.name}
                       </g-btn>
                       <div class="mb-3">
@@ -55,12 +77,17 @@ export default {
                         </g-icon>
                         {category.items.map((mod) =>
                             <g-btn key={mod._id} flat uppercase={false}
-                                   class={[...(isSelecting(mod)) ? ['active-btn', 'edit-btn'] : []]}
-                                   onClick={() => onSelect({...mod, groupIdx: currentGroupIdx.value, categoryIdx: idx}, 'modifier')}>
+                                   class={(isSelecting(mod)) ? ['active-btn', 'edit-btn'] : []}
+                                   onClick={() => onSelect({ ...mod, groupIdx: currentGroupIdx.value, categoryIdx: idx }, 'modifier')}
+                                   {...getScopeAttrs()}
+                            >
                               {mod.name}
                             </g-btn>
                         )}
-                        <g-btn flat background-color="#1271ff" text-color="#fff" uppercase={false} onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories`)} v-show="!newModifier">
+                        <g-btn flat background-color="#1271ff"
+                               text-color="#fff" uppercase={false}
+                               onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories.${idx}.items`, 'modifier')}
+                               {...getScopeAttrs()}>
                           <g-icon color="#fff" size="18" class="mr-2">
                             add
                           </g-icon>
@@ -70,7 +97,10 @@ export default {
                       </div>
                     </>
                 )}
-                <g-btn flat background-color="#1271ff" text-color="#fff" uppercase={false} onClick={() => onCreateItem(`groups.${currentGroupIdx.value}`, 'category')} v-show="activeGroup && !newCategory">
+                <g-btn flat background-color="#1271ff"
+                       text-color="#fff" uppercase={false}
+                       onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories`, 'category')}
+                       v-show={currentGroup.value}>
                   <g-icon color="#fff" size="18" class="mr-2">
                     add
                   </g-icon>
@@ -98,7 +128,7 @@ export default {
                         <span>
                           Duplicate this modifier </span>
                       </g-btn>
-                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={() => deleteItem('z')}>
+                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={deleteActiveItem}>
                         <g-icon color="#fff" size="18" class="mr-2">
                           delete
                         </g-icon>
@@ -130,7 +160,7 @@ export default {
                         </>
                         ,
                       }}></g-text-field-bs>
-                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={() => deleteItem('category')}>
+                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={deleteActiveItem}>
                         <g-icon color="#fff" size="18" class="mr-2">
                           delete
                         </g-icon>
@@ -140,7 +170,7 @@ export default {
                     </>
                   }
                   {
-                    (activeItem && activeItem.value.type === 'modifier') &&
+                    (activeItem.value && activeItem.value.type === 'modifier') &&
                     <>
                       <g-text-field-bs label="Name" required v-model={activeItem.value.name} v-slots={{
                         'append-inner': () => <>
@@ -166,6 +196,7 @@ export default {
                         </>
                         ,
                       }}></g-text-field-bs>
+                      {false &&
                       <div>
                         <div style="font-size: 13px; margin: 12px 4px 2px 4px;">
                           Group printer
@@ -174,16 +205,14 @@ export default {
                           'default': ({ toggleSelect, item, index }) => <>
                             <div class="prop-option" onClick={() => {toggleSelect(item)}}>
                               {item.name} </div>
-                          </>
-                          ,
+                          </>,
                           'selected': ({ toggleSelect, item, index }) => <>
                             <div class="prop-option prop-option--active" onClick={() => {toggleSelect(item)}}>
                               {item.name} </div>
                           </>
-                          ,
                         }}></g-grid-select>
-                      </div>
-                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={() => deleteItem('modifier')}>
+                      </div>}
+                      <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={deleteActiveItem}>
                         <g-icon color="#fff" size="18" class="mr-2">
                           delete
                         </g-icon>
@@ -209,14 +238,14 @@ export default {
           'input': ({ changeKeyboard }) => <>
             <div class="mb-4">
               {
-                (activeItem && activeItem.value.type === 'group') ?
+                (activeItem.value && activeItem.value.type === 'group') ?
                     <>
                       <pos-textfield-new label="Name" v-model={activeItem.value.name} required clearable>
                       </pos-textfield-new>
                     </>
                     :
                     (
-                        (activeItem && activeItem.value.type === 'category') ?
+                        (activeItem.value && activeItem.value.type === 'category') ?
                             <>
                               <div class="row-flex flex-wrap justify-between">
                                 <pos-textfield-new label="Name" required clearable v-model={activeItem.value.name} onClick={withModifiers(() => changeKeyboard('alpha'), ['native', 'stop'])}>
@@ -242,10 +271,8 @@ export default {
               }
             </div>
           </>
-          ,
         }}></dialog-form-input>
-      </div>
-    </>
+      </div>)
   }
 }
 </script>

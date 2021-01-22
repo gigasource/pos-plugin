@@ -3,7 +3,7 @@ import {makeWrapper, orm, wrapper} from "../../test-utils";
 
 import {nextTick} from "vue";
 import {demoData} from "../../OrderView/__test__/demoData";
-import RestaurantRoom from "../BasicRoom/RestaurantRoom";
+import RestaurantRoom from "../BasicRoom/RestaurantRoom2";
 import {fetchRooms, onSelectRoom, roomsStates} from "../RoomState";
 import EditableRoom from "../EditableRoom/EditableRoom";
 

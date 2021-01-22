@@ -3,7 +3,6 @@ import { CRUdFactory } from './crud';
 
 export const CRUdDbFactory = function(obj, path, collection) {
   const { create: createData, remove: removeData, update: updateData} = CRUdFactory(obj, path)
-
   const create = async function(newObj) {
     const createdData = createData(newObj)
     const pushQuery = {}
