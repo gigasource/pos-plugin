@@ -60,8 +60,11 @@ appHooks.on('orderChange', async function () {
   activeOrders.value = await cms.getModel('Order').find({ status: 'inProgress' });
 })
 
+cms.socket.on('update-table', () => appHooks.emit('orderChange'))
+
 
 export const posSettings = ref({})
 appHooks.on('settingChange', async function() {
   posSettings.value = await cms.getModel('PosSetting').findOne()
 })
+

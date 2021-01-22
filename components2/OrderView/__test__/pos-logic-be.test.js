@@ -49,6 +49,7 @@ import {mockProduct} from "./mock_product";
 
 const {Socket, Io} = require("schemahandler/io/io");
 import {mockOrder} from "./mock-order";
+import {mockProducts} from "./mock_products";
 
 const syncFlow = require("schemahandler/sync/sync-flow");
 const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
@@ -94,7 +95,6 @@ const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
 const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
 const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
 
-const feSocket = new Socket();
 jest.setTimeout(60000)
 
 beforeAll(async () => {
@@ -210,6 +210,17 @@ describe("pos-logic", function () {
     await nextTick();
     expect(stringify(actionList.value)).toMatchSnapshot();
   });
+
+  it('case 2e: create order + add 2 different items', async function () {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, mockProducts[0]);
+    await nextTick();
+    addProduct(order, mockProducts[1]);
+    await nextTick();
+    expect(stringify(actionList.value)).toMatchSnapshot();
+  })
 
   //todo: remove modifiers
 

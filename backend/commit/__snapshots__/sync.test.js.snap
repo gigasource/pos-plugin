@@ -1,0 +1,276 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sync test Case 1: Create order + add product 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 1,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 0,
+          },
+        ],
+        "name": "Cola",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 98,
+        "tax": 19,
+      },
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 2,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 1,
+          },
+        ],
+        "name": "Pepsi",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 35,
+        "tax": 0,
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": 10,
+    "user": Array [],
+    "vTaxGroups": Array [],
+  },
+]
+`;
+
+exports[`Sync test Case 1: Create order + add product 2`] = `Array []`;
+
+exports[`Sync test Case 1a: Add more than 1 products 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "cashback": -133,
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 2,
+        "name": "Pepsi",
+        "price": 35,
+        "printed": true,
+        "quantity": 1,
+        "sent": true,
+        "tax": 0,
+        "taxes": Array [
+          0,
+          null,
+        ],
+        "vSum": 35,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "0": Object {
+            "gross": 35,
+            "net": 35,
+            "tax": 0,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 1,
+        "name": "Cola",
+        "price": 98,
+        "printed": true,
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          null,
+        ],
+        "vSum": 98,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 98,
+            "net": 82.35,
+            "tax": 15.65,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 2,
+        "name": "Pepsi",
+        "price": 35,
+        "printed": true,
+        "quantity": 1,
+        "sent": true,
+        "tax": 0,
+        "taxes": Array [
+          0,
+          null,
+        ],
+        "vSum": 35,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "0": Object {
+            "gross": 35,
+            "net": 35,
+            "tax": 0,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2021-01-21T17:00:00.000Z",
+    "vSum": 133,
+    "vTaxGroups": Array [],
+    "vTaxSum": Object {
+      "0": Object {
+        "gross": 35,
+        "net": 35,
+        "tax": 0,
+      },
+      "19": Object {
+        "gross": 98,
+        "net": 82.35,
+        "tax": 15.65,
+      },
+    },
+  },
+]
+`;
+
+exports[`Sync test Case 1a: Create order + add product from client 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 1,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 0,
+          },
+        ],
+        "name": "Cola",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 98,
+        "tax": 19,
+      },
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 2,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 1,
+          },
+        ],
+        "name": "Pepsi",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 35,
+        "tax": 0,
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": 10,
+    "user": Array [],
+    "vTaxGroups": Array [],
+  },
+]
+`;
+
+exports[`Sync test Case 2: Create order + add order + set attribute 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 1,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 0,
+          },
+        ],
+        "name": "Cola",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 98,
+        "tax": 19,
+      },
+      Object {
+        "_id": "ObjectID",
+        "category": "ObjectID",
+        "id": 2,
+        "layouts": Array [
+          Object {
+            "color": "#FBE4EC",
+            "device": "pos",
+            "order": 1,
+          },
+        ],
+        "name": "Pepsi",
+        "option": Object {
+          "favorite": true,
+        },
+        "price": 35,
+        "tax": 0,
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": 10,
+    "user": Array [],
+    "vSum": 100,
+    "vTaxGroups": Array [],
+  },
+]
+`;
