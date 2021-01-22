@@ -1,24 +1,60 @@
 <script>
 
 import {$filters} from '../AppSharedStates';
+import { ref, withModifiers } from 'vue'
+import {internalValueFactory} from "../utils";
 
 export default {
-  setup() {
+  name: 'PosEndOfDayPrintDialog',
+  setup(props, {emit}) {
+    const xReport = ref(null)
+    const date = ref(null)
+
+    const dialog = internalValueFactory(props, {emit})
+
+    const open = async function (_date) {
+      date.value = _date;
+      xReport.value = await getXReport(date)
+    }
+
+    const close = function () {
+      dialog.value = false
+      xReport.value = null
+    }
+
+    const getSum = function (paymentTypes) {
+      return _.reduce(paymentTypes, (res, values) => {
+        return res + values
+      }, 0)
+    }
+
+    const print = async function () {
+      await printXReport(date.value)
+    }
+
+    const getXReport = function () {
+      console.error('ReportsStore:getXReport was not injected')
+    }
+
+    const printXReport = function () {
+      console.error('ReportsStore:printXReport was not injected')
+    }
+
     return () => <>
       <div>
         <slot close={close} open={open} name="activator"></slot>
-        <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog} width="70%">
+        <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="70%">
           <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
             <p class="eod-header">
               {t('report.xReport')} </p>
             <div style="height: calc(100% - 145px); overflow-y: auto;">
               <div class="eod-dialog-main">
-                {(xReport) &&
+                {(xReport.value) &&
                 <div class="eod-dialog-content">
                   <p class="section-title eod-title">
                     {t('common.sales')} </p>
                   <div class="eod-details">
-                    {xReport.sumByPayment.map((paymentValue, paymentName) =>
+                    {xReport.value.sumByPayment.map((paymentValue, paymentName) =>
                         <div class="details-content">
                           <p>
                             {paymentName} </p>
@@ -30,18 +66,18 @@ export default {
                       <p class="eod-subtitle">
                         {t('common.total')} </p>
                       <p style="text-decoration: underline; font-weight: 800;">
-                        €{$filters.formatCurrency(getSum(xReport.sumByPayment))}
+                        €{$filters.formatCurrency(getSum(xReport.value.sumByPayment))}
                       </p>
                     </div>
                   </div>
                   <p class="section-title eod-title">
                     {t('report.productSold')} </p>
                   <div class="eod-details">
-                    {xReport.groupItemsByCategory.map((items, category) =>
+                    {xReport.value.groupItemsByCategory.map((items, category) =>
                         <div>
                           <p class="eod-subtitle">
                             {category || 'No category'}
-                            (€{$filters.formatCurrency(xReport.sumByCategory[category])}) </p>
+                            (€{$filters.formatCurrency(xReport.value.sumByCategory[category])}) </p>
                           <div class="eod-sales-detail">
                             {items.map((quantity, name) =>
                                 <p> {quantity} x {name} </p>
