@@ -47,21 +47,68 @@ exports[`eod test case 1 date-picker 1`] = `
       <tbody>
         <tr>
           <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                27
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
           </td>
           <td>
             <button type="button"
-                    class="g-table-item"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
             >
               <div class="g-table-item__content">
-                01
+                28
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                29
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                30
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                31
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -74,7 +121,20 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                02
+                1
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item"
+            >
+              <div class="g-table-item__content">
+                2
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -89,7 +149,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                03
+                3
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -102,7 +162,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                04
+                4
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -115,7 +175,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                05
+                5
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -128,7 +188,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                06
+                6
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -141,7 +201,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                07
+                7
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -154,7 +214,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                08
+                8
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -167,7 +227,7 @@ exports[`eod test case 1 date-picker 1`] = `
                     class="g-table-item"
             >
               <div class="g-table-item__content">
-                09
+                9
               </div>
               <div class="g-date-picker-table__events">
               </div>
@@ -469,9 +529,621 @@ exports[`eod test case 1 date-picker 1`] = `
             <div class="g-table-item__background">
             </div>
           </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                1
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                2
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                3
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                4
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                5
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
+          <td>
+            <button type="button"
+                    class="g-table-item g-table-item--disabled"
+                    disabled
+            >
+              <div class="g-table-item__content">
+                6
+              </div>
+              <div class="g-date-picker-table__events">
+              </div>
+            </button>
+            <div class="g-table-item__background">
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
 </g-picker-stub>
+`;
+
+exports[`eod test case 2 PosEndOfDayMain 1`] = `
+<div style="height: 100%; background-color: rgb(238, 238, 238);">
+  <div class="g-picker g-picker--full-width">
+    <div class="g-picker__body g-picker__body--no-title">
+      <div class="g-date-picker-header">
+        <div class="g-date-picker-header-container">
+          <button class="g-date-picker-header__prev-button">
+          </button>
+          <div class="g-date-picker-header__value">
+            <div>
+              <button style="width: 208px;"
+                      disabled
+              >
+                January 2021
+              </button>
+            </div>
+          </div>
+          <button class="g-date-picker-header__next-button">
+          </button>
+        </div>
+      </div>
+      <div class="g-date-picker-table g-date-picker-table--date">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                onlineOrder.weekday.mon
+              </th>
+              <th>
+                onlineOrder.weekday.tue
+              </th>
+              <th>
+                onlineOrder.weekday.wed
+              </th>
+              <th>
+                onlineOrder.weekday.thu
+              </th>
+              <th>
+                onlineOrder.weekday.fri
+              </th>
+              <th>
+                onlineOrder.weekday.sat
+              </th>
+              <th>
+                onlineOrder.weekday.sun
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <button type="button"
+                        class="g-table-item g-table-item--disabled"
+                        disabled
+                >
+                  <div class="g-table-item__content">
+                    28
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item g-table-item--disabled"
+                        disabled
+                >
+                  <div class="g-table-item__content">
+                    29
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item g-table-item--disabled"
+                        disabled
+                >
+                  <div class="g-table-item__content">
+                    30
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item g-table-item--disabled"
+                        disabled
+                >
+                  <div class="g-table-item__content">
+                    31
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    1
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    2
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    3
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    4
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    5
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    6
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    7
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    8
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    9
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    10
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    11
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    12
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    13
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    14
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    15
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    16
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    17
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    18
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    19
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    20
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    21
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    22
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    23
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    24
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    25
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    26
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    27
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    28
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    29
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    30
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+              <td>
+                <button type="button"
+                        class="g-table-item"
+                >
+                  <div class="g-table-item__content">
+                    31
+                  </div>
+                  <div class="g-date-picker-table__events">
+                  </div>
+                </button>
+                <div class="g-table-item__background">
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="g-picker__actions g-picker__actions--no-title">
+    </div>
+  </div>
+</div>
 `;

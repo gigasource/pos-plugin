@@ -7,6 +7,7 @@ import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom2";
 import {fetchRooms, onSelectRoom, roomsStates} from "../../TablePlan/RoomState";
 import EditableRoom from "../../TablePlan/EditableRoom/EditableRoom";
 import PosEndOfDayDatePicker from "../PosEndOfDayDatePicker";
+import PosEndOfDayMain from "../PosEndOfDayMain";
 
 const {stringify} = require("schemahandler/utils");
 
@@ -30,9 +31,24 @@ describe("eod test", function () {
     //todo: convert singeton -> factory
     //room -> props
     //todo: dashboard: keep-alive
-    await fetchRooms()
     makeWrapper(PosEndOfDayDatePicker, {
       shallow: true,
+      props: {
+      }
+    });
+    await nextTick();
+    await delay(50);
+    expect(wrapper.html()).toMatchSnapshot()
+  }, 80000);
+
+  it("case 2 PosEndOfDayMain", async function () {
+    //order have 1 sent item, add one item -> should display print,
+    //todo: fetch data
+    //todo: convert singeton -> factory
+    //room -> props
+    //todo: dashboard: keep-alive
+    makeWrapper(PosEndOfDayMain, {
+      //shallow: true,
       props: {
       }
     });

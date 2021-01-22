@@ -115,7 +115,6 @@ export function setComponent(_component) {
 export const makeWrapper = (_component, options, useDefaults = false) => {
   const defaultOption = {
     props: {},
-    shallow: true,
     global: {
       directives: {
         touch: true

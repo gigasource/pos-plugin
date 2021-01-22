@@ -1,8 +1,10 @@
 <script>
 import {useI18n} from 'vue-i18n'
 import { onMounted, onActivated, ref } from 'vue'
+import PosEndOfDayDatePicker from "./PosEndOfDayDatePicker";
 
 export default {
+  components:{PosEndOfDayDatePicker},
   setup() {
     const {t} = useI18n();
 
