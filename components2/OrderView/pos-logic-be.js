@@ -147,8 +147,8 @@ export function orderBeFactory(id = 0) {
     initBeSnapshot(order)
   })
 
-  const clearOrder = () => {
-    actionList.value.length = 0;
+  const clearOrder = (clearActionList) => {
+    if (clearActionList) actionList.value.length = 0;
     _.forEach(order, (v, k) => {
       if (Array.isArray(v)) {
         v.length = 0;
@@ -162,13 +162,13 @@ export function orderBeFactory(id = 0) {
    *
    * @param __order (can be table or whole order)
    */
-  function prepareOrder(__order) {
+  function prepareOrder(__order, clearActionList = true) {
     hooks.emit(`pre:prepareOrder:${id}`, __order);
     let _new = typeof __order !== 'object' || !__order._id;
     if (typeof __order === 'string') {
       __order = {table: __order};
     }
-    clearOrder();
+    clearOrder(clearActionList);
     order = createOrder(_.assign(order, __order));
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
     if (_new) {
@@ -203,7 +203,7 @@ export function orderBeFactory(id = 0) {
     const cancellationItems = getRecentCancellationItems();
 
     //change to newOrder
-    prepareOrder(newOrder);
+    prepareOrder(newOrder, false);
     //apply to order
     for (const item of items) {
       if (!item.sent) {
@@ -253,7 +253,7 @@ export const {
   prepareOrder, order, clearOrder,
   beItemsSnapshot, beCancellationItemsSnapshot,
   startOnetimeSnapshot,
-  finishOnetimeSnapshot
+  finishOnetimeSnapshot, syncOrderChange
 } = orderBeFactory(0);
 
 //should run on backend
@@ -454,4 +454,11 @@ export const disablePay = computed(() => {
   }
   return false;
 })
+
+hooks.on('printOrder', () => {
+  order.date = new Date();
+  cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), _.cloneDeep(order));
+  clearOrder();
+});
+
 //</editor-fold>

@@ -1,11 +1,11 @@
 <script>
 import {Touch} from 'pos-vue-framework';
 import dialogConfigOrderItem from '../../components/posOrder/dialogConfigOrderItem';
-import {onActivated} from 'vue';
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
 import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
-import {getCurrentOrder, overlay, prepareOrder} from "./pos-logic-be";
+import {syncOrderChange, overlay, prepareOrder} from "./pos-logic-be";
+import {hooks} from './pos-logic'
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
@@ -21,26 +21,27 @@ export default {
     printedOrder: Object,
     isTakeAwayOrder: Boolean,
   },
-  emits: ['addItemQuantity', 'removeItemQuantity', 'removeProductModifier',
-    'addModifierToProduct', 'changePrice', 'updateOrderItem', 'resetOrderData',
-    'updateOrderTable', 'update:actionMode', 'quickCash',
-    'updateCurrentOrder', 'saveTableOrder'],
+  async activated() {
+    const route = useRoute()
+    if (route.params.id) {
+      const order = await cms.getModel('Order').findOne({ table: route.params.id, status: 'inProgress' })
+      console.log(_.cloneDeep(order))
+      if (!order) prepareOrder(route.params.id)
+      else prepareOrder(order)
+    }
+    //todo: fix this
+    cms.socket.on('update-table', async function (order) {
+      await syncOrderChange(order)
+    })
+  },
+  deactivated() {
+    prepareOrder({})
+  },
   setup(props, {emit}) {
-    //todo: edit ??
-    const order = getCurrentOrder();
+    const router = useRouter()
 
-    const route = useRoute();
-    //fixme: this code should not be here
-    onActivated(async () => {
-      if (route.params.id) {
-        //order.table = route.params.id
-        const activeOrder = _.find(activeOrders.value, {table: route.params.id});
-        if (activeOrder) {
-          prepareOrder(activeOrder);
-        } else {
-          prepareOrder(route.params.id);
-        }
-      }
+    hooks.on('printOrder', function () {
+      router.go(-1)
     })
 
     autoLoadOrderLayoutSetting();
