@@ -56,10 +56,10 @@ export const printers = ref([])
 export const isPrinter2Select = ref(false)
 // boolean value indicate whether "+2. printer" button should be shown
 export const showAddPrinter2 = computed(() => (
-    selectedProduct.groupPrinter
-    && !selectedProduct.groupPrinter2
-    && !selectedProduct.isModifier
-    && !selectedProduct.isNoPrint
+    selectedProduct.value.groupPrinter
+    && !selectedProduct.value.groupPrinter2
+    && !selectedProduct.value.isModifier
+    && !selectedProduct.value.isNoPrint
     && !isPrinter2Select.value
 ))
 
@@ -76,7 +76,7 @@ export async function selectPrinter(id) {
   }
 
   if (isPrinter2Select.value) {
-    if (selectedProduct.groupPrinter !== printer) {
+    if (selectedProduct.value.groupPrinter !== printer) {
       change.groupPrinter2 = printer;
     }
     isPrinter2Select.value = false;
@@ -85,16 +85,16 @@ export async function selectPrinter(id) {
     change.groupPrinter2 = null;
   }
 
-  if (!selectedProduct.tax && printer.defaultDineInTax) {
+  if (!selectedProduct.value.tax && printer.defaultDineInTax) {
     const taxCategory = printer.defaultDineInTax;
-    selectedProduct.tax = taxCategory
+    selectedProduct.value.tax = taxCategory
     change.taxCategory = taxCategory
     change.tax = dineInTaxes.value.find(i => i._id.toString() === taxCategory).value
   }
 
-  if (!selectedProduct.tax2 && printer.defaultTakeAwayTax) {
+  if (!selectedProduct.value.tax2 && printer.defaultTakeAwayTax) {
     const taxCategory2 = printer.defaultTakeAwayTax;
-    selectedProduct.tax2 = taxCategory2
+    selectedProduct.value.tax2 = taxCategory2
     change.taxCategory2 = taxCategory2
     change.tax2 = takeAwayTaxes.values.find(i => i._id.toString() === taxCategory2).value
   }
@@ -124,7 +124,6 @@ export async function changeCategory(category) {
 // todo: meaning??
 export const layoutType = ref('default')
 
-
 // modifier
 export const popupModifierGroups = ref([])
 export const loadPopupModifierGroups = async () => {
@@ -142,7 +141,6 @@ export const clearPopupModifierGroup = (toggleSelect, item) => {
   changePopupModifierGroup(null).then(resolve => resolve())
 }
 
-
 // product layout
 export async function updateProductLayout(change, forceCreate) {
   updateSelectedProductLayout({ ...selectedProductLayout.value, ...change })
@@ -158,6 +156,7 @@ export async function updateProductLayout(change, forceCreate) {
     showNotify()
   }
 }
+
 export async function createNewProductLayout(productId, extraInfo) {
   const productLayout = {
     product: productId,
@@ -167,9 +166,11 @@ export async function createNewProductLayout(productId, extraInfo) {
   const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
   updateOrderLayout(result)
 }
+
 export const debounceUpdateTextLayout = _.debounce(function(key, val) {
   updateTextLayout({ [key]: val }, !selectedProduct.value._id).then(res => res())
 }, 300)
+
 async function updateTextLayout(change) {
   const forceCreate = !selectedProductLayout._id;
   await updateProductLayout(change, forceCreate)
@@ -177,27 +178,19 @@ async function updateTextLayout(change) {
 
 // product
 export async function updateProduct(change, forceCreate) {
-  console.log('storing', change, 'to internal variable selectedProduct')
   selectedProduct.value = { ...selectedProduct.value, ...change }
-  if (selectedProduct._id) {
-    await orderLayoutApi.updateProduct(selectedProduct._id, change)
+  if (selectedProduct.value._id) {
+    await orderLayoutApi.updateProduct(selectedProduct.value._id, change)
     showNotify()
-  } else {
-    if (forceCreate) {
-      const product = await orderLayoutApi.createProduct(selectedProduct.value);
-      console.log('Create new ProductLayout linked to Product with id: ', product._id)
-      await createNewProductLayout(product._id)
-      showNotify()
-    } else {
-      console.log('Product is not existed yet. skipped')
-    }
+  } else if (forceCreate) {
+    const product = await orderLayoutApi.createProduct(selectedProduct.value);
+    await createNewProductLayout(product._id)
+    showNotify()
   }
 }
-export function setProductInfo(propName, propValue) {
-  selectedProduct[propName] = propValue
-}
+
 export const debouncedUpdateProduct = _.debounce((key, val) => {
-  updateProduct({ [key]: val }, !selectedProduct._id).then(res => res())
+  updateProduct({ [key]: val }, !selectedProduct.value._id).then(res => res())
 }, 300)
 
 
@@ -247,7 +240,6 @@ async function _execAction() {
 // side-effect: in-case the user select action then switch to another category
 // Do we need to clear action if the user change category ???
 watch(() => selectedProductLayout.value, async (newVal, oldValue) => {
-  console.log('watch selectedProductLayout.value',  newVal, oldValue)
   if (_action)
     await _execAction()
 })

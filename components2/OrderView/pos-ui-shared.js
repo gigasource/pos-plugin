@@ -115,22 +115,22 @@ export const products = computed(() => {
 })
 
 //fixme: only for dev
-
-prepareOrder();
-const order = getCurrentOrder();
-const once = _.once(() => {
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[1].product);
-  addProduct(order, products.value[1].product);
-
-  orderViewDialog.move = true;
-})
-watchEffect(() => {
-  if (order.items.length === 0 && products.value && products.value.length > 0) {
-    once();
-  }
-})
+//
+// prepareOrder();
+// const order = getCurrentOrder();
+// const once = _.once(() => {
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[1].product);
+//   addProduct(order, products.value[1].product);
+//
+//   orderViewDialog.move = true;
+// })
+// watchEffect(() => {
+//   if (order.items.length === 0 && products.value && products.value.length > 0) {
+//     once();
+//   }
+// })
 
 /*async function run() {
   await nextTick();
@@ -163,13 +163,13 @@ export function fillMissingAreas(areas, columns, rows, isCategory) {
     for (let column = 0; column < columns; column++) {
       let empty = createEmptyLayout(row, column);
       if (isCategory) {
-        if (selectedCategoryLayout && isSameArea(empty, selectedCategoryLayout))
-          empty = selectedCategoryLayout;
+        if (selectedCategoryLayout.value && isSameArea(empty, selectedCategoryLayout.value))
+          empty = selectedCategoryLayout.value;
         else
           empty = {...empty, ...createEmptyCategoryLayout()}
       } else {
-        if (selectedProductLayout && isSameArea(empty, selectedProductLayout))
-          empty = selectedProductLayout
+        if (selectedProductLayout.value && isSameArea(empty, selectedProductLayout.value))
+          empty = selectedProductLayout.value
         else
           empty = {...empty, ...createEmptyProductLayout()}
       }

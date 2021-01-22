@@ -21,7 +21,7 @@ import {
   popupModifierGroups, loadPopupModifierGroups, changePopupModifierGroup, addPopupModifierGroup, clearPopupModifierGroup,
   /*product layout*/ createNewProductLayout, updateProductLayout, debounceUpdateTextLayout,
   /*product*/
-  updateProduct, setProductInfo, debouncedUpdateProduct,
+  updateProduct, debouncedUpdateProduct,
   /*action*/
   canDelete, canSwitch, canCopy, deleteProductLayout, setAction
 } from './ProductEditorLogic'
@@ -109,16 +109,11 @@ export default {
     }
 
     function renderProductLayout() {
-      function updateProductInfo(prop, value) {
-        setProductInfo(prop, value);
-        debouncedUpdateProduct(prop, value);
-      }
-
       return <>
         <div>{t('article.id')} </div>
         <g-text-field-bs
             model-value={selectedProduct.value.id}
-            onUpdate:modelValue={e => updateProductInfo('id', e)}
+            onUpdate:modelValue={e => debouncedUpdateProduct('id', e)}
             v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('id')}>icon-keyboard</g-icon>
             }}/>
@@ -126,7 +121,7 @@ export default {
         <div>{t('article.name')}<span style="color: #FF4452">*</span></div>
         <g-text-field-bs
             model-value={selectedProduct.value.name}
-            onUpdate:modelValue={e => updateProductInfo('name', e)}
+            onUpdate:modelValue={e => debouncedUpdateProduct('name', e)}
             v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('name')}>icon-keyboard</g-icon>
             }}/>
@@ -134,7 +129,7 @@ export default {
         <div>{t('article.price')} <span style="color: #FF4452">*</span></div>
         <g-text-field-bs
             model-value={selectedProduct.value.price}
-            onUpdate:modelValue={e => updateProductInfo('price', e)}
+            onUpdate:modelValue={e => debouncedUpdateProduct('price', e)}
             v-slots={{
               'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('price')}>icon-keyboard</g-icon>
             }}/>
@@ -290,7 +285,9 @@ export default {
           onSubmit={e => updateProductLayout({ text: e, type: 'Text' }, e)}/>
     )
 
-    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers v-model={dialog.popupModifiers} product={selectedProduct.value}/>
+    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers
+        v-model={dialog.popupModifiers}
+        product={selectedProduct.value}/>
 
     // set layout type by route
     function setLayoutTypeByRouteQuery() {

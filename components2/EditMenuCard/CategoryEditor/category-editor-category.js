@@ -33,8 +33,8 @@ async function _updateCategory(change, forceCreate) {
     // otherwise, create new if forceCreate
     // in case of create new, we need to emit an event to update category layout _id
     const result = await orderLayoutApi.createCategoryLayout(orderLayout.value._id, selectedCategoryLayout.value)
-    showNotify();
-    updateOrderLayout(result)
+  showNotify();
+  updateOrderLayout(result)
   }
 }
 

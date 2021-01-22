@@ -60,7 +60,7 @@ async function updateCategoryLayout(categoryLayoutId, change) {
     result[`categories.$.${key}`] = value;
     return result
   }, {}) ;
-  await cms.getModel('OrderLayout').findOneAndUpdate(qry, { $set: set });
+  return await cms.getModel('OrderLayout').findOneAndUpdate(qry, { $set: set }, { new: true });
 }
 
 async function createCategoryLayout(orderLayoutId, categoryLayout) {
@@ -73,7 +73,6 @@ async function createCategoryLayout(orderLayoutId, categoryLayout) {
 
 // product api
 async function createProductLayout(layoutType, categoryLayoutId, productLayout) {
-  console.log('orderLayoutApi:createProductLayout', layoutType, categoryLayoutId, productLayout)
   return await cms.getModel('OrderLayout').findOneAndUpdate(
       {
         type: layoutType,
@@ -105,7 +104,6 @@ async function deleteProductLayout(categoryId, productLayoutId) {
 
 // product api (MOVE TO ANOTHER FILE???)
 async function updateProduct(productId, change) {
-  console.log(`updateProduct\n\tProduct Id:${productId}\n\tChange: `, change)
   return await cms.getModel('Product').findOneAndUpdate({ _id: productId }, change)
 }
 
