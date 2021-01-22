@@ -96,6 +96,7 @@ describe('Pos logic sync', function () {
     })
     await nextTick()
     addProduct(order1, cola)
+
     await nextTick()
     addProduct(order1, soda)
     await nextTick()

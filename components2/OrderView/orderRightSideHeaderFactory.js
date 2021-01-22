@@ -1,17 +1,16 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
-import {avatar, isMobile, user, username} from "../AppSharedStates";
+import {avatar, isMobile, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {actionList, clearOrder, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} from "./pos-logic-be";
-import {hooks, makeTakeaway, toggleTakeaway} from './pos-logic'
-import {computed, ref, withModifiers} from "vue";
+import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} from "./pos-logic-be";
+import {hooks, toggleTakeaway} from './pos-logic'
+import {ref, withModifiers} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
 import {payPrintBtnFactory} from "./payPrintBtnFactory";
 import {genScopeId} from "../utils";
-import cms from 'cms';
 
 export function orderRightSideHeader(props, {emit}) {
-  let {t: $t, locale} = useI18n();
+  let {t, locale} = useI18n();
   const order = getCurrentOrder();
   const menu = ref(false);
 
@@ -75,19 +74,19 @@ export function orderRightSideHeader(props, {emit}) {
               default: () => <g-expand-x-transition>
                 <div {...genScopeId()} class="order-detail__menu">
                   <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
-                  <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{$t('order.voucher')}</g-btn-bs>
-                  <g-btn-bs icon="icon-move-items" onClick={moveItems}>{$t('order.moveItem')}</g-btn-bs>
+                  <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
+                  <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
 
                   <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
                             onClick={toggleTakeAwayOrder}>Take Away
                   </g-btn-bs>
-                  <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{$t('order.splitOrder')}</g-btn-bs>
+                  <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{t('order.splitOrder')}</g-btn-bs>
                   {actionList.value.length > 0 && <g-btn-bs disabled={!hasOrderChange.value} icon="icon-print"
                                                             onClick={withModifiers(printOrder, ['stop'])}>
-                    {$t('ui.print')}
+                    {t('ui.print')}
                   </g-btn-bs>}
                   <g-btn-bs icon="icon-wallet"
-                            disabled={disablePay.value} onClick={pay}>{$t('article.pay')}</g-btn-bs>
+                            disabled={disablePay.value} onClick={pay}>{t('article.pay')}</g-btn-bs>
                 </div>
               </g-expand-x-transition>
             }}>
