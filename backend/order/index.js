@@ -32,7 +32,12 @@ module.exports = (cms) => {
           'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
         }
       });
+      //action print should be here
       await cms.emit('post:print-to-kitchen');
+    })
+
+    socket.on('action-list', async (actionList) => {
+      await execAllChain(actionList)
     })
 
     socket.on('cancel-order', cancelOrder)
@@ -41,6 +46,7 @@ module.exports = (cms) => {
   async function cancelOrder({_id, table}, cb = () => null) {
     if (!_id) return cb()
 
+    //fixme: refactore
     await orm('Order').deleteOne({_id}).commit({table})
 
     cb()
