@@ -3,214 +3,77 @@
 exports[`Pos logic sync Case 1: Create order + addProduct in master 1`] = `
 Array [
   Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-            "cancellationItems": Array [],
-            "items": Array [],
-            "payment": Array [],
-            "status": "inProgress",
-            "table": "10",
-            "takeAway": false,
-            "user": Array [],
-            "vDate": "2021-01-20T17:00:00.000Z",
-            "vSum": 0,
-            "vTaxSum": Object {},
-          },
-        ],
-        "fn": "create",
-      },
-      Object {
-        "args": Array [
-          "createOrder",
-          Object {
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
+    "_id": "ObjectID",
+    "course": 1,
+    "groupPrinter": "",
+    "id": "3",
+    "name": "Water",
+    "price": 67,
+    "printed": true,
+    "product": "ObjectID",
+    "quantity": 1,
+    "sent": true,
+    "tax": 7,
+    "taxes": Array [
+      7,
+      null,
     ],
-    "modelName": "Order",
+    "vSum": 67,
+    "vTakeAway": false,
+    "vTaxSum": Object {
+      "7": Object {
+        "gross": 67,
+        "net": 62.62,
+        "tax": 4.38,
+      },
+    },
   },
   Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$push": Object {
-              "items": Object {
-                "_id": "ObjectID",
-                "course": 1,
-                "groupPrinter": "",
-                "id": "3",
-                "name": "Water",
-                "price": 67,
-                "printed": true,
-                "product": "ObjectID",
-                "quantity": 1,
-                "sent": true,
-                "tax": 7,
-                "taxes": Array [
-                  7,
-                  null,
-                ],
-                "vSum": 67,
-                "vTakeAway": false,
-                "vTaxSum": Object {
-                  "7": Object {
-                    "gross": 67,
-                    "net": 62.62,
-                    "tax": 4.38,
-                  },
-                },
-              },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
-      },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
+    "_id": "ObjectID",
+    "course": 1,
+    "groupPrinter": "",
+    "id": 1,
+    "name": "Cola",
+    "price": 98,
+    "quantity": 1,
+    "tax": 19,
+    "taxes": Array [
+      19,
+      null,
     ],
-    "modelName": "Order",
+    "vSum": 98,
+    "vTakeAway": false,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 98,
+        "net": 82.35,
+        "tax": 15.65,
+      },
+    },
   },
   Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$set": Object {
-              "vSum": 67,
-              "vTaxSum": Object {
-                "7": Object {
-                  "gross": 67,
-                  "net": 62.62,
-                  "tax": 4.38,
-                },
-              },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
-      },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
+    "_id": "ObjectID",
+    "course": 1,
+    "groupPrinter": "",
+    "id": "4",
+    "name": "Soda",
+    "price": 20,
+    "product": "ObjectID",
+    "quantity": 1,
+    "tax": 19,
+    "taxes": Array [
+      19,
+      7,
     ],
-    "modelName": "Order",
-  },
-  Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$push": Object {
-              "items": Object {
-                "_id": "ObjectID",
-                "course": 1,
-                "groupPrinter": "",
-                "id": 1,
-                "name": "Cola",
-                "price": 98,
-                "quantity": 1,
-                "tax": 19,
-                "taxes": Array [
-                  19,
-                  null,
-                ],
-                "vSum": 98,
-                "vTakeAway": false,
-                "vTaxSum": Object {
-                  "19": Object {
-                    "gross": 98,
-                    "net": 82.35,
-                    "tax": 15.65,
-                  },
-                },
-              },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
+    "vSum": 20,
+    "vTakeAway": false,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 20,
+        "net": 16.81,
+        "tax": 3.19,
       },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
-    ],
-    "modelName": "Order",
-  },
-  Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$set": Object {
-              "vSum": 165,
-              "vTaxSum": Object {
-                "19": Object {
-                  "gross": 98,
-                  "net": 82.35,
-                  "tax": 15.65,
-                },
-                "7": Object {
-                  "gross": 67,
-                  "net": 62.62,
-                  "tax": 4.38,
-                },
-              },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
-      },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
-    ],
-    "modelName": "Order",
+    },
   },
 ]
 `;
@@ -556,6 +419,32 @@ Array [
           },
         },
       },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "4",
+        "name": "Soda",
+        "price": 20,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 20,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 20,
+            "net": 16.81,
+            "tax": 3.19,
+          },
+        },
+      },
     ],
     "payment": Array [],
     "status": "inProgress",
@@ -563,12 +452,12 @@ Array [
     "takeAway": false,
     "user": Array [],
     "vDate": "2021-01-20T17:00:00.000Z",
-    "vSum": 165,
+    "vSum": 185,
     "vTaxSum": Object {
       "19": Object {
-        "gross": 98,
-        "net": 82.35,
-        "tax": 15.65,
+        "gross": 118,
+        "net": 99.16,
+        "tax": 18.84,
       },
       "7": Object {
         "gross": 67,
@@ -674,6 +563,42 @@ Array [
   Object {
     "_id": "ObjectID",
     "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"4\\",\\"name\\":\\"Soda\\",\\"price\\":20,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":20,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":3.19,\\"net\\":16.81,\\"gross\\":20}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":185,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":18.84,\\"net\\":99.16,\\"gross\\":118}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$[].sent\\":true,\\"items.$[].printed\\":true,\\"cancellationItems.$[].sent\\":true,\\"cancellationItems.$[].printed\\":true}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
     "condition": "{\\"_id\\":\\"ObjectID\\"}",
@@ -681,7 +606,7 @@ Array [
       "docId": "ObjectID",
     },
     "fromMaster": true,
-    "id": 6,
+    "id": 8,
     "tags": Array [],
     "uuid": "uuid-v1",
   },
@@ -745,6 +670,32 @@ Array [
           },
         },
       },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "4",
+        "name": "Soda",
+        "price": 20,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 20,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 20,
+            "net": 16.81,
+            "tax": 3.19,
+          },
+        },
+      },
     ],
     "payment": Array [],
     "status": "inProgress",
@@ -752,12 +703,12 @@ Array [
     "takeAway": false,
     "user": Array [],
     "vDate": "2021-01-20T17:00:00.000Z",
-    "vSum": 165,
+    "vSum": 185,
     "vTaxSum": Object {
       "19": Object {
-        "gross": 98,
-        "net": 82.35,
-        "tax": 15.65,
+        "gross": 118,
+        "net": 99.16,
+        "tax": 18.84,
       },
       "7": Object {
         "gross": 67,
@@ -868,6 +819,44 @@ Array [
   Object {
     "_id": "ObjectID",
     "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"4\\",\\"name\\":\\"Soda\\",\\"price\\":20,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":20,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":3.19,\\"net\\":16.81,\\"gross\\":20}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "dbName": null,
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":185,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":18.84,\\"net\\":99.16,\\"gross\\":118}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "dbName": null,
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
     "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$[].sent\\":true,\\"items.$[].printed\\":true,\\"cancellationItems.$[].sent\\":true,\\"cancellationItems.$[].printed\\":true}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
     "collectionName": "Order",
     "condition": "{\\"_id\\":\\"ObjectID\\"}",
@@ -876,7 +865,7 @@ Array [
     },
     "dbName": null,
     "fromMaster": true,
-    "id": 6,
+    "id": 8,
     "tags": Array [],
     "uuid": "uuid-v1",
   },
@@ -939,6 +928,32 @@ Object {
         },
       },
     },
+    Object {
+      "_id": "ObjectID",
+      "course": 1,
+      "groupPrinter": "",
+      "id": "4",
+      "name": "Soda",
+      "price": 20,
+      "printed": true,
+      "product": "ObjectID",
+      "quantity": 1,
+      "sent": true,
+      "tax": 19,
+      "taxes": Array [
+        19,
+        7,
+      ],
+      "vSum": 20,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "19": Object {
+          "gross": 20,
+          "net": 16.81,
+          "tax": 3.19,
+        },
+      },
+    },
   ],
   "payment": Array [],
   "status": "inProgress",
@@ -946,12 +961,12 @@ Object {
   "takeAway": false,
   "user": Array [],
   "vDate": "2021-01-20T17:00:00.000Z",
-  "vSum": 165,
+  "vSum": 185,
   "vTaxSum": Object {
     "19": Object {
-      "gross": 98,
-      "net": 82.35,
-      "tax": 15.65,
+      "gross": 118,
+      "net": 99.16,
+      "tax": 18.84,
     },
     "7": Object {
       "gross": 67,
@@ -1024,6 +1039,33 @@ Object {
       "_id": "ObjectID",
       "course": 1,
       "groupPrinter": "",
+      "id": "4",
+      "name": "Soda",
+      "originalQuantity": 1,
+      "price": 20,
+      "printed": true,
+      "product": "ObjectID",
+      "quantity": 1,
+      "sent": true,
+      "tax": 19,
+      "taxes": Array [
+        19,
+        7,
+      ],
+      "vSum": 20,
+      "vTakeAway": false,
+      "vTaxSum": Object {
+        "19": Object {
+          "gross": 20,
+          "net": 16.81,
+          "tax": 3.19,
+        },
+      },
+    },
+    Object {
+      "_id": "ObjectID",
+      "course": 1,
+      "groupPrinter": "",
       "id": 2,
       "name": "Pepsi",
       "price": 35,
@@ -1050,7 +1092,7 @@ Object {
   "takeAway": false,
   "user": Array [],
   "vDate": "2021-01-20T17:00:00.000Z",
-  "vSum": 334,
+  "vSum": 354,
   "vTaxSum": Object {
     "0": Object {
       "gross": 35,
@@ -1058,9 +1100,9 @@ Object {
       "tax": 0,
     },
     "19": Object {
-      "gross": 98,
-      "net": 82.35,
-      "tax": 15.65,
+      "gross": 118,
+      "net": 99.16,
+      "tax": 18.84,
     },
     "7": Object {
       "gross": 201,
