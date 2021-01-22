@@ -37,7 +37,8 @@ function cmsFactory(testName) {
     feSocket,
     triggerFeConnect: function () {
       feSocket.connect(`frontend:${testName}`)
-    }
+    },
+    Types: {}
   }
   _.extend(cms, new Hooks())
   return cms

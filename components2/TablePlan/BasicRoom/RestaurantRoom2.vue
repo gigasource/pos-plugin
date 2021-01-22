@@ -8,6 +8,7 @@ import RoomStyleFactory from '../RoomStyles'
 import {roomsFactory} from '../RoomState';
 import {isBusyTable, isTable} from '../RoomShared';
 import Touch from "../../../../../backoffice/pos-vue-framework/src/directives/touch/touch";
+import {useRouter} from 'vue-router';
 
 export default {
   name: 'RestaurantRoom2',
@@ -52,10 +53,17 @@ export default {
       return style
     }
 
+    const router = useRouter();
+    function chooseTable(name) {
+      console.log('name');
+      router.push(`/pos-order/${name}`)
+    }
+
     const objectRender = (obj) => {
       return <div key={obj._id} id={obj.name}
                   style={_roomObjectContainerStyle(obj)}
-                  class={classes(obj)}>
+                  class={classes(obj)}
+                  onClick={() => chooseTable(obj.name)}>
         {objectContentRender(obj)}
       </div>
     }

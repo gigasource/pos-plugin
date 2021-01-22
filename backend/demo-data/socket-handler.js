@@ -84,8 +84,8 @@ module.exports = cms => {
 
         cb()
       } catch (e) {
-        console.log('error exporting demo data', e)
-        cb(e)
+        console.log('error exporting demo data')
+        cb('Error')
       }
     })
 
@@ -100,7 +100,7 @@ module.exports = cms => {
         cb()
       } catch (e) {
         console.log('error importing demo data', e)
-        cb(e)
+        cb('error')
       }
     })
 
@@ -122,7 +122,8 @@ module.exports = cms => {
         }));
         cb(stores)
       } catch (error) {
-        cb([], error)
+        console.error(error)
+        cb('Error')
       }
     })
 
