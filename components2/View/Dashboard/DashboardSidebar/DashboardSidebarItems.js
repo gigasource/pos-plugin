@@ -4,8 +4,9 @@ import _ from 'lodash';
 import {user} from '../../../AppSharedStates'
 
 import {onSelectRoom, roomsStates} from '../../../TablePlan/RoomState'
-import {activeScreen} from '../DashboardSharedStates';
+import { activeScreen, selectingRoomId } from '../DashboardSharedStates';
 import {useI18n} from 'vue-i18n'
+
 
 const DashboardSidebarItemsFactory = () => {
   const {t} = useI18n()
@@ -18,6 +19,7 @@ const DashboardSidebarItemsFactory = () => {
         iconType: 'small',
         onClick() {
           activeScreen.value = 'restaurant-room'
+          selectingRoomId.value = r.room._id
           onSelectRoom(r)
         }
       })),

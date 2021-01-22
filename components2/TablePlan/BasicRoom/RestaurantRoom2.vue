@@ -10,13 +10,15 @@ import {isBusyTable, isTable} from '../RoomShared';
 import Touch from "../../../../../backoffice/pos-vue-framework/src/directives/touch/touch";
 
 export default {
-  name: 'RestaurantRoom',
+  name: 'RestaurantRoom2',
   props: {
     roomId: String
   },
   directives: {Touch},
-  setup({roomId}) {
-    const {selectingRoomStates, objectsInSelectingRoom} = roomsFactory({roomId});
+  setup(props) {
+
+    const {selectingRoomStates, objectsInSelectingRoom} = roomsFactory(props);
+
     const {roomObjectContainerStyle, roomObjectStyle} = RoomStyleFactory(selectingRoomStates)
 
     const curTime = ref(new Date())
