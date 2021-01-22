@@ -2,6 +2,7 @@ import { ObjectID } from "bson";
 import { CRUdDbFactory } from "../crud-db";
 import cms from "cms";
 import { stringify } from "schemahandler/utils";
+import { ref } from "vue";
 const group1 = { _id: new ObjectID(), name: "g1", categories: [] };
 const group2 = { _id: new ObjectID(), name: "g2", categories: [] };
 const category1 = { _id: new ObjectID(), name: "c1", items: [] };
@@ -262,6 +263,36 @@ describe("test crud-db", () => {
                 "name": "c1",
               },
             ],
+            "name": "g2",
+          },
+        ],
+      }
+    `);
+  });
+
+  it("should work for ref", async () => {
+    const data = ref({});
+    let dbData;
+
+    const collectionName = "modifier-test";
+    const {
+      create: createGroup,
+      remove: removeGroup,
+      update: updateGroup
+    } = CRUdDbFactory(data, "value.groups", collectionName);
+    await createGroup(group1);
+    await createGroup(group2);
+    expect(stringify(data.value)).toMatchInlineSnapshot(`
+      Object {
+        "groups": Array [
+          Object {
+            "_id": "ObjectID",
+            "categories": Array [],
+            "name": "g1",
+          },
+          Object {
+            "_id": "ObjectID",
+            "categories": Array [],
             "name": "g2",
           },
         ],

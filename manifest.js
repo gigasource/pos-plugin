@@ -2,6 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+    { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos2-modifier' },
     { loader: { type: 'route' }, filePath: 'components2/View/Payment/Payment2.vue', name: 'Payment2', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos2-login' },
     { loader: { type: 'route' }, filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos-edit-table-plan' },
@@ -69,6 +70,13 @@ module.exports = {
         type: 'vue-singleton'
       },
       path: 'components/Store/InventoryStore.vue',
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/modifier/index.js',
+      type: 'backend'
     },
     {
       loader: {
