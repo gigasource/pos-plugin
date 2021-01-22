@@ -2,6 +2,7 @@
 import {useI18n} from 'vue-i18n'
 import { onMounted, onActivated, ref } from 'vue'
 import PosEndOfDayDatePicker from "./PosEndOfDayDatePicker";
+import {getDailyReports, listOfDatesWithReports} from "./eod-shared";
 
 export default {
   components:{PosEndOfDayDatePicker},
@@ -11,7 +12,6 @@ export default {
     const date = ref(null)
     const eventDates = ref([])
     const selectedReportDate = ref(null)
-    const listOfDatesWithReports = ref([])
     const daysOfWeek = ref([
       'onlineOrder.weekday.sun',
       'onlineOrder.weekday.mon',
@@ -36,14 +36,6 @@ export default {
 
     const getDatesWithReport = async function (date) {
       eventDates.value = await getDatesWithReports(date)
-    }
-
-    const getDailyReports = function () {
-      console.error('ReportsStore:getDailyReports wasn\'t not injected')
-    }
-
-    const getDatesWithReports = function () {
-      console.error('ReportsStore:getDatesWithReports wasn\'t not injected')
     }
 
     onMounted(() => {
