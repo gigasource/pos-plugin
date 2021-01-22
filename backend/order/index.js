@@ -23,10 +23,8 @@ module.exports = (cms) => {
     if (!feSocketLock.tryAcquire()) return
     setTimeout(async () => {
       feSocketLock.release()
-      const order = await orm('Order').findOne({
-        table: commit.data.table,
-        status: 'inProgress'
-      })
+      const condition = commit.data && commit.data.table ? { table: commit.data.table, status: 'inProgress' } : { _id: result._id, status: 'inProgress' }
+      const order = await orm('Order').findOne(condition)
       if (feSocket && order)
         feSocket.emit('update-table', order)
     }, 500)
