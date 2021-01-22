@@ -6,6 +6,7 @@ import {demoData} from "../../OrderView/__test__/demoData";
 import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom2";
 import {fetchRooms, onSelectRoom, roomsStates} from "../../TablePlan/RoomState";
 import EditableRoom from "../../TablePlan/EditableRoom/EditableRoom";
+import PosEndOfDayDatePicker from "../PosEndOfDayDatePicker";
 
 const {stringify} = require("schemahandler/utils");
 
@@ -13,7 +14,7 @@ const delay = require("delay");
 
 //</editor-fold>
 
-describe("order-view test", function () {
+describe("eod test", function () {
   beforeAll(async () => {
     await orm("PosSetting").remove({});
     await orm("PosSetting").create(demoData.PosSetting[0]);
@@ -23,33 +24,18 @@ describe("order-view test", function () {
     await orm("Room").create(demoData.Room);
   });
 
-  it("case 1 room", async function () {
+  it("case 1 date-picker", async function () {
     //order have 1 sent item, add one item -> should display print,
     //todo: fetch data
     //todo: convert singeton -> factory
     //room -> props
     //todo: dashboard: keep-alive
     await fetchRooms()
-    makeWrapper(RestaurantRoom, {
-      shallow: true, props: {
-        roomId: roomsStates.value[0].room._id.toString()
-      }
-    });
-    await nextTick();
-    await delay(50);
-    expect(wrapper.html()).toMatchSnapshot()
-  }, 80000);
+    makeWrapper(PosEndOfDayDatePicker, {
+      shallow: true,
+      props: {
 
-  it("case 2 editable-room", async function () {
-    //order have 1 sent item, add one item -> should display print,
-    //todo: fetch data
-    //todo: convert singeton -> factory
-    //room -> props
-    //todo: dashboard: keep-alive
-    await fetchRooms()
-    onSelectRoom(roomsStates.value[0]);
-    makeWrapper(EditableRoom, {
-      shallow: true
+      }
     });
     await nextTick();
     await delay(50);

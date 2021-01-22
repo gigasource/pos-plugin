@@ -384,7 +384,7 @@
       }
     },
     render() {
-      return genScopeId(this.datePickerRenderFn);
+      return genScopeId(this.datePickerRenderFn)();
     }
   }
 </script>
