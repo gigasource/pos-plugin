@@ -34,7 +34,6 @@ describe("eod test", function () {
     makeWrapper(PosEndOfDayDatePicker, {
       shallow: true,
       props: {
-
       }
     });
     await nextTick();
