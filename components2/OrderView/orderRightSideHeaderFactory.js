@@ -1,13 +1,14 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
 import {avatar, isMobile, user, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} from "./pos-logic-be";
+import {actionList, clearOrder, disablePay, getCurrentOrder, hasOrderChange, payPrintMode} from "./pos-logic-be";
 import {hooks, makeTakeaway, toggleTakeaway} from './pos-logic'
 import {computed, ref, withModifiers} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
 import {payPrintBtnFactory} from "./payPrintBtnFactory";
 import {genScopeId} from "../utils";
+import cms from 'cms';
 
 export function orderRightSideHeader(props, {emit}) {
   let {t: $t, locale} = useI18n();
@@ -22,7 +23,12 @@ export function orderRightSideHeader(props, {emit}) {
     orderViewDialog['voucher'] = true;
   }
 
-  hooks.on('printOrder', () => menu.value = false);
+  hooks.on('printOrder', () => {
+    cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), _.cloneDeep(order));
+    menu.value = false;
+    clearOrder();
+    router.push({path: '/pos-dashboard'})
+  });
   const printOrder = () => hooks.emit('printOrder');
 
   const router = useRouter()

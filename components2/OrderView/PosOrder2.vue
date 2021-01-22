@@ -5,10 +5,11 @@ import {onActivated} from 'vue';
 import {useRoute} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
 import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
-import {getCurrentOrder, overlay} from "./pos-logic-be";
+import {getCurrentOrder, overlay, prepareOrder} from "./pos-logic-be";
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
+import {activeOrders} from "../AppSharedStates";
 
 export default {
   name: "posOrder2",
@@ -32,7 +33,13 @@ export default {
     //fixme: this code should not be here
     onActivated(async () => {
       if (route.params.id) {
-        order.table = route.params.id
+        //order.table = route.params.id
+        const activeOrder = _.find(activeOrders.value, {table: route.params.id});
+        if (activeOrder) {
+          prepareOrder(activeOrder);
+        } else {
+          prepareOrder(route.params.id);
+        }
       }
     })
 
@@ -40,7 +47,8 @@ export default {
 
     const root = (children) => <div class='order-detail' style={getRootStyle()}>{children}</div>
 
-    const renderRightOverLay = () => <g-overlay modelValue={overlay.value} absolute opacity="0.7" color="rgba(255, 255, 255)"
+    const renderRightOverLay = () => <g-overlay modelValue={overlay.value} absolute opacity="0.7"
+                                                color="rgba(255, 255, 255)"
                                                 style="top: 54px"/>
 
     let {renderItemsTable} = orderRightSideItemsTable();
