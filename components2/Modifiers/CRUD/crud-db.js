@@ -19,6 +19,7 @@ export const CRUdDbFactory = function(obj, path, collection) {
     await cms.getModel(collection).findOneAndUpdate({}, {$pull: pullQuery})
   }
   const update = async function(updObj, newV) {
+    if (!updObj || !updObj._id) return
     const updatedValue = updateData(updObj, newV)
     const setQuery = {}
     setQuery[`${path}.$`] = updatedValue

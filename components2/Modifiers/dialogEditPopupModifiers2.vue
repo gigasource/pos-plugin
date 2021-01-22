@@ -21,7 +21,8 @@ import { genScopeId, internalValueFactory, intervalLog } from '../utils';
 export default {
   setup(props, { emit }) {
     //todo:
-    const internalValue = internalValueFactory({ modelValue: true }, { emit })
+    // const internalValue = internalValueFactory({ modelValue: true }, { emit })
+    const internalValue = internalValueFactory(props, { emit })
     onBeforeMount(async () => {
       await fetchModifiers()
     })

@@ -2,8 +2,8 @@ import { ObjectID } from 'bson';
 import cms from 'cms'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import { CRUdFactory } from './CRUD/crud';
-// import { CRUdDbFactory: CRUdFactory } from './CRUD/crud-db';
+// import { CRUdFactory } from './CRUD/crud';
+import { CRUdDbFactory as CRUdFactory } from './CRUD/crud-db';
 import _ from 'lodash'
 import { intervalLog, isSameId } from '../utils';
 
@@ -27,11 +27,15 @@ export const currentGroupIdx = computed(() => {
 })
 
 export const fetchModifiers = async function() {
-  modifiers.value = await cms.getModel('Modifier').findOne({})
+  modifiers.value = await cms.getModel('Modifiers').findOne({})
+  if (!modifiers.value) {
+    await cms.getModel('Modifiers').create({groups: []})
+    modifiers.value = { groups: []}
+  }
 }
 
 export const onCreateItem = async function(path, type) { // types: [modifier, category, group]
-  const { create } = CRUdFactory(modifiers.value, path, 'Modifier')
+  const { create } = CRUdFactory(modifiers.value, path, 'Modifiers')
   //todo: set selecting item
   if (type === 'modifier') {
     activeItem.value = await create({
@@ -70,12 +74,12 @@ export const isSelecting = function(item) {
 }
 
 export const onRemoveItem = async function(path, item) { // types: [modifier, category, group]
-  const { remove } = CRUdFactory(modifiers.value, path, 'Modifier')
+  const { remove } = CRUdFactory(modifiers.value, path, 'Modifiers')
   await remove(item)
 }
 
 export const onUpdateItem = async function(path, item, newV) {
-  const { update } = CRUdFactory(modifiers.value, path, 'Modifier')
+  const { update } = CRUdFactory(modifiers.value, path, 'Modifiers')
   await update(item, newV)
 }
 
