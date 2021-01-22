@@ -3,6 +3,7 @@
   import { computed, withModifiers, withScopeId, getCurrentInstance } from 'vue';
   import { _computedDatesInMonthCustom } from './computedDateInMonth';
   import { setBackgroundColor, setTextColor, GDatePickerUtil, GPicker } from 'pos-vue-framework';
+  import {genScopeId} from "../utils";
 
   const MINIMUM_WIDTH = 300;
   const DEFAULT_COLOR = 'rgb(98, 0, 237)';
@@ -383,8 +384,7 @@
       }
     },
     render() {
-      const { type } = getCurrentInstance();
-      return withScopeId(type.__scopeId)(this.datePickerRenderFn)()
+      return genScopeId(this.datePickerRenderFn);
     }
   }
 </script>

@@ -1,18 +1,63 @@
 <script>
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
+import dayjs from "dayjs";
+import {computed} from "vue";
+import {$filters} from "../AppSharedStates";
 
 export default {
+  props: ['modelValue'],
   setup() {
-    const { t } = useI18n()
+    const {t} = useI18n()
+
+    const model = ref({})
+    const zNumberReports = ref()
+    const selectedReportDate = ref(null)
+    const timeFormat = ref('')
+    const dateFormat = ref('')
+
+    const selectedDate = computed(() => {
+      if (selectedReportDate.value && selectedReportDate.value.date) {
+        return dayjs(selectedReportDate.value.date).format(dateFormat.value)
+      }
+      return '';
+    })
+
+    const selectedTab = computed({
+      get() {
+        return model.value;
+      },
+      set(value) {
+        model.value = value
+        this.$emit('update:modelValue', value);
+      }
+    })
+
+    watch(selectedReportDate, (newVal, oldVal) => {
+      if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
+        zNumberReports.value = selectedReportDate.value.reports.map(report => ({
+          begin: dayjs(report.begin).format(timeFormat.value),
+          end: dayjs(report.end).format(timeFormat.value),
+          sum: report.sum,
+          z: report.z
+        }))
+
+        this.model = this.zNumberReports[this.zNumberReports.length - 1]
+      } else {
+        this.zNumberReports = []
+        this.model = null
+      }
+    })
+
     return () => <>
       <div>
-        {(zNumberReports.length > 0) &&
-        <g-tabs items={zNumberReports} color="#F2F2F2" text-color="#000000" v-model={selectedTab} showArrows={false} slider-size="0" v-slots={{
-          'default': () => <> {zNumberReports.map((item, i) =>
+        {(zNumberReports.value.length > 0) &&
+        <g-tabs items={zNumberReports.value} color="#F2F2F2" text-color="#000000" v-model={selectedTab.value} showArrows={false}
+                slider-size="0" v-slots={{
+          default: () => <> {zNumberReports.value.map((item, i) =>
               <g-tab-item item={item} key={i}>
                 <div class="eod-info">
                   <span class="eod-info-important"> Date: </span>
-                  <span> {selectedDate} </span>
+                  <span> {selectedDate.value} </span>
                 </div>
                 <div class="eod-info">
                   <span class="eod-info-important">
@@ -36,12 +81,11 @@ export default {
                   <span class="eod-info-important">
                     {t('report.totalSales')}: </span>
                   <span class="eod-info-total-sale">
-                    € {item.sum.toFixed(2)} </span>
+                    € {$filters.formatCurrency(item.sum)} </span>
                 </div>
               </g-tab-item>
-          )} </>
-          ,
-          'tab': ({ item, index }) => <>
+          )} </>,
+          tab: ({item, index}) => <>
             <g-tab item={item} key={index} active-text-color="#000000">
               <p class="eod-tab-title">
                 Z: {item.z} </p>
@@ -49,70 +93,11 @@ export default {
                 {item.begin} - {item.end} </p>
             </g-tab>
           </>
-        }}></g-tabs>
+        }}/>
         }
       </div>
     </>
 
-  }
-}
-</script>
-
-<script>
-import dayjs from 'dayjs'
-
-export default {
-  name: 'PosEndOfDayDetails',
-  injectService: [
-    'ReportsStore:selectedReportDate', 'PosStore:(timeFormat, dateFormat)'
-  ],
-  data() {
-    return {
-      model: {},
-      zNumberReports: [],
-      // inject.ReportsStore
-      selectedReportDate: null,
-      // inject.PosStore
-      timeFormat: '',
-      dateFormat: ''
-    }
-  },
-  computed: {
-    selectedDate() {
-      if (this.selectedReportDate && this.selectedReportDate.date) {
-        return dayjs(this.selectedReportDate.date).format(this.dateFormat)
-      }
-      return '';
-    },
-    selectedTab: {
-      get() {
-        return this.model
-      },
-      set(value) {
-        this.model = value
-        this.$emit('update:modelValue', value);
-      }
-    }
-  },
-  watch: {
-    selectedReportDate: {
-      handler: function (newVal) {
-        if (newVal.reports && newVal.reports.length) {
-          this.zNumberReports = newVal.reports.map(report => ({
-            begin: dayjs(report.begin).format(this.timeFormat),
-            end: dayjs(report.end).format(this.timeFormat),
-            sum: report.sum,
-            z: report.z
-          }))
-
-          this.model = this.zNumberReports[this.zNumberReports.length - 1]
-        } else {
-          this.zNumberReports = []
-          this.model = null
-        }
-      },
-      deep: true
-    }
   }
 }
 </script>
