@@ -454,4 +454,10 @@ export const disablePay = computed(() => {
   }
   return false;
 })
+
+hooks.on('printOrder', () => {
+  cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), _.cloneDeep(order));
+  clearOrder();
+});
+
 //</editor-fold>
