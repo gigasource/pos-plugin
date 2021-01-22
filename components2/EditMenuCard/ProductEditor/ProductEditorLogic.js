@@ -293,19 +293,19 @@ function createNewProductId(id) {
 // switch action
 export const canSwitch = computed(() => selectedProductLayout.value && selectedProductLayout.value._id)
 async function switchProduct() {
-  if (actionCategoryTarget.value._id === selectedCategoryLayout.value._id) {
+  if (actionCategoryTarget._id === selectedCategoryLayout.value._id) {
     console.log('switch product in same category')
     // TODO: Bulk update
     let result = await changeProductLayoutPosInTheSameCate(
         actionTarget,
         _.pick(selectedProductLayout.value, ['top', 'left']),
-        actionCategoryTarget.value)
+        actionCategoryTarget)
 
     if (selectedProductLayout.value._id)
       result = await changeProductLayoutPosInTheSameCate(
           selectedProductLayout.value,
           _.pick(actionTarget, ['top', 'left']),
-          actionCategoryTarget.value)
+          actionCategoryTarget)
 
     updateOrderLayout(result)
   } else {

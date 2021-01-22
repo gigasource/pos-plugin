@@ -30,7 +30,6 @@ describe("order-view test", function () {
     //room -> props
     //todo: dashboard: keep-alive
     await fetchRooms()
-    const a = roomsStates;
     makeWrapper(RestaurantRoom, {
       shallow: true, props: {
         roomId: roomsStates.value[0].room._id.toString()

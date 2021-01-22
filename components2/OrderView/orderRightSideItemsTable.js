@@ -50,7 +50,7 @@ export function orderRightSideItemsTable() {
 
   function showItem(item) {
     if (item.quantity > 0) return true;
-    return itemQuantityChangeCheck(item.quantityModified)
+    return itemQuantityChangeCheck(item)
   }
 
   const tableRef = ref();

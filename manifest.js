@@ -16,7 +16,6 @@ module.exports = {
     // { loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
     //{ loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order', path: '/pos-order/:id?' },
-    { loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order-Mobile', path: '/pos-order-mobile/:id?' },
     { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
@@ -47,12 +46,6 @@ module.exports = {
         type: 'vue-singleton'
       },
       path: 'components/Store/PosStore.vue',
-    },
-    {
-      loader: {
-        type: 'vue-singleton'
-      },
-      path: 'components/Store/OrderStore.vue',
     },
     {
       loader: {
@@ -189,6 +182,12 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/rn-bridge/app-rn-bridge.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/commit/index.js'
     },
     // {
     //   loader: {

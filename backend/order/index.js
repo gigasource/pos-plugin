@@ -9,14 +9,22 @@ module.exports = (cms) => {
   const {orm} = cms
   const feSocketLock = new AwaitLock()
 
+  // Register manually orderSchema instead of using buildform
+  const schema = require('./orderSchema.json')
+  orm.registerSchema('Order', schema)
+  cms.Types['Order'] = {
+    schema,
+    name: 'Order',
+    Model: orm('Order'),
+    info: {}
+  }
+
   orm.on('commit:handler:finish:Order', async function (result, commit) {
     if (!feSocketLock.tryAcquire()) return
     setTimeout(async () => {
       feSocketLock.release()
-      const order = await orm('Order').findOne({
-        table: commit.data.table,
-        status: 'inProgress'
-      })
+      const condition = commit.data && commit.data.table ? { table: commit.data.table, status: 'inProgress' } : { _id: result._id, status: 'inProgress' }
+      const order = await orm('Order').findOne(condition)
       if (feSocket && order)
         feSocket.emit('update-table', order)
     }, 500)

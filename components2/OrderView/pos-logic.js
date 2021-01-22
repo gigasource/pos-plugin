@@ -443,7 +443,7 @@ export function addMultiPayment(order, payment) {
   addPayment(order, payment);
 }
 
-hooks.on('createOrder', order => {
+/*hooks.on('createOrder', order => {
   watchEffect(() => {
     const cardPayment = _.find(order.payment, p => p.type === 'card')
     const cashPayment = _.find(order.payment, p => p.type === 'cash')
@@ -462,7 +462,7 @@ hooks.on('createOrder', order => {
     order.tip = tip
     order.cashback = change
   })
-})
+})*/
 
 //todo: update payment
 
