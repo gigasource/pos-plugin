@@ -1,0 +1,303 @@
+[
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "create",
+        "args": [
+          {
+            "items": [],
+            "cancellationItems": [],
+            "payment": [],
+            "user": [],
+            "table": "10",
+            "_id": "5fee660055ffda39f723e225",
+            "takeAway": false,
+            "status": "inProgress",
+            "vSum": 0,
+            "vDate": "2020-12-31T17:00:00.000Z",
+            "vTaxSum": {}
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "createOrder",
+          {
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$push": {
+              "items": {
+                "groupPrinter": "",
+                "id": "3",
+                "name": "Water",
+                "price": 67,
+                "product": "5e784d7786e3ec0997b5e341",
+                "taxes": [
+                  7,
+                  null
+                ],
+                "course": 1,
+                "quantity": 1,
+                "_id": "5fee660055ffda39f723e226",
+                "sent": true,
+                "printed": true,
+                "vSum": 67,
+                "vTakeAway": false,
+                "tax": 7,
+                "vTaxSum": {
+                  "7": {
+                    "tax": 4.38,
+                    "net": 62.62,
+                    "gross": 67
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$set": {
+              "vSum": 67,
+              "vTaxSum": {
+                "7": {
+                  "tax": 4.38,
+                  "net": 62.62,
+                  "gross": 67
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$push": {
+              "items": {
+                "groupPrinter": "",
+                "id": 1,
+                "name": "Cola",
+                "price": 98,
+                "taxes": [
+                  19,
+                  null
+                ],
+                "course": 1,
+                "quantity": 1,
+                "_id": "5fee660055ffda39f723e228",
+                "vSum": 98,
+                "vTakeAway": false,
+                "tax": 19,
+                "vTaxSum": {
+                  "19": {
+                    "tax": 15.65,
+                    "net": 82.35,
+                    "gross": 98
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$set": {
+              "vSum": 165,
+              "vTaxSum": {
+                "7": {
+                  "tax": 4.38,
+                  "net": 62.62,
+                  "gross": 67
+                },
+                "19": {
+                  "tax": 15.65,
+                  "net": 82.35,
+                  "gross": 98
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$push": {
+              "items": {
+                "groupPrinter": "",
+                "id": "4",
+                "name": "Soda",
+                "price": 20,
+                "product": "5e784d7786e3ec0997b5e343",
+                "taxes": [
+                  19,
+                  7
+                ],
+                "course": 1,
+                "quantity": 1,
+                "_id": "5fee660055ffda39f723e229",
+                "vSum": 20,
+                "vTakeAway": false,
+                "tax": 19,
+                "vTaxSum": {
+                  "19": {
+                    "tax": 3.19,
+                    "net": 16.81,
+                    "gross": 20
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "modelName": "Order",
+    "action": [
+      {
+        "fn": "findOneAndUpdate",
+        "args": [
+          {
+            "_id": "5fee660055ffda39f723e225"
+          },
+          {
+            "$set": {
+              "vSum": 185,
+              "vTaxSum": {
+                "7": {
+                  "tax": 4.38,
+                  "net": 62.62,
+                  "gross": 67
+                },
+                "19": {
+                  "tax": 18.84,
+                  "net": 99.16,
+                  "gross": 118
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "fn": "commit",
+        "args": [
+          "updateActiveOrder",
+          {
+            "orderId": "5fee660055ffda39f723e225",
+            "table": "10"
+          }
+        ]
+      }
+    ]
+  }
+]
