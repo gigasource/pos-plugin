@@ -24,9 +24,7 @@ export function orderRightSideHeader(props, {emit}) {
   }
 
   hooks.on('printOrder', () => {
-    cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), _.cloneDeep(order));
     menu.value = false;
-    clearOrder();
     router.push({path: '/pos-dashboard'})
   });
   const printOrder = () => hooks.emit('printOrder');
