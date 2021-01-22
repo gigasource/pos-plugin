@@ -150,12 +150,12 @@ module.exports = async function (cms) {
 	 * If this is dev env, use config to
 	 * define which device is master
 	 */
-	if (argv.mode === 'dev') {
-		if (global.APP_CONFIG.setMaster) {
-			await cms.emit('connectToMaster', localIp())
-		} else if (global.APP_CONFIG.masterIp) {
-			await cms.emit('connectToMaster', global.APP_CONFIG.masterIp)
-		}
+	if (global.APP_CONFIG.forceSetMaster) {
+		console.log('Force set this node as master')
+		await cms.emit('connectToMaster', localIp())
+	} else if (global.APP_CONFIG.masterIp) {
+		console.log(`Connecting to predefined master ip:`, global.APP_CONFIG.masterIp)
+		await cms.emit('connectToMaster', global.APP_CONFIG.masterIp)
 	} else {
 		await cms.emit('connectToMaster')
 	}
