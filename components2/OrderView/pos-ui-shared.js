@@ -12,9 +12,66 @@ import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
 import cms from 'cms';
+
 export const orderLayout = ref({ categories: [] });
-export const selectedCategoryLayout = ref();
-export const selectedProductLayout = ref();
+// export const orderLayout = computed(() => {
+//   if (editable.value) {
+//     // TODO:
+//     return _orderLayout.value;
+//   } else {
+//     return _orderLayout.value;
+//   }
+// });
+export const updateOrderLayout = newLayout  => orderLayout.value = newLayout
+
+//
+const _selectedLayoutCache = {
+  categoryLayout: null,
+  productLayout: null
+}
+
+//
+export const selectedCategoryLayoutPosition = ref({ top: 0, left: 0 })
+export const selectedCategoryLayout = computed({
+  get: () => {
+    const layout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayoutPosition.value, c))
+    _selectedLayoutCache.categoryLayout = layout
+    return layout
+  },
+  set: () => {
+    console.error('trying to update immutable selectedCategoryLayout')
+  }
+})
+export const selectCategoryLayout = position => {
+  selectedCategoryLayoutPosition.value = validatePosition(position)
+}
+export const updateSelectedCategoryLayout = change => {
+  Object.assign(_selectedLayoutCache.categoryLayout, change)
+}
+
+//
+export const selectedProductLayoutPosition = ref({ top: 0, left: 0 })
+export const selectedProductLayout = computed({
+  get: () => {
+    if (selectedCategoryLayout.value) {
+      const prodLayout = _.find(selectedCategoryLayout.value.products, p => isSameArea(selectedProductLayoutPosition.value, p))
+      _selectedLayoutCache.productLayout = prodLayout
+      return prodLayout
+    } else {
+      _selectedLayoutCache.productLayout = null
+    }
+  },
+  set: (val) => {
+    console.error('trying to set immutable selectedProductLayout')
+  }
+});
+export const selectProductLayout = (position) => {
+  selectedProductLayoutPosition.value = validatePosition(position)
+}
+export const updateSelectedProductLayout = change => {
+  Object.assign(_selectedLayoutCache.productLayout, change)
+}
+
 export const selectedProduct = computed({
   get: () => {
     // if no product layout selected, then return null
@@ -28,9 +85,23 @@ export const selectedProduct = computed({
     return selectedProductLayout.value.product
   },
   set: (value) => {
-    selectedProductLayout.value.product = value
+    console.error('trying to set immutable selectedProduct')
   }
 })
+export const updateProduct = (change) => {
+  if (_selectedLayoutCache.productLayout) {
+    Object.assign(productLayout.product, change)
+  }
+}
+
+const validatePosition = (position) => {
+  const { top, left } = position
+
+  if (top == null || left == null)
+    throw 'Invalid position'
+
+  return { top, left }
+}
 export const selectedProductExisted = computed(() => {
   return !!(selectedProduct.value && selectedProduct.value._id)
 })
@@ -64,34 +135,24 @@ export function updateProductEditMode(newMode) {
 export const editable = ref(false);
 export const productDblClicked = ref(false);
 
-export function updateOrderLayout(newLayout) {
-  orderLayout.value = newLayout
-}
-export function updateSelectedCategoryLayout(newCategoryLayout) {
-  selectedCategoryLayout.value = newCategoryLayout
-}
-export function updateSelectedProductLayout(newProductLayout) {
-  selectedProductLayout.value = newProductLayout
-}
-
 watchEffect(() => {
   if (!orderLayout.value)
     return
 
   if (selectedCategoryLayout.value) {
     // update category layout to force re-render after product action executed
-    const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
-    if (cateLayout)
-      updateSelectedCategoryLayout(cateLayout)
+    // const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
+    // if (cateLayout)
+    //   updateSelectedCategoryLayout(cateLayout)
   } else {
     // automatically select first category
     if (orderLayout.value.categories.length > 0) {
       // find tab-product at 0-0
       const topLeftCategory = _.find(orderLayout.value.categories, c => c.top === 0 && c.left === 0)
       if (topLeftCategory)
-        updateSelectedCategoryLayout(topLeftCategory)
+        selectCategoryLayout(topLeftCategory)
       else
-        updateSelectedCategoryLayout(_.first(orderLayout.value.categories))
+        selectCategoryLayout(_.first(orderLayout.value.categories))
 
       if (editable.value && (!view.value || view.value.name !== 'CategoryEditor'))
         updateView('CategoryEditor')
@@ -117,15 +178,15 @@ export const products = computed(() => {
 //fixme: only for dev
 
 //prepareOrder();
-const order = getCurrentOrder();
-const once = _.once(() => {
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[1].product);
-  addProduct(order, products.value[1].product);
-
-  orderViewDialog.move = true;
-})
+// const order = getCurrentOrder();
+// const once = _.once(() => {
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[1].product);
+//   addProduct(order, products.value[1].product);
+//
+//   orderViewDialog.move = true;
+// })
 /*watchEffect(() => {
   if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();

@@ -6,8 +6,8 @@ import {
   getGridTemplateFromNumber,
   orderLayout,
   selectedCategoryLayout,
-  updateSelectedCategoryLayout,
-  updateSelectedProductLayout,
+  selectCategoryLayout,
+  selectProductLayout,
   updateView
 } from './pos-ui-shared';
 import {category} from "./order-layout-setting-logic";
@@ -91,12 +91,12 @@ export function orderLayoutCategoriesFactory() {
 
   async function selectCategory(categoryLayout) {
     if (editable.value) {
-      updateSelectedCategoryLayout(categoryLayout)
+      selectCategoryLayout(categoryLayout)
       updateView('CategoryEditor')
     } else {
-      updateSelectedCategoryLayout(categoryLayout)
+      selectCategoryLayout(categoryLayout)
     }
-    updateSelectedProductLayout(null)
+    selectProductLayout({ top: -1, left: -1})
   }
 
   function getCategoryName(item) {
