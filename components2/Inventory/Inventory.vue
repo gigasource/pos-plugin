@@ -1,6 +1,250 @@
 <script>
+import { ref, onActivated, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import _ from 'lodash'
+import dayjs from 'dayjs'
+import { $filters } from '../AppSharedStates';
+import { useI18n } from 'vue-i18n'
+import PosRangeSlider from '../../components/pos-shared-components/POSInput/PosRangeSlider';
+import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew';
+import dialogFormInput from '../../components/pos-shared-components/dialogFormInput';
+import dialogChangeStock from './dialogChangeStock'
+import dialogInventoryCategory from './dialogInventoryCategory';
+import {
+  updateInventoryHistory,
+  loadInventories,
+  loadInventoryCategories,
+  updateInventory,
+  deleteInventory
+} from './inventory-shared'
+
 export default {
+  name: 'Inventory',
+  components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
   setup() {
+    const { t } = useI18n()
+    const dialog = ref({
+      filter: false,
+      inventory: false,
+      mode: 'add',
+      stock: false,
+      category: false
+    })
+    const name = ref('')
+    const stock = ref('')
+    const category = ref('')
+    const unit = ref('')
+    const units = ref([
+      'piece',
+      'g',
+      'kg',
+      'ml',
+      'l'
+    ])
+    const filter = ref({
+      name: '',
+      id: '',
+      category: '',
+      stock: [0, 0]
+    })
+    const inventories = ref([])
+    const inventoryFilters = ref([])
+    const inventoryCategories = ref([])
+    const selectedInventory = ref(null)
+    const selectedInventoryIDs = ref([])
+    const inventoryPagination = ref({ limit: 15, currentPage: 1 })
+    const totalInventories = ref(null)
+
+    onActivated(async () => {
+      await loadInventories()
+      await loadInventoryCategories()
+    })
+
+    const limit = computed({
+      get: () => {
+        if (inventoryPagination.value)
+          return inventoryPagination.value.limit;
+        return 15
+      },
+      set: (val) => {
+        inventoryPagination.value.limit = val
+      }
+    })
+
+    const currentPage = computed({
+      get: () => {
+        if (inventoryPagination.value)
+          return inventoryPagination.value.currentPage
+        return 1
+      },
+      set: () => {
+        inventoryPagination.value.currentPage = val
+      }
+    })
+
+    const listIDs = computed(() => {
+      return inventories.value.map(i => i._id)
+    })
+
+    const router = useRouter()
+
+    const back = function () {
+      router.go(-1)
+    }
+    const goToReportPage = function () {
+      router.push({ path: '/pos-inventory-report' })
+    }
+    const goToStockPage = function () {
+      router.push({ path: '/pos-inventory-stock' })
+    }
+    const getFirstSelectedInventory = function () {
+      if (selectedInventoryIDs.value.length > 0) {
+        selectedInventory.value = inventories.value.find(p => p._id === selectedInventoryIDs.value[0])
+      } else {
+        selectedInventory.value = null;
+      }
+    }
+    const clearData = function () {
+      name.value = ''
+      stock.value = ''
+      category.value = ''
+      unit.value = 'piece'
+    }
+    const openDialogInventory = function(mode) {
+      dialog.value.mode = mode
+      if (mode === 'edit') {
+        name.value = _.cloneDeep(selectedInventory.value.name)
+        stock.value = (_.cloneDeep(selectedInventory.value.stock)).toFixed(2)
+        category.value = _.cloneDeep(selectedInventory.value.category._id)
+        unit.value = _.cloneDeep(selectedInventory.value.unit)
+      } else {
+        this.clearData()
+      }
+      dialog.value.inventory = true
+    }
+    const loadData = async function () {
+      selectedInventory.value = null
+      selectedInventoryIDs.value = []
+      inventoryFilters.value = []
+      await loadInventories()
+    }
+    const submitInventory = async function () {
+      if(!name.value || !category.value || !unit.value || !stock.value || isNaN(stock.value)) return
+      const inventory = {
+        name: name.value,
+        category: category.value,
+        unit: unit.value,
+        stock: stock.value
+      }
+      if(dialog.value.mode === 'add') {
+        await createInventory(inventory)
+      } else {
+        await updateInventory({...inventory, _id: selectedInventory.value._id})
+        if(stock.value !== selectedInventory.value.stock) {
+          const history = {
+            inventory: selectedInventory.value._id,
+            category: category.value,
+            type: stock.value > selectedInventory.value.stock ? 'add' : 'remove',
+            amount: Math.abs(stock.value - selectedInventory.value.stock),
+            date: new Date(),
+            reason: 'Update stock'
+          }
+          await updateInventoryHistory(history)
+        }
+      }
+      await loadData()
+      dialog.value.inventory = false
+    }
+    const removeInventory = async function () {
+      await deleteInventory(this.selectedInventoryIDs)
+      await loadData()
+    }
+    const openDialogStock = function (inventory) {
+      selectedInventory.value = inventory
+      dialog.value.stock = true
+    }
+    const updateStock = async function ({type, change, value, reason}) {
+      await updateInventory({
+        ...selectedInventory.value,
+        category: selectedInventory.value.category._id,
+        stock: value
+      })
+      const history = {
+        inventory: selectedInventory.value._id,
+        category: selectedInventory.value.category._id,
+        type,
+        amount: change,
+        date: new Date(),
+        reason: reason || 'Update stock'
+      }
+      await updateInventoryHistory(history)
+      await loadData()
+    }
+    const changeFilter = async function() {
+      let filters = []
+      if(filter.value.name) {
+        filters.push({
+          title: 'Name',
+          text: `'${filter.value.name}'`,
+          condition: {name: {"$regex": filter.value.name, "$options": 'i'}}
+        })
+      }
+      if(filter.value.category) {
+        filters.push({
+          title: 'Category',
+          text: filter.value.category.name,
+          condition: {category: filter.value.category._id}
+        })
+      }
+      if(filter.value.id) {
+        filters.push({
+          title: 'ID',
+          text: `'${filter.value.id}'`,
+          condition: {id: filter.value.id}
+        })
+      }
+      if(filter.value.stock && filter.value.stock[1]) {
+        filters.push({
+          title: 'Stock',
+          text: filter.value.stock[0] ? (filter.value.stock[0] + ' - ') : '≤ ' + filter.value.stock[1],
+          condition: {stock: { ...filter.value.stock[0] && {'$gte': filter.value.stock[0]}, '$lte': filter.value.stock[1] }}
+        })
+      }
+      inventoryFilters.value = filters
+      await loadInventories(inventoryFilters.value)
+      dialog.value.filter = false
+    }
+    const editInventory = function (inventory) {
+      selectedInventory.value = inventory
+      openDialogInventory('edit')
+    }
+    const formatDate = function (date) {
+      if (!date || !dayjs(date).isValid()) return ''
+      return dayjs(date).format('DD/MM/YYYY HH:mm')
+    }
+    const removeFilter = async function (filter) {
+      const index = inventoryFilters.value.findIndex(f => f.title === filter.title);
+      inventoryFilters.value.splice(index, 1);
+      if(filter.title.toLowerCase() === 'stock') {
+        filter.value.stock = [0, 0]
+      } else {
+        filter.value[filter.title.toLowerCase()] = ''
+      }
+      inventoryPagination.value.currentPage = 1;
+      await loadInventories(inventoryFilters.value);
+    }
+    const clearFilter = async function () {
+      inventoryFilters.value = [];
+      inventoryPagination.value.currentPage = 1;
+      filter.value = {
+        name: '',
+        id: '',
+        category: '',
+        stock: [0, 0],
+      }
+      await loadInventories();
+    }
+
     return () => <>
       <div style="height: 100%; display: flex; flex-direction: column">
         <g-simple-table striped fixed-header style="flex: 1">
@@ -31,7 +275,7 @@ export default {
           <tr>
             <td class="bg-grey-lighten-1">
               {
-                (inventories && inventories.length !== 0) ?
+                (inventories.value && inventories.value.length !== 0) ?
                     <g-checkbox v-model={selectedInventoryIDs} value={listIDs} multiple v-slots={{
                       'label': () => <>
                         <g-icon size="16" class="mb-1">
@@ -47,7 +291,7 @@ export default {
               <div class="filter">
                 {t('settings.filter')}
                 <div class="group-chip">
-                  {inventoryFilters.map((filter, i) =>
+                  {inventoryFilters.value.map((filter, i) =>
                       <g-chip key={filter.title} label small background-color="white" close class="ma-1" onClose={() => removeFilter(filter)}>
                         <div>
                           <span class="chip-title"> {filter.title}: </span>
@@ -56,7 +300,7 @@ export default {
                       </g-chip>
                   )} </div>
                 {
-                  (inventoryFilters && inventoryFilters.length > 0) &&
+                  (inventoryFilters.value && inventoryFilters.value.length > 0) &&
                   <g-btn-bs onClick={clearFilter}>
                     <u>
                       {t('settings.clearAll')} </u>
@@ -64,15 +308,15 @@ export default {
                 }
                 <g-spacer>
                 </g-spacer>
-                <div class="btn-add-filter" onClick={() => dialog.filter = true}>
+                <div class="btn-add-filter" onClick={() => dialog.value.filter = true}>
                   + {t('inventory.addFilter')} </div>
               </div>
             </td>
           </tr>
-          {inventories.map((inventory, i) =>
+          {inventories.value.map((inventory, i) =>
               <tr key={i}>
                 <td>
-                  <g-checkbox v-model={selectedInventoryIDs} value={inventory._id} onChange={getFirstSelectedInventory}>
+                  <g-checkbox v-model={selectedInventoryIDs.value} value={inventory._id} onChange={getFirstSelectedInventory}>
                   </g-checkbox>
                 </td>
                 <td onClick={() => editInventory(inventory)}>
@@ -121,21 +365,21 @@ export default {
 
               {t('inventory.newStock')}
             </g-btn>
-            <g-btn uppercase={false} style="margin-right: 5px" onClick={() => dialog.category = true}>
+            <g-btn uppercase={false} style="margin-right: 5px" onClick={() => dialog.value.category = true}>
               <g-icon small style="margin-right: 5px">
                 icon-inventory-category
               </g-icon>
 
               {t('article.category')}
             </g-btn>
-            <g-btn disabled={selectedInventoryIDs.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
+            <g-btn disabled={selectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
               <g-icon small style="margin-right: 5px">
                 icon-inventory-delete
               </g-icon>
 
               {t('ui.delete')}
             </g-btn>
-            <g-btn disabled={selectedInventoryIDs.length === 0} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
+            <g-btn disabled={selectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
               <g-icon small style="margin-right: 5px">
                 icon-inventory-edit
               </g-icon>
@@ -148,38 +392,38 @@ export default {
             </g-btn>
           </g-toolbar>
         </div>
-        <dialog-form-input v-model={dialog.inventory} onSubmit={submitInventory} v-slots={{
+        <dialog-form-input v-model={dialog.value.inventory} onSubmit={submitInventory} v-slots={{
           'input': () => <>
-            <div class="row-flex flex-wrap justify-around" key={dialog.inventory}>
+            <div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
               <pos-textfield-new style="width: 48%" label="Name" v-model={name} required>
               </pos-textfield-new>
-              <pos-textfield-new disabled={dialog.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" label={$t('inventory.stock')} v-model={stock} required>
+              <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" label={$t('inventory.stock')} v-model={stock.value} required>
               </pos-textfield-new>
-              <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={$t('article.category')} items={inventoryCategories} item-text="name" item-value="_id" v-model={category} required>
+              <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={$t('article.category')} items={inventoryCategories.value} item-text="name" item-value="_id" v-model={category.value} required>
               </g-select>
-              <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={$t('inventory.unit')} items={units} v-model={unit} required>
+              <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={$t('inventory.unit')} items={units.value} v-model={unit.value} required>
               </g-select>
             </div>
           </>
           ,
         }}></dialog-form-input>
-        <dialog-change-stock v-model={dialog.stock} name={selectedInventory && selectedInventory.name} stock={selectedInventory && selectedInventory.stock} onSubmit={updateStock}>
+        <dialog-change-stock v-model={dialog.value.stock} name={selectedInventory.value && selectedInventory.value.name} stock={selectedInventory.value && selectedInventory.value.stock} onSubmit={updateStock}>
         </dialog-change-stock>
-        <dialog-inventory-category v-model={dialog.category} onSubmit={loadData}>
+        <dialog-inventory-category v-model={dialog.value.category} onSubmit={loadData}>
         </dialog-inventory-category>
-        <dialog-form-input v-model={dialog.filter} onSubmit={changeFilter} v-slots={{
+        <dialog-form-input v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
           'input': () => <>
             <div class="row-flex flex-wrap justify-around mt-2">
-              <pos-textfield-new style="width: 30%" label="Product ID" v-model={filter.id} clearable>
+              <pos-textfield-new style="width: 30%" label="Product ID" v-model={filter.value.id} clearable>
               </pos-textfield-new>
-              <pos-textfield-new style="width: 30%" label="Name" v-model={filter.name} clearable>
+              <pos-textfield-new style="width: 30%" label="Name" v-model={filter.value.name} clearable>
               </pos-textfield-new>
-              <g-select menu-class="menu-select-inventory" text-field-component="PosTextfieldNew" outlined style="width: 30%" label={$t('article.category')} clearable items={inventoryCategories} item-text="name" return-object v-model={filter.category}>
+              <g-select menu-class="menu-select-inventory" text-field-component="PosTextfieldNew" outlined style="width: 30%" label={$t('article.category')} clearable items={inventoryCategories.value} item-text="name" return-object v-model={filter.category}>
               </g-select>
               <div class="col-12 row-flex">
                 <p style="margin-top: 35px; margin-left: 16px">
                   Stock Range: </p>
-                <pos-range-slider min={0} max={1000} prefix v-model={filter.stock}>
+                <pos-range-slider min={0} max={1000} prefix v-model={filter.value.stock}>
                 </pos-range-slider>
               </div>
             </div>

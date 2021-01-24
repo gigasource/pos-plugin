@@ -176,7 +176,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/order/inventory.js'
+      path: 'backend/inventory/inventory.js'
     },
     {
       loader: {

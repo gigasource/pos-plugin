@@ -1,14 +1,69 @@
 <script>
+import { ref, onCreated, computed, withModifiers } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { $filters } from '../AppSharedStates';
+import _ from 'lodash'
+
 export default {
+  name: "dialogInventoryCategory",
+  props: {
+    modelValue: Boolean
+  },
   setup() {
+    const { t } = useI18n()
+    const showKeyboard = ref(false)
+    const categories = ref([])
+
+    const internalValue = computed({
+      get: () => {
+        return this.modelValue
+      },
+      set: (value) => {
+        showKeyboard.value = false
+        this.$emit('update:modelValue', val)
+      }
+    })
+    const rules = computed(() => {
+      let rules = []
+      const categories = categories.value.map(cate => cate.name)
+      rules.push(val => categories.value.filter(cate => cate === val).length <=1 || '')
+      return rules
+    })
+
+    watch(() => internalValue.value, async (val) => {
+      if (val) {
+        categories.value = await loadCategoriesWithItem()
+      }
+    })
+
+    const addCategory = function () {
+      categories.value.unshift({
+        name: '',
+        available: true
+      })
+    }
+    const removeCategory = async function (category, index) {
+      if (!category.available) return
+      if(category._id) await deleteInventoryCategory(category._id)
+      categories.value.splice(index, 1)
+    }
+    const complete = async function () {
+      if(_.some(_.countBy(categories.value, 'name'), cate => cate > 1)) {
+        return
+      }
+      await updateInventoryCategory(categories.value)
+      await loadInventoryCategories()
+      internalValue.value = false
+    }
+
     return () => <>
-      <g-dialog fullscreen v-model={internalValue} content-class="dialog-inventory-category">
+      <g-dialog fullscreen v-model={internalValue.value} content-class="dialog-inventory-category">
         <div class="dialog">
-          <div class={showKeyboard ? 'dialog-left' : 'dialog-center'}>
+          <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
             <div class="category">
-              {categories.map((category, i) =>
+              {categories.value.map((category, i) =>
                   <div class="category-item" key={i}>
-                    <g-text-field-bs rules={rules} onClick={() => showKeyboard = true} virtual-event v-model={category.name}></g-text-field-bs>
+                    <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
                     <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>
                       <g-icon>
                         icon-delete2
@@ -26,12 +81,12 @@ export default {
             </div>
           </div>
           {
-            (showKeyboard) &&
+            (showKeyboard.value) &&
             <div class="dialog-keyboard">
               <pos-keyboard-full type="alpha-number"></pos-keyboard-full>
             </div>
           }
-          <div class="dialog-overlay" onClick={() => internalValue = false}></div>
+          <div class="dialog-overlay" onClick={() => internalValue.value = false}></div>
         </div>
       </g-dialog>
     </>

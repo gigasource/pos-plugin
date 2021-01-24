@@ -1,14 +1,105 @@
 <script>
+import { ref, onActivated } from 'vue'
+import { useRouter } from 'vue-router'
+import dateRangePicker from '../../components/OnlineOrder/dateRangePicker';
+import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
+import _ from 'lodash';
+import dayjs from 'dayjs'
+import { $filters } from '../AppSharedStates';
+import { useI18n } from 'vue-i18n'
+
 export default {
+  name: "InventoryReport",
+  components: {dateRangePicker, dialogTextFilter},
   setup() {
+    const { t } = useI18n()
+    const categories = ref([])
+    const selectedCategory = ref(null)
+    const searchText = ref('')
+    const dateFilter = ref({
+      fromDate: '',
+      toDate: ''
+    })
+    const dialog = ref({
+      text: false,
+      detail: false
+    })
+    const menu = ref(false)
+    const type = ref('all')
+    const display = ref('list')
+    const inventories = ref([])
+    const selectedItem = ref({
+      name: '',
+      unit: '',
+      history: []
+    })
+    const inventoryCategories = ref([])
+
+    onActivated(async () => {
+      dateFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
+      dateFilter.value.toDate = dayjs().format('YYYY-MM-DD')
+      selectedCategory.value = 'all'
+      await loadInventoryCategories()
+      await loadData()
+    })
+
+    const sortedInventories = computed(() => {
+      let sorted = _.cloneDeep(inventories.value)
+      if (searchText.value) {
+        sorted = _.filter(sorted, item => item.name && item.name.toLowerCase().includes(searchText.value.toLowerCase()))
+      }
+      if (this.type === 'add') {
+        sorted = _.map(sorted, item => _.omit(item, 'remove'))
+      } else if (this.type === 'remove') {
+        sorted = _.map(sorted, item => _.omit(item, 'add'))
+      }
+      return sorted
+    })
+
+    const router = useRouter()
+    const back = function () {
+      router.go(-1)
+    }
+    const loadData = async function () {
+      let filter = { date: this.dateFilter }
+      if (selectedCategory.value) {
+        filter.category = typeof selectedCategory.value === 'object' ? selectedCategory.value._id : null
+      }
+      inventories.value = await loadInventoriesWithChange(filter)
+    }
+    const selectCategory = async function (category) {
+      if(selectedCategory.value === category) {
+        selectedCategory.value = null
+      } else {
+        selectedCategory.value = category
+      }
+      await this.loadData()
+    }
+    const changeFilter = async function (range) {
+      dateFilter.value = range
+      await loadData()
+    }
+    const selectItem = async function (item) {
+      const history = await loadInventoryHistory(item._id, this.dateFilter)
+      selectedItem.value = {
+        ...item,
+        history
+      }
+      dialog.value.detail = true
+    }
+    const formatDate = function (value) {
+      if (!value || !dayjs(value).isValid()) return ''
+      return dayjs(value).format('DD/MM/YYYY HH:mm')
+    }
+
     return () => <>
       <div class="inventory-report" >
         <div class="inventory-report__left" >
           <div class="category" >
-            <div class={ ['category-item', selectedCategory === 'all' && 'category-item--selected'] } onClick={() => selectCategory('all')} >
+            <div class={ ['category-item', selectedCategory.value === 'all' && 'category-item--selected'] } onClick={() => selectCategory('all')} >
               ALL
             </div>
-            {inventoryCategories.map(category  =>
+            {inventoryCategories.value.map(category  =>
                 <div key={ category._id } onClick={() => selectCategory(category)} class={ ['category-item', selectedCategory === category && 'category-item--selected'] } >
                   {category.name}
                 </div>
@@ -18,22 +109,22 @@ export default {
         </div>
         <div class="inventory-report__main" >
           <div class="inventory-report__main-header" >
-            <g-text-field-bs v-model={searchText} clearable  v-slots={{ 'append-inner': () => <>
-                <g-icon onClick={() => dialog.text = true} >
+            <g-text-field-bs v-model={searchText.value} clearable  v-slots={{ 'append-inner': () => <>
+                <g-icon onClick={() => dialog.value.text = true} >
                   icon-keyboard </g-icon>
               </>
             }}> </g-text-field-bs>
-            <g-menu v-model={menu} nudge-bottom="4"  v-slots={{ 'default': () => <> <div class="type-menu" >
-                <div class="type-menu-item" onClick={() => type = 'all'} >
+            <g-menu v-model={menu.value} nudge-bottom="4"  v-slots={{ 'default': () => <> <div class="type-menu" >
+                <div class="type-menu-item" onClick={() => type.value = 'all'} >
                   <g-icon class="mr-2" > icon-inventory-report-all </g-icon>
                   {t('inventory.all')}
                 </div>
-                <div class="type-menu-item" onClick={() => type = 'add'} >
+                <div class="type-menu-item" onClick={() => type.value = 'add'} >
                   <g-icon size="16" class="ml-1 mr-2" >
                     icon-inventory-report-add </g-icon>
                   {t('inventory.add')}
                 </div>
-                <div class="type-menu-item" onClick={() => type = 'remove'} >
+                <div class="type-menu-item" onClick={() => type.value = 'remove'} >
                   <g-icon size="16" class="ml-1 mr-2" >
                     icon-inventory-report-remove </g-icon>
                   {t('inventory.useRemove')}
@@ -43,32 +134,32 @@ export default {
               'activator': ({on}) => <>
                 <div v-on="on" class="type" >
                   <g-icon size={ type === 'all' ? 24 : 16 } class="mr-1" >
-                    {`icon-inventory-report-${type}`} </g-icon>
+                    {`icon-inventory-report-${type.value}`} </g-icon>
 
-                  {type === 'remove' ? t('inventory.useRemove') : t(`inventory.${type}`)}
+                  {type === 'remove' ? t('inventory.useRemove') : t(`inventory.${type.value}`)}
                 </div>
               </>
             }}> </g-menu>
             <div class="display-btn" >
-              <div style="border-radius: 2px 0 0 2px; border-right: 1px solid #E3F2FD" class={ ['display-btn-item', display === 'list' && 'display-btn--selected'] } onClick={() => display = 'list'} >
+              <div style="border-radius: 2px 0 0 2px; border-right: 1px solid #E3F2FD" class={ ['display-btn-item', display.value === 'list' && 'display-btn--selected'] } onClick={() => display.value = 'list'} >
                 <g-icon size="20" >
                   icon-inventory-report-list </g-icon>
               </div>
-              <div style="border-radius: 0 2px 2px 0" class={ ['display-btn-item', display === 'grid' && 'display-btn--selected'] } onClick={() => display = 'grid'} >
+              <div style="border-radius: 0 2px 2px 0" class={ ['display-btn-item', display.value === 'grid' && 'display-btn--selected'] } onClick={() => display.value = 'grid'} >
                 <g-icon size="20" >
                   icon-inventory-report-grid </g-icon>
               </div>
             </div>
             <g-spacer>
             </g-spacer>
-            <date-range-picker from={ dateFilter.fromDate } to={ dateFilter.toDate } onSave={changeFilter} >
+            <date-range-picker from={ dateFilter.value.fromDate } to={ dateFilter.value.toDate } onSave={changeFilter} >
             </date-range-picker>
           </div>
-          <div class={ ['inventory-report__main-content', display === 'grid' && 'inventory-report__main-content--grid'] } >
+          <div class={ ['inventory-report__main-content', display.value === 'grid' && 'inventory-report__main-content--grid'] } >
             {
-              (display === 'list') &&
+              (display.value === 'list') &&
               <>
-                {sortedInventories.map((inventory, i)  =>
+                {sortedInventories.value.map((inventory, i)  =>
                     <div class="inventory-report-list-item" key={ `list_${i}` } onClick={() => selectItem(inventory)} >
                       <div class="inventory-report-list-item__name" >
                         {inventory.name} </div>
@@ -96,9 +187,9 @@ export default {
                 )} </>
             }
             {
-              (display === 'grid') &&
+              (display.value === 'grid') &&
               <>
-                {sortedInventories.map((inventory, i)  =>
+                {sortedInventories.value.map((inventory, i)  =>
                     <div class="inventory-report-grid-item" key={ `grid_${i}` } onClick={() => selectItem(inventory)} >
                       <div class="inventory-report-grid-item__name" >
                         {inventory.name} </div>
@@ -128,18 +219,18 @@ export default {
             }
           </div>
         </div>
-        <dialog-text-filter v-model={dialog.text} label="Search Item" onSubmit={val => {searchText = val}} >
+        <dialog-text-filter v-model={dialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}} >
         </dialog-text-filter>
         {
-          (selectedItem) &&
-          <g-dialog v-model={dialog.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
+          (selectedItem.value) &&
+          <g-dialog v-model={dialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
             <div class="dialog" >
               <div class="dialog-header" >
                 <div class="dialog-header__title" >
                   <div class="fw-700 flex-grow-1" >
-                    {selectedItem.name} </div>
+                    {selectedItem.value.name} </div>
                   <div>
-                    Unit: ({selectedItem.unit}) </div>
+                    Unit: ({selectedItem.value.unit}) </div>
                 </div>
                 <div class="dialog-header__bar" >
                   <div class="col-4 pl-2" >
@@ -150,7 +241,7 @@ export default {
                     {t('inventory.reason')} </div>
                 </div>
               </div>
-              {selectedItem.history.map((item, i)  =>
+              {selectedItem.value.history.map((item, i)  =>
                   <div class="dialog-history-item" key={ `history_${i}` } >
                     <div class="col-4 pl-2" >
                       { formatDate(item.date) } </div>

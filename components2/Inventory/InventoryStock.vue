@@ -1,12 +1,197 @@
 <script>
+import { ref, onActivated, onDeactivated } from 'vue'
+import { useRouter } from 'vue-router'
+import PosKeyboardFull from '../../components/pos-shared-components/PosKeyboardFull';
+import DialogChangeStock from '../../components/Inventory/dialogChangeStock';
+import cms from 'cms'
+import _ from 'lodash';
+import { useI18n } from 'vue-i18n'
+
 export default {
+  name: "InventoryStock",
+  components: {PosKeyboardFull, DialogChangeStock},
   setup() {
+    const { t } = useI18n()
+    const items = ref([])
+    const inventories = ref ([])
+    const selectedItem = ref(null)
+    const dialog = ref({
+      inventory: false,
+      low: false,
+      add: false
+    })
+    const name = ref('')
+    const itemId = ref('')
+    const category = ref('')
+    const unit = ref('')
+    const stock = ref(0)
+    const added = ref(0)
+    const showKeyboard = ref(false)
+
+    onActivated(async () => {
+      const inventories = await cms.getModel('Inventory').find();
+      const categories = await cms.getModel('InventoryCategory').find();
+      inventories.value = inventories.value.map(item => ({
+        ...item,
+        text: item.name,
+        category: categories.value.find(cate => cate._id.toString() === item.category)
+      }))
+      items.value = []
+      selectedItem.value = null
+      window.addEventListener('keydown', keyboardHandler, false)
+    })
+
+    onDeactivated(() => {
+      window.removeEventListener('keydown', keyboardHandler, false)
+    })
+
+    const router = useRouter()
+    const back = function () {
+      router.go(-1)
+    }
+    const openDialog = function () {
+      itemId.value = ''
+      category.value = ''
+      unit.value = ''
+      stock.value = 0
+      added.value = ''
+      dialog.value.inventory = true
+    }
+    const changeStock = function () {
+      if (isNaN(added.value)) return
+      const item = inventories.value.find(item => item._id === itemId.value)
+      const index = items.value.findIndex(i => i._id === item.value._id)
+      if (index.value === -1)
+        this.items.push({
+          ...item.value,
+          added: +added.value
+        })
+      else
+        this.items.splice(index.value, 1, {
+          ...item.value,
+          added: +added.value
+        })
+      dialog.value.inventory = false
+    }
+    const openDialogAdd = function (item) {
+      if (item) {
+        itemId.value = _.cloneDeep(item._id)
+        name.value = _.cloneDeep(item.name)
+        category.value = _.cloneDeep(item.category.name)
+        unit.value = _.cloneDeep(item.unit)
+        stock.value = _.cloneDeep(+item.stock)
+        added.value = _.cloneDeep(+item.added)
+      }
+      selectedItem.value = item
+      dialog.value.add = true
+    }
+    const updateStock = function ({change}) {
+      const item = inventories.value.find(item => item._id === itemId.value)
+      const index = items.value.findIndex(i => i._id === item._id)
+      if (index === -1) {
+        items.value.push({
+          ...item,
+          added: +change
+        })
+        selectedItem.value = _.last(items.value)
+      } else {
+        items.value.splice(index, 1, {
+          ...item,
+          added: +change
+        })
+        selectedItem.value = items.value[index]
+      }
+    }
+    const chooseItem = function (_id) {
+      const item = inventories.value.find(item => item._id === _id)
+      category.value = _.cloneDeep(item.category.name)
+      unit.value = _.cloneDeep(item.unit)
+      stock.value = item.stock && +(_.cloneDeep(item.stock)).toFixed(2)
+      added.value = ''
+    }
+    const selectItem = function (item) {
+      if (item && !items.value.find(i => i._id === item._id))
+        items.value.push({
+          ...item,
+          added: 0
+        })
+      showKeyboard.value = false
+    }
+    const removeItem = function (index) {
+      items.value.splice(index, 1)
+    }
+    const getLowStockItems = function (value) {
+      const _items = inventories.value.filter(item => item.stock <= value && !items.value.find(i => i._id === item._id)).map(item => ({
+        ...item,
+        added: 0
+      }))
+      items.value.push(..._items)
+      dialog.value.low = false
+    }
+    const complete = async function () {
+      const updateItems = items.value.filter(item => item.added).map(item => ({
+        ...item,
+        stock: item.stock + item.added
+      }))
+      for (const item of updateItems) {
+        await updateInventory(item)
+        const history = {
+          inventory: item._id,
+          category: item.category._id,
+          type: 'add',
+          amount: item.added,
+          date: new Date(),
+          reason: 'Import stock'
+        }
+        await updateInventoryHistory(history)
+      }
+      back()
+    }
+    const keyboardHandle = function (event) {
+      event.stopPropagation()
+      if(event.key === 'Tab' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        if(items.value.length > 0) {
+          if(!selectedItem.value) {
+            selectedItem.value = items[0]
+          } else {
+            const index = items.value.findIndex(i => i._id === selectedItem.value._id)
+            if(index === items.value.length - 1) {
+              selectedItem.value = items.value[0]
+            } else {
+              selectedItem.value = items.value[index + 1]
+            }
+          }
+        }
+      }
+      if(event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        event.preventDefault()
+        if(items.value.length > 0) {
+          if(!selectedItem.value) {
+            selectedItem.value = _.last(items)
+          } else {
+            const index = items.findIndex(i => i._id === selectedItem.value._id)
+            if(index === 0) {
+              selectedItem.value = _.last(items.value)
+            } else {
+              selectedItem.value = items.value[index - 1]
+            }
+          }
+        }
+      }
+      if(event.key === 'Enter') {
+        if(selectedItem.value) {
+          openDialogAdd(selectedItem.value)
+        }
+      }
+    }
+
     return () => <>
       <div class="inventory-stock">
         <div class="inventory-stock__header">
-          <g-autocomplete text-field-component="GTextFieldBs" onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories} return-object menu-class="menu-inventory-stock" v-slots={{
+          <g-autocomplete text-field-component="GTextFieldBs" onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories.value} return-object menu-class="menu-inventory-stock" v-slots={{
             'append-inner': () => <>
-              <g-icon onClick={() => showKeyboard = true}>
+              <g-icon onClick={() => showKeyboard.value = true}>
                 icon-keyboard
               </g-icon>
             </>
@@ -21,7 +206,7 @@ export default {
           <span class="fs-small">
             {t('inventory.products')}: </span>
           <span class="fs-large text-red ml-1">
-            {items.length} </span>
+            {items.value.length} </span>
         </div>
         <g-simple-table striped fixed-header style="flex: 1">
           <thead>
@@ -35,8 +220,8 @@ export default {
             <th> </th>
           </tr>
           </thead>
-          {items.map((inventory, i) =>
-              <tr key={i} class={selectedItem && selectedItem._id === inventory._id && 'row--selected'}>
+          {items.value.map((inventory, i) =>
+              <tr key={i} class={selectedItem.value && selectedItem.value._id === inventory._id && 'row--selected'}>
                 <td onClick={() => openDialogAdd(inventory)}> {inventory.id} </td>
                 <td onClick={() => openDialogAdd(inventory)}> {inventory.name} </td>
                 <td onClick={() => openDialogAdd(inventory)}> {inventory.category.name} </td>
@@ -59,7 +244,7 @@ export default {
               </g-icon>
               {t('ui.back')}
             </g-btn>
-            <g-btn uppercase={false} onClick={() => dialog.low = true}>
+            <g-btn uppercase={false} onClick={() => dialog.value.low = true}>
               {t('inventory.importLowStock')}
             </g-btn>
             <g-spacer>
@@ -72,28 +257,28 @@ export default {
             </g-btn>
           </g-toolbar>
         </div>
-        <dialog-form-input v-model={dialog.inventory} onSubmit={changeStock} v-slots={{
+        <dialog-form-input v-model={dialog.value.inventory} onSubmit={changeStock} v-slots={{
           'input': () => <>
             <div class="row-flex flex-wrap justify-around">
-              <g-autocomplete text-field-component="GTextFieldBs" v-model={itemId} style="width: 98%" class="inventory-stock-select" key={dialog.inventory} items={inventories} item-text="name" item-value="_id" keep-menu-on-blur menu-class="menu-select-inventory" onUpdate:modelValue={chooseItem}>
+              <g-autocomplete text-field-component="GTextFieldBs" v-model={itemId.value} style="width: 98%" class="inventory-stock-select" key={dialog.value.inventory} items={inventories.value} item-text="name" item-value="_id" keep-menu-on-blur menu-class="menu-select-inventory" onUpdate:modelValue={chooseItem}>
               </g-autocomplete>
-              <pos-textfield-new readonly style="width: 48%" v-model={category} label={$t('article.category')}>
+              <pos-textfield-new readonly style="width: 48%" v-model={category.value} label={$t('article.category')}>
               </pos-textfield-new>
-              <pos-textfield-new readonly style="width: 48%" v-model={unit} label={$t('inventory.unit')}>
+              <pos-textfield-new readonly style="width: 48%" v-model={unit.value} label={$t('inventory.unit')}>
               </pos-textfield-new>
-              <pos-textfield-new readonly style="width: 48%" v-model={stock} label={$t('inventory.currentStock')}>
+              <pos-textfield-new readonly style="width: 48%" v-model={stock.value} label={$t('inventory.currentStock')}>
               </pos-textfield-new>
-              <pos-textfield-new rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" v-model={added} label={$t('inventory.addedStock')}>
+              <pos-textfield-new rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" v-model={added.value} label={$t('inventory.addedStock')}>
               </pos-textfield-new>
             </div>
           </>
         }}></dialog-form-input>
-        <dialog-number-filter v-model={dialog.low} label="Low-stock threshold" onSubmit={getLowStockItems}>
+        <dialog-number-filter v-model={dialog.value.low} label="Low-stock threshold" onSubmit={getLowStockItems}>
         </dialog-number-filter>
-        <dialog-change-stock v-model={dialog.add} removeable={false} name={name} stock={stock} onSubmit={updateStock}>
+        <dialog-change-stock v-model={dialog.value.add} removable={false} name={name.value} stock={stock.value} onSubmit={updateStock}>
         </dialog-change-stock>
         {
-          (showKeyboard) &&
+          (showKeyboard.value) &&
           <div class="keyboard-wrapper">
             <pos-keyboard-full type="alpha-number">
             </pos-keyboard-full>
