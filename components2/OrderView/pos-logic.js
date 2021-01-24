@@ -458,7 +458,7 @@ export function addMultiPayment(order, payment) {
       newCardValue = Math.max(0, order.vSum - remainValue)
       tip = cardValue - newCardValue
     }
-    change = cashValue + newCardValue + remainValue - order.vSum
+    change = Math.max(0, cashValue + newCardValue + remainValue - order.vSum)
     order.tip = tip
     order.cashback = change
   })

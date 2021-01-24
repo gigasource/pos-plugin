@@ -16,10 +16,13 @@ export const CRUdFactory = function(obj, path) {
     if (idx !== -1) data.splice(idx, 1)
   }
   const update = function(updObj, newV) {
+    if (!updObj || !updObj._id) return null
     const data = _.get(obj, path)
     const idx = _.findIndex(data, i => i._id.toString() === updObj._id.toString())
-    if (idx !== -1) _.assign(data[idx], newV)
-    return data[idx]
+    if (idx !== -1) {
+      _.assign(data[idx], newV)
+      return data[idx]
+    } else return null
   }
   return {
     create, remove, update

@@ -26,3 +26,11 @@ export const VModel_number = (obj, field = 'value') => {
     set: (val) => obj[field] = parseNumber(val)
   })
 }
+
+export const intervalLog = (v, duration = 100) => {
+  setInterval(() => console.log(v), duration)
+}
+
+export const isSameId = function (obj, obj1) {
+  return obj._id.toString() === obj1._id.toString()
+}
