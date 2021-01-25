@@ -39,7 +39,6 @@ async function deleteCategory(orderLayoutId, categoryId) {
 }
 
 async function switchCategory(cateFrom, cateTo) {
-  console.log('switchCategory: from', cateFrom, ' to', cateTo)
   // [Note] the method suppose that there is [only 1] order layout
   // or [at least] category's id is unique
 
