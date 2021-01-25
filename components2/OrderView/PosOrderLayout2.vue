@@ -58,7 +58,6 @@ export default {
     onDeactivated(() => cms.socket.off('updateProductProps'))
 
     const displayOverlay = computed(() => {
-      console.log(showOverlay.value && showIcon.value);
       return showOverlay.value && showIcon.value
     })
 
