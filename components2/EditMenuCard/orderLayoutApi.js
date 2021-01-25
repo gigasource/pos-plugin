@@ -11,6 +11,9 @@ async function createOrderLayout(columns, rows) {
   })
 }
 
+async function loadOrderLayout(type) {
+  return cms.getModel('OrderLayout').findOne({type})
+}
 async function changeCategoryColumn(orderLayoutId, newColumn) {
   return await cms.getModel(colName).findOneAndUpdate(
       {_id: orderLayoutId},
@@ -36,6 +39,7 @@ async function deleteCategory(orderLayoutId, categoryId) {
 }
 
 async function switchCategory(cateFrom, cateTo) {
+  console.log('switchCategory: from', cateFrom, ' to', cateTo)
   // [Note] the method suppose that there is [only 1] order layout
   // or [at least] category's id is unique
 
@@ -118,6 +122,8 @@ async function deleteProduct(productId) {
 
 export default {
   createOrderLayout,
+  loadOrderLayout,
+  //
   changeCategoryColumn,
   changeCategoryRow,
   deleteCategory,

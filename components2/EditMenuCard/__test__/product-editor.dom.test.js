@@ -6,7 +6,6 @@ import _ from 'lodash'
 import ProductEditor2 from '../ProductEditor/ProductEditor2';
 import {nextTick} from 'vue'
 import {
-  updateOrderLayout,
   updateSelectedCategoryLayout,
   updateSelectedProductLayout
 } from '../../OrderView/pos-ui-shared';
@@ -15,7 +14,7 @@ const ignoreComponents = ['Portal', 'PortalTarget', 'MountingPortal', 'portal', 
 
 describe('product-editor', () => {
   it('should show correct', async () => {
-    updateOrderLayout({ rows: 2, columns: 4, categories: [] })
+    // TODO: update test case
     // updateSelectedCategoryLayout({ name: 'Wine', color: '#FFF', rows: 4, columns: 6,  })
     updateSelectedProductLayout({
       type: 'Article',

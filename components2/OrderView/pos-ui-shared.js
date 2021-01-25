@@ -12,25 +12,22 @@ import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
 import cms from 'cms';
+import orderLayoutApi from '../EditMenuCard/orderLayoutApi';
 
 export const orderLayout = ref({ categories: [] });
-// export const orderLayout = computed(() => {
-//   if (editable.value) {
-//     // TODO:
-//     return _orderLayout.value;
-//   } else {
-//     return _orderLayout.value;
-//   }
-// });
-export const updateOrderLayout = newLayout  => orderLayout.value = newLayout
+export async function loadOrderLayout(type = 'default') {
+  const _orderLayout = await orderLayoutApi.loadOrderLayout(type);
+  if (editable.value) {
+    _orderLayout.categories = fillMissingAreas(_orderLayout.categories, _orderLayout.columns, _orderLayout.rows, true);
+    _.each(_orderLayout.categories, c => c.products = fillMissingAreas(c.products, c.columns, c.rows, false))
+  }
+  orderLayout.value = _orderLayout
+}
 
-//
 const _selectedLayoutCache = {
   categoryLayout: null,
   productLayout: null
 }
-
-//
 export const selectedCategoryLayoutPosition = ref({ top: 0, left: 0 })
 export const selectedCategoryLayout = computed({
   get: () => {
@@ -90,7 +87,7 @@ export const selectedProduct = computed({
 })
 export const updateProduct = (change) => {
   if (_selectedLayoutCache.productLayout) {
-    Object.assign(productLayout.product, change)
+    Object.assign(_selectedLayoutCache.productLayout.product, change)
   }
 }
 
@@ -224,15 +221,17 @@ export function fillMissingAreas(areas, columns, rows, isCategory) {
     for (let column = 0; column < columns; column++) {
       let empty = createEmptyLayout(row, column);
       if (isCategory) {
-        if (selectedCategoryLayout.value && isSameArea(empty, selectedCategoryLayout.value))
-          empty = selectedCategoryLayout.value;
-        else
+        if (selectedCategoryLayout.value && isSameArea(empty, selectedCategoryLayout.value)) {
+          empty = selectedCategoryLayout.value
+        } else {
           empty = {...empty, ...createEmptyCategoryLayout()}
+        }
       } else {
-        if (selectedProductLayout.value && isSameArea(empty, selectedProductLayout.value))
+        if (selectedProductLayout.value && isSameArea(empty, selectedProductLayout.value)) {
           empty = selectedProductLayout.value
-        else
+        } else {
           empty = {...empty, ...createEmptyProductLayout()}
+        }
       }
       allAreas.push(empty)
     }
@@ -303,4 +302,14 @@ export function itemsRenderFactory() {
     </div>
   ))
   return itemsRender;
+}
+
+window.dbg = {
+  orderLayout,
+  _selectedLayoutCache,
+  selectedCategoryLayoutPosition,
+  selectedCategoryLayout,
+  selectedProductLayoutPosition,
+  selectedProductLayout,
+  selectedProduct,
 }

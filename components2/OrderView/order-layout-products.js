@@ -9,7 +9,6 @@ import {isMobile} from "../AppSharedStates";
 import {computed, reactive, ref} from "vue";
 import _ from "lodash";
 import {
-  fillMissingAreas,
   getAreaStyle,
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,

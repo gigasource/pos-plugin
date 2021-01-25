@@ -3,10 +3,9 @@ import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import cms from 'cms';
 import {
-  orderLayout, selectedCategoryLayout, selectedProductLayout, selectedProduct,
+  selectedCategoryLayout, selectedProductLayout, selectedProduct,
   updateView,
-  updateOrderLayout,
-  updateSelectedProductLayout
+  updateSelectedProductLayout, loadOrderLayout, selectProductLayout, updateProduct as _updateProduct
 } from '../../OrderView/pos-ui-shared';
 import orderLayoutApi from '../orderLayoutApi';
 
@@ -96,7 +95,7 @@ export async function selectPrinter(id) {
     const taxCategory2 = printer.defaultTakeAwayTax;
     selectedProduct.value.tax2 = taxCategory2
     change.taxCategory2 = taxCategory2
-    change.tax2 = takeAwayTaxes.values.find(i => i._id.toString() === taxCategory2).value
+    change.tax2 = takeAwayTaxes.value.find(i => i._id.toString() === taxCategory2).value
   }
 
   await updateProduct(change)
@@ -163,8 +162,8 @@ export async function createNewProductLayout(productId, extraInfo) {
     ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
     ...extraInfo
   }
-  const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
-  updateOrderLayout(result)
+  await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
+  await loadOrderLayout()
 }
 
 export const debounceUpdateTextLayout = _.debounce(function(key, val) {
@@ -178,7 +177,7 @@ async function updateTextLayout(change) {
 
 // product
 export async function updateProduct(change, forceCreate) {
-  selectedProduct.value = { ...selectedProduct.value, ...change }
+  _updateProduct(change)
   if (selectedProduct.value._id) {
     await orderLayoutApi.updateProduct(selectedProduct.value._id, change)
     showNotify()
@@ -190,7 +189,7 @@ export async function updateProduct(change, forceCreate) {
 }
 
 export const debouncedUpdateProduct = _.debounce((key, val) => {
-  updateProduct({ [key]: val }, !selectedProduct.value._id).then(res => res())
+  updateProduct({ [key]: val }, !selectedProduct.value._id).then()
 }, 300)
 
 
@@ -201,10 +200,10 @@ export async function deleteProductLayout() {
   if (selectedProductLayout.value.product._id)
     await orderLayoutApi.deleteProduct(selectedProductLayout.value.product._id)
 
-  const orderLayout = await orderLayoutApi.deleteProductLayout(selectedCategoryLayout.value._id, selectedProductLayout.value._id)
-  updateOrderLayout(orderLayout)
+  await orderLayoutApi.deleteProductLayout(selectedCategoryLayout.value._id, selectedProductLayout.value._id)
+  await loadOrderLayout()
   updateView('CategoryEditor')
-  updateSelectedProductLayout(null)
+  selectProductLayout({top: -1, left: -1})
 }
 
 // actions
@@ -233,7 +232,6 @@ async function _execAction() {
       await copyProduct()
       break;
   }
-  _clearAction()
 }
 
 // watch product layout change to trigger product layout action automatically
@@ -263,7 +261,8 @@ async function copyProduct() {
       selectedCategoryLayout.value._id,
       productLayout
   );
-  updateOrderLayout(result)
+  _clearAction()
+  await loadOrderLayout()
 }
 function copyProductInfo(product) {
   if (!product)
@@ -298,8 +297,8 @@ async function switchProduct() {
           selectedProductLayout.value,
           _.pick(actionTarget, ['top', 'left']),
           actionCategoryTarget)
-
-    updateOrderLayout(result)
+    _clearAction()
+    await loadOrderLayout()
   } else {
     // switch in 2 categories
     console.log('TODO: switching products between category is not implemented')

@@ -1,5 +1,5 @@
 <script>
-import { orderLayout, updateOrderLayout } from '../OrderView/pos-ui-shared';
+import { loadOrderLayout, orderLayout } from '../OrderView/pos-ui-shared';
 import constants from './EditMenuCardToolbar/constants';
 import { ref } from 'vue'
 import orderLayoutApi from './orderLayoutApi';
@@ -19,7 +19,8 @@ export default {
     const showAddOrderLayoutDialog = ref(false)
 
     async function createLayout() {
-      updateOrderLayout(await orderLayoutApi.createOrderLayout(column.value, row.value))
+      await orderLayoutApi.createOrderLayout(column.value, row.value)
+      await loadOrderLayout()
       showAddOrderLayoutDialog.value = false
     }
 

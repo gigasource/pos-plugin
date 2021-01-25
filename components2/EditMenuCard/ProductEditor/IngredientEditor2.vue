@@ -4,7 +4,11 @@ import { Touch } from 'pos-vue-framework'
 import { onActivated, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../../utils'
-import { updateOrderLayout, selectedProduct, selectedProductExisted } from '../../OrderView/pos-ui-shared'
+import {
+  selectedProduct,
+  selectedProductExisted,
+  loadOrderLayout
+} from '../../OrderView/pos-ui-shared'
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull'
 
 export default {
@@ -58,14 +62,10 @@ export default {
         inventory: item.inventory,
         amount: Number(item.amount)
       }))
-
-      console.log('_ingredients', _ingredients)
-
       if(_.some(_.countBy(_ingredients, 'inventory'), item => item > 1))
         return
-
       await cms.getModel('Product').findOneAndUpdate({ _id: selectedProduct.value._id }, { ingredients: _ingredients })
-      updateOrderLayout(await cms.getModel('OrderLayout').findOne({type: 'default'}))
+      await loadOrderLayout()
     }
 
     const debounceUpdateAmount = _.debounce(updateProductIngredient, 300)

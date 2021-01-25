@@ -16,13 +16,13 @@ import {isSameArea} from "../../components/posOrder/util";
 
 export function orderLayoutCategoriesFactory() {
   const categories = computed(() => {
-    if (editable.value) {
-      return fillMissingAreas(
-        orderLayout.value.categories,
-        orderLayout.value.columns,
-        orderLayout.value.rows,
-        true);
-    }
+    // if (editable.value) {
+    //   return fillMissingAreas(
+    //     orderLayout.value.categories,
+    //     orderLayout.value.columns,
+    //     orderLayout.value.rows,
+    //     true);
+    // }
     return [...orderLayout.value.categories]
   });
 
@@ -96,7 +96,7 @@ export function orderLayoutCategoriesFactory() {
     } else {
       selectCategoryLayout(categoryLayout)
     }
-    selectProductLayout({ top: -1, left: -1})
+    selectProductLayout({ top: 0, left: 0})
   }
 
   function getCategoryName(item) {
