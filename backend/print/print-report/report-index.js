@@ -18,14 +18,12 @@ module.exports = async function (cms) {
     await EndOfDay.create(_.omit(report, ['pending']));
     await Order.updateMany({
       date: {$gte: report.begin, $lte: report.end},
-      status: 'paid'
+      status: 'paid',
+      z: {$exists: false}
     }, {
       //todo: check if z is a number
       $set: {z: report.z}
     });
-
-    const orders = await Order.find({});
-    debugger
   })
 
   /**

@@ -15,7 +15,6 @@ import {
 import dayjs from "dayjs";
 import PosEndOfDayPrintDialog from "../PosEndOfDayPrintDialog";
 import PosEndOfDayPrintPendingZReport from "../PosEndOfDayPrintPendingZReport";
-import {preparePrintReport} from "../../../backend/print/print-report/print-report.prepare.test";
 
 const { prepareDb, prepareReportTest } = require('../../../backend/order-logic/report.prepare.test')
 
@@ -46,7 +45,8 @@ describe("eod test", function () {
   beforeAll(async () => {
     await cms.init()
     await prepareReportTest(cms)
-    await preparePrintReport(cms);
+    await require('../../../backend/print/print-report/report-index')(cms);
+
     await orm("PosSetting").remove({});
     await orm("PosSetting").create(demoData.PosSetting[0]);
     await orm("OrderLayout").remove({});

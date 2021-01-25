@@ -31,6 +31,7 @@ export function mapCalendarReports(dates) {
         sum: r.vSum,
         z: key ? key : highestZNumber.value,
         begin: r.from,
+        end: r.to,
         pending: !key
       }
     }).sort((cur, next) => cur.begin - next.begin)

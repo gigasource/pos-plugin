@@ -23,3 +23,5 @@ nên làm gì bây h :
 * [_] optimize later
 
 * [_] makeEOD -> tao ra eod co so z , value tuong ung (computed)
+
+* [_] call callback on frontend for refresh

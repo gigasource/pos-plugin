@@ -20,6 +20,7 @@ async function prepareDb(orm) {
   const Order = orm('Order')
   await Order.remove({});
   await orm('EndOfDay').remove()
+  await orm('EndOfDay').create([{z: 1}, {z: 2}]);
 
   const foodTax = {taxes: [5, 10]};
   const drinkTax = {taxes: [16, 32]};
