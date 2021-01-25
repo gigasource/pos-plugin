@@ -12,8 +12,14 @@ exports[`order-layout-editor should hide add button if orderLayout is initialize
 exports[`order-layout-editor should show add button if orderLayout is not initialized with predefined dialog { column=4, row=2 } 1`] = `
 <div>
   <portal-stub to="portal-left-buttons">
+    <g-btn-bs-stub text-color="#1271FF"
+                   elevation="2"
+                   icon="add_circle"
+    >
+      ui.add
+    </g-btn-bs-stub>
   </portal-stub>
-  <g-dialog-stub modelvalue="false"
+  <g-dialog-stub modelvalue="true"
                  width="90%"
                  eager="true"
                  fullscreen="false"
@@ -56,20 +62,5 @@ exports[`order-layout-editor should show add button if orderLayout is not initia
       </div>
     </div>
   </g-dialog-stub>
-</div>
-`;
-
-exports[`order-layout-editor should show add order layout if orderLayout is not initialize 1`] = `
-<div>
-  <portal-stub to="portal-left-buttons">
-    <g-btn-bs-stub text-color="#1271FF"
-                   elevation="2"
-                   icon="add_circle"
-    >
-      ui.add
-    </g-btn-bs-stub>
-  </portal-stub>
-  <dialog-form-input-stub>
-  </dialog-form-input-stub>
 </div>
 `;
