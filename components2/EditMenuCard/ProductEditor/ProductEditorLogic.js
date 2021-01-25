@@ -88,14 +88,18 @@ export async function selectPrinter(id) {
     const taxCategory = printer.defaultDineInTax;
     selectedProduct.value.tax = taxCategory
     change.taxCategory = taxCategory
-    change.tax = dineInTaxes.value.find(i => i._id.toString() === taxCategory).value
+    const dineImTax = dineInTaxes.value.find(i => i._id.toString() === taxCategory)
+    if (dineImTax)
+      change.tax = dineImTax.value
   }
 
   if (!selectedProduct.value.tax2 && printer.defaultTakeAwayTax) {
     const taxCategory2 = printer.defaultTakeAwayTax;
     selectedProduct.value.tax2 = taxCategory2
     change.taxCategory2 = taxCategory2
-    change.tax2 = takeAwayTaxes.value.find(i => i._id.toString() === taxCategory2).value
+    const takeAwayTax = takeAwayTaxes.value.find(i => i._id.toString() === taxCategory2)
+    if (takeAwayTax)
+      change.tax2 = takeAwayTax.value
   }
 
   await updateProduct(change)
