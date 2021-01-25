@@ -1,7 +1,7 @@
 <script>
 import { ref, onCreated, computed, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { $filters } from '../AppSharedStates';
+import { $filters } from '../../AppSharedStates';
 
 export default {
   name: "dialogChangeStock",
