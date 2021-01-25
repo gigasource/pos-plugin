@@ -1,0 +1,285 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test inventory screen Case 1: Inventory 1`] = `
+<div style="height: 100%; display: flex; flex-direction: column;">
+  <g-simple-table-stub striped="true"
+                       fixed-header="true"
+                       style="flex: 1;"
+  >
+    <thead>
+      <tr>
+        <th>
+        </th>
+        <th>
+          ID
+        </th>
+        <th>
+          article.name
+          <g-icon-stub size="12">
+            mdi-filter
+          </g-icon-stub>
+        </th>
+        <th>
+          inventory.lastUpdate
+        </th>
+        <th>
+          article.category
+          <g-icon-stub size="12">
+            mdi-magnify
+          </g-icon-stub>
+        </th>
+        <th>
+          inventory.unit
+        </th>
+        <th>
+          inventory.stock
+        </th>
+      </tr>
+    </thead>
+    <tr>
+      <td class="bg-grey-lighten-1">
+        <g-checkbox-stub modelvalue="[object Object]"
+                         value="[object Object]"
+                         multiple="true"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td colspan="6"
+          class="filter-wrapper"
+      >
+        <div class="filter">
+          settings.filter
+          <div class="group-chip">
+          </div>
+          <g-btn-bs-stub>
+            <u>
+              settings.clearAll
+            </u>
+          </g-btn-bs-stub>
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <div class="btn-add-filter">
+            + inventory.addFilter
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="5ff3ac00c7986615546e2b84"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        2
+      </td>
+      <td>
+        Meat
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Food
+      </td>
+      <td>
+        kg
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          50
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="5ff3ac00c7986615546e2b88"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        4
+      </td>
+      <td>
+        Apple
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Fruit
+      </td>
+      <td>
+        piece
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          100
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="5ff3ac00c7986615546e2b8a"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        5
+      </td>
+      <td>
+        Banana
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Fruit
+      </td>
+      <td>
+        piece
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          10
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="5ff3ac00c7986615546e2b8c"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        6
+      </td>
+      <td>
+        Vodka
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Drink
+      </td>
+      <td>
+        l
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          5.50
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+  </g-simple-table-stub>
+  <div>
+    <g-toolbar-stub color="#eeeeee"
+                    elevation="0"
+    >
+      <g-btn-stub uppercase="false"
+                  style="margin-right: 5px;"
+      >
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-back
+        </g-icon-stub>
+        ui.back
+      </g-btn-stub>
+      <g-btn-stub uppercase="false">
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-inventory-report
+        </g-icon-stub>
+        inventory.report
+      </g-btn-stub>
+      <g-spacer-stub>
+      </g-spacer-stub>
+      <g-btn-stub uppercase="false"
+                  style="margin-right: 5px;"
+      >
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-inventory-new-stock
+        </g-icon-stub>
+        inventory.newStock
+      </g-btn-stub>
+      <g-btn-stub uppercase="false"
+                  style="margin-right: 5px;"
+      >
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-inventory-category
+        </g-icon-stub>
+        article.category
+      </g-btn-stub>
+      <g-btn-stub disabled="true"
+                  uppercase="false"
+                  style="margin-right: 5px;"
+      >
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-inventory-delete
+        </g-icon-stub>
+        ui.delete
+      </g-btn-stub>
+      <g-btn-stub disabled="true"
+                  uppercase="false"
+                  style="margin-right: 5px;"
+      >
+        <g-icon-stub small="true"
+                     style="margin-right: 5px;"
+        >
+          icon-inventory-edit
+        </g-icon-stub>
+        ui.edit
+      </g-btn-stub>
+      <g-btn-stub uppercase="false"
+                  background-color="#4CAF50"
+                  text-color="#FFF"
+      >
+        <span style="font-size: 14px !important;">
+          + inventory.newProduct
+        </span>
+      </g-btn-stub>
+    </g-toolbar-stub>
+  </div>
+  <dialog-form-input-stub>
+  </dialog-form-input-stub>
+  <dialog-change-stock-stub>
+  </dialog-change-stock-stub>
+  <dialog-inventory-category-stub>
+  </dialog-inventory-category-stub>
+  <dialog-form-input-stub>
+  </dialog-form-input-stub>
+</div>
+`;

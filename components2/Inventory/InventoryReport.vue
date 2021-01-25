@@ -1,5 +1,5 @@
 <script>
-import { ref, onActivated } from 'vue'
+import { ref, onActivated, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import dateRangePicker from '../../components/OnlineOrder/dateRangePicker';
 import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
@@ -7,13 +7,16 @@ import _ from 'lodash';
 import dayjs from 'dayjs'
 import { $filters } from '../AppSharedStates';
 import { useI18n } from 'vue-i18n'
+import {
+  inventoryCategories,
+  inventories
+} from './inventory-logic-ui'
 
 export default {
   name: "InventoryReport",
   components: {dateRangePicker, dialogTextFilter},
   setup() {
     const { t } = useI18n()
-    const categories = ref([])
     const selectedCategory = ref(null)
     const searchText = ref('')
     const dateFilter = ref({
@@ -27,20 +30,16 @@ export default {
     const menu = ref(false)
     const type = ref('all')
     const display = ref('list')
-    const inventories = ref([])
     const selectedItem = ref({
       name: '',
       unit: '',
       history: []
     })
-    const inventoryCategories = ref([])
 
     onActivated(async () => {
       dateFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
       dateFilter.value.toDate = dayjs().format('YYYY-MM-DD')
       selectedCategory.value = 'all'
-      await loadInventoryCategories()
-      await loadData()
     })
 
     const sortedInventories = computed(() => {

@@ -1,6 +1,9 @@
 import { makeWrapper, orm, wrapper } from '../../test-utils';
 import {nextTick} from "vue";
 import Inventory from '../Inventory'
+import {
+  dialog
+} from "../inventory-ui-shared";
 
 const { prepareDb } = require('../../../backend/order-logic/report.prepare.test')
 
