@@ -2,10 +2,10 @@ import { ObjectID } from 'bson';
 import cms from 'cms'
 import { computed, nextTick, ref, watch } from 'vue'
 // import { CRUdFactory } from './CRUD/crud';
-import { CRUdDbFactory as CRUdFactory } from './CRUD/crud-db';
+import { CRUdDbFactory as CRUdFactory } from '../CRUD/crud-db';
 import _ from 'lodash'
-import { isSameId } from '../utils';
-import { appHooks } from '../AppSharedStates';
+import { isSameId } from '../../utils';
+import { appHooks } from '../../AppSharedStates';
 
 export const currentGroup = ref(null)
 export const categories = ref([])
@@ -47,34 +47,35 @@ export const onCreateItem = async function (path, type, item = null) { // types:
   const { create } = CRUdFactory(modifiers.value, path, 'Modifiers')
   //todo: set selecting item
   if (type === 'modifier') {
-    activeItem.value = await create(item || {
+    activeItem.value = await create(_.merge({
       name: 'New Modifier',
       _id: new ObjectID(),
       price: 0,
       max: 1,
-    })
+    }, item))
     _.assign(activeItem.value, { type: 'modifier' })
   }
   if (type === 'category') {
-    activeItem.value = await create(item || {
+    activeItem.value = await create(_.merge({
       name: 'New Category',
       _id: new ObjectID(),
       mandatory: true,
       selectOne: true,
       freeItems: 0,
       items: []
-    })
+    }, item))
     _.assign(activeItem.value, { type: 'category' })
   }
   if (type === 'group') {
-    currentGroup.value = await create(item || {
+    currentGroup.value = await create(_.merge({
       name: 'New Group',
       _id: new ObjectID(),
       categories: []
 
-    })
+    }, item))
     activeItem.value = { ...currentGroup.value, type: 'group' }
   }
+  return activeItem.value
   // appHooks.emit('updateModifiers')
 }
 

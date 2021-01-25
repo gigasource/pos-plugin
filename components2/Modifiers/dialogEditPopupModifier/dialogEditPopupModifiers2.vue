@@ -1,5 +1,7 @@
 <script>
 import { onBeforeMount, ref, watch, withModifiers } from 'vue';
+import { VModel_number } from '../../utils';
+
 import {
   activeItem,
   categories,
@@ -14,15 +16,15 @@ import {
   onSelect,
   onUpdateActiveItem
 } from './modifier-ui-logics';
-import { getScopeAttrs } from '../../utils/helpers';
-import { genScopeId, internalValueFactory } from '../utils';
-import { appHooks } from '../AppSharedStates';
+import { getScopeAttrs } from '../../../utils/helpers';
+import { genScopeId, internalValueFactory } from '../../utils';
+import { appHooks } from '../../AppSharedStates';
 
 export default {
   setup(props, { emit }) {
     //todo:
-    // const internalValue = internalValueFactory({ modelValue: true }, { emit })
-    const internalValue = internalValueFactory(props, { emit })
+    const internalValue = internalValueFactory({ modelValue: true }, { emit })
+    // const internalValue = internalValueFactory(props, { emit })
     onBeforeMount(async () => {
       appHooks.emit('updateModifiers')
       appHooks.emit('updateGroupPrinters')
@@ -183,7 +185,7 @@ export default {
                       </>
                       ,
                     }}></g-text-field-bs>
-                    <g-text-field-bs label="Price" v-model={activeItem.value.price} v-slots={{
+                    <g-text-field-bs label="Price" v-model={VModel_number(activeItem.value, 'price').value} v-slots={{
                       'append-inner': () => <>
                         <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
                           icon-keyboard
@@ -191,7 +193,7 @@ export default {
                       </>
                       ,
                     }}></g-text-field-bs>
-                    <g-text-field-bs label="Max items" v-model={activeItem.value.max} v-slots={{
+                    <g-text-field-bs label="Max items" v-model={VModel_number(activeItem.value, 'max').value} v-slots={{
                       'append-inner': () => <>
                         <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
                           icon-keyboard

@@ -2,7 +2,8 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
-    { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos2-modifier' },
+    { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos2-modifier' },
+    { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier2.vue', name: 'ChooseModifier', path: '/pos2-choose-modifier' },
     { loader: { type: 'route' }, filePath: 'components2/View/Payment/Payment2.vue', name: 'Payment2', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos2-login' },
     { loader: { type: 'route' }, filePath: 'components2/View/EditTablePlan/EditTablePlan2.vue', name: 'Plan2', path: '/pos-edit-table-plan' },

@@ -136,6 +136,8 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-btn': true,
         "g-btn-bs": true,
         'g-card': true,
+        'g-card-actions': true,
+        'g-card-text': true,
         'g-card-title': true,
         'g-combobox': true,
         'g-dialog': true,

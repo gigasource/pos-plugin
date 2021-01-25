@@ -3,7 +3,7 @@ import dialogEditPopupModifiers2 from '../dialogEditPopupModifiers2';
 import { nextTick } from 'vue';
 import { stringify } from 'schemahandler/utils';
 import _ from 'lodash';
-import { makeWrapper, setComponent, wrapper } from '../../test-utils';
+import { makeWrapper, setComponent, wrapper } from '../../../test-utils';
 import {
   activeItem,
   categories,
@@ -18,7 +18,7 @@ import {
   onUpdateItem
 } from '../modifier-ui-logics';
 import delay from 'delay';
-import { isSameId } from '../../utils';
+import { isSameId } from '../../../utils';
 
 // const group1 = { _id: new ObjectID(), name: "g1", categories: [] };
 // const group2 = { _id: new ObjectID(), name: "g2", categories: [] };
