@@ -44,9 +44,6 @@ describe("Test inventory logic ui", function() {
     expect(filter.value).toMatchInlineSnapshot(`
       Object {
         "category": "Food",
-        "id": null,
-        "name": null,
-        "stock": null,
       }
     `);
     expect(filteredInventory.value).toMatchInlineSnapshot(`
@@ -76,9 +73,7 @@ describe("Test inventory logic ui", function() {
     expect(filter.value).toMatchInlineSnapshot(`
       Object {
         "category": "Food",
-        "id": null,
         "name": "Fish",
-        "stock": null,
       }
     `);
     expect(filteredInventory.value).toMatchInlineSnapshot(`
@@ -95,23 +90,13 @@ describe("Test inventory logic ui", function() {
     `);
     clearFilter();
     await nextTick();
-    expect(filter.value).toMatchInlineSnapshot(`
-      Object {
-        "category": null,
-        "id": null,
-        "name": null,
-        "stock": null,
-      }
-    `);
+    expect(filter.value).toMatchInlineSnapshot(`Object {}`);
     addFilter({
       stock: [12, 31]
     });
     await nextTick();
     expect(filter.value).toMatchInlineSnapshot(`
       Object {
-        "category": null,
-        "id": null,
-        "name": null,
         "stock": Array [
           12,
           31,
@@ -148,14 +133,7 @@ describe("Test inventory logic ui", function() {
     `);
     removeFilter("stock");
     await nextTick();
-    expect(filter.value).toMatchInlineSnapshot(`
-      Object {
-        "category": null,
-        "id": null,
-        "name": null,
-        "stock": null,
-      }
-    `);
+    expect(filter.value).toMatchInlineSnapshot(`Object {}`);
     expect(filteredInventory.value).toMatchInlineSnapshot(`
       Array [
         Object {

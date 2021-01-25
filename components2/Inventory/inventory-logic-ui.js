@@ -14,13 +14,10 @@ export const inventoryHistories = ref([])
  *   id: '1',
  *   category: 'Food',
  *   stock: [10, 30]
+ *   date: {from, to}
  * }
  */
 export const filter = ref({
-  name: null,
-  id: null,
-  category: null,
-  stock: null
 })
 export const categories = ref([])
 
@@ -54,15 +51,11 @@ export function addFilter(newFilter) {
 }
 
 export function removeFilter(typeFilter) {
-  filter.value[typeFilter] = null
+  delete filter.value[typeFilter]
 }
 
 export function clearFilter() {
   filter.value = {
-    name: null,
-    id: null,
-    category: null,
-    stock: null
   }
 }
 
