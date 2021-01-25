@@ -3,10 +3,9 @@ import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import cms from 'cms';
 import {
-  orderLayout, selectedCategoryLayout, selectedProductLayout, selectedProduct,
+  selectedCategoryLayout, selectedProductLayout, selectedProduct,
   updateView,
-  updateOrderLayout,
-  updateSelectedProductLayout
+  updateSelectedProductLayout, loadOrderLayout, selectProductLayout, updateProduct as _updateProduct
 } from '../../OrderView/pos-ui-shared';
 import orderLayoutApi from '../orderLayoutApi';
 
@@ -56,10 +55,10 @@ export const printers = ref([])
 export const isPrinter2Select = ref(false)
 // boolean value indicate whether "+2. printer" button should be shown
 export const showAddPrinter2 = computed(() => (
-    selectedProduct.groupPrinter
-    && !selectedProduct.groupPrinter2
-    && !selectedProduct.isModifier
-    && !selectedProduct.isNoPrint
+    selectedProduct.value.groupPrinter
+    && !selectedProduct.value.groupPrinter2
+    && !selectedProduct.value.isModifier
+    && !selectedProduct.value.isNoPrint
     && !isPrinter2Select.value
 ))
 
@@ -76,7 +75,7 @@ export async function selectPrinter(id) {
   }
 
   if (isPrinter2Select.value) {
-    if (selectedProduct.groupPrinter !== printer) {
+    if (selectedProduct.value.groupPrinter !== printer) {
       change.groupPrinter2 = printer;
     }
     isPrinter2Select.value = false;
@@ -85,18 +84,22 @@ export async function selectPrinter(id) {
     change.groupPrinter2 = null;
   }
 
-  if (!selectedProduct.tax && printer.defaultDineInTax) {
+  if (!selectedProduct.value.tax && printer.defaultDineInTax) {
     const taxCategory = printer.defaultDineInTax;
-    selectedProduct.tax = taxCategory
+    selectedProduct.value.tax = taxCategory
     change.taxCategory = taxCategory
-    change.tax = dineInTaxes.value.find(i => i._id.toString() === taxCategory).value
+    const dineImTax = dineInTaxes.value.find(i => i._id.toString() === taxCategory)
+    if (dineImTax)
+      change.tax = dineImTax.value
   }
 
-  if (!selectedProduct.tax2 && printer.defaultTakeAwayTax) {
+  if (!selectedProduct.value.tax2 && printer.defaultTakeAwayTax) {
     const taxCategory2 = printer.defaultTakeAwayTax;
-    selectedProduct.tax2 = taxCategory2
+    selectedProduct.value.tax2 = taxCategory2
     change.taxCategory2 = taxCategory2
-    change.tax2 = takeAwayTaxes.values.find(i => i._id.toString() === taxCategory2).value
+    const takeAwayTax = takeAwayTaxes.value.find(i => i._id.toString() === taxCategory2)
+    if (takeAwayTax)
+      change.tax2 = takeAwayTax.value
   }
 
   await updateProduct(change)
@@ -124,7 +127,6 @@ export async function changeCategory(category) {
 // todo: meaning??
 export const layoutType = ref('default')
 
-
 // modifier
 export const popupModifierGroups = ref([])
 export const loadPopupModifierGroups = async () => {
@@ -142,7 +144,6 @@ export const clearPopupModifierGroup = (toggleSelect, item) => {
   changePopupModifierGroup(null).then(resolve => resolve())
 }
 
-
 // product layout
 export async function updateProductLayout(change, forceCreate) {
   updateSelectedProductLayout({ ...selectedProductLayout.value, ...change })
@@ -158,18 +159,21 @@ export async function updateProductLayout(change, forceCreate) {
     showNotify()
   }
 }
+
 export async function createNewProductLayout(productId, extraInfo) {
   const productLayout = {
     product: productId,
     ..._.pick(selectedProductLayout.value, ['top', 'left', 'color', 'type', 'text']),
     ...extraInfo
   }
-  const result = await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
-  updateOrderLayout(result)
+  await orderLayoutApi.createProductLayout(layoutType.value, selectedCategoryLayout.value._id, productLayout)
+  await loadOrderLayout()
 }
+
 export const debounceUpdateTextLayout = _.debounce(function(key, val) {
   updateTextLayout({ [key]: val }, !selectedProduct.value._id).then(res => res())
 }, 300)
+
 async function updateTextLayout(change) {
   const forceCreate = !selectedProductLayout._id;
   await updateProductLayout(change, forceCreate)
@@ -177,27 +181,19 @@ async function updateTextLayout(change) {
 
 // product
 export async function updateProduct(change, forceCreate) {
-  console.log('storing', change, 'to internal variable selectedProduct')
-  selectedProduct.value = { ...selectedProduct.value, ...change }
-  if (selectedProduct._id) {
-    await orderLayoutApi.updateProduct(selectedProduct._id, change)
+  _updateProduct(change)
+  if (selectedProduct.value._id) {
+    await orderLayoutApi.updateProduct(selectedProduct.value._id, change)
     showNotify()
-  } else {
-    if (forceCreate) {
-      const product = await orderLayoutApi.createProduct(selectedProduct.value);
-      console.log('Create new ProductLayout linked to Product with id: ', product._id)
-      await createNewProductLayout(product._id)
-      showNotify()
-    } else {
-      console.log('Product is not existed yet. skipped')
-    }
+  } else if (forceCreate) {
+    const product = await orderLayoutApi.createProduct(selectedProduct.value);
+    await createNewProductLayout(product._id)
+    showNotify()
   }
 }
-export function setProductInfo(propName, propValue) {
-  selectedProduct[propName] = propValue
-}
+
 export const debouncedUpdateProduct = _.debounce((key, val) => {
-  updateProduct({ [key]: val }, !selectedProduct._id).then(res => res())
+  updateProduct({ [key]: val }, !selectedProduct.value._id).then()
 }, 300)
 
 
@@ -208,10 +204,10 @@ export async function deleteProductLayout() {
   if (selectedProductLayout.value.product._id)
     await orderLayoutApi.deleteProduct(selectedProductLayout.value.product._id)
 
-  const orderLayout = await orderLayoutApi.deleteProductLayout(selectedCategoryLayout.value._id, selectedProductLayout.value._id)
-  updateOrderLayout(orderLayout)
+  await orderLayoutApi.deleteProductLayout(selectedCategoryLayout.value._id, selectedProductLayout.value._id)
+  await loadOrderLayout()
   updateView('CategoryEditor')
-  updateSelectedProductLayout(null)
+  selectProductLayout({top: -1, left: -1})
 }
 
 // actions
@@ -240,14 +236,12 @@ async function _execAction() {
       await copyProduct()
       break;
   }
-  _clearAction()
 }
 
 // watch product layout change to trigger product layout action automatically
 // side-effect: in-case the user select action then switch to another category
 // Do we need to clear action if the user change category ???
 watch(() => selectedProductLayout.value, async (newVal, oldValue) => {
-  console.log('watch selectedProductLayout.value',  newVal, oldValue)
   if (_action)
     await _execAction()
 })
@@ -271,7 +265,8 @@ async function copyProduct() {
       selectedCategoryLayout.value._id,
       productLayout
   );
-  updateOrderLayout(result)
+  _clearAction()
+  await loadOrderLayout()
 }
 function copyProductInfo(product) {
   if (!product)
@@ -306,8 +301,8 @@ async function switchProduct() {
           selectedProductLayout.value,
           _.pick(actionTarget, ['top', 'left']),
           actionCategoryTarget)
-
-    updateOrderLayout(result)
+    _clearAction()
+    await loadOrderLayout()
   } else {
     // switch in 2 categories
     console.log('TODO: switching products between category is not implemented')

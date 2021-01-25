@@ -12,9 +12,63 @@ import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
 import cms from 'cms';
+import orderLayoutApi from '../EditMenuCard/orderLayoutApi';
+
 export const orderLayout = ref({ categories: [] });
-export const selectedCategoryLayout = ref();
-export const selectedProductLayout = ref();
+export async function loadOrderLayout(type = 'default') {
+  const _orderLayout = await orderLayoutApi.loadOrderLayout(type);
+  if (editable.value) {
+    _orderLayout.categories = fillMissingAreas(_orderLayout.categories, _orderLayout.columns, _orderLayout.rows, true);
+    _.each(_orderLayout.categories, c => c.products = fillMissingAreas(c.products, c.columns, c.rows, false))
+  }
+  orderLayout.value = _orderLayout
+}
+
+const _selectedLayoutCache = {
+  categoryLayout: null,
+  productLayout: null
+}
+export const selectedCategoryLayoutPosition = ref({ top: 0, left: 0 })
+export const selectedCategoryLayout = computed({
+  get: () => {
+    const layout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayoutPosition.value, c))
+    _selectedLayoutCache.categoryLayout = layout
+    return layout
+  },
+  set: () => {
+    console.error('trying to update immutable selectedCategoryLayout')
+  }
+})
+export const selectCategoryLayout = position => {
+  selectedCategoryLayoutPosition.value = validatePosition(position)
+}
+export const updateSelectedCategoryLayout = change => {
+  Object.assign(_selectedLayoutCache.categoryLayout, change)
+}
+
+//
+export const selectedProductLayoutPosition = ref({ top: 0, left: 0 })
+export const selectedProductLayout = computed({
+  get: () => {
+    if (selectedCategoryLayout.value) {
+      const prodLayout = _.find(selectedCategoryLayout.value.products, p => isSameArea(selectedProductLayoutPosition.value, p))
+      _selectedLayoutCache.productLayout = prodLayout
+      return prodLayout
+    } else {
+      _selectedLayoutCache.productLayout = null
+    }
+  },
+  set: (val) => {
+    console.error('trying to set immutable selectedProductLayout')
+  }
+});
+export const selectProductLayout = (position) => {
+  selectedProductLayoutPosition.value = validatePosition(position)
+}
+export const updateSelectedProductLayout = change => {
+  Object.assign(_selectedLayoutCache.productLayout, change)
+}
+
 export const selectedProduct = computed({
   get: () => {
     // if no product layout selected, then return null
@@ -28,9 +82,23 @@ export const selectedProduct = computed({
     return selectedProductLayout.value.product
   },
   set: (value) => {
-    selectedProductLayout.value.product = value
+    console.error('trying to set immutable selectedProduct')
   }
 })
+export const updateProduct = (change) => {
+  if (_selectedLayoutCache.productLayout) {
+    Object.assign(_selectedLayoutCache.productLayout.product, change)
+  }
+}
+
+const validatePosition = (position) => {
+  const { top, left } = position
+
+  if (top == null || left == null)
+    throw 'Invalid position'
+
+  return { top, left }
+}
 export const selectedProductExisted = computed(() => {
   return !!(selectedProduct.value && selectedProduct.value._id)
 })
@@ -64,34 +132,24 @@ export function updateProductEditMode(newMode) {
 export const editable = ref(false);
 export const productDblClicked = ref(false);
 
-export function updateOrderLayout(newLayout) {
-  orderLayout.value = newLayout
-}
-export function updateSelectedCategoryLayout(newCategoryLayout) {
-  selectedCategoryLayout.value = newCategoryLayout
-}
-export function updateSelectedProductLayout(newProductLayout) {
-  selectedProductLayout.value = newProductLayout
-}
-
 watchEffect(() => {
   if (!orderLayout.value)
     return
 
   if (selectedCategoryLayout.value) {
     // update category layout to force re-render after product action executed
-    const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
-    if (cateLayout)
-      updateSelectedCategoryLayout(cateLayout)
+    // const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
+    // if (cateLayout)
+    //   updateSelectedCategoryLayout(cateLayout)
   } else {
     // automatically select first category
     if (orderLayout.value.categories.length > 0) {
       // find tab-product at 0-0
       const topLeftCategory = _.find(orderLayout.value.categories, c => c.top === 0 && c.left === 0)
       if (topLeftCategory)
-        updateSelectedCategoryLayout(topLeftCategory)
+        selectCategoryLayout(topLeftCategory)
       else
-        updateSelectedCategoryLayout(_.first(orderLayout.value.categories))
+        selectCategoryLayout(_.first(orderLayout.value.categories))
 
       if (editable.value && (!view.value || view.value.name !== 'CategoryEditor'))
         updateView('CategoryEditor')
@@ -117,15 +175,15 @@ export const products = computed(() => {
 //fixme: only for dev
 
 //prepareOrder();
-const order = getCurrentOrder();
-const once = _.once(() => {
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[0].product);
-  addProduct(order, products.value[1].product);
-  addProduct(order, products.value[1].product);
-
-  orderViewDialog.move = true;
-})
+// const order = getCurrentOrder();
+// const once = _.once(() => {
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[0].product);
+//   addProduct(order, products.value[1].product);
+//   addProduct(order, products.value[1].product);
+//
+//   orderViewDialog.move = true;
+// })
 /*watchEffect(() => {
   if (order.items.length === 0 && products.value && products.value.length > 0) {
     once();
@@ -163,15 +221,9 @@ export function fillMissingAreas(areas, columns, rows, isCategory) {
     for (let column = 0; column < columns; column++) {
       let empty = createEmptyLayout(row, column);
       if (isCategory) {
-        if (selectedCategoryLayout && isSameArea(empty, selectedCategoryLayout))
-          empty = selectedCategoryLayout;
-        else
-          empty = {...empty, ...createEmptyCategoryLayout()}
+        empty = {...empty, ...createEmptyCategoryLayout()}
       } else {
-        if (selectedProductLayout && isSameArea(empty, selectedProductLayout))
-          empty = selectedProductLayout
-        else
-          empty = {...empty, ...createEmptyProductLayout()}
+        empty = {...empty, ...createEmptyProductLayout()}
       }
       allAreas.push(empty)
     }
@@ -242,4 +294,14 @@ export function itemsRenderFactory() {
     </div>
   ))
   return itemsRender;
+}
+
+window.dbg = {
+  orderLayout,
+  _selectedLayoutCache,
+  selectedCategoryLayoutPosition,
+  selectedCategoryLayout,
+  selectedProductLayoutPosition,
+  selectedProductLayout,
+  selectedProduct,
 }

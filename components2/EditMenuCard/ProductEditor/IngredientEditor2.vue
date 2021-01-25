@@ -1,10 +1,14 @@
 <script>
 import _ from 'lodash';
 import { Touch } from 'pos-vue-framework'
-import { onActivated, ref, computed } from 'vue'
+import { onActivated, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../../utils'
-import { updateOrderLayout, selectedProduct, selectedProductExisted } from '../../OrderView/pos-ui-shared'
+import {
+  selectedProduct,
+  selectedProductExisted,
+  loadOrderLayout
+} from '../../OrderView/pos-ui-shared'
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull'
 
 export default {
@@ -18,25 +22,30 @@ export default {
     const { t } = useI18n()
     const showKeyboard = ref(false)
     const inventories = ref([])
-    const ingredients = computed(() => {
+    const ingredients = ref([])
+
+    function loadIngredients() {
       if (selectedProductExisted.value) {
-        return selectedProduct.value.ingredients.map(item => ({
+        ingredients.value = selectedProduct.value.ingredients.map(item => ({
           inventory: item.inventory,
           amount: '' + item.amount
         }))
       } else {
-        return []
+        ingredients.value = []
       }
-    })
-
+    }
     async function reloadInventories() {
       inventories.value = (await cms.getModel('Inventory').find()).map(item => ({
         text: `${item.name} (${item.unit})`,
         value: item._id
       }))
     }
+
+    // reload ingredients each time product changed
+    watch(selectedProduct, () => loadIngredients())
+
     onActivated(async() => await reloadInventories())
-    /*onCreated*/ reloadInventories()
+    /*onCreated*/ reloadInventories(); loadIngredients();
 
     const rules = computed(() => {
       let rules = []
@@ -58,18 +67,15 @@ export default {
         inventory: item.inventory,
         amount: Number(item.amount)
       }))
-
-      console.log('_ingredients', _ingredients)
-
       if(_.some(_.countBy(_ingredients, 'inventory'), item => item > 1))
         return
-
       await cms.getModel('Product').findOneAndUpdate({ _id: selectedProduct.value._id }, { ingredients: _ingredients })
-      updateOrderLayout(await cms.getModel('OrderLayout').findOne({type: 'default'}))
+      await loadOrderLayout()
     }
 
     const debounceUpdateAmount = _.debounce(updateProductIngredient, 300)
 
+    //fixme: i18n
     const renderNoProductSelected = () => <div style="display: flex; align-items: center; justify-content: center; height: 100%">
       Select product to edit ingredient
     </div>

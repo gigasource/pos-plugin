@@ -6,12 +6,15 @@ import {keyboardConfig, updateKeyboardConfig} from '../OrderView/order-layout-ke
 import {reactive, computed} from 'vue';
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils';
+import _ from 'lodash'
 
 export default {
   name: 'KeyboardEditor2.vue',
   components: {InputNumber2},
   props: {},
   setup() {
+    window.dbg = window.dbg || {}
+    window.dbg.keyboardConfig = keyboardConfig
     const { t } = useI18n()
     const state = reactive({
       dialog: false,
@@ -54,7 +57,7 @@ export default {
     })
 
     const extraColumns = computed(() => {
-      if(keyboardConfig.value && keyboardConfig.value.layout) {
+      if (keyboardConfig.value) {
         return _.max(keyboardConfig.value.layout.map(layout => layout && layout.rows && layout.rows.length)) || 0
       }
       return 0
@@ -79,12 +82,12 @@ export default {
 
     // methods
     async function _updateKeyboardConfig(change) {
-      await updateKeyboardConfig(Object.assign({}, keyboardConfig.value, change))
+      await updateKeyboardConfig(Object.assign(keyboardConfig.value, change))
     }
-    async function changeExtraColumns(val) {
+    async function changeExtraColumns(newExtraColumns) {
       const config = Object.assign({}, keyboardConfig.value)
       const layout = config.layout
-      if(val > extraColumns.value) { //add column
+      if (newExtraColumns > extraColumns.value) { // add column
         if(layout.length === 0) {
           while(layout.length < 4) {
             layout.push({rows: []})
@@ -121,6 +124,7 @@ export default {
       }
     }
     function onmousedown(e, column, row) {
+      console.log('onmousedown', column, row)
       state.selecting = true
       state.mouseDownCell = {x: column, y: row}
       state.mouseCurrentCell = {x: column, y: row}
@@ -129,11 +133,13 @@ export default {
       }
     }
     function mouseenter(column, row) {
+      console.log('mouseenter', column, row)
       if(state.selecting) {
         state.mouseCurrentCell = {x: column, y: row}
       }
     }
     function onmouseup() {
+      console.log('onmouseup')
       state.selecting = false
     }
     function changeLayout() {
@@ -178,18 +184,18 @@ export default {
         <g-btn-bs elevation="2" style="margin: 0 0 12px" onClick={() => state.dialog = true} icon="select_all">{t('ui.choose')}</g-btn-bs>
         <div class="keyboard-editor__title">{t('restaurant.menuEdit.expansionColumn')} </div>
         <div class="row-flex">
-          <input-number2 width="148" modelValue={extraColumns.value} onUpdate:modelvalue={changeExtraColumns}></input-number2>
+          <input-number2 width="148" model-value={extraColumns.value} onUpdate:modelValue={changeExtraColumns}></input-number2>
           <g-btn-bs elevation="2" icon="icon-redo" onClick={resetKeyboard}>{t('ui.reset')} </g-btn-bs>
         </div>
         <g-checkbox v-model={active.value} label="Active Keyboard"/>
         <g-checkbox v-model={onlyShowInFirstPage.value} label="Show Keyboard only in first page"/>
         <g-checkbox v-model={showXButton.value} label="Show 'x' Button"/>
         <g-dialog v-model={state.dialog} width="90%" height="90%" eager>
-          <div class="dialog">
+          { genScopeId(() => <div class="dialog">
             <div class="dialog-title">{t('restaurant.menuEdit.keyboardPosition')}</div>
             <div class="dialog-content" style={getDialogStyles()}>
-              {selectedCategoryLayout.rows.map(row => <>
-                    {selectedCategoryLayout.columns.map(column =>
+              {_.range(1, selectedCategoryLayout.value.rows + 1).map(row => <>
+                    {_.range(1, selectedCategoryLayout.value.columns + 1).map(column =>
                         <div class="dialog-content__cell"
                              style={getCellStyles(column, row)}
                              key={`${column}_${row}`}
@@ -203,13 +209,13 @@ export default {
                     )}
                   </>
               )}
-              <div style={selectingCells}></div>
+              <div style={selectingCells.value}></div>
             </div>
             <div class="dialog-action">
               <g-btn-bs text-color="#424242" onClick={closeDialog}>Cancel</g-btn-bs>
               <g-btn-bs width="120" background-color="#2979FF" onClick={changeLayout}>OK</g-btn-bs>
             </div>
-          </div>
+          </div>)() }
         </g-dialog>
       </div>
     </>)

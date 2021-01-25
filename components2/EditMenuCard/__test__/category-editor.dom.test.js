@@ -16,12 +16,12 @@ import {
 const delay = require("delay");
 import CategoryEditor2 from '../CategoryEditor/CategoryEditor2';
 import {nextTick} from 'vue'
-import { updateOrderLayout, updateSelectedCategoryLayout } from '../../OrderView/pos-ui-shared';
+import { updateSelectedCategoryLayout } from '../../OrderView/pos-ui-shared';
 const ignoreComponents = ['Portal', 'PortalTarget', 'MountingPortal', 'portal', 'portal-target']
 
 describe('category-editor', () => {
   it('should show correct', async () => {
-    updateOrderLayout({ rows: 2, columns: 4 })
+    // TODO: update test case
     updateSelectedCategoryLayout({ name: 'Wine', color: '#FFF', rows: 4, columns: 6,  })
 
     // wipe-out components (to make dependencies component un-resolvable) to make sure snapshot render prop for stub class

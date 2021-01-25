@@ -6,8 +6,8 @@ import {
   getGridTemplateFromNumber,
   orderLayout,
   selectedCategoryLayout,
-  updateSelectedCategoryLayout,
-  updateSelectedProductLayout,
+  selectCategoryLayout,
+  selectProductLayout,
   updateView
 } from './pos-ui-shared';
 import {category} from "./order-layout-setting-logic";
@@ -16,13 +16,13 @@ import {isSameArea} from "../../components/posOrder/util";
 
 export function orderLayoutCategoriesFactory() {
   const categories = computed(() => {
-    if (editable.value) {
-      return fillMissingAreas(
-        orderLayout.value.categories,
-        orderLayout.value.columns,
-        orderLayout.value.rows,
-        true);
-    }
+    // if (editable.value) {
+    //   return fillMissingAreas(
+    //     orderLayout.value.categories,
+    //     orderLayout.value.columns,
+    //     orderLayout.value.rows,
+    //     true);
+    // }
     return [...orderLayout.value.categories]
   });
 
@@ -90,13 +90,13 @@ export function orderLayoutCategoriesFactory() {
   }
 
   async function selectCategory(categoryLayout) {
+    selectProductLayout({ top: -1, left: -1 })
     if (editable.value) {
-      updateSelectedCategoryLayout(categoryLayout)
+      selectCategoryLayout(categoryLayout)
       updateView('CategoryEditor')
     } else {
-      updateSelectedCategoryLayout(categoryLayout)
+      selectCategoryLayout(categoryLayout)
     }
-    updateSelectedProductLayout(null)
   }
 
   function getCategoryName(item) {
