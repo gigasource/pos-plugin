@@ -266,7 +266,7 @@ export function orderLayoutProductFactory() {
               </div>
             ))
           }
-          {{/*renderKeyboard()*/}}
+          {renderKeyboard()}
         </div>
       </div>
     }
