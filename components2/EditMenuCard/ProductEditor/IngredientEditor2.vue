@@ -75,6 +75,7 @@ export default {
 
     const debounceUpdateAmount = _.debounce(updateProductIngredient, 300)
 
+    //fixme: i18n
     const renderNoProductSelected = () => <div style="display: flex; align-items: center; justify-content: center; height: 100%">
       Select product to edit ingredient
     </div>
