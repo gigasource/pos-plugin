@@ -12,12 +12,15 @@ import {
   makeLastItemDiscount,
   removeItem, addSinglePayment, getRestTotal, addMultiPayment
 } from "../../components2/OrderView/pos-logic";
+import _ from 'lodash';
 
 const moment = require("moment");
 
 async function prepareDb(orm) {
   const Order = orm('Order')
   await Order.remove({});
+  await orm('EndOfDay').remove()
+
   const foodTax = {taxes: [5, 10]};
   const drinkTax = {taxes: [16, 32]};
 
@@ -83,6 +86,14 @@ async function prepareDb(orm) {
     addSinglePayment(order, {type: "card", value: getRestTotal(order)});
     order.date = moment("06.01.2021", "DD.MM.YYYY").toDate();
     makeEOD(order, 2);
+    addUser(order, "Waiter 1");
+  });
+
+  await makeOrder({date: new Date()}, async order => {
+    addItem(order, cola, 1);
+    await nextTick();
+    addSinglePayment(order, {type: "card", value: getRestTotal(order)});
+    order.date = moment("07.01.2021", "DD.MM.YYYY").toDate();
     addUser(order, "Waiter 1");
   });
 }

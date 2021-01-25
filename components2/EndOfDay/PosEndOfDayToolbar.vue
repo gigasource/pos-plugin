@@ -1,13 +1,13 @@
 <script>
 
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router';
+import {computed, ref} from 'vue'
+import {useRoute} from 'vue-router';
 
 export default {
   setup() {
-    const  showEndOfDayConfirmDialog = ref(false)
+    const showEndOfDayConfirmDialog = ref(false)
     const showPendingEndOfDayConfirmDialog = ref(false)
-        // inject.ReportsStore
+    // inject.ReportsStore
     const selectedReportDate = ref(null)
     const listOfDatesWithReports = ref([])
     const hasDateReports = computed(() => {
@@ -20,8 +20,9 @@ export default {
       return hasDateReports.value && !selectedReportDate.value.reports.some(report => report.pending)
     })
     const router = useRoute()
+
     function back() {
-      router.push({ path: '/pos-dashboard' })
+      router.push({path: '/pos-dashboard'})
     }
 
     //todo: getOldestPendingReport, finalizeReport, getDatesWithReports, getDailyReports
@@ -33,12 +34,14 @@ export default {
       }
       showEndOfDayConfirmDialog.value = true
     }
+
     async function save(reports) {
       const date = selectedReportDate.date || new Date()
       await finalizeReport(reports)
       await getDatesWithReports(date)
       getDailyReports(date)
     }
+
     return () => <>
       <g-toolbar color="#eee" style="z-index: 2">
         <g-btn uppercase={false} onClick={back}>
@@ -50,7 +53,7 @@ export default {
         <g-spacer>
         </g-spacer>
         <pos-end-of-day-reprint-z-report v-slots={{
-          'activator': ({ open, close }) => <>
+          'activator': ({open, close}) => <>
             {
               (showReprint.value) &&
               <g-btn uppercase={false} class="mr-2" onClick={open}>
@@ -64,14 +67,11 @@ export default {
           ,
         }}></pos-end-of-day-reprint-z-report>
         <pos-end-of-day-print-dialog v-slots={{
-          'activator': ({ open, close }) => <>
-            {
+          'activator': ({open, close}) =>
               (showRunEndOfDay.value) &&
               <g-btn uppercase={false} onClick={() => open(selectedReportDate.value.date)} width="139px" class="mr-2">
                 {t('report.xReport')}
               </g-btn>
-            }
-          </>
         }}></pos-end-of-day-print-dialog>
         {
           (showRunEndOfDay.value) &&
@@ -82,7 +82,8 @@ export default {
         }
         <pos-end-of-day-print-pending-z-report onConfirmed={save} v-model={showPendingEndOfDayConfirmDialog.value}>
         </pos-end-of-day-print-pending-z-report>
-        <pos-end-of-day-print-z-report onConfirmed={() => save(selectedReportDate.value.reports)} v-model={showEndOfDayConfirmDialog.value}>
+        <pos-end-of-day-print-z-report onConfirmed={() => save(selectedReportDate.value.reports)}
+                                       v-model={showEndOfDayConfirmDialog.value}>
         </pos-end-of-day-print-z-report>
       </g-toolbar>
     </>

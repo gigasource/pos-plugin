@@ -4,9 +4,9 @@ const {
 } = require('../../order-logic/report-eod-logic')
 const dayjs = require('dayjs')
 
-async function makePrintData(cms, z) {
+async function makePrintData(cms, _report) {
   const posSetting = await cms.getModel('PosSetting').findOne({});
-  const endOfDayReport = await eodReport(z)
+  const endOfDayReport = await eodReport(_report.z)
   const {
     report,
     reportByPayment,
@@ -14,7 +14,7 @@ async function makePrintData(cms, z) {
     paidOrders
   } = endOfDayReport
 
-  if (!endOfDayReport) throw new Error(`z report number ${z} not found`);
+  if (!endOfDayReport) throw new Error(`report report number ${z} not found`);
 
   const {from} = report;
 
@@ -38,7 +38,7 @@ async function makePrintData(cms, z) {
     vTaxSum: report.vTaxSum,
     discount: report.vDiscount || 0,
     reportByPayment,
-    z
+    z: _report.z
   }
 }
 

@@ -1,23 +1,24 @@
 <script>
 
 import {$filters} from '../AppSharedStates';
-import { ref, withModifiers } from 'vue'
+import {ref, withModifiers} from 'vue'
 import {internalValueFactory} from "../utils";
+import {useI18n} from "vue-i18n";
+import {getXReport, xReport} from "./eod-shared";
+import _ from 'lodash';
 
 export default {
   name: 'PosEndOfDayPrintDialog',
   props: {
     value: null,
   },
-  setup(props, {emit}) {
-    const xReport = ref(null)
-    const date = ref(null)
+  setup(props, {emit, slots}) {
+    const {t} = useI18n();
 
     const dialog = internalValueFactory(props, {emit})
 
-    const open = async function (_date) {
-      date.value = _date;
-      xReport.value = await getXReport(date)
+    const open = async function () {
+      await getXReport()
     }
 
     const close = function () {
@@ -35,17 +36,9 @@ export default {
       await printXReport(date.value)
     }
 
-    const getXReport = function () {
-      console.error('ReportsStore:getXReport was not injected')
-    }
-
-    const printXReport = function () {
-      console.error('ReportsStore:printXReport was not injected')
-    }
-
     return () => <>
       <div>
-        <slot close={close} open={open} name="activator"></slot>
+        {slots.activator && slots.activator({close, open})}
         <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="70%">
           <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
             <p class="eod-header">
@@ -57,7 +50,7 @@ export default {
                   <p class="section-title eod-title">
                     {t('common.sales')} </p>
                   <div class="eod-details">
-                    {xReport.value.sumByPayment.map((paymentValue, paymentName) =>
+                    {_.map(xReport.value.sumByPayment, (paymentValue, paymentName) =>
                         <div class="details-content">
                           <p>
                             {paymentName} </p>
@@ -76,13 +69,14 @@ export default {
                   <p class="section-title eod-title">
                     {t('report.productSold')} </p>
                   <div class="eod-details">
-                    {xReport.value.groupItemsByCategory.map((items, category) =>
+                    {_.map(xReport.value.groupItemsByCategory, (items, category) =>
                         <div>
                           <p class="eod-subtitle">
                             {category || 'No category'}
-                            (€{$filters.formatCurrency(xReport.value.sumByCategory[category])}) </p>
+                            (€{$filters.formatCurrency(xReport.value.sumByCategory[category])})
+                          </p>
                           <div class="eod-sales-detail">
-                            {items.map((quantity, name) =>
+                            {_.map(items, (quantity, name) =>
                                 <p> {quantity} x {name} </p>
                             )}
                           </div>
@@ -98,7 +92,8 @@ export default {
 
                   {t('ui.cancel')}
                 </g-btn>
-                <g-btn uppercase={false} background-color="#2979FF" text-color="#fff" onClick={withModifiers(print, ['stop'])}>
+                <g-btn uppercase={false} background-color="#2979FF" text-color="#fff"
+                       onClick={withModifiers(print, ['stop'])}>
                   <g-icon class="mr-2" svg>
                     icon-print
                   </g-icon>

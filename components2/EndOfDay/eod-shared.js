@@ -1,64 +1,131 @@
 import dayjs from 'dayjs'
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import * as jsonfn from "json-fn";
 import cms from 'cms'
-export const listOfDatesWithReports = ref([])
 import _ from 'lodash'
 
-async function getEodReportsCalender(from, to) {
-  try {
-    // let result = await cms.processData('OrderEODCalendar', {from, to});
-    let result = await new Promise((resolve, reject) => {
-      cms.socket.emit('get-eod-report-calender', from.toDate(), to.toDate(), (eodReport) => {
-        resolve(eodReport)
-      })
-    })
+export const listOfDatesWithReports = ref([])
+export const selectedDate = ref(new Date());
 
-    result = jsonfn.clone(result, true, true);
-    return result.ordersByDate
-  } catch (e) {
-    console.error(e)
-  }
-}
+export const eventDates = computed(() => {
+  return _.map(listOfDatesWithReports.value, (value, key) => {
+    const color = Object.keys(value).includes('') ? '#00E676' : '#EF9A9A'
+    return {
+      date: dayjs(key).format('YYYY-MM-DD'),
+      color
+    }
+  })
+});
+export const highestZNumber = ref(1);
 
-export async function getDatesWithReports(month) {
-  let eventDates = []
+export function mapCalendarReports(dates) {
+  const detailReports = [];
+  for (const _date of Object.keys(dates)) {
+    const date = dayjs(_date).toDate();
+    const _reports = dates[_date];
+    //todo: this.getHighestZNumber
 
-  if (month) {
-    let currentDate = dayjs(month).startOf('month')
-    const endDate = currentDate.add(1, 'month')
-
-    const dates = await getEodReportsCalender(currentDate, endDate)
-
-    eventDates = _.map(dates, (value, key) => {
-      const color = Object.keys(value).includes('') ? '#00E676' : '#EF9A9A'
+    const reports = _.map(_reports, (r, key) => {
+      if (!key) getHighestZNumber();
       return {
-        date: dayjs(key).format('YYYY-MM-DD'),
-        color
+        sum: r.vSum,
+        z: key ? key : highestZNumber.value,
+        begin: r.from,
+        pending: !key
       }
+    }).sort((cur, next) => cur.begin - next.begin)
+
+    detailReports.push({
+      date,
+      reports
     })
   }
-
-  return eventDates
+  return detailReports;
 }
 
-export async function getDailyReports(month) {
-  let eventDates = []
+export const detailsDailyReport = computed(() => mapCalendarReports(listOfDatesWithReports.value))
 
-  if (month) {
-    let currentDate = dayjs(month).startOf('month')
-    const endDate = currentDate.add(1, 'month')
+export const selectedReportDate = computed(() => {
+  //base on selectedDate and detailsDailyReport
+  selectedDate.value;
+  detailsDailyReport.value;
+  //target ->
+  //todo: begin hours concept
+  return detailsDailyReport.value.find(item => dayjs(item.date).startOf('d').isSame(dayjs(selectedDate.value).startOf('d')));
+})
 
-    const dates = await getEodReportsCalender(currentDate, endDate)
+async function getHighestZNumber() {
+  const eod0 = await cms.getModel('EndOfDay').findOne({}).sort({z: '-1'});
+  highestZNumber.value = eod0 ? eod0.z + 1 : 1;
+}
 
-    eventDates = _.map(dates, (value, key) => {
-      const color = Object.keys(value).includes('') ? '#00E676' : '#EF9A9A'
-      return {
-        date: dayjs(key).format('YYYY-MM-DD'),
-        color
-      }
+export async function getEodReportsInMonthCalender(month = new Date()) {
+  //todo: beginHours
+  let from = dayjs(month).startOf('month').toDate()
+  const to = dayjs(month).endOf('month').toDate()
+  await getEodReportsCalender(from, to)
+}
+
+async function getEodReportsCalender(from, to, fillToSingleton = true) {
+  let result = await new Promise((resolve, reject) => {
+    cms.socket.emit('get-eod-report-calender', from, to, (eodReport) => {
+      resolve(eodReport)
     })
-  }
+  })
 
-  return eventDates
+  result = jsonfn.clone(result);
+  if (fillToSingleton) listOfDatesWithReports.value = result.ordersByDate;
+  return result.ordersByDate
 }
+
+export const xReport = ref();
+
+export async function getXReport() {
+  //todo: XReport, beginHour
+  /*const beginHour = cms.getList('PosSetting')[0].generalSetting.beginHour || '00:00'
+  const [hour, minutes] = beginHour.split(':')
+  const from = dayjs(date).startOf('day').hour(parseInt(hour)).minute(parseInt(minutes)).toDate()
+  const to = dayjs(from).add(1, 'day').toDate()*/
+  const from = dayjs(selectedDate.value).startOf('d').toDate();
+  const to = dayjs(selectedDate.value).endOf('d').toDate();
+
+  cms.socket.emit('get-x-report', from, to, async (result) => {
+    result = jsonfn.clone(result);
+    xReport.value = result;
+  })
+}
+
+export const pendingReport = ref();
+
+/**
+ * find one report (computed base on list of orders) which doesn't have z
+ * @returns {Promise<void>}
+ */
+export async function getOldestPendingReport() {
+  //todo: beginHour
+  const pendingOrder = await cms.getModel('Order').findOne({z: {$exists: false}, status: 'paid'}).sort('date')
+  if (pendingOrder) {
+    const fromDate = dayjs(pendingOrder.vDate);
+    let eodData = await getEodReportsCalender(fromDate.toDate(), fromDate.add(1, 'day').toDate(), false)
+    await getHighestZNumber();
+    let reports = mapCalendarReports(eodData)
+    pendingReport.value = reports.reduce((l,i) => l.concat(i.reports), []).find(r => r.pending);
+  }
+}
+
+export async function makeEODReport(report) {
+  if (!report || !report.pending) return;
+  await new Promise(resolve => cms.socket.emit('endOfDay', report, resolve))
+  //todo: binding with backend
+  /*await new Promise(resolve => cms.socket.emit('printReport', 'XReport', date, function () {
+    resolve();
+  }))*/
+}
+
+async function printXReport(date) {
+  //todo: @Huy : make it run
+  await new Promise(resolve => cms.socket.emit('printReport', 'XReport', date, function () {
+    resolve();
+  }))
+}
+

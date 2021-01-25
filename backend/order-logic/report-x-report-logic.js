@@ -39,7 +39,7 @@ async function xReport(from, to) {
   let sumByCategory = renderPivotTable(
     {
       rows: ["category"],
-      columns: ["@date[DD.MM.YYYY]:orderDate"],
+      //columns: ["@date[DD.MM.YYYY]:orderDate"],
       reducers: ["@sum[2]:vSum"]
     },
     items
@@ -48,7 +48,7 @@ async function xReport(from, to) {
   let sumByPayment = renderPivotTable(
     {
       rows: ["payment.0.type"],
-      columns: ["@date[DD.MM.YYYY]:vDate"],
+      //columns: ["@date[DD.MM.YYYY]:vDate"],
       reducers: ["@sum[2]:vSum"]
     },
     paidOrder
@@ -57,7 +57,7 @@ async function xReport(from, to) {
   let sumByTakeout = renderPivotTable(
     {
       rows: ["takeout"],
-      columns: ["@date[DD.MM.YYYY]:orderDate"],
+      //columns: ["@date[DD.MM.YYYY]:orderDate"],
       reducers: ["@sum[2]:vSum"]
     },
     items

@@ -1,9 +1,5 @@
 //<editor-fold desc="declare">
-import {nextTick} from "vue";
 import {renderPivotTable} from "./pivot";
-import {
-  mergeVTaxGroup
-} from "../../components2/OrderView/pos-logic";
 import {eodReport} from "./report-eod-logic";
 import {eodReportCalender} from "./report-eod-calender-logic";
 import {monthReport} from "./report-month-report";

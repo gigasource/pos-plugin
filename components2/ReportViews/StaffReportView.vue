@@ -49,7 +49,8 @@ export default {
     }
 
     // inject service
-    function getListUsers() {
+    async function getListUsers() {
+      listUsers.value = await cms.getModel('PosUser').find().lean();
     }
 
     function getOrderSalesByStaff() {
@@ -73,11 +74,11 @@ export default {
     // }
 
     // fixme:
-    // onBeforeMount(async() => {
-    //   await getListUsers();
-    //   staffs.value = listUsers.value;
-    //   selectedStaff.value = staffs.value.length && staffs.value[0]
-    // })
+    onBeforeMount(async() => {
+      await getListUsers();
+      staffs.value = listUsers.value;
+      selectedStaff.value = staffs.value.length && staffs.value[0]
+    })
 
     return () => <>
       <div class="staff-report-view">

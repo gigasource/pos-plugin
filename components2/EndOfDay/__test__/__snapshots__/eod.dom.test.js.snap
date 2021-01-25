@@ -783,6 +783,7 @@ exports[`eod test case 2 PosEndOfDayMain 1`] = `
               <td>
                 <button type="button"
                         class="g-table-item"
+                        style="background-color: rgb(239, 154, 154); border-color: #ef9a9a; color: rgb(255, 255, 255); caret-color: #FFFFFF;"
                 >
                   <div class="g-table-item__content">
                     5
@@ -796,6 +797,7 @@ exports[`eod test case 2 PosEndOfDayMain 1`] = `
               <td>
                 <button type="button"
                         class="g-table-item"
+                        style="background-color: rgb(239, 154, 154); border-color: #ef9a9a; color: rgb(255, 255, 255); caret-color: #FFFFFF;"
                 >
                   <div class="g-table-item__content">
                     6
@@ -1145,5 +1147,208 @@ exports[`eod test case 2 PosEndOfDayMain 1`] = `
     <div class="g-picker__actions g-picker__actions--no-title">
     </div>
   </div>
+</div>
+`;
+
+exports[`eod test case 3 PosEODDetails 1`] = `
+<div>
+  <g-tabs-stub items="[object Object]"
+               color="#F2F2F2"
+               text-color="#000000"
+               modelvalue="[object Object]"
+               showarrows="false"
+               slider-size="0"
+  >
+    <g-tab-item-stub item="[object Object]">
+      <div class="eod-info">
+        <span class="eod-info-important">
+          Date:
+        </span>
+        <span>
+          2021-01-05T00:00:00+07:00
+        </span>
+      </div>
+      <div class="eod-info">
+        <span class="eod-info-important">
+          report.zNumber:
+        </span>
+        <span>
+          1
+        </span>
+      </div>
+      <div class="eod-info">
+        <span class="eod-info-important">
+          report.firstOrder:
+        </span>
+        <span>
+          2021-01-05T00:00:00+07:00
+        </span>
+      </div>
+      <div class="eod-info">
+        <span class="eod-info-important">
+          report.lastOrder:
+        </span>
+        <span>
+          2021-01-05T00:00:00+07:00
+        </span>
+      </div>
+      <div class="eod-info">
+        <span class="eod-info-important">
+          report.totalSales:
+        </span>
+        <span class="eod-info-total-sale">
+          € 19.60
+        </span>
+      </div>
+    </g-tab-item-stub>
+  </g-tabs-stub>
+</div>
+`;
+
+exports[`eod test case 4 PosEODPrintDialog 1`] = `
+<div>
+  <g-dialog-stub eager="true"
+                 overlay-color="#6B6F82"
+                 overlay-opacity="0.95"
+                 width="70%"
+  >
+    <div style="width: 100%; background-color: rgb(255, 255, 255); position: relative; height: 75vh;">
+      <p class="eod-header">
+        report.xReport
+      </p>
+      <div style="height: calc(100% - 145px); overflow-y: auto;">
+        <div class="eod-dialog-main">
+          <div class="eod-dialog-content">
+            <p class="section-title eod-title">
+              common.sales
+            </p>
+            <div class="eod-details">
+              <div class="details-content">
+                <p>
+                  cash
+                </p>
+                <p>
+                  € 5.30
+                </p>
+              </div>
+              <div class="details-content">
+                <p>
+                  card
+                </p>
+                <p>
+                  € 14.30
+                </p>
+              </div>
+              <div class="total-content">
+                <p class="eod-subtitle">
+                  common.total
+                </p>
+                <p style="text-decoration: underline; font-weight: 800;">
+                  €19.60
+                </p>
+              </div>
+            </div>
+            <p class="section-title eod-title">
+              report.productSold
+            </p>
+            <div class="eod-details">
+              <div>
+                <p class="eod-subtitle">
+                  drink(€6.60)
+                </p>
+                <div class="eod-sales-detail">
+                  <p>
+                    2.6 x Cola
+                  </p>
+                  <p>
+                    4 x Fanta
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p class="eod-subtitle">
+                  food(€13)
+                </p>
+                <div class="eod-sales-detail">
+                  <p>
+                    13 x Rice
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <g-toolbar-stub bottom="true"
+                        color="#eee"
+        >
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <g-btn-stub uppercase="false"
+                      class="mr-2"
+          >
+            ui.cancel
+          </g-btn-stub>
+          <g-btn-stub uppercase="false"
+                      background-color="#2979FF"
+                      text-color="#fff"
+          >
+            <g-icon-stub class="mr-2"
+                         svg="true"
+            >
+              icon-print
+            </g-icon-stub>
+            ui.print
+          </g-btn-stub>
+        </g-toolbar-stub>
+      </div>
+    </div>
+  </g-dialog-stub>
+</div>
+`;
+
+exports[`eod test case 7 PosEndOfDayPrintPendingZReport 1`] = `
+<div>
+  <g-dialog-stub eager="true"
+                 modelvalue="true"
+                 width="45%"
+                 overlay-color="#6B6F82"
+                 overlay-opacity="0.95"
+  >
+    <div class="print-confirm-dialog">
+      <p class="title">
+        ui.notification
+      </p>
+      <div class="confirmation-content">
+        <p>
+          'report.pendingPrintLine1' , { date: '07.01.2021' }
+        </p>
+        <p>
+          'report.pendingPrintLine2' , { date: '07.01.2021' }
+        </p>
+      </div>
+      <div class="confirmation-buttons">
+        <g-btn-stub uppercase="false"
+                    background-color="#fff"
+                    class="mr-2"
+                    flat="true"
+                    style="border: 1px solid #979797;"
+                    text-color="#1D1D26"
+                    width="120px"
+        >
+          ui.cancel
+        </g-btn-stub>
+        <g-btn-stub ok="true"
+                    uppercase="false"
+                    background-color="#E57373"
+                    class="mr-2"
+                    flat="true"
+                    text-color="#FFFFFF"
+                    width="120px"
+        >
+          ui.ok
+        </g-btn-stub>
+      </div>
+    </div>
+  </g-dialog-stub>
 </div>
 `;

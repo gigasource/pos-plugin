@@ -18,3 +18,8 @@ nên làm gì bây h :
 2. vue-test-utils for refactor and test
 3. rewrite for edit isolate (prevent complex)
 4. base on data
+
+// idea -> frontend -> make action so backend can process without use middle binding layer
+* [_] optimize later
+
+* [_] makeEOD -> tao ra eod co so z , value tuong ung (computed)

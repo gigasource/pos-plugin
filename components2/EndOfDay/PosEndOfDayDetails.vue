@@ -1,8 +1,9 @@
 <script>
 import {useI18n} from 'vue-i18n';
 import dayjs from "dayjs";
-import {computed} from "vue";
+import {computed, ref, watch} from "vue";
 import {$filters} from "../AppSharedStates";
+import {selectedReportDate} from "./eod-shared";
 
 export default {
   props: ['modelValue'],
@@ -10,8 +11,7 @@ export default {
     const {t} = useI18n()
 
     const model = ref({})
-    const zNumberReports = ref()
-    const selectedReportDate = ref(null)
+    const zNumberReports = ref([])
     const timeFormat = ref('')
     const dateFormat = ref('')
 
@@ -28,9 +28,14 @@ export default {
       },
       set(value) {
         model.value = value
-        this.$emit('update:modelValue', value);
+        emit('update:modelValue', value);
       }
     })
+
+    /**
+     * selectedReportDate: .reports, .date
+     * reports -> begin, end, sum , z
+     */
 
     watch(selectedReportDate, (newVal, oldVal) => {
       if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
@@ -41,10 +46,10 @@ export default {
           z: report.z
         }))
 
-        this.model = this.zNumberReports[this.zNumberReports.length - 1]
+        model.value = zNumberReports.value[zNumberReports.value.length - 1]
       } else {
-        this.zNumberReports = []
-        this.model = null
+        zNumberReports.value = []
+        model.value = null
       }
     })
 

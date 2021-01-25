@@ -1,11 +1,11 @@
 <script>
 
-import { internalValueFactory } from '../utils';
+import {internalValueFactory} from '../utils';
 
 export default {
   props: ['modelValue'],
-  setup(props, { emit }) {
-    const dialog = internalValueFactory(props, { emit })
+  setup(props, {emit, slots}) {
+    const dialog = internalValueFactory(props, {emit})
     const open = function () {
       dialog.value = true
     }
@@ -13,29 +13,31 @@ export default {
       dialog.value = false
       if (confirmed) emit('confirmed')
     }
-    return () => <>
-      <div>
-        <slot close={close} open={open} name="activator"></slot>
-        <g-dialog eager v-model={dialog.value} width="45%" overlay-color="#6B6F82" overlay-opacity="0.95">
-          <div class="print-confirm-dialog">
-            <p class="title"> {t('ui.confirmation')} </p>
-            <p class="confirmation-content">
-              {t('report.confirmationPrintZ1')}
-              <br> </br>
-              {t('report.confirmationPrintZ2')}?
-            </p>
-            <div class="confirmation-buttons">
-              <g-btn onClick={() => close()} uppercase={false} background-color="#fff" class="mr-2" flat style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
-                {t('ui.cancel')}
-              </g-btn>
-              <g-btn onClick={() => close(true)} uppercase={false} background-color="#E57373" class="mr-2" flat text-color="#FFFFFF" width="120px">
-                {t('ui.ok')}
-              </g-btn>
+    return () => (
+        <div>
+          {slots.activator && slots.activator({close, open})}
+          <g-dialog eager v-model={dialog.value} width="45%" overlay-color="#6B6F82" overlay-opacity="0.95">
+            <div class="print-confirm-dialog">
+              <p class="title"> {t('ui.confirmation')} </p>
+              <p class="confirmation-content">
+                {t('report.confirmationPrintZ1')}
+                <br> </br>
+                {t('report.confirmationPrintZ2')}?
+              </p>
+              <div class="confirmation-buttons">
+                <g-btn onClick={() => close()} uppercase={false} background-color="#fff" class="mr-2" flat
+                       style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
+                  {t('ui.cancel')}
+                </g-btn>
+                <g-btn onClick={() => close(true)} uppercase={false} background-color="#E57373" class="mr-2" flat
+                       text-color="#FFFFFF" width="120px">
+                  {t('ui.ok')}
+                </g-btn>
+              </div>
             </div>
-          </div>
-        </g-dialog>
-      </div>
-    </>
+          </g-dialog>
+        </div>
+    )
   }
 }
 </script>

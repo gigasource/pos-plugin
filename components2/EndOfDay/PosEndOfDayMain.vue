@@ -1,18 +1,15 @@
 <script>
 import {useI18n} from 'vue-i18n'
-import { onMounted, onActivated, ref } from 'vue'
+import {onActivated, onMounted, ref} from 'vue'
 import PosEndOfDayDatePicker from "./PosEndOfDayDatePicker";
 import dayjs from 'dayjs'
-import {getDailyReports, listOfDatesWithReports, getDatesWithReports} from "./eod-shared";
+import {eventDates, getDailyReports, getEodReportsInMonthCalender, selectedDate} from "./eod-shared";
 
 export default {
   components:{PosEndOfDayDatePicker},
   setup() {
     const {t} = useI18n();
 
-    const date = ref(null)
-    const eventDates = ref([])
-    const selectedReportDate = ref(null)
     const daysOfWeek = ref([
       'onlineOrder.weekday.sun',
       'onlineOrder.weekday.mon',
@@ -28,39 +25,30 @@ export default {
       return t(daysOfWeek.value[i])
     }
 
-    const selectDate = function (value) {
-      if (!selectedReportDate.value || !value) selectedReportDate.value = {}
-      if (selectedReportDate.value && selectedReportDate.value.date === value) return
-      date.value = value
-      getDailyReports(dayjs(value, 'YYYY-MM-DD').toDate())
-    }
-
     const getDatesWithReport = async function (date) {
-      eventDates.value = await getDatesWithReports(date)
+      await getEodReportsInMonthCalender(date);
     }
 
     onMounted(async () => {
       const currentDate = dayjs().format('YYYY-MM-DD');
-      await getDatesWithReport(currentDate)
-      await selectDate(currentDate)
+      await getEodReportsInMonthCalender(currentDate);
 
     })
 
     onActivated(async () => {
       const currentDate = dayjs().format('YYYY-MM-DD');
-      await getDatesWithReport(currentDate)
-      await selectDate(currentDate)
+      await getEodReportsInMonthCalender(currentDate);
     })
 
     return () => <>
       <div style="height: 100%; background-color: #EEEEEE;">
         <pos-end-of-day-date-picker
-            eventDates={listOfDatesWithReports.value}
+            eventDates={eventDates.value}
             firstDayOfWeek={1}
             monthSelectDisabled={true}
             weekdayFormat={getDay} color="#fff"
             full-width no-title
-            modelValue={date.value} onUpdate:modelValue={selectDate}
+            modelValue={selectedDate.value}
             onClick:prev={getDatesWithReport}
             onClick:next={getDatesWithReport}>
         </pos-end-of-day-date-picker>

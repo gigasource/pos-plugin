@@ -6,11 +6,14 @@ import {disablePay, payBtnClickable, payPrintMode, showIcon} from "./OrderView/p
 import StubFactory from './StubFactory';
 
 jest.mock("vue-i18n", () => {
+  const util = require('util');
   return {
     useI18n() {
       return {
-        t(t) {
-          return t; // [Consider] return `t('${t}')` to indicate that i18n has been used
+        t(s) {
+          if (s === 'dates.dateFormat') return 'DD.MM.YYYY';
+          if (arguments.length > 1) return [...arguments].map(s => util.inspect(s)).join(' , ')
+          return s; // [Consider] return `t('${t}')` to indicate that i18n has been used
         },
         locale: "en"
       };
@@ -54,19 +57,22 @@ export const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
 export const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
 
 beforeAll(async () => {
-  orm.connect({uri: "mongodb://localhost:27017"}, "myproject");
+  //orm.connect({uri: "mongodb://localhost:27017"}, "myproject");
   orm.registerSchema("Order", {
-    inProgress: Boolean,
+    status: String,
+    date: Date,
+    vDate: Date,
     items: [{}],
-    table: Number
+    table: String
   });
   await orm("Order").deleteMany();
   await orm("Commit").deleteMany();
 
   orm.plugin(syncPlugin);
   orm.plugin(syncFlow);
-  orm.registerCommitBaseCollection("Order");
+  orm.registerCommitBaseCollection('Order', 'Action');
   orm.plugin(require("../backend/commit/orderCommit"));
+  //orm.plugin(require("../backend/commit/actionCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
 });
@@ -186,3 +192,18 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));
+
+import fs from 'fs';
+import {PNG} from "pngjs";
+global.printFunctions = {
+  printPng: async (png) => {
+    try {
+      const bufferInBase64 = PNG.sync.write(png);
+      fs.writeFileSync(__dirname + '/EndOfDay/__test__/__snapshots__/report.png', bufferInBase64);
+
+    } catch (e) {
+      console.log('canvasprinter: printPng exception', e)
+    }
+  },
+  print: () => null
+}

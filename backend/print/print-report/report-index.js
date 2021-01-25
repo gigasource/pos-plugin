@@ -9,10 +9,24 @@ const virtualPrinter = require('../print-utils/virtual-printer')
 const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
-  const { orm } = cms
+  const {orm} = cms
   const Order = cms.getModel('Order')
   const EndOfDay = cms.getModel('EndOfDay');
   const Action = cms.getModel('Action')
+
+  cms.on('run:endOfDay', async report => {
+    await EndOfDay.create(_.omit(report, ['pending']));
+    await Order.updateMany({
+      date: {$gte: report.begin, $lte: report.end},
+      status: 'paid'
+    }, {
+      //todo: check if z is a number
+      $set: {z: report.z}
+    });
+
+    const orders = await Order.find({});
+    debugger
+  })
 
   /**
    * Handle action for endOfDay
@@ -20,9 +34,9 @@ module.exports = async function (cms) {
    */
   orm.on('commit:handler:finish:Action', async function (action, commit) {
     if (!commit.tags.includes('endOfDay') || !orm.isMaster) return
-    const { z } = action
-    cms.emit('run:endOfDay', z)
-    await printHandler('ZReport', z)
+    const {report} = action
+    await cms.emit('run:endOfDay', report)
+    await printHandler('ZReport', report)
   })
 
   orm.on('commit:handler:finish:Action', async function (action, commit) {
@@ -30,7 +44,7 @@ module.exports = async function (cms) {
     if (action.reportType === 'XReport') {
       const from = dayjs(action.data).startOf('day').toDate()
       const to = dayjs(action.data).add(1, 'day').toDate()
-      action.data = { from, to }
+      action.data = {from, to}
     } else {
       action.data = JsonFn.clone(action.data)
     }
@@ -39,14 +53,16 @@ module.exports = async function (cms) {
   })
 
   cms.socket.on('connect', (socket) => {
-    socket.on('endOfDay', async function (z, cb) {
-      Action.create({
-        z
+    //todo: create action on frontend
+    socket.on('endOfDay', async function (report, cb) {
+      //todo: emit/on pattern
+      await Action.create({
+        report
       }).commit('endOfDay')
       cb()
     })
-    socket.on('printReport', (reportType, data, cb) => {
-      Action.create({
+    socket.on('printReport', async (reportType, data, cb) => {
+      await Action.create({
         reportType,
         data
       }).commit('printReport')
@@ -109,6 +125,7 @@ async function printHandler(reportType, reportData, device, callback = () => nul
       return callbackWithError(callback, new Error(`Report type ${reportType} is not supported`));
   }
 
+  //todo: refactor : performance cost is too big
   try {
     const locale = await getLocale()
     const printData = await report.makePrintData(cms, reportData, locale);
@@ -127,11 +144,12 @@ async function printHandler(reportType, reportData, device, callback = () => nul
 
       const {escPOS} = printerInfo
       const escPrinter = await getEscPrinter(printerInfo);
-      if (escPOS) {
+      //todo: think some better concept
+      if (escPOS && process.env.NODE_ENV !== 'test') {
         await report.printEscPos(escPrinter, printData, printerInfo.groupPrinter, 'escpos');
       } else {
         const pureImagePrinter = new PureImagePrinter(560, {
-          printFunctions: {
+          printFunctions: global.printFunctions || {
             printPng: escPrinter.printPng.bind(escPrinter),
             print: escPrinter.print.bind(escPrinter),
           }

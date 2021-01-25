@@ -96,7 +96,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print/print-report/index.js',
+      path: 'backend/print/print-report/report-index.js',
       type: 'backend'
     },
     {
