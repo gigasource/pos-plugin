@@ -90,6 +90,7 @@ export function orderLayoutCategoriesFactory() {
   }
 
   async function selectCategory(categoryLayout) {
+    selectProductLayout({ top: -1, left: -1 })
     if (editable.value) {
       selectCategoryLayout(categoryLayout)
       updateView('CategoryEditor')
