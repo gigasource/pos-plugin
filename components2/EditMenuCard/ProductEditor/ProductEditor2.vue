@@ -14,7 +14,7 @@ import {
   /*taxes*/
   dineInTaxes, takeAwayTaxes, showDineInTax, loadTaxes,
   /*printer*/
-  printers, isPrinter2Select, showAddPrinter2, loadPrinters, selectPrinter, setAsNoPrint,
+  printers, isPrinter2Select, showAddPrinter2, loadPrinters, selectPrinter, setAsNoPrint, allowSelectPrinter2,
   /*category*/
   categories, loadCategories, changeCategory,
   /*modifier*/
@@ -147,7 +147,7 @@ export default {
             <div>
               <div class="product-editor__prop">
                 <span class="product-editor__label">{t('restaurant.product.printer')}</span>
-                {showAddPrinter2.value && <span class="prop-option--printer" onClick={() => isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span> }
+                {showAddPrinter2.value && <span class="prop-option--printer" onClick={() => allowSelectPrinter2()}>+2. {t('restaurant.product.printer')}</span> }
               </div>
               <div>
                 { printers.value.map((item, index) => <span key={index} class={getPrinterClass(item._id)} onClick={() => selectPrinter(item._id)}>{item.name}</span>) }
