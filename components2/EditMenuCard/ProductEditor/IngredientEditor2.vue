@@ -1,7 +1,7 @@
 <script>
 import _ from 'lodash';
 import { Touch } from 'pos-vue-framework'
-import { onActivated, ref, computed } from 'vue'
+import { onActivated, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../../utils'
 import {
@@ -22,25 +22,30 @@ export default {
     const { t } = useI18n()
     const showKeyboard = ref(false)
     const inventories = ref([])
-    const ingredients = computed(() => {
+    const ingredients = ref([])
+
+    function loadIngredients() {
       if (selectedProductExisted.value) {
-        return selectedProduct.value.ingredients.map(item => ({
+        ingredients.value = selectedProduct.value.ingredients.map(item => ({
           inventory: item.inventory,
           amount: '' + item.amount
         }))
       } else {
-        return []
+        ingredients.value = []
       }
-    })
-
+    }
     async function reloadInventories() {
       inventories.value = (await cms.getModel('Inventory').find()).map(item => ({
         text: `${item.name} (${item.unit})`,
         value: item._id
       }))
     }
+
+    // reload ingredients each time product changed
+    watch(selectedProduct, () => loadIngredients())
+
     onActivated(async() => await reloadInventories())
-    /*onCreated*/ reloadInventories()
+    /*onCreated*/ reloadInventories(); loadIngredients();
 
     const rules = computed(() => {
       let rules = []
