@@ -221,17 +221,9 @@ export function fillMissingAreas(areas, columns, rows, isCategory) {
     for (let column = 0; column < columns; column++) {
       let empty = createEmptyLayout(row, column);
       if (isCategory) {
-        if (selectedCategoryLayout.value && isSameArea(empty, selectedCategoryLayout.value)) {
-          empty = selectedCategoryLayout.value
-        } else {
-          empty = {...empty, ...createEmptyCategoryLayout()}
-        }
+        empty = {...empty, ...createEmptyCategoryLayout()}
       } else {
-        if (selectedProductLayout.value && isSameArea(empty, selectedProductLayout.value)) {
-          empty = selectedProductLayout.value
-        } else {
-          empty = {...empty, ...createEmptyProductLayout()}
-        }
+        empty = {...empty, ...createEmptyProductLayout()}
       }
       allAreas.push(empty)
     }

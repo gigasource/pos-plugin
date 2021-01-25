@@ -96,7 +96,6 @@ export function orderLayoutCategoriesFactory() {
     } else {
       selectCategoryLayout(categoryLayout)
     }
-    selectProductLayout({ top: 0, left: 0})
   }
 
   function getCategoryName(item) {
