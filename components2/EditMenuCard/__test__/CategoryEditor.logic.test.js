@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { reactive, nextTick } from 'vue'
-import { orderLayout, selectedCategoryLayout } from '../../../OrderView/pos-ui-shared'
+import { orderLayout, selectedCategoryLayout } from '../../OrderView/pos-ui-shared'
 
 import {
   productRows,
@@ -8,21 +8,13 @@ import {
   categoryName,
   categoryColor,
   debouncedUpdateCategory
-} from '../category-editor-category'
+} from '../CategoryEditor/category-editor-category'
 
 import {
-  categoryRows,
-  categoryColumns,
-  //
-  createLayout,
   changeCategoryColumn,
-  changeCategoryRow,
-  deleteCategory,
-  setAction,
-  canSwitch
-} from '../category-editor-order-layout'
+} from '../CategoryEditor/category-editor-order-layout'
 
-import orderLayoutApi from '../../orderLayoutApi';
+import orderLayoutApi from '../orderLayoutApi';
 
 describe('Logic:CategoryEditor', () => {
   describe('changeCategoryColumn', () => {
@@ -49,10 +41,6 @@ describe('Logic:CategoryEditor', () => {
       expect(orderLayoutApi.changeCategoryColumn.mock.calls[0].length).toBe(2)
       expect(orderLayoutApi.changeCategoryColumn.mock.calls[0][0]).toBe(orderLayoutId)
       expect(orderLayoutApi.changeCategoryColumn.mock.calls[0][1]).toBe(newColumn)
-
-      // expect that returned result will be pass to updateOrderLayout
-      // it's depend on external function: updateOrderLayout (but don't know how to mock yet)
-      expect(orderLayout.value).toEqual(returnedOrderLayout)
     })
   })
 

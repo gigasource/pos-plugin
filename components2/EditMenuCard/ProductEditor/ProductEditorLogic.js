@@ -53,6 +53,7 @@ export async function loadTaxes() {
 //// <editor-fold desc="Printer stuff">
 export const printers = ref([])
 export const isPrinter2Select = ref(false)
+export const allowSelectPrinter2 = () => isPrinter2Select.value = true
 // boolean value indicate whether "+2. printer" button should be shown
 export const showAddPrinter2 = computed(() => (
     selectedProduct.value.groupPrinter

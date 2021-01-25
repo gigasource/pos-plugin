@@ -24,7 +24,6 @@ export function createEmptyProduct() {
   }
 }
 
-
 export function createEmptyLayout(row, column) {
   return {
     top: row,
@@ -37,10 +36,9 @@ export function createEmptyCategoryLayout() {
   return {
     rows: 10,
     columns: 6,
-    color: '#FFF'
+    color: '#FFFFFF'
   }
 }
-
 
 export function isSameArea(area1, area2) {
   return area1.top === area2.top && area1.left === area2.left
