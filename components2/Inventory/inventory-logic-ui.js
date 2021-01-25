@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 
 export const inventories = ref([])
 export const inventoryCategories = ref([])
+export const inventoryHistories = ref([])
 /**
  * @name: {string} name of item need to filter
  * @id: {string} id of item need to filter
