@@ -160,42 +160,47 @@ export default {
 
     function renderTax() {
       const dineInTaxSlots = {
-        default: ({ toggleSelect, item, index }) => (
-           <div class="prop-option"
-                      onClick={e => {
-                        toggleSelect(item);
-                        updateProduct({ tax: item.value, taxCategory: item._id })
-                      }}>
-            {item.text} ({item.value}%)
-          </div>
-        ),
-        selected: ({ toggleSelect, item, index }) => (
-          <div class="prop-option prop-option--1"
-               onClick={e => {
-                 toggleSelect(item);
-                 updateProduct({ tax: item.value, taxCategory: item._id })
-               }}>{item.text} ({item.value}%)
-          </div>
-        )
+        default: ({ toggleSelect, item, index }) => {
+          return genScopeId(() =>
+              <div class="prop-option"
+                   onClick={e => {
+                     toggleSelect(item);
+                     updateProduct({ tax: item.value, taxCategory: item._id })
+                   }}>
+                {item.text} ({item.value}%)
+              </div>)()
+        },
+        selected: ({ toggleSelect, item, index }) => {
+          return genScopeId(() =>
+              <div class="prop-option prop-option--1"
+                   onClick={e => {
+                     toggleSelect(item);
+                     updateProduct({ tax: item.value, taxCategory: item._id })
+                   }}>{item.text} ({item.value}%)
+              </div>)()
+        }
       }
 
       const takeAwayTaxSlots = {
-        default: ({toggleSelect, item, index}) => (
-          <div class="prop-option" onClick={e => {
-            toggleSelect(item);
-            updateProduct({ tax2: item.value, taxCategory2: item._id })
-          }}>
-            {item.text} ({item.value}%)
-          </div>
-        ),
-        selected: ({toggleSelect, item, index}) => (
-          <div class="prop-option prop-option--1" onClick={e => {
-            toggleSelect(item);
-            updateProduct({ tax2: item.value, taxCategory2: item._id })
-          }}>
-            {item.text} ({item.value}%)
-          </div>
-        )
+        default: ({toggleSelect, item, index}) => {
+          return genScopeId(() =>
+              <div class="prop-option" onClick={e => {
+                toggleSelect(item);
+                updateProduct({ tax2: item.value, taxCategory2: item._id })
+              }}>
+                {item.text} ({item.value}%)
+              </div>)()
+        },
+        selected: ({toggleSelect, item, index}) => {
+          return genScopeId(() =>
+              <div class="prop-option prop-option--1"
+                   onClick={e => {
+                     toggleSelect(item);
+                     updateProduct({ tax2: item.value, taxCategory2: item._id })
+                   }}>
+                {item.text} ({item.value}%)
+              </div>)()
+        }
       }
 
       return (
