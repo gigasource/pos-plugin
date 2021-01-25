@@ -1,5 +1,5 @@
 <script>
-import { onCreated } from 'vue'
+import { onBeforeMount } from 'vue'
 import PosRangeSlider from '../../components/pos-shared-components/POSInput/PosRangeSlider'
 import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew'
 import dialogFormInput from '../../components/pos-shared-components/dialogFormInput'
@@ -23,19 +23,13 @@ import {
   renderMainInventoryTable
 } from './inventory-table'
 
-import {
-  inventories,
-  inventoryCategories,
-  clearFilter
-} from "./inventory-logic-ui";
-
 export default {
   name: 'Inventory',
   components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
   setup(props, { emit }) {
-    onCreated(async () => {
-      await loadInventories()
+    onBeforeMount(async () => {
       await loadInventoryCategories()
+      await loadInventories()
     })
 
     const {

@@ -155,6 +155,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-text-field-bs': true,
         'g-toolbar': true,
         'g-snackbar': true,
+        'g-checkbox': true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
         //'pos-order-split-order': true,

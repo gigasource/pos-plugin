@@ -39,6 +39,13 @@ export const listIDs = computed(() => {
   return inventories.value.map(i => i._id)
 })
 
+export const isFiltered = computed(() => {
+  Object.keys(filter.value).forEach(typeFilter => {
+    if (filter.value[typeFilter] !== null) return true
+  })
+  return false
+})
+
 export function addFilter(newFilter) {
   filter.value = {
     ...filter.value,

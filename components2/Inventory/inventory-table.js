@@ -1,17 +1,24 @@
 import {useI18n} from 'vue-i18n'
-import {clearFilter, inventories} from './inventory-logic-ui'
 import {$filters} from '../AppSharedStates'
 import {useRouter} from 'vue-router'
 import {
 	checkBoxSelectedInventoryIDs,
 	dialog,
 	openDialogInventory,
-	openDialogStock
+	openDialogStock,
+	formatDate
 } from "./inventory-ui-shared";
 import {
 	listIDs,
-	removeFilter
+	removeFilter,
+	clearFilter,
+	inventories,
+	filter,
+	isFiltered
 } from './inventory-logic-ui'
+import {
+	deleteInventory
+} from "./inventory-logic-be";
 
 export function renderMainInventoryTable(props, { emit }) {
 	const router = useRouter()
@@ -24,6 +31,9 @@ export function renderMainInventoryTable(props, { emit }) {
 	}
 	const goToStockPage = function () {
 		router.push({ path: '/pos-inventory-stock' })
+	}
+	const removeInventory = async function () {
+		await deleteInventory(this.selectedInventoryIDs)
 	}
 
 	const { t } = useI18n()
@@ -84,7 +94,7 @@ export function renderMainInventoryTable(props, { emit }) {
 									: <></>
 							)} </div>
 						{
-							(inventoryFilters.value && inventoryFilters.value.length > 0) &&
+							(isFiltered) &&
 							<g-btn-bs onClick={clearFilter}>
 								<u>
 									{t('settings.clearAll')}
@@ -163,14 +173,14 @@ export function renderMainInventoryTable(props, { emit }) {
 
 					{t('article.category')}
 				</g-btn>
-				<g-btn disabled={selectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
+				<g-btn disabled={checkBoxSelectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
 					<g-icon small style="margin-right: 5px">
 						icon-inventory-delete
 					</g-icon>
 
 					{t('ui.delete')}
 				</g-btn>
-				<g-btn disabled={selectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
+				<g-btn disabled={checkBoxSelectedInventoryIDs.value.length !== 1} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
 					<g-icon small style="margin-right: 5px">
 						icon-inventory-edit
 					</g-icon>
