@@ -147,22 +147,11 @@ export default {
             <div>
               <div class="product-editor__prop">
                 <span class="product-editor__label">{t('restaurant.product.printer')}</span>
-                {showAddPrinter2.value
-                    ?
-                    <span class="prop-option--printer" onClick={() => isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span>
-                    : null
-                }
+                {showAddPrinter2.value && <span class="prop-option--printer" onClick={() => isPrinter2Select.value = true}>+2. {t('restaurant.product.printer')}</span> }
               </div>
               <div>
-                {
-                  printers.value.map((item, index) => <>
-                    <span key={index} class={getPrinterClass(item._id)} onClick={() => selectPrinter(item._id)}>{item.name}</span>
-                    {isPrinter2Select.value
-                        ? null
-                        :
-                        <span class={noPrintClasses} onClick={setAsNoPrint}>{t('restaurant.product.noPrinter')}</span>}
-                  </>)
-                }
+                { printers.value.map((item, index) => <span key={index} class={getPrinterClass(item._id)} onClick={() => selectPrinter(item._id)}>{item.name}</span>) }
+                { !isPrinter2Select.value && <span class={noPrintClasses.value} onClick={setAsNoPrint}>{t('restaurant.product.noPrinter')}</span> }
               </div>
             </div>
         )
