@@ -96,7 +96,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print/print-report/index.js',
+      path: 'backend/print/print-report/report-index.js',
       type: 'backend'
     },
     {
@@ -189,6 +189,12 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/rn-bridge/app-rn-bridge.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/order-logic/report-init-cms.js'
     },
     {
       loader: {

@@ -2,11 +2,8 @@ const { stringify } = require('schemahandler/utils')
 const { cmsFactory } = require('../../../test-utils')
 const moment = require('moment')
 const {
-	preparePrintReport
-} = require('./print-report.prepare.test')
-const {
 	printInvoiceHandler
-} = require('./index')
+} = require('./report-index')
 const {
 	prepareDb
 } = require('../../order-logic/report.prepare.test')
@@ -20,7 +17,7 @@ jest.setTimeout(60000)
 describe('Test print report', function () {
 	beforeAll(async () => {
 		await cms.init('')
-		await preparePrintReport(cms)
+		await require('./report-index')(cms)
 		await prepareDb(cms.orm)
 	})
 
