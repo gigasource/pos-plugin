@@ -131,7 +131,9 @@ export const productDblClicked = ref(false);
 
 watch(orderLayout, () => {
   if (selectedCategoryLayout.value && selectedCategoryLayout.value._id) {
-    //....
+    if (editable.value && !view.value.name) {
+      updateView('CategoryEditor')
+    }
   } else {
     // automatically select first category
     if (orderLayout.value.categories.length > 0) {
