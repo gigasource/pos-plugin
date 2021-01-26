@@ -35,11 +35,13 @@ module.exports = async function (cms) {
     const {report} = action
     await cms.emit('run:endOfDay', report)
     await printHandler('ZReport', report)
+    await cms.emit('post:endOfDay', report);
   })
 
   orm.on('commit:handler:finish:Action', async function (action, commit) {
     if (!commit.tags.includes('printReport') || !orm.isMaster) return
     if (action.reportType === 'XReport') {
+      //todo: make global startOf with reactive data : startOfWorkingDay(), startOfWorkingMonth()
       const from = dayjs(action.data).startOf('day').toDate()
       const to = dayjs(action.data).add(1, 'day').toDate()
       action.data = {from, to}

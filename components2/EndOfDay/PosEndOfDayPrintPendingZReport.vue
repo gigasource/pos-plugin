@@ -6,6 +6,7 @@ import {getOldestPendingReport, makeEODReport, pendingReport} from "./eod-shared
 
 export default {
   props: ['modelValue'],
+  emits: ['update:modelValue'],
   setup: function (props, {emit, slots}) {
     const {t} = useI18n();
     const dialog = internalValueFactory(props, {emit})

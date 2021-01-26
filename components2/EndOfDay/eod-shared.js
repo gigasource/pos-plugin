@@ -29,7 +29,7 @@ export function mapCalendarReports(dates) {
       if (!key) getHighestZNumber();
       return {
         sum: r.vSum,
-        z: key ? key : highestZNumber.value,
+        z: key ? parseInt(key) : highestZNumber.value,
         begin: r.from,
         end: r.to,
         pending: !key
@@ -48,11 +48,21 @@ export const detailsDailyReport = computed(() => mapCalendarReports(listOfDatesW
 
 export const selectedReportDate = computed(() => {
   //base on selectedDate and detailsDailyReport
-  selectedDate.value;
-  detailsDailyReport.value;
   //target ->
   //todo: begin hours concept
   return detailsDailyReport.value.find(item => dayjs(item.date).startOf('d').isSame(dayjs(selectedDate.value).startOf('d')));
+})
+
+export const hasDateReports = computed(() => {
+  return selectedReportDate.value && selectedReportDate.value.reports && selectedReportDate.value.reports.length > 0
+})
+
+export const showRunEndOfDay = computed(() => {
+  return hasDateReports.value && selectedReportDate.value.reports.some(report => report.pending)
+})
+
+export const showReprint = computed(() => {
+  return hasDateReports.value && !selectedReportDate.value.reports.some(report => report.pending)
 })
 
 async function getHighestZNumber() {
@@ -123,10 +133,11 @@ export async function makeEODReport(report) {
   }))*/
 }
 
-async function printXReport(date) {
-  //todo: @Huy : make it run
-  await new Promise(resolve => cms.socket.emit('printReport', 'XReport', date, function () {
-    resolve();
-  }))
+export async function printXReport() {
+  await new Promise(resolve => cms.socket.emit('printReport', 'XReport', selectedDate.value, resolve))
+}
+
+export async function printZReport(report) {
+  await new Promise(resolve => cms.socket.emit('printReport', 'ZReport', report, resolve))
 }
 

@@ -36,7 +36,7 @@ export default {
      * selectedReportDate: .reports, .date
      * reports -> begin, end, sum , z
      */
-
+    //fixme: remove watch
     watch(selectedReportDate, (newVal, oldVal) => {
       if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
         zNumberReports.value = selectedReportDate.value.reports.map(report => ({

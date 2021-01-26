@@ -1,10 +1,13 @@
 <script>
 
 import {internalValueFactory} from '../utils';
+import {useI18n} from "vue-i18n";
 
 export default {
   props: ['modelValue'],
+  emits: ['update:modelValue'],
   setup(props, {emit, slots}) {
+    const {t} = useI18n();
     const dialog = internalValueFactory(props, {emit})
     const open = function () {
       dialog.value = true
@@ -25,7 +28,7 @@ export default {
                 {t('report.confirmationPrintZ2')}?
               </p>
               <div class="confirmation-buttons">
-                <g-btn onClick={() => close()} uppercase={false} background-color="#fff" class="mr-2" flat
+                <g-btn onClick={() => close()}x uppercase={false} background-color="#fff" class="mr-2" flat
                        style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
                   {t('ui.cancel')}
                 </g-btn>
