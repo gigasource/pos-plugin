@@ -20,13 +20,23 @@ module.exports = (cms) => {
   }
 
   orm.on('commit:handler:finish:Order', async function (result, commit) {
-    if (!feSocketLock.tryAcquire()) return
-    setTimeout(async () => {
-      feSocketLock.release()
+    const sendNewOrderToFE = async function () {
       const condition = commit.data && commit.data.table ? { table: commit.data.table, status: 'inProgress' } : { _id: result._id, status: 'inProgress' }
       const order = await orm('Order').findOne(condition)
       if (feSocket && order)
         feSocket.emit('update-table', order)
+    }
+
+    if (commit.data.isLastCommit) {
+      feSocketLock.release() // Release lock
+      await sendNewOrderToFE()
+      return
+    }
+    if (!feSocketLock.tryAcquire()) return // if lock is acquired, return. Otherwise set new debounce
+    setTimeout(async () => {
+      if (!feSocketLock.acquired) return // Lock is released before debounce
+      feSocketLock.release()
+      await sendNewOrderToFE()
     }, 500)
   })
 
@@ -61,6 +71,19 @@ module.exports = (cms) => {
   }
 
   async function execAllChain(actionList) {
+    if (actionList && actionList.length) {
+      // find and add isLastCommit into data of last commit in actionList
+      const lastAction = _.last(actionList)
+      const lastInChain = _.last(lastAction.action)
+      if (lastInChain.fn === 'commit') {
+        lastInChain.args.map(arg => {
+          if (typeof arg === 'object') {
+            arg.isLastCommit = true
+          }
+          return arg
+        })
+      }
+    }
     const {orm} = cms
     let finalResult
     for (let {action, modelName} of actionList) {

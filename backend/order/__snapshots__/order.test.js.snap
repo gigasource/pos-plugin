@@ -1,0 +1,479 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Order test Case 1: Emit print-to-kitchen normally 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "3",
+        "name": "Water",
+        "price": 67,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 7,
+        "taxes": Array [
+          7,
+          null,
+        ],
+        "vSum": 67,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "7": Object {
+            "gross": 67,
+            "net": 62.62,
+            "tax": 4.38,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 1,
+        "name": "Cola",
+        "price": 98,
+        "printed": true,
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          null,
+        ],
+        "vSum": 98,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 98,
+            "net": 82.35,
+            "tax": 15.65,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "4",
+        "name": "Soda",
+        "price": 20,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 20,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 20,
+            "net": 16.81,
+            "tax": 3.19,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 185,
+    "vTaxGroups": Array [],
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 118,
+        "net": 99.16,
+        "tax": 18.84,
+      },
+      "7": Object {
+        "gross": 67,
+        "net": 62.62,
+        "tax": 4.38,
+      },
+    },
+  },
+]
+`;
+
+exports[`Order test Case 1: Emit print-to-kitchen normally 2`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{},\\"vTaxGroups\\":[],\\"printer\\":[],\\"discounts\\":[]}]}]",
+    "collectionName": "Order",
+    "condition": "null",
+    "data": Object {
+      "docId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 1,
+    "tags": Array [
+      "createOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"3\\",\\"name\\":\\"Water\\",\\"price\\":67,\\"product\\":\\"ObjectID\\",\\"taxes\\":[7,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"sent\\":true,\\"printed\\":true,\\"vSum\\":67,\\"vTakeAway\\":false,\\"tax\\":7,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 2,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":67,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":1,\\"name\\":\\"Cola\\",\\"price\\":98,\\"taxes\\":[19,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":98,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 4,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":165,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 5,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"4\\",\\"name\\":\\"Soda\\",\\"price\\":20,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":20,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":3.19,\\"net\\":16.81,\\"gross\\":20}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":185,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":18.84,\\"net\\":99.16,\\"gross\\":118}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "isLastCommit": true,
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+]
+`;
+
+exports[`Order test Case 2: Emit print-to-kitchen with timeout 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [],
+    "discounts": Array [],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "3",
+        "name": "Water",
+        "price": 67,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 7,
+        "taxes": Array [
+          7,
+          null,
+        ],
+        "vSum": 67,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "7": Object {
+            "gross": 67,
+            "net": 62.62,
+            "tax": 4.38,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": 1,
+        "name": "Cola",
+        "price": 98,
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          null,
+        ],
+        "vSum": 98,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 98,
+            "net": 82.35,
+            "tax": 15.65,
+          },
+        },
+      },
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "",
+        "id": "4",
+        "name": "Soda",
+        "price": 20,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 20,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 20,
+            "net": 16.81,
+            "tax": 3.19,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "printer": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 165,
+    "vTaxGroups": Array [],
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 98,
+        "net": 82.35,
+        "tax": 15.65,
+      },
+      "7": Object {
+        "gross": 67,
+        "net": 62.62,
+        "tax": 4.38,
+      },
+    },
+  },
+]
+`;
+
+exports[`Order test Case 2: Emit print-to-kitchen with timeout 2`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{},\\"vTaxGroups\\":[],\\"printer\\":[],\\"discounts\\":[]}]}]",
+    "collectionName": "Order",
+    "condition": "null",
+    "data": Object {
+      "docId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 1,
+    "tags": Array [
+      "createOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"3\\",\\"name\\":\\"Water\\",\\"price\\":67,\\"product\\":\\"ObjectID\\",\\"taxes\\":[7,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"sent\\":true,\\"printed\\":true,\\"vSum\\":67,\\"vTakeAway\\":false,\\"tax\\":7,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 2,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":67,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":1,\\"name\\":\\"Cola\\",\\"price\\":98,\\"taxes\\":[19,null],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":98,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 4,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":165,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":15.65,\\"net\\":82.35,\\"gross\\":98}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 5,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"\\",\\"id\\":\\"4\\",\\"name\\":\\"Soda\\",\\"price\\":20,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":20,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":3.19,\\"net\\":16.81,\\"gross\\":20}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":185,\\"vTaxSum\\":{\\"7\\":{\\"tax\\":4.38,\\"net\\":62.62,\\"gross\\":67},\\"19\\":{\\"tax\\":18.84,\\"net\\":99.16,\\"gross\\":118}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "isLastCommit": true,
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+]
+`;

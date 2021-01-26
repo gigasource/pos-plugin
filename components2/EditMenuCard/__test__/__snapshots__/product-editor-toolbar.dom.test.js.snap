@@ -1,0 +1,281 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`product-editor-toolbar should render switch to basic mode when current mode is ingredient 1`] = `
+<portal-stub to="portal-left-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-switch"
+                 disabled="true"
+  >
+    ui.switch
+  </g-btn-bs-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-delete"
+                 disabled="true"
+  >
+    ui.delete
+  </g-btn-bs-stub>
+  <dialog-confirm-delete-stub modelvalue="false"
+                              type=" this product"
+  >
+  </dialog-confirm-delete-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-copy"
+                 disabled="true"
+  >
+    ui.copy
+  </g-btn-bs-stub>
+</portal-stub>
+<portal-stub to="portal-right-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-ingredient-mode"
+  >
+    inventory.ingredientMode
+  </g-btn-bs-stub>
+  <g-dialog-stub modelvalue="false"
+                 eager="true"
+                 width="448"
+  >
+    <div class="dialog">
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-basic-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.basicMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.basicNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-ingredient-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.ingredientMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.ingredientNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-message">
+        inventory.clickDismiss
+      </div>
+    </div>
+  </g-dialog-stub>
+</portal-stub>
+`;
+
+exports[`product-editor-toolbar should render switch to ingredient mode when current mode is basic 1`] = `
+<portal-stub to="portal-left-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-switch"
+                 disabled="true"
+  >
+    ui.switch
+  </g-btn-bs-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-delete"
+                 disabled="true"
+  >
+    ui.delete
+  </g-btn-bs-stub>
+  <dialog-confirm-delete-stub modelvalue="false"
+                              type=" this product"
+  >
+  </dialog-confirm-delete-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-copy"
+                 disabled="true"
+  >
+    ui.copy
+  </g-btn-bs-stub>
+</portal-stub>
+<portal-stub to="portal-right-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-basic-mode"
+  >
+    inventory.basicMode
+  </g-btn-bs-stub>
+  <g-dialog-stub modelvalue="false"
+                 eager="true"
+                 width="448"
+  >
+    <div class="dialog">
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-basic-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.basicMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.basicNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-ingredient-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.ingredientMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.ingredientNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-message">
+        inventory.clickDismiss
+      </div>
+    </div>
+  </g-dialog-stub>
+</portal-stub>
+`;
+
+exports[`product-editor-toolbar should render, allow switch, copy, delete when product is real 1`] = `
+<portal-stub to="portal-left-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-switch"
+                 disabled="false"
+  >
+    ui.switch
+  </g-btn-bs-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-delete"
+                 disabled="false"
+  >
+    ui.delete
+  </g-btn-bs-stub>
+  <dialog-confirm-delete-stub modelvalue="false"
+                              type=" this product"
+  >
+  </dialog-confirm-delete-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-copy"
+                 disabled="false"
+  >
+    ui.copy
+  </g-btn-bs-stub>
+</portal-stub>
+<portal-stub to="portal-right-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-basic-mode"
+  >
+    inventory.basicMode
+  </g-btn-bs-stub>
+  <g-dialog-stub modelvalue="false"
+                 eager="true"
+                 width="448"
+  >
+    <div class="dialog">
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-basic-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.basicMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.basicNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-ingredient-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.ingredientMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.ingredientNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-message">
+        inventory.clickDismiss
+      </div>
+    </div>
+  </g-dialog-stub>
+</portal-stub>
+`;
+
+exports[`product-editor-toolbar should render, not allow to switch, copy, delete when product is empty 1`] = `
+<portal-stub to="portal-left-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-switch"
+                 disabled="true"
+  >
+    ui.switch
+  </g-btn-bs-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-delete"
+                 disabled="true"
+  >
+    ui.delete
+  </g-btn-bs-stub>
+  <dialog-confirm-delete-stub modelvalue="false"
+                              type=" this product"
+  >
+  </dialog-confirm-delete-stub>
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-edit-menu-card-copy"
+                 disabled="true"
+  >
+    ui.copy
+  </g-btn-bs-stub>
+</portal-stub>
+<portal-stub to="portal-right-buttons">
+  <g-btn-bs-stub elevation="2"
+                 icon="icon-basic-mode"
+  >
+    inventory.basicMode
+  </g-btn-bs-stub>
+  <g-dialog-stub modelvalue="false"
+                 eager="true"
+                 width="448"
+  >
+    <div class="dialog">
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-basic-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.basicMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.basicNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-content">
+        <g-icon-stub>
+          icon-ingredient-mode
+        </g-icon-stub>
+        <div style="flex: 1; margin-left: 16px;">
+          <p class="dialog-content__title">
+            inventory.ingredientMode
+          </p>
+          <p class="dialog-content__detail">
+            inventory.ingredientNote
+          </p>
+        </div>
+      </div>
+      <div class="dialog-message">
+        inventory.clickDismiss
+      </div>
+    </div>
+  </g-dialog-stub>
+</portal-stub>
+`;

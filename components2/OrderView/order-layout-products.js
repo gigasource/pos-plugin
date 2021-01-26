@@ -9,12 +9,11 @@ import {isMobile} from "../AppSharedStates";
 import {computed, reactive, ref} from "vue";
 import _ from "lodash";
 import {
-  fillMissingAreas,
   getAreaStyle,
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,
   selectedProductLayout,
-  editable, productDblClicked, products, updateView, updateSelectedProductLayout
+  editable, productDblClicked, products, updateView, selectProductLayout
 } from './pos-ui-shared';
 import {isSameArea} from "../../components/posOrder/util";
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
@@ -209,10 +208,10 @@ export function orderLayoutProductFactory() {
     if (editable.value) {
       if (selectedCategoryLayout.value._id) {
         updateView('ProductEditor')
-        updateSelectedProductLayout(productLayout)
+        selectProductLayout(productLayout)
       }
     } else {
-      updateSelectedProductLayout(productLayout)
+      selectProductLayout(productLayout)
     }
     highlightProduct(productLayout)
   }
@@ -267,7 +266,7 @@ export function orderLayoutProductFactory() {
               </div>
             ))
           }
-          {{/*renderKeyboard()*/}}
+          {renderKeyboard()}
         </div>
       </div>
     }

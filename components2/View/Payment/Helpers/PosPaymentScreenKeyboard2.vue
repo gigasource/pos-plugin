@@ -66,22 +66,7 @@ export default {
     })
     //todo: move to payment-logics
     const removePaymentItem = function (index) {
-      const offset = currentOrder.payment[index].value
       currentOrder.payment.splice(index, 1)
-      const cardPayment = currentOrderPaymentList.value.find(i => i.type === 'card')
-      const cashPayment = currentOrderPaymentList.value.find(i => i.type === 'cash')
-      if (cashPayment || cardPayment) {
-        const filtered = cashPayment ? currentOrderPaymentList.value.filter(i => i.type !== 'cash') : currentOrderPaymentList.value.filter(i => i.type !== 'card')
-        //todo: update payment
-        // emit('updateCurrentOrder', 'payment',
-        //     [
-        //       {
-        //         type: cashPayment ? 'cash' : 'card',
-        //         value: (cashPayment ? cashPayment.value : cardPayment.value) + offset
-        //       },
-        //       ...filtered
-        //     ])
-      }
     }
 
     return genScopeId(() =>

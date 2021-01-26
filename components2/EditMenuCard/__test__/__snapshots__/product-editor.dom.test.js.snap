@@ -1,179 +1,836 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`product-editor should show correct 1`] = `
-<div>
-  article.type
-</div>
-<g-select-stub disabled="true"
-               skip-search="true"
-               text-field-component="GTextFieldBs"
-               modelvalue="Article"
-               items="[object Object],[object Object],[object Object]"
->
-</g-select-stub>
-<div>
-  article.id
-</div>
-<g-text-field-bs-stub model-value="48">
-</g-text-field-bs-stub>
-<div>
-  article.name
-  <span style="color: rgb(255, 68, 82);">
-    *
-  </span>
-</div>
-<g-text-field-bs-stub model-value="Whiskey">
-</g-text-field-bs-stub>
-<div>
-  article.price
-  <span style="color: rgb(255, 68, 82);">
-    *
-  </span>
-</div>
-<g-text-field-bs-stub model-value="40">
-</g-text-field-bs-stub>
-<g-switch-stub>
-</g-switch-stub>
-<div style="font-size: 13px;">
-  article.isModifier
-</div>
-<div>
-  <div class="product-editor__prop">
-    <span class="product-editor__label">
-      restaurant.product.printer
-    </span>
+exports[`product-editor [printer] [Add printer 2 btn] should not show if no printer selected or 2 printer selected 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub model-value="false">
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
   </div>
   <div>
-  </div>
-</div>
-<div class="row-flex mt-2 product-editor__tax">
-  <div class="col-6">
-    <div class="product-editor__label">
-      restaurant.product.dineInTax
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
     </div>
-    <g-grid-select-stub mandatory="true"
-                        item-value="_id"
-                        items
-                        itemcols="auto"
-    >
-    </g-grid-select-stub>
-  </div>
-  <div class="col-6">
-    <div class="product-editor__label">
-      restaurant.product.takeAwayTax
+    <div>
+      <span class="prop-option prop-option--1">
+        restaurant.product.noPrinter
+      </span>
     </div>
-    <g-grid-select-stub mandatory="true"
-                        item-value="_id"
-                        items
-                        itemcols="auto"
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
     >
-    </g-grid-select-stub>
+    </color-selector-stub>
   </div>
-</div>
-<div class="mt-2">
-  <div class="product-editor__label">
-    ui.color
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
   </div>
-  <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
-                       item-size="25"
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
   >
-  </color-selector-stub>
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
 </div>
-<div class="mt-2">
-  <div class="row-flex justify-between">
-    <div class="product-editor__label">
-      Popup modifiers
+`;
+
+exports[`product-editor [printer] [Add printer 2 btn] should not show if no printer selected or 2 printer selected 2`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
     </div>
-    <g-icon-stub size="16">
-      icon-edit_modifiers
-    </g-icon-stub>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub model-value="false">
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
   </div>
   <div>
-    <g-grid-select-stub item-text="name"
-                        item-value="_id"
-                        items
-                        itemcols="auto"
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
+    </div>
+    <div>
+      <span class="prop-option">
+        restaurant.product.noPrinter
+      </span>
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
     >
-    </g-grid-select-stub>
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor [printer] [Add printer 2 btn] should not show if this button has been clicked 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub model-value="false">
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
+  </div>
+  <div>
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
+    </div>
+    <div>
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
+    >
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor [printer] [Add printer 2 btn] should show when product only have 1 printer 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub model-value="false">
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
+  </div>
+  <div>
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
+      <span class="prop-option--printer">
+        +2. restaurant.product.printer
+      </span>
+    </div>
+    <div>
+      <span class="prop-option">
+        restaurant.product.noPrinter
+      </span>
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
+    >
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor [printer] should not render printer section if product is modifier 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub model-value="true">
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
+    >
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor should render placeholder product layout 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="false"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub>
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value>
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub>
+    </g-text-field-bs-stub>
+    <g-switch-stub>
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
+  </div>
+  <div>
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
+    </div>
+    <div>
+      <span class="prop-option">
+        restaurant.product.noPrinter
+      </span>
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
+    >
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor should render real product 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="true"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.id
+    </div>
+    <g-text-field-bs-stub model-value="48">
+    </g-text-field-bs-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="Whiskey">
+    </g-text-field-bs-stub>
+    <div>
+      article.price
+      <span style="color: rgb(255, 68, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-bs-stub model-value="40">
+    </g-text-field-bs-stub>
+    <g-switch-stub>
+    </g-switch-stub>
+    <div style="font-size: 13px;">
+      article.isModifier
+    </div>
+  </div>
+  <div>
+    <div class="product-editor__prop">
+      <span class="product-editor__label">
+        restaurant.product.printer
+      </span>
+      <span class="prop-option--printer">
+        +2. restaurant.product.printer
+      </span>
+    </div>
+    <div>
+      <span class="prop-option">
+        restaurant.product.noPrinter
+      </span>
+    </div>
+  </div>
+  <div class="row-flex mt-2 product-editor__tax">
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.dineInTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+    <div class="col-6">
+      <div class="product-editor__label">
+        restaurant.product.takeAwayTax
+      </div>
+      <g-grid-select-stub mandatory="true"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <div class="mt-2">
+    <div class="product-editor__label">
+      ui.color
+    </div>
+    <color-selector-stub colors="#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91"
+                         item-size="25"
+    >
+    </color-selector-stub>
+  </div>
+  <div class="mt-2">
+    <div class="row-flex justify-between">
+      <div class="product-editor__label">
+        Popup modifiers
+      </div>
+      <g-icon-stub size="16">
+        icon-edit_modifiers
+      </g-icon-stub>
+    </div>
+    <div>
+      <g-grid-select-stub item-text="name"
+                          item-value="_id"
+                          items
+                          itemcols="auto"
+      >
+      </g-grid-select-stub>
+    </div>
+  </div>
+  <dialog-product-info-stub modelvalue="false"
+                            product="[object Object]"
+  >
+  </dialog-product-info-stub>
+  <dialog-text-filter-stub label="Text"
+                           modelvalue="false"
+  >
+  </dialog-text-filter-stub>
+  <dialog-edit-popup-modifiers-stub modelvalue="false"
+                                    product="[object Object]"
+  >
+  </dialog-edit-popup-modifiers-stub>
+</div>
+`;
+
+exports[`product-editor should render text 1`] = `
+<div class="product-editor">
+  <div class="product-editor__prop-grid">
+    <div>
+      article.type
+    </div>
+    <g-select-stub disabled="false"
+                   skip-search="true"
+                   text-field-component="GTextFieldBs"
+                   modelvalue="Text"
+                   items="[object Object],[object Object],[object Object]"
+    >
+    </g-select-stub>
+    <div>
+      article.name
+      <span style="color: rgb(255, 69, 82);">
+        *
+      </span>
+    </div>
+    <g-text-field-stub>
+    </g-text-field-stub>
   </div>
 </div>
-<dialog-product-info-stub modelvalue="false"
-                          product="[object Object]"
->
-</dialog-product-info-stub>
-<dialog-text-filter-stub label="Text"
-                         modelvalue="false"
->
-</dialog-text-filter-stub>
-<dialog-edit-popup-modifiers-stub modelvalue="false"
-                                  product="[object Object]"
->
-</dialog-edit-popup-modifiers-stub>
-<portal-stub to="portal-left-buttons">
-  <g-btn-bs-stub elevation="2"
-                 icon="icon-edit-menu-card-switch"
-                 disabled="true"
-  >
-    ui.switch
-  </g-btn-bs-stub>
-  <g-btn-bs-stub elevation="2"
-                 icon="icon-edit-menu-card-copy"
-                 disabled="true"
-  >
-    ui.copy
-  </g-btn-bs-stub>
-  <g-btn-bs-stub elevation="2"
-                 icon="icon-edit-menu-card-delete"
-                 disabled="true"
-  >
-    ui.delete
-  </g-btn-bs-stub>
-  <dialog-confirm-delete-stub modelvalue="false"
-                              type=" this product"
-  >
-  </dialog-confirm-delete-stub>
-</portal-stub>
-<portal-stub to="portal-right-buttons">
-  <g-btn-bs-stub elevation="2"
-                 icon="icon-basic-mode"
-  >
-    inventory.basicMode
-  </g-btn-bs-stub>
-  <g-dialog-stub modelvalue="false"
-                 eager="true"
-                 width="448"
-  >
-    <div class="dialog">
-      <div class="dialog-content">
-        <g-icon-stub>
-          icon-basic-mode
-        </g-icon-stub>
-        <div style="flex: 1; margin-left: 16px;">
-          <p class="dialog-content__title">
-            inventory.basicMode
-          </p>
-          <p class="dialog-content__detail">
-            inventory.basicNote
-          </p>
-        </div>
-      </div>
-      <div class="dialog-content">
-        <g-icon-stub>
-          icon-ingredient-mode
-        </g-icon-stub>
-        <div style="flex: 1; margin-left: 16px;">
-          <p class="dialog-content__title">
-            inventory.ingredientMode
-          </p>
-          <p class="dialog-content__detail">
-            inventory.ingredientNote
-          </p>
-        </div>
-      </div>
-      <div class="dialog-message">
-        inventory.clickDismiss
-      </div>
-    </div>
-  </g-dialog-stub>
-</portal-stub>
 `;
