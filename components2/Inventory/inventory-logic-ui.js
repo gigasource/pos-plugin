@@ -54,7 +54,8 @@ export const filteredInventoryHistories = computed(() => {
   }
 
   const inventoryHistoriesFiltered = inventoryHistories.value.filter(item => {
-    if ((historyFilter.date && (historyFilter.date.from.getTime() > item.date.getTime() || historyFilter.date.to.getTime() < item.date.getTime())))
+    if ((historyFilter.fromDate && historyFilter.fromDate.getTime() > item.date.getTime())
+      || (historyFilter.toDate && historyFilter.toDate.getTime() < item.date.getTime()))
       return false
     return true
   })

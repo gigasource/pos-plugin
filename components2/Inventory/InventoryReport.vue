@@ -9,7 +9,8 @@ import { $filters } from '../AppSharedStates';
 import { useI18n } from 'vue-i18n'
 import {
   inventoryCategories,
-  inventories
+  filteredInventoryHistories,
+  historyFilter
 } from './inventory-logic-ui'
 
 export default {
@@ -19,11 +20,7 @@ export default {
     const { t } = useI18n()
     const selectedCategory = ref(null)
     const searchText = ref('')
-    const dateFilter = ref({
-      fromDate: '',
-      toDate: ''
-    })
-    const dialog = ref({
+    const reportDialog = ref({
       text: false,
       detail: false
     })
@@ -37,13 +34,13 @@ export default {
     })
 
     onActivated(async () => {
-      dateFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
-      dateFilter.value.toDate = dayjs().format('YYYY-MM-DD')
+      historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
+      historyFilter.value.toDate = dayjs().format('YYYY-MM-DD')
       selectedCategory.value = 'all'
     })
 
     const sortedInventories = computed(() => {
-      let sorted = _.cloneDeep(inventories.value)
+      let sorted = _.cloneDeep(filteredInventoryHistories.value)
       if (searchText.value) {
         sorted = _.filter(sorted, item => item.name && item.name.toLowerCase().includes(searchText.value.toLowerCase()))
       }
@@ -59,13 +56,7 @@ export default {
     const back = function () {
       router.go(-1)
     }
-    const loadData = async function () {
-      let filter = { date: this.dateFilter }
-      if (selectedCategory.value) {
-        filter.category = typeof selectedCategory.value === 'object' ? selectedCategory.value._id : null
-      }
-      inventories.value = await loadInventoriesWithChange(filter)
-    }
+
     const selectCategory = async function (category) {
       if(selectedCategory.value === category) {
         selectedCategory.value = null
@@ -74,21 +65,12 @@ export default {
       }
       await this.loadData()
     }
-    const changeFilter = async function (range) {
-      dateFilter.value = range
-      await loadData()
+    const changeFilter = function (range) {
+      historyFilter.value = range
     }
     const selectItem = async function (item) {
-      const history = await loadInventoryHistory(item._id, this.dateFilter)
-      selectedItem.value = {
-        ...item,
-        history
-      }
-      dialog.value.detail = true
-    }
-    const formatDate = function (value) {
-      if (!value || !dayjs(value).isValid()) return ''
-      return dayjs(value).format('DD/MM/YYYY HH:mm')
+      selectedItem.value = item
+      reportDialog.value.detail = true
     }
 
     return () => <>
@@ -109,7 +91,7 @@ export default {
         <div class="inventory-report__main" >
           <div class="inventory-report__main-header" >
             <g-text-field-bs v-model={searchText.value} clearable  v-slots={{ 'append-inner': () => <>
-                <g-icon onClick={() => dialog.value.text = true} >
+                <g-icon onClick={() => reportDialog.value.text = true} >
                   icon-keyboard </g-icon>
               </>
             }}> </g-text-field-bs>
@@ -218,11 +200,11 @@ export default {
             }
           </div>
         </div>
-        <dialog-text-filter v-model={dialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}} >
+        <dialog-text-filter v-model={reportDialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}} >
         </dialog-text-filter>
         {
           (selectedItem.value) &&
-          <g-dialog v-model={dialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
+          <g-dialog v-model={reportDialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
             <div class="dialog" >
               <div class="dialog-header" >
                 <div class="dialog-header__title" >
