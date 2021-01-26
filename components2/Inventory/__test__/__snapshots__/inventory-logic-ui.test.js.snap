@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test inventory logic ui Case 2: Test inventory histories 1`] = `
+Array [
+  Object {
+    "amount": 30,
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "3",
+    "type": "add",
+  },
+  Object {
+    "amount": 10,
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "3",
+    "type": "add",
+  },
+  Object {
+    "amount": 10,
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "3",
+    "type": "remove",
+  },
+  Object {
+    "amount": 25,
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "2",
+    "type": "add",
+  },
+]
+`;
+
+exports[`Test inventory logic ui Case 2: Test inventory histories 2`] = `
+Array [
+  Object {
+    "_id": "2",
+    "add": 25,
+    "category": Object {
+      "name": "Food",
+    },
+    "history": Array [
+      Object {
+        "amount": 25,
+        "date": 2021-01-04T17:00:00.000Z,
+        "inventory": "2",
+        "type": "add",
+      },
+    ],
+    "inventory": "2",
+    "name": "Meat",
+    "remove": 0,
+    "stock": 12,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "3",
+    "add": 40,
+    "category": Object {
+      "name": "Fruit",
+    },
+    "history": Array [
+      Object {
+        "amount": 30,
+        "date": 2021-01-04T17:00:00.000Z,
+        "inventory": "3",
+        "type": "add",
+      },
+      Object {
+        "amount": 10,
+        "date": 2021-01-04T17:00:00.000Z,
+        "inventory": "3",
+        "type": "add",
+      },
+      Object {
+        "amount": 10,
+        "date": 2021-01-04T17:00:00.000Z,
+        "inventory": "3",
+        "type": "remove",
+      },
+    ],
+    "inventory": "3",
+    "name": "Apple",
+    "remove": 10,
+    "stock": 50,
+    "unit": "piece",
+  },
+]
+`;
