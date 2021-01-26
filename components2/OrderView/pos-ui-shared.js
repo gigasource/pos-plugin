@@ -1,4 +1,4 @@
-import {computed, nextTick, reactive, ref, watchEffect} from 'vue';
+import {computed, nextTick, reactive, ref, watchEffect, watch} from 'vue';
 import {
   createEmptyCategoryLayout,
   createEmptyLayout,
@@ -6,12 +6,9 @@ import {
   isSameArea
 } from "../../components/posOrder/util";
 import _ from "lodash";
-import {addItem} from "./pos-logic";
-import { addProduct, getCurrentOrder, prepareOrder } from './pos-logic-be';
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import { createEmptyProduct } from '../EditMenuCard/utils';
-import cms from 'cms';
 import orderLayoutApi from '../EditMenuCard/orderLayoutApi';
 
 export const orderLayout = ref({ categories: [] });
@@ -132,27 +129,24 @@ export function updateProductEditMode(newMode) {
 export const editable = ref(false);
 export const productDblClicked = ref(false);
 
-watchEffect(() => {
-  if (!orderLayout.value)
-    return
-
-  if (selectedCategoryLayout.value) {
-    // update category layout to force re-render after product action executed
-    // const cateLayout = _.find(orderLayout.value.categories, c => isSameArea(selectedCategoryLayout.value, c))
-    // if (cateLayout)
-    //   updateSelectedCategoryLayout(cateLayout)
+watch(orderLayout, () => {
+  if (selectedCategoryLayout.value && selectedCategoryLayout.value._id) {
+    //....
   } else {
     // automatically select first category
     if (orderLayout.value.categories.length > 0) {
       // find tab-product at 0-0
-      const topLeftCategory = _.find(orderLayout.value.categories, c => c.top === 0 && c.left === 0)
-      if (topLeftCategory)
+      const topLeftCategory = _.find(orderLayout.value.categories, c => c._id && isSameArea(c, { top: 0, left: 0 }))
+      if (topLeftCategory) {
         selectCategoryLayout(topLeftCategory)
-      else
+      } else {
         selectCategoryLayout(_.first(orderLayout.value.categories))
+      }
 
-      if (editable.value && (!view.value || view.value.name !== 'CategoryEditor'))
+      // select category editor as default editor if there is no editor at the moment
+      if (editable.value && !view.value.name) {
         updateView('CategoryEditor')
+      }
     }
   }
 })
