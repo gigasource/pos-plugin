@@ -66,7 +66,7 @@ export default {
     })
 
     const changeValue = function (val) {
-      change.value = val
+      change.value = Number(val)
     }
     const submit = function () {
       if (mode.value === 'remove' && props.stock < change.value) return

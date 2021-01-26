@@ -12,6 +12,8 @@ import {
   filteredInventoryHistories,
   historyFilter
 } from './inventory-logic-ui'
+import {genScopeId} from '../utils';
+import { formatDate } from './inventory-ui-shared';
 
 export default {
   name: "InventoryReport",
@@ -32,6 +34,7 @@ export default {
       unit: '',
       history: []
     })
+    const dateFilter = ref({})
 
     onActivated(async () => {
       historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
@@ -44,9 +47,9 @@ export default {
       if (searchText.value) {
         sorted = _.filter(sorted, item => item.name && item.name.toLowerCase().includes(searchText.value.toLowerCase()))
       }
-      if (this.type === 'add') {
+      if (type.value === 'add') {
         sorted = _.map(sorted, item => _.omit(item, 'remove'))
-      } else if (this.type === 'remove') {
+      } else if (type.value === 'remove') {
         sorted = _.map(sorted, item => _.omit(item, 'add'))
       }
       return sorted
@@ -63,7 +66,8 @@ export default {
       } else {
         selectedCategory.value = category
       }
-      await this.loadData()
+      // TODO: impl
+      // await loadData()
     }
     const changeFilter = function (range) {
       historyFilter.value = range
@@ -73,172 +77,155 @@ export default {
       reportDialog.value.detail = true
     }
 
-    return () => <>
-      <div class="inventory-report" >
-        <div class="inventory-report__left" >
-          <div class="category" >
-            <div class={ ['category-item', selectedCategory.value === 'all' && 'category-item--selected'] } onClick={() => selectCategory('all')} >
-              ALL
-            </div>
-            {inventoryCategories.value.map(category  =>
-                <div key={ category._id } onClick={() => selectCategory(category)} class={ ['category-item', selectedCategory === category && 'category-item--selected'] } >
-                  {category.name}
-                </div>
-            )} </div>
-          <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white" icon="icon-back" onClick={back} >
-            {t('ui.back')} </g-btn-bs>
-        </div>
-        <div class="inventory-report__main" >
-          <div class="inventory-report__main-header" >
-            <g-text-field-bs v-model={searchText.value} clearable  v-slots={{ 'append-inner': () => <>
-                <g-icon onClick={() => reportDialog.value.text = true} >
-                  icon-keyboard </g-icon>
-              </>
-            }}> </g-text-field-bs>
-            <g-menu v-model={menu.value} nudge-bottom="4"  v-slots={{ 'default': () => <> <div class="type-menu" >
-                <div class="type-menu-item" onClick={() => type.value = 'all'} >
-                  <g-icon class="mr-2" > icon-inventory-report-all </g-icon>
-                  {t('inventory.all')}
-                </div>
-                <div class="type-menu-item" onClick={() => type.value = 'add'} >
-                  <g-icon size="16" class="ml-1 mr-2" >
-                    icon-inventory-report-add </g-icon>
-                  {t('inventory.add')}
-                </div>
-                <div class="type-menu-item" onClick={() => type.value = 'remove'} >
-                  <g-icon size="16" class="ml-1 mr-2" >
-                    icon-inventory-report-remove </g-icon>
-                  {t('inventory.useRemove')}
-                </div>
+    const renderLefColumn = () => {
+      return (
+          <div class="inventory-report__left">
+            <div class="category">
+              <div class={['category-item', selectedCategory.value === 'all' && 'category-item--selected']} onClick={() => selectCategory('all')}>
+                ALL
               </div>
-              </>,
-              'activator': ({on}) => <>
-                <div v-on="on" class="type" >
-                  <g-icon size={ type === 'all' ? 24 : 16 } class="mr-1" >
-                    {`icon-inventory-report-${type.value}`} </g-icon>
-
-                  {type === 'remove' ? t('inventory.useRemove') : t(`inventory.${type.value}`)}
-                </div>
-              </>
-            }}> </g-menu>
-            <div class="display-btn" >
-              <div style="border-radius: 2px 0 0 2px; border-right: 1px solid #E3F2FD" class={ ['display-btn-item', display.value === 'list' && 'display-btn--selected'] } onClick={() => display.value = 'list'} >
-                <g-icon size="20" >
-                  icon-inventory-report-list </g-icon>
-              </div>
-              <div style="border-radius: 0 2px 2px 0" class={ ['display-btn-item', display.value === 'grid' && 'display-btn--selected'] } onClick={() => display.value = 'grid'} >
-                <g-icon size="20" >
-                  icon-inventory-report-grid </g-icon>
-              </div>
-            </div>
-            <g-spacer>
-            </g-spacer>
-            <date-range-picker from={ dateFilter.value.fromDate } to={ dateFilter.value.toDate } onSave={changeFilter} >
-            </date-range-picker>
-          </div>
-          <div class={ ['inventory-report__main-content', display.value === 'grid' && 'inventory-report__main-content--grid'] } >
-            {
-              (display.value === 'list') &&
-              <>
-                {sortedInventories.value.map((inventory, i)  =>
-                    <div class="inventory-report-list-item" key={ `list_${i}` } onClick={() => selectItem(inventory)} >
-                      <div class="inventory-report-list-item__name" >
-                        {inventory.name} </div>
-                      <div class="inventory-report-list-item__unit" >
-                        {inventory.unit} </div>
-                      <div class="inventory-report-list-item__add" >
-                        {
-                          (inventory.add || inventory.add === 0) &&
-                          <g-icon size="12" style="margin-bottom: 2px" >
-                            icon-inventory-report-add </g-icon>
-                        }
-
-                        { $filters.formatCurrency(inventory.add) }
-                      </div>
-                      <div class="inventory-report-list-item__remove" >
-                        {
-                          (inventory.remove || inventory.remove === 0) &&
-                          <g-icon size="14" class="mr-1" >
-                            icon-inventory-report-remove </g-icon>
-                        }
-
-                        { $filters.formatCurrency(inventory.remove) }
-                      </div>
-                    </div>
-                )} </>
-            }
-            {
-              (display.value === 'grid') &&
-              <>
-                {sortedInventories.value.map((inventory, i)  =>
-                    <div class="inventory-report-grid-item" key={ `grid_${i}` } onClick={() => selectItem(inventory)} >
-                      <div class="inventory-report-grid-item__name" >
-                        {inventory.name} </div>
-                      <g-spacer>
-                      </g-spacer>
-                      <div class="inventory-report-grid-item__detail" >
-                        <div class="inventory-report-grid-item__add" >
-                          {
-                            (inventory.add || inventory.add === 0) &&
-                            <g-icon size="12" style="margin-bottom: 2px" >
-                              icon-inventory-report-add </g-icon>
-                          }
-                          { $filters.formatCurrency(inventory.add) }
-                        </div>
-                        <g-spacer></g-spacer>
-                        <div class="inventory-report-grid-item__remove" >
-                          {
-                            (inventory.remove || inventory.remove === 0) &&
-                            <g-icon size="14" class="mr-1" >
-                              icon-inventory-report-remove </g-icon>
-                          }
-                          { $filters.formatCurrency(inventory.remove) }
-                        </div>
-                      </div>
-                    </div>
-                )} </>
-            }
-          </div>
-        </div>
-        <dialog-text-filter v-model={reportDialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}} >
-        </dialog-text-filter>
-        {
-          (selectedItem.value) &&
-          <g-dialog v-model={reportDialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
-            <div class="dialog" >
-              <div class="dialog-header" >
-                <div class="dialog-header__title" >
-                  <div class="fw-700 flex-grow-1" >
-                    {selectedItem.value.name} </div>
-                  <div>
-                    Unit: ({selectedItem.value.unit}) </div>
-                </div>
-                <div class="dialog-header__bar" >
-                  <div class="col-4 pl-2" >
-                    {t('inventory.date')} </div>
-                  <div class="col-2" >
-                    {t('inventory.amount')} </div>
-                  <div class="col-6" >
-                    {t('inventory.reason')} </div>
-                </div>
-              </div>
-              {selectedItem.value.history.map((item, i)  =>
-                  <div class="dialog-history-item" key={ `history_${i}` } >
-                    <div class="col-4 pl-2" >
-                      { formatDate(item.date) } </div>
-                    <div class="col-2" >
-                      <g-icon size="12" style="margin-bottom: 2px" >
-                        {`icon-inventory-report-${item.type}`} </g-icon>
-                      { $filters.formatCurrency(item.amount) }
-                    </div>
-                    <div class="col-6" >
-                      {item.reason} </div>
+              {inventoryCategories.value.map(category =>
+                  <div key={category._id} onClick={() => selectCategory(category)} class={['category-item', selectedCategory.value === category && 'category-item--selected']}>
+                    {category.name}
                   </div>
-              )} </div>
-          </g-dialog>
-        }
+              )}
+            </div>
+            <g-btn-bs block style="margin: 0" class="elevation-1" background-color="white" icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
+          </div>
+      )
+    }
+
+    const renderMainHeader = () => (
+        <div class="inventory-report__main-header">
+          <g-text-field-bs v-model={searchText.value} clearable v-slots={{
+            'append-inner': () => <g-icon onClick={() => reportDialog.value.text = true}>icon-keyboard</g-icon>
+          }}>
+          </g-text-field-bs>
+          <g-menu v-model={menu.value} nudge-bottom="4" v-slots={{
+            default: genScopeId(() => <div class="type-menu">
+              <div class="type-menu-item" onClick={() => type.value = 'all'}>
+                <g-icon class="mr-2"> icon-inventory-report-all</g-icon>
+                {t('inventory.all')}
+              </div>
+              <div class="type-menu-item" onClick={() => type.value = 'add'}>
+                <g-icon size="16" class="ml-1 mr-2">icon-inventory-report-add</g-icon>
+                {t('inventory.add')}
+              </div>
+              <div class="type-menu-item" onClick={() => type.value = 'remove'}>
+                <g-icon size="16" class="ml-1 mr-2">icon-inventory-report-remove</g-icon>
+                {t('inventory.useRemove')}
+              </div>
+            </div>),
+            activator: ({ on }) => genScopeId(() => (
+                <div onClick={on.click} class="type">
+                  <g-icon size={type.value === 'all' ? 24 : 16} class="mr-1">{`icon-inventory-report-${type.value}`}</g-icon>
+                  {type.value === 'remove' ? t('inventory.useRemove') : t(`inventory.${type.value}`)}
+                </div>
+            ))()
+          }}>
+          </g-menu>
+          <div class="display-btn">
+            <div style="border-radius: 2px 0 0 2px; border-right: 1px solid #E3F2FD"
+                 class={['display-btn-item', display.value === 'list' && 'display-btn--selected']}
+                 onClick={() => display.value = 'list'}>
+              <g-icon size="20">icon-inventory-report-list</g-icon>
+            </div>
+            <div style="border-radius: 0 2px 2px 0"
+                 class={['display-btn-item', display.value === 'grid' && 'display-btn--selected']}
+                 onClick={() => display.value = 'grid'}>
+              <g-icon size="20">icon-inventory-report-grid</g-icon>
+            </div>
+          </div>
+          <g-spacer/>
+          <date-range-picker from={dateFilter.value.fromDate} to={dateFilter.value.toDate} onSave={changeFilter}/>
+        </div>
+    )
+
+    const renderMainContent = () => (
+        <div class={['inventory-report__main-content', display.value === 'grid' && 'inventory-report__main-content--grid']}>
+          {
+            (display.value === 'list') && sortedInventories.value.map((inventory, i) =>
+                <div class="inventory-report-list-item" key={`list_${i}`} onClick={() => selectItem(inventory)}>
+                  <div class="inventory-report-list-item__name">{inventory.name}</div>
+                  <div class="inventory-report-list-item__unit">{inventory.unit}</div>
+                  <div class="inventory-report-list-item__add">
+                    {(inventory.add || inventory.add === 0) && <g-icon size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>}
+                    {$filters.formatCurrency(inventory.add)}
+                  </div>
+                  <div class="inventory-report-list-item__remove">
+                    {(inventory.remove || inventory.remove === 0) && <g-icon size="14" class="mr-1">icon-inventory-report-remove</g-icon>}
+                    {$filters.formatCurrency(inventory.remove)}
+                  </div>
+                </div>
+            )
+          }
+          {
+            (display.value === 'grid') && sortedInventories.value.map((inventory, i) =>
+                <div class="inventory-report-grid-item" key={`grid_${i}`} onClick={() => selectItem(inventory)}>
+                  <div class="inventory-report-grid-item__name">{inventory.name}</div>
+                  <g-spacer/>
+                  <div class="inventory-report-grid-item__detail">
+                    <div class="inventory-report-grid-item__add">
+                      {(inventory.add || inventory.add === 0) && <g-icon size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>}
+                      {$filters.formatCurrency(inventory.add)}
+                    </div>
+                    <g-spacer/>
+                    <div class="inventory-report-grid-item__remove">
+                      {(inventory.remove || inventory.remove === 0) && <g-icon size="14" class="mr-1">icon-inventory-report-remove</g-icon>}
+                      {$filters.formatCurrency(inventory.remove)}
+                    </div>
+                  </div>
+                </div>
+            )
+          }
+        </div>
+    )
+
+    const renderMain = () => (
+        <div class="inventory-report__main">
+          { renderMainHeader() }
+          { renderMainContent() }
+        </div>
+    )
+
+    const renderSearchItemDialog = () => (<dialog-text-filter v-model={reportDialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}}/>)
+
+    const renderDetail = () => (selectedItem.value) && <g-dialog v-model={reportDialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
+          <div class="dialog">
+            <div class="dialog-header">
+              <div class="dialog-header__title">
+                <div class="fw-700 flex-grow-1">{selectedItem.value.name}</div>
+                <div>Unit: ({selectedItem.value.unit}) </div>
+              </div>
+              <div class="dialog-header__bar">
+                <div class="col-4 pl-2" >{t('inventory.date')}</div>
+                <div class="col-2">{t('inventory.amount')}</div>
+                <div class="col-6">{t('inventory.reason')}</div>
+              </div>
+            </div>
+            {selectedItem.value.history.map((item, i)  =>
+                <div class="dialog-history-item" key={ `history_${i}` }>
+                  <div class="col-4 pl-2" >{ formatDate(item.date) }</div>
+                  <div class="col-2">
+                    <g-icon size="12" style="margin-bottom: 2px">{`icon-inventory-report-${item.type}`}</g-icon>
+                    { $filters.formatCurrency(item.amount) }
+                  </div>
+                  <div class="col-6">{item.reason}</div>
+                </div>
+            )}
+          </div>
+        </g-dialog>
+
+    const renderInventoryStock = () => <>
+      <div class="inventory-report">
+        { renderLefColumn() }
+        { renderMain() }
+        { renderSearchItemDialog() }
+        { renderDetail() }
       </div>
     </>
+
+    return genScopeId(renderInventoryStock)
   }
 }
 </script>

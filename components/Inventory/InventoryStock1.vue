@@ -90,7 +90,7 @@
   import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
 
   export default {
-    name: "InventoryStock",
+    name: "InventoryStock1",
     components: {PosKeyboardFull, DialogChangeStock},
     injectService: ['InventoryStore:(updateInventory, updateInventoryHistory)'],
     props: {},
