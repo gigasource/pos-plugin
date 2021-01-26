@@ -1,3 +1,5 @@
+jest.setTimeout(60000)
+
 const { Socket, Io } = require('schemahandler/io/io')
 const _ = require('lodash')
 const Hooks = require('schemahandler/hooks/hooks');
@@ -14,6 +16,11 @@ const syncTranspoter = require('schemahandler/sync/sync-transporter')
 const clientToOnlineSocket = new Socket()
 const uuid = require('uuid')
 const ObjectID = require('bson').ObjectID
+
+const { syncFactory } = require('../../test-utils')
+const {
+	prepareActionCommitTest
+} = require('./actionCommit.prepare.test')
 
 let socketToOrm
 let fakeCommit
@@ -39,6 +46,10 @@ const cms = {
 	}
 }
 _.extend(cms, new Hooks())
+
+let cmsList
+let cmsMaster
+let cmsClient
 
 describe('test-action-commit', function () {
 	beforeAll(async () => {
@@ -78,9 +89,23 @@ describe('test-action-commit', function () {
 		orm.emit('getOnlineDevice', posSetting.onlineDevice)
 		clientToOnlineSocket.connect('local', 'fromClient')
 		orm.emit('initSyncForClient', clientToOnlineSocket)
+
+		/**
+		 * Init for case > 2
+		 */
+		cmsList = await syncFactory('actionCommitTest', 2)
+		cmsMaster = cmsList[0]
+		cmsClient = cmsList[1]
+		await prepareActionCommitTest(cmsMaster)
+		await prepareActionCommitTest(cmsClient)
 	})
 
-	it('print', async (done) => {
+	beforeEach(async () => {
+		await orm('Action').remove({}).direct()
+		await orm('Commit').remove({}).direct()
+	})
+
+	it('Case 1: Print', async (done) => {
 		let count = 0;
 		let actions = []
 		cms.on('run:print', (action) => {
@@ -117,4 +142,61 @@ describe('test-action-commit', function () {
 		expect(stringify(actions)).toMatchSnapshot()
 		done()
 	}, 30000)
+
+	/**
+	 * Flow of this test:
+	 *
+	 * Master emits and receives event on master (only master can receive event)
+	 */
+	it('Case 2a: emitToMaster from master', async (done) => {
+		const _stringVar = 'Hello'
+		const _objectVar = {
+			a: 1
+		}
+		const _arrayVar = [1, 2]
+		const _dateVar = new Date()
+		cmsMaster.on('action:endOfDay', (stringVar, objectVar, arrayVar, dateVar, cb) => {
+			expect(stringVar).toEqual(_stringVar)
+			expect(objectVar).toEqual(_objectVar)
+			expect(arrayVar).toEqual(_arrayVar)
+			expect(dateVar).toEqual(_dateVar)
+			cb()
+		})
+		await cmsMaster.emitAction('action:endOfDay', _stringVar, _objectVar, _arrayVar, _dateVar, () => {
+			done()
+		})
+	})
+
+	/**
+	 * Flow of this test:
+	 *
+	 * Client emits and receives event on client (and also on master)
+	 */
+	it('Case 2b: emitToMaster from client', async (done) => {
+		const _stringVar = 'Hello'
+		const _objectVar = {
+			a: 1
+		}
+		const _arrayVar = [1, 2]
+		const _dateVar = new Date()
+		/**
+		 * Check whether master receives event or not
+		 * @type {boolean}
+		 */
+		let masterReceived = false
+		cmsMaster.on('action:endOfDay', () => {
+			masterReceived = true
+		})
+		cmsClient.on('action:endOfDay', (stringVar, objectVar, arrayVar, dateVar, cb) => {
+			expect(stringVar).toEqual(_stringVar)
+			expect(objectVar).toEqual(_objectVar)
+			expect(arrayVar).toEqual(_arrayVar)
+			expect(dateVar).toEqual(_dateVar)
+			cb()
+		})
+		await cmsClient.emitAction('action:endOfDay', _stringVar, _objectVar, _arrayVar, _dateVar, () => {
+			expect(masterReceived).toEqual(true)
+			done()
+		})
+	})
 })
