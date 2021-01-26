@@ -4,7 +4,7 @@ import {
 	loadInventories,
 	loadInventoryCategories,
 	updateInventory,
-	loadInventoryHistories, createInventory, deleteInventory
+	loadInventoryHistories, createInventory, deleteInventory, updateInventoryCategories
 } from "../inventory-logic-be";
 import _ from 'lodash'
 import {inventories, inventoryCategories, inventoryHistories} from "../inventory-logic-ui";
@@ -76,7 +76,7 @@ describe("Test inventory logic be", function() {
 		let oldLength = inventories.value.length
 		await createInventory({
 			name: 'Whiskey',
-			category: inventoryCategories[2],
+			category: inventoryCategories.value[2],
 			unit: 'l',
 			stock: 20
 		})
@@ -88,7 +88,7 @@ describe("Test inventory logic be", function() {
 		let oldLength = inventories.value.length
 		await createInventory({
 			name: 'Whiskey',
-			category: inventoryCategories[2],
+			category: _.cloneDeep(inventoryCategories.value[2]),
 			unit: 'l',
 			stock: 20,
 			id: '6'
@@ -106,5 +106,23 @@ describe("Test inventory logic be", function() {
 		await nextTick()
 		expect(stringify(inventories.value)).toMatchSnapshot()
 		expect(inventories.value.length).toEqual(oldLength - 2)
+	})
+	it('Case 5: Update and delete category', async () => {
+		const addedCategory = [{
+			name: 'Cream',
+			available: true
+		}]
+		await updateInventoryCategories([...addedCategory, ...inventoryCategories.value])
+		await nextTick()
+		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
+		const oldValue = _.cloneDeep(inventoryCategories.value)
+		await loadInventoryCategories()
+		await nextTick()
+		expect(inventoryCategories.value.length).toEqual(oldValue.length)
+		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
+		for (const category of inventoryCategories.value) {
+			const oldCategory = oldValue.find(_category => category._id.toString() === _category._id.toString())
+			expect(!!oldCategory).toBe(true)
+		}
 	})
 });
