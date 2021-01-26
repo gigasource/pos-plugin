@@ -3,7 +3,13 @@ import { ref, watch, computed, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { $filters } from '../../AppSharedStates';
 import _ from 'lodash'
-import { loadInventoryCategories } from '../inventory-logic-be';
+import {
+  inventoryCategories
+} from '../inventory-logic-ui'
+import {
+  deleteInventoryCategory,
+  updateInventoryCategories
+} from '../inventory-logic-be'
 
 export default {
   name: "dialogInventoryCategory",
@@ -14,7 +20,7 @@ export default {
   setup(props, context) {
     const { t } = useI18n()
     const showKeyboard = ref(false)
-    const categories = ref([])
+    const addedCategory = ref([])
 
     const internalValue = computed({
       get: () => {
@@ -27,38 +33,32 @@ export default {
     })
     const rules = computed(() => {
       let rules = []
-      const categories = categories.value.map(cate => cate.name)
-      rules.push(val => categories.value.filter(cate => cate === val).length <=1 || '')
+      rules.push(val => inventoryCategories.value.filter(cate => cate === val).length <= 1 || '')
       return rules
     })
 
     watch(() => internalValue.value, async (val) => {
       if (val) {
-        // TODO: impl
-        // categories.value = await loadCategoriesWithItem()
+        addedCategory.value = []
       }
     })
 
     const addCategory = function () {
-      categories.value.unshift({
+      addedCategory.value.unshift({
         name: '',
         available: true
       })
     }
-    const removeCategory = async function (category, index) {
+    const removeCategory = async function (category) {
       if (!category.available) return
-      // TODO: impl
-      // if(category._id)
-      //   await deleteInventoryCategory(category._id)
-      categories.value.splice(index, 1)
+      if(category._id) await deleteInventoryCategory(category._id)
     }
     const complete = async function () {
-      if(_.some(_.countBy(categories.value, 'name'), cate => cate > 1)) {
+      const mergedInventories = [...addedCategory.value, ...inventoryCategories.value]
+      if(_.some(_.countBy(mergedInventories, 'name'), cate => cate > 1)) {
         return
       }
-      // TODO: impl
-      // await updateInventoryCategory(categories.value)
-      await loadInventoryCategories()
+      await updateInventoryCategories(mergedInventories)
       internalValue.value = false
     }
 
@@ -67,7 +67,7 @@ export default {
         <div class="dialog">
           <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
             <div class="category">
-              {categories.value.map((category, i) =>
+              {[...addedCategory.value, ...inventoryCategories.value].map((category, i) =>
                   <div class="category-item" key={i}>
                     <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
                     <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>

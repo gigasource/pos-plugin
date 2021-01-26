@@ -35,6 +35,7 @@ Array [
     "_id": "2",
     "add": 25,
     "category": Object {
+      "_id": "1",
       "name": "Food",
     },
     "history": Array [
@@ -55,6 +56,7 @@ Array [
     "_id": "3",
     "add": 40,
     "category": Object {
+      "_id": "2",
       "name": "Fruit",
     },
     "history": Array [
@@ -82,6 +84,26 @@ Array [
     "remove": 10,
     "stock": 50,
     "unit": "piece",
+  },
+]
+`;
+
+exports[`Test inventory logic ui Case 3: Test inventory categories 1`] = `
+Array [
+  Object {
+    "_id": "1",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "2",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "3",
+    "available": true,
+    "name": "Cream",
   },
 ]
 `;

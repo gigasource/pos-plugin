@@ -98,3 +98,22 @@ export async function deleteInventory(ids) {
 		await updateInventoryHistory(histories)
 	}
 }
+
+export async function deleteInventoryCategory(_id) {
+	_.remove(inventoryCategories.value, (category) => {
+		return _id.toString() === category._id.toString()
+	})
+	await InventoryCategory.deleteOne({ _id })
+}
+
+export async function updateInventoryCategories(newInventoryCategory) {
+	for (const category of newInventoryCategory) {
+		if (category._id) {
+			await InventoryCategory.findOneAndUpdate({_id: category._id}, category)
+		} else {
+			category._id = new ObjectID()
+			await InventoryCategory.create(category)
+		}
+	}
+	inventoryCategories.value = newInventoryCategory
+}

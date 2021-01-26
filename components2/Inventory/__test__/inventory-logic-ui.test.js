@@ -30,34 +30,40 @@ describe("Test inventory logic ui", function() {
       name: "Fish",
       unit: "piece",
       stock: 30,
-      category: { name: "Food" }
+      category: { name: "Food", _id: "1" }
     });
     inventories.value.push({
       _id: "2",
       name: "Meat",
       unit: "kg",
       stock: 12,
-      category: { name: "Food" }
+      category: { name: "Food", _id: "1" }
     });
     inventories.value.push({
       _id: "3",
       name: "Apple",
       unit: "piece",
       stock: 50,
-      category: { name: "Fruit" }
+      category: { name: "Fruit", _id: "2" }
     });
     inventories.value.push({
       _id: "4",
       name: "Banana",
       unit: "piece",
       stock: 15,
-      category: { name: "Fruit" }
+      category: { name: "Fruit", _id: "2" }
     });
     inventoryCategories.value.push({
+      _id: "1",
+      name: "Food"
+    });
+    inventoryCategories.value.push({
+      _id: "2",
       name: "Fruit"
     });
     inventoryCategories.value.push({
-      name: "Food"
+      _id: "3",
+      name: "Cream"
     });
     inventoryHistories.value.push({
       amount: 30,
@@ -100,6 +106,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "1",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Fish",
@@ -109,6 +116,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "2",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Meat",
@@ -132,6 +140,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "1",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Fish",
@@ -160,6 +169,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "1",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Fish",
@@ -169,6 +179,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "2",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Meat",
@@ -178,6 +189,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "4",
           "category": Object {
+            "_id": "2",
             "name": "Fruit",
           },
           "name": "Banana",
@@ -194,6 +206,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "1",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Fish",
@@ -203,6 +216,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "2",
           "category": Object {
+            "_id": "1",
             "name": "Food",
           },
           "name": "Meat",
@@ -212,6 +226,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "3",
           "category": Object {
+            "_id": "2",
             "name": "Fruit",
           },
           "name": "Apple",
@@ -221,6 +236,7 @@ describe("Test inventory logic ui", function() {
         Object {
           "_id": "4",
           "category": Object {
+            "_id": "2",
             "name": "Fruit",
           },
           "name": "Banana",
@@ -234,5 +250,9 @@ describe("Test inventory logic ui", function() {
   it("Case 2: Test inventory histories", async () => {
     expect(inventoryHistories.value).toMatchSnapshot();
     expect(filteredInventoryHistories.value).toMatchSnapshot();
+  });
+
+  it("Case 3: Test inventory categories", () => {
+    expect(inventoryCategories.value).toMatchSnapshot();
   });
 });

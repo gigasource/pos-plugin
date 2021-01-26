@@ -11,13 +11,13 @@ async function prepareInventoryDb(orm) {
 	const Inventory = orm('Inventory')
 	const InventoryCategory = orm('InventoryCategory')
 	const InventoryHistory = orm('InventoryHistory')
-	await Inventory.remove()
-	await InventoryCategory.remove()
-	await InventoryHistory.remove()
+	await Inventory.remove({})
+	await InventoryCategory.remove({})
+	await InventoryHistory.remove({})
 	const makeCategory = async function (categoryName) {
 		return await InventoryCategory.create({
 			name: categoryName,
-			available: true
+			available: false
 		})
 	}
 

@@ -1,9 +1,21 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import _ from 'lodash'
 
 export const inventories = ref([])
 export const inventoryCategories = ref([])
 export const inventoryHistories = ref([])
+
+/**
+ * If category.available is true, then this category can be deleted
+ */
+watchEffect(() => {
+  inventoryCategories.value.forEach(category => {
+    const inventoryWithCategory = inventories.value.find(inventory => {
+      return inventory.category._id.toString() === category._id.toString()
+    })
+    category.available = !inventoryWithCategory
+  })
+})
 /**
  * @name: {string} name of item need to filter
  * @id: {string} id of item need to filter
@@ -19,7 +31,6 @@ export const inventoryHistories = ref([])
  * }
  */
 export const filter = ref({})
-export const categories = ref([])
 /**
  * @date: {Object} range from, to of selected inventory histories
  * @example:
