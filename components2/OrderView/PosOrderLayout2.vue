@@ -51,8 +51,15 @@ export default {
       })
     }
 
-    onBeforeMount(created)
-    onActivated(created)
+    // execute created twice ???
+    onBeforeMount(async() => {
+      console.log('onBeforeMount')
+      await created()
+    })
+    onActivated(async () => {
+      console.log('onActivated')
+      await created()
+    })
 
     onBeforeUnmount(() => cms.socket.off('updateOrderLayouts'))
     onDeactivated(() => cms.socket.off('updateProductProps'))
