@@ -1,26 +1,28 @@
 <script>
-import { ref, onCreated, computed, withModifiers } from 'vue'
+import { ref, watch, computed, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { $filters } from '../../AppSharedStates';
 import _ from 'lodash'
+import { loadInventoryCategories } from '../inventory-logic-be';
 
 export default {
   name: "dialogInventoryCategory",
   props: {
     modelValue: Boolean
   },
-  setup() {
+  emits: ['update:modelValue'],
+  setup(props, context) {
     const { t } = useI18n()
     const showKeyboard = ref(false)
     const categories = ref([])
 
     const internalValue = computed({
       get: () => {
-        return this.modelValue
+        return props.modelValue
       },
       set: (value) => {
         showKeyboard.value = false
-        this.$emit('update:modelValue', val)
+        context.emit('update:modelValue', val)
       }
     })
     const rules = computed(() => {
@@ -32,7 +34,8 @@ export default {
 
     watch(() => internalValue.value, async (val) => {
       if (val) {
-        categories.value = await loadCategoriesWithItem()
+        // TODO: impl
+        // categories.value = await loadCategoriesWithItem()
       }
     })
 
@@ -44,14 +47,17 @@ export default {
     }
     const removeCategory = async function (category, index) {
       if (!category.available) return
-      if(category._id) await deleteInventoryCategory(category._id)
+      // TODO: impl
+      // if(category._id)
+      //   await deleteInventoryCategory(category._id)
       categories.value.splice(index, 1)
     }
     const complete = async function () {
       if(_.some(_.countBy(categories.value, 'name'), cate => cate > 1)) {
         return
       }
-      await updateInventoryCategory(categories.value)
+      // TODO: impl
+      // await updateInventoryCategory(categories.value)
       await loadInventoryCategories()
       internalValue.value = false
     }
@@ -65,19 +71,14 @@ export default {
                   <div class="category-item" key={i}>
                     <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
                     <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>
-                      <g-icon>
-                        icon-delete2
-                      </g-icon>
+                      <g-icon>icon-delete2</g-icon>
                     </div>
                   </div>
               )} </div>
-            <p>
-              * {t('inventory.onlyEmpty')} </p>
+            <p>* {t('inventory.onlyEmpty')}</p>
             <div class="dialog-action">
-              <g-btn-bs icon="add" background-color="#1271FF" onClick={addCategory}>
-                {t('article.category')} </g-btn-bs>
-              <g-btn-bs background-color="#388E3C" onClick={complete}>
-                {t('inventory.complete')} </g-btn-bs>
+              <g-btn-bs icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
+              <g-btn-bs background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
             </div>
           </div>
           {
@@ -90,8 +91,6 @@ export default {
         </div>
       </g-dialog>
     </>
-
-
   }
 }
 </script>

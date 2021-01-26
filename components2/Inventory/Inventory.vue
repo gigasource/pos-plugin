@@ -1,5 +1,6 @@
 <script>
 import { onBeforeMount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import PosRangeSlider from '../../components/pos-shared-components/POSInput/PosRangeSlider'
 import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew'
 import dialogFormInput from '../../components/pos-shared-components/dialogFormInput'
@@ -22,11 +23,14 @@ import {
 import {
   renderMainInventoryTable
 } from './inventory-table'
+import { genScopeId } from '../utils';
 
 export default {
   name: 'Inventory',
   components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
   setup(props, { emit }) {
+    const { t } = useI18n();
+
     onBeforeMount(async () => {
       await loadInventoryCategories()
       await loadInventories()
@@ -37,16 +41,16 @@ export default {
       renderToolBar
     } = renderMainInventoryTable(props, { emit })
 
-    return () => <>
+    return genScopeId(() => <>
       <div style="height: 100%; display: flex; flex-direction: column">
         {renderMainTable()}
         {renderToolBar()}
-        {renderInventoryDialog()}
+        {renderInventoryDialog(t)}
         {renderChangeStockDialog()}
         {renderCategoryDialog()}
-        {renderFilterDialog()}
+        {renderFilterDialog(t)}
       </div>
-    </>
+    </>)
   }
 }
 </script>
