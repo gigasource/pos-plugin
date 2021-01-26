@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useI18n } from 'vue-i18n';
 dayjs.extend(customParseFormat)
 // format used in current app
 const DATE_FORMAT = 'DD/MM/YYYY'
@@ -11,6 +12,7 @@ const DATE_PICKER_FORMAT = 'YYYY-MM-DD'
 export default {
   props: ['from', 'to'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const showMenu = ref(false)
     const showFromDatePicker = ref(false)
     const showToDatePicker = ref(false)

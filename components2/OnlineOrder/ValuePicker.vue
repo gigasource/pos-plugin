@@ -11,9 +11,9 @@ export default {
     defaultValue: null
   },
   components: [GBtnBs, GTextFieldBs, dialogNumberFilter, GIcon],
-  setup() {
+  setup(props, { emit }) {
     const { t } = useI18n()
-    const values = ref(props.values)
+    const values = ref(props.values || [])
     const modelValue = ref(props.modelValue)
     const defaultValue = ref(props.defaultValue)
     const allowCustom = ref(props.allowCustom)

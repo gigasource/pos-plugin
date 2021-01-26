@@ -1,8 +1,10 @@
 <script>
 import { onBeforeMount, withModifiers } from 'vue';
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n';
 export default {
   setup(props, { emit }) {
+    const { t } = useI18n()
     const delivery = ref(null)
     const pickup = ref(null)
     const note = ref('')

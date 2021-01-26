@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n';
 import { ref, computed, onBeforeMount, onActivated } from 'vue'
 import axios from 'axios';
+import cms from 'cms'
 
 export default {
   props: {
@@ -11,7 +12,7 @@ export default {
   },
   setup(props, { emit }) {
     const onlineDevice = ref(props.onlineDevice)
-    const defaultPrepareTime = ref(props.defaultPrepareTime())
+    const defaultPrepareTime = ref(props.defaultPrepareTime)
     const onlineOrderSorting = ref(props.onlineOrderSorting)
     const { t, locale } = useI18n()
     const internalDevice = ref(null)

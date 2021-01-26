@@ -2,7 +2,7 @@
 import { computed, onBeforeMount } from 'vue';
 import { roomsStates } from '../../TablePlan/RoomState';
 import { fetchRooms } from '../../TablePlan/RoomState';
-import { pendingOrders, kitchenOrders} from '../../../composition/useOrderLogic';
+import { pendingOrders, kitchenOrders } from '../../../composition/useOrderLogic';
 
 export default {
   setup() {
@@ -28,6 +28,7 @@ export default {
         onClick: function () {
           // context.emit('update:view', { name: 'ManualTable', params: '' })
 
+        }
       },
       {
         title: 'Functions',

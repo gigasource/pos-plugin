@@ -66,7 +66,7 @@ export default {
 
     return () => <>
       {
-        (order) &&
+        (order.value) &&
         <g-dialog v-model={dialog.value} width="580px">
           <g-card class="px-3 pb-2">
             <g-card-title style="font-size: 20px">

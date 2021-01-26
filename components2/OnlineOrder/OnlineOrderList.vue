@@ -14,7 +14,7 @@ export default {
       default: () => []
     }
   },
-  setup() {
+  setup(props, { emit }) {
     const { t, locale } = useI18n()
     const onlineOrders = ref(props.onlineOrders)
     const status = ref(props.status)

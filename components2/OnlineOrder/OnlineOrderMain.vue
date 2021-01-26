@@ -5,6 +5,7 @@ import { CALL_SYSTEM_MODES } from '../../components/constants';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { $filters } from '../AppSharedStates';
+import { pendingReservationsLength } from '../../composition/usePosLogic';
 
 export default {
   props: {
@@ -17,7 +18,7 @@ export default {
     const { t, locale } = useI18n()
     const router = useRouter()
     const pendingOrders = ref(props.pendingOrders)
-    const defaultPrepareTime = ref(props.defaultPrepareTime())
+    const defaultPrepareTime = ref(props.defaultPrepareTime)
     const kitchenOrders = ref(props.kitchenOrders)
     const onlineOrderSorting = ref(props.onlineOrderSorting)
     const internalOrders = ref([])
@@ -30,6 +31,12 @@ export default {
       createOrder: false
     })
     const dialogRef = ref(null)
+
+    ///todo:
+    const calls = ref([])
+    const missedCalls = ref([])
+    const selectedCustomer = ref(null)
+    const orderType = ref(null)
 
     const timeoutInterval = ref({})
     const timeoutProgress = ref({})
@@ -150,8 +157,8 @@ export default {
     }
 
     function openReservationDialog({ customer, callId }) {
-      selectedCustomer = customer
-      dialog.reservation = true
+      selectedCustomer.value = customer
+      dialog.value.reservation = true
       cancelMissedCallTimeout(callId)
     }
 
@@ -160,13 +167,13 @@ export default {
 
       if (index) {
         calls.unshift({
-          ...missedCalls[index],
+          ...missedCalls.value[index],
           type: 'missed'
         })
         deleteMissedCall(index)
       }
-      selectedCustomer = customer
-      orderType = type
+      selectedCustomer.value = customer
+      orderType.value = type
       router.push(
           { path: '/pos-order-delivery' }
       )
@@ -177,7 +184,7 @@ export default {
     }
 
     function deleteMissedCall(index) {
-      missedCalls.splice(index, 1)
+      missedCalls.value.splice(index, 1)
     }
 
     async function updateModemDeviceStatus(connectionStatus) {
@@ -196,6 +203,14 @@ export default {
 
     function cancelMissedCallTimeout(callId) {
       cms.socket.emit('cancel-missed-call-timeout', callId);
+    }
+    async function getPendingReservationsLength() {
+      const currentDate = dayjs().startOf('day')
+      const reservations = await cms.getModel('Reservation').find({
+        status: 'pending',
+        date: { $gte: currentDate.toDate(), $lt: currentDate.add(1, 'day').toDate() }
+      })
+      pendingReservationsLength.value = reservations.length
     }
 
     return () =>
@@ -232,7 +247,7 @@ export default {
                     (
                         ((!internalOrders.value || !internalOrders.value.length) && (calls.length > 0 || missedCalls.length > 0)) ?
                             <>
-                              {calls.map((call, i) =>
+                              {calls.value.map((call, i) =>
                                   <div class={['pending-orders--call', call.type === 'missed' && 'b-red']} key={`call_${i}`}>
                                     <div class='pending-orders--call-title'>
                                       <div>
@@ -310,7 +325,7 @@ export default {
                               )} </>
                             :
                             <>
-                              {calls.map((call, i) =>
+                              {calls.value.map((call, i) =>
                                   <div class="pending-orders--call" key={`call_${i}`}>
                                     <div class="pending-orders--call-title">
                                       <div>
@@ -348,7 +363,7 @@ export default {
                                     </div>
                                   </div>
                               )}
-                              {missedCalls.map((call, i) =>
+                              {missedCalls.value.map((call, i) =>
                                   <div class="pending-orders--call b-red" key={`call_${i}`} v-touch="getTouchHandlers(i)">
                                     <div class="pending-orders--call-title">
                                       <div>
@@ -662,7 +677,7 @@ export default {
             </div>
           </div>
           <dialog-complete-order ref={dialogRef} v-model={showDialog} onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
-          <dialog-text-filter v-model={dialog.reason} label="Reason" defaultValue={dialog.order.declineReason} onSubmit={submitReason}></dialog-text-filter>
+          <dialog-text-filter v-model={dialog.reason} label="Reason" defaultValue={dialog.value.order.declineReason} onSubmit={submitReason}></dialog-text-filter>
           <new-reservation-dialog v-model={dialog.reservation} receivedPhone={selectedCustomer ? selectedCustomer.phone : ''} onSubmit={getPendingReservationsLength}></new-reservation-dialog>
         </div>
   }
