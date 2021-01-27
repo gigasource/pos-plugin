@@ -1,117 +1,82 @@
 <script>
-import { $filters } from '../AppSharedStates';
-import { ref, onCreated, onActivated } from 'vue'
+import {$filters} from '../AppSharedStates';
+import {onActivated, ref, watch} from 'vue'
+import {getMonthReport, monthReport, showProductSold} from "./month-report-shared";
+import {useI18n} from "vue-i18n";
+import _ from 'lodash';
 
 export default {
   name: 'PosMonthReport',
   setup() {
-    const total = ref(0)
-    const salesByCategory = ref(null)
-    const salesByPayment = ref(null)
-    const zNumbers = ref(null)
-    const monthReport = ref(null)
-    const showAllZNumber = ref(null)
-    const showProductSold = ref(null)
+    const {t} = useI18n();
 
-    onCreated(() => {
-      setTimeout(async () => {
-        await getMonthReport()
-      }, 50)
-    })
+    getMonthReport();
 
-    watch(() => monthReport.value, (newVal) => {
-      if (newVal) {
-        const {
-          total: _total,
-          salesByCategory: _salesByCategory,
-          salesByPayment: _salesByPayment,
-          zNumbers: _zNumbers } = newVal
-        total.value = _total
-        salesByCategory.value = _salesByCategory
-        salesByPayment.value = _salesByPayment
-        zNumbers.value = _zNumbers
-      }
-    }, { deep: true })
+    onActivated(getMonthReport);
 
-    const getMonthReport = function () {
-      console.error('ReportsStore:getMonthReport was not injected')
-    }
-
-    onActivated(() => {
-      setTimeout(async () => {
-        await getMonthReport()
-      }, 50)
-    })
-
-    return () => <>
-      <div class="report-wrapper">
-        <div class="report-content">
-          <div class="report__sales">
-            <div class="title">
-              Sales
-            </div>
-            <g-divider dashed color="black">
-            </g-divider>
-            {salesByPayment.value.map((amount, payment) =>
-                <div class="detail" key={`sales${payment}`}>
-                  <span> {payment} </span>
-                  <span>€{$filters.formatCurrency(amount)} </span>
-                </div>
-            )}
-            <div class="total">
-              <span>
-                {t('common.total')} </span>
-              <span>
-                <u>
-                  € {$filters.formatCurrency(total.value)} </u>
-              </span>
-            </div>
-          </div>
-          <div v-show="showAllZNumber.value" class="report__z-number">
-            <g-divider dashed color="black">
-            </g-divider>
-            <table>
-              {zNumbers.value.map((z, i) =>
-                  <tr key={`zNumber${i}`} class="z-number">
-                    <td>
-                      <div class="row-flex justify-between">
-                        <span>
-                          {t('report.zNumber')} {z.z}: </span>
-                        <span class="ml-2">
-                          € {$filters.formatCurrency(z.sum)} </span>
-                      </div>
-                    </td>
-                    <td class="pl-3">
-                      {t('common.date')}: {z.date} </td>
-                  </tr>
-              )} </table>
-            <g-divider dashed color="black">
-            </g-divider>
-          </div>
-          {
-            (showProductSold.value) &&
-            <div class="report__product">
+    return () => (
+        <div class="report-wrapper">
+          <div class="report-content">
+            <div class="report__sales">
               <div class="title">
-                {t('report.productSold')} </div>
+                Sales
+              </div>
               <g-divider dashed color="black">
               </g-divider>
-              {salesByCategory.value.map(({ products, sum }, category) =>
-                  <div key={`category${category}`}>
+              {monthReport.value && _.map(monthReport.value.salesByPayment, (amount, payment) =>
+                  <div class="detail" key={`sales${payment}`}>
+                    <span> {payment} </span>
+                    <span>€{$filters.formatCurrency(amount)} </span>
+                  </div>
+              )}
+              {monthReport.value && <div class="total">
+                <span>
+                  {t('common.total')} </span>
+                <span>
+                  <u>
+                    € {$filters.formatCurrency(monthReport.value.total)} </u>
+                </span>
+              </div>}
+            </div>
+            <div class="report__z-number">
+              <g-divider dashed color="black"/>
+              <table>
+                {monthReport.value && _.map(monthReport.value.zNumbers, (report, i) =>
+                    <tr key={`zNumber${i}`} class="z-number">
+                      <td>
+                        <div class="row-flex justify-between">
+                          <span>
+                            {t('report.zNumber')} {report.z}: </span>
+                          <span class="ml-2">
+                            € {$filters.formatCurrency(report.sum)} </span>
+                        </div>
+                      </td>
+                      <td class="pl-3">
+                        {t('common.date')}: {report.date} </td>
+                    </tr>
+                )} </table>
+              <g-divider dashed color="black"/>
+            </div>
+            {showProductSold.value &&
+            <div class="report__product">
+              <div class="title">{t('report.productSold')} </div>
+              <g-divider dashed color="black"/>
+              {monthReport.value && _.map(monthReport.value.salesByCategoryName, (category, categoryName) =>
+                  <div key={`category${categoryName}`}>
                     <p class="category">
-                      {category || 'No category'} (€ {$filters.formatCurrency(sum)})
+                      {categoryName || 'No category'} (€ {$filters.formatCurrency(monthReport.value.salesByCategory[categoryName].vSum)})
                     </p>
-                    {products.map(({ product, quantity }) =>
+                    {_.map(category, ({vSum, quantity}, product) =>
                         <p class="product" key={`item${product}`}>
-                          {quantity} x {product}
+                          {quantity} x {product} (€ {$filters.formatCurrency(vSum)})
                         </p>
                     )}
                   </div>
               )}
-            </div>
-          }
+            </div>}
+          </div>
         </div>
-      </div>
-    </>
+    )
   }
 }
 </script>

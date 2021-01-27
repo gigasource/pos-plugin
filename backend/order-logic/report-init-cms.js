@@ -1,5 +1,5 @@
+const {monthReport} = require("./report-month-report");
 const {xReport} = require("./report-x-report-logic");
-const {eodReport} = require('./report-eod-logic')
 const {eodReportCalender} = require('./report-eod-calender-logic')
 
 module.exports = function (cms) {
@@ -14,8 +14,8 @@ module.exports = function (cms) {
       cb(result)
     })
 
-    socket.on('make-eod-report', async function (from, to, cb) {
-      let result = await xReport(from, to);
+    socket.on('make-month-report', async function (from, to, cb) {
+      let result = await monthReport(from, to);
       cb(result)
     })
   })

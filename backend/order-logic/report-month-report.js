@@ -1,15 +1,15 @@
-import {renderPivotTable} from "./pivot";
+const {renderPivotTable} = require('./pivot')
 const orm = require("schemahandler");
-const {fromReducer, quantityReducer, toReducer, vTaxSumReducer} = require("./report-shared");
 let Order = orm("Order");
 const _ = require('lodash');
 
 async function monthReport(from, to) {
-  //todo: query z
   const query = {
-    ...from && {from},
-    ...to && {to},
-    status: 'paid'
+    date: {
+      ...from && {$gte: from},
+      ...to && {$lte: to},
+    },
+    status: "paid"
   };
 
   const orders = await Order.find(query);
