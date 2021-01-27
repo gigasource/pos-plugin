@@ -49,3 +49,13 @@ export async function getMonthReport() {
 
   monthReport.value = {total, salesByCategory, salesByPayment, zNumbers, salesByCategoryName}
 }
+
+export async function printMonthReport() {
+  await new Promise(resolve => cms.socket.emit('printReport', 'MonthlyReport', {
+    showAllZNumber: showAllZNumber.value,
+    showProductSold: showProductSold.value,
+    from: monthReportFrom.value,
+    to: monthReportTo.value,
+    selectedPeriod: selectedPeriod.value
+  }, resolve))
+}

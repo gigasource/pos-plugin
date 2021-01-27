@@ -12,6 +12,7 @@ jest.mock("vue-i18n", () => {
       return {
         t(s) {
           if (s === 'dates.dateFormat') return 'DD.MM.YYYY';
+          if (s === 'dates.timeFormat') return 'HH:mm';
           if (arguments.length > 1) return [...arguments].map(s => util.inspect(s)).join(' , ')
           return s; // [Consider] return `t('${t}')` to indicate that i18n has been used
         },

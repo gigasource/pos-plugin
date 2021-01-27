@@ -1,3 +1,5 @@
+import {demoData as data} from "../components2/OrderView/__test__/demoData";
+
 const { Socket, Io } = require('schemahandler/io/io')
 //const Orm = require('schemahandler/orm')
 const orm = require('schemahandler')
@@ -25,7 +27,6 @@ function cmsFactory(testName) {
     },
     initDemoData: async function () {
       const dataPath = path.resolve(__dirname, './dataMock/demoData.json')
-      const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
       for (const collection in data) {
         await cms.getModel(collection).remove({})

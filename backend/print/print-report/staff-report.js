@@ -80,7 +80,8 @@ async function printEscPos(escPrinter, printData) {
 }
 
 async function printCanvas(canvasPrinter, printData) {
-  const {orderSalesByStaff: {name, user, from, groupByTax, groupByPayment}} = printData;
+  let {userSales, groupByStatus, groupByPayment, staffName, from, to} = printData;
+  //const {orderSalesByStaff: {name, user, from, groupByTax, groupByPayment}} = printData;
 
   function convertMoney(value) {
     return !isNaN(value) ? value.toFixed(2) : value
@@ -92,53 +93,55 @@ async function printCanvas(canvasPrinter, printData) {
 
   await canvasPrinter.bold(true);
   await canvasPrinter.alignLeft();
-  await canvasPrinter.println(`Staff name: ${name}`);
+  await canvasPrinter.println(`Staff name: ${staffName}`);
 
-  if (user[name]) {
+  if (userSales[staffName]) {
     await canvasPrinter.println(`Report Date: ${formatDate(from)}`);
     await canvasPrinter.bold(false);
-    await canvasPrinter.println(`First Order: ${formatDate(user[name].from)}`);
-    await canvasPrinter.println(`Last Order: ${formatDate(user[name].to)}`);
+    await canvasPrinter.println(`First Order: ${formatDate(userSales[staffName].from)}`);
+    await canvasPrinter.println(`Last Order: ${formatDate(userSales[staffName].to)}`);
   }
 
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
   await canvasPrinter.println('Sales');
 
-  if (user[name]) {
+  if (userSales[staffName] && userSales[staffName].vTaxSum) {
     await canvasPrinter.bold(false);
-    await canvasPrinter.leftRight('Total', convertMoney(user[name].vSum));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(user[name].net));
-    await canvasPrinter.leftRight('Tax', convertMoney(user[name].tax));
+    await canvasPrinter.leftRight('Total', convertMoney(userSales[staffName].vTaxSum.gross));
+    await canvasPrinter.leftRight('Sub-total', convertMoney(userSales[staffName].vTaxSum.net));
+    await canvasPrinter.leftRight('Tax', convertMoney(userSales[staffName].vTaxSum.tax));
   }
 
   await canvasPrinter.drawLine();
 
+  const groupByTax = userSales[staffName] && userSales[staffName].vTaxSum && userSales[staffName].vTaxSum.vTaxSum;
   if (groupByTax) {
     await canvasPrinter.bold(false);
 
     const taxGroups = Object.keys(groupByTax);
     for (let i = 0; i < taxGroups.length; i++) {
       const taxGroup = taxGroups[i];
-      const {gross, net, salesTax} = groupByTax[taxGroup];
+      const {gross, net, tax} = groupByTax[taxGroup];
 
       await canvasPrinter.println(`Tax ${taxGroup}%:`);
       await canvasPrinter.leftRight('Total', convertMoney(gross));
       await canvasPrinter.leftRight('Sub-total', convertMoney(net));
-      await canvasPrinter.leftRight('Tax', convertMoney(salesTax));
+      await canvasPrinter.leftRight('Tax', convertMoney(tax));
       await canvasPrinter.newLine();
     }
   }
 
-  if (user[name]) {
+  if (userSales[staffName]) {
     await canvasPrinter.leftRight('Vouchers Sold', convertMoney(0));
     await canvasPrinter.leftRight('Vouchers Used', convertMoney(0));
-    await canvasPrinter.leftRight('Discount', convertMoney(user[name].discount));
+    await canvasPrinter.leftRight('Discount', convertMoney(userSales[staffName].vDiscount));
   }
 
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
+  groupByPayment = groupByPayment[staffName];
   if (groupByPayment) {
     const paymentTypes = Object.keys(groupByPayment);
     for (let i = 0; i < paymentTypes.length; i++) {

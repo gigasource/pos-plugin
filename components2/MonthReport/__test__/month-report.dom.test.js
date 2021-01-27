@@ -6,9 +6,10 @@ import {demoData} from "../../OrderView/__test__/demoData";
 import PosMonthReport from "../PosMonthReport";
 import PosMonthReportSetting from "../PosMonthReportSetting";
 import PosMonthSelect from "../PosMonthSelect";
-import {monthReportTo} from "../month-report-shared";
+import {monthReportTo, printMonthReport} from "../month-report-shared";
 import dayjs from "dayjs";
-import moment from "moment";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat)
 
 const { prepareDb, prepareReportTest } = require('../../../backend/order-logic/report.prepare.test')
 
@@ -98,13 +99,23 @@ describe("eod test", function () {
       }
     });
     //const a = dayjs;
-    monthReportTo.value = moment('20.02.2021', 'DD.MM.YYYY').toDate();
-    const a = monthReportTo
+    monthReportTo.value = dayjs('20.02.2021', 'DD.MM.YYYY').toDate();
     //await getMonthReport();
     //wrapper.find('[previous]').trigger('click')
     await delay(200);
     await nextTick();
     expect(wrapper.html()).toMatchSnapshot()
   }, 80000);
+
+  it("case 5 print", async function () {
+    monthReportTo.value = dayjs('20.02.2021', 'DD.MM.YYYY').toDate();
+
+    await delay(200);
+    await nextTick();
+
+    await printMonthReport();
+    await delay(1000);
+  }, 80000);
+
 
 });

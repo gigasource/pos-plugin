@@ -76,6 +76,13 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/dayjs-utils.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/modifier/index.js',
       type: 'backend'
     },

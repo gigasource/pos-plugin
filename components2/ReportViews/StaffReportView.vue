@@ -1,267 +1,235 @@
 <script>
 import dayjs from 'dayjs';
-import { useRoute } from 'vue-router';
-import { onBeforeMount, computed } from 'vue';
-import { $filters } from '../AppSharedStates';
-import { useI18n } from 'vue-i18n';
-import { GIcon, GTabItem, GTabs, GToolbar } from '../../../../backoffice/pos-vue-framework';
+import {onActivated, ref} from 'vue';
+import {$filters} from '../AppSharedStates';
+import {useI18n} from 'vue-i18n';
+import {GIcon, GTabItem, GTabs, GToolbar} from '../../../../backoffice/pos-vue-framework';
+import {backFn, dateFormat, timeFormat} from "../utils";
+import {
+  getListUsers,
+  getStaffReport,
+  groupByPayment,
+  reportDate,
+  selectedStaff,
+  staffs,
+  userSales
+} from "./staf-report-logic";
+import _ from 'lodash';
 
 export default {
   components: [GTabs, GTabItem, GToolbar, GIcon],
   setup() {
-    const { t } = useI18n()
-    const selectedStaff = ref(null)
-    const staffs = ref([])
+    const {t} = useI18n()
     const orderSalesByStaff = ref(null)
-    // PosStore: inject
-    const systemDate = ref(null)
-    const dateFormat = ref(null)
-    const timeFormat = ref(null)
-    // SettingsStore inject
-    const listUsers = ref([])
-    const reportDate = computed(() => {
-      return dayjs(systemDate.value).format(dateFormat.value)
-    })
-    watch(() => selectedStaff.value, async (newV) => {
-      if (!newV) {
-        return []
-      }
-      //todo: getOrderSalesByStaff
-      orderSalesByStaff.value = await getOrderSalesByStaff(newV.name, systemDate.value)
-    })
-
-    const router = useRoute()
-
-    function back() {
-      router.push({ path: '/pos-dashboard' })
-    }
 
     //todo: printStaffReport
     async function print() {
-      if (!orderSalesByStaff.value) {
-        return
-      }
       return await printStaffReport(orderSalesByStaff.value)
     }
 
     function getFormattedTime(val) {
-      return val ? dayjs(val).format(`${dateFormat} ${timeFormat}`) : ''
+      return val ? dayjs(val).format(`${dateFormat.value} ${timeFormat.value}`) : ''
     }
 
-    // inject service
-    async function getListUsers() {
-      listUsers.value = await cms.getModel('PosUser').find().lean();
-    }
-
-    function getOrderSalesByStaff() {
-    }
-
-    function printStaffReport() {
-    }
-
-
-    // async mounted() {
-    //   setTimeout(async () => {
-    //     await this.getListUsers();
-    //     this.staffs = this.listUsers;
-    //     this.selectedStaff = this.staffs.length && this.staffs[0]
-    //   }, 100)
-    // },
-    // async activated() {
-    //   await this.getListUsers();
-    //   this.staffs = this.listUsers;
-    //   this.selectedStaff = this.staffs.length && this.staffs[0]
-    // }
-
-    // fixme:
-    onBeforeMount(async() => {
+    onActivated(async () => {
       await getListUsers();
-      staffs.value = listUsers.value;
-      selectedStaff.value = staffs.value.length && staffs.value[0]
+      await getStaffReport();
     })
+    getListUsers()
+    getStaffReport();
 
-    return () => <>
-      <div class="staff-report-view">
-        <div class="staff-report-content">
-          {(staffs.value.length) &&
-          <g-tabs items={staffs.value} showArrows={false}
-                  vertical={true} color="#F2F2F2"
-                  slider-color="#2979FF" slider-size="4px"
-                  text-color="#000000" v-model={selectedStaff.value}
-                  v-slots={{
-                    'default': () => <> {staffs.value.map((item, i) =>
-                        <g-tab-item item={item} key={i}>
-                          <div class="detail-header">
-                            {t('report.staffName')}: {item.name}
-                          </div>
-                          {
-                            (orderSalesByStaff.value && orderSalesByStaff.value.user[orderSalesByStaff.value.name]) &&
-                            <div>
-                              <div class="detail-header">
-                                {t('report.reportDate')}: {reportDate.value} </div>
-                              <div class="detail-time">
-                                {t('report.firstOrder')}:
-                                {getFormattedTime(orderSalesByStaff.value.user[orderSalesByStaff.value.name].from)}
-                              </div>
-                              <div class="detail-time">
-                                {t('report.lastOrder')}:
-                                {getFormattedTime(orderSalesByStaff.value.user[orderSalesByStaff.value.name].to)}
-                              </div>
-                            </div>
-                          }
-                          <div class="sales-details-header">
-                            {t('common.sales')}
-                          </div>
-                          {
-                            (orderSalesByStaff.value && orderSalesByStaff.value.user[orderSalesByStaff.value.name]) &&
-                            <div>
-                              <p>
-                                <span class="sales-entry sales-type">
-                                  {t('common.total')}
-                                </span>
-                                <span class="sales-entry sales-amount">
-                                  {$filters.formatCurrency(orderSalesByStaff.value.user[orderSalesByStaff.value.name].vSum)}
-                                </span>
-                              </p>
-                              <p>
-                                <span class="sales-entry sales-type">
-                                  {t('common.subtotal')}
-                                </span>
-                                <span class="sales-entry sales-amount">
-                                  {$filters.formatCurrency(orderSalesByStaff.value.user[orderSalesByStaff.value.name].net)}
-                                </span>
-                              </p>
-                              <p>
-                                <span class="sales-entry sales-type">
-                                  {t('common.tax')} </span>
-                                <span class="sales-entry sales-amount">
-                                  {$filters.formatCurrency(orderSalesByStaff.value.user[orderSalesByStaff.value.name].tax)}
-                                </span>
-                              </p>
-                            </div>
-                          }
-                          <div class="tax-detail">
-                            {
-                              (orderSalesByStaff.value && orderSalesByStaff.value['groupByTax']) &&
-                              <div>
-                                {orderSalesByStaff.value['groupByTax'].map((entry, key, index) =>
-                                    <div>
-                                      <p class="sales-entry sales-type">
-                                        {t('common.tax')} {key}%:
-                                      </p>
-                                      <p>
-                                        <span class="sales-entry sales-type">
-                                          {t('common.total')}
-                                        </span>
-                                        <span class="sales-entry sales-amount">
-                                          {$filters.formatCurrency(entry.gross)}
-                                        </span>
-                                      </p>
-                                      <p>
-                                        <span class="sales-entry sales-type">
-                                          {t('common.subtotal')}
-                                        </span>
-                                        <span class="sales-entry sales-amount">
-                                          {$filters.formatCurrency(entry.net)}
-                                        </span>
-                                      </p>
-                                      <p>
-                                        <span class="sales-entry sales-type">
-                                          {t('common.tax')}
-                                        </span>
-                                        <span class="sales-entry sales-amount">
-                                          {$filters.formatCurrency(entry.salesTax)}
-                                        </span>
-                                      </p>
-                                      <br> </br>
-                                    </div>
-                                )}
-                              </div>
-                            }
-                            {
-                              (orderSalesByStaff.value && orderSalesByStaff.value.user[orderSalesByStaff.value.name]) &&
-                              <div>
-                                <p>
-                                  <span class="sales-entry sales-type">
-                                    {t('report.vouchersSold')}
-                                  </span>
-                                  <span class="sales-entry sales-amount">
-                                    {$filters.formatCurrency(0)}
-                                  </span>
-                                </p>
-                                <p>
-                                  <span class="sales-entry sales-type">
-                                    {t('report.vouchersUsed')}
-                                  </span>
-                                  <span class="sales-entry sales-amount">
-                                    {$filters.formatCurrency(0)}
-                                  </span>
-                                </p>
-                                <p>
-                                  <span class="sales-entry sales-type">
-                                    {t('common.discount')}
-                                  </span>
-                                  <span class="sales-entry sales-amount">
-                                    {
-                                      $filters.formatCurrency(orderSalesByStaff.value.user[orderSalesByStaff.value.name].discount)
-                                    }
-                                  </span>
-                                </p>
-                              </div>
-                            }
-                          </div>
-                          {
-                            (orderSalesByStaff.value && orderSalesByStaff.value['groupByPayment']) &&
-                            <div class="sales-details">
-                              {orderSalesByStaff.value['groupByPayment'].map((sale, key, index) =>
-                                  <p key={index}>
-                                    <span class="sales-entry sales-type">
-                                      {key} {t('common.sales')}:
-                                    </span>
-                                    <span class="sales-entry">
-                                      {$filters.formatCurrency(sale)}
-                                    </span>
-                                  </p>
-                              )}<p>
-                              <span class="sales-entry sales-type">
-                                {t('report.returnedTotal')}:
-                              </span>
-                              <span class="sales-entry">
-                                {$filters.formatCurrency(0)}
-                              </span>
-                            </p>
-                            </div>
-                          }
-                        </g-tab-item>
-                    )} </>,
-                    'tab': ({ item, index }) => <>
-                      <g-tab item={item} key={index} active-text-color="#000000">
-                        <p class="tab-username">
-                          {item.name}
-                        </p>
-                      </g-tab>
-                    </>
-                  }}>
-          </g-tabs>
+    const genSalesDetail = (user) => {
+      return <>
+        {
+          userSales.value && userSales.value[user] &&
+          <div>
+            <div class="detail-header">
+              {t('report.reportDate')}: {reportDate.value} </div>
+            <div class="detail-time">
+              {t('report.firstOrder')}:
+              {getFormattedTime(userSales.value[user].from)}
+            </div>
+            <div class="detail-time">
+              {t('report.lastOrder')}:
+              {getFormattedTime(userSales.value[user].to)}
+            </div>
+          </div>
+        }
+        <div class="sales-details-header">
+          {t('common.sales')}
+        </div>
+        {
+          userSales.value && userSales.value[user] &&
+          <div>
+            <p>
+              <span class="sales-entry sales-type">
+                {t('common.total')}
+              </span>
+              <span class="sales-entry sales-amount">
+                {$filters.formatCurrency(userSales.value[user].vTaxSum.gross)}
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                {t('common.subtotal')}
+              </span>
+              <span class="sales-entry sales-amount">
+                {$filters.formatCurrency(userSales.value[user].vTaxSum.net)}
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                {t('common.tax')} </span>
+              <span class="sales-entry sales-amount">
+                {$filters.formatCurrency(userSales.value[user].vTaxSum.tax)}
+              </span>
+            </p>
+          </div>
+        }
+      </>
+    }
+
+    const genTaxesDetail = (user) => {
+      return <>
+        <div className="tax-detail">
+          {
+            userSales.value && userSales.value[user] && userSales.value[user].vTaxSum &&
+            <div>
+              {_.map(userSales.value[user].vTaxSum.vTaxSum, (taxObject, taxPercent, index) =>
+                  <div key={index}>
+                    <p className="sales-entry sales-type">
+                      {t('common.tax')} {taxPercent}%:
+                    </p>
+                    <p>
+                      <span className="sales-entry sales-type">
+                        {t('common.total')}
+                      </span>
+                      <span className="sales-entry sales-amount">
+                        {$filters.formatCurrency(taxObject.gross)}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="sales-entry sales-type">
+                        {t('common.subtotal')}
+                      </span>
+                      <span className="sales-entry sales-amount">
+                        {$filters.formatCurrency(taxObject.net)}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="sales-entry sales-type">
+                        {t('common.tax')}
+                      </span>
+                      <span className="sales-entry sales-amount">
+                        {$filters.formatCurrency(taxObject.tax)}
+                      </span>
+                    </p>
+                    <br> </br>
+                  </div>
+              )}
+            </div>
+          }
+          {
+            userSales.value && userSales.value[user] &&
+            <div>
+              <p>
+                <span className="sales-entry sales-type">
+                  {t('report.vouchersSold')}
+                </span>
+                <span className="sales-entry sales-amount">
+                  {$filters.formatCurrency(0)}
+                </span>
+              </p>
+              <p>
+                <span className="sales-entry sales-type">
+                  {t('report.vouchersUsed')}
+                </span>
+                <span className="sales-entry sales-amount">
+                  {$filters.formatCurrency(0)}
+                </span>
+              </p>
+              <p>
+                <span className="sales-entry sales-type">
+                  {t('common.discount')}
+                </span>
+                <span className="sales-entry sales-amount">
+                  {
+                    $filters.formatCurrency(userSales.value[user].vDiscount)
+                  }
+                </span>
+              </p>
+            </div>
           }
         </div>
-        <g-toolbar bottom color="#EEEEEE">
-          <g-btn uppercase={false} onClick={back} width="94px">
-            <g-icon class="mr-2" svg>
-              icon-back
-            </g-icon>
-            {t('ui.back')}
-          </g-btn>
-          <g-spacer></g-spacer>
-          <g-btn uppercase={false} onClick={print} background-color="#2979FF" text-color="#FFFFFF">
-            <g-icon class="mr-2" svg>
-              icon-print2
-            </g-icon>
-            {t('report.printReport')}
-          </g-btn>
-        </g-toolbar>
-      </div>
-    </>
+      </>
+    }
+
+    //todo: voucher
+    //todo: cancellation
+    const genPayment = (user) => {
+      return groupByPayment.value && groupByPayment.value[user] &&
+          <div class="sales-details">
+            {_.map(groupByPayment.value[user], (sale, paymentType, index) =>
+                <p key={index}>
+                  <span class="sales-entry sales-type">
+                    {paymentType} {t('common.sales')}:
+                  </span>
+                  <span class="sales-entry">
+                    {$filters.formatCurrency(sale)}
+                  </span>
+                </p>
+            )}<p>
+            <span class="sales-entry sales-type">
+              {t('report.returnedTotal')}:
+            </span>
+            <span class="sales-entry">
+              {$filters.formatCurrency(0)}
+            </span>
+          </p>
+          </div>
+    }
+
+    return () => (
+        <div class="staff-report-view">
+          <div class="staff-report-content">
+            {staffs.value.length &&
+            <g-tabs items={staffs.value} showArrows={false}
+                    vertical={true} color="#F2F2F2"
+                    slider-color="#2979FF" slider-size="4px"
+                    text-color="#000000" v-model={selectedStaff.value}
+                    v-slots={{
+                      default: () => staffs.value.map((item, i) =>
+                          <g-tab-item item={item} key={i}>
+                            <div class="detail-header">
+                              {t('report.staffName')}: {item.name}
+                            </div>
+                            {genSalesDetail(item.name)}
+                            {genTaxesDetail(item.name)}
+                            {genPayment(item.name)}
+                          </g-tab-item>
+                      ),
+                      tab: ({item, index}) =>
+                          <g-tab item={item} key={index} active-text-color="#000000">
+                            <p class="tab-username">
+                              {item.name}
+                            </p>
+                          </g-tab>
+                    }}/>
+            }
+          </div>
+          <g-toolbar bottom color="#EEEEEE">
+            <g-btn uppercase={false} onClick={backFn.value} width="94px">
+              <g-icon class="mr-2" svg>icon-back</g-icon>
+              {t('ui.back')}
+            </g-btn>
+            <g-spacer></g-spacer>
+            <g-btn uppercase={false} onClick={print} background-color="#2979FF" text-color="#FFFFFF">
+              <g-icon class="mr-2" svg>icon-print2</g-icon>
+              {t('report.printReport')}
+            </g-btn>
+          </g-toolbar>
+        </div>
+    )
   }
 }
 </script>

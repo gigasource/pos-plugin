@@ -1,3 +1,4 @@
+const {staffReport} = require("./report-staff-logic");
 const {monthReport} = require("./report-month-report");
 const {xReport} = require("./report-x-report-logic");
 const {eodReportCalender} = require('./report-eod-calender-logic')
@@ -16,6 +17,11 @@ module.exports = function (cms) {
 
     socket.on('make-month-report', async function (from, to, cb) {
       let result = await monthReport(from, to);
+      cb(result)
+    })
+
+    socket.on('make-staff-report', async function (from, to, cb) {
+      let result = await staffReport(from, to);
       cb(result)
     })
   })
