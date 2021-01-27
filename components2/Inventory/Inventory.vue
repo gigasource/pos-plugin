@@ -18,6 +18,7 @@ import {
 import {
   loadInventories,
   loadInventoryCategories,
+  loadInventoryHistories
 } from './inventory-logic-be'
 
 import {
@@ -34,6 +35,7 @@ export default {
     onBeforeMount(async () => {
       await loadInventoryCategories()
       await loadInventories()
+      await loadInventoryHistories()
     })
 
     const {

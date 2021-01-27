@@ -63,7 +63,7 @@ describe("Test inventory logic be", function() {
 		  	name: 'Lamb',
 		  }
 	  })
-	  updateInventory({
+	  await updateInventory({
 		  ...inventories.value[2],
 		  ...{
 		  	category: inventoryCategories.value[1]

@@ -289,6 +289,14 @@ Array [
     "inventory": "ObjectID",
     "type": "add",
   },
+  Object {
+    "amount": 10,
+    "category": "ObjectID",
+    "date": "2021-01-05T00:00:00.000Z",
+    "inventory": "ObjectID",
+    "reason": "Update stock",
+    "type": "remove",
+  },
 ]
 `;
 
@@ -456,6 +464,7 @@ Array [
     "unit": "l",
   },
   Object {
+    "_id": "ObjectID",
     "category": Object {
       "_id": "ObjectID",
       "available": false,

@@ -79,8 +79,8 @@ export default {
                   )} </div>
                 <p>* {t('inventory.onlyEmpty')}</p>
                 <div class="dialog-action">
-                  <g-btn-bs icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
-                  <g-btn-bs background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
+                  <g-btn-bs addCategory icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
+                  <g-btn-bs complete background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
                 </div>
               </div>
               {
