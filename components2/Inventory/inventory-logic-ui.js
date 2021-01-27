@@ -115,5 +115,13 @@ export function clearFilter() {
   }
 }
 
-
+window.dbg = {
+  ...(window.dbg || {}),
+  inventory: {
+    inventories,
+    inventoryCategories,
+    inventoryHistories,
+    filter
+  }
+}
 
