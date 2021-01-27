@@ -37,9 +37,12 @@ export const isSameId = function (obj, obj1) {
   return obj._id.toString() === obj1._id.toString()
 }
 
-const {t} = useI18n();
+let t;
 //todo dateFormat
-export const dateFormat = computed(() => t('dates.dateFormat'));
+export const dateFormat = computed(() => {
+  if (!t) t = useI18n().t;
+  return t('dates.dateFormat');
+});
 
 export function formatDate(date) {
   if (!date || !dayjs(date).isValid()) return ''

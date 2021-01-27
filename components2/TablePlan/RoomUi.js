@@ -11,6 +11,7 @@ export function roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsIn
     viewH.value = roomContainer.value ? roomContainer.value.offsetHeight * 0.9 : 800
   })
   const preventStop = withModifiers(() => null, ['prevent', 'stop'])
+  //fixme: fix code for preventStop to prevent side effect
   const renderRoom = genScopeId(() =>
     <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle.value}
          /*onMousemove={preventStop}
