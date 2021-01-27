@@ -14,7 +14,7 @@ import {
 	clearFilter,
 	inventories,
 	filter,
-	isFiltered
+	isFiltered, convertFilterTypeToString
 } from './inventory-logic-ui'
 import {
 	deleteInventory
@@ -78,8 +78,8 @@ export function renderMainInventoryTable(props, { emit }) {
 											    <g-chip key={typeFilter} label small background-color="white" close class="ma-1"
 											            onClose={() => removeFilter(typeFilter)}>
 												    <div>
-													    <span class="chip-title">{typeFilter}:</span>
-													    <span class="chip-content">{filter.value[typeFilter]} </span>
+													    <span class="chip-title">{typeFilter}: </span>
+													    <span class="chip-content">{convertFilterTypeToString(typeFilter)} </span>
 												    </div>
 											    </g-chip>
 									    ))}

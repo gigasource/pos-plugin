@@ -115,6 +115,13 @@ export function clearFilter() {
   }
 }
 
+export function convertFilterTypeToString(typeFilter) {
+  if (typeFilter === 'stock') {
+    return `[${filter.value.stock[0]} - ${filter.value.stock[1]}]`
+  }
+  return filter.value[typeFilter]
+}
+
 window.dbg = {
   ...(window.dbg || {}),
   inventory: {
