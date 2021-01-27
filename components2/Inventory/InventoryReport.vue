@@ -34,7 +34,6 @@ export default {
       unit: '',
       history: []
     })
-    const dateFilter = ref({})
 
     onActivated(async () => {
       historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
@@ -137,7 +136,7 @@ export default {
             </div>
           </div>
           <g-spacer/>
-          <date-range-picker from={dateFilter.value.fromDate} to={dateFilter.value.toDate} onSave={changeFilter}/>
+          <date-range-picker from={historyFilter.value.fromDate} to={historyFilter.value.toDate} onSave={changeFilter}/>
         </div>
     )
 
