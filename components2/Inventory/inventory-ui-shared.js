@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
 	inventoryCategories,
 	filter
@@ -124,9 +124,12 @@ function changeFilter() {
 	}
 	dialog.value.filter = false
 }
+watch(() => dialog.value.filter, () => {
+	temporaryDialogFilter.value = _.cloneDeep(filter.value)
+})
 
 export function renderFilterDialog(t) {
-	return <dialog-form-input v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
+	return <dialog-form-input data-jest-filter-dialog v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
 		'input': () => <>
 			<div class="row-flex flex-wrap justify-around mt-2">
 				<pos-textfield-new style="width: 30%" label="Product ID" v-model={temporaryDialogFilter.value.id} clearable>

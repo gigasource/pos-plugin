@@ -47,7 +47,7 @@ export const filteredInventory = computed(() => {
   return inventories.value.filter(item => {
     if ((filter.value.name && item.name !== filter.value.name)
         || (filter.value.id && item.id !== filter.value.id)
-        || (filter.value.category && item.category.name !== filter.value.category)
+        || (filter.value.category && item.category.name !== filter.value.category.name)
         || (filter.value.stock && (item.stock < filter.value.stock[0] || item.stock > filter.value.stock[1])))
       return false
     return true
