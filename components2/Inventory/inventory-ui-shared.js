@@ -130,7 +130,7 @@ export function renderFilterDialog(t) {
 				<div class="col-12 row-flex">
 					<p style="margin-top: 35px; margin-left: 16px">
 						Stock Range: </p>
-					<pos-range-slider min={0} max={1000} prefix v-model={filter.value.stock}>
+					<pos-range-slider min={0} max={1000} prefix={""} v-model={filter.value.stock}>
 					</pos-range-slider>
 				</div>
 			</div>
