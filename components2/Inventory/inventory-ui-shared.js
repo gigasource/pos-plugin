@@ -118,7 +118,10 @@ export function renderCategoryDialog() {
 const temporaryDialogFilter = ref({
 })
 function changeFilter() {
-	filter.value = _.cloneDeep(temporaryDialogFilter.value)
+	filter.value = {
+		...filter.value,
+		..._.cloneDeep(temporaryDialogFilter.value)
+	}
 	temporaryDialogFilter.value = {
 	}
 	dialog.value.filter = false
