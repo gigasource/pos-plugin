@@ -190,7 +190,7 @@ export default {
     const renderSearchItemDialog = () => (<dialog-text-filter v-model={reportDialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}}/>)
 
     const renderDetail = () => (selectedItem.value) && <g-dialog v-model={reportDialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
-          {genScopeId(() =><div class="dialog">
+          {genScopeId(() =><div class="dialog col-flex">
             <div class="dialog-header">
               <div class="dialog-header__title">
                 <div class="fw-700 flex-grow-1">{selectedItem.value.name}</div>
@@ -202,16 +202,18 @@ export default {
                 <div class="col-6">{t('inventory.reason')}</div>
               </div>
             </div>
-            {selectedItem.value.history.map((item, i)  =>
-                <div class="dialog-history-item" key={ `history_${i}` }>
-                  <div class="col-4 pl-2" >{ formatDate(item.date) }</div>
-                  <div class="col-2">
-                    <g-icon size="12" style="margin-bottom: 2px">{`icon-inventory-report-${item.type}`}</g-icon>
-                    { $filters.formatCurrency(item.amount) }
+            <div style="border-radius: 4px; overflow: auto;">
+              {selectedItem.value.history.map((item, i)  =>
+                  <div class="dialog-history-item" key={ `history_${i}` }>
+                    <div class="col-4 pl-2" >{ formatDate(item.date) }</div>
+                    <div class="col-2">
+                      <g-icon size="12" style="margin-bottom: 2px">{`icon-inventory-report-${item.type}`}</g-icon>
+                      { $filters.formatCurrency(item.amount) }
+                    </div>
+                    <div class="col-6">{item.reason}</div>
                   </div>
-                  <div class="col-6">{item.reason}</div>
-                </div>
-            )}
+              )}
+            </div>
           </div>)()}
         </g-dialog>
 
@@ -429,7 +431,6 @@ export default {
     background-color: white;
     width: 100%;
     border-radius: 4px;
-    overflow: auto;
 
     &-header {
       position: sticky;
