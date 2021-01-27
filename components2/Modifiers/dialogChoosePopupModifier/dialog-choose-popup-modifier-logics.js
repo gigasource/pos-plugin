@@ -1,4 +1,4 @@
-import { modifiers } from '../dialogEditPopupModifier/modifier-ui-logics';
+import { modifierGroups } from '../dialogEditPopupModifier/modifier-ui-logics';
 import { computed, ref, watch } from 'vue';
 import { internalValueFactory, intervalLog, isSameId } from '../../utils';
 import _ from 'lodash'
@@ -6,8 +6,8 @@ import _ from 'lodash'
 const dialogChoosePopupModifierLogicsFactory = function (props, { emit }) {
   const internalValue = internalValueFactory(props, { emit })
   const categories = computed(() => {
-    if (!modifiers.value || !modifiers.value.groups) return []
-    const group = _.find(modifiers.value.groups, i => i._id.toString() === props.product.activePopupModifierGroup.toString())
+    if (!modifierGroups.value || !modifierGroups.value.groups) return []
+    const group = _.find(modifierGroups.value.groups, i => i._id.toString() === props.product.activePopupModifierGroup.toString())
     return (group && group.categories) ? group.categories : []
   })
   const countItems = ref({})

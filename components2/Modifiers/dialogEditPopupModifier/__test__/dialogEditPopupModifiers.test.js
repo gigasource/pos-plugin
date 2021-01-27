@@ -1,24 +1,24 @@
-import cms from 'cms';
-import dialogEditPopupModifiers2 from '../dialogEditPopupModifiers2';
-import { nextTick } from 'vue';
-import { stringify } from 'schemahandler/utils';
-import _ from 'lodash';
-import { makeWrapper, setComponent, wrapper } from '../../../test-utils';
+import cms from "cms";
+import dialogEditPopupModifiers2 from "../dialogEditPopupModifiers2";
+import { nextTick } from "vue";
+import { stringify } from "schemahandler/utils";
+import _ from "lodash";
+import { makeWrapper, wrapper } from "../../../test-utils";
 import {
   activeItem,
   categories,
   currentGroup,
   currentGroupIdx,
-  modifiers,
+  modifierGroups,
   onCreateItem,
   onDeleteActiveItem,
   onDuplicate,
   onRemoveItem,
   onSelect,
   onUpdateItem
-} from '../modifier-ui-logics';
-import delay from 'delay';
-import { isSameId } from '../../../utils';
+} from "../modifier-ui-logics";
+import delay from "delay";
+import { isSameId } from "../../../utils";
 
 // const group1 = { _id: new ObjectID(), name: "g1", categories: [] };
 // const group2 = { _id: new ObjectID(), name: "g2", categories: [] };
@@ -28,18 +28,20 @@ import { isSameId } from '../../../utils';
 // const item2 = { _id: new ObjectID(), name: "i2" };
 // const item3 = { _id: new ObjectID(), name: "i2" };
 
+jest.setTimeout(10000)
 beforeAll(async () => {
-  const Modifier = cms.getModel("Modifier");
+  const orm = require('schemahandler')
+  await orm.connect("mongodb://localhost:27017", "Modifiers");
+  const Modifier = cms.getModel("Modifiers");
   await Modifier.remove({});
   await Modifier.create({ groups: [] });
 });
-
 describe("test dialog edit popup modifier UI", () => {
   it("should render", async () => {
-    setComponent(dialogEditPopupModifiers2);
-    makeWrapper(null, { shallow: true });
+    makeWrapper(dialogEditPopupModifiers2, { shallow: true });
     await delay(300); // wait fetch modifiers
     await onCreateItem("groups", "group");
+    await nextTick()
     expect(stringify(currentGroup.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
@@ -48,15 +50,15 @@ describe("test dialog edit popup modifier UI", () => {
         "type": "group",
       }
     `);
+
     const firstGroupTmp = _.cloneDeep(activeItem.value);
     await onCreateItem(
       `groups.${currentGroupIdx.value}.categories`,
       "category"
     );
     await nextTick();
-
     const categoryTmp = _.cloneDeep(activeItem.value);
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -106,7 +108,7 @@ describe("test dialog edit popup modifier UI", () => {
     await onRemoveItem(`groups.0.categories.0.items`, activeItem.value);
     await nextTick();
     await delay(50);
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -134,9 +136,8 @@ describe("test dialog edit popup modifier UI", () => {
     await onUpdateItem(`groups.0.categories.0.items`, activeItem.value, {
       name: "ketchup"
     });
-
     await nextTick();
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -176,10 +177,11 @@ describe("test dialog edit popup modifier UI", () => {
     `);
 
     expect(wrapper.text()).toMatchInlineSnapshot(
-      `"New Groupadd Group New Categorykeyboard_arrow_rightNew ModifierketchupaddItem addCategory deleteDelete this item Close"`
+      `"New Groupadd Group New Categorykeyboard_arrow_rightNew ModifierketchupaddItem addCategory Group printerdeleteDelete this item Close"`
     );
     await onRemoveItem(`groups.0.categories`, categoryTmp);
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    await nextTick()
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -193,10 +195,12 @@ describe("test dialog edit popup modifier UI", () => {
       }
     `);
     await onCreateItem(`groups`, "group");
+    await nextTick()
     await onUpdateItem(`groups`, activeItem.value, {
       name: "second group"
     });
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    await nextTick()
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -216,8 +220,10 @@ describe("test dialog edit popup modifier UI", () => {
       }
     `);
     onSelect({ ...firstGroupTmp }, "group");
+    await nextTick()
     await onDeleteActiveItem();
-    expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
+    await nextTick()
+    expect(stringify(modifierGroups.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
         "groups": Array [
@@ -231,7 +237,7 @@ describe("test dialog edit popup modifier UI", () => {
       }
     `);
 
-    const dbData = await cms.getModel("Modifier").findOne({});
+    const dbData = await cms.getModel("Modifiers").findOne({});
     expect(stringify(dbData)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
@@ -250,12 +256,13 @@ describe("test dialog edit popup modifier UI", () => {
       "category"
     );
     await onDuplicate();
-    expect(modifiers.value.groups.length).toEqual(2);
-    expect(modifiers.value.groups[1].categories.length).toEqual(1);
+    await nextTick()
+    expect(modifierGroups.value.groups.length).toEqual(2);
+    expect(modifierGroups.value.groups[1].categories.length).toEqual(1);
     expect(
       isSameId(
-        modifiers.value.groups[1].categories[0],
-        modifiers.value.groups[0].categories[0]
+        modifierGroups.value.groups[1].categories[0],
+        modifierGroups.value.groups[0].categories[0]
       )
     ).toBeFalsy();
   });
