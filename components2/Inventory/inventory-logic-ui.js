@@ -115,11 +115,15 @@ export function clearFilter() {
   }
 }
 
-export function convertFilterTypeToString(typeFilter) {
-  if (typeFilter === 'stock') {
-    return `[${filter.value.stock[0]} - ${filter.value.stock[1]}]`
+export function convertFilterValueToString(typeFilter) {
+  switch (typeFilter) {
+    case 'stock':
+      return `[${filter.value.stock[0]} - ${filter.value.stock[1]}]`
+    case 'category':
+      return filter.value[typeFilter].name
+    default:
+      return filter.value[typeFilter]
   }
-  return filter.value[typeFilter]
 }
 
 window.dbg = {

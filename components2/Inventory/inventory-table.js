@@ -13,8 +13,10 @@ import {
 	removeFilter,
 	clearFilter,
 	inventories,
+	filteredInventory,
 	filter,
-	isFiltered, convertFilterTypeToString
+	isFiltered,
+	convertFilterValueToString
 } from './inventory-logic-ui'
 import {
 	deleteInventory
@@ -63,7 +65,7 @@ export function renderMainInventoryTable(props, { emit }) {
     					<tr>
     						<td class="bg-grey-lighten-1">
     							{
-    								(inventories.value && inventories.value.length !== 0) ?
+    								(filteredInventory.value && filteredInventory.value.length !== 0) ?
     										<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={listIDs.value} multiple v-slots={{
     											'label': () => <g-icon size="16" class="mb-1">fas fa-caret-down</g-icon>
     										}}></g-checkbox>
@@ -78,8 +80,8 @@ export function renderMainInventoryTable(props, { emit }) {
 											    <g-chip key={typeFilter} label small background-color="white" close class="ma-1"
 											            onClose={() => removeFilter(typeFilter)}>
 												    <div>
-													    <span class="chip-title">{typeFilter}: </span>
-													    <span class="chip-content">{convertFilterTypeToString(typeFilter)} </span>
+													    <span class="chip-title">{t(`inventory.filter.${typeFilter}`)}: </span>
+													    <span class="chip-content">{convertFilterValueToString(typeFilter)} </span>
 												    </div>
 											    </g-chip>
 									    ))}
@@ -90,7 +92,7 @@ export function renderMainInventoryTable(props, { emit }) {
     							</div>
     						</td>
     					</tr>
-    					{inventories.value.map((inventory, i) =>
+    					{filteredInventory.value.map((inventory, i) =>
     							<tr key={i}>
     								<td>
     									<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>

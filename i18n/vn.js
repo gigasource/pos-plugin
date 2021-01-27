@@ -591,6 +591,12 @@ module.exports = {
       date: 'Ngày',
       amount: 'Khối lượng',
       reason: 'Lý do',
+      filter: {
+        id: 'Id',
+        name: 'Tên',
+        category: 'Nhóm hàng',
+        stock: 'Tồn kho'
+      }
     },
 
     discount: {
