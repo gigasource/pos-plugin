@@ -74,17 +74,16 @@ export function renderMainInventoryTable(props, { emit }) {
     							<div class="filter">
     								{t('settings.filter')}
     								<div class="group-chip">
-    									{Object.keys(filter.value).forEach((typeFilter) =>
-    											(filter.value[typeFilter] !== null) ?
-    													<g-chip key={typeFilter} label small background-color="white" close class="ma-1"
-    													        onClose={() => removeFilter(typeFilter)}>
-    														<div>
-    															<span class="chip-title">{typeFilter}:</span>
-    															<span class="chip-content">{filter.value[typeFilter]} </span>
-    														</div>
-    													</g-chip>
-    													: <></>
-    									)} </div>
+    									{Object.keys(filter.value).map(typeFilter => (filter.value[typeFilter] != null) && (
+											    <g-chip key={typeFilter} label small background-color="white" close class="ma-1"
+											            onClose={() => removeFilter(typeFilter)}>
+												    <div>
+													    <span class="chip-title">{typeFilter}:</span>
+													    <span class="chip-content">{filter.value[typeFilter]} </span>
+												    </div>
+											    </g-chip>
+									    ))}
+    								</div>
     								{
     									(isFiltered.value) &&
     									<g-btn-bs onClick={clearFilter}>
