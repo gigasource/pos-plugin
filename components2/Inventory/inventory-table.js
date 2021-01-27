@@ -65,7 +65,7 @@ export function renderMainInventoryTable(props, { emit }) {
     							{
     								(inventories.value && inventories.value.length !== 0) ?
     										<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={listIDs.value} multiple v-slots={{
-    											'label': () => <g-icon size="16" className="mb-1">fas fa-caret-down</g-icon>
+    											'label': () => <g-icon size="16" class="mb-1">fas fa-caret-down</g-icon>
     										}}></g-checkbox>
     										: <g-checkbox></g-checkbox>
     							}
