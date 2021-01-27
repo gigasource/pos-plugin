@@ -190,7 +190,7 @@ export default {
     const renderSearchItemDialog = () => (<dialog-text-filter v-model={reportDialog.value.text} label="Search Item" onSubmit={val => {searchText.value = val}}/>)
 
     const renderDetail = () => (selectedItem.value) && <g-dialog v-model={reportDialog.value.detail} width="479" overlay-color="rgb(107, 111, 130)" overlay-opacity="0.7" >
-          <div class="dialog">
+          {genScopeId(() =><div class="dialog">
             <div class="dialog-header">
               <div class="dialog-header__title">
                 <div class="fw-700 flex-grow-1">{selectedItem.value.name}</div>
@@ -212,7 +212,7 @@ export default {
                   <div class="col-6">{item.reason}</div>
                 </div>
             )}
-          </div>
+          </div>)()}
         </g-dialog>
 
     const renderInventoryStock = () => <>
