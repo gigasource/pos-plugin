@@ -6,6 +6,9 @@ import {
 } from './inventory-logic-ui'
 import {ObjectID} from "bson"
 import _ from 'lodash'
+import test from '../../test'
+
+test()
 
 const Inventory = cms.getModel('Inventory')
 const InventoryCategory = cms.getModel('InventoryCategory')
@@ -59,7 +62,7 @@ export async function updateInventory({ _id, name, category, unit, stock, lowSto
 	if (stock !== inventory.stock) {
 		const history = {
 			inventory: _id,
-			category,
+			category: category._id,
 			type: stock.value > inventory.stock ? 'add' : 'remove',
 			amount: Math.abs(stock.value - inventory.stock),
 			date: new Date(),
@@ -70,7 +73,7 @@ export async function updateInventory({ _id, name, category, unit, stock, lowSto
 	await Inventory.findOneAndUpdate(
 		{ _id },
 		{
-			name, category, unit, stock, lowStockThreshold, lastUpdateTimestamp: new Date()
+			name, category: category._id, unit, stock, lowStockThreshold, lastUpdateTimestamp: new Date()
 		}
 	)
 }
