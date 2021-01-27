@@ -84,18 +84,9 @@ export function renderMainInventoryTable(props, { emit }) {
 											    </g-chip>
 									    ))}
     								</div>
-    								{
-    									(isFiltered.value) &&
-    									<g-btn-bs onClick={clearFilter}>
-    										<u>
-    											{t('settings.clearAll')}
-    										</u>
-    									</g-btn-bs>
-    								}
+    								{ (isFiltered.value) && <g-btn-bs onClick={clearFilter}><u>{t('settings.clearAll')}</u></g-btn-bs>}
     								<g-spacer/>
-    								<div class="btn-add-filter" onClick={() => dialog.value.filter = true}>
-    									+ {t('inventory.addFilter')}
-    								</div>
+    								<div class="btn-add-filter" onClick={() => dialog.value.filter = true}>+ {t('inventory.addFilter')}</div>
     							</div>
     						</td>
     					</tr>

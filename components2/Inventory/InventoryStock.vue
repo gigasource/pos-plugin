@@ -6,6 +6,9 @@ import DialogChangeStock from '../../components/Inventory/dialogChangeStock';
 import cms from 'cms'
 import _ from 'lodash';
 import { useI18n } from 'vue-i18n'
+import { updateInventoryHistory } from './inventory-logic-be';
+import { genScopeId } from '../utils';
+import { $filters } from '../AppSharedStates';
 
 export default {
   name: "InventoryStock",
@@ -29,20 +32,20 @@ export default {
     const showKeyboard = ref(false)
 
     onActivated(async () => {
-      const inventories = await cms.getModel('Inventory').find();
-      const categories = await cms.getModel('InventoryCategory').find();
-      inventories.value = inventories.value.map(item => ({
+      const _inventories = await cms.getModel('Inventory').find();
+      const _categories = await cms.getModel('InventoryCategory').find();
+      inventories.value = _inventories.map(item => ({
         ...item,
         text: item.name,
-        category: categories.value.find(cate => cate._id.toString() === item.category)
+        category: _categories.find(cate => cate._id.toString() === item.category)
       }))
       items.value = []
       selectedItem.value = null
-      window.addEventListener('keydown', keyboardHandler, false)
+      window.addEventListener('keydown', keyboardHandle, false)
     })
 
     onDeactivated(() => {
-      window.removeEventListener('keydown', keyboardHandler, false)
+      window.removeEventListener('keydown', keyboardHandle, false)
     })
 
     const router = useRouter()
@@ -147,7 +150,7 @@ export default {
       }
       back()
     }
-    const keyboardHandle = function (event) {
+    function keyboardHandle(event) {
       event.stopPropagation()
       if(event.key === 'Tab' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault()
@@ -186,30 +189,22 @@ export default {
       }
     }
 
-    return () => <>
+    return genScopeId(() => <>
       <div class="inventory-stock">
         <div class="inventory-stock__header">
           <g-autocomplete text-field-component="GTextFieldBs" onUpdate:modelValue={selectItem} clearable keep-menu-on-blur items={inventories.value} return-object menu-class="menu-inventory-stock" v-slots={{
-            'append-inner': () => <>
-              <g-icon onClick={() => showKeyboard.value = true}>
-                icon-keyboard
-              </g-icon>
-            </>
+            'append-inner': () => <g-icon onClick={() => showKeyboard.value = true}>icon-keyboard</g-icon>
           }}></g-autocomplete>
           <div class="inventory-stock__header-btn" onClick={() => openDialog()}>
-            <g-icon color="white">
-              add
-            </g-icon>
+            <g-icon color="white">add</g-icon>
           </div>
-          <g-spacer>
-          </g-spacer>
-          <span class="fs-small">
-            {t('inventory.products')}: </span>
-          <span class="fs-large text-red ml-1">
-            {items.value.length} </span>
+          <g-spacer/>
+          <span class="fs-small">{t('inventory.products')}: </span>
+          <span class="fs-large text-red ml-1">{items.value.length}</span>
         </div>
         <g-simple-table striped fixed-header style="flex: 1">
-          <thead>
+          {genScopeId(() => <>
+            <thead>
           <tr>
             <th>Product ID</th>
             <th>Name</th>
@@ -220,72 +215,64 @@ export default {
             <th> </th>
           </tr>
           </thead>
-          {items.value.map((inventory, i) =>
-              <tr key={i} class={selectedItem.value && selectedItem.value._id === inventory._id && 'row--selected'}>
-                <td onClick={() => openDialogAdd(inventory)}> {inventory.id} </td>
-                <td onClick={() => openDialogAdd(inventory)}> {inventory.name} </td>
-                <td onClick={() => openDialogAdd(inventory)}> {inventory.category.name} </td>
-                <td onClick={() => openDialogAdd(inventory)}> {inventory.unit} </td>
-                <td onClick={() => openDialogAdd(inventory)}> {$filters.formatCurrency(inventory.stock)} </td>
-                <td class="fw-700 text-blue" onClick={() => openDialogAdd(inventory)}> {inventory.added} </td>
-                <td onClick={() => removeItem(i)}>
-                  <g-icon color="red">
-                    cancel
-                  </g-icon>
-                </td>
-              </tr>
-          )}
+            {items.value.map((inventory, i) =>
+                <tr key={i} class={selectedItem.value && selectedItem.value._id === inventory._id && 'row--selected'}>
+                  <td onClick={() => openDialogAdd(inventory)}> {inventory.id} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {inventory.name} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {inventory.category.name} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {inventory.unit} </td>
+                  <td onClick={() => openDialogAdd(inventory)}> {$filters.formatCurrency(inventory.stock)} </td>
+                  <td class="fw-700 text-blue" onClick={() => openDialogAdd(inventory)}> {inventory.added} </td>
+                  <td onClick={() => removeItem(i)}>
+                    <g-icon color="red">cancel</g-icon>
+                  </td>
+                </tr>
+            )}
+          </>)()}
         </g-simple-table>
         <div>
           <g-toolbar color="#eeeeee">
             <g-btn uppercase={false} style="margin-right: 5px" onClick={back}>
-              <g-icon small style="margin-right: 5px">
-                icon-back
-              </g-icon>
+              <g-icon small style="margin-right: 5px">icon-back</g-icon>
               {t('ui.back')}
             </g-btn>
-            <g-btn uppercase={false} onClick={() => dialog.value.low = true}>
-              {t('inventory.importLowStock')}
-            </g-btn>
-            <g-spacer>
-            </g-spacer>
+            <g-btn uppercase={false} onClick={() => dialog.value.low = true}>{t('inventory.importLowStock')}</g-btn>
+            <g-spacer/>
             <g-btn uppercase={false} background-color="#4CAF50" text-color="#FFF" onClick={complete}>
-              <g-icon small style="margin-right: 5px">
-                icon-inventory-new-stock
-              </g-icon>
+              <g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
               {t('inventory.complete')}
             </g-btn>
           </g-toolbar>
         </div>
         <dialog-form-input v-model={dialog.value.inventory} onSubmit={changeStock} v-slots={{
-          'input': () => <>
-            <div class="row-flex flex-wrap justify-around">
-              <g-autocomplete text-field-component="GTextFieldBs" v-model={itemId.value} style="width: 98%" class="inventory-stock-select" key={dialog.value.inventory} items={inventories.value} item-text="name" item-value="_id" keep-menu-on-blur menu-class="menu-select-inventory" onUpdate:modelValue={chooseItem}>
-              </g-autocomplete>
-              <pos-textfield-new readonly style="width: 48%" v-model={category.value} label={$t('article.category')}>
-              </pos-textfield-new>
-              <pos-textfield-new readonly style="width: 48%" v-model={unit.value} label={$t('inventory.unit')}>
-              </pos-textfield-new>
-              <pos-textfield-new readonly style="width: 48%" v-model={stock.value} label={$t('inventory.currentStock')}>
-              </pos-textfield-new>
-              <pos-textfield-new rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" v-model={added.value} label={$t('inventory.addedStock')}>
-              </pos-textfield-new>
-            </div>
-          </>
-        }}></dialog-form-input>
-        <dialog-number-filter v-model={dialog.value.low} label="Low-stock threshold" onSubmit={getLowStockItems}>
-        </dialog-number-filter>
-        <dialog-change-stock v-model={dialog.value.add} removable={false} name={name.value} stock={stock.value} onSubmit={updateStock}>
-        </dialog-change-stock>
+          'input': () => (
+              <div class="row-flex flex-wrap justify-around">
+                <g-autocomplete text-field-component="GTextFieldBs"
+                                v-model={itemId.value} style="width: 98%"
+                                class="inventory-stock-select"
+                                key={dialog.value.inventory}
+                                items={inventories.value}
+                                item-text="name" item-value="_id"
+                                keep-menu-on-blur
+                                menu-class="menu-select-inventory"
+                                onUpdate:modelValue={chooseItem}/>
+                <pos-textfield-new readonly style="width: 48%" v-model={category.value} label={t('article.category')}/>
+                <pos-textfield-new readonly style="width: 48%" v-model={unit.value} label={t('inventory.unit')}/>
+                <pos-textfield-new readonly style="width: 48%" v-model={stock.value} label={t('inventory.currentStock')}/>
+                <pos-textfield-new rules={[val => !isNaN(val) || 'Must be a number!']} style="width: 48%" v-model={added.value} label={t('inventory.addedStock')}/>
+              </div>
+          )
+        }}/>
+        <dialog-number-filter v-model={dialog.value.low} label="Low-stock threshold" onSubmit={getLowStockItems}/>
+        <dialog-change-stock v-model={dialog.value.add} removable={false} name={name.value} stock={stock.value} onSubmit={updateStock}/>
         {
           (showKeyboard.value) &&
           <div class="keyboard-wrapper">
-            <pos-keyboard-full type="alpha-number">
-            </pos-keyboard-full>
+            <pos-keyboard-full type="alpha-number"/>
           </div>
         }
       </div>
-    </>
+    </>)
   }
 }
 </script>
