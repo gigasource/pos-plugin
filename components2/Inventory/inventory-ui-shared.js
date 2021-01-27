@@ -27,13 +27,14 @@ export const dialog = ref({
  * in inventory dialog and in stock
  * dialog
  */
-export const selectedInventory = ref({
+const createEmptyInventory = () => ({
 	_id: null,
 	name: null,
 	category: null,
 	unit: null,
 	stock: null
 })
+export const selectedInventory = ref(createEmptyInventory())
 
 /**
  * Unit of inventory
@@ -152,12 +153,20 @@ export function openDialogStock(inventory) {
 }
 
 export function openDialogInventory(inventory, mode) {
+	// no inventory a.s.a passing mode as 1st parameter
 	if (typeof inventory === 'string') {
-		inventory = null
 		mode = inventory
+		dialog.value.mode = mode
+		// mode:
+		//   + add: create empty inventory
+		//   + edit: just keep selectedInventory as it is
+		if (mode === 'add')
+			selectedInventory.value = createEmptyInventory()
+	} else {
+		dialog.value.mode = mode
+		selectedInventory.value = inventory
 	}
-	selectedInventory.value = inventory
-	dialog.value.mode = mode
+
 	dialog.value.inventory = true
 }
 
