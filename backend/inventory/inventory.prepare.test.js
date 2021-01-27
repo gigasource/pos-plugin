@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { ObjectID } = require('bson')
 
 /**
  * All date will be 05/01/2021
@@ -16,14 +17,19 @@ async function prepareInventoryDb(orm) {
 	await InventoryHistory.remove({})
 	const makeCategory = async function (categoryName) {
 		return await InventoryCategory.create({
+			_id: new ObjectID(),
 			name: categoryName,
 			available: false
 		})
 	}
 
 	const makeInventory = async function (inventory) {
-		const createdInventory = await Inventory.create(inventory)
+		const createdInventory = await Inventory.create({
+			_id: new ObjectID(),
+			...inventory
+		})
 		await InventoryHistory.create({
+			_id: new ObjectID(),
 			inventory: createdInventory._id,
 			category: createdInventory.category,
 			type: 'add',

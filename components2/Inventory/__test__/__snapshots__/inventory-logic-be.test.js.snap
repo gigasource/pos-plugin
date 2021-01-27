@@ -243,67 +243,6 @@ exports[`Test inventory logic be Case 2: Update inventory 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
-    "amount": 30,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "_id": "ObjectID",
-    "amount": 50,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "_id": "ObjectID",
-    "amount": 60.22,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "_id": "ObjectID",
-    "amount": 100,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "_id": "ObjectID",
-    "amount": 10,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "_id": "ObjectID",
-    "amount": 5.5,
-    "category": "ObjectID",
-    "date": "2021-01-04T17:00:00.000Z",
-    "inventory": "ObjectID",
-    "type": "add",
-  },
-  Object {
-    "amount": 10,
-    "category": "ObjectID",
-    "date": "2021-01-05T00:00:00.000Z",
-    "inventory": "ObjectID",
-    "reason": "Update stock",
-    "type": "remove",
-  },
-]
-`;
-
-exports[`Test inventory logic be Case 2: Update inventory 3`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
     "category": Object {
       "_id": "ObjectID",
       "available": false,

@@ -1,11 +1,19 @@
-import { ref, watch } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import {
 	inventoryCategories,
-	filter
+	filter,
+	inventories
 } from './inventory-logic-ui'
-import {createInventory, deleteInventory, loadInventories, updateInventory} from "./inventory-logic-be";
+import {
+	createInventory,
+	deleteInventory,
+	loadInventories,
+	loadInventoryHistories,
+	updateInventory
+} from "./inventory-logic-be";
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
+import _ from 'lodash'
 
 /**
  * This variable control the state
@@ -178,3 +186,51 @@ export function formatDate(date) {
 	if (!date || !dayjs(date).isValid()) return ''
 	return dayjs(date).format('DD/MM/YYYY HH:mm')
 }
+
+/**
+ * @date: {Object} range from, to of selected inventory histories
+ * @example:
+ * {
+ *   data: {
+ *     from:
+ *     to:
+ *   }
+ * }
+ */
+export const historyFilter = ref({})
+export const filteredInventoryHistories = ref([])
+watchEffect(async () => {
+	const inventoryHistories = await loadInventoryHistories(historyFilter.value)
+
+	const getAmount = (histories, mode) => {
+		return histories.reduce((acc, item) => {
+			if (mode === item.type) {
+				return acc + parseInt(item.amount)
+			}
+			return acc
+		}, 0)
+	}
+	const inventoryHistoriesFiltered = inventoryHistories.filter(item => {
+		if ((historyFilter.fromDate && historyFilter.fromDate.getTime() > item.date.getTime())
+			|| (historyFilter.toDate && historyFilter.toDate.getTime() < item.date.getTime()))
+			return false
+		return true
+	})
+	filteredInventoryHistories.value = _.map(
+		_.groupBy(inventoryHistoriesFiltered, history => history.inventory),
+		(group, inventory) => {
+			return {
+				inventory,
+				history: group,
+				add: getAmount(group, 'add'),
+				remove: getAmount(group, 'remove')
+			}
+		}
+	).filter(item => {
+		return !!inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+	}).map(item => ({
+		...item,
+		...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+	}))
+	const a = filteredInventoryHistories.value
+})

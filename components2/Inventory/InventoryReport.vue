@@ -1,5 +1,5 @@
 <script>
-import { ref, onActivated, computed } from 'vue'
+import { ref, onActivated, computed, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
 import dateRangePicker from '../../components/OnlineOrder/dateRangePicker';
 import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
@@ -8,12 +8,10 @@ import dayjs from 'dayjs'
 import { $filters } from '../AppSharedStates';
 import { useI18n } from 'vue-i18n'
 import {
-  inventoryCategories,
-  filteredInventoryHistories,
-  historyFilter
+  inventoryCategories
 } from './inventory-logic-ui'
 import {genScopeId} from '../utils';
-import { formatDate } from './inventory-ui-shared';
+import { formatDate, filteredInventoryHistories, historyFilter } from './inventory-ui-shared';
 
 export default {
   name: "InventoryReport",
@@ -36,6 +34,12 @@ export default {
     })
 
     onActivated(async () => {
+      historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
+      historyFilter.value.toDate = dayjs().format('YYYY-MM-DD')
+      selectedCategory.value = 'all'
+    })
+
+    onDeactivated(async () => {
       historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
       historyFilter.value.toDate = dayjs().format('YYYY-MM-DD')
       selectedCategory.value = 'all'

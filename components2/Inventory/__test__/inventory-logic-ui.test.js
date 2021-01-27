@@ -5,9 +5,7 @@ import {
   addFilter,
   clearFilter,
   removeFilter,
-  inventoryHistories,
-  inventoryCategories,
-  filteredInventoryHistories
+  inventoryCategories
 } from "../inventory-logic-ui";
 import { nextTick } from "vue";
 
@@ -65,40 +63,20 @@ describe("Test inventory logic ui", function() {
       _id: "3",
       name: "Cream"
     });
-    inventoryHistories.value.push({
-      amount: 30,
-      inventory: "3",
-      type: "add",
-      date: genDate()
-    });
-    inventoryHistories.value.push({
-      amount: 10,
-      inventory: "3",
-      type: "add",
-      date: genDate()
-    });
-    inventoryHistories.value.push({
-      amount: 10,
-      inventory: "3",
-      type: "remove",
-      date: genDate()
-    });
-    inventoryHistories.value.push({
-      amount: 25,
-      inventory: "2",
-      type: "add",
-      date: genDate()
-    });
   });
 
   it("Case 1: Test filter inventory", async () => {
     addFilter({
-      category: "Food"
+      category: {
+        name: "Food"
+      }
     });
     await nextTick();
     expect(filter.value).toMatchInlineSnapshot(`
       Object {
-        "category": "Food",
+        "category": Object {
+          "name": "Food",
+        },
       }
     `);
     expect(filteredInventory.value).toMatchInlineSnapshot(`
@@ -131,7 +109,9 @@ describe("Test inventory logic ui", function() {
     await nextTick();
     expect(filter.value).toMatchInlineSnapshot(`
       Object {
-        "category": "Food",
+        "category": Object {
+          "name": "Food",
+        },
         "name": "Fish",
       }
     `);
@@ -247,12 +227,7 @@ describe("Test inventory logic ui", function() {
     `);
   });
 
-  it("Case 2: Test inventory histories", async () => {
-    expect(inventoryHistories.value).toMatchSnapshot();
-    expect(filteredInventoryHistories.value).toMatchSnapshot();
-  });
-
-  it("Case 3: Test inventory categories", () => {
+  it("Case 2: Test inventory categories", () => {
     expect(inventoryCategories.value).toMatchSnapshot();
   });
 });

@@ -1,9 +1,6 @@
-import { ref, computed, watchEffect } from 'vue'
-import _ from 'lodash'
-
+import { ref, computed, watchEffect, watch } from 'vue'
 export const inventories = ref([])
 export const inventoryCategories = ref([])
-export const inventoryHistories = ref([])
 
 /**
  * If category.available is true, then this category can be deleted
@@ -31,17 +28,6 @@ watchEffect(() => {
  * }
  */
 export const filter = ref({})
-/**
- * @date: {Object} range from, to of selected inventory histories
- * @example:
- * {
- *   data: {
- *     from:
- *     to:
- *   }
- * }
- */
-export const historyFilter = ref({})
 
 export const filteredInventory = computed(() => {
   return inventories.value.filter(item => {
@@ -52,40 +38,6 @@ export const filteredInventory = computed(() => {
       return false
     return true
   })
-})
-
-export const filteredInventoryHistories = computed(() => {
-  const getAmount = (histories, mode) => {
-    return histories.reduce((acc, item) => {
-      if (mode === item.type) {
-        return acc + parseInt(item.amount)
-      }
-      return acc
-    }, 0)
-  }
-
-  const inventoryHistoriesFiltered = inventoryHistories.value.filter(item => {
-    if ((historyFilter.fromDate && historyFilter.fromDate.getTime() > item.date.getTime())
-      || (historyFilter.toDate && historyFilter.toDate.getTime() < item.date.getTime()))
-      return false
-    return true
-  })
-  return _.map(
-    _.groupBy(inventoryHistoriesFiltered, history => history.inventory),
-    (group, inventory) => {
-      return {
-        inventory,
-        history: group,
-        add: getAmount(group, 'add'),
-        remove: getAmount(group, 'remove')
-      }
-    }
-  ).filter(item => {
-    return !!inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
-  }).map(item => ({
-    ...item,
-    ...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
-  }))
 })
 
 export const listIDs = computed(() => {
@@ -131,7 +83,6 @@ window.dbg = {
   inventory: {
     inventories,
     inventoryCategories,
-    inventoryHistories,
     filter
   }
 }
