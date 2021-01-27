@@ -6,9 +6,6 @@ import {
 } from './inventory-logic-ui'
 import {ObjectID} from "bson"
 import _ from 'lodash'
-import test from '../../test'
-
-test()
 
 const Inventory = cms.getModel('Inventory')
 const InventoryCategory = cms.getModel('InventoryCategory')
