@@ -133,7 +133,16 @@ describe("Test inventory logic be", function() {
 			}
 		})
 		await nextTick()
-		expect(inventories.value).toMatchSnapshot()
-		expect(inventoryCategories.value).toMatchSnapshot
+		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
+		await updateInventory({
+			...inventories.value[0],
+			...{
+				category: inventoryCategories.value[2]._id.toString()
+			}
+		})
+		await nextTick()
+		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
 	})
 });

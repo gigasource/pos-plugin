@@ -660,83 +660,82 @@ Array [
 ]
 `;
 
-exports[`Test inventory logic be Case 6: Update inventory 1`] = `
+exports[`Test inventory logic be Case 6: Update inventory with object id 1`] = `
 Array [
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc42",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "_id": "ObjectID",
       "available": false,
-      "name": "Food",
+      "name": "Fruit",
     },
     "id": "1",
-    "lastUpdateTimestamp": 2021-01-05T00:00:00.000Z,
-    "lowStockThreshold": undefined,
+    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
     "name": "Fish",
     "stock": 30,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc44",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "_id": "ObjectID",
       "available": false,
       "name": "Food",
     },
     "id": "2",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Meat",
     "stock": 50,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc46",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "_id": "ObjectID",
       "available": false,
       "name": "Food",
     },
     "id": "3",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Pork",
     "stock": 60.22,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc48",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc40",
+      "_id": "ObjectID",
       "available": false,
       "name": "Fruit",
     },
     "id": "4",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Apple",
     "stock": 100,
     "unit": "piece",
   },
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc4a",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc40",
+      "_id": "ObjectID",
       "available": false,
       "name": "Fruit",
     },
     "id": "5",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Banana",
     "stock": 10,
     "unit": "piece",
   },
   Object {
-    "_id": "5ff3ac0016e8f31dd467dc4c",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac0016e8f31dd467dc41",
+      "_id": "ObjectID",
       "available": false,
       "name": "Drink",
     },
     "id": "6",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Vodka",
     "stock": 5.5,
     "unit": "l",
@@ -744,86 +743,125 @@ Array [
 ]
 `;
 
-exports[`Test inventory logic be Case 6: Update inventory with object id 1`] = `
+exports[`Test inventory logic be Case 6: Update inventory with object id 2`] = `
 Array [
   Object {
-    "_id": "5ff3ac00078ac01e5289d28c",
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Drink",
+  },
+]
+`;
+
+exports[`Test inventory logic be Case 6: Update inventory with object id 3`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d28a",
+      "_id": "ObjectID",
       "available": false,
-      "name": "Fruit",
+      "name": "Drink",
     },
     "id": "1",
-    "lastUpdateTimestamp": 2021-01-05T00:00:00.000Z,
-    "lowStockThreshold": undefined,
+    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
     "name": "Fish",
     "stock": 30,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac00078ac01e5289d28e",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d289",
+      "_id": "ObjectID",
       "available": false,
       "name": "Food",
     },
     "id": "2",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Meat",
     "stock": 50,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac00078ac01e5289d290",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d289",
+      "_id": "ObjectID",
       "available": false,
       "name": "Food",
     },
     "id": "3",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Pork",
     "stock": 60.22,
     "unit": "kg",
   },
   Object {
-    "_id": "5ff3ac00078ac01e5289d292",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d28a",
+      "_id": "ObjectID",
       "available": false,
       "name": "Fruit",
     },
     "id": "4",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Apple",
     "stock": 100,
     "unit": "piece",
   },
   Object {
-    "_id": "5ff3ac00078ac01e5289d294",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d28a",
+      "_id": "ObjectID",
       "available": false,
       "name": "Fruit",
     },
     "id": "5",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Banana",
     "stock": 10,
     "unit": "piece",
   },
   Object {
-    "_id": "5ff3ac00078ac01e5289d296",
+    "_id": "ObjectID",
     "category": Object {
-      "_id": "5ff3ac00078ac01e5289d28b",
+      "_id": "ObjectID",
       "available": false,
       "name": "Drink",
     },
     "id": "6",
-    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "name": "Vodka",
     "stock": 5.5,
     "unit": "l",
+  },
+]
+`;
+
+exports[`Test inventory logic be Case 6: Update inventory with object id 4`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "ObjectID",
+    "available": false,
+    "name": "Drink",
   },
 ]
 `;

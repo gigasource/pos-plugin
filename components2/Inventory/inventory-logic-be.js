@@ -47,7 +47,7 @@ export async function createInventory(inventory) {
 
 export async function updateInventory({ _id, name, category, unit, stock, lowStockThreshold }, reason) {
 	const inventory = _.find(inventories.value, (inventory) => inventory._id.toString() === _id.toString())
-	category = (category._bsontype ? inventoryCategories.value.find(_category => _category._id.toString() === category.toString()) : category)
+	category = ((category._bsontype || typeof category === 'string') ? inventoryCategories.value.find(_category => _category._id.toString() === category.toString()) : category)
 	Object.assign(inventory, {
 		name,
 		category,
