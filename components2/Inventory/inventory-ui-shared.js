@@ -115,22 +115,31 @@ export function renderCategoryDialog() {
 	</dialog-inventory-category>
 }
 
+const temporaryDialogFilter = ref({
+})
+function changeFilter() {
+	filter.value = _.cloneDeep(temporaryDialogFilter.value)
+	temporaryDialogFilter.value = {
+	}
+	dialog.value.filter = false
+}
+
 export function renderFilterDialog(t) {
-	return <dialog-form-input v-model={dialog.value.filter} onSubmit={() => dialog.value.filter = false} v-slots={{
+	return <dialog-form-input v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
 		'input': () => <>
 			<div class="row-flex flex-wrap justify-around mt-2">
-				<pos-textfield-new style="width: 30%" label="Product ID" v-model={filter.value.id} clearable>
+				<pos-textfield-new style="width: 30%" label="Product ID" v-model={temporaryDialogFilter.value.id} clearable>
 				</pos-textfield-new>
-				<pos-textfield-new style="width: 30%" label="Name" v-model={filter.value.name} clearable>
+				<pos-textfield-new style="width: 30%" label="Name" v-model={temporaryDialogFilter.value.name} clearable>
 				</pos-textfield-new>
 				<g-select menu-class="menu-select-inventory" text-field-component="PosTextfieldNew" outlined style="width: 30%"
 				          label={t('article.category')} clearable items={inventoryCategories.value} item-text="name"
-				          return-object v-model={filter.value.category}>
+				          return-object v-model={temporaryDialogFilter.value.category}>
 				</g-select>
 				<div class="col-12 row-flex">
 					<p style="margin-top: 35px; margin-left: 16px">
 						Stock Range: </p>
-					<pos-range-slider min={0} max={1000} prefix={""} v-model={filter.value.stock}>
+					<pos-range-slider min={0} max={1000} prefix={""} v-model={temporaryDialogFilter.value.stock}>
 					</pos-range-slider>
 				</div>
 			</div>
