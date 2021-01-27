@@ -59,7 +59,8 @@ export async function submitInventory () {
 		!selectedInventory.value.category ||
 		!selectedInventory.value.unit ||
 		!selectedInventory.value.stock ||
-		isNaN(selectedInventory.value.stock)) return
+		isNaN(selectedInventory.value.stock) /* Note that isNaN('12') === true */ ) return
+	selectedInventory.value.stock = Number(selectedInventory.value.stock)
 	const inventory = selectedInventory.value
 	if(dialog.value.mode === 'add') {
 		await createInventory(inventory)
@@ -89,7 +90,7 @@ export function renderInventoryDialog(t) {
 					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
 					                   style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock} required/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
-					          items={inventoryCategories.value} item-text="name" item-value="_id" v-model={selectedInventory.value.category}
+					          items={inventoryCategories.value} item-text="name" return-object v-model={selectedInventory.value.category}
 					          required/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
 					          items={units.value} v-model={selectedInventory.value.unit} required/>
