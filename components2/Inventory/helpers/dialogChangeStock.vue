@@ -88,45 +88,46 @@ export default {
     return () => (
       <g-dialog v-model={internalValue.value}>
         {genScopeId(() => (
-            <><div class="dialog">
-              <div class="dialog-title">{t('inventory.addRemoveStock')}</div>
-              <g-icon size="16" class="dialog-icon--close" onClick={() => internalValue.value = false}>icon-close</g-icon>
-              <div class="dialog-content">
-                <p><b>{t('inventory.item')}: </b>{props.name}</p>
-                <p> <b>{t('inventory.currentStock')}: </b>{$filters.formatCurrency(props.stock)}</p>
-                <p>
-                  <b>{t('inventory.newStock')}: </b>
-                  <span style={{ ...mode.value === 'add' && { color: '#1271FF' }, ...mode.value === 'remove' && { color: '#FF4452' } }}>
-                    {$filters.formatCurrency(newStock.value)}
-                  </span>
-                </p>
-                <div class="dialog-content__action">
-                  <div class={['btn', mode.value === 'add' && 'btn--blue']} onClick={() => mode.value = 'add'}>
-                    <g-icon color="white">
-                      add
-                    </g-icon>
+            <div class="dialog">
+              <div style="padding: 16px">
+                <div class="dialog-title">{t('inventory.addRemoveStock')}</div>
+                <g-icon size="16" class="dialog-icon--close" onClick={() => internalValue.value = false}>icon-close</g-icon>
+                <div class="dialog-content">
+                  <p><b>{t('inventory.item')}: </b>{props.name}</p>
+                  <p> <b>{t('inventory.currentStock')}: </b>{$filters.formatCurrency(props.stock)}</p>
+                  <p>
+                    <b>{t('inventory.newStock')}: </b>
+                    <span style={{ ...mode.value === 'add' && { color: '#1271FF' }, ...mode.value === 'remove' && { color: '#FF4452' } }}>
+                      {$filters.formatCurrency(newStock.value)}
+                    </span>
+                  </p>
+                  <div class="dialog-content__action">
+                    <div class={['btn', mode.value === 'add' && 'btn--blue']} onClick={() => mode.value = 'add'}>
+                      <g-icon color="white">
+                        add
+                      </g-icon>
+                    </div>
+                    <div class={['btn', mode.value === 'remove' && 'btn--red', !props.removable && 'disabled']} onClick={() => mode.value = 'remove'}>
+                      <g-icon color="white">
+                        remove
+                      </g-icon>
+                    </div>
+                    <g-text-field-bs ref={textfield} rules={rules.value} modelValue={change.value} onUpdate:modelValue={changeValue}>
+                    </g-text-field-bs>
                   </div>
-                  <div class={['btn', mode.value === 'remove' && 'btn--red', !props.removable && 'disabled']} onClick={() => mode.value = 'remove'}>
-                    <g-icon color="white">
-                      remove
-                    </g-icon>
-                  </div>
-                  <g-text-field-bs ref={textfield} rules={rules.value} modelValue={change.value} onUpdate:modelValue={changeValue}>
-                  </g-text-field-bs>
+                  {
+                    (mode.value === 'remove') ?
+                        <g-select class="dialog-content__reason" text-field-component="GTextFieldBs" items={reasons.value} v-model={reason.value} placeholder="Reason (Optional)">
+                        </g-select>
+                        :
+                        <div class="dialog-content__reason" style="height: 38px"></div>
+                  }
                 </div>
-                {
-                  (mode.value === 'remove') ?
-                      <g-select class="dialog-content__reason" text-field-component="GTextFieldBs" items={reasons.value} v-model={reason.value} placeholder="Reason (Optional)">
-                      </g-select>
-                      :
-                      <div class="dialog-content__reason" style="height: 38px"></div>
-                }
               </div>
               <div class="dialog-keyboard">
-                <pos-keyboard-full width="100%" type="numeric" onEnterPressed={submit}>
-                </pos-keyboard-full>
+                <pos-keyboard-full width="100%" type="numeric" onEnterPressed={submit}/>
               </div>
-            </div></>
+            </div>
         ))()}
       </g-dialog>
     )
@@ -140,7 +141,6 @@ export default {
   margin-left: auto;
   margin-right: auto;
   background-color: white;
-  padding: 16px;
   position: relative;
   overflow: auto;
   border-radius: 2px;
@@ -207,8 +207,7 @@ export default {
 
   &-keyboard {
     background: #bdbdbd;
-    padding: 4px;
-    border-radius: 2px;
+    padding: 16px;
   }
 }
 
