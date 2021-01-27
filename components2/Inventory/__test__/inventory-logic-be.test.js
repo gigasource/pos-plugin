@@ -125,4 +125,15 @@ describe("Test inventory logic be", function() {
 			expect(!!oldCategory).toBe(true)
 		}
 	})
+	it('Case 6: Update inventory with object id', async () => {
+		await updateInventory({
+			...inventories.value[0],
+			...{
+				category: inventoryCategories.value[1]._id
+			}
+		})
+		await nextTick()
+		expect(inventories.value).toMatchSnapshot()
+		expect(inventoryCategories.value).toMatchSnapshot
+	})
 });

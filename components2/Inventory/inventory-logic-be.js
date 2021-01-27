@@ -47,6 +47,7 @@ export async function createInventory(inventory) {
 
 export async function updateInventory({ _id, name, category, unit, stock, lowStockThreshold }, reason) {
 	const inventory = _.find(inventories.value, (inventory) => inventory._id.toString() === _id.toString())
+	category = (category._bsontype ? inventoryCategories.value.find(_category => _category._id.toString() === category.toString()) : category)
 	Object.assign(inventory, {
 		name,
 		category,
@@ -55,7 +56,6 @@ export async function updateInventory({ _id, name, category, unit, stock, lowSto
 		lowStockThreshold,
 		lastUpdateTimestamp: new Date()
 	})
-	category = (typeof category === 'object' ? category._id : category)
 	if (stock !== inventory.stock) {
 		const history = {
 			inventory: _id,

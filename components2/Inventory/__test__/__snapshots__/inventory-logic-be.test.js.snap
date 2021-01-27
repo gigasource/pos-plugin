@@ -659,3 +659,171 @@ Array [
   },
 ]
 `;
+
+exports[`Test inventory logic be Case 6: Update inventory 1`] = `
+Array [
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc42",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "1",
+    "lastUpdateTimestamp": 2021-01-05T00:00:00.000Z,
+    "lowStockThreshold": undefined,
+    "name": "Fish",
+    "stock": 30,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc44",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "2",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Meat",
+    "stock": 50,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc46",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc3f",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "3",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Pork",
+    "stock": 60.22,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc48",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc40",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "4",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Apple",
+    "stock": 100,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc4a",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc40",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "5",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Banana",
+    "stock": 10,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "5ff3ac0016e8f31dd467dc4c",
+    "category": Object {
+      "_id": "5ff3ac0016e8f31dd467dc41",
+      "available": false,
+      "name": "Drink",
+    },
+    "id": "6",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Vodka",
+    "stock": 5.5,
+    "unit": "l",
+  },
+]
+`;
+
+exports[`Test inventory logic be Case 6: Update inventory with object id 1`] = `
+Array [
+  Object {
+    "_id": "5ff3ac00078ac01e5289d28c",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d28a",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "1",
+    "lastUpdateTimestamp": 2021-01-05T00:00:00.000Z,
+    "lowStockThreshold": undefined,
+    "name": "Fish",
+    "stock": 30,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac00078ac01e5289d28e",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d289",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "2",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Meat",
+    "stock": 50,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac00078ac01e5289d290",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d289",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "3",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Pork",
+    "stock": 60.22,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "5ff3ac00078ac01e5289d292",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d28a",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "4",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Apple",
+    "stock": 100,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "5ff3ac00078ac01e5289d294",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d28a",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "5",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Banana",
+    "stock": 10,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "5ff3ac00078ac01e5289d296",
+    "category": Object {
+      "_id": "5ff3ac00078ac01e5289d28b",
+      "available": false,
+      "name": "Drink",
+    },
+    "id": "6",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Vodka",
+    "stock": 5.5,
+    "unit": "l",
+  },
+]
+`;
