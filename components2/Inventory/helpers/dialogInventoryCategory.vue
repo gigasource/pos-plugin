@@ -10,6 +10,7 @@ import {
   deleteInventoryCategory,
   updateInventoryCategories
 } from '../inventory-logic-be'
+import { genScopeId } from '../../utils';
 
 export default {
   name: "dialogInventoryCategory",
@@ -28,7 +29,7 @@ export default {
       },
       set: (value) => {
         showKeyboard.value = false
-        context.emit('update:modelValue', val)
+        context.emit('update:modelValue', value)
       }
     })
     const rules = computed(() => {
@@ -37,7 +38,7 @@ export default {
       return rules
     })
 
-    watch(() => internalValue.value, async (val) => {
+    watch(internalValue, async (val) => {
       if (val) {
         addedCategory.value = []
       }
@@ -64,31 +65,33 @@ export default {
 
     return () => <>
       <g-dialog fullscreen v-model={internalValue.value} content-class="dialog-inventory-category">
-        <div class="dialog">
-          <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
-            <div class="category">
-              {[...addedCategory.value, ...inventoryCategories.value].map((category, i) =>
-                  <div class="category-item" key={i}>
-                    <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
-                    <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>
-                      <g-icon>icon-delete2</g-icon>
-                    </div>
-                  </div>
-              )} </div>
-            <p>* {t('inventory.onlyEmpty')}</p>
-            <div class="dialog-action">
-              <g-btn-bs icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
-              <g-btn-bs background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
+        {genScopeId(() => (
+            <div class="dialog">
+              <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
+                <div class="category">
+                  {[...addedCategory.value, ...inventoryCategories.value].map((category, i) =>
+                      <div class="category-item" key={i}>
+                        <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
+                        <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>
+                          <g-icon>icon-delete2</g-icon>
+                        </div>
+                      </div>
+                  )} </div>
+                <p>* {t('inventory.onlyEmpty')}</p>
+                <div class="dialog-action">
+                  <g-btn-bs icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
+                  <g-btn-bs background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
+                </div>
+              </div>
+              {
+                (showKeyboard.value) &&
+                <div class="dialog-keyboard">
+                  <pos-keyboard-full type="alpha-number"></pos-keyboard-full>
+                </div>
+              }
+              <div class="dialog-overlay" onClick={() => internalValue.value = false}></div>
             </div>
-          </div>
-          {
-            (showKeyboard.value) &&
-            <div class="dialog-keyboard">
-              <pos-keyboard-full type="alpha-number"></pos-keyboard-full>
-            </div>
-          }
-          <div class="dialog-overlay" onClick={() => internalValue.value = false}></div>
-        </div>
+        ))()}
       </g-dialog>
     </>
   }
