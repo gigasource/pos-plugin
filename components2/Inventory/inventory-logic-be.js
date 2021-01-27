@@ -39,10 +39,23 @@ export async function createInventory(inventory) {
 		})
 		if (foundId) return
 	}
+	if (!inventory._id) {
+		inventory._id = new ObjectID()
+	}
 	inventory.lastUpdateTimestamp = new Date()
 	inventories.value.push(_.cloneDeep(inventory))
-	inventory.category = (typeof inventory.category === 'Object' ? inventory.category._id : inventory.category)
+	inventory.category = inventory.category._id
+
 	await Inventory.create(inventory)
+	// update history
+	await updateInventoryHistory({
+		inventory: inventory._id,
+		category: inventory.category,
+		type: 'add',
+		amount: inventory.stock,
+		date: new Date(),
+		reason: 'Create inventory'
+	})
 }
 
 export async function updateInventory({ _id, name, category, unit, stock, lowStockThreshold }, reason) {
