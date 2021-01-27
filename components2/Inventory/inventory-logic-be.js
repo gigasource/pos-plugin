@@ -48,6 +48,17 @@ export async function createInventory(inventory) {
 export async function updateInventory({ _id, name, category, unit, stock, lowStockThreshold }, reason) {
 	const inventory = _.find(inventories.value, (inventory) => inventory._id.toString() === _id.toString())
 	category = ((category._bsontype || typeof category === 'string') ? inventoryCategories.value.find(_category => _category._id.toString() === category.toString()) : category)
+	if (stock !== inventory.stock) {
+		const history = {
+			inventory: _id,
+			category: category._id,
+			type: stock > inventory.stock ? 'add' : 'remove',
+			amount: Math.abs(stock - inventory.stock),
+			date: new Date(),
+			reason: reason ? reason : 'Update stock'
+		}
+		await updateInventoryHistory(history)
+	}
 	Object.assign(inventory, {
 		name,
 		category,
@@ -56,17 +67,6 @@ export async function updateInventory({ _id, name, category, unit, stock, lowSto
 		lowStockThreshold,
 		lastUpdateTimestamp: new Date()
 	})
-	if (stock !== inventory.stock) {
-		const history = {
-			inventory: _id,
-			category: category._id,
-			type: stock.value > inventory.stock ? 'add' : 'remove',
-			amount: Math.abs(stock.value - inventory.stock),
-			date: new Date(),
-			reason: reason ? reason : 'Update stock'
-		}
-		await updateInventoryHistory(history)
-	}
 	await Inventory.findOneAndUpdate(
 		{ _id },
 		{
