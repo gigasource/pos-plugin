@@ -82,22 +82,18 @@ export async function removeInventory() {
 
 export function renderInventoryDialog(t) {
 	return <dialog-form-input v-model={dialog.value.inventory} onSubmit={submitInventory} v-slots={{
-			'input': genScopeId(() => <>
+			input: genScopeId(() => (
 				<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-					<pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.name} required>
-					</pos-textfield-new>
+					<pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.name} required/>
 					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-					                   style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock} required>
-					</pos-textfield-new>
+					                   style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock} required/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
 					          items={inventoryCategories.value} item-text="name" item-value="_id" v-model={selectedInventory.value.category}
-					          required>
-					</g-select>
+					          required/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
-					          items={units.value} v-model={selectedInventory.value.unit} required>
-					</g-select>
+					          items={units.value} v-model={selectedInventory.value.unit} required/>
 				</div>
-			</>),
+			)),
 		}}>
 	</dialog-form-input>
 }

@@ -120,52 +120,32 @@ export function renderMainInventoryTable(props, { emit }) {
 			<div>
 				<g-toolbar color="#eeeeee" elevation="0">
 					<g-btn uppercase={false} style="margin-right: 5px" onClick={back}>
-						<g-icon small style="margin-right: 5px">
-							icon-back
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-back</g-icon>
 						{t('ui.back')}
 					</g-btn>
 					<g-btn uppercase={false} onClick={goToReportPage}>
-						<g-icon small style="margin-right: 5px">
-							icon-inventory-report
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-inventory-report</g-icon>
 						{t('inventory.report')}
 					</g-btn>
-					<g-spacer>
-					</g-spacer>
+					<g-spacer/>
 					<g-btn uppercase={false} style="margin-right: 5px" onClick={goToStockPage}>
-						<g-icon small style="margin-right: 5px">
-							icon-inventory-new-stock
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-inventory-new-stock</g-icon>
 						{t('inventory.newStock')}
 					</g-btn>
 					<g-btn uppercase={false} style="margin-right: 5px" onClick={() => dialog.value.category = true}>
-						<g-icon small style="margin-right: 5px">
-							icon-inventory-category
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-inventory-category</g-icon>
 						{t('article.category')}
 					</g-btn>
 					<g-btn disabled={checkBoxSelectedInventoryIDs.value.length === 0} uppercase={false} style="margin-right: 5px" onClick={removeInventory}>
-						<g-icon small style="margin-right: 5px">
-							icon-inventory-delete
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
 						{t('ui.delete')}
 					</g-btn>
 					<g-btn disabled={checkBoxSelectedInventoryIDs.value.length !== 1} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
-						<g-icon small style="margin-right: 5px">
-							icon-inventory-edit
-						</g-icon>
-
+						<g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
 						{t('ui.edit')}
 					</g-btn>
 					<g-btn uppercase={false} background-color="#4CAF50" text-color="#FFF" onClick={() => openDialogInventory('add')}>
-						<span style="font-size: 14px !important">
-							+ {t('inventory.newProduct')} </span>
+						<span style="font-size: 14px !important">+ {t('inventory.newProduct')} </span>
 					</g-btn>
 				</g-toolbar>
 			</div>
