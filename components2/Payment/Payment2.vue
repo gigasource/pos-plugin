@@ -6,8 +6,8 @@ import PosPaymentScreenPaymentMethods2 from './Helpers/PosPaymentScreenPaymentMe
 import PosRestaurantPaymentOrderDetail2 from './Helpers/PosRestaurantPaymentOrderDetail2';
 import PosRestaurantPaymentToolbar2 from './Helpers/PosRestaurantPaymentToolbar2';
 import PaymentLogicsFactory from './payment-logics';
-import { genScopeId } from '../../utils';
-import { makeDiscount } from '../../OrderView/pos-logic';
+import { genScopeId } from '../utils';
+import { makeDiscount } from '../OrderView/pos-logic';
 
 export default {
   name: 'Payment',

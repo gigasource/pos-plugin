@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import EditTablePlanUI from '../EditTablePlanUI';
 import { nextTick } from 'vue';
 import delay from 'delay';
-import prepareDb from '../../../TablePlan/__test__/test-setup-db';
+import prepareDb from '../../TablePlan/__test__/test-setup-db';
 
 beforeAll(async () => {
   await prepareDb();

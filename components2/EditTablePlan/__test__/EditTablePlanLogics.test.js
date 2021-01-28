@@ -1,5 +1,5 @@
 import { nextTick } from "vue";
-import { createRoom, addRoomObject } from "../../../TablePlan/RoomLogics";
+import { createRoom, addRoomObject } from "../../TablePlan/RoomLogics";
 
 import { stringify } from "schemahandler/utils";
 import { ObjectID } from "bson";
@@ -7,7 +7,7 @@ import {
   fetchRooms,
   objectsInSelectingRoom,
   onSelectRoom
-} from "../../../TablePlan/RoomState";
+} from "../../TablePlan/RoomState";
 
 import {
   createOrder,
@@ -49,7 +49,7 @@ import {
   addNewRoomObjectToSelectingRoom, onChangeObjectName,
   onSelectObject,
   selectingObject
-} from '../../../TablePlan/EditableRoom/EditTablePlanLogics';
+} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
 
 const VIEW_W = 100;
 const VIEW_H = 100;

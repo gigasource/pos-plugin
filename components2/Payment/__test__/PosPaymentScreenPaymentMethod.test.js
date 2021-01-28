@@ -1,9 +1,9 @@
 import PosPaymentScreenPaymentMethods2 from "../Helpers/PosPaymentScreenPaymentMethods2";
-import { wrapper, setComponent, makeWrapper, cola } from "../../../test-utils";
+import { wrapper, setComponent, makeWrapper, cola } from "../../test-utils";
 
 import PaymentLogicsFactory from "../payment-logics";
 import * as PaymentLogics from "../payment-logics";
-import { addItem } from "../../../OrderView/pos-logic";
+import { addItem } from "../../OrderView/pos-logic";
 import { nextTick } from "vue";
 
 const {

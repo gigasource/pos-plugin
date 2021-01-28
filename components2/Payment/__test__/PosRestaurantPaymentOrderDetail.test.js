@@ -1,5 +1,5 @@
 import PosRestaurantPaymentOrderDetail2 from "../Helpers/PosRestaurantPaymentOrderDetail2";
-import { wrapper, setComponent, makeWrapper } from "../../../test-utils";
+import { wrapper, setComponent, makeWrapper } from "../../test-utils";
 
 describe("test Pos Payment Screen Keyboard", () => {
   it("should render", async () => {

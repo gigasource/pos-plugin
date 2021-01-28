@@ -1,6 +1,6 @@
 import PosPaymentScreenKeyboard2 from '../Helpers/PosPaymentScreenKeyboard2';
-import { cola, ketchup, makeWrapper, setComponent, wrapper } from '../../../test-utils';
-import { addItem, addModifier } from '../../../OrderView/pos-logic';
+import { cola, ketchup, makeWrapper, setComponent, wrapper } from '../../test-utils';
+import { addItem, addModifier } from '../../OrderView/pos-logic';
 import { nextTick } from 'vue';
 import PaymentLogicsFactory from '../payment-logics';
 import delay from 'delay';

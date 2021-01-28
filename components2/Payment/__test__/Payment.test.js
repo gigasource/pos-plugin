@@ -1,5 +1,5 @@
 import Payment from "../Payment2";
-import { wrapper, makeWrapper, setComponent } from "../../../test-utils";
+import { wrapper, makeWrapper, setComponent } from "../../test-utils";
 
 describe("test Pos Payment Screen Keyboard", () => {
   it("should render", async () => {

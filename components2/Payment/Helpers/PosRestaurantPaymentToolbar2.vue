@@ -1,12 +1,12 @@
 <script>
 import { ref, withModifiers, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getCurrentOrder } from '../../../OrderView/pos-logic-be';
+import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import PaymentLogicsFactory from '../payment-logics';
 import { useRoute } from 'vue-router';
-import { posSettings } from '../../../AppSharedStates';
-import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from '../../../../../../backoffice/pos-vue-framework';
-import { genScopeId } from '../../../utils';
+import { posSettings } from '../../AppSharedStates';
+import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from '../../../../../backoffice/pos-vue-framework';
+import { genScopeId } from '../../utils';
 
 export default {
   name: 'PosRestaurantPaymentToolbar2',

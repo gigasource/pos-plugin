@@ -1,9 +1,9 @@
 <script>
-import { $filters, avatar, username } from '../../../AppSharedStates';
-import { getCurrentOrder } from '../../../OrderView/pos-logic-be';
+import { $filters, avatar, username } from '../../AppSharedStates';
+import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import { computed } from 'vue';
-import { GAvatar, GChip, GSpacer } from '../../../../../../backoffice/pos-vue-framework';
-import { genScopeId } from '../../../utils';
+import { GAvatar, GChip, GSpacer } from '../../../../../backoffice/pos-vue-framework';
+import { genScopeId } from '../../utils';
 
 export default {
   name: 'PosRestaurantPaymentOrderDetail2',
