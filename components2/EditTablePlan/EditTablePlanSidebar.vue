@@ -1,5 +1,5 @@
 <script>
-import { GBtn, GSwitch, GTextFieldBs } from '../../../../../backoffice/pos-vue-framework';
+import { GBtn, GSwitch, GTextFieldBs } from '../../../../backoffice/pos-vue-framework';
 import PosDashboardSidebar2 from '../Dashboard/DashboardSidebar/PosDashboardSidebar2';
 import { useI18n } from 'vue-i18n'
 import {
@@ -25,10 +25,10 @@ import {
   updateSelectingObjectInSelectingRoom,
   updateTableName,
   wallColors
-} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
-import { selectingRoomStates } from '../../TablePlan/RoomState';
-import { isTable } from '../../TablePlan/RoomShared';
-import { getScopeAttrs } from '../../../utils/helpers';
+} from '../TablePlan/EditableRoom/EditTablePlanLogics';
+import { selectingRoomStates } from '../TablePlan/RoomState';
+import { isTable } from '../TablePlan/RoomShared';
+import { getScopeAttrs } from '../../utils/helpers';
 
 export default {
   name: 'EditTablePlanSidebar',

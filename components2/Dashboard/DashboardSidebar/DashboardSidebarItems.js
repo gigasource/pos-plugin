@@ -1,9 +1,9 @@
 import {computed} from 'vue';
 import _ from 'lodash';
 
-import {user} from '../../../AppSharedStates'
+import {user} from '../../AppSharedStates'
 
-import {onSelectRoom, roomsStates} from '../../../TablePlan/RoomState'
+import {onSelectRoom, roomsStates} from '../../TablePlan/RoomState'
 import { activeScreen, selectingRoomId } from '../DashboardSharedStates';
 import {useI18n} from 'vue-i18n'
 

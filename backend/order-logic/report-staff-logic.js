@@ -1,9 +1,8 @@
-const {renderPivotTable} = require("./pivot");
-
 const orm = require("schemahandler");
 const {fromReducer, quantityReducer, toReducer, vTaxSumReducer} = require("./report-shared");
 let Order = orm("Order");
 const _ = require('lodash');
+const {renderPivotTable} = require("./pivot");
 
 async function staffReport(from, to) {
   const query = {
@@ -15,6 +14,7 @@ async function staffReport(from, to) {
 
   let orders = await Order.find(query);
 
+  //todo: cashback, tip logic
   //groupByPayment
   const payment = orders.reduce((r, order) => r.concat(...order.payment.map(p => {
     return {

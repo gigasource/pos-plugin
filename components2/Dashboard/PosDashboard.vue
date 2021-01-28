@@ -1,14 +1,14 @@
 
 <script>
-  import RestaurantRoom2 from "../../TablePlan/BasicRoom/RestaurantRoom2";
-  import EditableRoom from "../../TablePlan/EditableRoom/EditableRoom";
+  import RestaurantRoom2 from "../TablePlan/BasicRoom/RestaurantRoom2";
+  import EditableRoom from "../TablePlan/EditableRoom/EditableRoom";
   import PosDashboardSidebar from "./DashboardSidebar/PosDashboardSidebar2";
   import { onBeforeMount, onMounted, ref } from 'vue';
-  import {fetchRooms, roomsStates} from "../../TablePlan/RoomState";
-  import {appHooks} from "../../AppSharedStates";
+  import {fetchRooms, roomsStates} from "../TablePlan/RoomState";
+  import {appHooks} from "../AppSharedStates";
   import {activeScreen} from "./DashboardSharedStates";
   import DashboardSidebarItemsFactory from "./DashboardSidebar/DashboardSidebarItems";
-  import {getScopeAttrs} from "../../../utils/helpers";
+  import {getScopeAttrs} from "../../utils/helpers";
   import { PortalTarget } from 'portal-vue/dist/portal-vue.esm'
   import { selectingRoomId } from './DashboardSharedStates';
 

@@ -1,6 +1,6 @@
 import PaymentLogicsFactory from "../payment-logics";
 import { stringify } from "schemahandler/utils";
-import { addItem, addModifier, addPayment } from "../../../OrderView/pos-logic";
+import { addItem, addModifier, addPayment } from "../../OrderView/pos-logic";
 import { nextTick } from "vue";
 import delay from "delay";
 

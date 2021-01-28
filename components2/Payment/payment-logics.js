@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import _ from 'lodash';
-import { getCurrentOrder } from '../../OrderView/pos-logic-be';
+import { getCurrentOrder } from '../OrderView/pos-logic-be';
 import {
   addMultiPayment,
   addPayment,
@@ -9,7 +9,7 @@ import {
   updateOrderWithHooks,
   updatePayment,
   updateSinglePayment
-} from '../../OrderView/pos-logic';
+} from '../OrderView/pos-logic';
 
 // todo: singleton stuffs should be out of factory
 const PaymentLogicsFactory = () => {
