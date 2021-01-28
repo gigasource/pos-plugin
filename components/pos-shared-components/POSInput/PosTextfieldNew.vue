@@ -32,7 +32,9 @@
       },
       internalValue: {
         get() {
-          return '' + this.modelValue
+          if (this.modelValue)
+            return '' + this.modelValue
+          return ''
         },
         set(val) {
           this.$emit('update:modelValue', val)

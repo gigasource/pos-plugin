@@ -56,7 +56,7 @@ export default {
       <g-text-field-bs
           border-color="#979797"
           modelValue={categoryName.value}
-          onUpdate:modelValue={newName => debouncedUpdateCategory({ name: newName })}
+          onUpdate:modelValue={newName => debouncedUpdateCategory({ name: newName }, newName)}
           v-slots={{
             'append-inner': () => <g-icon style="cursor: pointer" onClick={() => showCategoryNameKbd.value = true}>icon-keyboard</g-icon>
           }}>

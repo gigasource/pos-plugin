@@ -67,7 +67,6 @@ describe('product-editor', () => {
     makeWrapper(ProductEditor2, {
       shallow: false,
       global: {
-        renderStubDefaultSlot: false,
         stubs: {
           portal: true,
           'dialog-confirm-delete': true,

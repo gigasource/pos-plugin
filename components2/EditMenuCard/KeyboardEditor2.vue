@@ -124,7 +124,6 @@ export default {
       }
     }
     function onmousedown(e, column, row) {
-      console.log('onmousedown', column, row)
       state.selecting = true
       state.mouseDownCell = {x: column, y: row}
       state.mouseCurrentCell = {x: column, y: row}
@@ -133,13 +132,11 @@ export default {
       }
     }
     function mouseenter(column, row) {
-      console.log('mouseenter', column, row)
       if(state.selecting) {
         state.mouseCurrentCell = {x: column, y: row}
       }
     }
     function onmouseup() {
-      console.log('onmouseup')
       state.selecting = false
     }
     function changeLayout() {

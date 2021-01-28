@@ -72,22 +72,24 @@ export function orderRightSideHeader(props, {emit}) {
               </div>),
 
               default: () => <g-expand-x-transition>
-                <div {...genScopeId()} class="order-detail__menu">
-                  <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
-                  <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
-                  <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
+                {genScopeId(() => (
+                    <div class="order-detail__menu">
+                      <g-btn-bs icon="icon-blue-cog" onClick={() => editModeOL.value = true}>Edit Screen</g-btn-bs>
+                      <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
+                      <g-btn-bs icon="icon-move-items" onClick={moveItems}>{t('order.moveItem')}</g-btn-bs>
 
-                  <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
-                            onClick={toggleTakeAwayOrder}>Take Away
-                  </g-btn-bs>
-                  <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{t('order.splitOrder')}</g-btn-bs>
-                  {actionList.value.length > 0 && <g-btn-bs disabled={!hasOrderChange.value} icon="icon-print"
-                                                            onClick={withModifiers(printOrder, ['stop'])}>
-                    {t('ui.print')}
-                  </g-btn-bs>}
-                  <g-btn-bs icon="icon-wallet"
-                            disabled={disablePay.value} onClick={pay}>{t('article.pay')}</g-btn-bs>
-                </div>
+                      <g-btn-bs icon="icon-delivery" background-color={order.takeAway ? '#2979FF' : '#FFF'}
+                                onClick={toggleTakeAwayOrder}>Take Away
+                      </g-btn-bs>
+                      <g-btn-bs icon="icon-split_check_2" onClick={splitOrder}>{t('order.splitOrder')}</g-btn-bs>
+                      {actionList.value.length > 0 && <g-btn-bs disabled={!hasOrderChange.value} icon="icon-print"
+                                                                onClick={withModifiers(printOrder, ['stop'])}>
+                        {t('ui.print')}
+                      </g-btn-bs>}
+                      <g-btn-bs icon="icon-wallet"
+                                disabled={disablePay.value} onClick={pay}>{t('article.pay')}</g-btn-bs>
+                    </div>
+                ))()}
               </g-expand-x-transition>
             }}>
             </g-menu>

@@ -87,8 +87,7 @@ export function payPrintBtnFactory() {
         </g-btn-bs>
       )
     }
-    return <span
-      className="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
+    return <span class="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
   }
 
   return {

@@ -832,23 +832,5 @@ exports[`product-editor should render text 1`] = `
     <g-text-field-stub>
     </g-text-field-stub>
   </div>
-  <div class="mt-2">
-    <div class="row-flex justify-between">
-      <div class="product-editor__label">
-        Popup modifiers
-      </div>
-      <g-icon-stub size="16">
-        icon-edit_modifiers
-      </g-icon-stub>
-    </div>
-    <div>
-      <g-grid-select-stub item-text="name"
-                          item-value="_id"
-                          items
-                          itemcols="auto"
-      >
-      </g-grid-select-stub>
-    </div>
-  </div>
 </div>
 `;

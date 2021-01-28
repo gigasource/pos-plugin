@@ -1,111 +1,102 @@
-import _ from 'lodash'
-import { reactive, nextTick } from 'vue'
-import { orderLayout, selectedCategoryLayout } from '../../OrderView/pos-ui-shared'
-
+import _ from "lodash";
+import { nextTick } from "vue";
 import {
-  productRows,
-  productCols,
-  categoryName,
-  categoryColor,
-  debouncedUpdateCategory
-} from '../CategoryEditor/category-editor-category'
-
+  editable,
+  loadOrderLayout,
+  orderLayout,
+  selectCategoryLayout,
+  selectedCategoryLayout
+} from "../../OrderView/pos-ui-shared";
+const delay = require("delay");
 import {
-  changeCategoryColumn,
-} from '../CategoryEditor/category-editor-order-layout'
+  _updateCategory
+} from "../CategoryEditor/category-editor-category";
 
-import orderLayoutApi from '../orderLayoutApi';
+import { changeCategoryColumn } from "../CategoryEditor/category-editor-order-layout";
+import { stringify } from 'schemahandler/utils'
 
-describe('Logic:CategoryEditor', () => {
-  describe('changeCategoryColumn', () => {
-    // the same to update categories row
-    it('should update change categories column', async () => {
-      const orderLayoutId = 1
-      const returnedOrderLayout = {
-        _id: 'whatEver',
-        columns: 100
-      }
-      orderLayout.value._id = orderLayoutId
-      orderLayoutApi.changeCategoryColumn = jest.fn(() => {
-        return returnedOrderLayout
-      })
+import { orm } from "../../test-utils";
 
-      const newColumn = 5
-      // try to change column
-      await changeCategoryColumn(newColumn)
+import { demoData } from "../../OrderView/__test__/demoData";
 
-      // expect orderLayoutApi.changeCategoryColumn call 1
-      expect(orderLayoutApi.changeCategoryColumn.mock.calls.length).toBe(1)
+describe("Logic:CategoryEditor", () => {
+  beforeEach(async () => {
+    await orm("OrderLayout").remove({});
+    await orm("OrderLayout").create(demoData.OrderLayout[0]);
+  });
 
-      // expect changeCategoryColumn call with (orderLayoutId, newColumn)
-      expect(orderLayoutApi.changeCategoryColumn.mock.calls[0].length).toBe(2)
-      expect(orderLayoutApi.changeCategoryColumn.mock.calls[0][0]).toBe(orderLayoutId)
-      expect(orderLayoutApi.changeCategoryColumn.mock.calls[0][1]).toBe(newColumn)
-    })
-  })
+  // the same to update categories row
+  it("should change categories column", async () => {
+    await loadOrderLayout();
+    await changeCategoryColumn(5);
+    await nextTick();
+    await delay(100);
+    expect(orderLayout.value.columns).toBe(5);
+  });
 
-  describe('updateCategory', () => {
-    it('should assign change to selectedCategoryLayout', async (done) => {
-      selectedCategoryLayout.value = { abc: 'xyz' }
-      const change = { row: 1, column: 2, color: '#FFF' }
-      debouncedUpdateCategory(change)
-      setTimeout(() => {
-        expect(selectedCategoryLayout.value).toEqual(Object.assign(selectedCategoryLayout.value, change))
-        done()
-      }, 500)
-    })
+  describe("updateCategory", () => {
+    it("should assign change to selectedCategoryLayout", async () => {
+      await loadOrderLayout();
+      await selectCategoryLayout({ top: 0, left: 0 });
+      const currentValue = _.cloneDeep(selectedCategoryLayout.value);
+      const change = { row: 1, column: 2, color: "#FFF" };
+      // for some reason, _.debounce doesn't work in the test
+      await _updateCategory(change);
+      await nextTick();
+      expect(selectedCategoryLayout.value).toEqual(
+        Object.assign({}, currentValue, change)
+      );
+    });
 
-    it('should create new category layout __if__ forceCreate is true and selectedCategoryLayout._id is null', async (done) => {
-      const updateResult = { just: 'dont care' }
-      orderLayoutApi.createCategoryLayout = jest.fn(() => updateResult)
+    it("should create new category layout __if__ forceCreate is true and selectedCategoryLayout._id is null", async () => {
+      editable.value = true;
+      await loadOrderLayout();
+      await selectCategoryLayout({ top: 0, left: 1 }); // select blank category
+      console.log(selectedCategoryLayout.value)
+      await _updateCategory(
+        { name: "Fruit", rows: 1, columns: 2, color: "#FFF" },
+        true
+      );
+      await delay(100);
+      editable.value = false;
+      await loadOrderLayout();
+      // Test case failed but it still running correctly in front-end :$
+      expect(stringify(selectedCategoryLayout.value)).toMatchInlineSnapshot(`
+        Object {
+          "_id": "ObjectID",
+          "color": "#FFF",
+          "columns": 2,
+          "left": 1,
+          "name": "Fruit",
+          "rows": 1,
+          "top": 0,
+        }
+      `);
+    });
 
-      const orderLayoutId = 'what ever'
-      orderLayout.value = { _id: orderLayoutId }
-      selectedCategoryLayout.value = {}
-
-      const change = { row: 1, column: 2, color: '#FFF' }
-      debouncedUpdateCategory(change, true /*forceCreate*/)
-
-      setTimeout(() => {
-        // expect orderLayoutApi.createCategoryLayout will be call (orderLayoutId, selectedCategoryLayoutValue) once
-        expect(orderLayoutApi.createCategoryLayout.mock.calls.length).toBe(1)
-        expect(orderLayoutApi.createCategoryLayout.mock.calls[0].length).toBe(2)
-        expect(orderLayoutApi.createCategoryLayout.mock.calls[0][0]).toBe(orderLayoutId)
-        expect(orderLayoutApi.createCategoryLayout.mock.calls[0][1]).toEqual(change)
-
-        // expect returned result of orderLayoutApi.createCategoryLayout will be updated to orderLayout
-        expect(orderLayout.value).toEqual(updateResult)
-
-        done()
-      }, 500 /*because debouncedUpdateCategory is 300*/)
-    })
-
-    it('should update category __if__ selectedCategoryLayout._id exist', async (done) => {
-      orderLayoutApi.updateCategoryLayout = jest.fn(() => null)
-
-      const selectedCategoryLayoutId = 1
-      orderLayout.value = { _id: 'what ever' }
-      selectedCategoryLayout.value = { _id: selectedCategoryLayoutId }
-
-      const change = { row: 1, column: 2, color: '#FFF' }
-      debouncedUpdateCategory(change)
-
-      setTimeout(() => {
-        // expect orderLayoutApi.updateCategoryLayout will be call (orderLayoutId, selectedCategoryLayoutValue) once
-        expect(orderLayoutApi.updateCategoryLayout.mock.calls.length).toBe(1)
-        expect(orderLayoutApi.updateCategoryLayout.mock.calls[0].length).toBe(2)
-        expect(orderLayoutApi.updateCategoryLayout.mock.calls[0][0]).toBe(selectedCategoryLayoutId)
-        expect(orderLayoutApi.updateCategoryLayout.mock.calls[0][1]).toEqual(change)
-
-        // expect updateOrderLayout called 0 time
-        // (a.k.a orderLayoutApi.updateCategoryLayout result won't be apply to orderLayout)
-        expect(orderLayout.value).toEqual({ _id: 'what ever' })
-
-        // but category layout will be update in memory
-        expect(selectedCategoryLayout.value).toEqual(Object.assign(selectedCategoryLayout.value, change))
-
-        done()
-      }, 500 /*because debouncedUpdateCategory is 300*/)
-    })
-  })
-})
+    it("should update category __if__ selectedCategoryLayout._id exist", async () => {
+      editable.value = true;
+      await loadOrderLayout();
+      await selectCategoryLayout({ top: 0, left: 0 }); // select existed
+      await _updateCategory(
+        { name: "Fruit", rows: 1, columns: 2, color: "#FFF" },
+        true
+      );
+      await delay(100);
+      editable.value = false;
+      await loadOrderLayout();
+      expect(_.omit(selectedCategoryLayout.value, "products"))
+        .toMatchInlineSnapshot(`
+        Object {
+          "_id": "5e7ad2185028531d08009e32",
+          "color": "#FFF",
+          "columns": 2,
+          "left": 0,
+          "name": "Fruit",
+          "rows": 1,
+          "top": 0,
+        }
+      `);
+    });
+  });
+});

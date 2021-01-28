@@ -15,13 +15,10 @@ export const productCols = computed(() => selectedCategoryLayout.value && select
 export const categoryName = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value.name)
 export const categoryColor = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value.color)
 
-export const debouncedUpdateCategory = _.debounce(change => {
-  _updateCategory(change, !selectedCategoryLayout.value._id).then(() => {})
-}, 300)
+export const debouncedUpdateCategory = _.debounce(_updateCategory, 300)
 
-async function _updateCategory(change, forceCreate) {
-  // assign change
-  updateSelectedCategoryLayout({...selectedCategoryLayout.value, ...change})
+export async function _updateCategory(change, forceCreate) {
+  updateSelectedCategoryLayout(change)
 
   // if selected product layout is not empty then update it
   // in case of update, because we already update the selectCategoryLayout so we don't need
