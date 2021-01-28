@@ -57,22 +57,22 @@ export default {
     const renderSwitchEditModeDialog = () => (
         <g-dialog v-model={showSwitchEditModeDialog.value} eager width="448">
           {genScopeId(() => (
-              <div className="dialog" onClick={() => showSwitchEditModeDialog.value = false}>
-                <div className="dialog-content">
+              <div class="dialog" onClick={() => showSwitchEditModeDialog.value = false}>
+                <div class="dialog-content">
                   <g-icon>icon-basic-mode</g-icon>
                   <div style="flex: 1; margin-left: 16px">
-                    <p className="dialog-content__title">{t('inventory.basicMode')}</p>
-                    <p className="dialog-content__detail">{t('inventory.basicNote')}</p>
+                    <p class="dialog-content__title">{t('inventory.basicMode')}</p>
+                    <p class="dialog-content__detail">{t('inventory.basicNote')}</p>
                   </div>
                 </div>
-                <div className="dialog-content">
+                <div class="dialog-content">
                   <g-icon>icon-ingredient-mode</g-icon>
                   <div style="flex: 1; margin-left: 16px">
-                    <p className="dialog-content__title">{t('inventory.ingredientMode')}</p>
-                    <p className="dialog-content__detail">{t('inventory.ingredientNote')}</p>
+                    <p class="dialog-content__title">{t('inventory.ingredientMode')}</p>
+                    <p class="dialog-content__detail">{t('inventory.ingredientNote')}</p>
                   </div>
                 </div>
-                <div className="dialog-message">{t('inventory.clickDismiss')}</div>
+                <div class="dialog-message">{t('inventory.clickDismiss')}</div>
               </div>
           ))()}
         </g-dialog>
