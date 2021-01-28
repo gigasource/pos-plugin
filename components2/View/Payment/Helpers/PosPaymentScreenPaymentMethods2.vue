@@ -4,7 +4,7 @@ import { ref, watch, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { isMobile } from '../../../AppSharedStates';
 import { GBadge, GBtn, GIcon } from '../../../../../../backoffice/pos-vue-framework';
-import dialogMultiPayment2 from '../../../OrderView/Helper/dialogMultiPayment2';
+import dialogMultiPayment2 from './dialogMultiPayment2';
 import PosTextfieldNew from '../../../../components/pos-shared-components/POSInput/PosTextfieldNew';
 import { genScopeId, VModel_number } from '../../../utils';
 
@@ -78,17 +78,15 @@ export default {
                            onClick={withModifiers(() => onAddFixedItem(item), ['stop'])}>
                       {
                         (item.icon) &&
-                        <g-icon size="20">
-                          {item.icon} </g-icon>
+                        <g-icon size="20"> {item.icon} </g-icon>
                       }
                       <span class="mr-2" style="text-transform: capitalize">
                         {`${item.type}${item.value ? ` ${t('common.currency', locale.value)}${item.value}` : ''}`}
                       </span>
                       <g-badge inline={true} color="#FF4452" v-slots={{
-                        'badge': () => <>
-                          <div> {getBadgeCount(item)} </div>
-                        </>
-                      }}></g-badge>
+                        'badge': () => <div> {getBadgeCount(item)} </div>
+                      }}>
+                      </g-badge>
                     </g-btn>
                     :
                     <g-btn
@@ -118,7 +116,7 @@ export default {
                              onSubmit={onSaveMulti}>
       </dialog-multi-payment2>
       <dialog-form-input width="40%"
-                         modelValue={showAddTipDialog.value}
+                         v-model={showAddTipDialog.value}
                          keyboard-type="numeric" onSubmit={onSaveTip} keyboard-width="100%" v-slots={{
         'input': () => <>
           <pos-textfield-new ref={tipTextfield}

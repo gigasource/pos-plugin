@@ -3,7 +3,7 @@ import { ref, withModifiers, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getCurrentOrder } from '../../../OrderView/pos-logic-be';
 import PaymentLogicsFactory from '../payment-logics';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { posSettings } from '../../../AppSharedStates';
 import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from '../../../../../../backoffice/pos-vue-framework';
 import { genScopeId } from '../../../utils';
@@ -17,11 +17,12 @@ export default {
     const processing = ref(false)
     const currentOrder = getCurrentOrder()
     const isPayBtnDisabled = computed(() => {
-      if (!currentOrder.payment || processing) return true
+      if (!currentOrder.payment || processing.value) return true
       return paidValue.value < currentOrder.vSum
     })
-    const router = useRoute()
+    const router = useRouter()
     const back = function () {
+      if (processing.value) return
       router.go(-1)
     }
     const pay = async function (isPayBtn) {
@@ -36,6 +37,7 @@ export default {
       })
     }
     const promotion = function () {
+      if (processing.value) return
       emit('promotion')
     }
     return genScopeId(() =>

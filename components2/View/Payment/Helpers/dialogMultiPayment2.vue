@@ -1,10 +1,12 @@
 <script>
 import { useI18n } from 'vue-i18n';
-import { internalValueFactory, VModel_number } from '../../utils'
+import { genScopeId, internalValueFactory, VModel_number } from '../../../utils'
 import { computed, ref } from 'vue';
-import { onCLick_Stop } from '../../../utils/helpers';
-import { getCurrentOrder } from '../pos-logic-be';
+import { onCLick_Stop } from '../../../../utils/helpers';
+import { getCurrentOrder } from '../../../OrderView/pos-logic-be';
+import { getScopeAttrs } from '../../../../utils/helpers';
 
+import _ from 'lodash'
 export default {
   name: 'dialogMultiPayment2',
   setup(props, { emit }) {
@@ -43,8 +45,8 @@ export default {
       { type: 'cash', icon: 'icon-cash' },
       { type: 'card', icon: 'icon-credit_card' },
     ])
-    const cashEditValue = ref('')
-    const cardEditValue = ref('')
+    const cashEditValue = ref(0)
+    const cardEditValue = ref(0)
 
     const cardTextfieldRef = ref(null)
     const cashTextfieldRef = ref(null)
@@ -54,23 +56,19 @@ export default {
     }
 
     const disableConfirmMulti = computed(() => {
-      const number = (+cashEditValue.value) + (+cardEditValue.value);
-      return isNaN(+cashEditValue.value) ||
-          isNaN(+cardEditValue.value) ||
-          number < currentOrder.vSum
+      return cashEditValue.value + cardEditValue.value < currentOrder.vSum
     })
 
     const getRemainingValue = function () {
       if (cashEditValue.value && cardEditValue.value) return 0
-      if (+cashEditValue.value > currentOrder.vSum || +cardEditValue.value > currentOrder.vSum) return 0
-      console.log(cashEditValue.value)
-      if (cashEditValue.value && !isNaN(+cashEditValue.value)) return cardEditValue.value = currentOrder.vSum - (+cashEditValue.value)
-      if (cardEditValue.value && !isNaN(+cardEditValue.value)) cashEditValue.value = currentOrder.vSum - (+cardEditValue.value)
+      if (cashEditValue.value > currentOrder.vSum || cardEditValue.value > currentOrder.vSum) return 0
+      if (cashEditValue.value) return cardEditValue.value = _.round(currentOrder.vSum - cashEditValue.value, 3)
+      cashEditValue.value = _.round(currentOrder.vSum - cardEditValue.value, 3)
     }
     const submit = function () {
       emit('submit', {
-        card: +cardEditValue.value,
-        cash: +cashEditValue.value,
+        card: cardEditValue.value,
+        cash: cashEditValue.value,
       })
     }
     const click = function (ref) {
@@ -89,9 +87,9 @@ export default {
     }
 
 
-    return () => <g-dialog v-model={internalValue.value} width="50%">
-      <g-card class={["dialog-multi-payment", rotate && "rotate"]}>
-        <div class="dialog-multi-payment__header">
+    return genScopeId(() => <g-dialog v-model={internalValue.value} width="50%">
+      <g-card class={["dialog-multi-payment", rotate && "rotate"]}{...getScopeAttrs()}>
+        <div class="dialog-multi-payment__header" {...getScopeAttrs()}>
           <span class="dialog-multi-payment__header-title">Multi Payment</span>
           <g-spacer/>
           <span class="mr-1">Total:</span>
@@ -99,9 +97,9 @@ export default {
             {t('common.currency', locale.value)} {currentOrder.vSum}
           </span>
         </div>
-        <div class="dialog-multi-payment__screen">
+        <div class="dialog-multi-payment__screen" {...getScopeAttrs()}>
           {defaultPaymentList.value.map(item =>
-              <div class="mt-1 mb-2 row-flex align-items-center">
+              <div class="mt-1 mb-2 row-flex align-items-center" >
                 <g-btn-bs backgroundColor={getBackgroundColor(item)} border-radius="2px"
                           style="border: 1px solid #bdbdbd"
                           onClick={() => click(`${item.type}-textfield`)}>
@@ -119,30 +117,28 @@ export default {
         </div>
         <div class="dialog-multi-payment__screen--mobile">
           <g-text-field clearable ref={cardTextfieldRef} outlined label={t('payment.cash')} class="mr-1"
-                        v-model_number={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
-            {{
-              'prepend-inner': () => <g-icon>icon-cash</g-icon>
-            }}
+                        v-model_number={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)} v-slots={{
+            'prepend-inner': () => <g-icon>icon-cash</g-icon>
+          }}>
           </g-text-field>
           <g-text-field clearable ref={cashTextfieldRef} outlined label={t('payment.card')}
-                        v-model_number={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)}>
-            {{
-              'prepend-inner': () => <g-icon>icon-credit_card</g-icon>
-            }}
+                        v-model_number={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)} v-slots={{
+            'prepend-inner': () => <g-icon>icon-credit_card</g-icon>
+          }}>
           </g-text-field>
         </div>
-        <div class="dialog-multi-payment__keyboard">
+        <div class="dialog-multi-payment__keyboard" {...getScopeAttrs()}>
           <pos-keyboard-full
               style="grid-area: 1 / 1 / 5 / 4"
               template={keyboardTemplate.value}
-              items={keyboardItems.value}/>
+              items={keyboardItems.value} {...getScopeAttrs()}/>
         </div>
         <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" disabled={disableConfirmMulti.value}
-                  onClick={onCLick_Stop(submit)}>
+                  onClick={onCLick_Stop(submit)} {...getScopeAttrs()}>
           Confirm
         </g-btn-bs>
       </g-card>
-    </g-dialog>
+    </g-dialog>)
   }
 }
 </script>

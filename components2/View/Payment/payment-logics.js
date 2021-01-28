@@ -5,7 +5,7 @@ import {
   addMultiPayment,
   addPayment,
   addSinglePayment,
-  clearPayment,
+  clearPayment, getPaymentTotal,
   updateOrderWithHooks,
   updatePayment,
   updateSinglePayment
@@ -15,12 +15,10 @@ import {
 const PaymentLogicsFactory = () => {
   const showMultiPaymentDialog = ref(false)
   const showAddTipDialog = ref(false)
-  const tipEditValue = ref('')
-  const cashEditValue = ref('')
-  const cardEditValue = ref('')
-
+  const tipEditValue = ref(0)
+  const cashEditValue = ref(0)
+  const cardEditValue = ref(0)
   const currentOrder = getCurrentOrder()
-
   const defaultPaymentList = ref([
     { type: 'cash', icon: 'icon-cash' },
     { type: 'card', icon: 'icon-credit_card' },
@@ -28,7 +26,7 @@ const PaymentLogicsFactory = () => {
   ])
 
   const paidValue = computed(() => {
-    return _.sumBy(currentOrder.payment, i => +i.value || 0) || 0
+    return getPaymentTotal(currentOrder)
   })
 
   const currentOrderTip = computed(() => {
@@ -60,17 +58,16 @@ const PaymentLogicsFactory = () => {
   }
 
   const onSaveTip = function() {
-    const filtered = currentOrder.payment ? currentOrder.payment.filter(i => i.type !== 'cash' && i.type !== 'card') : []
-    const tip = (+tipEditValue.value) - _.sumBy(filtered, i => i.value) - currentOrder.vSum
-    if (tip <= 0) {
+    if (tipEditValue.value < currentOrder.vSum) {
       return
     }
-    updateSinglePayment(currentOrder, {
+    clearPayment(currentOrder)
+    addSinglePayment(currentOrder, {
       type: 'card',
-      value: +tipEditValue.value
+      value: tipEditValue.value
     })
     showAddTipDialog.value = false
-    tipEditValue.value = ''
+    tipEditValue.value = 0
   }
 
   const onSaveMulti = function({ card, cash }) {

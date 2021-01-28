@@ -1,24 +1,28 @@
 import Payment from "../Payment2";
 import { wrapper, makeWrapper, setComponent } from "../../../test-utils";
+import { getCurrentOrder, prepareOrder } from "../../../OrderView/pos-logic-be";
+import { mockOrder } from "../../../OrderView/__test__/mock-order";
+beforeAll(() => {
+  prepareOrder(mockOrder);
+});
 
 describe("test Pos Payment Screen Keyboard", () => {
   it("should render", async () => {
-    setComponent(Payment);
-    makeWrapper();
+    makeWrapper(Payment);
     expect(wrapper.html()).toMatchInlineSnapshot(`
       <div class="payment">
         <div class="payment-main">
-          <pos-payment-screen-payment-methods-stub>
-          </pos-payment-screen-payment-methods-stub>
-          <pos-payment-screen-keyboard-stub>
-          </pos-payment-screen-keyboard-stub>
+          <pos-payment-screen-payment-methods2-stub>
+          </pos-payment-screen-payment-methods2-stub>
+          <pos-payment-screen-keyboard2-stub>
+          </pos-payment-screen-keyboard2-stub>
         </div>
-        <pos-restaurant-payment-order-detail-stub>
-        </pos-restaurant-payment-order-detail-stub>
-        <pos-restaurant-payment-toolbar-stub>
-        </pos-restaurant-payment-toolbar-stub>
+        <pos-restaurant-payment-order-detail2-stub>
+        </pos-restaurant-payment-order-detail2-stub>
+        <pos-restaurant-payment-toolbar2-stub>
+        </pos-restaurant-payment-toolbar2-stub>
       </div>
-      <g-snackbar-stub modelvalue
+      <g-snackbar-stub modelvalue="false"
                        color="#FFC107"
                        timeout="2000"
                        top="true"
@@ -37,5 +41,10 @@ describe("test Pos Payment Screen Keyboard", () => {
       <dialog-change-value-stub>
       </dialog-change-value-stub>
     `);
+    //test discount
   });
+  it("test discount", () => {
+    const order = getCurrentOrder()
+    onAddPaymentMethod
+  })
 });
