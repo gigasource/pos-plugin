@@ -130,13 +130,13 @@ watch(() => dialog.value.filter, () => {
 
 export function renderFilterDialog(t) {
 	return <dialog-form-input data-jest-filter-dialog v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
-		'input': () => <>
+		input: genScopeId(() => <>
 			<div class="row-flex flex-wrap justify-around mt-2">
 				<pos-textfield-new style="width: 30%" label="Product ID" v-model={temporaryDialogFilter.value.id} clearable>
 				</pos-textfield-new>
 				<pos-textfield-new style="width: 30%" label="Name" v-model={temporaryDialogFilter.value.name} clearable>
 				</pos-textfield-new>
-				<g-select menu-class="menu-select-inventory" text-field-component="PosTextfieldNew" outlined style="width: 30%"
+				<g-select menu-class="menu-select-inventory" text-field-component="GTextFieldBs" outlined style="width: 30%"
 				          label={t('article.category')} clearable items={inventoryCategories.value} item-text="name"
 				          return-object v-model={temporaryDialogFilter.value.category}>
 				</g-select>
@@ -147,10 +147,11 @@ export function renderFilterDialog(t) {
 					</pos-range-slider>
 				</div>
 			</div>
-		</>
+		</>)
 	}}></dialog-form-input>
 }
 
+// PosTextfieldNew
 export function openDialogStock(inventory) {
 	selectedInventory.value = inventory
 	dialog.value.stock = true
