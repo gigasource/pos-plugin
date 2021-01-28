@@ -1,4 +1,5 @@
 import {renderPivotTable} from "./pivot";
+
 const orm = require("schemahandler");
 const {fromReducer, quantityReducer, toReducer, vTaxSumReducer} = require("./report-shared");
 let Order = orm("Order");
@@ -15,11 +16,16 @@ async function staffReport(from, to) {
   let orders = await Order.find(query);
 
   //groupByPayment
-  const payment = orders.reduce((r, order) => r.concat(...order.payment), []);
+  const payment = orders.reduce((r, order) => r.concat(...order.payment.map(p => {
+    return {
+      ...p,
+      user: _.get(order, 'user.0.name', '')
+    }
+  })), []);
 
   let groupByPayment = renderPivotTable(
     {
-      columns: ["type"],
+      columns: ['user', "type"],
       reducers: ["@sum[2]:value"]
     },
     payment
