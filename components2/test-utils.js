@@ -66,8 +66,8 @@ beforeAll(async () => {
     items: [{}],
     table: String
   });
-  await orm("Order").deleteMany();
-  await orm("Commit").deleteMany();
+  orm("Order").deleteMany().then();
+  orm("Commit").deleteMany().then();
 
   orm.plugin(syncPlugin);
   orm.plugin(syncFlow);
@@ -76,15 +76,6 @@ beforeAll(async () => {
   //orm.plugin(require("../backend/commit/actionCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
-});
-
-afterEach(async () => {
-  await orm("Order")
-    .deleteMany()
-    .direct();
-  await orm("Commit")
-    .deleteMany()
-    .direct();
 });
 
 export let actions = [];
