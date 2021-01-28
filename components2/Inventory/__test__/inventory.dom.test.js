@@ -9,7 +9,8 @@ import {
 import _ from 'lodash'
 import {
   inventories,
-  inventoryCategories
+  inventoryCategories,
+  filter
 } from "../inventory-logic-ui";
 import {
   addedCategory
@@ -108,7 +109,18 @@ describe('Test inventory screen', function () {
     });
     await nextTick();
     await delay(50);
-    const component = wrapper.find("[content-class='dialog-inventory-category']")
+    const component = wrapper.find("[data-jest-filter-dialog]")
+    expect(component.exists()).toBe(true)
+    /**
+     * Fake filter action
+     */
+    filter.value = {
+      id: 1,
+      stock: [10, 20]
+    }
+    await nextTick()
+    const showFilter = wrapper.find("[class='filter-wrapper']")
+    expect(showFilter.html()).toMatchSnapshot()
   })
 })
 

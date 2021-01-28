@@ -340,7 +340,7 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
   </dialog-change-stock-stub>
   <dialog-inventory-category-stub>
   </dialog-inventory-category-stub>
-  <dialog-form-input-stub>
+  <dialog-form-input-stub data-jest-filter-dialog="true">
   </dialog-form-input-stub>
 </div>
 `;
@@ -429,59 +429,6 @@ Array [
 `;
 
 exports[`Test inventory screen Case 1: Inventory 3`] = `
-Array [
-  Object {
-    "_id": "0000000000000000000007d3",
-    "amount": 30,
-    "category": "0000000000000000000007cf",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007d2",
-    "type": "add",
-  },
-  Object {
-    "_id": "0000000000000000000007d5",
-    "amount": 50,
-    "category": "0000000000000000000007cf",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007d4",
-    "type": "add",
-  },
-  Object {
-    "_id": "0000000000000000000007d7",
-    "amount": 60.22,
-    "category": "0000000000000000000007cf",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007d6",
-    "type": "add",
-  },
-  Object {
-    "_id": "0000000000000000000007d9",
-    "amount": 100,
-    "category": "0000000000000000000007d0",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007d8",
-    "type": "add",
-  },
-  Object {
-    "_id": "0000000000000000000007db",
-    "amount": 10,
-    "category": "0000000000000000000007d0",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007da",
-    "type": "add",
-  },
-  Object {
-    "_id": "0000000000000000000007dd",
-    "amount": 5.5,
-    "category": "0000000000000000000007d1",
-    "date": 2021-01-04T17:00:00.000Z,
-    "inventory": "0000000000000000000007dc",
-    "type": "add",
-  },
-]
-`;
-
-exports[`Test inventory screen Case 1: Inventory 4`] = `
 Array [
   Object {
     "_id": "0000000000000000000007cf",
@@ -676,4 +623,51 @@ Array [
     "name": "Drink",
   },
 ]
+`;
+
+exports[`Test inventory screen Case 3: Filter dialog 1`] = `
+<td colspan="6"
+    class="filter-wrapper"
+>
+  <div class="filter">
+    settings.filter
+    <div class="group-chip">
+      <g-chip-stub label="true"
+                   small="true"
+                   background-color="white"
+                   close="true"
+                   class="ma-1"
+      >
+        <div>
+          <span class="chip-title">
+            inventory.filter.id:
+          </span>
+          <span class="chip-content">
+            1
+          </span>
+        </div>
+      </g-chip-stub>
+      <g-chip-stub label="true"
+                   small="true"
+                   background-color="white"
+                   close="true"
+                   class="ma-1"
+      >
+        <div>
+          <span class="chip-title">
+            inventory.filter.stock:
+          </span>
+          <span class="chip-content">
+            [10 - 20]
+          </span>
+        </div>
+      </g-chip-stub>
+    </div>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <div class="btn-add-filter">
+      + inventory.addFilter
+    </div>
+  </div>
+</td>
 `;

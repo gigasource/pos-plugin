@@ -156,6 +156,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-toolbar': true,
         'g-snackbar': true,
         'g-checkbox': true,
+        'g-chip': true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
         //'pos-order-split-order': true,
