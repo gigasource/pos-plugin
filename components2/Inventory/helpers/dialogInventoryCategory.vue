@@ -11,6 +11,11 @@ import {
   updateInventoryCategories
 } from '../inventory-logic-be'
 import { genScopeId } from '../../utils';
+import {
+  addedCategory,
+  showKeyboard,
+  rules
+} from './dialog-inventory-category-logic'
 
 export default {
   name: "dialogInventoryCategory",
@@ -20,8 +25,6 @@ export default {
   emits: ['update:modelValue'],
   setup(props, context) {
     const { t } = useI18n()
-    const showKeyboard = ref(false)
-    const addedCategory = ref([])
 
     const internalValue = computed({
       get: () => {
@@ -31,11 +34,6 @@ export default {
         showKeyboard.value = false
         context.emit('update:modelValue', value)
       }
-    })
-    const rules = computed(() => {
-      let rules = []
-      rules.push(val => inventoryCategories.value.filter(cate => cate === val).length <= 1 || '')
-      return rules
     })
 
     watch(internalValue, async (val) => {

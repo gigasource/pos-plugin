@@ -4,15 +4,21 @@ import {
 	loadInventories,
 	loadInventoryCategories,
 	updateInventory,
-	loadInventoryHistories, createInventory, deleteInventory, updateInventoryCategories
+	createInventory, deleteInventory, updateInventoryCategories
 } from "../inventory-logic-be";
 import _ from 'lodash'
-import {inventories, inventoryCategories, inventoryHistories} from "../inventory-logic-ui";
+import { inventories, inventoryCategories } from "../inventory-logic-ui";
+import {
+	filteredInventoryHistories,
+	historyFilter
+} from '../inventory-ui-shared'
 const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());
+const moment = require('moment')
 const {
   prepareInventoryDb
 } = require("../../../backend/inventory/inventory.prepare.test");
+const delay = require('delay')
 
 jest.mock("cms", () => {
   process.env.USE_GLOBAL_ORM = true;
@@ -40,23 +46,28 @@ describe("Test inventory logic be", function() {
 	  await prepareInventoryDb(orm);
 	  await loadInventoryCategories();
 	  await loadInventories();
-	  await loadInventoryHistories();
   })
   it("Case 1: Check load inventories", async () => {
     await nextTick()
     expect(stringify(inventories.value)).toMatchSnapshot();
     expect(stringify(inventoryCategories.value)).toMatchSnapshot();
-    expect(stringify(inventoryHistories.value)).toMatchSnapshot()
   });
   it('Case 2: Update inventory', async () => {
+  	await nextTick()
   	await updateInventory({
 		  ...inventories.value[0],
 		  ...{
 		  	stock: 20
 		  }
 	  })
-	  expect(stringify(inventories.value)).toMatchSnapshot()
-	  expect(stringify(inventoryHistories.value)).toMatchSnapshot()
+	  const a = inventories.value
+	  historyFilter.value = {
+  		fromDate: moment('04.01.2021', 'DD.MM.YYYY').toDate(),
+			toDate: moment('06.01.2021', 'DD.MM.YYYY').toDate()
+		}
+		await nextTick()
+		await delay(50)
+	  expect(stringify(filteredInventoryHistories.value)).toMatchSnapshot()
 	  await updateInventory({
 		  ...inventories.value[1],
 		  ...{

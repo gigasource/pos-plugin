@@ -38,8 +38,8 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
     </thead>
     <tr>
       <td class="bg-grey-lighten-1">
-        <g-checkbox-stub modelvalue="[object Object]"
-                         value="[object Object]"
+        <g-checkbox-stub modelvalue
+                         value="0000000000000000000007d2,0000000000000000000007d4,0000000000000000000007d6,0000000000000000000007d8,0000000000000000000007da,0000000000000000000007dc"
                          multiple="true"
         >
         </g-checkbox-stub>
@@ -51,11 +51,6 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
           settings.filter
           <div class="group-chip">
           </div>
-          <g-btn-bs-stub>
-            <u>
-              settings.clearAll
-            </u>
-          </g-btn-bs-stub>
           <g-spacer-stub>
           </g-spacer-stub>
           <div class="btn-add-filter">
@@ -67,7 +62,40 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
     <tr>
       <td>
         <g-checkbox-stub modelvalue
-                         value="5ff3ac00c7986615546e2b84"
+                         value="0000000000000000000007d2"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        1
+      </td>
+      <td>
+        Fish
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Food
+      </td>
+      <td>
+        kg
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          30
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="0000000000000000000007d4"
         >
         </g-checkbox-stub>
       </td>
@@ -100,7 +128,40 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
     <tr>
       <td>
         <g-checkbox-stub modelvalue
-                         value="5ff3ac00c7986615546e2b88"
+                         value="0000000000000000000007d6"
+        >
+        </g-checkbox-stub>
+      </td>
+      <td>
+        3
+      </td>
+      <td>
+        Pork
+      </td>
+      <td>
+        05/01/2021 00:00
+      </td>
+      <td>
+        Food
+      </td>
+      <td>
+        kg
+      </td>
+      <td>
+        <div class="row-flex justify-between">
+          60.22
+          <g-icon-stub size="18"
+                       color="#757575"
+          >
+            edit
+          </g-icon-stub>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <g-checkbox-stub modelvalue
+                         value="0000000000000000000007d8"
         >
         </g-checkbox-stub>
       </td>
@@ -133,7 +194,7 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
     <tr>
       <td>
         <g-checkbox-stub modelvalue
-                         value="5ff3ac00c7986615546e2b8a"
+                         value="0000000000000000000007da"
         >
         </g-checkbox-stub>
       </td>
@@ -166,7 +227,7 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
     <tr>
       <td>
         <g-checkbox-stub modelvalue
-                         value="5ff3ac00c7986615546e2b8c"
+                         value="0000000000000000000007dc"
         >
         </g-checkbox-stub>
       </td>
@@ -282,4 +343,337 @@ exports[`Test inventory screen Case 1: Inventory 1`] = `
   <dialog-form-input-stub>
   </dialog-form-input-stub>
 </div>
+`;
+
+exports[`Test inventory screen Case 1: Inventory 2`] = `
+Array [
+  Object {
+    "_id": "0000000000000000000007d2",
+    "category": Object {
+      "_id": "0000000000000000000007cf",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "1",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Fish",
+    "stock": 30,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "0000000000000000000007d4",
+    "category": Object {
+      "_id": "0000000000000000000007cf",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "2",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Meat",
+    "stock": 50,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "0000000000000000000007d6",
+    "category": Object {
+      "_id": "0000000000000000000007cf",
+      "available": false,
+      "name": "Food",
+    },
+    "id": "3",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Pork",
+    "stock": 60.22,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "0000000000000000000007d8",
+    "category": Object {
+      "_id": "0000000000000000000007d0",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "4",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Apple",
+    "stock": 100,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "0000000000000000000007da",
+    "category": Object {
+      "_id": "0000000000000000000007d0",
+      "available": false,
+      "name": "Fruit",
+    },
+    "id": "5",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Banana",
+    "stock": 10,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "0000000000000000000007dc",
+    "category": Object {
+      "_id": "0000000000000000000007d1",
+      "available": false,
+      "name": "Drink",
+    },
+    "id": "6",
+    "lastUpdateTimestamp": 2021-01-04T17:00:00.000Z,
+    "name": "Vodka",
+    "stock": 5.5,
+    "unit": "l",
+  },
+]
+`;
+
+exports[`Test inventory screen Case 1: Inventory 3`] = `
+Array [
+  Object {
+    "_id": "0000000000000000000007d3",
+    "amount": 30,
+    "category": "0000000000000000000007cf",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007d2",
+    "type": "add",
+  },
+  Object {
+    "_id": "0000000000000000000007d5",
+    "amount": 50,
+    "category": "0000000000000000000007cf",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007d4",
+    "type": "add",
+  },
+  Object {
+    "_id": "0000000000000000000007d7",
+    "amount": 60.22,
+    "category": "0000000000000000000007cf",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007d6",
+    "type": "add",
+  },
+  Object {
+    "_id": "0000000000000000000007d9",
+    "amount": 100,
+    "category": "0000000000000000000007d0",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007d8",
+    "type": "add",
+  },
+  Object {
+    "_id": "0000000000000000000007db",
+    "amount": 10,
+    "category": "0000000000000000000007d0",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007da",
+    "type": "add",
+  },
+  Object {
+    "_id": "0000000000000000000007dd",
+    "amount": 5.5,
+    "category": "0000000000000000000007d1",
+    "date": 2021-01-04T17:00:00.000Z,
+    "inventory": "0000000000000000000007dc",
+    "type": "add",
+  },
+]
+`;
+
+exports[`Test inventory screen Case 1: Inventory 4`] = `
+Array [
+  Object {
+    "_id": "0000000000000000000007cf",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "0000000000000000000007d0",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "0000000000000000000007d1",
+    "available": false,
+    "name": "Drink",
+  },
+]
+`;
+
+exports[`Test inventory screen Case 2: Category dialog 1`] = `
+<g-dialog-stub fullscreen="true"
+               modelvalue="true"
+               content-class="dialog-inventory-category"
+>
+  <div class="dialog">
+    <div class="dialog-center">
+      <div class="category">
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Food"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Fruit"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Drink"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+      </div>
+      <p>
+        * inventory.onlyEmpty
+      </p>
+      <div class="dialog-action">
+        <g-btn-bs-stub data-jest-addcategory="true"
+                       icon="add"
+                       background-color="#1271FF"
+        >
+          article.category
+        </g-btn-bs-stub>
+        <g-btn-bs-stub data-jest-complete="true"
+                       background-color="#388E3C"
+        >
+          inventory.complete
+        </g-btn-bs-stub>
+      </div>
+    </div>
+    <div class="dialog-overlay">
+    </div>
+  </div>
+</g-dialog-stub>
+`;
+
+exports[`Test inventory screen Case 2: Category dialog 2`] = `
+<g-dialog-stub fullscreen="true"
+               modelvalue="true"
+               content-class="dialog-inventory-category"
+>
+  <div class="dialog">
+    <div class="dialog-left">
+      <div class="category">
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="TestCategory"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn category-item__btn--delete">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Food"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Fruit"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+        <div class="category-item">
+          <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
+                                virtual-event="true"
+                                modelvalue="Drink"
+          >
+          </g-text-field-bs-stub>
+          <div class="category-item__btn">
+            <g-icon-stub>
+              icon-delete2
+            </g-icon-stub>
+          </div>
+        </div>
+      </div>
+      <p>
+        * inventory.onlyEmpty
+      </p>
+      <div class="dialog-action">
+        <g-btn-bs-stub data-jest-addcategory="true"
+                       icon="add"
+                       background-color="#1271FF"
+        >
+          article.category
+        </g-btn-bs-stub>
+        <g-btn-bs-stub data-jest-complete="true"
+                       background-color="#388E3C"
+        >
+          inventory.complete
+        </g-btn-bs-stub>
+      </div>
+    </div>
+    <div class="dialog-keyboard">
+      <pos-keyboard-full-stub type="alpha-number">
+      </pos-keyboard-full-stub>
+    </div>
+    <div class="dialog-overlay">
+    </div>
+  </div>
+</g-dialog-stub>
+`;
+
+exports[`Test inventory screen Case 2: Category dialog 3`] = `
+Array [
+  Object {
+    "_id": "0000000000000000000007de",
+    "available": true,
+    "name": "TestCategory",
+  },
+  Object {
+    "_id": "0000000000000000000007cf",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "0000000000000000000007d0",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "0000000000000000000007d1",
+    "available": false,
+    "name": "Drink",
+  },
+]
 `;

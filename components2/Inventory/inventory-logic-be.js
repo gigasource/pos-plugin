@@ -1,9 +1,9 @@
 import cms from 'cms'
 import {
 	inventories,
-	inventoryCategories,
-	inventoryHistories
+	inventoryCategories
 } from './inventory-logic-ui'
+import dayjs from 'dayjs'
 import {ObjectID} from "bson"
 import _ from 'lodash'
 
@@ -23,8 +23,14 @@ export async function loadInventoryCategories() {
 	inventoryCategories.value = await InventoryCategory.find()
 }
 
-export async function loadInventoryHistories() {
-	inventoryHistories.value = await InventoryHistory.find()
+export async function loadInventoryHistories(filter) {
+	const condition = {}
+	if (filter.fromDate) {
+		const fromDate = dayjs(filter.fromDate).startOf('day').toDate()
+		const toDate = dayjs(filter.toDate).endOf('day').toDate()
+		Object.assign(condition, {date: {$gte: fromDate, $lte: toDate}})
+	}
+	return await InventoryHistory.find(condition).sort({date: -1})
 }
 
 export async function createInventory(inventory) {
@@ -89,7 +95,6 @@ export async function updateInventory({ _id, name, category, unit, stock, lowSto
 }
 
 export async function updateInventoryHistory(history) {
-	inventoryHistories.value.push(history)
 	await InventoryHistory.create(history)
 }
 

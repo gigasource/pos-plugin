@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Test inventory logic ui Case 2: Test inventory categories 1`] = `
+Array [
+  Object {
+    "_id": "1",
+    "available": false,
+    "name": "Food",
+  },
+  Object {
+    "_id": "2",
+    "available": false,
+    "name": "Fruit",
+  },
+  Object {
+    "_id": "3",
+    "available": true,
+    "name": "Cream",
+  },
+]
+`;
+
 exports[`Test inventory logic ui Case 2: Test inventory histories 1`] = `
 Array [
   Object {
