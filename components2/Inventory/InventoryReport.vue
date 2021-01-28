@@ -34,14 +34,18 @@ export default {
     })
 
     onActivated(async () => {
-      historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
-      historyFilter.value.toDate = dayjs().format('YYYY-MM-DD')
+      historyFilter.value = Object.assign(historyFilter.value, {
+        fromDate: dayjs().format('YYYY-MM-DD'),
+        toDate: dayjs().format('YYYY-MM-DD')
+      })
       selectedCategory.value = 'all'
     })
 
     onDeactivated(async () => {
-      historyFilter.value.fromDate = dayjs().format('YYYY-MM-DD')
-      historyFilter.value.toDate = dayjs().format('YYYY-MM-DD')
+      historyFilter.value = Object.assign(historyFilter.value, {
+        fromDate: dayjs().format('YYYY-MM-DD'),
+        toDate: dayjs().format('YYYY-MM-DD')
+      })
       selectedCategory.value = 'all'
     })
 

@@ -18,6 +18,7 @@ const moment = require('moment')
 const {
   prepareInventoryDb
 } = require("../../../backend/inventory/inventory.prepare.test");
+const delay = require('delay')
 
 jest.mock("cms", () => {
   process.env.USE_GLOBAL_ORM = true;
@@ -60,8 +61,12 @@ describe("Test inventory logic be", function() {
 		  }
 	  })
 	  const a = inventories.value
-	  historyFilter.value.fromDate = moment('04.01.2021', 'DD.MM.YYYY').toDate()
-	  historyFilter.value.toDate = moment('06.01.2021', 'DD.MM.YYYY').toDate()
+	  historyFilter.value = {
+  		fromDate: moment('04.01.2021', 'DD.MM.YYYY').toDate(),
+			toDate: moment('06.01.2021', 'DD.MM.YYYY').toDate()
+		}
+		await nextTick()
+		await delay(50)
 	  expect(stringify(filteredInventoryHistories.value)).toMatchSnapshot()
 	  await updateInventory({
 		  ...inventories.value[1],

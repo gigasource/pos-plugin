@@ -197,9 +197,12 @@ export function formatDate(date) {
  *   }
  * }
  */
-export const historyFilter = ref({})
+export const historyFilter = ref({
+	fromDate: dayjs().format('YYYY-MM-DD'),
+	toDate: dayjs().format('YYYY-MM-DD')
+})
 export const filteredInventoryHistories = ref([])
-watchEffect(async () => {
+watch(() => historyFilter.value, async () => {
 	const inventoryHistories = await loadInventoryHistories(historyFilter.value)
 
 	const getAmount = (histories, mode) => {
@@ -210,14 +213,9 @@ watchEffect(async () => {
 			return acc
 		}, 0)
 	}
-	const inventoryHistoriesFiltered = inventoryHistories.filter(item => {
-		if ((historyFilter.fromDate && historyFilter.fromDate.getTime() > item.date.getTime())
-			|| (historyFilter.toDate && historyFilter.toDate.getTime() < item.date.getTime()))
-			return false
-		return true
-	})
+
 	filteredInventoryHistories.value = _.map(
-		_.groupBy(inventoryHistoriesFiltered, history => history.inventory),
+		_.groupBy(inventoryHistories, history => history.inventory),
 		(group, inventory) => {
 			return {
 				inventory,
@@ -232,5 +230,4 @@ watchEffect(async () => {
 		...item,
 		...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
 	}))
-	const a = filteredInventoryHistories.value
-})
+}, { deep: true })
