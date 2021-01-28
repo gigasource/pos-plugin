@@ -29,7 +29,9 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory1.vue', name: 'Inventory1', path: '/pos1-inventory' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport1.vue', name: 'InventoryReport1', path: '/pos1-inventory-report' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryStock1.vue', name: 'InventoryStock1', path: '/pos1-inventory-stock' },
-    { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
+    //{ loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
+    { loader: { type: 'route' }, filePath: 'components2/EndOfDay/PosEndOfDayReport.vue', name: 'PosEndOfDayReport', path: '/pos-eod-report' },
+
     // { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },

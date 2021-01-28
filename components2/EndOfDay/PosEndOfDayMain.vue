@@ -3,10 +3,17 @@ import {useI18n} from 'vue-i18n'
 import {onActivated, onMounted, ref} from 'vue'
 import PosEndOfDayDatePicker from "./PosEndOfDayDatePicker";
 import dayjs from 'dayjs'
-import {eventDates, getDailyReports, getEodReportsInMonthCalender, selectedDate} from "./eod-shared";
+import {
+  eventDates,
+  getDailyReports,
+  getEodReportsInMonthCalender,
+  selectedDate,
+  selectedDateString
+} from "./eod-shared";
+import {genScopeId} from "../utils";
 
 export default {
-  components:{PosEndOfDayDatePicker},
+  components: {PosEndOfDayDatePicker},
   setup() {
     const {t} = useI18n();
 
@@ -29,31 +36,28 @@ export default {
       await getEodReportsInMonthCalender(date);
     }
 
-    onMounted(async () => {
-      const currentDate = dayjs().format('YYYY-MM-DD');
-      await getEodReportsInMonthCalender(currentDate);
-
-    })
+    const currentDate = dayjs().format('YYYY-MM');
+    getEodReportsInMonthCalender(currentDate);
 
     onActivated(async () => {
-      const currentDate = dayjs().format('YYYY-MM-DD');
+      const currentDate = dayjs().format('YYYY-MM');
       await getEodReportsInMonthCalender(currentDate);
     })
 
-    return () => <>
-      <div style="height: 100%; background-color: #EEEEEE;">
-        <pos-end-of-day-date-picker
-            eventDates={eventDates.value}
-            firstDayOfWeek={1}
-            monthSelectDisabled={true}
-            weekdayFormat={getDay} color="#fff"
-            full-width no-title
-            modelValue={selectedDate.value}
-            onClick:prev={getDatesWithReport}
-            onClick:next={getDatesWithReport}>
-        </pos-end-of-day-date-picker>
-      </div>
-    </>
+    return genScopeId(() => (
+        <div style="height: 100%; background-color: #EEEEEE;">
+          <pos-end-of-day-date-picker
+              eventDates={eventDates.value}
+              firstDayOfWeek={1}
+              monthSelectDisabled={true}
+              weekdayFormat={getDay} color="#fff"
+              full-width no-title
+              modelValue={selectedDateString.value}
+              onClick:prev={getDatesWithReport}
+              onClick:next={getDatesWithReport}>
+          </pos-end-of-day-date-picker>
+        </div>
+    ))
   }
 }
 </script>

@@ -84,6 +84,10 @@ export const PosEndOfDayDatePicker = {
       type: [Array],
       default: () => ([]),
     },
+    _computedDatesInMonthCustom: {
+      type: null,
+      default: () => _computedDatesInMonthCustom
+    }
   },
   emits: ['update:modelValue'],
   setup(props, context) {
@@ -94,7 +98,7 @@ export const PosEndOfDayDatePicker = {
       dateTableModel,
       monthTableModel,
       state,
-    } = GDatePickerUtil(Object.assign({}, props, {_computedDatesInMonthCustom}), context)
+    } = GDatePickerUtil(props, context)
 
     // Title render function
     const cptDatePickerTitleClass = computed(() => ({
@@ -360,8 +364,9 @@ export const PosEndOfDayDatePicker = {
     const datePickerBodyRenderFn = () => state.activePicker === 'year' ? yearListRenderFn() : [headerRenderFn(), dateMonthTableRenderFn()]
 
     // datepicker render function
-    function datePickerRenderFn() {
+    const datePickerRenderFn = genScopeId(() => {
       const slots = {
+        default: () => datePickerBodyRenderFn(),
         title: () => datePickerTitleRenderFn(),
         actions: () => context.slots.default && context.slots.default()
       }
@@ -374,22 +379,10 @@ export const PosEndOfDayDatePicker = {
           noTitle={props.noTitle}
           disabled={props.disabled}
           vSlots={slots}>
-          {datePickerBodyRenderFn()}
         </g-picker>
       )
-    }
+    });
 
-    return {
-      datePickerRenderFn,
-      titleModel,
-      yearModel,
-      headerModel,
-      dateTableModel,
-      monthTableModel,
-      state,
-    }
-  },
-  render() {
-    return genScopeId(this.datePickerRenderFn)();
+    return datePickerRenderFn;
   }
 }
