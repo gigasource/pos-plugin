@@ -15,12 +15,13 @@ import {
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
 import {loadKeyboardConfig} from "./order-layout-keyboard";
-import {editable, orderLayout} from "./pos-ui-shared";
+import { editable, orderLayout, loadOrderLayout } from './pos-ui-shared';
 import {payPrintMode, showIcon} from "./pos-logic-be";
 import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";
 import cms from 'cms';
 import {genScopeId} from "../utils";
+import _ from 'lodash'
 
 export default {
   name: 'PosOrderLayout2',
@@ -34,10 +35,6 @@ export default {
   emits: ['update:selectedCategoryLayout', 'update:selectedProductLayout', 'update:view', 'update:orderLayout', 'update:keyboardConfig', 'update:productDblClicked', 'addModifierToProduct', 'addProductToOrder'],
   setup(props) {
     editable.value = props.editable;
-
-    async function loadOrderLayout(type = 'default') {
-      orderLayout.value = await cms.getModel('OrderLayout').findOne({type});
-    }
 
     const route = useRoute();
     //todo: render keyboard in factory
@@ -54,14 +51,20 @@ export default {
       })
     }
 
-    onBeforeMount(created)
-    onActivated(created)
+    // execute created twice ???
+    onBeforeMount(async() => {
+      console.log('onBeforeMount')
+      await created()
+    })
+    onActivated(async () => {
+      console.log('onActivated')
+      await created()
+    })
 
     onBeforeUnmount(() => cms.socket.off('updateOrderLayouts'))
     onDeactivated(() => cms.socket.off('updateProductProps'))
 
     const displayOverlay = computed(() => {
-      console.log(showOverlay.value && showIcon.value);
       return showOverlay.value && showIcon.value
     })
 

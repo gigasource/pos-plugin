@@ -1,25 +1,24 @@
-import cms from "cms";
-import dialogEditPopupModifiers2 from "../dialogEditPopupModifiers2";
-import { nextTick, onUpdated, ref } from "vue";
-import { stringify } from "schemahandler/utils";
-import _ from "lodash";
-import { setComponent, wrapper, makeWrapper } from "../../test-utils";
+import cms from 'cms';
+import dialogEditPopupModifiers2 from '../dialogEditPopupModifiers2';
+import { nextTick } from 'vue';
+import { stringify } from 'schemahandler/utils';
+import _ from 'lodash';
+import { makeWrapper, setComponent, wrapper } from '../../../test-utils';
 import {
+  activeItem,
+  categories,
   currentGroup,
+  currentGroupIdx,
   modifiers,
   onCreateItem,
-  onSelect,
+  onDeleteActiveItem,
+  onDuplicate,
   onRemoveItem,
-  currentGroupIdx,
-  categories,
-  activeItem,
-  onUpdateItem,
-  deleteActiveItem
-} from "../modifier-ui-logics";
-import delay from "delay";
-import { ObjectID } from "bson";
-import { CRUdFactory } from "../CRUD/crud";
-import { CRUdDbFactory } from "../CRUD/crud-db";
+  onSelect,
+  onUpdateItem
+} from '../modifier-ui-logics';
+import delay from 'delay';
+import { isSameId } from '../../../utils';
 
 // const group1 = { _id: new ObjectID(), name: "g1", categories: [] };
 // const group2 = { _id: new ObjectID(), name: "g2", categories: [] };
@@ -46,6 +45,7 @@ describe("test dialog edit popup modifier UI", () => {
         "_id": "ObjectID",
         "categories": Array [],
         "name": "New Group",
+        "type": "group",
       }
     `);
     const firstGroupTmp = _.cloneDeep(activeItem.value);
@@ -74,6 +74,7 @@ describe("test dialog edit popup modifier UI", () => {
               },
             ],
             "name": "New Group",
+            "type": "group",
           },
         ],
       }
@@ -123,6 +124,7 @@ describe("test dialog edit popup modifier UI", () => {
               },
             ],
             "name": "New Group",
+            "type": "group",
           },
         ],
       }
@@ -167,6 +169,7 @@ describe("test dialog edit popup modifier UI", () => {
               },
             ],
             "name": "New Group",
+            "type": "group",
           },
         ],
       }
@@ -184,6 +187,7 @@ describe("test dialog edit popup modifier UI", () => {
             "_id": "ObjectID",
             "categories": Array [],
             "name": "New Group",
+            "type": "group",
           },
         ],
       }
@@ -200,17 +204,19 @@ describe("test dialog edit popup modifier UI", () => {
             "_id": "ObjectID",
             "categories": Array [],
             "name": "New Group",
+            "type": "group",
           },
           Object {
             "_id": "ObjectID",
             "categories": Array [],
             "name": "second group",
+            "type": "group",
           },
         ],
       }
     `);
     onSelect({ ...firstGroupTmp }, "group");
-    await deleteActiveItem();
+    await onDeleteActiveItem();
     expect(stringify(modifiers.value)).toMatchInlineSnapshot(`
       Object {
         "_id": "ObjectID",
@@ -219,6 +225,7 @@ describe("test dialog edit popup modifier UI", () => {
             "_id": "ObjectID",
             "categories": Array [],
             "name": "second group",
+            "type": "group",
           },
         ],
       }
@@ -233,9 +240,23 @@ describe("test dialog edit popup modifier UI", () => {
             "_id": "ObjectID",
             "categories": Array [],
             "name": "second group",
+            "type": "group",
           },
         ],
       }
     `);
+    const firstCategory = await onCreateItem(
+      `groups.${currentGroupIdx.value}.categories`,
+      "category"
+    );
+    await onDuplicate();
+    expect(modifiers.value.groups.length).toEqual(2);
+    expect(modifiers.value.groups[1].categories.length).toEqual(1);
+    expect(
+      isSameId(
+        modifiers.value.groups[1].categories[0],
+        modifiers.value.groups[0].categories[0]
+      )
+    ).toBeFalsy();
   });
 });

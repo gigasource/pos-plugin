@@ -50,7 +50,7 @@ async function changeKeyboardExtension(val) {
   keyboardConfig.value = config;
 }
 
-function opendDialogEdit(position) {
+function openDialogEdit(position) {
   dialog.position = position
   dialog.value = true
 }
@@ -58,9 +58,9 @@ function opendDialogEdit(position) {
 export function orderLayoutKeyboardFactory() {
   const renderKeyboard = () => (
     <>
-      {showCalculator && <pos-order-keyboard keyboard-config={keyboardConfig}
+      {showCalculator.value && <pos-order-keyboard keyboard-config={keyboardConfig.value}
                            mode={editable.value ? 'edit' : 'active'}
-                           onEdit_keyboard={(e) => opendDialogEdit(e)}
+                           onEdit:keyboard={e => openDialogEdit(e)}
                            onOpenDialogSearch={() => dialog.search = true}/>}
       <dialog-text-filter v-model={dialog.value} onSubmit={e => changeKeyboardExtension(e)}/>
       <dialog-product-search-result v-model={dialog.search}/>

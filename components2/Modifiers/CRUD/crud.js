@@ -2,6 +2,19 @@ import * as _ from 'lodash'
 
 import { ObjectID} from 'bson';
 
+
+/**
+ * @param {Object} obj
+ * @param {String} path
+ * example
+ * obj = {}
+ * path = 'items'
+ * const { create, update, remove } = CRUdFactory(obj, path)
+ * create( { name: 'item1' }
+ * Result: obj = { items: [ { name: item1 }]}
+ *
+ * When using remove and update function, you should provide object 's _id
+ */
 export const CRUdFactory = function(obj, path) {
   const create = function(newObj) {
     const _newObj = _.cloneDeep(newObj)

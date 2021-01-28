@@ -13,25 +13,17 @@
     setup() {
       const { t } = useI18n()
       const router = useRouter()
-      function back() {
-        router.push({ path: '/pos-dashboard' })
-      }
-
-      // TODO: Figure how to bring keyboardConfig, product edit mode (basic, ingredient) stuff to another file
-      function renderToolbarButtons() {
-        return <>
-          <g-btn-bs elevation="2" icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
-          <portal-target name={constants.portalLeftButtons}></portal-target>
-          <g-spacer></g-spacer>
-          <portal-target name={constants.portalRightButtons}></portal-target>
-          <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={() => updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
-        </>
-      }
 
       return genScopeId(() => <>
         <div style="height: 100%; width: 100%">
           <g-toolbar height="100%" elevation="0" color="#eee">
-            { genScopeId(renderToolbarButtons)() }
+            { genScopeId(() => <>
+              <g-btn-bs elevation="2" icon="icon-back" onClick={() => router.push({ path: '/pos-dashboard' })}>{t('ui.back')}</g-btn-bs>
+              <portal-target name={constants.portalLeftButtons}></portal-target>
+              <g-spacer></g-spacer>
+              <portal-target name={constants.portalRightButtons}></portal-target>
+              <g-btn-bs elevation="2" icon="fas fa-calculator" onClick={() => updateView('KeyboardEditor')}>{t('restaurant.menuEdit.editKeyboard')}</g-btn-bs>
+            </>)() }
           </g-toolbar>
         </div>
       </>)

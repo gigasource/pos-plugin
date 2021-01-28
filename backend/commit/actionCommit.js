@@ -1,6 +1,31 @@
 const _ = require('lodash')
+const uuid = require('uuid')
+const jsonFn = require('json-fn')
 
 module.exports = async function (orm, cms) {
+	orm.registerCommitBaseCollection('Action')
+
+	const Action = orm('Action')
+	cms.emitAction = async (action, ...args) => {
+		const actionId = uuid.v4()
+		const cb = typeof _.last(args) === 'function' ? _.last(args) : null
+		orm.once(`action:${actionId}`, function () {
+			this.value = cb
+		})
+		await Action.create({
+			eventName: action,
+			args: jsonFn.stringify(cb ? args.slice(0, -1) : args)
+		}).commit('emit', { actionId })
+	}
+
+	orm.on('commit:handler:finish:Action', async function (action, commit) {
+		if (action && action.eventName) {
+			const { value: cb } = orm.emit(`action:${commit.data.actionId}`)
+			const args = jsonFn.parse(action.args)
+			cms.emit(action.eventName, ...args, cb)
+		}
+	})
+
 	if (orm.mode !== 'multi') {
 		let onlineDevice
 

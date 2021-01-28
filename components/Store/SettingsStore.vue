@@ -708,7 +708,6 @@
         this.selectedPrinterMenu = this.printerSidebar.find(s => s.slot === 'general')
       },
       async loadUsbPrinters() {
-        console.log('SettingStore: load-usb-printers')
         try {
           cms.socket.emit('load-usb-printers', deviceList => {
             console.log('SettingsStore:loadUsbPrinters', deviceList)

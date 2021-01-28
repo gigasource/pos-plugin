@@ -3,9 +3,9 @@ import { showNotify } from '../../AppSharedStates';
 import _ from 'lodash'
 import orderLayoutApi from '../orderLayoutApi';
 import {
-  orderLayout,
+  loadOrderLayout,
+  orderLayout, selectCategoryLayout,
   selectedCategoryLayout,
-  updateOrderLayout,
   updateSelectedCategoryLayout
 } from '../../OrderView/pos-ui-shared'
 
@@ -15,13 +15,10 @@ export const productCols = computed(() => selectedCategoryLayout.value && select
 export const categoryName = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value.name)
 export const categoryColor = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value.color)
 
-export const debouncedUpdateCategory = _.debounce(change => {
-  _updateCategory(change, !selectedCategoryLayout.value._id).then(() => {})
-}, 300)
+export const debouncedUpdateCategory = _.debounce(_updateCategory, 300)
 
-async function _updateCategory(change, forceCreate) {
-  // assign change
-  updateSelectedCategoryLayout({...selectedCategoryLayout.value, ...change})
+export async function _updateCategory(change, forceCreate) {
+  updateSelectedCategoryLayout(change)
 
   // if selected product layout is not empty then update it
   // in case of update, because we already update the selectCategoryLayout so we don't need
@@ -32,9 +29,9 @@ async function _updateCategory(change, forceCreate) {
   } else if (forceCreate)  {
     // otherwise, create new if forceCreate
     // in case of create new, we need to emit an event to update category layout _id
-    const result = await orderLayoutApi.createCategoryLayout(orderLayout.value._id, selectedCategoryLayout.value)
+    await orderLayoutApi.createCategoryLayout(orderLayout.value._id, _.omit(selectedCategoryLayout.value, 'products'))
     showNotify();
-    updateOrderLayout(result)
+    await loadOrderLayout()
   }
 }
 
@@ -45,10 +42,10 @@ export const canDelete = computed(() => {
   return cateExist && !cateHasItem
 })
 export async function deleteCategory() {
-  const result = await orderLayoutApi.deleteCategory(orderLayout.value._id, selectedCategoryLayout.value._id)
+  await orderLayoutApi.deleteCategory(orderLayout.value._id, selectedCategoryLayout.value._id)
   showNotify()
-  updateSelectedCategoryLayout(null)
-  updateOrderLayout(result)
+  selectCategoryLayout({top: 0, left: 0})
+  await loadOrderLayout()
 }
 
 // actions
@@ -66,10 +63,11 @@ function _clearAction() {
   actionTarget = null
 }
 async function _execAction() {
-  if (action.value === 'switch') {
+  if (_action === 'switch') {
     await switchCategory()
+  } else {
+    console.log('_execAction unsupported:', _action)
   }
-  _clearAction()
 }
 
 // watch category layout change then trigger category layout action automatically
@@ -83,6 +81,7 @@ watch(() => selectedCategoryLayout.value, async () => {
 // switch
 export const canSwitch = computed(() => selectedCategoryLayout.value && selectedCategoryLayout.value._id)
 async function switchCategory() {
-  const result = await orderLayoutApi.switchCategory(actionTarget, selectedCategoryLayout.value)
-  updateOrderLayout(result)
+  await orderLayoutApi.switchCategory(actionTarget, selectedCategoryLayout.value)
+  _clearAction()
+  await loadOrderLayout()
 }
