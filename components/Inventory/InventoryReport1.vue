@@ -121,7 +121,7 @@
   import dateRangePicker from '../OnlineOrder/dateRangePicker';
 
   export default {
-    name: "InventoryReport",
+    name: "InventoryReport1",
     injectService: ['InventoryStore:(inventoryCategories, loadInventoryCategories, loadInventoriesWithChange, loadInventoryHistory)'],
     components: {dateRangePicker, dialogTextFilter},
     data() {
@@ -148,8 +148,8 @@
         },
         // inject
         inventoryCategories: [],
-        
-        
+
+
       }
     },
     created() {
