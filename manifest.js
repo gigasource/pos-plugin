@@ -11,6 +11,11 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components2/OrderView/Order2.vue', name: 'Order2', path: '/pos-order/:id?' },
     { loader: { type: 'route' }, filePath: 'components2/Dashboard/PosDashboard.vue', name: 'Dashboard', path: '/pos-dashboard' },
     { loader: { type: 'route' }, filePath: 'components2/OrderView/delivery/PosOrderDelivery2.vue', name: 'posOrderDelivery', path: '/pos-order-delivery' },
+    { loader: { type: 'route' }, filePath: 'components2/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
+    { loader: { type: 'route' }, filePath: 'components2/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report' },
+    { loader: { type: 'route' }, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
+
+    /// old components
     // { loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
     { loader: { type: 'route' }, filePath: 'components/View/Login.vue', name: 'Login', path: '/pos-login' },
@@ -21,9 +26,9 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
     // { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
-    { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory.vue', name: 'Inventory', path: '/pos-inventory' },
-    { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report' },
-    { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
+    { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory1.vue', name: 'Inventory1', path: '/pos1-inventory' },
+    { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport1.vue', name: 'InventoryReport1', path: '/pos1-inventory-report' },
+    { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryStock1.vue', name: 'InventoryStock1', path: '/pos1-inventory-stock' },
     { loader: { type: 'route' }, filePath: 'components/View/posEndOfDayReport.vue', name: 'posEndOfDayReport', path: '/pos-eod-report' },
     // { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
@@ -76,6 +81,13 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
+      path: 'backend/dayjs-utils.js',
+      type: 'backend'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
       path: 'backend/modifier/index.js',
       type: 'backend'
     },
@@ -97,7 +109,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/print/print-report/index.js',
+      path: 'backend/print/print-report/report-index.js',
       type: 'backend'
     },
     {
@@ -177,7 +189,7 @@ module.exports = {
       loader: {
         type: 'backend-api'
       },
-      path: 'backend/order/inventory.js'
+      path: 'backend/inventory/inventory.js'
     },
     {
       loader: {
@@ -190,6 +202,12 @@ module.exports = {
         type: 'backend-api'
       },
       path: 'backend/rn-bridge/app-rn-bridge.js'
+    },
+    {
+      loader: {
+        type: 'backend-api'
+      },
+      path: 'backend/order-logic/report-init-cms.js'
     },
     {
       loader: {

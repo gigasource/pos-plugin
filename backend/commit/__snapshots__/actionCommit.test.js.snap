@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test-action-commit print 1`] = `
+exports[`test-action-commit Case 1: Print 1`] = `
 Array [
   Object {
     "_id": "ObjectID",
@@ -28,3 +28,4 @@ Array [
   },
 ]
 `;
+

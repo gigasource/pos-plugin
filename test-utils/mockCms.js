@@ -1,14 +1,23 @@
+import {demoData as data} from "../components2/OrderView/__test__/demoData";
+
 const { Socket, Io } = require('schemahandler/io/io')
-const Orm = require('schemahandler/orm')
+//const Orm = require('schemahandler/orm')
+const orm = require('schemahandler')
 const Hooks = require('schemahandler/hooks/hooks')
 const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
 
 function cmsFactory(testName) {
-  const orm = new Orm()
-  orm.name = testName
-  orm.connect({uri: "mongodb://localhost:27017"}, testName);
+  let _orm
+  if (process.env.USE_GLOBAL_ORM) {
+    _orm = orm;
+  } else {
+    _orm = new orm();
+  }
+  //const orm = new Orm()
+  //orm.name = testName
+  _orm.connect({uri: "mongodb://localhost:27017"}, testName);
   const socketToFrontend = new Io()
   socketToFrontend.listen(`frontend:${testName}`)
   const feSocket = new Socket()
@@ -18,7 +27,6 @@ function cmsFactory(testName) {
     },
     initDemoData: async function () {
       const dataPath = path.resolve(__dirname, './dataMock/demoData.json')
-      const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
       for (const collection in data) {
         await cms.getModel(collection).remove({})
@@ -29,10 +37,10 @@ function cmsFactory(testName) {
         }
       }
     },
-    orm,
+    orm: _orm,
     socket: socketToFrontend,
     getModel: function (modelName) {
-      return orm(modelName)
+      return _orm(modelName)
     },
     feSocket,
     triggerFeConnect: function () {

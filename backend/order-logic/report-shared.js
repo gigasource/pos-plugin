@@ -1,5 +1,14 @@
-import {mergeVTaxGroup} from "../../components2/OrderView/pos-logic";
 const _ = require('lodash');
+
+function mergeVTaxGroup(objValue, itemValue) {
+  if (!objValue) return itemValue;
+  if (!itemValue) return objValue;
+  return {
+    tax: objValue.tax + itemValue.tax,
+    net: objValue.net + itemValue.net,
+    gross: objValue.gross + itemValue.gross
+  };
+}
 
 let fromReducer = {
   label: "from",
@@ -53,5 +62,6 @@ module.exports = {
   fromReducer,
   toReducer,
   vTaxSumReducer,
-  quantityReducer
+  quantityReducer,
+  mergeVTaxGroup
 }
