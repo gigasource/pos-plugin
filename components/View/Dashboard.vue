@@ -81,7 +81,7 @@
   import PosOrderManualTable from "../Order/PosOrderManualTable";
   import PosDashboardFunction from "../Dashboard/PosDashboardFunction";
   import RestaurantRoom from "../Restaurant/RestaurantRoom";
-  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain";
+  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain1";
   import OnlineOrderList from "../OnlineOrder/OnlineOrderList";
   import OnlineOrderServices from "../OnlineOrder/OnlineOrderServices";
   import ReservationsList from "../Reservation/ReservationsList";

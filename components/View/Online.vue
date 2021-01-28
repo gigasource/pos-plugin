@@ -15,7 +15,7 @@
 </template>
 <script>
   import PosDashboardSidebar from '../Dashboard/PosDashboardSidebar';
-  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
+  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain1';
   import {pendingOrders, kitchenOrders} from '../../composition/useOrderLogic';
   import { state as RoomState } from '../../composition/useRoomLogic'
   import { onMounted, ref, reactive } from 'vue';
@@ -57,7 +57,7 @@
           }
         },
       ])
-      
+
       onMounted(() => {
         const rooms = RoomState.rooms
         if (rooms.length > 0) {
@@ -67,7 +67,7 @@
           })
         }
       })
-      
+
       return {
         pendingOrders,
         kitchenOrders,
@@ -83,7 +83,7 @@
     display: grid;
     grid-template-columns: 220px calc(100% - 220px);
     grid-template-rows: 100%;
-    
+
     &__sidebar {
       grid-area: 1 / 1 / 2 / 2;
       height: 100vh;

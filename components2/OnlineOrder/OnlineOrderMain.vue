@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { $filters } from '../AppSharedStates';
 import { pendingReservationsLength } from '../../composition/usePosLogic';
+import { renderPendingOrdersFactory } from "./online-order-main-pending-orders-render";
 
 export default {
   props: {
@@ -21,7 +22,6 @@ export default {
     const defaultPrepareTime = ref(props.defaultPrepareTime)
     const kitchenOrders = ref(props.kitchenOrders)
     const onlineOrderSorting = ref(props.onlineOrderSorting)
-    const internalOrders = ref([])
     const showDialog = ref(false)
     const decimals = ref(2)
     const dialog = ref({
@@ -33,8 +33,6 @@ export default {
     const dialogRef = ref(null)
 
     ///todo:
-    const calls = ref([])
-    const missedCalls = ref([])
     const selectedCustomer = ref(null)
     const orderType = ref(null)
 
@@ -143,75 +141,10 @@ export default {
       return dayjs(order.deliveryTime, 'HH:mm').diff(dayjs(), 'minute')
     }
 
-    function getItemPrice(item) {
-      return orderUtil.getItemPrice(item)
-    }
 
-    function getExtraInfo(item) {
-      return orderUtil.getExtraInfo(item)
-    }
-
-    function deleteCall(index, { callId }) {
-      calls.splice(index, 1)
-      cancelMissedCallTimeout(callId)
-    }
-
-    function openReservationDialog({ customer, callId }) {
-      selectedCustomer.value = customer
-      dialog.value.reservation = true
-      cancelMissedCallTimeout(callId)
-    }
-
-    function openOrderDialog({ customer, callId }, type, index) {
-      cancelMissedCallTimeout(callId);
-
-      if (index) {
-        calls.unshift({
-          ...missedCalls.value[index],
-          type: 'missed'
-        })
-        deleteMissedCall(index)
-      }
-      selectedCustomer.value = customer
-      orderType.value = type
-      router.push(
-          { path: '/pos-order-delivery' }
-      )
-    }
-
-    function calcDiffTime(date) {
-      return `${dayjs().diff(dayjs(date), 'minute')} minute(s) ago`
-    }
-
-    function deleteMissedCall(index) {
-      missedCalls.value.splice(index, 1)
-    }
-
-    async function updateModemDeviceStatus(connectionStatus) {
-      if (!connectionStatus) return;
-
-      const callSystem = (await cms.getModel('PosSetting').findOne()).call;
-
-      if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
-        modemDeviceConnected.value = null;
-      } else {
-        modemDeviceConnected.value =
-            typeof connectionStatus === 'string'
-            && connectionStatus.toLowerCase() === 'connected';
-      }
-    }
-
-    function cancelMissedCallTimeout(callId) {
-      cms.socket.emit('cancel-missed-call-timeout', callId);
-    }
-    async function getPendingReservationsLength() {
-      const currentDate = dayjs().startOf('day')
-      const reservations = await cms.getModel('Reservation').find({
-        status: 'pending',
-        date: { $gte: currentDate.toDate(), $lt: currentDate.add(1, 'day').toDate() }
-      })
-      pendingReservationsLength.value = reservations.length
-    }
+    const {
+      renderPendingOrders
+    } = renderPendingOrdersFactory()
 
     return () =>
         <div class="main">

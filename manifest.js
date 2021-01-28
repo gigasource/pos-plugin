@@ -24,7 +24,7 @@ module.exports = {
     //{ loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order', path: '/pos-order/:id?' },
     { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
-    { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
+    { loader: { type: 'route' }, filePath: 'components2/OnlineOrder/OnlineOrderMain.vue', name: 'OnlineOrderMain', path: '/pos-online' },
     // { loader: { type: 'route' }, filePath: 'components/View/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory1.vue', name: 'Inventory1', path: '/pos1-inventory' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/InventoryReport1.vue', name: 'InventoryReport1', path: '/pos1-inventory-report' },
