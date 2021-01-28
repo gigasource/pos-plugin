@@ -3,7 +3,7 @@ import {useI18n} from 'vue-i18n';
 import dayjs from "dayjs";
 import {computed, ref, watch} from "vue";
 import {$filters} from "../AppSharedStates";
-import {selectedReportDate} from "./eod-shared";
+import { listOfDatesWithReports, selectedDate, selectedReportDate } from './eod-shared';
 import {genScopeId} from "../utils";
 
 export default {
@@ -16,7 +16,7 @@ export default {
     const timeFormat = ref('')
     const dateFormat = ref('')
 
-    const selectedDate = computed(() => {
+    const _selectedDate = computed(() => {
       if (selectedReportDate.value && selectedReportDate.value.date) {
         return dayjs(selectedReportDate.value.date).format(dateFormat.value)
       }
@@ -39,7 +39,7 @@ export default {
      */
     //fixme: remove watch
     watch(selectedReportDate, (newVal, oldVal) => {
-      if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
+      if (selectedReportDate.value && selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
         zNumberReports.value = selectedReportDate.value.reports.map(report => ({
           begin: dayjs(report.begin).format(timeFormat.value),
           end: dayjs(report.end).format(timeFormat.value),
@@ -64,7 +64,7 @@ export default {
                 <g-tab-item item={item} key={i}>
                   <div class="eod-info">
                     <span class="eod-info-important"> Date: </span>
-                    <span> {selectedDate.value} </span>
+                    <span> {_selectedDate.value} </span>
                   </div>
                   <div class="eod-info">
                     <span class="eod-info-important">

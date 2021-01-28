@@ -45,7 +45,7 @@ export default {
     })
 
     function onSelectDate (date) {
-      selectedDate.value = new Date(date)
+      selectedDate.value = dayjs(date, "YYYY.MM.DD").toDate()
     }
 
     return genScopeId(() => (

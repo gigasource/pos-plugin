@@ -91,7 +91,6 @@ async function getEodReportsCalender(from, to, fillToSingleton = true) {
       resolve(eodReport)
     })
   })
-
   result = jsonfn.clone(result);
   if (fillToSingleton) listOfDatesWithReports.value = result.ordersByDate;
   return result.ordersByDate
