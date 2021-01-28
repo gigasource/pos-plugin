@@ -153,7 +153,7 @@
   import dialogInventoryCategory from './dialogInventoryCategory';
 
   export default {
-    name: 'Inventory',
+    name: 'Inventory1',
     injectService: ['InventoryStore:(inventories, loadInventories, createInventory, updateInventory, deleteInventory, updateInventoryHistory,' +
                                     'inventoryCategories, loadInventoryCategories, selectedInventory, selectedInventoryIDs, inventoryPagination, totalInventories)'],
     components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
