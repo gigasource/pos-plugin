@@ -11,6 +11,9 @@ import {
   inventories,
   inventoryCategories
 } from "../inventory-logic-ui";
+import {
+  addedCategory
+} from "../helpers/dialog-inventory-category-logic";
 
 const { prepareInventoryDb } = require('../../../backend/inventory/inventory.prepare.test')
 
@@ -76,22 +79,23 @@ describe('Test inventory screen', function () {
     await nextTick()
     const categoryItems = wrapper.findAll("[class='category-item']")
     expect(categoryItems.length).toEqual(oldLength + 1)
-    const addedCategory = _.last(categoryItems)
-    const textField = addedCategory.find('g-text-field-bs-stub')
+    const _addedCategory = _.last(categoryItems)
+    const textField = _addedCategory.find('g-text-field-bs-stub')
     await textField.trigger('click')
-    await nextTick()
-    const completeCategoryBtn = wrapper.find('[data-jest-complete]')
-    await completeCategoryBtn.trigger('click')
-    const a = wrapper.findComponent("[content-class='dialog-inventory-category']")
     /**
      * Fake set value
      */
-
+    const a = addedCategory.value
+    addedCategory.value[0].name = 'TestCategory'
+    await nextTick()
+    const completeCategoryBtn = wrapper.find('[data-jest-complete]')
+    await completeCategoryBtn.trigger('click')
     await nextTick()
     /**
-     * Expect re-reder of dialog after open keyboard
+     * Expect re-render of dialog after open keyboard
      */
     expect(wrapper.find("[content-class='dialog-inventory-category']").html()).toMatchSnapshot()
+    await delay(50)
     expect(inventoryCategories.value).toMatchSnapshot()
   })
 

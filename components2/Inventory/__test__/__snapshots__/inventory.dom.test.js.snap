@@ -580,7 +580,7 @@ exports[`Test inventory screen Case 2: Category dialog 2`] = `
         <div class="category-item">
           <g-text-field-bs-stub rules="val => _inventoryLogicUi.inventoryCategories.value.filter(cate => cate === val).length <= 1 || ''"
                                 virtual-event="true"
-                                modelvalue
+                                modelvalue="TestCategory"
           >
           </g-text-field-bs-stub>
           <div class="category-item__btn category-item__btn--delete">
@@ -655,6 +655,11 @@ exports[`Test inventory screen Case 2: Category dialog 2`] = `
 
 exports[`Test inventory screen Case 2: Category dialog 3`] = `
 Array [
+  Object {
+    "_id": "0000000000000000000007de",
+    "available": true,
+    "name": "TestCategory",
+  },
   Object {
     "_id": "0000000000000000000007cf",
     "available": false,
