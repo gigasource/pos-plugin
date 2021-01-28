@@ -36,7 +36,7 @@ export default {
       logout()
     }}>
       <g-icon svg>icon-logout</g-icon>
-      <span className="ml-2">{$t('sidebar.logOut')}</span>
+      <span class="ml-2">{$t('sidebar.logOut')}</span>
     </g-btn>
 
     const sidebarSlots = {

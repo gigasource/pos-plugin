@@ -3,6 +3,7 @@ const uuid = require('uuid')
 const jsonFn = require('json-fn')
 
 module.exports = async function (orm, cms) {
+	//todo: need to understand logic here to refactor
 	orm.registerCommitBaseCollection('Action')
 
 	const Action = orm('Action')

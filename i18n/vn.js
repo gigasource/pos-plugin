@@ -568,7 +568,7 @@ module.exports = {
       swipeRight: 'Vuốt sang phải để xóa',
       lastUpdate: 'Cập nhật lần cuối',
       unit: 'Đơn vị',
-      stock: 'Hàng trong kho',
+      stock: 'Tồn kho',
       report: 'Báo cáo',
       newStock: 'Nhập hàng',
       newProduct: 'Tạo hàng mới',
@@ -591,6 +591,12 @@ module.exports = {
       date: 'Ngày',
       amount: 'Khối lượng',
       reason: 'Lý do',
+      filter: {
+        id: 'Id',
+        name: 'Tên',
+        category: 'Nhóm hàng',
+        stock: 'Tồn kho'
+      }
     },
 
     discount: {

@@ -134,7 +134,7 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.setTextNormal();
   await canvasPrinter.alignLeft();
   await canvasPrinter.bold(true);
-  await canvasPrinter.println(`Report Date: ${date}`);
+  await canvasPrinter.println(`Report Date: ${dayjs(date).format('DD.MM.YYYY')}`);
   await canvasPrinter.bold(false);
   await canvasPrinter.println(`First Order: ${getDateTimeString(from)}`);
   await canvasPrinter.println(`Last Order: ${getDateTimeString(to)}`);

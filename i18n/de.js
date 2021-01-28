@@ -580,6 +580,12 @@ module.exports = {
       date: 'Datum',
       amount: 'Menge',
       reason: 'Grund',
+      filter: {
+        id: 'Id',
+        name: 'Name',
+        category: 'Kategorie',
+        stock: 'Lager'
+      }
     },
     discount: {
       percent: 'Prozent',
