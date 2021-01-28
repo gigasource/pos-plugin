@@ -44,6 +44,10 @@ export default {
       await getEodReportsInMonthCalender(currentDate);
     })
 
+    function onSelectDate (date) {
+      selectedDate.value = new Date(date)
+    }
+
     return genScopeId(() => (
         <div style="height: 100%; background-color: #EEEEEE;">
           <pos-end-of-day-date-picker
@@ -54,7 +58,9 @@ export default {
               full-width no-title
               modelValue={selectedDateString.value}
               onClick:prev={getDatesWithReport}
-              onClick:next={getDatesWithReport}>
+              onClick:next={getDatesWithReport}
+              onClick:date={onSelectDate}
+          >
           </pos-end-of-day-date-picker>
         </div>
     ))

@@ -1,4 +1,4 @@
-import {renderPivotTable} from "./pivot";
+const {renderPivotTable} = require("./pivot");
 
 const orm = require("schemahandler");
 const {fromReducer, quantityReducer, toReducer, vTaxSumReducer} = require("./report-shared");

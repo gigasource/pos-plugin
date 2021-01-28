@@ -3,6 +3,8 @@ import PosEndOfDayDetails from "./PosEndOfDayDetails";
 import PosEndOfDayToolbar from "./PosEndOfDayToolbar";
 import PosEndOfDayMain from "./PosEndOfDayMain";
 import {genScopeId} from "../utils";
+import { onBeforeMount } from 'vue';
+import { prepareDb } from './fakeData';
 
 export default {
   components: {
@@ -11,6 +13,9 @@ export default {
     PosEndOfDayMain
   },
   setup() {
+    onBeforeMount(async() => {
+      await prepareDb()
+    })
     return genScopeId(() =>
         <div class="pos-eod-report">
           <pos-end-of-day-details class="pos-eod-report__report"/>
