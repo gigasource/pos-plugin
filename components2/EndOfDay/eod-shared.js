@@ -6,6 +6,14 @@ import _ from 'lodash'
 
 export const listOfDatesWithReports = ref([])
 export const selectedDate = ref(new Date());
+export const selectedDateString = computed({
+  get() {
+    return dayjs(selectedDate.value).format('YYYY-MM-DD')
+  },
+  set(val) {
+    selectedDate.value = dayjs(val).toDate()
+  }
+});
 
 export const eventDates = computed(() => {
   return _.map(listOfDatesWithReports.value, (value, key) => {

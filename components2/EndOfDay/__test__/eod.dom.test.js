@@ -17,6 +17,7 @@ import PosEndOfDayPrintDialog from "../PosEndOfDayPrintDialog";
 import PosEndOfDayPrintPendingZReport from "../PosEndOfDayPrintPendingZReport";
 import PosEndOfDayToolbar from "../PosEndOfDayToolbar";
 import PosEndOfDayReprintZReport from "../PosEndOfDayReprintZReport";
+import PosEndOfDayReport from "../PosEndOfDayReport";
 
 const { prepareDb, prepareReportTest } = require('../../../backend/order-logic/report.prepare.test')
 
@@ -234,6 +235,17 @@ describe("eod test", function () {
     await delay(200);
     expect(wrapper.html()).toMatchSnapshot()
     done()
+  }, 80000);
+
+  it("case 12 PosEndOfDayReport", async function () {
+    makeWrapper(PosEndOfDayReport, {
+      //shallow: true,
+      props: {
+      }
+    });
+    await nextTick();
+    await delay(50);
+    expect(wrapper.html()).toMatchSnapshot()
   }, 80000);
 
 });
