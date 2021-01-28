@@ -1,67 +1,128 @@
 <script>
 import { internalValueFactory } from '../utils';
 import { computed, ref, watch } from 'vue'
-import { updateReservation, createReservation, getReservations } from '../../composition/useReservationLogic';
 import { useI18n } from 'vue-i18n';
+import { reservationSetting, getReservations, updateReservation } from './reservation-shared';
+import { genScopeId } from '../utils';
+import dayjs from 'dayjs'
+import _ from 'lodash'
+import cms from 'cms';
 
 export default {
   props: {
     modelValue: Boolean,
-    reservation: Object,
-    edit: Boolean,
+    reservation: Object, // contain information about reservation: customer info (name, phone, note), reservation info (date, time, number of guests)
+    edit: Boolean,       // indicate whether the dialog show in 'edit' or 'add' mode
     receivedPhone: [Number, String]
   },
   setup(props, { emit }) {
     const { t } = useI18n()
+    const internalValue = internalValueFactory(props, { emit })
+
+    // customer info
     const name = ref('')
     const phone = ref('')
     const note = ref('')
+
+    // reservation info
     const date = ref('')
-    const people = ref('')
+    const numberOfGuests = ref('')
     const time = ref('')
+
+    // reference to scroll-select components
     const scrollDate = ref(null)
-    const scrollPeople = ref(null)
+    const scrollNoOfGuests = ref(null)
     const scrollTime = ref(null)
-    const list = ref({ date: [t('onlineOrder.today'), t('onlineOrder.tomorrow')], people: ['1 Guest'] })
+    const scrollSelectHeight = computed(() => {
+      if (window.innerHeight >= 600)
+        return 250
+      else
+        return 200
+    })
+    const scrollSelectItemHeight = computed(() => scrollSelectItemHeight.value / 5)
+    // scrollSelect items
+    const list = computed(() => {
+      const scrollSelectItems = {
+        date: [
+          t('onlineOrder.today'),
+          t('onlineOrder.tomorrow')
+        ],
+        numberOfGuests: ['1 Guest']
+      }
+      if (reservationSetting.value.maxDay) {
+        for (let i = 0; i < reservationSetting.value.maxDay - 2; i++) {
+          scrollSelectItems.date.push(dayjs().add(i + 2, 'day').format('DD MMM'))
+        }
+      }
+      if (reservationSetting.value.maxGuest) {
+        for (let i = 0; i < reservationSetting.value.maxGuest - 1; i++) {
+          scrollSelectItems.numberOfGuests.push(`${i + 2} Guests`)
+        }
+      }
+      return scrollSelectItems
+    })
     const reservations = ref([])
-    const reservationSetting = ref(null)
-    const internalValue = internalValueFactory(props, { emit })
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const seatLimitByDay = computed(() => {
+      if (!date.value)
+        return []
+
+      const list = []
+      const date = getDayJsDateFromDateString(date.value)
+      const day = days[date.day()]
+      for (const seatLimitSetting of reservationSetting.value.seatLimit) {
+        if (!seatLimitSetting.days.includes(day))
+          continue
+
+        const { startTime, endTime } = seatLimitSetting
+        const availableSeats = seatLimitSetting.seat - getReservedSeatsAt({ startTime, endTime })
+
+        list.push({
+          start: startTime,
+          end: endTime,
+          availableSeats: availableSeats
+        })
+      }
+      return list
+    })
     const timeList = computed(() => {
       let times = []
-      if (reservationSetting.value && reservationSetting.value.openHours && date.value) {
-        const date = date.value === t('onlineOrder.today') ? dayjs() : (date.value === t('onlineOrder.tomorrow') ? dayjs().add(1, 'day') : dayjs(date.value, 'DD MMM'))
-        const weekday = date.day() === 0 ? 6 : date.day() - 1
-        reservationSetting.value.openHours.forEach(({ dayInWeeks, openTime, closeTime }) => {
+      if (reservationSetting.value.openHours && date.value) {
+        const _date = getDayJsDateFromDateString(date.value)
+        const weekday = _date.day() === 0 ? 6 : _date.day() - 1
+        const now = dayjs()
+        _.each(reservationSetting.value.openHours, ({ dayInWeeks, openTime, closeTime }) => {
           if (dayInWeeks[weekday]) {
-            let baseHour, baseMinute
-            if (date === t('onlineOrder.today')) {
-              baseHour = dayjs().hour()
-              baseMinute = dayjs().minute()
-            } else {
-              [baseHour, baseMinute] = openTime.split(':')
-            }
-            let [openTimeHour, openTimeMinute] = openTime.split(':')
-            let [closeTimeHour, closeTimeMinute] = closeTime.split(':')
+            const [baseHour, baseMinute] = (
+                date.value === t('onlineOrder.today')
+                    ? [now.hour(), now.minute()]
+                    : openTime.split(':').map(Number)
+            )
+            let [openTimeHour, openTimeMinute] = openTime.split(':').map(Number)
+            const [closeTimeHour, closeTimeMinute] = closeTime.split(':').map(Number)
 
+            // make open minute divisible by 5
             if (openTimeMinute % 5 !== 0) {
               if (openTimeMinute > 55) {
                 openTimeMinute = 0
-                openTimeHour = +openTimeHour + 1
+                openTimeHour++
               } else {
                 openTimeMinute = Math.round(openTimeMinute / 5) * 5
               }
             }
-            while (+openTimeHour < +closeTimeHour || (+openTimeHour === +closeTimeHour && +openTimeMinute < +closeTimeMinute)) {
-              if (+openTimeHour > +baseHour || (+openTimeHour === +baseHour && +openTimeMinute >= +baseMinute)) {
-                const time = `${openTimeHour.toString().length === 1 ? '0' + openTimeHour : openTimeHour}:${openTimeMinute.toString().length === 1 ? '0' + openTimeMinute : openTimeMinute}`
-                if (!seatLimitByDay.some(limit => limit.start <= time && limit.end >= time && limit.seat < (list.people.indexOf(people) + 1))) {
+
+            // find all available time
+            while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute < closeTimeMinute)) {
+              if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute)) {
+                const time = `${_.padStart(openTimeHour, 2, '0')}:${_.padStart(openTimeMinute, 2, '0')}`
+                if (!seatLimitByDay.some(limit => limit.start <= time && time <= limit.end && limit.availableSeats < (list.value.numberOfGuests.indexOf(numberOfGuests.value) + 1))) {
                   times.push(time)
                 }
               }
 
-              openTimeMinute = +openTimeMinute + 5
+              openTimeMinute += 5
               if (openTimeMinute >= 60) {
-                openTimeMinute = +openTimeMinute - 60
+                openTimeMinute -= 60
                 openTimeHour++
               }
             }
@@ -70,49 +131,107 @@ export default {
       }
       return times.sort()
     })
-    const seatLimitByDay = computed(() => {
-      let list = []
-      if (date.value && reservationSetting.value) {
-        // duplicate code
-        const date = date.value === t('onlineOrder.today') ? dayjs() : (date.value === t('onlineOrder.tomorrow') ? dayjs().add(1, 'day') : dayjs(date.value, 'DD MMM'))
-        const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.day()]
-        for (const limit of reservationSetting.value.seatLimit) {
-          if (limit.days.includes(day)) {
-            const reservedSeat = reservations.value ? reservations.value.filter(r => dayjs(r.date).format('HH:mm') >= limit.startTime && dayjs(r.date).format('HH:mm') <= limit.endTime).reduce((acc, val) => (acc + val.noOfGuests), 0) : 0
-            list.push({
-              start: limit.startTime,
-              end: limit.endTime,
-              seat: limit.seat - reservedSeat
-            })
-          }
+    /**
+     * Compute total seats which has been reserved by the time range
+     * @return {Number}
+     */
+    function getReservedSeatsAt({ startTime, endTime }) {
+      return _.sumBy(_.filter(reservations.value, r => {
+        const reservedTime = dayjs(r.date).format('HH:mm')
+        return startTime <= reservedTime && reservedTime <= endTime
+      }), r => r.noOfGuests)
+    }
+
+    //
+    watch(() => date.value, async(newV) => {
+      const date = getDayJsDateFromDateString(newV)
+      reservations.value = await getReservations(date)
+      time.value = timeList.value[0] || ''
+    })
+    watch(() => internalValue.value, async (newV) => {
+      console.log('NewReservationDialog: internalValue', newV)
+      if (!newV)
+        return;
+
+      resetData()
+      const _date = getDayJsDateFromDateString(date.value)
+      reservations.value = await getReservations(_date)
+
+      if (props.edit) { // TODO: edit singleton
+        name.value = props.reservation.customer.name
+        phone.value = props.reservation.customer.phone
+        note.value = props.reservation.note
+        numberOfGuests.value = list.value.numberOfGuests[props.reservation.noOfGuests - 1]
+        time.value = dayjs(props.reservation.date).format('HH:mm')
+        const day = dayjs(props.reservation.date)
+        if (day.isSame(dayjs(), 'day')) {
+          date.value = $t('onlineOrder.today')
+        } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
+          date.value = $t('onlineOrder.tomorrow')
+        } else {
+          date.value = day.format('DD MMM') // TODO: Resolve hard-coded string
         }
       }
-      return list
-    })
-    const height = computed(() => {
-      if (window.innerHeight >= 600)
-        return 250
-      else
-        return 200
-    })
+      if (props.receivedPhone) {
+        phone.value = props.receivedPhone.toString()
+      }
 
+      setTimeout(() => {
+        // TODO: review old code old code using setTimeout
+        scrollDate.value.scrollToValue()
+        scrollNoOfGuests.value.scrollToValue()
+        scrollTime.value.scrollToValue()
+      }, 100)
+    })
+    function resetData() {
+      date.value = list.value.date[0]
+      numberOfGuests.value = list.value.numberOfGuests[0]
+      time.value = timeList[0] || ''
+      name.value = ''
+      phone.value = ''
+      note.value = ''
+    }
+
+    async function createReservation(reservation) {
+      const res = await ReservationModel.create(reservation)
+      cms.socket.emit('scheduleNewReservation', res)
+      cms.socket.emit('updateOnlineReservation', res._id, 'create')
+    }
+
+    /**
+     * Return date dayjs object from date string
+     * @param date "Today" | "Tomorrow" | "2020-12-31" // specified date value
+     * @return {*|dayjs.Dayjs|dayjs.Dayjs}
+     */
+    function getDayJsDateFromDateString(date) {
+      switch(date) {
+        case t('onlineOrder.today'):
+          return dayjs()
+        case t('onlineOrder.tomorrow'):
+          return dayjs().add(1, 'day')
+        default:
+          return dayjs(date, 'DD MMM')
+      }
+    }
     async function submit() {
-      if (!name.value || !phone.value) return
+      if (!name.value || !phone.value)
+        return
+
       const customer = {
         name: name.value,
         phone: phone.value,
-        email: edit.value ? props.reservation.customer.email : ''
+        email: props.edit ? props.reservation.customer.email : ''
       }
-      const [hour, minute] = time.value.split(':')
-      const date = dayjs().add(list.value.date.indexOf(date.value), 'day').hour(+hour).minute(+minute).toDate()
+      const [hour, minute] = time.value.split(':').map(Number)
+      const _date = dayjs().add(list.value.date.indexOf(date.value), 'day').hour(hour).minute(minute).toDate()
       const reservation = {
-        noOfGuests: list.value.people.indexOf(people.value) + 1,
-        date,
+        noOfGuests: list.value.numberOfGuests.indexOf(numberOfGuests.value) + 1,
+        date: _date,
         customer,
         note: note.value,
         status: 'pending'
       }
-      if (edit.value) {
+      if (props.edit) {
         await updateReservation(reservation._id, reservation)
         cms.socket.emit('updateOnlineReservation', reservation._id, 'update')
       } else {
@@ -123,98 +242,47 @@ export default {
       emit('submit')
     }
 
-    function resetData() {
-      date.value = list.date[0]
-      people.value = list.people[0]
-      time.value = timeList[0] || ''
-      name.value = ''
-      phone.value = ''
-      note.value = ''
-    }
-    watch(() => internalValue.value, async (newV) => {
-      resetData()
-      const date = date === $t('onlineOrder.today') ? dayjs().toDate() : (date === $t('onlineOrder.tomorrow') ? dayjs().add(1, 'day').toDate() : dayjs(date, 'DD MMM').toDate())
-      reservations.value = await getReservations(date)
-      if (newV && scrollDate.value && scrollPeople.value && scrollTime.value) {
-        if (edit) {
-          name.value = props.reservation.customer.name
-          phone.value = props.reservation.customer.phone
-          note.value = props.reservation.note
-          people.value = list.people[props.reservation.noOfGuests - 1]
-          time.value = dayjs(props.reservation.date).format('HH:mm')
-          const day = dayjs(props.reservation.date)
-          if (day.isSame(new Date(), 'day')) {
-            date.value = $t('onlineOrder.today')
-          } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
-            date.value = $t('onlineOrder.tomorrow')
-          } else {
-            date.value = day.format('DD MMM')
-          }
-        }
-        if (props.receivedPhone) {
-          phone.value = props.receivedPhone.toString()
-        }
-        setTimeout(() => {
-          scrollDate.scrollToValue()
-          scrollPeople.scrollToValue()
-          scrollTime.scrollToValue()
-        }, 100)
-      }
-    })
-
-    watch(() => date.value, async(newV) => {
-      const date = val === t('onlineOrder.today') ? dayjs().toDate() : (newV === t('onlineOrder.tomorrow') ? dayjs().add(1, 'day').toDate() : dayjs(val, 'DD MMM').toDate())
-      reservations.value = await getReservations(date)
-      time.value = timeList.value[0] || ''
-    })
-
     return () =>
         <g-dialog v-model={internalValue.value} fullscreen eager>
+          { genScopeId(() =>
           <div class="dialog">
-            <g-icon class="dialog-icon--close" onClick={() => internalValue.value = false}>
-              icon-close
-            </g-icon>
+            <g-icon class="dialog-icon--close" onClick={() => internalValue.value = false}>icon-close</g-icon>
             <div class="dialog-content">
               <div class="dialog-content--left">
-                <scroll-select ref={scrollDate} class="col-4" v-model={date.value} items={list.value.date} height={height.value} itemHeight={height.value / 5} selected-color="#1271FF">
-                </scroll-select>
-                <scroll-select ref={scrollPeople} class="col-4" v-model={people.value} items={list.value.people} height={height.value} itemHeight={height.value / 5} selected-color="#1271FF">
-                </scroll-select>
-                <scroll-select ref={scrollTime} class="col-4" v-model={time.value} items={timeList.value} height={height.value} itemHeight={height.value / 5} selected-color="#1271FF">
-                </scroll-select>
+                <scroll-select ref={scrollDate} class="col-4" v-model={date.value} items={list.value.date}
+                               height={scrollSelectHeight.value} itemHeight={scrollSelectItemHeight.value} selected-color="#1271FF"/>
+                <scroll-select ref={scrollNoOfGuests} class="col-4" v-model={numberOfGuests.value} items={list.value.numberOfGuests}
+                               height={scrollSelectHeight.value} itemHeight={scrollSelectItemHeight.value} selected-color="#1271FF"/>
+                <scroll-select ref={scrollTime} class="col-4" v-model={time.value} items={timeList.value}
+                               height={scrollSelectHeight.value} itemHeight={scrollSelectItemHeight.value} selected-color="#1271FF"/>
               </div>
-              <div class="dialog-content--right">
-                <div class="dialog-content__title">
-                  {t('onlineOrder.makeReservation')} </div>
-                <div class="row-flex">
-                  <g-text-field-bs class="bs-tf__pos" v-model={name.value} label="Name" placeholder={t('onlineOrder.fillText')} required key={`${internalValue.value}_name`}>
-                  </g-text-field-bs>
-                  <g-text-field-bs class="bs-tf__pos" v-model={phone.value} label={t('settings.tel')} placeholder={t('onlineOrder.fillNumber')} number required key={`${internalValue.value}_phone`}>
-                  </g-text-field-bs>
-                </div>
-                <div>
-                  <div class="label">
-                    {t('onlineOrder.note')} </div>
-                  <g-textarea rows="3" outlined v-model={note.value} placeholder={t('onlineOrder.fillText')} no-resize>
-                  </g-textarea>
-                </div>
-                <div class="dialog-action" style="margin-right: -4px">
-                  <g-btn-bs width="100" border-color="#424242" onClick={() => internalValue.value = false}>
-                    {t('onlineOrder.cancel')} </g-btn-bs>
-                  <g-btn-bs width="140" background-color="#2979FF" onClick={submit}>
-                    {t('onlineOrder.submit')} </g-btn-bs>
-                </div>
-              </div>
-            </div>
-            <g-spacer>
-            </g-spacer>
-            <div class="dialog-keyboard">
-              <pos-keyboard-full onEnterPressed={submit}>
-              </pos-keyboard-full>
-            </div>
-          </div>
-        </g-dialog>
 
+              <div class="dialog-content--right">
+                <div class="dialog-content__title">{t('onlineOrder.makeReservation')}</div>
+                <div class="row-flex">
+                  <g-text-field-bs class="bs-tf__pos" v-model={name.value} label="Name"
+                                   placeholder={t('onlineOrder.fillText')} required key={`${internalValue.value}_name`}/>
+                  <g-text-field-bs class="bs-tf__pos" v-model={phone.value} label={t('settings.tel')}
+                                   placeholder={t('onlineOrder.fillNumber')} number required key={`${internalValue.value}_phone`}/>
+                </div>
+
+                <div>
+                  <div class="label">{t('onlineOrder.note')}</div>
+                  <g-textarea rows="3" outlined v-model={note.value} placeholder={t('onlineOrder.fillText')} no-resize/>
+                </div>
+
+                <div class="dialog-action" style="margin-right: -4px">
+                  <g-btn-bs width="100" border-color="#424242" onClick={() => internalValue.value = false}>{t('onlineOrder.cancel')}</g-btn-bs>
+                  <g-btn-bs width="140" background-color="#2979FF" onClick={submit}>{t('onlineOrder.submit')}</g-btn-bs>
+                </div>
+              </div>
+            </div>
+            <g-spacer/>
+            <div class="dialog-keyboard">
+              <pos-keyboard-full onEnterPressed={submit}/>
+            </div>
+          </div>)() }
+        </g-dialog>
   }
 }
 </script>

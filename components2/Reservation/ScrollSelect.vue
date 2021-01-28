@@ -23,7 +23,6 @@ export default {
     }
   },
   setup(props, { emit }) {
-
     const height = ref(props.height)
     const itemHeight = ref(props.itemHeight)
     const modelValue = ref(props.modelValue)

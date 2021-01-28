@@ -1,142 +1,46 @@
 <script>
-import { ref, computed, onActivated, onBeforeMount, onMounted, watch } from 'vue'
+import { onActivated, onBeforeMount, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n';
+import { formatDate } from '../utils';
 import dayjs from 'dayjs';
 import _ from 'lodash'
-import { checkReservationDay } from '../../composition/useReservationLogic';
+
+import { selectedReservation, reservationDialog } from './reservation-shared'
+
+import {
+  reservations,
+  status, date, week, formattedDate,
+  reservationInHours,
+  showNoticeDialog,
+  showDeleteDialog,
+  genReservations, genWeek, prevWeek, nextWeek, chooseDate,
+  completeReservation, showEditDialog, showRemoveDialog, confirmRemove,
+  backToToday,
+} from './reservation-list-logic';
+import cms from 'cms';
+
 export default {
-  props: {
-    reservations: Array,
-    reservationSetting: null,
-  },
-  setup(props, { emit } ) {
+  setup() {
     const { t } = useI18n()
-    const dialog = ref({
-      reservation: false,
-      notice: false,
-      delete: false
-    })
-    const listStatus = [
+    const reservationStatusFilters = [
       { text: 'All', value: 'all' },
       { text: t('onlineOrder.arrived'), value: 'completed' },
       { text: t('onlineOrder.notArrived'), value: 'pending' }
     ]
-    const status = ref('all')
-    const date = ref(new Date())
-    const week = ref([])
-    const dayInWeeks = [t('onlineOrder.weekday.mon'), t('onlineOrder.weekday.tue'), t('onlineOrder.weekday.wed'), t('onlineOrder.weekday.thu'), t('onlineOrder.weekday.fri'), t('onlineOrder.weekday.sat'), t('onlineOrder.weekday.sun')]
-    const edit = ref(false)
-    const selectedReservation = ref(null)
+    const dayInWeeks = [
+      t('onlineOrder.weekday.mon'),
+      t('onlineOrder.weekday.tue'),
+      t('onlineOrder.weekday.wed'),
+      t('onlineOrder.weekday.thu'),
+      t('onlineOrder.weekday.fri'),
+      t('onlineOrder.weekday.sat'),
+      t('onlineOrder.weekday.sun')
+    ]
 
-
-    const formattedDate = computed(() => {
-      return dayjs(date.value).format('DD/MM/YYYY')
-    })
-    const reservationInHours = computed(() => {
-      let hours = [], start = 0, end = 24
-      if (props.reservationSetting && props.reservationSetting.openHours) {
-        const weekday = dayjs(date.value).day() === 0 ? 6 : dayjs(date.value).day() - 1
-        props.reservationSetting.openHours.forEach(({ dayInWeeks, closeTime, openTime }) => {
-          if (dayInWeeks[weekday]) {
-            if (start === 0 || +openTime.split(':')[0] < start) start = +openTime.split(':')[0]
-            if (end === 24 || +closeTime.split(':')[0] > end) end = +closeTime.split(':')[0] + (+closeTime.split(':')[2] > 0 ? 1 : 0)
-          }
-        })
-      }
-      for (let i = start; i < end; i++) {
-        const time = `${i < 10 ? `0${i}` : i}h`
-        const hour = dayjs(date.value).hour(i).startOf('hour'),
-            nextHour = dayjs(date.value).hour(i + 1).startOf('hour')
-        const reservations = props.reservations ? props.reservations.filter(r => dayjs(r.date).isBetween(hour, nextHour, null, '[)')) : []
-        if (props.reservationSetting && props.reservationSetting.hideEmpty) {
-          if (props.reservations.length > 0)
-            hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
-        } else {
-          hours.push({ time, reservations: _.sortBy(reservations, r => r.date) })
-        }
-      }
-      return hours
-    })
-
-    function genReservations(date = date.value, status = status.value) {
-      emit('getReservations', date, status)
-      emit('getPendingReservationsLength')
-    }
-
-    async function genWeek(date) {
-      let week = []
-      for (let i = 1; i < 8; i++) {
-        const weekday = dayjs(date).day(i)
-        const hasReservation = await checkReservationDay(weekday.toDate())
-        week.push({
-          date: weekday,
-          hasReservation
-        })
-      }
-      week.value = week
-    }
-
-    async function prevWeek() {
-      const date = week[0].date.add(-7, 'day').toDate()
-      await genWeek(date)
-    }
-
-    async function nextWeek() {
-      const date = week[0].date.add(7, 'day').toDate()
-      await genWeek(date)
-    }
-
-    function chooseDate(day) {
-      date.value = day.toDate()
-    }
-
-    function confirm(reservation) {
-      if (reservation.status === 'completed') return
-      emit('completeReservation', reservation._id)
-      emit('getPendingReservationsLength')
-    }
-
-    function modify(reservation) {
-      if (reservation.status === 'completed') {
-        dialog.notice = true
-        return
-      }
-      edit.value = true
-      selectedReservation.value = reservation
-      dialog.value.reservation = true
-    }
-
-    function remove(reservation) {
-      selectedReservation.value = reservation
-      dialog.delete = true
-    }
-
-    async function confirmRemove() {
-      emit('removeReservation', selectedReservation.value._id)
-      dialog.value.delete = false
-      if (props.reservations.length === 1) {
-        await genWeek(date.value)
-      }
-      await $getService('PosStore').getPendingReservationsLength()
-    }
-
-    async function backToToday() {
-      date.value = new Date()
-      await genWeek(date.value)
-    }
-
-    function makeReservation() {
-      edit.value = false
-      dialog.value.reservation = true
-    }
-
-    onActivated(() => {
-      genReservations()
-    })
+    onActivated(() => { genReservations() })
     onBeforeMount(async () => {
       await genWeek(date.value)
-      genReservations()
-
+      await genReservations()
       cms.socket.on('updateReservationList', async sentryTagString => {
         console.debug(sentryTagString, `3. Restaurant frontend: received 'updateReservationList', refreshing data`)
         await genReservations()
@@ -144,7 +48,7 @@ export default {
       })
     })
     onMounted(() => {
-      const firstReservation = _.minBy(props.reservations, r => r.date)
+      const firstReservation = _.minBy(reservations.value, r => r.date)
       if (firstReservation) {
         const hour = dayjs(firstReservation.date).format('HH')
         const row = document.getElementById(hour + 'h')
@@ -152,17 +56,8 @@ export default {
       }
     })
 
-    watch(() => status.value, (newV) => {
-      genReservations(data.value, newV)
-    })
-    watch(() => date.value, (newV) => {
-      genReservations(newV, status.value)
-    })
-    watch(() => dialog.value, (newV) => {
-      if (!newV) edit.value = false
-    })
-    watch(() => props.reservations, (newV) => {
-      //todo: refactor: duplicate code with onMounted
+    watch(reservations, (newV) => {
+      // todo: refactor: duplicate code with onMounted
       const firstReservation = _.minBy(newV, r => r.date)
       if (firstReservation) {
         const hour = dayjs(firstReservation.date).format('HH')
@@ -171,138 +66,158 @@ export default {
       }
     })
 
-    return () =>
-        <div class="reservation">
+    const renderReservationHeader = () => {
+      return (
           <div class="reservation-header">
-            <div class="reservation-header__day" onClick={backToToday}>
-              {t('onlineOrder.backToday')} </div>
-            <g-select text-field-component="GTextFieldBs" items={listStatus} v-model={status.value}></g-select>
-            <div></div>
-            <g-spacer></g-spacer>
-            <g-btn-bs background-color="#2979FF" icon="icon-reservation_make" onClick={makeReservation}>
-              {t('onlineOrder.makeReservation')} </g-btn-bs>
+            <div class="reservation-header__day" onClick={backToToday}>{t('onlineOrder.backToday')}</div>
+            <g-select text-field-component="GTextFieldBs" items={reservationStatusFilters} v-model={status.value}/>
+            <g-spacer/>
+            <g-btn-bs background-color="#2979FF" icon="icon-reservation_make"
+                      onClick={() => reservationDialog.value = { show: true, editMode: false }}>{t('onlineOrder.makeReservation')}</g-btn-bs>
           </div>
-          <div class="reservation-tab">
-            <div class="reservation-tab__header">
-              <div class="reservation-tab__header--left" onClick={prevWeek}>
-                <g-icon>
-                  fas fa-long-arrow-alt-left
-                </g-icon>
-              </div>
-              {week.value.map((day, i) =>
-                  <div class="col-flex" key={day.date.format('DD/MM/YYYY')} onClick={() => chooseDate(day.date)}>
-                    {
-                      (day.hasReservation) &&
-                      <div class="reservation-notification"></div>
-                    }
-                    <p class="fw-700 fs-small-2">
-                      {dayInWeeks[i]} </p>
-                    <p class={['reservation-tab__header--day', day.date.format('DD/MM/YYYY') === formattedDate.value && 'selected']}>
-                      {day.date.format('DD')} </p>
-                  </div>
-              )}
-              <div class="reservation-tab__header--right" onClick={nextWeek}>
-                <g-icon>
-                  fas fa-long-arrow-alt-right
-                </g-icon>
-              </div>
+      )
+    }
+    const renderTableHeader = () => {
+      return (
+          <div class="reservation-tab__header">
+            <div class="reservation-tab__header--left" onClick={prevWeek}>
+              <g-icon>fas fa-long-arrow-alt-left</g-icon>
             </div>
-            <div class="reservation-tab__content">
-              {reservationInHours.value.map((rih, index) =>
-                  <div key={index} class="reservation-tab__content-row" id={rih.time}>
-                    <div class="reservation-tab__content-row--hour">
-                      {rih.time}
-                    </div>
-                    <div class="flex-grow-1">
-                      {rih.reservations.map((reservation, i) =>
-                          <div key={`${rih.time}_${i}`} class={['reservation-info', reservation.status === 'completed' && 'reservation-info--completed', reservation.status === 'pending' && 'reservation-info--pending']}>
-                            <div class="reservation-info__time">
-                              {reservation.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} </div>
-                            <div class="reservation-info__customer">
-                              <div class="reservation-info__customer--name">
-                                {reservation.customer.name} </div>
-                              <div class="reservation-info__customer--phone">
-                                {reservation.customer.phone} </div>
-                              {
-                                (reservation.note) &&
-                                <div class="reservation-info__customer--note">
-                                  Note: {reservation.note} </div>
-                              }
-                            </div>
-                            <div class="reservation-info__guest">
-                              <img alt src="/plugins/pos-plugin/assets/guest.svg"> </img>
-                              <span class="fw-700 fs-small ml-1">
-                                {reservation.noOfGuests} </span>
-                            </div>
-                            <div class="reservation-info__action">
-                              <g-btn-bs min-width="145" backgroundColor={reservation.status === 'pending' ? '#757575' : '#4CAF50'} icon={reservation.status === 'completed' && 'check'} onClick={() => confirm(reservation)}>
 
-                                {t('onlineOrder.arrived')}
-                              </g-btn-bs>
-                              <g-btn-bs background-color="#F9A825" style={reservation.status === 'completed' && { opacity: 0.5 }} onClick={() => modify(reservation)}>
-                                <g-icon>
-                                  icon-reservation_modify
-                                </g-icon>
-                              </g-btn-bs>
-                              <g-btn-bs background-color="#E57373" onClick={() => remove(reservation)}>
-                                <g-icon>
-                                  icon-delete
-                                </g-icon>
-                              </g-btn-bs>
-                            </div>
-                          </div>
-                      )} </div>
-                  </div>
-              )} </div>
+            {
+              week.value.map((day, i) =>
+                <div class="col-flex" key={formatDate(day.date)} onClick={() => chooseDate(day.date)}>
+                  { (day.hasReservation) &&  <div class="reservation-notification"></div> }
+                  <p class="fw-700 fs-small-2">{dayInWeeks[i]}</p>
+                  <p class={['reservation-tab__header--day', formatDate(day.date) === formattedDate.value && 'selected']}>{day.date.format('DD')}</p>
+                </div>
+            )}
+
+            <div class="reservation-tab__header--right" onClick={nextWeek}>
+              <g-icon>fas fa-long-arrow-alt-right</g-icon>
+            </div>
           </div>
-          <new-reservation-dialog v-model={dialog.value.reservation} edit={edit.value} reservation={selectedReservation.value} onSubmit={genReservations}></new-reservation-dialog>
-          <g-dialog v-model={dialog.value.notice} width="338">
+      )
+    }
+    const renderTableContent = () => {
+      return (
+          <div class="reservation-tab__content">
+            { reservationInHours.value.map((rih, index) =>
+                <div key={index} class="reservation-tab__content-row" id={rih.time}>
+                  <div class="reservation-tab__content-row--hour">{rih.time}</div>
+                  <div class="flex-grow-1">
+                    { rih.reservations.map(renderReservation) }
+                  </div>
+                </div>
+            )}
+          </div>
+      )
+    }
+    const renderReservation = (reservation, i) => {
+      const klass = [
+        'reservation-info',
+        reservation.status === 'completed' && 'reservation-info--completed',
+        reservation.status === 'pending' && 'reservation-info--pending'
+      ]
+      return (
+          <div key={`${rih.time}_${i}`} class={klass}>
+            <div class="reservation-info__time">
+              {reservation.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+
+            <div class="reservation-info__customer">
+              <div class="reservation-info__customer--name">{reservation.customer.name}</div>
+              <div class="reservation-info__customer--phone">{reservation.customer.phone}</div>
+              {(reservation.note) && <div class="reservation-info__customer--note">Note: {reservation.note}</div>}
+            </div>
+            <div class="reservation-info__guest">
+              <img alt src="/plugins/pos-plugin/assets/guest.svg"> </img>
+              <span class="fw-700 fs-small ml-1">{reservation.noOfGuests}</span>
+            </div>
+            <div class="reservation-info__action">
+              <g-btn-bs min-width="145"
+                        backgroundColor={reservation.status === 'pending' ? '#757575' : '#4CAF50'}
+                        icon={reservation.status === 'completed' && 'check'}
+                        onClick={() => completeReservation(reservation)}>
+                {t('onlineOrder.arrived')}
+              </g-btn-bs>
+
+              <g-btn-bs background-color="#F9A825" style={reservation.status === 'completed' && { opacity: 0.5 }} onClick={() => showEditDialog(reservation)}>
+                <g-icon>icon-reservation_modify</g-icon>
+              </g-btn-bs>
+
+              <g-btn-bs background-color="#E57373" onClick={() => showRemoveDialog(reservation)}>
+                <g-icon>icon-delete</g-icon>
+              </g-btn-bs>
+            </div>
+          </div>
+      )
+    }
+    const renderCreateNewDialog = () => {
+      return (
+          <new-reservation-dialog v-model={reservationDialog.value.show} edit={reservationDialog.value.editMode} reservation={selectedReservation.value} onSubmit={genReservations}/>
+      )
+    }
+    const renderNoticeDialog = () => {
+      return (
+          <g-dialog v-model={showNoticeDialog.value} width="338">
             <g-card>
               <g-card-title class="justify-center">
-                <div class="fs-large fw-700 pt-3">
-                  Notice
-                </div>
+                <div class="fs-large fw-700 pt-3">Notice</div>
               </g-card-title>
               <g-card-text class="ta-center">
                 You cannot modify a marked-as-arrived reservation.
               </g-card-text>
               <g-divider color="#9e9e9e" inset style="border-bottom: none"></g-divider>
               <g-card-actions style="justify-content: center">
-                <g-btn-bs text-color="#536DFE" onClick={() => dialog.value.notice = false}>
-                  Close
-                </g-btn-bs>
+                <g-btn-bs text-color="#536DFE" onClick={() => showNoticeDialog.value = false}>Close</g-btn-bs>
               </g-card-actions>
             </g-card>
           </g-dialog>
-          <g-dialog v-model={dialog.value.delete} width="422">
+      )
+    }
+    const renderDeleteDialog = () => {
+      return (
+          <g-dialog v-model={showDeleteDialog.value} width="422">
             <g-card>
               <g-card-title>
-                <p class="fs-large-3">
-                  Delete Reservation </p>
+                <p class="fs-large-3">Delete Reservation</p>
               </g-card-title>
               <g-card-text>
-                <p class="ta-center pa-3">
-                  Are you sure you want to delete the following reservation? </p>
+                <p class="ta-center pa-3">Are you sure you want to delete the following reservation?</p>
                 <p class="fw-700 ta-center">
                   <span class="mr-1">
-                    {selectedReservation.value && selectedReservation.value.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} </span>
+                    {selectedReservation.value && selectedReservation.value.date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                   <span class="mr-1">
-                    {selectedReservation.value && selectedReservation.value.customer.name} </span>
+                    {selectedReservation.value && selectedReservation.value.customer.name}
+                  </span>
                   <span class="mr-1">
-                    {selectedReservation.value && selectedReservation.value.customer.phone} </span>
+                    {selectedReservation.value && selectedReservation.value.customer.phone}
+                  </span>
                 </p>
               </g-card-text>
               <g-card-actions class="pa-3">
-                <g-btn-bs text-color="#424242" onClick={() => dialog.value.delete = false}>
-                  Cancel
-                </g-btn-bs>
-                <g-btn-bs width="80" background-color="#FF5252" text-color="white" onClick={confirmRemove}>
-                  Delete
-                </g-btn-bs>
+                <g-btn-bs text-color="#424242" onClick={() => showDeleteDialog.value = false}>Cancel</g-btn-bs>
+                <g-btn-bs width="80" background-color="#FF5252" text-color="white" onClick={confirmRemove}>Delete</g-btn-bs>
               </g-card-actions>
             </g-card>
           </g-dialog>
+      )
+    }
+
+    return () => (
+        <div class="reservation">
+          { renderReservationHeader() }
+          <div class="reservation-tab">
+            { renderTableHeader() }
+            { renderTableContent() }
+          </div>
+          { renderCreateNewDialog() }
+          { renderNoticeDialog() }
+          { renderDeleteDialog() }
         </div>
+    )
   }
 }
 </script>
