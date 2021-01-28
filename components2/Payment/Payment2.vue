@@ -6,10 +6,10 @@ import PosPaymentScreenPaymentMethods2 from './Helpers/PosPaymentScreenPaymentMe
 import PosRestaurantPaymentOrderDetail2 from './Helpers/PosRestaurantPaymentOrderDetail2';
 import PosRestaurantPaymentToolbar2 from './Helpers/PosRestaurantPaymentToolbar2';
 import PaymentLogicsFactory from './payment-logics';
-import { genScopeId } from '../../utils';
-import { addItem, createOrder, makeDiscount } from '../../OrderView/pos-logic';
+import { genScopeId } from '../utils';
+import { addItem, createOrder, makeDiscount } from '../OrderView/pos-logic';
 import dialogChangeValue2 from './Helpers/dialogChangeValue2';
-import { getCurrentOrder } from '../../OrderView/pos-logic-be';
+import { getCurrentOrder } from '../OrderView/pos-logic-be';
 export default {
   name: 'Payment',
   components: [PosPaymentScreenKeyboard2, PosPaymentScreenPaymentMethods2, PosRestaurantPaymentOrderDetail2, PosRestaurantPaymentToolbar2, dialogChangeValue2],
