@@ -36,6 +36,7 @@ export const sortedKitchenOrders = computed(() => {
 	return kitchenOrders.value
 })
 export const dialogRef = ref({})
+export const defaultPrepareTime = ref(15)
 
 //<editor-fold desc="function">
 export function submitReason(reason) {
@@ -83,5 +84,17 @@ export function getTimeoutProgress(order) {
 
 	if (!order.timeoutDate) return
 	return calTimeout()
+}
+
+export function getItemPrice(item) {
+	let price = item.originalPrice || item.price
+	if (item.modifiers && item.modifiers.length > 0) {
+		price += _.sumBy(item.modifiers, m => m.price * m.quantity)
+	}
+	return price
+}
+
+export function isPrepaidOrder(order) {
+	return order.paypalOrderDetail && order.paypalOrderDetail.orderID != null // paypal
 }
 //</editor-fold>

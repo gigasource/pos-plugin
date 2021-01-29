@@ -8,7 +8,9 @@ import {
 	calls,
 	missedCalls,
 	paymentIcon,
-	getExtraInfo
+	defaultPrepareTime,
+	getExtraInfo,
+	getItemPrice
 } from './online-order-main-logic'
 import {
 	cancelMissedCallTimeout,
@@ -53,9 +55,13 @@ export function openReservationDialog({ customer, callId }) {
 	dialog.value.reservation = true
 	cancelMissedCallTimeout()
 }
-export function getItemPrice(item) {
-	//todo: fill this
-	return 10
+
+export function onClickAccept(order) {
+	if (order.deliveryTime === 'asap') {
+		if (order.declineStep2) order.declineStep2 = false
+		if (!order.confirmStep2) return order.confirmStep2 = true
+		if (!order.prepareTime) order.prepareTime = defaultPrepareTime
+	}
 }
 //</editor-fold>
 
