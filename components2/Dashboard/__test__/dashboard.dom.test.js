@@ -15,7 +15,7 @@ describe("order-view test", function() {
   it("case 1 dashboard", async function() {
     makeWrapper(Dashboard, {});
     await nextTick();
-    await delay(50);
+    await delay(200);
     expect(wrapper.html()).toMatchInlineSnapshot(`
       <p>
         1

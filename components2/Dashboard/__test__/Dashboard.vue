@@ -2,14 +2,21 @@
 import ContentRender from "../../../components/common/ContentRender";
 import {KeepAlive, onActivated, ref, h} from "vue";
 import {contentView} from "./dashboard-shared";
+import _ from 'lodash';
+
 
 const TextField = {
   setup(props) {
     const count = ref(0);
+    const init = _.debounce(() => {
+      count.value ++;
+    }, 10);
+    init();
     onActivated(() => {
-      count.value++;
+      init();
       console.log('onActivated');
     })
+
     return () => <p>{count.value}</p>
   }
 }

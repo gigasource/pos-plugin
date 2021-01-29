@@ -2,7 +2,7 @@
 import { $filters, avatar, username } from '../../AppSharedStates';
 import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import { computed } from 'vue';
-import { GAvatar, GChip, GSpacer } from '../../../../../../backoffice/pos-vue-framework';
+import { GAvatar, GChip, GSpacer } from 'pos-vue-framework';
 import { genScopeId } from '../../utils';
 import { useI18n } from 'vue-i18n';
 

@@ -2,7 +2,7 @@
 
 import {$filters} from '../AppSharedStates';
 import {ref, watchEffect, withModifiers} from 'vue'
-import {internalValueFactory} from "../utils";
+import {genScopeId, internalValueFactory} from "../utils";
 import {useI18n} from "vue-i18n";
 import {getXReport, printXReport, xReport} from "./eod-shared";
 import _ from 'lodash';
@@ -27,75 +27,77 @@ export default {
       return _.reduce(paymentTypes, (res, values) => res + values, 0)
     }
 
-    return () => (
+    return genScopeId(() => (
         <div>
           {slots.activator && slots.activator({close, open})}
           <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="70%">
-            <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
-              <p class="eod-header">
-                {t('report.xReport')} </p>
-              <div style="height: calc(100% - 145px); overflow-y: auto;">
-                <div class="eod-dialog-main">
-                  {(xReport.value) &&
-                  <div class="eod-dialog-content">
-                    <p class="section-title eod-title">
-                      {t('common.sales')} </p>
-                    <div class="eod-details">
-                      {_.map(xReport.value.sumByPayment, (paymentValue, paymentName) =>
-                          <div class="details-content">
-                            <p>
-                              {paymentName} </p>
-                            <p>
-                              € {$filters.formatCurrency(paymentValue)} </p>
-                          </div>
-                      )}
-                      <div class="total-content">
-                        <p class="eod-subtitle">
-                          {t('common.total')} </p>
-                        <p style="text-decoration: underline; font-weight: 800;">
-                          €{$filters.formatCurrency(getSum(xReport.value.sumByPayment))}
-                        </p>
-                      </div>
-                    </div>
-                    <p class="section-title eod-title">
-                      {t('report.productSold')} </p>
-                    <div class="eod-details">
-                      {_.map(xReport.value.groupItemsByCategory, (items, category) =>
-                          <div>
-                            <p class="eod-subtitle">
-                              {category || 'No category'}
-                              (€{$filters.formatCurrency(xReport.value.sumByCategory[category])})
-                            </p>
-                            <div class="eod-sales-detail">
-                              {_.map(items, (quantity, name) =>
-                                  <p> {quantity} x {name} </p>
-                              )}
+            {genScopeId(() => <>
+              <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
+                <p class="eod-header">
+                  {t('report.xReport')} </p>
+                <div style="height: calc(100% - 145px); overflow-y: auto;">
+                  <div class="eod-dialog-main">
+                    {(xReport.value) &&
+                    <div class="eod-dialog-content">
+                      <p class="section-title eod-title">
+                        {t('common.sales')} </p>
+                      <div class="eod-details">
+                        {_.map(xReport.value.sumByPayment, (paymentValue, paymentName) =>
+                            <div class="details-content">
+                              <p>
+                                {paymentName} </p>
+                              <p>
+                                € {$filters.formatCurrency(paymentValue)} </p>
                             </div>
-                          </div>
-                      )} </div>
+                        )}
+                        <div class="total-content">
+                          <p class="eod-subtitle">
+                            {t('common.total')} </p>
+                          <p style="text-decoration: underline; font-weight: 800;">
+                            €{$filters.formatCurrency(getSum(xReport.value.sumByPayment))}
+                          </p>
+                        </div>
+                      </div>
+                      <p class="section-title eod-title">
+                        {t('report.productSold')} </p>
+                      <div class="eod-details">
+                        {_.map(xReport.value.groupItemsByCategory, (items, category) =>
+                            <div>
+                              <p class="eod-subtitle">
+                                {category || 'No category'}
+                                (€{$filters.formatCurrency(xReport.value.sumByCategory[category])})
+                              </p>
+                              <div class="eod-sales-detail">
+                                {_.map(items, (quantity, name) =>
+                                    <p> {quantity} x {name} </p>
+                                )}
+                              </div>
+                            </div>
+                        )} </div>
+                    </div>
+                    }
                   </div>
-                  }
-                </div>
-                <g-toolbar bottom color="#eee">
-                  <g-spacer>
-                  </g-spacer>
-                  <g-btn uppercase={false} onClick={close} class="mr-2">
+                  <g-toolbar bottom color="#eee">
+                    <g-spacer>
+                    </g-spacer>
+                    <g-btn uppercase={false} onClick={close} class="mr-2">
 
-                    {t('ui.cancel')}
-                  </g-btn>
-                  <g-btn uppercase={false} background-color="#2979FF" text-color="#fff"
-                         onClick={printXReport}>
-                    <g-icon class="mr-2" svg>
-                      icon-print
-                    </g-icon>
-                    {t('ui.print')}
-                  </g-btn>
-                </g-toolbar>
+                      {t('ui.cancel')}
+                    </g-btn>
+                    <g-btn uppercase={false} background-color="#2979FF" text-color="#fff"
+                           onClick={printXReport}>
+                      <g-icon class="mr-2" svg>
+                        icon-print
+                      </g-icon>
+                      {t('ui.print')}
+                    </g-btn>
+                  </g-toolbar>
+                </div>
               </div>
-            </div>
+            </>)()}
           </g-dialog>
         </div>
-    )
+    ))
   }
 }
 </script>

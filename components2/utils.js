@@ -10,7 +10,9 @@ export const internalValueFactory = (props, {emit}) => {
   })
 }
 
+let inited = false;
 export function genScopeId(render, currentInstance) {
+  if (!inited) initUtils();
   if (render) {
     return withScopeId((currentInstance || getCurrentInstance()).type['__scopeId'])(render);
   }
@@ -49,9 +51,29 @@ export const timeFormat = computed(() => {
   return t('dates.timeFormat');
 });
 
+export const datetimeFormat = computed(() => {
+  const {t} = useI18n();
+  return `${t('dates.dateFormat')} ${t('dates.timeFormat')}`;
+});
+
 export function formatDate(date) {
   if (!date || !dayjs(date).isValid()) return ''
   return dayjs(date).format(dateFormat.value);
+}
+
+export function formatDatetime(date) {
+  if (!date || !dayjs(date).isValid()) return ''
+  return dayjs(date).format(datetimeFormat.value);
+}
+
+export function initUtils() {
+  const [] = [
+    dateFormat.value,
+    timeFormat.value,
+    datetimeFormat.value,
+    backFn.value
+  ]
+  inited = true;
 }
 
 export const backFn = computed(() => {

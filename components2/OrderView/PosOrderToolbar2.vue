@@ -1,14 +1,14 @@
 <script>
-import {disablePay, disablePrint, getCurrentOrder, onlyCheckoutPrintedItems} from "../pos-logic-be";
+import {disablePay, disablePrint, getCurrentOrder, onlyCheckoutPrintedItems} from "./pos-logic-be";
 import {useI18n} from "vue-i18n";
-import {hooks, makeTakeaway} from "../pos-logic";
+import {hooks, makeTakeaway} from "./pos-logic";
 import {computed, onActivated, ref, withModifiers} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {orderViewDialog} from "../pos-ui-shared";
-import {genScopeId} from "../../utils";
+import {orderViewDialog} from "./pos-ui-shared";
+import {backFn, genScopeId} from "../utils";
 
 export default {
-  name: "PosQuickOrderToolbar2",
+  name: "PosOrderToolbar2",
   setup(props, {emit}) {
     const order = getCurrentOrder();
     const showMenu = ref(false);
@@ -66,7 +66,7 @@ export default {
 
     return genScopeId(() => (
         <g-toolbar elevation="0" color="#eee">
-          <g-btn-bs icon="icon-back" onClick="back">{$t('ui.back')}</g-btn-bs>
+          <g-btn-bs icon="icon-back" onClick={back}>{$t('ui.back')}</g-btn-bs>
           <g-menu top nudge-top="5" v-model={showMenu.value} v-slots={{
             activator: ({toggleContent}) => (
                 <g-btn-bs icon="icon-menu" onClick={toggleContent}>{$t('ui.more')}</g-btn-bs>
