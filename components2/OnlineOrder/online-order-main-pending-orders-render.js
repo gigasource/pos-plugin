@@ -7,7 +7,8 @@ import {
 	pendingOrders,
 	calls,
 	missedCalls,
-	paymentIcon
+	paymentIcon,
+	getExtraInfo
 } from './online-order-main-logic'
 import {
 	cancelMissedCallTimeout,
@@ -61,7 +62,6 @@ export function getItemPrice(item) {
 //<editor-fold desc="pendingOrders">
 export function renderPendingOrdersFactory () {
 	const { t, locale } = useI18n()
-	console.log((pendingOrders.value && pendingOrders.value.length))
 	function renderPendingOrdersHeader() {
 		return (
 			<div className="header">
@@ -239,80 +239,82 @@ export function renderPendingOrdersFactory () {
 	}
 
 	function renderPendingOrdersText(order) {
-		<g-card-text>
-			{
-				(order.note) &&
-				<div className="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
-					{t('onlineOrder.note')}: {order.note}
-				</div>
-			}
-			{
-				(order.type === 'delivery') &&
-				<div className="row-flex">
-					<div style="flex: 0 0 25px">
-						<g-icon color="#9E9E9E" size="20">
-							icon-place
-						</g-icon>
+		return (
+			<g-card-text>
+				{
+					(order.note) &&
+					<div className="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
+						{t('onlineOrder.note')}: {order.note}
 					</div>
-					<div style="max-width: calc(100% - 25px);" className="flex-equal pl-1">
-						{`${order.customer.address} ${order.customer.zipCode}`}
+				}
+				{
+					(order.type === 'delivery') &&
+					<div className="row-flex">
+						<div style="flex: 0 0 25px">
+							<g-icon color="#9E9E9E" size="20">
+								icon-place
+							</g-icon>
+						</div>
+						<div style="max-width: calc(100% - 25px);" className="flex-equal pl-1">
+							{`${order.customer.address} ${order.customer.zipCode}`}
+						</div>
 					</div>
-				</div>
-			}
-			{
-				(order.items) &&
-				<div>
-					{order.items.map(item =>
-						<div className="row-flex align-items-start">
-							<div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">
-								{item.quantity}x
-							</div>
-							<div className="flex-equal fs-small-2 pl-1" style="word-break: break-all">
+				}
+				{
+					(order.items) &&
+					<div>
+						{order.items.map(item =>
+							<div className="row-flex align-items-start">
+								<div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">
+									{item.quantity}x
+								</div>
+								<div className="flex-equal fs-small-2 pl-1" style="word-break: break-all">
 
-								{item.id && `${item.id}.`} {item.name}
-								<span className="i text-grey">
-								{getExtraInfo(item)}
-							</span>
-							</div>
-							<div className="fs-small-2 ta-right">
-								€{$filters.formatCurrency(getItemPrice(item), 2)} </div>
-						</div>
-					)} </div>
-			}
-			{
-				(order.type === 'delivery') &&
-				<div className="row-flex">
-					<div className="flex-equal fw-700">
-						{t('onlineOrder.shippingFee')} </div>
-					<div className="fs-small-2 ta-right">
-						€{$filters.formatCurrency(order.shippingFee, 2)} </div>
-				</div>
-			}
-			{
-				(order.discounts && order.discounts.length) &&
-				<div>
-					{order.discounts.map(discount =>
-						<div className="row-flex align-items-start">
-							<div>
-							<span>
-								{discount.coupon ? `Coupon ` : discount.name}
-							</span>
-								{
-									(discount.coupon) &&
-									<span style="color: #757575; font-style: italic">
-									({discount.coupon})
+									{item.id && `${item.id}.`} {item.name}
+									<span className="i text-grey">
+									{getExtraInfo(item)}
 								</span>
-								}
+								</div>
+								<div className="fs-small-2 ta-right">
+									€{$filters.formatCurrency(getItemPrice(item), 2)} </div>
 							</div>
-							<g-spacer></g-spacer>
-							<div className="fs-small-2">
-								-{t('common.currency', locale.value)}{$filters.formatCurrency(discount.value, 2)}
+						)} </div>
+				}
+				{
+					(order.type === 'delivery') &&
+					<div className="row-flex">
+						<div className="flex-equal fw-700">
+							{t('onlineOrder.shippingFee')} </div>
+						<div className="fs-small-2 ta-right">
+							€{$filters.formatCurrency(order.shippingFee, 2)} </div>
+					</div>
+				}
+				{
+					(order.discounts && order.discounts.length) &&
+					<div>
+						{order.discounts.map(discount =>
+							<div className="row-flex align-items-start">
+								<div>
+								<span>
+									{discount.coupon ? `Coupon ` : discount.name}
+								</span>
+									{
+										(discount.coupon) &&
+										<span style="color: #757575; font-style: italic">
+										({discount.coupon})
+									</span>
+									}
+								</div>
+								<g-spacer></g-spacer>
+								<div className="fs-small-2">
+									-{t('common.currency', locale.value)}{$filters.formatCurrency(discount.value, 2)}
+								</div>
 							</div>
-						</div>
-					)}
-				</div>
-			}
-		</g-card-text>
+						)}
+					</div>
+				}
+			</g-card-text>
+		)
 	}
 
 	function renderPendingOrdersActions(order) {

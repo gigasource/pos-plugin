@@ -1,5 +1,16 @@
 const {ObjectID} = require('bson')
 
+/**
+ *
+ * @param date {Date} current date
+ * @param interval {Number} time interval in second
+ * @example
+ * genDateInFuture(new Date(), 300)
+ */
+function genDateInFuture(date, interval) {
+	return new Date(date.getTime() + interval * 1000)
+}
+
 const orders = [{
 	"printer": [],
 	"_id": new ObjectID("5ffffadd207bc21ece71a2db"),
@@ -194,11 +205,11 @@ const orders = [{
 		"deliveryTime": "",
 		"distance": null
 	},
-	"deliveryDate": new Date("2021-01-29T02:23:18.426Z"),
+	"deliveryDate": new Date(),
 	"payment": [{"_id": new ObjectID("60137196dbf49c517d9ccbad"), "type": "cash", "value": 3.5}],
 	"type": "pickup",
-	"date": new Date("2021-01-29T02:23:15.825Z"),
-	"timeoutDate": new Date("2021-01-29T02:28:15.825Z"),
+	"date": new Date(),
+	"timeoutDate": genDateInFuture(new Date(), 300),
 	"vDate": new Date("2021-01-28T17:00:00.000Z"),
 	"bookingNumber": "210129092315825",
 	"shippingFee": 0,
@@ -244,11 +255,11 @@ const orders = [{
 		"deliveryTime": "",
 		"distance": null
 	},
-	"deliveryDate": "2021-01-29T02:23:34.589Z",
+	"deliveryDate": genDateInFuture(new Date(), -100),
 	"payment": [{"_id": new ObjectID("601371a6dbf49c517d9ccbcd"), "type": "cash", "value": 0.1}],
 	"type": "pickup",
-	"date": new Date("2021-01-29T02:23:31.991Z"),
-	"timeoutDate": new Date("2021-01-29T02:28:31.991Z"),
+	"date": genDateInFuture(new Date(), -100),
+	"timeoutDate": genDateInFuture(new Date, 200),
 	"vDate": new Date("2021-01-28T17:00:00.000Z"),
 	"bookingNumber": "210129092331991",
 	"shippingFee": 0,
