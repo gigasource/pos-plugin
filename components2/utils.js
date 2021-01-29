@@ -41,6 +41,13 @@ export const isSameId = function (obj, obj1) {
 }
 
 //todo dateFormat
+
+export const formatsFactory = () => {
+  const { t } = useI18n()
+  const dateFormat = t('dates.dateFormat');
+  return { dateFormat }
+}
+
 export const dateFormat = computed(() => {
   const {t} = useI18n();
   return t('dates.dateFormat');
