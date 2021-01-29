@@ -7,13 +7,13 @@ const _ = require('lodash');
 async function eodReportCalender(from, to) {
   const query = {
     date: {
-      ...from && {$gte: from},
-      ...to && {$lte: to},
+      ...from && {$gte: new Date(from)},
+      ...to && {$lte: new Date(to)},
     },
     status: "paid"
   };
-
   let orders = await Order.find(query);
+  console.log(orders)
   const ordersByDate = renderPivotTable({
     columns: ["@date:vDate", "z"],
     reducers: ["@sum[2]:vSum", fromReducer, toReducer]

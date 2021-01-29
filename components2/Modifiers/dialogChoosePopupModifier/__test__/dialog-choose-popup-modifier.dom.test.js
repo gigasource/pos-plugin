@@ -25,6 +25,8 @@ const {
 } = dialogChoosePopupModifierLogicsFactory({ product }, { emit: {} });
 
 beforeAll(async () => {
+  const orm = require("schemahandler");
+  await orm.connect("mongodb://localhost:27017", "Modifiers");
   const Modifier = cms.getModel("Modifiers");
   await Modifier.remove({});
   await Modifier.create({ groups: [] });
@@ -111,7 +113,6 @@ describe("test dialog choose popup modifier ui", () => {
                                   return-object="true"
                                   multiple="false"
                                   mandatory="true"
-                                  modelvalue="[object Object]"
               >
               </g-grid-select-stub>
             </div>
@@ -126,7 +127,7 @@ describe("test dialog choose popup modifier ui", () => {
                                   return-object="true"
                                   multiple="true"
                                   mandatory="false"
-                                  modelvalue="[object Object]"
+                                  modelvalue
               >
               </g-grid-select-stub>
             </div>
@@ -153,30 +154,86 @@ describe("test dialog choose popup modifier ui", () => {
     expect(getModifierQty(item1)).toEqual(2);
     onClickModifier(item1, category1);
     expect(getModifierQty(item1)).toEqual(0);
-    expect(activeItem(category1).value).toMatchInlineSnapshot(`Array []`);
+    expect(activeItem(category1).value).toMatchInlineSnapshot(`null`);
     onClickModifier(item1, category1);
     expect(stringify(activeItem(category1).value)).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "_id": "ObjectID",
-          "max": 2,
-          "name": "i1",
-          "price": 0,
-          "type": "modifier",
-        },
-      ]
+      Object {
+        "_id": "ObjectID",
+        "max": 2,
+        "name": "i1",
+        "price": 0,
+        "type": "modifier",
+      }
+    `);
+    await nextTick();
+    expect(wrapper.html()).toMatchInlineSnapshot(`
+      <g-dialog-stub width="60%">
+        <g-card-stub class="pt-3 pr-4 pb-3 pl-4">
+          <g-card-title-stub>
+            <div class="row-flex flex-grow-1">
+              <div class="flex-grow-1">
+                Water
+              </div>
+              <g-icon-stub>
+                icon-close
+              </g-icon-stub>
+            </div>
+          </g-card-title-stub>
+          <g-card-text-stub>
+            <div>
+              <span>
+                c1
+              </span>
+              <span style="color: rgb(255, 68, 82);">
+                *
+              </span>
+            </div>
+            <div class="mt-2 mb-3">
+              <g-grid-select-stub items="[object Object],[object Object]"
+                                  grid="false"
+                                  return-object="true"
+                                  multiple="false"
+                                  mandatory="true"
+                                  modelvalue="[object Object]"
+              >
+              </g-grid-select-stub>
+            </div>
+            <div>
+              <span>
+                c2
+              </span>
+            </div>
+            <div class="mt-2 mb-3">
+              <g-grid-select-stub items="[object Object],[object Object]"
+                                  grid="false"
+                                  return-object="true"
+                                  multiple="true"
+                                  mandatory="false"
+                                  modelvalue
+              >
+              </g-grid-select-stub>
+            </div>
+          </g-card-text-stub>
+          <g-card-actions-stub>
+            <g-btn-stub background-color="#2979FF"
+                        text-color="#fff"
+                        disabled="false"
+            >
+              Save
+            </g-btn-stub>
+          </g-card-actions-stub>
+        </g-card-stub>
+      </g-dialog-stub>
     `);
     onClickModifier(item2, category1);
     expect(stringify(activeItem(category1).value)).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "_id": "ObjectID",
-          "max": 1,
-          "name": "i2",
-          "price": 0,
-          "type": "modifier",
-        },
-      ]
+      Object {
+        "_id": "ObjectID",
+        "max": 1,
+        "name": "i2",
+        "price": 0,
+        "type": "modifier",
+      }
     `);
 
     //test case: selectOne = false
@@ -201,6 +258,66 @@ describe("test dialog choose popup modifier ui", () => {
           "type": "modifier",
         },
       ]
+    `);
+    await nextTick();
+    expect(wrapper.html()).toMatchInlineSnapshot(`
+      <g-dialog-stub width="60%">
+        <g-card-stub class="pt-3 pr-4 pb-3 pl-4">
+          <g-card-title-stub>
+            <div class="row-flex flex-grow-1">
+              <div class="flex-grow-1">
+                Water
+              </div>
+              <g-icon-stub>
+                icon-close
+              </g-icon-stub>
+            </div>
+          </g-card-title-stub>
+          <g-card-text-stub>
+            <div>
+              <span>
+                c1
+              </span>
+              <span style="color: rgb(255, 68, 82);">
+                *
+              </span>
+            </div>
+            <div class="mt-2 mb-3">
+              <g-grid-select-stub items="[object Object],[object Object]"
+                                  grid="false"
+                                  return-object="true"
+                                  multiple="false"
+                                  mandatory="true"
+                                  modelvalue="[object Object]"
+              >
+              </g-grid-select-stub>
+            </div>
+            <div>
+              <span>
+                c2
+              </span>
+            </div>
+            <div class="mt-2 mb-3">
+              <g-grid-select-stub items="[object Object],[object Object]"
+                                  grid="false"
+                                  return-object="true"
+                                  multiple="true"
+                                  mandatory="false"
+                                  modelvalue="[object Object],[object Object]"
+              >
+              </g-grid-select-stub>
+            </div>
+          </g-card-text-stub>
+          <g-card-actions-stub>
+            <g-btn-stub background-color="#2979FF"
+                        text-color="#fff"
+                        disabled="false"
+            >
+              Save
+            </g-btn-stub>
+          </g-card-actions-stub>
+        </g-card-stub>
+      </g-dialog-stub>
     `);
     onClickModifier(item3, category2);
     expect(stringify(activeItem(category2).value)).toMatchInlineSnapshot(`

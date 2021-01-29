@@ -48,9 +48,13 @@ describe("pos-logic", function() {
     //<editor-fold desc="order-expect">
     expect(order).toMatchInlineSnapshot(`
       Object {
+        "_id": "60110a77b2b0b9a01234a616",
         "cancellationItems": Array [],
+        "cashback": 0,
         "items": Array [
           Object {
+            "_id": "60110a77b2b0b9a01234a617",
+            "course": 1,
             "name": "Cola",
             "price": 1.3,
             "quantity": 10,
@@ -70,6 +74,8 @@ describe("pos-logic", function() {
             },
           },
           Object {
+            "_id": "60110a77b2b0b9a01234a618",
+            "course": 1,
             "name": "Fanta",
             "price": 2,
             "quantity": 20,
@@ -89,8 +95,12 @@ describe("pos-logic", function() {
             },
           },
         ],
+        "payment": Array [],
         "status": "inProgress",
         "takeAway": false,
+        "tip": 0,
+        "user": Array [],
+        "vDate": 2021-01-26T17:00:00.000Z,
         "vSum": 53,
         "vTaxSum": Object {
           "16": Object {
@@ -852,7 +862,7 @@ describe("pos-logic", function() {
             "value": 5,
           },
         ],
-        47.7,
+        52.7,
       ]
     `);
     //</editor-fold>
@@ -955,8 +965,8 @@ describe("pos-logic", function() {
             "value": 43,
           },
         ],
-        undefined,
-        undefined,
+        0,
+        0,
       ]
     `);
     //</editor-fold>

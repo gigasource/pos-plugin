@@ -20,7 +20,7 @@
 
 <script>
   import { nextTick } from 'vue';
-
+  import _ from 'lodash'
   export default {
     name: 'ScrollSelect',
     props: {

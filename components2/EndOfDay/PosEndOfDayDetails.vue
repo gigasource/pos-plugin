@@ -3,7 +3,8 @@ import {useI18n} from 'vue-i18n';
 import dayjs from "dayjs";
 import {computed, ref, watch} from "vue";
 import {$filters} from "../AppSharedStates";
-import {selectedReportDate} from "./eod-shared";
+import { listOfDatesWithReports, selectedDate, selectedReportDate } from './eod-shared';
+import {genScopeId} from "../utils";
 
 export default {
   props: ['modelValue'],
@@ -15,7 +16,7 @@ export default {
     const timeFormat = ref('')
     const dateFormat = ref('')
 
-    const selectedDate = computed(() => {
+    const _selectedDate = computed(() => {
       if (selectedReportDate.value && selectedReportDate.value.date) {
         return dayjs(selectedReportDate.value.date).format(dateFormat.value)
       }
@@ -38,7 +39,7 @@ export default {
      */
     //fixme: remove watch
     watch(selectedReportDate, (newVal, oldVal) => {
-      if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
+      if (selectedReportDate.value && selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
         zNumberReports.value = selectedReportDate.value.reports.map(report => ({
           begin: dayjs(report.begin).format(timeFormat.value),
           end: dayjs(report.end).format(timeFormat.value),
@@ -53,55 +54,56 @@ export default {
       }
     })
 
-    return () => <>
-      <div>
-        {(zNumberReports.value.length > 0) &&
-        <g-tabs items={zNumberReports.value} color="#F2F2F2" text-color="#000000" v-model={selectedTab.value} showArrows={false}
-                slider-size="0" v-slots={{
-          default: () => <> {zNumberReports.value.map((item, i) =>
-              <g-tab-item item={item} key={i}>
-                <div class="eod-info">
-                  <span class="eod-info-important"> Date: </span>
-                  <span> {selectedDate.value} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.zNumber')}: </span>
-                  <span>
-                    {item.z} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.firstOrder')}: </span>
-                  <span>
-                    {item.begin} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.lastOrder')}: </span>
-                  <span>
-                    {item.end} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.totalSales')}: </span>
-                  <span class="eod-info-total-sale">
-                    € {$filters.formatCurrency(item.sum)} </span>
-                </div>
-              </g-tab-item>
-          )} </>,
-          tab: ({item, index}) => <>
-            <g-tab item={item} key={index} active-text-color="#000000">
-              <p class="eod-tab-title">
-                Z: {item.z} </p>
-              <p class="eod-tab-subtitle">
-                {item.begin} - {item.end} </p>
-            </g-tab>
-          </>
-        }}/>
-        }
-      </div>
-    </>
+    return genScopeId(() => (
+        <div>
+          {(zNumberReports.value.length > 0) &&
+          <g-tabs items={zNumberReports.value} color="#F2F2F2" text-color="#000000" v-model={selectedTab.value}
+                  showArrows={false}
+                  slider-size="0" v-slots={{
+            default: () => <> {zNumberReports.value.map((item, i) =>
+                <g-tab-item item={item} key={i}>
+                  <div class="eod-info">
+                    <span class="eod-info-important"> Date: </span>
+                    <span> {_selectedDate.value} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.zNumber')}: </span>
+                    <span>
+                      {item.z} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.firstOrder')}: </span>
+                    <span>
+                      {item.begin} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.lastOrder')}: </span>
+                    <span>
+                      {item.end} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.totalSales')}: </span>
+                    <span class="eod-info-total-sale">
+                      € {$filters.formatCurrency(item.sum)} </span>
+                  </div>
+                </g-tab-item>
+            )} </>,
+            tab: ({item, index}) => <>
+              <g-tab item={item} key={index} active-text-color="#000000">
+                <p class="eod-tab-title">
+                  Z: {item.z} </p>
+                <p class="eod-tab-subtitle">
+                  {item.begin} - {item.end} </p>
+              </g-tab>
+            </>
+          }}/>
+          }
+        </div>
+    ))
 
   }
 }
