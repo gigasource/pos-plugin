@@ -7,8 +7,8 @@ const {renderPivotTable} = require("./pivot");
 async function staffReport(from, to) {
   const query = {
     date: {
-      ...from && {$gte: from},
-      ...to && {$lte: to},
+      ...from && {$gte: new Date(from)},
+      ...to && {$lte: new Date(to)},
     }
   };
 
