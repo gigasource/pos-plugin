@@ -1,8 +1,11 @@
 import {
-	calls,
+	calls, kitchenOrders,
+	pendingOrders,
 	missedCalls,
 	paymentIcon
 } from './online-order-main-logic'
+
+const Order = cms.getModel('Order')
 
 export async function getPaymentIcon(payment) {
 	const paymentMethod = await cms.getModel('PosSetting').find()
@@ -29,5 +32,9 @@ export function declineOrder(order) {
 	// todo: fill this
 }
 
+export async function loadOrders() {
+	pendingOrders.value = await Order.find({ online: true, status: 'inProgress' })
+	kitchenOrders.value = await Order.find({ online: true, status: 'kitchen' })
+}
 
 

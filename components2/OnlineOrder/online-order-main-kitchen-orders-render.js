@@ -2,7 +2,9 @@
 import { withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
 import {
-	sortedKitchenOrders
+	sortedKitchenOrders,
+	getPendingOrderKitchenTime,
+	getExtraInfo
 } from "./online-order-main-logic";
 
 export function renderKitchenOrdersFactory() {
@@ -55,7 +57,7 @@ export function renderKitchenOrdersFactory() {
 	}
 
 	function renderKitchenOrdersText(order) {
-		return
+		return (
 			<g-card-text>
 				{
 					(order.note) &&
@@ -114,6 +116,7 @@ export function renderKitchenOrdersFactory() {
 					</div>
 				}
 			</g-card-text>
+		)
 	}
 
 	function renderKitchenOrdersContent() {

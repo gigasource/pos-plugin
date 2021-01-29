@@ -1,13 +1,22 @@
 <script>
+import { onBeforeMount } from 'vue'
 import { renderPendingOrdersFactory } from "./online-order-main-pending-orders-render";
 import { renderKitchenOrdersFactory } from "./online-order-main-kitchen-orders-render";
 import {
   declineOrder,
   completeOrder,
+  loadOrders
 } from "./online-order-main-logic-be";
+import {
+  genScopeId
+} from "../utils";
 
 export default {
   setup(props, { emit }) {
+    onBeforeMount(async () => {
+      await loadOrders()
+    })
+
     const {
       renderPendingOrders
     } = renderPendingOrdersFactory()
@@ -15,14 +24,14 @@ export default {
       renderKitchenOdrers
     } = renderKitchenOrdersFactory()
 
-    return () => (
+    return genScopeId(() => (
       <div class="main">
         {renderPendingOrders()}
         {renderKitchenOdrers()}
         <dialog-complete-order onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
         <dialog-text-filter label="Reason"></dialog-text-filter>
       </div>
-    )
+    ))
   }
 }
 </script>

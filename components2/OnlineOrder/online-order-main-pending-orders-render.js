@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import {
 	timeoutProgress,
 	modemDeviceConnected,
-	internalOrders,
+	pendingOrders,
 	calls,
 	missedCalls,
 	paymentIcon
@@ -61,6 +61,7 @@ export function getItemPrice(item) {
 //<editor-fold desc="pendingOrders">
 export function renderPendingOrdersFactory () {
 	const { t, locale } = useI18n()
+	console.log((pendingOrders.value && pendingOrders.value.length))
 	function renderPendingOrdersHeader() {
 		return (
 			<div className="header">
@@ -68,11 +69,11 @@ export function renderPendingOrdersFactory () {
 				{t('onlineOrder.pendingOrders')}
 			</span>
 				{
-					(internalOrders.value && internalOrders.value.length) &&
+					(pendingOrders.value && !!pendingOrders.value.length) &&
 					<g-badge className="ml-1" inline modelValue={true} color="#4CAF50" v-slots={{
 						'badge': () =>
 							<div className="px-2">
-								{internalOrders.value.length}
+								{pendingOrders.value.length}
 							</div>
 					}}>
 					</g-badge>
@@ -189,7 +190,7 @@ export function renderPendingOrdersFactory () {
 		)
 	}
 
-	function renderInternalOrdersTitle(order) {
+	function renderPendingOrdersTitle(order) {
 		return (
 			<g-card-title className="pending-orders--title">
 				<div className="row-flex align-items-center flex-grow-1">
@@ -237,7 +238,7 @@ export function renderPendingOrdersFactory () {
 		)
 	}
 
-	function renderInternalOrdersText(order) {
+	function renderPendingOrdersText(order) {
 		<g-card-text>
 			{
 				(order.note) &&
@@ -314,7 +315,7 @@ export function renderPendingOrdersFactory () {
 		</g-card-text>
 	}
 
-	function renderInternalOrdersActions(order) {
+	function renderPendingOrdersActions(order) {
 		return (
 			<>
 				{
@@ -389,12 +390,12 @@ export function renderPendingOrdersFactory () {
 		)
 	}
 
-	function renderInternalOrders() {
-		return internalOrders.value.map((order, index) => (
+	function renderAllPendingOrders() {
+		return pendingOrders.value.map((order, index) => (
 			<g-card elevation="0" key={index}>
-				{renderInternalOrdersTitle(order)}
-				{renderInternalOrdersText(order)}
-				{renderInternalOrdersActions(order)}
+				{renderPendingOrdersTitle(order)}
+				{renderPendingOrdersText(order)}
+				{renderPendingOrdersActions(order)}
 			</g-card>
 		))
 	}
@@ -402,18 +403,19 @@ export function renderPendingOrdersFactory () {
 	function renderPendingOrdersContent() {
 		return (
 			<div class="content">
+				{(!pendingOrders.value || !pendingOrders.value.length) && renderEmptyPendingOrders()}
 				{renderPendingOrdersCalls()}
-				{renderInternalOrders()}
+				{renderAllPendingOrders()}
 			</div>
 		)
 	}
 
 	function renderPendingOrders() {
 		return (
-			<>
+			<div className="pending-orders pr-2">
 				{renderPendingOrdersHeader()}
 				{renderPendingOrdersContent()}
-			</>
+			</div>
 		)
 	}
 
@@ -423,8 +425,8 @@ export function renderPendingOrdersFactory () {
 		renderEmptyPendingOrders,
 		renderPendingOrdersCalls,
 		renderPendingOrdersMissedCall,
-		renderInternalOrders,
-		renderPendingOrders
+		renderPendingOrders,
+		renderAllPendingOrders
 	}
 };
 
