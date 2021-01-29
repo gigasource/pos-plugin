@@ -4,6 +4,7 @@ import {onActivated, ref, watch} from 'vue'
 import {getMonthReport, monthReport, showProductSold} from "./month-report-shared";
 import {useI18n} from "vue-i18n";
 import _ from 'lodash';
+import { genScopeId } from '../utils';
 
 export default {
   name: 'PosMonthReport',
@@ -14,7 +15,7 @@ export default {
 
     onActivated(getMonthReport);
 
-    return () => (
+    return genScopeId(() => (
         <div class="report-wrapper">
           <div class="report-content">
             <div class="report__sales">
@@ -76,7 +77,7 @@ export default {
             </div>}
           </div>
         </div>
-    )
+    ))
   }
 }
 </script>

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {dateFormat} from "../utils";
+import { dateFormat, formatsFactory } from '../utils';
 import {computed, ref} from 'vue';
 import cms from "cms";
 import JsonFn from "json-fn";
@@ -20,11 +20,12 @@ export function autoAssignFromTo() {
 }
 
 export const selectedPeriod = computed(() => {
+  const { dateFormat } = formatsFactory()
   if (monthReportFrom.value && monthReportTo.value) {
     const start = dayjs(monthReportFrom.value);
     const end = dayjs(monthReportTo.value);
     if (!start.isSame(selectedMonthFrom.value, 'day') || !end.isSame(selectedMonthTo.value, 'day')) {
-      return `${start.format(dateFormat.value)} - ${end.format(dateFormat.value)}`
+      return `${start.format(dateFormat)} - ${end.format(dateFormat)}`
     }
   }
   if (selectedMonth.value) {
@@ -34,6 +35,8 @@ export const selectedPeriod = computed(() => {
 
 //todo: test this first
 export async function getMonthReport() {
+  const { dateFormat } = formatsFactory()
+
   let {total, salesByCategory, salesByPayment, zNumbers, salesByCategoryName}
     = JsonFn.clone(await new Promise(
     r => cms.socket.emit('make-month-report', monthReportFrom.value, monthReportTo.value, r)));
@@ -41,7 +44,7 @@ export async function getMonthReport() {
   zNumbers = _.reduce(zNumbers, (acc, data, date) => {
     _.forEach(data, (sum, z) => {
       if (!z) return;
-      const _item = {z: parseInt(z), sum: sum, date: dayjs(date, 'DD.MM.YYYY').format(dateFormat.value)}
+      const _item = {z: parseInt(z), sum: sum, date: dayjs(date, 'DD.MM.YYYY').format(dateFormat)}
       acc.push(_item);
     })
     return acc

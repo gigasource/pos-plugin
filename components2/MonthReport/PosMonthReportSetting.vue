@@ -1,22 +1,31 @@
 <script>
-import {useI18n} from 'vue-i18n';
-import {getMonthReport, monthReportFrom, monthReportTo, showAllZNumber, showProductSold} from "./month-report-shared";
-import {watch} from 'vue'
+import { useI18n } from 'vue-i18n';
+import { getMonthReport, monthReportFrom, monthReportTo, showAllZNumber, showProductSold } from './month-report-shared';
+import { watch, ref, computed } from 'vue'
+import { genScopeId } from '../utils';
+import dayjs from 'dayjs';
+import { selectedDate } from '../EndOfDay/eod-shared';
 
 export default {
   name: 'PosMonthReportSetting',
   setup() {
     watch([() => monthReportFrom.value, () => monthReportTo.value], getMonthReport);
-
+    const dateStringComputed = (ori) => computed({
+      get() {
+        return dayjs(ori.value).format('YYYY-MM-DD')
+      },
+      set(val) {
+        ori.value = dayjs(val).toDate()
+      }
+    });
     const { t } = useI18n()
-    return () => <>
-      <div class="setting-wrapper">
-        <g-date-picker-input label={t('report.from')} v-model={monthReportFrom.value} class="mt-5"/>
-        <g-date-picker-input label={t('report.to')} v-model={monthReportTo.value}/>
-        <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold.value}/>
-        <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber.value} class="mt-5"/>
-      </div>
-    </>
+    return genScopeId(() =>
+        <div class="setting-wrapper">
+          <g-date-picker-input label={t('report.from')} v-model={dateStringComputed(monthReportFrom).value} class="mt-5"/>
+          <g-date-picker-input label={t('report.to')} v-model={dateStringComputed(monthReportTo).value}/>
+          <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold.value}/>
+          <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber.value} class="mt-5"/>
+        </div>)
   }
 }
 </script>
