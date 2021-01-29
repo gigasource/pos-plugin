@@ -1,6 +1,6 @@
-const { ObjectID } = require('bson')
+const {ObjectID} = require('bson')
 
-module.export = [{
+const orders = [{
 	"printer": [],
 	"_id": new ObjectID("5ffffadd207bc21ece71a2db"),
 	"id": 1,
@@ -147,10 +147,124 @@ module.export = [{
 	"online": true,
 	"note": "",
 	"onlineOrderId": "e571c160-5fbc-11eb-a77a-a1ad16df7dd7",
-	"discounts": [{"_id": new ObjectID("600fe788bd5c7e5549974893"), "name": "Giam gia test", "value": 1, "type": "percent"}],
+	"discounts": [{
+		"_id": new ObjectID("600fe788bd5c7e5549974893"),
+		"name": "Giam gia test",
+		"value": 1,
+		"type": "percent"
+	}],
 	"deliveryTime": "17:27",
 	"user": [{"_id": new ObjectID("5e1d89f200971c2ac29fcccb"), "name": "admin"}],
 	"commits": [],
 	"declineReason": "",
 	"prepareTime": 30
+}, {
+	"printer": [],
+	"_id": new ObjectID("60137196dbf49c517d9ccba9"),
+	"id": 4,
+	"status": "inProgress",
+	"items": [{
+		"taxes": [],
+		"_id": new ObjectID("60137196dbf49c517d9ccbaa"),
+		"originalPrice": 0,
+		"id": "1",
+		"image": "/cms-files/files/view//images/212 - ov292aq.png",
+		"name": "Pepe 1",
+		"price": 0,
+		"tax": 19,
+		"quantity": 1,
+		"note": "",
+		"modifiers": [{
+			"_id": "5ebd12347604c41966d66475",
+			"name": "Choice 1 - Nhom 1",
+			"price": 2.5,
+			"quantity": 1
+		}, {"_id": new ObjectID("5ebd0c667604c41966d66435"), "name": "Choice 1 - Nhom 2", "price": 1, "quantity": 1}],
+		"groupPrinter": "Kitchen",
+		"groupPrinter2": "false",
+		"category": "1",
+		"attributes": []
+	}],
+	"customer": {
+		"name": "ádf",
+		"company": "",
+		"phone": "123",
+		"address": "",
+		"zipCode": "",
+		"deliveryTime": "",
+		"distance": null
+	},
+	"deliveryDate": new Date("2021-01-29T02:23:18.426Z"),
+	"payment": [{"_id": new ObjectID("60137196dbf49c517d9ccbad"), "type": "cash", "value": 3.5}],
+	"type": "pickup",
+	"date": new Date("2021-01-29T02:23:15.825Z"),
+	"timeoutDate": new Date("2021-01-29T02:28:15.825Z"),
+	"vDate": new Date("2021-01-28T17:00:00.000Z"),
+	"bookingNumber": "210129092315825",
+	"shippingFee": 0,
+	"vSum": 3.5,
+	"vTax": 0,
+	"vTaxGroups": [{"_id": new ObjectID("60137196dbf49c517d9ccbae"), "taxType": 19, "tax": 0, "sum": 0}],
+	"vDiscount": 0,
+	"online": true,
+	"note": "",
+	"onlineOrderId": "f1f9eb10-61d8-11eb-a77a-a1ad16df7dd7",
+	"discounts": [],
+	"deliveryTime": "asap",
+	"user": [],
+	"commits": []
+}, {
+	"printer": [],
+	"_id": new ObjectID("601371a6dbf49c517d9ccbcb"),
+	"id": 5,
+	"status": "inProgress",
+	"items": [{
+		"taxes": [],
+		"_id": new ObjectID("601371a6dbf49c517d9ccbcc"),
+		"id": "3",
+		"image": "/cms-files/files/view/Restaurant%20Plus%20images/75ABE9D7-3244-494D-BDF3-F6E3EED92699.png",
+		"name": "mon test",
+		"desc": "In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. ",
+		"price": 0.1,
+		"tax": 7,
+		"quantity": 1,
+		"modifiers": [],
+		"groupPrinter": "Kitchen",
+		"groupPrinter2": "false",
+		"category": "1",
+		"originalPrice": 0.1,
+		"attributes": []
+	}],
+	"customer": {
+		"name": "dfd",
+		"company": "",
+		"phone": "123",
+		"address": "",
+		"zipCode": "",
+		"deliveryTime": "",
+		"distance": null
+	},
+	"deliveryDate": "2021-01-29T02:23:34.589Z",
+	"payment": [{"_id": new ObjectID("601371a6dbf49c517d9ccbcd"), "type": "cash", "value": 0.1}],
+	"type": "pickup",
+	"date": new Date("2021-01-29T02:23:31.991Z"),
+	"timeoutDate": new Date("2021-01-29T02:28:31.991Z"),
+	"vDate": new Date("2021-01-28T17:00:00.000Z"),
+	"bookingNumber": "210129092331991",
+	"shippingFee": 0,
+	"vSum": 0.1,
+	"vTax": 0.01,
+	"vTaxGroups": [{"_id": new ObjectID("601371a6dbf49c517d9ccbce"), "taxType": 7, "tax": 0.01, "sum": 0.1}],
+	"vDiscount": 0,
+	"online": true,
+	"note": "",
+	"onlineOrderId": "fb9c8060-61d8-11eb-a77a-a1ad16df7dd7",
+	"discounts": [],
+	"deliveryTime": "asap",
+	"user": [],
+	"commits": []
 }]
+
+module.exports = {
+	orders
+}

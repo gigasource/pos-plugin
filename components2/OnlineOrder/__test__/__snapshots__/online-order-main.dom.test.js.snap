@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test render online order should render 1`] = `
+<div class="main">
+  <div class="header">
+    <span>
+      onlineOrder.pendingOrders
+    </span>
+    0
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <span style="color: rgb(211, 47, 47);">
+      Modem not connected
+    </span>
+  </div>
+  <div class="content">
+  </div>
+  <div class="kitchen-orders pl-2">
+    <div class="header">
+      onlineOrder.sentToKitchen
+      <g-badge-stub class="ml-1"
+                    inline="true"
+                    modelvalue="true"
+                    color="#F9A825"
+      >
+      </g-badge-stub>
+    </div>
+    <div class="content">
+      <div class="kitchen-orders--empty">
+        <p>
+          onlineOrder.noKitchen
+        </p>
+      </div>
+    </div>
+  </div>
+  <dialog-complete-order-stub>
+  </dialog-complete-order-stub>
+  <dialog-text-filter-stub label="Reason">
+  </dialog-text-filter-stub>
+</div>
+`;

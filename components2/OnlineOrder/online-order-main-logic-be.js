@@ -20,3 +20,14 @@ export function deleteMissedCall(index) {
 export function cancelMissedCallTimeout(callId) {
 	// todo: fill this
 }
+
+export function completeOrder(order) {
+	// todo: fill this
+}
+
+export function declineOrder(order) {
+	// todo: fill this
+}
+
+
+

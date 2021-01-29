@@ -399,7 +399,7 @@ export function renderPendingOrdersFactory () {
 		))
 	}
 
-	function renderPendingOrders() {
+	function renderPendingOrdersContent() {
 		return (
 			<div class="content">
 				{renderPendingOrdersCalls()}
@@ -408,13 +408,23 @@ export function renderPendingOrdersFactory () {
 		)
 	}
 
+	function renderPendingOrders() {
+		return (
+			<>
+				{renderPendingOrdersHeader()}
+				{renderPendingOrdersContent()}
+			</>
+		)
+	}
+
 	return {
 		renderPendingOrdersHeader,
-		renderPendingOrders,
+		renderPendingOrdersContent,
 		renderEmptyPendingOrders,
 		renderPendingOrdersCalls,
 		renderPendingOrdersMissedCall,
-		renderInternalOrders
+		renderInternalOrders,
+		renderPendingOrders
 	}
 };
 

@@ -1,6 +1,9 @@
 //<editor-fold desc="kitchenOrders">
 import { withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
+import {
+	sortedKitchenOrders
+} from "./online-order-main-logic";
 
 export function renderKitchenOrdersFactory() {
 	const { t, locale } = useI18n()
@@ -143,15 +146,13 @@ export function renderKitchenOrdersFactory() {
 			<div className="kitchen-orders pl-2">
 				{renderKitchenOrdersHeader()}
 				{renderKitchenOrdersContent()}
-				<dialog-complete-order ref={dialogRef} v-model={showDialog} onCompleteorder={completeOrder} onDeclineorder={declineOrder}/>
-				<dialog-text-filter v-model={dialog.reason} label="Reason" defaultValue={dialog.value.order.declineReason} onSubmit={submitReason}/>
-				<new-reservation-dialog v-model={dialog.reservation} receivedPhone={selectedCustomer ? selectedCustomer.phone : ''} onSubmit={getPendingReservationsLength}/>
 			</div>
 		)
 	}
 
 	return {
-		renderKitchenOdrers
+		renderKitchenOdrers,
+		renderKitchenOrdersHeader
 	}
 }
 //</editor-fold>
