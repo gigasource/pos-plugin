@@ -7,7 +7,7 @@ import PosMonthReportSetting from './PosMonthReportSetting';
 
 export default {
   name: 'PosMonthReportView',
-  components: [PosMonthReport, PosMonthSelect, PosMonthReportSetting],
+  components: {PosMonthReport, PosMonthSelect, PosMonthReportSetting},
   setup() {
     //todo: ReportsStore, printMonthlyReport
     return genScopeId(() =>
@@ -29,9 +29,9 @@ export default {
                 Print report </span>
             </g-btn>
           </g-toolbar>
-          <PosMonthReportSetting class="pos-month-report__setting"/>
-          <PosMonthSelect class="pos-month-report__month-select"/>
-          <PosMonthReport class="pos-month-report__report-content"/>
+          <pos-month-report-setting class="pos-month-report__setting"/>
+          <pos-month-select class="pos-month-report__month-select"/>
+          <pos-month-report class="pos-month-report__report-content"/>
         </div>)
   }
 }

@@ -1,16 +1,7 @@
 <script>
 import dayjs from 'dayjs'
-import { ref, computed, onCreated } from 'vue'
-import {
-  autoAssignFromTo,
-  getMonthReport,
-  monthReportFrom,
-  monthReportTo,
-  selectedMonth,
-  selectedMonthFrom,
-  selectedMonthTo, selectedPeriod
-} from './month-report-shared';
-import { dateFormat, genScopeId } from '../utils';
+import {autoAssignFromTo, getMonthReport, selectedMonth, selectedPeriod} from './month-report-shared';
+import {genScopeId} from '../utils';
 
 export default {
   name: 'PosMonthSelect',

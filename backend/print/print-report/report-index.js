@@ -10,11 +10,11 @@ const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
   const {orm} = cms
-  const Order = cms.getModel('Order')
+  const Order = cms.orm('Order')
   const EndOfDay = cms.getModel('EndOfDay');
-  const Action = cms.getModel('Action')
+  const Action = cms.orm('Action')
 
-  cms.on('run:endOfDay', async report => {
+  cms.on('run:endOfDay', -1, async report => {
     await EndOfDay.create(_.omit(report, ['pending']));
     await Order.updateMany({
       date: {$gte: report.begin, $lte: report.end},
@@ -30,12 +30,20 @@ module.exports = async function (cms) {
    * Handle action for endOfDay
    * Action is acted iff this is master
    */
-  orm.on('commit:handler:finish:Action', async function (action, commit) {
+  /*orm.on('commit:handler:finish:Action', async function (action, commit) {
     if (!commit.tags.includes('endOfDay') || !orm.isMaster) return
     const {report} = action
     await cms.emit('run:endOfDay', report)
     await printHandler('ZReport', report)
     await cms.emit('post:endOfDay', report);
+  })*/
+
+  cms.on('action:endOfDay', async (report, cb) => {
+    if (!orm.isMaster) return
+    await cms.emit('run:endOfDay', report)
+    await printHandler('ZReport', report)
+    await cms.emit('post:endOfDay', report);
+    cb();
   })
 
   orm.on('commit:handler:finish:Action', async function (action, commit) {
@@ -56,10 +64,13 @@ module.exports = async function (cms) {
     //todo: create action on frontend
     socket.on('endOfDay', async function (report, cb) {
       //todo: emit/on pattern
-      await Action.create({
+
+      cms.emitAction('action:endOfDay', report, () => {
+        cb();
+      });
+      /*await Action.create({
         report
-      }).commit('endOfDay')
-      cb()
+      }).commit('endOfDay')*/
     })
     socket.on('printReport', async (reportType, data, cb) => {
       await Action.create({

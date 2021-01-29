@@ -1,41 +1,21 @@
 <script>
 import {useI18n} from 'vue-i18n';
-import {computed, ref, watch} from "vue";
 import {$filters} from "../AppSharedStates";
-import {selectedReportDate} from './eod-shared';
+import {reportsInSelectedDate, selectedReport, selectedReportDate} from './eod-shared';
 import {formatDatetime, genScopeId} from "../utils";
-import _ from 'lodash';
 
 export default {
   name: 'PosEndOfDayDetails',
   setup() {
     const {t} = useI18n()
-
-    const selectedTab = ref()
-
-    const reports = computed(() => {
-      if (_.get(selectedReportDate, 'value.reports.length', 0)) {
-        return selectedReportDate.value.reports
-      }
-      return [];
-    })
-
-    /**
-     * selectedReportDate: .reports, .date
-     * reports -> begin, end, sum , z
-     */
-    watch(selectedReportDate, () => {
-      selectedTab.value = reports.value[reports.value.length - 1]
-    })
-
     return genScopeId(() => (
         <>
-          {reports.value.length > 0 &&
-          <g-tabs items={reports.value} color="#F2F2F2" text-color="#000000"
-                  v-model={selectedTab.value}
+          {reportsInSelectedDate.value.length > 0 &&
+          <g-tabs items={reportsInSelectedDate.value} color="#F2F2F2" text-color="#000000"
+                  v-model={selectedReport.value}
                   showArrows={false}
                   slider-size="0" v-slots={{
-            default: () => reports.value.map((item, i) =>
+            default: () => reportsInSelectedDate.value.map((item, i) =>
                 <g-tab-item item={item} key={i}>
                   <div class="eod-info">
                     <span class="eod-info-important"> Date: </span>

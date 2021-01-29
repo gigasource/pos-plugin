@@ -2,6 +2,7 @@
 
 import {genScopeId, internalValueFactory} from '../utils';
 import {useI18n} from "vue-i18n";
+import {makeEODReport, printZReport, selectedReportDate} from "./eod-shared";
 
 export default {
   props: ['modelValue'],
@@ -14,7 +15,10 @@ export default {
     }
     const close = function (confirmed = false) {
       dialog.value = false
-      if (confirmed) emit('confirmed')
+      if (confirmed) {
+        makeEODReport()
+        emit('confirmed');
+      }
     }
     return genScopeId(() =>
         <>
