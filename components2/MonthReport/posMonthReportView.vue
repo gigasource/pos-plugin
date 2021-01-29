@@ -1,13 +1,12 @@
 <script>
-import { backFn, genScopeId } from '../utils';
-import { printMonthReport } from './month-report-shared';
+import {backFn, genScopeId} from '../utils';
+import {printMonthReport} from './month-report-shared';
 import PosMonthReport from './PosMonthReport';
 import PosMonthSelect from './PosMonthSelect';
 import PosMonthReportSetting from './PosMonthReportSetting';
-import { getScopeAttrs } from '../../utils/helpers';
 
 export default {
-  name: 'PosMonthReportView2',
+  name: 'PosMonthReportView',
   components: [PosMonthReport, PosMonthSelect, PosMonthReportSetting],
   setup() {
     //todo: ReportsStore, printMonthlyReport

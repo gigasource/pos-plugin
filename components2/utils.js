@@ -11,6 +11,7 @@ export const internalValueFactory = (props, {emit}) => {
 }
 
 let inited = false;
+
 export function genScopeId(render, currentInstance) {
   if (!inited) initUtils();
   if (render) {
@@ -43,9 +44,9 @@ export const isSameId = function (obj, obj1) {
 //todo dateFormat
 
 export const formatsFactory = () => {
-  const { t } = useI18n()
+  const {t} = useI18n()
   const dateFormat = t('dates.dateFormat');
-  return { dateFormat }
+  return {dateFormat}
 }
 
 export const dateFormat = computed(() => {
@@ -83,11 +84,21 @@ export function initUtils() {
   inited = true;
 }
 
+export const dateStringComputedFn = date => computed({
+  get() {
+    return dayjs(date.value).format('YYYY-MM-DD')
+  },
+  set(val) {
+    date.value = dayjs(val, 'YYYY-MM-DD').toDate()
+  }
+});
+
 export const backFn = computed(() => {
   const router = useRouter()
 
   function back() {
     router.go(-1)
   }
+
   return back;
 })

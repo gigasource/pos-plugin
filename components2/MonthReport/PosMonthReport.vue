@@ -1,10 +1,10 @@
 <script>
 import {$filters} from '../AppSharedStates';
-import {onActivated, ref, watch} from 'vue'
+import {onActivated} from 'vue'
 import {getMonthReport, monthReport, showProductSold} from "./month-report-shared";
 import {useI18n} from "vue-i18n";
 import _ from 'lodash';
-import { genScopeId } from '../utils';
+import {genScopeId} from '../utils';
 
 export default {
   name: 'PosMonthReport',
