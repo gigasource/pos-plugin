@@ -8,6 +8,7 @@ import PosEndOfDayPrintPendingZReport from "./PosEndOfDayPrintPendingZReport";
 import PosEndOfDayPrintDialog from "./PosEndOfDayPrintDialog";
 import {useI18n} from "vue-i18n";
 import {getOldestPendingReport, pendingReport, selectedReportDate, showReprint, showRunEndOfDay} from "./eod-shared";
+import {backFn} from "../utils";
 
 export default {
   components: {
@@ -19,13 +20,6 @@ export default {
     const showEndOfDayConfirmDialog = ref(false)
     const showPendingEndOfDayConfirmDialog = ref(false)
 
-    //todo: move to shared file
-    const router = useRouter()
-
-    function back() {
-      router.push({path: '/pos-dashboard'})
-    }
-
     async function runEndOfDay() {
       await getOldestPendingReport()
       if (pendingReport.value && pendingReport.value.date < selectedReportDate.value.date) {
@@ -36,7 +30,7 @@ export default {
 
     return () => (
         <g-toolbar color="#eee" style="z-index: 2">
-          <g-btn uppercase={false} onClick={back}>
+          <g-btn uppercase={false} onClick={backFn.value}>
             <g-icon class="mr-2" svg>icon-back</g-icon>
             {t('ui.back')}
           </g-btn>

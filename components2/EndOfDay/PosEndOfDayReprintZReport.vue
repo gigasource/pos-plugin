@@ -1,5 +1,5 @@
 <script>
-import {formatDate, internalValueFactory} from '../utils';
+import {formatDate, genScopeId, internalValueFactory} from '../utils';
 import {useI18n} from "vue-i18n";
 import {printZReport, selectedReportDate} from "./eod-shared";
 
@@ -13,31 +13,33 @@ export default {
     const open = () => dialog.value = true;
     const close = () => dialog.value = false;
 
-    return () => (
-        <div>
+    return genScopeId(() => (
+        <>
           {slots.activator && slots.activator({close, open})}
-          <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="45%">
-            <div class="print-confirm-dialog">
-              <p class="head-title">
-                {t('report.reprintZReport')} </p>
-              <div class="printed-list">
-                {selectedReportDate.value && selectedReportDate.value.reports.map((item, index) =>
-                    <div key={index} class="report-item" style="display: flex">
-                      <p> {formatDate(item.begin)} - {formatDate(item.end)} : Z-Number {item.z} </p>
-                      <g-btn print-z uppercase={false} background-color="#2979FF" flat style="margin-left: auto"
-                             text-color="#fff" height="40px" onClick={() => printZReport(item)}>
-                        <g-icon class="mr-2" svg>
-                          icon-print2
-                        </g-icon>
-                        {t('ui.print')}
-                      </g-btn>
-                    </div>
-                )}
+          <g-dialog overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="45%">
+            {genScopeId(() => <>
+              <div class="print-confirm-dialog">
+                <p class="head-title">
+                  {t('report.reprintZReport')} </p>
+                <div class="printed-list">
+                  {selectedReportDate.value && selectedReportDate.value.reports.map((item, index) =>
+                      <div key={index} class="report-item" style="display: flex">
+                        <p> {formatDate(item.begin)} - {formatDate(item.end)} : Z-Number {item.z} </p>
+                        <g-btn print-z uppercase={false} background-color="#2979FF" flat style="margin-left: auto"
+                               text-color="#fff" height="40px" onClick={() => printZReport(item)}>
+                          <g-icon class="mr-2" svg>
+                            icon-print2
+                          </g-icon>
+                          {t('ui.print')}
+                        </g-btn>
+                      </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </>)()}
           </g-dialog>
-        </div>
-    )
+        </>
+    ))
   }
 }
 </script>

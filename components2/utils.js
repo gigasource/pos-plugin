@@ -1,9 +1,13 @@
-import {computed, getCurrentInstance, withScopeId} from "vue";
+import {computed, getCurrentInstance, ref, withScopeId} from "vue";
 import {useI18n} from "vue-i18n";
 import dayjs from "dayjs";
 import {useRouter} from 'vue-router';
+import cms from 'cms';
 
 export const internalValueFactory = (props, {emit}) => {
+  if (!props.modelValue) {
+    return ref();
+  }
   return computed({
     get: () => props.modelValue,
     set: (val) => emit('update:modelValue', val)
@@ -97,8 +101,12 @@ export const backFn = computed(() => {
   const router = useRouter()
 
   function back() {
-    router.go(-1)
+    router.push({path: '/pos-dashboard'})
   }
 
   return back;
 })
+
+export async function socketEmit() {
+  return await new Promise(resolve => cms.socket.emit(...arguments, resolve));
+}

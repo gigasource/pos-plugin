@@ -3,6 +3,7 @@ import {computed, ref, watch} from "vue";
 import * as jsonfn from "json-fn";
 import cms from 'cms'
 import _ from 'lodash'
+import {socketEmit} from "../utils";
 
 export const listOfDatesWithReports = ref([])
 export const selectedDate = ref(new Date());
@@ -148,7 +149,7 @@ export async function getOldestPendingReport() {
 export async function makeEODReport() {
   const report = selectedReport.value;
   if (!report || !report.pending) return;
-  await new Promise(resolve => cms.socket.emit('endOfDay', report, resolve))
+  await socketEmit('endOfDay', report);
   await getEodReportsInMonthCalender(selectedDate.value);
 }
 
