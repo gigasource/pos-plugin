@@ -1,11 +1,19 @@
 //<editor-fold desc="kitchenOrders">
-import { withModifiers } from 'vue'
+import { ref, withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
 import {
 	sortedKitchenOrders,
 	getPendingOrderKitchenTime,
 	getExtraInfo
 } from "./online-order-main-logic";
+
+export const completeOrderDialogShow = ref(false)
+export const dialogOrder = ref(null)
+
+export function openCompleteDialog(order) {
+	dialogOrder.value = order
+	completeOrderDialog.value = true
+}
 
 export function renderKitchenOrdersFactory() {
 	const { t, locale } = useI18n()
@@ -36,7 +44,7 @@ export function renderKitchenOrdersFactory() {
 					{order.customer ? order.customer.phone : 'No customer phone'}
 				</div>
 				<g-spacer></g-spacer>
-				<div className="kitchen-orders__timer" onClick={withModifiers(() => openDialog(order), ['stop'])}>
+				<div className="kitchen-orders__timer" onClick={withModifiers(() => openCompleteDialog(order), ['stop'])}>
 					{
 						(order.type === 'delivery') &&
 						<g-icon>

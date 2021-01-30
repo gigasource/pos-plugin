@@ -33,7 +33,9 @@ export const timeoutProgress = ref({})
 export const kitchenOrders = ref([])
 export const sortedKitchenOrders = computed(() => {
 	//todo: fill this
-	return kitchenOrders.value
+	return kitchenOrders.value.sort((orderA, orderB) => {
+		return getPendingOrderKitchenTime(orderA) - getPendingOrderKitchenTime(orderB)
+	})
 })
 export const dialogRef = ref({})
 export const defaultPrepareTime = ref(15)
@@ -78,7 +80,7 @@ export function getTimeoutProgress(order) {
 
 			order.timeoutProgress = progress
 			timeoutProgress.value[order._id] = { progress, remaining: diff.toFixed(0) }
-			timeoutInterval.value[order._id] = setTimeout(calTimeout, 250)
+			timeoutInterval[order._id] = setTimeout(calTimeout, 250)
 		})
 	}
 

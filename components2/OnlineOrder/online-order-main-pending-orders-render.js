@@ -13,6 +13,7 @@ import {
 	getItemPrice
 } from './online-order-main-logic'
 import {
+	acceptOrder,
 	cancelMissedCallTimeout,
 	deleteCall, deleteMissedCall
 } from './online-order-main-logic-be'
@@ -32,7 +33,6 @@ const dialog = ref({
  * Remove missed call when openOrderDialog
  */
 export function openOrderDialog({ customer, callId }, type, index) {
-	//todo: fill this
 	cancelMissedCallTimeout(callId)
 	if (index) {
 		calls.unshift({
@@ -56,12 +56,13 @@ export function openReservationDialog({ customer, callId }) {
 	cancelMissedCallTimeout()
 }
 
-export function onClickAccept(order) {
+export async function onClickAccept(order) {
 	if (order.deliveryTime === 'asap') {
 		if (order.declineStep2) order.declineStep2 = false
 		if (!order.confirmStep2) return order.confirmStep2 = true
 		if (!order.prepareTime) order.prepareTime = defaultPrepareTime
 	}
+	await acceptOrder(order)
 }
 //</editor-fold>
 

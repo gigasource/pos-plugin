@@ -10,8 +10,10 @@ import {
 import {
   genScopeId
 } from "../utils";
+import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
 
 export default {
+  components: {dialogCompleteOrder},
   setup(props, { emit }) {
     onBeforeMount(async () => {
       await loadOrders()

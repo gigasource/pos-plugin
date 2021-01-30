@@ -4,11 +4,16 @@ import {
 	missedCalls,
 	isPrepaidOrder
 } from './online-order-main-logic'
+import {
+	user
+} from '../AppSharedStates'
+import cms from 'cms'
 
 const Order = cms.getModel('Order')
 
-export async function getPaymentIcon(payment) {
+export async function getPaymentMethod(payment) {
 	const paymentMethod = await cms.getModel('PosSetting').find()
+	return paymentMethod
 }
 
 export function deleteCall(index, { callId }) {
@@ -24,8 +29,23 @@ export function cancelMissedCallTimeout(callId) {
 	// todo: fill this
 }
 
-export function completeOrder(order) {
-	// todo: fill this
+export async function completeOrder(order) {
+	if (!order.status === 'kitchen') {
+		console.warn('This order is not from kitchen')
+		return
+	}
+	const status = 'completed'
+	const orderStatus = {
+		orderId: order.id,
+		onlineOrderId: order.onlineOrderId,
+		status,
+		paypalOrderDetail: order.paypalOrderDetail
+	}
+	Object.assign(order, orderStatus)
+	await Order.findOneAndUpdate({
+		_id: order._id
+	}, order)
+	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
 }
 
 export function declineOrder(order) {
@@ -48,7 +68,6 @@ export async function acceptOrder(order) {
 	const status = 'kitchen'
 	let _isPrepaidOrder = isPrepaidOrder(order);
 
-	let updateOrderInfo = Object.assign({}, order, { status, user: this.user });
 	let updatedOrder;
 	if (isPrepaidOrder) {
 		updatedOrder = order
@@ -64,7 +83,8 @@ export async function acceptOrder(order) {
 		onlineOrderId: updatedOrder.onlineOrderId,
 		status: status,
 		paypalOrderDetail: order.paypalOrderDetail,
-		total: order.vSum
+		total: order.vSum,
+		user
 	}
 
 	Object.assign(order, orderStatus)
@@ -72,6 +92,7 @@ export async function acceptOrder(order) {
 	await Order.findOneAndUpdate({
 		_id: order._id
 	}, order)
-	// todo: update pendingOrders and kitchenOrders
+	_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
+	kitchenOrders.value.unshift(order)
 }
 
