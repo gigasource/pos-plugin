@@ -8,7 +8,7 @@ import {getXReport, printXReport, xReport} from "./eod-shared";
 import _ from 'lodash';
 
 export default {
-  name: 'PosEndOfDayPrintDialog',
+  name: 'PosEndOfDayPrintXReport',
   props: ['modelValue'],
   emits: ['update:modelValue'],
   setup(props, {emit, slots}) {
@@ -26,6 +26,7 @@ export default {
     const getSum = function (paymentTypes) {
       return _.reduce(paymentTypes, (res, values) => res + values, 0)
     }
+    const open = () => dialog.value = true;
 
     return genScopeId(() => (
         <div>
@@ -33,8 +34,7 @@ export default {
           <g-dialog eager overlay-color="#6B6F82" overlay-opacity="0.95" v-model={dialog.value} width="70%">
             {genScopeId(() => <>
               <div style="width: 100%; background-color: #fff; position: relative; height: 75vh">
-                <p class="eod-header">
-                  {t('report.xReport')} </p>
+                <p class="eod-header">{t('report.xReport')} </p>
                 <div style="height: calc(100% - 145px); overflow-y: auto;">
                   <div class="eod-dialog-main">
                     {(xReport.value) &&
@@ -68,8 +68,8 @@ export default {
                                 (€{$filters.formatCurrency(xReport.value.sumByCategory[category])})
                               </p>
                               <div class="eod-sales-detail">
-                                {_.map(items, (quantity, name) =>
-                                    <p> {quantity} x {name} </p>
+                                {_.map(items, ({vSum, quantity}, name) =>
+                                    <p> {quantity} x {name} ({vSum}) </p>
                                 )}
                               </div>
                             </div>

@@ -31,7 +31,7 @@ async function xReport(from, to) {
     {
       rows: ["name"],
       columns: ["category"],
-      reducers: ["@sum[2]:vSum"]
+      reducers: ["@sum[2]:vSum", '@sum:quantity']
     },
     items
   );

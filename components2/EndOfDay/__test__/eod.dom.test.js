@@ -12,7 +12,7 @@ import {
   selectedDate
 } from "../eod-shared";
 import dayjs from "dayjs";
-import PosEndOfDayPrintDialog from "../PosEndOfDayPrintDialog";
+import PosEndOfDayPrintXReport from "../PosEndOfDayPrintXReport";
 import PosEndOfDayPrintPendingZReport from "../PosEndOfDayPrintPendingZReport";
 import PosEndOfDayToolbar from "../PosEndOfDayToolbar";
 import PosEndOfDayReprintZReport from "../PosEndOfDayReprintZReport";
@@ -115,7 +115,7 @@ describe("eod test", function() {
   it("case 4 PosEODPrintDialog", async function() {
     //todo: getXReport
     //todo: printXReport
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {}
     });
@@ -182,7 +182,7 @@ describe("eod test", function() {
   }, 80000);
 
   it("case 9 printXReport", async function(done) {
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {
         modelValue: true
@@ -203,7 +203,7 @@ describe("eod test", function() {
   }, 80000);
 
   it("case 10 printZReport", async function(done) {
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {
         modelValue: true

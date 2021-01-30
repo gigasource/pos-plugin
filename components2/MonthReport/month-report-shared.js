@@ -21,6 +21,8 @@ export function autoAssignFromTo() {
 
 export const selectedPeriod = computed(() => {
   if (monthReportFrom.value && monthReportTo.value) {
+    const start = dayjs(monthReportFrom.value);
+    const end = dayjs(monthReportTo.value);
     if (!start.isSame(selectedMonthFrom.value, 'day') || !end.isSame(selectedMonthTo.value, 'day')) {
       return `${formatDate(monthReportFrom.value)} - ${formatDate(monthReportTo.value)}`
     }

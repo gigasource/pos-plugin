@@ -1,18 +1,17 @@
 <script>
 
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router';
+import {ref} from 'vue'
 import PosEndOfDayReprintZReport from "./PosEndOfDayReprintZReport";
 import PosEndOfDayPrintZReport from "./PosEndOfDayPrintZReport";
 import PosEndOfDayPrintPendingZReport from "./PosEndOfDayPrintPendingZReport";
-import PosEndOfDayPrintDialog from "./PosEndOfDayPrintDialog";
+import PosEndOfDayPrintXReport from "./PosEndOfDayPrintXReport";
 import {useI18n} from "vue-i18n";
 import {getOldestPendingReport, pendingReport, selectedReportDate, showReprint, showRunEndOfDay} from "./eod-shared";
 import {backFn} from "../utils";
 
 export default {
   components: {
-    PosEndOfDayReprintZReport, PosEndOfDayPrintDialog,
+    PosEndOfDayReprintZReport, PosEndOfDayPrintXReport,
     PosEndOfDayPrintZReport, PosEndOfDayPrintPendingZReport
   },
   setup() {
@@ -46,10 +45,10 @@ export default {
                 </g-btn>
             ,
           }}/>
-          <pos-end-of-day-print-dialog v-slots={{
+          <pos-end-of-day-print-x-report v-slots={{
             'activator': ({open, close}) =>
-                (showRunEndOfDay.value) &&
-                <g-btn uppercase={false} onClick={() => open(selectedReportDate.value.date)} width="139px" class="mr-2">
+                showRunEndOfDay.value &&
+                <g-btn uppercase={false} onClick={() => open()} width="139px" class="mr-2">
                   {t('report.xReport')}
                 </g-btn>
           }}/>

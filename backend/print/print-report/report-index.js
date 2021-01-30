@@ -14,7 +14,7 @@ module.exports = async function (cms) {
   const EndOfDay = cms.getModel('EndOfDay');
   const Action = cms.orm('Action')
 
-  cms.on('run:endOfDay', -1, async report => {
+  cms.on('run:endOfDay', async report => {
     await EndOfDay.create(_.omit(report, ['pending']));
     await Order.updateMany({
       date: {$gte: report.begin, $lte: report.end},
