@@ -1,8 +1,10 @@
 import { ref, onActivated, computed, onBeforeMount } from 'vue'
 import {useI18n} from 'vue-i18n'
-import {$filters} from '../AppSharedStates'
+import {$filters, user} from '../AppSharedStates'
 import { formatDate } from "../utils";
 import {getOnlineOrdersByLimit} from './online-order-main-logic-be'
+import { isRefunded, isRefundable } from "./online-order-main-logic"
+import cms from 'cms'
 
 //<editor-fold desc="Variables">
 /**
@@ -18,7 +20,7 @@ export const listOnlineOrderStatus = ref('completed')
 export const ordersListByStatus = computed(() => {
   const resultList = onlineOrdersList.value.filter(order => order.status === listOnlineOrderStatus.value)
   if (filter.value && filter.value.fromDate && filter.value.toDate) {
-    return resultList.filter(order => dayjs(order.date).isBetween(filter.value.fromDate, filter.value.toDate), 'day', [])
+    return resultList.filter(order => dayjs(order.date).isBetween(filter.value.fromDate, filter.value.toDate, 'day', []))
   }
   return resultList
 })
@@ -34,6 +36,10 @@ export const totalIncome = computed(() => {
 export function changeFilter(range) {
   filter.value = range
 }
+export function getImagePayment(type) {
+  let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+  return paymentMethod && paymentMethod.icon
+}
 //</editor-fold>
 
 export function onlineOrderListFactory(props) {
@@ -48,6 +54,9 @@ export function onlineOrderListFactory(props) {
   })
 
   const { t, locale } = useI18n()
+  const i18n = useI18n();
+  const { onlineOrder: { address, amount, customer, delivery, no, received, _status, type, refund, refunded } } = i18n.messages.value[i18n.locale.value] || i18n.messages.value[i18n.fallbackLocale.value]
+  const headers = [no, customer, address, amount, received, delivery, type, _status, '']
 
   const renderOnlineOrderListTitle = function () {
     return (
@@ -89,7 +98,7 @@ export function onlineOrderListFactory(props) {
           )} </tr>
         </thead>
         <tbody>
-        {computedItems.value.map((item, i) =>
+        {ordersListByStatus.value.map((item, i) =>
           <tr key={i} onClick={() => openDialogDetail(item)}>
             <td className="fw-700">
               <p style="white-space: nowrap">
@@ -155,21 +164,21 @@ export function onlineOrderListFactory(props) {
                   icon-take-away </g-icon>
               }
             </td>
-            <td className={statusClass.value}>
+            <td className={listOnlineOrderStatus.value}>
               <div style="white-space: nowrap">
                 {t(`onlineOrder.${item.status}`)} </div>
               <div style="font-size: x-small; margin-top: -5px">
-                {isRefunded(item) ? refundedStr.value : ''} </div>
+                {isRefunded(item) ? refunded : ''} </div>
             </td>
             <td>
               {
-                (isAdminUser.value && isRefundable(item)) &&
+                (user.role === 'admin' && isRefundable(item)) &&
                 <g-menu v-model={item.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
                   'default': () => <>
                     <g-card background="white">
                       <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', item, status)}>
                         {
-                          refundStr
+                          refunded
                         }
                       </div>
                     </g-card>
@@ -194,7 +203,7 @@ export function onlineOrderListFactory(props) {
       <div className="online-order-list">
         {renderOnlineOrderListTitle()}
         <div className="online-order-list__table">
-
+          {renderOnlineOrderListTable()}
         </div>
         <dialog-complete-order disabled-btn v-model={showDialog.value}></dialog-complete-order>
       </div>

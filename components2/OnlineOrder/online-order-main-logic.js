@@ -106,4 +106,19 @@ export function getItemPrice(item) {
 export function isPrepaidOrder(order) {
 	return order.paypalOrderDetail && order.paypalOrderDetail.orderID != null // paypal
 }
+
+export function isRefunded(order) {
+	return (order.paypalOrderDetail
+		&& order.paypalOrderDetail.refundResponses
+		&& _.every(order.paypalOrderDetail.refundResponses, r => r.status === "COMPLETED"))
+}
+
+export function isRefundable(order) {
+	// refundable order is order paid via paypal and money has been captured
+	// and not refund yet or refund but some capture failed
+	return (order.paypalOrderDetail
+		&& order.paypalOrderDetail.captureResponses
+		&& order.paypalOrderDetail.captureResponses.status === "COMPLETED" && !this.isCaptureRefundExpired(order.paypalOrderDetail.captureResponses)
+		&& (!order.paypalOrderDetail.refundResponses || this.isRefundFailed(order.paypalOrderDetail.refundResponses)))
+}
 //</editor-fold>
