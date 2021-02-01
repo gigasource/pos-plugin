@@ -2,9 +2,6 @@
 import {
   dialogCompleteOrderFactory
 } from './dialog-complete-order-render'
-import {
-  genScopeId
-} from "../../utils";
 
 export default {
   props: {
