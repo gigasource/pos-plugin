@@ -1,16 +1,23 @@
-import {computed, getCurrentInstance, withScopeId} from "vue";
+import {computed, getCurrentInstance, ref, withScopeId} from "vue";
 import {useI18n} from "vue-i18n";
 import dayjs from "dayjs";
 import {useRouter} from 'vue-router';
+import cms from 'cms';
 
 export const internalValueFactory = (props, {emit}) => {
+  if (!props.modelValue) {
+    return ref();
+  }
   return computed({
     get: () => props.modelValue,
     set: (val) => emit('update:modelValue', val)
   })
 }
 
+let inited = false;
+
 export function genScopeId(render, currentInstance) {
+  if (!inited) initUtils();
   if (render) {
     return withScopeId((currentInstance || getCurrentInstance()).type['__scopeId'])(render);
   }
@@ -41,9 +48,9 @@ export const isSameId = function (obj, obj1) {
 //todo dateFormat
 
 export const formatsFactory = () => {
-  const { t } = useI18n()
+  const {t} = useI18n()
   const dateFormat = t('dates.dateFormat');
-  return { dateFormat }
+  return {dateFormat}
 }
 
 export const dateFormat = computed(() => {
@@ -56,16 +63,50 @@ export const timeFormat = computed(() => {
   return t('dates.timeFormat');
 });
 
+export const datetimeFormat = computed(() => {
+  const {t} = useI18n();
+  return `${t('dates.dateFormat')} ${t('dates.timeFormat')}`;
+});
+
 export function formatDate(date) {
   if (!date || !dayjs(date).isValid()) return ''
   return dayjs(date).format(dateFormat.value);
 }
 
+export function formatDatetime(date) {
+  if (!date || !dayjs(date).isValid()) return ''
+  return dayjs(date).format(datetimeFormat.value);
+}
+
+export function initUtils() {
+  const [] = [
+    dateFormat.value,
+    timeFormat.value,
+    datetimeFormat.value,
+    backFn.value
+  ]
+  inited = true;
+}
+
+export const dateStringComputedFn = date => computed({
+  get() {
+    return dayjs(date.value).format('YYYY-MM-DD')
+  },
+  set(val) {
+    date.value = dayjs(val, 'YYYY-MM-DD').toDate()
+  }
+});
+
 export const backFn = computed(() => {
   const router = useRouter()
 
   function back() {
-    router.go(-1)
+    router.push({path: '/pos-dashboard'})
   }
+
   return back;
 })
+
+export async function socketEmit() {
+  return await new Promise(resolve => cms.socket.emit(...arguments, resolve));
+}

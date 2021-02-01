@@ -1,0 +1,379 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`eod test case 1 StaffReportView 1`] = `
+<div class="staff-report-view">
+  <div class="staff-report-content">
+    <g-tabs-stub items="[object Object],[object Object],[object Object],[object Object]"
+                 showarrows="false"
+                 vertical="true"
+                 color="#F2F2F2"
+                 slider-color="#2979FF"
+                 slider-size="4px"
+                 text-color="#000000"
+                 modelvalue="[object Object]"
+    >
+      <g-tab-item-stub item="[object Object]">
+        <div class="detail-header">
+          report.staffName: admin
+        </div>
+        <div class="sales-details-header">
+          common.sales
+        </div>
+        <div class="tax-detail">
+        </div>
+      </g-tab-item-stub>
+      <g-tab-item-stub item="[object Object]">
+        <div class="detail-header">
+          report.staffName: Manager
+        </div>
+        <div class="sales-details-header">
+          common.sales
+        </div>
+        <div class="tax-detail">
+        </div>
+      </g-tab-item-stub>
+      <g-tab-item-stub item="[object Object]">
+        <div class="detail-header">
+          report.staffName: Waiter 1
+        </div>
+        <div>
+          <div class="detail-header">
+            report.reportDate: 05.01.2021
+          </div>
+          <div class="detail-time">
+            report.firstOrder:05.01.2021 00:00
+          </div>
+          <div class="detail-time">
+            report.lastOrder:05.01.2021 00:00
+          </div>
+        </div>
+        <div class="sales-details-header">
+          common.sales
+        </div>
+        <div>
+          <p>
+            <span class="sales-entry sales-type">
+              common.total
+            </span>
+            <span class="sales-entry sales-amount">
+              6.60
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              common.subtotal
+            </span>
+            <span class="sales-entry sales-amount">
+              5.55
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              common.tax
+            </span>
+            <span class="sales-entry sales-amount">
+              1.05
+            </span>
+          </p>
+        </div>
+        <div class="tax-detail">
+          <div>
+            <div>
+              <p class="sales-entry sales-type">
+                common.tax 16%:
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.total
+                </span>
+                <span class="sales-entry sales-amount">
+                  5.30
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.subtotal
+                </span>
+                <span class="sales-entry sales-amount">
+                  4.57
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.tax
+                </span>
+                <span class="sales-entry sales-amount">
+                  0.73
+                </span>
+              </p>
+              <br>
+            </div>
+            <div>
+              <p class="sales-entry sales-type">
+                common.tax 32%:
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.total
+                </span>
+                <span class="sales-entry sales-amount">
+                  1.30
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.subtotal
+                </span>
+                <span class="sales-entry sales-amount">
+                  0.98
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.tax
+                </span>
+                <span class="sales-entry sales-amount">
+                  0.32
+                </span>
+              </p>
+              <br>
+            </div>
+          </div>
+          <div>
+            <p>
+              <span class="sales-entry sales-type">
+                report.vouchersSold
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                report.vouchersUsed
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                common.discount
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="sales-details">
+          <p>
+            <span class="sales-entry sales-type">
+              cash common.sales:
+            </span>
+            <span class="sales-entry">
+              6.60
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              report.returnedTotal:
+            </span>
+            <span class="sales-entry">
+              0
+            </span>
+          </p>
+        </div>
+      </g-tab-item-stub>
+      <g-tab-item-stub item="[object Object]">
+        <div class="detail-header">
+          report.staffName: Waiter 2
+        </div>
+        <div>
+          <div class="detail-header">
+            report.reportDate: 05.01.2021
+          </div>
+          <div class="detail-time">
+            report.firstOrder:05.01.2021 00:00
+          </div>
+          <div class="detail-time">
+            report.lastOrder:05.01.2021 00:00
+          </div>
+        </div>
+        <div class="sales-details-header">
+          common.sales
+        </div>
+        <div>
+          <p>
+            <span class="sales-entry sales-type">
+              common.total
+            </span>
+            <span class="sales-entry sales-amount">
+              14.30
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              common.subtotal
+            </span>
+            <span class="sales-entry sales-amount">
+              13.50
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              common.tax
+            </span>
+            <span class="sales-entry sales-amount">
+              0.80
+            </span>
+          </p>
+        </div>
+        <div class="tax-detail">
+          <div>
+            <div>
+              <p class="sales-entry sales-type">
+                common.tax 5%:
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.total
+                </span>
+                <span class="sales-entry sales-amount">
+                  13
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.subtotal
+                </span>
+                <span class="sales-entry sales-amount">
+                  12.38
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.tax
+                </span>
+                <span class="sales-entry sales-amount">
+                  0.62
+                </span>
+              </p>
+              <br>
+            </div>
+            <div>
+              <p class="sales-entry sales-type">
+                common.tax 16%:
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.total
+                </span>
+                <span class="sales-entry sales-amount">
+                  1.30
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.subtotal
+                </span>
+                <span class="sales-entry sales-amount">
+                  1.12
+                </span>
+              </p>
+              <p>
+                <span class="sales-entry sales-type">
+                  common.tax
+                </span>
+                <span class="sales-entry sales-amount">
+                  0.18
+                </span>
+              </p>
+              <br>
+            </div>
+          </div>
+          <div>
+            <p>
+              <span class="sales-entry sales-type">
+                report.vouchersSold
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                report.vouchersUsed
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+            <p>
+              <span class="sales-entry sales-type">
+                common.discount
+              </span>
+              <span class="sales-entry sales-amount">
+                0
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="sales-details">
+          <p>
+            <span class="sales-entry sales-type">
+              card common.sales:
+            </span>
+            <span class="sales-entry">
+              2
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              cash common.sales:
+            </span>
+            <span class="sales-entry">
+              12.30
+            </span>
+          </p>
+          <p>
+            <span class="sales-entry sales-type">
+              report.returnedTotal:
+            </span>
+            <span class="sales-entry">
+              0
+            </span>
+          </p>
+        </div>
+      </g-tab-item-stub>
+    </g-tabs-stub>
+  </div>
+  <g-toolbar-stub bottom="true"
+                  color="#EEEEEE"
+  >
+    <g-btn-stub uppercase="false"
+                width="94px"
+    >
+      <g-icon-stub class="mr-2"
+                   svg="true"
+      >
+        icon-back
+      </g-icon-stub>
+      ui.back
+    </g-btn-stub>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <g-btn-stub uppercase="false"
+                background-color="#2979FF"
+                text-color="#FFFFFF"
+    >
+      <g-icon-stub class="mr-2"
+                   svg="true"
+      >
+        icon-print2
+      </g-icon-stub>
+      report.printReport
+    </g-btn-stub>
+  </g-toolbar-stub>
+</div>
+`;

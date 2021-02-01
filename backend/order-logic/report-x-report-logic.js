@@ -7,8 +7,8 @@ const _ = require('lodash');
 async function xReport(from, to) {
   const query = {
     date: {
-      ...from && {$gte: new Date(from)},
-      ...to && {$lte: new Date(to)},
+      ...from && {$gte: from},
+      ...to && {$lte: to},
     },
     status: "paid"
   };
@@ -31,7 +31,7 @@ async function xReport(from, to) {
     {
       rows: ["name"],
       columns: ["category"],
-      reducers: ["@sum[2]:vSum"]
+      reducers: ["@sum[2]:vSum", '@sum:quantity']
     },
     items
   );

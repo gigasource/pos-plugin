@@ -33,13 +33,13 @@ module.exports = {
 
     // { loader: { type: 'route' }, filePath: 'components/View/Payment.vue', name: 'Payment', path: '/pos-payment' },
     // { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
-    { loader: { type: 'route' }, filePath: 'components2/MonthReport/posMonthReportView2.vue', name: 'posMonthReportView2', path: '/pos-month-report' },
+    { loader: { type: 'route' }, filePath: 'components2/MonthReport/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
 
     { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery1', path: '/pos1-order-delivery' },
     { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     { loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
-    { loader: { type: 'route' }, filePath: 'components/View/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report' },
+    { loader: { type: 'route' }, filePath: 'components2/ReportViews/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report' },
     {
       loader: { type: 'init '},
       path: 'composition/plugin-init.js'

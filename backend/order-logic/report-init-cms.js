@@ -25,6 +25,7 @@ module.exports = function (cms) {
     })
 
     socket.on('make-staff-report', async function (from, to, cb) {
+      [from, to] = JsonFn.clone([from, to]);
       let result = await staffReport(from, to);
       cb(result)
     })

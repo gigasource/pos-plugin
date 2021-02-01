@@ -1,5 +1,5 @@
 <script>
-import {formatDate, internalValueFactory} from '../utils';
+import {formatDate, genScopeId, internalValueFactory} from '../utils';
 import {watchEffect} from 'vue'
 import {useI18n} from "vue-i18n";
 import {getOldestPendingReport, makeEODReport, pendingReport} from "./eod-shared";
@@ -24,33 +24,36 @@ export default {
 
     watchEffect(() => dialog.value && getOldestPendingReport())
     //fixme: show vSum, cash, card v.v.
-    return () => <>
+    return genScopeId(() => <>
       <div>
         {slots.activator && slots.activator({close, open})}
         <g-dialog eager v-model={dialog.value} width="45%" overlay-color="#6B6F82" overlay-opacity="0.95">
-          <div class="print-confirm-dialog">
-            <p class="title">
-              {t('ui.notification')} </p>
-            <div class="confirmation-content">
-              <p>
-                {t('report.pendingPrintLine1', {date: formatDate(pendingReport.value && pendingReport.value.begin)})} </p>
-              <p>
-                {t('report.pendingPrintLine2', {date: formatDate(pendingReport.value && pendingReport.value.begin)})} </p>
-            </div>
-            <div class="confirmation-buttons">
-              <g-btn onClick={() => close()} uppercase={false} background-color="#fff" class="mr-2" flat
-                     style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
-                {t('ui.cancel')}
-              </g-btn>
-              <g-btn ok onClick={() => close(true)} uppercase={false} background-color="#E57373" class="mr-2" flat
-                     text-color="#FFFFFF" width="120px">
-                {t('ui.ok')}
-              </g-btn>
-            </div>
-          </div>
+          {genScopeId(() => (
+              <div className="print-confirm-dialog">
+                <p className="title">
+                  {t('ui.notification')} </p>
+                <div className="confirmation-content">
+                  <p>
+                    {t('report.pendingPrintLine1', {date: formatDate(pendingReport.value && pendingReport.value.begin)})} </p>
+                  <p>
+                    {t('report.pendingPrintLine2', {date: formatDate(pendingReport.value && pendingReport.value.begin)})} </p>
+                </div>
+                <div className="confirmation-buttons">
+                  <g-btn onClick={() => close()} uppercase={false} background-color="#fff" className="mr-2" flat
+                         style="border: 1px solid #979797" text-color="#1D1D26" width="120px">
+                    {t('ui.cancel')}
+                  </g-btn>
+                  <g-btn ok onClick={() => close(true)} uppercase={false} background-color="#E57373" className="mr-2"
+                         flat
+                         text-color="#FFFFFF" width="120px">
+                    {t('ui.ok')}
+                  </g-btn>
+                </div>
+              </div>
+          ))()}
         </g-dialog>
       </div>
-    </>
+    </>)
   }
 }
 </script>

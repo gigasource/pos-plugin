@@ -5,7 +5,7 @@ import { getCurrentOrder } from '../../OrderView/pos-logic-be';
 import PaymentLogicsFactory from '../payment-logics';
 import { useRoute, useRouter } from 'vue-router';
 import { posSettings } from '../../AppSharedStates';
-import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from '../../../../../../backoffice/pos-vue-framework';
+import { GBtnBs, GProgressCircular, GSpacer, GToolbar } from 'pos-vue-framework';
 import { genScopeId } from '../../utils';
 
 export default {

@@ -1165,7 +1165,7 @@ exports[`eod test case 3 PosEODDetails 1`] = `
           Date:
         </span>
         <span>
-          2021-01-05T00:00:00+07:00
+          05.01.2021 00:00
         </span>
       </div>
       <div class="eod-info">
@@ -1181,7 +1181,7 @@ exports[`eod test case 3 PosEODDetails 1`] = `
           report.firstOrder:
         </span>
         <span>
-          2021-01-05T00:00:00+07:00
+          05.01.2021 00:00
         </span>
       </div>
       <div class="eod-info">
@@ -1189,7 +1189,7 @@ exports[`eod test case 3 PosEODDetails 1`] = `
           report.lastOrder:
         </span>
         <span>
-          2021-01-05T00:00:00+07:00
+          05.01.2021 00:00
         </span>
       </div>
       <div class="eod-info">
@@ -1197,7 +1197,7 @@ exports[`eod test case 3 PosEODDetails 1`] = `
           report.totalSales:
         </span>
         <span class="eod-info-total-sale">
-          € 19.60
+          € 32.25
         </span>
       </div>
     </g-tab-item-stub>
