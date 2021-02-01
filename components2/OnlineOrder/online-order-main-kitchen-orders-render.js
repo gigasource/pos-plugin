@@ -8,9 +8,11 @@ import {
 	getPendingOrderKitchenTime,
 	getExtraInfo
 } from "./online-order-main-logic";
+import {
+	dialogOrder
+} from './helpers/dialog-complete-order-render'
 
 export const completeOrderDialogShow = ref(false)
-export const dialogOrder = ref(null)
 
 export function openCompleteDialog(order) {
 	dialogOrder.value = order

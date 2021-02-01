@@ -8,8 +8,10 @@ export default {
     modelValue: Boolean,
     disableBtn: Boolean,
   },
-  setup(props) {
-    const { renderDialogComplete } = dialogCompleteOrderFactory(props)
+  setup(props, { emit }) {
+
+    const { renderDialogComplete } = dialogCompleteOrderFactory(props, { emit })
+
     return () => (
       renderDialogComplete()
     )

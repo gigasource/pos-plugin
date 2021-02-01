@@ -1,10 +1,6 @@
 import { ref, computed, withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
 import {
-	completeOrderDialogShow,
-	dialogOrder
-} from '../online-order-main-kitchen-orders-render'
-import {
 	declineOrder,
 	completeOrder
 } from '../online-order-main-logic-be'
@@ -17,6 +13,8 @@ import {
 } from '../online-order-main-logic'
 import orderUtil from "../../../components/logic/orderUtil";
 import { genScopeId } from '../../utils';
+
+export const dialogOrder = ref(null)
 
 export const totalWithShipping = computed(() => {
 	const { shippingFee, vSum } = dialogOrder.value;
@@ -36,17 +34,27 @@ export const paymentMethod = computed(() => {
 	return Object.assign(payment || {}, { value, type })
 })
 
-export async function onClickDecline(order) {
-	await declineOrder(order)
-	completeOrderDialogShow.value = false
-}
+export function dialogCompleteOrderFactory(props, { emit }) {
+	const modelValue = computed({
+		get: () => {
+			return props.modelValue
+		},
+		set: (val) => {
+			dialogOrder.value = null
+			emit('update:modelValue', val)
+		}
+	})
 
-export async function onClickComplete(order) {
-	await completeOrder(order)
-	completeOrderDialogShow.value = false
-}
+	const onClickDecline = async function(order) {
+		await declineOrder(order)
+		modelValue.value = true
+	}
 
-export function dialogCompleteOrderFactory(props) {
+	const onClickComplete = async function(order) {
+		await completeOrder(order)
+		modelValue.value = false
+	}
+
 	const { t, locale } = useI18n()
 	const renderContentInfo = function () {
 		return (
@@ -123,7 +131,7 @@ export function dialogCompleteOrderFactory(props) {
 	}
 
 	const renderBtn = function () {
-		return (!props.disabledBtn) &&
+		return (!props.disableBtn) &&
 			<g-card-actions>
 				{genScopeId(() => (<>
 				    <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" onClick={withModifiers(() => onClickDecline(dialogOrder.value), ['stop'])}>
@@ -147,40 +155,45 @@ export function dialogCompleteOrderFactory(props) {
 		return <>
 			{
 				dialogOrder.value &&
-				<g-dialog v-model={completeOrderDialogShow.value} width="580px">
+				<g-dialog v-model={modelValue.value} width="580px">
 					<g-card class="px-3 pb-2">
-						<g-card-title style="font-size: 20px">{t('onlineOrder.orderDetails')}</g-card-title>
+						<g-card-title style="font-size: 20px">
+							{t('onlineOrder.orderDetails')} </g-card-title>
 						<g-card-text class="fs-small">
-							{genScopeId(() => (<>
-							    {renderContentInfo()}
-    							{renderContentAddress()}
-    							{renderContentItems()}
-    							<div class="dashed-gradient"></div>
-    							<div class="row-flex justify-between mt-2">
-    								<div>{t('onlineOrder.total')} <b>{orderQuantity.value}</b> {t('onlineOrder.items')}</div>
-    								<div class="ta-right">{t('common.currency', locale.value)} {$filters.formatCurrency(subTotal.value)}</div>
-    							</div>
-    							{renderContentShippingFee()}
-    							{renderContentDiscount()}
-    							<div class="dashed-gradient mt-2"></div>
-    							<div class="row-flex justify-between mt-2"
-    							     style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
-    								<div>{t('onlineOrder.total')}</div>
-    								<div class="ta-right">
-    									{t('common.currency', locale.value)} {$filters.formatCurrency(dialogOrder.value.vSum)}
-    								</div>
-    							</div>
-    							<div class="row-flex justify-between mt-1"
-    							     style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
-    								<div>Payment</div>
-    								<div class="ta-right row-flex align-items-center" style="text-transform: capitalize">
-    									{
-    										(paymentMethod.value.icon) && <img src={paymentMethod.value.icon} style="height: 16px" class="mr-1"> </img>
-    									}
-    									<span>{paymentMethod.value.type}</span>
-    								</div>
-    							</div>
-							</>))()}
+							{renderContentInfo()}
+							{renderContentAddress()}
+							{renderContentItems()}
+							<div class="dashed-gradient"></div>
+							<div class="row-flex justify-between mt-2">
+								<div>
+									{t('onlineOrder.total')} <b>
+									{orderQuantity.value} </b>
+									{t('onlineOrder.items')} </div>
+								<div class="ta-right">
+									{t('common.currency', locale.value)} {$filters.formatCurrency(subTotal.value)} </div>
+							</div>
+							{renderContentShippingFee()}
+							{renderContentDiscount()}
+							<div class="dashed-gradient mt-2"></div>
+							<div class="row-flex justify-between mt-2"
+							     style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
+								<div>
+									{t('onlineOrder.total')} </div>
+								<div class="ta-right">
+									{t('common.currency', locale.value)} {$filters.formatCurrency(dialogOrder.value.vSum)} </div>
+							</div>
+							<div class="row-flex justify-between mt-1"
+							     style="font-size: 15px; font-weight: 700; font-family: Verdana, sans-serif">
+								<div>
+									Payment
+								</div>
+								<div class="ta-right row-flex align-items-center" style="text-transform: capitalize">
+									{
+										(paymentMethod.value.icon) && <img src={paymentMethod.value.icon} style="height: 16px" class="mr-1"> </img>
+									}
+									<span>{paymentMethod.value.type}</span>
+								</div>
+							</div>
 						</g-card-text>
 						{renderBtn()}
 						{renderForwadedStore()}

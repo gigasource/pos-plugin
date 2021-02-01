@@ -1,7 +1,7 @@
 <script>
 import { onBeforeMount } from 'vue'
 import { renderPendingOrdersFactory } from "./online-order-main-pending-orders-render";
-import { renderKitchenOrdersFactory } from "./online-order-main-kitchen-orders-render";
+import { renderKitchenOrdersFactory, completeOrderDialogShow } from "./online-order-main-kitchen-orders-render";
 import {
   declineOrder,
   completeOrder,
@@ -30,7 +30,7 @@ export default {
       <div class="main">
         {renderPendingOrders()}
         {renderKitchenOdrers()}
-        <dialog-complete-order onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
+        <dialog-complete-order v-model={completeOrderDialogShow.value} onCompleteorder={completeOrder} onDeclineorder={declineOrder}></dialog-complete-order>
         <dialog-text-filter label="Reason"></dialog-text-filter>
       </div>
     ))
