@@ -113,11 +113,18 @@ export function onlineOrderListFactory(props) {
                 <tr key={i} onClick={() => openDialogDetail(order)}>
                   <td class="fw-700">
                     <p style="white-space: nowrap">#{order.dailyId ? order.dailyId : order.id}</p>
-                    <g-tooltip openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
-                       v-slots={{
-                         default: () => <span><b>From: </b>{order.forwardedStore}</span>,
-                         activator: ({on}) => (order.forwardedStore) && <div onClick={on.click}><g-icon size="16">icon-delivery-forward</g-icon></div>
-                       }}/>
+                    { order.forwardedStore && (<g-tooltip
+                        openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
+                         v-slots={{
+                           default: () => <span><b>From: </b>{order.forwardedStore}</span>,
+                           activator: ({on}) => <div
+                               onMouseEnter={on.mouseenter}
+                               onMouseLeave={on.mouseleave}
+                               onClick={on.click}>
+                             <g-icon size="16">icon-delivery-forward</g-icon>
+                           </div>
+                         }}/>)
+                    }
                   </td>
                   <td>
                     <p>{order.customer.name}</p>
