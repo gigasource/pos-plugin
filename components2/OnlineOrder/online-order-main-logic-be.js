@@ -89,22 +89,14 @@ export async function acceptOrder(order) {
 	const status = 'kitchen'
 	let _isPrepaidOrder = isPrepaidOrder(order);
 
-	let updatedOrder;
-	if (_isPrepaidOrder) {
-		updatedOrder = order
-	} else {
-		updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
+	if (!_isPrepaidOrder) {
 		// this.printOnlineOrderKitchen(order._id)
 		// this.printOnlineOrderReport(order._id)
 		// await this.updateOnlineOrders()
 	}
 
 	const orderStatus = {
-		orderId: updatedOrder.id,
-		onlineOrderId: updatedOrder.onlineOrderId,
 		status: status,
-		paypalOrderDetail: order.paypalOrderDetail,
-		total: order.vSum,
 		user
 	}
 
