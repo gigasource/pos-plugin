@@ -5,6 +5,7 @@ import { formatDate } from "../utils";
 import {getOnlineOrdersByLimit} from './online-order-main-logic-be'
 import { isRefunded, isRefundable } from "./online-order-main-logic"
 import cms from 'cms'
+import { genScopeId } from '../utils';
 
 //<editor-fold desc="Variables">
 /**
@@ -60,24 +61,24 @@ export function onlineOrderListFactory(props) {
 
   const renderOnlineOrderListTitle = function () {
     return (
-      <div className="row-flex align-items-center mb-2">
-        <div className="online-order-list__title">
+      <div class="row-flex align-items-center mb-2">
+        <div class="online-order-list__title">
           {`${t(`onlineOrder.${listOnlineOrderStatus.value}`)} ${t('onlineOrder.orders')}`}
         </div>
         <g-spacer></g-spacer>
-        <div className="online-order-list__info">
-          <div className="row-flex align-items-center">
-            <g-icon className="mr-2" size="20">
+        <div class="online-order-list__info">
+          <div class="row-flex align-items-center">
+            <g-icon class="mr-2" size="20">
               icon-cutleries2
             </g-icon>
-            <span className="fw-700">
+            <span class="fw-700">
                 {totalOrder.value} </span>
           </div>
-          <div className="row-flex align-items-center">
-            <g-icon className="mr-2" size="20">
+          <div class="row-flex align-items-center">
+            <g-icon class="mr-2" size="20">
               icon-money-bag
             </g-icon>
-            <span className="fw-700">
+            <span class="fw-700">
                 {t('common.currency', locale.value)}{$filters.formatCurrency(totalIncome.value)} </span>
           </div>
         </div>
@@ -90,119 +91,76 @@ export function onlineOrderListFactory(props) {
   const renderOnlineOrderListTable = function () {
     return (
       <g-table elevation="2" fixed-header>
-        <thead>
-        <tr>
-          {headers.map(header =>
-            <th style="white-space: nowrap">
-              {header} </th>
-          )} </tr>
-        </thead>
-        <tbody>
-        {ordersListByStatus.value.map((item, i) =>
-          <tr key={i} onClick={() => openDialogDetail(item)}>
-            <td className="fw-700">
-              <p style="white-space: nowrap">
-                #{item.dailyId ? item.dailyId : item.id} </p>
-              <g-tooltip openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
-                 v-slots={{
-                   'default': () => <> <span>
-                <b> From: </b>
-                     {item.forwardedStore} </span>
-                   </>
-                   ,
-                   'activator': ({on}) => <>
-                     {
-                       (item.forwardedStore) &&
-                       <div v-on="on">
-                         <g-icon size="16">
-                           icon-delivery-forward
-                         </g-icon>
-                       </div>
-                     }
-                   </>
-                 }}/>
-            </td>
-            <td>
-              <p> {item.customer.name} </p>
-              <p style="white-space: nowrap"> {item.customer.phone} </p>
-            </td>
-            <td>
-              {
-                (item.customer.address) ?
-                  <div>
-                    <p style="word-break: break-word">
-                      {item.customer.address} </p>
-                    <p>
-                      {item.customer.zipCode} </p>
-                  </div>
-                  :
-                  <div> -- </div>
-              }
-            </td>
-            <td>
-              <p className="fw-700" style="white-space: nowrap">
-
-                {t('common.currency', locale.value)}{$filters.formatCurrency(item.payment[0].value)}
-              </p>
-              <p>
-                <img alt src={getImagePayment(item.payment[0].type)}> </img>
-              </p>
-            </td>
-            <td style="white-space: nowrap">
-              {formatDate(item.date)} </td>
-            <td style="white-space: nowrap">
-              {item.deliveryTime} </td>
-            <td>
-              {
-                (item.type === 'delivery') &&
-                <g-icon>
-                  icon-delivery-scooter </g-icon>
-              }
-              {
-                (item.type === 'pickup') &&
-                <g-icon>
-                  icon-take-away </g-icon>
-              }
-            </td>
-            <td className={listOnlineOrderStatus.value}>
-              <div style="white-space: nowrap">
-                {t(`onlineOrder.${item.status}`)} </div>
-              <div style="font-size: x-small; margin-top: -5px">
-                {isRefunded(item) ? refunded : ''} </div>
-            </td>
-            <td>
-              {
-                (user.role === 'admin' && isRefundable(item)) &&
-                <g-menu v-model={item.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
-                  'default': () => <>
-                    <g-card background="white">
-                      <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', item, status)}>
-                        {
-                          refunded
-                        }
+        {genScopeId(() => (<>
+            <thead>
+              <tr>{headers.map(header => <th style="white-space: nowrap">{header}</th>)}</tr>
+            </thead>
+            <tbody>
+            {ordersListByStatus.value.map((item, i) =>
+              <tr key={i} onClick={() => openDialogDetail(item)}>
+                <td class="fw-700">
+                  <p style="white-space: nowrap">#{item.dailyId ? item.dailyId : item.id}</p>
+                  <g-tooltip openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
+                     v-slots={{
+                       default: () => <span><b> From: </b>{item.forwardedStore}</span>,
+                       activator: ({on}) => (item.forwardedStore) && <div onClick={on.click}><g-icon size="16">icon-delivery-forward</g-icon></div>
+                     }}/>
+                </td>
+                <td>
+                  <p> {item.customer.name} </p>
+                  <p style="white-space: nowrap"> {item.customer.phone} </p>
+                </td>
+                <td>
+                  {
+                    (item.customer.address) ?
+                      <div>
+                        <p style="word-break: break-word">{item.customer.address}</p>
+                        <p>{item.customer.zipCode}</p>
                       </div>
-                    </g-card>
-                  </>
-                  ,
-                  'activator': ({on}) => <>
-                    <div onClick={on.click} style={moreMenuStyle}>
-                      ···
-                    </div>
-                  </>
-                }}/>
-              }
-            </td>
-          </tr>
-        )} </tbody>
+                      : <div> -- </div>
+                  }
+                </td>
+                <td>
+                  <p class="fw-700" style="white-space: nowrap">
+                    {t('common.currency', locale.value)}{$filters.formatCurrency(item.payment[0].value)}
+                  </p>
+                  <p> <img alt src={getImagePayment(item.payment[0].type)}> </img></p>
+                </td>
+                <td style="white-space: nowrap">{formatDate(item.date)}</td>
+                <td style="white-space: nowrap">{item.deliveryTime}</td>
+                <td>
+                  { item.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon> }
+                  { item.type === 'pickup' && <g-icon>icon-take-away</g-icon> }
+                </td>
+                <td class={listOnlineOrderStatus.value}>
+                  <div style="white-space: nowrap">{t(`onlineOrder.${item.status}`)}</div>
+                  <div style="font-size: x-small; margin-top: -5px">{isRefunded(item) ? refunded : ''}</div>
+                </td>
+                <td>
+                  {
+                    (user.role === 'admin' && isRefundable(item)) &&
+                    <g-menu v-model={item.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
+                      default: () => (
+                        <g-card background="white">
+                          <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', item, status)}>{ refunded }</div>
+                        </g-card>
+                      ),
+                      activator: ({on}) => <div onClick={on.click} style={moreMenuStyle}>···</div>
+                    }}/>
+                  }
+                </td>
+              </tr>
+            )} </tbody>
+        </>))()}
       </g-table>
     )
   }
 
   const renderOnlineOrderList = function () {
     return (
-      <div className="online-order-list">
+      <div class="online-order-list">
         {renderOnlineOrderListTitle()}
-        <div className="online-order-list__table">
+        <div class="online-order-list__table">
           {renderOnlineOrderListTable()}
         </div>
         <dialog-complete-order disabled-btn v-model={showDialog.value}></dialog-complete-order>

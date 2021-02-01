@@ -1,5 +1,6 @@
 <script>
 import { onlineOrderListFactory } from './online-order-list-render'
+import {genScopeId} from '../utils';
 
 export default {
   props: {
@@ -9,12 +10,12 @@ export default {
       default: () => []
     }
   },
-  setup(props, { emit }) {
+  setup(props) {
     const { renderOnlineOrderList } = onlineOrderListFactory(props)
 
-    return () => <>
+    return genScopeId(() => <>
       {renderOnlineOrderList()}
-    </>
+    </>)
   }
 }
 </script>
