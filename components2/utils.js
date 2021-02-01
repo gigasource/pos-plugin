@@ -1,17 +1,23 @@
-import {computed, getCurrentInstance, ref, withScopeId} from "vue";
+import {computed, getCurrentInstance, ref, watch, withScopeId} from "vue";
 import {useI18n} from "vue-i18n";
 import dayjs from "dayjs";
 import {useRouter} from 'vue-router';
 import cms from 'cms';
 
 export const internalValueFactory = (props, {emit}) => {
-  if (!props.modelValue) {
-    return ref();
-  }
-  return computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val)
-  })
+  const rawInternalValue = ref(props.modelValue);
+
+  watch(() => props.modelValue, () => rawInternalValue.value = props.modelValue, { lazy: true });
+
+  const internalValue = computed({
+    get: () => rawInternalValue.value,
+    set: (value) => {
+      rawInternalValue.value = value;
+      emit('update:modelValue', rawInternalValue.value)
+    }
+  });
+
+  return internalValue;
 }
 
 let inited = false;
