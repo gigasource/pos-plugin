@@ -117,3 +117,7 @@ export async function acceptOrder(order) {
 	kitchenOrders.value.unshift(order)
 }
 
+export async function getOnlineOrdersByLimit(page, limit) {
+	return await Order.find({ online: true }).sort({ date: -1 }).skip(page * limit).limit(limit)
+}
+
