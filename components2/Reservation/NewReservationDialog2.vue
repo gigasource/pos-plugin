@@ -8,6 +8,9 @@ import dayjs from 'dayjs'
 import _ from 'lodash'
 import cms from 'cms';
 import ScrollSelect from './ScrollSelect2';
+// TODO: remove for production: for debug only
+// import { appHooks } from '../AppSharedStates';
+// appHooks.emit('settingChange')
 
 export default {
   name: 'NewReservationDialog2',
@@ -71,8 +74,8 @@ export default {
         return []
 
       const list = []
-      const date = getDayJsDateFromDateString(date.value)
-      const day = days[date.day()]
+      const _date = getDayJsDateFromDateString(date.value)
+      const day = days[_date.day()]
       for (const seatLimitSetting of reservationSetting.value.seatLimit) {
         if (!seatLimitSetting.days.includes(day))
           continue
@@ -118,7 +121,7 @@ export default {
             while (openTimeHour < closeTimeHour || (openTimeHour === closeTimeHour && openTimeMinute < closeTimeMinute)) {
               if (openTimeHour > baseHour || (openTimeHour === baseHour && openTimeMinute >= baseMinute)) {
                 const time = `${_.padStart(openTimeHour, 2, '0')}:${_.padStart(openTimeMinute, 2, '0')}`
-                if (!seatLimitByDay.some(limit => limit.start <= time && time <= limit.end && limit.availableSeats < (list.value.numberOfGuests.indexOf(numberOfGuests.value) + 1))) {
+                if (!seatLimitByDay.value.some(limit => limit.start <= time && time <= limit.end && limit.availableSeats < (list.value.numberOfGuests.indexOf(numberOfGuests.value) + 1))) {
                   times.push(time)
                 }
               }
@@ -152,7 +155,6 @@ export default {
       time.value = timeList.value[0] || ''
     })
     watch(() => internalValue.value, async (newV) => {
-      console.log('NewReservationDialog: internalValue', newV)
       if (!newV)
         return;
 
@@ -198,7 +200,7 @@ export default {
     }
 
     async function createReservation(reservation) {
-      const res = await ReservationModel.create(reservation)
+      const res = await cms.getModel('Reservation').create(reservation)
       cms.socket.emit('scheduleNewReservation', res)
       cms.socket.emit('updateOnlineReservation', res._id, 'create')
     }
@@ -247,7 +249,7 @@ export default {
       emit('submit')
     }
 
-    return () =>
+    const renderFn = () =>
         <g-dialog v-model={props.modelValue} fullscreen eager>
           { genScopeId(() =>
           <div class="dialog">
@@ -288,6 +290,22 @@ export default {
             </div>
           </div>)() }
         </g-dialog>
+
+    return {
+      date,
+      numberOfGuests,
+      time,
+
+      list,
+      reservations,
+      seatLimitByDay,
+      timeList,
+
+      renderFn
+    }
+  },
+  render() {
+    return this.renderFn()
   }
 }
 </script>

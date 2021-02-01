@@ -24,45 +24,40 @@ export default {
     }
   },
   setup(props, { emit }) {
-    const height = ref(props.height)
-    const itemHeight = ref(props.itemHeight)
-    const modelValue = ref(props.modelValue)
-    const selectedColor = ref(props.selectedColor)
-    const items = ref(props.items)
     const container = ref(null)
     const computedList = computed(() => {
-      return ['', '',...items.value,'', '']
+      return ['', '',...props.items,'', '']
     })
     const computedItemHeight = computed(() => {
-      return isNaN(+itemHeight.value) ? 0 : `${itemHeight.value}px`
+      return isNaN(props.itemHeight) ? 0 : `${props.itemHeight}px`
     })
     const computedHeight = computed(() => {
-      return isNaN(+height.value) ? 0 : `${height.value}px`
+      return isNaN(props.height) ? 0 : `${props.height}px`
     })
     const computedTop = computed(() => {
-      return isNaN(+itemHeight.value) ? 0 : `calc(50% - ${itemHeight.value/2}px)`
+      return isNaN(props.itemHeight) ? 0 : `calc(50% - ${props.itemHeight/2}px)`
     })
     const itemSelected = computed(() => {
-      return !!items.value.find(item => item === modelValue.value)
+      return !!_.find(props.items, item => item === props.modelValue)
     })
 
     const handleScroll = _.debounce(function (event) {
-      const precision = ('' + itemHeight.value).length - 1
-      const index = _.round(event.target.scrollTop / itemHeight, precision)
-      emit('update:modelValue', items[index])
+      const precision = ('' + props.itemHeight).length - 1
+      const index = _.round(event.target.scrollTop / props.itemHeight, precision)
+      emit('update:modelValue', props.items[index])
     }, 100)
 
     function scrollToValue() {
-      const index = items.value.indexOf(modelValue.value)
+      const index = _.indexOf(props.items, props.modelValue)
       setTimeout(() => {
-        container.value.scrollTop = itemHeight.value * index
+        container.value.scrollTop = props.itemHeight * index
       }, 100)
     }
 
     function chooseItem(item, index) {
       if (!item) return
       emit('update:modelValue', item)
-      container.value.scroll({top: itemHeight.value * (index - 2), behavior: 'smooth'})
+      container.value.scroll({top: props.itemHeight * (index - 2), behavior: 'smooth'})
     }
 
     const renderFn = genScopeId(() =>
@@ -77,7 +72,7 @@ export default {
                     <div class="scroll-select__container--item"
                          key={index} id={item}
                          onClick={() => chooseItem(item, index)}
-                         style={{ height: computedItemHeight.value, ...modelValue.value === item && { color: 'white', fontWeight: '700' } }}>
+                         style={{ height: computedItemHeight.value, ...props.modelValue === item && { color: 'white', fontWeight: '700' } }}>
                       {item}
                     </div>
                   </slot>
@@ -86,7 +81,7 @@ export default {
           {
             (itemSelected.value) &&
             <div class="selected" style={{ height: computedHeight.value }}>
-              <div class="selected--item" style={{ height: computedItemHeight.value, top: computedTop.value, background: selectedColor.value }}></div>
+              <div class="selected--item" style={{ height: computedItemHeight.value, top: computedTop.value, background: props.selectedColor }}></div>
             </div>
           }
         </div>)
