@@ -137,17 +137,19 @@ export function onlineOrderListFactory(props) {
                           <p style="word-break: break-word">{order.customer.address}</p>
                           <p>{order.customer.zipCode}</p>
                         </div>
-                        : <div> -- </div>
+                        : <div style="text-align: center"> -- </div>
                     }
                   </td>
                   <td>
-                    <p class="fw-700" style="white-space: nowrap">
-                      {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
-                    </p>
-                    <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
+                    <div class="col-flex align-items-center">
+                      <p class="fw-700" style="white-space: nowrap">
+                        {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
+                      </p>
+                      <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
+                    </div>
                   </td>
-                  <td style="white-space: nowrap">{formatDate(order.date)}</td>
-                  <td style="white-space: nowrap">{order.deliveryTime}</td>
+                  <td style="white-space: nowrap; text-align: center">{formatDate(order.date)}</td>
+                  <td style="white-space: nowrap; text-align: center">{order.deliveryTime}</td>
                   <td>
                     <div class="row-flex justify-center">
                       { order.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon> }
