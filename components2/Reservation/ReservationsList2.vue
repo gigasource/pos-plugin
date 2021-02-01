@@ -1,11 +1,11 @@
 <script>
 import { onActivated, onBeforeMount, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n';
-import { formatDate } from '../utils';
+import { formatDate, genScopeId } from '../utils';
 import dayjs from 'dayjs';
 import _ from 'lodash'
-
-import { selectedReservation, reservationDialog } from './reservation-shared'
+import NewReservationDialog from './NewReservationDialog2';
+import { selectedReservation, showReservationDialog, reservationDialogEditMode } from './reservation-shared'
 
 import {
   reservations,
@@ -20,6 +20,8 @@ import {
 import cms from 'cms';
 
 export default {
+  name: 'ReservationLists2',
+  components: {NewReservationDialog},
   setup() {
     const { t } = useI18n()
     const reservationStatusFilters = [
@@ -73,7 +75,10 @@ export default {
             <g-select text-field-component="GTextFieldBs" items={reservationStatusFilters} v-model={status.value}/>
             <g-spacer/>
             <g-btn-bs background-color="#2979FF" icon="icon-reservation_make"
-                      onClick={() => reservationDialog.value = { show: true, editMode: false }}>{t('onlineOrder.makeReservation')}</g-btn-bs>
+                      onClick={() => {
+                        showReservationDialog.value = true;
+                        reservationDialogEditMode.value = false;
+                      }}>{t('onlineOrder.makeReservation')}</g-btn-bs>
           </div>
       )
     }
@@ -106,14 +111,14 @@ export default {
                 <div key={index} class="reservation-tab__content-row" id={rih.time}>
                   <div class="reservation-tab__content-row--hour">{rih.time}</div>
                   <div class="flex-grow-1">
-                    { rih.reservations.map(renderReservation) }
+                    { rih.reservations.map((reservation, i) => renderReservation(rih, reservation, i)) }
                   </div>
                 </div>
             )}
           </div>
       )
     }
-    const renderReservation = (reservation, i) => {
+    const renderReservation = (rih, reservation, i) => {
       const klass = [
         'reservation-info',
         reservation.status === 'completed' && 'reservation-info--completed',
@@ -155,7 +160,10 @@ export default {
     }
     const renderCreateNewDialog = () => {
       return (
-          <new-reservation-dialog v-model={reservationDialog.value.show} edit={reservationDialog.value.editMode} reservation={selectedReservation.value} onSubmit={genReservations}/>
+          <new-reservation-dialog v-model={showReservationDialog.value}
+                                  edit={reservationDialogEditMode.value}
+                                  reservation={selectedReservation.value}
+                                  onSubmit={genReservations}/>
       )
     }
     const renderNoticeDialog = () => {
@@ -206,7 +214,7 @@ export default {
       )
     }
 
-    return () => (
+    const renderFn = genScopeId(() => (
         <div class="reservation">
           { renderReservationHeader() }
           <div class="reservation-tab">
@@ -216,8 +224,25 @@ export default {
           { renderCreateNewDialog() }
           { renderNoticeDialog() }
           { renderDeleteDialog() }
-        </div>
+        </div>)
     )
+
+    return {
+      selectedReservation,
+      showReservationDialog,
+      reservationDialogEditMode,
+
+      reservations,
+      status, date, week, formattedDate,
+      reservationInHours,
+      showNoticeDialog,
+      showDeleteDialog,
+
+      renderFn,
+    }
+  },
+  render(){
+    return this.renderFn()
   }
 }
 </script>

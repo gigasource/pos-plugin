@@ -4,7 +4,8 @@ import { computed, ref, watch } from 'vue';
 import {
   reservationSetting,
   selectedReservation,
-  reservationDialog,
+  showReservationDialog,
+  reservationDialogEditMode,
   updatePendingReservationsLength,
   getReservations,
   updateReservation,
@@ -26,7 +27,9 @@ export async function genWeek(date) {
   let _week = []
   const dateObj = dayjs(date)
   for (let i = 0; i < 7; i++) {
-    const weekday = dateObj.weekday(i)
+    // week day start from 0 - sunday
+    // add 1 to move to monday
+    const weekday = dateObj.weekday(i).add(1, 'day')
     const hasReservation = await hasReservationAt(weekday.toDate())
     _week.push({
       date: weekday,
@@ -57,7 +60,7 @@ export async function hasReservationAt(date) {
 // date
 export const date = ref(new Date())
 export const formattedDate = computed(() => formatDate(date.value))
-export const chooseDate = date => date.value = date.toDate()
+export const chooseDate = _date => date.value = _date.toDate()
 watch(() => date.value, async (selectedDate) => {
   await genReservations(selectedDate, status.value)
 })
@@ -65,7 +68,7 @@ watch(() => date.value, async (selectedDate) => {
 // status
 export const status = ref('all')
 watch(() => status.value, async (newStatus) => {
-  await genReservations(data.value, newStatus)
+  await genReservations(date.value, newStatus)
 })
 
 //
@@ -123,7 +126,8 @@ export function showEditDialog(reservation) {
     return
   }
   selectedReservation.value = reservation
-  reservationDialog.value = { show: true, editMode: true }
+  showReservationDialog.value = true
+  reservationDialogEditMode.value = true
 }
 // decline
 export const showDeleteDialog = ref(false)

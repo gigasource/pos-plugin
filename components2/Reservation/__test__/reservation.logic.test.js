@@ -14,7 +14,7 @@ import { posSettings } from "../../AppSharedStates";
 import {
   todayPendingReservation,
   selectedReservation
-} from '../reservation-shared'
+} from "../reservation-shared";
 const {
   reservations,
   reservationInHours,
@@ -78,7 +78,27 @@ describe("reservation logic", () => {
         m({ date: "2021/01/28 8:54:00 PM" }),
         m({ date: "2021/01/29 8:54:00 PM" })
       ];
-      expect(stringify(reservationInHours.value)).toMatchInlineSnapshot();
+      expect(stringify(reservationInHours.value)).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "reservations": Array [
+              Object {
+                "_id": "ObjectID",
+                "customer": Object {
+                  "email": "jo@gmail.com",
+                  "name": "Jo",
+                  "phone": "0345.678.910",
+                },
+                "date": "2021-01-28T13:54:00.000Z",
+                "noOfGuests": 5,
+                "note": "...",
+                "status": "pending",
+              },
+            ],
+            "time": "20h",
+          },
+        ]
+      `);
     });
     it("should reject reservation", () => {
       posSettings.value = {
@@ -114,7 +134,79 @@ describe("reservation logic", () => {
         m({ date: "2021/01/28 8:54:00 PM" }),
         m({ date: "2021/01/29 8:54:00 PM" })
       ];
-      expect(stringify(reservationInHours.value)).toMatchInlineSnapshot();
+      expect(stringify(reservationInHours.value)).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "reservations": Array [],
+            "time": "07h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "08h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "09h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "10h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "11h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "12h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "13h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "14h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "15h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "16h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "17h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "18h",
+          },
+          Object {
+            "reservations": Array [],
+            "time": "19h",
+          },
+          Object {
+            "reservations": Array [
+              Object {
+                "_id": "ObjectID",
+                "customer": Object {
+                  "email": "jo@gmail.com",
+                  "name": "Jo",
+                  "phone": "0345.678.910",
+                },
+                "date": "2021-01-28T13:54:00.000Z",
+                "noOfGuests": 5,
+                "note": "...",
+                "status": "pending",
+              },
+            ],
+            "time": "20h",
+          },
+        ]
+      `);
     });
     // only show reservation in open hours
     it("should not show reservation in close hours", () => {
@@ -172,7 +264,7 @@ describe("reservation logic", () => {
 
     afterAll(async () => {
       await cms.getModel("Reservation").remove({});
-    })
+    });
 
     beforeEach(() => {
       week.value = [];
@@ -187,13 +279,13 @@ describe("reservation logic", () => {
       await genWeek("2021/01/25");
       expect(week.value.map(formatWeekday)).toMatchInlineSnapshot(`
         Array [
-          "2021/01/24 00:00:00 _ false",
           "2021/01/25 00:00:00 _ false",
           "2021/01/26 00:00:00 _ false",
           "2021/01/27 00:00:00 _ true",
           "2021/01/28 00:00:00 _ false",
           "2021/01/29 00:00:00 _ true",
           "2021/01/30 00:00:00 _ true",
+          "2021/01/31 00:00:00 _ true",
         ]
       `);
     });
@@ -203,13 +295,13 @@ describe("reservation logic", () => {
       await prevWeek();
       expect(week.value.map(formatWeekday)).toMatchInlineSnapshot(`
         Array [
-          "2021/01/17 00:00:00 _ false",
           "2021/01/18 00:00:00 _ true",
           "2021/01/19 00:00:00 _ false",
           "2021/01/20 00:00:00 _ true",
           "2021/01/21 00:00:00 _ false",
           "2021/01/22 00:00:00 _ false",
           "2021/01/23 00:00:00 _ false",
+          "2021/01/24 00:00:00 _ false",
         ]
       `);
     });
@@ -219,83 +311,88 @@ describe("reservation logic", () => {
       await nextWeek();
       expect(week.value.map(formatWeekday)).toMatchInlineSnapshot(`
         Array [
-          "2021/01/31 00:00:00 _ true",
           "2021/02/01 00:00:00 _ true",
           "2021/02/02 00:00:00 _ false",
           "2021/02/03 00:00:00 _ false",
           "2021/02/04 00:00:00 _ true",
           "2021/02/05 00:00:00 _ false",
           "2021/02/06 00:00:00 _ false",
+          "2021/02/07 00:00:00 _ false",
         ]
       `);
     });
   });
 
   it("should complete reservation", async () => {
-    let emit = cms.socket.emit
-    cms.socket.emit = jest.fn(() => {})
+    let emit = cms.socket.emit;
+    cms.socket.emit = jest.fn(() => {});
 
-    await cms.getModel('Reservation').remove({})
-    await cms.getModel('Reservation').create(m({ date: '2021/01/28 11:35:00 AM' }))
+    await cms.getModel("Reservation").remove({});
+    await cms
+      .getModel("Reservation")
+      .create(m({ date: "2021/01/28 11:35:00 AM" }));
 
-    await genReservations()
-    expect(todayPendingReservation.value).toBe(1)
+    await genReservations();
+    expect(todayPendingReservation.value).toBe(1);
 
-    await completeReservation(reservations.value[0])
-    expect(todayPendingReservation.value).toBe(0)
+    await completeReservation(reservations.value[0]);
+    expect(todayPendingReservation.value).toBe(0);
 
-    expect(reservations.value[0].status).toBe('completed')
+    expect(reservations.value[0].status).toBe("completed");
 
-    const record = await cms.getModel('Reservation').findOne({ _id: reservations.value[0]._id })
-    expect(record.status).toBe('completed')
+    const record = await cms
+      .getModel("Reservation")
+      .findOne({ _id: reservations.value[0]._id });
+    expect(record.status).toBe("completed");
 
     expect(cms.socket.emit.mock.calls[0]).toEqual([
-      'rescheduleReservation',
+      "rescheduleReservation",
       reservations.value[0]._id,
-      { status: 'completed' }
-    ])
+      { status: "completed" }
+    ]);
 
-    cms.socket.emit = emit
+    cms.socket.emit = emit;
   });
 
   it("should remove reservation", async () => {
-    let emit = cms.socket.emit
-    cms.socket.emit = jest.fn(() => {})
+    let emit = cms.socket.emit;
+    cms.socket.emit = jest.fn(() => {});
 
-    await cms.getModel('Reservation').remove({})
-    const reservationRecord = m({ date: '2021/01/28 11:35:00 AM' })
-    await cms.getModel('Reservation').create(reservationRecord)
+    await cms.getModel("Reservation").remove({});
+    const reservationRecord = m({ date: "2021/01/28 11:35:00 AM" });
+    await cms.getModel("Reservation").create(reservationRecord);
 
     // has 1 pending reservation
-    await genReservations()
-    expect(reservations.value.length).toBe(1)
-    expect(todayPendingReservation.value).toBe(1)
+    await genReservations();
+    expect(reservations.value.length).toBe(1);
+    expect(todayPendingReservation.value).toBe(1);
 
     // execute delete
-    selectedReservation.value = reservationRecord
-    await confirmRemove()
+    selectedReservation.value = reservationRecord;
+    await confirmRemove();
 
     // deleted reservation will be removed in memory
-    expect(reservations.value.length).toBe(0)
-    expect(todayPendingReservation.value).toBe(0)
+    expect(reservations.value.length).toBe(0);
+    expect(todayPendingReservation.value).toBe(0);
 
     // status updated to 'declined'
-    const record = await cms.getModel('Reservation').findOne({ _id: reservationRecord._id })
-    expect(record.status).toBe('declined')
+    const record = await cms
+      .getModel("Reservation")
+      .findOne({ _id: reservationRecord._id });
+    expect(record.status).toBe("declined");
 
     // socket call to announce (don't know why we do it)
     expect(cms.socket.emit.mock.calls[0]).toEqual([
-      'rescheduleReservation',
+      "rescheduleReservation",
       reservationRecord._id,
-      { status: 'declined' }
-    ])
+      { status: "declined" }
+    ]);
     expect(cms.socket.emit.mock.calls[1]).toEqual([
-      'updateOnlineReservation',
+      "updateOnlineReservation",
       reservationRecord._id,
-      'delete'
-     ])
+      "delete"
+    ]);
 
-
-    cms.socket.emit = emit
+    cms.socket.emit = emit;
   });
 });

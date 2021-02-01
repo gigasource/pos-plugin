@@ -7,8 +7,11 @@ import { genScopeId } from '../utils';
 import dayjs from 'dayjs'
 import _ from 'lodash'
 import cms from 'cms';
+import ScrollSelect from './ScrollSelect2';
 
 export default {
+  name: 'NewReservationDialog2',
+  components: { ScrollSelect },
   props: {
     modelValue: Boolean,
     reservation: Object, // contain information about reservation: customer info (name, phone, note), reservation info (date, time, number of guests)
@@ -39,7 +42,7 @@ export default {
       else
         return 200
     })
-    const scrollSelectItemHeight = computed(() => scrollSelectItemHeight.value / 5)
+    const scrollSelectItemHeight = computed(() => scrollSelectHeight.value / 5)
     // scrollSelect items
     const list = computed(() => {
       const scrollSelectItems = {
@@ -176,12 +179,14 @@ export default {
         phone.value = props.receivedPhone.toString()
       }
 
-      setTimeout(() => {
-        // TODO: review old code old code using setTimeout
-        scrollDate.value.scrollToValue()
-        scrollNoOfGuests.value.scrollToValue()
-        scrollTime.value.scrollToValue()
-      }, 100)
+      // const interval = setInterval(() => {
+      //   if (scrollDate.value) {
+      //     scrollDate.value.scrollToValue()
+      //     scrollNoOfGuests.value.scrollToValue()
+      //     scrollTime.value.scrollToValue()
+      //     clearInterval(interval)
+      //   }
+      // }, 100)
     })
     function resetData() {
       date.value = list.value.date[0]
@@ -243,7 +248,7 @@ export default {
     }
 
     return () =>
-        <g-dialog v-model={internalValue.value} fullscreen eager>
+        <g-dialog v-model={props.modelValue} fullscreen eager>
           { genScopeId(() =>
           <div class="dialog">
             <g-icon class="dialog-icon--close" onClick={() => internalValue.value = false}>icon-close</g-icon>
@@ -261,9 +266,9 @@ export default {
                 <div class="dialog-content__title">{t('onlineOrder.makeReservation')}</div>
                 <div class="row-flex">
                   <g-text-field-bs class="bs-tf__pos" v-model={name.value} label="Name"
-                                   placeholder={t('onlineOrder.fillText')} required key={`${internalValue.value}_name`}/>
+                                   placeholder={t('onlineOrder.fillText')} required/>
                   <g-text-field-bs class="bs-tf__pos" v-model={phone.value} label={t('settings.tel')}
-                                   placeholder={t('onlineOrder.fillNumber')} number required key={`${internalValue.value}_phone`}/>
+                                   placeholder={t('onlineOrder.fillNumber')} number required/>
                 </div>
 
                 <div>

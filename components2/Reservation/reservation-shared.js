@@ -50,7 +50,5 @@ export const reservationSetting = computed(() => {
 export const selectedReservation = ref({})
 
 // object contain information whether reservation dialog will be shown or not, in edit mode or add
-export const reservationDialog = ref({
-  show: false,
-  editMode: false
-})
+export const showReservationDialog = ref(false)
+export const reservationDialogEditMode = ref(false)

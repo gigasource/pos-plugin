@@ -3,6 +3,7 @@ import { ref, computed, withModifiers } from 'vue'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
 export default {
+  name: 'ScrollSelect2',
   props: {
     height: {
       type: Number,
@@ -64,7 +65,7 @@ export default {
       container.value.scroll({top: itemHeight.value * (index - 2), behavior: 'smooth'})
     }
 
-    return genScopeId(() =>
+    const renderFn = genScopeId(() =>
         <div class="scroll-select__wrapper">
           <div class="scroll-select"
                style={{ height: computedHeight.value }}
@@ -89,6 +90,15 @@ export default {
             </div>
           }
         </div>)
+
+    // scrollToValue will be use in another component so we must return it
+    return {
+      scrollToValue,
+      renderFn
+    }
+  },
+  render() {
+    return this.renderFn()
   }
 }
 </script>
