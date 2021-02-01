@@ -2,19 +2,14 @@
 import {
   dialogCompleteOrderFactory
 } from './dialog-complete-order-render'
-import {
-  genScopeId
-} from "../../utils";
 
 export default {
   props: {
     modelValue: Boolean,
     disableBtn: Boolean,
   },
-  setup(props, { emit }) {
-
+  setup(props) {
     const { renderDialogComplete } = dialogCompleteOrderFactory(props)
-
     return () => (
       renderDialogComplete()
     )
