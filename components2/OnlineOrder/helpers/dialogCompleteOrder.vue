@@ -13,7 +13,7 @@ export default {
   },
   setup(props, { emit }) {
 
-    const { renderDialogComplete } = dialogCompleteOrderFactory(props)
+    const { renderDialogComplete } = dialogCompleteOrderFactory(props, { emit })
 
     return () => (
       renderDialogComplete()

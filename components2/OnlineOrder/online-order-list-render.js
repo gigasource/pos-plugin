@@ -4,6 +4,7 @@ import {$filters, user} from '../AppSharedStates'
 import { formatDate } from "../utils";
 import {getOnlineOrdersByLimit} from './online-order-main-logic-be'
 import { isRefunded, isRefundable } from "./online-order-main-logic"
+import { dialogOrder } from './helpers/dialog-complete-order-render';
 import cms from 'cms'
 
 //<editor-fold desc="Variables">
@@ -39,6 +40,10 @@ export function changeFilter(range) {
 export function getImagePayment(type) {
   let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
   return paymentMethod && paymentMethod.icon
+}
+export function openDialogDetail(order) {
+  dialogOrder.value = order
+  showDialog.value = true
 }
 //</editor-fold>
 
@@ -98,21 +103,21 @@ export function onlineOrderListFactory(props) {
           )} </tr>
         </thead>
         <tbody>
-        {ordersListByStatus.value.map((item, i) =>
-          <tr key={i} onClick={() => openDialogDetail(item)}>
+        {ordersListByStatus.value.map((order, i) =>
+          <tr key={i} onClick={() => openDialogDetail(order)}>
             <td className="fw-700">
               <p style="white-space: nowrap">
-                #{item.dailyId ? item.dailyId : item.id} </p>
+                #{order.dailyId ? order.dailyId : order.id} </p>
               <g-tooltip openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
                  v-slots={{
                    'default': () => <> <span>
                 <b> From: </b>
-                     {item.forwardedStore} </span>
+                     {order.forwardedStore} </span>
                    </>
                    ,
                    'activator': ({on}) => <>
                      {
-                       (item.forwardedStore) &&
+                       (order.forwardedStore) &&
                        <div v-on="on">
                          <g-icon size="16">
                            icon-delivery-forward
@@ -123,17 +128,17 @@ export function onlineOrderListFactory(props) {
                  }}/>
             </td>
             <td>
-              <p> {item.customer.name} </p>
-              <p style="white-space: nowrap"> {item.customer.phone} </p>
+              <p> {order.customer.name} </p>
+              <p style="white-space: nowrap"> {order.customer.phone} </p>
             </td>
             <td>
               {
-                (item.customer.address) ?
+                (order.customer.address) ?
                   <div>
                     <p style="word-break: break-word">
-                      {item.customer.address} </p>
+                      {order.customer.address} </p>
                     <p>
-                      {item.customer.zipCode} </p>
+                      {order.customer.zipCode} </p>
                   </div>
                   :
                   <div> -- </div>
@@ -142,41 +147,41 @@ export function onlineOrderListFactory(props) {
             <td>
               <p className="fw-700" style="white-space: nowrap">
 
-                {t('common.currency', locale.value)}{$filters.formatCurrency(item.payment[0].value)}
+                {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
               </p>
               <p>
-                <img alt src={getImagePayment(item.payment[0].type)}> </img>
+                <img alt src={getImagePayment(order.payment[0].type)}> </img>
               </p>
             </td>
             <td style="white-space: nowrap">
-              {formatDate(item.date)} </td>
+              {formatDate(order.date)} </td>
             <td style="white-space: nowrap">
-              {item.deliveryTime} </td>
+              {order.deliveryTime} </td>
             <td>
               {
-                (item.type === 'delivery') &&
+                (order.type === 'delivery') &&
                 <g-icon>
                   icon-delivery-scooter </g-icon>
               }
               {
-                (item.type === 'pickup') &&
+                (order.type === 'pickup') &&
                 <g-icon>
                   icon-take-away </g-icon>
               }
             </td>
             <td className={listOnlineOrderStatus.value}>
               <div style="white-space: nowrap">
-                {t(`onlineOrder.${item.status}`)} </div>
+                {t(`onlineOrder.${order.status}`)} </div>
               <div style="font-size: x-small; margin-top: -5px">
-                {isRefunded(item) ? refunded : ''} </div>
+                {isRefunded(order) ? refunded : ''} </div>
             </td>
             <td>
               {
-                (user.role === 'admin' && isRefundable(item)) &&
-                <g-menu v-model={item.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
+                (user.role === 'admin' && isRefundable(order)) &&
+                <g-menu v-model={order.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
                   'default': () => <>
                     <g-card background="white">
-                      <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', item, status)}>
+                      <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', order, status)}>
                         {
                           refunded
                         }

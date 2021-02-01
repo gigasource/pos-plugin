@@ -1,10 +1,6 @@
 import { ref, computed, withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
 import {
-	completeOrderDialogShow,
-	dialogOrder
-} from '../online-order-main-kitchen-orders-render'
-import {
 	declineOrder,
 	completeOrder
 } from '../online-order-main-logic-be'
@@ -16,6 +12,8 @@ import {
 	getItemPrice
 } from '../online-order-main-logic'
 import orderUtil from "../../../components/logic/orderUtil";
+
+export const dialogOrder = ref(null)
 
 export const totalWithShipping = computed(() => {
 	const { shippingFee, vSum } = dialogOrder.value;
@@ -35,17 +33,27 @@ export const paymentMethod = computed(() => {
 	return Object.assign(payment || {}, { value, type })
 })
 
-export async function onClickDecline(order) {
-	await declineOrder(order)
-	completeOrderDialogShow.value = false
-}
+export function dialogCompleteOrderFactory(props, { emit }) {
+	const modelValue = computed({
+		get: () => {
+			return props.modelValue
+		},
+		set: (val) => {
+			dialogOrder.value = null
+			emit('update:modelValue', val)
+		}
+	})
 
-export async function onClickComplete(order) {
-	await completeOrder(order)
-	completeOrderDialogShow.value = false
-}
+	const onClickDecline = async function(order) {
+		await declineOrder(order)
+		modelValue.value = true
+	}
 
-export function dialogCompleteOrderFactory(props) {
+	const onClickComplete = async function(order) {
+		await completeOrder(order)
+		modelValue.value = false
+	}
+
 	const { t, locale } = useI18n()
 	const renderContentInfo = function () {
 		return (
@@ -166,7 +174,7 @@ export function dialogCompleteOrderFactory(props) {
 		return <>
 			{
 				dialogOrder.value &&
-				<g-dialog v-model={completeOrderDialogShow.value} width="580px">
+				<g-dialog v-model={modelValue.value} width="580px">
 					<g-card className="px-3 pb-2">
 						<g-card-title style="font-size: 20px">
 							{t('onlineOrder.orderDetails')} </g-card-title>
