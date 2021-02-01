@@ -1,5 +1,6 @@
 import { ref, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { genScopeId } from '../utils'
 
 import {
 	timeoutProgress,
@@ -88,7 +89,7 @@ export function renderPendingOrdersFactory () {
 
 	function renderEmptyPendingOrders() {
 		return (
-			<div className="pending-orders--empty">
+			<div class="pending-orders--empty">
 				<img alt src="/plugins/pos-plugin/assets/pending_order.svg"> </img>
 				<p> {t('onlineOrder.noPending')} </p>
 			</div>
@@ -99,8 +100,8 @@ export function renderPendingOrdersFactory () {
 		return (
 			<>
 				{calls.value.map((call, i) =>
-					<div className="pending-orders--call" key={`call_${i}`}>
-						<div className="pending-orders--call-title">
+					<div class="pending-orders--call" key={`call_${i}`}>
+						<div class="pending-orders--call-title">
 							<div>
 								{call.customer.name}
 								<span> - </span>
@@ -110,26 +111,26 @@ export function renderPendingOrdersFactory () {
 								icon-call
 							</g-icon>
 						</div>
-						<p className="fs-small-2 text-grey-darken-1">
+						<p class="fs-small-2 text-grey-darken-1">
 							Incoming call </p>
-						<div className="pending-orders--call-buttons">
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteCall(i, call)}>
+						<div class="pending-orders--call-buttons">
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteCall(i, call)}>
 								<g-icon size="16">
 									icon-cross-red
 								</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
 								<g-icon size="16">
 									icon-table-reservation
 								</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4"
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4"
 							          onClick={() => openOrderDialog(call, 'pickup')}>
 								<g-icon size="16">
 									icon-take-away
 								</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal" border-color="#C4C4C4" onClick={() => openOrderDialog(call, 'delivery')}>
+							<g-btn-bs class="flex-equal" border-color="#C4C4C4" onClick={() => openOrderDialog(call, 'delivery')}>
 								<g-icon size="16">
 									icon-delivery-scooter
 								</g-icon>
@@ -145,8 +146,8 @@ export function renderPendingOrdersFactory () {
 		return (
 			<>
 				{missedCalls.value.map((call, i) =>
-					<div className="pending-orders--call b-red" key={`missed_call_${i}`}>
-						<div className="pending-orders--call-title">
+					<div class="pending-orders--call b-red" key={`missed_call_${i}`}>
+						<div class="pending-orders--call-title">
 							<div>
 								{call.customer.name} <span> - </span>
 								{call.customer.phone} </div>
@@ -155,30 +156,22 @@ export function renderPendingOrdersFactory () {
 								icon-missed-call
 							</g-icon>
 						</div>
-						<p className="fs-small-2 text-grey-darken-1">
+						<p class="fs-small-2 text-grey-darken-1">
 							Missed call </p>
-						<div className="pending-orders--call-buttons">
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteMissedCall(i)}>
-								<g-icon size="16">
-									icon-cross-red
-								</g-icon>
+						<div class="pending-orders--call-buttons">
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => deleteMissedCall(i)}>
+								<g-icon size="16">icon-cross-red</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
-								<g-icon size="16">
-									icon-table-reservation
-								</g-icon>
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4" onClick={() => openReservationDialog(call)}>
+								<g-icon size="16">icon-table-reservation</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal mr-2" border-color="#C4C4C4"
+							<g-btn-bs class="flex-equal mr-2" border-color="#C4C4C4"
 							          onClick={() => openOrderDialog(call, 'pickup', i)}>
-								<g-icon size="16">
-									icon-take-away
-								</g-icon>
+								<g-icon size="16">icon-take-away</g-icon>
 							</g-btn-bs>
-							<g-btn-bs className="flex-equal" border-color="#C4C4C4"
+							<g-btn-bs class="flex-equal" border-color="#C4C4C4"
 							          onClick={() => openOrderDialog(call, 'delivery', i)}>
-								<g-icon size="16">
-									icon-delivery-scooter
-								</g-icon>
+								<g-icon size="16">icon-delivery-scooter</g-icon>
 							</g-btn-bs>
 						</div>
 					</div>
@@ -189,48 +182,35 @@ export function renderPendingOrdersFactory () {
 
 	function renderPendingOrdersTitle(order) {
 		return (
-			<g-card-title className="pending-orders--title">
-				<div className="row-flex align-items-center flex-grow-1">
-					{
-						(order.type === 'delivery') &&
-						<g-icon>
-							icon-delivery-scooter
-						</g-icon>
-					}
-					{
-						(order.type === 'pickup') &&
-						<g-icon>
-							icon-take-away
-						</g-icon>
-					}
-					<div className="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
-          <span className="fs-small fw-700 text-indigo-accent-2">
-            #{order.dailyId}
-          </span>
-
-						{order.customer ? order.customer.name : 'No customer name'} -
-						{order.customer ? order.customer.phone : 'No customer phone'}
+			<g-card-title class="pending-orders--title">
+				{ genScopeId(() => <>
+					<div class="row-flex align-items-center flex-grow-1">
+						{ (order.type === 'delivery') && <g-icon>icon-delivery-scooter</g-icon> }
+						{ (order.type === 'pickup') && <g-icon>icon-take-away</g-icon> }
+						<div class="fs-small-2 ml-1" style="max-width: calc(100% - 24px); line-height: 1.2">
+							<span class="fs-small fw-700 text-indigo-accent-2">#{order.dailyId}</span>
+							{order.customer ? order.customer.name : 'No customer name'} -
+							{order.customer ? order.customer.phone : 'No customer phone'}
+						</div>
 					</div>
-				</div>
-				<div className="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
-					{
-						(order.deliveryTime) &&
-						<span className="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">
-            {order.deliveryTime}
-					</span>
-					}
-					{
-						(order.timeoutDate && timeoutProgress.value[order._id]) &&
-						<>
-							<g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373"
-							                     value={timeoutProgress.value[order._id].progress}>
-							</g-progress-circular>
-							<div className="progress-remaining">
-								{timeoutProgress.value[order._id].remaining}
-							</div>
-						</>
-					}
-				</div>
+					<div class="row-flex justify-end align-items-center r" style="flex: 0 0 auto">
+						{
+							(order.deliveryTime) && <span class="fw-700 fs-small ml-2 mr-2" style="text-transform: uppercase">
+								{order.deliveryTime}
+							</span>
+						}
+						{
+							(order.timeoutDate && timeoutProgress.value[order._id]) && <>
+								<g-progress-circular rotate="-90" width="1.5" size="36" color="#E57373"
+								                     value={timeoutProgress.value[order._id].progress}>
+								</g-progress-circular>
+								<div class="progress-remaining">
+									{timeoutProgress.value[order._id].remaining}
+								</div>
+							</>
+						}
+					</div>
+				</>)() }
 			</g-card-title>
 		)
 	}
@@ -240,19 +220,19 @@ export function renderPendingOrdersFactory () {
 			<g-card-text>
 				{
 					(order.note) &&
-					<div className="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
+					<div class="text-grey-darken-1 i mb-1" style="font-size: 13px; line-height: 16px">
 						{t('onlineOrder.note')}: {order.note}
 					</div>
 				}
 				{
 					(order.type === 'delivery') &&
-					<div className="row-flex">
+					<div class="row-flex">
 						<div style="flex: 0 0 25px">
 							<g-icon color="#9E9E9E" size="20">
 								icon-place
 							</g-icon>
 						</div>
-						<div style="max-width: calc(100% - 25px);" className="flex-equal pl-1">
+						<div style="max-width: calc(100% - 25px);" class="flex-equal pl-1">
 							{`${order.customer.address} ${order.customer.zipCode}`}
 						</div>
 					</div>
@@ -261,28 +241,28 @@ export function renderPendingOrdersFactory () {
 					(order.items) &&
 					<div>
 						{order.items.map(item =>
-							<div className="row-flex align-items-start">
+							<div class="row-flex align-items-start">
 								<div style="flex: 0 0 25px; font-weight: 700; font-size: 12px">
 									{item.quantity}x
 								</div>
-								<div className="flex-equal fs-small-2 pl-1" style="word-break: break-all">
+								<div class="flex-equal fs-small-2 pl-1" style="word-break: break-all">
 
 									{item.id && `${item.id}.`} {item.name}
-									<span className="i text-grey">
+									<span class="i text-grey">
 									{getExtraInfo(item)}
 								</span>
 								</div>
-								<div className="fs-small-2 ta-right">
+								<div class="fs-small-2 ta-right">
 									€{$filters.formatCurrency(getItemPrice(item), 2)} </div>
 							</div>
 						)} </div>
 				}
 				{
 					(order.type === 'delivery') &&
-					<div className="row-flex">
-						<div className="flex-equal fw-700">
+					<div class="row-flex">
+						<div class="flex-equal fw-700">
 							{t('onlineOrder.shippingFee')} </div>
-						<div className="fs-small-2 ta-right">
+						<div class="fs-small-2 ta-right">
 							€{$filters.formatCurrency(order.shippingFee, 2)} </div>
 					</div>
 				}
@@ -290,7 +270,7 @@ export function renderPendingOrdersFactory () {
 					(order.discounts && order.discounts.length === 0) &&
 					<div>
 						{order.discounts.map(discount =>
-							<div className="row-flex align-items-start">
+							<div class="row-flex align-items-start">
 								<div>
 								<span>
 									{discount.coupon ? `Coupon ` : discount.name}
@@ -303,7 +283,7 @@ export function renderPendingOrdersFactory () {
 									}
 								</div>
 								<g-spacer></g-spacer>
-								<div className="fs-small-2">
+								<div class="fs-small-2">
 									-{t('common.currency', locale.value)}{$filters.formatCurrency(discount.value, 2)}
 								</div>
 							</div>
@@ -392,9 +372,11 @@ export function renderPendingOrdersFactory () {
 	function renderAllPendingOrders() {
 		return pendingOrders.value.map((order, index) => (
 			<g-card elevation="0" key={index}>
-				{renderPendingOrdersTitle(order)}
-				{renderPendingOrdersText(order)}
-				{renderPendingOrdersActions(order)}
+				{ genScopeId(() => <>
+					{renderPendingOrdersTitle(order)}
+					{renderPendingOrdersText(order)}
+					{renderPendingOrdersActions(order)}
+				</>)() }
 			</g-card>
 		))
 	}
@@ -411,7 +393,7 @@ export function renderPendingOrdersFactory () {
 
 	function renderPendingOrders() {
 		return (
-			<div className="pending-orders pr-2">
+			<div class="pending-orders pr-2">
 				{renderPendingOrdersHeader()}
 				{renderPendingOrdersContent()}
 			</div>
