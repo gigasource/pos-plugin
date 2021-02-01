@@ -1,5 +1,4 @@
 <script>
-import ContentRender from "../../../components/common/ContentRender";
 import {KeepAlive, onActivated, ref, h} from "vue";
 import {contentView} from "./dashboard-shared";
 
@@ -25,9 +24,6 @@ const views = {
 
 export default {
   name: "Dashboard",
-  components: {
-    ContentRender,
-  },
   setup() {
     return () => <KeepAlive>
       {h(views[contentView.value.name])}

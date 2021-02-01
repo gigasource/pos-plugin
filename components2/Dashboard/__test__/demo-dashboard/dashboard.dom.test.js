@@ -1,5 +1,5 @@
 //<editor-fold desc="declare">
-import { makeWrapper, wrapper } from "../../test-utils";
+import { makeWrapper, wrapper } from "../../../test-utils";
 
 import { nextTick } from "vue";
 import Dashboard from "./Dashboard";
@@ -38,4 +38,5 @@ describe("order-view test", function() {
       </p>
     `);
   }, 80000);
+
 });
