@@ -37,7 +37,6 @@ const {
 describe("reservation logic", () => {
   beforeAll(async () => {
     console.log("mock-date", new Date());
-    // init demo data then query posSetting from database
     await cms.initDemoData();
     // then register another schema
     cms.orm.registerSchema("Reservation", {

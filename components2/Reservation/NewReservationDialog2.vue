@@ -31,7 +31,7 @@ export default {
     const note = ref('')
 
     // reservation info
-    const date = ref('')
+    const date = ref(t('onlineOrder.today'))
     const numberOfGuests = ref('')
     const time = ref('')
 
@@ -162,7 +162,7 @@ export default {
       const _date = getDayJsDateFromDateString(date.value)
       reservations.value = await getReservations(_date)
 
-      if (props.edit) { // TODO: edit singleton
+      if (props.edit) {
         name.value = props.reservation.customer.name
         phone.value = props.reservation.customer.phone
         note.value = props.reservation.note
@@ -170,13 +170,16 @@ export default {
         time.value = dayjs(props.reservation.date).format('HH:mm')
         const day = dayjs(props.reservation.date)
         if (day.isSame(dayjs(), 'day')) {
-          date.value = $t('onlineOrder.today')
+          date.value = t('onlineOrder.today')
         } else if (day.isSame(dayjs().add(1, 'day'), 'day')) {
-          date.value = $t('onlineOrder.tomorrow')
+          date.value = t('onlineOrder.tomorrow')
         } else {
           date.value = day.format('DD MMM') // TODO: Resolve hard-coded string
         }
+      } else {
+        date.value = t('onlineOrder.today')
       }
+
       if (props.receivedPhone) {
         phone.value = props.receivedPhone.toString()
       }
