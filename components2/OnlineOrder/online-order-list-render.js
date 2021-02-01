@@ -210,7 +210,7 @@ export function onlineOrderListFactory(props) {
         <div className="online-order-list__table">
           {renderOnlineOrderListTable()}
         </div>
-        <dialog-complete-order disabled-btn v-model={showDialog.value}></dialog-complete-order>
+        <dialog-complete-order disable-btn v-model={showDialog.value}></dialog-complete-order>
       </div>
     )
   }

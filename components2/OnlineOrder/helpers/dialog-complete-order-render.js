@@ -131,7 +131,7 @@ export function dialogCompleteOrderFactory(props, { emit }) {
 	}
 
 	const renderBtn = function () {
-		return (!props.disabledBtn) &&
+		return (!props.disableBtn) &&
 			<g-card-actions>
 				{genScopeId(() => (<>
 				    <g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" onClick={withModifiers(() => onClickDecline(dialogOrder.value), ['stop'])}>
