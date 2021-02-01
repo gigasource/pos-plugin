@@ -71,27 +71,17 @@ export function renderPendingOrdersFactory () {
 	const { t, locale } = useI18n()
 	function renderPendingOrdersHeader() {
 		return (
-			<div className="header">
-			<span>
-				{t('onlineOrder.pendingOrders')}
-			</span>
+			<div class="header">
+				<span>{t('onlineOrder.pendingOrders')}</span>
 				{
-					(pendingOrders.value && !!pendingOrders.value.length) &&
-					<g-badge className="ml-1" inline modelValue={true} color="#4CAF50" v-slots={{
-						'badge': () =>
-							<div className="px-2">
-								{pendingOrders.value.length}
-							</div>
-					}}>
-					</g-badge>
+					pendingOrders.value && pendingOrders.value.length > 0 &&
+						<g-badge class="ml-1" inline modelValue={true} color="#4CAF50" v-slots={{
+							badge: () => <div class="px-2">{pendingOrders.value.length}</div>
+						}}>
+						</g-badge>
 				}
-				<g-spacer></g-spacer>
-				{
-					(!modemDeviceConnected.value) &&
-					<span style="color: #D32F2F">
-          Modem not connected
-        </span>
-				}
+				<g-spacer/>
+				{ (!modemDeviceConnected.value) &&  <span style="color: #D32F2F">Modem not connected</span> }
 			</div>
 		)
 	}

@@ -22,12 +22,11 @@ export function renderKitchenOrdersFactory() {
 		return (
 			<div class="header">
 				{ t('onlineOrder.sentToKitchen') }
-				<g-badge className="ml-1" inline modelValue={true} color="#F9A825" v-slots={{
-					'badge': () =>
-						<div className="px-2">
-							{sortedKitchenOrders.length}
-						</div>
-				}}/>
+				{ sortedKitchenOrders.value && sortedKitchenOrders.value.length > 0 &&
+					<g-badge class="ml-1" inline modelValue={true} color="#F9A825" v-slots={{
+						'badge': () => <div class="px-2">{sortedKitchenOrders.value.length}</div>
+					}}></g-badge>
+				}
 			</div>
 		)
 	}
