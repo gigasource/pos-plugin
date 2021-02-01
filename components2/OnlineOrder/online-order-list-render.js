@@ -110,7 +110,7 @@ export function onlineOrderListFactory(props) {
             </thead>
             <tbody>
               {ordersListByStatus.value.map((order, i) =>
-                <tr key={i} onClick={() => openDialogDetail(order)}>
+                <tr key={i} onClick={() => openDialogDetail(order)} style="cursor: pointer">
                   <td class="fw-700">
                     <p style="white-space: nowrap">#{order.dailyId ? order.dailyId : order.id}</p>
                     { order.forwardedStore && (<g-tooltip
