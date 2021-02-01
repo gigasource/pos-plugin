@@ -63,7 +63,7 @@
   import _ from 'lodash'
   import ContentRender from "../common/ContentRender";
   import PosOrderManualTable from "../Order/PosOrderManualTable";
-  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain";
+  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain1";
   import OnlineOrderList from "../OnlineOrder/OnlineOrderList";
   import OnlineOrderServices from "../OnlineOrder/OnlineOrderServices";
   import ReservationsList from "../Reservation/ReservationsList";

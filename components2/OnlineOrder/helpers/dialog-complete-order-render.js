@@ -36,6 +36,7 @@ export const paymentMethod = computed(() => {
 })
 
 export async function onClickDecline(order) {
+	await declineOrder(order)
 	completeOrderDialogShow.value = false
 }
 
@@ -145,7 +146,7 @@ export function dialogCompleteOrderFactory(props) {
 	const renderBtn = function () {
 		return (!props.disabledBtn) &&
 			<g-card-actions>
-				<g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" onClick={withModifiers(() => declineOrder(dialogOrder.value), ['stop'])}>
+				<g-btn-bs height="60" background-color="#E57373" text-color="white" class="flex-equal" onClick={withModifiers(() => onClickDecline(dialogOrder.value), ['stop'])}>
 					{t('onlineOrder.cancelOrder')} </g-btn-bs>
 				<g-btn-bs height="60" background-color="#2979FF" text-color="white" class="flex-equal" onClick={withModifiers(() => onClickComplete(dialogOrder.value), ['stop'])}>
 					{t('onlineOrder.completeOrder')} </g-btn-bs>

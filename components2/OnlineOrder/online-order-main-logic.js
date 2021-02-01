@@ -1,6 +1,8 @@
 import { ref, computed, watch } from 'vue'
 import dayjs from 'dayjs'
 
+export const hooks = new (require('schemahandler/hooks/hooks'))();
+
 const timeoutInterval = {}
 
 export const pendingOrders = ref([])
@@ -20,6 +22,9 @@ watch(() => pendingOrders.value, (val, preVal) => {
 	}
 
 	timeoutProgress.value = {}
+	Object.keys(timeoutInterval).forEach(orderId => {
+		clearTimeout(timeoutInterval[orderId])
+	})
 	pendingOrders.value.map((order) => {
 			getTimeoutProgress(order)
 	})
@@ -71,8 +76,10 @@ export function getTimeoutProgress(order) {
 			const diff = dayjs(order.timeoutDate).diff(now, 'second', true);
 			const timeout = dayjs(order.timeoutDate).diff(order.date, 'second', true)
 			if (diff <= 0){
-				// this.$emit('getPendingOnlineOrderCounter')
-				return timeoutProgress.value[order._id] = { progress: 0, remaining: 0 }
+				delete timeoutProgress.value[order._id]
+				_.remove(pendingOrders.value, _order => _order._id.toString() === order._id.toString())
+				hooks.emit('timeoutOrder', order._id)
+				return
 			}
 
 			const x = (timeout - diff) / timeout

@@ -112,7 +112,7 @@ module.exports = async function (cms) {
 	 -------------------------------------------
 	 */
 	cms.on('onlineOrderSocket', async function (socket) {
-		if (socket === cloudSocket) return
+		if (!socket || socket === cloudSocket) return
 		cloudSocket = socket
 		const posSettings = await cms.getModel('PosSetting').findOne({})
 		let { onlineDevice, masterIp, masterClientId } = posSettings

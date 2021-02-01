@@ -297,7 +297,7 @@ export function renderPendingOrdersFactory () {
 					</div>
 				}
 				{
-					(order.discounts && order.discounts.length) &&
+					(order.discounts && order.discounts.length === 0) &&
 					<div>
 						{order.discounts.map(discount =>
 							<div className="row-flex align-items-start">

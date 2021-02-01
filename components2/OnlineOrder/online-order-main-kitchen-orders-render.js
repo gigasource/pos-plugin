@@ -12,7 +12,7 @@ export const dialogOrder = ref(null)
 
 export function openCompleteDialog(order) {
 	dialogOrder.value = order
-	completeOrderDialog.value = true
+	completeOrderDialogShow.value = true
 }
 
 export function renderKitchenOrdersFactory() {
@@ -57,8 +57,8 @@ export function renderKitchenOrdersFactory() {
 							icon-take-away </g-icon>
 					}
 					<span className="fw-700 fs-small ml-2">
-	                      {order.deliveryTime}
-											</span>
+						{order.deliveryTime}
+					</span>
 				</div>
 			</g-card-title>
 		)

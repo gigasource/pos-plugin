@@ -2,7 +2,8 @@ import {
 	calls, kitchenOrders,
 	pendingOrders,
 	missedCalls,
-	isPrepaidOrder
+	isPrepaidOrder,
+	hooks
 } from './online-order-main-logic'
 import {
 	user
@@ -10,6 +11,18 @@ import {
 import cms from 'cms'
 
 const Order = cms.getModel('Order')
+
+/**
+ * Recognize timeout order
+ */
+hooks.on('timeoutOrder', async function (orderId) {
+	await Order.findOneAndUpdate({
+		_id: orderId
+	}, {
+		status: 'declined',
+		responseMessage: 'Order timeout'
+	})
+})
 
 export async function getPaymentMethod(payment) {
 	const paymentMethod = await cms.getModel('PosSetting').find()
@@ -37,9 +50,7 @@ export async function completeOrder(order) {
 	const status = 'completed'
 	const orderStatus = {
 		orderId: order.id,
-		onlineOrderId: order.onlineOrderId,
-		status,
-		paypalOrderDetail: order.paypalOrderDetail
+		status
 	}
 	Object.assign(order, orderStatus)
 	await Order.findOneAndUpdate({
@@ -48,8 +59,18 @@ export async function completeOrder(order) {
 	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
 }
 
-export function declineOrder(order) {
-	// todo: fill this
+export async function declineOrder(order) {
+	const status = 'declined'
+	const orderStatus = {
+		orderId: order.id,
+		status,
+		responseMessage: order.declineReason
+	}
+	Object.assign(order, orderStatus)
+	await Order.findOneAndUpdate({
+		_id: order._id
+	}, order)
+	_.remove(kitchenOrders.value, _order => _order._id.toString() === order._id.toString())
 }
 
 export async function loadOrders() {
@@ -69,7 +90,7 @@ export async function acceptOrder(order) {
 	let _isPrepaidOrder = isPrepaidOrder(order);
 
 	let updatedOrder;
-	if (isPrepaidOrder) {
+	if (_isPrepaidOrder) {
 		updatedOrder = order
 	} else {
 		updatedOrder = await cms.getModel('Order').findOneAndUpdate({ _id: order._id }, updateOrderInfo)
