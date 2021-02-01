@@ -1,41 +1,63 @@
 <script>
 
 import { roomUiFactory } from '../RoomUi'
-import { getTableOrderInfo, initRouter, isTransferringTable } from './RestaurantRoomLogics'
+import {
+  initRouter,
+  isTransferringTable,
+  onCustomerDialogSubmit,
+  showNumberOfCustomersDialog
+} from './RestaurantRoomLogics'
 import { getDiffTime } from '../../../utils/commons'
-import { onBeforeUnmount, ref } from 'vue';
+import { onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue';
 import RoomStyleFactory from '../RoomStyles'
 import { roomsFactory } from '../RoomState';
-import { isBusyTable, isTable } from '../RoomShared';
+import { getTableOrderInfo, isBusyTable, isTable } from '../RoomShared';
 import Touch from '../../../../../backoffice/pos-vue-framework/src/directives/touch/touch';
 import { useI18n } from 'vue-i18n';
 import RestaurantRoomEventHandlers from './EventHandlersForRestaurantRoom'
+import { appHooks, user } from '../../AppSharedStates';
+import NumberOfCustomersDialog from './NumberOfCustomersDialog';
 
 export default {
-  name: 'RestaurantRoom2',
+  name: 'RestaurantRoom',
+  components: { NumberOfCustomersDialog },
   props: {
     roomId: String
   },
   directives: { Touch },
-  setup(props) {
-    const { t, locale } = useI18n()
+  setup(props, { emit }) {
+    // appHooks.emit('updateTseConfig')
     initRouter()
+    onActivated(() => {
+      console.log('room activated')
+    })
+    onDeactivated(() => {
+      console.log('room deactivated')
+    })
+    const { t, locale } = useI18n()
     const { touchHandlers } = RestaurantRoomEventHandlers()
     const { selectingRoomStates, objectsInSelectingRoom } = roomsFactory(props);
-
     const { roomObjectContainerStyle, roomObjectStyle } = RoomStyleFactory(selectingRoomStates)
-
     const curTime = ref(new Date())
 
-    const clearTimerInterval = setInterval(() => curTime.value = new Date(), 30000)
-    onBeforeUnmount(() => clearTimerInterval());
+    const timerInterval = setInterval(() => curTime.value = new Date(), 30000)
+    onBeforeUnmount(() => clearInterval(timerInterval));
 
     const objectContentRender = (obj) => {
       const isActiveTable = obj.type === 'table' && isBusyTable(obj)
       const order = getTableOrderInfo(obj)
       const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
+      const isUserTable = (order, user) => {
+        //todo: check this logic: compare by name is correct ?
+        return _.some(order.user, i => i.name === user.name)
+      }
       return <div style={roomObjectStyle(obj)}>
         {isTable(obj) && <>
+          {isBusyTable(obj) && isUserTable(order, user.value) &&
+          <g-icon
+              style="position: absolute; top: 0; right: 0; height: 13px; width: 15px">icon-room-border
+          </g-icon>
+          }
           {isBusyTable(obj) &&
           <div style={`font-size: ${11 * zoom}px ;position: absolute; top: 2px`}>
             {t('common.currency', locale.value)}{order.vSum}
@@ -65,7 +87,6 @@ export default {
       return style
     }
 
-
     const objectRender = (obj) => {
       return <div key={obj._id} id={obj.name}
                   style={_roomObjectContainerStyle(obj)}
@@ -78,7 +99,16 @@ export default {
     }
 
     const { renderRoom } = roomUiFactory(objectRender, selectingRoomStates, objectsInSelectingRoom);
-    return () => renderRoom();
+    // const numberOfCustomersDialog = () =>
+    //     <NumberOfCustomersDialog v-model={showNumberOfCustomersDialog.value}
+    //                              onSubmit={({ numberOfCustomers, tseMethod }) => onCustomerDialogSubmit({ numberOfCustomers, tseMethod }, emit)}
+    //     >
+    //
+    //     </NumberOfCustomersDialog>
+    return () => <>
+      {renderRoom()}
+
+    </>
   }
 }
 </script>

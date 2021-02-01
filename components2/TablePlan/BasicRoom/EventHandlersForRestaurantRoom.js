@@ -17,7 +17,7 @@ const RestaurantRoomEventHandlers = () => {
       move: () => {
         if (!transferTableFrom.value) swiping.value = true
       },
-      end: async() => {
+      end: async () => {
         if (transferTableFrom.value) {
           if (!isBusyTable(item) && !isSameId(item, transferTableFrom.value)) {
             await moveOrderToNewTable(transferTableFrom.value, item)
@@ -33,7 +33,7 @@ const RestaurantRoomEventHandlers = () => {
             swiping.value = false
           } else {
             //todo: check table is disable or not
-            chooseTable(item.name)
+            await chooseTable(item)
           }
         }
       }
