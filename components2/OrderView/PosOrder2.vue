@@ -4,12 +4,12 @@ import dialogConfigOrderItem from '../../components/posOrder/dialogConfigOrderIt
 import {useRoute, useRouter} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
 import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
-import {syncOrderChange, overlay, prepareOrder} from "./pos-logic-be";
+import {clearOrder, overlay, prepareOrder, syncOrderChange} from "./pos-logic-be";
 import {hooks} from './pos-logic'
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
-import {activeOrders} from "../AppSharedStates";
+import {onActivated, onDeactivated} from "vue";
 
 export default {
   name: "posOrder2",
@@ -21,24 +21,33 @@ export default {
     printedOrder: Object,
     isTakeAwayOrder: Boolean,
   },
-  async activated() {
-    const route = useRoute()
-    if (route.params.id) {
-      const order = await cms.getModel('Order').findOne({ table: route.params.id, status: 'inProgress' })
-      console.log(_.cloneDeep(order))
-      if (!order) prepareOrder(route.params.id)
-      else prepareOrder(order)
-    }
-    //todo: fix this
-    cms.socket.on('update-table', async function (order) {
-      await syncOrderChange(order)
-    })
-  },
-  deactivated() {
-    prepareOrder({})
-  },
   setup(props, {emit}) {
     const router = useRouter()
+
+    onActivated(async () => {
+      const route = useRoute()
+      if (route.params.id) {
+        //let order = _.find(activeOrders.value, {table: route.params.id, status: 'inProgress'})
+        let order;
+        if (!order) {
+          order = await cms.getModel('Order').findOne({table: route.params.id, status: 'inProgress'})
+        }
+        console.log(_.cloneDeep(order))
+        if (!order) {
+          prepareOrder(route.params.id)
+        } else {
+          prepareOrder(order)
+        }
+      }
+      //todo: fix this
+      cms.socket.on('update-table', async function (order) {
+        await syncOrderChange(order)
+      })
+    })
+
+    onDeactivated(() => {
+      clearOrder();
+    })
 
     hooks.on('printOrder', function () {
       router.go(-1)

@@ -3,7 +3,7 @@ import PaymentLogicsFactory from '../payment-logics';
 import { ref, watch, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { isMobile} from '../../AppSharedStates';
-import { GBadge, GBtn, GIcon } from '../../../../../../backoffice/pos-vue-framework';
+import { GBadge, GBtn, GIcon } from 'pos-vue-framework';
 import dialogMultiPayment2 from './dialogMultiPayment2';
 import PosTextfieldNew from '../../../components/pos-shared-components/POSInput/PosTextfieldNew';
 import { genScopeId, VModel_number } from '../../utils';

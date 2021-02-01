@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {dateFormat} from "../utils";
+import {formatDate} from '../utils';
 import {computed, ref} from 'vue';
 import cms from "cms";
 import JsonFn from "json-fn";
@@ -24,11 +24,11 @@ export const selectedPeriod = computed(() => {
     const start = dayjs(monthReportFrom.value);
     const end = dayjs(monthReportTo.value);
     if (!start.isSame(selectedMonthFrom.value, 'day') || !end.isSame(selectedMonthTo.value, 'day')) {
-      return `${start.format(dateFormat.value)} - ${end.format(dateFormat.value)}`
+      return `${formatDate(monthReportFrom.value)} - ${formatDate(monthReportTo.value)}`
     }
   }
   if (selectedMonth.value) {
-    return dayjs(selectedMonth.value).format('MMMM YYYY')
+    return dayjs(selectedMonth.value).format('MM.YYYY')
   }
 })
 
@@ -41,7 +41,7 @@ export async function getMonthReport() {
   zNumbers = _.reduce(zNumbers, (acc, data, date) => {
     _.forEach(data, (sum, z) => {
       if (!z) return;
-      const _item = {z: parseInt(z), sum: sum, date: dayjs(date, 'DD.MM.YYYY').format(dateFormat.value)}
+      const _item = {z: parseInt(z), sum: sum, date: formatDate(date)}
       acc.push(_item);
     })
     return acc

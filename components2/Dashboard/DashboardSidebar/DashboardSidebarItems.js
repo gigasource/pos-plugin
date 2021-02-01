@@ -1,15 +1,15 @@
-import {computed} from 'vue';
+import { computed } from 'vue';
 import _ from 'lodash';
 
-import {user} from '../../AppSharedStates'
+import { user } from '../../AppSharedStates'
 
-import {onSelectRoom, roomsStates} from '../../TablePlan/RoomState'
-import { activeScreen, selectingRoomId } from '../DashboardSharedStates';
-import {useI18n} from 'vue-i18n'
+import { roomsStates } from '../../TablePlan/RoomState'
+import { activeScreen, dashboardHooks } from '../DashboardSharedStates';
+import { useI18n } from 'vue-i18n'
 
 
 const DashboardSidebarItemsFactory = () => {
-  const {t} = useI18n()
+  const { t } = useI18n()
   const dashboardSidebarItems = computed(() => [
     {
       icon: 'icon-restaurant',
@@ -18,9 +18,9 @@ const DashboardSidebarItemsFactory = () => {
         icon: 'radio_button_unchecked',
         iconType: 'small',
         onClick() {
-          activeScreen.value = 'restaurant-room'
-          selectingRoomId.value = r.room._id
-          onSelectRoom(r)
+          dashboardHooks.emit('updateScreen', 'KeptAliveRoomViews')
+          dashboardHooks.emit('selectRoom', r.room._id.toString())
+          // onSelectRoom(r)
         }
       })),
       title: t('sidebar.restaurant'),
@@ -31,7 +31,7 @@ const DashboardSidebarItemsFactory = () => {
       title: t('sidebar.manualTable'),
       feature: 'manualTable',
       onClick() {
-        console.log('click manual table')
+        dashboardHooks.emit('updateScreen', 'ManualTableView')
       }
     },
     {
@@ -73,14 +73,9 @@ const DashboardSidebarItemsFactory = () => {
     },
     {
       icon: 'icon-functions',
-      title: t('sidebar.functions')
-    },
-    {
-      icon: 'icon-functions',
-      title: 'edit table plan',
+      title: t('sidebar.functions'),
       onClick() {
-        activeScreen.value = 'edit-table-plan'
-        // selectingRoom.value =
+        dashboardHooks.emit('updateScreen', 'FunctionsView')
       }
     }
   ])
@@ -107,14 +102,14 @@ const DashboardSidebarItemsFactory = () => {
         case 'Reservation':
           return {
             ...item,
-            ...{badge: '1' + '', badgeColor: '#FF5252'}
+            ...{ badge: '1' + '', badgeColor: '#FF5252' }
           }
         case 'Dashboard':
           const items = item.items.map(i => {
             if (i.key === 'Orders') {
               return {
                 ...i,
-                ...{badge: '2' + '', badgeColor: '#FF5252'}
+                ...{ badge: '2' + '', badgeColor: '#FF5252' }
               }
             }
             return i

@@ -1,11 +1,6 @@
 <template>
   <div class="pos-online">
-    <pos-dashboard-sidebar
-        class="pos-online__sidebar"
-        #sidebar
-        :view="view"
-        :items="sidebarItems"
-        default-path="item.0.item.0"/>
+
     <online-order-main
         class="pos-online__content"
         #content
@@ -14,15 +9,14 @@
   </div>
 </template>
 <script>
-  import PosDashboardSidebar from '../Dashboard/PosDashboardSidebar';
-  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain1';
+  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
   import {pendingOrders, kitchenOrders} from '../../composition/useOrderLogic';
   import { state as RoomState } from '../../composition/useRoomLogic'
   import { onMounted, ref, reactive } from 'vue';
 
   export default {
     name: 'Online',
-    components: { OnlineOrderMain, PosDashboardSidebar },
+    components: { OnlineOrderMain },
     props: {},
     emits: ['update:view'],
     setup(props, context) {

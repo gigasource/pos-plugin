@@ -1,16 +1,7 @@
 <script>
 import dayjs from 'dayjs'
-import {ref, computed, onCreated} from 'vue'
-import {
-  autoAssignFromTo,
-  getMonthReport,
-  monthReportFrom,
-  monthReportTo,
-  selectedMonth,
-  selectedMonthFrom,
-  selectedMonthTo, selectedPeriod
-} from "./month-report-shared";
-import {dateFormat} from "../utils";
+import {autoAssignFromTo, getMonthReport, selectedMonth, selectedPeriod} from './month-report-shared';
+import {genScopeId} from '../utils';
 
 export default {
   name: 'PosMonthSelect',
@@ -28,7 +19,7 @@ export default {
     }
     getMonthReport();
 
-    return () => (
+    return genScopeId(() => (
         <div class="month-select-wrapper">
           <g-icon previous class="mr-4" onClick={previousMonth}>
             arrow_back_ios
@@ -39,7 +30,7 @@ export default {
             arrow_forward_ios
           </g-icon>
         </div>
-    )
+    ))
   }
 }
 </script>

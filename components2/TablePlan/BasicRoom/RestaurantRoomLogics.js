@@ -1,18 +1,59 @@
 import cms from 'cms';
 import _ from 'lodash';
 
-import { isBusyTable } from '../RoomShared';
-import { activeOrders } from '../../AppSharedStates';
+import { getTableName, isBusyTable, isTable } from '../RoomShared';
+import { activeOrders, appHooks, tseConfig } from '../../AppSharedStates';
+import { useRouter } from 'vue-router'
+import { isSameId } from '../../utils';
+import { ref } from 'vue'
 
-export const getTableOrderInfo = function (table) {
-  const idx = _.findIndex(activeOrders.value, order => order.table === table.name)
-  return idx === -1 ? null : activeOrders.value[idx]
-}
+export const showNumberOfCustomersDialog = ref(false)
+
+const selectingTable = ref(null)
+
+
 
 export const moveOrderToNewTable = async function (fromTable, toTable) {
   if (isBusyTable(toTable) || !isBusyTable(fromTable)) {
     return
   }
-  const order = await cms.getModel('Order').findOne({table: fromTable.name})
+  const order = _.find(activeOrders.value, i => i.table === fromTable.name)
   await cms.getModel('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
+  appHooks.emit('orderChange')
+}
+
+export let router
+
+export function initRouter() {
+  router = useRouter()
+}
+
+export function routeToOrder(table) {
+  setTimeout(() => router.push(`/pos-order/${getTableName(table)}`), 150) // wave effect
+}
+
+export async function chooseTable(obj) {
+  if (!isTable(obj) || isBusyTable(obj)) return
+  if (tseConfig.value && tseConfig.value.tseEnable && tseConfig.value.numberOfCustomersDialog) {
+    showNumberOfCustomersDialog.value = true
+    selectingTable.value = obj
+  } else {
+    routeToOrder()
+  }
+}
+
+export const transferTableFrom = ref(null)
+export const transferTableTo = ref(null)
+export const swiping = ref(false)
+export const isTransferringTable = (item) => {
+  return transferTableFrom.value && isSameId(transferTableFrom.value, item)
+}
+
+export function onCustomerDialogSubmit( { numberOfCustomers, tseMethod }, emit) {
+  showNumberOfCustomersDialog.value = false
+  emit('setInitOrderProps', {
+    ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
+    tseMethod: tseMethod || 'auto'
+  })
+  routeToOrder()
 }

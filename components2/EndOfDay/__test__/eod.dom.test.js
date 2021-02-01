@@ -2,25 +2,22 @@
 import { makeWrapper, orm, wrapper } from "../../test-utils";
 
 import { nextTick } from "vue";
-import { demoData } from "../../OrderView/__test__/demoData";
 import PosEndOfDayDatePicker from "../PosEndOfDayDatePicker";
 import PosEndOfDayMain from "../PosEndOfDayMain";
 import PosEndOfDayDetails from "../PosEndOfDayDetails";
 import {
-  detailsDailyReport,
   getEodReportsInMonthCalender,
   getOldestPendingReport,
   getXReport,
-  printXReport,
-  selectedDate,
-  selectedReportDate
+  selectedDate
 } from "../eod-shared";
 import dayjs from "dayjs";
-import PosEndOfDayPrintDialog from "../PosEndOfDayPrintDialog";
+import PosEndOfDayPrintXReport from "../PosEndOfDayPrintXReport";
 import PosEndOfDayPrintPendingZReport from "../PosEndOfDayPrintPendingZReport";
 import PosEndOfDayToolbar from "../PosEndOfDayToolbar";
 import PosEndOfDayReprintZReport from "../PosEndOfDayReprintZReport";
 import PosEndOfDayReport from "../PosEndOfDayReport";
+import fs from "fs";
 
 const {
   prepareDb,
@@ -55,17 +52,23 @@ describe("eod test", function() {
     await cms.init();
     await prepareReportTest(cms);
     await require("../../../backend/print/print-report/report-index")(cms);
-
-    await orm("PosSetting").remove({});
-    await orm("PosSetting").create(demoData.PosSetting[0]);
-    await orm("OrderLayout").remove({});
-    await orm("OrderLayout").create(demoData.OrderLayout[0]);
-    await orm("Room").remove({});
-    await orm("Room").create(demoData.Room);
     await prepareDb(/*cms.*/ orm);
-
     cms.triggerFeConnect();
-    // await cms.getModel()
+  });
+
+  it("case 0 export data", async function() {
+    const orders = await orm("Order").find();
+    const content = JSON.stringify(orders, null, 4);
+    fs.writeFileSync(__dirname + "/mockData.json", content, "utf-8");
+  });
+
+  it("case 0a test date", async function() {
+    const a = {
+      date: new Date()
+    };
+    expect(JSON.stringify(a)).toMatchInlineSnapshot(
+      `"{\\"date\\":\\"2021-01-01T00:00:00.000Z\\"}"`
+    );
   });
 
   it("case 1 date-picker", async function() {
@@ -101,19 +104,18 @@ describe("eod test", function() {
     });
     await getEodReportsInMonthCalender();
     await nextTick();
-    await delay(100);
+    await delay(50);
     selectedDate.value = dayjs("05.01.2021", "DD.MM.YYYY").toDate();
 
     await nextTick();
     await delay(100);
-
-    expect(wrapper.html()).toMatchSnapshot()
+    expect(wrapper.html()).toMatchSnapshot();
   }, 80000);
 
   it("case 4 PosEODPrintDialog", async function() {
     //todo: getXReport
     //todo: printXReport
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {}
     });
@@ -180,7 +182,7 @@ describe("eod test", function() {
   }, 80000);
 
   it("case 9 printXReport", async function(done) {
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {
         modelValue: true
@@ -201,7 +203,7 @@ describe("eod test", function() {
   }, 80000);
 
   it("case 10 printZReport", async function(done) {
-    makeWrapper(PosEndOfDayPrintDialog, {
+    makeWrapper(PosEndOfDayPrintXReport, {
       //shallow: true,
       props: {
         modelValue: true

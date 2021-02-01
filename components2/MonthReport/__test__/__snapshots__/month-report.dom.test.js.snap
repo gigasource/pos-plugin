@@ -1,0 +1,173 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`eod test case 1 PosMonthReport 1`] = `
+<div class="report-wrapper">
+  <div class="report-content">
+    <div class="report__sales">
+      <div class="title">
+        Sales
+      </div>
+      <g-divider-stub dashed="true"
+                      color="black"
+      >
+      </g-divider-stub>
+      <div class="detail">
+        <span>
+          cash
+        </span>
+        <span>
+          €17.60
+        </span>
+      </div>
+      <div class="detail">
+        <span>
+          card
+        </span>
+        <span>
+          €4.08
+        </span>
+      </div>
+      <div class="total">
+        <span>
+          common.total
+        </span>
+        <span>
+          <u>
+            € 21.68
+          </u>
+        </span>
+      </div>
+    </div>
+    <div class="report__z-number">
+      <g-divider-stub dashed="true"
+                      color="black"
+      >
+      </g-divider-stub>
+      <table>
+        <tr class="z-number">
+          <td>
+            <div class="row-flex justify-between">
+              <span>
+                report.zNumber 1:
+              </span>
+              <span class="ml-2">
+                € 19.60
+              </span>
+            </div>
+          </td>
+          <td class="pl-3">
+            common.date: 01.05.2021
+          </td>
+        </tr>
+        <tr class="z-number">
+          <td>
+            <div class="row-flex justify-between">
+              <span>
+                report.zNumber 2:
+              </span>
+              <span class="ml-2">
+                € 0.78
+              </span>
+            </div>
+          </td>
+          <td class="pl-3">
+            common.date: 01.06.2021
+          </td>
+        </tr>
+      </table>
+      <g-divider-stub dashed="true"
+                      color="black"
+      >
+      </g-divider-stub>
+    </div>
+    <div class="report__product">
+      <div class="title">
+        report.productSold
+      </div>
+      <g-divider-stub dashed="true"
+                      color="black"
+      >
+      </g-divider-stub>
+      <div>
+        <p class="category">
+          drink (€ 8.68)
+        </p>
+        <p class="product">
+          4 x Cola (€ 4.68)
+        </p>
+        <p class="product">
+          2 x Fanta (€ 4)
+        </p>
+      </div>
+      <div>
+        <p class="category">
+          food (€ 13)
+        </p>
+        <p class="product">
+          1 x Rice (€ 13)
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`eod test case 2 PosMonthReportSetting 1`] = `
+<div class="setting-wrapper">
+  <g-date-picker-input label="report.from"
+                       modelvalue="Fri Jan 01 2021 00:00:00 GMT+0700 (Indochina Time)"
+                       class="mt-5"
+  >
+  </g-date-picker-input>
+  <g-date-picker-input label="report.to"
+                       modelvalue="Sun Jan 31 2021 23:59:59 GMT+0700 (Indochina Time)"
+  >
+  </g-date-picker-input>
+  <pos-switch dense="true"
+              label="report.showProductSold"
+              modelvalue="true"
+  >
+  </pos-switch>
+  <pos-switch dense="true"
+              label="report.showZ"
+              class="mt-5"
+  >
+  </pos-switch>
+</div>
+`;
+
+exports[`eod test case 3 PosMonthSelect 1`] = `
+<div class="month-select-wrapper">
+  <g-icon-stub previous="true"
+               class="mr-4"
+  >
+    arrow_back_ios
+  </g-icon-stub>
+  <span>
+    December 2020
+  </span>
+  <g-icon-stub next="true"
+               class="ml-4"
+  >
+    arrow_forward_ios
+  </g-icon-stub>
+</div>
+`;
+
+exports[`eod test case 4 PosMonthSelect 2 1`] = `
+<div class="month-select-wrapper">
+  <g-icon-stub previous="true"
+               class="mr-4"
+  >
+    arrow_back_ios
+  </g-icon-stub>
+  <span>
+    01.01.2021 - 20.02.2021
+  </span>
+  <g-icon-stub next="true"
+               class="ml-4"
+  >
+    arrow_forward_ios
+  </g-icon-stub>
+</div>
+`;

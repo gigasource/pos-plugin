@@ -1,5 +1,5 @@
 //<editor-fold desc="declare">
-import { makeWrapper, wrapper } from "../../test-utils";
+import { makeWrapper, wrapper } from "../../../test-utils";
 
 import { nextTick } from "vue";
 import Dashboard from "./Dashboard";
@@ -15,7 +15,7 @@ describe("order-view test", function() {
   it("case 1 dashboard", async function() {
     makeWrapper(Dashboard, {});
     await nextTick();
-    await delay(50);
+    await delay(200);
     expect(wrapper.html()).toMatchInlineSnapshot(`
       <p>
         1
@@ -38,4 +38,5 @@ describe("order-view test", function() {
       </p>
     `);
   }, 80000);
+
 });

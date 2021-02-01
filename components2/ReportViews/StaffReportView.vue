@@ -4,11 +4,11 @@ import {onActivated, ref} from 'vue';
 import {$filters} from '../AppSharedStates';
 import {useI18n} from 'vue-i18n';
 import {GIcon, GTabItem, GTabs, GToolbar} from '../../../../backoffice/pos-vue-framework';
-import {backFn, dateFormat, timeFormat} from "../utils";
+import {backFn, dateFormat, genScopeId, timeFormat} from "../utils";
 import {
   getListUsers,
   getStaffReport,
-  groupByPayment,
+  groupByPayment, printStaffReport,
   reportDate,
   selectedStaff,
   staffs,
@@ -20,11 +20,10 @@ export default {
   components: [GTabs, GTabItem, GToolbar, GIcon],
   setup() {
     const {t} = useI18n()
-    const orderSalesByStaff = ref(null)
 
     //todo: printStaffReport
     async function print() {
-      return await printStaffReport(orderSalesByStaff.value)
+      return await printStaffReport()
     }
 
     function getFormattedTime(val) {
@@ -189,7 +188,7 @@ export default {
           </div>
     }
 
-    return () => (
+    return genScopeId(() => (
         <div class="staff-report-view">
           <div class="staff-report-content">
             {staffs.value.length &&
@@ -229,7 +228,7 @@ export default {
             </g-btn>
           </g-toolbar>
         </div>
-    )
+    ))
   }
 }
 </script>

@@ -1,26 +1,11 @@
 <template>
   <div class="dashboard">
-    <pos-dashboard-sidebar
-        v-model:view="view"
-        :items="computedDashboardSidebar"
-        :default-path="defaultSidebarPath"
-        :after-mount-fn="afterMountFn"/>
+
     <content-render v-model:view="view">
       <template v-slot:ManualTable>
         <pos-order-manual-table :is-mobile="isMobile" :active-orders="activeOrders" @setInitOrderProps="setInitOrderProps"/>
       </template>
-      <template v-slot:Functions>
-        <pos-dashboard-function v-model:view="view" :enabledFeatures="enabledFeatures" :user="user"/>
-      </template>
-      <template v-slot:Restaurant="{ id }">
-        <restaurant-room
-            :id="id"
-            :activeOrders="activeOrders"
-            :user="user"
-            @setInitOrderProps="setInitOrderProps"
-            @changeTable="changeTable"
-        />
-      </template>
+
       <template v-slot:Dashboard>
         <OnlineOrderMain
             :pending-orders="pendingOrders"
@@ -76,12 +61,9 @@
 
 <script>
   import _ from 'lodash'
-  import PosDashboardSidebar from "../Dashboard/PosDashboardSidebar";
   import ContentRender from "../common/ContentRender";
   import PosOrderManualTable from "../Order/PosOrderManualTable";
-  import PosDashboardFunction from "../Dashboard/PosDashboardFunction";
-  import RestaurantRoom from "../Restaurant/RestaurantRoom";
-  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain1";
+  import OnlineOrderMain from "../OnlineOrder/OnlineOrderMain";
   import OnlineOrderList from "../OnlineOrder/OnlineOrderList";
   import OnlineOrderServices from "../OnlineOrder/OnlineOrderServices";
   import ReservationsList from "../Reservation/ReservationsList";
@@ -94,7 +76,7 @@
       OnlineOrderServices,
       OnlineOrderList,
       OnlineOrderMain,
-      RestaurantRoom, PosDashboardFunction, PosOrderManualTable, ContentRender, PosDashboardSidebar},
+      PosOrderManualTable, ContentRender},
     injectService: [
         'PosStore:(computedDashboardSidebar, defaultSidebarPath, storeLocale, user, showErrorSnackbar, showInfoSnackbar, enabledFeatures, getPendingReservationsLength, getPendingOnlineOrderCounter, isMobile)',
         'OrderStore:(pendingOrders, kitchenOrders, updateOnlineOrders, declineOrder, acceptPendingOrder, completeOrder, activeOrders, setInitOrderProps, ' +

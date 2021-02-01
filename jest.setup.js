@@ -1,4 +1,4 @@
-//orm.connect("mongodb://localhost:27017", "roomTest");
+// orm.connect("mongodb://localhost:27017", "roomTest");
 
 jest.mock('cms', () => {
   const orm = require('schemahandler');
@@ -11,18 +11,24 @@ jest.mock('cms', () => {
   }
 })
 
-jest.mock('vue-i18n', () => {
-  return {
-    useI18n() {
-      return {
-        t: x => x,
-        locale: {
-          value: 'en'
+jest.mock('vue-i18n', () => ({
+  useI18n() {
+    return {messages: {
+        value: {
+          'en': {
+            dashboard: {}
+          }
         }
-      }
-    }
-  }
-})
+      },
+      locale: {
+        value: 'en'
+      },
+      fallbackLocale: {
+        value: 'en'
+      },
+      t: x => x,
+    }}
+}))
 
 jest.mock("vue-router", () => {
   return {
