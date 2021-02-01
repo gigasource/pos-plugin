@@ -7,7 +7,6 @@ import {
   categories,
   currentGroup,
   currentGroupIdx,
-  groupPrinters,
   groups,
   isSelecting,
   onCreateItem,
@@ -16,9 +15,10 @@ import {
   onSelect,
   onUpdateActiveItem
 } from './modifier-ui-logics';
+
 import { getScopeAttrs } from '../../../utils/helpers';
 import { genScopeId, internalValueFactory } from '../../utils';
-import { appHooks } from '../../AppSharedStates';
+import { groupPrinters, appHooks } from '../../AppSharedStates';
 
 export default {
   setup(props, { emit }) {

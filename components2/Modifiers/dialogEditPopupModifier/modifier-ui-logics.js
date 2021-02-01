@@ -8,27 +8,21 @@ import { isSameId } from '../../utils';
 import { appHooks } from '../../AppSharedStates';
 
 export const currentGroup = ref(null)
-export const categories = ref([])
 export const activeItem = ref(null)
-export const modifiers = ref({})
-export const groups = ref([])
-//todo: move groupPrinters to appshared
-export const groupPrinters = ref([])
-appHooks.on('updateGroupPrinters', async() => {
-  groupPrinters.value = await cms.getModel('GroupPrinter').find()
+export const modifierGroups = ref({})
+export const groups = computed(() => {
+  return (modifierGroups.value && modifierGroups.value.groups) || []
 })
 
-watch(() => modifiers.value, () => {
-  groups.value = (modifiers.value && modifiers.value.groups) || []
-  if (currentGroup.value && currentGroup.value._id) currentGroup.value = _.find(modifiers.value.groups, i => isSameId(i, currentGroup.value))
-}, { deep: true })
-
-watch(() => currentGroup.value, () => {
-  categories.value = (currentGroup.value && currentGroup.value.categories) || []
+export const categories = computed(() => {
+  return (currentGroup.value && currentGroup.value.categories) || []
+})
+watch(() => modifierGroups.value, () => {
+  if (currentGroup.value && currentGroup.value._id) currentGroup.value = _.find(modifierGroups.value.groups, i => isSameId(i, currentGroup.value))
 }, { deep: true })
 
 export const currentGroupIdx = computed(() => {
-  return _.findIndex(modifiers.value.groups, i => isSameId(i, currentGroup.value))
+  return _.findIndex(modifierGroups.value.groups, i => isSameId(i, currentGroup.value))
 })
 
 appHooks.on('updateModifiers', async () => {
@@ -36,16 +30,15 @@ appHooks.on('updateModifiers', async () => {
 })
 
 export const fetchModifiers = async function () {
-  modifiers.value = await cms.getModel('Modifiers').findOne({})
-  if (!modifiers.value) {
+  modifierGroups.value = await cms.getModel('Modifiers').findOne({})
+  if (!modifierGroups.value) {
     await cms.getModel('Modifiers').create({ groups: [] })
-    modifiers.value = { groups: [] }
+    modifierGroups.value = { groups: [] }
   }
 }
 
 export const onCreateItem = async function (path, type, item = null) { // types: [modifier, category, group]
-  const { create } = CRUdFactory(modifiers.value, path, 'Modifiers')
-  //todo: set selecting item
+  const { create } = CRUdFactory(modifierGroups.value, path, 'Modifiers')
   if (type === 'modifier') {
     activeItem.value = await create(_.merge({
       name: 'New Modifier',
@@ -71,7 +64,6 @@ export const onCreateItem = async function (path, type, item = null) { // types:
       name: 'New Group',
       _id: new ObjectID(),
       categories: []
-
     }, item))
     activeItem.value = { ...currentGroup.value, type: 'group' }
   }
@@ -84,12 +76,12 @@ export const isSelecting = function (item) {
 }
 
 export const onRemoveItem = async function (path, item) { // types: [modifier, category, group]
-  const { remove } = CRUdFactory(modifiers.value, path, 'Modifiers')
+  const { remove } = CRUdFactory(modifierGroups.value, path, 'Modifiers')
   await remove(item)
 }
 
 export const onUpdateItem = async function (path, item, newV) {
-  const { update } = CRUdFactory(modifiers.value, path, 'Modifiers')
+  const { update } = CRUdFactory(modifierGroups.value, path, 'Modifiers')
   await update(item, newV)
 }
 
@@ -129,9 +121,9 @@ export const onDeleteActiveItem = async function () {
   await onRemoveItem(activeItemPath.value, activeItem.value)
   await nextTick()
   if (activeItem.value.type === 'group') {
-    tmp = Math.min(modifiers.value.groups.length - 1, tmp)
+    tmp = Math.min(groups.value.length - 1, tmp)
     if (tmp >= 0) {
-      currentGroup.value = modifiers.value.groups[tmp]
+      currentGroup.value = groups.value[tmp]
       activeItem.value = { ...currentGroup.value, type: 'group' }
       return
     } else currentGroup.value = null

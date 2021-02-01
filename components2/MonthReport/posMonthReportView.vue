@@ -1,36 +1,38 @@
 <script>
-import {backFn} from "../utils";
-import {printMonthReport} from "./month-report-shared";
+import {backFn, genScopeId} from '../utils';
+import {printMonthReport} from './month-report-shared';
+import PosMonthReport from './PosMonthReport';
+import PosMonthSelect from './PosMonthSelect';
+import PosMonthReportSetting from './PosMonthReportSetting';
 
 export default {
-
+  name: 'PosMonthReportView',
+  components: {PosMonthReport, PosMonthSelect, PosMonthReportSetting},
   setup() {
     //todo: ReportsStore, printMonthlyReport
-
-    return () => <>
-      <div class="pos-month-report">
-        <g-toolbar class="pos-month-report__toolbar">
-          <g-btn background-color="white" text-color="#1d1d26" onClick={backFn.value}>
-            <g-icon>
-              icon-back
-            </g-icon>
-            <span class="ml-2">Back </span>
-          </g-btn>
-          <g-spacer>
-          </g-spacer>
-          <g-btn background-color="#1271FF" text-color="#FFFFFF" onClick={printMonthReport}>
-            <g-icon>
-              icon-printer_2
-            </g-icon>
-            <span class="ml-2">
-              Print report </span>
-          </g-btn>
-        </g-toolbar>
-        <pos-month-report-setting class="pos-month-report__setting"/>
-        <pos-month-select class="pos-month-report__month-select"/>
-        <pos-month-report class="pos-month-report__report-content"/>
-      </div>
-    </>
+    return genScopeId(() =>
+        <div class="pos-month-report">
+          <g-toolbar class="pos-month-report__toolbar">
+            <g-btn background-color="white" text-color="#1d1d26" onClick={backFn.value}>
+              <g-icon>
+                icon-back
+              </g-icon>
+              <span class="ml-2">Back </span>
+            </g-btn>
+            <g-spacer>
+            </g-spacer>
+            <g-btn background-color="#1271FF" text-color="#FFFFFF" onClick={printMonthReport}>
+              <g-icon>
+                icon-printer_2
+              </g-icon>
+              <span class="ml-2">
+                Print report </span>
+            </g-btn>
+          </g-toolbar>
+          <pos-month-report-setting class="pos-month-report__setting"/>
+          <pos-month-select class="pos-month-report__month-select"/>
+          <pos-month-report class="pos-month-report__report-content"/>
+        </div>)
   }
 }
 </script>

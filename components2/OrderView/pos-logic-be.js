@@ -64,7 +64,10 @@ const processItems = (order, actionList, items, itemsSnapshot, prop, _hooks) => 
     } else {
       const diffItem = diff(item, itemSnapshot);
       if (JSON.stringify(diffItem) !== '{}') {
-        !_hooks && addItemAction(order, actionList, item, {$set: {'items.$': diffItem}});
+        const _diffItem = _.mapKeys(diffItem, (v, k) => {
+          return `items.$.${k}`;
+        })
+        !_hooks && addItemAction(order, actionList, item, {$set: _diffItem});
         _hooks && _hooks.emit('change-item', diffItem, item, itemSnapshot);
       }
     }
@@ -147,7 +150,7 @@ export function orderBeFactory(id = 0) {
     initBeSnapshot(order)
   })
 
-  const clearOrder = (clearActionList) => {
+  const clearOrder = (clearActionList = true) => {
     if (clearActionList) actionList.value.length = 0;
     _.forEach(order, (v, k) => {
       if (Array.isArray(v)) {
@@ -196,7 +199,7 @@ export function orderBeFactory(id = 0) {
    * @returns {Promise<void>}
    */
   async function syncOrderChange(newOrder) {
-    if (newOrder._id.toString() != order._id.toString()) return
+    if (!order._id || newOrder._id.toString() != order._id.toString()) return
     //add items
     //diff to get patch
     const items = getRecentItems();

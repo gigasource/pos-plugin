@@ -1,107 +1,64 @@
 <script>
 import {useI18n} from 'vue-i18n';
-import dayjs from "dayjs";
-import {computed, ref, watch} from "vue";
 import {$filters} from "../AppSharedStates";
-import {selectedReportDate} from "./eod-shared";
+import {reportsInSelectedDate, selectedReport, selectedReportDate} from './eod-shared';
+import {formatDatetime, genScopeId} from "../utils";
 
 export default {
-  props: ['modelValue'],
+  name: 'PosEndOfDayDetails',
   setup() {
     const {t} = useI18n()
-
-    const model = ref({})
-    const zNumberReports = ref([])
-    const timeFormat = ref('')
-    const dateFormat = ref('')
-
-    const selectedDate = computed(() => {
-      if (selectedReportDate.value && selectedReportDate.value.date) {
-        return dayjs(selectedReportDate.value.date).format(dateFormat.value)
-      }
-      return '';
-    })
-
-    const selectedTab = computed({
-      get() {
-        return model.value;
-      },
-      set(value) {
-        model.value = value
-        emit('update:modelValue', value);
-      }
-    })
-
-    /**
-     * selectedReportDate: .reports, .date
-     * reports -> begin, end, sum , z
-     */
-    //fixme: remove watch
-    watch(selectedReportDate, (newVal, oldVal) => {
-      if (selectedReportDate.value.reports && selectedReportDate.value.reports.length) {
-        zNumberReports.value = selectedReportDate.value.reports.map(report => ({
-          begin: dayjs(report.begin).format(timeFormat.value),
-          end: dayjs(report.end).format(timeFormat.value),
-          sum: report.sum,
-          z: report.z
-        }))
-
-        model.value = zNumberReports.value[zNumberReports.value.length - 1]
-      } else {
-        zNumberReports.value = []
-        model.value = null
-      }
-    })
-
-    return () => <>
-      <div>
-        {(zNumberReports.value.length > 0) &&
-        <g-tabs items={zNumberReports.value} color="#F2F2F2" text-color="#000000" v-model={selectedTab.value} showArrows={false}
-                slider-size="0" v-slots={{
-          default: () => <> {zNumberReports.value.map((item, i) =>
-              <g-tab-item item={item} key={i}>
-                <div class="eod-info">
-                  <span class="eod-info-important"> Date: </span>
-                  <span> {selectedDate.value} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.zNumber')}: </span>
-                  <span>
-                    {item.z} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.firstOrder')}: </span>
-                  <span>
-                    {item.begin} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.lastOrder')}: </span>
-                  <span>
-                    {item.end} </span>
-                </div>
-                <div class="eod-info">
-                  <span class="eod-info-important">
-                    {t('report.totalSales')}: </span>
-                  <span class="eod-info-total-sale">
-                    € {$filters.formatCurrency(item.sum)} </span>
-                </div>
-              </g-tab-item>
-          )} </>,
-          tab: ({item, index}) => <>
-            <g-tab item={item} key={index} active-text-color="#000000">
-              <p class="eod-tab-title">
-                Z: {item.z} </p>
-              <p class="eod-tab-subtitle">
-                {item.begin} - {item.end} </p>
-            </g-tab>
-          </>
-        }}/>
-        }
-      </div>
-    </>
+    return genScopeId(() => (
+        <>
+          {reportsInSelectedDate.value.length > 0 &&
+          <g-tabs items={reportsInSelectedDate.value} color="#F2F2F2" text-color="#000000"
+                  v-model={selectedReport.value}
+                  showArrows={false}
+                  slider-size="0" v-slots={{
+            default: () => reportsInSelectedDate.value.map((item, i) =>
+                <g-tab-item item={item} key={i}>
+                  <div class="eod-info">
+                    <span class="eod-info-important"> Date: </span>
+                    <span> {formatDatetime(selectedReportDate.value.date)} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.zNumber')}: </span>
+                    <span>
+                      {item.z} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.firstOrder')}: </span>
+                    <span>
+                      {formatDatetime(item.begin)} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.lastOrder')}: </span>
+                    <span>
+                      {formatDatetime(item.end)} </span>
+                  </div>
+                  <div class="eod-info">
+                    <span class="eod-info-important">
+                      {t('report.totalSales')}: </span>
+                    <span class="eod-info-total-sale">
+                      € {$filters.formatCurrency(item.sum)} </span>
+                  </div>
+                </g-tab-item>
+            ),
+            tab: ({item, index}) => <>
+              <g-tab item={item} key={index} active-text-color="#000000">
+                <p class="eod-tab-title">
+                  Z: {item.z} </p>
+                <p class="eod-tab-subtitle">
+                  {formatDatetime(item.begin)} - {formatDatetime(item.end)} </p>
+              </g-tab>
+            </>
+          }}/>
+          }
+        </>
+    ))
 
   }
 }

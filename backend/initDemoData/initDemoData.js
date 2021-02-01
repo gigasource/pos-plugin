@@ -14,7 +14,15 @@ module.exports = async function (cms) {
         for (const collection in data) {
           if (data.hasOwnProperty(collection)) {
             await Promise.all(data[collection].map(async document => {
-              await cms.getModel(collection).findOneAndUpdate({_id: document._id}, document, {upsert: true, new: true})
+              try {
+                if (document._id){
+                  await cms.getModel(collection).findOneAndUpdate({_id: document._id}, document, {upsert: true, new: true})
+                } else {
+                  await cms.getModel(collection).create(document);
+                }
+              } catch (e) {
+                console.warn(e);
+              }
             }))
           }
         }

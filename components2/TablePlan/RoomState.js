@@ -31,7 +31,7 @@ export function roomsFactory(props) {
   let selectingRoomStates;
   if (props) {
     selectingRoomStates = computed(() => {
-      return roomsStates.value.find(s => s.room._id.toString() === props.roomId);
+      return roomsStates.value.find(s => s.room._id.toString() === props.roomId.toString());
     });
   } else {
     selectingRoomStates = ref();

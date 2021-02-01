@@ -1,22 +1,24 @@
 <script>
 import {useI18n} from 'vue-i18n';
-import {getMonthReport, monthReportFrom, monthReportTo, showAllZNumber, showProductSold} from "./month-report-shared";
+import {getMonthReport, monthReportFrom, monthReportTo, showAllZNumber, showProductSold} from './month-report-shared';
 import {watch} from 'vue'
+import {dateStringComputedFn, genScopeId} from '../utils';
 
 export default {
   name: 'PosMonthReportSetting',
   setup() {
     watch([() => monthReportFrom.value, () => monthReportTo.value], getMonthReport);
+    const {t} = useI18n()
 
-    const { t } = useI18n()
-    return () => <>
-      <div class="setting-wrapper">
-        <g-date-picker-input label={t('report.from')} v-model={monthReportFrom.value} class="mt-5"/>
-        <g-date-picker-input label={t('report.to')} v-model={monthReportTo.value}/>
-        <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold.value}/>
-        <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber.value} class="mt-5"/>
-      </div>
-    </>
+    const strFrom = dateStringComputedFn(monthReportFrom)
+    const strTo = dateStringComputedFn(monthReportTo)
+    return genScopeId(() =>
+        <div class="setting-wrapper">
+          <g-date-picker-input label={t('report.from')} v-model={strFrom.value} class="mt-5"/>
+          <g-date-picker-input label={t('report.to')} v-model={strTo.value}/>
+          <pos-switch dense label={t('report.showProductSold')} v-model={showProductSold.value}/>
+          <pos-switch dense label={t('report.showZ')} v-model={showAllZNumber.value} class="mt-5"/>
+        </div>)
   }
 }
 </script>

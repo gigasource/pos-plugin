@@ -1,15 +1,15 @@
 <script>
-import { computed } from 'vue';
-import { posSettings } from '../../AppSharedStates';
+import {posSettings} from '../../AppSharedStates';
 import _ from 'lodash';
-import { cms } from 'cms'
+import cms from 'cms'
+
 export default {
 
   setup() {
     const keyboardDeliveryConfig = ref(posSettings.value && posSettings.value.keyboardDeliveryConfig) || []
     const position = ref({})
     const dialog = ref(false)
-    const fetchMenu = function() {
+    const fetchMenu = function () {
       cms.socket.emit('getDeliveryProducts', () => {
         const contentFn = () => (
             <div style="margin: 0 auto">
@@ -19,20 +19,20 @@ export default {
         // showSnackbar(contentFn, '#536dfe', 3000)
       })
     }
-    const changeExtraRows = function(val) {
-      if(val > keyboardDeliveryConfig.length) {
+    const changeExtraRows = function (val) {
+      if (val > keyboardDeliveryConfig.length) {
         keyboardDeliveryConfig.unshift([' ', ' ', ' '])
       } else {
         keyboardDeliveryConfig.shift()
       }
     }
-    const openDialogEdit = function(position) {
+    const openDialogEdit = function (position) {
       position.value = position
       dialog.value = true
     }
-    const changeKeyboardExtension = async function(val) {
+    const changeKeyboardExtension = async function (val) {
       _.set(keyboardDeliveryConfig.value, [position.value.top, position.value.left], val)
-      await cms.getModel('PosSetting').findOneAndUpdate({}, { keyboardDeliveryConfig: keyboardDeliveryConfig })
+      await cms.getModel('PosSetting').findOneAndUpdate({}, {keyboardDeliveryConfig: keyboardDeliveryConfig})
     }
 
     return () => <div class="delivery-config">
@@ -53,7 +53,8 @@ export default {
         </div>
         <div class="col-6 col-flex h-100">
           <g-spacer/>
-          <pos-order-delivery-keyboard key={dialog.value} mode="edit" keyboardConfig={keyboardDeliveryConfig.value} onEdit:keyboard={openDialogEdit}/>
+          <pos-order-delivery-keyboard key={dialog.value} mode="edit" keyboardConfig={keyboardDeliveryConfig.value}
+                                       onEdit:keyboard={openDialogEdit}/>
         </div>
       </div>
       <dialog-text-filter v-model={dialog.value} label="Enter key" onSubmit={changeKeyboardExtension}/>
@@ -63,18 +64,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .delivery-config {
-    padding: 24px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+.delivery-config {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
-    &__title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-    }
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
   }
+}
 </style>

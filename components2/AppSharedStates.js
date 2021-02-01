@@ -68,3 +68,20 @@ appHooks.on('settingChange', async function() {
   posSettings.value = await cms.getModel('PosSetting').findOne()
 })
 
+export const groupPrinters = ref([])
+appHooks.on('updateGroupPrinters', async() => {
+  groupPrinters.value = await cms.getModel('GroupPrinter').find()
+})
+
+export const tseConfig = ref({})
+appHooks.on('updateTseConfig', async() => {
+  tseConfig.value = await cms.getModel('tseConfig').findOne()
+})
+
+export const enabledFeatures = ref([])
+appHooks.on('updateEnabledFeatures', async() => {
+  const _enabledFeatures = await cms.getModel('Feature').find({ enabled: true })
+  enabledFeatures.value = _enabledFeatures.map(feature => feature.name)
+})
+
+

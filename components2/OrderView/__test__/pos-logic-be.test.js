@@ -191,10 +191,16 @@ describe("pos-logic", function () {
     await nextTick();
     addProduct(order, mockProduct);
     await nextTick();
-    actionList.value.length = 0;
+    //actionList.value.length = 0;
     addModifier(order, ketchup);
     await nextTick();
-    expect(stringify(actionList.value)).toMatchSnapshot();
+    //expect(stringify(actionList.value)).toMatchSnapshot();
+
+    for (const action of _.cloneDeep(actionList.value)) {
+      await orm.execChain({name: action.modelName, chain: action.action}, true);
+    }
+    const _order = await orm("Order").findOne();
+    expect(stringify(_order)).toMatchSnapshot();
   });
 
   it("case 2d: create Order + removeModifier", async function () {

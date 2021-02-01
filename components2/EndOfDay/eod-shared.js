@@ -1,11 +1,20 @@
 import dayjs from 'dayjs'
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import * as jsonfn from "json-fn";
 import cms from 'cms'
 import _ from 'lodash'
+import {socketEmit} from "../utils";
 
 export const listOfDatesWithReports = ref([])
 export const selectedDate = ref(new Date());
+export const selectedDateString = computed({
+  get() {
+    return dayjs(selectedDate.value).format('YYYY-MM-DD')
+  },
+  set(val) {
+    selectedDate.value = dayjs(val).toDate()
+  }
+});
 
 export const eventDates = computed(() => {
   return _.map(listOfDatesWithReports.value, (value, key) => {
@@ -46,6 +55,7 @@ export function mapCalendarReports(dates) {
 
 export const detailsDailyReport = computed(() => mapCalendarReports(listOfDatesWithReports.value))
 
+//has multiple reports
 export const selectedReportDate = computed(() => {
   //base on selectedDate and detailsDailyReport
   //target ->
@@ -53,8 +63,25 @@ export const selectedReportDate = computed(() => {
   return detailsDailyReport.value.find(item => dayjs(item.date).startOf('d').isSame(dayjs(selectedDate.value).startOf('d')));
 })
 
+export const selectedReport = ref()
+
+/**
+ * selectedReportDate: .reports, .date
+ * reports -> begin, end, sum , z
+ */
+watch(selectedReportDate, () => {
+  selectedReport.value = reportsInSelectedDate.value[reportsInSelectedDate.value.length - 1]
+})
+
 export const hasDateReports = computed(() => {
   return selectedReportDate.value && selectedReportDate.value.reports && selectedReportDate.value.reports.length > 0
+})
+
+export const reportsInSelectedDate = computed(() => {
+  if (_.get(selectedReportDate, 'value.reports.length', 0)) {
+    return selectedReportDate.value.reports
+  }
+  return [];
 })
 
 export const showRunEndOfDay = computed(() => {
@@ -70,7 +97,7 @@ async function getHighestZNumber() {
   highestZNumber.value = eod0 ? eod0.z + 1 : 1;
 }
 
-export async function getEodReportsInMonthCalender(month = new Date()) {
+export async function getEodReportsInMonthCalender(month =new Date()) {
   //todo: beginHours
   let from = dayjs(month).startOf('month').toDate()
   const to = dayjs(month).endOf('month').toDate()
@@ -83,7 +110,6 @@ async function getEodReportsCalender(from, to, fillToSingleton = true) {
       resolve(eodReport)
     })
   })
-
   result = jsonfn.clone(result);
   if (fillToSingleton) listOfDatesWithReports.value = result.ordersByDate;
   return result.ordersByDate
@@ -93,10 +119,6 @@ export const xReport = ref();
 
 export async function getXReport() {
   //todo: XReport, beginHour
-  /*const beginHour = cms.getList('PosSetting')[0].generalSetting.beginHour || '00:00'
-  const [hour, minutes] = beginHour.split(':')
-  const from = dayjs(date).startOf('day').hour(parseInt(hour)).minute(parseInt(minutes)).toDate()
-  const to = dayjs(from).add(1, 'day').toDate()*/
   const from = dayjs(selectedDate.value).startOf('d').toDate();
   const to = dayjs(selectedDate.value).endOf('d').toDate();
 
@@ -124,20 +146,18 @@ export async function getOldestPendingReport() {
   }
 }
 
-export async function makeEODReport(report) {
+export async function makeEODReport() {
+  const report = selectedReport.value;
   if (!report || !report.pending) return;
-  await new Promise(resolve => cms.socket.emit('endOfDay', report, resolve))
-  //todo: binding with backend
-  /*await new Promise(resolve => cms.socket.emit('printReport', 'XReport', date, function () {
-    resolve();
-  }))*/
+  await socketEmit('endOfDay', report);
+  await getEodReportsInMonthCalender(selectedDate.value);
 }
 
 export async function printXReport() {
   await new Promise(resolve => cms.socket.emit('printReport', 'XReport', selectedDate.value, resolve))
 }
 
-export async function printZReport(report) {
-  await new Promise(resolve => cms.socket.emit('printReport', 'ZReport', report, resolve))
+export async function printZReport() {
+  await new Promise(resolve => cms.socket.emit('printReport', 'ZReport', selectedReport.value, resolve))
 }
 

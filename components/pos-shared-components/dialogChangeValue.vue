@@ -1,3 +1,4 @@
+
 <template>
   <g-dialog v-model="dialog" overlay-color="#6b6f82" :fullscreen="isMobile" overlay-opacity="0.95">
     <div class="dialog-change w-100" :style="[{background: 'white'}]">
