@@ -14,7 +14,7 @@ import dialogCompleteOrder from "./helpers/dialogCompleteOrder";
 
 export default {
   components: {dialogCompleteOrder},
-  setup(props, { emit }) {
+  setup() {
     onBeforeMount(async () => {
       await loadOrders()
     })

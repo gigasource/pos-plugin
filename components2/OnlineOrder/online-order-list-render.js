@@ -1,4 +1,4 @@
-import { ref, onActivated, computed, onBeforeMount } from 'vue'
+import { ref, onActivated, computed, onBeforeMount, withModifiers } from 'vue'
 import {useI18n} from 'vue-i18n'
 import {$filters, user} from '../AppSharedStates'
 import { formatDate } from "../utils";
@@ -74,21 +74,15 @@ export function onlineOrderListFactory(props) {
         <div class="online-order-list__title">
           {`${t(`onlineOrder.${listOnlineOrderStatus.value}`)} ${t('onlineOrder.orders')}`}
         </div>
-        <g-spacer></g-spacer>
+        <g-spacer/>
         <div class="online-order-list__info">
           <div class="row-flex align-items-center">
-            <g-icon class="mr-2" size="20">
-              icon-cutleries2
-            </g-icon>
-            <span class="fw-700">
-                {totalOrder.value} </span>
+            <g-icon class="mr-2" size="20">icon-cutleries2</g-icon>
+            <span class="fw-700">{totalOrder.value}</span>
           </div>
           <div class="row-flex align-items-center">
-            <g-icon class="mr-2" size="20">
-              icon-money-bag
-            </g-icon>
-            <span class="fw-700">
-                {t('common.currency', locale.value)}{$filters.formatCurrency(totalIncome.value)} </span>
+            <g-icon class="mr-2" size="20">icon-money-bag</g-icon>
+            <span class="fw-700">{t('common.currency', locale.value)}{$filters.formatCurrency(totalIncome.value)}</span>
           </div>
         </div>
         <date-range-picker from={filter.value.fromDate} to={filter.value.toDate}
@@ -98,6 +92,20 @@ export function onlineOrderListFactory(props) {
   }
 
   const renderOnlineOrderListTable = function () {
+    const moreMenuStyle = {
+      'text-align': 'center',
+      'line-height': '18px',
+      color: '#999',
+      // border: `1px solid ${color}`,
+      'border-radius': '50%',
+      width: '20px',
+      height: '20px',
+      'box-sizing': 'border-box',
+      'box-shadow': '0px 0px 3px 0px rgba(0,0,0, 0.6)',
+      cursor: 'pointer',
+      'background-color': '#fff'
+    }
+
     return (
       <g-table elevation="2" fixed-header>
         {genScopeId(() => (<>
@@ -105,61 +113,73 @@ export function onlineOrderListFactory(props) {
               <tr>{headers.map(header => <th style="white-space: nowrap">{header}</th>)}</tr>
             </thead>
             <tbody>
-            {ordersListByStatus.value.map((order, i) =>
-              <tr key={i} onClick={() => openDialogDetail(order)}>
-                <td class="fw-700">
-                  <p style="white-space: nowrap">#{order.dailyId ? order.dailyId : order.id}</p>
-                  <g-tooltip openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
-                     v-slots={{
-                       default: () => <span><b> From: </b>{order.forwardedStore}</span>,
-                       activator: ({on}) => (order.forwardedStore) && <div onClick={on.click}><g-icon size="16">icon-delivery-forward</g-icon></div>
-                     }}/>
-                </td>
-                <td>
-              <p> {order.customer.name} </p>
-              <p style="white-space: nowrap"> {order.customer.phone} </p>
-                </td>
-                <td>
-                  {
-                (order.customer.address) ?
-                      <div>
-                        <p style="word-break: break-word">{order.customer.address}</p>
-                        <p>{order.customer.zipCode}</p>
-                      </div>
-                      : <div> -- </div>
-                  }
-                </td>
-                <td>
-                  <p class="fw-700" style="white-space: nowrap">
-                    {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
-                  </p>
-                  <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
-                </td>
-                <td style="white-space: nowrap">{formatDate(order.date)}</td>
-                <td style="white-space: nowrap">{order.deliveryTime}</td>
-                <td>
-                  { order.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon> }
-                  { order.type === 'pickup' && <g-icon>icon-take-away</g-icon> }
-                </td>
-                <td class={listOnlineOrderStatus.value}>
-                  <div style="white-space: nowrap">{t(`onlineOrder.${order.status}`)}</div>
-                  <div style="font-size: x-small; margin-top: -5px">{isRefunded(order) ? refunded : ''}</div>
-                </td>
-                <td>
-                  {
-                    (user.role === 'admin' && isRefundable(order)) &&
-                    <g-menu v-model={order.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
-                      default: () => (
-                        <g-card background="white">
-                          <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', order, status)}>{ refunded }</div>
-                        </g-card>
-                      ),
-                      activator: ({on}) => <div onClick={on.click} style={moreMenuStyle}>···</div>
-                    }}/>
-                  }
-                </td>
-              </tr>
-            )} </tbody>
+              {ordersListByStatus.value.map((order, i) =>
+                <tr key={i} onClick={() => openDialogDetail(order)} style="cursor: pointer">
+                  <td class="fw-700">
+                    <p style="white-space: nowrap">#{order.dailyId ? order.dailyId : order.id}</p>
+                    { order.forwardedStore && (<g-tooltip
+                        openOnHover={true} color="#616161" transition="0.3" speech-bubble remove-content-on-close
+                         v-slots={{
+                           default: () => <span><b>From: </b>{order.forwardedStore}</span>,
+                           activator: ({on}) => <div
+                               onMouseEnter={on.mouseenter}
+                               onMouseLeave={on.mouseleave}
+                               onClick={on.click}>
+                             <g-icon size="16">icon-delivery-forward</g-icon>
+                           </div>
+                         }}/>)
+                    }
+                  </td>
+                  <td>
+                    <p>{order.customer.name}</p>
+                    <p style="white-space: nowrap">{order.customer.phone}</p>
+                  </td>
+                  <td>
+                    {
+                  (order.customer.address) ?
+                        <div>
+                          <p style="word-break: break-word">{order.customer.address}</p>
+                          <p>{order.customer.zipCode}</p>
+                        </div>
+                        : <div style="text-align: center"> -- </div>
+                    }
+                  </td>
+                  <td>
+                    <div class="col-flex align-items-center">
+                      <p class="fw-700" style="white-space: nowrap">
+                        {t('common.currency', locale.value)}{$filters.formatCurrency(order.payment[0].value)}
+                      </p>
+                      <p> <img alt src={getImagePayment(order.payment[0].type)}> </img></p>
+                    </div>
+                  </td>
+                  <td style="white-space: nowrap; text-align: center">{formatDate(order.date)}</td>
+                  <td style="white-space: nowrap; text-align: center">{order.deliveryTime}</td>
+                  <td>
+                    <div class="row-flex justify-center">
+                      { order.type === 'delivery' && <g-icon>icon-delivery-scooter</g-icon> }
+                      { order.type === 'pickup' && <g-icon>icon-take-away</g-icon> }
+                    </div>
+                  </td>
+                  <td class={listOnlineOrderStatus.value}>
+                    <div style="white-space: nowrap">{t(`onlineOrder.${order.status}`)}</div>
+                    <div style="font-size: x-small; margin-top: -5px">{isRefunded(order) ? refunded : ''}</div>
+                  </td>
+                  <td>
+                    {
+                      (user.role === 'admin' && isRefundable(order)) &&
+                      <g-menu v-model={order.showMenu} nudgeBottom={10} close-on-content-click v-slots={{
+                        default: () => (
+                          <g-card background="white">
+                            <div style="padding: 10px; cursor: pointer" onClick={() => emit('refundOrder', order, status)}>{ refunded }</div>
+                          </g-card>
+                        ),
+                        activator: ({on}) => <div onClick={withModifiers(on.click, ['stop'])} style={moreMenuStyle}>···</div>
+                      }}/>
+                    }
+                  </td>
+                </tr>
+              )}
+            </tbody>
         </>))()}
       </g-table>
     )
