@@ -1,0 +1,21 @@
+{
+  "events": [],
+  "_id": "5e12c0294bf5602f565be631",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "PosPaymentLayoutConfig",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/FnButton/PosPaymentLayoutConfig.vue",
+      "path": "components/FnButton/PosPaymentLayoutConfig.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posPaymentConfig",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-payment-config"
+}

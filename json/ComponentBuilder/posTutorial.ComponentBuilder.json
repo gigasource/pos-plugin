@@ -1,0 +1,18 @@
+{
+  "events": [],
+  "_id": "5fb5f9c24061cd4a65469bd0",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "Tutorial",
+      "binding": [],
+      "slotScopeBinding": []
+    }
+  ],
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-tutorial",
+  "name": "posTutorial"
+}

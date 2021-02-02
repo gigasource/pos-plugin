@@ -1,0 +1,22 @@
+{
+  "events": [],
+  "_id": "5e0473e349b6aa0421cce93c",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "PosStaffReportDialog",
+      "binding": [],
+      "slotScopeBinding": [],
+      "url": "plugins/pos-plugin/components/StaffReport/PosStaffReportDialog.vue",
+      "path": "components/StaffReport/PosStaffReportDialog.vue",
+      "pluginName": "pos-plugin"
+    }
+  ],
+  "name": "posStaffReport",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-staff-report",
+  "renderInIframe": true
+}

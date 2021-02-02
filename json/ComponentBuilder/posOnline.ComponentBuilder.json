@@ -1,0 +1,203 @@
+{
+  "events": [],
+  "_id": "5e8c386dc307604a9a9cb921",
+  "items": [
+    {
+      "choice": "view",
+      "component": "GGridLayout",
+      "content": {
+        "props": {
+          "layout": {
+            "name": "app",
+            "top": -1,
+            "left": -1,
+            "width": 0,
+            "height": 0,
+            "margin": "",
+            "padding": "",
+            "bgColor": "hsl(80, 100%, 50%, 50%)",
+            "alignSelf": "",
+            "justifySelf": "",
+            "wrapInDiv": false,
+            "displayFlex": false,
+            "flexDirection": "row",
+            "flexWrap": false,
+            "flexJustifyContent": "",
+            "flexAlignItems": "",
+            "flexAlignContent": "",
+            "flexOrder": "",
+            "flexGrow": "",
+            "flexShrink": "",
+            "flexBasis": "",
+            "flexAlignSelf": "",
+            "alignItems": "",
+            "alignContent": "",
+            "justifyItems": "",
+            "justifyContent": "",
+            "columns": [
+              "220px",
+              "calc(100% - 220px)"
+            ],
+            "rows": [
+              "100%"
+            ],
+            "columnGap": 0,
+            "rowGap": 0,
+            "subAreas": [
+              {
+                "name": "sidebar",
+                "top": 1,
+                "left": 1,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(293, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              },
+              {
+                "name": "content",
+                "top": 1,
+                "left": 2,
+                "width": 1,
+                "height": 1,
+                "margin": "",
+                "padding": "",
+                "bgColor": "hsl(331, 100%, 50%, 50%)",
+                "alignSelf": "",
+                "justifySelf": "",
+                "wrapInDiv": false,
+                "displayFlex": false,
+                "flexDirection": "row",
+                "flexWrap": false,
+                "flexJustifyContent": "",
+                "flexAlignItems": "",
+                "flexAlignContent": "",
+                "flexOrder": "",
+                "flexGrow": "",
+                "flexShrink": "",
+                "flexBasis": "",
+                "flexAlignSelf": ""
+              }
+            ]
+          },
+          "style": {
+            "height": "100%"
+          }
+        }
+      },
+      "binding": [],
+      "slotScopeBinding": [],
+      "items": [
+        {
+          "choice": "view",
+          "component": "PosDashboardSidebar",
+          "binding": [
+            {
+              "type": ".sync",
+              "root": "data.view",
+              "local": "view"
+            }
+          ],
+          "slotScopeBinding": [
+            {
+              "type": "prop",
+              "slotScope": "id",
+              "local": "id"
+            }
+          ],
+          "slot": "sidebar",
+          "url": "plugins/pos-plugin/components/Dashboard/PosDashboardSidebar.vue",
+          "path": "components/Dashboard/PosDashboardSidebar.vue",
+          "pluginName": "pos-plugin",
+          "items": [],
+          "content": {
+            "props": {
+              "items": [
+                {
+                  "choice": "dynamicItem",
+                  "title": "Restaurant",
+                  "icon": "icon-restaurant",
+                  "children": {
+                    "_code_": "module.exports = function () {\n  const rooms = this.$getService('RoomStore').rooms\n  const result = rooms.map(room => {\n    return {\n      title: room.name,\n      icon: 'radio_button_unchecked',\n      iconType: 'small',\n      onClick: () => {\n        this.$emit('update:view', {\n          name: 'Restaurant',\n          params: { \n            id: room._id\n          }\n        })\n      }\n    }\n  });\n\n  return result;\n}",
+                    "_code_type_": "commonJs"
+                  }
+                },
+                {
+                  "choice": "item",
+                  "title": "Manual Table",
+                  "icon": "icon-manual-table",
+                  "onClick": {
+                    "_code_": "module.exports = function() {\n  // this.$emit('update:view', {\n  //   name: 'ManualTable',\n  //   params: ''\n  // })\n}",
+                    "_code_type_": "commonJs"
+                  }
+                },
+                {
+                  "choice": "item",
+                  "title": "Functions",
+                  "icon": "icon-functions",
+                  "onClick": {
+                    "_code_": "module.exports = function() {\n  this.$emit('update:view', {\n    name: 'Functions',\n    params: ''\n  })\n}",
+                    "_code_type_": "commonJs"
+                  }
+                }
+              ],
+              "afterMountFn": {
+                "_code_": "module.exports = function () {\n  const rooms = this.$getService('RoomStore').rooms\n  if (rooms.length > 0) {\n    this.$emit('update:view', {\n      name: 'Restaurant',\n      params: {\n        id: rooms[0]._id\n      }\n    })\n  }\n}",
+                "_code_type_": "commonJs"
+              },
+              "defaultPath": "item.0.item.0"
+            }
+          }
+        },
+        {
+          "choice": "view",
+          "binding": [],
+          "slotScopeBinding": [],
+          "slot": "content",
+          "component": "OnlineOrderMain",
+          "url": "plugins/pos-plugin/components/OnlineOrder/OnlineOrderMain.vue",
+          "path": "components/OnlineOrder/OnlineOrderMain.vue",
+          "pluginName": "pos-plugin",
+          "items": [],
+          "inject": [
+            {
+              "service": "OrderStore:pendingOrders",
+              "local": "pendingOrders",
+              "type": "prop"
+            },
+            {
+              "service": "OrderStore:kitchenOrders",
+              "local": "kitchenOrders",
+              "type": "prop"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "name": "posOnline",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-online",
+  "isProduction": true,
+  "data": {
+    "data": {
+      "view": null
+    }
+  }
+}

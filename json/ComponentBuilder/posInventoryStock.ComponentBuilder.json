@@ -1,0 +1,18 @@
+{
+  "events": [],
+  "_id": "5f99390351bd2583b5e54b3b",
+  "isProduction": true,
+  "items": [
+    {
+      "choice": "view",
+      "component": "InventoryStock",
+      "binding": [],
+      "slotScopeBinding": []
+    }
+  ],
+  "name": "posInventoryStock",
+  "props": {
+    "fields": []
+  },
+  "renderToRoute": "pos-inventory-stock"
+}
