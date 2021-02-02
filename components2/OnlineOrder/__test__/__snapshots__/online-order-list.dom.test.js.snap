@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test online order list should render 1`] = `
+<div class="online-order-list">
+  <div class="row-flex align-items-center mb-2">
+    <div class="online-order-list__title">
+      onlineOrder.completed onlineOrder.orders
+    </div>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <div class="online-order-list__info">
+      <div class="row-flex align-items-center">
+        <g-icon-stub class="mr-2"
+                     size="20"
+        >
+          icon-cutleries2
+        </g-icon-stub>
+        <span class="fw-700">
+        </span>
+      </div>
+      <div class="row-flex align-items-center">
+        <g-icon-stub class="mr-2"
+                     size="20"
+        >
+          icon-money-bag
+        </g-icon-stub>
+        <span class="fw-700">
+          'common.currency' , undefined12
+        </span>
+      </div>
+    </div>
+    <date-range-picker from="2021-01-14"
+                       to="2021-01-14"
+    >
+    </date-range-picker>
+  </div>
+  <div class="online-order-list__table">
+    <g-table-stub elevation="2"
+                  fixed-header="true"
+    >
+      <thead>
+        <tr>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+          <th style="white-space: nowrap;">
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fw-700">
+            <p style="white-space: nowrap;">
+              #1
+            </p>
+            <g-tooltip openonhover="true"
+                       color="#616161"
+                       transition="0.3"
+                       speech-bubble="true"
+                       remove-content-on-close="true"
+            >
+            </g-tooltip>
+          </td>
+          <td>
+            <p>
+              fgh
+            </p>
+            <p style="white-space: nowrap;">
+              0123123131
+            </p>
+          </td>
+          <td>
+            <div>
+              --
+            </div>
+          </td>
+          <td>
+            <p class="fw-700"
+               style="white-space: nowrap;"
+            >
+              'common.currency' , undefined12
+            </p>
+            <p>
+              <img alt="true">
+            </p>
+          </td>
+          <td style="white-space: nowrap;">
+            14.01.2021
+          </td>
+          <td style="white-space: nowrap;">
+            15:33
+          </td>
+          <td>
+            <g-icon-stub>
+              icon-take-away
+            </g-icon-stub>
+          </td>
+          <td class="completed">
+            <div style="white-space: nowrap;">
+              onlineOrder.completed
+            </div>
+            <div style="font-size: x-small; margin-top: -5px;">
+            </div>
+          </td>
+          <td>
+          </td>
+        </tr>
+      </tbody>
+    </g-table-stub>
+  </div>
+  <dialog-complete-order-stub disable-btn="true"
+                              modelvalue="false"
+  >
+  </dialog-complete-order-stub>
+</div>
+`;

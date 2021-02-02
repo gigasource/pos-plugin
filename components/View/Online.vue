@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
+  import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain1';
   import {pendingOrders, kitchenOrders} from '../../composition/useOrderLogic';
   import { state as RoomState } from '../../composition/useRoomLogic'
   import { onMounted, ref, reactive } from 'vue';

@@ -1,0 +1,304 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test render online order should render 1`] = `
+<div class="main">
+  <div class="pending-orders pr-2">
+    <div class="header">
+      <span>
+        onlineOrder.pendingOrders
+      </span>
+      <g-badge-stub class="ml-1"
+                    inline="true"
+                    modelvalue="true"
+                    color="#4CAF50"
+      >
+      </g-badge-stub>
+      <g-spacer-stub>
+      </g-spacer-stub>
+      <span style="color: rgb(211, 47, 47);">
+        Modem not connected
+      </span>
+    </div>
+    <div class="content">
+      <g-card-stub elevation="0">
+        <g-card-title-stub class="pending-orders--title">
+          <div class="row-flex align-items-center flex-grow-1">
+            <g-icon-stub>
+              icon-take-away
+            </g-icon-stub>
+            <div class="fs-small-2 ml-1"
+                 style="max-width: calc(100% - 24px); line-height: 1.2;"
+            >
+              <span class="fs-small fw-700 text-indigo-accent-2">
+                #
+              </span>
+              ádf -123
+            </div>
+          </div>
+          <div class="row-flex justify-end align-items-center r"
+               style="flex: 0 0 auto;"
+          >
+            <span class="fw-700 fs-small ml-2 mr-2"
+                  style="text-transform: uppercase;"
+            >
+              asap
+            </span>
+            <g-progress-circular rotate="-90"
+                                 width="1.5"
+                                 size="36"
+                                 color="#E57373"
+                                 value="100"
+            >
+            </g-progress-circular>
+            <div class="progress-remaining">
+              300
+            </div>
+          </div>
+        </g-card-title-stub>
+        <g-card-text-stub>
+          <div>
+            <div class="row-flex align-items-start">
+              <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px;">
+                1x
+              </div>
+              <div class="flex-equal fs-small-2 pl-1"
+                   style="word-break: break-all;"
+              >
+                1. Pepe 1
+                <span class="i text-grey">
+                  (Choice 1 - Nhom 1, Choice 1 - Nhom 2)
+                </span>
+              </div>
+              <div class="fs-small-2 ta-right">
+                €3.50
+              </div>
+            </div>
+          </div>
+          <div>
+          </div>
+        </g-card-text-stub>
+        <g-card-actions-stub>
+          <g-btn-bs-stub height="54"
+                         width="60"
+                         border-color="#C4C4C4"
+                         text-color="black"
+          >
+            <g-icon-stub size="14">
+              icon-cross-red
+            </g-icon-stub>
+          </g-btn-bs-stub>
+          <g-btn-bs-stub height="54"
+                         background-color="#E0E0E0"
+                         class="pending-orders--btn-price"
+                         text-color="black"
+                         style="flex: 1;"
+          >
+            <span class="mr-2">
+              cash
+            </span>
+            <span>
+              'common.currency' , undefined3.50
+            </span>
+          </g-btn-bs-stub>
+        </g-card-actions-stub>
+      </g-card-stub>
+      <g-card-stub elevation="0">
+        <g-card-title-stub class="pending-orders--title">
+          <div class="row-flex align-items-center flex-grow-1">
+            <g-icon-stub>
+              icon-take-away
+            </g-icon-stub>
+            <div class="fs-small-2 ml-1"
+                 style="max-width: calc(100% - 24px); line-height: 1.2;"
+            >
+              <span class="fs-small fw-700 text-indigo-accent-2">
+                #
+              </span>
+              dfd -123
+            </div>
+          </div>
+          <div class="row-flex justify-end align-items-center r"
+               style="flex: 0 0 auto;"
+          >
+            <span class="fw-700 fs-small ml-2 mr-2"
+                  style="text-transform: uppercase;"
+            >
+              asap
+            </span>
+            <g-progress-circular rotate="-90"
+                                 width="1.5"
+                                 size="36"
+                                 color="#E57373"
+                                 value="50"
+            >
+            </g-progress-circular>
+            <div class="progress-remaining">
+              200
+            </div>
+          </div>
+        </g-card-title-stub>
+        <g-card-text-stub>
+          <div>
+            <div class="row-flex align-items-start">
+              <div style="flex: 0 0 25px; font-weight: 700; font-size: 12px;">
+                1x
+              </div>
+              <div class="flex-equal fs-small-2 pl-1"
+                   style="word-break: break-all;"
+              >
+                3. mon test
+                <span class="i text-grey">
+                </span>
+              </div>
+              <div class="fs-small-2 ta-right">
+                €0.10
+              </div>
+            </div>
+          </div>
+          <div>
+          </div>
+        </g-card-text-stub>
+        <g-card-actions-stub>
+          <g-btn-bs-stub height="54"
+                         width="60"
+                         border-color="#C4C4C4"
+                         text-color="black"
+          >
+            <g-icon-stub size="14">
+              icon-cross-red
+            </g-icon-stub>
+          </g-btn-bs-stub>
+          <g-btn-bs-stub height="54"
+                         background-color="#E0E0E0"
+                         class="pending-orders--btn-price"
+                         text-color="black"
+                         style="flex: 1;"
+          >
+            <span class="mr-2">
+              cash
+            </span>
+            <span>
+              'common.currency' , undefined0.10
+            </span>
+          </g-btn-bs-stub>
+        </g-card-actions-stub>
+      </g-card-stub>
+    </div>
+  </div>
+  <div class="kitchen-orders pl-2">
+    <div class="header">
+      onlineOrder.sentToKitchen
+      <g-badge-stub class="ml-1"
+                    inline="true"
+                    modelvalue="true"
+                    color="#F9A825"
+      >
+      </g-badge-stub>
+    </div>
+    <div class="content">
+      <g-card-stub elevation="0">
+        <g-card-title-stub>
+          <div class="fs-small-2 ml-1"
+               style="max-width: calc(100% - 96px); line-height: 1.2;"
+          >
+            <span class="fs-small fw-700 text-indigo-accent-2">
+              #2
+            </span>
+            xa -01234
+          </div>
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <div class="kitchen-orders__timer">
+            <g-icon-stub>
+              icon-take-away
+            </g-icon-stub>
+            <span class="fw-700 fs-small ml-2">
+              17:27
+            </span>
+          </div>
+        </g-card-title-stub>
+        <g-card-text-stub>
+          <div class="row-flex">
+            <div class="col-1"
+                 style="line-height: 20px;"
+            >
+              <g-icon-stub color="#9E9E9E"
+                           size="20"
+              >
+                icon-food
+              </g-icon-stub>
+            </div>
+            <div style="padding-top: 2px;">
+              <span>
+                <span class="fw-700">
+                  1x
+                </span>
+                <span class="mr-3"
+                      style="word-break: break-all;"
+                >
+                  3. mon test
+                  <span class="i text-grey fs-small-2">
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </g-card-text-stub>
+      </g-card-stub>
+      <g-card-stub elevation="0">
+        <g-card-title-stub>
+          <div class="fs-small-2 ml-1"
+               style="max-width: calc(100% - 96px); line-height: 1.2;"
+          >
+            <span class="fs-small fw-700 text-indigo-accent-2">
+              #3
+            </span>
+            xa -0123
+          </div>
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <div class="kitchen-orders__timer">
+            <g-icon-stub>
+              icon-take-away
+            </g-icon-stub>
+            <span class="fw-700 fs-small ml-2">
+              17:27
+            </span>
+          </div>
+        </g-card-title-stub>
+        <g-card-text-stub>
+          <div class="row-flex">
+            <div class="col-1"
+                 style="line-height: 20px;"
+            >
+              <g-icon-stub color="#9E9E9E"
+                           size="20"
+              >
+                icon-food
+              </g-icon-stub>
+            </div>
+            <div style="padding-top: 2px;">
+              <span>
+                <span class="fw-700">
+                  1x
+                </span>
+                <span class="mr-3"
+                      style="word-break: break-all;"
+                >
+                  4. VIT THAI XOAI | MANGO IN THE „DUCK"
+                  <span class="i text-grey fs-small-2">
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </g-card-text-stub>
+      </g-card-stub>
+    </div>
+  </div>
+  <dialog-complete-order-stub>
+  </dialog-complete-order-stub>
+  <dialog-text-filter-stub label="Reason">
+  </dialog-text-filter-stub>
+</div>
+`;

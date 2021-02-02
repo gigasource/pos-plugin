@@ -45,17 +45,28 @@ const DashboardSidebarItemsFactory = () => {
           iconType: 'small',
 
           title: t('onlineOrder.dashboard'),
-          key: 'Orders'
+          key: 'Orders',
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderMainView')
+          }
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: t('onlineOrder.completedOrders')
+          title: t('onlineOrder.completedOrders'),
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderListCompletedView')
+            dashboardHooks.emit('changeOnlineOrderListStatus', 'completed')
+          }
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: t('onlineOrder.declinedOrders')
+          title: t('onlineOrder.declinedOrders'),
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderListDeclinedView')
+            dashboardHooks.emit('changeOnlineOrderListStatus', 'declined')
+          }
         },
         {
           icon: 'icon-services',
