@@ -76,6 +76,10 @@
   }
 
   .buttons {
-    padding: 8px 8px 8px 0;
+    padding: 8px 8px 8px 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-gap: 4px;
   }
 </style>

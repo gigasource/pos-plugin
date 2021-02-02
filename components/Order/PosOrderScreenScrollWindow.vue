@@ -148,7 +148,7 @@
           }
 
           this.productWindows = Object.assign({}, this.productWindows, tempValue);
-          this.activeProductWindows = Object.keys(newValue).reduce((obj, key) => {
+          this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
             obj[key] = 0;
             return obj
           }, {})

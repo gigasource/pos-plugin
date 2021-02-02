@@ -2,9 +2,9 @@
   <div class="action" ref="action">
     <div class="btn"
          v-for="(btn, i) in listBtn" :key="i"
-         :style="{
-              gridRow: btn.rows[0] + '/' + btn.rows[1],
-              gridColumn: btn.cols[0] + '/' + btn.cols[1],
+         :style="btn && {
+              // gridRow: btn.rows[0] + '/' + btn.rows[1],
+              // gridColumn: btn.cols[0] + '/' + btn.cols[1],
               backgroundColor: btn.backgroundColor,
               color: btn.backgroundColor !== '#FFFFFF' ? btn.textColor : '#000d',
               border: btn.backgroundColor && btn.backgroundColor !== '#FFFFFF' ? null : '1px solid #979797',
@@ -13,7 +13,7 @@
               cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
             }"
          @click="onClick(btn)">
-      {{btn.text}}
+      {{btn && btn.text}}
     </div>
   </div>
 </template>
@@ -44,12 +44,12 @@
         const actionRef = this.$refs.action;
 
         if (actionRef) {
-          const tablePercent = 73 - 9 * rows;
-          const actionPercent = 9 * rows;
-          actionRef.style['grid-template-rows'] = `repeat(${rows},1fr)`;
-          const leftLayout = actionRef.parentElement;
-          leftLayout.style['grid-template-rows'] = `8% ${tablePercent}% 11% ${actionPercent}% 8%`;
-          actionRef.style.display = rows === 0 ? 'none' : 'grid';
+          // const tablePercent = 73 - 9 * rows;
+          // const actionPercent = 9 * rows;
+          // actionRef.style['grid-template-rows'] = `repeat(${rows},1fr)`;
+          // const leftLayout = actionRef.parentElement;
+          // leftLayout.style['grid-template-rows'] = `8% ${tablePercent}% 11% ${actionPercent}% 8%`;
+          // actionRef.style.display = rows === 0 ? 'none' : 'grid';
         }
         //add btn
         this.listBtn = [];
@@ -65,6 +65,9 @@
                 })
                 : btn);
           }
+        }
+        if(this.listBtn.length === 4) {
+          this.listBtn.unshift(null, null, null, null)
         }
 
         const posStore = this.$getService('OrderStore')
@@ -85,7 +88,11 @@
 
 <style scoped lang="scss">
   .action {
-    padding: 9px 6px;
+    padding: 0 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 4px;
   }
 
   .btn {
