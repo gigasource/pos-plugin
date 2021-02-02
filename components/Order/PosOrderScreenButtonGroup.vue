@@ -22,7 +22,7 @@
   export default {
     name: 'PosOrderScreenButtonGroup',
     injectService: [
-      'OrderStore:(chooseFunction,activeTableProduct,currentOrder)', 'SettingsStore:getPosSetting'
+      'OrderStore:(chooseFunction,activeTableProduct,currentOrder,isActiveFnBtn,chooseFunction)', 'SettingsStore:getPosSetting'
     ],
     data() {
       return {
@@ -34,7 +34,7 @@
         const setting = await this.getPosSetting();
         this.listBtn = [];
         const rightFunctionButtons = setting.rightFunctionButtons;
-        const containedBtns = rightFunctionButtons.reduce((acc, btn) => ([...acc, ...btn.containedButtons]), []);
+        const containedBtns = rightFunctionButtons.reduce((acc, btn) => ([...acc, ...(btn.containedButtons || [])]), []);
         for (const btn of rightFunctionButtons) {
           if (!containedBtns.includes(btn._id)) {
             this.listBtn.push(
@@ -47,18 +47,23 @@
         }
       },
       isActiveBtn(btn) {
-        return this.$getService('OrderStore:isActiveFnBtn')(btn)
+        return this.isActiveFnBtn(btn)
       },
       onClick(btn) {
         if (!btn || !btn.buttonFunction) return
-        this.$getService('OrderStore:chooseFunction')(btn.buttonFunction)(btn.buttonFunctionValue)
+        this.chooseFunction(btn.buttonFunction)(btn.buttonFunctionValue)
       }
     },
     async activated() {
-      await this.generateTemplate();
+      setTimeout(async () => {
+        await this.generateTemplate();
+      }, 100)
+
     },
     async mounted() {
-      await this.generateTemplate();
+      setTimeout(async () => {
+        await this.generateTemplate();
+      })
     },
   }
 </script>

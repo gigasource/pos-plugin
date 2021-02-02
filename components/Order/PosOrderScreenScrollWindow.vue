@@ -45,6 +45,7 @@
 
   export default {
     name: 'PosOrderScreenScrollWindow',
+    injectService: ['OrderStore:(addProductToOrder,getScrollWindowProducts,scrollWindowProducts)'],
     components: {
       scrollWindow: {
         name: 'ScrollWindow',
@@ -102,7 +103,7 @@
     },
     methods: {
       addProduct(item) {
-        this.$getService('OrderStore:addProductToOrder')(item)
+        this.addProductToOrder(item)
       },
       getItemStyle(item) {
         if (item.layout) return {
@@ -110,66 +111,103 @@
           ...(item.layout.color === '#FFFFFF' || !item.layout.color) && {border: '1px solid #979797', backgroundColor: '#FFF'},
           ...item.layout.color && item.layout.color !== '#FFFFFF' && {backgroundColor: item.layout.color}
         }
+      },
+      // inject
+      addProductToOrder() {
+        console.log('OrderStore:addProductToOrder was not implemented')
+      },
+      getScrollWindowProducts() {
+        console.log('OrderStore:getScrollWindowProducts was not implemented')
       }
     },
     created() {
-      const orderStore = this.$getService('OrderStore');
+      // const orderStore = this.$getService('OrderStore');
 
-      orderStore.changeProductList = (newValue, oldValue) => {
-        if (newValue) {
-          const newCategory = newValue.name;
-          const oldCategory = oldValue && oldValue.name;
+      // orderStore.changeProductList = (newValue, oldValue) => {
+      //   if (newValue) {
+      //     const newCategory = newValue.name;
+      //     const oldCategory = oldValue && oldValue.name;
+      //
+      //     if (newCategory && this.$refs[`window_${newCategory}`]) {
+      //       this.$refs[`window_${newCategory}`][0].style.zIndex = '1'
+      //     }
+      //
+      //     if (oldCategory) {
+      //       if (newCategory === oldCategory) return;
+      //       const oldRef = this.$refs[`window_${oldCategory}`];
+      //
+      //       if (oldRef && oldRef.length > 0) {
+      //         oldRef[0].style.zIndex = '-1'
+      //       }
+      //     }
+      //   }
+      // };
 
-          if (newCategory && this.$refs[`window_${newCategory}`]) {
-            this.$refs[`window_${newCategory}`][0].style.zIndex = '1'
-          }
-
-          if (oldCategory) {
-            if (newCategory === oldCategory) return;
-            const oldRef = this.$refs[`window_${oldCategory}`];
-
-            if (oldRef && oldRef.length > 0) {
-              oldRef[0].style.zIndex = '-1'
-            }
-          }
-        }
-      };
-
-      this.unwatch = orderStore.$watch('scrollWindowProducts', (newValue, oldValue) => {
-        if (!_.isEqual(newValue, oldValue)) {
-          const tempValue = Object.assign({}, this.productWindows, newValue);
-          for (const category in tempValue) {
-            if (tempValue.hasOwnProperty(category)) {
-              tempValue[category] = tempValue[category].map(window => window.map(product => ({
-                ...product,
-                layout: this.$getService('SettingsStore:getProductLayout')(product, { name: category })
-              })))
-            }
-          }
-
-          this.productWindows = Object.assign({}, this.productWindows, tempValue);
-          this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
-            obj[key] = 0;
-            return obj
-          }, {})
-        }
-      }, { immediate: true, deep: true, sync: true })
+      // this.unwatch = orderStore.$watch('scrollWindowProducts', (newValue, oldValue) => {
+      //   if (!_.isEqual(newValue, oldValue)) {
+      //     const tempValue = Object.assign({}, this.productWindows, newValue);
+      //     for (const category in tempValue) {
+      //       if (tempValue.hasOwnProperty(category)) {
+      //         tempValue[category] = tempValue[category].map(window => window.map(product => ({
+      //           ...product,
+      //           layout: this.$getService('SettingsStore:getProductLayout')(product, { name: category })
+      //         })))
+      //       }
+      //     }
+      //
+      //     this.productWindows = Object.assign({}, this.productWindows, tempValue);
+      //     this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
+      //       obj[key] = 0;
+      //       return obj
+      //     }, {})
+      //   }
+      // }, { immediate: true, deep: true, sync: true })
     },
-    async activated() {
-      this.shouldForceUpdate = true;
-      await this.$getService('OrderStore:getScrollWindowProducts')();
-      nextTick(() => {
-        this.shouldForceUpdate = false
-      })
+    activated() {
+      setTimeout(async () => {
+        this.shouldForceUpdate = true;
+        await this.getScrollWindowProducts();
+        await nextTick(() => {
+          this.shouldForceUpdate = false
+        })
+      }, 1000)
     },
-    async mounted() {
-      await this.$getService('OrderStore:getScrollWindowProducts')();
-      nextTick(() => {
-        this.shouldForceUpdate = false
-      })
+    watch: {
+      scrollWindowProducts: {
+        handler: (newValue, oldValue) => {
+          if (!_.isEqual(newValue, oldValue)) {
+            const tempValue = Object.assign({}, this.productWindows, newValue);
+            for (const category in tempValue) {
+              if (tempValue.hasOwnProperty(category)) {
+                tempValue[category] = tempValue[category].map(window => window.map(product => ({
+                  ...product,
+                  layout: this.$getService('SettingsStore:getProductLayout')(product, { name: category })
+                })))
+              }
+            }
+
+            this.productWindows = Object.assign({}, this.productWindows, tempValue);
+            this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
+              obj[key] = 0;
+              return obj
+            }, {})
+          }
+        },
+        deep: true,
+        sync: true,
+        immediate: true
+      }
+    },
+    mounted() {
+      setTimeout( async() => {
+        await this.getScrollWindowProducts();
+        await nextTick(() => {
+          this.shouldForceUpdate = false
+        })
+      }, 1000)
     },
     beforeDestroy() {
-      this.unwatch()
+      // this.unwatch()
     }
   }
 </script>

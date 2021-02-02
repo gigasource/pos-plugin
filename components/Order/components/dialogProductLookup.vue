@@ -41,7 +41,7 @@
               <div v-else>-</div>
             </td>
           </tr>
-          
+
           <tr :key="i"
               :class="[(selected && product._id === selected._id) && 'tr__selected']"
               @click="addToOrder(product)"
@@ -90,6 +90,7 @@
         productSliceLength: 15,
         lastRowIntersectArgs: null,
         lastRowIntersectValue: null,
+        productNameQuery: null,
       }
     },
     methods: {
@@ -119,11 +120,6 @@
       },
     },
     created() {
-      const orderStore = this.$getService('OrderStore')
-      orderStore.$watch('productNameQuery', () => {
-        this.queryProductsByName()
-      }, { immediate: true })
-
       this.productNameQuery = ''
       this.lastRowIntersectArgs = { root: this.$el, threshold: 0.1 }
       this.lastRowIntersectValue = () => this.productSliceLength += 15
@@ -144,6 +140,12 @@
           this.$refs.dialogContent.addEventListener('click', listener)
         }
         !newVal && this.$refs.dialogContent.removeEventListener('click', listener)
+      },
+      productNameQuery: {
+        handler() {
+          this.queryProductsByName()
+        },
+        immediate:true
       }
     }
   }
@@ -156,30 +158,30 @@
     display: flex;
     flex-direction: column;
     border: 16px solid rgba(107, 111, 130, 0.95);
-    
+
     .g-tf-wrapper fieldset {
       border-radius: 0;
       border: 2px solid #BDBDBD;
     }
-    
+
     .g-toolbar {
       flex: 0;
     }
-    
+
     .g-table {
       overflow: scroll;
-      
+
       &.tbLookup {
         height: calc(65% - 64px) !important;
         flex-basis: calc(65% - 64px);
         flex-grow: 0;
         flex-shrink: 0;
-        
+
         &__full {
           flex-basis: calc(100% - 64px);
         }
       }
-      
+
       thead tr th {
         font-size: 13px;
         line-height: 16px;
@@ -187,42 +189,42 @@
         background-color: white;
         text-align: left;
       }
-      
+
       tbody tr td {
         height: 60px;
       }
-      
+
       .td-attr:not(:last-child) {
         border-right: 1px solid #979797;
         padding-right: 16px;
       }
-      
+
       .td-attr:not(:first-child) {
         padding-left: 8px;
       }
-      
+
       .tr__selected {
         td {
           border-top: 1px solid #1271ff !important;
           border-bottom: 1px solid #1271ff !important;
         }
-        
+
         td:first-child {
           border-left: 1px solid #1271ff !important;
         }
-        
+
         td:last-child {
           border-right: 1px solid #1271ff !important;
         }
       }
     }
-    
+
     ::v-deep .keyboard-wrapper {
       flex-basis: 35%;
       height: 35%;
       padding: 16px;
       background-color: #BDBDBD;
-      
+
       .key {
         border-radius: 0;
         font-size: 24px;

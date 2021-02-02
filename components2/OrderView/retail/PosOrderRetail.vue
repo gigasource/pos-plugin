@@ -1,67 +1,45 @@
 <template>
-  <div>
-    <g-grid-layout :layout="layout">
-      <template #keyboard>
-        <pos-order-screen-number-keyboard/>
-      </template>
-      <template #menu>
-        <pos-order-screen-product-category-menu/>
-      </template>
-      <template #table>
-        <pos-order-screen-detail/>
-      </template>
-      <template #layout_left>
-      </template>
-      <template #toolbar>
-        <pos-order-screen-toolbar/>
-      </template>
-      <template #detail>
-        <pos-order-screen-detail/>
-      </template>
-    </g-grid-layout>
-
-    <dialog-saved-list v-model="dialogProductSearchResult"/>
-    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>
-    <dialog-product-lookup v-model="dialogProductLookup"/>
+  <div class="por">
+    <pos-retail-category class="por__category"/>
+    <div class="por__main">
+      <pos-order-screen-scroll-window class="por__main__window"/>
+      <pos-order-screen-number-keyboard class="por__main__keyboard"/>
+      <pos-order-screen-button-group class="por__main__buttons"/>
+    </div>
+    <pos-retail-order class="por__detail"/>
+<!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
+<!--    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>-->
+<!--    <dialog-product-lookup v-model="dialogProductLookup"/>-->
   </div>
-<!--  <div class="por" style="height: 100%">-->
-<!--    <div class="layout__left">-->
-<!--      <div class="menu"></div>-->
-<!--      <div class="main_row2">-->
-<!--        <div class="keyboard"></div>-->
-<!--      </div>-->
-<!--      <div class="main_row1"></div>-->
-<!--    </div>-->
-<!--    <div class="toolbar"></div>-->
-<!--    <div class="detail"></div>-->
-<!--  </div>-->
 </template>
 <script>
-import layout from '../../../json/ComponentBuilder/posOrderRetail.ComponentBuilder.json'
+// import layout from '../../../json/ComponentBuilder/posOrderRetail.ComponentBuilder.json'
 import PosOrderScreenNumberKeyboard from '../../../components/Order/PosOrderScreenNumberKeyboard';
-import PosOrderScreenProductCategoryMenu from '../../../components/Order/PosOrderScreenProductCategoryMenu';
-import PosOrderScreenDetail from '../../../components/Order/PosOrderScreenDetail'
-import PosOrderScreenToolbar from '../../../components/Order/PosOrderScreenToolbar'
 import DialogSavedList from '../../../components/Order/components/dialogSavedList';
 import DialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
 import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
+import PosRetailOrder from '../../../components/Retail/PosRetailOrder';
+import PosRetailCategory from '../../../components/Retail/PosRetailCategory';
+import PosOrderScreenButtonGroup from '../../../components/Order/PosOrderScreenButtonGroup';
+import PosOrderScreenScrollWindow from '../../../components/Order/PosOrderScreenScrollWindow';
 
 export default {
   name: 'PosOrderRetail',
   props: {},
   injectService: ['PosStore:updateNewPrice'],
   components: {
+    PosOrderScreenScrollWindow,
+    PosOrderScreenButtonGroup,
+    PosRetailCategory,
+    PosRetailOrder,
     DialogProductLookup,
     DialogChangeValue,
     DialogSavedList,
     PosOrderScreenNumberKeyboard,
-    PosOrderScreenProductCategoryMenu,
-    PosOrderScreenDetail,
-    PosOrderScreenToolbar
   },
   data: function () {
     return {
-      layout: layout,
+      // layout: layout,
       dialogProductSearchResult: false,
       dialogChangePrice: false,
       dialogProductLookup: false,
@@ -80,8 +58,37 @@ export default {
 </script>
 <style scoped lang="scss">
 .por {
+  height: 100%;
   display: grid;
-  grid-template-rows: 1fr 64px;
-  grid-template-columns: 1fr 30%;
+  grid-template-rows: 100%;
+  grid-template-columns: 20% 50% 30%;
+
+  &__category {
+    grid-area: 0/0/1/1;
+  }
+
+  &__main {
+    grid-area: 1/2/2/3;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
+
+    &__window {
+      grid-area: 1/1/2/3;
+    }
+
+    &__keyboard {
+      grid-area: 2/1/3/2;
+      padding: 8px 4px 8px 8px;
+    }
+
+    &__buttons {
+      grid-area: 2/2/3/3;
+    }
+  }
+
+  &__detail {
+    grid-area: 1/3/2/4;
+  }
 }
 </style>
