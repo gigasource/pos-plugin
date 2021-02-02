@@ -12,7 +12,6 @@
       <pos-textfield-new label="Table" v-model="text" ref="tf"/>
       <pos-keyboard-full @enter-pressed="addTable"/>
     </div>
-    <number-of-customers-dialog v-model="showNumberOfCustomersDialog" @submit="onCustomerDialogSubmit"/>
   </div>
 </template>
 
@@ -20,11 +19,10 @@
   import { nextTick } from 'vue'
   import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
   import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
-  import NumberOfCustomersDialog from '../Restaurant/NumberOfCustomersDialog';
-  
+
   export default {
     name: 'PosOrderManualTable',
-    components: { NumberOfCustomersDialog, PosTextfieldNew, PosKeyboardFull },
+    components: { PosTextfieldNew, PosKeyboardFull },
     props: {
       isMobile: Boolean,
       activeOrders: Array

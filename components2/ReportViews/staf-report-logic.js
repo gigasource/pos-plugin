@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import {dateFormat} from "../utils";
 
 export const currentDate = ref(new Date());
+//export const currentDate = ref(dayjs('05.01.2021', 'DD.MM.YYYY').toDate());
 export const reportDate = computed(() => {
   return dayjs(currentDate.value).format(dateFormat.value)
 })

@@ -2,7 +2,7 @@
 
 import PosOrder2 from "./PosOrder2";
 import PosOrderLayout2 from "./PosOrderLayout2";
-import PosQuickOrderToolbar2 from "./Helper/PosQuickOrderToolbar2";
+import PosOrderToolbar2 from "./PosOrderToolbar2";
 import {isMobile} from "../AppSharedStates";
 import {orderViewDialog} from "./pos-ui-shared";
 import PosOrderSplitOrder2 from "./Helper/PosOrderSplitOrder2";
@@ -17,7 +17,7 @@ export default {
   components: {
     PosOrder2,
     PosOrderLayout2,
-    PosQuickOrderToolbar2,
+    PosOrderToolbar2,
     PosOrderSplitOrder2,
     PosOrderReceipt2,
     PosOrderMoveItems2,
@@ -31,7 +31,7 @@ export default {
               <pos-order-layout2 style="flex: 1"/>
               <pos-order2 style={!isMobile.value && {flex: '0 0 25%'}}/>
             </div>
-            {!isMobile.value && <pos-quick-order-toolbar2/>}
+            {!isMobile.value && <pos-order-toolbar2/>}
           </div>
           <pos-order-split-order2 v-model={orderViewDialog.split}/>
           <pos-order-receipt2 v-model={orderViewDialog.receipt}/>

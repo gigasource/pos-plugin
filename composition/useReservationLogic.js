@@ -1,5 +1,6 @@
 import { ref } from 'vue';
-
+import cms from 'cms'
+import dayjs from 'dayjs';
 const ReservationModel = cms.getModel('Reservation');
 
 export const reservations = ref([])
@@ -32,14 +33,14 @@ export async function removeReservation(_id) {
   cms.socket.emit('updateOnlineReservation', _id, 'delete')
 }
 
-async function checkReservationDay(date) {
+export async function checkReservationDay(date) {
   const dateTo = dayjs(date).startOf('day').add(1, 'day').toDate(),
     dateFrom = dayjs(date).startOf('day').toDate()
   const _reservations = await ReservationModel.find({date: { $gte: dateFrom, $lte: dateTo }, status: {$ne: 'declined'}})
   return _reservations && _reservations.length > 0
 }
 
-async function createReservation(reservation) {
+export async function createReservation(reservation) {
   const res = await ReservationModel.create(reservation)
   cms.socket.emit('scheduleNewReservation', res)
   cms.socket.emit('updateOnlineReservation', res._id, 'create')

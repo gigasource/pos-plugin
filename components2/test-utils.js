@@ -66,8 +66,8 @@ beforeAll(async () => {
     items: [{}],
     table: String
   });
-  await orm("Order").deleteMany();
-  await orm("Commit").deleteMany();
+  orm("Order").deleteMany().then();
+  orm("Commit").deleteMany().then();
 
   orm.plugin(syncPlugin);
   orm.plugin(syncFlow);
@@ -76,15 +76,6 @@ beforeAll(async () => {
   //orm.plugin(require("../backend/commit/actionCommit"));
   orm.registerCollectionOptions("Order");
   orm.emit("commit:flow:setMaster", true);
-});
-
-afterEach(async () => {
-  await orm("Order")
-    .deleteMany()
-    .direct();
-  await orm("Commit")
-    .deleteMany()
-    .direct();
 });
 
 export let actions = [];
@@ -153,12 +144,14 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-menu': true,
         "g-overlay": true,
         'g-radio': true,
+        'g-select': true,
         'g-simple-table': true,
         'g-spacer': true,
         'g-switch': true,
         'g-table': true,
         'g-tabs': true,
         'g-tab-item': true,
+        'g-textarea': true,
         'g-text-field': true,
         'g-text-field-bs': true,
         'g-toolbar': true,
@@ -168,6 +161,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'pos-order': true,
         'pos-quick-order-toolbar': true,
         //'pos-order-split-order': true,
+        'new-reservation-dialog': true,
         'pos-keyboard-full': true,
         'pos-order-keyboard': true,
         'pos-order-move-items': true,
@@ -179,6 +173,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'pos-payment-screen-keyboard2': true,
         'pos-restaurant-payment-order-detail2': true,
         'pos-restaurant-payment-toolbar2': true,
+        'scroll-select': true,
       },
       mocks: {
         t: a => a,

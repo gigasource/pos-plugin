@@ -1,30 +1,23 @@
 <script>
 
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router';
+import {ref} from 'vue'
 import PosEndOfDayReprintZReport from "./PosEndOfDayReprintZReport";
 import PosEndOfDayPrintZReport from "./PosEndOfDayPrintZReport";
 import PosEndOfDayPrintPendingZReport from "./PosEndOfDayPrintPendingZReport";
-import PosEndOfDayPrintDialog from "./PosEndOfDayPrintDialog";
+import PosEndOfDayPrintXReport from "./PosEndOfDayPrintXReport";
 import {useI18n} from "vue-i18n";
 import {getOldestPendingReport, pendingReport, selectedReportDate, showReprint, showRunEndOfDay} from "./eod-shared";
+import {backFn} from "../utils";
 
 export default {
   components: {
-    PosEndOfDayReprintZReport, PosEndOfDayPrintDialog,
+    PosEndOfDayReprintZReport, PosEndOfDayPrintXReport,
     PosEndOfDayPrintZReport, PosEndOfDayPrintPendingZReport
   },
   setup() {
     const {t} = useI18n();
     const showEndOfDayConfirmDialog = ref(false)
     const showPendingEndOfDayConfirmDialog = ref(false)
-
-    //todo: move to shared file
-    const router = useRouter()
-
-    function back() {
-      router.push({path: '/pos-dashboard'})
-    }
 
     async function runEndOfDay() {
       await getOldestPendingReport()
@@ -36,7 +29,7 @@ export default {
 
     return () => (
         <g-toolbar color="#eee" style="z-index: 2">
-          <g-btn uppercase={false} onClick={back}>
+          <g-btn uppercase={false} onClick={backFn.value}>
             <g-icon class="mr-2" svg>icon-back</g-icon>
             {t('ui.back')}
           </g-btn>
@@ -52,10 +45,10 @@ export default {
                 </g-btn>
             ,
           }}/>
-          <pos-end-of-day-print-dialog v-slots={{
+          <pos-end-of-day-print-x-report v-slots={{
             'activator': ({open, close}) =>
-                (showRunEndOfDay.value) &&
-                <g-btn uppercase={false} onClick={() => open(selectedReportDate.value.date)} width="139px" class="mr-2">
+                showRunEndOfDay.value &&
+                <g-btn uppercase={false} onClick={() => open()} width="139px" class="mr-2">
                   {t('report.xReport')}
                 </g-btn>
           }}/>

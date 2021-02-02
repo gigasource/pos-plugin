@@ -12,7 +12,6 @@ async function eodReportCalender(from, to) {
     },
     status: "paid"
   };
-
   let orders = await Order.find(query);
   const ordersByDate = renderPivotTable({
     columns: ["@date:vDate", "z"],

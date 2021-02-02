@@ -26,11 +26,8 @@ beforeAll(async () => {
   //   }],
   // })
   const Modifier = cms.getModel("modifier-test");
-  console.log(Modifier);
   await Modifier.remove({});
   await Modifier.create({ groups: [] });
-  const wtd = await cms.getModel("modifier-test").findOne({});
-  console.log(wtd);
 });
 describe("test crud-db", () => {
   it("should word", async () => {
