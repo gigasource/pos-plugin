@@ -16,7 +16,25 @@ jest.mock('vue-i18n', () => ({
     return {messages: {
         value: {
           'en': {
-            dashboard: {}
+            dashboard: {},
+            messages: {
+              value: {
+                en: {
+                  onlineOrder: {
+                    address: 'address',
+                    amount: 'amount',
+                    customer: 'customer',
+                    delivery: 'delivery',
+                    no: 'no',
+                    received: 'received',
+                    _status: 'status',
+                    type: 'type',
+                    refund: 'refund',
+                    refunded: 'refunded'
+                  }
+                }
+              }
+            }
           }
         }
       },

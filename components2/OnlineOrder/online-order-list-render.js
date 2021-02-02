@@ -4,9 +4,13 @@ import {$filters, user} from '../AppSharedStates'
 import { formatDate } from "../utils";
 import {getOnlineOrdersByLimit} from './online-order-main-logic-be'
 import { isRefunded, isRefundable } from "./online-order-main-logic"
-import { dialogOrder } from './helpers/dialog-complete-order-render';
+import { dialogOrder } from './helpers/dialog-complete-order-render'
 import cms from 'cms'
-import { genScopeId } from '../utils';
+import { genScopeId } from '../utils'
+import isBetween from 'dayjs/plugin/isBetween'
+import dayjs from 'dayjs'
+dayjs.extend(isBetween)
+import _ from 'lodash'
 
 //<editor-fold desc="Variables">
 /**
@@ -39,7 +43,7 @@ export function changeFilter(range) {
   filter.value = range
 }
 export function getImagePayment(type) {
-  let paymentMethod = cms.getList('PosSetting')[0].payment.find(i => i.name === type)
+  let paymentMethod = cms.getList && cms.getList('PosSetting')[0].payment.find(i => i.name === type)
   return paymentMethod && paymentMethod.icon
 }
 export function openDialogDetail(order) {
@@ -61,7 +65,7 @@ export function onlineOrderListFactory(props) {
 
   const { t, locale } = useI18n()
   const i18n = useI18n();
-  const { onlineOrder: { address, amount, customer, delivery, no, received, _status, type, refund, refunded } } = i18n.messages.value[i18n.locale.value] || i18n.messages.value[i18n.fallbackLocale.value]
+  const { onlineOrder: { address, amount, customer, delivery, no, received, _status, type, refund, refunded } } = i18n.messages ? (i18n.messages.value[i18n.locale.value] || i18n.messages.value[i18n.fallbackLocale.value]) : { onlineOrder: {} }
   const headers = [no, customer, address, amount, received, delivery, type, _status, '']
 
   const renderOnlineOrderListTitle = function () {
