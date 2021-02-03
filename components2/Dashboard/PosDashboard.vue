@@ -2,6 +2,8 @@
 import RestaurantRoom from '../TablePlan/BasicRoom/RestaurantRoom';
 import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
+import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
+import OnlineOrderList from '../OnlineOrder/OnlineOrderList'
 import { onBeforeMount, KeepAlive, computed, ref, watch } from 'vue';
 import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
 import { appHooks } from '../AppSharedStates';
@@ -13,7 +15,9 @@ import { h } from 'vue'
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
 export default {
   name: 'Dashboard',
-  components: { PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable },
+  components: {
+    OnlineOrderList,
+    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable },
   setup() {
     fetchRooms().then(() => {
       //auto select first room
@@ -48,10 +52,16 @@ export default {
     };
     const ManualTableView = () => <PosOrderManualTable> </PosOrderManualTable>
     const FunctionsView = () => <PosDashboardFunction></PosDashboardFunction>
+    const OnlineOrderMainView = <OnlineOrderMain></OnlineOrderMain>
+    const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"></OnlineOrderList>
+    const OnlineOrderListCompletedView = <OnlineOrderList status="completed"></OnlineOrderList>
     const DashBoardViews = {
       KeptAliveRoomViews,
       ManualTableView,
-      FunctionsView
+      FunctionsView,
+      OnlineOrderMainView,
+      OnlineOrderListDeclinedView,
+      OnlineOrderListCompletedView
     };
 
     return () =>

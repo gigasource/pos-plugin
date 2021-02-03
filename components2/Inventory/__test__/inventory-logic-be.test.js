@@ -60,7 +60,6 @@ describe("Test inventory logic be", function() {
 		  	stock: 20
 		  }
 	  })
-	  const a = inventories.value
 	  historyFilter.value = {
   		fromDate: moment('04.01.2021', 'DD.MM.YYYY').toDate(),
 			toDate: moment('06.01.2021', 'DD.MM.YYYY').toDate()
