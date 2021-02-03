@@ -3,7 +3,6 @@ import {useI18n} from "vue-i18n";
 import dayjs from "dayjs";
 import {useRouter} from 'vue-router';
 import cms from 'cms';
-import { watch } from 'vue'
 
 export const internalValueFactory = (props, {emit}, target = 'modelValue') => {
   const rawInternalValue = ref(props[target]);
