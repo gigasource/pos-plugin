@@ -1,17 +1,22 @@
-import {computed, getCurrentInstance, ref, withScopeId} from "vue";
-import {useI18n} from "vue-i18n";
-import dayjs from "dayjs";
-import {useRouter} from 'vue-router';
+import { computed, getCurrentInstance, ref, withScopeId } from 'vue';
+import { useI18n } from 'vue-i18n';
+import dayjs from 'dayjs';
+import { useRouter } from 'vue-router';
 import cms from 'cms';
+import { watch } from 'vue'
 
-export const internalValueFactory = (props, {emit}) => {
-  if (!props.modelValue) {
-    return ref();
-  }
+export const internalValueFactory = (props, {emit}, target = 'modelValue') => {
+  const rawInternalValue = ref(props[target]);
+
+  watch(() => props[target], () => rawInternalValue.value = props[target], { lazy: true });
+
   return computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val)
-  })
+    get: () => rawInternalValue.value,
+    set: (value) => {
+      rawInternalValue.value = value;
+      emit(`update:${target}`, rawInternalValue.value)
+    }
+  });
 }
 
 let inited = false;
@@ -110,3 +115,12 @@ export const backFn = computed(() => {
 export async function socketEmit() {
   return await new Promise(resolve => cms.socket.emit(...arguments, resolve));
 }
+
+export const attrComputed = (data, target, fallbackValue) => computed({
+  get() {
+    return (data.value && data.value[target]) || fallbackValue
+  },
+  set(val) {
+    data.value[target] = val
+  }
+})
