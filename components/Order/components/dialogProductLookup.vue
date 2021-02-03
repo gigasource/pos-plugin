@@ -143,7 +143,8 @@
       },
       productNameQuery: {
         handler() {
-          this.queryProductsByName()
+          if (this.queryProductsByName)
+            this.queryProductsByName()
         },
         immediate:true
       }

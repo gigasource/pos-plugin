@@ -26,8 +26,10 @@
       },
     },
     async activated() {
-      this.menu = await this.getAllCategories();
-      await this.select(this.menu[0])
+      setTimeout(async() => {
+        this.menu = await this.getAllCategories();
+        await this.select(this.menu[0])
+      }, 100)
     }
   }
 </script>
