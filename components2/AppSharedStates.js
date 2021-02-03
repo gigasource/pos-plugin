@@ -5,6 +5,11 @@ import cms from 'cms';
 
 export const appHooks = new Hooks()
 
+export const appType = {
+  POS_RESTAURANT: true,
+  POS_RETAIL: false
+}
+export const currentAppType = ref(appType.POS_RESTAURANT)
 export const user = ref(null)
 
 export const avatar = computed(() => user.value ? user.value.avatar : '');
