@@ -9,6 +9,9 @@ export const user = ref(null)
 
 export const avatar = computed(() => user.value ? user.value.avatar : '');
 export const username = computed(() => user.value ? user.value.name : '');
+export function isAdmin(user) { return user && user.role === 'admin'}
+export const currentUserIsAdmin = computed(() => user.value && isAdmin(user.value))
+export const isLoggedIn = computed(() => !!user.value)
 
 appHooks.on('updateUser', function (value) {
   user.value = value
