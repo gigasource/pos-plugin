@@ -168,17 +168,10 @@
       }
     },
     {
-      "schemaType": "object",
+      "schemaType": "array",
       "key": "subCategory",
       "default": null,
-      "mixed": null,
-      "unique": null,
-      "type": "object",
-      "label": null,
-      "flex": null,
-      "noPanel": null,
-      "addable": null,
-      "isVisible": null
+      "unique": null
     }
   ],
   "name": "InventoryRetailCategory",
