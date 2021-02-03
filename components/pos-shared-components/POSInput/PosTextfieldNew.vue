@@ -68,6 +68,11 @@
 
       const { type } = getCurrentInstance();
       return withScopeId(type.__scopeId)(renderFn.bind(this))()
+    },
+    methods: {
+      focus() {
+        this.$refs.textfield.onFocus()
+      }
     }
   }
 </script>
