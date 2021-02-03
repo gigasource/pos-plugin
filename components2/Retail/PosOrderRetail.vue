@@ -13,15 +13,14 @@
   </div>
 </template>
 <script>
-// import layout from '../../../json/ComponentBuilder/posOrderRetail.ComponentBuilder.json'
-import PosOrderScreenNumberKeyboard from '../../../components/Order/PosOrderScreenNumberKeyboard';
-import DialogSavedList from '../../../components/Order/components/dialogSavedList';
-import DialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
-import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
-import PosRetailOrder from '../../../components/Retail/PosRetailOrder';
-import PosRetailCategory from '../../../components/Retail/PosRetailCategory';
-import PosOrderScreenButtonGroup from '../../../components/Order/PosOrderScreenButtonGroup';
-import PosOrderScreenScrollWindow from '../../../components/Order/PosOrderScreenScrollWindow';
+import PosOrderScreenNumberKeyboard from '../../components/Order/PosOrderScreenNumberKeyboard';
+import DialogSavedList from '../../components/Order/components/dialogSavedList';
+import DialogChangeValue from '../../components/pos-shared-components/dialogChangeValue';
+import DialogProductLookup from '../../components/Order/components/dialogProductLookup';
+import PosRetailOrder from '../../components/Retail/PosRetailOrder';
+import PosRetailCategory from '../../components/Retail/PosRetailCategory';
+import PosOrderScreenButtonGroup from '../../components/Order/PosOrderScreenButtonGroup';
+import PosOrderScreenScrollWindow from '../../components/Order/PosOrderScreenScrollWindow';
 
 export default {
   name: 'PosOrderRetail',

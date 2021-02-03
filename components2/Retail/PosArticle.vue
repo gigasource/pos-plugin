@@ -38,15 +38,16 @@
   </div>
 </template>
 <script>
-import PosFunctionSortComponent from '../../../components/Article/PosFunctionSortComponent';
-import PosFunctionToolbar from '../../../components/Article/PosFunctionToolbar';
-import PosColorSelector from '../../../components/Article/PosColorSelector';
-import PosArticleProductInfo from '../../../components/Article/PosArticleProductInfo';
-import PosArticleProductCategoryMenu from '../../../components/Article/PosArticleProductCategoryMenu';
-import PosArticleScrollWindow from '../../../components/Article/PosArticleScrollWindow';
-import PosArticleLayoutOverlay from '../../../components/Article/PosArticleLayoutOverlay';
-import PosArticleNumpad from '../../../components/Article/PosArticleNumpad';
-import PosArticleFunctionButton from '../../../components/Article/PosArticleFunctionButton';
+
+import PosFunctionSortComponent from '../../components/Article/PosFunctionSortComponent';
+import PosFunctionToolbar from '../../components/Article/PosFunctionToolbar';
+import PosColorSelector from '../../components/Article/PosColorSelector';
+import PosArticleProductInfo from '../../components/Article/PosArticleProductInfo';
+import PosArticleProductCategoryMenu from '../../components/Article/PosArticleProductCategoryMenu';
+import PosArticleScrollWindow from '../../components/Article/PosArticleScrollWindow';
+import PosArticleLayoutOverlay from '../../components/Article/PosArticleLayoutOverlay';
+import PosArticleNumpad from '../../components/Article/PosArticleNumpad';
+import PosArticleFunctionButton from '../../components/Article/PosArticleFunctionButton';
 
 export default {
   name: 'PosArticle',
