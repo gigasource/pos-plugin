@@ -16,10 +16,16 @@
 </template>
 
 <script>
+  import { activeCategory, switchProductOrder } from '../pos-article-logic';
+
   export default {
     name: 'PosFunctionSortComponent',
-    injectService: ['SettingsStore:(switchProductOrder, activeCategory)'],
-    components: { }
+    setup() {
+      return {
+        activeCategory,
+        switchProductOrder
+      }
+    }
   }
 </script>
 

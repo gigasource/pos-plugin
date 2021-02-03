@@ -1,73 +1,120 @@
-<template>
-  <div class="pra">
-    <div class="pra__left">
-      <pos-article-product-info class="pra__left__product-info"/>
-      <!--color selector-->
-      <p class="pra__left__color-title"
-         style="font-family: Muli; font-size: 13px; font-weight: normal; line-height: 16px; color: #1D1D26">
-        Color
-      </p>
-      <pos-color-selector class="pra__left__color-content"/>
-      <!-- function sort -->
-      <p class="pra__left__sorting-title"
-         style="font-family: Muli; font-size: 13px; font-weight: normal; line-height: 16px; color: #1D1D26">
-        Sorting
-      </p>
-      <pos-function-sort-component class="pra__left__sorting-content"/>
-      <pos-function-toolbar class="pra__left__button-control"/>
-      <pos-article-layout-overlay class="pra__left__layout-left-overlay"/>
-    </div>
-    <div class="pra__right">
-      <pos-article-product-category-menu class="pra__right__menu"/>
-      <div class="pra__right__menu__overlay"></div>
-      <pos-article-scroll-window class="pra__right__main">
-        <div class="pra__right__main__window"></div>
-        <div class="pra__right__main__delimiter"></div>
-      </pos-article-scroll-window>
-      <div class="pra__right__main__overlay"></div>
-      <div class="pra__right__controller">
-        <pos-article-numpad class="pra__right__controller__keyboard"/>
-        <pos-article-function-button class="pra__right__controller__buttons">
-          <div class="pra__right__controller__buttons__big-btn"></div>
-        </pos-article-function-button>
-        <div class="pra__right__controller__buttons__overlay"></div>
-        <div class="pra__right__controller__overlay"></div>
-      </div>
-      <div class="pra__right__overlay"></div>
-    </div>
-  </div>
-</template>
 <script>
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { genScopeId } from '../utils';
+import { articleSelectedProductButton } from './pos-article-logic'
 
-import PosFunctionSortComponent from '../../components/Article/PosFunctionSortComponent';
-import PosFunctionToolbar from '../../components/Article/PosFunctionToolbar';
-import PosColorSelector from '../../components/Article/PosColorSelector';
-import PosArticleProductInfo from '../../components/Article/PosArticleProductInfo';
-import PosArticleProductCategoryMenu from '../../components/Article/PosArticleProductCategoryMenu';
-import PosArticleScrollWindow from '../../components/Article/PosArticleScrollWindow';
-import PosArticleLayoutOverlay from '../../components/Article/PosArticleLayoutOverlay';
-import PosArticleNumpad from '../../components/Article/PosArticleNumpad';
-import PosArticleFunctionButton from '../../components/Article/PosArticleFunctionButton';
+import PosFunctionSortComponent from './Article/PosFunctionSortComponent';
+import PosColorSelector from './Article/PosColorSelector';
+import PosArticleProductInfo from './Article/PosArticleProductInfo';
+import PosArticleProductCategoryMenu from './Article/PosArticleProductCategoryMenu';
+import PosArticleScrollWindow from './Article/PosArticleScrollWindow';
+import PosArticleNumpad from './Article/PosArticleNumpad';
+import PosArticleFunctionButton from './Article/PosArticleFunctionButton';
 
 export default {
   name: 'PosArticle',
-  props: {},
   components: {
     PosFunctionSortComponent,
-    PosFunctionToolbar,
     PosColorSelector,
     PosArticleNumpad,
     PosArticleFunctionButton,
     PosArticleProductInfo,
     PosArticleProductCategoryMenu,
     PosArticleScrollWindow,
-    PosArticleLayoutOverlay
   },
-  data: function () {
-    return {}
-  },
-  computed: {},
-  methods: {}
+  setup() {
+    const { t } = useI18n()
+
+    const router = useRouter()
+    function goBack() {
+      router.go(-1)
+    }
+
+    function renderProductInfo() {
+      return (
+          <pos-article-product-info class="pra__left__product-info"></pos-article-product-info>
+      )
+    }
+    function renderColorSelector() {
+      return <>
+        <p class="pra__left__color-title pra__left__prop">Color</p>
+        <pos-color-selector class="pra__left__color-content"></pos-color-selector>
+      </>
+    }
+    function renderFunctionSort() {
+      return <>
+        <p class="pra__left__sorting-title pra__left__prop">Sorting</p>
+        <pos-function-sort-component class="pra__left__sorting-content"></pos-function-sort-component>
+      </>
+    }
+    function renderToolbar() {
+      return (
+          <g-toolbar color="#eee" elevation="0" fill-height class="pra__left__button-control">
+            <g-btn uppercase={false} background-color="white" class="mr-3" style="margin-left: -4px" onClick={goBack}>
+              <g-icon class="mr-2" svg>
+                icon-back
+              </g-icon>
+
+              {t('ui.back')}
+            </g-btn>
+          </g-toolbar>
+      )
+    }
+    function renderProductOverlay() {
+      if (articleSelectedProductButton.value)
+        return
+
+      return (
+        <div class="pra__left__layout-left-overlay" style="z-index: 99; background-color: rgba(255, 255, 255, 1); width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <g-icon svg size="62" style="margin-bottom: 10px;">icon-info-green</g-icon>
+            <p>Please select a button to configure</p>
+          </div>
+        </div>
+      )
+    }
+    function renderLeft() {
+      return (
+          <div class="pra__left">
+            { renderProductInfo() }
+            { renderColorSelector() }
+            { renderFunctionSort() }
+            { renderToolbar() }
+            { renderProductOverlay() }
+          </div>
+      )
+    }
+    function renderRight() {
+      return (
+          <div class="pra__right">
+            <pos-article-product-category-menu class="pra__right__menu"></pos-article-product-category-menu>
+            <div class="pra__right__menu__overlay"></div>
+            <pos-article-scroll-window class="pra__right__main">
+              <div class="pra__right__main__window"></div>
+              <div class="pra__right__main__delimiter"></div>
+            </pos-article-scroll-window>
+            <div class="pra__right__main__overlay"></div>
+            <div class="pra__right__controller">
+              <pos-article-numpad class="pra__right__controller__keyboard"></pos-article-numpad>
+              <pos-article-function-button class="pra__right__controller__buttons">
+                <div class="pra__right__controller__buttons__big-btn"></div>
+              </pos-article-function-button>
+              <div class="pra__right__controller__buttons__overlay"></div>
+              <div class="pra__right__controller__overlay"></div>
+            </div>
+            <div class="pra__right__overlay"></div>
+          </div>
+      )
+    }
+
+    return genScopeId(() => (
+        <div class="pra">
+          { renderLeft() }
+          { renderRight() }
+        </div>
+    ))
+  }
 }
 </script>
 <style scoped lang="scss">
@@ -81,6 +128,15 @@ export default {
     display: grid;
     grid-template-columns: 16% 1fr 1fr;
     grid-template-rows: minmax(8%, 1fr) 1fr minmax(18%, 1fr) minmax(170px, 1fr) 1fr 64px;
+
+    &__prop {
+      font-family: Muli;
+      font-size: 13px;
+      font-weight: normal;
+      line-height: 16px;
+      color: #1D1D26
+    }
+
     &__sorting-title {
       grid-area: 4/1/5/2;
     }
@@ -116,15 +172,6 @@ export default {
     }
     &__main {
       grid-area: 2/1/3/2;
-      display: grid;
-      grid-template-columns: 100%;
-      grid-template-rows: 1fr 12px;
-      &__window {
-        grid-area: 1/1/2/2;
-      }
-      &__delimiter {
-        grid-area: 2/1/3/2;
-      }
       &__overlay {
         grid-area: 2/1/3/2;
       }
