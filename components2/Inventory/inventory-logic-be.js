@@ -2,7 +2,8 @@ import { watch } from 'vue'
 import cms from 'cms'
 import {
 	inventories,
-	inventoryCategories
+	inventoryCategories,
+	hooks
 } from './inventory-logic-ui'
 import dayjs from 'dayjs'
 import {ObjectID} from "bson"
@@ -37,11 +38,8 @@ watch(() => currentAppType.value, () => {
 })
 
 export async function loadInventories() {
-	const _inventories = await Inventory.find()
-	inventories.value = _inventories.map(item => ({
-		...item,
-		category: inventoryCategories.value.find(cate => cate._id.toString() === item.category.toString())
-	}))
+	inventories.value = await Inventory.find()
+	hooks.emit('after:loadInventory')
 }
 
 export async function loadInventoryCategories() {

@@ -12,6 +12,7 @@ import {
 	filteredInventoryHistories,
 	historyFilter
 } from '../inventory-ui-shared'
+import {appType, currentAppType} from "../../AppSharedStates";
 const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());
 const moment = require('moment')
@@ -157,3 +158,11 @@ describe("Test inventory logic be", function() {
 		expect(stringify(inventoryCategories.value)).toMatchSnapshot()
 	})
 });
+
+describe("Test inventory logic be for retail", function () {
+	beforeAll(async () => {
+		await cms.initDemoData();
+		cms.triggerFeConnect();
+		currentAppType.value = appType.POS_RETAIL
+	});
+})

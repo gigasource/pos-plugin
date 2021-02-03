@@ -52,6 +52,7 @@ const createEmptyInventory = {
 		category: null,
 		unit: null,
 		stock: null,
+		price: null,
 		unitCostPrice: null,
 		isFavorite: false,
 		isVoucher: false,
