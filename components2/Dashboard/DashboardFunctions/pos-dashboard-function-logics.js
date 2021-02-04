@@ -2,7 +2,7 @@ import { useI18n } from 'vue-i18n';
 
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router';
-import { appHooks, enabledFeatures, user } from '../../AppSharedStates'
+import { appHooks, enabledFeatures, user, appType, currentAppType } from '../../AppSharedStates'
 
 let t, locale
 let router
@@ -98,8 +98,12 @@ export const DashboardFunctionFactory = () => {
 
     return items
   })
+  const shouldRenderButtonFnDivider = computed(() => {
+    return (computedBtnGroup1.value && computedBtnGroup1.value.length
+        && computedBtnGroup2.value && computedBtnGroup2.value.length)
+  })
 
-  return { btnUp, btnDown, computedBtnGroup1, computedBtnGroup2 }
+  return { btnUp, btnDown, computedBtnGroup1, computedBtnGroup2, shouldRenderButtonFnDivider }
 }
 
 
