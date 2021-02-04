@@ -1,7 +1,7 @@
 import { DashboardFunctionFactory } from "../pos-dashboard-function-logics";
 import { nextTick } from "vue";
 import cms from "cms";
-import { appHooks, user } from "../../../AppSharedStates";
+import { appHooks, user, currentAppType, appType} from "../../../AppSharedStates";
 import delay from "delay";
 beforeAll(async () => {
   const orm = require("schemahandler");
@@ -29,6 +29,7 @@ describe("test dashboard functions logics", () => {
       name: "admin",
       role: "admin"
     };
+    currentAppType.value = appType.POS_RESTAURANT
     const {
       btnUp,
       btnDown,
@@ -38,7 +39,7 @@ describe("test dashboard functions logics", () => {
 
     await nextTick();
     await delay(100);
-    expect(btnUp).toMatchInlineSnapshot(`
+    expect(btnUp[currentAppType.value]).toMatchInlineSnapshot(`
       Array [
         Object {
           "click": [Function],
@@ -60,7 +61,7 @@ describe("test dashboard functions logics", () => {
         },
       ]
     `);
-    expect(btnDown).toMatchInlineSnapshot(`
+    expect(btnDown[currentAppType.value]).toMatchInlineSnapshot(`
       Array [
         Object {
           "click": [Function],

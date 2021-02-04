@@ -34,32 +34,49 @@ export const DashboardFunctionFactory = () => {
       dineInMenu, deliveryMenu, inventory, customer
     }
   } = messages.value[locale.value] || messages.value[fallbackLocale.value]
-  const btnUp = [
-    { title: fastCheckout, feature: 'fastCheckout', icon: 'icon-fast-checkout', click: () => changePath('/pos-order') },
-    { title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => changePath('/pos-order-delivery') },
-    { title: 'Tutorial', feature: 'tutorial', icon: 'icon-tutorial', click: () => changePath('/pos-tutorial') },
-  ]
-  const btnDown = [
-    { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
-    { title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
-    { title: dineInMenu, feature: 'editMenuCard', icon: 'icon-menu1', click: () => changePath('/pos-edit-menu-card') },
-    // {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => updateView('DeliveryConfig')},
-    { title: endOfDay, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
-    { title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
-    { title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
-    { title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan', click: () => changePath('/pos-edit-table-plan') },
-    { title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting', click: () => changePath('/pos-printer-setting') },
-    { title: customer, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
-    { title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
-    { title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: openStoreSetting },
-    // {title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support')},
-  ]
+
+  const btnUp = {
+    [appType.POS_RESTAURANT] : [
+      { title: fastCheckout, feature: 'fastCheckout', icon: 'icon-fast-checkout', click: () => changePath('/pos-order') },
+      { title: delivery, feature: 'delivery', icon: 'icon-order-food', click: () => changePath('/pos-order-delivery') },
+      { title: 'Tutorial'/*TODO: i18n*/, feature: 'tutorial', icon: 'icon-tutorial', click: () => changePath('/pos-tutorial') },
+    ],
+    [appType.POS_RETAIL] : [
+      { title: 'Cash Register' /*TODO: i18n*/, icon: 'icon-fast-checkout' /*TODO: update icon*/, click: () => changePath('/pos-order-retail') },
+      { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
+    ]
+  }
+  const btnDown = {
+    [appType.POS_RESTAURANT] : [
+      { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
+      { title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
+      { title: dineInMenu, feature: 'editMenuCard', icon: 'icon-menu1', click: () => changePath('/pos-edit-menu-card') },
+      // {title: deliveryMenu, feature: 'editMenuCard', icon: 'icon-menu2',  click: () => updateView('DeliveryConfig')},
+      { title: endOfDay, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
+      { title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
+      { title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
+      { title: editTablePlan, feature: 'editTablePlan', icon: 'icon-edit-table-plan', click: () => changePath('/pos-edit-table-plan') },
+      { title: printerSettings, feature: 'printerSettings', icon: 'icon-printer-setting', click: () => changePath('/pos-printer-setting') },
+      { title: customer, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
+      { title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
+      { title: onlineOrdering, feature: 'onlineOrdering', icon: 'icon-online-order-menu', click: openStoreSetting },
+      // { title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
+    ],
+    [appType.POS_RETAIL] : [
+      { title: staffReport, feature: 'staffReport', icon: 'icon-staff-report', click: () => changePath('/pos-staff-report') },
+      { title: settings, feature: 'settings', icon: 'icon-dashboard', click: () => changePath('/pos-settings') },
+      { title: endOfDay, feature: 'eodReport', icon: 'icon-calendar', click: () => changePath('/pos-eod-report') },
+      { title: support, icon: 'icon-support-2',  click: () => changePath('/pos-support') },
+      { title: monthlyReport, feature: 'monthlyReport', icon: 'icon-month_report', click: () => changePath('/pos-month-report') },
+      { title: inventory, feature: 'manageInventory', icon: 'icon-inventory', click: () => changePath('/pos-inventory') },
+      { title: 'Product Setting' /*TODO: i18n*/, icon: 'icon-inventory' /*TODO: update icon*/, click: () => changePath('/pos-product-setting') },
+      { title: customer, feature: 'customerInfo', icon: 'icon-customer-info', click: () => changePath('/pos-customer') },
+    ]
+  }
 
   const computedBtnGroup1 = computed(() => {
     if (!enabledFeatures.value || !enabledFeatures.value.length) return []
-
-
-    return btnUp.filter(item => {
+    return btnUp[currentAppType.value].filter(item => {
       if (!item.feature) return true
       if (item.feature === 'tutorial') {
         return !!(posSetting.value && posSetting.value.showTutorial)
@@ -70,7 +87,7 @@ export const DashboardFunctionFactory = () => {
   const computedBtnGroup2 = computed(() => {
     if (!enabledFeatures.value || !enabledFeatures.value.length) return []
     //todo: check this logic
-    const items = btnDown.filter(item => {
+    const items = btnDown[currentAppType.value].filter(item => {
       if (!user.value) return false
       if (!item.feature) return true
       if (user.value.role === 'admin')
