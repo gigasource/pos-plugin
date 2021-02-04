@@ -22,69 +22,61 @@
 </template>
 
 <script>
-
+import { categories, selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
+import { genScopeId } from '../../utils';
 
 export default {
   name: "PosRetailCategory",
-  props: {
-
-  },
-  data() {
-    return {
-      categories: [
-        { _id: 1, name: 'Favorite', icon: 'star', iconColor: '#FFCB3A' },
-        { _id: 2, name: 'Sport',
-          items: [
-            { _id: 20, name: 'Football' },
-            { _id: 21, name: 'Baseball' },
-            { _id: 22, name: 'Basketball' },
-          ]
-        },
-        { _id: 3, name: 'Food',
-          items: [
-            { _id: 30, name: 'Burger' },
-            { _id: 31, name: 'Rice' },
-            { _id: 32, name: 'Noodle' },
-          ] },
-        { _id: 4, name: 'Drink',
-          items: [
-            { _id: 40, name: 'Alcohol' },
-            { _id: 41, name: 'Non-alcoholic' },
-          ] },
-        { _id: 5, name: 'Gift' },
-        { _id: 6, name: 'Motobike',
-          items: [
-            { _id: 60, name: 'Standard' },
-            { _id: 61, name: 'Cruiser' },
-            { _id: 62, name: 'Sport' },
-            { _id: 63, name: 'Scooter' },
-          ] },
-        { _id: 7, name: 'Clothes',
-          items: [
-            { _id: 70, name: 'Shirt' },
-            { _id: 71, name: 'Dress' },
-            { _id: 72, name: 'Jeans' },
-            { _id: 73, name: 'Trousers' },
-          ]
-        },
-      ],
-      selectedCategory: null,
+  setup() {
+    function getSubCategoryClass(item) {
+      return [
+          'category-group__item',
+          selectedCategory.value && selectedCategory.value._id === item._id && 'category-group__item--selected'
+      ]
     }
-  },
-  computed: {
-
-  },
-  methods: {
-    showingCategory(category) {
-      if(!this.selectedCategory) return false
-      return category.items && category.items.length > 0 && (this.selectedCategory._id === category._id || this.selectedCategory.parentId === category._id)
-    },
-    selectCategory(item, parent) {
-      this.selectedCategory = item
-      if(parent) {
-        this.selectedCategory.parentId = parent._id
-      }
+    function renderSubCategory(category) {
+      // Known issue: even showCategory return false, g-expand doesn't collapse
+      // Work-around: move showSubCategory to outside g-expand-transition
+      // Side effect: no transition will be apply
+      return showSubCategory(category) && (
+          <g-expand-transition>
+            { genScopeId(() => (
+                  <div>
+                    { category.subCategory.map((item, i) =>
+                        <div key={i} class={getSubCategoryClass(item)}
+                             onClick={() => selectCategory(item, category)}>
+                          <g-icon size="12" class="mr-2">radio_button_unchecked</g-icon>
+                          <div>{item.name}</div>
+                        </div>
+                    )}
+                  </div>
+              ))()
+            }
+          </g-expand-transition>
+      )
     }
+    function getCategoryClass(category) {
+      return [
+        'm-elevation-1',
+        'category-group__header',
+        selectedCategory.value && selectedCategory.value._id === category._id && 'category-group__header--selected'
+      ]
+    }
+    return genScopeId(() => (
+        <div class="category">
+          {
+            categories.value.map((category, iGroup) =>
+              <div key={`cate_${iGroup}`} class="category-group">
+                <div class={getCategoryClass(category)}
+                     onClick={() => selectCategory(category)}>
+                  { category.name }
+                  { category.icon && <g-icon class="ml-1" size="14" color={category.iconColor}>{category.icon}</g-icon> }
+                </div>
+                { renderSubCategory(category) }
+              </div>
+          )}
+        </div>
+    ))
   }
 }
 </script>
