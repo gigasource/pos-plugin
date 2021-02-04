@@ -13,14 +13,14 @@
   </div>
 </template>
 <script>
-import PosOrderScreenNumberKeyboard from '../../components/Order/PosOrderScreenNumberKeyboard';
 import DialogSavedList from '../../components/Order/components/dialogSavedList';
-import DialogChangeValue from '../../components/pos-shared-components/dialogChangeValue';
 import DialogProductLookup from '../../components/Order/components/dialogProductLookup';
-import PosRetailOrder from '../../components/Retail/PosRetailOrder';
-import PosRetailCategory from '../../components/Retail/PosRetailCategory';
-import PosOrderScreenButtonGroup from '../../components/Order/PosOrderScreenButtonGroup';
-import PosOrderScreenScrollWindow from '../../components/Order/PosOrderScreenScrollWindow';
+import DialogChangeValue from '../../components/pos-shared-components/dialogChangeValue';
+import PosOrderScreenNumberKeyboard from './Order/PosOrderScreenNumberKeyboard';
+import PosOrderScreenButtonGroup from './Order/PosOrderScreenButtonGroup';
+import PosOrderScreenScrollWindow from './Order/PosOrderScreenScrollWindow';
+import PosRetailOrder from './Order/PosRetailOrder';
+import PosRetailCategory from './Order/PosRetailCategory';
 
 export default {
   name: 'PosOrderRetail',
