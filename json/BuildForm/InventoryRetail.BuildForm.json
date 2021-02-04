@@ -1,0 +1,1311 @@
+{
+  "_id": "601a147ae3771508f08efbd8",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f9aae12d5785b926d42178b",
+      "schemaType": "string",
+      "key": "id",
+      "type": "input",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5f8d153c0565d380841ed51c",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5f8d153c0565d380841ed51b",
+      "schemaType": "number",
+      "key": "stock",
+      "type": "input@number",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5fa37d8c2d8ff0368b61a7e4",
+      "schemaType": "string",
+      "key": "category",
+      "type": "input",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5f8d153c0565d380841ed51a",
+      "schemaType": "number",
+      "key": "lowStockThreshold",
+      "type": "input@number",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5f8d153c0565d380841ed518",
+      "schemaType": "string",
+      "key": "unit",
+      "type": "input",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "_id": "5f8d49ea534d360923550bf7",
+      "schemaType": "date",
+      "key": "lastUpdateTimestamp",
+      "type": "input@date",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "schemaType": "number",
+      "key": "price",
+      "default": null,
+      "unique": null,
+      "type": "input@number",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "number",
+      "key": "unitCostPrice",
+      "default": null,
+      "unique": null,
+      "type": "input@number",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "number",
+      "key": "tax",
+      "default": null,
+      "unique": null,
+      "type": "input@number",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "mixed",
+      "key": "barcode",
+      "default": null,
+      "mixed": null,
+      "unique": null,
+      "type": "input@select",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null,
+      "returnObject": null,
+      "itemText": null,
+      "itemValue": null,
+      "chips": null,
+      "normalize": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "isFavorite",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "isVoucher",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "isActive",
+      "default": null,
+      "unique": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "isRefundable",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "showOnOrderScreen",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "manualPrice",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "boolean",
+      "key": "hasComboIngridient",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "array",
+      "key": "Attributes",
+      "default": null,
+      "unique": null,
+      "type": "array",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "schemaType": "array",
+      "key": "comboIngredient",
+      "default": null,
+      "unique": null,
+      "type": "array",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    }
+  ],
+  "name": "InventoryRetail",
+  "tabs": [],
+  "type": "Collection",
+  "alwaysLoad": null,
+  "class": null,
+  "title": null
+}

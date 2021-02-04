@@ -1,6 +1,37 @@
 import { ref, computed, watchEffect, watch } from 'vue'
+import {appType, currentAppType} from "../AppSharedStates";
 export const inventories = ref([])
 export const inventoryCategories = ref([])
+export const hooks = new (require('schemahandler/hooks/hooks'))();
+
+//<editor-fold desc="Handle hook">
+/**
+ * Manage combo
+ */
+hooks.on('after:loadInventory', () => {
+  inventories.value = inventories.value.map(inventory => {
+    inventory.category =
+      inventoryCategories.value.find(cate => cate && cate._id && cate._id.toString() === inventory.category.toString())
+    || inventoryCategories.value.reduce((subCate, cate) => {
+         if (cate.subCategory) {
+           subCate.push(...cate.subCategory)
+         }
+       }, []).find(subCate => subCate._id.toString() === inventory.category.toString())
+    /**
+     * Convert combo/ingredient from inventory's objectId
+     * to an instance of inventory item
+     */
+    if (currentAppType.value === appType.POS_RETAIL) {
+      inventory.comboIngredient = inventory.comboIngredient.map(item => {
+        return inventories.value.find(inventory => {
+          return inventory._id.toString() === item._id.toString()
+        })
+      })
+    }
+    return inventory
+  })
+})
+//</editor-fold>
 
 /**
  * If category.available is true, then this category can be deleted

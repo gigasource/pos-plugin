@@ -1,5 +1,5 @@
 import {useI18n} from 'vue-i18n'
-import {$filters} from '../AppSharedStates'
+import {$filters, appType, currentAppType} from '../AppSharedStates'
 import {useRouter} from 'vue-router'
 import {
 	checkBoxSelectedInventoryIDs,
@@ -40,28 +40,85 @@ export function renderMainInventoryTable(props, { emit }) {
 	}
 
 	const { t } = useI18n()
+
+	const renderInventory = {
+		[appType.POS_RESTAURANT]: (inventory, i) => {
+			return (
+				<tr key={i}>
+					<td>
+						<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
+					</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.category.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
+					<td onClick={() => openDialogStock(inventory)}>
+						<div className="row-flex justify-between">
+							{$filters.formatCurrency(inventory.stock)}
+							<g-icon size="18" color="#757575">edit</g-icon>
+						</div>
+					</td>
+				</tr>
+			)
+		}
+	}
+
+	const renderTableTitle = {
+		[appType.POS_RESTAURANT]: () => {
+			return (
+				<thead>
+				<tr>
+					<th></th>
+					<th>ID</th>
+					<th>
+						{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>{t('inventory.lastUpdate')}</th>
+					<th>
+						{t('article.category')}
+						<g-icon size="12">
+							mdi-magnify
+						</g-icon>
+					</th>
+					<th>{t('inventory.unit')}</th>
+					<th>{t('inventory.stock')}</th>
+				</tr>
+				</thead>
+			)
+		},
+		[appType.POS_RETAIL]: () => {
+			return (
+				<thead>
+				<tr>
+					<th></th>
+					<th>Product ID</th>
+					<th>
+						{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>
+						{t('inventory.price')}
+						<g-icon size="12">mdi-filter</g-icon>
+					</th>
+					<th>
+						{t('article.category')}
+						<g-icon size="12">
+							mdi-magnify
+						</g-icon>
+					</th>
+					<th>{t('inventory.unitPrice')}</th>
+					<th>{t('inventory.stock')}</th>
+				</tr>
+				</thead>
+			)
+		}
+	}
+
 	const renderMainTable = () => (
 			<g-simple-table striped fixed-header style="flex: 1">
 				{genScopeId(() => (
 				    <>
-    					<thead>
-    					<tr>
-    						<th></th>
-    						<th>ID</th>
-    						<th>
-    							{t('article.name')}<g-icon size="12">mdi-filter</g-icon>
-    						</th>
-    						<th>{t('inventory.lastUpdate')}</th>
-    						<th>
-    							{t('article.category')}
-    							<g-icon size="12">
-    								mdi-magnify
-    							</g-icon>
-    						</th>
-    						<th>{t('inventory.unit')}</th>
-    						<th>{t('inventory.stock')}</th>
-    					</tr>
-    					</thead>
+							{renderTableTitle[currentAppType.value]()}
     					<tr>
     						<td class="bg-grey-lighten-1">
     							{
@@ -93,22 +150,7 @@ export function renderMainInventoryTable(props, { emit }) {
     						</td>
     					</tr>
     					{filteredInventory.value.map((inventory, i) =>
-    							<tr key={i}>
-    								<td>
-    									<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
-    								</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.name}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.category.name}</td>
-    								<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
-    								<td onClick={() => openDialogStock(inventory)}>
-    									<div class="row-flex justify-between">
-    										{$filters.formatCurrency(inventory.stock)}
-    										<g-icon size="18" color="#757575">edit</g-icon>
-    									</div>
-    								</td>
-    							</tr>
+								{renderInventory[currentAppType.value](inventory, i)}
     					)}
     				</>
 				))()}

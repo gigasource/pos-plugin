@@ -1,0 +1,183 @@
+{
+  "_id": "601a191be3771508f08efbd9",
+  "extensions": [],
+  "fields": [
+    {
+      "_id": "5f8d14860565d380841ed4fc",
+      "schemaType": "string",
+      "key": "name",
+      "type": "input",
+      "virtual": {
+        "form": {}
+      },
+      "string": {
+        "form": {
+          "input": {
+            "isVisible": {},
+            "onChange": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "number": {
+        "form": {
+          "input@number": {
+            "isVisible": {}
+          },
+          "input@select:number": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "onChange": {},
+            "itemText": {},
+            "itemValue": {}
+          }
+        }
+      },
+      "boolean": {
+        "form": {
+          "input@switch": {
+            "isVisible": {}
+          },
+          "input@checkbox": {
+            "isVisible": {}
+          }
+        }
+      },
+      "objectId": {
+        "form": {
+          "ref-select": {
+            "isVisible": {}
+          }
+        }
+      },
+      "date": {
+        "form": {
+          "input@date": {
+            "isVisible": {}
+          },
+          "input@datetime-local": {
+            "isVisible": {}
+          }
+        }
+      },
+      "object": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          }
+        }
+      },
+      "mixed": {
+        "form": {
+          "choice": {
+            "isVisible": {}
+          },
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "object": {
+            "isVisible": {}
+          },
+          "object@dynamic": {
+            "dynamicFields": {
+              "code": {}
+            },
+            "isVisible": {}
+          },
+          "tree": {
+            "getText": {}
+          },
+          "input@select": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      },
+      "array": {
+        "form": {
+          "array": {
+            "isVisible": {}
+          },
+          "tableArray": {
+            "expansion": [],
+            "isVisible": {}
+          },
+          "choiceArray": {
+            "isVisible": {}
+          },
+          "input@multiSelect": {
+            "options": {
+              "textValue": [],
+              "onlyValue": [],
+              "code": {}
+            },
+            "isVisible": {},
+            "itemText": {},
+            "itemValue": {},
+            "normalize": {}
+          }
+        }
+      }
+    },
+    {
+      "schemaType": "array",
+      "key": "subCategory",
+      "default": null,
+      "unique": null
+    }
+  ],
+  "name": "InventoryRetailCategory",
+  "tabs": [],
+  "type": "Collection",
+  "alwaysLoad": null,
+  "class": null,
+  "title": null
+}
