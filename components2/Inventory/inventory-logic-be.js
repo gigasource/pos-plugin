@@ -151,3 +151,15 @@ export async function updateInventoryCategories(newInventoryCategory) {
 	}
 	inventoryCategories.value = newInventoryCategory
 }
+
+export async function removeFromInventory(removedInventoryItems) {
+	removedInventoryItems = hooks.emit('before:removeFromInventory', removedInventoryItems).value
+	// There are some items out of stock
+	if (removedInventoryItems.find(item => item.outOfStock))
+		return removedInventoryItems
+	for (let removedItem of removedInventoryItems) {
+		const inventory = inventories.value.find(inventory => inventory._id.toString() === removedItem._id.toString())
+		inventory.stock -= removedItem.quantity
+		await updateInventory(inventory)
+	}
+}
