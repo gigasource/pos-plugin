@@ -1,4 +1,5 @@
 import { ref, computed, watchEffect, watch } from 'vue'
+import _ from 'lodash'
 import {appType, currentAppType} from "../AppSharedStates";
 export const inventories = ref([])
 export const inventoryCategories = ref([])
@@ -16,6 +17,7 @@ hooks.on('after:loadInventory', () => {
          if (cate.subCategory) {
            subCate.push(...cate.subCategory)
          }
+         return subCate
        }, []).find(subCate => subCate._id.toString() === inventory.category.toString())
     /**
      * Convert combo/ingredient from inventory's objectId
@@ -23,14 +25,54 @@ hooks.on('after:loadInventory', () => {
      */
     if (currentAppType.value === appType.POS_RETAIL) {
       inventory.comboIngredient = inventory.comboIngredient.map(item => {
-        return inventories.value.find(inventory => {
+        const { _id, name, unitCostPrice, price } = inventories.value.find(inventory => {
           return inventory._id.toString() === item._id.toString()
         })
+        return {
+          _id, name, unitCostPrice, price,
+          quantity: item.quantity
+        }
       })
     }
     return inventory
   })
 })
+/**
+ * Check before update item
+ * -  Control number of item and never let them negative
+ * -  Inventories must be an array and items in inventories must include _id and quantity
+ * -  If inventory item is combo, get the sum of the item in that combo to calculate final change
+ */
+hooks.on('before:removeFromInventory', function (removedInventoryItems) {
+  const groupItems = _.groupBy(
+    removedInventoryItems.reduce((result, item) => {
+      const inventory = inventories.value.find(inventory => inventory._id.toString() === item._id.toString())
+      if (inventory.hasComboIngredient) {
+        result.push(...inventory.comboIngredient.map(comboItem => {
+          return {
+            _id: comboItem._id,
+            quantity: comboItem.quantity * item.quantity
+          }
+        }))
+      }
+      result.push(item)
+      return result
+    }, []),
+    item => item._id
+  )
+  removedInventoryItems = []
+  Object.keys(groupItems).forEach(itemId => {
+    const inventory = inventories.value.find(inventory => inventory._id.toString() === itemId.toString())
+    const totalQuantity = _.sumBy(groupItems[itemId], item => item.quantity)
+    removedInventoryItems.push({
+      _id: itemId,
+      quantity: totalQuantity,
+      outOfStock: inventory.stock < totalQuantity
+    })
+  })
+  return this.value = removedInventoryItems
+})
+
 //</editor-fold>
 
 /**

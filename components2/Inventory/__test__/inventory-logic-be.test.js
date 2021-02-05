@@ -4,8 +4,8 @@ import {
 	loadInventories,
 	loadInventoryCategories,
 	updateInventory,
-	createInventory, deleteInventory, updateInventoryCategories
-} from "../inventory-logic-be";
+	createInventory, deleteInventory, updateInventoryCategories, removeFromInventory
+} from '../inventory-logic-be';
 import _ from 'lodash'
 import { inventories, inventoryCategories } from "../inventory-logic-ui";
 import {
@@ -17,14 +17,15 @@ const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());
 const moment = require('moment')
 const {
-  prepareInventoryDb
+  prepareInventoryDb,
+	prepareInventoryRetailDb
 } = require("../../../backend/inventory/inventory.prepare.test");
 const delay = require('delay')
 
 jest.mock("cms", () => {
   process.env.USE_GLOBAL_ORM = true;
   const { cmsFactory } = require("../../../test-utils");
-  const _cms = cmsFactory("eodDom");
+  const _cms = cmsFactory("inventoryBe");
   global.cms = _cms;
   return {
     socket: _cms.feSocket,
@@ -159,10 +160,68 @@ describe("Test inventory logic be", function() {
 	})
 });
 
+/**
+ * @desc db test is:
+ * [
+		 {name: 'Fish', category: foodCategory._id, unit: 'kg', stock: 30, id: '1', lastUpdateTimestamp: genDate(), price: 30, unitCostPrice: 10, isFavorite: false, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: true, manualPrice: false, hasComboIngredient: false, attributes: [], comboIngredient: []},
+		 {name: 'Meat', category: foodCategory._id, unit: 'kg', stock: 50, id: '2', lastUpdateTimestamp: genDate(), price: 20, unitCostPrice: 15, isFavorite: true, isVoucher: false, isActive: true, isRefundable: true, showOnOrderScreen: true, manualPrice: true, hasComboIngredient: false, attributes: [], comboIngredient: []},
+		 {name: 'Pork', category: foodCategory._id, unit: 'kg', stock: 60.22, id: '3', lastUpdateTimestamp: genDate(), price: 55, unitCostPrice: 30, isFavorite: true, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: true, manualPrice: false, hasComboIngredient: false, attributes: [], comboIngredient: []},
+		 {name: 'Apple', category: fruitCategory._id, unit: 'piece', stock: 100, id: '4', lastUpdateTimestamp: genDate(), price: 100, unitCostPrice: 50, isFavorite: true, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: false, manualPrice: false, hasComboIngredient: false, attributes: [{color: 'red'}], comboIngredient: []},
+		 {name: 'Banana', category: fruitCategory._id, unit: 'piece', stock: 10, id: '5', lastUpdateTimestamp: genDate(), price: 17, unitCostPrice: 4, isFavorite: true, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: true, manualPrice: false, hasComboIngredient: false, attributes: [{size: 'big'}], comboIngredient: []},
+		 {name: 'Vodka', category: drinkCategory.subCategory[0]._id, unit: 'l', stock: 5.5, id: '6', lastUpdateTimestamp: genDate(), price: 44, unitCostPrice: 22, isFavorite: true, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: true, manualPrice: false, hasComboIngredient: false, attributes: [], comboIngredient: []},
+     {name: 'ComboFishMeat', category: foodCategory._id, unit: 'piece', stock: 1, id: '7', lastUpdateTimestamp: genDate(), price: 55, unitCostPrice: inventories[0].unitCostPrice * 20 + inventories[1].unitCostPrice, isFavorite: true, isVoucher: false, isActive: true, isRefundable: false, showOnOrderScreen: true, manualPrice: false, hasComboIngredient: true, attributes: [], comboIngredient: [{ _id: inventories[0]._id, quantity: 20 },  { _id: inventories[1]._id, quantity: 1 }]}
+ ]
+ */
 describe("Test inventory logic be for retail", function () {
 	beforeAll(async () => {
 		await cms.initDemoData();
 		cms.triggerFeConnect();
 		currentAppType.value = appType.POS_RETAIL
 	});
+
+	beforeEach(async () => {
+		await prepareInventoryRetailDb(orm)
+		await loadInventoryCategories()
+		await loadInventories()
+	})
+
+	it("Case 1: Check load inventories", async () => {
+		await nextTick()
+		expect(stringify(inventories.value)).toMatchSnapshot();
+		expect(stringify(inventoryCategories.value)).toMatchSnapshot();
+	});
+
+	it('Case 2: Test remove item from category', async () => {
+		await nextTick()
+		await removeFromInventory([
+			{
+				_id: inventories.value[0]._id,
+				quantity: 5
+			},
+			{
+				_id: inventories.value[6]._id,
+				quantity: 1
+			}
+		])
+		await nextTick()
+		await delay(50)
+		expect(stringify(inventories.value)).toMatchSnapshot();
+	})
+
+	it('Case 2a: Test remove item from inventory fail', async () => {
+		await nextTick()
+		const result = await removeFromInventory([
+			{
+				_id: inventories.value[0]._id,
+				quantity: 11
+			},
+			{
+				_id: inventories.value[6]._id,
+				quantity: 2
+			}
+		])
+		await nextTick()
+		await delay(50)
+		expect(stringify(result)).toMatchSnapshot()
+	})
 })
