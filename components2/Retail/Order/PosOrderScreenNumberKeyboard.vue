@@ -14,12 +14,13 @@
 
 <script>
   import { nextTick } from 'vue';
+  import { genScopeId } from '../../utils';
 
   export default {
     name: 'PosOrderScreenNumberKeyboard',
     injectService: ['OrderStore:(productIdQuery,queryProductsById,productIdQueryResults,addProductToOrder)'],
-    data() {
-      return {
+    setup() {
+      const numpad_1 = {
         numpad_1: [
           {
             content: ['7'],
@@ -97,9 +98,9 @@
           { img: 'delivery/key_enter', classes: 'key-number white', type: 'enter', action: () => null, style: 'grid-area: Enter; border: 1px solid #979797' }
         ]
       }
-    },
-    methods: {
-      async openDialogProductSearchResults() {
+
+      async function openDialogProductSearchResults() {
+        // TODO: this
         if (this.productIdQuery.trim()) {
           await this.queryProductsById()
           if (this.productIdQueryResults.length === 1) {
@@ -108,12 +109,32 @@
               this.addProductToOrder(onlyResult)
               return
             }
-            nextTick(() => {
+            await nextTick(() => {
+              // TODO
               this.$getService('dialogProductSearchResult:setActive')(true)
             })
           }
         }
       }
+
+      // TODO: area
+      return genScopeId(() => (
+          <g-number-keyboard
+              area="keyboard" v-model={productIdQuery}
+              items={numpad_1}
+              onSubmit={openDialogProductSearchResults}
+              v-slots={{
+                screen: () => (
+                  <div class="number-key-show ba-thin bg-grey-lighten-3" style="height: calc(16.6667% - 4px)">
+                    <input id="number_key_output"
+                           class="number-key-text col-12 self-center bg-transparent fs-large-2 fw-700 pl-2"
+                           style="border: none; outline: none" v-model={productIdQuery}> </input>
+                  </div>
+                )
+              }}>
+          </g-number-keyboard>
+      ))
+
     }
   }
 </script>
