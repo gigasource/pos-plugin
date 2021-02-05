@@ -90,7 +90,7 @@ watchEffect(() => {
           return inventory.category._id.toString() === subCategory._id.toString()
         })
         subCategory.available = !inventoryWithCategory
-        category.available ||= subCategory.available
+        category.available &&= subCategory.available
       })
     }
   })
