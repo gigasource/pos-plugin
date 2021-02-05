@@ -1,68 +1,69 @@
-<template>
-  <div class="info">
-    <g-avatar size="40">
-      <g-img :src="srcImg"></g-img>
-    </g-avatar>
-    <div style="margin-left: 8px; line-height: 1.2; font-weight: 600">
-      <p class="username">{{userName}}</p>
-      <p class="dateTime">{{dateTime}}</p>
-    </div>
-    <g-spacer/>
-    <g-btn-bs class="elevation-2" @click="back">
-      <g-icon>icon-back</g-icon>
-    </g-btn-bs>
-    <g-badge overlay color="#FF4452" v-if="savedOrders && savedOrders.length > 0">
-      <template v-slot:badge>
-        <span>{{savedOrders.length}}</span>
-      </template>
-      <g-btn-bs class="elevation-2" @click="openDialogSavedList">
-        <g-icon>icon-folder</g-icon>
-      </g-btn-bs>
-    </g-badge>
-    <g-btn-bs v-else  class="elevation-2" @click="openDialogSavedList">
-      <g-icon>icon-folder</g-icon>
-    </g-btn-bs>
-  </div>
-</template>
-
 <script>
+import { ref, onBeforeUnmount, computed } from 'vue'
+import { genScopeId } from '../../utils';
+import { username , avatar } from '../../AppSharedStates';
+import { useRouter } from 'vue-router'
+
 export default {
   name: "PosRetailMobileInfo",
   injectService: ['PosStore:(user, storeLocale)', 'OrderStore:(savedOrders,getSavedOrders)'],
   props: {},
-  data() {
-    return {
-      time: null
-    }
-  },
-  created() {
-    this.time = new Date()
-    this.interval = setInterval(() => {
-      this.time = new Date()
+  setup() {
+    // update time
+    const time = ref(null)
+    time.value = new Date()
+    const interval = setInterval(() => {
+      time.value = new Date()
     }, 60000)
-  },
-  beforeDestroy() {
-    clearInterval(this.interval)
-  },
-  computed: {
-    userName() {
-      return this.user ? this.user.name : ''
-    },
-    srcImg() {
-      return this.user ? this.user.avatar : ''
-    },
-    dateTime() {
-      return dayjs(this.time).format('MMM DD, YY • HH:mm')
-    },
-  },
-  methods: {
-    back() {
-      this.$router.push({path: '/pos-dashboard'})
-    },
-    async openDialogSavedList() {
+    onBeforeUnmount(() => {
+      clearInterval(interval)
+    })
+    const dateTime = computed(() => {
+      return dayjs(time.value).format('MMM DD, YY • HH:mm')
+    })
+
+    const router = useRouter()
+    function back() {
+      router.push({path: '/pos-dashboard'})
+    }
+    async function openDialogSavedList() {
       await this.getSavedOrders()
+      // TODO:
       this.$getService('dialogSavedList:setActive')(true)
-    },
+    }
+
+    return genScopeId(() => (
+        <div class="info">
+          <g-avatar size="40">
+            <g-img src={avatar.value}></g-img>
+          </g-avatar>
+          <div style="margin-left: 8px; line-height: 1.2; font-weight: 600">
+            <p class="username">{username.value}</p>
+            <p class="dateTime">{dateTime.value}</p>
+          </div>
+          <g-spacer/>
+          <g-btn-bs class="elevation-2" onClick={back}>
+            <g-icon>icon-back</g-icon>
+          </g-btn-bs>
+          {
+            (savedOrders && savedOrders.length > 0) ?
+                <g-badge overlay color="#FF4452" v-slots={{
+                  default: () => (
+                    <g-btn-bs class="elevation-2" onClick={openDialogSavedList}>
+                      <g-icon>icon-folder</g-icon>
+                    </g-btn-bs>
+                  ),
+                  badge: () => <span>{savedOrders.length}</span>,
+                }}>
+                </g-badge>
+                : (
+                    <g-btn-bs class="elevation-2" onClick={openDialogSavedList}>
+                      <g-icon>icon-folder</g-icon>
+                    </g-btn-bs>
+                )
+          }
+        </div>
+    ))
   }
 }
 </script>

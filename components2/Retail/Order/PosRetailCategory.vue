@@ -1,26 +1,3 @@
-<template>
-  <div class="category">
-    <div v-for="(category, iGroup) in categories" :key="`cate_${iGroup}`"
-         class="category-group">
-      <div :class="['m-elevation-1', 'category-group__header', selectedCategory && selectedCategory._id === category._id && 'category-group__header--selected']"
-           @click="selectCategory(category)">
-        {{category.name}}
-        <g-icon class="ml-1" size="14" v-if="category.icon" :color="category.iconColor">{{category.icon}}</g-icon>
-      </div>
-      <g-expand-transition>
-        <div v-show="showingCategory(category)">
-          <div v-for="(item, iItem) in category.items" :key="iItem"
-               :class="['category-group__item', selectedCategory && selectedCategory._id === item._id && 'category-group__item--selected']"
-               @click="selectCategory(item, category)">
-            <g-icon size="12" class="mr-2">radio_button_unchecked</g-icon>
-            <div>{{item.name}}</div>
-          </div>
-        </div>
-      </g-expand-transition>
-    </div>
-  </div>
-</template>
-
 <script>
 import { categories, selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
 import { genScopeId } from '../../utils';
