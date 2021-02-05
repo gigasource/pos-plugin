@@ -6,8 +6,8 @@ import cms from 'cms';
 export const appHooks = new Hooks()
 
 export const appType = {
-  POS_RESTAURANT: true,
-  POS_RETAIL: false
+  POS_RESTAURANT: 'POS_RESTAURANT',
+  POS_RETAIL: 'POS_RETAIL'
 }
 export const currentAppType = ref(appType.POS_RESTAURANT)
 

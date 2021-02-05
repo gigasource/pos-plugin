@@ -150,7 +150,7 @@ export function renderMainInventoryTable(props, { emit }) {
     						</td>
     					</tr>
     					{filteredInventory.value.map((inventory, i) =>
-								{renderInventory[currentAppType.value](inventory, i)}
+								renderInventory[currentAppType.value](inventory, i)
     					)}
     				</>
 				))()}

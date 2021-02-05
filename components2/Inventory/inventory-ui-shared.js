@@ -244,8 +244,17 @@ export function renderChangeStockDialog() {
 }
 
 export function renderCategoryDialog() {
-	return <dialog-inventory-category v-model={dialog.value.category}>
-	</dialog-inventory-category>
+	const renderDialog = {
+		[appType.POS_RESTAURANT]: () => (
+			<dialog-inventory-category v-model={dialog.value.category}>
+			</dialog-inventory-category>
+		),
+		[appType.POS_RETAIL]: () => (
+			<dialog-inventory-retail-category v-model={dialog.value.category}>
+			</dialog-inventory-retail-category>
+		)
+	}
+	return renderDialog[currentAppType.value]()
 }
 
 const temporaryDialogFilter = ref({
@@ -304,7 +313,7 @@ export function openDialogInventory(inventory, mode) {
 			selectedInventory.value = createEmptyInventory[currentAppType.value]()
 	} else {
 		dialog.value.mode = mode
-		selectedInventory.value = inventory
+		selectedInventory.value = _.cloneDeep(inventory)
 	}
 
 	dialog.value.inventory = true

@@ -84,6 +84,15 @@ watchEffect(() => {
       return inventory.category._id.toString() === category._id.toString()
     })
     category.available = !inventoryWithCategory
+    if (category.subCategory) {
+      category.subCategory.forEach(subCategory => {
+        const inventoryWithCategory = inventories.value.find(inventory => {
+          return inventory.category._id.toString() === subCategory._id.toString()
+        })
+        subCategory.available = !inventoryWithCategory
+        category.available ||= subCategory.available
+      })
+    }
   })
 })
 /**
@@ -156,7 +165,8 @@ window.dbg = {
   inventory: {
     inventories,
     inventoryCategories,
-    filter
+    filter,
+    filteredInventory
   }
 }
 

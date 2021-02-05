@@ -1009,6 +1009,7 @@ Array [
       "subCategory": Array [
         Object {
           "_id": "ObjectID",
+          "available": true,
           "name": "Vegetables",
         },
       ],
@@ -1039,6 +1040,7 @@ Array [
       "subCategory": Array [
         Object {
           "_id": "ObjectID",
+          "available": true,
           "name": "Vegetables",
         },
       ],
@@ -1069,6 +1071,7 @@ Array [
       "subCategory": Array [
         Object {
           "_id": "ObjectID",
+          "available": true,
           "name": "Vegetables",
         },
       ],
@@ -1152,6 +1155,7 @@ Array [
     "attributes": Array [],
     "category": Object {
       "_id": "ObjectID",
+      "available": false,
       "name": "Wine",
     },
     "comboIngredient": Array [],
@@ -1180,6 +1184,7 @@ Array [
       "subCategory": Array [
         Object {
           "_id": "ObjectID",
+          "available": true,
           "name": "Vegetables",
         },
       ],
@@ -1227,6 +1232,7 @@ Array [
     "subCategory": Array [
       Object {
         "_id": "ObjectID",
+        "available": true,
         "name": "Vegetables",
       },
     ],
@@ -1244,10 +1250,12 @@ Array [
     "subCategory": Array [
       Object {
         "_id": "ObjectID",
+        "available": false,
         "name": "Wine",
       },
       Object {
         "_id": "ObjectID",
+        "available": true,
         "name": "Soda",
       },
     ],

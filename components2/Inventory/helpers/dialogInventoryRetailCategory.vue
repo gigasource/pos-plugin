@@ -1,8 +1,8 @@
 <script>
-import { ref, watch, computed } from 'vue'
+import { watch, computed, ref, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { $filters } from '../../AppSharedStates';
 import _ from 'lodash'
+import GTreeFactory from 'pos-vue-framework/src/components/GTreeViewFactory/GTreeFactory'
 import {
   inventoryCategories
 } from '../inventory-logic-ui'
@@ -11,12 +11,10 @@ import {
   updateInventoryCategories
 } from '../inventory-logic-be'
 import { genScopeId } from '../../utils';
-import {
-  addedCategory
-} from './dialog-inventory-category-logic' // testing purpose
+import { ObjectID } from 'bson'
 
 export default {
-  name: "dialogInventoryCategory",
+  name: "dialogInventoryRetailCategory",
   props: {
     modelValue: Boolean
   },
@@ -25,12 +23,16 @@ export default {
     const { t } = useI18n()
 
     const showKeyboard = ref(false)
-    const inventoryCategoriesClone = ref([])
+    const selectedCategory = ref(null)
 
     const rules = computed(() => {
       let rules = []
       rules.push(val => inventoryCategories.value.filter(cate => cate === val).length <= 1 || '')
       return rules
+    })
+
+    const newCategorySuffix = computed(() => {
+      return inventoryCategories.value.length + 1
     })
 
     const internalValue = computed({
@@ -43,51 +45,92 @@ export default {
       }
     })
 
-    watch(internalValue, async (val) => {
-      if (val) {
-        addedCategory.value = []
-        inventoryCategoriesClone.value = _.cloneDeep(inventoryCategories.value)
+    const addCategory = async function () {
+      if (selectedCategory.value && selectedCategory.value.subCategory) {
+        let category = inventoryCategories.value.find(category => {
+          return category._id === selectedCategory.value._id
+        })
+        category.subCategory.push({
+          _id: new ObjectID(),
+          name: `Sub category ${category.subCategory.length + 1}`,
+          available: true
+        })
+      } else {
+        inventoryCategories.value.push({
+          _id: new ObjectID(),
+          name: `New category ${newCategorySuffix.value}`,
+          subCategory: [],
+          available: true
+        })
       }
-    })
-
-    const addCategory = function () {
-      addedCategory.value.unshift({
-        name: '',
-        available: true
-      })
+      await updateCategories()
     }
     const removeCategory = async function (category) {
       if (!category.available) return
       if(category._id) await deleteInventoryCategory(category._id)
     }
-    const complete = async function () {
-      const mergedInventories = [...addedCategory.value, ...inventoryCategoriesClone.value]
-      if(_.some(_.countBy(mergedInventories, 'name'), cate => cate > 1)) {
+    const updateCategories = async function () {
+      if(_.some(_.countBy(inventoryCategories.value, 'name'), cate => cate > 1)) {
         return
       }
-      await updateInventoryCategories(mergedInventories)
-      internalValue.value = false
+      await updateInventoryCategories(inventoryCategories.value)
     }
+
+    //<editor-fold desc="tree view code">
+    const treeViewItemSelected = function (item, state) {
+      selectedCategory.value = item
+      state.collapse = !state.collapse
+    }
+
+    const genNode = function ({node, text, childrenVNodes, isLast, state, path}) {
+      return <li onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>
+        {node.name}
+        {!state.collapse ? childrenVNodes : null}
+      </li>
+    }
+
+    const genWrapper = function (childrenVNodes) {
+      return <ul>{childrenVNodes}</ul>
+    }
+
+    const genRootWrapper = function (childrenVNodes) {
+      return (
+          <div root>
+            <ul>{childrenVNodes}</ul>
+          </div>
+      )
+    }
+
+    const { genTree } = GTreeFactory({
+      data: inventoryCategories,
+      genNode,
+      genRootWrapper,
+      genWrapper,
+      itemChildren: 'subCategory'
+    })
+    //</editor-fold>
 
     return () => <>
       <g-dialog fullscreen v-model={internalValue.value} content-class="dialog-inventory-category">
+        {/*todo: check this onClick */}
         {genScopeId(() => (
-            <div class="dialog">
+            <div class="dialog" onClick={() => selectedCategory.value = null}>
               <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
+                <div class="dialog-header">
+                  Manage categories
+                  <g-btn-bs icon="add" onClick={withModifiers(addCategory, ['stop'])}>{t('article.category')}</g-btn-bs>
+                </div>
                 <div class="category">
-                  {[...addedCategory.value, ...inventoryCategoriesClone.value].map((category, i) =>
-                      <div class="category-item" key={i}>
-                        <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
-                        <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>
-                          <g-icon>icon-delete2</g-icon>
-                        </div>
-                      </div>
-                  )}
+                  {genTree()}
                 </div>
                 <p>* {t('inventory.onlyEmpty')}</p>
                 <div class="dialog-action">
-                  <g-btn-bs data-jest-addCategory icon="add" background-color="#1271FF" onClick={addCategory}>{t('article.category')}</g-btn-bs>
-                  <g-btn-bs data-jest-complete background-color="#388E3C" onClick={complete}>{t('inventory.complete')}</g-btn-bs>
+                  <g-btn-bs data-jest-addCategory icon="add" background-color="#1271FF" onClick={() => showKeyboard.value = true}>{t('inventory.rename')}</g-btn-bs>
+                  <g-btn-bs data-jest-complete class={['category-item__btn', selectedCategory.value && selectedCategory.value.available && 'category-item__btn--delete']}
+                    onClick={withModifiers(() => removeCategory(selectedCategory.value), ['stop'])}>
+                    <g-icon>icon-delete2</g-icon>
+                    {t('inventory.remove')}
+                  </g-btn-bs>
                 </div>
               </div>
               {

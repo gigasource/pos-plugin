@@ -6,6 +6,7 @@ import PosTextfieldNew from '../../components/pos-shared-components/POSInput/Pos
 import dialogFormInput from '../../components/pos-shared-components/dialogFormInput'
 import dialogChangeStock from './helpers/dialogChangeStock'
 import dialogInventoryCategory from './helpers/dialogInventoryCategory'
+import dialogInventoryRetailCategory from './helpers/dialogInventoryRetailCategory'
 
 import {
   renderInventoryDialog,
@@ -27,7 +28,7 @@ import { genScopeId } from '../utils';
 
 export default {
   name: 'Inventory',
-  components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory},
+  components: {PosRangeSlider, PosTextfieldNew, dialogFormInput, dialogChangeStock, dialogInventoryCategory, dialogInventoryRetailCategory},
   setup(props, { emit }) {
     const { t } = useI18n();
 

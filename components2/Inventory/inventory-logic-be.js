@@ -134,16 +134,28 @@ export async function deleteInventory(ids) {
 }
 
 export async function deleteInventoryCategory(_id) {
-	_.remove(inventoryCategories.value, (category) => {
-		return _id.toString() === category._id.toString()
-	})
-	await InventoryCategory.deleteOne({ _id })
+	if (inventoryCategories.value.find(category => category._id === _id)) {
+		_.remove(inventoryCategories.value, (category) => {
+			return _id.toString() === category._id.toString()
+		})
+		await InventoryCategory.deleteOne({ _id })
+	} else {
+		// delete sub category
+		for (let category of inventoryCategories.value) {
+			if (category.subCategory && category.subCategory.find(subCategory => subCategory._id === _id)) {
+				_.remove(category.subCategory, subCategory => subCategory._id === _id)
+				await InventoryCategory.findOneAndUpdate({
+					_id: category._id
+				}, category)
+			}
+		}
+	}
 }
 
 export async function updateInventoryCategories(newInventoryCategory) {
 	for (const category of newInventoryCategory) {
 		if (category._id) {
-			await InventoryCategory.findOneAndUpdate({_id: category._id}, category)
+			await InventoryCategory.findOneAndUpdate({_id: category._id}, category, {upsert: true})
 		} else {
 			category._id = new ObjectID()
 			await InventoryCategory.create(category)
