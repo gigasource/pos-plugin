@@ -1,25 +1,25 @@
 <script>
 import { genScopeId } from '../../utils';
 import { $filters } from '../../AppSharedStates';
+import { paymentTax, paymentDiscount, paymentSubTotal, paymentTotal } from './temp-logic'
 
 export default {
   name: 'PosOrderScreenReport',
-  injectService: ['OrderStore:(paymentTax,paymentTotal,paymentSubTotal,paymentDiscount)',],
   setup() {
-    // TODO
+    // TODO: handle Euro sign in template
     return genScopeId(() => (
         <div style="position:relative;">
           <div class="report-column">
             <span>{t('common.discount')} ({t('common.currency')})</span>
-            <span class="number">{$filters.formatCurrency(paymentDiscount)}</span>
+            <span class="number">{$filters.formatCurrency(paymentDiscount.value)}</span>
             <span>{t('common.tax')} ({t('common.currency')})</span>
-            <span class="number">{$filters.formatCurrency(paymentTax)}</span>
+            <span class="number">{$filters.formatCurrency(paymentTax.value)}</span>
           </div>
           <div class="report-column">
             <span>{t('common.subtotal')} (€)</span>
-            <span class="number">{$filters.formatCurrency(paymentSubTotal)}</span>
+            <span class="number">{$filters.formatCurrency(paymentSubTotal.value)}</span>
             <span>{t('common.total')} (€)</span>
-            <span class="number__important">{$filters.formatCurrency(paymentTotal)}</span>
+            <span class="number__important">{$filters.formatCurrency(paymentTotal.value)}</span>
           </div>
         </div>
     ))

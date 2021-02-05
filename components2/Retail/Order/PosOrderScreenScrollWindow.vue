@@ -1,12 +1,12 @@
 <script>
 import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
-import { nextTick, onActivated, onMounted, withModifiers } from 'vue';
+import { nextTick, onActivated, onMounted, onBeforeUnmount, withModifiers } from 'vue';
 import { genScopeId } from '../../utils';
+import { addProductToOrder, getScrollWindowProducts, getProductLayout, scrollWindowProducts, changeProductList } from './temp-logic'
 
 export default {
   name: 'PosOrderScreenScrollWindow',
-  injectService: ['OrderStore:(addProductToOrder,getScrollWindowProducts,scrollWindowProducts)'],
   components: {
     scrollWindow: {
       name: 'ScrollWindow',
@@ -20,11 +20,11 @@ export default {
         }
       },
       mounted() {
-        this._forceUpdate = this.$forceUpdate
+        _forceUpdate.value = this.$forceUpdate
       },
       watch: {
         shouldForceUpdate(newVal) {
-          this.$forceUpdate = newVal ? this._forceUpdate : () => null
+          this.$forceUpdate = newVal ? _forceUpdate.value : () => null
         }
       }
     },
@@ -40,11 +40,11 @@ export default {
         }
       },
       mounted() {
-        this._forceUpdate = this.$forceUpdate
+        _forceUpdate.value = this.$forceUpdate
       },
       watch: {
         shouldForceUpdate(newVal) {
-          this.$forceUpdate = newVal ? this._forceUpdate : () => null
+          this.$forceUpdate = newVal ? _forceUpdate.value : () => null
         }
       }
     }
@@ -61,7 +61,7 @@ export default {
     const shouldForceUpdate = ref(true)
 
     function addProduct(item) {
-      this.addProductToOrder(item)
+      addProductToOrder(item)
     }
 
     function getItemStyle(item) {
@@ -74,79 +74,50 @@ export default {
       }
     }
 
-    function addProductToOrder() {
-      console.log('OrderStore:addProductToOrder was not implemented')
-    }
+    changeProductList.value = (newValue, oldValue) => {
+      if (newValue) {
+        const newCategory = newValue.name;
+        const oldCategory = oldValue && oldValue.name;
 
-    function getScrollWindowProducts() {
-      console.log('OrderStore:getScrollWindowProducts was not implemented')
-    }
+        // TODO: Refs array
+        if (newCategory && this.$refs[`window_${newCategory}`]) {
+          this.$refs[`window_${newCategory}`][0].style.zIndex = '1'
+        }
 
-    // created() {
-    // const orderStore = this.$getService('OrderStore');
-    // orderStore.changeProductList = (newValue, oldValue) => {
-    //   if (newValue) {
-    //     const newCategory = newValue.name;
-    //     const oldCategory = oldValue && oldValue.name;
-    //
-    //     if (newCategory && this.$refs[`window_${newCategory}`]) {
-    //       this.$refs[`window_${newCategory}`][0].style.zIndex = '1'
-    //     }
-    //
-    //     if (oldCategory) {
-    //       if (newCategory === oldCategory) return;
-    //       const oldRef = this.$refs[`window_${oldCategory}`];
-    //
-    //       if (oldRef && oldRef.length > 0) {
-    //         oldRef[0].style.zIndex = '-1'
-    //       }
-    //     }
-    //   }
-    // };
-    // this.unwatch = orderStore.$watch('scrollWindowProducts', (newValue, oldValue) => {
-    //   if (!_.isEqual(newValue, oldValue)) {
-    //     const tempValue = Object.assign({}, this.productWindows, newValue);
-    //     for (const category in tempValue) {
-    //       if (tempValue.hasOwnProperty(category)) {
-    //         tempValue[category] = tempValue[category].map(window => window.map(product => ({
-    //           ...product,
-    //           layout: this.$getService('SettingsStore:getProductLayout')(product, { name: category })
-    //         })))
-    //       }
-    //     }
-    //
-    //     this.productWindows = Object.assign({}, this.productWindows, tempValue);
-    //     this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
-    //       obj[key] = 0;
-    //       return obj
-    //     }, {})
-    //   }
-    // }, { immediate: true, deep: true, sync: true })
-    // }
+        if (oldCategory) {
+          if (newCategory === oldCategory) return;
+          const oldRef = this.$refs[`window_${oldCategory}`];
+
+          if (oldRef && oldRef.length > 0) {
+            oldRef[0].style.zIndex = '-1'
+          }
+        }
+      }
+    };
 
     onActivated(async () => {
-      this.shouldForceUpdate = true;
-      await this.getScrollWindowProducts();
+      shouldForceUpdate.value = true;
+      await getScrollWindowProducts();
       await nextTick(() => {
-        this.shouldForceUpdate = false
+        shouldForceUpdate.value = false
       })
     })
 
-    watch(() => scrollWindowProducts.value, {
+    const watcher = watch(() => scrollWindowProducts.value, {
       handler: (newValue, oldValue) => {
         if (!_.isEqual(newValue, oldValue)) {
-          const tempValue = Object.assign({}, this.productWindows, newValue);
+          const tempValue = Object.assign({}, productWindows.value, newValue);
           for (const category in tempValue) {
             if (tempValue.hasOwnProperty(category)) {
               tempValue[category] = tempValue[category].map(window => window.map(product => ({
                 ...product,
-                layout: this.$getService('SettingsStore:getProductLayout')(product, { name: category })
+                layout: getProductLayout(product, { name: category })
               })))
             }
           }
 
-          this.productWindows = Object.assign({}, this.productWindows, tempValue);
-          this.activeProductWindows = newValue && Object.keys(newValue).reduce((obj, key) => {
+          productWindows.value = Object.assign({}, productWindows.value, tempValue);
+          activeProductWindows.value = newValue && Object.keys(newValue).reduce((obj, key) => {
             obj[key] = 0;
             return obj
           }, {})
@@ -158,10 +129,14 @@ export default {
     })
 
     onMounted(async () => {
-      await this.getScrollWindowProducts();
+      await getScrollWindowProducts();
       await nextTick(() => {
-        this.shouldForceUpdate = false
+        shouldForceUpdate.value = false
       })
+    })
+
+    onBeforeUnmount(() => {
+      watcher.unwatch() // todo: misisng 1 args
     })
 
     return genScopeId(() => (

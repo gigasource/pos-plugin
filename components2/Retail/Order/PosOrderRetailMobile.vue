@@ -1,5 +1,4 @@
 <script>
-import { ref } from 'vue'
 import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
 import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
 import PosOrderScreenTable from './PosOrderScreenTable';
@@ -11,6 +10,11 @@ import dialogProductSearchResult from '../../../components/Order/components/dial
 import dialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
 import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
 import { genScopeId } from '../../utils';
+
+import {
+  showDialogSavedList, showDialogProductSearchResult, showDialogChangePrice, showDialogProductLookup,
+  updateNewPrice
+} from './temp-logic'
 
 export default {
   name: 'PosOrderRetailMobile',
@@ -26,17 +30,12 @@ export default {
     dialogProductSearchResult,
     dialogChangeValue,
   },
-  props: {},
   setup() {
-    const showDialogSavedList = ref(false)
-    const showDialogProductSearchResult = ref(false)
-    const showDialogChangePrice = ref(false)
-    const showDialogProductLookup = ref(false)
     function submitChangePrice(val) {
-      this.$getService('PosStore:updateNewPrice')(val);
+      updateNewPrice(val)
     }
 
-    const renderFn = genScopeId(() => <>
+    return genScopeId(() => <>
       <div class="porm">
         <pos-order-screen-table class="porm__table"></pos-order-screen-table>
         <div class="porm__main-retail">
@@ -52,17 +51,6 @@ export default {
       <dialog-change-value v-model={showDialogChangePrice.value} new-value-editable="true" onSubmit={submitChangePrice}></dialog-change-value>
       <dialog-product-lookup v-model={showDialogProductLookup.value}></dialog-product-lookup>
     </>)
-
-    return {
-      showDialogSavedList,
-      showDialogProductSearchResult,
-      showDialogChangePrice,
-      showDialogProductLookup,
-      renderFn
-    }
-  },
-  render() {
-    return this.renderFn()
   }
 }
 </script>

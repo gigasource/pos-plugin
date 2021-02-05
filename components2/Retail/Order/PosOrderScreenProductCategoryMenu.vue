@@ -1,6 +1,8 @@
 <script>
   import { nextTick, onMounted, onActivated, withModifiers } from 'vue';
   import { genScopeId } from '../../utils';
+  import { getAllCategories, changeProductList, activeCategory } from './temp-logic';
+
   export default {
     name: 'PosOrderScreenProductCategoryMenu',
     setup() {
@@ -8,52 +10,46 @@
       const menuRef = ref(null)
 
       onMounted(async () => {
-        // TODO
-        menu.value = await this.$getService('SettingsStore:getAllCategories')()
+        menu.value = await getAllCategories()
         await nextTick(() => {
           select(menu.value[0])
         })
       })
 
       onActivated(async () => {
-        // TODO
-        menu.value = await this.$getService('SettingsStore:getAllCategories')()
+        menu.value = await getAllCategories()
       })
 
       function select(item) {
-        // TODO
-        this.posStore.changeCategory(item, this.posStore.activeCategory)
-        this.posStore.changeProductList(item, this.posStore.activeCategory)
-        this.posStore.activeCategory = item;
+        changeCategory.value(item, activeCategory.value)
+        changeProductList.value(item, activeCategory.value)
+        activeCategory.value = item;
       }
 
-      // TODO
-      // async created() {
-      //   this.posStore = this.$getService('OrderStore');
-      //   this.posStore.changeCategory = (newValue, oldValue) => {
-      //     if (newValue) {
-      //       const newCategory = newValue.name
-      //       const oldCategory = oldValue && oldValue.name
-      //       if (newCategory && this.$refs[`button_${newCategory}`]) {
-      //         this.$refs[`button_${newCategory}`][0].classList.add('menu__active')
-      //       }
-      //
-      //       if (oldCategory) {
-      //         if (newCategory === oldCategory) return
-      //         const oldRef = this.$refs[`button_${oldCategory}`];
-      //         if (oldRef && oldRef.length > 0) {
-      //           oldRef[0].classList.remove('menu__active')
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
+      changeCategory.value = (newValue, oldValue) => {
+        if (newValue) {
+          const newCategory = newValue.name
+          const oldCategory = oldValue && oldValue.name
+          if (newCategory && this.$refs[`button_${newCategory}`]) {
+            // TODO: refs array
+            this.$refs[`button_${newCategory}`][0].classList.add('menu__active')
+          }
+
+          if (oldCategory) {
+            if (newCategory === oldCategory) return
+            const oldRef = this.$refs[`button_${oldCategory}`];
+            if (oldRef && oldRef.length > 0) {
+              oldRef[0].classList.remove('menu__active')
+            }
+          }
+        }
+      }
 
       // TODO: area
       return genScopeId(() => (
           <div area="menu" ref={menuRef}>
-            {menu.map((item, i) =>
-                <div key={i} className="btn" onClick={withModifiers(() => select(item), ['stop'])}
+            {menu.value.map((item, i) =>
+                <div key={i} class="btn" onClick={withModifiers(() => select(item), ['stop'])}
                      ref={`button_${item.name}`}>
                   {item.name}
                 </div>

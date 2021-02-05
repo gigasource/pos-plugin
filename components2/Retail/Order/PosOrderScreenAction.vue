@@ -1,12 +1,16 @@
 <script>
 import { ref, onActivated, onMounted } from 'vue'
 import { genScopeId } from '../../utils';
+import { posSettings } from '../../AppSharedStates';
 
-  export default {
+import {
+  chooseFunction,
+  isActiveFnBtn,
+  updateTableRows
+} from './temp-logic';
+
+export default {
     name: 'PosOrderScreenAction',
-    injectService: [
-      'OrderStore:(chooseFunction,activeTableProduct)', 'SettingsStore:getPosSetting'
-    ],
     setup() {
       const listBtn = ref([])
       onActivated(async() => {
@@ -19,8 +23,7 @@ import { genScopeId } from '../../utils';
       const actionRef = ref(null)
 
       async function generateTemplate() {
-        const setting = await getPosSetting();
-        const rows = setting.generalSetting.quickFnRows;
+        const rows = posSettings.value.generalSetting.quickFnRows;
 
         //define template
 
@@ -50,22 +53,17 @@ import { genScopeId } from '../../utils';
         if(listBtn.value.length === 4) {
           listBtn.value.unshift(null, null, null, null)
         }
-
-        const posStore = this.$getService('OrderStore') // TODO
-        if (posStore && posStore.updateTableRows && typeof posStore.updateTableRows === 'function') {
-          posStore.updateTableRows()
-        }
+        updateTableRows.value()
       }
 
       function isActiveBtn(btn) {
-        return this.$getService('OrderStore:isActiveFnBtn')(btn)
+        return isActiveFnBtn(btn)
       }
 
       function onClick(btn) {
         if (!btn || !btn.buttonFunction)
           return
-        // TODO
-        this.$getService('OrderStore:chooseFunction')(btn.buttonFunction)(btn.buttonFunctionValue)
+        chooseFunction(btn.buttonFunction)(btn.buttonFunctionValue)
       }
 
       function getBtnStyle(btn) {

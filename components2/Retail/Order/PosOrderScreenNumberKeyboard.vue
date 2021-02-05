@@ -1,10 +1,17 @@
 <script>
   import { nextTick } from 'vue';
   import { genScopeId } from '../../utils';
+  import {
+    productIdQuery,
+    queryProductsById,
+    productIdQueryResults,
+    addProductToOrder,
+
+    showDialogProductSearchResult
+  } from './temp-logic';
 
   export default {
     name: 'PosOrderScreenNumberKeyboard',
-    injectService: ['OrderStore:(productIdQuery,queryProductsById,productIdQueryResults,addProductToOrder)'],
     setup() {
       const numpad_1 = {
         numpad_1: [
@@ -86,18 +93,16 @@
       }
 
       async function openDialogProductSearchResults() {
-        // TODO: this
-        if (this.productIdQuery.trim()) {
-          await this.queryProductsById()
-          if (this.productIdQueryResults.length === 1) {
-            const onlyResult = this.productIdQueryResults[0];
+        if (productIdQuery.value.trim()) {
+          await queryProductsById()
+          if (productIdQueryResults.value.length === 1) {
+            const onlyResult = productIdQueryResults.value[0];
             if (onlyResult.attributes.keys().length === onlyResult.attributes.length) {
-              this.addProductToOrder(onlyResult)
+              addProductToOrder(onlyResult)
               return
             }
             await nextTick(() => {
-              // TODO
-              this.$getService('dialogProductSearchResult:setActive')(true)
+              showDialogProductSearchResult.value = true
             })
           }
         }
@@ -106,7 +111,8 @@
       // TODO: area
       return genScopeId(() => (
           <g-number-keyboard
-              area="keyboard" v-model={productIdQuery}
+              area="keyboard"
+              v-model={productIdQuery.value}
               items={numpad_1}
               onSubmit={openDialogProductSearchResults}
               v-slots={{
@@ -114,7 +120,8 @@
                   <div class="number-key-show ba-thin bg-grey-lighten-3" style="height: calc(16.6667% - 4px)">
                     <input id="number_key_output"
                            class="number-key-text col-12 self-center bg-transparent fs-large-2 fw-700 pl-2"
-                           style="border: none; outline: none" v-model={productIdQuery}> </input>
+                           style="border: none; outline: none"
+                           v-model={productIdQuery.value}/>
                   </div>
                 )
               }}>

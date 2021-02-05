@@ -2,26 +2,24 @@
 import { onMounted, withModifiers } from 'vue'
 import { genScopeId } from '../../utils';
 import { useRouter } from 'vue-router'
+import { showDialogSavedList, savedOrders, getSavedOrders, resetOrderData } from './temp-logic';
 
 export default {
   name: 'PosOrderScreenToolbar',
-  injectService: ['OrderStore:(savedOrders,getSavedOrders)'],
   setup() {
     const router = useRouter()
 
     async function openDialogSavedList() {
-      await this.getSavedOrders()
-      this.$getService('dialogSavedList:setActive')(true)
+      await getSavedOrders()
+      showDialogSavedList.value = true
     }
 
     onMounted(async () => {
-      // TODO
-      await this.getSavedOrders()
+      await getSavedOrders()
     })
 
     async function back() {
-      // TODO
-      this.$getService('OrderStore:resetOrderData')()
+      resetOrderData()
       router.push({ path: '/pos-dashboard' })
     }
 
@@ -33,7 +31,7 @@ export default {
               {t('ui.back')}
             </g-btn>
             {
-              (savedOrders && savedOrders.length > 0) ?
+              (savedOrders.value && savedOrders.value.length > 0) ?
                   <g-badge overlay color="#FF4452" v-slots={{
                     default: genScopeId(() => (
                         <g-btn uppercase={false} background-color="white" onClick={openDialogSavedList}>
@@ -41,7 +39,7 @@ export default {
                           {t('order.savedList')}
                         </g-btn>
                     )),
-                    badge: genScopeId(() => <span>{savedOrders.length}</span>),
+                    badge: genScopeId(() => <span>{savedOrders.value.length}</span>),
                   }}></g-badge>
                   :
                   <g-btn uppercase={false} background-color="white" onClick={openDialogSavedList}>

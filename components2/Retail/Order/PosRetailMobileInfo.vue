@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: "PosRetailMobileInfo",
-  injectService: ['PosStore:(user, storeLocale)', 'OrderStore:(savedOrders,getSavedOrders)'],
+  injectService: ['OrderStore:(savedOrders,getSavedOrders)'],
   props: {},
   setup() {
     // update time

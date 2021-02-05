@@ -37,17 +37,13 @@ export const mockCategories = [
     ]
   },
 ]
-
 export const categories = ref(mockCategories)
-
 export const selectedCategory = ref(null)
-
 export function selectCategory(item, parent) {
   selectedCategory.value = item
   if (parent)
     selectedCategory.value.parentId = parent._id
 }
-
 export function showSubCategory(category) {
   if (!selectedCategory.value)
     return false

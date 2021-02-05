@@ -2,14 +2,18 @@
 import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash'
 import { genScopeId } from '../../utils';
+import { storeLocale } from '../../AppSharedStates';
+import { currentOrder, activeTableProduct,
+  addItemQuantity as _addItemQuantity,
+  removeItemQuantity as _removeItemQuantity
+} from './temp-logic';
 
 export default {
   name: 'PosOrderScreenTable',
-  injectService: ['OrderStore:(currentOrder)', 'PosStore:storeLocale'],
   setup() {
     const viewportRows = ref(0)
     const formattedProducts = computed(() => {
-      return this.currentOrder.items.map(item => ({
+      return currentOrder.value.items.map(item => ({
         ..._.omit(item, 'attributes'),
         attributes: getAttributes(item),
         originalTotal: (item.quantity * item.originalPrice).toFixed(2),
@@ -24,52 +28,49 @@ export default {
     }
 
     function toggle(index) {
-      // TODO
-      const posStore = this.$getService('OrderStore')
-      if (index === posStore.activeTableProduct) {
-        posStore.activeTableProduct = undefined
+      if (index === activeTableProduct.value) {
+        activeTableProduct.value = undefined
       } else if (!_.isNil(index)) {
-        posStore.activeTableProduct = index
+        activeTableProduct.value = index
       }
     }
 
     function addItemQuantity(index) {
-      // TODO
-      this.$getService('OrderStore:addItemQuantity')(this.currentOrder.items[index])
+      _addItemQuantity(currentOrder.value.items[index])
     }
 
     function removeItemQuantity(index, removeAll) {
-      // TODO
-      this.$getService('OrderStore:removeItemQuantity')(this.currentOrder.items[index], removeAll)
+      _removeItemQuantity(currentOrder.value.items[index], removeAll)
     }
 
+    watch(() => currentOrder.value, ({ items }, { items: oldItems }) => {
+      if (this.$el) {
+        // TODO $el
+        const tableWrapper = this.$el.querySelector('.table-wrapper')
+        if (items && items.length > oldItems.length) {
+          tableWrapper.scrollTop = items.length >= this.viewportRows
+              ? tableWrapper.scrollHeight
+              : 0
+        }
+      }
+    })
+
+    watch(() => activeTableProduct.value, (newValue, oldValue) => {
+      // TODO: refs array
+      if (!_.isNil(newValue) && newValue > -1 && this.$refs[`row_${newValue}`].length > 0) {
+        this.$refs[`row_${newValue}`][0].$el.classList.add('g-expansion__active')
+      }
+      if (!_.isNil(oldValue) && oldValue > -1 && this.$refs[`row_${oldValue}`].length > 0) {
+        this.$refs[`row_${oldValue}`][0].$el.classList.remove('g-expansion__active')
+      }
+    })
+
     onMounted(() => {
-      const orderStore = this.$getService('OrderStore')
-
-      orderStore.$watch('currentOrder.items', (items, oldItems) => {
-        if (this.$el) {
-          const tableWrapper = this.$el.querySelector('.table-wrapper')
-          if (items && items.length > oldItems.length) {
-            tableWrapper.scrollTop = items.length >= this.viewportRows
-                ? tableWrapper.scrollHeight
-                : 0
-          }
-        }
-      }, { deep: true })
-
-      orderStore.$watch('activeTableProduct', (newValue, oldValue) => {
-        if (!_.isNil(newValue) && newValue > -1 && this.$refs[`row_${newValue}`].length > 0) {
-          this.$refs[`row_${newValue}`][0].$el.classList.add('g-expansion__active')
-        }
-        if (!_.isNil(oldValue) && oldValue > -1 && this.$refs[`row_${oldValue}`].length > 0) {
-          this.$refs[`row_${oldValue}`][0].$el.classList.remove('g-expansion__active')
-        }
+      updateTableRows.value = (() => {
+        // TODO: this $el
+        nextTick(() => viewportRows.value = Math.floor(this.$el.querySelector('.table-wrapper').clientHeight / 44))
       })
-
-      orderStore.updateTableRows = (() =>
-          nextTick(() => this.viewportRows = Math.floor(this.$el.querySelector('.table-wrapper').clientHeight / 44)))
-
-      orderStore.updateTableRows()
+      updateTableRows.value()
     })
 
     return genScopeId(() => (
@@ -83,8 +84,8 @@ export default {
                     <span class="flex-grow-1 pa-2 ta-left">{t('order.name')}</span>
                     <span class="w-10 pa-2 ta-center">{t('order.unit')}</span>
                     <span class="w-10 pa-2 ta-right">{t('order.quantity')}</span>
-                    <span class="w-12 pa-2 ta-right">{t('order.each')}({t('common.currency', storeLocale)})</span>
-                    <span class="pa-2 ta-right" style="width: 15%; max-width: 15%">{t('common.total')}({t('common.currency', storeLocale)})</span>
+                    <span class="w-12 pa-2 ta-right">{t('order.each')}({t('common.currency', storeLocale.value)})</span>
+                    <span class="pa-2 ta-right" style="width: 15%; max-width: 15%">{t('common.total')}({t('common.currency', storeLocale.value)})</span>
                   </div>
                 </th>
               </tr>

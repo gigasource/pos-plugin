@@ -38,7 +38,6 @@ export default {
   },
   data: function () {
     return {
-      // layout: layout,
       dialogProductSearchResult: false,
       dialogChangePrice: false,
       dialogProductLookup: false,

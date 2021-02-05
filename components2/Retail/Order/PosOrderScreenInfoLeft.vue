@@ -2,9 +2,10 @@
 import { genScopeId } from '../../utils';
 import { useI18n } from 'vue-i18n'
 import { $filters } from '../../AppSharedStates'
+import { lastPayment } from './temp-logic';
+
 export default {
   name: 'PosOrderScreenInfoLeft',
-  injectService: ['OrderStore:(paymentTotal,lastPayment)'],
   setup() {
     const { t } = useI18n()
     return genScopeId(() => (lastPayment.value > 0) && (

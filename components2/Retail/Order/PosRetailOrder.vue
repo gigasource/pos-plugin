@@ -1,11 +1,10 @@
 <script>
-import { avatar, username } from '../../AppSharedStates';
+import { avatar, username, storeLocale } from '../../AppSharedStates';
 import { useRouter } from 'vue-router'
 import { genScopeId } from '../../utils';
 
 export default {
   name: 'PosRetailOrder',
-  injectService: ['PosStore:(user, storeLocale)'],
   props: {},
   setup() {
     const items = ref([
@@ -37,7 +36,7 @@ export default {
             <g-btn-bs class="elevation-2" onClick={back}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
-            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF">{t('common.currency', storeLocale)}{total}</g-btn-bs>
+            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF">{t('common.currency', storeLocale.value)}{total}</g-btn-bs>
           </div>
           <div class="detail-table">
             {items.value.map((item, i) =>
@@ -45,7 +44,7 @@ export default {
                   <div class="detail-table__row-main">
                     <p class="fs-small fw-700">{item.name}</p>
                     <p>
-                      <span class="detail-table__row-price">{t('common.currency', storeLocale)} {item.price}</span>
+                      <span class="detail-table__row-price">{t('common.currency', storeLocale.value)} {item.price}</span>
                       {item.attributes.map((attr, key) =>
                           <span class="detail-table__row-attr" style={{ color: generateRandomColor() }} key={`${key}_${attr}_${i}`}>
                             {key}: {attr}

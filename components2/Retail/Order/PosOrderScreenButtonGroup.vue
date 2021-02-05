@@ -1,12 +1,14 @@
 <script>
 import { ref, onActivated, onMounted } from 'vue'
-  import { genScopeId } from '../../utils';
+import { genScopeId } from '../../utils';
+import { posSettings } from '../../AppSharedStates';
+import {
+  chooseFunction,
+  isActiveFnBtn
+} from './temp-logic';
 
-  export default {
+export default {
     name: 'PosOrderScreenButtonGroup',
-    injectService: [
-      'OrderStore:(chooseFunction,activeTableProduct,currentOrder,isActiveFnBtn,chooseFunction)', 'SettingsStore:getPosSetting'
-    ],
     setup() {
       const listBtn = ref([])
       onActivated(async() => {
@@ -17,7 +19,7 @@ import { ref, onActivated, onMounted } from 'vue'
       })
 
       async function generateTemplate() {
-        const setting = await getPosSetting();
+        const setting = posSettings.value;
         listBtn.value = [];
         const rightFunctionButtons = setting.rightFunctionButtons;
         const containedBtns = rightFunctionButtons.reduce((acc, btn) => ([...acc, ...(btn.containedButtons || [])]), []);
