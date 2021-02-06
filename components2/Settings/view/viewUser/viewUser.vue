@@ -8,28 +8,28 @@ import {
   onEditUsername,
   selectedUser,
   selectedUserIsAdmin,
-    showDialogUserDetail,
-    showDialogSelectAvatar,
-  onSave,
-    init, viewOnlineOrderDashboard, viewOnlineOrderMenu, viewOrder, viewOrderHistory, viewReservation
+  showDialogUserDetail,
+  showDialogSelectAvatar,
+  onSave, userList,
+  init, viewOnlineOrderDashboard, viewOnlineOrderMenu, viewOrder, viewOrderHistory, viewReservation, getUserList
 } from './view-user-logics';
 import { genScopeId } from '../../../utils';
 import { useI18n } from 'vue-i18n';
 import dialogSelectAvatar from './dialogSelectAvatar'
 import dialogUserDetail from './dialogUserDetail';
+import { onActivated } from 'vue';
 export default {
-  components: { dialogSelectAvatar, dialogUserDetail},
+  components: { dialogSelectAvatar, dialogUserDetail },
   setup() {
     const { t } = useI18n()
-    init()
-    // onActivated(async () => {
-    //   if (filteredUserList.value.length === 0)
-    //     await getListUsers()
-    //   selectedUser.value.value = filteredUserList.value[0]
-    // })
+    onActivated(async () => {
+      if (filteredUserList.value.length === 0) userList.value = await getUserList()
+      if (!selectedUser.value) selectedUser.value = (filteredUserList.value.length > 0 ? filteredUserList.value[0]: null)
+    })
 
     const userListRender = genScopeId(() => <div class="user-list">
-      <g-list items={filteredUserList.value}
+      {
+        <g-list items={filteredUserList.value}
               active-class="item__active"
               divider
               elevation="0"
@@ -40,6 +40,7 @@ export default {
               selectable
               v-model={selectedUser.value}>
       </g-list>
+      }
       <div onClick={onAddUser} class="row-flex align-items-center pa-2 pl-3">
         <g-avatar size="40">
           <g-icon svg>
@@ -51,75 +52,75 @@ export default {
       </div>
     </div>)
 
-    const editAreaRender = genScopeId(() => <div class="user">
-      {selectedUser.value &&
-      <div class="user-edit">
-        <div class="user-edit__title row-flex align-items-center pl-4 fw-700">
-          {t('settings.editUser')}
-        </div>
-        <div class="user-edit__item">
-          <g-text-field-bs label={t('settings.name')} v-model={selectedUser.value.name} onUpdate:modelValue={onSave} v-slots={{
-            'append-inner': () =>
-                <g-icon style="cursor: pointer" onClick={onEditUsername}>
-                  icon-keyboard
-                </g-icon>
-          }}>
-          </g-text-field-bs>
-        </div>
-        {
-          (!selectedUserIsAdmin.value) &&
-          <div class="user-edit__item">
-            <p class="mb-2">
-              {t('settings.userAvatar')} </p>
-            <div class="row-flex align-items-center" style="height: 40px">
-              {
-                (selectedUser.value && selectedUser.value.avatar) &&
-                <g-avatar class="mr-2" size="40">
-                  <img src={selectedUser.value.avatar} alt> </img>
-                </g-avatar>
-              }
-              <a onClick={() => showDialogSelectAvatar.value = true} class="link-change"> {t('ui.change')} </a>
-            </div>
+    const editAreaRender = genScopeId(() => selectedUser.value &&
+        <div class="user-edit">
+          <div class="user-edit__title row-flex align-items-center pl-4 fw-700">
+            {t('settings.editUser')}
           </div>
-        }
-        <div class="user-edit__item">
-          <g-text-field-bs label={t('settings.passcode')} v-model={selectedUser.value.passcode} v-slots={{
-            'append-inner': () =>
-                <g-icon style="cursor: pointer" onClick={onEditPasscode}>
-                  icon-keyboard
-                </g-icon>
-          }}></g-text-field-bs>
-        </div>
-        {
-          (!selectedUserIsAdmin.value) && <>
+          <div class="user-edit__item">
+            <g-text-field-bs label={t('settings.name')} v-model={selectedUser.value.name} onUpdate:modelValue={onSave} v-slots={{
+              'append-inner': () =>
+                  <g-icon style="cursor: pointer" onClick={onEditUsername}>
+                    icon-keyboard
+                  </g-icon>
+            }}>
+            </g-text-field-bs>
+          </div>
+          {
+            (!selectedUserIsAdmin.value) &&
             <div class="user-edit__item">
-              <g-switch dense label={t('settings.viewOnlineOrderDashboard')} v-model={viewOnlineOrderDashboard.value} onUpdate:modelValue={onSave}/>
+              <p class="mb-2">
+                {t('settings.userAvatar')} </p>
+              <div class="row-flex align-items-center" style="height: 40px">
+                {
+                  (selectedUser.value && selectedUser.value.avatar) &&
+                  <g-avatar class="mr-2" size="40">
+                    <img src={selectedUser.value.avatar} alt> </img>
+                  </g-avatar>
+                }
+                <a onClick={() => showDialogSelectAvatar.value = true} class="link-change"> {t('ui.change')} </a>
+              </div>
             </div>
-            <div class="user-edit__item">
-              <g-switch dense label={t('settings.viewOrder')} v-model={viewOrder.value} onUpdate:modelValue={onSave}/>
-            </div>
+          }
+          <div class="user-edit__item">
+            <g-text-field-bs label={t('settings.passcode')} v-model={selectedUser.value.passcode} v-slots={{
+              'append-inner': () =>
+                  <g-icon style="cursor: pointer" onClick={onEditPasscode}>
+                    icon-keyboard
+                  </g-icon>
+            }}></g-text-field-bs>
+          </div>
+          {
+            (!selectedUserIsAdmin.value) && <>
+              <div class="user-edit__item">
+                <g-switch dense label={t('settings.viewOnlineOrderDashboard')} v-model={viewOnlineOrderDashboard.value} onUpdate:modelValue={onSave}/>
+              </div>
+              <div class="user-edit__item">
+                <g-switch dense label={t('settings.viewOrder')} v-model={viewOrder.value} onUpdate:modelValue={onSave}/>
+              </div>
 
-            <div class="user-edit__item">
-              <g-switch dense label={t('settings.viewOnlineOrderMenu')} v-model={viewOnlineOrderMenu.value} onUpdate:modelValue={onSave}/>
-            </div>
+              <div class="user-edit__item">
+                <g-switch dense label={t('settings.viewOnlineOrderMenu')} v-model={viewOnlineOrderMenu.value} onUpdate:modelValue={onSave}/>
+              </div>
 
-            <div class="user-edit__item">
-              <g-switch dense label={t('settings.viewOrderHistory')} v-model={viewOrderHistory.value} onUpdate:modelValue={onSave}/>
-            </div>
-            <div class="user-edit__item">
-              <g-switch dense label={t('settings.viewReservation')} v-model={viewReservation.value} onUpdate:modelValue={onSave}/>
-            </div>
-          </>
-        }
-      </div>}
-    </div>)
-    return genScopeId(() => <>
-      { userListRender()}
-      { editAreaRender()}
-      <dialogUserDetail v-models={[[focusInput.value, 'focusInput'], [showDialogUserDetail.value]]} />
+              <div class="user-edit__item">
+                <g-switch dense label={t('settings.viewOrderHistory')} v-model={viewOrderHistory.value} onUpdate:modelValue={onSave}/>
+              </div>
+              <div class="user-edit__item">
+                <g-switch dense label={t('settings.viewReservation')} v-model={viewReservation.value} onUpdate:modelValue={onSave}/>
+              </div>
+            </>
+          }
+        </div>)
+    return genScopeId(() => <div class="user">
+      {userListRender()}
+      {
+        // editAreaRender()
+      }
+      <dialogUserDetail v-models={[[focusInput.value, 'focusInput'], [showDialogUserDetail.value]]}/>
       <dialogSelectAvatar v-model={showDialogSelectAvatar.value}/>
       <dialogUserDetail add v-models={[[focusInput.value, 'focusInput'], [showDialogNewUser.value]]}/>
-    </>)
+    </div>)
   }
 }
 </script>
