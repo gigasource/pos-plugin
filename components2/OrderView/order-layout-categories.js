@@ -8,10 +8,9 @@ import {
   selectedCategoryLayout,
   selectCategoryLayout,
   selectProductLayout,
-  updateView
+  updateView, isSameArea
 } from './pos-ui-shared';
 import {category} from "./order-layout-setting-logic";
-import {isSameArea} from "../../components/posOrder/util";
 
 
 export function orderLayoutCategoriesFactory() {

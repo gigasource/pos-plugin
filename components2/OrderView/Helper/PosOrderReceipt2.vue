@@ -12,13 +12,15 @@ export default {
   name: 'PosOrderReceipt2',
   props: {
     modelValue: Boolean,
-    split: Boolean
+    split: Boolean,
+    splitOrders: Array,
+    order: Object
   },
   //fixme
   emits: ['update:modelValue', 'updatePayment', 'updateCurrentOrder', 'printOrderReport', 'saveRestaurantOrder', 'print', 'complete'],
   setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
-    const order = getCurrentOrder();
+    const order = props.order;
     const {t, locale} = useI18n();
     const store = ref({
       name: 'Lotteria Nguyen Khanh Toan',
@@ -74,8 +76,8 @@ export default {
       return []
     })
 
-    //todo: analyse order.splits
-    menu.value = (order.splits && order.splits.map(() => false)) || [];
+    //todo: analyse props.splitOrders
+    menu.value = (props.splitOrders && props.splitOrders.map(() => false)) || [];
 
     watch(() => dialog.value.tip, () => {
       if (dialog.value.tip) {
@@ -153,6 +155,10 @@ export default {
     }
 
     function back() {
+      if (props.split) {
+        internalValue.value = false
+        return;
+      }
       const isComplete = printed || !order.items || order.items.length === 0
       internalValue.value = false
       printed.value = false
@@ -162,8 +168,8 @@ export default {
     const router = useRouter();
 
     function complete() {
-      emit('complete')
-      if (!this.split) {
+      emit('complete');
+      if (!props.split) {
         emit('saveRestaurantOrder', null, true, false)
         internalValue.value = false
         printed.value = false
@@ -260,57 +266,58 @@ export default {
           </div>
           <div class="receipt-main__title">Table: {order.table}</div>
           {props.split ? <>
-                {order.splits.map((split, i) => <>
+                {props.splitOrders.map((split, i) => <>
                   <div class="receipt-main__item" key={split._id}>
                     <div class="row-flex align-items-center">
-                      <g-menu v-model={menu[i]} nudge-bottom="10" content-class="menu-receipt-action">
-                        {{
-                          activator: on => (<div v-on={on}
-                                                 class={['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']}>
-                            Seat {i + 1}
-                          </div>),
-                          default: () => (
-                              <div class="menu-seat-btn">
-                                <div class="menu-seat-btn--payment">
-                                  <g-btn-bs width="100" icon="icon-print" class="elevation-2"
-                                            onClick={withModifiers(() => print(split), ['stop'])}>
-                                    Print
-                                  </g-btn-bs>
-                                  <g-btn-bs width="100" class="elevation-2">
-                                    Bewirtung
-                                  </g-btn-bs>
-                                </div>
-                                <div class="menu-seat-btn--payment">
-                                  <g-btn-bs width="100" icon="icon-credit_card"
-                                            background-color={getPaymentColor(split.payment, 'card')}
-                                            class="elevation-2"
-                                            onClick={withModifiers(() => savePayment(split, 'card'), ['stop'])}>
-                                    Card
-                                  </g-btn-bs>
-                                  <g-btn-bs width="100" icon="icon-cash"
-                                            background-color={getPaymentColor(split.payment, 'cash')}
-                                            class="elevation-2"
-                                            onClick={withModifiers(() => savePayment(split, 'cash'), ['stop'])}>
-                                    Cash
-                                  </g-btn-bs>
-                                  <g-btn-bs width="100" icon="icon-multi_payment"
-                                            background-color={getPaymentColor(split.payment, 'multi')}
-                                            class="elevation-2"
-                                            onClick={withModifiers(() => openMultiDialog(split), ['stop'])}>
-                                    Multi
-                                  </g-btn-bs>
-                                </div>
-                                <g-btn-bs width="100" icon="icon-email" class="elevation-2">
-                                  Email
+                      <g-menu v-model={menu[i]} nudge-bottom="10" content-class="menu-receipt-action" v-slots={{
+                        activator: ({on}) => genScopeId(() =>
+                            <div onClick={on.click}
+                                 class={['receipt-main__item-seat', menu[i] && 'receipt-main__item-seat--selected']}>
+                              Seat {i + 1}
+                            </div>
+                        )()
+                        ,
+                        default: () => genScopeId(() =>
+                            <div class="menu-seat-btn">
+                              <div class="menu-seat-btn--payment">
+                                <g-btn-bs width="100" icon="icon-print" class="elevation-2"
+                                          onClick={withModifiers(() => print(split), ['stop'])}>
+                                  Print
                                 </g-btn-bs>
-                                <g-btn-bs width="100" icon="icon-coin-box" class="elevation-2"
-                                          onClick={withModifiers(() => showTipDialog(split), ['stop'])}>
-                                  Trinkgeld
+                                <g-btn-bs width="100" class="elevation-2">
+                                  Bewirtung
                                 </g-btn-bs>
                               </div>
-                          )
-                        }}
-                      </g-menu>
+                              <div class="menu-seat-btn--payment">
+                                <g-btn-bs width="100" icon="icon-credit_card"
+                                          background-color={getPaymentColor(split.payment, 'card')}
+                                          class="elevation-2"
+                                          onClick={withModifiers(() => savePayment(split, 'card'), ['stop'])}>
+                                  Card
+                                </g-btn-bs>
+                                <g-btn-bs width="100" icon="icon-cash"
+                                          background-color={getPaymentColor(split.payment, 'cash')}
+                                          class="elevation-2"
+                                          onClick={withModifiers(() => savePayment(split, 'cash'), ['stop'])}>
+                                  Cash
+                                </g-btn-bs>
+                                <g-btn-bs width="100" icon="icon-multi_payment"
+                                          background-color={getPaymentColor(split.payment, 'multi')}
+                                          class="elevation-2"
+                                          onClick={withModifiers(() => openMultiDialog(split), ['stop'])}>
+                                  Multi
+                                </g-btn-bs>
+                              </div>
+                              <g-btn-bs width="100" icon="icon-email" class="elevation-2">
+                                Email
+                              </g-btn-bs>
+                              <g-btn-bs width="100" icon="icon-coin-box" class="elevation-2"
+                                        onClick={withModifiers(() => showTipDialog(split), ['stop'])}>
+                                Trinkgeld
+                              </g-btn-bs>
+                            </div>
+                        )()
+                      }}/>
 
                       <g-spacer/>
                       {split.payment.map((p, iP) =>
@@ -347,7 +354,7 @@ export default {
               <div class="receipt-main__item">
                 <div class="row-flex align-items-center">
                   <g-spacer/>
-                  {order.payment.map((p, iP) =>
+                  {_.map(order.payment, (p, iP) =>
                       <div class="receipt-main__item-total" key={`payment_${iP}`}>
                         <g-icon class="mr-1">{getIcon(p.type)}</g-icon>
                         <span>{t('common.currency', locale)} {p.value}</span>

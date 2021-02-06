@@ -1,16 +1,21 @@
 <script>
-import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
+import {useI18n} from 'vue-i18n';
+import {computed, ref} from 'vue';
 
 export default {
-  setup(props, { emit }) {
-    const { t: $t, locale } = useI18n()
+  props: {
+    modelValue: null,
+    product: null,
+    originalValue: Number
+  },
+  setup(props, {emit}) {
+    const {t: $t, locale} = useI18n()
     const product = props.product
     const originalValue = props.originalValue
     const tab = ref(null)
     const tabItems = ref([
-      { title: $t('restaurant.modifier'), event: 'addModifier' },
-      { title: $t('common.discount'), event: 'changePrice' }
+      {title: $t('restaurant.modifier'), event: 'addModifier'},
+      {title: $t('common.discount'), event: 'changePrice'}
     ])
     const modifierGroups = ref([])
     const selectedModifiers = ref({})
@@ -38,7 +43,7 @@ export default {
     })
     const tabs = computed(() => {
       const mods = modifierGroups.value.map(group => {
-        const { name, categories, modifiers } = group
+        const {name, categories, modifiers} = group
         const modifiersByCategory = _.groupBy(modifiers, 'category')
 
         return ({
@@ -61,7 +66,7 @@ export default {
       const modifiersByCategories = _.groupBy(listModifiers.value, 'category')
 
       _.forEach(modifiersByCategories, (mods, catId) => {
-        const { freeItems } = tab.value.categories.find(c => c._id === catId)
+        const {freeItems} = tab.value.categories.find(c => c._id === catId)
 
         const sortedModsByPrice = mods.sort((cur, next) => next.price - cur.price)
 
@@ -85,7 +90,7 @@ export default {
     const addModifier = function () {
       if (!price.value) price.value = 0
       if (modifier.value && !isNaN(price.value) && price.value >= 0)
-        emit('addModifier', { name: modifier.value, price: +price.value })
+        emit('addModifier', {name: modifier.value, price: +price.value})
       dialogConfigOrderItem.value = false
     }
     const changePrice = function () {
@@ -137,21 +142,26 @@ export default {
       }
     }
     return () =>
-        <dialog-form-input v-model={dialogConfigOrderItem.value} width="90%" onSubmit={submit} showKeyboard={!tab.value || !tab.value.isGlobalMod}>
+        <dialog-form-input v-model={dialogConfigOrderItem.value} width="90%" onSubmit={submit}
+                           showKeyboard={!tab.value || !tab.value.isGlobalMod}>
           {{
             input: () =>
-                <g-tabs v-model={tab.value} items={tabs.value} text-color="#1d1d26" color="white" active-text-color="#1d1d26"
+                <g-tabs v-model={tab.value} items={tabs.value} text-color="#1d1d26" color="white"
+                        active-text-color="#1d1d26"
                         slider-color="#1471ff" slider-size="3">
                   {tabs.value.map((tabItem, index) =>
                       <g-tab-item key={index} item={tabItem}>
                         {(index === 0) &&
                         <div class="modifier-content row-flex flex-wrap justify-around mb-2">
-                          <pos-textfield-new style="width: 48%;" v-model={modifier} label="Modifier" placeholder="Name"/>
-                          <pos-textfield-new style="width: 48%;" rules={rules} v-model={price} label="Price" placeholder="Price"/>
+                          <pos-textfield-new style="width: 48%;" v-model={modifier} label="Modifier"
+                                             placeholder="Name"/>
+                          <pos-textfield-new style="width: 48%;" rules={rules} v-model={price} label="Price"
+                                             placeholder="Price"/>
                         </div>}
 
                         {(index === 1) &&
-                        <change-value v-model={changeType.value} originalValue={originalValue} newValueEditable={newValueEditable.value}
+                        <change-value v-model={changeType.value} originalValue={originalValue}
+                                      newValueEditable={newValueEditable.value}
                                       v-model={newValue.value}/>
                         }
 
@@ -163,32 +173,40 @@ export default {
                                   {category.mandatory && <span style="color: #FF4452;">*</span>}
                                 </div>
                                 <div class="mt-2 mb-3">
-                                  <g-grid-select items={tabItem.modifiersByCategory[category._id]} grid={false} return-object
+                                  <g-grid-select items={tabItem.modifiersByCategory[category._id]} grid={false}
+                                                 return-object
                                                  multiple={!category.selectOne} mandatory={category.mandatory}
-                                                 modelValue={selectedModifiers[category._id]} onUpdate:modelValue={(newV) => selectModifier(newV, category)}
+                                                 modelValue={selectedModifiers[category._id]}
+                                                 onUpdate:modelValue={(newV) => selectModifier(newV, category)}
                                   >
                                     {{
-                                      default: ({ toggleSelect, item, index }) =>
-                                          <g-btn uppercase={false} border-radius="2" outlined class="mr-3" background-color="#F0F0F0"
+                                      default: ({toggleSelect, item, index}) =>
+                                          <g-btn uppercase={false} border-radius="2" outlined class="mr-3"
+                                                 background-color="#F0F0F0"
                                                  style="border: 1px solid #C9C9C9"
                                                  onClick={() => onClickModifier(item, category, toggleSelect)}>
-                                            <span class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
+                                            <span
+                                                class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
                                           </g-btn>,
-                                      selected: ({ toggleSelect, item, index }) => <>
+                                      selected: ({toggleSelect, item, index}) => <>
                                         {(getModifierQty(item._id) > 1) ?
                                             <g-badge overlay color="#FF4452" class="mr-3">
                                               {{
                                                 badge: () => <div>{getModifierQty(item._id)}</div>,
                                                 default: () =>
-                                                    <g-btn uppercase={false} border-radius="2" flat background-color="#2979FF" text-color="#fff"
+                                                    <g-btn uppercase={false} border-radius="2" flat
+                                                           background-color="#2979FF" text-color="#fff"
                                                            onClick={onClickModifier(item, category, toggleSelect)}>
-                                                      <span class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
+                                                      <span
+                                                          class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
                                                     </g-btn>
                                               }}
                                             </g-badge> :
-                                            <g-btn uppercase={false} border-radius="2" flat class="mr-3" background-color="#2979FF" text-color="#fff"
+                                            <g-btn uppercase={false} border-radius="2" flat class="mr-3"
+                                                   background-color="#2979FF" text-color="#fff"
                                                    onClick={onClickModifier(item, category, toggleSelect)}>
-                                              <span class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
+                                              <span
+                                                  class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
                                             </g-btn>}
                                       </>
                                     }}

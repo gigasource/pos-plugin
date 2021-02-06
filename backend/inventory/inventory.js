@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const mongoose = require('mongoose')
+const {ObjectID} = require("bson");
 
 function compact(arr) {
   return _.uniqWith(arr.map(item => ({
@@ -18,7 +18,7 @@ module.exports = cms => {
     const { items } = order
     const ids = items.map(item => {
       if(item.modifiers && item.modifiers.length > 0) {
-        return [item.product, ...item.modifiers.map(m => mongoose.Types.ObjectId(m.product))]
+        return [item.product, ...item.modifiers.map(m => new ObjectID(m.product))]
       }
       return item.product
     }).flat()

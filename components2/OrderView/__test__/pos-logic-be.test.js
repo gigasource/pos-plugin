@@ -1,30 +1,44 @@
 //<editor-fold desc="declare">
+require('initPrint').init(__dirname, ['bon1.png', 'bon2.png']);
+
+jest.mock('cms', () => {
+  const {cmsFactory} = require('../../../test-utils')
+  const _cms = cmsFactory('inventoryDom')
+  global.cms = _cms
+  return {
+    socket: _cms.feSocket,
+    getModel: function (modelName) {
+      return _cms.orm(modelName)
+    }
+  }
+})
+
 import "../../../jest.setup";
 import {nextTick} from "vue";
 import _ from "lodash";
 import {
-  addPayment,
-  cancelOrder,
+  addSinglePayment,
   changeCourse,
-  clearPayment,
+  changeItemQuantity, getRestTotal,
+  hooks, makeLastItemTakeaway,
   removeItem,
   removeModifier,
-  updateItem,
-  hooks,
   simulateBackendPrint,
-  changeItemQuantity
+  updateItem
 } from "../pos-logic";
 import {
   actionList,
   actionList2,
   addProduct,
-  addProductToSecondOrder,
   cancelSplitOrder,
+  createPrintAction,
   currentTable,
   disablePay,
   finishMoveItemsOrder,
   finishSplitOrder,
   getCurrentOrder,
+  getRecentCancellationItems,
+  getRecentItems,
   getSecondOrder,
   itemQuantityChangeCheck,
   makeSplitOrder,
@@ -39,17 +53,14 @@ import {
   quickBtnAction,
   returnItem,
   showIcon,
-  startOnetimeSnapshot,
-  togglePayPrintBtn,
-  createPrintAction,
-  getRecentItems,
-  getRecentCancellationItems
+  togglePayPrintBtn
 } from "../pos-logic-be";
+import '../../AppSharedStates.js'
 import {mockProduct} from "./mock_product";
-
-const {Socket, Io} = require("schemahandler/io/io");
 import {mockOrder} from "./mock-order";
 import {mockProducts} from "./mock_products";
+
+const {Socket, Io} = require("schemahandler/io/io");
 
 const syncFlow = require("schemahandler/sync/sync-flow");
 const syncPlugin = require("schemahandler/sync/sync-plugin-multi");
@@ -81,19 +92,20 @@ const {
   makeLastItemDiscount
 } = require("../pos-logic");
 
-const cms = cmsFactory('posLogicBe')
-global.cms = cms
-const { orm, feSocket } = cms
+//const cms = cmsFactory('posLogicBe')
+//global.cms = cms
+const cms = global.cms;
+const {orm, feSocket} = cms
 
-const delay = require("delay");
+import delay from "delay";
 
-const foodTax = { taxes: [5, 10] };
-const drinkTax = { taxes: [16, 32] };
+const foodTax = {taxes: [5, 10]};
+const drinkTax = {taxes: [16, 32]};
 
-const cola = { name: "Cola", price: 1.3, quantity: 1, ...drinkTax };
-const fanta = { name: "Fanta", price: 2, quantity: 1, ...drinkTax };
-const rice = { name: "Rice", price: 10, quantity: 1, ...foodTax };
-const ketchup = { name: "Add Ketchup", price: 3, quantity: 1 };
+const cola = {name: "Cola", price: 1.3, quantity: 1, ...drinkTax};
+const fanta = {name: "Fanta", price: 2, quantity: 1, ...drinkTax};
+const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
+const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
 
 jest.setTimeout(60000)
 
@@ -301,7 +313,7 @@ describe("pos-logic", function () {
     await nextTick();
     addProduct(order, mockProduct);
     await nextTick();
-    //simulateBackendPrint(order);
+    simulateBackendPrint(order);
     await nextTick();
 
     expect(expectArray()).toMatchInlineSnapshot(`
@@ -535,7 +547,7 @@ describe("pos-logic", function () {
     await nextTick();
 
     //todo: clone order:
-    makeSplitOrder();
+    await makeSplitOrder();
     await nextTick();
     moveItemToSecondOrder(0);
     await nextTick();
@@ -556,7 +568,7 @@ describe("pos-logic", function () {
 
     actionList.value.length = 0;
     //begin split
-    makeSplitOrder();
+    await makeSplitOrder();
     await nextTick();
     moveItemToSecondOrder(0);
     await nextTick();
@@ -577,7 +589,7 @@ describe("pos-logic", function () {
     await nextTick();
 
     //todo: clone order:
-    makeSplitOrder();
+    await makeSplitOrder();
     await nextTick();
     moveItemToSecondOrder(0);
     await nextTick();
@@ -616,7 +628,7 @@ describe("pos-logic", function () {
     expect(stringify(actionList2.value)).toMatchSnapshot();
   });
 
-  it("case 14a: create Order + addProduct + togglePrint + printToKitchen", async function(done) {
+  it("case 14a: create Order + addProduct + togglePrint + printToKitchen", async function (done) {
     prepareOrder("10");
     const order = getCurrentOrder();
     await nextTick();
@@ -635,5 +647,103 @@ describe("pos-logic", function () {
     })
     //todo: add code to frontend
     feSocket.emit('print-to-kitchen', actionList.value, order)
+  });
+
+  it("case 15a: print to kitchen", async function (done) {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    const _mockProduct = _.cloneDeep(mockProduct)
+    _mockProduct.groupPrinter.name = "Kitchen"
+    addProduct(order, _mockProduct, 2);
+    addModifier(order, ketchup);
+    await nextTick();
+    removeItem(order, 0, 1, true);
+    await nextTick();
+    console.log(actionList.value)
+    cms.once('run:print', async function (commit) {
+      expect(stringify(actionList.value)).toMatchSnapshot();
+      expect(stringify(commit)).toMatchSnapshot()
+      await checkOrderCreated(cms.orm)
+      await delay(1000);
+      done()
+    })
+    hooks.emit('printOrder')
+    //todo: add code to frontend
+  });
+
+  it("case 15b: pay", async function (done) {
+    require('initPrint').setFiles(['15b_1.png', '15b_2.png']);
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    const _mockProduct = _.cloneDeep(mockProduct)
+    _mockProduct.groupPrinter.name = "Kitchen"
+    addProduct(order, _mockProduct, 2);
+    await nextTick();
+    addModifier(order, ketchup);
+    await nextTick();
+    removeItem(order, 0, 1, true);
+    await nextTick();
+    addSinglePayment(order, {type: "cash", value: getRestTotal(order) + 5});
+    await nextTick();
+    cms.once('run:print', async function (commit) {
+      expect(stringify(actionList.value)).toMatchSnapshot();
+      expect(stringify(commit)).toMatchSnapshot()
+      await checkOrderCreated(cms.orm)
+      await delay(1000);
+      done()
+    })
+    hooks.emit('pay', true)
+    //todo: add code to frontend
+  });
+
+  it("case 15c: print to kitchen", async function (done) {
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    const _mockProduct = _.cloneDeep(mockProduct)
+    _mockProduct.groupPrinter.name = "Kitchen"
+    addProduct(order, _mockProduct, 2);
+    await nextTick()
+    addModifier(order, ketchup);
+    await nextTick()
+    makeLastItemTakeaway(order);
+    await nextTick();
+    console.log(actionList.value)
+    cms.once('run:print', async function (commit) {
+      const orders = await orm('Order').find({});
+    })
+    hooks.emit('printOrder')
+    //todo: add code to frontend
+  });
+
+  it("case 16: split order intergrate", async function () {
+    require('initPrint').setFiles(['16_1.png', '16.png']);
+    prepareOrder("10");
+    const order = getCurrentOrder();
+    await nextTick();
+    addItem(order, cola, 2);
+    await nextTick();
+    removeItem(order, 0, 1, true);
+    await nextTick();
+    addItem(order, fanta, 1);
+    await nextTick();
+
+    //begin split
+    await makeSplitOrder();
+    await nextTick();
+    moveItemToSecondOrder(0)
+    await nextTick();
+    const a = order;
+    addSinglePayment(order2, {type: "cash", value: getRestTotal(order2)});
+    await nextTick();
+    //expect(stringify(_.omit(actionList2.value, ['splitId']))).toMatchSnapshot();
+    //todo: pay
+    //todo: problem: update old order, print invoice for split order
+    await hooks.emit('pay-split', true);
+    const orders = await orm('Order').find({});
+    expect(orders).toMatchSnapshot();
+    await delay(1000);
   });
 });

@@ -1,12 +1,19 @@
 <script>
-import { updatePayment } from '../../settings-shared-logics';
-import { computed, ref, withModifiers, watch } from 'vue'
-import { useI18n } from 'vue-i18n';
-import { selectedPayment, onOpenDialogDelete, onOpenDialogEditPayment, onDeletePayment, dialogRef, showDialogConfirmDelete, onOpenDialogNewPayment} from './view-payment-logics';
+import {useI18n} from 'vue-i18n';
+import {
+  dialogRef,
+  onDeletePayment,
+  onOpenDialogDelete,
+  onOpenDialogEditPayment,
+  onOpenDialogNewPayment,
+  selectedPayment,
+  showDialogConfirmDelete
+} from './view-payment-logics';
 import dialogNewPayment from './dialogNewPayment';
-import dialogConfirmDelete from '../../dialog/dialogConfirmDelete';
+import DialogConfirmDelete from "../../../Dialog/DialogConfirmDelete";
+
 export default {
-  components: {dialogNewPayment, dialogConfirmDelete},
+  components: {dialogNewPayment, DialogConfirmDelete},
   setup() {
     const { t } = useI18n()
     return () => <>

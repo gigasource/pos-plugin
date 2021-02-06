@@ -13,9 +13,9 @@ import {
   getGridTemplateFromNumber, highlightSelectedProduct,
   selectedCategoryLayout,
   selectedProductLayout,
-  editable, productDblClicked, products, updateView, selectProductLayout
+  editable, productDblClicked, products, updateView, selectProductLayout, isSameArea
 } from './pos-ui-shared';
-import {isSameArea} from "../../components/posOrder/util";
+
 import {addProduct, getCurrentOrder} from "./pos-logic-be";
 import {addModifier} from "./pos-logic";
 import {orderLayoutKeyboardFactory} from "./order-layout-keyboard";

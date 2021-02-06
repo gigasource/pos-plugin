@@ -1,11 +1,13 @@
 //<editor-fold desc="declare">
-import {addItem, changeItemQuantity, createOrder, hooks} from './pos-logic';
+import {addItem, changeItemQuantity, createOrder, genSplitId, hooks, updateOrderWithHooks} from './pos-logic';
 import {computed, ref, toRaw} from "vue";
 import cms from 'cms';
 import _ from 'lodash';
 import rdiff from 'recursive-diff';
 import Hooks from "schemahandler/hooks/hooks";
-import {v1} from 'uuid';
+import dayjs from "dayjs";
+import delay from "delay";
+import {socketEmit} from "../utils";
 
 const Order = cms.getModel('Order');
 
@@ -13,7 +15,7 @@ function addItemAction(order, actionList, item, update) {
   update = _.cloneDeep(update);
   actionList.value.push({
     modelName: 'Order', // todo: review
-    action: cms.getModel('Order')
+    action: Order
       .findOneAndUpdate({_id: order._id, 'items._id': item._id}, update)
       .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain
   })
@@ -23,7 +25,7 @@ function addOrderAction(order, actionList, update) {
   update = _.cloneDeep(update);
   actionList.value.push({
     modelName: 'Order', // todo: review
-    action: cms.getModel('Order')
+    action: Order
       .findOneAndUpdate({_id: order._id}, update)
       .commit('updateActiveOrder', {...order._id && {orderId: order._id}, table: order.table}).chain
   })
@@ -82,6 +84,10 @@ hooks.on('pre:order:update', order => {
 
 hooks.on('post:order:update', order => {
   return hooks.emit(`post:order:update:${orderMap.get(order)}`, order);
+})
+
+hooks.on('pre:prepareOrder', order => {
+  return hooks.emit(`pre:prepareOrder:${orderMap.get(order)}`, order);
 })
 
 function mapProduct(p) {
@@ -165,17 +171,17 @@ export function orderBeFactory(id = 0) {
    *
    * @param __order (can be table or whole order)
    */
-  function prepareOrder(__order, clearActionList = true) {
-    hooks.emit(`pre:prepareOrder:${id}`, __order);
+  function prepareOrder(__order, clearActionList = true, split) {
     let _new = typeof __order !== 'object' || !__order._id;
     if (typeof __order === 'string') {
       __order = {table: __order};
     }
     clearOrder(clearActionList);
     order = createOrder(_.assign(order, __order));
+    hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
     if (_new) {
-      const action = Order.create(_order).commit('createOrder', {table: order.table}).chain
+      const action = Order.create(_order).commit('createOrder', {table: order.table, ...split && {split: true}}).chain
       actionList.value.push({
         modelName: 'Order', // todo: review
         action
@@ -199,7 +205,7 @@ export function orderBeFactory(id = 0) {
    * @returns {Promise<void>}
    */
   async function syncOrderChange(newOrder) {
-    if (!order._id || newOrder._id.toString() != order._id.toString()) return
+    if (!newOrder || !order._id || newOrder._id.toString() != order._id.toString()) return
     //add items
     //diff to get patch
     const items = getRecentItems();
@@ -244,7 +250,8 @@ export function orderBeFactory(id = 0) {
     return order.cancellationItems.filter((i, k) => k > beCancellationItemsSnapshot.value.length - 1);
   }
 
-  return {actionList, getCurrentOrder, currentTable, prepareOrder,
+  return {
+    actionList, getCurrentOrder, currentTable, prepareOrder,
     order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
     startOnetimeSnapshot, finishOnetimeSnapshot, syncOrderChange,
     getRecentItems, getRecentCancellationItems
@@ -252,6 +259,7 @@ export function orderBeFactory(id = 0) {
 }
 
 export const {
+  getRecentItems, getRecentCancellationItems,
   actionList, getCurrentOrder, currentTable,
   prepareOrder, order, clearOrder,
   beItemsSnapshot, beCancellationItemsSnapshot,
@@ -275,10 +283,11 @@ export const {
 
 let tempItemsSnapshot = [], tempCancellationItemsSnapshot = [];
 
-export function makeSplitOrder() {
+export async function makeSplitOrder() {
   clearSecondOrder();
-  order.splitId = order.splitId || v1();
-  prepareSecondOrder(_.omit(order, ['items', 'cancellationItems', '_id', 'vSum', 'vTaxSum', 'status']));
+  updateOrderWithHooks(order, () => genSplitId(order));
+  await delay(0);
+  prepareSecondOrder(_.omit(order, ['items', 'cancellationItems', '_id', 'vSum', 'vTaxSum', 'status', 'payment']), true, true);
   [tempItemsSnapshot, tempCancellationItemsSnapshot] = [_.cloneDeep(order).items, _.cloneDeep(order).cancellationItems]
   startOnetimeSnapshot();
   startOnetimeSnapshot2();
@@ -399,8 +408,11 @@ let actionTimeout;
 
 /**
  *
+ * @param actionList
  * @param printType
  * @param order
+ * @param device
+ * @param recent
  * @example
  * cms.once('run:print', function (commit) {
  *    expect(stringify(actionList.value)).toMatchSnapshot();
@@ -410,12 +422,14 @@ let actionTimeout;
  *  })
  *
  */
-export function createPrintAction(printType, order, actionList) { // todo: review
+export function createPrintAction(actionList, printType, {order, device, recent}) { // todo: review
   actionList.push({
     modelName: 'Action',
     action: cms.getModel('Action').create({
       printType,
-      order
+      order,
+      device,
+      recent
     }).commit('print').chain
   })
 }
@@ -460,8 +474,104 @@ export const disablePay = computed(() => {
 
 hooks.on('printOrder', () => {
   order.date = new Date();
-  cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), _.cloneDeep(order));
+  const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
+  makeSent(actionList.value);
+  createPrintAction(actionList.value, 'kitchen', {order, device: 'Terminal 1', recent})
+  cms.socket.emit('print-to-kitchen', _.cloneDeep(actionList.value), order);
   clearOrder();
 });
+
+async function genMaxId(order) {
+  //fixme: run only in master process to prevent missed data
+  const order0 = await Order.findOne({id: {$exists: true}}).sort({id: '-1'})
+  order.id = order0 ? order0.id + 1 : 1;
+}
+
+async function genBookingNumber(order) {
+  order.bookingNumber = dayjs(order.date).format('YYMMDDHHmmssSSS');
+}
+
+async function getAllSplitOrder(splitId) {
+  return await Order.find({splitId});
+}
+
+function makeSent(actionList) {
+  actionList.push({
+    modelName: 'Order',
+    action: Order.updateOne({_id: order._id}, {
+      $set: {
+        'items.$[].sent': true, 'items.$[].printed': true,
+        'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
+      }
+    }).chain
+  });
+}
+
+function makePaid(actionList) {
+  actionList.push({
+    modelName: 'Order',
+    action: Order.updateOne({_id: order._id}, {
+      $set: {status: 'paid'}
+    }).chain
+  });
+}
+
+//todo: support print to kitchen
+hooks.on('pay', async (printInvoice = false) => {
+  //todo: withPrintInvoice, noPrintInvoice, split
+  //todo: split ??
+  //base on splitId
+  //todo: virtual printer
+
+  order.date = new Date();
+  const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
+  if (printInvoice) {
+    createPrintAction(actionList.value, 'invoice', {order, device: 'Terminal 1', recent})
+  }
+  makePaid(actionList.value);
+
+  if (beItemsSnapshot.value.length === 0 && beCancellationItemsSnapshot.value.length === 0) {
+    order.immediatePay = true;
+  }
+
+  await genMaxId(order);
+  await genBookingNumber(order);
+
+  cms.socket.emit('pay-order', _.cloneDeep(actionList.value), order);
+  clearOrder();
+})
+
+hooks.on('pay-split', async (printInvoice) => {
+  const empty = order.items.length === 0;
+  //todo: case new order
+  //todo: print to kitchen if new order ??
+  //todo: discount on split
+  //todo: isMobile : show receipt
+  order2.date = new Date();
+  await genMaxId(order2);
+  await genBookingNumber(order2);
+  if (empty) {
+    order2.cancellationItems = [...order.cancellationItems];
+  }
+  order2.status = 'paid';
+
+  finishSplitOrder();
+  await delay(0);
+  const _actionList = [..._.cloneDeep(actionList.value), ..._.cloneDeep(actionList2.value)];
+  if (printInvoice) {
+    createPrintAction(_actionList, 'invoice', {order: order2, device: 'Terminal 1'})
+  }
+
+  //remove order
+  if (empty) {
+    //remove empty order
+    _actionList.push({modelName: 'Order', action: Order.remove({_id: order._id}).chain});
+  }
+
+  await socketEmit('action-list', _actionList);
+  clearSecondOrder();
+  if (empty) clearOrder();
+  if (!empty) await makeSplitOrder();
+})
 
 //</editor-fold>

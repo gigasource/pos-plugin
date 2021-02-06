@@ -27,10 +27,9 @@
   import PosPrinterSetting from '../posPrinterSetting/PosPrinterSetting';
   import PosPrinterSettingForMultiple from '../posPrinterSetting/PosPrinterSettingForMultiple';
   import PosPrinterSettingGeneral from '../posPrinterSetting/PosPrinterSettingGeneral';
-  import DialogConfirmDelete from '../Settings/dialog/dialogConfirmDelete';
   export default {
     name: 'posPrinterSettingView',
-    components: { DialogConfirmDelete, PosPrinterSettingGeneral, PosPrinterSettingForMultiple, PosPrinterSetting, ContentRender, PosPrinterSettingSidebar },
+    components: { PosPrinterSettingGeneral, PosPrinterSettingForMultiple, PosPrinterSetting, ContentRender, PosPrinterSettingSidebar },
     props: {},
     injectService: ['SettingsStore:(selectedPrinterMenu,deleteGroupPrinter)'],
     data: function () {
@@ -61,14 +60,14 @@
     grid-template-columns: 256px 1fr;
     grid-template-rows: 100%;
     height: 100%;
-    
+
     &__sidebar {
       grid-area: 1 / 1 / 2 / 2;
     }
-    
+
     &__content {
       grid-area: 1 / 2 / 2 / 3;
     }
-    
+
   }
 </style>

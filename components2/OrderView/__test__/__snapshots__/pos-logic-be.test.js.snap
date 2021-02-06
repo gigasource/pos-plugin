@@ -2447,3 +2447,996 @@ Array [
   },
 ]
 `;
+
+exports[`pos-logic case 15a: print to kitchen 1`] = `Array []`;
+
+exports[`pos-logic case 15a: print to kitchen 2`] = `
+Object {
+  "_id": "ObjectID",
+  "device": "Terminal 1",
+  "order": Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "cashback": 0,
+    "date": "2021-01-01T00:00:00.000Z",
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 43,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 43,
+        "net": 36.13,
+        "tax": 6.87,
+      },
+    },
+  },
+  "printType": "kitchen",
+  "recent": Object {
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`pos-logic case 15a: print to kitchen 3`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "cashback": 0,
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "printed": true,
+        "product": "ObjectID",
+        "quantity": 1,
+        "sent": true,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+    "payment": Array [],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 43,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 43,
+        "net": 36.13,
+        "tax": 6.87,
+      },
+    },
+  },
+]
+`;
+
+exports[`pos-logic case 15a: print to kitchen 4`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{},\\"tip\\":0,\\"cashback\\":0}]}]",
+    "collectionName": "Order",
+    "condition": "null",
+    "data": Object {
+      "docId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 1,
+    "tags": Array [
+      "createOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$.modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"items.$.vSum\\":86,\\"items.$.vTakeAway\\":false,\\"items.$.tax\\":19,\\"items.$.vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 2,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":86,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":2,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 4,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":86,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}},\\"tip\\":0,\\"cashback\\":0}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 5,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$.quantity\\":1,\\"items.$.vSum\\":43,\\"items.$.vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"cancellationItems\\":{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":43,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 8,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$[].sent\\":true,\\"items.$[].printed\\":true,\\"cancellationItems.$[].sent\\":true,\\"cancellationItems.$[].printed\\":true}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+    },
+    "fromMaster": true,
+    "id": 9,
+    "tags": Array [],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"printType\\":\\"kitchen\\",\\"order\\":{\\"items\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":43,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}],\\"cancellationItems\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":43,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}},\\"tip\\":0,\\"cashback\\":0,\\"date\\":\\"2021-01-01T00:00:00.000Z\\"},\\"device\\":\\"Terminal 1\\",\\"recent\\":{\\"items\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":43,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}],\\"cancellationItems\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}],\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}]}}]}]",
+    "collectionName": "Action",
+    "condition": "null",
+    "data": Object {
+      "printFromMaster": true,
+    },
+    "fromMaster": true,
+    "id": 10,
+    "tags": Array [
+      "print",
+    ],
+    "uuid": "uuid-v1",
+  },
+]
+`;
+
+exports[`pos-logic case 15b: pay 1`] = `Array []`;
+
+exports[`pos-logic case 15b: pay 2`] = `
+Object {
+  "_id": "ObjectID",
+  "device": "Terminal 1",
+  "order": Object {
+    "_id": "ObjectID",
+    "bookingNumber": "210101070000000",
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "cashback": 5,
+    "date": "2021-01-01T00:00:00.000Z",
+    "id": 1,
+    "immediatePay": true,
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+    "multiPayment": false,
+    "payment": Array [
+      Object {
+        "type": "cash",
+        "value": 48,
+      },
+    ],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 43,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 43,
+        "net": 36.13,
+        "tax": 6.87,
+      },
+    },
+  },
+  "printType": "invoice",
+  "recent": Object {
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`pos-logic case 15b: pay 3`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "cancellationItems": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 86,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 86,
+            "net": 72.27,
+            "tax": 13.73,
+          },
+        },
+      },
+    ],
+    "cashback": 5,
+    "items": Array [
+      Object {
+        "_id": "ObjectID",
+        "course": 1,
+        "groupPrinter": "Kitchen",
+        "id": "48",
+        "modifiers": Array [
+          Object {
+            "name": "Add Ketchup",
+            "price": 3,
+            "quantity": 1,
+          },
+        ],
+        "name": "Whiskey",
+        "price": 40,
+        "product": "ObjectID",
+        "quantity": 1,
+        "tax": 19,
+        "taxes": Array [
+          19,
+          7,
+        ],
+        "vSum": 43,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "19": Object {
+            "gross": 43,
+            "net": 36.13,
+            "tax": 6.87,
+          },
+        },
+      },
+    ],
+    "multiPayment": false,
+    "payment": Array [
+      Object {
+        "type": "cash",
+        "value": 48,
+      },
+    ],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": "2020-12-31T17:00:00.000Z",
+    "vSum": 43,
+    "vTaxSum": Object {
+      "19": Object {
+        "gross": 43,
+        "net": 36.13,
+        "tax": 6.87,
+      },
+    },
+  },
+]
+`;
+
+exports[`pos-logic case 15b: pay 4`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"items\\":[],\\"cancellationItems\\":[],\\"payment\\":[],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":0,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{},\\"tip\\":0,\\"cashback\\":0}]}]",
+    "collectionName": "Order",
+    "condition": "null",
+    "data": Object {
+      "docId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 1,
+    "tags": Array [
+      "createOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"items\\":{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":2,\\"_id\\":\\"ObjectID\\",\\"vSum\\":80,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":12.77,\\"net\\":67.23,\\"gross\\":80}}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 2,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":80,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":12.77,\\"net\\":67.23,\\"gross\\":80}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 3,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$.vSum\\":86,\\"items.$.vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}},\\"items.$.modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 4,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":86,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 5,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"},{\\"$set\\":{\\"items.$.quantity\\":1,\\"items.$.vSum\\":43,\\"items.$.vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\",\\"items._id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 6,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$push\\":{\\"cancellationItems\\":{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}},\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 7,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"vSum\\":43,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}}}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 8,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"findOneAndUpdate\\",\\"args\\":[{\\"_id\\":\\"ObjectID\\"},{\\"$set\\":{\\"payment\\":[{\\"type\\":\\"cash\\",\\"value\\":48}],\\"cashback\\":5,\\"multiPayment\\":false}}]},{\\"fn\\":\\"setOptions\\",\\"args\\":[{\\"new\\":true}]}]",
+    "collectionName": "Order",
+    "condition": "{\\"_id\\":\\"ObjectID\\"}",
+    "data": Object {
+      "docId": "ObjectID",
+      "orderId": "ObjectID",
+      "table": "10",
+    },
+    "fromMaster": true,
+    "id": 9,
+    "tags": Array [
+      "updateActiveOrder",
+    ],
+    "uuid": "uuid-v1",
+  },
+  Object {
+    "_id": "ObjectID",
+    "approved": false,
+    "chain": "[{\\"fn\\":\\"insertOne\\",\\"args\\":[{\\"printType\\":\\"invoice\\",\\"order\\":{\\"items\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":43,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}},\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}],\\"cancellationItems\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}},\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}],\\"payment\\":[{\\"type\\":\\"cash\\",\\"value\\":48}],\\"user\\":[],\\"table\\":\\"10\\",\\"_id\\":\\"ObjectID\\",\\"takeAway\\":false,\\"status\\":\\"inProgress\\",\\"vSum\\":43,\\"vDate\\":\\"2020-12-31T17:00:00.000Z\\",\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}},\\"tip\\":0,\\"cashback\\":5,\\"multiPayment\\":false,\\"date\\":\\"2021-01-01T00:00:00.000Z\\",\\"immediatePay\\":true,\\"id\\":1,\\"bookingNumber\\":\\"210101070000000\\"},\\"device\\":\\"Terminal 1\\",\\"recent\\":{\\"items\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":43,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":6.87,\\"net\\":36.13,\\"gross\\":43}},\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}],\\"cancellationItems\\":[{\\"groupPrinter\\":\\"Kitchen\\",\\"id\\":\\"48\\",\\"name\\":\\"Whiskey\\",\\"price\\":40,\\"product\\":\\"ObjectID\\",\\"taxes\\":[19,7],\\"course\\":1,\\"quantity\\":1,\\"_id\\":\\"ObjectID\\",\\"vSum\\":86,\\"vTakeAway\\":false,\\"tax\\":19,\\"vTaxSum\\":{\\"19\\":{\\"tax\\":13.73,\\"net\\":72.27,\\"gross\\":86}},\\"modifiers\\":[{\\"name\\":\\"Add Ketchup\\",\\"price\\":3,\\"quantity\\":1}]}]}}]}]",
+    "collectionName": "Action",
+    "condition": "null",
+    "data": Object {
+      "printFromMaster": true,
+    },
+    "fromMaster": true,
+    "id": 10,
+    "tags": Array [
+      "print",
+    ],
+    "uuid": "uuid-v1",
+  },
+]
+`;
+
+exports[`pos-logic case 16: split order intergrate 1`] = `
+Array [
+  Object {
+    "_id": "0000000000000000000007cf",
+    "cancellationItems": Array [],
+    "cashback": 0,
+    "items": Array [
+      Object {
+        "_id": "0000000000000000000007d1",
+        "course": 1,
+        "name": "Fanta",
+        "price": 2,
+        "quantity": 1,
+        "tax": 16,
+        "taxes": Array [
+          16,
+          32,
+        ],
+        "vSum": 2,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 2,
+            "net": 1.72,
+            "tax": 0.28,
+          },
+        },
+      },
+    ],
+    "payment": Array [
+      Object {
+        "type": "cash",
+        "value": 1.3,
+      },
+    ],
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": 2020-12-31T17:00:00.000Z,
+    "vSum": 2,
+    "vTaxSum": Object {
+      "16": Object {
+        "gross": 2,
+        "net": 1.72,
+        "tax": 0.28,
+      },
+    },
+  },
+  Object {
+    "_id": "0000000000000000000007d2",
+    "bookingNumber": "210101070000000",
+    "cancellationItems": Array [],
+    "cashback": 0,
+    "date": 2021-01-01T00:00:00.000Z,
+    "id": 1,
+    "items": Array [
+      Object {
+        "_id": "0000000000000000000007d3",
+        "course": 1,
+        "name": "Cola",
+        "price": 1.3,
+        "quantity": 1,
+        "tax": 16,
+        "taxes": Array [
+          16,
+          32,
+        ],
+        "vSum": 1.3,
+        "vTakeAway": false,
+        "vTaxSum": Object {
+          "16": Object {
+            "gross": 1.3,
+            "net": 1.12,
+            "tax": 0.18,
+          },
+        },
+      },
+    ],
+    "multiPayment": false,
+    "payment": Array [
+      Object {
+        "type": "cash",
+        "value": 1.3,
+      },
+    ],
+    "splitId": "4a784001-4bc4-11eb-a273-a7b8ef82044c",
+    "status": "inProgress",
+    "table": "10",
+    "takeAway": false,
+    "tip": 0,
+    "user": Array [],
+    "vDate": 2020-12-31T17:00:00.000Z,
+    "vSum": 1.3,
+    "vTaxSum": Object {
+      "16": Object {
+        "gross": 1.3,
+        "net": 1.12,
+        "tax": 0.18,
+      },
+    },
+  },
+]
+`;

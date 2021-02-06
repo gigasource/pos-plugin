@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test dashboard should render 1`] = `
+<div class="row-flex">
+  <g-sidebar-stub medium="true"
+                  style="height: 100vh; z-index: 2;"
+  >
+    <g-side-bar-tree-view-stub data="[object Object],[object Object],[object Object],[object Object],[object Object]">
+    </g-side-bar-tree-view-stub>
+    <slot name="above-spacer">
+    </slot>
+    <g-spacer-stub>
+    </g-spacer-stub>
+    <g-btn-stub uppercase="false"
+                large="true"
+                text="true"
+                background-color="white"
+                text-color="#424242"
+                width="100%"
+    >
+      <g-icon-stub svg="true">
+        icon-logout
+      </g-icon-stub>
+      <span class="ml-2">
+        sidebar.logOut
+      </span>
+    </g-btn-stub>
+  </g-sidebar-stub>
+</div>
+`;

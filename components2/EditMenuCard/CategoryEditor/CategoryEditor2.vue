@@ -1,34 +1,29 @@
 <script>
 import ColorSelector from '../../../components/common/ColorSelector';
-import InputNumber from '../../../components/EditMenuCard/InputNumber';
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 import constants from '../EditMenuCardToolbar/constants';
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 import {
-  productRows,
-  productCols,
-  categoryName,
+  canDelete,
+  canSwitch,
   categoryColor,
+  categoryName,
   debouncedUpdateCategory,
   deleteCategory,
-  setAction,
-  canSwitch,
-  canDelete
+  productCols,
+  productRows,
+  setAction
 } from './category-editor-category'
 
-import {
-  categoryRows,
-  categoryColumns,
-  changeCategoryColumn,
-  changeCategoryRow,
-} from './category-editor-order-layout'
-import { genScopeId } from '../../utils';
+import {categoryColumns, categoryRows, changeCategoryColumn, changeCategoryRow,} from './category-editor-order-layout'
+import {genScopeId} from '../../utils';
+import InputNumber2 from "../InputNumber2";
 
 export default {
   name: 'CategoryEditor2',
-  components: { PosKeyboardFull, InputNumber, ColorSelector },
+  components: { PosKeyboardFull, InputNumber2, ColorSelector },
   setup() {
     const { t } = useI18n()
 

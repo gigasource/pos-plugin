@@ -1,5 +1,6 @@
 //<editor-fold desc="declare">
 import {ObjectID} from "bson";
+import {v1} from "uuid";
 
 const {reactive, computed, watch, watchEffect, h, nextTick, ref, isProxy} = require('vue');
 const _ = require('lodash');
@@ -332,6 +333,16 @@ export function toggleTakeaway(order) {
   hooks.emit('post:order:update', order);
 }
 
+export function makeLastItemTakeaway(order) {
+  hooks.emit('pre:order:update', order);
+  const last = _.last(order.items);
+  if (last) {
+    last.course = 0;
+    last.takeAway = true;
+  }
+  hooks.emit('post:order:update', order);
+}
+
 export function addModifier(order, modifier) {
   hooks.emit('pre:order:update', order);
   const _modifier = _.cloneDeep(modifier);
@@ -490,11 +501,13 @@ export function clearPayment(order) {
  * @param order
  * @param query
  * @param quantity
+ * @param force
  * @example
  * removeItem(order, 0, 10);
  * removeItem(order, {name: 'Cola'}, 3);
+ * force use only for testing
  */
-export function removeItem(order, query, quantity = 1) {
+export function removeItem(order, query, quantity = 1, force = false) {
   if (typeof query !== 'number') {
     query = _.findIndex(order.items, query);
   }
@@ -511,7 +524,7 @@ export function removeItem(order, query, quantity = 1) {
     order.items.splice(query, 1);
   }
   //todo: sent or not
-  if (item.sent && item.originalQuantity > item.quantity - quantity) {
+  if (force || (item.sent && item.originalQuantity > item.quantity - quantity)) {
     order.cancellationItems.push(_item);
   }
   hooks.emit('post:order:update', order);
@@ -575,11 +588,17 @@ export function redeemVoucher(order, value) {
   hooks.emit('post:order:update', order);
 }
 
+export function genSplitId(order) {
+  order.splitId = order.splitId || v1();
+}
+
 export function simulateBackendPrint(order) {
   order.items.forEach(i => {
     i.sent = true;
     i.printed = true;
+    i.originalQuantity = i.quantity
   })
+  hooks.emit('pre:prepareOrder', order);
 }
 
 export function mergeSameItems(order, mutate = true) {

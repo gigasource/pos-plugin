@@ -13,13 +13,6 @@ export default {
   components: [GGridSelect],
   setup(props, { emit }) {
     const { t, locale } = useI18n()
-    const fakeProps = {
-      modelValue: true,
-      product: {
-        name: 'Water',
-        activePopupModifierGroup: new ObjectID('600e91fe59aa8475e361e257')
-      }
-    }
     onBeforeMount(() => {
       appHooks.emit('updateModifiers')
     })
@@ -31,9 +24,8 @@ export default {
       onClickModifier,
       getModifierQty,
       onSave
-    } = dialogChoosePopupModifierLogicsFactory(fakeProps, { emit })
+    } = dialogChoosePopupModifierLogicsFactory(props, { emit })
 
-    props = fakeProps
     return genScopeId(() => <g-dialog v-model={internalValue.value} width="60%">
       <g-card class="pt-3 pr-4 pb-3 pl-4">
         <g-card-title>
