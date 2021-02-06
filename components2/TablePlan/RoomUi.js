@@ -14,10 +14,11 @@ export function roomUiFactory(roomObjectRenderFn, selectingRoomStates, objectsIn
   //fixme: fix code for preventStop to prevent side effect
   const renderRoom = genScopeId(() =>
     <div id="room" class={['room']} ref={roomContainer} style={roomContainerStyle.value}
-         onMousemove={preventStop}
-         onMouseup={preventStop}
-         onTouchmove={preventStop}
-         onTouchend={preventStop}>
+         // onMousemove={preventStop}
+         // onMouseup={preventStop}
+         // onTouchmove={preventStop}
+         // onTouchend={preventStop}
+      >
       {objectsInSelectingRoom.value.map((obj) => {
         return roomObjectRenderFn && roomObjectRenderFn(obj)
       })}
