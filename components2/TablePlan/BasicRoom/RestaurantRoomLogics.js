@@ -38,7 +38,7 @@ export async function chooseTable(obj) {
     showNumberOfCustomersDialog.value = true
     selectingTable.value = obj
   } else {
-    routeToOrder()
+    routeToOrder(obj)
   }
 }
 
@@ -55,5 +55,5 @@ export function onCustomerDialogSubmit( { numberOfCustomers, tseMethod }, emit) 
     ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
     tseMethod: tseMethod || 'auto'
   })
-  routeToOrder()
+  routeToOrder(obj)
 }
