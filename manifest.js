@@ -2,12 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
-    { loader: { type: 'route' }, filePath: 'components2/Settings/Settings2.vue', name: 'Settings2', path: '/pos2-settings' },
-    { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewUser/viewUser.vue', name: 'UserSetting', path: '/pos-view-user' },
-    { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewTax/viewTax.vue', name: 'TaxSetting', path: '/pos-view-tax' },
-    { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewPayment/viewPayment.vue', name: 'PaymentSetting', path: '/pos-view-payment' },
-    { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewGeneral.vue', name: 'GeneralSetting', path: '/pos-view-general' },
-    { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewCompany.vue', name: 'Company', path: '/pos-view-company' },
+    { loader: { type: 'route' }, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos2-modifier' },
     { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier2.vue', name: 'ChooseModifier', path: '/pos2-choose-modifier' },
     { loader: { type: 'route' }, filePath: 'components2/Payment/Payment2.vue', name: 'Payment2', path: '/pos-payment' },
@@ -28,7 +23,7 @@ module.exports = {
     //{ loader: { type: 'route' }, filePath: 'components/View/Dashboard.vue', name: 'Dashboard', path: '/pos2-dashboard' },
     { loader: { type: 'route' }, filePath: 'components/View/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history' },
     //{ loader: { type: 'route' }, filePath: 'components/View/Order.vue', name: 'Order', path: '/pos-order/:id?' },
-    { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
+    // { loader: { type: 'route' }, filePath: 'components/View/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components/View/EditMenuCard.vue', name: 'EditMenuCard', path: '/pos-edit-menu-card' },
     { loader: { type: 'route' }, filePath: 'components/View/Online.vue', name: 'Online', path: '/pos-online' },
     { loader: { type: 'route' }, filePath: 'components/Inventory/Inventory1.vue', name: 'Inventory1', path: '/pos1-inventory' },
