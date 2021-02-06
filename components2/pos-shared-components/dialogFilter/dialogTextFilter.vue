@@ -33,6 +33,7 @@
 				default: ''
 			},
     },
+    emits: ['update:modelValue', 'submit'],
 		injectService: ['PosStore:(isMobile, isIOS)'],
     data() {
       return {

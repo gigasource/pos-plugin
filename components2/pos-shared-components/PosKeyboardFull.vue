@@ -120,6 +120,7 @@
   export default {
     name: 'PosKeyboardFull',
     injectService: ['PosStore:locale'],
+    emits: ['update:modelValue', 'change-type', 'enter-pressed'],
     data() {
       return {
         keyboardEnglish: [

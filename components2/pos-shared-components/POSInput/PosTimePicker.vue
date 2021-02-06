@@ -1,7 +1,7 @@
 <template>
   <div class="pos-time-picker">
     <g-time-picker-input append-inner-icon="access_time" use24-hours :label="label"
-                         v-model="internalValue" @change="$emit('change', $event)"
+                         v-model="internalValue"
     ></g-time-picker-input>
   </div>
 </template>
@@ -29,6 +29,7 @@
         }
       }
     },
+    emits: ['update:modelValue'],
     watch: {
       modelValue: {
         handler(val) {
