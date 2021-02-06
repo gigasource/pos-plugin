@@ -1,7 +1,7 @@
 <script>
 import ColorSelector from '../../../components/common/ColorSelector';
 import InputNumber from '../../../components/EditMenuCard/InputNumber';
-import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
+import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
 import { useI18n } from 'vue-i18n'
 import constants from '../EditMenuCardToolbar/constants';
 import { ref } from 'vue'

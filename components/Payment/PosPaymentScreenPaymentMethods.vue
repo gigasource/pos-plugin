@@ -73,8 +73,8 @@
   import _ from 'lodash';
   import { nextTick } from 'vue';
   import dialogMultiPayment from '../posOrder/dialogMultiPayment';
-  import dialogFormInput from '../pos-shared-components/dialogFormInput';
-  import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew'
+  import dialogFormInput from '../../components2/pos-shared-components/dialogFormInput';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew'
 
   export default {
     name: 'PosPaymentScreenPaymentMethods',

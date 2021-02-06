@@ -17,8 +17,8 @@
 
 <script>
   import { nextTick } from 'vue'
-  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
-  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew';
+  import PosKeyboardFull from '../../components2/pos-shared-components/PosKeyboardFull';
 
   export default {
     name: 'PosOrderManualTable',

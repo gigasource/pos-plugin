@@ -42,9 +42,9 @@
   import DialogConfirmDelete from "../Settings/dialog/dialogConfirmDelete";
   import orderUtil from '../logic/orderUtil';
   import DialogDateTimePicker from "../OrderHistory/dialogDateTimePicker";
-  import DialogNumberFilter from "../pos-shared-components/dialogFilter/dialogNumberFilter";
-  import DialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
-  import DialogRangeFilter from "../pos-shared-components/dialogFilter/dialogRangeFilter";
+  import DialogNumberFilter from "../../components2/pos-shared-components/dialogFilter/dialogNumberFilter";
+  import DialogTextFilter from "../../components2/pos-shared-components/dialogFilter/dialogTextFilter";
+  import DialogRangeFilter from "../../components2/pos-shared-components/dialogFilter/dialogRangeFilter";
 
   export default {
     name: "OrderHistory",

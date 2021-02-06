@@ -2,7 +2,7 @@
 import { withModifiers, ref, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { GBtnBs, GIcon, GTextFieldBs } from '../../../../backoffice/pos-vue-framework';
-import dialogNumberFilter from '../../components/pos-shared-components/dialogFilter/dialogNumberFilter';
+import dialogNumberFilter from '../pos-shared-components/dialogFilter/dialogNumberFilter';
 export default {
   props: {
     values: Array,

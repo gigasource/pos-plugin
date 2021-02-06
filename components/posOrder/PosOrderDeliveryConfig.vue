@@ -28,7 +28,7 @@
   import _ from 'lodash'
   import inputNumber from '../EditMenuCard/InputNumber'
   import posOrderDeliveryKeyboard from './posOrderDeliveryKeyboard';
-  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogTextFilter from '../../components2/pos-shared-components/dialogFilter/dialogTextFilter';
 
   export default {
     name: "PosOrderDeliveryConfig",

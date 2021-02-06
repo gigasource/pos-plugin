@@ -1,7 +1,7 @@
 <script>
 import posOrderKeyboard from '../../components/posOrder/PosOrderKeyboard'
 import dialogChoosePopupModifier from '../../components/posOrder/dialogChoosePopupModifier';
-import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
+import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 import dialogProductSearchResult from '../../components/Order/components/dialogProductSearchResult';
 import {
   computed,

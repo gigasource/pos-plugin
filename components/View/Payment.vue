@@ -43,7 +43,7 @@
   import PosRestaurantPaymentToolbar from "../posRestaurantPayment/PosRestaurantPaymentToolbar";
   import PosPaymentScreenPaymentMethods from "../Payment/PosPaymentScreenPaymentMethods";
   import PosPaymentScreenKeyboard from "../Payment/PosPaymentScreenKeyboard";
-  import DialogChangeValue from "../pos-shared-components/dialogChangeValue";
+  import DialogChangeValue from "../../components2/pos-shared-components/dialogChangeValue";
   export default {
     name: "Payment",
     components: {

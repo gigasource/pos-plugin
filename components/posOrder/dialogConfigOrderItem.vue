@@ -64,8 +64,8 @@
 </template>
 
 <script>
-  import ChangeValue from '../pos-shared-components/ChangeValue';
-  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import ChangeValue from '../../components2/pos-shared-components/ChangeValue';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew';
 
   export default {
     name: "dialogConfigOrderItem",

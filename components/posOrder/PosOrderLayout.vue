@@ -41,7 +41,7 @@
   import _ from 'lodash'
   import posOrderKeyboard from '../../components/posOrder/PosOrderKeyboard'
   import dialogChoosePopupModifier from './dialogChoosePopupModifier';
-  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogTextFilter from '../../components2/pos-shared-components/dialogFilter/dialogTextFilter';
   import dialogProductSearchResult from '../Order/components/dialogProductSearchResult';
   import { createEmptyCategoryLayout, createEmptyLayout, createEmptyProductLayout, isSameArea } from './util'
 

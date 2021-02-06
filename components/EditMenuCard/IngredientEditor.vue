@@ -38,7 +38,7 @@
 </template>
 
 <script>
-  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  import PosKeyboardFull from '../../components2/pos-shared-components/PosKeyboardFull';
   import {Touch} from 'pos-vue-framework';
   import _ from 'lodash'
 

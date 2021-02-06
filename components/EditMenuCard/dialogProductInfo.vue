@@ -12,7 +12,7 @@
 
 <script>
   import {log} from "../../../../backoffice/public/js/monaco-editor-core/esm/vs/editor/standalone/common/monarch/monarchCommon";
-  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew';
   import { nextTick } from 'vue';
 
   export default {

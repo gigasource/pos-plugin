@@ -33,9 +33,9 @@
 <script>
   // TODO:
   //  - Consider to change props value to modelValue?
-  
-  import ScrollSelect from '../Reservation/ScrollSelect';
-  
+
+  import ScrollSelect from '../../components/Reservation/ScrollSelect';
+
   export default {
     name: 'DiscountInput',
     injectService: ['PosStore:storeLocale'],

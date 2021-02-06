@@ -1,9 +1,9 @@
 <script>
 import { onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
-import PosRangeSlider from '../../components/pos-shared-components/POSInput/PosRangeSlider'
-import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew'
-import dialogFormInput from '../../components/pos-shared-components/dialogFormInput'
+import PosRangeSlider from '../pos-shared-components/POSInput/PosRangeSlider'
+import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew'
+import dialogFormInput from '../pos-shared-components/dialogFormInput'
 import dialogChangeStock from './helpers/dialogChangeStock'
 import dialogInventoryCategory from './helpers/dialogInventoryCategory'
 

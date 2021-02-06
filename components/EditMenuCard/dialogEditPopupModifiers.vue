@@ -165,9 +165,9 @@
 </template>
 
 <script>
-  import PosTextField from '../pos-shared-components/POSInput/PosTextField';
-  import DialogFormInput from '../pos-shared-components/dialogFormInput';
-  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+  import PosTextField from '../../components2/pos-shared-components/POSInput/PosTextField';
+  import DialogFormInput from '../../components2/pos-shared-components/dialogFormInput';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew';
 
   export default {
     name: 'dialogEditPopupModifiers',

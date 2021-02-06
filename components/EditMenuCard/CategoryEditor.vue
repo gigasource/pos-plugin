@@ -61,7 +61,7 @@
   import _ from 'lodash';
   import ColorSelector from '../common/ColorSelector';
   import InputNumber from './InputNumber';
-  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
+  import PosKeyboardFull from '../../components2/pos-shared-components/PosKeyboardFull';
   import { reactive, computed, toRefs } from 'vue'
   export default {
     name: 'CategoryEditor',
@@ -81,10 +81,10 @@
         notifyContent: null,
         debouncedUpdateCategory: () => null
       })
-      
+
       const cateRows = computed(() => props.selectedCategoryLayout.rows)
       const cateCols = computed(() => props.selectedCategoryLayout.columns)
-      
+
       const debouncedUpdateCategory = _.debounce(change => {
         updateCategory(change, !props.selectedCategoryLayout._id)
       }, 300)
@@ -94,13 +94,13 @@
         showNotify()
         context.emit('update:orderLayout', result)
       }
-      
+
       async function changeOrderLayoutRow(rows) {
         const result = await cms.getModel('OrderLayout').findOneAndUpdate({_id: props.orderLayout._id}, { rows }, { new: true })
         showNotify()
         context.emit('update:orderLayout', result)
       }
-      
+
       async function updateCategory(change, forceCreate) {
         console.log('Store ', change, ' to this.selectedCategoryLayout')
         _.assign(props.selectedCategoryLayout, change)
@@ -128,13 +128,13 @@
           }
         }
       }
-      
+
       function showNotify(content) {
         state.notifyContent = content || 'Saved'
         state.showSnackbar = true
       }
-      
-      
+
+
       return {
         ...toRefs(state),
         cateRows,
