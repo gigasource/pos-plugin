@@ -21,8 +21,6 @@ import PosOrderDeliveryConfig from './DeliverySetting/PosOrderDeliveryConfig'
 export default {
   components: { PosOrderDeliveryConfig, OnlineOrderSetting, CustomerScreenConfig, CallSystem, PosSettingsScreenToolbar, viewGeneral, viewUser, viewPayment, viewTax, viewCompany, viewUserToolbar, viewTaxToolbar, viewPaymentToolbar, PosSettingsScreenSidebar},
   setup() {
-    //todo: keep-alive
-    login('0000')
     const GeneralSettingView = <viewGeneral style="flex: 1"/>
     const UserSettingView = <viewUser style="flex: 1"/>
     const CompanyInfoSettingView =<viewCompany style="flex: 1"/>
