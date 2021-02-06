@@ -13,33 +13,34 @@ import {
   onSave, userList,
   init, viewOnlineOrderDashboard, viewOnlineOrderMenu, viewOrder, viewOrderHistory, viewReservation, getUserList
 } from './view-user-logics';
-import { genScopeId } from '../../../utils';
+import { genScopeId } from '../../utils';
 import { useI18n } from 'vue-i18n';
 import dialogSelectAvatar from './dialogSelectAvatar'
 import dialogUserDetail from './dialogUserDetail';
 import { onActivated } from 'vue';
+
 export default {
   components: { dialogSelectAvatar, dialogUserDetail },
   setup() {
     const { t } = useI18n()
     onActivated(async () => {
       if (filteredUserList.value.length === 0) userList.value = await getUserList()
-      if (!selectedUser.value) selectedUser.value = (filteredUserList.value.length > 0 ? filteredUserList.value[0]: null)
+      if (!selectedUser.value) selectedUser.value = (filteredUserList.value.length > 0 ? filteredUserList.value[0] : null)
     })
 
     const userListRender = genScopeId(() => <div class="user-list">
       {
         <g-list items={filteredUserList.value}
-              active-class="item__active"
-              divider
-              elevation="0"
-              item-text="name"
-              mandatory
-              prepend-type="avatar"
-              return-object
-              selectable
-              v-model={selectedUser.value}>
-      </g-list>
+                active-class="item__active"
+                divider
+                elevation="0"
+                item-text="name"
+                mandatory
+                prepend-type="avatar"
+                return-object
+                selectable
+                v-model={selectedUser.value}>
+        </g-list>
       }
       <div onClick={onAddUser} class="row-flex align-items-center pa-2 pl-3">
         <g-avatar size="40">
@@ -115,7 +116,7 @@ export default {
     return genScopeId(() => <div class="user">
       {userListRender()}
       {
-        // editAreaRender()
+        editAreaRender()
       }
       <dialogUserDetail v-models={[[focusInput.value, 'focusInput'], [showDialogUserDetail.value]]}/>
       <dialogSelectAvatar v-model={showDialogSelectAvatar.value}/>

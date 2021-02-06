@@ -1,9 +1,9 @@
 <script>
-import { appHooks, posSettings } from '../../../AppSharedStates';
+import { appHooks, posSettings } from '../../AppSharedStates';
 import { computed, ref } from 'vue'
-import { genScopeId, isSameId } from '../../../utils';
+import { genScopeId, isSameId } from '../../utils';
 import { useI18n } from 'vue-i18n';
-import { getScopeAttrs } from '../../../../utils/helpers';
+import { getScopeAttrs } from '../../../utils/helpers';
 import { selectedPayment, listPayments, onSelectPayment } from './view-payment-logics';
 
 export default {

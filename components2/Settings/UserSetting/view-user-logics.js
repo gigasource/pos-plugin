@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
-import { currentUserIsAdmin, isAdmin, isLoggedIn, user } from '../../../AppSharedStates';
-import { attrComputed, isSameId } from '../../../utils';
-import { login } from '../../../Login/LoginLogic';
+import { currentUserIsAdmin, isAdmin, isLoggedIn, user } from '../../AppSharedStates';
+import { attrComputed, isSameId } from '../../utils';
+import { login } from '../../Login/LoginLogic';
 export const showDialogUserDetail = ref(false)
 export const focusInput = ref('username')
 export const showDialogSelectAvatar = ref(false)
@@ -59,7 +59,7 @@ export async function onSave() {
   await updateUser(selectedUser.value._id, selectedUser.value);
 }
 
-async function getUserList() {
+export async function getUserList() {
     return await cms.getModel('PosUser').find().lean();
 }
 

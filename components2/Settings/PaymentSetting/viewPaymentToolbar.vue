@@ -1,10 +1,10 @@
 <script>
-import { updatePayment } from '../../settings-shared-logics';
+import { updatePayment } from '../settings-shared-logics';
 import { computed, ref, withModifiers, watch } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { selectedPayment, onOpenDialogDelete, onOpenDialogEditPayment, onDeletePayment, dialogRef, showDialogConfirmDelete, onOpenDialogNewPayment} from './view-payment-logics';
 import dialogNewPayment from './dialogNewPayment';
-import dialogConfirmDelete from '../../dialog/dialogConfirmDelete';
+import dialogConfirmDelete from '../../pos-shared-components/dialogConfirmDelete';
 export default {
   components: {dialogNewPayment, dialogConfirmDelete},
   setup() {

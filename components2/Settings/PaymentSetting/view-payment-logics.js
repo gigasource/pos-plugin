@@ -1,8 +1,8 @@
 import { computed, ref } from 'vue';
-import { posSettings } from '../../../AppSharedStates';
-import { updatePayment } from '../../settings-shared-logics';
+import { posSettings } from '../../AppSharedStates';
+import { updatePayment } from '../settings-shared-logics';
 import { useI18n } from 'vue-i18n';
-import { internalValueFactory } from '../../../utils';
+import { internalValueFactory } from '../../utils';
 import { ObjectID } from 'bson';
 
 export const listPayments = computed(() => {

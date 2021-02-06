@@ -1,12 +1,13 @@
 <script>
-import { isMobile } from '../../../AppSharedStates';
+import { isMobile } from '../../AppSharedStates';
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { TaxCategoryDialogLogicsFactory } from './view-tax-logics';
-import { genScopeId } from '../../../utils';
-import { getScopeAttrs} from '../../../../utils/helpers';
+import { genScopeId } from '../../utils';
+import { getScopeAttrs} from '../../../utils/helpers';
 
 export default {
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const { internalValue, submit, open, isValid, rules, taxType, taxName, taxValue } = TaxCategoryDialogLogicsFactory(props, { emit })

@@ -1,7 +1,7 @@
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import cms from 'cms';
-import { internalValueFactory } from '../../../utils';
+import { internalValueFactory } from '../../utils';
 
 export const listTaxCategories = ref([])
 export const selectedTaxCategory = ref(null)

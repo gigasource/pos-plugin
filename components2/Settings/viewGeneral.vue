@@ -1,10 +1,10 @@
 <script>
-import { attrComputed, genScopeId } from '../../utils';
-import { appHooks, posSettings } from '../../AppSharedStates';
+import { attrComputed, genScopeId } from '../utils';
+import { appHooks, posSettings } from '../AppSharedStates';
 import { computed, ref, withModifiers, watch } from 'vue'
 import cms from 'cms'
 import { useI18n } from 'vue-i18n';
-import { updateSetting } from '../settings-shared-logics';
+import { updateSetting } from './settings-shared-logics';
 
 export default {
   setup() {
@@ -41,54 +41,46 @@ export default {
       }
     }, {
       deep: true
-    })
+    }, { onTrigger: () => console.log('trigger')})
 
 
     const leftSideRender = genScopeId(() => <div class="col-5 px-3">
       <div class="row-flex align-items-center justify-between">
-        <span>
-          {t('settings.companyBarcode')} </span>
+        <span> {t('settings.companyBarcode')} </span>
         <g-switch v-model={barcode.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          {t('settings.showFav')} </span>
+        <span> {t('settings.showFav')} </span>
         <g-switch v-model={favoriteArticle.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          {t('settings.autoCashdrawer')} </span>
+        <span> {t('settings.autoCashdrawer')} </span>
         <g-switch v-model={automaticCashdrawer.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          Quick pay/print button </span>
+        <span> Quick pay/print button </span>
         <g-switch v-model={quickBtn.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          Only checkout printed items </span>
+        <span> Only checkout printed items </span>
         <g-switch v-model={onlyCheckoutPrintedItems.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          Using virtual printer </span>
+        <span> Using virtual printer </span>
         <g-switch v-model={useVirtualPrinter.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          Pay button prints receipt </span>
+        <span> Pay button prints receipt </span>
         <g-switch v-model={printReceiptWithPay.value}></g-switch>
       </div>
       <div class="row-flex align-items-center justify-between">
-        <span>
-          Show tutorial button </span>
+        <span> Show tutorial button </span>
         <g-switch v-model={showTutorial.value}></g-switch>
       </div>
     </div>)
 
     const rightSideRender = genScopeId(() => <div class="flex-grow-1 offset-1">
-      <div class="row-flex align-items-center justify-center">
+      <div className="row-flex align-items-center justify-center">
         <pos-time-picker label={t('settings.beginHour')} v-model={beginHour.value} v-slots={{
           'append': () => <g-icon> access_time </g-icon>
         }}>

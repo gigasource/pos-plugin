@@ -2,9 +2,9 @@
 import { ref, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { PaymentDialogLogicsFactory } from './view-payment-logics';
-import { genScopeId } from '../../../utils';
+import { genScopeId } from '../../utils';
 import { selectedPayment} from './view-payment-logics';
-import { getScopeAttrs } from '../../../../utils/helpers';
+import { getScopeAttrs } from '../../../utils/helpers';
 
 export default {
   props: {
@@ -13,6 +13,7 @@ export default {
       default: false
     }
   },
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const  { isEditing, paymentName, showKeyboard, back, save, iconSrc, openPaymentDialog, internalValue} = PaymentDialogLogicsFactory(props, { emit })

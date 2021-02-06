@@ -10,7 +10,7 @@ import {
   onDeleteTaxCategory,
     dialogRef
 } from './view-tax-logics';
-import { genScopeId } from '../../../utils';
+import { genScopeId } from '../../utils';
 import dialogNewTaxCategory from './dialogNewTaxCategory';
 export default {
   components: { dialogNewTaxCategory},

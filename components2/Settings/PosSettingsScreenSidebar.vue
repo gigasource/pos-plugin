@@ -6,10 +6,6 @@ import { changeView } from './settings-ui-logics';
 import { ref } from 'vue'
 
 export default {
-  props: {
-    modelValue: null,
-    sidebarData: null
-  },
   setup(props, { emit }) {
 
     const { sidebarData } = SettingsSidebarFactory()

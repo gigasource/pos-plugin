@@ -1,6 +1,6 @@
 <script>
 import { useI18n } from 'vue-i18n';
-import { genScopeId, isSameId } from '../../../utils';
+import { genScopeId, isSameId } from '../../utils';
 import { init, listTaxCategories, onSelectTax, selectedTaxCategory } from './view-tax-logics';
 //todo: remove
 export default {

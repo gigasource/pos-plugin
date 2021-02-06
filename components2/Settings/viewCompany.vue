@@ -2,9 +2,9 @@
 import { convertToUnit } from 'pos-vue-framework';
 import { computed, ref, withModifiers, watch } from 'vue'
 import _ from 'lodash'
-import { attrComputed, genScopeId } from '../../utils';
+import { attrComputed, genScopeId } from '../utils';
 import { useI18n } from 'vue-i18n';
-import { appHooks, posSettings } from '../../AppSharedStates';
+import { appHooks, posSettings } from '../AppSharedStates';
 
 export default {
   setup() {
@@ -44,7 +44,7 @@ export default {
           reader.readAsDataURL(file.value);
         }
       }
-    })
+    }, { onTrigger: () => console.log('trigger')})
 
     async function update() {
       dialog.value = false
@@ -81,7 +81,7 @@ export default {
         </div>)
 
     //todo: should auto focus on textfield which user want to modify
-    const leftSideRender = genScopeId(() => <div class="main">
+    const leftSideRender = genScopeId(() => <>
       {inputRender('companyName', name, true)()}
       {inputRender('address', address, true)()}
       {inputRender('address2', address2)()}
@@ -90,32 +90,34 @@ export default {
       {inputRender('tel', telephone, true)()}
       {inputRender('taxNo', taxNumber, true)()}
       {inputRender('ustId', ustId)()}
+    </>)
 
-      <div class="main__item">
-        <p class="item-label">
-          {t('settings.logo')} </p>
-        <g-file-input outlined filled dense prepend-inner-icon="icon-upload" svg-icon v-model={file.value} accept="image/*" placeholder="Upload"></g-file-input>
-      </div>
-      <div class="main__item">
-        <p class="item-label">
-          {t('settings.logoSize')} </p>
-        <div class="logo">
-          {_.range(6).map(i =>
-              <div key={i + 1} class={['item', logoSize.value === i + 1 && 'item__selected']} onClick={() => changeLogoSize(i + 1)}>
-                {i + 1}
-              </div>
-          )} </div>
-      </div>
-      <div class="main__item item__big">
-        <p class="item-label">
-          {t('settings.logoPreview')} </p>
-        <div class="preview-wrapper">
-          <img alt style={imgStyle.value} src={logo.value}> </img>
-        </div>
-      </div>
-    </div>)
-
-    const rightSideRender = genScopeId(() => <dialog-form-input v-model={dialog.value} onSubmit={update} v-slots={{
+    const rightSideRender = genScopeId(() => <>
+          <div class="main__item">
+            <p class="item-label">
+              {t('settings.logo')} </p>
+            <g-file-input outlined filled dense prepend-inner-icon="icon-upload" svg-icon v-model={file.value} accept="image/*" placeholder="Upload"></g-file-input>
+          </div>
+          <div class="main__item">
+            <p class="item-label">
+              {t('settings.logoSize')} </p>
+            <div class="logo">
+              {_.range(6).map(i =>
+                  <div key={i + 1} class={['item', logoSize.value === i + 1 && 'item__selected']} onClick={() => changeLogoSize(i + 1)}>
+                    {i + 1}
+                  </div>
+              )} </div>
+          </div>
+          <div class="main__item item__big">
+            <p class="item-label">
+              {t('settings.logoPreview')} </p>
+            <div class="preview-wrapper">
+              <img alt style={imgStyle.value} src={logo.value}> </img>
+            </div>
+          </div>
+        </>
+    )
+    const dialogRender = genScopeId(() => <dialog-form-input v-model={dialog.value} onSubmit={update} v-slots={{
       'input': genScopeId(() =>
           <div class="row-flex flex-wrap justify-around">
             <pos-textfield-new style="width: 48%" label={t('settings.companyName')} v-model={name.value} required/>
@@ -129,10 +131,11 @@ export default {
           </div>)
     }}>
     </dialog-form-input>)
-    return genScopeId(() => <>
+    return genScopeId(() => <div class="main">
       {leftSideRender()}
       {rightSideRender()}
-    </>)
+      {dialogRender()}
+    </div>)
   }
 }
 </script>

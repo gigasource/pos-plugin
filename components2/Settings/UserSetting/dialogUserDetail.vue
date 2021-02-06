@@ -1,8 +1,8 @@
 <script>
 
-import { isMobile } from '../../../AppSharedStates';
+import { isMobile } from '../../AppSharedStates';
 import { computed, ref, watch } from 'vue'
-import { genScopeId, internalValueFactory } from '../../../utils';
+import { genScopeId, internalValueFactory } from '../../utils';
 import { useI18n } from 'vue-i18n';
 import { userList, selectedUser, updateUser } from './view-user-logics';
 
@@ -12,6 +12,7 @@ export default {
     focusInput: String,
     add: Boolean
   },
+  emits: ['update:modelValue', 'update:focusInput'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const name = ref('')
@@ -47,14 +48,13 @@ export default {
       showDialogUserDetail.value = false;
     }
 
-
     watch(() => showDialogUserDetail.value, () => {
       setTimeout(() => {
         if (refs[`${check.value}Ref`].value)  refs[`${check.value}Ref`].value.focus();
       }, 200);
       name.value = props.add ? '' : selectedUser.value.name;
       passcode.value = props.add ? '' : selectedUser.value.passcode;
-    })
+    }, { onTrigger: () => console.log('trigger')})
     return genScopeId(() =>
         <g-dialog v-model={showDialogUserDetail.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager fullscreen={isMobile.value}>
           <div class="dialog-user w-100">
