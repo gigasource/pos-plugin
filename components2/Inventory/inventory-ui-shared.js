@@ -1,16 +1,17 @@
 import { ref, watch, watchEffect } from 'vue'
 import {
-	inventoryCategories,
 	filter,
 	inventories
 } from './inventory-logic-ui'
 import {
+	categories
+} from '../Product/product-logic'
+import {
 	createInventory,
 	deleteInventory,
-	loadInventories,
-	loadInventoryHistories,
+	loadInventoryActions,
 	updateInventory
-} from "./inventory-logic-be";
+} from './inventory-logic-be';
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
@@ -36,36 +37,16 @@ export const dialog = ref({
  * in inventory dialog and in stock
  * dialog
  */
-const createEmptyInventory = {
-	[appType.POS_RESTAURANT]: () => ({
+const createEmptyInventory = () => ({
 		_id: null,
 		id: null,
 		name: null,
 		category: null,
 		unit: null,
 		stock: null
-	}),
-	[appType.POS_RETAIL]: () => ({
-		_id: null,
-		id: null,
-		name: null,
-		category: null,
-		unit: null,
-		stock: null,
-		price: null,
-		unitCostPrice: null,
-		isFavorite: false,
-		isVoucher: false,
-		isActive: false,
-		isRefundable: true,
-		showOnOrderScreen: true,
-		manualPrice: false,
-		hasComboIngredient: false,
-		attributes: [],
-		comboIngredient: []
-	})
-}
-export const selectedInventory = ref(createEmptyInventory[currentAppType.value]())
+})
+
+export const selectedInventory = ref(createEmptyInventory())
 
 /**
  * Unit of inventory
@@ -157,7 +138,7 @@ export function renderInventoryDialog(t) {
 				<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
 													 style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
 				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
-									items={inventoryCategories.value} item-text="name" return-object v-model={selectedInventory.value.category}/>
+									items={categories.value} item-text="name" return-object v-model={selectedInventory.value.category}/>
 				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
 									items={units.value} v-model={selectedInventory.value.unit}/>
 			</div>
@@ -168,7 +149,7 @@ export function renderInventoryDialog(t) {
 				<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
 					<pos-textfield-new style="width: 30%" label="Name" v-model={selectedInventory.value.name}/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 20%" label={t('article.category')}
-										items={inventoryCategories.value} item-text="name" return-object v-model={selectedInventory.value.category}
+										items={categories.value} item-text="name" return-object v-model={selectedInventory.value.category}
 					/>
 					<pos-textfield-new style="width: 20%" label="Product ID" v-model={selectedInventory.value.id}/>
 					<pos-textfield-new style="width: 20%" rules={[val => !isNaN(val) || 'Must be a number!']}
@@ -281,7 +262,7 @@ export function renderFilterDialog(t) {
 				<pos-textfield-new style="width: 30%" label="Name" v-model={temporaryDialogFilter.value.name} clearable>
 				</pos-textfield-new>
 				<g-select menu-class="menu-select-inventory" text-field-component="GTextFieldBs" outlined style="width: 30%"
-				          label={t('article.category')} clearable items={inventoryCategories.value} item-text="name"
+				          label={t('article.category')} clearable items={categories.value} item-text="name"
 				          return-object v-model={temporaryDialogFilter.value.category}>
 				</g-select>
 				<div class="col-12 row-flex">
@@ -310,7 +291,7 @@ export function openDialogInventory(inventory, mode) {
 		//   + add: create empty inventory
 		//   + edit: just keep selectedInventory as it is
 		if (mode === 'add')
-			selectedInventory.value = createEmptyInventory[currentAppType.value]()
+			selectedInventory.value = createEmptyInventory()
 	} else {
 		dialog.value.mode = mode
 		selectedInventory.value = _.cloneDeep(inventory)
@@ -325,7 +306,7 @@ export function formatDate(date) {
 }
 
 /**
- * @date: {Object} range from, to of selected inventory histories
+ * @date: {Object} range from, to of selected inventory actions
  * @example:
  * {
  *   data: {
@@ -334,16 +315,16 @@ export function formatDate(date) {
  *   }
  * }
  */
-export const historyFilter = ref({
+export const actionFilter = ref({
 	fromDate: dayjs().format('YYYY-MM-DD'),
 	toDate: dayjs().format('YYYY-MM-DD')
 })
-export const filteredInventoryHistories = ref([])
-watch(() => historyFilter.value, async () => {
-	const inventoryHistories = await loadInventoryHistories(historyFilter.value)
+export const filteredInventoryActions = ref([])
+watch(() => actionFilter.value, async () => {
+	const inventoryActions = await loadInventoryActions(actionFilter.value)
 
-	const getAmount = (histories, mode) => {
-		return histories.reduce((acc, item) => {
+	const getAmount = (actions, mode) => {
+		return actions.reduce((acc, item) => {
 			if (mode === item.type) {
 				return acc + parseInt(item.amount)
 			}
@@ -351,12 +332,12 @@ watch(() => historyFilter.value, async () => {
 		}, 0)
 	}
 
-	filteredInventoryHistories.value = _.map(
-		_.groupBy(inventoryHistories, history => history.inventory),
+	filteredInventoryActions.value = _.map(
+		_.groupBy(inventoryActions, action => action.inventory),
 		(group, inventory) => {
 			return {
 				inventory,
-				history: group,
+				action: group,
 				add: getAmount(group, 'add'),
 				remove: getAmount(group, 'remove')
 			}
