@@ -44,14 +44,14 @@ export function updateGeneralSetting() {
 export async function updateSetting(value) {
   const settingModel = cms.getModel('PosSetting');
   await settingModel.findOneAndUpdate({}, value)
-  Object.assign(posSettings, value)
+  Object.assign(posSettings.value, value)
 
   // appHooks.emit('settingChange') => this cause problems with watch effect because it reassign posSettings.value
 }
 
 export const settingsHooks = new Hooks()
 
-export const currentSettingView = ref('')
+export const currentSettingView = ref('UserSettingView')
 settingsHooks.on('changeSettingView', (val) => {
   currentSettingView.value = val
 })

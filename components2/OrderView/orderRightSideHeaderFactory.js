@@ -3,7 +3,7 @@ import {avatar, isMobile, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode, showIcon} from "./pos-logic-be";
 import {hooks, toggleTakeaway} from './pos-logic'
-import {ref, withModifiers} from "vue";
+import {ref, withModifiers, Transition} from "vue";
 import {useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
 import {payPrintBtnFactory} from "./payPrintBtnFactory";
@@ -60,7 +60,7 @@ export function orderRightSideHeader(props, {emit}) {
         <g-icon>icon-split_check_2</g-icon>
       </g-btn-bs>}
 
-      <transition name="fade">
+      <Transition name="fade">
         {!(isMobile.value && showSplitBtn.value && payPrintMode.value === 'pay'&& showIcon.value) &&
         <div class="row-flex align-items-center flex-grow-1">
           {isMobile.value ?
@@ -110,7 +110,7 @@ export function orderRightSideHeader(props, {emit}) {
             <g-icon>icon-back</g-icon>
           </g-btn-bs>}
         </div>}
-      </transition>
+      </Transition>
       <g-spacer/>
       {renderPayBtn()}
 

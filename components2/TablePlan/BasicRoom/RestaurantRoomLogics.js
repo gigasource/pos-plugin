@@ -54,5 +54,5 @@ export function onCustomerDialogSubmit({numberOfCustomers, tseMethod}, emit) {
     ...numberOfCustomers && {numberOfCustomers: +numberOfCustomers},
     tseMethod: tseMethod || 'auto'
   })
-  routeToOrder()
+  routeToOrder(obj)
 }

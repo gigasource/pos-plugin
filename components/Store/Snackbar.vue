@@ -37,7 +37,7 @@
         this.computedSnackbar = false
       }
     },
-    render(h) {
+    render() {
       const snackbarListener = {
         on: {
           input: e => this.computedSnackbar = e
@@ -45,7 +45,7 @@
       }
 
       return (
-        <g-snackbar absolute color={this.snackbarColor} timeout={this.snackbarTimeout} value={this.computedSnackbar} {...snackbarListener}>
+        <g-snackbar absolute color={this.snackbarColor} timeout={this.snackbarTimeout} v-model={this.computedSnackbar} {...snackbarListener}>
           {typeof this.snackbarContent === 'function' ? this.snackbarContent() : this.snackbarContent}
         </g-snackbar>
       )

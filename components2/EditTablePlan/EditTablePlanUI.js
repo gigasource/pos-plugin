@@ -3,7 +3,7 @@ import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import EditTablePlanSidebar from './EditTablePlanSidebar';
 import { fetchRooms } from '../TablePlan/RoomState';
 import { getScopeAttrs } from '../../utils/helpers';
-import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
+import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 import GSnackbar from '../../../../backoffice/pos-vue-framework/src/components/GSnackbar/GSnackbar';
 
 const EditablePlanFactory = () => {

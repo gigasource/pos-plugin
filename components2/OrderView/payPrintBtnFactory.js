@@ -1,8 +1,8 @@
 import {smallSidebar} from "./order-layout-setting-logic";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {onActivated, ref, withModifiers} from "vue";
 import {useRouter} from 'vue-router';
+import {onActivated, ref, withModifiers, Transition} from "vue";
 import {
   getCurrentOrder,
   onlyCheckoutPrintedItems,
@@ -55,30 +55,30 @@ export function payPrintBtnFactory() {
       if (smallSidebar.value) {
         if (payPrintMode.value === 'print') {
           return <g-btn-bs {...btnAttrs}>
-            <transition name="front">
+            <Transition name="front">
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
-            </transition>
-            <transition name="back">
+            </Transition>
+            <Transition name="back">
               {showIcon.value && <div class="animation-wrapper" style="background-color: #0EA76F">
                 <g-icon>icon-print</g-icon>
               </div>}
-            </transition>
+            </Transition>
           </g-btn-bs>
         }
         return (
           <g-btn-bs {...btnAttrs}>
-            <transition name="front">
+            <Transition name="front">
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
-            </transition>
-            <transition name="back">
+            </Transition>
+            <Transition name="back">
               {showIcon.value && <div class="animation-wrapper bg-pink">
                 <g-icon>icon-wallet</g-icon>
               </div>}
-            </transition>
+            </Transition>
           </g-btn-bs>
         )
       }

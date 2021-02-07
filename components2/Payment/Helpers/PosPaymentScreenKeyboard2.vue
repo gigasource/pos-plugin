@@ -1,11 +1,11 @@
 <script>
-import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
+import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
 import { computed, onMounted, ref, watch } from 'vue'
 import { $filters, isMobile } from '../../AppSharedStates';
 import { useI18n } from 'vue-i18n';
 import PaymentLogicsFactory from '../payment-logics';
 import { GDivider, GIcon, GSpacer, GTable } from '../../../../../backoffice/pos-vue-framework';
-import PosTextfieldNew from '../../../components/pos-shared-components/POSInput/PosTextfieldNew';
+import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNew';
 import { genScopeId, VModel_number } from '../../utils';
 
 export default {

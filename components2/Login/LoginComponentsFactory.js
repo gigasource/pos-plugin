@@ -2,7 +2,7 @@ import Hooks from 'schemahandler/hooks/hooks'
 import { passcode, isValidPasscode, login } from './LoginLogic'
 import { Portal } from 'portal-vue/dist/portal-vue.esm'
 import { GTextField, GIcon } from 'pos-vue-framework'
-import PosLoginKeyboard from '../../components/pos-shared-components/POSInput/PosLoginKeyboard';
+import PosLoginKeyboard from '../pos-shared-components/POSInput/PosLoginKeyboard';
 import { useRouter } from 'vue-router';
 
 function loginTextFieldFactory() {

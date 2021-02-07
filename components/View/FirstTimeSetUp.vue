@@ -76,8 +76,8 @@
   import DialogCustomUrl from '../Login/dialogCustomUrl';
   import {v4 as uuidv4} from 'uuid';
   import _ from 'lodash';
-  import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
-  import PosTextfieldNew from "../pos-shared-components/POSInput/PosTextfieldNew";
+  import PosKeyboardFull from "../../components2/pos-shared-components/PosKeyboardFull";
+  import PosTextfieldNew from "../../components2/pos-shared-components/POSInput/PosTextfieldNew";
 
   export default {
     name: 'FirstTimeSetUp',

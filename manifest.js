@@ -2,7 +2,7 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
-    { loader: { type: 'route' }, filePath: 'components2/Settings/Settings2.vue', name: 'Settings2', path: '/pos2-settings' },
+    { loader: { type: 'route' }, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewUser/viewUser.vue', name: 'UserSetting', path: '/pos-view-user' },
     { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewTax/viewTax.vue', name: 'TaxSetting', path: '/pos-view-tax' },
     { loader: { type: 'route' }, filePath: 'components2/Settings/view/viewPayment/viewPayment.vue', name: 'PaymentSetting', path: '/pos-view-payment' },

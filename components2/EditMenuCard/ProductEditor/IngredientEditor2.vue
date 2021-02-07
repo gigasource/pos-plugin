@@ -9,7 +9,7 @@ import {
   selectedProductExisted,
   loadOrderLayout
 } from '../../OrderView/pos-ui-shared'
-import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull'
+import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull'
 
 export default {
   name: 'IngredientEditor2',

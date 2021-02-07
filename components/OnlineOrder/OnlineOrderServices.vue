@@ -34,7 +34,7 @@
   //todo on/off timer (awaiting redesign/conceptualization)
 
   import { nextTick } from 'vue';
-  import dialogBlogtextInput from '../pos-shared-components/dialogFilter/dialogBlogtextInput';
+  import dialogBlogtextInput from '../../components2/pos-shared-components/dialogFilter/dialogBlogtextInput';
 
   export default {
     name: 'OnlineOrderServices',

@@ -289,7 +289,7 @@
 <script>
   import orderUtil from '../logic/orderUtil'
   import dialogCompleteOrder from './dialogCompleteOrder2';
-  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogTextFilter from '../../components2/pos-shared-components/dialogFilter/dialogTextFilter';
   import NewReservationDialog from '../Reservation/NewReservationDialog';
   import { Touch } from 'pos-vue-framework'
   import {CALL_SYSTEM_MODES} from '../constants';

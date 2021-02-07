@@ -155,7 +155,7 @@
   // TODO:
   // - g-grid-select doesn't highlight selected item
 
-  import DialogFormInput from '../pos-shared-components/dialogFormInput';
+  import DialogFormInput from '../../components2/pos-shared-components/dialogFormInput';
   import { nextTick } from 'vue';
   export default {
     name: "PosPrinterSetting",

@@ -117,7 +117,7 @@
 
 <script>
   import _ from 'lodash'
-  import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
+  import dialogTextFilter from '../../components2/pos-shared-components/dialogFilter/dialogTextFilter';
   import dateRangePicker from '../OnlineOrder/dateRangePicker';
 
   export default {
