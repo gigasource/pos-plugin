@@ -99,12 +99,7 @@ const {orm, feSocket} = cms
 
 import delay from "delay";
 
-const foodTax = {taxes: [5, 10]};
-const drinkTax = {taxes: [16, 32]};
-
-const cola = {name: "Cola", price: 1.3, quantity: 1, ...drinkTax};
-const fanta = {name: "Fanta", price: 2, quantity: 1, ...drinkTax};
-const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
+let cola, pepsi, water, soda;
 const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
 
 jest.setTimeout(60000)
@@ -126,7 +121,9 @@ beforeAll(async () => {
   prepareActionCommitTest(cms)
   prepareOrderTest(cms)
   prepareKitchenPrinter(cms)
-  cms.triggerFeConnect()
+  cms.triggerFeConnect();
+  let mockProducts = await orm('Product').find();
+  [cola, pepsi, water, soda] = mockProducts;
 });
 
 afterEach(async () => {
@@ -239,6 +236,25 @@ describe("pos-logic", function () {
     await nextTick();
     expect(stringify(actionList.value)).toMatchSnapshot();
   })
+
+  it("case 2f: load order + load order", async function () {
+    const order1 = createOrder();
+    addItem(order1, cola);
+    simulateBackendPrint(order1);
+
+    prepareOrder(order1);
+    const order = getCurrentOrder();
+    await nextTick();
+    addProduct(order, pepsi);
+    await nextTick();
+    removeItem(order, 0 , 1)
+    await hooks.emit('printOrder');
+
+    expect(stringify(actionList.value)).toMatchSnapshot();
+
+    prepareOrder('10');
+    await nextTick();
+  });
 
   //todo: remove modifiers
 
@@ -713,6 +729,7 @@ describe("pos-logic", function () {
     console.log(actionList.value)
     cms.once('run:print', async function (commit) {
       const orders = await orm('Order').find({});
+      done();
     })
     hooks.emit('printOrder')
     //todo: add code to frontend

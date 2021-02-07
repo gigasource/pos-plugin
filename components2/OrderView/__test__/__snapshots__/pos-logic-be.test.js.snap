@@ -2,120 +2,6 @@
 
 exports[`pos-logic case 2a: create Order + addProduct 1`] = `
 Array [
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "_id": "ObjectID",
-          "cancellationItems": Array [],
-          "items": Array [],
-          "payment": Array [],
-          "status": "inProgress",
-          "table": "10",
-          "takeAway": false,
-          "user": Array [],
-          "vDate": "2020-12-31T17:00:00.000Z",
-          "vSum": 0,
-          "vTaxSum": Object {},
-        },
-      ],
-      "fn": "create",
-    },
-    Object {
-      "args": Array [
-        "createOrder",
-        Object {
-          "table": "10",
-        },
-      ],
-      "fn": "commit",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "_id": "ObjectID",
-        },
-        Object {
-          "$push": Object {
-            "items": Object {
-              "_id": "ObjectID",
-              "course": 1,
-              "groupPrinter": "Bar",
-              "id": "48",
-              "name": "Whiskey",
-              "price": 40,
-              "product": "ObjectID",
-              "quantity": 1,
-              "tax": 19,
-              "taxes": Array [
-                19,
-                7,
-              ],
-              "vSum": 40,
-              "vTakeAway": false,
-              "vTaxSum": Object {
-                "19": Object {
-                  "gross": 40,
-                  "net": 33.61,
-                  "tax": 6.39,
-                },
-              },
-            },
-          },
-        },
-      ],
-      "fn": "findOneAndUpdate",
-    },
-    Object {
-      "args": Array [
-        "updateActiveOrder",
-        Object {
-          "orderId": "ObjectID",
-          "table": "10",
-        },
-      ],
-      "fn": "commit",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "_id": "ObjectID",
-        },
-        Object {
-          "$set": Object {
-            "vSum": 40,
-            "vTaxSum": Object {
-              "19": Object {
-                "gross": 40,
-                "net": 33.61,
-                "tax": 6.39,
-              },
-            },
-          },
-        },
-      ],
-      "fn": "findOneAndUpdate",
-    },
-    Object {
-      "args": Array [
-        "updateActiveOrder",
-        Object {
-          "orderId": "ObjectID",
-          "table": "10",
-        },
-      ],
-      "fn": "commit",
-    },
-  ],
-]
-`;
-
-exports[`pos-logic case 2b: create Order + add 2 products 1`] = `
-Array [
   Object {
     "action": Array [
       Object {
@@ -123,41 +9,9 @@ Array [
           Object {
             "_id": "ObjectID",
             "cancellationItems": Array [],
-            "items": Array [],
-            "payment": Array [],
-            "status": "inProgress",
-            "table": "10",
-            "takeAway": false,
-            "user": Array [],
-            "vDate": "2020-12-31T17:00:00.000Z",
-            "vSum": 0,
-            "vTaxSum": Object {},
-          },
-        ],
-        "fn": "create",
-      },
-      Object {
-        "args": Array [
-          "createOrder",
-          Object {
-            "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
-    ],
-    "modelName": "Order",
-  },
-  Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$push": Object {
-              "items": Object {
+            "cashback": 0,
+            "items": Array [
+              Object {
                 "_id": "ObjectID",
                 "course": 1,
                 "groupPrinter": "Bar",
@@ -181,51 +35,30 @@ Array [
                   },
                 },
               },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
-      },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
+            ],
+            "payment": Array [],
+            "status": "inProgress",
             "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
-    ],
-    "modelName": "Order",
-  },
-  Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$set": Object {
-              "vSum": 40,
-              "vTaxSum": Object {
-                "19": Object {
-                  "gross": 40,
-                  "net": 33.61,
-                  "tax": 6.39,
-                },
+            "takeAway": false,
+            "tip": 0,
+            "user": Array [],
+            "vDate": "2020-12-31T17:00:00.000Z",
+            "vSum": 40,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 40,
+                "net": 33.61,
+                "tax": 6.39,
               },
             },
           },
         ],
-        "fn": "findOneAndUpdate",
+        "fn": "create",
       },
       Object {
         "args": Array [
-          "updateActiveOrder",
+          "createOrder",
           Object {
-            "orderId": "ObjectID",
             "table": "10",
           },
         ],
@@ -234,19 +67,36 @@ Array [
     ],
     "modelName": "Order",
   },
+]
+`;
+
+exports[`pos-logic case 2b: create Order + add 2 products 1`] = `
+Array [
   Object {
     "action": Array [
       Object {
         "args": Array [
           Object {
             "_id": "ObjectID",
-            "items._id": "ObjectID",
-          },
-          Object {
-            "$set": Object {
-              "items.$": Object {
+            "cancellationItems": Array [],
+            "cashback": 0,
+            "items": Array [
+              Object {
+                "_id": "ObjectID",
+                "course": 1,
+                "groupPrinter": "Bar",
+                "id": "48",
+                "name": "Whiskey",
+                "price": 40,
+                "product": "ObjectID",
                 "quantity": 2,
+                "tax": 19,
+                "taxes": Array [
+                  19,
+                  7,
+                ],
                 "vSum": 80,
+                "vTakeAway": false,
                 "vTaxSum": Object {
                   "19": Object {
                     "gross": 80,
@@ -255,51 +105,30 @@ Array [
                   },
                 },
               },
-            },
-          },
-        ],
-        "fn": "findOneAndUpdate",
-      },
-      Object {
-        "args": Array [
-          "updateActiveOrder",
-          Object {
-            "orderId": "ObjectID",
+            ],
+            "payment": Array [],
+            "status": "inProgress",
             "table": "10",
-          },
-        ],
-        "fn": "commit",
-      },
-    ],
-    "modelName": "Order",
-  },
-  Object {
-    "action": Array [
-      Object {
-        "args": Array [
-          Object {
-            "_id": "ObjectID",
-          },
-          Object {
-            "$set": Object {
-              "vSum": 80,
-              "vTaxSum": Object {
-                "19": Object {
-                  "gross": 80,
-                  "net": 67.23,
-                  "tax": 12.77,
-                },
+            "takeAway": false,
+            "tip": 0,
+            "user": Array [],
+            "vDate": "2020-12-31T17:00:00.000Z",
+            "vSum": 80,
+            "vTaxSum": Object {
+              "19": Object {
+                "gross": 80,
+                "net": 67.23,
+                "tax": 12.77,
               },
             },
           },
         ],
-        "fn": "findOneAndUpdate",
+        "fn": "create",
       },
       Object {
         "args": Array [
-          "updateActiveOrder",
+          "createOrder",
           Object {
-            "orderId": "ObjectID",
             "table": "10",
           },
         ],
@@ -643,6 +472,36 @@ Array [
             "orderId": "ObjectID",
             "table": "10",
           },
+        ],
+        "fn": "commit",
+      },
+    ],
+    "modelName": "Order",
+  },
+]
+`;
+
+exports[`pos-logic case 2f: load order + load order 1`] = `
+Array [
+  Object {
+    "action": Array [
+      Object {
+        "args": Array [
+          Object {},
+          Object {
+            "$pull": Object {
+              "items": Object {
+                "_id": "ObjectID",
+              },
+            },
+          },
+        ],
+        "fn": "findOneAndUpdate",
+      },
+      Object {
+        "args": Array [
+          "updateActiveOrder",
+          Object {},
         ],
         "fn": "commit",
       },

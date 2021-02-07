@@ -1,6 +1,14 @@
 //<editor-fold desc="declare">
-import {addItem, changeItemQuantity, createOrder, genSplitId, hooks, updateOrderWithHooks} from './pos-logic';
-import {computed, ref, toRaw} from "vue";
+import {
+  addItem,
+  changeItemQuantity,
+  clearNullQuantityItems,
+  createOrder,
+  genSplitId,
+  hooks, mergeSameItems,
+  updateOrderWithHooks
+} from './pos-logic';
+import {computed, ref, toRaw, watch, watchEffect} from "vue";
 import cms from 'cms';
 import _ from 'lodash';
 import rdiff from 'recursive-diff';
@@ -109,43 +117,47 @@ export function addProduct(order, product, quantity) {
 
 export function orderBeFactory(id = 0) {
   let order = createOrder();
+  let _new, _split, _off;
   orderMap.set(order, id);
 
   const actionList = ref([]);
   const getCurrentOrder = () => order;
   const currentTable = computed(() => order.table);
 
-  let orderSnapshot, itemsSnapshot, cancellationItemsSnapshot;
   let beItemsSnapshot = ref([]), beCancellationItemsSnapshot = ref([]);
+  let beOrderSnapshot = ref({});
   let omitOrderProps = ['items', 'cancellationItems', 'beforeSend'];
 
   let disableSnapshot = false;
-  hooks.on(`pre:order:update:${id}`, function (order, force) {
-    if (disableSnapshot && !force) return;
-    orderSnapshot = _.omit(_.cloneDeep(order), omitOrderProps);
-    itemsSnapshot = _.cloneDeep(order.items);
-    cancellationItemsSnapshot = _.cloneDeep(order.cancellationItems);
-  })
 
-  hooks.on(`post:order:update:${id}`, async function (order, force) {
-    if (disableSnapshot && !force) return;
+  async function makeActionList() {
     let _order = toRaw(order);
     await Promise.resolve();
 
+    actionList.value.length = 0;
+    if (_new) {
+      return actionList.value.push({
+        modelName: 'Order', // todo: review
+        action: Order.create(_order).commit('createOrder', {table: order.table, ..._split && {split: true}}).chain
+      });
+    }
 
-    processItems(order, actionList, _order.items, itemsSnapshot, 'items');
-    processItems(order, actionList, _order.cancellationItems, cancellationItemsSnapshot, 'cancellationItems');
+    processItems(order, actionList, _order.items, beItemsSnapshot.value, 'items');
+    processItems(order, actionList, _order.cancellationItems, beCancellationItemsSnapshot.value, 'cancellationItems');
 
-    const diffOrder = diff(_.omit(_order, omitOrderProps), orderSnapshot);
+    const diffOrder = diff(_.omit(_order, omitOrderProps), beOrderSnapshot.value);
     if (JSON.stringify(diffOrder) !== '{}') {
       addOrderAction(order, actionList, {$set: diffOrder});
     }
+  }
 
-    itemsSnapshot = undefined;
-    orderSnapshot = undefined;
+  hooks.onQueue(`post:order:update:${id}`, async function (order, force) {
+    if (disableSnapshot && !force) return;
+    await makeActionList(order);
   })
 
   function initBeSnapshot(order) {
+    beOrderSnapshot.value = _.omit(_.cloneDeep(order), omitOrderProps);
     [beItemsSnapshot.value.length, beCancellationItemsSnapshot.value.length] = [0, 0];
     if (typeof order === 'object') {
       [beItemsSnapshot.value, beCancellationItemsSnapshot.value] = [_.cloneDeep(order).items || [], _.cloneDeep(order).cancellationItems || []];
@@ -157,6 +169,7 @@ export function orderBeFactory(id = 0) {
   })
 
   const clearOrder = (clearActionList = true) => {
+    if (_off) _off();
     if (clearActionList) actionList.value.length = 0;
     _.forEach(order, (v, k) => {
       if (Array.isArray(v)) {
@@ -171,8 +184,9 @@ export function orderBeFactory(id = 0) {
    *
    * @param __order (can be table or whole order)
    */
-  function prepareOrder(__order, clearActionList = true, split) {
-    let _new = typeof __order !== 'object' || !__order._id;
+  function prepareOrder(__order, clearActionList = true, split = false) {
+    _split = split;
+    _new = typeof __order !== 'object' || !__order._id;
     if (typeof __order === 'string') {
       __order = {table: __order};
     }
@@ -180,23 +194,11 @@ export function orderBeFactory(id = 0) {
     order = createOrder(_.assign(order, __order));
     hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
-    if (_new) {
-      const action = Order.create(_order).commit('createOrder', {table: order.table, ...split && {split: true}}).chain
-      actionList.value.push({
-        modelName: 'Order', // todo: review
-        action
-      });
-    }
-  }
 
-  function startOnetimeSnapshot() {
-    disableSnapshot = true;
-    hooks.emit(`pre:order:update:${id}`, order, true);
-  }
-
-  function finishOnetimeSnapshot() {
-    disableSnapshot = false;
-    hooks.emit(`post:order:update:${id}`, order, true);
+    _off = watch(order, async () => {
+      await hooks.emit(`post:order:update:${id}`, order, true);
+      hooks.emit('nextTick');
+    }, {immediate: true, deep: true})
   }
 
   /**
@@ -224,10 +226,6 @@ export function orderBeFactory(id = 0) {
     }
 
     //todo: apply takeAway, discount v.v
-
-    //actionList.value = []
-    /*hooks.emit(`pre:order:update:${id}`, newOrder, true)
-    hooks.emit(`post:order:update:${id}`, order, true)*/
   }
 
   const getRecentItems = function () {
@@ -253,8 +251,9 @@ export function orderBeFactory(id = 0) {
   return {
     actionList, getCurrentOrder, currentTable, prepareOrder,
     order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
-    startOnetimeSnapshot, finishOnetimeSnapshot, syncOrderChange,
-    getRecentItems, getRecentCancellationItems
+    syncOrderChange,
+    getRecentItems, getRecentCancellationItems,
+    makeActionList
   }
 }
 
@@ -263,8 +262,8 @@ export const {
   actionList, getCurrentOrder, currentTable,
   prepareOrder, order, clearOrder,
   beItemsSnapshot, beCancellationItemsSnapshot,
-  startOnetimeSnapshot,
-  finishOnetimeSnapshot, syncOrderChange
+  syncOrderChange,
+  makeActionList
 } = orderBeFactory(0);
 
 //should run on backend
@@ -277,44 +276,38 @@ export const {
   prepareOrder: prepareSecondOrder,
   order: order2,
   clearOrder: clearSecondOrder,
-  startOnetimeSnapshot: startOnetimeSnapshot2,
-  finishOnetimeSnapshot: finishOnetimeSnapshot2
+  makeActionList: makeActionList2
 } = orderBeFactory(1);
 
 let tempItemsSnapshot = [], tempCancellationItemsSnapshot = [];
 
 export async function makeSplitOrder() {
   clearSecondOrder();
-  updateOrderWithHooks(order, () => genSplitId(order));
+  genSplitId(order);
   await delay(0);
   prepareSecondOrder(_.omit(order, ['items', 'cancellationItems', '_id', 'vSum', 'vTaxSum', 'status', 'payment']), true, true);
   [tempItemsSnapshot, tempCancellationItemsSnapshot] = [_.cloneDeep(order).items, _.cloneDeep(order).cancellationItems]
-  startOnetimeSnapshot();
-  startOnetimeSnapshot2();
 }
 
 export function prepareMoveItemsOrder() {
   clearSecondOrder();
   prepareSecondOrder();
   [tempItemsSnapshot, tempCancellationItemsSnapshot] = [_.cloneDeep(order).items, _.cloneDeep(order).cancellationItems]
-  startOnetimeSnapshot();
-  startOnetimeSnapshot2();
 }
 
-export function finishSplitOrder() {
+export async function finishSplitOrder() {
   [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[], []];
-  finishOnetimeSnapshot();
-  finishOnetimeSnapshot2();
+  await makeActionList();
+  await makeActionList2();
 }
 
-export function finishMoveItemsOrder(_order) {
+export async function finishMoveItemsOrder(_order) {
   const items = _.cloneDeep(order2.items);
   prepareSecondOrder(_order);
-  startOnetimeSnapshot2();
   for (const item of items) {
     addItem(order2, item);
   }
-  finishSplitOrder();
+  await finishSplitOrder();
 }
 
 export function cancelSplitOrder() {
@@ -434,7 +427,7 @@ export function createPrintAction(actionList, printType, {order, device, recent}
   })
 }
 
-export function togglePayPrintBtn() {
+export function togglePayPrintBtn(cb) {
   if (!showIcon.value) {
     //show icon and overlay
     [showIcon.value, overlay.value] = [true, true]
@@ -445,18 +438,19 @@ export function togglePayPrintBtn() {
   // thanh toan hoac in an
   if (actionTimeout) clearTimeout(actionTimeout);
   [showIcon.value, overlay.value] = [false, false];
-  hooks.emit('togglePayPrintBtn:step2');
+  hooks.emit('togglePayPrintBtn:step2', cb);
 }
 
 export const quickBtnAction = ref('pay');
 //todo: init from setting
-hooks.on('togglePayPrintBtn:step2', () => {
+hooks.on('togglePayPrintBtn:step2', async (cb) => {
   if (!payBtnClickable.value) return;
   if (payPrintMode.value === 'pay') {
     if (quickBtnAction.value === 'receipt') {
       hooks.emit('showOrderReceipt');
     } else {
-      hooks.emit('pay');
+      await hooks.emit('pay');
+      if (cb) cb();
     }
   } else {
     hooks.emit('printOrder');
@@ -472,8 +466,11 @@ export const disablePay = computed(() => {
   return false;
 })
 
-hooks.on('printOrder', () => {
+hooks.on('printOrder', async () => {
   order.date = new Date();
+  clearNullQuantityItems(order);
+  mergeSameItems(order);
+  await new Promise(r => hooks.once('nextTick', r));
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   makeSent(actionList.value);
   createPrintAction(actionList.value, 'kitchen', {order, device: 'Terminal 1', recent})
@@ -524,6 +521,10 @@ hooks.on('pay', async (printInvoice = false) => {
   //todo: virtual printer
 
   order.date = new Date();
+  clearNullQuantityItems(order);
+  mergeSameItems(order);
+  await new Promise(r => hooks.once('nextTick', r));
+
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   if (printInvoice) {
     createPrintAction(actionList.value, 'invoice', {order, device: 'Terminal 1', recent})
@@ -554,9 +555,7 @@ hooks.on('pay-split', async (printInvoice) => {
     order2.cancellationItems = [...order.cancellationItems];
   }
   order2.status = 'paid';
-
-  finishSplitOrder();
-  await delay(0);
+  await finishSplitOrder();
   const _actionList = [..._.cloneDeep(actionList.value), ..._.cloneDeep(actionList2.value)];
   if (printInvoice) {
     createPrintAction(_actionList, 'invoice', {order: order2, device: 'Terminal 1'})

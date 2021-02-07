@@ -2,6 +2,7 @@ import {smallSidebar} from "./order-layout-setting-logic";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {onActivated, ref, withModifiers} from "vue";
+import {useRouter} from 'vue-router';
 import {
   getCurrentOrder,
   onlyCheckoutPrintedItems,
@@ -28,6 +29,11 @@ export function payPrintBtnFactory() {
     }
   })
 
+  const router = useRouter();
+  const _togglePayPrintBtn = () => {
+    togglePayPrintBtn(() => router.push({path: '/pos-dashboard'}));
+  }
+
   const renderPayBtn = () => {
     const btnAttrs = {
       width: 75,
@@ -35,14 +41,14 @@ export function payPrintBtnFactory() {
       'text-color': "#FFF",
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick: withModifiers(togglePayPrintBtn, ['stop'])
+      onClick: withModifiers(_togglePayPrintBtn, ['stop'])
     }
     const bigBtnAttrs = {
       width: '104',
       style: 'font-size: 14px; padding: 4px 0',
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick: withModifiers(togglePayPrintBtn, ['stop'])
+      onClick: withModifiers(_togglePayPrintBtn, ['stop'])
     }
 
     if (showQuickBtn.value) {
