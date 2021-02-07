@@ -1,59 +1,28 @@
-import { watch } from 'vue'
 import cms from 'cms'
 import {
 	inventories,
-	inventoryCategories,
 	hooks
 } from './inventory-logic-ui'
 import dayjs from 'dayjs'
 import {ObjectID} from "bson"
 import _ from 'lodash'
-import {appType, currentAppType} from "../AppSharedStates";
 
-const InventoryModel = {
-	[appType.POS_RESTAURANT]: cms.getModel('Inventory'),
-	[appType.POS_RETAIL]: cms.getModel('InventoryRetail')
-}
-const InventoryCategoryModel = {
-	[appType.POS_RESTAURANT]: cms.getModel('InventoryCategory'),
-	[appType.POS_RETAIL]: cms.getModel('InventoryRetailCategory'),
-}
-const InventoryHistoryModel = {
-	[appType.POS_RESTAURANT]: cms.getModel('InventoryHistory'),
-	[appType.POS_RETAIL]: cms.getModel('InventoryRetailHistory'),
-}
-
-export function selectModel(modelType) {
-	return currentAppType.value === appType.POS_RESTAURANT ? modelType[appType.POS_RESTAURANT] : modelType[appType.POS_RETAIL]
-}
-
-let Inventory = selectModel(InventoryModel)
-let InventoryCategory = selectModel(InventoryCategoryModel)
-let InventoryHistory = selectModel(InventoryHistoryModel)
-
-watch(() => currentAppType.value, () => {
-	Inventory = selectModel(InventoryModel)
-	InventoryCategory = selectModel(InventoryCategoryModel)
-	InventoryHistory = selectModel(InventoryHistoryModel)
-})
+const Inventory = cms.getModel('Inventory')
+const InventoryAction = cms.getModel('InventoryAction')
 
 export async function loadInventories() {
 	inventories.value = await Inventory.find()
 	hooks.emit('after:loadInventory')
 }
 
-export async function loadInventoryCategories() {
-	inventoryCategories.value = await InventoryCategory.find()
-}
-
-export async function loadInventoryHistories(filter) {
+export async function loadInventoryActions(filter) {
 	const condition = {}
 	if (filter.fromDate) {
 		const fromDate = dayjs(filter.fromDate).startOf('day').toDate()
 		const toDate = dayjs(filter.toDate).endOf('day').toDate()
 		Object.assign(condition, {date: {$gte: fromDate, $lte: toDate}})
 	}
-	return await InventoryHistory.find(condition).sort({date: -1})
+	return await InventoryAction.find(condition).sort({date: -1})
 }
 
 export async function createInventory(inventory) {
@@ -73,13 +42,11 @@ export async function createInventory(inventory) {
 	}
 	inventory.lastUpdateTimestamp = new Date()
 	inventories.value.push(_.cloneDeep(inventory))
-	inventory.category = inventory.category._id
 
 	await Inventory.create(inventory)
-	// update history
-	await updateInventoryHistory({
+	// update action
+	await updateInventoryAction({
 		inventory: inventory._id,
-		category: inventory.category,
 		type: 'add',
 		amount: inventory.stock,
 		date: new Date(),
@@ -89,17 +56,15 @@ export async function createInventory(inventory) {
 
 export async function updateInventory(_inventory, reason) {
 	const inventory = _.find(inventories.value, (inventory) => inventory._id.toString() === _inventory._id.toString())
-	_inventory.category = ((_inventory.category._bsontype || typeof _inventory.category === 'string') ? inventoryCategories.value.find(_category => _category._id.toString() === _inventory.category.toString()) : _inventory.category)
 	if (_inventory.stock !== inventory.stock) {
-		const history = {
+		const action = {
 			inventory: _inventory._id,
-			category: _inventory.category._id,
 			type: _inventory.stock > inventory.stock ? 'add' : 'remove',
 			amount: Math.abs(_inventory.stock - inventory.stock),
 			date: new Date(),
 			reason: reason ? reason : 'Update stock'
 		}
-		await updateInventoryHistory(history)
+		await updateInventoryAction(action)
 	}
 	Object.assign(inventory, _inventory, {
 		lastUpdateTimestamp: new Date()
@@ -110,8 +75,8 @@ export async function updateInventory(_inventory, reason) {
 	)
 }
 
-export async function updateInventoryHistory(history) {
-	await InventoryHistory.create(history)
+export async function updateInventoryAction(action) {
+	await InventoryAction.create(action)
 }
 
 export async function deleteInventory(ids) {
@@ -123,45 +88,13 @@ export async function deleteInventory(ids) {
 	if(result.n === ids.length) {
 		const histories = inventoriesDeleted.value.map(i => ({
 			inventory: i._id.toString(),
-			category: i.category,
 			type: 'remove',
 			amount: i.stock,
 			date: new Date(),
 			reason: 'Remove inventory',
 		}))
-		await updateInventoryHistory(histories)
+		await updateInventoryAction(histories)
 	}
-}
-
-export async function deleteInventoryCategory(_id) {
-	if (inventoryCategories.value.find(category => category._id === _id)) {
-		_.remove(inventoryCategories.value, (category) => {
-			return _id.toString() === category._id.toString()
-		})
-		await InventoryCategory.deleteOne({ _id })
-	} else {
-		// delete sub category
-		for (let category of inventoryCategories.value) {
-			if (category.subCategory && category.subCategory.find(subCategory => subCategory._id === _id)) {
-				_.remove(category.subCategory, subCategory => subCategory._id === _id)
-				await InventoryCategory.findOneAndUpdate({
-					_id: category._id
-				}, category)
-			}
-		}
-	}
-}
-
-export async function updateInventoryCategories(newInventoryCategory) {
-	for (const category of newInventoryCategory) {
-		if (category._id) {
-			await InventoryCategory.findOneAndUpdate({_id: category._id}, category, {upsert: true})
-		} else {
-			category._id = new ObjectID()
-			await InventoryCategory.create(category)
-		}
-	}
-	inventoryCategories.value = newInventoryCategory
 }
 
 export async function removeFromInventory(removedInventoryItems) {
