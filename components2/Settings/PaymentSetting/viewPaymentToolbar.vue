@@ -10,7 +10,7 @@ import {
   showDialogConfirmDelete
 } from './view-payment-logics';
 import dialogNewPayment from './dialogNewPayment';
-import DialogConfirmDelete from "../../../Dialog/DialogConfirmDelete";
+import DialogConfirmDelete from "../../Dialog/DialogConfirmDelete";
 
 export default {
   components: {dialogNewPayment, DialogConfirmDelete},

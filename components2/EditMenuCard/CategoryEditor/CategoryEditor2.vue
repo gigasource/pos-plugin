@@ -1,10 +1,9 @@
 <script>
 import ColorSelector from '../../../components/common/ColorSelector';
-import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
+
 import {useI18n} from 'vue-i18n'
 import constants from '../EditMenuCardToolbar/constants';
 import {ref} from 'vue'
-
 import {
   canDelete,
   canSwitch,
@@ -20,6 +19,7 @@ import {
 import {categoryColumns, categoryRows, changeCategoryColumn, changeCategoryRow,} from './category-editor-order-layout'
 import {genScopeId} from '../../utils';
 import InputNumber2 from "../InputNumber2";
+import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 
 export default {
   name: 'CategoryEditor2',

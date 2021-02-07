@@ -1,5 +1,4 @@
 <script>
-import dialogTextFilter from '../../components/pos-shared-components/dialogFilter/dialogTextFilter';
 import dialogProductSearchResult from '../../components/Order/components/dialogProductSearchResult';
 import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated} from "vue";
 import {useRoute} from "vue-router";
@@ -13,6 +12,7 @@ import cms from 'cms';
 import {genScopeId} from "../utils";
 import PosOrderKeyboard2 from "./Helper/PosOrderKeyboard2";
 import dialogChoosePopupModifier from "../Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier";
+import dialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
 
 export default {
   name: 'PosOrderLayout2',
@@ -43,7 +43,7 @@ export default {
     }
 
     // execute created twice ???
-    onBeforeMount(async() => {
+    onBeforeMount(async () => {
       console.log('onBeforeMount')
       await created()
     })
