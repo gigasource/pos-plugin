@@ -12,6 +12,8 @@ import {
   showIcon,
   togglePayPrintBtn
 } from "./pos-logic-be";
+import {orderViewDialog} from "./pos-ui-shared";
+import {addSinglePayment, clearPayment, getRestTotal} from "./pos-logic";
 
 export function payPrintBtnFactory() {
   let {t: $t, locale} = useI18n();
@@ -31,7 +33,13 @@ export function payPrintBtnFactory() {
 
   const router = useRouter();
   const _togglePayPrintBtn = () => {
-    togglePayPrintBtn(() => router.push({path: '/pos-dashboard'}));
+    togglePayPrintBtn(() => {
+      //todo: receiptView
+      //router.push({path: '/pos-dashboard'});
+      clearPayment(order);
+      addSinglePayment(order, {type: 'cash', value: getRestTotal(order)});
+      orderViewDialog.receipt = true;
+    });
   }
 
   const renderPayBtn = () => {
@@ -73,6 +81,7 @@ export function payPrintBtnFactory() {
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
+
             </Transition>
             <Transition name="back">
               {showIcon.value && <div class="animation-wrapper bg-pink">
@@ -93,7 +102,8 @@ export function payPrintBtnFactory() {
         </g-btn-bs>
       )
     }
-    return <span class="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
+    return <span
+      class="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
   }
 
   return {

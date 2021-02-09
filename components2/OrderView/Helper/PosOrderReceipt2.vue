@@ -1,15 +1,19 @@
 <script>
-import {genId, genScopeId, internalValueFactory} from "../../utils";
+import {genScopeId, internalValueFactory} from "../../utils";
 import {getCurrentOrder} from "../pos-logic-be";
 import {useI18n} from "vue-i18n";
-import {computed, nextTick, watch, ref, withModifiers} from "vue";
-import {calItemVSum, mergeSameItems, updateOrderWithHooks} from "../pos-logic";
-import {$filters} from "../../AppSharedStates";
+import {computed, nextTick, ref, watch, withModifiers} from "vue";
+import {addSinglePayment, calItemVSum, clearPayment, hooks, mergeSameItems} from "../pos-logic";
+import {$filters, appHooks, posSettings} from "../../AppSharedStates";
 import {useRouter} from "vue-router";
 import _ from 'lodash';
+import dialogMultiPayment from "../../Payment/Helpers/dialogMultiPayment";
 
 export default {
   name: 'PosOrderReceipt2',
+  components: {
+    dialogMultiPayment
+  },
   props: {
     modelValue: Boolean,
     split: Boolean,
@@ -20,14 +24,19 @@ export default {
   emits: ['update:modelValue', 'updatePayment', 'updateCurrentOrder', 'printOrderReport', 'saveRestaurantOrder', 'print', 'complete'],
   setup(props, {emit}) {
     const internalValue = internalValueFactory(props, {emit});
-    const order = props.order;
+    const order = props.order || getCurrentOrder();
     const {t, locale} = useI18n();
-    const store = ref({
+    /*const store = ref({
       name: 'Lotteria Nguyen Khanh Toan',
       address: '103 DN11, Nguyen Khanh Toan, Quan Hoa, Cau Giay, Ha Noi',
       phone: '0462.813.977',
       vat: '123456789'
-    });
+    });*/
+    const store = computed(() => {
+      if (!posSettings.value.companyInfo)  appHooks.emit('settingChange');
+      return  posSettings.value.companyInfo || {};
+    })
+
     const menu = ref([]);
     const dialog = ref({multi: false, tip: false});
     const tempSplit = ref({});
@@ -43,31 +52,13 @@ export default {
     const blurReceipt = computed(() => menu.value.some(i => i === true))
     const activeOrderPaymentItem = computed(() => {
       if (!order.payment || order.payment.length === 0) return paymentMethods.find(i => i.type === 'cash')
-      if (order.payment.length > 1) return this.paymentMethods.find(i => i.type === 'multi')
+      if (order.payment.length > 1) return paymentMethods.find(i => i.type === 'multi')
       else if (!order.payment.length) return {}
       return paymentMethods.find(i => i.type === order.payment[0].type)
     })
     const paymentMethodMenuItems = computed(() => {
       return paymentMethods.filter(i => i.type !== activeOrderPaymentItem.value.type);
     })
-
-    //fixme: should do on backend, careful with commit base system
-    //todo: consider: maybe in order logic
-    function compactOrder(products) {
-      let resultArr = [];
-      products.forEach(product => {
-        const existingProduct = resultArr.find(r =>
-            _.isEqual(_.omit(r, 'quantity', '_id'), _.omit(product, 'quantity', '_id'))
-        );
-        if (existingProduct) {
-          existingProduct.quantity = existingProduct.quantity + product.quantity
-        } else {
-          resultArr.push(_.cloneDeep(product));
-        }
-      })
-      return resultArr
-    }
-
 
     const orderItems = computed(() => {
       if (!props.split && order.items) {
@@ -131,14 +122,16 @@ export default {
         emit('updatePayment', tempSplit.value._id, formattedPayment)
         tempSplit.value = {}
       } else {
-        updateOrderWithHooks(order, () => {
-          order.payment = formattedPayment;
-        })
+        order.payment = formattedPayment;
       }
     }
 
     function savePayment(split, payment) {
       //fixme
+      if (!split) {
+        clearPayment(order);
+        addSinglePayment(order, payment[0]);
+      }
       emit('updatePayment', split._id, [{type: payment, value: split.vSum}])
     }
 
@@ -159,18 +152,19 @@ export default {
         internalValue.value = false
         return;
       }
-      const isComplete = printed || !order.items || order.items.length === 0
       internalValue.value = false
       printed.value = false
-      if (isComplete) complete();
+      clearPayment(order);
+      //complete();
     }
 
     const router = useRouter();
 
-    function complete() {
+    async function complete() {
       emit('complete');
       if (!props.split) {
-        emit('saveRestaurantOrder', null, true, false)
+        await hooks.emit('pay')
+
         internalValue.value = false
         printed.value = false
         router.go(-1)
@@ -181,7 +175,9 @@ export default {
       if (item.type === 'multi') {
         return openMultiDialog()
       }
-      emit('updateCurrentOrder', 'payment', [{type: item.type, value: order.vSum}])
+      clearPayment(order)
+      addSinglePayment(order, {type: item.type, value: order.vSum});
+      //emit('updateCurrentOrder', 'payment', [{type: item.type, value: order.vSum}])
     }
 
     function showTipDialog(split) {
@@ -226,7 +222,7 @@ export default {
               </div>
             </g-btn-bs>
             {!props.split &&
-            <g-menu v-model={paymentMethodMenu.value} content-class="menu-payment-option" v-slots={{
+            <g-menu v-model={paymentMethodMenu.value} close-on-content-click content-class="menu-payment-option" v-slots={{
               activator: ({on}) => genScopeId(() =>
                   <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.value.icon} onClick={on.click}>
                     <div>{activeOrderPaymentItem.value.text}</div>
@@ -239,7 +235,7 @@ export default {
                         <g-btn-bs
                             class="ml-0 mr-0"
                             icon={item.icon}
-                            onClick={withModifiers(() => setOrderPaymentMethod(item), ['stop'])}
+                            onClick={() => setOrderPaymentMethod(item)}
                             key={`paymentMethodMenuItems-${index}`}
                         >
                           <div>{item.text}</div>
@@ -250,7 +246,7 @@ export default {
             </g-menu>}
             <g-spacer/>
             <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
-                      onClick={withModifiers(complete, ['stop'])}>
+                      onClick={complete}>
               Complete
             </g-btn-bs>
           </>)()}
@@ -260,8 +256,8 @@ export default {
             <div class="receipt-main__header-title">{store.value.name}</div>
             <div class="receipt-main__header-subtitle">{store.value.address}</div>
             <div class="receipt-main__header-subtitle">
-              <span class="mr-3">Tel: {store.value.phone}</span>
-              <span>VAT Reg No: {store.value.vat}</span>
+              <span class="mr-3">Tel: {store.value.telephone}</span>
+              <span>VAT Reg No: {store.value.taxNumber}</span>
             </div>
           </div>
           <div class="receipt-main__title">Table: {order.table}</div>
@@ -385,7 +381,6 @@ export default {
       <dialog-multi-payment
           rotate
           v-model={dialog.value.multi}
-          store-locale={locale}
           total={props.split ? tempSplit.vSum : order.vSum}
           onSubmit={saveMultiPayment}/>
 

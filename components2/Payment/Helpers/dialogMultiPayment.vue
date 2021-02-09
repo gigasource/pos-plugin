@@ -10,7 +10,8 @@ import {isMobile} from "../../AppSharedStates";
 export default {
   name: 'dialogMultiPayment',
   props: {
-    total: Number
+    total: Number,
+    rotate: Boolean
   },
   setup(props, {emit}) {
     const {t, locale} = useI18n()
@@ -136,7 +137,7 @@ export default {
                 template={keyboardTemplate.value}
                 items={keyboardItems.value}/>
           </div>
-          <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100 mt-4 mx-0" disabled={disableConfirmMulti.value}
+          <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" disabled={disableConfirmMulti.value}
                     onClick={onCLick_Stop(submit)}>
             Confirm
           </g-btn-bs>
@@ -158,10 +159,11 @@ export default {
   padding-bottom: 16px;
 }
 
-.g-btn-bs {
+:deep(.g-btn-bs) {
   margin: 0;
   flex-basis: 40%;
   height: 50px;
+  margin-top: 20px;
 }
 
 .g-tf-wrapper {
@@ -216,7 +218,7 @@ export default {
 
 .rotate {
   width: 400px;
-  height: 580px !important;
+  height: 615px !important;
   transform: rotate(-90deg) translateX(-100%);
   transform-origin: left top;
 }

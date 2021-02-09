@@ -361,7 +361,9 @@ export const hasOrderChange = computed(() => {
 
   const _hooks = new Hooks();
   ['add-item', 'remove-item', 'change-item']
-    .forEach(e => _hooks.on(e, () => result = true));
+    .forEach(e => _hooks.on(e, (i1, i2) => {
+      return result = true;
+    }));
   processItems(order, actionList, order.items, beItemsSnapshot.value, 'items', _hooks);
   return result;
 })
@@ -449,8 +451,11 @@ hooks.on('togglePayPrintBtn:step2', async (cb) => {
     if (quickBtnAction.value === 'receipt') {
       hooks.emit('showOrderReceipt');
     } else {
-      await hooks.emit('pay');
-      if (cb) cb();
+      if (cb) {
+        cb();
+      } else {
+        await hooks.emit('pay');
+      }
     }
   } else {
     hooks.emit('printOrder');
@@ -555,6 +560,7 @@ hooks.on('pay-split', async (printInvoice) => {
     order2.cancellationItems = [...order.cancellationItems];
   }
   order2.status = 'paid';
+  mergeSameItems(order2);
   await finishSplitOrder();
   const _actionList = [..._.cloneDeep(actionList.value), ..._.cloneDeep(actionList2.value)];
   if (printInvoice) {
