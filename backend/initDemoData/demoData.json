@@ -38,32 +38,172 @@
     {
       "_id": "5df6f31ba037304c8b0df66c",
       "name": "Drink",
-      "position": 1
+      "position": 1,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5ee7854273fa4fd98a4",
       "name": "Electronic",
-      "position": 2
+      "position": 2,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5e27854273fa4fd98a1",
       "name": "Material",
-      "position": 3
+      "position": 3,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5cd7854273fa4fd989b",
       "name": "Sport",
-      "position": 4
+      "position": 4,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5df6f5dd7854273fa4fd989e",
       "name": "Wine",
-      "position": 5
+      "position": 5,
+      "appType": "POS_RESTAURANT"
+    },
+    {
+      "_id": "6023518f790afb794efbabc5",
+      "name": "Favorite",
+      "icon": "star",
+      "iconColor": "#FFCB3A",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc0",
+      "name": "Sport",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc6",
+      "name": "Football",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc7",
+      "name": "Baseball",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc8",
+      "name": "Basketball",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc0"
+    },
+    {
+      "_id": "6023518f790afb794efbabc1",
+      "name": "Food",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc9",
+      "name": "Burger",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabca",
+      "name": "Rice",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabcb",
+      "name": "Noodle",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc1"
+    },
+    {
+      "_id": "6023518f790afb794efbabc2",
+      "name": "Drink",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabcc",
+      "name": "Alcohol",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc2"
+    },
+    {
+      "_id": "6023518f790afb794efbabcd",
+      "name": "Non-alcoholic",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc2"
+    },
+    {
+      "_id": "6023518f790afb794efbabce",
+      "name": "Gift",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabc3",
+      "name": "Motorbike",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabcf",
+      "name": "Standard",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd0",
+      "name": "Cruiser",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd1",
+      "name": "Sport",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabd2",
+      "name": "Scooter",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc3"
+    },
+    {
+      "_id": "6023518f790afb794efbabc4",
+      "name": "Clothes",
+      "appType": "POS_RETAIL"
+    },
+    {
+      "_id": "6023518f790afb794efbabd3",
+      "name": "Shirt",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd4",
+      "name": "Dress",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd5",
+      "name": "Jeans",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
+    },
+    {
+      "_id": "6023518f790afb794efbabd6",
+      "name": "Trousers",
+      "appType": "POS_RETAIL",
+      "parentCategory": "6023518f790afb794efbabc4"
     }
   ],
   "Product": [
     {
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Cola",
       "price": 98,
       "tax": 19,
@@ -74,10 +214,13 @@
           "device": "pos"
         }
       ],
-      "id": 1
+      "id": 1,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Pepsi",
       "price": 35,
       "tax": 0,
@@ -88,11 +231,14 @@
           "device": "pos"
         }
       ],
-      "id": 2
+      "id": 2,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e341",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Water",
       "price": 67,
       "tax": 7,
@@ -104,11 +250,14 @@
         }
       ],
       "id": "3",
-      "isNoPrint": true
+      "isNoPrint": true,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e343",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Soda",
       "price": 20,
       "tax": 19,
@@ -123,11 +272,14 @@
       "attributes": [],
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e345",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Green Tea",
       "price": 39,
       "tax": 7,
@@ -139,11 +291,14 @@
         }
       ],
       "id": "5",
-      "groupPrinter": "5e7864c486e3ec0997b5e492"
+      "groupPrinter": "5e7864c486e3ec0997b5e492",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e347",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Black Tea",
       "price": 1,
       "tax": 0,
@@ -155,11 +310,14 @@
         }
       ],
       "id": "6",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e349",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Coffee",
       "price": 64,
       "tax": 19,
@@ -171,11 +329,14 @@
         }
       ],
       "id": "7",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e34b",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Lemonade",
       "price": 48,
       "tax": 0,
@@ -187,11 +348,14 @@
         }
       ],
       "id": "8",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e34d",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Milkshake",
       "price": 12,
       "tax": 0,
@@ -203,10 +367,13 @@
         }
       ],
       "id": "9",
-      "groupPrinter": "5e7864c486e3ec0997b5e492"
+      "groupPrinter": "5e7864c486e3ec0997b5e492",
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Milk",
       "price": 76,
       "tax": 19,
@@ -217,11 +384,14 @@
           "device": "pos"
         }
       ],
-      "id": 10
+      "id": 10,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e351",
-      "category": ["5df6f31ba037304c8b0df66c"],
+      "category": [
+        "5df6f31ba037304c8b0df66c"
+      ],
       "name": "Juice",
       "price": 80,
       "tax": 0,
@@ -233,10 +403,13 @@
         }
       ],
       "id": "11",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Soccer ball",
       "price": 3,
       "tax": 0,
@@ -247,10 +420,13 @@
           "device": "pos"
         }
       ],
-      "id": 12
+      "id": 12,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Tennis ball",
       "price": 32,
       "tax": 0,
@@ -261,10 +437,13 @@
           "device": "pos"
         }
       ],
-      "id": 13
+      "id": 13,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Net",
       "price": 89,
       "tax": 0,
@@ -275,10 +454,13 @@
           "device": "pos"
         }
       ],
-      "id": 14
+      "id": 14,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Gloves",
       "price": 22,
       "tax": 0,
@@ -289,10 +471,13 @@
           "device": "pos"
         }
       ],
-      "id": 15
+      "id": 15,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Helmet",
       "price": 73,
       "tax": 0,
@@ -303,10 +488,13 @@
           "device": "pos"
         }
       ],
-      "id": 16
+      "id": 16,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Running Shoes",
       "price": 76,
       "tax": 19,
@@ -317,10 +505,13 @@
           "device": "pos"
         }
       ],
-      "id": 17
+      "id": 17,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Racquet",
       "price": 4,
       "tax": 7,
@@ -331,10 +522,13 @@
           "device": "pos"
         }
       ],
-      "id": 18
+      "id": 18,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Bat",
       "price": 32,
       "tax": 7,
@@ -345,10 +539,13 @@
           "device": "pos"
         }
       ],
-      "id": 19
+      "id": 19,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Stick",
       "price": 3,
       "tax": 19,
@@ -359,10 +556,13 @@
           "device": "pos"
         }
       ],
-      "id": 20
+      "id": 20,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5cd7854273fa4fd989b"],
+      "category": [
+        "5df6f5cd7854273fa4fd989b"
+      ],
       "name": "Club",
       "price": 42,
       "tax": 19,
@@ -373,10 +573,13 @@
           "device": "pos"
         }
       ],
-      "id": 21
+      "id": 21,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Wood",
       "price": 84,
       "tax": 19,
@@ -387,10 +590,13 @@
           "device": "pos"
         }
       ],
-      "id": 22
+      "id": 22,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Metal",
       "price": 87,
       "tax": 7,
@@ -401,10 +607,13 @@
           "device": "pos"
         }
       ],
-      "id": 23
+      "id": 23,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Glass",
       "price": 37,
       "tax": 19,
@@ -415,10 +624,13 @@
           "device": "pos"
         }
       ],
-      "id": 24
+      "id": 24,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Cement",
       "price": 58,
       "tax": 7,
@@ -429,10 +641,13 @@
           "device": "pos"
         }
       ],
-      "id": 25
+      "id": 25,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Paper",
       "price": 41,
       "tax": 7,
@@ -443,10 +658,13 @@
           "device": "pos"
         }
       ],
-      "id": 26
+      "id": 26,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Plastic",
       "price": 78,
       "tax": 0,
@@ -457,10 +675,13 @@
           "device": "pos"
         }
       ],
-      "id": 27
+      "id": 27,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Nilon",
       "price": 70,
       "tax": 0,
@@ -471,10 +692,13 @@
           "device": "pos"
         }
       ],
-      "id": 28
+      "id": 28,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Cotton",
       "price": 73,
       "tax": 7,
@@ -485,10 +709,13 @@
           "device": "pos"
         }
       ],
-      "id": 29
+      "id": 29,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Bronze",
       "price": 24,
       "tax": 19,
@@ -499,10 +726,13 @@
           "device": "pos"
         }
       ],
-      "id": 30
+      "id": 30,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Iron",
       "price": 9,
       "tax": 0,
@@ -513,10 +743,13 @@
           "device": "pos"
         }
       ],
-      "id": 31
+      "id": 31,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Silver",
       "price": 13,
       "tax": 0,
@@ -527,10 +760,13 @@
           "device": "pos"
         }
       ],
-      "id": 32
+      "id": 32,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5e27854273fa4fd98a1"],
+      "category": [
+        "5df6f5e27854273fa4fd98a1"
+      ],
       "name": "Gold",
       "price": 2,
       "tax": 19,
@@ -541,10 +777,13 @@
           "device": "pos"
         }
       ],
-      "id": 33
+      "id": 33,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Laptop",
       "price": 29,
       "tax": 0,
@@ -555,10 +794,13 @@
           "device": "pos"
         }
       ],
-      "id": 34
+      "id": 34,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Camera",
       "price": 57,
       "tax": 19,
@@ -569,10 +811,13 @@
           "device": "pos"
         }
       ],
-      "id": 35
+      "id": 35,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Refrigerator",
       "price": 47,
       "tax": 0,
@@ -583,10 +828,13 @@
           "device": "pos"
         }
       ],
-      "id": 36
+      "id": 36,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Oven",
       "price": 10,
       "tax": 0,
@@ -597,10 +845,13 @@
           "device": "pos"
         }
       ],
-      "id": 37
+      "id": 37,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Television",
       "price": 91,
       "tax": 0,
@@ -611,10 +862,13 @@
           "device": "pos"
         }
       ],
-      "id": 38
+      "id": 38,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Radio",
       "price": 68,
       "tax": 7,
@@ -625,10 +879,13 @@
           "device": "pos"
         }
       ],
-      "id": 39
+      "id": 39,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "MP3 player",
       "price": 6,
       "tax": 7,
@@ -639,10 +896,13 @@
           "device": "pos"
         }
       ],
-      "id": 40
+      "id": 40,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Fan",
       "price": 41,
       "tax": 0,
@@ -653,10 +913,13 @@
           "device": "pos"
         }
       ],
-      "id": 41
+      "id": 41,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Mobile phone",
       "price": 2,
       "tax": 0,
@@ -667,10 +930,13 @@
           "device": "pos"
         }
       ],
-      "id": 42
+      "id": 42,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Projector",
       "price": 75,
       "tax": 7,
@@ -681,10 +947,13 @@
           "device": "pos"
         }
       ],
-      "id": 43
+      "id": 43,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Monitor",
       "price": 21,
       "tax": 0,
@@ -695,10 +964,13 @@
           "device": "pos"
         }
       ],
-      "id": 44
+      "id": 44,
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5ee7854273fa4fd98a4"],
+      "category": [
+        "5df6f5ee7854273fa4fd98a4"
+      ],
       "name": "Lamp",
       "price": 33,
       "tax": 19,
@@ -709,11 +981,14 @@
           "device": "pos"
         }
       ],
-      "id": 45
+      "id": 45,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e397",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Brandy",
       "price": 95,
       "tax": 19,
@@ -726,11 +1001,14 @@
       ],
       "id": "46",
       "isNoPrint": true,
-      "tax2": 19
+      "tax2": 19,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e399",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Baijiu",
       "price": 12,
       "tax": 19,
@@ -744,11 +1022,14 @@
       "id": "47",
       "groupPrinter": "5e7864c486e3ec0997b5e492",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e39b",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Whiskey",
       "price": 40,
       "tax": 19,
@@ -763,10 +1044,13 @@
       "id": "48",
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "tax2": 7,
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Vermouth",
       "price": 18,
       "tax": 7,
@@ -777,11 +1061,14 @@
           "device": "pos"
         }
       ],
-      "id": 49
+      "id": 49,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e39f",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Mezcal",
       "price": 66,
       "tax": 19,
@@ -794,11 +1081,14 @@
       ],
       "id": "50",
       "groupPrinter": "5e7864c486e3ec0997b5e492",
-      "groupPrinter2": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter2": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a1",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Pisco",
       "price": 96,
       "tax": 19,
@@ -810,11 +1100,14 @@
         }
       ],
       "id": "51",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a3",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Gin",
       "price": 27,
       "tax": 19,
@@ -827,11 +1120,14 @@
         }
       ],
       "id": "52",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a5",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Tequila",
       "price": 43,
       "tax": 0,
@@ -844,11 +1140,14 @@
         }
       ],
       "id": "53",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a7",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Bourbon",
       "price": 83,
       "tax": 7,
@@ -859,11 +1158,14 @@
           "device": "pos"
         }
       ],
-      "id": "54"
+      "id": "54",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e784d7786e3ec0997b5e3a9",
-      "category": ["5df6f5dd7854273fa4fd989e"],
+      "category": [
+        "5df6f5dd7854273fa4fd989e"
+      ],
       "name": "Vodka",
       "price": 63,
       "tax": 0,
@@ -875,7 +1177,8 @@
         }
       ],
       "id": "55",
-      "isNoPrint": true
+      "isNoPrint": true,
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79d04e5028531d08009cb5",
@@ -883,7 +1186,8 @@
       "name": "Pudding",
       "price": 1,
       "isModifier": true,
-      "id": "101"
+      "id": "101",
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79cfc75028531d08009ca5",
@@ -892,7 +1196,8 @@
       "name": "Olive",
       "price": 1,
       "id": "100",
-      "option": {}
+      "option": {},
+      "appType": "POS_RESTAURANT"
     },
     {
       "_id": "5e79d0205028531d08009cab",
@@ -900,7 +1205,8 @@
       "name": "Ice",
       "price": 0,
       "id": "99",
-      "groupPrinter": "5e7864b186e3ec0997b5e48e"
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "appType": "POS_RESTAURANT"
     }
   ],
   "OrderLayout": [
