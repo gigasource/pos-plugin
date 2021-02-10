@@ -95,7 +95,7 @@ export async function getWebshopUrl() {
 
 
 export const webshopName = computed(() => {
-  if (onlineDevice.value && onlineDevice.store.value && onlineDevice.value.store.name) {
+  if (onlineDevice.value && onlineDevice.value.store && onlineDevice.value.store.name) {
     return onlineDevice.value.store.name.trim()
   }
   return ''

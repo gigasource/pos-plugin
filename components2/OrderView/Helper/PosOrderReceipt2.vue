@@ -26,15 +26,9 @@ export default {
     const internalValue = internalValueFactory(props, {emit});
     const order = props.order || getCurrentOrder();
     const {t, locale} = useI18n();
-    /*const store = ref({
-      name: 'Lotteria Nguyen Khanh Toan',
-      address: '103 DN11, Nguyen Khanh Toan, Quan Hoa, Cau Giay, Ha Noi',
-      phone: '0462.813.977',
-      vat: '123456789'
-    });*/
     const store = computed(() => {
-      if (!posSettings.value.companyInfo)  appHooks.emit('settingChange');
-      return  posSettings.value.companyInfo || {};
+      if (!posSettings.value.companyInfo) appHooks.emit('settingChange');
+      return posSettings.value.companyInfo || {};
     })
 
     const menu = ref([]);
@@ -48,6 +42,7 @@ export default {
       {text: 'Multi', type: 'multi', icon: 'icon-multi_payment'},
     ];
     const printed = ref(null);
+    const tipTextFieldRef = ref();
 
     const blurReceipt = computed(() => menu.value.some(i => i === true))
     const activeOrderPaymentItem = computed(() => {
@@ -74,8 +69,7 @@ export default {
       if (dialog.value.tip) {
         setTimeout(() => {
           if (!tipEditValue.value) tipEditValue.value = '' + tempSplit.value.vSum
-          //fixme: ref
-          nextTick(() => this.$refs['tip-textfield'] && this.$refs['tip-textfield'].$el.click())
+          nextTick(() => tipTextFieldRef.value && tipTextFieldRef.value.$el.click())
         }, 500)
       }
     })
@@ -135,15 +129,11 @@ export default {
       emit('updatePayment', split._id, [{type: payment, value: split.vSum}])
     }
 
-    async function print(order) {
-      emit('print', order)
+    async function print() {
       if (!props.split) {
-        if (printed.value) {
-          const order = await cms.getModel('Order').findById(this.order._id)
-          emit('printOrderReport', order)
-        } else {
-          emit('saveRestaurantOrder', null, false, true, false, () => this.printed = true)
-        }
+        await hooks.emit('pay', true);
+      } else {
+
       }
     }
 
@@ -212,7 +202,7 @@ export default {
               Back
             </g-btn-bs>
             <g-btn-bs width="120" icon="icon-print" class="elevation-2"
-                      onClick={withModifiers(() => print(), ['stop'])}>
+                      onClick={print}>
               Print
             </g-btn-bs>
             <g-btn-bs width="120" icon="icon-receipt2" style="white-space: unset" class="elevation-2">
@@ -222,27 +212,28 @@ export default {
               </div>
             </g-btn-bs>
             {!props.split &&
-            <g-menu v-model={paymentMethodMenu.value} close-on-content-click content-class="menu-payment-option" v-slots={{
-              activator: ({on}) => genScopeId(() =>
-                  <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.value.icon} onClick={on.click}>
-                    <div>{activeOrderPaymentItem.value.text}</div>
-                  </g-btn-bs>
-              )()
-              ,
-              default: () => genScopeId(() =>
-                  <div class="col-flex">
-                    {paymentMethodMenuItems.value.map((item, index) =>
-                        <g-btn-bs
-                            class="ml-0 mr-0"
-                            icon={item.icon}
-                            onClick={() => setOrderPaymentMethod(item)}
-                            key={`paymentMethodMenuItems-${index}`}
-                        >
-                          <div>{item.text}</div>
-                        </g-btn-bs>)}
-                  </div>
-              )()
-            }}>
+            <g-menu v-model={paymentMethodMenu.value} close-on-content-click content-class="menu-payment-option"
+                    v-slots={{
+                      activator: ({on}) => genScopeId(() =>
+                          <g-btn-bs class="elevation-2" icon={activeOrderPaymentItem.value.icon} onClick={on.click}>
+                            <div>{activeOrderPaymentItem.value.text}</div>
+                          </g-btn-bs>
+                      )()
+                      ,
+                      default: () => genScopeId(() =>
+                          <div class="col-flex">
+                            {paymentMethodMenuItems.value.map((item, index) =>
+                                <g-btn-bs
+                                    class="ml-0 mr-0"
+                                    icon={item.icon}
+                                    onClick={() => setOrderPaymentMethod(item)}
+                                    key={`paymentMethodMenuItems-${index}`}
+                                >
+                                  <div>{item.text}</div>
+                                </g-btn-bs>)}
+                          </div>
+                      )()
+                    }}>
             </g-menu>}
             <g-spacer/>
             <g-btn-bs width="120" background-color="#0EA76F" icon="icon-complete" class="elevation-2"
@@ -394,7 +385,7 @@ export default {
         {{
           input: () => (
               <pos-textfield-new
-                  ref={tip - textfield}
+                  ref={tipTextFieldRef}
                   label="Card Payment"
                   v-model={tipEditValue}
                   clearable/>

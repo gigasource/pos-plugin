@@ -13,9 +13,11 @@ import { getScopeAttrs } from '../../utils/helpers';
 import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
 import { h } from 'vue'
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
+import VirtualPrinterView from "../../components/VirtualPrinter/VirtualPrinterView";
 export default {
   name: 'Dashboard',
   components: {
+    VirtualPrinterView,
     OnlineOrderList,
     OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable },
   setup() {
@@ -55,13 +57,15 @@ export default {
     const OnlineOrderMainView = <OnlineOrderMain></OnlineOrderMain>
     const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"></OnlineOrderList>
     const OnlineOrderListCompletedView = <OnlineOrderList status="completed"></OnlineOrderList>
+    const VirtualPrinter = <VirtualPrinterView></VirtualPrinterView>
     const DashBoardViews = {
       KeptAliveRoomViews,
       ManualTableView,
       FunctionsView,
       OnlineOrderMainView,
       OnlineOrderListDeclinedView,
-      OnlineOrderListCompletedView
+      OnlineOrderListCompletedView,
+      VirtualPrinter
     };
 
     return () =>

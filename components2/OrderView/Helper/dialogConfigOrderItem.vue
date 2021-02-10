@@ -54,7 +54,7 @@ export default {
           isGlobalMod: true
         });
       });
-      return [...tabItems, ...mods]
+      return [...tabItems.value, ...mods]
     })
     const existingModifiers = computed(() => {
       if (!product || !product.modifiers) return {}
