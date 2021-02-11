@@ -14,7 +14,7 @@ export default {
     const order = getCurrentOrder()
     const total = computed(() => {
       return order.items.reduce((totalPrice, item) => {
-        totalPrice += item.price
+        totalPrice += item.price * item.quantity
         return totalPrice
       }, 0)
     })
@@ -22,6 +22,10 @@ export default {
 
     function back() {
       router.push({ path: '/pos-dashboard' })
+    }
+
+    function toPayment() {
+      router.push({ path: '/pos-order-retail-payment' })
     }
 
     function generateRandomColor() {
@@ -39,7 +43,7 @@ export default {
             <g-btn-bs class="elevation-2" onClick={back}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
-            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF">{t('common.currency', storeLocale.value)}{total.value}</g-btn-bs>
+            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF" onClick={toPayment}>{t('common.currency', storeLocale.value)}{total.value}</g-btn-bs>
           </div>
           <div class="detail-table">
             {order.items.map((item, i) =>
@@ -47,7 +51,7 @@ export default {
                   <div class="detail-table__row-main">
                     <p class="fs-small fw-700">{item.name}</p>
                     <p>
-                      <span class="detail-table__row-price">{t('common.currency', storeLocale.value)} {item.price}</span>
+                      <span class="detail-table__row-price">{t('common.currency', storeLocale.value)} {item.price * item.quantity}</span>
                       {item.attributes && item.attributes.map((attr, key) =>
                           <span class="detail-table__row-attr" style={{ color: generateRandomColor() }} key={`${key}_${attr}_${i}`}>
                             {key}: {attr}

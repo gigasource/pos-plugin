@@ -27,7 +27,7 @@ export default {
       return order.value.items.map(item => ({
         ..._.omit(item, 'attributes'),
         attributes: getAttributes(item),
-        originalTotal: (item.quantity * item.originalPrice).toFixed(2),
+        originalTotal: (item.quantity * item.costPrice).toFixed(2),
         total: (item.quantity * item.price).toFixed(2)
       }))
     })
