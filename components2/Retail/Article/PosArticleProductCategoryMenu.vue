@@ -2,16 +2,21 @@
   import { onActivated, withModifiers } from 'vue'
   import { genScopeId } from '../../utils';
   import {
-    categories,
     activeCategory, articleSelectedProductButton, articleSelectedColor,
-    loadAllCategories, getActiveProducts, updateArticleOrders
+    getActiveProducts, updateArticleOrders
   } from '../pos-article-logic'
+  import {
+    categories
+  } from '../../Product/product-logic';
+  import {
+    loadCategories
+  } from '../../Product/product-logic-be';
 
   export default {
     name: 'PosArticleProductCategoryMenu',
     setup() {
       onActivated(async() => {
-        await loadAllCategories();
+        await loadCategories();
         await select(categories.value[0])
       })
 

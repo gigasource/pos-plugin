@@ -17,6 +17,28 @@
       "clickable": true,
       "key": "position",
       "type": "input@number"
+    },
+    {
+      "_id": "601e640409d70256c643e724",
+      "schemaType": "string",
+      "key": "appType",
+      "default": null,
+      "unique": null,
+      "type": "input",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null,
+      "onChange": null
+    },
+    {
+      "schemaType": "objectId",
+      "key": "parentCategory",
+      "default": null,
+      "ref": "ParentCategory",
+      "autopopulate": null,
+      "populateSelect": null,
+      "unique": null
     }
   ],
   "id": "5c46e2b15889c52fe001ab83",

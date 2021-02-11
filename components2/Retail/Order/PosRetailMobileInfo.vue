@@ -6,7 +6,6 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: "PosRetailMobileInfo",
-  injectService: ['OrderStore:(savedOrders,getSavedOrders)'],
   props: {},
   setup() {
     // update time
@@ -26,11 +25,6 @@ export default {
     function back() {
       router.push({path: '/pos-dashboard'})
     }
-    async function openDialogSavedList() {
-      await this.getSavedOrders()
-      // TODO:
-      this.$getService('dialogSavedList:setActive')(true)
-    }
 
     return genScopeId(() => (
         <div class="info">
@@ -45,23 +39,6 @@ export default {
           <g-btn-bs class="elevation-2" onClick={back}>
             <g-icon>icon-back</g-icon>
           </g-btn-bs>
-          {
-            (savedOrders && savedOrders.length > 0) ?
-                <g-badge overlay color="#FF4452" v-slots={{
-                  default: () => (
-                    <g-btn-bs class="elevation-2" onClick={openDialogSavedList}>
-                      <g-icon>icon-folder</g-icon>
-                    </g-btn-bs>
-                  ),
-                  badge: () => <span>{savedOrders.length}</span>,
-                }}>
-                </g-badge>
-                : (
-                    <g-btn-bs class="elevation-2" onClick={openDialogSavedList}>
-                      <g-icon>icon-folder</g-icon>
-                    </g-btn-bs>
-                )
-          }
         </div>
     ))
   }

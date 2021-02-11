@@ -1,20 +1,29 @@
+import { watch } from 'vue'
 import cms from 'cms'
 import {
   products,
   categories
 } from './product-logic'
+import {
+  currentAppType
+} from '../AppSharedStates'
 import { ObjectID } from 'bson'
 import _ from 'lodash'
+
+watch(() => currentAppType.value, async () => {
+  await loadCategories()
+  await loadProducts()
+})
 
 const Product = cms.getModel('Product')
 const Category = cms.getModel('Category')
 
 export async function loadProducts() {
-  products.value = await Product.find()
+  products.value = await Product.find({ appType: currentAppType.value })
 }
 
 export async function loadCategories() {
-  categories.value = await Category.find()
+  categories.value = await Category.find({ appType: currentAppType.value })
 }
 
 export async function createProduct(product) {

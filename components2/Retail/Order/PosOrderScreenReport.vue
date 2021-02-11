@@ -2,11 +2,12 @@
 import { genScopeId } from '../../utils';
 import { $filters } from '../../AppSharedStates';
 import { paymentTax, paymentDiscount, paymentSubTotal, paymentTotal } from './temp-logic'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'PosOrderScreenReport',
   setup() {
-    // TODO: handle Euro sign in template
+    const { t } = useI18n()
     return genScopeId(() => (
         <div style="position:relative;">
           <div class="report-column">

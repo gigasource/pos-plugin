@@ -1,4 +1,4 @@
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, computed } from 'vue'
 
 export const products = ref([])
 export const categories = ref([])
@@ -24,3 +24,26 @@ watchEffect(() => {
     }
   })
 })
+
+/**
+ * Format category to format with subCategory as array attribute
+ * {
+ *   ...
+ *   subCategory: list of sub categories
+ *   ...
+ * }
+ */
+export const formattedCategories = computed(() => {
+  const result = categories.value.map(category => {
+    category.subCategory = _.cloneDeep(categories.value.filter(_category => {
+      return _category.parentCategory && _category.parentCategory.toString() === category._id.toString()
+    }))
+    category.subCategory = !!category.subCategory ? category.subCategory : []
+    return category
+  })
+  _.remove(result, category => {
+    return !!category.parentCategory
+  })
+  return result
+})
+

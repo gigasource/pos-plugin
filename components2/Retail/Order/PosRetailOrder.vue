@@ -1,15 +1,18 @@
 <script>
+import { ref } from 'vue'
 import { avatar, username, storeLocale } from '../../AppSharedStates';
 import { useRouter } from 'vue-router'
-import { genScopeId } from '../../utils';
+import { genScopeId } from '../../utils'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'PosRetailOrder',
   props: {},
   setup() {
+    const { t } = useI18n()
     const items = ref([
       { name: 'T-shirt', price: 12, quantity: 10 },
-      { name: 'Dress', price: 12, quantity: 4, attributes: { size: 39, color: 'Yellow' } },
+      { name: 'Dress', price: 12, quantity: 4, attributes: [{ size: 39, color: 'Yellow' }] },
       { name: 'Hat', price: 12, quantity: 2 },
       { name: 'Shoes', price: 12, quantity: 2 },
       { name: 'Bag', price: 12, quantity: 3 },
@@ -45,7 +48,7 @@ export default {
                     <p class="fs-small fw-700">{item.name}</p>
                     <p>
                       <span class="detail-table__row-price">{t('common.currency', storeLocale.value)} {item.price}</span>
-                      {item.attributes.map((attr, key) =>
+                      {item.attributes && item.attributes.map((attr, key) =>
                           <span class="detail-table__row-attr" style={{ color: generateRandomColor() }} key={`${key}_${attr}_${i}`}>
                             {key}: {attr}
                           </span>
