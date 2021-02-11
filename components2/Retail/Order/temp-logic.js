@@ -37,9 +37,6 @@ export const /*OrderStore::*/ queryProductsById = () => {
   console.error('OrderStore::queryProductsById not impl')
 }
 export const /*OrderStore::*/ productIdQueryResults = ref('')
-export const /*OrderStore::*/ addProductToOrder = () => {
-  console.error('OrderStore::queryProductsById not impl')
-}
 export const /*OrderStore::*/ getScrollWindowProducts = () => {
   console.error('OrderStore::getScrollWindowProducts not impl')
 }

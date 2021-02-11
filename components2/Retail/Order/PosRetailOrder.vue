@@ -1,23 +1,23 @@
 <script>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { avatar, username, storeLocale } from '../../AppSharedStates';
 import { useRouter } from 'vue-router'
 import { genScopeId } from '../../utils'
 import { useI18n } from 'vue-i18n'
+import { getCurrentOrder } from '../../OrderView/pos-logic-be'
 
 export default {
   name: 'PosRetailOrder',
   props: {},
   setup() {
     const { t } = useI18n()
-    const items = ref([
-      { name: 'T-shirt', price: 12, quantity: 10 },
-      { name: 'Dress', price: 12, quantity: 4, attributes: [{ size: 39, color: 'Yellow' }] },
-      { name: 'Hat', price: 12, quantity: 2 },
-      { name: 'Shoes', price: 12, quantity: 2 },
-      { name: 'Bag', price: 12, quantity: 3 },
-    ])
-    const total = ref(1234.50)
+    const order = getCurrentOrder()
+    const total = computed(() => {
+      return order.items.reduce((totalPrice, item) => {
+        totalPrice += item.price
+        return totalPrice
+      }, 0)
+    })
     const router = useRouter()
 
     function back() {
@@ -39,10 +39,10 @@ export default {
             <g-btn-bs class="elevation-2" onClick={back}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
-            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF">{t('common.currency', storeLocale.value)}{total}</g-btn-bs>
+            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF">{t('common.currency', storeLocale.value)}{total.value}</g-btn-bs>
           </div>
           <div class="detail-table">
-            {items.value.map((item, i) =>
+            {order.items.map((item, i) =>
                 <div key={i} class="detail-table__row">
                   <div class="detail-table__row-main">
                     <p class="fs-small fw-700">{item.name}</p>

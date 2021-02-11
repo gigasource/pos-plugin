@@ -8,7 +8,6 @@ import {
   products,
   categories
 } from '../../Product/product-logic'
-import { addProductToOrder } from './temp-logic'
 import {
   selectedCategory
 } from '../pos-order-retail-logic'
@@ -16,6 +15,11 @@ import {
   getProductLayout,
   getProductGridOrder
 } from '../pos-retail-shared-logic'
+import {
+  prepareOrder,
+  getCurrentOrder
+} from '../../OrderView/pos-logic-be'
+import { addItem } from '../../OrderView/pos-logic';
 
 export default {
   name: 'PosOrderScreenScrollWindow',
@@ -81,8 +85,13 @@ export default {
       }
     }
 
+    onActivated(() => {
+      prepareOrder(0)
+    })
+
     function addProduct(item) {
-      addProductToOrder(item)
+      const order = getCurrentOrder()
+      addItem(order, item, 1)
     }
 
     function getItemStyle(item) {
