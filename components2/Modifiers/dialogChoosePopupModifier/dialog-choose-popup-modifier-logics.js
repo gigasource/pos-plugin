@@ -1,38 +1,41 @@
-import { modifierGroups } from '../dialogEditPopupModifier/modifier-ui-logics';
-import { computed, ref, watch } from 'vue';
-import { internalValueFactory, intervalLog, isSameId } from '../../utils';
+import {modifierGroups} from '../dialogEditPopupModifier/modifier-ui-logics';
+import {computed, ref, watch} from 'vue';
+import {internalValueFactory, intervalLog, isSameId} from '../../utils';
 import _ from 'lodash'
 
-const dialogChoosePopupModifierLogicsFactory = function (props, { emit }) {
-  const internalValue = internalValueFactory(props, { emit })
-  const categories = computed(() => {
+const dialogChoosePopupModifierLogicsFactory = function (props, {emit}, _categories) {
+  const internalValue = internalValueFactory(props, {emit})
+  const categories = _categories || computed(() => {
     if (!modifierGroups.value || !modifierGroups.value.groups) return []
-    const group = _.find(modifierGroups.value.groups, i => i._id.toString() === props.product.activePopupModifierGroup.toString())
+    const group = _.find(modifierGroups.value.groups, i => i._id.toString() === _.get(props, 'product.activePopupModifierGroup', '').toString())
     return (group && group.categories) ? group.categories : []
   })
+
   const countItems = ref({})
   const countItemsByCategory = ref({})
 
+  const categoryMap = new WeakMap();
+
   const activeItem = (category) => {
-    return computed(() => {
+    if (categoryMap.has(category)) return categoryMap.get(category);
+    categoryMap.set(category, computed(() => {
       const res = category.items.filter(item => countItemsByCategory.value[category._id] && countItemsByCategory.value[category._id][item._id] % ((item.max || 1) + 1) > 0)
       if (category.selectOne) {
         if (res.length === 1) return res[0]
         else return null
       }
       return res
-    })
+    }))
+    return categoryMap.get(category);
   }
 
-  setInterval(() => {
-    if (!categories.value || categories.value.length === 0) return
-    console.log(activeItem(categories.value[0]).value)
-  }, 1000)
-
-  watch(() => categories.value, () => {
-    countItemsByCategory.value = {}
-    _.forEach(categories.value, category => countItemsByCategory.value[category._id] = {})
-  }, { deep: true })
+  watch([() => internalValue.value, () => props.categories], () => {
+    if (internalValue.value || props.categories) {
+      countItemsByCategory.value = {}
+      countItems.value = {}
+      _.forEach(categories.value, category => countItemsByCategory.value[category._id] = {})
+    }
+  })
 
   const enableSaveBtn = computed(() => {
     if (!categories.value) return false
@@ -61,8 +64,23 @@ const dialogChoosePopupModifierLogicsFactory = function (props, { emit }) {
   }
 
   const onSave = function () {
-    //todo: emit selected modifier list here
-    // consider category's no.free items here
+    const modifiers = []
+    for (const category of categories.value) {
+      const _modifiers = [];
+      if (category.selectOne) {
+        _modifiers.push(_.cloneDeep(activeItem(category).value));
+      } else {
+        _modifiers.push(..._.cloneDeep(activeItem(category).value));
+      }
+      for (const _modifier of _modifiers) {
+        let quantity = getModifierQty(_modifier);
+        for (let i = 0; i < quantity; i++) {
+          modifiers.push(_modifier);
+        }
+      }
+    }
+    if (!props.embed) internalValue.value = false;
+    emit('save', props.product, modifiers);
   }
 
   return {

@@ -18,15 +18,11 @@ export default {
   setup() {
     initRouter()
     const roomRef = ref(null)
-    onMounted(() => {
-      focusTextField()
-    })
-    onActivated(() => {
-      focusTextField()
-    })
+    onMounted(focusTextField)
+    onActivated(focusTextField)
     return genScopeId(() =>
-        <div class="wrapper col-flex" {...getScopeAttrs()}>
-          <div class="room-container flex-grow-1" ref={roomRef} {...getScopeAttrs()}>
+        <div class="wrapper col-flex">
+          <div class="room-container flex-grow-1" ref={roomRef}>
             {manualTables.value.map(table =>
                 <div class="table waves-effect waves-red"
                      onClick={withModifiers(() => routeToOrder(table), ['stop'])}>
@@ -54,7 +50,7 @@ export default {
   height: 100%;
   width: 100%;
 
-  .room-container {
+  :deep .room-container {
     display: flex;
     flex-direction: row;
     padding: 32px;
@@ -81,7 +77,7 @@ export default {
   padding: 1rem;
 }
 
-.g-tf-wrapper ::v-deep {
+:deep .g-tf-wrapper {
   margin: 0 0 8px 0;
   width: 100%;
 

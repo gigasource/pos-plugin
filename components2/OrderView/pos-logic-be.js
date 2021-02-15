@@ -78,7 +78,9 @@ const processItems = (order, actionList, items, itemsSnapshot, prop, _hooks) => 
           return `items.$.${k}`;
         })
         !_hooks && addItemAction(order, actionList, item, {$set: _diffItem});
-        _hooks && _hooks.emit('change-item', diffItem, item, itemSnapshot);
+        if (['quantity', 'price', 'modifiers', 'name'].find(p => diffItem.hasOwnProperty(p))) {
+          _hooks && _hooks.emit('change-item', diffItem, item, itemSnapshot);
+        }
       }
     }
   }
@@ -388,6 +390,7 @@ export const payBtnClickable = computed(() => {
 })
 
 export const payPrintMode = computed(() => {
+  if (!order.table) return 'pay';
   if (order.items.find(i => !i.sent)) return "print"
   if (order.items.length === 0) return "print"
   return hasOrderChange.value ? 'print' : 'pay';
@@ -463,8 +466,7 @@ hooks.on('togglePayPrintBtn:step2', async (cb) => {
 })
 
 export const disablePay = computed(() => {
-  if (!order.table) return false
-  if (!order.items.some(i => i.quantity)) return true
+  if (!order.table) return false;
   if (onlyCheckoutPrintedItems.value) {
     return hasOrderChange.value;
   }
@@ -475,7 +477,7 @@ hooks.on('printOrder', async () => {
   order.date = new Date();
   clearNullQuantityItems(order);
   mergeSameItems(order);
-  await new Promise(r => hooks.once('nextTick', r));
+  await makeActionList();
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   makeSent(actionList.value);
   createPrintAction(actionList.value, 'kitchen', {order, device: 'Terminal 1', recent})
@@ -491,10 +493,6 @@ async function genMaxId(order) {
 
 async function genBookingNumber(order) {
   order.bookingNumber = dayjs(order.date).format('YYMMDDHHmmssSSS');
-}
-
-async function getAllSplitOrder(splitId) {
-  return await Order.find({splitId});
 }
 
 function makeSent(actionList) {
@@ -528,7 +526,7 @@ hooks.on('pay', async (printInvoice = false) => {
   order.date = new Date();
   clearNullQuantityItems(order);
   mergeSameItems(order);
-  await new Promise(r => hooks.once('nextTick', r));
+  await makeActionList();
 
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   if (printInvoice) {

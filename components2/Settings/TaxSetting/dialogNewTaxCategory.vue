@@ -1,23 +1,22 @@
 <script>
-import { isMobile } from '../../AppSharedStates';
-import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n';
-import { TaxCategoryDialogLogicsFactory } from './view-tax-logics';
-import { genScopeId } from '../../utils';
-import { getScopeAttrs} from '../../../utils/helpers';
+import {isMobile} from '../../AppSharedStates';
+import {computed, ref} from 'vue'
+import {useI18n} from 'vue-i18n';
+import {TaxCategoryDialogLogicsFactory} from './view-tax-logics';
+import {genScopeId} from '../../utils';
+import {getScopeAttrs} from '../../../utils/helpers';
 
 export default {
   emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const { internalValue, submit, open, isValid, rules, taxType, taxName, taxValue } = TaxCategoryDialogLogicsFactory(props, { emit })
+  setup(props, {emit}) {
+    const {t} = useI18n()
+    const {internalValue, submit, open, isValid, rules, taxType, taxName, taxValue} = TaxCategoryDialogLogicsFactory(props, {emit})
 
 
-    const formRender = genScopeId(() => <div class="form">
+    const formRender = () => <div class="form">
       <div class="input">
         <g-text-field-bs class="bs-tf__pos" label="Name" v-model={taxName.value} suffix="%"/>
         <g-text-field-bs class="bs-tf__pos"
-                         onClick={() => check.value = 'tax'}
                          label={t('common.tax')}
                          v-model={taxValue.value} rules={[rules.value.number, rules.value.range]}
                          suffix="%"/>
@@ -28,24 +27,28 @@ export default {
         <div class="action">
           <g-btn uppercase={false} outlined class="mr-3" width="120" onClick={() => internalValue.value = false}>
             {t('ui.cancel')} </g-btn>
-          <g-btn uppercase={false} flat background-color="blue accent 3" text-color="white" width="120" onClick={submit} disabled={!isValid.value}>
+          <g-btn uppercase={false} flat background-color="blue accent 3" text-color="white" width="120" onClick={submit}
+                 disabled={!isValid.value}>
             {t('ui.ok')} </g-btn>
         </div>
       }
-    </div>)
-    const renderFn = genScopeId(() => <>
-      <g-dialog v-model={internalValue.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager fullscreen={isMobile.value}>
-        <div class="dialog-new-tax w-100" { ...getScopeAttrs()}>
-          <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon" {...getScopeAttrs()}>
-            icon-close
-          </g-icon>
-          { formRender()}
-          <div class="bg-grey-lighten-1 pa-2" >
-            <pos-keyboard-full onEnterPressed={submit}/>
+    </div>
+    const renderFn = () => <>
+      <g-dialog v-model={internalValue.value} overlay-color="#6b6f82" overlay-opacity="0.95" width="90%" eager
+                fullscreen={isMobile.value}>
+        {genScopeId(() => <>
+          <div class="dialog-new-tax w-100">
+            <g-icon onClick={() => internalValue.value = false} svg size="20" class="icon">
+              icon-close
+            </g-icon>
+            {formRender()}
+            <div class="bg-grey-lighten-1 pa-2">
+              <pos-keyboard-full onEnterPressed={submit}/>
+            </div>
           </div>
-        </div>
+        </>)()}
       </g-dialog>
-    </>)
+    </>
     return {
       renderFn,
       open

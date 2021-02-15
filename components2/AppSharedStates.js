@@ -75,10 +75,16 @@ appHooks.on('orderChange', async function () {
 
 cms.socket.on('update-table', () => appHooks.emit('orderChange'))
 
-
-export const posSettings = ref({})
+const _posSettings = ref()
+export const posSettings = computed(() => {
+  if (!_posSettings.value) {
+    appHooks.emit('settingChange');
+    return {};
+  }
+  return _posSettings.value;
+})
 appHooks.on('settingChange', async function () {
-  posSettings.value = await cms.getModel('PosSetting').findOne()
+  _posSettings.value = await cms.getModel('PosSetting').findOne()
 })
 
 export const groupPrinters = ref([])

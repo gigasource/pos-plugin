@@ -222,7 +222,7 @@ export function orderLayoutProductFactory() {
     if (productLayout.product && productLayout.product._id && productLayout.product.id)
       return `${productLayout.product.id}. ${productLayout.product.name}`
     else
-      return productLayout.product.name
+      return _.get(productLayout, 'product.name', '')
   }
 
   async function showPopupModifierDialog({product}) {
@@ -239,12 +239,9 @@ export function orderLayoutProductFactory() {
   }
 
   async function addProductWithModifier(product, modifiers) {
-    //todo: test if can not create the right modifier
     addProduct(order, product);
-    await Promise.resolve();
     for (const modifier of modifiers) {
       addModifier(order, modifier);
-      await Promise.resolve();
     }
   }
 

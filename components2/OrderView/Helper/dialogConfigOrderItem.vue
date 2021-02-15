@@ -1,23 +1,30 @@
 <script>
 import {useI18n} from 'vue-i18n';
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
+import {getCurrentOrder} from "../pos-logic-be";
+import {addItemModifier, addModifier, makeDiscount, makeItemDiscount} from "../pos-logic";
+import DiscountInput2 from "../../Payment/Helpers/DiscountInput2";
+import {getScopeAttrs} from "../../../utils/helpers";
+import {genScopeId} from "../../utils";
+import Hooks from "schemahandler/hooks/hooks";
+import {fetchModifiers, modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
+import dialogChoosePopupModifier from "../../Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier";
 
 export default {
+  name: 'DialogConfigOrderItem',
   props: {
     modelValue: null,
-    product: null,
-    originalValue: Number
+    product: null
   },
+  components: {DiscountInput2, dialogChoosePopupModifier},
   setup(props, {emit}) {
     const {t: $t, locale} = useI18n()
-    const product = props.product
-    const originalValue = props.originalValue
+    const hooks = new Hooks();
     const tab = ref(null)
     const tabItems = ref([
       {title: $t('restaurant.modifier'), event: 'addModifier'},
       {title: $t('common.discount'), event: 'changePrice'}
     ])
-    const modifierGroups = ref([])
     const selectedModifiers = ref({})
     const listModifiers = ref([])
     // add modifier
@@ -26,6 +33,7 @@ export default {
     const rules = ref([
       val => !isNaN(val) || $t('ui.numberRulesErr')
     ])
+    const order = getCurrentOrder();
 
     // discount
     const newValueEditable = ref(true)
@@ -41,8 +49,9 @@ export default {
         emit('update:modelValue', val)
       }
     })
+    fetchModifiers();
     const tabs = computed(() => {
-      const mods = modifierGroups.value.map(group => {
+      const mods = modifierGroups.value.groups.map(group => {
         const {name, categories, modifiers} = group
         const modifiersByCategory = _.groupBy(modifiers, 'category')
 
@@ -51,14 +60,15 @@ export default {
           categories,
           modifiersByCategory,
           event: 'addModifier',
+          //todo
           isGlobalMod: true
         });
       });
       return [...tabItems.value, ...mods]
     })
     const existingModifiers = computed(() => {
-      if (!product || !product.modifiers) return {}
-      const modifiersByCategory = _.groupBy(product.modifiers.filter(mod => mod.modifierGroup), 'category')
+      if (!props.product || !props.product.modifiers) return {}
+      const modifiersByCategory = _.groupBy(props.product.modifiers.filter(mod => mod.modifierGroup), 'category')
       return _.mapValues(modifiersByCategory, item => item.length)
     })
     const listModifiersWithFreeItems = computed(() => {
@@ -87,12 +97,7 @@ export default {
       })
       return list
     })
-    const addModifier = function () {
-      if (!price.value) price.value = 0
-      if (modifier.value && !isNaN(price.value) && price.value >= 0)
-        emit('addModifier', {name: modifier.value, price: +price.value})
-      dialogConfigOrderItem.value = false
-    }
+
     const changePrice = function () {
       emit('changePrice', newValue.value)
       dialogConfigOrderItem.value = false
@@ -131,93 +136,80 @@ export default {
       return listModifiers.value.filter(mod => mod._id === _id).length;
     }
 
-    const submit = function () {
-      if (tab) {
+    const submit = function ({type, value}) {
+      if (tab.value) {
         if (listModifiersWithFreeItems.value.length) {
           listModifiersWithFreeItems.value.forEach(mod => emit('addModifier', mod))
           return dialogConfigOrderItem.value = false
         }
 
-        tab.value.event()
+        if (tab.value.event === 'addModifier') {
+          addModifier(order, {name: modifier.value, price: price.value || 0});
+        } else if (tab.value.event === 'changePrice') {
+          if (type === 'percentage') {
+            makeItemDiscount(order, props.product, value + '%');
+          } else {
+            makeItemDiscount(order, props.product, value + '');
+          }
+        }
+        dialogConfigOrderItem.value = false;
       }
     }
+
+    function submitModifiers(product, modifiers) {
+      for (const modifier of modifiers) {
+        addItemModifier(order, props.product, modifier);
+      }
+      dialogConfigOrderItem.value = false;
+    }
+
+    let discountInputRef = ref();
+
+    watch([() => dialogConfigOrderItem.value, () => discountInputRef.value], () => {
+      if (dialogConfigOrderItem.value && discountInputRef.value) {
+        if (_.includes(props.product.discount, '%')) {
+          hooks.emit('init', parseFloat(props.product.discount.split('%')[0]));
+        } else {
+          hooks.emit('init', undefined, parseFloat(props.product.discount));
+        }
+      }
+    })
+
     return () =>
-        <dialog-form-input v-model={dialogConfigOrderItem.value} width="90%" onSubmit={submit}
-                           showKeyboard={!tab.value || !tab.value.isGlobalMod}>
-          {{
-            input: () =>
+        <g-dialog v-model={dialogConfigOrderItem.value} width="90%" onSubmit={submit}
+                  forceDisableButtons={true}
+                  showKeyboard={!tab.value || !tab.value.isGlobalMod && tab.value.event !== 'changePrice'} v-slots={{
+          default: genScopeId(() =>
+              <g-card>
                 <g-tabs v-model={tab.value} items={tabs.value} text-color="#1d1d26" color="white"
                         active-text-color="#1d1d26"
-                        slider-color="#1471ff" slider-size="3">
+                        slider-color="#1471ff" slider-size="3"
+                        vertical>
                   {tabs.value.map((tabItem, index) =>
                       <g-tab-item key={index} item={tabItem}>
                         {(index === 0) &&
                         <div class="modifier-content row-flex flex-wrap justify-around mb-2">
-                          <pos-textfield-new style="width: 48%;" v-model={modifier} label="Modifier"
+                          <pos-textfield-new style="width: 48%;" v-model={modifier.value} label="Modifier"
                                              placeholder="Name"/>
-                          <pos-textfield-new style="width: 48%;" rules={rules} v-model={price} label="Price"
+                          <pos-textfield-new style="width: 48%;" rules={rules.value} v-model_number={price.value}
+                                             label="Price"
                                              placeholder="Price"/>
+                          <div class="keyboard w-100 mt-5">
+                            <pos-keyboard-full onEnterPressed={submit}/>
+                          </div>
                         </div>}
 
                         {(index === 1) &&
-                        <change-value v-model={changeType.value} originalValue={originalValue}
-                                      newValueEditable={newValueEditable.value}
-                                      v-model={newValue.value}/>
+                        <discount-input2 ref={discountInputRef} onSubmit={submit} hooks={hooks}/>
                         }
 
-                        {tabItem.isGlobalMod && <>
-                          {tabItem.categories.map(category =>
-                              <>
-                                <div>
-                                  <span>{category.name}</span>
-                                  {category.mandatory && <span style="color: #FF4452;">*</span>}
-                                </div>
-                                <div class="mt-2 mb-3">
-                                  <g-grid-select items={tabItem.modifiersByCategory[category._id]} grid={false}
-                                                 return-object
-                                                 multiple={!category.selectOne} mandatory={category.mandatory}
-                                                 modelValue={selectedModifiers[category._id]}
-                                                 onUpdate:modelValue={(newV) => selectModifier(newV, category)}
-                                  >
-                                    {{
-                                      default: ({toggleSelect, item, index}) =>
-                                          <g-btn uppercase={false} border-radius="2" outlined class="mr-3"
-                                                 background-color="#F0F0F0"
-                                                 style="border: 1px solid #C9C9C9"
-                                                 onClick={() => onClickModifier(item, category, toggleSelect)}>
-                                            <span
-                                                class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
-                                          </g-btn>,
-                                      selected: ({toggleSelect, item, index}) => <>
-                                        {(getModifierQty(item._id) > 1) ?
-                                            <g-badge overlay color="#FF4452" class="mr-3">
-                                              {{
-                                                badge: () => <div>{getModifierQty(item._id)}</div>,
-                                                default: () =>
-                                                    <g-btn uppercase={false} border-radius="2" flat
-                                                           background-color="#2979FF" text-color="#fff"
-                                                           onClick={onClickModifier(item, category, toggleSelect)}>
-                                                      <span
-                                                          class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
-                                                    </g-btn>
-                                              }}
-                                            </g-badge> :
-                                            <g-btn uppercase={false} border-radius="2" flat class="mr-3"
-                                                   background-color="#2979FF" text-color="#fff"
-                                                   onClick={onClickModifier(item, category, toggleSelect)}>
-                                              <span
-                                                  class="fw-700">{item.name} - {$t('common.currency', locale.value)}{item.price}</span>
-                                            </g-btn>}
-                                      </>
-                                    }}
-                                  </g-grid-select>
-                                </div>
-                              </>)}
-                        </>}
+                        {tabItem.isGlobalMod &&
+                          <dialog-choose-popup-modifier v-model={dialogConfigOrderItem.value} embed categories={tabItem.categories} onSave={submitModifiers}/>
+                        }
                       </g-tab-item>)}
                 </g-tabs>
-          }}
-        </dialog-form-input>
+              </g-card>)
+        }}/>
   }
 }
 </script>
@@ -230,4 +222,21 @@ export default {
     font-size: 16px;
   }
 }
+
+:deep .keyboard {
+  background-color: #bdbdbd;
+  padding: 0.5rem;
+  margin: 0 -16px -16px -16px;
+}
+
+@media screen and (max-height: 599px) {
+  .keyboard {
+    margin: 0 -8px -8px -8px;
+
+    :deep .key {
+      font-size: 18px;
+    }
+  }
+}
+
 </style>

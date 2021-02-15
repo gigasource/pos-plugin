@@ -12,7 +12,7 @@ export default {
     modelValue: Boolean,
     newValueEditable: false
   },
-  components: [DiscountInput2],
+  components: {DiscountInput2},
   setup(props, { emit }) {
     const order = getCurrentOrder()
     const changeType = ref(null)

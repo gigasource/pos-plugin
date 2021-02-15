@@ -90,7 +90,7 @@ export default {
       }
     }
 
-    return genScopeId(() => <g-dialog v-model={internalValue.value} width="50%">
+    return () => <g-dialog v-model={internalValue.value} width="50%">
       {genScopeId(() => <>
         <g-card class={["dialog-multi-payment", rotate && "rotate"]}>
           <div class="dialog-multi-payment__header">
@@ -121,15 +121,14 @@ export default {
           </div>}
           {isMobile.value && <div class="dialog-multi-payment__screen--mobile">
             <g-text-field clearable ref={cardTextfieldRef} outlined label={t('payment.cash')} class="mr-1"
-                          v-model_number={cardEditValue.value} onClick={onCLick_Stop(getRemainingValue)} v-slots={{
+                          v-model_number={cardEditValue.value} onClick={getRemainingValue} v-slots={{
               'prepend-inner': () => <g-icon>icon-cash</g-icon>
-            }}>
-            </g-text-field>
+            }}/>
+
             <g-text-field clearable ref={cashTextfieldRef} outlined label={t('payment.card')}
-                          v-model_number={cashEditValue.value} onClick={onCLick_Stop(getRemainingValue)} v-slots={{
+                          v-model_number={cashEditValue.value} onClick={getRemainingValue} v-slots={{
               'prepend-inner': () => <g-icon>icon-credit_card</g-icon>
-            }}>
-            </g-text-field>
+            }}/>
           </div>}
           <div class="dialog-multi-payment__keyboard">
             <pos-keyboard-full
@@ -137,19 +136,20 @@ export default {
                 template={keyboardTemplate.value}
                 items={keyboardItems.value}/>
           </div>
-          <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100" disabled={disableConfirmMulti.value}
-                    onClick={onCLick_Stop(submit)}>
+          <g-btn-bs background-color="#2979ff" text-color="#fff" class="w-100 mt-2" disabled={disableConfirmMulti.value}
+                    style="min-height: 25px"
+                    onClick={submit}>
             Confirm
           </g-btn-bs>
         </g-card>
       </>)()}
-    </g-dialog>)
+    </g-dialog>
   }
 }
 </script>
 
 <style scoped lang="scss">
-:deep(.key) {
+:deep .key {
   border: 1px solid #BDBDBD;
   border-radius: 2px;
   font-size: 24px;
@@ -159,20 +159,19 @@ export default {
   padding-bottom: 16px;
 }
 
-:deep(.g-btn-bs) {
+:deep .g-btn-bs {
   margin: 0;
   flex-basis: 40%;
   height: 50px;
-  margin-top: 20px;
 }
 
-.g-tf-wrapper {
+:deep .dialog-multi-payment__screen .g-tf-wrapper {
   margin-bottom: 0;
   margin-top: 0;
   margin-right: 0;
 }
 
-.bs-tf-wrapper {
+:deep .bs-tf-wrapper {
   margin-bottom: 0;
   margin-top: 0;
   margin-right: 0;
@@ -224,7 +223,7 @@ export default {
 }
 
 @media screen and (max-height: 599px) {
-  .dialog-multi-payment {
+  :deep .dialog-multi-payment {
     padding: 8px;
 
     &__header {
@@ -248,11 +247,11 @@ export default {
         .g-tf-wrapper {
           margin-top: 8px;
 
-          :deep(fieldset) {
+          :deep fieldset {
             border-color: #ced4da;
           }
 
-          &.g-tf__focused ::v-deep fieldset {
+          &.g-tf__focused :deep fieldset {
             border-color: #1867c0;
           }
         }
@@ -262,7 +261,7 @@ export default {
     &__keyboard {
       margin: 8px 0;
 
-      :deep(.keyboard__template) {
+      .keyboard__template {
         grid-gap: 5px !important;
 
         .key {

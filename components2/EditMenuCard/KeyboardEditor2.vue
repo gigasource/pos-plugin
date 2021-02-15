@@ -1,6 +1,6 @@
 
 <script>
-import InputNumber2 from './InputNumber2';
+import InputNumber from './InputNumber';
 import {selectedCategoryLayout} from '../OrderView/pos-ui-shared';
 import {keyboardConfig, updateKeyboardConfig} from '../OrderView/order-layout-keyboard';
 import {reactive, computed} from 'vue';
@@ -10,7 +10,7 @@ import _ from 'lodash'
 
 export default {
   name: 'KeyboardEditor2.vue',
-  components: {InputNumber2},
+  components: {InputNumber},
   props: {},
   setup() {
     window.dbg = window.dbg || {}
@@ -181,7 +181,7 @@ export default {
         <g-btn-bs elevation="2" style="margin: 0 0 12px" onClick={() => state.dialog = true} icon="select_all">{t('ui.choose')}</g-btn-bs>
         <div class="keyboard-editor__title">{t('restaurant.menuEdit.expansionColumn')} </div>
         <div class="row-flex">
-          <input-number2 width="148" model-value={extraColumns.value} onUpdate:modelValue={changeExtraColumns}></input-number2>
+          <input-number width="148" model-value={extraColumns.value} onUpdate:modelValue={changeExtraColumns}></input-number>
           <g-btn-bs elevation="2" icon="icon-redo" onClick={resetKeyboard}>{t('ui.reset')} </g-btn-bs>
         </div>
         <g-checkbox v-model={active.value} label="Active Keyboard"/>

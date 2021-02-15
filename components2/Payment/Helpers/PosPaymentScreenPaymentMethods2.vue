@@ -4,14 +4,14 @@ import { ref, watch, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { isMobile} from '../../AppSharedStates';
 import { GBadge, GBtn, GIcon } from 'pos-vue-framework';
-import dialogMultiPayment2 from './dialogMultiPayment';
+import dialogMultiPayment from './dialogMultiPayment';
 import { genScopeId, VModel_number } from '../../utils';
 import PosTextfieldNew from "../../pos-shared-components/POSInput/PosTextfieldNew";
 
 //todo: ref-tip-textfield
 export default {
   name: 'PosPaymentScreenPaymentMethods2',
-  components: [GBtn, GIcon, GBadge, dialogMultiPayment2, PosTextfieldNew],
+  components: {GBtn, GIcon, GBadge, dialogMultiPayment, PosTextfieldNew},
   setup() {
     const {
       defaultPaymentList,
@@ -108,13 +108,13 @@ export default {
               }
             </>
         )} </div>
-      <dialog-multi-payment2 v-model={showMultiPaymentDialog.value}
+      <dialog-multi-payment v-model={showMultiPaymentDialog.value}
                              total={currentOrder.vSum}
                              cardValue={cardEditValue.value}
                              cashValue={cashEditValue.value}
                              isMobile={isMobile.value}
                              onSubmit={onSaveMulti}>
-      </dialog-multi-payment2>
+      </dialog-multi-payment>
       <dialog-form-input width="40%"
                          v-model={showAddTipDialog.value}
                          keyboard-type="numeric" onSubmit={onSaveTip} keyboard-width="100%" v-slots={{

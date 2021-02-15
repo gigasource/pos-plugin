@@ -1,9 +1,10 @@
-import { computed, nextTick, ref } from 'vue';
-import { activeOrders } from '../../../AppSharedStates';
-import { getDiffTime } from '../../../../utils/commons';
-import { routeToOrder } from '../RestaurantRoomLogics';
-import { getTableOrderInfo, isBusyTable } from '../../RoomShared';
+import {computed, nextTick, ref} from 'vue';
+import {activeOrders} from '../../../AppSharedStates';
+import {getDiffTime} from '../../../../utils/commons';
+import {routeToOrder} from '../RestaurantRoomLogics';
+import {getTableOrderInfo, isBusyTable} from '../../RoomShared';
 import _ from 'lodash'
+
 export const textFieldRef = ref(null)
 export const tableNameInput = ref('')
 export const showNumberOfCustomersDialog = ref(false)
@@ -13,8 +14,8 @@ export const manualTables = computed(() => {
 })
 
 export function tableExists() {
-  if (!this.text) return
-  return this.manualTables.includes(this.trimmedText)
+  if (!tableNameInput.value) return
+  return manualTables.value.includes(_.trim(tableNameInput.value));
 }
 
 export function getOrderTime(tableName) {
@@ -23,12 +24,8 @@ export function getOrderTime(tableName) {
 }
 
 export async function addTable() {
-  //todo:
-  if (!tableNameInput.value || this.tableExists) return
-  if (isBusyTable(tableNameInput.value.trim())) {
-    routeToOrder(tableNameInput.value)
-    return
-  }
+  if (!tableNameInput.value || tableExists()) return
+  routeToOrder(tableNameInput.value)
 }
 
 export function focusTextField() {

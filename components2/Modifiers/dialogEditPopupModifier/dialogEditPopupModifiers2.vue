@@ -1,6 +1,6 @@
 <script>
-import { onBeforeMount, ref, watch, withModifiers } from 'vue';
-import { VModel_number } from '../../utils';
+import {onBeforeMount, ref, watch, withModifiers} from 'vue';
+import {genScopeId, internalValueFactory, VModel_number} from '../../utils';
 
 import {
   activeItem,
@@ -16,14 +16,17 @@ import {
   onUpdateActiveItem
 } from './modifier-ui-logics';
 
-import { getScopeAttrs } from '../../../utils/helpers';
-import { genScopeId, internalValueFactory } from '../../utils';
-import { groupPrinters, appHooks } from '../../AppSharedStates';
+import {getScopeAttrs} from '../../../utils/helpers';
+import {appHooks, groupPrinters} from '../../AppSharedStates';
 
 export default {
+  props: {
+    modelValue: Boolean
+  },
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     //todo:
-    const internalValue = internalValueFactory({ modelValue: true }, { emit })
+    const internalValue = internalValueFactory(props, { emit })
     // const internalValue = internalValueFactory(props, { emit })
     onBeforeMount(async () => {
       appHooks.emit('updateModifiers')
@@ -35,6 +38,8 @@ export default {
     watch(() => activeItem.value, () => {
       onUpdateActiveItem()
     }, { deep: true })
+
+    const close = () => internalValue.value = false;
 
     // console.log(getScopeAttrs())
     return genScopeId(() => <div>

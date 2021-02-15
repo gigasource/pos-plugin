@@ -1,23 +1,23 @@
 <script>
-import { $filters, avatar, username } from '../../AppSharedStates';
-import { getCurrentOrder } from '../../OrderView/pos-logic-be';
-import { computed } from 'vue';
-import { GAvatar, GChip, GSpacer } from 'pos-vue-framework';
-import { genScopeId } from '../../utils';
-import { useI18n } from 'vue-i18n';
+import {$filters, avatar, username} from '../../AppSharedStates';
+import {getCurrentOrder} from '../../OrderView/pos-logic-be';
+import {GAvatar, GChip, GSpacer} from 'pos-vue-framework';
+import {genScopeId} from '../../utils';
+import {useI18n} from 'vue-i18n';
+import {itemsRenderFactory} from "../../OrderView/pos-ui-shared";
 
 export default {
   name: 'PosRestaurantPaymentOrderDetail2',
   components: [GAvatar, GSpacer, GChip],
   setup() {
-    const { t } = useI18n()
-    const currentOrder = getCurrentOrder()
+    const {t} = useI18n()
+    const order = getCurrentOrder()
     const isItemDiscounted = function (item) {
       return item.originalPrice !== item.price
     }
-    const items = computed(() => {
-      return currentOrder.items.filter(i => i.quantity)
-    })
+
+    const itemsRender = itemsRenderFactory();
+
     return genScopeId(() =>
         <div class="order-detail">
           <div class="order-detail__header">
@@ -27,54 +27,23 @@ export default {
             <div class="ml-2">
               <span class="order-detail__header-username">{username.value} </span>
               {
-                (currentOrder.table) &&
+                order.table &&
                 <div>
                   <span class="order-detail__header-title">
                     {t('restaurant.table')} </span>
                   <span class="order-detail__header-value">
-                    {currentOrder.table} </span>
+                    {order.table} </span>
                 </div>
               }
             </div>
             <g-spacer></g-spacer>
             <span class="order-detail__header-title"> Total </span>
             <span class="order-detail__header-value text-red">
-              €{$filters.formatCurrency(currentOrder.vSum, 2)}
+              €{$filters.formatCurrency(order.vSum, 2)}
             </span>
           </div>
           <div class="order-detail__content">
-            {items.value.map((item, i) =>
-                <div key={i} class="item">
-                  <div class="item-detail">
-                    <div>
-                      <p class="item-detail__name">
-                        {item.name} </p>
-                      <p>
-                        <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
-                          €{$filters.formatCurrency(item.originalPrice)} </span>
-                        {
-                          (isItemDiscounted(item)) &&
-                          <span class="item-detail__price--new"> € {$filters.formatCurrency(item.price)} </span>
-                        }
-                        <span class={['item-detail__option', item.option === 'Take away' ? 'text-green-accent-3' : 'text-red-accent-2']}> {item.option} </span>
-                      </p>
-                    </div>
-                    <div class="item-action">
-                      <span> {item.quantity} </span>
-                    </div>
-                  </div>
-                  {
-                    (item.modifiers) &&
-                    <div>
-                      {item.modifiers.map((modifier, index) =>
-                          <g-chip label small text-color="#616161" key={`${item._id}_${index}`}>
-                            {modifier.name} | €{$filters.formatCurrency(modifier.price, 2)}
-                          </g-chip>
-                      )}
-                    </div>
-                  }
-                </div>
-            )}
+            {itemsRender(order.items)}
           </div>
         </div>)
   }
@@ -97,18 +66,18 @@ export default {
 
     &-username {
       font-weight: 700;
-      font-size: 11px;
+      font-size: 12px;
       flex-grow: 1;
     }
 
     &-title {
       opacity: 0.5;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
     }
 
     &-value {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       margin-left: 4px;
     }

@@ -48,15 +48,18 @@ export default {
 
     const router = useRouter();
 
-    function submitTable(val) {
-      if (val) {
-        //fixme:
-        emit('moveItems', val, itemsToMove.value, remainingItems.value, () => {
+    function submitTable(table) {
+        debugger
+      //todo:
+      if (table) {
+        //todo:
+
+        /*emit('moveItems', val, itemsToMove.value, remainingItems.value, () => {
           // cleanup
           router.go(-1)
           showChooseTableDialog.value = false
           internalValue.value = false
-        })
+        })*/
       }
     }
 

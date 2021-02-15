@@ -336,6 +336,20 @@ export function addModifier(order, modifier) {
   }
 }
 
+export function addItemModifier(order,queryItem, modifier) {
+  if (typeof queryItem !== 'number') {
+    queryItem = _.findIndex(order.items, queryItem);
+  }
+  const item = order.items[queryItem];
+
+  const _modifier = _.cloneDeep(modifier);
+  if (!modifier.quantity) _modifier.quantity = 1;
+  if (item && !item.sent) {
+    item.modifiers = item.modifiers || [];
+    item.modifiers.push(_modifier);
+  }
+}
+
 export function removeModifier(order, queryItem, queryModifier, quantity = 1) {
   if (typeof queryItem !== 'number') {
     queryItem = _.findIndex(order.items, queryItem);
@@ -356,6 +370,14 @@ export function removeModifier(order, queryItem, queryModifier, quantity = 1) {
 
 export function makeDiscount(order, discount) {
   order.discount = discount;
+}
+
+export function makeItemDiscount(order, queryItem, discount) {
+  if (typeof queryItem !== 'number') {
+    queryItem = _.findIndex(order.items, queryItem);
+  }
+  const item = order.items[queryItem];
+  item.discount = discount
 }
 
 export function makeLastItemDiscount(order, discount) {
