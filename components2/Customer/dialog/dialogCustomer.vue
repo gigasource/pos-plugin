@@ -2,7 +2,7 @@
   import { ref, computed } from 'vue'
   import { dialog } from '../customer-logic-shared'
   import { isIOS } from '../../AppSharedStates'
-  import { internalValueFactory } from '../../utils'
+  import { genScopeId, execGenScopeId, internalValueFactory } from '../../utils'
   import { updateCustomer } from '../customer-logic-be'
 
   export default {
@@ -23,38 +23,41 @@
         closeDialogEdit()
       }
 
-      return () => (
+      return genScopeId(() => (
         <g-dialog fullscreen v-model={internalValue.value}>
-          <div class="dialog">
-            <div class="dialog-left">
-              <div class="row-flex">
-                <g-text-field virtual-event={isIOS} outlined style="flex: 1" label="Name" v-model={props.selectedCustomer.name}/>
-                <g-text-field virtual-event={isIOS} outlined style="flex: 1" label="Phone" v-model={props.selectedCustomer.phone}/>
-              </div>
-              {
-                props.selectedCustomer.addresses &&
-                props.selectedCustomer.addresses.map((address, i) => (
-                  <div class="row-flex flex-wrap justify-around mt-4 r">
-                    <div class="row-flex">
-                      <g-text-field label={`Address`} key={`street_${i}`}
-                                    v-model={address.address} virtual-event={isIOS} outlined/>
-                      <g-text-field label={`Zipcode`} key={`zipcode_${i}`} v-model={address.zipcode} virtual-event={isIOS} outlined/>
-                      <g-text-field label={`City`} key={`city_${i}`} v-model={address.city} virtual-event={isIOS} outlined/>
-                    </div>
+          {
+            execGenScopeId(() => <>
+              <div class="dialog-overlay" onClick={() => internalValue.value = false}></div>
+              <div class="dialog">
+                <div class="dialog-left">
+                  <div class="row-flex">
+                    <g-text-field virtual-event={isIOS} outlined style="flex: 1" label="Name" v-model={props.selectedCustomer.name}/>
+                    <g-text-field virtual-event={isIOS} outlined style="flex: 1" label="Phone" v-model={props.selectedCustomer.phone}/>
                   </div>
-                ))
-              }
-            </div>
-            <div class="dialog-keyboard">
-              <div style="flex: 1" onClick={closeDialogEdit}/>
-              <div class="keyboard-wrapper">
-                <pos-keyboard-full type="alpha-number" onEnterPressed={doUpdateCustomer}/>
+                  {
+                    props.selectedCustomer.addresses && props.selectedCustomer.addresses.map((address, i) => (
+                        <div class="row-flex flex-wrap justify-around mt-4 r">
+                          <div class="row-flex">
+                            <g-text-field label={`Address`} key={`street_${i}`}
+                                          v-model={address.address} virtual-event={isIOS} outlined/>
+                            <g-text-field label={`Zipcode`} key={`zipcode_${i}`} v-model={address.zipcode} virtual-event={isIOS} outlined/>
+                            <g-text-field label={`City`} key={`city_${i}`} v-model={address.city} virtual-event={isIOS} outlined/>
+                          </div>
+                        </div>
+                    ))
+                  }
+                </div>
+                <div class="dialog-keyboard">
+                  <div style="flex: 1" onClick={closeDialogEdit}/>
+                  <div class="keyboard-wrapper">
+                    <pos-keyboard-full type="alpha-number" onEnterPressed={doUpdateCustomer}/>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="dialog-overlay" onClick={() => internalValue.value = false}></div>
+            </>)
+          }
         </g-dialog>
-      )
+      ))
     }
   }
 </script>
@@ -65,6 +68,7 @@
   width: 100%;
   background: rgba(21, 21, 21, 0.42);
   display: flex;
+  z-index: 1;
 
   &-overlay {
     position: absolute;
@@ -72,7 +76,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1;
     background-color: #21212121;
   }
 

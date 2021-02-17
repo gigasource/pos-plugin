@@ -1,9 +1,7 @@
 <script>
 import { useI18n } from 'vue-i18n'
-import {
-  dialog,
-  selectedCustomer
-} from '../customer-logic-shared'
+import { dialog, selectedCustomer } from '../customer-logic-shared'
+import { genScopeId, execGenScopeId } from '../../utils';
 
 export default {
   name: 'dialogConfirmDelete',
@@ -25,27 +23,31 @@ export default {
       await deleteCustomer(selectedCustomer.value._id)
     }
 
-    return () => (
-      <g-dialog v-model={dialog.value.delete}
-                overlay-color="#6b6f82" overlay-opacity="0.95" width="40%" eager>
-        <g-card class="w-100">
-          <g-card-title>
-            {t('ui.confirmation')}
-          </g-card-title>
-          <g-card-text>
-            <span>{t('settings.deletePrompt')}</span>
-            <span>{t('settings.customer')}</span>
-            <b>"{selectedCustomer.value}"</b>?
-          </g-card-text>
-          <g-card-actions>
-            <g-btn-bs border-color="#1d1d26" onClick={cancelDialog}>
-              {t('ui.cancel')}
-            </g-btn-bs>
-            <g-btn-bs background-color="red lighten 2" text-color="white" onClick={deleteCustomer}>{t('ui.delete')}</g-btn-bs>
-          </g-card-actions>
-        </g-card>
-      </g-dialog>
-    )
+    return genScopeId(() => (
+        <g-dialog v-model={dialog.value.delete}
+                  overlay-color="#6b6f82" overlay-opacity="0.95" width="40%" eager>
+          {execGenScopeId(() => (
+              <g-card class="w-100">
+                { execGenScopeId(() => <>
+                  <g-card-title>{t('ui.confirmation')}</g-card-title>
+                  <g-card-text>
+                    <span>{t('settings.deletePrompt')}</span>
+                    <span>{t('settings.customer')}</span>
+                    <b>"{selectedCustomer.value}"</b>?
+                  </g-card-text>
+                  <g-card-actions>
+                    {
+                      execGenScopeId(() => <>
+                        <g-btn-bs border-color="#1d1d26" onClick={cancelDialog}>{t('ui.cancel')}</g-btn-bs>
+                        <g-btn-bs background-color="red lighten 2" text-color="white" onClick={deleteCustomer}>{t('ui.delete')}</g-btn-bs>
+                      </>)
+                    }
+                  </g-card-actions>
+                </>) }
+              </g-card>
+          ))}
+        </g-dialog>
+    ))
   }
 }
 </script>
