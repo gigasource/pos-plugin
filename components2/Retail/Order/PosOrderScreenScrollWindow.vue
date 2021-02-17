@@ -136,15 +136,12 @@ export default {
     }
 
     const activeProductWindow = ref(0)
-    const activeWindow = computed(() => {
-      return `${activeProductWindow.value}`
-    })
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
-          <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeWindow.value}>
+          <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeProductWindow.value}>
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
-                  <g-scroll-window-item key={`${category}_window_item_${windowIndex}`}>
+                  <g-scroll-window-item key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindow.value = windowIndex}>
                     {window.map((item, i) => execGenScopeId(() =>
                         <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
                              onClick={withModifiers(() => addProduct(item), ['stop'])}>
