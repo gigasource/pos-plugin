@@ -9,7 +9,7 @@ export const appType = {
   POS_RESTAURANT: 'POS_RESTAURANT',
   POS_RETAIL: 'POS_RETAIL'
 }
-export const currentAppType = ref(appType.POS_RESTAURANT)
+export const currentAppType = ref(appType.POS_RETAIL)
 
 export const dateTime = ref(new Date())
 setInterval(() => {
