@@ -118,6 +118,7 @@ export default {
     //   immediate: true
     // })
 
+    const activeProductWindow = ref(0)
     function renderDelimiter(productsList, category) {
       return (
           <g-item-group
@@ -127,15 +128,18 @@ export default {
               v-slots={{
                 default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
                     <g-item isActive={active(item)} key={`${category}_item_${index}`}>
-                      { execGenScopeId(() => <g-btn uppercase={false} onClick={withModifiers(() => toggle(item), ['native', 'stop'])} border-radius="50%"></g-btn>) }
+                      { execGenScopeId(() => <g-btn
+                          uppercase={false}
+                          onClick={withModifiers(() => {
+                            toggle(item);
+                            activeProductWindow.value = index
+                          }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
                     </g-item>
                 ))
               }}>
           </g-item-group>
       )
     }
-
-    const activeProductWindow = ref(0)
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
           <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeProductWindow.value}>
