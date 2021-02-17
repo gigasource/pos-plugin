@@ -17,9 +17,13 @@ import {
 
 
 import {
-  loadInventories,
-  loadInventoryCategories
+  loadInventories
 } from './inventory-logic-be'
+
+import {
+  loadProducts,
+  loadCategories
+} from '../Product/product-logic-be';
 
 import {
   renderMainInventoryTable
@@ -33,7 +37,8 @@ export default {
     const { t } = useI18n();
 
     onBeforeMount(async () => {
-      await loadInventoryCategories()
+      await loadCategories()
+      await loadProducts()
       await loadInventories()
     })
 

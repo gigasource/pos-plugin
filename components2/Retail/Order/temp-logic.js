@@ -37,18 +37,11 @@ export const /*OrderStore::*/ queryProductsById = () => {
   console.error('OrderStore::queryProductsById not impl')
 }
 export const /*OrderStore::*/ productIdQueryResults = ref('')
-export const /*OrderStore::*/ addProductToOrder = () => {
-  console.error('OrderStore::queryProductsById not impl')
-}
 export const /*OrderStore::*/ getScrollWindowProducts = () => {
   console.error('OrderStore::getScrollWindowProducts not impl')
 }
-export const /*OrderStore::*/ scrollWindowProducts = ref(null)
 export const /*OrderStore::*/ currentOrder = ref(null)
 export const /*OrderStore::*/ activeTableProduct = ref(null)
-export const /*OrderStore::*/ addItemQuantity = () => {
-  console.error('OrderStore::addItemQuantity not impl')
-}
 export const /*OrderStore::*/ removeItemQuantity = () => {
   console.error('OrderStore::removeItemQuantity not impl')
 }

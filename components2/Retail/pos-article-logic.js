@@ -1,6 +1,11 @@
 import { ref } from 'vue'
-import { getProductGridOrder } from '../../components/logic/productUtils';
-export const categories = ref([])
+import {
+  products
+} from '../Product/product-logic'
+import {
+  getProductGridOrder
+} from './pos-retail-shared-logic'
+
 export const activeCategory = ref(null)
 export const activeCategoryProducts = ref(null)
 export const articleSelectedProductButton = ref(null)
@@ -12,28 +17,25 @@ function getProductLayout(item, category) {
   return item.layouts && item.layouts.find(layout => !!layout.favourite === isFavourite) || {}
 }
 
-export async function loadAllCategories() {
-  const _categories = await cms.getModel('Category').find().sort('position')
-  const posSettings = (await cms.getModel('PosSetting').find())[0]; // TODO: Using posSetting in app-shared-state
-  let favoriteArticle = posSettings.generalSetting.favoriteArticle;
-  categories.value = favoriteArticle ? _categories : _categories.filter(cat => cat.name !== 'Favourite').map(c => ({
-    ...c,
-    position: c.position
-  }))
-}
 export async function getActiveProducts() {
   if (!activeCategory.value) {
     activeCategoryProducts.value = []
     return
   }
 
-  let products
+  let _products
   if (activeCategory.value.name === 'Favourite') {
-    products = await cms.getModel('Product').find({'option.favorite': true})
+    _products = products.value.filter(product => {
+      return product.option.favorite
+    })
   } else {
-    products = await cms.getModel('Product').find({'category': activeCategory.value._id})
+    _products = products.value.filter(product => {
+      return !!product.category.findOne(category => {
+        category._id.toString() === activeCategory.value._id.toString()
+      })
+    })
   }
-  activeCategoryProducts.value = products.sort((current, next) => getProductGridOrder(current) - getProductGridOrder(next))
+  activeCategoryProducts.value = _products.sort((current, next) => getProductGridOrder(current) - getProductGridOrder(next))
 }
 
 export async function updateArticleOrders() {

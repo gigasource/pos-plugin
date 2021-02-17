@@ -21,6 +21,8 @@ import PosOrderScreenButtonGroup from './Order/PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './Order/PosOrderScreenScrollWindow';
 import PosRetailOrder from './Order/PosRetailOrder';
 import PosRetailCategory from './Order/PosRetailCategory';
+import { onBeforeMount } from 'vue'
+import { loadCategories, loadProducts } from '../Product/product-logic-be'
 
 export default {
   name: 'PosOrderRetail',
@@ -51,6 +53,12 @@ export default {
     updateNewPrice() {
       console.log('PosStore:updateNewPrice was not injected!')
     }
+  },
+  setup() {
+    onBeforeMount(async () => {
+      await loadCategories()
+      await loadProducts()
+    })
   }
 }
 </script>

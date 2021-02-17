@@ -1,22 +1,33 @@
 <script>
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import _ from 'lodash'
 import { genScopeId } from '../../utils';
 import { storeLocale } from '../../AppSharedStates';
-import { currentOrder, activeTableProduct,
-  addItemQuantity as _addItemQuantity,
+import {
   removeItemQuantity as _removeItemQuantity
 } from './temp-logic';
+import {
+  getCurrentOrder
+} from '../../OrderView/pos-logic-be'
+import { useI18n } from 'vue-i18n'
+import { appHooks } from '../../AppSharedStates';
 
 export default {
   name: 'PosOrderScreenTable',
   setup() {
+    appHooks.emit('settingChange')
+    const { t } = useI18n()
     const viewportRows = ref(0)
+    const tableWrapper = ref(null)
+    // This is product which is being selected among all products
+    const selectedTableProduct = ref(null)
+    const order = getCurrentOrder()
     const formattedProducts = computed(() => {
-      return currentOrder.value.items.map(item => ({
+      if (!order.value) return null
+      return order.value.items.map(item => ({
         ..._.omit(item, 'attributes'),
         attributes: getAttributes(item),
-        originalTotal: (item.quantity * item.originalPrice).toFixed(2),
+        originalTotal: (item.quantity * item.costPrice).toFixed(2),
         total: (item.quantity * item.price).toFixed(2)
       }))
     })
@@ -28,54 +39,44 @@ export default {
     }
 
     function toggle(index) {
-      if (index === activeTableProduct.value) {
-        activeTableProduct.value = undefined
+      if (index === selectedTableProduct.value) {
+        selectedTableProduct.value = undefined
       } else if (!_.isNil(index)) {
-        activeTableProduct.value = index
+        selectedTableProduct.value = index
       }
     }
 
     function addItemQuantity(index) {
-      _addItemQuantity(currentOrder.value.items[index])
     }
 
     function removeItemQuantity(index, removeAll) {
-      _removeItemQuantity(currentOrder.value.items[index], removeAll)
     }
 
-    watch(() => currentOrder.value, ({ items }, { items: oldItems }) => {
-      if (this.$el) {
-        // TODO $el
-        const tableWrapper = this.$el.querySelector('.table-wrapper')
-        if (items && items.length > oldItems.length) {
-          tableWrapper.scrollTop = items.length >= this.viewportRows
-              ? tableWrapper.scrollHeight
-              : 0
-        }
+    watch(() => order, ({ items }, { items: oldItems }) => {
+      if (items && items.length > oldItems.length) {
+        tableWrapper.scrollTop = items.length >= viewportRows.value
+            ? tableWrapper.scrollHeight
+            : 0
       }
     })
 
-    watch(() => activeTableProduct.value, (newValue, oldValue) => {
-      // TODO: refs array
-      if (!_.isNil(newValue) && newValue > -1 && this.$refs[`row_${newValue}`].length > 0) {
-        this.$refs[`row_${newValue}`][0].$el.classList.add('g-expansion__active')
-      }
-      if (!_.isNil(oldValue) && oldValue > -1 && this.$refs[`row_${oldValue}`].length > 0) {
-        this.$refs[`row_${oldValue}`][0].$el.classList.remove('g-expansion__active')
-      }
-    })
+    // watch(() => selectedTableProduct.value, (newValue, oldValue) => {
+    //   // TODO: refs array
+    //   if (!_.isNil(newValue) && newValue > -1 && this.$refs[`row_${newValue}`].length > 0) {
+    //     this.$refs[`row_${newValue}`][0].$el.classList.add('g-expansion__active')
+    //   }
+    //   if (!_.isNil(oldValue) && oldValue > -1 && this.$refs[`row_${oldValue}`].length > 0) {
+    //     this.$refs[`row_${oldValue}`][0].$el.classList.remove('g-expansion__active')
+    //   }
+    // })
 
     onMounted(() => {
-      updateTableRows.value = (() => {
-        // TODO: this $el
-        nextTick(() => viewportRows.value = Math.floor(this.$el.querySelector('.table-wrapper').clientHeight / 44))
-      })
-      updateTableRows.value()
+      nextTick(() => viewportRows.value = Math.floor(tableWrapper.clientHeight / 44))
     })
 
     return genScopeId(() => (
         <div>
-          <div class="table-wrapper">
+          <div ref={tableWrapper} class="table-wrapper">
             <g-simple-table striped fixed-header ref="table">
               <thead>
               <tr>
@@ -90,7 +91,7 @@ export default {
                 </th>
               </tr>
               </thead>
-              {formattedProducts.value.map((item, index) =>
+              {formattedProducts.value && formattedProducts.value.map((item, index) =>
                   <table-expansion-row
                       key={index} ref={`row_${index}`} v-bind={item}
                       onToggle={() => toggle(index)}
@@ -99,7 +100,7 @@ export default {
                   </table-expansion-row>
               )}
               {
-              (formattedProducts.value.length < viewportRows.value) && _.range(1, viewportRows.value - formattedProducts.value.length).map((i, index) =>
+              (formattedProducts.value && formattedProducts.value.length < viewportRows.value) && _.range(1, viewportRows.value - formattedProducts.value.length).map((i, index) =>
                   <tr key={`empty_${index}`} class="empty-row">
                     <td></td>
                   </tr>

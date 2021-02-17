@@ -12,7 +12,6 @@ import {
 	listIDs,
 	removeFilter,
 	clearFilter,
-	inventories,
 	filteredInventory,
 	filter,
 	isFiltered,
@@ -36,7 +35,7 @@ export function renderMainInventoryTable(props, { emit }) {
 		router.push({ path: '/pos-inventory-stock' })
 	}
 	const removeInventory = async function () {
-		await deleteInventory(this.selectedInventoryIDs)
+		await deleteInventory(selectedInventoryIDs)
 	}
 
 	const { t } = useI18n()
@@ -49,9 +48,9 @@ export function renderMainInventoryTable(props, { emit }) {
 						<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
 					</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
-					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
-					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.category.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.category.name}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
 					<td onClick={() => openDialogStock(inventory)}>
 						<div className="row-flex justify-between">

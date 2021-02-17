@@ -1,6 +1,7 @@
 <script>
-import { categories, selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
+import { selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
 import { genScopeId } from '../../utils';
+import { formattedCategories as categories } from '../../Product/product-logic'
 
 export default {
   name: "PosRetailCategory",

@@ -1,42 +1,24 @@
 import { ref, computed, watchEffect, watch } from 'vue'
 import _ from 'lodash'
-import {appType, currentAppType} from "../AppSharedStates";
-export const inventories = ref([])
-export const inventoryCategories = ref([])
-export const hooks = new (require('schemahandler/hooks/hooks'))();
+import {
+  products,
+  categories
+} from '../Product/product-logic';
 
-//<editor-fold desc="Handle hook">
-/**
- * Manage combo
- */
-hooks.on('after:loadInventory', () => {
-  inventories.value = inventories.value.map(inventory => {
-    inventory.category =
-      inventoryCategories.value.find(cate => cate && cate._id && cate._id.toString() === inventory.category.toString())
-    || inventoryCategories.value.reduce((subCate, cate) => {
-         if (cate.subCategory) {
-           subCate.push(...cate.subCategory)
-         }
-         return subCate
-       }, []).find(subCate => subCate._id.toString() === inventory.category.toString())
-    /**
-     * Convert combo/ingredient from inventory's objectId
-     * to an instance of inventory item
-     */
-    if (currentAppType.value === appType.POS_RETAIL) {
-      inventory.comboIngredient = inventory.comboIngredient.map(item => {
-        const { _id, name, unitCostPrice, price } = inventories.value.find(inventory => {
-          return inventory._id.toString() === item._id.toString()
-        })
-        return {
-          _id, name, unitCostPrice, price,
-          quantity: item.quantity
-        }
-      })
-    }
+export const inventories = ref([])
+export const hooks = new (require('schemahandler/hooks/hooks'))();
+export const detailInventories = computed(() => {
+  return inventories.value.map(inventory => {
+    const product = products.value.find(product => product._id.toString() === inventory.productId.toString())
+    inventory.product = _.cloneDeep(product)
+    inventory.product.category = inventory.product.category.map(categoryId => {
+      return _.cloneDeep(categories.value.find(category => categoryId.toString() === category._id.toString()))
+    })
     return inventory
   })
 })
+
+//<editor-fold desc="Handle hook">
 /**
  * Check before update item
  * -  Control number of item and never let them negative
@@ -74,27 +56,6 @@ hooks.on('before:removeFromInventory', function (removedInventoryItems) {
 })
 
 //</editor-fold>
-
-/**
- * If category.available is true, then this category can be deleted
- */
-watchEffect(() => {
-  inventoryCategories.value.forEach(category => {
-    const inventoryWithCategory = inventories.value.find(inventory => {
-      return inventory.category._id.toString() === category._id.toString()
-    })
-    category.available = !inventoryWithCategory
-    if (category.subCategory) {
-      category.subCategory.forEach(subCategory => {
-        const inventoryWithCategory = inventories.value.find(inventory => {
-          return inventory.category._id.toString() === subCategory._id.toString()
-        })
-        subCategory.available = !inventoryWithCategory
-        category.available &&= subCategory.available
-      })
-    }
-  })
-})
 /**
  * @name: {string} name of item need to filter
  * @id: {string} id of item need to filter
@@ -112,10 +73,11 @@ watchEffect(() => {
 export const filter = ref({})
 
 export const filteredInventory = computed(() => {
-  return inventories.value.filter(item => {
-    if ((filter.value.name && item.name !== filter.value.name)
+  const a = detailInventories.value
+  return detailInventories.value.filter(item => {
+    if ((filter.value.name && item.product.name !== filter.value.name)
         || (filter.value.id && item.id !== filter.value.id)
-        || (filter.value.category && item.category.name !== filter.value.category.name)
+        || (filter.value.category && !item.product.category.find(category => category.name === filter.value.category.name))
         || (filter.value.stock && (item.stock < filter.value.stock[0] || item.stock > filter.value.stock[1])))
       return false
     return true
@@ -164,7 +126,6 @@ window.dbg = {
   ...(window.dbg || {}),
   inventory: {
     inventories,
-    inventoryCategories,
     filter,
     filteredInventory
   }

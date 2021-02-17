@@ -23,37 +23,37 @@ export default {
       const actionRef = ref(null)
 
       async function generateTemplate() {
-        const rows = posSettings.value.generalSetting.quickFnRows;
-
-        //define template
-
-        if (actionRef.value) {
-          // const tablePercent = 73 - 9 * rows;
-          // const actionPercent = 9 * rows;
-          // actionRef.value.style['grid-template-rows'] = `repeat(${rows},1fr)`;
-          // const leftLayout = actionRef.parentElement;
-          // leftLayout.style['grid-template-rows'] = `8% ${tablePercent}% 11% ${actionPercent}% 8%`;
-          // actionRef.value.style.display = rows === 0 ? 'none' : 'grid';
-        }
-        //add btn
-        listBtn.value = [];
-        const btns = setting.leftFunctionButtons.slice(0, 4 * rows);
-        const containedBtns = btns.reduce((acc, btn) => ([...acc, ...btn.containedButtons]), []);
-
-        for (const btn of btns) {
-          if (!containedBtns.includes(btn._id)) {
-            listBtn.value.push(
-                btn.buttonFunction === 'buybackProduct'
-                    ? Object.assign({}, btn, {
-                      buttonFunctionValue: btn.buyback
-                    })
-                    : btn);
-          }
-        }
-        if(listBtn.value.length === 4) {
-          listBtn.value.unshift(null, null, null, null)
-        }
-        updateTableRows.value()
+        // const rows = posSettings.value.generalSetting.quickFnRows;
+        //
+        // //define template
+        //
+        // if (actionRef.value) {
+        //   // const tablePercent = 73 - 9 * rows;
+        //   // const actionPercent = 9 * rows;
+        //   // actionRef.value.style['grid-template-rows'] = `repeat(${rows},1fr)`;
+        //   // const leftLayout = actionRef.parentElement;
+        //   // leftLayout.style['grid-template-rows'] = `8% ${tablePercent}% 11% ${actionPercent}% 8%`;
+        //   // actionRef.value.style.display = rows === 0 ? 'none' : 'grid';
+        // }
+        // //add btn
+        // listBtn.value = [];
+        // const btns = setting.leftFunctionButtons.slice(0, 4 * rows);
+        // const containedBtns = btns.reduce((acc, btn) => ([...acc, ...btn.containedButtons]), []);
+        //
+        // for (const btn of btns) {
+        //   if (!containedBtns.includes(btn._id)) {
+        //     listBtn.value.push(
+        //         btn.buttonFunction === 'buybackProduct'
+        //             ? Object.assign({}, btn, {
+        //               buttonFunctionValue: btn.buyback
+        //             })
+        //             : btn);
+        //   }
+        // }
+        // if(listBtn.value.length === 4) {
+        //   listBtn.value.unshift(null, null, null, null)
+        // }
+        // updateTableRows.value()
       }
 
       function isActiveBtn(btn) {

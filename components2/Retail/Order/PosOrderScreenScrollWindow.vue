@@ -1,54 +1,29 @@
 <script>
+import { ref, watch, computed } from 'vue'
 import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
-import { nextTick, onActivated, onMounted, onBeforeUnmount, withModifiers } from 'vue';
+import { onActivated, withModifiers } from 'vue';
 import { genScopeId } from '../../utils';
-import { addProductToOrder, getScrollWindowProducts, getProductLayout, scrollWindowProducts, changeProductList } from './temp-logic'
+import {
+  products,
+  categories
+} from '../../Product/product-logic'
+import {
+  selectedCategory
+} from '../pos-order-retail-logic'
+import {
+  getProductLayout,
+  getProductGridOrder
+} from '../pos-retail-shared-logic'
+import {
+  prepareOrder,
+  getCurrentOrder
+} from '../../OrderView/pos-logic-be'
+import { addItem } from '../../OrderView/pos-logic';
 
 export default {
   name: 'PosOrderScreenScrollWindow',
-  components: {
-    scrollWindow: {
-      name: 'ScrollWindow',
-      mixins: [GScrollWindow],
-      props: {
-        shouldForceUpdate: Boolean
-      },
-      data() {
-        return {
-          _forceUpdate: null
-        }
-      },
-      mounted() {
-        _forceUpdate.value = this.$forceUpdate
-      },
-      watch: {
-        shouldForceUpdate(newVal) {
-          this.$forceUpdate = newVal ? _forceUpdate.value : () => null
-        }
-      }
-    },
-    scrollWindowItem: {
-      name: 'ScrollWindowItem',
-      mixins: [GScrollWindowItem],
-      props: {
-        shouldForceUpdate: Boolean
-      },
-      data() {
-        return {
-          _forceUpdate: null
-        }
-      },
-      mounted() {
-        _forceUpdate.value = this.$forceUpdate
-      },
-      watch: {
-        shouldForceUpdate(newVal) {
-          this.$forceUpdate = newVal ? _forceUpdate.value : () => null
-        }
-      }
-    }
-  },
+  components: [GScrollWindow, GScrollWindowItem],
   props: {
     value: {
       type: Number,
@@ -56,124 +31,146 @@ export default {
     }
   },
   setup(props) {
-    const productWindows = ref(null)
-    const activeProductWindows = ref({})
-    const shouldForceUpdate = ref(true)
+    let itemRef = {}
+
+    /**
+     * Object key is category._id
+     */
+    const groupedProducts = computed(() => {
+      const result = {}
+      categories.value.forEach(category => {
+        result[category._id.toString()] = _.cloneDeep(products.value.filter(product => {
+          return !!product.category.find(_category => {
+            return _category.toString() === category._id.toString()
+          })
+        }))
+        //todo: sort
+        // result[category].sort((current, next) => {
+        //   return getProductGridOrder()
+        // })
+      })
+      return result
+    })
+
+    const favoriteProducts = computed(() => {
+      const result = products.value.filter(product => {
+        return product.option.favorite
+      })
+      return result
+    })
+
+    const productWindows = computed(() => {
+      const result = {}
+      Object.keys(groupedProducts.value).forEach(category => {
+        result[category] = _.chunk(groupedProducts.value[category], 28)
+      })
+      result['favorite'] = _.chunk(favoriteProducts.value, 28)
+      return result
+    })
+
+    watch(() => selectedCategory.value, (newCategory, oldCategory) => {
+      const categoryId = newCategory ? newCategory._id.toString() : null
+      if (categoryId && itemRef[categoryId]) {
+        itemRef[categoryId].style.zIndex = 1
+      }
+      const oldCategoryId = oldCategory ? oldCategory._id.toString() : null
+      if (oldCategoryId && itemRef[oldCategoryId]) {
+        itemRef[oldCategoryId].style.zIndex = -1
+      }
+    }, { deep: true })
+
+    function setItemRef(el, category) {
+      if (el) {
+        itemRef[category] = el
+      }
+    }
+
+    onActivated(() => {
+      prepareOrder(0)
+    })
 
     function addProduct(item) {
-      addProductToOrder(item)
+      const order = getCurrentOrder()
+      addItem(order, item, 1)
     }
 
     function getItemStyle(item) {
-      if (item.layout) {
+      if (item.layouts) {
         return {
-          order: item.layout.order,
-          ...(item.layout.color === '#FFFFFF' || !item.layout.color) && { border: '1px solid #979797', backgroundColor: '#FFF' },
-          ...item.layout.color && item.layout.color !== '#FFFFFF' && { backgroundColor: item.layout.color }
+          order: item.layouts[0].order,
+          ...(item.layouts[0].color === '#FFFFFF' || !item.layouts[0].color) && { border: '1px solid #979797', backgroundColor: '#FFF' },
+          ...item.layouts[0].color && item.layouts[0].color !== '#FFFFFF' && { backgroundColor: item.layouts[0].color }
         }
       }
     }
 
-    changeProductList.value = (newValue, oldValue) => {
-      if (newValue) {
-        const newCategory = newValue.name;
-        const oldCategory = oldValue && oldValue.name;
-
-        // TODO: Refs array
-        if (newCategory && this.$refs[`window_${newCategory}`]) {
-          this.$refs[`window_${newCategory}`][0].style.zIndex = '1'
-        }
-
-        if (oldCategory) {
-          if (newCategory === oldCategory) return;
-          const oldRef = this.$refs[`window_${oldCategory}`];
-
-          if (oldRef && oldRef.length > 0) {
-            oldRef[0].style.zIndex = '-1'
-          }
-        }
-      }
-    };
-
-    onActivated(async () => {
-      shouldForceUpdate.value = true;
-      await getScrollWindowProducts();
-      await nextTick(() => {
-        shouldForceUpdate.value = false
-      })
-    })
-
-    const watcher = watch(() => scrollWindowProducts.value, {
-      handler: (newValue, oldValue) => {
-        if (!_.isEqual(newValue, oldValue)) {
-          const tempValue = Object.assign({}, productWindows.value, newValue);
-          for (const category in tempValue) {
-            if (tempValue.hasOwnProperty(category)) {
-              tempValue[category] = tempValue[category].map(window => window.map(product => ({
-                ...product,
-                layout: getProductLayout(product, { name: category })
-              })))
-            }
-          }
-
-          productWindows.value = Object.assign({}, productWindows.value, tempValue);
-          activeProductWindows.value = newValue && Object.keys(newValue).reduce((obj, key) => {
-            obj[key] = 0;
-            return obj
-          }, {})
-        }
-      },
-      deep: true,
-      sync: true,
-      immediate: true
-    })
-
-    onMounted(async () => {
-      await getScrollWindowProducts();
-      await nextTick(() => {
-        shouldForceUpdate.value = false
-      })
-    })
-
-    onBeforeUnmount(() => {
-      watcher.unwatch() // todo: misisng 1 args
-    })
+    // const watcher = watch(() => scrollWindowProducts.value, {
+    //   handler: (newValue, oldValue) => {
+    //     if (!_.isEqual(newValue, oldValue)) {
+    //       const tempValue = Object.assign({}, productWindows.value, newValue);
+    //       for (const category in tempValue) {
+    //         if (tempValue.hasOwnProperty(category)) {
+    //           tempValue[category] = tempValue[category].map(window => window.map(product => ({
+    //             ...product,
+    //             layout: getProductLayout(product, { name: category })
+    //           })))
+    //         }
+    //       }
+    //
+    //       productWindows.value = Object.assign({}, productWindows.value, tempValue);
+    //       activeProductWindows.value = newValue && Object.keys(newValue).reduce((obj, key) => {
+    //         obj[key] = 0;
+    //         return obj
+    //       }, {})
+    //     }
+    //   },
+    //   deep: true,
+    //   sync: true,
+    //   immediate: true
+    // })
 
     return genScopeId(() => (
         <div class="main">
-          {productWindows.value.map((productsList, category) =>
-              <div key={category} ref={`window_${category}`} style="z-index: -1">
-                <scroll-window area="window" showArrows={false} elevation="0"
-                               shouldForceUpdate={shouldForceUpdate.value} key={`window_${category}`}
-                               value={activeProductWindows.value[category]}>
-                  {productsList.map((window, windowIndex) =>
-                      <scroll-window-item
-                          shouldForceUpdate={shouldForceUpdate.value}
-                          key={`${category}_window_item_${windowIndex}`}
-                          onInput={activeProductWindows.value[category] = $event}>
-                        {window.map((item, i) =>
-                            <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
-                                 onClick={withModifiers(() => addProduct(item), ['stop'])}>
-                              {item.name}
-                            </div>
-                        )} </scroll-window-item>
-                  )} </scroll-window>
+          {Object.keys(productWindows.value).map((category) => {
+            const productsList = productWindows.value[category]
+            return (
+              <div key={category} ref={(el) => setItemRef(el, category)} style="z-index: -1">
+                <g-scroll-window area="window" showArrows={false} elevation="0"
+                                 key={`window_${category}`}>
+                  {productsList.map((window, windowIndex) => {
+                    return (
+                      <g-scroll-window-item
+                        key={`${category}_window_item_${windowIndex}`}>
+                      {window.map((item, i) =>
+                          <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
+                               onClick={withModifiers(() => addProduct(item), ['stop'])}>
+                            {item.name}
+                          </div>
+                      )} </g-scroll-window-item>
+                    )
+                  })}
+                </g-scroll-window>
                 <g-item-group
                     area="delimiter" returnObject={false} mandatory
-                    v-model={activeProductWindows.value[category]} key={`group_${category}`}
+                    key={`group_${category}`}
                     items={productsList}
                     v-slots={{
-                      default: ({toggle, active}) => <>
-                        {productsList.map((item, index) =>
-                            <g-item isActive={active(item)} key={`${category}_item_${index}`}>
-                              <g-btn uppercase={false} onClick={withModifiers(() => toggle(item), ['native', 'stop'])} border-radius="50%"></g-btn>
-                            </g-item>
-                        )}
-                      </>
+                      default: ({ toggle, active }) => {
+                        return (
+                          <>
+                            {productsList.map((item, index) =>
+                                <g-item isActive={active(item)} key={`${category}_item_${index}`}>
+                                  <g-btn uppercase={false} onClick={withModifiers(() => toggle(item), ['native', 'stop'])} border-radius="50%"></g-btn>
+                                </g-item>
+                            )}
+                          </>
+                        )
+                      }
                     }}>
                 </g-item-group>
               </div>
-          )}
+            )
+          })}
         </div>
     ))
   }

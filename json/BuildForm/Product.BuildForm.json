@@ -82,23 +82,14 @@
       "flex": "md4"
     },
     {
-      "_id": "5e782f1efbe5dc038265be12",
-      "schemaType": "objectId",
-      "key": "category",
-      "ref": "Category",
-      "autopopulate": true,
-      "type": "ref-select",
-      "label": "name",
-      "labelProp": "name",
-      "clipboardType": "cut"
-    },
-    {
       "_id": "5ddce0a012b6deb726104504",
       "schemaType": "number",
       "key": "drinkPart",
       "type": "input@number",
       "flex": "md4",
-      "addable": true
+      "addable": true,
+      "label": null,
+      "isVisible": null
     },
     {
       "_id": "5ddce0a012b6deb726104503",
@@ -317,7 +308,51 @@
       "_id": "5faa58216c4b27f60dec5a0f",
       "schemaType": "string",
       "key": "taxCategory2",
-      "type": "input"
+      "type": "input",
+      "default": null,
+      "unique": null,
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null,
+      "onChange": null
+    },
+    {
+      "_id": "5e782f1efbe5dc038265be12",
+      "schemaType": "array",
+      "key": "category",
+      "default": null,
+      "unique": null,
+      "type": "array",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "_id": "601e5c76b9aa1dd6a7385df7",
+      "schemaType": "number",
+      "key": "costPrice",
+      "default": null,
+      "unique": null,
+      "type": "input@number",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "_id": "601e5c76b9aa1dd6a7385df8",
+      "schemaType": "string",
+      "key": "appType",
+      "default": null,
+      "unique": null,
+      "type": "input",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null,
+      "onChange": null
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

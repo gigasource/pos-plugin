@@ -6,6 +6,7 @@ import _ from 'lodash';
 import rdiff from 'recursive-diff';
 import Hooks from "schemahandler/hooks/hooks";
 import {v1} from 'uuid';
+import { currentAppType } from '../AppSharedStates';
 
 const Order = cms.getModel('Order');
 
@@ -103,6 +104,7 @@ export function addProduct(order, product, quantity) {
 
 export function orderBeFactory(id = 0) {
   let order = createOrder();
+  order.appType = currentAppType.value
   orderMap.set(order, id);
 
   const actionList = ref([]);

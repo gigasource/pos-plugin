@@ -14,14 +14,22 @@ export default {
       onActivated(async() => {
         await generateTemplate();
       })
-      onMounted(async () => {
-        await generateTemplate();
-      })
 
       async function generateTemplate() {
         const setting = posSettings.value;
-        listBtn.value = [];
-        const rightFunctionButtons = setting.rightFunctionButtons;
+        listBtn.value = [{
+          rows: [0, 1],
+          cols: [0, 1],
+          backgroundColor: '#FFFFFF',
+          text: 'Hello'
+        }, {
+          rows: [0, 1],
+          cols: [0, 1],
+          backgroundColor: '#FFFFFF',
+          text: 'hi'
+        }];
+        const rightFunctionButtons = setting.rightFunctionButtons
+        if (!rightFunctionButtons) return
         const containedBtns = rightFunctionButtons.reduce((acc, btn) => ([...acc, ...(btn.containedButtons || [])]), []);
         for (const btn of rightFunctionButtons) {
           if (!containedBtns.includes(btn._id)) {
@@ -36,7 +44,7 @@ export default {
       }
 
       function isActiveBtn(btn) {
-        return isActiveFnBtn(btn)
+        return true
       }
 
       function onClick(btn) {
@@ -46,7 +54,7 @@ export default {
 
       return genScopeId(() => (
           <div class="buttons" area="buttons">
-            {listBtn.map((btn, i) =>
+            {listBtn.value.map((btn, i) =>
                 <div class="btn" key={i} style={btn && {
                   gridRow: btn.rows[0] + '/' + btn.rows[1],
                   gridColumn: btn.cols[0] + '/' + btn.cols[1],
