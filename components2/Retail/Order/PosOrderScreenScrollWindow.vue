@@ -137,8 +137,7 @@ export default {
 
     const activeProductWindow = ref(0)
     const activeWindow = computed(() => {
-      if (selectedCategory.value)
-        return `${selectedCategory.value._id}_window_item_${activeProductWindow.value}`
+      return `${activeProductWindow.value}`
     })
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
