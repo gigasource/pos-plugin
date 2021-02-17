@@ -65,6 +65,8 @@ export default {
 .category {
   background-color: #E3F2FD;
   padding: 4px;
+  max-height: 100%;
+  overflow: scroll;
 
   &-group {
     background-color: white;
