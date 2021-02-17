@@ -159,13 +159,18 @@ export default {
       )
     }
 
+    function getWindowStyle(category) {
+      if (!selectedCategory.value || selectedCategory.value._id !== category) {
+        return { display: 'none' }
+      }
+    }
 
     return genScopeId(() => (
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
             return (
-                <div key={category} ref={(el) => setItemRef(el, category)}>
+                <div key={category} ref={(el) => setItemRef(el, category)} style={getWindowStyle(category)}>
                   {renderProducts(productsList, category)}
                   {renderDelimiter(productsList, category)}
                 </div>
