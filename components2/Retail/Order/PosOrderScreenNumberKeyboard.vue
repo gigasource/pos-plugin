@@ -106,10 +106,8 @@
         }
       }
 
-      // TODO: area
       return genScopeId(() => (
           <g-number-keyboard
-              area="keyboard"
               v-model={productIdQuery.value}
               items={numpad_1}
               onSubmit={openDialogProductSearchResults}

@@ -65,12 +65,9 @@ export default {
                   opacity: !isActiveBtn(btn) ? '0.4' : '1', //disabled
                   cursor: !isActiveBtn(btn) ? 'none' : 'pointer'
                 }} onClick={() => onClick(btn)}>
-
                   {btn && btn.text}
                 </div>
             )} </div>
-
-
       ))
     }
   }

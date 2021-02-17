@@ -2,10 +2,12 @@
 import { selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
 import { genScopeId } from '../../utils';
 import { formattedCategories as categories } from '../../Product/product-logic'
+import { loadCategories } from '../../Product/product-logic-be';
 
 export default {
   name: "PosRetailCategory",
   setup() {
+    loadCategories()
     function getSubCategoryClass(item) {
       return [
           'category-group__item',

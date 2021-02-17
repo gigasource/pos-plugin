@@ -1,24 +1,11 @@
 <script>
-import { ref, watch, computed } from 'vue'
+import { ref, computed, onActivated, watch, withModifiers } from 'vue'
 import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
-import { onActivated, withModifiers } from 'vue';
-import { genScopeId } from '../../utils';
-import {
-  products,
-  categories
-} from '../../Product/product-logic'
-import {
-  selectedCategory
-} from '../pos-order-retail-logic'
-import {
-  getProductLayout,
-  getProductGridOrder
-} from '../pos-retail-shared-logic'
-import {
-  prepareOrder,
-  getCurrentOrder
-} from '../../OrderView/pos-logic-be'
+import { execGenScopeId, genScopeId } from '../../utils';
+import { categories, products } from '../../Product/product-logic'
+import { selectedCategory } from '../pos-order-retail-logic'
+import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
 
 export default {
@@ -39,9 +26,10 @@ export default {
     const groupedProducts = computed(() => {
       const result = {}
       categories.value.forEach(category => {
-        result[category._id.toString()] = _.cloneDeep(products.value.filter(product => {
-          return !!product.category.find(_category => {
-            return _category.toString() === category._id.toString()
+        const cateId = category._id.toString()
+        result[cateId] = _.cloneDeep(products.value.filter(product => {
+          return product.category && !!product.category.find(_category => {
+            return _category.toString() === cateId
           })
         }))
         //todo: sort
@@ -49,12 +37,13 @@ export default {
         //   return getProductGridOrder()
         // })
       })
+      console.log('groupped products', result)
       return result
     })
 
     const favoriteProducts = computed(() => {
       const result = products.value.filter(product => {
-        return product.option.favorite
+        return product.option && product.option.favorite
       })
       return result
     })
@@ -129,46 +118,57 @@ export default {
     //   immediate: true
     // })
 
+    function renderDelimiter(productsList, category) {
+      return (
+          <g-item-group
+              returnObject={false} mandatory
+              key={`group_${category}`}
+              items={productsList}
+              v-slots={{
+                default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
+                    <g-item isActive={active(item)} key={`${category}_item_${index}`}>
+                      { execGenScopeId(() => <g-btn uppercase={false} onClick={withModifiers(() => toggle(item), ['native', 'stop'])} border-radius="50%"></g-btn>) }
+                    </g-item>
+                ))
+              }}>
+          </g-item-group>
+      )
+    }
+
+    const activeProductWindow = ref(0)
+    const activeWindow = computed(() => {
+      if (selectedCategory.value)
+        return `${selectedCategory.value._id}_window_item_${activeProductWindow.value}`
+    })
+    function renderProducts(productsList, category) {
+      return execGenScopeId(() =>
+          <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeWindow.value}>
+            {
+              productsList.map((window, windowIndex) => execGenScopeId(() =>
+                  <g-scroll-window-item key={`${category}_window_item_${windowIndex}`}>
+                    {window.map((item, i) => execGenScopeId(() =>
+                        <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
+                             onClick={withModifiers(() => addProduct(item), ['stop'])}>
+                          { item.name }
+                        </div>)
+                    )}
+                  </g-scroll-window-item>
+              ))
+            }
+          </g-scroll-window>
+      )
+    }
+
+
     return genScopeId(() => (
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
             return (
-              <div key={category} ref={(el) => setItemRef(el, category)} style="z-index: -1">
-                <g-scroll-window area="window" showArrows={false} elevation="0"
-                                 key={`window_${category}`}>
-                  {productsList.map((window, windowIndex) => {
-                    return (
-                      <g-scroll-window-item
-                        key={`${category}_window_item_${windowIndex}`}>
-                      {window.map((item, i) =>
-                          <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
-                               onClick={withModifiers(() => addProduct(item), ['stop'])}>
-                            {item.name}
-                          </div>
-                      )} </g-scroll-window-item>
-                    )
-                  })}
-                </g-scroll-window>
-                <g-item-group
-                    area="delimiter" returnObject={false} mandatory
-                    key={`group_${category}`}
-                    items={productsList}
-                    v-slots={{
-                      default: ({ toggle, active }) => {
-                        return (
-                          <>
-                            {productsList.map((item, index) =>
-                                <g-item isActive={active(item)} key={`${category}_item_${index}`}>
-                                  <g-btn uppercase={false} onClick={withModifiers(() => toggle(item), ['native', 'stop'])} border-radius="50%"></g-btn>
-                                </g-item>
-                            )}
-                          </>
-                        )
-                      }
-                    }}>
-                </g-item-group>
-              </div>
+                <div key={category} ref={(el) => setItemRef(el, category)}>
+                  {renderProducts(productsList, category)}
+                  {renderDelimiter(productsList, category)}
+                </div>
             )
           })}
         </div>

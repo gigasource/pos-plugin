@@ -30,6 +30,10 @@ export function genScopeId(render, currentInstance) {
   return {[(currentInstance || getCurrentInstance()).type['__scopeId']]: ''};
 }
 
+export function execGenScopeId(render, currentInstance) {
+  return genScopeId(render, currentInstance)()
+}
+
 export const parseNumber = function (number) {
   const res = parseFloat(number)
   if (isNaN(res)) return 0
