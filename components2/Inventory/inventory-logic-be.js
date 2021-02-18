@@ -6,12 +6,14 @@ import {
 import dayjs from 'dayjs'
 import {ObjectID} from "bson"
 import _ from 'lodash'
+import { createProduct, updateProductInfo, removeProductInfo } from '../Product/product-logic-be';
+import { currentAppType } from '../AppSharedStates';
 
 const Inventory = cms.getModel('Inventory')
 const InventoryAction = cms.getModel('InventoryAction')
 
 export async function loadInventories() {
-	inventories.value = await Inventory.find()
+	inventories.value = await Inventory.find({ appType: currentAppType.value })
 	hooks.emit('after:loadInventory')
 }
 
@@ -26,6 +28,18 @@ export async function loadInventoryActions(filter) {
 }
 
 export async function createInventory(inventory) {
+	/**
+	 * Handle product
+	 */
+	if (inventory.product) {
+		const product = await createProduct(inventory.product)
+		delete inventory.product
+		inventory.productId = product._id
+	}
+	inventory.appType = currentAppType.value
+	/**
+	 * Create inventory
+	 */
 	if (!inventory.id) {
 		const maxId = inventories.value.reduce((maxId, inventory) => {
 			return Math.max(maxId, parseInt(inventory.id))
@@ -55,6 +69,10 @@ export async function createInventory(inventory) {
 }
 
 export async function updateInventory(_inventory, reason) {
+	if (_inventory.product) {
+		await updateProductInfo(_inventory.product)
+		delete _inventory.product
+	}
 	const inventory = _.find(inventories.value, (inventory) => inventory._id.toString() === _inventory._id.toString())
 	if (_inventory.stock !== inventory.stock) {
 		const action = {
@@ -76,13 +94,19 @@ export async function updateInventory(_inventory, reason) {
 }
 
 export async function updateInventoryAction(action) {
-	await InventoryAction.create(action)
+	await InventoryAction.create({
+		...action,
+		appType: currentAppType.value
+	})
 }
 
 export async function deleteInventory(ids) {
-	_.remove(inventories.value, (inventory) => {
+	const removed = _.remove(inventories.value, (inventory) => {
 		return ids.includes(inventory._id)
 	})
+	for (const item of removed) {
+		await removeProductInfo(item.productId)
+	}
 	const inventoriesDeleted = await Inventory.find({_id: {$in: ids}})
 	const result = await Inventory.deleteMany({_id: {$in: ids}})
 	if(result.n === ids.length) {

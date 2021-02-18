@@ -10,6 +10,8 @@ export const hooks = new (require('schemahandler/hooks/hooks'))();
 export const detailInventories = computed(() => {
   return inventories.value.map(inventory => {
     const product = products.value.find(product => product._id.toString() === inventory.productId.toString())
+    const a = products.value
+    if (!product) return inventory
     inventory.product = _.cloneDeep(product)
     inventory.product.category = inventory.product.category.map(categoryId => {
       return _.cloneDeep(categories.value.find(category => categoryId.toString() === category._id.toString()))
@@ -73,7 +75,6 @@ hooks.on('before:removeFromInventory', function (removedInventoryItems) {
 export const filter = ref({})
 
 export const filteredInventory = computed(() => {
-  const a = detailInventories.value
   return detailInventories.value.filter(item => {
     if ((filter.value.name && item.product.name !== filter.value.name)
         || (filter.value.id && item.id !== filter.value.id)

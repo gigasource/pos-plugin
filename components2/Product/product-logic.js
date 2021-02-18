@@ -10,7 +10,7 @@ watchEffect(() => {
   categories.value.forEach(category => {
     const product = products.value.find(product => {
       return !!product.category.find(categoryId => {
-        return categoryId === category._id.toString()
+        return categoryId.toString() === category._id.toString()
       })
     })
     category.available = !product
