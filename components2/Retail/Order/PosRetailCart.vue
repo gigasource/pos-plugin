@@ -25,7 +25,7 @@ export default {
     }
 
     function toPayment() {
-      router.push({ path: '/pos-order-retail-payment' })
+      router.push({ path: '/retail--order-payment' })
     }
 
     function generateRandomColor() {

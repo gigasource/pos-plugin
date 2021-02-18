@@ -42,7 +42,7 @@ export const DashboardFunctionFactory = () => {
       { title: 'Tutorial'/*TODO: i18n*/, feature: 'tutorial', icon: 'icon-tutorial', click: () => changePath('/pos-tutorial') },
     ],
     [appType.POS_RETAIL] : [
-      { title: 'Cash Register' /*TODO: i18n*/, icon: 'icon-fast-checkout' /*TODO: update icon*/, click: () => changePath('/pos-order-retail') },
+      { title: 'Cash Register' /*TODO: i18n*/, icon: 'icon-fast-checkout' /*TODO: update icon*/, click: () => changePath('/retail--order') },
       { title: orderHistory, feature: 'orderHistory', icon: 'icon-history', click: () => changePath('/pos-order-history') },
     ]
   }
