@@ -32,8 +32,9 @@ export function getProductGridOrder(product, isFavourite = false) {
 }
 
 export function renderDisplayOrderItemsTable(order, t) {
+  // TODO: Style break when order contain a lot of unique items
   return (
-      <g-simple-table striped fixed-header>
+      <g-simple-table striped fixed-header dense>
         {
           execGenScopeId(() => <>
             <thead>
@@ -44,6 +45,7 @@ export function renderDisplayOrderItemsTable(order, t) {
                 <th class="pa-2 ta-right" style="width: 15%; max-width: 15%">{t('common.total')}({t('common.currency', storeLocale.value)})</th>
               </tr>
             </thead>
+            <tbody style="overflow: scroll">
             {
               order.items.map((item, index) =>
                   <tr key={index}>
@@ -54,6 +56,7 @@ export function renderDisplayOrderItemsTable(order, t) {
                   </tr>
               )
             }
+            </tbody>
           </>)
         }
       </g-simple-table>
