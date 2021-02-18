@@ -1,21 +1,11 @@
-import { ref, watch, watchEffect } from 'vue'
-import {
-	filter,
-	inventories
-} from './inventory-logic-ui'
-import {
-	categories
-} from '../Product/product-logic'
-import {
-	createInventory,
-	deleteInventory,
-	loadInventoryActions,
-	updateInventory
-} from './inventory-logic-be';
+import { ref, watch } from 'vue'
+import { filter, inventories } from './inventory-logic-ui'
+import { categories } from '../Product/product-logic'
+import { createInventory, deleteInventory, loadInventoryActions, updateInventory } from './inventory-logic-be';
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
-import {appType, currentAppType} from "../AppSharedStates";
+import { appType, currentAppType } from '../AppSharedStates';
 
 /**
  * This variable control the state
@@ -25,11 +15,11 @@ import {appType, currentAppType} from "../AppSharedStates";
  * that key
  */
 export const dialog = ref({
-	mode: 'add',
-	filter: false,
-	inventory: false,
-	stock: false,
-	category: false
+  mode: 'add',
+  filter: false,
+  inventory: false,
+  stock: false,
+  category: false
 })
 
 /**
@@ -38,15 +28,15 @@ export const dialog = ref({
  * dialog
  */
 const createEmptyInventory = () => ({
-		_id: null,
-		id: null,
-		product: {
-			option: {},
-			attributes: []
-		},
-		category: null,
-		unit: null,
-		stock: null
+  _id: null,
+  id: null,
+  product: {
+    option: {},
+    attributes: []
+  },
+  category: null,
+  unit: null,
+  stock: null
 })
 
 export const selectedInventory = ref(createEmptyInventory())
@@ -55,15 +45,15 @@ export const selectedInventory = ref(createEmptyInventory())
  * Unit of inventory
  */
 export const units = ref([
-	'piece',
-	'g',
-	'kg',
-	'ml',
-	'l'
+  'piece',
+  'g',
+  'kg',
+  'ml',
+  'l'
 ])
 
 export const tax = ref([
-	0, 7, 19
+  0, 7, 19
 ])
 
 /**
@@ -78,234 +68,259 @@ export const checkBoxSelectedInventoryIDs = ref([])
  * and press delete icon to delete atrtibute
  */
 export function createAttribute() {
-	!!selectedInventory.value.attributes && selectedInventory.value.attributes.push({
-		name: '',
-		description: ''
-	})
+  !!selectedInventory.value.attributes && selectedInventory.value.attributes.push({
+    name: '',
+    description: ''
+  })
 }
+
 export function removeAttribute(i) {
-	!!selectedInventory.value.attributes && selectedInventory.value.attributes.splice(i, 1)
+  !!selectedInventory.value.attributes && selectedInventory.value.attributes.splice(i, 1)
 }
 
 export function createComboItem() {
-	!!selectedInventory.value.comboIngredient && selectedInventory.value.comboIngredient.push({
-		item: null,
-		quantity: null
-	})
+  !!selectedInventory.value.comboIngredient && selectedInventory.value.comboIngredient.push({
+    item: null,
+    quantity: null
+  })
 }
 
 export function removeComboItem(i) {
-	!!selectedInventory.value.comboIngredient && selectedInventory.value.comboIngredient.splice(i, 1)
+  !!selectedInventory.value.comboIngredient && selectedInventory.value.comboIngredient.splice(i, 1)
 }
 
-export async function submitInventory () {
-	if(!selectedInventory.value.name ||
-		!selectedInventory.value.category ||
-		!selectedInventory.value.unit ||
-		!selectedInventory.value.stock ||
-		isNaN(selectedInventory.value.stock) /* Note that isNaN('12') === true */ ) return
-	selectedInventory.value.stock = Number(selectedInventory.value.stock)
-	const inventory = selectedInventory.value
-	if(dialog.value.mode === 'add') {
-		await createInventory(inventory)
-	} else {
-		await updateInventory(inventory)
-	}
-	dialog.value.inventory = false
+export async function submitInventory() {
+  if (!selectedInventory.value.name ||
+      !selectedInventory.value.category ||
+      !selectedInventory.value.unit ||
+      !selectedInventory.value.stock ||
+      isNaN(selectedInventory.value.stock) /* Note that isNaN('12') === true */) {
+    return
+  }
+  selectedInventory.value.stock = Number(selectedInventory.value.stock)
+  const inventory = selectedInventory.value
+  if (dialog.value.mode === 'add') {
+    await createInventory(inventory)
+  } else {
+    await updateInventory(inventory)
+  }
+  dialog.value.inventory = false
 }
 
-export async function updateStock({value, reason}) {
-	await updateInventory({
-		...selectedInventory.value,
-		category: selectedInventory.value.category._id,
-		stock: value
-	}, reason)
+export async function updateStock({ value, reason }) {
+  await updateInventory({
+    ...selectedInventory.value,
+    category: selectedInventory.value.category._id,
+    stock: value
+  }, reason)
 }
 
 export async function removeInventory() {
-	await deleteInventory(selectedInventory.value)
+  await deleteInventory(selectedInventory.value)
 }
 
 export function renderInventoryDialog(t) {
-	/**
-	 * @desc i18n value of attributes
-	 */
-	const defaultAttrs = [
-		{text: t('inventory.size'), val: 'size'},
-		{text: t('inventory.color'), val: 'color'}
-	]
-	const renderDialog = {
-		[appType.POS_RESTAURANT]: () => (
-			<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-				<pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.product.name}/>
-				<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-													 style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
-				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
-									items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}/>
-				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
-									items={units.value} v-model={selectedInventory.value.unit}/>
-			</div>
-		),
-		[appType.POS_RETAIL]: () => (
-			<div class="column-flex flex-wrap justify-around">
-				<div>{t('inventory.createNewProduct')}</div>
-				<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-					<pos-textfield-new style="width: 30%" label="Name" v-model={selectedInventory.value.product.name}/>
-					<g-select menu-class="menu-select-inventory" outlined style="width: 20%" label={t('article.category')}
-										items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}
-					/>
-					<pos-textfield-new style="width: 20%" label="Product ID" v-model={selectedInventory.value.product.id}/>
-					<pos-textfield-new style="width: 20%" rules={[val => !isNaN(val) || 'Must be a number!']}
-														 label={t("inventory.price")} v-model={selectedInventory.value.product.price}/>
-					<g-select menu-class="menu-select-inventory" outlined style="width: 15%" label={t('inventory.tax')}
-										items={units.value} v-model={selectedInventory.value.unit}/>
-					<g-select menu-class="menu-select-inventory" outlined style="width: 15%" label={t('inventory.unit')}
-										items={tax.value} v-model={selectedInventory.value.product.tax}/>
-					<pos-textfield-new style="width: 15%" rules={[val => !isNaN(val) || 'Must be a number!']}
-														 label={t("inventory.unitPrice")} v-model={selectedInventory.value.product.unitCostPrice}/>
-					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-														 style="width: 15%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
-					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-														 style="width: 15%" label={t('inventory.barcode')} v-model={selectedInventory.value.product.barcode}/>
-				</div>
-				{/**
-				  *	Render switch
-				  */}
-				<div class="row-flex flex-wrap justify-around">
-					<g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
-					<g-switch v-model={selectedInventory.value.product.option.voucher} label={t('inventory.isVoucher')}/>
-					<g-switch v-model={selectedInventory.value.product.option.active} label={t('inventory.isActive')}/>
-					<g-switch v-model={selectedInventory.value.product.option.nonRefundable} label={t('inventory.isRefundable')}/>
-					<g-switch v-model={selectedInventory.value.product.option.showOnOrderScreen} label={t('inventory.showOnOrderScreen')}/>
-					<g-switch v-model={selectedInventory.value.product.option.manualPrice} label={t('inventory.manualPrice')}/>
-					<g-switch v-model={selectedInventory.value.hasComboIngredient} label={t('inventory.comboIngredient')}/>
-				</div>
-				{/**
-				 *	Render attribute
-				 */}
-				<div class="column-flex">
-					<div>{t('inventory.attribute')}</div>
-					{selectedInventory.value.product.attributes.map((attribute, i) => (
-						<div class="row-flex">
-							<g-select menu-class="menu-select-inventory" outlined style="width: 10%" label={t('inventory.attributes')}
-												items={defaultAttrs} v-model={attribute.name} itemText="text" itemValue="val"/>
-							<pos-textfield-new style="width: 15%" label={t("inventory.attributeDescription")}
-																 v-model={attribute.description}/>
-							{/*todo: this is not showing on FE*/}
-							<div onClick={() => removeAttribute(i)}
-									 className={['category-item__btn', 'category-item__btn--delete']}>
-								<g-icon>icon-delete2</g-icon>
-							</div>
-						</div>
-					))}
-					<g-btn-bs icon="add" background-color="#1271FF" onClick={createAttribute}>{t('inventory.newAttribute')}</g-btn-bs>
-				</div>
-				{/**
-				 *	Render combo
-				 */}
-				{
-					selectedInventory.value.hasComboIngredient &&
-					<div className="column-flex">
-						<div>{t('inventory.comboIngredient')}</div>
-						<g-btn-bs icon="add" background-color="#1271FF" onClick={createAttribute}>{t('inventory.newAttribute')}</g-btn-bs>
-					</div>
-				}
-			</div>
-		)
-	}
-	return <dialog-form-input v-model={dialog.value.inventory} onSubmit={submitInventory} v-slots={{
-			input: genScopeId(renderDialog[currentAppType.value]),
-		}}>
-	</dialog-form-input>
+  /**
+   * @desc i18n value of attributes
+   */
+  const defaultAttrs = [
+    { text: t('inventory.size'), val: 'size' },
+    { text: t('inventory.color'), val: 'color' }
+  ]
+  const renderDialog = {
+    [appType.POS_RESTAURANT]: () => (
+        <div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
+          <pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.product.name}/>
+          <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
+                             style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
+          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
+                    items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}/>
+          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
+                    items={units.value} v-model={selectedInventory.value.unit}/>
+        </div>
+    ),
+    [appType.POS_RETAIL]: () => {
+      const halfGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr' }
+
+      return (
+          <div class="column-flex flex-wrap justify-around">
+            <div>{t('inventory.createNewProduct')}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+              <g-text-field-bs label="Name" required v-model={selectedInventory.value.product.name}/>
+              <g-select
+                  label={t('article.category')}
+                  required
+                  menu-class="menu-select-inventory" text-field-component="g-text-field-bs" outlined
+                  items={categories.value} item-text="name" return-object
+                  v-model={selectedInventory.value.product.category}/>
+
+              <div style={halfGrid}>
+                <g-text-field-bs label="Product ID" v-model={selectedInventory.value.product.id}/>
+                <g-text-field-bs
+                    label={t('inventory.price')}
+                    required
+                    rules={[val => !isNaN(val) || 'Must be a number!']}
+                    v-model={selectedInventory.value.product.price}/>
+              </div>
+
+              <div style={halfGrid}>
+                <g-select
+                    label={t('inventory.tax')}
+                    menu-class="menu-select-inventory" text-field-component="g-text-field-bs" outlined
+                    items={tax.value} v-model={selectedInventory.value.product.tax}/>
+                <g-select
+                    label={t('inventory.unit')}
+                    menu-class="menu-select-inventory" text-field-component="g-text-field-bs" outlined
+                    items={units.value} v-model={selectedInventory.value.unit}/>
+              </div>
+
+              <div style={halfGrid}>
+                <g-text-field-bs
+                    rules={[val => !isNaN(val) || 'Must be a number!']}
+                    label={t('inventory.unitPrice')} v-model={selectedInventory.value.product.unitCostPrice}/>
+                <g-text-field-bs
+                    disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
+                    label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
+              </div>
+
+              <g-text-field-bs
+                  disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
+                  label={t('inventory.barcode')} v-model={selectedInventory.value.product.barcode}/>
+
+              {/* switch */}
+              <g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
+              <g-switch v-model={selectedInventory.value.product.option.voucher} label={t('inventory.isVoucher')}/>
+              <g-switch v-model={selectedInventory.value.product.option.active} label={t('inventory.isActive')}/>
+              <g-switch v-model={selectedInventory.value.product.option.nonRefundable} label={t('inventory.isRefundable')}/>
+              <g-switch v-model={selectedInventory.value.product.option.showOnOrderScreen} label={t('inventory.showOnOrderScreen')}/>
+              <g-switch v-model={selectedInventory.value.product.option.manualPrice} label={t('inventory.manualPrice')}/>
+              <g-switch v-model={selectedInventory.value.hasComboIngredient} label={t('inventory.comboIngredient')}/>
+            </div>
+            {/* attribute */}
+            <div class="column-flex">
+              <div>{t('inventory.attribute')}</div>
+              {selectedInventory.value.product.attributes.map((attribute, i) => (
+                  <div class="row-flex">
+                    <g-select
+                        menu-class="menu-select-inventory" outlined style="width: 10%" label={t('inventory.attributes')}
+                        items={defaultAttrs} v-model={attribute.name} itemText="text" itemValue="val"/>
+                    <g-text-field-bs
+                        style="width: 15%" label={t('inventory.attributeDescription')}
+                        v-model={attribute.description}/>
+                    <div onClick={() => removeAttribute(i)}
+                         class={['category-item__btn', 'category-item__btn--delete']}>
+                      <g-icon>icon-delete2</g-icon>
+                    </div>
+                  </div>
+              ))}
+              <g-btn-bs icon="add" background-color="#1271FF" onClick={createAttribute}>{t('inventory.newAttribute')}</g-btn-bs>
+            </div>
+            {/* combo/ingredients */}
+            {
+              selectedInventory.value.hasComboIngredient &&
+              <div class="column-flex">
+                <div>{t('inventory.comboIngredient')}</div>
+                <g-btn-bs icon="add" background-color="#1271FF" onClick={createAttribute}>{t('inventory.newAttribute')}</g-btn-bs>
+              </div>
+            }
+          </div>
+      )
+    }
+  }
+  return <dialog-form-input v-model={dialog.value.inventory} onSubmit={submitInventory} v-slots={{
+    input: genScopeId(renderDialog[currentAppType.value]),
+  }}>
+  </dialog-form-input>
 }
 
 export function renderChangeStockDialog() {
-	return <dialog-change-stock v-model={dialog.value.stock}
-	                            name={selectedInventory.value && selectedInventory.value.name}
-	                            stock={selectedInventory.value && selectedInventory.value.stock}
-	                            onSubmit={updateStock}>
-	</dialog-change-stock>
+  return <dialog-change-stock v-model={dialog.value.stock}
+                              name={selectedInventory.value && selectedInventory.value.name}
+                              stock={selectedInventory.value && selectedInventory.value.stock}
+                              onSubmit={updateStock}>
+  </dialog-change-stock>
 }
 
 export function renderCategoryDialog() {
-	const renderDialog = {
-		[appType.POS_RESTAURANT]: () => (
-			<dialog-inventory-category v-model={dialog.value.category}>
-			</dialog-inventory-category>
-		),
-		[appType.POS_RETAIL]: () => (
-			<dialog-inventory-retail-category v-model={dialog.value.category}>
-			</dialog-inventory-retail-category>
-		)
-	}
-	return renderDialog[currentAppType.value]()
+  const renderDialog = {
+    [appType.POS_RESTAURANT]: () => (
+        <dialog-inventory-category v-model={dialog.value.category}>
+        </dialog-inventory-category>
+    ),
+    [appType.POS_RETAIL]: () => (
+        <dialog-inventory-retail-category v-model={dialog.value.category}>
+        </dialog-inventory-retail-category>
+    )
+  }
+  return renderDialog[currentAppType.value]()
 }
 
-const temporaryDialogFilter = ref({
-})
+const temporaryDialogFilter = ref({})
+
 function changeFilter() {
-	filter.value = {
-		...filter.value,
-		..._.cloneDeep(temporaryDialogFilter.value)
-	}
-	temporaryDialogFilter.value = {
-	}
-	dialog.value.filter = false
+  filter.value = {
+    ...filter.value,
+    ..._.cloneDeep(temporaryDialogFilter.value)
+  }
+  temporaryDialogFilter.value = {}
+  dialog.value.filter = false
 }
+
 watch(() => dialog.value.filter, () => {
-	temporaryDialogFilter.value = _.cloneDeep(filter.value)
+  temporaryDialogFilter.value = _.cloneDeep(filter.value)
 })
 
 export function renderFilterDialog(t) {
-	return <dialog-form-input data-jest-filter-dialog v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
-		input: genScopeId(() => <>
-			<div class="row-flex flex-wrap justify-around mt-2">
-				<pos-textfield-new style="width: 30%" label="Product ID" v-model={temporaryDialogFilter.value.id} clearable>
-				</pos-textfield-new>
-				<pos-textfield-new style="width: 30%" label="Name" v-model={temporaryDialogFilter.value.name} clearable>
-				</pos-textfield-new>
-				<g-select menu-class="menu-select-inventory" text-field-component="GTextFieldBs" outlined style="width: 30%"
-				          label={t('article.category')} clearable items={categories.value} item-text="name"
-				          return-object v-model={temporaryDialogFilter.value.category}>
-				</g-select>
-				<div class="col-12 row-flex">
-					<p style="margin-top: 35px; margin-left: 16px">
-						Stock Range: </p>
-					<pos-range-slider min={0} max={1000} prefix={""} v-model={temporaryDialogFilter.value.stock}>
-					</pos-range-slider>
-				</div>
-			</div>
-		</>)
-	}}></dialog-form-input>
+  return <dialog-form-input data-jest-filter-dialog v-model={dialog.value.filter} onSubmit={changeFilter} v-slots={{
+    input: genScopeId(() => <>
+      <div class="row-flex flex-wrap justify-around mt-2">
+        <pos-textfield-new style="width: 30%" label="Product ID" v-model={temporaryDialogFilter.value.id} clearable>
+        </pos-textfield-new>
+        <pos-textfield-new style="width: 30%" label="Name" v-model={temporaryDialogFilter.value.name} clearable>
+        </pos-textfield-new>
+        <g-select menu-class="menu-select-inventory" text-field-component="GTextFieldBs" outlined style="width: 30%"
+                  label={t('article.category')} clearable items={categories.value} item-text="name"
+                  return-object v-model={temporaryDialogFilter.value.category}>
+        </g-select>
+        <div class="col-12 row-flex">
+          <p style="margin-top: 35px; margin-left: 16px">
+            Stock Range: </p>
+          <pos-range-slider min={0} max={1000} prefix={''} v-model={temporaryDialogFilter.value.stock}>
+          </pos-range-slider>
+        </div>
+      </div>
+    </>)
+  }}></dialog-form-input>
 }
 
 // PosTextfieldNew
 export function openDialogStock(inventory) {
-	selectedInventory.value = inventory
-	dialog.value.stock = true
+  selectedInventory.value = inventory
+  dialog.value.stock = true
 }
 
 export function openDialogInventory(inventory, mode) {
-	// no inventory a.s.a passing mode as 1st parameter
-	if (typeof inventory === 'string') {
-		mode = inventory
-		dialog.value.mode = mode
-		// mode:
-		//   + add: create empty inventory
-		//   + edit: just keep selectedInventory as it is
-		if (mode === 'add')
-			selectedInventory.value = createEmptyInventory()
-	} else {
-		dialog.value.mode = mode
-		selectedInventory.value = _.cloneDeep(inventory)
-	}
+  // no inventory a.s.a passing mode as 1st parameter
+  if (typeof inventory === 'string') {
+    mode = inventory
+    dialog.value.mode = mode
+    // mode:
+    //   + add: create empty inventory
+    //   + edit: just keep selectedInventory as it is
+    if (mode === 'add') {
+      selectedInventory.value = createEmptyInventory()
+    }
+  } else {
+    dialog.value.mode = mode
+    selectedInventory.value = _.cloneDeep(inventory)
+  }
 
-	dialog.value.inventory = true
+  dialog.value.inventory = true
 }
 
 export function formatDate(date) {
-	if (!date || !dayjs(date).isValid()) return ''
-	return dayjs(date).format('DD/MM/YYYY HH:mm')
+  if (!date || !dayjs(date).isValid()) return ''
+  return dayjs(date).format('DD/MM/YYYY HH:mm')
 }
 
 /**
@@ -319,36 +334,36 @@ export function formatDate(date) {
  * }
  */
 export const actionFilter = ref({
-	fromDate: dayjs().format('YYYY-MM-DD'),
-	toDate: dayjs().format('YYYY-MM-DD')
+  fromDate: dayjs().format('YYYY-MM-DD'),
+  toDate: dayjs().format('YYYY-MM-DD')
 })
 export const filteredInventoryActions = ref([])
 watch(() => actionFilter.value, async () => {
-	const inventoryActions = await loadInventoryActions(actionFilter.value)
+  const inventoryActions = await loadInventoryActions(actionFilter.value)
 
-	const getAmount = (actions, mode) => {
-		return actions.reduce((acc, item) => {
-			if (mode === item.type) {
-				return acc + parseInt(item.amount)
-			}
-			return acc
-		}, 0)
-	}
+  const getAmount = (actions, mode) => {
+    return actions.reduce((acc, item) => {
+      if (mode === item.type) {
+        return acc + parseInt(item.amount)
+      }
+      return acc
+    }, 0)
+  }
 
-	filteredInventoryActions.value = _.map(
-		_.groupBy(inventoryActions, action => action.inventory),
-		(group, inventory) => {
-			return {
-				inventory,
-				action: group,
-				add: getAmount(group, 'add'),
-				remove: getAmount(group, 'remove')
-			}
-		}
-	).filter(item => {
-		return !!inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
-	}).map(item => ({
-		...item,
-		...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
-	}))
+  filteredInventoryActions.value = _.map(
+      _.groupBy(inventoryActions, action => action.inventory),
+      (group, inventory) => {
+        return {
+          inventory,
+          action: group,
+          add: getAmount(group, 'add'),
+          remove: getAmount(group, 'remove')
+        }
+      }
+  ).filter(item => {
+    return !!inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+  }).map(item => ({
+    ...item,
+    ...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+  }))
 }, { deep: true })
