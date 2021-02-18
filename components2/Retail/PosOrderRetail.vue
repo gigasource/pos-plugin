@@ -67,7 +67,7 @@ export default {
   height: 100%;
   display: grid;
   grid-template-rows: 100%;
-  grid-template-columns: 20% 50% 30%;
+  grid-template-columns: 20% 55% 25%;
 
   &__category {
     grid-area: 0/0/1/1;
