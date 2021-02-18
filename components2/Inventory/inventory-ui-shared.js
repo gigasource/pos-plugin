@@ -159,6 +159,7 @@ export function renderInventoryDialog(t) {
                 <g-text-field-bs
                     label={t('inventory.price')}
                     required
+                    suffix='$'
                     rules={[val => !isNaN(val) || 'Must be a number!']}
                     v-model={selectedInventory.value.product.price}/>
               </div>
@@ -176,16 +177,21 @@ export function renderInventoryDialog(t) {
 
               <div style={halfGrid}>
                 <g-text-field-bs
+                    label={t('inventory.unitPrice')}
+                    suffix='$'
                     rules={[val => !isNaN(val) || 'Must be a number!']}
-                    label={t('inventory.unitPrice')} v-model={selectedInventory.value.product.unitCostPrice}/>
+                    v-model={selectedInventory.value.product.unitCostPrice}/>
                 <g-text-field-bs
                     disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
                     label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
               </div>
 
               <g-text-field-bs
-                  disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-                  label={t('inventory.barcode')} v-model={selectedInventory.value.product.barcode}/>
+                  label={t('inventory.barcode')}
+                  append-inner-icon='mdi-barcode'
+                  disabled={dialog.value.mode === 'edit'}
+                  rules={[val => !isNaN(val) || 'Must be a number!']}
+                  v-model={selectedInventory.value.product.barcode}/>
 
               {/* switch */}
               <g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
