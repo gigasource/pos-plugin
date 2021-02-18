@@ -5,17 +5,20 @@ import { execGenScopeId } from '../utils';
 export const selectedCategory = ref({
   name: 'Favorite'
 })
+
 export function selectCategory(item, parent) {
   selectedCategory.value = item
-  if (parent)
+  if (parent) {
     selectedCategory.value.parentId = parent._id
+  }
 }
 
 export function showSubCategory(category) {
-  if (!selectedCategory.value)
+  if (!selectedCategory.value) {
     return false
+  }
   return (category.subCategory && category.subCategory.length > 0 &&
-    (selectedCategory.value._id === category._id || selectedCategory.value.parentId === category._id))
+      (selectedCategory.value._id === category._id || selectedCategory.value.parentId === category._id))
 }
 
 export function getProductLayout(item, category) {
@@ -29,22 +32,20 @@ export function getProductGridOrder(product, isFavourite = false) {
 }
 
 export function renderDisplayOrderItemsTable(order, t) {
+  // TODO: Style break when order contain a lot of unique items
   return (
-      <g-simple-table striped fixed-header>
+      <g-simple-table striped fixed-header dense>
         {
           execGenScopeId(() => <>
             <thead>
-            <tr>
-              <th>
-                <div class="row-flex" style="line-height: 1.75">
-                  <span class="flex-grow-1 pa-2 ta-left">{t('order.name')}</span>
-                  <span class="w-10 pa-2 ta-right">{t('order.quantity')}</span>
-                  <span class="w-12 pa-2 ta-right">{t('order.each')}({t('common.currency', storeLocale.value)})</span>
-                  <span class="pa-2 ta-right" style="width: 15%; max-width: 15%">{t('common.total')}({t('common.currency', storeLocale.value)})</span>
-                </div>
-              </th>
-            </tr>
+              <tr>
+                <th class="flex-grow-1 pa-2 ta-left">{t('order.name')}</th>
+                <th class="w-10 pa-2 ta-right">{t('order.quantity')}</th>
+                <th class="w-12 pa-2 ta-right">{t('order.each')}({t('common.currency', storeLocale.value)})</th>
+                <th class="pa-2 ta-right" style="width: 15%; max-width: 15%">{t('common.total')}({t('common.currency', storeLocale.value)})</th>
+              </tr>
             </thead>
+            <tbody style="overflow: scroll">
             {
               order.items.map((item, index) =>
                   <tr key={index}>
@@ -55,6 +56,7 @@ export function renderDisplayOrderItemsTable(order, t) {
                   </tr>
               )
             }
+            </tbody>
           </>)
         }
       </g-simple-table>

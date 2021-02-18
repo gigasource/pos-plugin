@@ -140,23 +140,12 @@ export function renderInventoryDialog(t) {
     ),
     [appType.POS_RETAIL]: () => {
       const halfGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr' }
-
+      const triGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }
       return (
           <div class="column-flex flex-wrap justify-around">
             <div>{t('inventory.createNewProduct')}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
-              <g-text-field-bs label="Name" required v-model={selectedInventory.value.product.name}/>
-              <g-select
-                  label={t('article.category')}
-                  required
-                  multiple
-                  chips
-                  deletableChips
-                  text-field-component="g-text-field-bs"
-                  menu-class="menu-select-inventory" outlined
-                  items={categories.value} item-text="name" item-value="_id"
-                  v-model={selectedInventory.value.product.category}/>
-
+            <div style={triGrid}>
+              <g-text-field-bs style={{ gridArea: '1/1/2/3' }} label="Name" required v-model={selectedInventory.value.product.name}/>
               <div style={halfGrid}>
                 <g-text-field-bs label="Product ID" v-model={selectedInventory.value.product.id}/>
                 <g-text-field-bs
@@ -166,6 +155,18 @@ export function renderInventoryDialog(t) {
                     rules={[val => !isNaN(val) || 'Must be a number!']}
                     v-model={selectedInventory.value.product.price}/>
               </div>
+
+              <g-select
+                  label={t('article.category')}
+                  required
+                  multiple
+                  chips
+                  deletableChips
+                  style={{gridColums:'span 3'}}
+                  text-field-component="g-text-field-bs"
+                  menu-class="menu-select-inventory" outlined
+                  items={categories.value} item-text="name" item-value="_id"
+                  v-model={selectedInventory.value.product.category}/>
 
               <div style={halfGrid}>
                 <g-select
@@ -195,7 +196,9 @@ export function renderInventoryDialog(t) {
                   disabled={dialog.value.mode === 'edit'}
                   rules={[val => !isNaN(val) || 'Must be a number!']}
                   v-model={selectedInventory.value.product.barcode}/>
+            </div>
 
+            <div style={triGrid}>
               {/* switch */}
               <g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
 					    <g-switch v-model={selectedInventory.value.product.isVoucher} label={t('inventory.isVoucher')}/>
@@ -205,6 +208,7 @@ export function renderInventoryDialog(t) {
               <g-switch v-model={selectedInventory.value.product.option.manualPrice} label={t('inventory.manualPrice')}/>
 					    <g-switch v-model={selectedInventory.value.product.isCombo} label={t('inventory.comboIngredient')}/>
             </div>
+
             {/* attribute */}
             <div class="column-flex">
               <div>{t('inventory.attribute')}</div>
