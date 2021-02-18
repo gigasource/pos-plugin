@@ -150,7 +150,11 @@ export function renderInventoryDialog(t) {
               <g-select
                   label={t('article.category')}
                   required
-                  menu-class="menu-select-inventory" text-field-component="g-text-field-bs" outlined
+                  multiple
+                  chips
+                  deletableChips
+                  text-field-component="g-text-field-bs"
+                  menu-class="menu-select-inventory" outlined
                   items={categories.value} item-text="name" return-object
                   v-model={selectedInventory.value.product.category}/>
 
