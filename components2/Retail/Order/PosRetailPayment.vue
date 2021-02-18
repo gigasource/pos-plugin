@@ -12,6 +12,7 @@ import { genScopeId } from '../../utils';
 import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
 import { avatar, username, storeLocale } from '../../AppSharedStates';
 import dayjs from 'dayjs'
+import { execGenScopeId } from '../../utils';
 
 export default {
   name: 'PosRetailPayment',
@@ -54,28 +55,46 @@ export default {
       router.go(-1)
     }
 
+    const showMenu = ref(false)
+
     return genScopeId(() => (
       <div class="row-flex">
         <div style="flex: 1">
           {renderDisplayOrderItemsTable(order, t)}
         </div>
         <div class="column-flex" style="flex: 1">
-          <div className="detail-header">
-            <g-btn-bs className="elevation-2" onClick={back}>
+          <div class="detail-header">
+            <g-btn-bs class="elevation-2" onClick={back} style={{ width: '36px', height: '36px', borderRadius: '50%' }}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
-            <span className="username">{username.value}</span>
-            <span>{dayjs().format('MMM DD, YY - HH:MM')}</span>
+            <div>
+              <p class="username">{username.value}</p>
+              <p>{dayjs().format('MMM DD, YY - HH:MM')}</p>
+            </div>
+            <g-spacer/>
+            <g-menu top nudge-top="5" v-model={showMenu.value} v-slots={{
+              activator: ({toggleContent}) => execGenScopeId(() => (
+                <g-btn-bs icon="icon-menu" onClick={toggleContent}>More</g-btn-bs>
+              )),
+              default: () => execGenScopeId(() => (
+                  <div class="col-flex bg-white">
+                    <div>TODO: define more items </div>
+                    <g-btn-bs icon="icon-dinner_copy">More items</g-btn-bs>
+                    <g-btn-bs icon="icon-promotion">Discount</g-btn-bs>
+                  </div>
+              ))
+            }}>
+          </g-menu>
           </div>
-          <div className="row-flex number-key-show ba-thin bg-grey-lighten-3">
+          <div class="row-flex number-key-show ba-thin bg-grey-lighten-3">
             <div style="flex: 1">
-              <div className="row-flex">
-                <div>{t('something.balanceDue')}</div>
+              <div class="row-flex">
+                <div>{t('payment.balanceDue')}</div>
                 <g-spacer/>
-                <div>{t('something.amountTendered')}</div>
+                <div>{t('payment.amountTendered')}</div>
               </div>
               <input id="number_retail_key_output"
-                     className="number-key-text col-12 self-center bg-transparent fs-large-2 fw-700 pl-2"
+                     class="number-key-text col-12 self-center bg-transparent fs-large-2 fw-700 pl-2"
                      style="border: none; outline: none"
                      v-model={inputValue.value}/>
             </div>
