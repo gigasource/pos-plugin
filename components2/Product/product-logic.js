@@ -18,7 +18,7 @@ watchEffect(() => {
     // If category is not available (can not be deleted) so is the parent
     if (!category.available && category.parentCategory) {
       const parentCategory = categories.value.find(_category => {
-        return _category._id.toString() === _category.parentCategory.toString()
+        return _category._id.toString() === category.parentCategory.toString()
       })
       parentCategory.available = false
     }
