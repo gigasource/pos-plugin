@@ -1,45 +1,34 @@
 <script>
-import { ref, onActivated, onMounted } from 'vue'
+import { ref, onActivated, onBeforeMount } from 'vue'
 import { genScopeId } from '../../utils';
-import { posSettings } from '../../AppSharedStates';
+import { appHooks, posSettings } from '../../AppSharedStates';
 import {
-  chooseFunction,
-  isActiveFnBtn
-} from './temp-logic';
+  chooseFunction
+} from '../pos-retail-shared-logic'
 
 export default {
     name: 'PosOrderScreenButtonGroup',
     setup() {
       const listBtn = ref([])
       onActivated(async() => {
+        await appHooks.emit('settingChange')
         await generateTemplate();
       })
 
       async function generateTemplate() {
         const setting = posSettings.value;
-        listBtn.value = [{
-          rows: [0, 1],
-          cols: [0, 1],
-          backgroundColor: '#FFFFFF',
-          text: 'Hello'
-        }, {
-          rows: [0, 1],
-          cols: [0, 1],
-          backgroundColor: '#FFFFFF',
-          text: 'hi'
-        }];
+        listBtn.value = []
         const rightFunctionButtons = setting.rightFunctionButtons
         if (!rightFunctionButtons) return
-        const containedBtns = rightFunctionButtons.reduce((acc, btn) => ([...acc, ...(btn.containedButtons || [])]), []);
+
         for (const btn of rightFunctionButtons) {
-          if (!containedBtns.includes(btn._id)) {
-            listBtn.value.push(
-                btn.buttonFunction === 'buybackProduct'
-                    ? Object.assign({}, btn, {
-                      buttonFunctionValue: btn.buyback
-                    })
-                    : btn);
-          }
+          listBtn.value.push(
+            btn.buttonFunction === 'buybackProduct'
+                ? Object.assign({}, btn, {
+                  buttonFunctionValue: btn.buyback
+                })
+                : btn
+          );
         }
       }
 

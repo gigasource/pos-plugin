@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
 import { execGenScopeId, genScopeId } from '../../utils';
 import { categories, products } from '../../Product/product-logic'
-import { selectedCategory } from '../pos-order-retail-logic'
+import { selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
 
@@ -53,20 +53,9 @@ export default {
       Object.keys(groupedProducts.value).forEach(category => {
         result[category] = _.chunk(groupedProducts.value[category], 28)
       })
-      result['favorite'] = _.chunk(favoriteProducts.value, 28)
+      result['Favorite'] = _.chunk(favoriteProducts.value, 28)
       return result
     })
-
-    watch(() => selectedCategory.value, (newCategory, oldCategory) => {
-      const categoryId = newCategory ? newCategory._id.toString() : null
-      if (categoryId && itemRef[categoryId]) {
-        itemRef[categoryId].style.zIndex = 1
-      }
-      const oldCategoryId = oldCategory ? oldCategory._id.toString() : null
-      if (oldCategoryId && itemRef[oldCategoryId]) {
-        itemRef[oldCategoryId].style.zIndex = -1
-      }
-    }, { deep: true })
 
     function setItemRef(el, category) {
       if (el) {
@@ -160,7 +149,7 @@ export default {
     }
 
     function getWindowStyle(category) {
-      if (!selectedCategory.value || selectedCategory.value._id !== category) {
+      if (!selectedCategory.value || (selectedCategory.value._id !== category && selectedCategory.value.name !== category)) {
         return { display: 'none' }
       }
     }

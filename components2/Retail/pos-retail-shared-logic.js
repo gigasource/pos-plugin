@@ -1,5 +1,22 @@
+import { ref } from 'vue'
 import { storeLocale } from '../AppSharedStates';
 import { execGenScopeId } from '../utils';
+
+export const selectedCategory = ref({
+  name: 'Favorite'
+})
+export function selectCategory(item, parent) {
+  selectedCategory.value = item
+  if (parent)
+    selectedCategory.value.parentId = parent._id
+}
+
+export function showSubCategory(category) {
+  if (!selectedCategory.value)
+    return false
+  return (category.subCategory && category.subCategory.length > 0 &&
+    (selectedCategory.value._id === category._id || selectedCategory.value.parentId === category._id))
+}
 
 export function getProductLayout(item, category) {
   const isFavourite = category && category.name === 'Favourite' || false
@@ -42,4 +59,11 @@ export function renderDisplayOrderItemsTable(order, t) {
         }
       </g-simple-table>
   )
+}
+
+export function chooseFunction(functionName) {
+  //todo: add more function
+  if (!functionName) return
+  return () => {
+  }
 }

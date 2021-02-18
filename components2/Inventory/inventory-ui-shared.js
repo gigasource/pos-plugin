@@ -40,7 +40,10 @@ export const dialog = ref({
 const createEmptyInventory = () => ({
 		_id: null,
 		id: null,
-		name: null,
+		product: {
+			option: {},
+			attributes: []
+		},
 		category: null,
 		unit: null,
 		stock: null
@@ -134,11 +137,11 @@ export function renderInventoryDialog(t) {
 	const renderDialog = {
 		[appType.POS_RESTAURANT]: () => (
 			<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-				<pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.name}/>
+				<pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.product.name}/>
 				<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
 													 style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
 				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
-									items={categories.value} item-text="name" return-object v-model={selectedInventory.value.category}/>
+									items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}/>
 				<g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
 									items={units.value} v-model={selectedInventory.value.unit}/>
 			</div>
@@ -147,34 +150,34 @@ export function renderInventoryDialog(t) {
 			<div class="column-flex flex-wrap justify-around">
 				<div>{t('inventory.createNewProduct')}</div>
 				<div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
-					<pos-textfield-new style="width: 30%" label="Name" v-model={selectedInventory.value.name}/>
+					<pos-textfield-new style="width: 30%" label="Name" v-model={selectedInventory.value.product.name}/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 20%" label={t('article.category')}
-										items={categories.value} item-text="name" return-object v-model={selectedInventory.value.category}
+										items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}
 					/>
-					<pos-textfield-new style="width: 20%" label="Product ID" v-model={selectedInventory.value.id}/>
+					<pos-textfield-new style="width: 20%" label="Product ID" v-model={selectedInventory.value.product.id}/>
 					<pos-textfield-new style="width: 20%" rules={[val => !isNaN(val) || 'Must be a number!']}
-														 label={t("inventory.price")} v-model={selectedInventory.value.price}/>
+														 label={t("inventory.price")} v-model={selectedInventory.value.product.price}/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 15%" label={t('inventory.tax')}
 										items={units.value} v-model={selectedInventory.value.unit}/>
 					<g-select menu-class="menu-select-inventory" outlined style="width: 15%" label={t('inventory.unit')}
-										items={tax.value} v-model={selectedInventory.value.tax}/>
+										items={tax.value} v-model={selectedInventory.value.product.tax}/>
 					<pos-textfield-new style="width: 15%" rules={[val => !isNaN(val) || 'Must be a number!']}
-														 label={t("inventory.unitPrice")} v-model={selectedInventory.value.unitCostPrice}/>
+														 label={t("inventory.unitPrice")} v-model={selectedInventory.value.product.unitCostPrice}/>
 					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
 														 style="width: 15%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
 					<pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
-														 style="width: 15%" label={t('inventory.barcode')} v-model={selectedInventory.value.barcode}/>
+														 style="width: 15%" label={t('inventory.barcode')} v-model={selectedInventory.value.product.barcode}/>
 				</div>
 				{/**
 				  *	Render switch
 				  */}
 				<div class="row-flex flex-wrap justify-around">
-					<g-switch v-model={selectedInventory.value.isFavorite} label={t('inventory.isFavorite')}/>
-					<g-switch v-model={selectedInventory.value.isVoucher} label={t('inventory.isVoucher')}/>
-					<g-switch v-model={selectedInventory.value.isActive} label={t('inventory.isActive')}/>
-					<g-switch v-model={selectedInventory.value.isRefundable} label={t('inventory.isRefundable')}/>
-					<g-switch v-model={selectedInventory.value.showOnOrderScreen} label={t('inventory.showOnOrderScreen')}/>
-					<g-switch v-model={selectedInventory.value.manualPrice} label={t('inventory.manualPrice')}/>
+					<g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
+					<g-switch v-model={selectedInventory.value.product.option.voucher} label={t('inventory.isVoucher')}/>
+					<g-switch v-model={selectedInventory.value.product.option.active} label={t('inventory.isActive')}/>
+					<g-switch v-model={selectedInventory.value.product.option.nonRefundable} label={t('inventory.isRefundable')}/>
+					<g-switch v-model={selectedInventory.value.product.option.showOnOrderScreen} label={t('inventory.showOnOrderScreen')}/>
+					<g-switch v-model={selectedInventory.value.product.option.manualPrice} label={t('inventory.manualPrice')}/>
 					<g-switch v-model={selectedInventory.value.hasComboIngredient} label={t('inventory.comboIngredient')}/>
 				</div>
 				{/**
@@ -182,7 +185,7 @@ export function renderInventoryDialog(t) {
 				 */}
 				<div class="column-flex">
 					<div>{t('inventory.attribute')}</div>
-					{selectedInventory.value.attributes.map((attribute, i) => (
+					{selectedInventory.value.product.attributes.map((attribute, i) => (
 						<div class="row-flex">
 							<g-select menu-class="menu-select-inventory" outlined style="width: 10%" label={t('inventory.attributes')}
 												items={defaultAttrs} v-model={attribute.name} itemText="text" itemValue="val"/>

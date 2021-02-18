@@ -1,5 +1,5 @@
 <script>
-import { selectedCategory, selectCategory, showSubCategory } from '../pos-order-retail-logic'
+import { selectedCategory, selectCategory, showSubCategory } from '../pos-retail-shared-logic'
 import { genScopeId } from '../../utils';
 import { formattedCategories as categories } from '../../Product/product-logic'
 import { loadCategories } from '../../Product/product-logic-be';
