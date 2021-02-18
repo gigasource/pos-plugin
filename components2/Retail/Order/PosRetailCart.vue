@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { getCurrentOrder } from '../../OrderView/pos-logic-be'
 
 export default {
-  name: 'PosRetailOrder',
+  name: 'PosRetailCart',
   props: {},
   setup() {
     const { t } = useI18n()

@@ -6,7 +6,7 @@
       <pos-order-screen-number-keyboard class="por__main__keyboard"/>
       <pos-order-screen-button-group class="por__main__buttons"/>
     </div>
-    <pos-retail-order class="por__detail"/>
+    <pos-retail-cart class="por__detail"/>
 <!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
 <!--    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>-->
 <!--    <dialog-product-lookup v-model="dialogProductLookup"/>-->
@@ -19,7 +19,7 @@ import DialogChangeValue from '../../components/pos-shared-components/dialogChan
 import PosOrderScreenNumberKeyboard from './Order/PosOrderScreenNumberKeyboard';
 import PosOrderScreenButtonGroup from './Order/PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './Order/PosOrderScreenScrollWindow';
-import PosRetailOrder from './Order/PosRetailOrder';
+import PosRetailCart from './Order/PosRetailCart';
 import PosRetailCategory from './Order/PosRetailCategory';
 import { onBeforeMount } from 'vue'
 import { loadCategories, loadProducts } from '../Product/product-logic-be'
@@ -32,7 +32,7 @@ export default {
     PosOrderScreenScrollWindow,
     PosOrderScreenButtonGroup,
     PosRetailCategory,
-    PosRetailOrder,
+    PosRetailCart,
     DialogProductLookup,
     DialogChangeValue,
     DialogSavedList,

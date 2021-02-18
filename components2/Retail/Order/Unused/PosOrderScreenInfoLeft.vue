@@ -1,8 +1,8 @@
 <script>
-import { genScopeId } from '../../utils';
+import { genScopeId } from '../../../utils';
 import { useI18n } from 'vue-i18n'
-import { $filters } from '../../AppSharedStates'
-import { lastPayment } from './temp-logic';
+import { $filters } from '../../../AppSharedStates'
+import { lastPayment } from '../temp-logic';
 
 export default {
   name: 'PosOrderScreenInfoLeft',

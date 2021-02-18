@@ -1,20 +1,20 @@
 <script>
-import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
-import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
+import PosOrderScreenNumberKeyboard from '../PosOrderScreenNumberKeyboard';
+import PosOrderScreenButtonGroup from '../PosOrderScreenButtonGroup';
 import PosOrderScreenTable from './PosOrderScreenTable';
 import PosRetailMobileInfo from './PosRetailMobileInfo';
 import PosOrderScreenAction from './PosOrderScreenAction';
 import PosOrderScreenReport from './PosOrderScreenReport';
-import dialogSavedList from '../../../components/Order/components/dialogSavedList';
-import dialogProductSearchResult from '../../../components/Order/components/dialogProductSearchResult';
-import dialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
-import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
-import { genScopeId } from '../../utils';
+import dialogSavedList from '../../../../components/Order/components/dialogSavedList';
+import dialogProductSearchResult from '../../../../components/Order/components/dialogProductSearchResult';
+import dialogChangeValue from '../../../../components/pos-shared-components/dialogChangeValue';
+import DialogProductLookup from '../../../../components/Order/components/dialogProductLookup';
+import { genScopeId } from '../../../utils';
 
 import {
   showDialogSavedList, showDialogProductSearchResult, showDialogChangePrice, showDialogProductLookup,
   updateNewPrice
-} from './temp-logic'
+} from '../temp-logic'
 
 export default {
   name: 'PosOrderRetailMobile',

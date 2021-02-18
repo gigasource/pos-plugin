@@ -1,7 +1,7 @@
 <script>
   import { nextTick, onMounted, onActivated, withModifiers } from 'vue';
-  import { genScopeId } from '../../utils';
-  import { getAllCategories, changeProductList, activeCategory } from './temp-logic';
+  import { genScopeId } from '../../../utils';
+  import { getAllCategories, changeProductList, activeCategory } from '../temp-logic';
 
   export default {
     name: 'PosOrderScreenProductCategoryMenu',

@@ -1,6 +1,6 @@
 <script>
-  import { username, avatar, formattedDateTime } from '../../AppSharedStates';
-  import { genScopeId } from '../../utils';
+  import { username, avatar, formattedDateTime } from '../../../AppSharedStates';
+  import { genScopeId } from '../../../utils';
 
   export default {
     name: 'PosOrderScreenInfoRight',

@@ -17,7 +17,6 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components2/Reservation/ReservationsList2.vue', name: 'Reservation', path: '/pos-reservation' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/PosOrderRetail.vue', name: 'Retail', path: '/pos-order-retail' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/PosRetailPayment.vue', name: 'RetailPayment', path: '/pos-order-retail-payment' },
-    { loader: { type: 'route' }, filePath: 'components2/Retail/PosOrderRetailMobile.vue', name: 'RetailMobile', path: '/pos-order-retail-mobile' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/PosArticle.vue', name: 'Article', path: '/pos-article' },
     { loader: { type: 'route' }, filePath: 'components2/Customer/Customer.vue', name: 'Customer', path: '/pos-customer' },
     /// old components

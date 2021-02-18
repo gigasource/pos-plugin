@@ -1,8 +1,8 @@
 <script>
 import { onMounted, withModifiers } from 'vue'
-import { genScopeId } from '../../utils';
+import { genScopeId } from '../../../utils';
 import { useRouter } from 'vue-router'
-import { showDialogSavedList, savedOrders, getSavedOrders, resetOrderData } from './temp-logic';
+import { showDialogSavedList, savedOrders, getSavedOrders, resetOrderData } from '../temp-logic';
 
 export default {
   name: 'PosOrderScreenToolbar',

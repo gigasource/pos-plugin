@@ -1,13 +1,13 @@
 <script>
 import { ref, onActivated, onMounted } from 'vue'
-import { genScopeId } from '../../utils';
-import { posSettings } from '../../AppSharedStates';
+import { genScopeId } from '../../../utils';
+import { posSettings } from '../../../AppSharedStates';
 
 import {
   chooseFunction,
   isActiveFnBtn,
   updateTableRows
-} from './temp-logic';
+} from '../temp-logic';
 
 export default {
     name: 'PosOrderScreenAction',

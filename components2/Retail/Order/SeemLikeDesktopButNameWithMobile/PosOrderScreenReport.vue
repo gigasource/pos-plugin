@@ -1,7 +1,7 @@
 <script>
-import { genScopeId } from '../../utils';
-import { $filters } from '../../AppSharedStates';
-import { paymentTax, paymentDiscount, paymentSubTotal, paymentTotal } from './temp-logic'
+import { genScopeId } from '../../../utils';
+import { $filters } from '../../../AppSharedStates';
+import { paymentTax, paymentDiscount, paymentSubTotal, paymentTotal } from '../temp-logic'
 import { useI18n } from 'vue-i18n'
 
 export default {

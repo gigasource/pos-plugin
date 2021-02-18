@@ -1,7 +1,7 @@
 <script>
 import { ref, onBeforeUnmount, computed } from 'vue'
-import { genScopeId } from '../../utils';
-import { username , avatar } from '../../AppSharedStates';
+import { genScopeId } from '../../../utils';
+import { username , avatar } from '../../../AppSharedStates';
 import { useRouter } from 'vue-router'
 
 export default {

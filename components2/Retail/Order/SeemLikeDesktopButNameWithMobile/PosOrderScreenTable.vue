@@ -1,16 +1,16 @@
 <script>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import _ from 'lodash'
-import { genScopeId } from '../../utils';
-import { storeLocale } from '../../AppSharedStates';
+import { genScopeId } from '../../../utils';
+import { storeLocale } from '../../../AppSharedStates';
 import {
   removeItemQuantity as _removeItemQuantity
-} from './temp-logic';
+} from '../temp-logic';
 import {
   getCurrentOrder
-} from '../../OrderView/pos-logic-be'
+} from '../../../OrderView/pos-logic-be'
 import { useI18n } from 'vue-i18n'
-import { appHooks } from '../../AppSharedStates';
+import { appHooks } from '../../../AppSharedStates';
 
 export default {
   name: 'PosOrderScreenTable',
