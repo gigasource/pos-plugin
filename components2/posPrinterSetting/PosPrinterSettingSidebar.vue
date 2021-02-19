@@ -1,18 +1,27 @@
 <script>
 import { onCreateNewPrinterGroup, SidebarFactory } from './pos-print-logics';
-import { avatar, username } from '../AppSharedStates';
-import { ref, withModifiers } from 'vue'
+import { avatar, user, username } from '../AppSharedStates';
+import { onBeforeMount, onBeforeUnmount, ref, withModifiers } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { genScopeId } from '../utils'
 import { useRouter } from 'vue-router'
+import { login } from '../Login/LoginLogic';
+import dayjs from 'dayjs';
 
 export default {
   setup() {
     const { t } = useI18n()
-
     const router = useRouter()
     const { sidebarData, onSelect, isSelecting, selectingItem, onDeleteMenu } = SidebarFactory()
     const now = ref('')
+    let timerInterval
+    onBeforeMount(async function () {
+      timerInterval = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
+    })
+
+    onBeforeUnmount(() => {
+      if (timerInterval) clearInterval(timerInterval)
+    })
 
     // todo: sidebar header: duplicate code
 
@@ -78,7 +87,7 @@ export default {
                 <dialog-confirm-delete v-model={showDeleteDialog.value} type="" onSubmit={onDeleteMenu}></dialog-confirm-delete>
               </div>)
           ,
-          'header': () =>
+          'header': genScopeId(() =>
               <div class="row-flex align-items-center py-2 px-3">
                 <g-avatar size="40">
                   <img alt src={avatar.value}> </img>
@@ -86,7 +95,7 @@ export default {
                 <p class="username"> {username.value} </p>
                 <p class="time">
                   {now.value} </p>
-              </div>
+              </div>)
         }}>
         </g-sidebar>)
   }
