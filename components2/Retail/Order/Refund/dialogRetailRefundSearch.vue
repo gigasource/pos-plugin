@@ -76,9 +76,9 @@ export default {
                     <td>{order.customer}</td>
                     <td>{order.items.length}</td>
                     <td>
-                      <div className="row-flex justify-between">
+                      <div class="row-flex justify-between">
                         <span>{order.vSum}</span>
-                        <g-btn elevation="1" className="mr-2" background-color="#2979FF" text-color="#FFF" style="height: 26px" onClick={() => showRefundForOrder(order)}>Select</g-btn>
+                        <g-btn elevation="1" class="mr-2" background-color="#2979FF" text-color="#FFF" style="height: 26px" onClick={() => showRefundForOrder(order)}>Select</g-btn>
                       </div>
                     </td>
                   </tr>
