@@ -20,6 +20,7 @@ import PosPrinterSettingGeneral from './PosPrinterSettingGeneral';
 export default {
   components: { PosPrinterSetting, PosPrinterSettingSidebar, PosPrinterSettingGeneral },
   setup() {
+    //todo: remove auto login
     login('0000')
     appHooks.emit('settingChange')
     printerHooks.emit('printerGroupsListChange')
@@ -35,11 +36,11 @@ export default {
 
     taxCategoryHooks.emit('updateListTaxCategories')
 
-    watch(() => printerGroupsList.value, () => {
-      if (printerGroupsList.value && !selectingPrinterGroup.value) {
-        onSelectPrinterGroup(printerGroupsList.value[0])
-      }
-    }, { deep: true })
+    // watch(() => printerGroupsList.value, () => {
+    //   if (printerGroupsList.value && !selectingPrinterGroup.value) {
+    //     onSelectPrinterGroup(printerGroupsList.value[0])
+    //   }
+    // }, { deep: true })
 
     return genScopeId(() => <div className="pos-printer-setting-view">
       <PosPrinterSettingSidebar class="pos-printer-setting-view__sidebar"/>
