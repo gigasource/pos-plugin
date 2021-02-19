@@ -8,11 +8,11 @@ import { execGenScopeId, genScopeId } from '../../../utils';
 import { $filters, username } from '../../../AppSharedStates';
 import dayjs from 'dayjs'
 import { paymentAmountTendered, paymentChange, paymentTotal } from '../temp-logic';
-import PosRetailPaymentKeyboard from './PosRetailPaymentKeyboard';
+import PosKeyboardFull from '../../../../components/pos-shared-components/PosKeyboardFull';
 
 export default {
   name: 'PosRetailPayment',
-  components: { PosRetailPaymentKeyboard },
+  components: { PosKeyboardFull },
   props: {},
   setup() {
     const { t } = useI18n()
@@ -85,6 +85,7 @@ export default {
       )
     }
 
+    // payment methods
     const listPayments = [
       { type: 'cash', icon: 'icon-cash' },
       { type: 'card', icon: 'icon-credit_card' },
@@ -128,6 +129,60 @@ export default {
       )
     }
 
+    // payment keyboards
+    const items = [
+      { content: ['7'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key9"' },
+      { content: ['8'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key8"' },
+      { content: ['9'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key9"' },
+      { content: ['$100'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => 100, style: 'grid-area: "keyEx1"' },
+
+      { content: ['4'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key4"' },
+      { content: ['5'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key5"' },
+      { content: ['6'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key6"' },
+      { content: ['$50'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => 50, style: 'grid-area: "keyEx2"' },
+
+      { content: ['1'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key1"' },
+      { content: ['2'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key2"' },
+      { content: ['3'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key3"' },
+      { content: ['$20'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => 20, style: 'grid-area: "keyEx3"' },
+
+      { content: ['0'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "key0"' },
+      { content: [','], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => (value + append), style: 'grid-area: "keyComma' },
+      { content: ['x'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value) => value.substring(0, value.length - 1), style: 'grid-area: "keyX"' },
+      { content: ['$10'], classes: 'key-number bg-white ba-blue-9 ba-thin', action: (value, append) => 10, style: 'grid-area: "keyEx4"' },
+    ]
+    const template = 'grid-template: "key7 key8 key9 keyEx1" "key4 key5 key6 keyEx2" "key1 key2 key3 keyEx3" "key0 keyComma keyX keyEx4"/ 1fr 1fr 1fr 1fr'
+
+    function renderPaymentKeyboard() {
+      const funcBtnStyle = {
+        border: '1px solid #9B9B9B',
+        borderRadius: '6px',
+        backgroundColor: '#DFDFDF'
+      }
+      const funcBtnActiveStyle = {
+        border: '1px solid #1E88E5',
+        borderRadius: '6px',
+        backgroundColor: '#1E88E5',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }
+      return (
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gridGap: '4px' }}>
+            <g-keyboard class="payment_keyboard" items={items} template={template}></g-keyboard>
+            <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr 1fr 1fr', gridTemplateColumns: '1fr', gridGap: '4px' }}>
+              <div style={funcBtnStyle}></div>
+              <div style={funcBtnStyle}></div>
+              <div style={funcBtnStyle}></div>
+              <div style={funcBtnActiveStyle}>
+                Pay
+              </div>
+            </div>
+          </div>
+      )
+    }
+
     return genScopeId(() => (
         <div class="row-flex" style="height: 100%">
           <div style="flex: 1">
@@ -139,7 +194,7 @@ export default {
             {renderPaymentBalance()}
             {renderPaymentMethods()}
             <g-spacer/>
-            <pos-retail-payment-keyboard/>
+            {renderPaymentKeyboard()}
           </div>
         </div>
     ))
@@ -161,6 +216,15 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
+  }
+}
+
+.payment_keyboard {
+  ::v-deep .key-number {
+    height: 50px;
+    border-radius: 4px;
+    border: 1px solid #979797;
+    font-weight: normal;
   }
 }
 </style>
