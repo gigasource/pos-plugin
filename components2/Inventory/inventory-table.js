@@ -21,9 +21,6 @@ import {
 	deleteInventory
 } from "./inventory-logic-be";
 import { genScopeId } from '../utils'
-import {
-	categories
-} from '../Product/product-logic'
 
 export function renderMainInventoryTable(props, { emit }) {
 	const router = useRouter()
@@ -41,12 +38,10 @@ export function renderMainInventoryTable(props, { emit }) {
 		await deleteInventory(selectedInventoryIDs)
 	}
 	const getCategoryText = function (categoryList) {
-		const filteredList = categories.value.filter(category => {
-			return !!categoryList.find(categoryId => categoryId.toString() === category._id.toString())
-		})
-		return filteredList.reduce((result, category) => {
+		return categoryList.reduce((result, category) => {
 			if (result.length) result += ', '
 			result += category.name
+			return result
 		}, '')
 	}
 
@@ -83,7 +78,7 @@ export function renderMainInventoryTable(props, { emit }) {
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{$filters.formatCurrency(inventory.product.price)}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{getCategoryText(inventory.product.category)}</td>
-					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.costPrice}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.costPrice}</td>
 					<td onClick={() => openDialogStock(inventory)}>
 						<div className="row-flex justify-between">
 							{$filters.formatCurrency(inventory.stock)}

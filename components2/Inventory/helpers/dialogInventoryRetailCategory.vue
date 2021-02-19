@@ -4,14 +4,11 @@ import { useI18n } from 'vue-i18n'
 import _ from 'lodash'
 import GTreeFactory from 'pos-vue-framework/src/components/GTreeViewFactory/GTreeFactory'
 import {
-  inventoryCategories
-} from '../inventory-logic-ui'
-import {
-  deleteInventoryCategory,
-  updateInventoryCategories
-} from '../inventory-logic-be'
+  formattedCategories
+} from '../../Product/product-logic'
 import { genScopeId } from '../../utils';
 import { ObjectID } from 'bson'
+import { createCategory, deleteCategory } from '../../Product/product-logic-be';
 
 export default {
   name: "dialogInventoryRetailCategory",
@@ -27,12 +24,12 @@ export default {
 
     const rules = computed(() => {
       let rules = []
-      rules.push(val => inventoryCategories.value.filter(cate => cate === val).length <= 1 || '')
+      rules.push(val => formattedCategories.value.filter(cate => cate === val).length <= 1 || '')
       return rules
     })
 
     const newCategorySuffix = computed(() => {
-      return inventoryCategories.value.length + 1
+      return formattedCategories.value.length + 1
     })
 
     const internalValue = computed({
@@ -46,34 +43,23 @@ export default {
     })
 
     const addCategory = async function () {
-      if (selectedCategory.value && selectedCategory.value.subCategory) {
-        let category = inventoryCategories.value.find(category => {
-          return category._id === selectedCategory.value._id
-        })
-        category.subCategory.push({
-          _id: new ObjectID(),
+      if (selectedCategory.value) {
+        await createCategory({
+          parentCategory: selectedCategory.value._id,
           name: `Sub category ${category.subCategory.length + 1}`,
           available: true
         })
       } else {
-        inventoryCategories.value.push({
-          _id: new ObjectID(),
+        await createCategory({
           name: `New category ${newCategorySuffix.value}`,
           subCategory: [],
           available: true
         })
       }
-      await updateCategories()
     }
     const removeCategory = async function (category) {
       if (!category.available) return
-      if(category._id) await deleteInventoryCategory(category._id)
-    }
-    const updateCategories = async function () {
-      if(_.some(_.countBy(inventoryCategories.value, 'name'), cate => cate > 1)) {
-        return
-      }
-      await updateInventoryCategories(inventoryCategories.value)
+      if(category._id) await deleteCategory(category._id)
     }
 
     //<editor-fold desc="tree view code">
@@ -102,7 +88,7 @@ export default {
     }
 
     const { genTree } = GTreeFactory({
-      data: inventoryCategories,
+      data: formattedCategories,
       genNode,
       genRootWrapper,
       genWrapper,

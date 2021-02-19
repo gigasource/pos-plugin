@@ -26,6 +26,22 @@ watchEffect(() => {
 })
 
 /**
+ * Display category name with parent category as prefix
+ * i.e. Sport - Football
+ */
+export const categoriesWithParentName = computed(() => {
+  return categories.value.map(category => {
+    category = _.cloneDeep(category) // prevent change from categories
+    if (category.parentCategory) {
+      const parentCategory = categories.value.find(_category => _category._id.toString() === category.parentCategory.toString())
+      category.name = parentCategory.name + ' - ' + category.name
+      category.parentCategory = parentCategory
+    }
+    return category
+  })
+})
+
+/**
  * Format category to format with subCategory as array attribute
  * {
  *   ...

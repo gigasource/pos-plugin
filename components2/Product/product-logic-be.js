@@ -27,6 +27,10 @@ export async function loadCategories() {
 }
 
 export async function createProduct(product) {
+  product.category = product.category.map(category => {
+    if (category._id) return category._id
+    return category
+  })
   product.appType = currentAppType.value
   if (!product._id) {
     product._id = new ObjectID()
@@ -43,6 +47,10 @@ export async function createProduct(product) {
 }
 
 export async function updateProductInfo(product) {
+  product.category = product.category.map(category => {
+    if (category._id) return category._id
+    return category
+  })
   const foundProduct = products.value.find(_product => _product._id.toString() === product._id.toString())
   Object.assign(foundProduct, { ...product })
   await Product.updateOne({ _id: product._id }, product)
@@ -51,4 +59,16 @@ export async function updateProductInfo(product) {
 export async function removeProductInfo(productId) {
   _.remove(products.value, _product => _product._id.toString() === productId.toString())
   await Product.remove({ _id: productId })
+}
+
+export async function createCategory(newCategory) {
+  if (!newCategory._id)
+    newCategory._id = new ObjectID()
+  if (!!categories.value.find(category => category.name === newCategory.name)) return
+  categories.value.push(newCategory)
+  await Category.create(newCategory)
+}
+
+export async function deleteCategory(categoryId) {
+  await Category.remove({ _id: categoryId })
 }

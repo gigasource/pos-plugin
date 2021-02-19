@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { filter, inventories } from './inventory-logic-ui'
-import { categories } from '../Product/product-logic'
+import { categories, categoriesWithParentName } from '../Product/product-logic'
 import { createInventory, deleteInventory, loadInventoryActions, updateInventory } from './inventory-logic-be';
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
@@ -32,9 +32,9 @@ const createEmptyInventory = () => ({
   id: null,
   product: {
     option: {},
-    attributes: []
+    attributes: [],
+    category: []
   },
-  category: null,
   unit: null,
   stock: null
 })
@@ -126,6 +126,22 @@ export function renderInventoryDialog(t) {
     { text: t('inventory.size'), val: 'size' },
     { text: t('inventory.color'), val: 'color' }
   ]
+
+  const updateSelectedInventoryCategory = function (newValue) {
+    if (!newValue) return
+    if (newValue.length < selectedInventory.value.product.category.length) {
+      selectedInventory.value.product.category = newValue
+      return
+    }
+    const newAddedCategory = _.last(newValue)
+    selectedInventory.value.product.category.push(newAddedCategory)
+    if (newAddedCategory.parentCategory &&
+        !selectedInventory.value.product.category.find(_category => {
+          return newAddedCategory.parentCategory._id.toString() === _category._id.toString()
+        }))
+      selectedInventory.value.product.category.push(newAddedCategory.parentCategory)
+  }
+
   const renderDialog = {
     [appType.POS_RESTAURANT]: () => (
         <div class="row-flex flex-wrap justify-around" key={dialog.value.inventory}>
@@ -165,8 +181,9 @@ export function renderInventoryDialog(t) {
                   style={{gridColumn:'span 3'}}
                   text-field-component="g-text-field-bs"
                   menu-class="menu-select-inventory" outlined
-                  items={categories.value} item-text="name" item-value="_id"
-                  v-model={selectedInventory.value.product.category}/>
+                  items={categoriesWithParentName.value} item-text="name" return-object
+                  modelValue={selectedInventory.value.product.category}
+                  onUpdate:modelValue={updateSelectedInventoryCategory}/>
 
               <div style={halfGrid}>
                 <g-select
