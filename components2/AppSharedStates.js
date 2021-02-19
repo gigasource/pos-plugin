@@ -67,6 +67,11 @@ cms.socket.on('update-table', () => appHooks.emit('orderChange'))
 
 
 export const posSettings = ref({})
+
+//todo: check side effect
+watch(() => posSettings, async() => {
+  await cms.getModel('PosSetting').findOneAndUpdate({}, posSettings.value)
+}, { deep: true})
 appHooks.on('settingChange', async function() {
   posSettings.value = await cms.getModel('PosSetting').findOne()
 })
