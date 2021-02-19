@@ -162,7 +162,7 @@ export function renderInventoryDialog(t) {
                   multiple
                   chips
                   deletableChips
-                  style={{gridColums:'span 3'}}
+                  style={{gridColumn:'span 3'}}
                   text-field-component="g-text-field-bs"
                   menu-class="menu-select-inventory" outlined
                   items={categories.value} item-text="name" item-value="_id"
