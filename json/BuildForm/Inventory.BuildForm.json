@@ -21,12 +21,6 @@
       "type": "input@number"
     },
     {
-      "_id": "5fa37d8c2d8ff0368b61a7e4",
-      "schemaType": "string",
-      "key": "category",
-      "type": "input"
-    },
-    {
       "_id": "5f8d153c0565d380841ed51a",
       "schemaType": "number",
       "key": "lowStockThreshold",
@@ -43,9 +37,37 @@
       "schemaType": "date",
       "key": "lastUpdateTimestamp",
       "type": "input@date"
+    },
+    {
+      "_id": "602e3c3cbf39c195a82bad6d",
+      "schemaType": "objectId",
+      "key": "productId",
+      "default": null,
+      "ref": "ProductId",
+      "autopopulate": null,
+      "populateSelect": null,
+      "unique": null,
+      "type": "ref-select",
+      "label": null,
+      "flex": null,
+      "labelProp": null,
+      "addable": null,
+      "isVisible": null,
+      "editable": null,
+      "undefined": null
+    },
+    {
+      "_id":"602e3c3cbf39c195a82bad6e",
+      "schemaType": "string",
+      "key": "appType",
+      "default": null,
+      "unique": null
     }
   ],
   "name": "Inventory",
   "tabs": [],
-  "type": "Collection"
+  "type": "Collection",
+  "alwaysLoad": null,
+  "class": null,
+  "title": null
 }

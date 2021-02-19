@@ -20,7 +20,10 @@ import {
 import {
 	deleteInventory
 } from "./inventory-logic-be";
-import { genScopeId } from '../utils';
+import { genScopeId } from '../utils'
+import {
+	categories
+} from '../Product/product-logic'
 
 export function renderMainInventoryTable(props, { emit }) {
 	const router = useRouter()
@@ -37,6 +40,15 @@ export function renderMainInventoryTable(props, { emit }) {
 	const removeInventory = async function () {
 		await deleteInventory(selectedInventoryIDs)
 	}
+	const getCategoryText = function (categoryList) {
+		const filteredList = categories.value.filter(category => {
+			return !!categoryList.find(categoryId => categoryId.toString() === category._id.toString())
+		})
+		return filteredList.reduce((result, category) => {
+			if (result.length) result += ', '
+			result += category.name
+		}, '')
+	}
 
 	const { t } = useI18n()
 
@@ -52,6 +64,26 @@ export function renderMainInventoryTable(props, { emit }) {
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.category.name}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
+					<td onClick={() => openDialogStock(inventory)}>
+						<div className="row-flex justify-between">
+							{$filters.formatCurrency(inventory.stock)}
+							<g-icon size="18" color="#757575">edit</g-icon>
+						</div>
+					</td>
+				</tr>
+			)
+		},
+		[appType.POS_RETAIL]: (inventory, i) => {
+			return (
+				<tr key={i}>
+					<td>
+						<g-checkbox v-model={checkBoxSelectedInventoryIDs.value} value={inventory._id}></g-checkbox>
+					</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.id}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{$filters.formatCurrency(inventory.product.price)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{getCategoryText(inventory.product.category)}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.costPrice}</td>
 					<td onClick={() => openDialogStock(inventory)}>
 						<div className="row-flex justify-between">
 							{$filters.formatCurrency(inventory.stock)}

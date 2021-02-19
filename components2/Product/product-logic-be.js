@@ -27,6 +27,7 @@ export async function loadCategories() {
 }
 
 export async function createProduct(product) {
+  product.appType = currentAppType.value
   if (!product._id) {
     product._id = new ObjectID()
   }
@@ -37,5 +38,17 @@ export async function createProduct(product) {
     product.id = (maxId ? maxId + 1 : 0)
   }
   products.value.push(product)
-  return await Product.create(product)
+  await Product.create(product)
+  return product
+}
+
+export async function updateProductInfo(product) {
+  const foundProduct = products.value.find(_product => _product._id.toString() === product._id.toString())
+  Object.assign(foundProduct, { ...product })
+  await Product.updateOne({ _id: product._id }, product)
+}
+
+export async function removeProductInfo(productId) {
+  _.remove(products.value, _product => _product._id.toString() === productId.toString())
+  await Product.remove({ _id: productId })
 }

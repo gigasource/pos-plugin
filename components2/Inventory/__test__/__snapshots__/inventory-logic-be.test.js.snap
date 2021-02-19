@@ -4,6 +4,7 @@ exports[`Test inventory logic be Case 1: Check load inventories 1`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -12,6 +13,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -20,6 +22,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -28,6 +31,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -36,6 +40,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -44,6 +49,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -57,6 +63,7 @@ exports[`Test inventory logic be Case 1: Check load inventories 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -65,6 +72,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -73,6 +81,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -81,6 +90,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -89,6 +99,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -97,6 +108,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "category": Array [
       "ObjectID",
     ],
@@ -110,16 +122,19 @@ exports[`Test inventory logic be Case 1: Check load inventories 3`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "available": true,
     "name": "Food",
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "available": true,
     "name": "Fruit",
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "available": true,
     "name": "Drink",
   },
@@ -130,13 +145,16 @@ exports[`Test inventory logic be Case 1: Check load inventories 4`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -150,13 +168,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -170,13 +191,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -190,13 +214,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Fruit",
         },
@@ -210,13 +237,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Fruit",
         },
@@ -230,13 +260,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Drink",
         },
@@ -259,6 +292,7 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 10,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-05T00:00:00.000Z",
         "inventory": "ObjectID",
         "reason": "Update stock",
@@ -267,12 +301,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 30,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 30,
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
@@ -287,12 +323,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 50,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 50,
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
@@ -307,12 +345,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 60.22,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 60,
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
@@ -327,12 +367,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 100,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 100,
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
@@ -347,12 +389,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 10,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 10,
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
@@ -367,12 +411,14 @@ Array [
       Object {
         "_id": "ObjectID",
         "amount": 5.5,
+        "appType": "POS_RESTAURANT",
         "date": "2021-01-04T17:00:00.000Z",
         "inventory": "ObjectID",
         "type": "add",
       },
     ],
     "add": 5,
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "inventory": "ObjectID",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
@@ -388,6 +434,7 @@ exports[`Test inventory logic be Case 3: Create inventory 1`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -396,6 +443,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -404,6 +452,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -412,6 +461,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -420,6 +470,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -428,6 +479,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -436,6 +488,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "7",
     "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
     "productId": "ObjectID",
@@ -449,13 +502,16 @@ exports[`Test inventory logic be Case 3: Create inventory 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -469,13 +525,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -489,13 +548,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Food",
         },
@@ -509,13 +571,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Fruit",
         },
@@ -529,13 +594,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Fruit",
         },
@@ -549,13 +617,16 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "product": Object {
       "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Drink",
         },
@@ -569,6 +640,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "7",
     "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
     "product": Object {
@@ -576,6 +648,7 @@ Array [
       "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
           "name": "Drink",
         },
@@ -594,6 +667,7 @@ exports[`Test inventory logic be Case 3a: Create inventory with duplicate id 1`]
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "1",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -602,6 +676,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -610,6 +685,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -618,6 +694,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -626,6 +703,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -634,6 +712,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -647,6 +726,7 @@ exports[`Test inventory logic be Case 4: Delete inventory 1`] = `
 Array [
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -655,6 +735,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -663,6 +744,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -671,6 +753,7 @@ Array [
   },
   Object {
     "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
     "productId": "ObjectID",
@@ -680,770 +763,385 @@ Array [
 ]
 `;
 
-exports[`Test inventory logic be Case 5: Update and delete category 1`] = `
+exports[`Test inventory logic be Case 4: Delete inventory 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
-    "available": true,
-    "name": "Cream",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "2",
+    "name": "Meat",
   },
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Food",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "4",
+    "name": "Apple",
   },
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Fruit",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "5",
+    "name": "Banana",
   },
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Drink",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "6",
+    "name": "Vodka",
   },
 ]
 `;
 
-exports[`Test inventory logic be Case 5: Update and delete category 2`] = `
+exports[`Test inventory logic be Case 5: Create inventory with product 1`] = `
 Array [
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Food",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Fruit",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Drink",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": true,
-    "name": "Cream",
-  },
-]
-`;
-
-exports[`Test inventory logic be Case 6: Update inventory with object id 1`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "1",
-    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
-    "name": "Fish",
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
+    "productId": "ObjectID",
     "stock": 30,
     "unit": "kg",
   },
   Object {
     "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Meat",
+    "productId": "ObjectID",
     "stock": 50,
     "unit": "kg",
   },
   Object {
     "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "3",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Pork",
+    "productId": "ObjectID",
     "stock": 60.22,
     "unit": "kg",
   },
   Object {
     "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "4",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Apple",
+    "productId": "ObjectID",
     "stock": 100,
     "unit": "piece",
   },
   Object {
     "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "5",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Banana",
+    "productId": "ObjectID",
     "stock": 10,
     "unit": "piece",
   },
   Object {
     "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Drink",
-    },
+    "appType": "POS_RESTAURANT",
     "id": "6",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Vodka",
+    "productId": "ObjectID",
     "stock": 5.5,
     "unit": "l",
   },
-]
-`;
-
-exports[`Test inventory logic be Case 6: Update inventory with object id 2`] = `
-Array [
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Food",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Fruit",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Drink",
-  },
-]
-`;
-
-exports[`Test inventory logic be Case 6: Update inventory with object id 3`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Drink",
-    },
-    "id": "1",
-    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
-    "name": "Fish",
-    "stock": 30,
-    "unit": "kg",
-  },
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-    },
-    "id": "2",
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Meat",
-    "stock": 50,
-    "unit": "kg",
-  },
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-    },
-    "id": "3",
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Pork",
-    "stock": 60.22,
-    "unit": "kg",
-  },
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-    },
-    "id": "4",
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Apple",
-    "stock": 100,
-    "unit": "piece",
-  },
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-    },
-    "id": "5",
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Banana",
-    "stock": 10,
-    "unit": "piece",
-  },
-  Object {
-    "_id": "ObjectID",
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Drink",
-    },
-    "id": "6",
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "name": "Vodka",
-    "stock": 5.5,
-    "unit": "l",
-  },
-]
-`;
-
-exports[`Test inventory logic be Case 6: Update inventory with object id 4`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Food",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Fruit",
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Drink",
-  },
-]
-`;
-
-exports[`Test inventory logic be for retail Case 1: Check load inventories 1`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "1",
-    "isActive": true,
-    "isFavorite": false,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Fish",
-    "price": 30,
-    "showOnOrderScreen": true,
-    "stock": 30,
-    "unit": "kg",
-    "unitCostPrice": 10,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "2",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": true,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": true,
-    "name": "Meat",
-    "price": 20,
-    "showOnOrderScreen": true,
-    "stock": 50,
-    "unit": "kg",
-    "unitCostPrice": 15,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "3",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Pork",
-    "price": 55,
-    "showOnOrderScreen": true,
-    "stock": 60.22,
-    "unit": "kg",
-    "unitCostPrice": 30,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [
-      Object {
-        "color": "red",
-      },
-    ],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-      "subCategory": Array [],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "4",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Apple",
-    "price": 100,
-    "showOnOrderScreen": false,
-    "stock": 100,
-    "unit": "piece",
-    "unitCostPrice": 50,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [
-      Object {
-        "size": "big",
-      },
-    ],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-      "subCategory": Array [],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "5",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Banana",
-    "price": 17,
-    "showOnOrderScreen": true,
-    "stock": 10,
-    "unit": "piece",
-    "unitCostPrice": 4,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Wine",
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "6",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Vodka",
-    "price": 44,
-    "showOnOrderScreen": true,
-    "stock": 5.5,
-    "unit": "l",
-    "unitCostPrice": 22,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [
-      Object {
-        "_id": "ObjectID",
-        "name": "Fish",
-        "price": 30,
-        "quantity": 20,
-        "unitCostPrice": 10,
-      },
-      Object {
-        "_id": "ObjectID",
-        "name": "Meat",
-        "price": 20,
-        "quantity": 1,
-        "unitCostPrice": 15,
-      },
-    ],
-    "hasComboIngredient": true,
+    "appType": "POS_RESTAURANT",
     "id": "7",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "ComboFishMeat",
-    "price": 55,
-    "showOnOrderScreen": true,
-    "stock": 1,
-    "unit": "piece",
-    "unitCostPrice": 215,
+    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
+    "productId": "ObjectID",
+    "stock": 20,
+    "unit": "l",
   },
 ]
 `;
 
-exports[`Test inventory logic be for retail Case 1: Check load inventories 2`] = `
+exports[`Test inventory logic be Case 5: Create inventory with product 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
-    "available": false,
-    "name": "Food",
-    "subCategory": Array [
-      Object {
-        "_id": "ObjectID",
-        "available": true,
-        "name": "Vegetables",
-      },
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
     ],
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": false,
-    "name": "Fruit",
-    "subCategory": Array [],
-  },
-  Object {
-    "_id": "ObjectID",
-    "available": true,
-    "name": "Drink",
-    "subCategory": Array [
-      Object {
-        "_id": "ObjectID",
-        "available": false,
-        "name": "Wine",
-      },
-      Object {
-        "_id": "ObjectID",
-        "available": true,
-        "name": "Soda",
-      },
-    ],
-  },
-]
-`;
-
-exports[`Test inventory logic be for retail Case 2: Test remove item from category 1`] = `
-Array [
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
     "id": "1",
-    "isActive": true,
-    "isFavorite": false,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
-    "manualPrice": false,
     "name": "Fish",
-    "price": 30,
-    "showOnOrderScreen": true,
-    "stock": 5,
-    "unit": "kg",
-    "unitCostPrice": 10,
   },
   Object {
     "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
-        Object {
-          "_id": "ObjectID",
-          "available": true,
-          "name": "Vegetables",
-        },
-      ],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
     "id": "2",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": true,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
-    "manualPrice": true,
     "name": "Meat",
-    "price": 20,
-    "showOnOrderScreen": true,
-    "stock": 49,
-    "unit": "kg",
-    "unitCostPrice": 15,
   },
   Object {
     "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "3",
+    "name": "Pork",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "4",
+    "name": "Apple",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "5",
+    "name": "Banana",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "6",
+    "name": "Vodka",
+  },
+  Object {
+    "_id": "ObjectID",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "7",
+    "name": "Whiskey",
+  },
+]
+`;
+
+exports[`Test inventory logic be Case 5a: Create inventory with product 1`] = `
+Array [
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "id": "1",
+    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
+    "product": Object {
       "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
+      "appType": "POS_RESTAURANT",
+      "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
-          "name": "Vegetables",
+          "name": "Food",
         },
       ],
+      "id": "1",
+      "name": "Fish",
     },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "3",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
+    "productId": "ObjectID",
+    "stock": 30,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "id": "2",
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Pork",
-    "price": 55,
-    "showOnOrderScreen": true,
+    "product": Object {
+      "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
+      "category": Array [
+        Object {
+          "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
+          "available": true,
+          "name": "Food",
+        },
+      ],
+      "id": "2",
+      "name": "Meat",
+    },
+    "productId": "ObjectID",
+    "stock": 50,
+    "unit": "kg",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "id": "3",
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
+    "product": Object {
+      "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
+      "category": Array [
+        Object {
+          "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
+          "available": true,
+          "name": "Food",
+        },
+      ],
+      "id": "3",
+      "name": "Pork",
+    },
+    "productId": "ObjectID",
     "stock": 60.22,
     "unit": "kg",
-    "unitCostPrice": 30,
   },
   Object {
     "_id": "ObjectID",
-    "attributes": Array [
-      Object {
-        "color": "red",
-      },
-    ],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-      "subCategory": Array [],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
+    "appType": "POS_RESTAURANT",
     "id": "4",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
     "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Apple",
-    "price": 100,
-    "showOnOrderScreen": false,
-    "stock": 100,
-    "unit": "piece",
-    "unitCostPrice": 50,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [
-      Object {
-        "size": "big",
-      },
-    ],
-    "category": Object {
+    "product": Object {
       "_id": "ObjectID",
-      "available": false,
-      "name": "Fruit",
-      "subCategory": Array [],
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "5",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Banana",
-    "price": 17,
-    "showOnOrderScreen": true,
-    "stock": 10,
-    "unit": "piece",
-    "unitCostPrice": 4,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Wine",
-    },
-    "comboIngredient": Array [],
-    "hasComboIngredient": false,
-    "id": "6",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
-    "manualPrice": false,
-    "name": "Vodka",
-    "price": 44,
-    "showOnOrderScreen": true,
-    "stock": 5.5,
-    "unit": "l",
-    "unitCostPrice": 22,
-  },
-  Object {
-    "_id": "ObjectID",
-    "attributes": Array [],
-    "category": Object {
-      "_id": "ObjectID",
-      "available": false,
-      "name": "Food",
-      "subCategory": Array [
+      "appType": "POS_RESTAURANT",
+      "category": Array [
         Object {
           "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
           "available": true,
-          "name": "Vegetables",
+          "name": "Fruit",
         },
       ],
+      "id": "4",
+      "name": "Apple",
     },
-    "comboIngredient": Array [
-      Object {
-        "_id": "ObjectID",
-        "name": "Fish",
-        "price": 30,
-        "quantity": 20,
-        "unitCostPrice": 10,
-      },
-      Object {
-        "_id": "ObjectID",
-        "name": "Meat",
-        "price": 20,
-        "quantity": 1,
-        "unitCostPrice": 15,
-      },
-    ],
-    "hasComboIngredient": true,
-    "id": "7",
-    "isActive": true,
-    "isFavorite": true,
-    "isRefundable": false,
-    "isVoucher": false,
-    "lastUpdateTimestamp": "2021-01-05T00:00:00.000Z",
-    "manualPrice": false,
-    "name": "ComboFishMeat",
-    "price": 55,
-    "showOnOrderScreen": true,
-    "stock": 0,
+    "productId": "ObjectID",
+    "stock": 100,
     "unit": "piece",
-    "unitCostPrice": 215,
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "id": "5",
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
+    "product": Object {
+      "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
+      "category": Array [
+        Object {
+          "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
+          "available": true,
+          "name": "Fruit",
+        },
+      ],
+      "id": "5",
+      "name": "Banana",
+    },
+    "productId": "ObjectID",
+    "stock": 10,
+    "unit": "piece",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "id": "6",
+    "lastUpdateTimestamp": "2021-01-04T17:00:00.000Z",
+    "product": Object {
+      "_id": "ObjectID",
+      "appType": "POS_RESTAURANT",
+      "category": Array [
+        Object {
+          "_id": "ObjectID",
+          "appType": "POS_RESTAURANT",
+          "available": true,
+          "name": "Drink",
+        },
+      ],
+      "id": "6",
+      "name": "Vodka",
+    },
+    "productId": "ObjectID",
+    "stock": 5.5,
+    "unit": "l",
   },
 ]
 `;
 
-exports[`Test inventory logic be for retail Case 2a: Test remove item from inventory fail 1`] = `
+exports[`Test inventory logic be Case 5a: Create inventory with product 2`] = `
 Array [
   Object {
     "_id": "ObjectID",
-    "outOfStock": true,
-    "quantity": 51,
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      Object {
+        "_id": "ObjectID",
+        "appType": "POS_RESTAURANT",
+        "available": true,
+        "name": "Food",
+      },
+    ],
+    "id": "1",
+    "name": "Test item",
   },
   Object {
     "_id": "ObjectID",
-    "outOfStock": false,
-    "quantity": 2,
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "2",
+    "name": "Meat",
   },
   Object {
     "_id": "ObjectID",
-    "outOfStock": true,
-    "quantity": 2,
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "3",
+    "name": "Pork",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "4",
+    "name": "Apple",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "5",
+    "name": "Banana",
+  },
+  Object {
+    "_id": "ObjectID",
+    "appType": "POS_RESTAURANT",
+    "category": Array [
+      "ObjectID",
+    ],
+    "id": "6",
+    "name": "Vodka",
   },
 ]
 `;

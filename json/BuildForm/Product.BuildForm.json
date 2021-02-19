@@ -353,6 +353,30 @@
       "addable": null,
       "isVisible": null,
       "onChange": null
+    },
+    {
+      "_id": "602e1c7b5dbcccdffacbdc5d",
+      "schemaType": "boolean",
+      "key": "isVoucher",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
+    },
+    {
+      "_id": "602e1c7b5dbcccdffacbdc5e",
+      "schemaType": "boolean",
+      "key": "isCombo",
+      "default": null,
+      "unique": null,
+      "type": "input@switch",
+      "label": null,
+      "flex": null,
+      "addable": null,
+      "isVisible": null
     }
   ],
   "id": "5c46e1c05889c52fe001ab7b",

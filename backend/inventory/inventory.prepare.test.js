@@ -19,26 +19,30 @@ async function prepareInventoryDb(orm) {
 	await Product.remove({})
 
 	const makeProduct = async function (product) {
+		product.appType = 'POS_RESTAURANT'
 		return await Product.create(product)
 	}
 
 	const makeCategory = async function (categoryName) {
 		return await Category.create({
 			_id: new ObjectID(),
-			name: categoryName
+			name: categoryName,
+			appType: 'POS_RESTAURANT'
 		})
 	}
 
 	const makeInventory = async function (inventory) {
 		const createdInventory = await Inventory.create({
 			_id: new ObjectID(),
-			...inventory
+			...inventory,
+			appType: 'POS_RESTAURANT',
 		})
 		await InventoryAction.create({
 			_id: new ObjectID(),
 			inventory: createdInventory._id,
 			type: 'add',
 			amount: inventory.stock,
+			appType: 'POS_RESTAURANT',
 			date: inventory.lastUpdateTimestamp
 		})
 	}

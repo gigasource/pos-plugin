@@ -90,15 +90,15 @@ export function removeComboItem(i) {
 }
 
 export async function submitInventory() {
-  if (!selectedInventory.value.name ||
-      !selectedInventory.value.category ||
+	if (!selectedInventory.value.product.name ||
+		  !selectedInventory.value.product.category ||
       !selectedInventory.value.unit ||
       !selectedInventory.value.stock ||
       isNaN(selectedInventory.value.stock) /* Note that isNaN('12') === true */) {
     return
   }
   selectedInventory.value.stock = Number(selectedInventory.value.stock)
-  const inventory = selectedInventory.value
+	const inventory = _.cloneDeep(selectedInventory.value)
   if (dialog.value.mode === 'add') {
     await createInventory(inventory)
   } else {
@@ -110,7 +110,6 @@ export async function submitInventory() {
 export async function updateStock({ value, reason }) {
   await updateInventory({
     ...selectedInventory.value,
-    category: selectedInventory.value.category._id,
     stock: value
   }, reason)
 }
@@ -166,7 +165,7 @@ export function renderInventoryDialog(t) {
                   style={{gridColums:'span 3'}}
                   text-field-component="g-text-field-bs"
                   menu-class="menu-select-inventory" outlined
-                  items={categories.value} item-text="name" return-object
+                  items={categories.value} item-text="name" item-value="_id"
                   v-model={selectedInventory.value.product.category}/>
 
               <div style={halfGrid}>
@@ -185,7 +184,7 @@ export function renderInventoryDialog(t) {
                     label={t('inventory.unitPrice')}
                     suffix='$'
                     rules={[val => !isNaN(val) || 'Must be a number!']}
-                    v-model={selectedInventory.value.product.unitCostPrice}/>
+                    v-model={selectedInventory.value.product.costPrice}/>
                 <g-text-field-bs
                     disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
                     label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
@@ -202,12 +201,12 @@ export function renderInventoryDialog(t) {
             <div style={triGrid}>
               {/* switch */}
               <g-switch v-model={selectedInventory.value.product.option.favorite} label={t('inventory.isFavorite')}/>
-              <g-switch v-model={selectedInventory.value.product.option.voucher} label={t('inventory.isVoucher')}/>
+					    <g-switch v-model={selectedInventory.value.product.isVoucher} label={t('inventory.isVoucher')}/>
               <g-switch v-model={selectedInventory.value.product.option.active} label={t('inventory.isActive')}/>
               <g-switch v-model={selectedInventory.value.product.option.nonRefundable} label={t('inventory.isRefundable')}/>
               <g-switch v-model={selectedInventory.value.product.option.showOnOrderScreen} label={t('inventory.showOnOrderScreen')}/>
               <g-switch v-model={selectedInventory.value.product.option.manualPrice} label={t('inventory.manualPrice')}/>
-              <g-switch v-model={selectedInventory.value.hasComboIngredient} label={t('inventory.comboIngredient')}/>
+					    <g-switch v-model={selectedInventory.value.product.isCombo} label={t('inventory.comboIngredient')}/>
             </div>
 
             {/* attribute */}
@@ -231,7 +230,7 @@ export function renderInventoryDialog(t) {
             </div>
             {/* combo/ingredients */}
             {
-              selectedInventory.value.hasComboIngredient &&
+              selectedInventory.value.product.isCombo &&
               <div class="column-flex">
                 <div>{t('inventory.comboIngredient')}</div>
                 <g-btn-bs icon="add" background-color="#1271FF" onClick={createAttribute}>{t('inventory.newAttribute')}</g-btn-bs>

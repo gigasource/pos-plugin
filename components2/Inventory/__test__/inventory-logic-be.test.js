@@ -21,6 +21,10 @@ import {
 	filteredInventoryActions,
 	actionFilter
 } from '../inventory-ui-shared'
+import {
+	appType,
+	currentAppType
+} from '../../AppSharedStates'
 
 const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());
@@ -49,6 +53,7 @@ let { orm } = cms;
 
 describe("Test inventory logic be", function() {
   beforeAll(async () => {
+  	currentAppType.value = appType.POS_RESTAURANT
     await cms.initDemoData();
     cms.triggerFeConnect();
   });
@@ -73,7 +78,6 @@ describe("Test inventory logic be", function() {
 		  	stock: 20
 		  }
 	  })
-	  const a = inventories.value
 	  actionFilter.value = {
   		fromDate: moment('04.01.2021', 'DD.MM.YYYY').toDate(),
 			toDate: moment('06.01.2021', 'DD.MM.YYYY').toDate()
@@ -117,6 +121,30 @@ describe("Test inventory logic be", function() {
 		])
 		await nextTick()
 		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
 		expect(inventories.value.length).toEqual(oldLength - 2)
+	})
+	it('Case 5: Create inventory with product', async () => {
+		await createInventory({
+			product: {id: '7', name: 'Whiskey', category: [categories.value[2]._id]},
+			unit: 'l',
+			stock: 20,
+			id: '7'
+		})
+		await nextTick()
+		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
+	})
+	it('Case 5a: Create inventory with product', async () => {
+		await updateInventory({
+			...detailInventories.value[0],
+			product: {
+				...detailInventories.value[0].product,
+				name: 'Test item'
+			}
+		})
+		await nextTick()
+		expect(stringify(inventories.value)).toMatchSnapshot()
+		expect(stringify(products.value)).toMatchSnapshot()
 	})
 });
