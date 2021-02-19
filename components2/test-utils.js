@@ -162,7 +162,6 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-snackbar': true,
         'g-checkbox': true,
         'g-chip': true,
-        'g-select': true,
         'pos-file-input-image': true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
@@ -180,6 +179,8 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'pos-payment-screen-keyboard2': true,
         'pos-restaurant-payment-order-detail2': true,
         'pos-restaurant-payment-toolbar2': true,
+        'g-sidebar': true,
+        'g-side-bar-tree-view': true,
         'scroll-select': true,
       },
       mocks: {
@@ -199,18 +200,3 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));
-
-import fs from 'fs';
-import {PNG} from "pngjs";
-global.printFunctions = {
-  printPng: async (png) => {
-    try {
-      const bufferInBase64 = PNG.sync.write(png);
-      fs.writeFileSync(__dirname + '/EndOfDay/__test__/__snapshots__/report.png', bufferInBase64);
-
-    } catch (e) {
-      console.log('canvasprinter: printPng exception', e)
-    }
-  },
-  print: () => null
-}

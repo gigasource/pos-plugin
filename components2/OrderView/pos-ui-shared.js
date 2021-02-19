@@ -1,14 +1,8 @@
-import {computed, nextTick, reactive, ref, watchEffect, watch} from 'vue';
-import {
-  createEmptyCategoryLayout,
-  createEmptyLayout,
-  createEmptyProductLayout,
-  isSameArea
-} from "../../components/posOrder/util";
+import {computed, reactive, ref, watch} from 'vue';
 import _ from "lodash";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import { createEmptyProduct } from '../EditMenuCard/utils';
+import {createEmptyProduct} from '../EditMenuCard/utils';
 import orderLayoutApi from '../EditMenuCard/orderLayoutApi';
 
 export const orderLayout = ref({ categories: [] });
@@ -263,20 +257,19 @@ export function itemsRenderFactory() {
             {item.id && `${item.id}. `}{item.name}</p>
           <p>
             <span class={['item-detail__price', isItemDiscounted(item) && 'item-detail__discount']}>
-              {t('common.currency', locale)}{$filters.formatCurrency(item.originalPrice)}
+              {t('common.currency', locale)}{$filters.formatCurrency(isItemDiscounted(item) ? item.originalPrice : item.price)}
             </span>
             {isItemDiscounted(item) &&
             <span class="item-detail__price--new">
-              {t('common.currency', locale)} {$filters.formatCurrency(item.price)}
-            </span>
-            }
+              {t('common.currency', locale)}{$filters.formatCurrency(item.price)}
+            </span>}
             <span class={['item-detail__option', 'text-red-accent-2']}>
               {getItemSubtext(item)}
             </span>
           </p>
         </div>
         <div class="mr-2 fw-700 row-flex align-items-center"
-             style="font-size: 18px">{item.quantity}</div>
+             style="font-size: 18px" style={[item.sent && {opacity: 0.55}]}>{item.quantity}</div>
       </div>
       {item.modifiers && <div>
         {item.modifiers.map(modifier => (
@@ -291,6 +284,51 @@ export function itemsRenderFactory() {
   ))
   return itemsRender;
 }
+
+export function createEmptyProductLayout() {
+  return {
+    type: 'Article',
+    text: '',
+    color: '#ddd',
+    product: {
+      type: null,
+      id: '',
+      name: '',
+      price: '',
+      groupPrinter: null,
+      groupPrinter2: null,
+      isNoPrint: null,
+      isItemNote: null,
+      tax: null,
+      tax2: null,
+      category: null,
+      isDivArticle: null
+    }
+  }
+}
+
+
+export function createEmptyLayout(row, column) {
+  return {
+    top: row,
+    left: column,
+    name: ''
+  }
+}
+
+export function createEmptyCategoryLayout() {
+  return {
+    rows: 10,
+    columns: 6,
+    color: '#FFF'
+  }
+}
+
+
+export function isSameArea(area1, area2) {
+  return area1.top === area2.top && area1.left === area2.left
+}
+
 
 window.dbg = {
   orderLayout,

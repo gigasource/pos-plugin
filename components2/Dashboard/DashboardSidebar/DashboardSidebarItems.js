@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 import _ from 'lodash';
 
-import { user } from '../../AppSharedStates'
+import {appHooks, posSettings, user} from '../../AppSharedStates'
 
 import { roomsStates } from '../../TablePlan/RoomState'
 import { activeScreen, dashboardHooks } from '../DashboardSharedStates';
@@ -91,6 +91,14 @@ const DashboardSidebarItemsFactory = () => {
     }
   ])
 
+  let showVirtualReportInSidebar = computed(() => {
+    if (posSettings.value.generalSetting) {
+      return !!posSettings.value.generalSetting.useVirtualPrinter;
+    } else {
+      appHooks.emit('settingChange');
+    }
+  });
+
   const refactoredDashboardSidebarItems = computed(() => {
     let sidebar = _.cloneDeep(dashboardSidebarItems.value)
     if (user.value && user.value.role !== 'admin') {
@@ -106,6 +114,16 @@ const DashboardSidebarItemsFactory = () => {
       if (!user.value.viewReservation) {
         sidebar = sidebar.filter(s => s.feature !== 'reservation' || s.key !== 'Reservation')
       }
+    }
+
+    if (showVirtualReportInSidebar.value) {
+      sidebar.push({
+        icon: 'icon-printer',
+        onClick() {
+          dashboardHooks.emit('updateScreen', 'VirtualPrinter')
+        },
+        title: 'Virtual Printer'
+      })
     }
 
     return sidebar.map(item => {

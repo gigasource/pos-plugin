@@ -13,7 +13,8 @@ jest.mock('cms', () => {
 
 jest.mock('vue-i18n', () => ({
   useI18n() {
-    return {messages: {
+    return {
+      messages: {
         value: {
           'en': {
             sidebar: {},
@@ -46,7 +47,8 @@ jest.mock('vue-i18n', () => ({
         value: 'en'
       },
       t: x => x,
-    }}
+    }
+  }
 }))
 
 jest.mock("vue-router", () => {
@@ -69,8 +71,9 @@ jest.mock("vue-router", () => {
 
 jest.mock('bson', () => {
   const bson = jest.requireActual('bson')
-  const { ObjectID } = bson
+  const {ObjectID} = bson
   let current = 1997
+
   function genBuffer() {
     let hexString = current.toString(16)
     while (hexString.length < 24) {
@@ -93,3 +96,30 @@ jest.mock('bson', () => {
     ObjectID: _ObjectID
   }
 })
+
+jest.mock('initPrint', () => {
+  const fs = require('fs')
+  const {PNG} = require("pngjs")
+  let files = ['report1.png', 'report2.png'];
+  return {
+    setFiles(_files) {
+      files = _files;
+    },
+    init(__dirname, _files) {
+      let i = 0;
+      if (_files) files = _files;
+      global.printFunctions = {
+        printPng: async (png) => {
+          try {
+            const bufferInBase64 = PNG.sync.write(png);
+            fs.writeFileSync(`${__dirname}/${files[i]}`, bufferInBase64);
+            i++;
+          } catch (e) {
+            console.log('canvasprinter: printPng exception', e)
+          }
+        },
+        print: () => null
+      }
+    }
+  }
+}, {virtual: true})

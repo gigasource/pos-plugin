@@ -60,7 +60,7 @@ export const demoData = {
         {
           "_id": "5dfb217296714b382ee3ed83",
           "printerType": "ip",
-          "ip": "192.168.10.60",
+          "ip": "192.168.10.6",
           "merge": "true"
         }
       ]
@@ -106,7 +106,8 @@ export const demoData = {
           "device": "pos"
         }
       ],
-      "id": 1
+      "id": 1,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e"
     },
     {
       "category": "5df6f31ba037304c8b0df66c",
@@ -120,7 +121,8 @@ export const demoData = {
           "device": "pos"
         }
       ],
-      "id": 2
+      "id": 2,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e"
     },
     {
       "_id": "5e784d7786e3ec0997b5e341",
@@ -136,7 +138,8 @@ export const demoData = {
         }
       ],
       "id": "3",
-      "isNoPrint": true
+      "isNoPrint": true,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e"
     },
     {
       "_id": "5e784d7786e3ec0997b5e343",
@@ -155,7 +158,7 @@ export const demoData = {
       "attributes": [],
       "groupPrinter": "5e7864b186e3ec0997b5e48e",
       "tax2": 7,
-      "option": {}
+      "option": {},
     },
     {
       "_id": "5e784d7786e3ec0997b5e345",
@@ -1158,8 +1161,8 @@ export const demoData = {
           "includes": [],
           "_id": "5e81774685fb2d03dda95cd0",
           "printerType": "ip",
-          "ip": "192.168.10.60",
-          "escPOS": true,
+          "ip": "192.168.10.6",
+          "escPOS": false,
           "merge": "true"
         }
       ],
@@ -1178,9 +1181,9 @@ export const demoData = {
           "includes": [],
           "_id": "5e81631d85fb2d03dda918c1",
           "printerType": "ip",
-          "ip": "192.168.10.60",
+          "ip": "192.168.10.6",
           "merge": true,
-          "escPOS": true,
+          "escPOS": false,
           "fontSize": 1,
           "marginTop": 0
         }
@@ -1198,10 +1201,10 @@ export const demoData = {
           "includes": [],
           "_id": "5e81614c85fb2d03dda91809",
           "printerType": "ip",
-          "ip": "192.168.10.60",
+          "ip": "192.168.10.6",
           "merge": true,
           "sound": true,
-          "escPOS": true,
+          "escPOS": false,
           "fontSize": 3,
           "marginTop": 2
         }

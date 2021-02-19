@@ -2,12 +2,12 @@
 
 import {GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer} from "../../../../../backoffice/pos-vue-framework";
 import {useI18n} from "vue-i18n";
-import DashboardSidebarItemsFactory from "./DashboardSidebarItems";
 import {onBeforeMount, onBeforeUnmount, ref} from "vue";
 import {avatar, user, username} from "../../AppSharedStates";
 import {login} from "../../Login/LoginLogic";
 import {getScopeAttrs} from "../../../utils/helpers";
 import {genScopeId} from "../../utils";
+import dayjs from "dayjs";
 
 export default {
   name: 'PosDashboardSidebar',

@@ -1,31 +1,22 @@
 <script>
-import posOrderKeyboard from '../../components/posOrder/PosOrderKeyboard'
-import dialogChoosePopupModifier from '../../components/posOrder/dialogChoosePopupModifier';
-import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 import dialogProductSearchResult from '../../components/Order/components/dialogProductSearchResult';
-import {
-  computed,
-  getCurrentInstance,
-  onActivated,
-  onBeforeMount,
-  onBeforeUnmount,
-  onDeactivated,
-  withScopeId
-} from "vue";
+import {computed, onActivated, onBeforeMount, onBeforeUnmount, onDeactivated} from "vue";
 import {useRoute} from "vue-router";
 import {category, showOverlay,} from "./order-layout-setting-logic";
 import {loadKeyboardConfig} from "./order-layout-keyboard";
-import { editable, orderLayout, loadOrderLayout } from './pos-ui-shared';
+import {editable, loadOrderLayout, orderLayout} from './pos-ui-shared';
 import {payPrintMode, showIcon} from "./pos-logic-be";
 import {orderLayoutCategoriesFactory} from "./order-layout-categories";
 import {orderLayoutProductFactory} from "./order-layout-products";
 import cms from 'cms';
 import {genScopeId} from "../utils";
-import _ from 'lodash'
+import PosOrderKeyboard2 from "./Helper/PosOrderKeyboard2";
+import dialogChoosePopupModifier from "../Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier";
+import dialogTextFilter from "../pos-shared-components/dialogFilter/dialogTextFilter";
 
 export default {
   name: 'PosOrderLayout2',
-  components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, posOrderKeyboard},
+  components: {dialogChoosePopupModifier, dialogTextFilter, dialogProductSearchResult, PosOrderKeyboard2},
   props: {
     editable: {
       type: Boolean,
@@ -52,7 +43,7 @@ export default {
     }
 
     // execute created twice ???
-    onBeforeMount(async() => {
+    onBeforeMount(async () => {
       console.log('onBeforeMount')
       await created()
     })

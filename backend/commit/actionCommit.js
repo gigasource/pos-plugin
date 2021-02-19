@@ -48,7 +48,7 @@ module.exports = async function (orm, cms) {
 		// This is for client only
 		orm.on('commit:auto-assign:Action', async function (commit) {
 			if (!onlineDevice || !onlineDevice.id) {
-				console.error('No clientId found for this device')
+				console.log('No clientId found for this device')
 				return
 			}
 			if (!onlineDevice.id) {
