@@ -1,7 +1,7 @@
 
 <script>
   // TODO: Refactor using ColorSelector
-  import { activeCategory, articleSelectedColor, setSelectedArticleColor } from '../pos-article-logic';
+  import { activeCategory, articleSelectedColor, setSelectedArticleColor } from './pos-article-logic';
   import { genScopeId } from '../../utils';
   import { watch } from 'vue'
 

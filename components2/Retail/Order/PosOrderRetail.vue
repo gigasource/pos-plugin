@@ -13,16 +13,16 @@
   </div>
 </template>
 <script>
-import DialogSavedList from '../../components/Order/components/dialogSavedList';
-import DialogProductLookup from '../../components/Order/components/dialogProductLookup';
-import DialogChangeValue from '../../components/pos-shared-components/dialogChangeValue';
-import PosOrderScreenNumberKeyboard from './Order/PosOrderScreenNumberKeyboard';
-import PosOrderScreenButtonGroup from './Order/PosOrderScreenButtonGroup';
-import PosOrderScreenScrollWindow from './Order/PosOrderScreenScrollWindow';
-import PosRetailCart from './Order/PosRetailCart';
-import PosRetailCategory from './Order/PosRetailCategory';
+import DialogSavedList from '../../../components/Order/components/dialogSavedList';
+import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
+import DialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
+import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
+import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
+import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
+import PosRetailCart from './PosRetailCart';
+import PosRetailCategory from './PosRetailCategory';
 import { onBeforeMount } from 'vue'
-import { loadCategories, loadProducts } from '../Product/product-logic-be'
+import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 
 export default {
   name: 'PosOrderRetail',

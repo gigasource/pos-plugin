@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import { activeCategory, switchProductOrder } from '../pos-article-logic';
+  import { activeCategory, switchProductOrder } from './pos-article-logic';
 
   export default {
     name: 'PosFunctionSortComponent',

@@ -8,7 +8,7 @@ import {
   articleSelectedProductButton,
   getActiveProducts,
   selectArticle
-} from '../pos-article-logic';
+} from './pos-article-logic';
 import { genScopeId } from '../../utils';
 
 export default {

@@ -15,9 +15,9 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components2/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report' },
     { loader: { type: 'route' }, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
     { loader: { type: 'route' }, filePath: 'components2/Reservation/ReservationsList2.vue', name: 'Reservation', path: '/pos-reservation' },
-    { loader: { type: 'route' }, filePath: 'components2/Retail/PosOrderRetail.vue', name: 'Retail', path: '/retail--order' },
-    { loader: { type: 'route' }, filePath: 'components2/Retail/PosRetailPayment.vue', name: 'RetailPayment', path: '/retail--order-payment' },
-    { loader: { type: 'route' }, filePath: 'components2/Retail/PosArticle.vue', name: 'Article', path: '/pos-article' },
+    { loader: { type: 'route' }, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'Retail', path: '/retail--order' },
+    { loader: { type: 'route' }, filePath: 'components2/Retail/Order/Payment/PosRetailPayment.vue', name: 'RetailPayment', path: '/retail--order-payment' },
+    { loader: { type: 'route' }, filePath: 'components2/Retail/Article/PosArticle.vue', name: 'Article', path: '/retail--article' },
     { loader: { type: 'route' }, filePath: 'components2/Customer/Customer.vue', name: 'Customer', path: '/pos-customer' },
     /// old components
     // { loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },

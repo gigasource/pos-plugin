@@ -1,50 +1,23 @@
 <script>
 import { ref, withModifiers } from 'vue'
-import { renderDisplayOrderItemsTable } from '../pos-retail-shared-logic'
+import { renderDisplayOrderItemsTable } from '../../pos-retail-shared-logic'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { getCurrentOrder } from '../../OrderView/pos-logic-be'
-import { execGenScopeId, genScopeId } from '../../utils';
-import PosKeyboardFull from '../../../components/pos-shared-components/PosKeyboardFull';
-import { $filters, username } from '../../AppSharedStates';
+import { getCurrentOrder } from '../../../OrderView/pos-logic-be'
+import { execGenScopeId, genScopeId } from '../../../utils';
+import { $filters, username } from '../../../AppSharedStates';
 import dayjs from 'dayjs'
-import { paymentAmountTendered, paymentChange, paymentTotal } from './temp-logic';
+import { paymentAmountTendered, paymentChange, paymentTotal } from '../temp-logic';
+import PosRetailPaymentKeyboard from './PosRetailPaymentKeyboard';
 
 export default {
   name: 'PosRetailPayment',
-  components: { PosKeyboardFull },
+  components: { PosRetailPaymentKeyboard },
   props: {},
   setup() {
     const { t } = useI18n()
     const order = getCurrentOrder()
     const inputValue = ref(null)
-
-    const keyboardTemplate = 'grid-template-areas: " key7 key7 key8 key8 key9 key9" ' +
-        '"key4 key4 key5 key5 key6 key6" ' +
-        '"key1 key1 key2 key2 key3 key3" ' +
-        '"key0 key0 keyDot keyDot del del";' +
-        'grid-auto-columns: 1fr; grid-gap: 5px'
-    const keyboardItems = [
-      ...Object.values({
-        key7: { content: ['7'], style: 'grid-area: key7' },
-        key8: { content: ['8'], style: 'grid-area: key8' },
-        key9: { content: ['9'], style: 'grid-area: key9' },
-        key4: { content: ['4'], style: 'grid-area: key4' },
-        key5: { content: ['5'], style: 'grid-area: key5' },
-        key6: { content: ['6'], style: 'grid-area: key6' },
-        key1: { content: ['1'], style: 'grid-area: key1' },
-        key2: { content: ['2'], style: 'grid-area: key2' },
-        key3: { content: ['3'], style: 'grid-area: key3' },
-        key0: { content: ['0'], style: 'grid-area: key0' },
-        keyDot: { content: [','], style: 'grid-area: keyDot' },
-      }),
-      {
-        content: [''],
-        img: 'delivery/key_delete',
-        style: 'grid-area: del; background-color: #e0e0e0',
-        action: 'delete'
-      }
-    ]
 
     const router = useRouter()
     const back = function () {
@@ -166,7 +139,7 @@ export default {
             {renderPaymentBalance()}
             {renderPaymentMethods()}
             <g-spacer/>
-            <pos-keyboard-full template={keyboardTemplate} items={keyboardItems} v-model={inputValue.value}/>
+            <pos-retail-payment-keyboard/>
           </div>
         </div>
     ))

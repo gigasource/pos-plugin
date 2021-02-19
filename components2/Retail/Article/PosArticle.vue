@@ -1,16 +1,16 @@
 <script>
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { genScopeId } from '../utils';
+import { genScopeId } from '../../utils';
 import { articleSelectedProductButton } from './pos-article-logic'
 
-import PosFunctionSortComponent from './Article/PosFunctionSortComponent';
-import PosColorSelector from './Article/PosColorSelector';
-import PosArticleProductInfo from './Article/PosArticleProductInfo';
-import PosArticleProductCategoryMenu from './Article/PosArticleProductCategoryMenu';
-import PosArticleScrollWindow from './Article/PosArticleScrollWindow';
-import PosArticleNumpad from './Article/PosArticleNumpad';
-import PosArticleFunctionButton from './Article/PosArticleFunctionButton';
+import PosFunctionSortComponent from './PosFunctionSortComponent';
+import PosColorSelector from './PosColorSelector';
+import PosArticleProductInfo from './PosArticleProductInfo';
+import PosArticleProductCategoryMenu from './PosArticleProductCategoryMenu';
+import PosArticleScrollWindow from './PosArticleScrollWindow';
+import PosArticleNumpad from './PosArticleNumpad';
+import PosArticleFunctionButton from './PosArticleFunctionButton';
 
 export default {
   name: 'PosArticle',

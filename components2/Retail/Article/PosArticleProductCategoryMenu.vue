@@ -4,7 +4,7 @@
   import {
     activeCategory, articleSelectedProductButton, articleSelectedColor,
     getActiveProducts, updateArticleOrders
-  } from '../pos-article-logic'
+  } from './pos-article-logic'
   import {
     categories
   } from '../../Product/product-logic';

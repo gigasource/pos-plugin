@@ -1,6 +1,6 @@
 <script>
   import _ from 'lodash'
-  import { activeCategory, articleSelectedProductButton } from '../pos-article-logic';
+  import { activeCategory, articleSelectedProductButton } from './pos-article-logic';
   import { computed } from 'vue'
   import { genScopeId } from '../../utils';
   import { useI18n } from 'vue-i18n'

@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import {
   products
-} from '../Product/product-logic'
+} from '../../Product/product-logic'
 import {
   getProductGridOrder
-} from './pos-retail-shared-logic'
+} from '../pos-retail-shared-logic'
 
 export const activeCategory = ref(null)
 export const activeCategoryProducts = ref(null)
