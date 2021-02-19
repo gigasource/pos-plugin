@@ -2,7 +2,7 @@ import { ObjectID } from 'bson';
 import cms from 'cms'
 import { computed, nextTick, ref, watch } from 'vue'
 // import { CRUdFactory } from './CRUD/crud';
-import { CRUdDbFactory as CRUdFactory } from '../CRUD/crud-db';
+import { CRUdDbFactory as CRUdFactory } from '../../../utils/CRUD/crud-db';
 import _ from 'lodash'
 import { isSameId } from '../../utils';
 import { appHooks } from '../../AppSharedStates';

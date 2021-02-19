@@ -33,6 +33,7 @@
 
   export default {
     name: "dialogFormInput",
+    emits: [ 'submit'],
     props: {
       modelValue: null,
       showKeyboard: {

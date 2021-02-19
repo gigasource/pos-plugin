@@ -2,6 +2,8 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+
+    { loader: { type: 'route' }, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings' },
     { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos2-modifier' },
     { loader: { type: 'route' }, filePath: 'components2/Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier2.vue', name: 'ChooseModifier', path: '/pos2-choose-modifier' },
@@ -36,7 +38,7 @@ module.exports = {
     // { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     { loader: { type: 'route' }, filePath: 'components2/MonthReport/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
 
-    { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
+    // { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     { loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery1', path: '/pos1-order-delivery' },
     { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     { loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
