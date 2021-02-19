@@ -5,6 +5,7 @@
       <pos-order-screen-scroll-window class="por__main__window"/>
       <pos-order-screen-number-keyboard class="por__main__keyboard"/>
       <pos-order-screen-button-group class="por__main__buttons"/>
+      <dialog-retail-refund-search v-model="showRefundSearch"></dialog-retail-refund-search>
     </div>
     <pos-retail-cart class="por__detail"/>
 <!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
@@ -23,12 +24,14 @@ import PosRetailCart from './PosRetailCart';
 import PosRetailCategory from './PosRetailCategory';
 import { onBeforeMount } from 'vue'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
+import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 
 export default {
   name: 'PosOrderRetail',
   props: {},
   injectService: ['PosStore:updateNewPrice'],
   components: {
+    DialogRetailRefundSearch,
     PosOrderScreenScrollWindow,
     PosOrderScreenButtonGroup,
     PosRetailCategory,
@@ -40,6 +43,7 @@ export default {
   },
   data: function () {
     return {
+      showRefundSearch: true,
       dialogProductSearchResult: false,
       dialogChangePrice: false,
       dialogProductLookup: false,
