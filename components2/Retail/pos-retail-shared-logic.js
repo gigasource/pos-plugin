@@ -32,9 +32,8 @@ export function getProductGridOrder(product, isFavourite = false) {
 }
 
 export function renderDisplayOrderItemsTable(order, t) {
-  // TODO: Style break when order contain a lot of unique items
   return (
-      <g-simple-table striped fixed-header dense>
+      <g-table striped fixed-header dense>
         {
           execGenScopeId(() => <>
             <thead>
@@ -59,7 +58,7 @@ export function renderDisplayOrderItemsTable(order, t) {
             </tbody>
           </>)
         }
-      </g-simple-table>
+      </g-table>
   )
 }
 
