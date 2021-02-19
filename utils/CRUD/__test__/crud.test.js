@@ -1,9 +1,9 @@
 import { CRUdFactory } from '../crud';
-import { ObjectId } from 'bson';
+import { ObjectID } from 'bson';
 import { stringify } from 'schemahandler/utils';
 
-const item1 = { name: "item1", _id: new ObjectId() };
-const item2 = { name: "item2", _id: new ObjectId() };
+const item1 = { name: "item1", _id: new ObjectID() };
+const item2 = { name: "item2", _id: new ObjectID() };
 describe("test crud", () => {
   it("crud should work", () => {
     const data = {}
@@ -54,10 +54,10 @@ describe("test crud", () => {
     `);
   });
   it("it should work for document type", () => {
-    const parent1 = { name: "d1", _id: new ObjectId() };
-    const parent2 = { name: "m1", _id: new ObjectId() };
-    const child1 = { name: "c1", _id: new ObjectId() };
-    const child2 = { name: "c2", _id: new ObjectId() };
+    const parent1 = { name: "d1", _id: new ObjectID() };
+    const parent2 = { name: "m1", _id: new ObjectID() };
+    const child1 = { name: "c1", _id: new ObjectID() };
+    const child2 = { name: "c2", _id: new ObjectID() };
     const data = {}
     const {
       create: createParent,
