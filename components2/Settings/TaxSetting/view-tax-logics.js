@@ -3,8 +3,18 @@ import { computed, ref } from 'vue';
 import cms from 'cms';
 import { internalValueFactory } from '../../utils';
 
+
+import Hooks from 'schemahandler/hooks/hooks'
+
+
 export const listTaxCategories = ref([])
 export const selectedTaxCategory = ref(null)
+
+export const taxCategoryHooks = new Hooks()
+
+taxCategoryHooks.on('updateListTaxCategories', async() => {
+  listTaxCategories.value = await getListTaxCategory()
+})
 
 export function onSelectTax(tax) {
   selectedTaxCategory.value = tax;
@@ -17,6 +27,14 @@ export async function getListTaxCategory() {
 export function init() {
   getListTaxCategory().then(v => listTaxCategories.value = v)
 }
+
+export const dineInTaxCategories = computed(() => {
+  return listTaxCategories.value.filter(i => i.type.includes('dineIn'))
+})
+
+export const takeAwayTaxCategories = computed(() => {
+  return listTaxCategories.value.filter(i => i.type.includes('takeAway'))
+})
 
 export const dialogRef = ref(null)
 export const showDialogConfirmDelete = ref(false)
