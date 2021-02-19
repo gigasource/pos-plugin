@@ -9,7 +9,7 @@ export default {
   props: {
     modelValue: Boolean
   },
-  setup(props) {
+  setup(props, { emit }) {
     const searchTerms = [
       { text: 'Order No', value: 0 },
       { text: 'Item Name', value: 1 },
@@ -38,6 +38,7 @@ export default {
       //  - passing order id as route params
       //  - store order in singleton variable
       // router.push({path: `retail--order-refund/{:${order}`})
+      emit('update:modelValue', false)
       router.push({path: 'retail--order-refund'})
     }
     return genScopeId(() => <>
