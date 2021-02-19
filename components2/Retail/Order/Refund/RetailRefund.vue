@@ -5,31 +5,32 @@
       <pos-order-screen-scroll-window class="por__main__window"/>
       <pos-order-screen-number-keyboard class="por__main__keyboard"/>
       <pos-order-screen-button-group class="por__main__buttons"/>
-      <dialog-retail-refund-search v-model="showRefundSearch"></dialog-retail-refund-search>
     </div>
     <pos-retail-cart class="por__detail"/>
-<!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
-<!--    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>-->
-<!--    <dialog-product-lookup v-model="dialogProductLookup"/>-->
+    <!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
+    <!--    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>-->
+    <!--    <dialog-product-lookup v-model="dialogProductLookup"/>-->
   </div>
 </template>
 <script>
-import DialogSavedList from '../../../components/Order/components/dialogSavedList';
-import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
-import DialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
-import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
-import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
-import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
-import PosRetailCart from './PosRetailCart';
-import PosRetailCategory from './PosRetailCategory';
+// TODO: The code in this file similart too the code in ../PosOrderRetail
+// find a way to re-use
+
+import DialogSavedList from '../../../../components/Order/components/dialogSavedList';
+import DialogProductLookup from '../../../../components/Order/components/dialogProductLookup';
+import DialogChangeValue from '../../../../components/pos-shared-components/dialogChangeValue';
+import PosOrderScreenNumberKeyboard from '../PosOrderScreenNumberKeyboard';
+import PosOrderScreenButtonGroup from '../PosOrderScreenButtonGroup';
+import PosOrderScreenScrollWindow from '../PosOrderScreenScrollWindow';
+import PosRetailCart from '../PosRetailCart';
+import PosRetailCategory from '../PosRetailCategory';
 import { onBeforeMount } from 'vue'
-import { loadCategories, loadProducts } from '../../Product/product-logic-be'
-import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
+import { loadCategories, loadProducts } from '../../../Product/product-logic-be'
+import DialogRetailRefundSearch from '../Refund/dialogRetailRefundSearch';
 
 export default {
-  name: 'PosOrderRetail',
+  name: 'RetailRefund',
   props: {},
-  injectService: ['PosStore:updateNewPrice'],
   components: {
     DialogRetailRefundSearch,
     PosOrderScreenScrollWindow,
