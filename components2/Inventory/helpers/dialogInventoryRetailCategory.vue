@@ -78,7 +78,7 @@ export default {
         <div class="row-flex align-items-center" style={{ backgroundColor: state.selected ? '#1271FF' : '#FFF', borderRadius: '4px'}}>
           <div class="row-flex align-items-center mr-3" onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>
             { !node.parentCategory && <g-icon style="width: 10px" small class="mr-2">{!state.collapse ? 'fas fa-angle-right': 'fas fa-angle-up'}</g-icon> }
-            { node.parentCategory && <span style="border-bottom: 2px solid #000; width: 20px; display: inline-block; margin-right: 5px"></span> }
+            { node.parentCategory && <span style="border-bottom: 2px solid #000; width: 15px; display: inline-block; margin-right: 5px"></span> }
             <span style={{ fontWeight: node.parentCategory ? 'normal' : 'bold' }}>{node.name}</span>
           </div>
           { !node.parentCategory &&
