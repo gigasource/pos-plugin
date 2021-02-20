@@ -68,21 +68,38 @@ export default {
       state.collapse = !state.collapse
     }
 
+    function addSubCategory(node, path) {
+
+    }
+
     const genNode = function ({node, text, childrenVNodes, isLast, state, path}) {
-      return <li onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>
-        {node.name}
+      console.log('genNode', state.selected)
+      return <li>
+        <div class="row-flex align-items-center" style={{ backgroundColor: state.selected ? '#1271FF' : '#FFF', borderRadius: '4px'}}>
+          <div class="row-flex align-items-center mr-3" onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>
+            { !node.parentCategory && <g-icon style="width: 10px" small class="mr-2">{!state.collapse ? 'fas fa-angle-right': 'fas fa-angle-up'}</g-icon> }
+            { node.parentCategory && <span style="border-bottom: 2px solid #000; width: 20px; display: inline-block; margin-right: 5px"></span> }
+            <span style={{ fontWeight: node.parentCategory ? 'normal' : 'bold' }}>{node.name}</span>
+          </div>
+          { !node.parentCategory &&
+            <g-btn flat rounded elevation={0} background-color="#1271FF" style="width: 20px; min-width: 20px" x-small onClick={withModifiers(() => addSubCategory(node, path), ['stop'])}>
+              <g-icon x-small color="#FFF">add</g-icon>
+            </g-btn>
+          }
+        </div>
+
         {!state.collapse ? childrenVNodes : null}
       </li>
     }
 
     const genWrapper = function (childrenVNodes) {
-      return <ul>{childrenVNodes}</ul>
+      return <ul style="list-style-type: none; border-left: 2px solid #000; padding-left: 0; margin-left: 25px;">{childrenVNodes}</ul>
     }
 
     const genRootWrapper = function (childrenVNodes) {
       return (
           <div root>
-            <ul>{childrenVNodes}</ul>
+            <ul style="list-style-type: none; padding-left: 0;">{childrenVNodes}</ul>
           </div>
       )
     }
@@ -102,19 +119,22 @@ export default {
         {genScopeId(() => (
             <div class="dialog" onClick={() => selectedCategory.value = null}>
               <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
-                <div class="dialog-header">
-                  Manage categories
-                  <g-btn-bs icon="add" onClick={withModifiers(addCategory, ['stop'])}>{t('article.category')}</g-btn-bs>
+                <div class="row-flex justify-between align-items-center">
+                  <span style="font-size: 14px; font-weight: bold">Manage categories</span>
+                  <g-btn-bs style="font-size: 14px; margin: 0" background-color="#E1E3EB" onClick={withModifiers(addCategory, ['stop'])}>
+                    <g-icon small>add</g-icon>
+                    {t('article.category')}
+                  </g-btn-bs>
                 </div>
                 <div class="category">
                   {genTree()}
                 </div>
                 <p>* {t('inventory.onlyEmpty')}</p>
                 <div class="dialog-action">
-                  <g-btn-bs data-jest-addCategory icon="add" background-color="#1271FF" onClick={() => showKeyboard.value = true}>{t('inventory.rename')}</g-btn-bs>
-                  <g-btn-bs data-jest-complete class={['category-item__btn', selectedCategory.value && selectedCategory.value.available && 'category-item__btn--delete']}
+                  <g-btn-bs icon="edit" small background-color="#1271FF" onClick={() => showKeyboard.value = true}>{t('inventory.rename')}</g-btn-bs>
+                  <g-btn-bs small background-color="#FF4452" class={['category-item__btn', selectedCategory.value && selectedCategory.value.available && 'category-item__btn--delete']}
                     onClick={withModifiers(() => removeCategory(selectedCategory.value), ['stop'])}>
-                    <g-icon>icon-delete2</g-icon>
+                    <g-icon small>icon-delete2</g-icon>
                     {t('inventory.remove')}
                   </g-btn-bs>
                 </div>
@@ -171,7 +191,7 @@ export default {
   &-center, &-left {
     position: absolute;
     background: white;
-    padding: 8px;
+    padding: 14px;
     width: 33%;
     z-index: 2;
     display: flex;
