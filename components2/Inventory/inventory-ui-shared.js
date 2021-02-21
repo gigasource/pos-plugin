@@ -1,5 +1,5 @@
-import { ref, watch } from 'vue'
-import { filter, inventories } from './inventory-logic-ui'
+import { ref, watch, computed } from 'vue'
+import { detailInventories, filter } from './inventory-logic-ui'
 import { categories, categoriesWithParentName } from '../Product/product-logic'
 import { createInventory, deleteInventory, loadInventoryActions, updateInventory } from './inventory-logic-be';
 import dayjs from 'dayjs'
@@ -391,9 +391,9 @@ watch(() => actionFilter.value, async () => {
         }
       }
   ).filter(item => {
-    return !!inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+    return !!detailInventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
   }).map(item => ({
     ...item,
-    ...inventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
+    ...detailInventories.value.find(inventory => inventory._id.toString() === item.inventory.toString())
   }))
 }, { deep: true })
