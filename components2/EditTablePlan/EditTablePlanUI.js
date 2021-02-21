@@ -1,10 +1,11 @@
 import Hooks from 'schemahandler/hooks/hooks'
 import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import EditTablePlanSidebar from './EditTablePlanSidebar';
-import { fetchRooms } from '../TablePlan/RoomState';
+import { fetchRooms, onSelectRoom, roomsStates } from '../TablePlan/RoomState';
 import { getScopeAttrs } from '../../utils/helpers';
 import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 import GSnackbar from '../../../../backoffice/pos-vue-framework/src/components/GSnackbar/GSnackbar';
+import { genScopeId } from '../utils';
 
 const EditablePlanFactory = () => {
   const hooks = new Hooks()
@@ -12,9 +13,10 @@ const EditablePlanFactory = () => {
     name: 'EditTablePlan',
     components: [EditTablePlanSidebar, EditableRoom, dialogTextFilter, GSnackbar],
     setup() {
-      fetchRooms()
-      const sidebarRenderFn = () => <edit-table-plan-sidebar {...getScopeAttrs()} >
-      </edit-table-plan-sidebar>
+      fetchRooms().then(() => {
+        roomsStates.value.length > 0 && onSelectRoom(roomsStates.value[0])
+      })
+      const sidebarRenderFn = genScopeId(() => <edit-table-plan-sidebar/>)
       const roomRenderFn = () =>
         <EditableRoom {...getScopeAttrs()}> </EditableRoom>
 

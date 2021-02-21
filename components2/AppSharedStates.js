@@ -122,6 +122,10 @@ appHooks.on('settingChange', async function () {
   posSettings.value = await cms.getModel('PosSetting').findOne()
 })
 
+export const generalSettings = computed(() => {
+  return (posSettings.value && posSettings.value.generalSetting) || {}
+})
+
 export const groupPrinters = ref([])
 appHooks.on('updateGroupPrinters', async () => {
   groupPrinters.value = await cms.getModel('GroupPrinter').find()

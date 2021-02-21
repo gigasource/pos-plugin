@@ -221,9 +221,5 @@ export const onAddNewTable = async function() {
 }
 
 
-export const onBack = function() {
-
-}
-
 const tableNameExistedErrorMsg = ref('')
 
