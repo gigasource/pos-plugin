@@ -1,8 +1,8 @@
 import Hooks from 'schemahandler/hooks/hooks'
-import {computed, ref, watch, reactive} from 'vue';
-import {mobileCheck} from "../components/logic/commonUtils";
+import { computed, ref, watch, reactive } from 'vue';
+import { mobileCheck } from '../components/logic/commonUtils';
 import cms from 'cms';
-import {getCurrentOrder, syncOrderChange} from "./OrderView/pos-logic-be";
+import { getCurrentOrder, syncOrderChange } from './OrderView/pos-logic-be';
 import _ from 'lodash';
 
 export const appHooks = new Hooks()
@@ -38,6 +38,42 @@ run();
 export let isMobile = ref(mobileCheck());
 export const isIOS = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPod') || navigator.userAgent.includes('iPad')
 
+export const online = ref(true)
+
+export const webShopConnected = ref(true)
+appHooks.on('updateWebShopConnectionStatus', () => {
+  cms.socket.emit('socketConnected', value => {
+    webShopConnected.value = value
+  })
+})
+
+export const version = ref('0.0.0')
+appHooks.on('updateVersion', () => {
+  cms.socket.emit('get-app-version', _version => {
+    if (_version) version.value = _version
+  })
+})
+
+export const storeId = ref('')
+appHooks.on('updateStoreId', () => {
+  cms.socket.emit('getWebshopId', sId => {
+    storeId.value = sId || ''
+  })
+})
+
+export const locale = ref('en')
+appHooks.on('changeLocale', async (_locale) => {
+  await cms.getModel('SystemConfig').updateOne({ type: 'I18n' }, { 'content.locale': _locale }, { upsert: true })
+  locale.value = _locale
+})
+
+appHooks.on('fetchLocale', async() => {
+  const config = await cms.getModel('SystemConfig').findOne({ type: 'I18n'})
+  if (config) {
+    locale.value = config.content.locale
+  }
+})
+
 //fixme: remove by production
 //isMobile.value = true;
 
@@ -66,10 +102,10 @@ export function showNotify(content) {
 export const activeOrders = ref([]);
 
 appHooks.on('orderChange', async function () {
-  activeOrders.value = await cms.getModel('Order').find({status: 'inProgress'});
+  activeOrders.value = await cms.getModel('Order').find({ status: 'inProgress' });
   const order = getCurrentOrder();
-  if (order._id && _.find(activeOrders.value, {_id: order._id})) {
-    await syncOrderChange(_.find(activeOrders.value, {_id: order._id}));
+  if (order._id && _.find(activeOrders.value, { _id: order._id })) {
+    await syncOrderChange(_.find(activeOrders.value, { _id: order._id }));
   }
 })
 
@@ -79,10 +115,10 @@ cms.socket.on('update-table', () => appHooks.emit('orderChange'))
 export const posSettings = ref({})
 
 //todo: check side effect
-watch(() => posSettings, async() => {
+watch(() => posSettings, async () => {
   await cms.getModel('PosSetting').findOneAndUpdate({}, posSettings.value)
-}, { deep: true})
-appHooks.on('settingChange', async function() {
+}, { deep: true })
+appHooks.on('settingChange', async function () {
   posSettings.value = await cms.getModel('PosSetting').findOne()
 })
 
@@ -98,7 +134,7 @@ appHooks.on('updateTseConfig', async () => {
 
 export const enabledFeatures = ref([])
 appHooks.on('updateEnabledFeatures', async () => {
-  const _enabledFeatures = await cms.getModel('Feature').find({enabled: true})
+  const _enabledFeatures = await cms.getModel('Feature').find({ enabled: true })
   enabledFeatures.value = _enabledFeatures.map(feature => feature.name)
 })
 
