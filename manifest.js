@@ -16,8 +16,8 @@ module.exports = {
     { loader: { type: 'route' }, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock' },
     { loader: { type: 'route' }, filePath: 'components2/Reservation/ReservationsList2.vue', name: 'Reservation', path: '/pos-reservation' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/Order/PosOrderRetail.vue', name: 'Retail', path: '/retail--order' },
+    { loader: { type: 'route' }, filePath: 'components2/Retail/Order/PosOrderRetail', name: 'RetailRefund', path: '/retail--order-refund' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/Order/Payment/PosRetailPayment.vue', name: 'RetailPayment', path: '/retail--order-payment' },
-    { loader: { type: 'route' }, filePath: 'components2/Retail/Order/Refund/RetailRefund.vue', name: 'RetailRefund', path: '/retail--order-refund' },
     { loader: { type: 'route' }, filePath: 'components2/Retail/Article/PosArticle.vue', name: 'Article', path: '/retail--article' },
     { loader: { type: 'route' }, filePath: 'components2/Customer/Customer.vue', name: 'Customer', path: '/pos-customer' },
     /// old components

@@ -1,5 +1,11 @@
 import { ref } from 'vue';
 
+export const OrderDisplayModes = {
+  Buy: 1,
+  Refund: 2
+}
+export const orderDisplayMode = ref(OrderDisplayModes.Buy)
+
 export const showDialogSavedList = ref(false)
 export const showDialogProductSearchResult = ref(false)
 export const showDialogChangePrice = ref(false)

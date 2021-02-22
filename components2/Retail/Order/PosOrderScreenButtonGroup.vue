@@ -1,5 +1,5 @@
 <script>
-import { ref, onActivated, onBeforeMount } from 'vue'
+import { ref, onActivated } from 'vue'
 import { genScopeId } from '../../utils';
 import { appHooks, posSettings } from '../../AppSharedStates';
 import {
