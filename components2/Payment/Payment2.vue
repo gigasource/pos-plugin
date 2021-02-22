@@ -14,19 +14,6 @@ export default {
   name: 'Payment',
   components: [PosPaymentScreenKeyboard2, PosPaymentScreenPaymentMethods2, PosRestaurantPaymentOrderDetail2, PosRestaurantPaymentToolbar2, dialogChangeValue2],
   setup() {
-
-    onBeforeMount(() => {
-      //setup fake order
-      const foodTax = { taxes: [5, 10] };
-      const drinkTax = { taxes: [16, 32] };
-      const cola = {name: "Cola", price: 1.3, quantity: 1, ...drinkTax};
-      const fanta = {name: "Fanta", price: 2, quantity: 1, ...drinkTax};
-      const rice = {name: "Rice", price: 10, quantity: 1, ...foodTax};
-      const ketchup = {name: "Add Ketchup", price: 3, quantity: 1};
-      const order = getCurrentOrder()
-      addItem(order, cola, 1)
-      addItem(order, fanta, 3)
-    })
     const {t} = useI18n()
     const showDiscountMessage = ref(false)
     const discountDialog = ref(null)

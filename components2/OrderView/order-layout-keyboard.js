@@ -58,7 +58,7 @@ function openDialogEdit(position) {
 export function orderLayoutKeyboardFactory() {
   const renderKeyboard = () => (
     <>
-      {showCalculator.value && <pos-order-keyboard keyboard-config={keyboardConfig.value}
+      {showCalculator.value && <pos-order-keyboard2 keyboard-config={keyboardConfig.value}
                            mode={editable.value ? 'edit' : 'active'}
                            onEdit:keyboard={e => openDialogEdit(e)}
                            onOpenDialogSearch={() => dialog.search = true}/>}

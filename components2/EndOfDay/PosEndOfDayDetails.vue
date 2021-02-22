@@ -2,7 +2,7 @@
 import {useI18n} from 'vue-i18n';
 import {$filters} from "../AppSharedStates";
 import {reportsInSelectedDate, selectedReport, selectedReportDate} from './eod-shared';
-import {formatDatetime, genScopeId} from "../utils";
+import {formatDatetime, formatTime, genScopeId} from "../utils";
 
 export default {
   name: 'PosEndOfDayDetails',
@@ -52,7 +52,7 @@ export default {
                 <p class="eod-tab-title">
                   Z: {item.z} </p>
                 <p class="eod-tab-subtitle">
-                  {formatDatetime(item.begin)} - {formatDatetime(item.end)} </p>
+                  {formatTime(item.begin)} - {formatTime(item.end)} </p>
               </g-tab>
             </>
           }}/>
@@ -69,51 +69,51 @@ export default {
   height: 100%;
   box-shadow: -1px 0px 6px rgba(0, 0, 0, 0.25);
 
-  ::v-deep .g-tabs {
+  :deep .g-tabs {
     .g-tabs-bar {
       .g-slide-group {
         .g-slide-group__wrapper {
           .g-slide-group__content {
-            height: 85px;
+            height: 65px;
           }
         }
       }
     }
   }
 
-  .eod-tab-title {
+  :deep .eod-tab-title {
     font-style: normal;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 30px;
     color: #1D1D26;
   }
 
-  .eod-tab-subtitle {
+  :deep .eod-tab-subtitle {
     font-style: normal;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 8px;
     line-height: 15px;
     color: #9E9E9E;
   }
 
-  .g-tab:hover:before {
+  :deep .g-tab:hover:before {
     opacity: 0;
   }
 
-  .g-tab {
-    height: 85px;
+  :deep .g-tab {
+    height: 65px;
     border-right: 1px solid #E0E0E0;
     background-color: #ffffff;
   }
 
-  .g-tab:not(.g-tab__active) {
-    height: 85px;
+  :deep .g-tab:not(.g-tab__active) {
+    height: 65px;
     border-top: 4px solid transparent;
     background-color: #F2F2F2;
   }
 
-  .g-tab.g-tab__active {
+  :deep .g-tab.g-tab__active {
     border-top: 4px solid #2979FF;
   }
 

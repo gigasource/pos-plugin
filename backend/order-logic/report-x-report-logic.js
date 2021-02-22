@@ -10,7 +10,8 @@ async function xReport(from, to) {
       ...from && {$gte: from},
       ...to && {$lte: to},
     },
-    status: "paid"
+    status: {$in: ["paid", "cancelled", ]},
+    z: {$exists: false}
   };
 
   let orders = await Order.find(query);

@@ -156,13 +156,20 @@ module.exports = {
       subtotal: 'Netto',
     },
 
-    //reports
+    //<editor-fold desc="reports">
     report: {
       zNumber: 'Z-Nummer',
+      zReport: 'Z-Bericht',
       reportDate: 'Datum',
-      firstOrder: 'erster Verkauf',
-      lastOrder: 'letzter Verkauf',
+      ZNumber: 'Z-Nummer',
+      firstOrder: 'Erster Verkauf',
+      lastOrder: 'Letzter Verkauf',
+      printDate: 'Druckdatum',
       totalSales: 'Gesamtumsatz',
+      total:'Brutto',
+      subtotal: 'Netto',
+      tax: 'MwSt',
+      cancelledTotal: 'Storno Summe',
       xReport: 'X-Bericht',
       productSold: 'Artikelverkauf',
       printReport: 'Print Report',
@@ -178,10 +185,13 @@ module.exports = {
       to: 'Bis',
       //staff
       staffName: 'Mitarbeiter',
-      vouchersSold: 'Gutscheine verkauft',
-      vouchersUsed: 'Gutscheine eingelöst',
+      vouchersSold: 'Gutscheinverkauf',
+      vouchersUsed: 'Gutscheineinlösung',
       returnedTotal: 'Storno',
+      dineIn: 'Im Haus',
+      takeAway: 'Außer Haus',
     },
+    //</editor-fold>
 
     order: {
       lastPay: 'Last Pay',
@@ -320,7 +330,8 @@ module.exports = {
     dates: {
       daysOfWeek: ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'],
       timeFormat: 'HH:mm',
-      dateFormat: 'DD/MM/YYYY',
+      dateFormat: 'DD.MM.YYYY',
+      datetimeFormat: 'DD.MM.YYYY HH:mm'
     },
 
     sidebar: {
@@ -501,7 +512,6 @@ module.exports = {
       noteToCustomer: 'Hinweis für Kunden',
       reservation: 'Reservierung',
       yes: 'Ja',
-      no2: 'Nein',
       no2: 'Nein',
       note: 'Hinweis',
       save: 'Speichern',

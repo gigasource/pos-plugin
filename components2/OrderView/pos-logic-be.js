@@ -1,6 +1,6 @@
 //<editor-fold desc="declare">
 import {
-  addItem,
+  addItem, addUser,
   changeItemQuantity,
   clearNullQuantityItems,
   createOrder,
@@ -18,6 +18,7 @@ import { currentAppType } from '../AppType';
 import dayjs from "dayjs";
 import delay from "delay";
 import {socketEmit} from "../utils";
+import {username} from "../AppSharedStates";
 
 const Order = cms.getModel('Order');
 
@@ -80,7 +81,9 @@ const processItems = (order, actionList, items, itemsSnapshot, prop, _hooks) => 
           return `items.$.${k}`;
         })
         !_hooks && addItemAction(order, actionList, item, {$set: _diffItem});
-        _hooks && _hooks.emit('change-item', diffItem, item, itemSnapshot);
+        if (['quantity', 'price', 'modifiers', 'name'].find(p => diffItem.hasOwnProperty(p))) {
+          _hooks && _hooks.emit('change-item', diffItem, item, itemSnapshot);
+        }
       }
     }
   }
@@ -198,10 +201,14 @@ export function orderBeFactory(id = 0) {
     hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
 
-    _off = watch(order, async () => {
+    /*_off = watch(order, async () => {
       await hooks.emit(`post:order:update:${id}`, order, true);
       hooks.emit('nextTick');
-    }, {immediate: true, deep: true})
+    }, {immediate: true, deep: true})*/
+  }
+
+  function setNeedCreate(needCreate) {
+    _new = needCreate;
   }
 
   /**
@@ -217,7 +224,7 @@ export function orderBeFactory(id = 0) {
     const cancellationItems = getRecentCancellationItems();
 
     //change to newOrder
-    prepareOrder(newOrder, false);
+    prepareOrder(_.cloneDeep(newOrder), false);
     //apply to order
     for (const item of items) {
       if (!item.sent) {
@@ -256,7 +263,8 @@ export function orderBeFactory(id = 0) {
     order, clearOrder, beItemsSnapshot, beCancellationItemsSnapshot,
     syncOrderChange,
     getRecentItems, getRecentCancellationItems,
-    makeActionList
+    makeActionList,
+    setNeedCreate
   }
 }
 
@@ -279,7 +287,8 @@ export const {
   prepareOrder: prepareSecondOrder,
   order: order2,
   clearOrder: clearSecondOrder,
-  makeActionList: makeActionList2
+  makeActionList: makeActionList2,
+  setNeedCreate: setNeedCreate2
 } = orderBeFactory(1);
 
 let tempItemsSnapshot = [], tempCancellationItemsSnapshot = [];
@@ -299,18 +308,33 @@ export function prepareMoveItemsOrder() {
 }
 
 export async function finishSplitOrder() {
-  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[], []];
   await makeActionList();
   await makeActionList2();
+  [tempItemsSnapshot, tempCancellationItemsSnapshot] = [[], []];
 }
 
-export async function finishMoveItemsOrder(_order) {
-  const items = _.cloneDeep(order2.items);
-  prepareSecondOrder(_order);
-  for (const item of items) {
-    addItem(order2, item);
+export async function finishMoveItemsOrder() {
+  //todo: check if order is empty
+  if (order.items.length === 0) {
+    order2.cancellationItems.push(...order.cancellationItems);
   }
   await finishSplitOrder();
+}
+
+export async function assignTableToOrder2(table) {
+  //check exists
+  const _order = await Order.findOne({table, status: 'inProgress'});
+  setNeedCreate2(!_order);
+  if (_order) {
+    const items = _.cloneDeep(order2.items);
+    clearSecondOrder();
+    prepareSecondOrder(_order);
+    for (const item of items) {
+      addItem(order2, item);
+    }
+  } else {
+    order2.table = table;
+  }
 }
 
 export function cancelSplitOrder() {
@@ -329,7 +353,7 @@ export function cancelMoveItemsOrder() {
 export function moveItemToSecondOrder(query) {
   let item = typeof query === 'number' ? order.items[query] : _.find(order.items, query);
   changeItemQuantity(order, query, -1, true);
-  const existItem = _.find(order2.items, {_id: item._id});
+  const existItem = _.find(order2.items, i => i._id.toString() === item._id.toString());
   if (existItem) {
     changeItemQuantity(order2, existItem, 1);
   } else {
@@ -391,6 +415,7 @@ export const payBtnClickable = computed(() => {
 })
 
 export const payPrintMode = computed(() => {
+  if (!order.table) return 'pay';
   if (order.items.find(i => !i.sent)) return "print"
   if (order.items.length === 0) return "print"
   return hasOrderChange.value ? 'print' : 'pay';
@@ -466,8 +491,7 @@ hooks.on('togglePayPrintBtn:step2', async (cb) => {
 })
 
 export const disablePay = computed(() => {
-  if (!order.table) return false
-  if (!order.items.some(i => i.quantity)) return true
+  if (!order.table) return false;
   if (onlyCheckoutPrintedItems.value) {
     return hasOrderChange.value;
   }
@@ -478,7 +502,7 @@ hooks.on('printOrder', async () => {
   order.date = new Date();
   clearNullQuantityItems(order);
   mergeSameItems(order);
-  await new Promise(r => hooks.once('nextTick', r));
+  await makeActionList();
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   makeSent(actionList.value);
   createPrintAction(actionList.value, 'kitchen', {order, device: 'Terminal 1', recent})
@@ -494,10 +518,6 @@ async function genMaxId(order) {
 
 async function genBookingNumber(order) {
   order.bookingNumber = dayjs(order.date).format('YYMMDDHHmmssSSS');
-}
-
-async function getAllSplitOrder(splitId) {
-  return await Order.find({splitId});
 }
 
 function makeSent(actionList) {
@@ -531,7 +551,10 @@ hooks.on('pay', async (printInvoice = false) => {
   order.date = new Date();
   clearNullQuantityItems(order);
   mergeSameItems(order);
-  await new Promise(r => hooks.once('nextTick', r));
+  await genMaxId(order);
+  await genBookingNumber(order);
+  addUser(order, username.value, order.date);
+  await makeActionList();
 
   const recent = {items: getRecentItems(), cancellationItems: getRecentCancellationItems()}
   if (printInvoice) {
@@ -543,11 +566,27 @@ hooks.on('pay', async (printInvoice = false) => {
     order.immediatePay = true;
   }
 
-  await genMaxId(order);
-  await genBookingNumber(order);
+  console.log(_.cloneDeep(actionList.value));
 
-  cms.socket.emit('pay-order', _.cloneDeep(actionList.value), order);
+  cms.socket.emit('pay-order', _.cloneDeep(actionList.value), order, recent);
   clearOrder();
+})
+
+hooks.on('move-items', async () => {
+  const empty = order.items.length === 0;
+  order2.date = new Date();
+  mergeSameItems(order2);
+  await finishMoveItemsOrder();
+  if (empty) {
+    actionList.value.push({
+      modelName: 'Order',
+      action: Order.remove({_id: order._id}).chain
+    })
+  }
+  const _actionList = [..._.cloneDeep(actionList.value), ..._.cloneDeep(actionList2.value)];
+  await socketEmit('action-list', _actionList);
+  clearSecondOrder();
+  if (empty) clearOrder();
 })
 
 hooks.on('pay-split', async (printInvoice) => {

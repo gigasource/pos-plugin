@@ -56,7 +56,7 @@ let vTaxSumReducer = {
 let quantityReducer = {
   label: "quantity",
   fn: q => q + 1
-};
+}
 
 module.exports = {
   fromReducer,

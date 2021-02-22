@@ -1,36 +1,37 @@
 <script>
-import {
-  view,
-  selectedProductLayout,
-  selectedProduct,
-  ProductEditModes,
-  updateProductEditMode,
-} from '../../OrderView/pos-ui-shared';
+import {selectedProduct, selectedProductLayout,} from '../../OrderView/pos-ui-shared';
 
 import {
+  addPopupModifierGroup,
+  allowSelectPrinter2,
+  changeType,
+  clearPopupModifierGroup,
+  debouncedUpdateProduct,
+  debounceUpdateTextLayout,
+  dineInTaxes,
+  isPrinter2Select,
   isProductLayout,
-  /*type*/
-  changeType, types, type, layoutType,
-  /*taxes*/
-  dineInTaxes, takeAwayTaxes, showDineInTax, loadTaxes,
-  /*printer*/
-  printers, isPrinter2Select, showAddPrinter2, loadPrinters, selectPrinter, setAsNoPrint, allowSelectPrinter2,
-  /*category*/
-  categories, loadCategories, changeCategory,
-  /*modifier*/
-  popupModifierGroups, loadPopupModifierGroups, changePopupModifierGroup, addPopupModifierGroup, clearPopupModifierGroup,
-  /*product layout*/ createNewProductLayout, updateProductLayout, debounceUpdateTextLayout,
-  /*product*/
-  updateProduct, debouncedUpdateProduct,
-  /*action*/
-  canDelete, canSwitch, canCopy, deleteProductLayout, setAction
+  layoutType,
+  loadCategories,
+  loadPrinters,
+  loadTaxes,
+  printers,
+  selectPrinter,
+  setAsNoPrint,
+  showAddPrinter2,
+  takeAwayTaxes,
+  type,
+  types,
+  updateProduct,
+  updateProductLayout
 } from './ProductEditorLogic'
-
-import constants from '../EditMenuCardToolbar/constants';
-import { useI18n }  from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { computed, onActivated, reactive, watch, ref } from 'vue';
-import { genScopeId } from '../../utils';
+import {useI18n} from 'vue-i18n'
+import {useRouter} from 'vue-router'
+import {computed, onActivated, reactive, watch} from 'vue';
+import {genScopeId} from '../../utils';
+import dialogEditPopupModifiers2 from "../../Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2";
+import {appHooks} from "../../AppSharedStates";
+import {modifierGroups} from "../../Modifiers/dialogEditPopupModifier/modifier-ui-logics";
 
 
 const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'.split(',')
@@ -38,9 +39,9 @@ const colors = '#FFFFFF,#CE93D8,#B2EBF2,#C8E6C9,#DCE775,#FFF59D,#FFCC80,#FFAB91'
 export default {
   name: 'ProductEditor2.vue',
   props: {},
-  components: {}, // TODO: update component
+  components: {dialogEditPopupModifiers2}, // TODO: update component
   setup() {
-    const { t } = useI18n()
+    const {t} = useI18n()
     const router = useRouter()
 
     const dialog = reactive({
@@ -56,9 +57,9 @@ export default {
     }
 
     watch(() => dialog.popupModifiers, async (val) => {
-      await loadPopupModifierGroups()
+      appHooks.emit('updateModifiers');
+      //await loadPopupModifierGroups()
     })
-
 
 
     // styles
@@ -103,7 +104,8 @@ export default {
             modelValue={selectedProductLayout.value.text}
             onUpdate:modelValue={e => debounceUpdateTextLayout('text', e)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => dialog.showTextKbd = true}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer"
+                                            onClick={() => dialog.showTextKbd = true}>icon-keyboard</g-icon>
             }}/>
       </>
     }
@@ -115,7 +117,8 @@ export default {
             model-value={selectedProduct.value.id}
             onUpdate:modelValue={e => debouncedUpdateProduct('id', e)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('id')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer"
+                                            onClick={() => openDialogInfo('id')}>icon-keyboard</g-icon>
             }}/>
 
         <div>{t('article.name')}<span style="color: #FF4452">*</span></div>
@@ -123,7 +126,8 @@ export default {
             model-value={selectedProduct.value.name}
             onUpdate:modelValue={e => debouncedUpdateProduct('name', e)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('name')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer"
+                                            onClick={() => openDialogInfo('name')}>icon-keyboard</g-icon>
             }}/>
 
         <div>{t('article.price')} <span style="color: #FF4452">*</span></div>
@@ -131,12 +135,13 @@ export default {
             model-value={selectedProduct.value.price}
             onUpdate:modelValue={e => debouncedUpdateProduct('price', e)}
             v-slots={{
-              'append-inner': () => <g-icon style="cursor: pointer" onClick={() => openDialogInfo('price')}>icon-keyboard</g-icon>
+              'append-inner': () => <g-icon style="cursor: pointer"
+                                            onClick={() => openDialogInfo('price')}>icon-keyboard</g-icon>
             }}/>
 
         <g-switch
             model-value={selectedProduct.value.isModifier}
-            onUpdate:modelValue={e => updateProduct({ isModifier: e })}/>
+            onUpdate:modelValue={e => updateProduct({isModifier: e})}/>
         <div style="font-size: 13px">{t('article.isModifier')}</div>
       </>
     }
@@ -147,11 +152,14 @@ export default {
             <div>
               <div class="product-editor__prop">
                 <span class="product-editor__label">{t('restaurant.product.printer')}</span>
-                {showAddPrinter2.value && <span class="prop-option--printer" onClick={() => allowSelectPrinter2()}>+2. {t('restaurant.product.printer')}</span> }
+                {showAddPrinter2.value && <span class="prop-option--printer"
+                                                onClick={() => allowSelectPrinter2()}>+2. {t('restaurant.product.printer')}</span>}
               </div>
               <div>
-                { printers.value.map((item, index) => <span key={index} class={getPrinterClass(item._id)} onClick={() => selectPrinter(item._id)}>{item.name}</span>) }
-                { !isPrinter2Select.value && <span class={noPrintClasses.value} onClick={setAsNoPrint}>{t('restaurant.product.noPrinter')}</span> }
+                {printers.value.map((item, index) => <span key={index} class={getPrinterClass(item._id)}
+                                                           onClick={() => selectPrinter(item._id)}>{item.name}</span>)}
+                {!isPrinter2Select.value &&
+                <span class={noPrintClasses.value} onClick={setAsNoPrint}>{t('restaurant.product.noPrinter')}</span>}
               </div>
             </div>
         )
@@ -160,22 +168,22 @@ export default {
 
     function renderTax() {
       const dineInTaxSlots = {
-        default: ({ toggleSelect, item, index }) => {
+        default: ({toggleSelect, item, index}) => {
           return genScopeId(() =>
               <div class="prop-option"
                    onClick={e => {
                      toggleSelect(item);
-                     updateProduct({ tax: item.value, taxCategory: item._id })
+                     updateProduct({tax: item.value, taxCategory: item._id})
                    }}>
                 {item.text} ({item.value}%)
               </div>)()
         },
-        selected: ({ toggleSelect, item, index }) => {
+        selected: ({toggleSelect, item, index}) => {
           return genScopeId(() =>
               <div class="prop-option prop-option--1"
                    onClick={e => {
                      toggleSelect(item);
-                     updateProduct({ tax: item.value, taxCategory: item._id })
+                     updateProduct({tax: item.value, taxCategory: item._id})
                    }}>{item.text} ({item.value}%)
               </div>)()
         }
@@ -186,7 +194,7 @@ export default {
           return genScopeId(() =>
               <div class="prop-option" onClick={e => {
                 toggleSelect(item);
-                updateProduct({ tax2: item.value, taxCategory2: item._id })
+                updateProduct({tax2: item.value, taxCategory2: item._id})
               }}>
                 {item.text} ({item.value}%)
               </div>)()
@@ -196,7 +204,7 @@ export default {
               <div class="prop-option prop-option--1"
                    onClick={e => {
                      toggleSelect(item);
-                     updateProduct({ tax2: item.value, taxCategory2: item._id })
+                     updateProduct({tax2: item.value, taxCategory2: item._id})
                    }}>
                 {item.text} ({item.value}%)
               </div>)()
@@ -204,29 +212,29 @@ export default {
       }
 
       return (
-        <div class="row-flex mt-2 product-editor__tax">
-          <div class="col-6">
-            <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
-            <g-grid-select
-                mandatory
-                v-model={selectedProduct.value.taxCategory}
-                item-value="_id"
-                items={dineInTaxes.value}
-                itemCols="auto"
-                v-slots={dineInTaxSlots}/>
-          </div>
+          <div class="row-flex mt-2 product-editor__tax">
+            <div class="col-6">
+              <div class="product-editor__label">{t('restaurant.product.dineInTax')}</div>
+              <g-grid-select
+                  mandatory
+                  v-model={selectedProduct.value.taxCategory}
+                  item-value="_id"
+                  items={dineInTaxes.value}
+                  itemCols="auto"
+                  v-slots={dineInTaxSlots}/>
+            </div>
 
-          <div class="col-6">
-            <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
-            <g-grid-select
-                mandatory
-                v-model={selectedProduct.value.taxCategory2}
-                item-value="_id"
-                items={takeAwayTaxes.value}
-                itemCols="auto"
-                v-slots={takeAwayTaxSlots}/>
+            <div class="col-6">
+              <div class="product-editor__label">{t('restaurant.product.takeAwayTax')}</div>
+              <g-grid-select
+                  mandatory
+                  v-model={selectedProduct.value.taxCategory2}
+                  item-value="_id"
+                  items={takeAwayTaxes.value}
+                  itemCols="auto"
+                  v-slots={takeAwayTaxSlots}/>
+            </div>
           </div>
-        </div>
       )
     }
 
@@ -237,7 +245,7 @@ export default {
               model-value={selectedProductLayout.value.color}
               colors={colors}
               item-size="25"
-              onUpdate:modelValue={e => updateProductLayout({ color: e })}/>
+              onUpdate:modelValue={e => updateProductLayout({color: e})}/>
         </div>
     )
 
@@ -252,7 +260,7 @@ export default {
                 v-model={selectedProduct.value.activePopupModifierGroup}
                 item-text="name"
                 item-value="_id"
-                items={popupModifierGroups.value}
+                items={modifierGroups.value.groups}
                 itemCols="auto" v-slots={{
               default: ({ toggleSelect, item, index }) =>
                   <div class="prop-option" key={`${index}-default`} onClick={() => addPopupModifierGroup(toggleSelect, item)}>{item.name}</div>,
@@ -273,13 +281,13 @@ export default {
 
     const renderTextFilter = () => (
         <dialog-text-filter
-          label="Text"
-          default-value={selectedProductLayout.value.text}
-          v-model={dialog.showTextKbd}
-          onSubmit={e => updateProductLayout({ text: e, type: 'Text' }, e)}/>
+            label="Text"
+            default-value={selectedProductLayout.value.text}
+            v-model={dialog.showTextKbd}
+            onSubmit={e => updateProductLayout({text: e, type: 'Text'}, e)}/>
     )
 
-    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers
+    const renderPopupModifierDialog = () => <dialog-edit-popup-modifiers2
         v-model={dialog.popupModifiers}
         product={selectedProduct.value}/>
 
@@ -294,36 +302,38 @@ export default {
 
     setLayoutTypeByRouteQuery()
     onActivated(() => setLayoutTypeByRouteQuery())
+
     async function _created() {
       await loadPrinters()
       await loadCategories()
       await loadTaxes()
-      await loadPopupModifierGroups()
+      await appHooks.emit('updateModifiers');
+      //await loadPopupModifierGroups()
     }
 
     _created()
 
     return genScopeId(() => {
       return <div class="product-editor">
-        { isProductLayout.value ? <>
-            <div class="product-editor__prop-grid">
-              {renderLayoutType()}
-              {renderProductLayout()}
-            </div>
-            {renderPrinterSetting()}
-            {renderTax()}
-            {renderColor()}
-            {renderPopupModifier()}
-            {renderDialogProductInfo()}
-            {renderTextFilter()}
-            {renderPopupModifierDialog()}
-          </> : <>
-            <div class="product-editor__prop-grid">
-              {renderLayoutType()}
-              {renderTextLayout()}
-            </div>
-            {renderPopupModifier()}
-          </>
+        {isProductLayout.value ? <>
+          <div class="product-editor__prop-grid">
+            {renderLayoutType()}
+            {renderProductLayout()}
+          </div>
+          {renderPrinterSetting()}
+          {renderTax()}
+          {renderColor()}
+          {renderPopupModifier()}
+          {renderDialogProductInfo()}
+          {renderTextFilter()}
+          {renderPopupModifierDialog()}
+        </> : <>
+          <div class="product-editor__prop-grid">
+            {renderLayoutType()}
+            {renderTextLayout()}
+          </div>
+          {renderPopupModifier()}
+        </>
         }
       </div>
     })
@@ -378,7 +388,7 @@ export default {
   }
 }
 
-.prop-option {
+:deep .prop-option {
   display: inline-block;
   padding: 0 6px;
   margin-right: 4px;

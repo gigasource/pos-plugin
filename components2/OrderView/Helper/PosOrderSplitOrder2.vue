@@ -226,7 +226,6 @@ export default {
                                 onSubmit={saveMultiPayment}/>
 
           <pos-order-receipt2 v-model={showReceiptDialog.value}
-                              order={order2}
                               split
                               splitOrders={splitOrders.value}
                               onUpdatePayment={updateSplitPayment}

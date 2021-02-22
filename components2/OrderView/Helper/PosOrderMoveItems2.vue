@@ -1,6 +1,7 @@
 <script>
 import {genScopeId, internalValueFactory} from "../../utils";
 import {
+  assignTableToOrder2,
   cancelMoveItemsOrder,
   currentTable,
   getCurrentOrder,
@@ -15,6 +16,7 @@ import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {ref, watch} from 'vue';
 import ChooseTableDialog2 from "./ChooseTableDialog2";
+import {hooks} from "../pos-logic";
 
 //finish
 export default {
@@ -48,15 +50,11 @@ export default {
 
     const router = useRouter();
 
-    function submitTable(val) {
-      if (val) {
-        //fixme:
-        emit('moveItems', val, itemsToMove.value, remainingItems.value, () => {
-          // cleanup
-          router.go(-1)
-          showChooseTableDialog.value = false
-          internalValue.value = false
-        })
+    async function submitTable(table) {
+      if (table) {
+        await assignTableToOrder2(table);
+        await hooks.emit('move-items');
+        internalValue.value = false
       }
     }
 
@@ -123,8 +121,8 @@ export default {
     return () =>
         <div>
           <choose-table-dialog2 table={currentTable.value} active-orders={activeOrders.value}
-                               v-model={showChooseTableDialog.value}
-                               onSubmit={submitTable}/>
+                                v-model={showChooseTableDialog.value}
+                                onSubmit={submitTable}/>
           <g-dialog v-model={internalValue.value} transition={false} content-class="move-items-dialog">
             {contentRender()}
           </g-dialog>

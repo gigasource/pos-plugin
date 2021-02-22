@@ -45,7 +45,9 @@
           </div>
         </td>
       </tr>
-      <tr v-for="(order, i) in orderHistoryOrders" :key="i" :class="[order._id === orderHistoryCurrentOrder._id && 'tr__active']" @click="chooseOrder(order)">
+      <tr v-for="(order, i) in orderHistoryOrders" :key="i"
+          :class="[order._id === orderHistoryCurrentOrder._id && 'tr__active',
+          order.status === 'cancelled' && 'cancelled']" @click="chooseOrder(order)">
         <td>
           <div class="ta-center" style="white-space: nowrap; position: relative">
             {{order.id}}
@@ -67,7 +69,7 @@
           <span> {{order.type || 'Dine-in'}}</span>
         </td>
         <td class="ta-left">{{order.table || ''}}</td>
-        <td class="ta-right" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
+        <td class="ta-right sum" style="white-space: nowrap">€ {{order.amount.toFixed(2)}}</td>
         <td class="ta-center">
           <template v-if="getOrderPayment(order).icon">
             <g-icon v-if="getOrderPayment(order).multi" size="24" class="mr-2">{{getOrderPayment(order).icon}}</g-icon>
@@ -266,6 +268,14 @@
       background-color: white;
       font-weight: 700;
       white-space: nowrap;
+    }
+
+
+    .cancelled {
+      color: #555;
+      .sum {
+        text-decoration: line-through;
+      }
     }
 
     tr td {

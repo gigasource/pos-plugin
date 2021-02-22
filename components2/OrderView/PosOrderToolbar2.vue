@@ -1,7 +1,7 @@
 <script>
-import {disablePay, disablePrint, getCurrentOrder, onlyCheckoutPrintedItems} from "./pos-logic-be";
+import {clearOrder, disablePay, disablePrint, getCurrentOrder, onlyCheckoutPrintedItems} from "./pos-logic-be";
 import {useI18n} from "vue-i18n";
-import {hooks, makeTakeaway} from "./pos-logic";
+import {addPayment, clearPayment, getRestTotal, hooks, makeTakeaway} from "./pos-logic";
 import {computed, onActivated, ref, withModifiers} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {orderViewDialog} from "./pos-ui-shared";
@@ -12,7 +12,7 @@ export default {
   setup(props, {emit}) {
     const order = getCurrentOrder();
     const showMenu = ref(false);
-    const {t: $t, locale} = useI18n();
+    const {t} = useI18n();
 
     const disableMoveItemsBtn = computed(() => {
       return !order.items.length
@@ -22,11 +22,13 @@ export default {
 
     function back() {
       //fixme
-      hooks.emit('resetOrderData');
+      clearOrder();
       router.push({path: '/pos-dashboard'})
     }
 
     function pay() {
+      clearPayment(order);
+      addPayment(order, {type: 'cash', value: getRestTotal(order)})
       router.push({path: '/pos-payment'})
     }
 
@@ -40,7 +42,7 @@ export default {
     }
 
     function print() {
-      emit('saveTableOrder')
+      hooks.emit('printOrder');
     }
 
     function moveItems() {
@@ -52,7 +54,7 @@ export default {
     }
 
     function toggleTakeAwayOrder() {
-      makeTakeaway(order,!(!!order.takeAway));
+      makeTakeaway(order, !(!!order.takeAway));
     }
 
     onActivated(async () => {
@@ -66,16 +68,16 @@ export default {
 
     return genScopeId(() => (
         <g-toolbar elevation="0" color="#eee">
-          <g-btn-bs icon="icon-back" onClick={back}>{$t('ui.back')}</g-btn-bs>
+          <g-btn-bs icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
           <g-menu top nudge-top="5" v-model={showMenu.value} v-slots={{
             activator: ({toggleContent}) => (
-                <g-btn-bs icon="icon-menu" onClick={toggleContent}>{$t('ui.more')}</g-btn-bs>
+                <g-btn-bs icon="icon-menu" onClick={toggleContent}>{t('ui.more')}</g-btn-bs>
             ),
             default: () => (
                 <div class="col-flex bg-white">
                   <g-btn-bs icon="icon-move-items" onClick={withModifiers(moveItems, ['stop'])}
-                            disabled={disableMoveItemsBtn}>{$t('order.moveItem')}</g-btn-bs>
-                  <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{$t('order.voucher')}</g-btn-bs>
+                            disabled={disableMoveItemsBtn}>{t('order.moveItem')}</g-btn-bs>
+                  <g-btn-bs icon="icon-voucher" onClick={showVoucherDialog}>{t('order.voucher')}</g-btn-bs>
                 </div>
             )
           }}/>
@@ -86,27 +88,27 @@ export default {
           {order.table && <g-btn-bs background-color="#1271ff" text-color="#fff"
                                     disabled={disablePrint.value} icon="icon-print"
                                     onClick={print}>
-            {$t('ui.print')}
+            {t('ui.print')}
           </g-btn-bs>}
 
-          {order.table ? <g-btn-bs disabled={!disablePay.value} icon="icon-split_check_2"
-                                   onClick={splitOrder}>
-                {$t('order.splitOrder')}
+          {order.table ?
+              <g-btn-bs disabled={disablePay.value} icon="icon-split_check_2" onClick={splitOrder}>
+                {t('order.splitOrder')}
               </g-btn-bs> :
               <>
                 <g-btn-bs class="col-2" background-color="#4CAF50" disabled={!disablePay.value}
                           onClick={() => quickCash(false)}>
-                  {$t('restaurant.cashAndDineIn')}
+                  {t('restaurant.cashAndDineIn')}
                 </g-btn-bs>
                 <g-btn-bs class="col-2" background-color="#4CAF50" disabled={!disablePay.value}
                           onClick={() => quickCash(true)}>
-                  {$t('restaurant.cashAndTakeAway')}
+                  {t('restaurant.cashAndTakeAway')}
                 </g-btn-bs>
               </>
           }
 
           <g-btn-bs class="col-2" icon="icon-pay" disabled={disablePay.value} onClick={pay}>
-            {$t('fnBtn.paymentFunctions.pay')}
+            {t('fnBtn.paymentFunctions.pay')}
           </g-btn-bs>
         </g-toolbar>
     ))

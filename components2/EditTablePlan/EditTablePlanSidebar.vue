@@ -78,7 +78,7 @@ export default {
     const objectToolbarRenderFn = () => isSelectingARoomObject.value &&
         <div class='card-info'>
           {isTable(selectingObject.value) ? <>
-                <g-text-fiedld-bs
+                <g-text-field-bs
                     label="Table name: "
                     modelValue={selectingObject.value.name}
                     onUpdate:modelValue={updateTableName}

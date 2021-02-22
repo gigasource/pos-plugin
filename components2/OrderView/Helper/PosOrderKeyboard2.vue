@@ -1,10 +1,16 @@
 <script>
-import { computed, nextTick } from 'vue';
-import { actionMap, defaultKeyboard } from './PosOrderKeyboardShared';
+import {computed, nextTick, ref} from 'vue';
+import {actionMap, defaultKeyboard} from './PosOrderKeyboardShared';
+import {genScopeId} from "../../utils";
+import {addProduct, getCurrentOrder} from "../pos-logic-be";
+import {addModifier} from "../pos-logic";
 
 export default {
-  setup(props, { emit }) {
-    const { keyboardConfig, mode } = props
+  props: ['keyboardConfig', 'mode'],
+  emits: ['edit:keyboard'],
+  setup(props, {emit}) {
+    const {keyboardConfig, mode} = props
+    const order = getCurrentOrder();
     const productIdQuery = ref(null)
     const productIdQueryResults = ref(null)
     const mainKeyboard = computed(() => {
@@ -28,13 +34,13 @@ export default {
         for (let j = 0; j < rows.length; j++) {
           if (rows[j].trim() === '') {
             if (mode === 'edit') {
-              keys.push({ top: i + 1, left: j + 1, bottom: i + 2, right: j + 2, type: 'edit' })
+              keys.push({top: i + 1, left: j + 1, bottom: i + 2, right: j + 2, type: 'edit'})
             }
             continue
           }
           const existKey = keys.find(key => key.value === rows[j])
           if (existKey && j + 1 < existKey.right && j + 1 >= existKey.left && i + 1 < existKey.bottom && i + 1 >= existKey.top) continue
-          const key = { top: i + 1, left: j + 1, bottom: i + 2, right: j + 2, value: rows[j] }
+          const key = {top: i + 1, left: j + 1, bottom: i + 2, right: j + 2, value: rows[j]}
           let k = j + 1
           //check duplicate in horizontal
           while (k < rows.length) {
@@ -75,7 +81,7 @@ export default {
           keys.push(key)
         }
       }
-      return { items: keys, rows: keyboardConfig.layout.length, columns: maxColumns }
+      return {items: keys, rows: keyboardConfig.layout.length, columns: maxColumns}
     })
     const keyboardStyles = computed(() => {
       let styles = {}
@@ -85,11 +91,10 @@ export default {
       styles['grid-gap'] = `5px`
       return styles
     })
-    const screenStyles = computed(() => {
-      return {
-        'grid-area': `1/1/2/${mainKeyboard.value.columns + leftsideItems.value.columns + 1}`
-      }
-    })
+    const screenStyles = computed(() => ({
+      'grid-area': `1/1/2/${mainKeyboard.value.columns + leftsideItems.value.columns + 1}`
+    }))
+
     const keyboardTemplate = computed(() => {
       let template = ''
       template += `grid-area: 2/1/${Math.max(mainKeyboard.value.rows, leftsideItems.value.rows) + 2}/${mainKeyboard.value.columns + leftsideItems.value.columns + 1};`
@@ -103,17 +108,17 @@ export default {
         let key = {}
         let content = []
         if (item.value && typeof item.value === 'string') content.push(item.value)
-        Object.assign(key, { content })
+        Object.assign(key, {content})
         if (item.type === 'text') {
-          Object.assign(key, { action: actionMap.insert })
+          Object.assign(key, {action: actionMap.insert})
         } else {
-          Object.assign(key, { type: item.type, action: actionMap[item.type] })
-          if (!item.value) Object.assign(key, { img: `delivery/key_${item.type}` })
+          Object.assign(key, {type: item.type, action: actionMap[item.type]})
+          if (!item.value) Object.assign(key, {img: `delivery/key_${item.type}`})
         }
         let left = item.left + leftsideItems.value.columns,
             right = item.right + leftsideItems.value.columns,
             style = `grid-area: ${item.top}/${left}/${item.bottom}/${right}`
-        Object.assign(key, { style })
+        Object.assign(key, {style})
         return key
       })
       const extraItems = leftsideItems.value.items.map(item => ({
@@ -122,25 +127,34 @@ export default {
         style: `grid-area: ${item.top}/${item.left}/${item.bottom}/${item.right}`,
         ...item.type === 'edit' && {
           type: 'edit',
-          position: { top: item.top, left: item.left },
+          position: {top: item.top, left: item.left},
           img: !item.value && 'order/add'
         },
       }))
       return [...mainItems, ...extraItems]
     })
 
-    const queryProductsById = function () {
-      console.error('queryProductsById not impl')
+    async function queryProductsById() {
+      let quantity;
+      if (productIdQuery.value.includes('x')) {
+        const queryStrArr = productIdQuery.value.split(' ')
+        quantity = parseInt(queryStrArr[2]);
+        productIdQuery.value = queryStrArr[0]
+      }
+      const results = cms.getList('Product').filter(item => item.id === productIdQuery.value)
+      if (results) {
+        productIdQueryResults.value = results.map(product => ({
+          ...product,
+          originalPrice: product.price,
+          ...quantity && { quantity }
+        }))
+      }
     }
-    const addProductToOrder = function () {
-      console.error('addProductToOrder not impl')
-    }
-    const addModifierToProduct = function () {
-      console.error('addModifierToProduct not impl')
-    }
+
     const clearScreen = function () {
       productIdQuery.value = ''
     }
+
     const openDialogProductSearchResults = async function () {
       if (mode !== 'active') {
         return
@@ -153,16 +167,16 @@ export default {
             if (onlyResult.isModifier) {
               onlyResult.product = onlyResult._id.toString()
               onlyResult.quantity = onlyResult.quantity || 1
-              addModifierToProduct(onlyResult)
+              addModifier(order, onlyResult);
             } else {
-              addProductToOrder(onlyResult)
+              addProduct(order, onlyResult);
             }
             productIdQuery.value = ''
             return
           }
         }
         await nextTick(() => {
-          emit('openDialogSearch')
+          emit('openDialogSearch', productIdQuery.value);
         })
       }
     }
@@ -170,14 +184,14 @@ export default {
     const edit = function (position) {
       emit('edit:keyboard', position)
     }
-    return () =>
-        <div class="pos-keyboard" style={keyboardStyles.value}>
-          <div class="pos-keyboard-screen" style={screenStyles.value}>
-            <input class="pos-keyboard-screen__input" v-model={productIdQuery.value}/>
-            <g-icon v-if={productIdQuery.value} size="20" onClick={clearScreen}>icon-cancel</g-icon>
-          </div>
-          <g-keyboard template={keyboardTemplate} items={keyboardItems.value} v-model={productIdQuery.value} onSubmit={openDialogProductSearchResults} onEdit={e => edit(e)}/>
-        </div>
+    return genScopeId(() => <div class="pos-keyboard" style={keyboardStyles.value}>
+      <div class="pos-keyboard-screen" style={screenStyles.value}>
+        <input class="pos-keyboard-screen__input" v-model={productIdQuery.value}/>
+        {productIdQuery.value && <g-icon size="20" onClick={clearScreen}>icon-cancel</g-icon>}
+      </div>
+      <g-keyboard template={keyboardTemplate.value} items={keyboardItems.value} v-model={productIdQuery.value}
+                  onSubmit={openDialogProductSearchResults} onEdit={e => edit(e)}/>
+    </div>)
   }
 }
 </script>
@@ -211,7 +225,7 @@ export default {
     }
   }
 
-  ::v-deep .key {
+  :deep .key {
     border: 1px solid #979797;
 
     .waves-ripple {

@@ -4,11 +4,13 @@ import {createRoom} from './RoomLogics';
 import cms from 'cms';
 
 export const roomsStates = ref([]);
+export const rooms = ref([]);
 
 let Room = cms.getModel('Room');
 
 export const fetchRooms = async function () {
   let _rooms = await Room.find({})
+  rooms.value = _rooms;
   _rooms = _.sortBy(_rooms.map(r => createRoom(r)), r => r.room.order)
   roomsStates.value = _rooms;
 }

@@ -1,9 +1,11 @@
 <script>
-import { ref, computed, withModifiers } from 'vue'
-import { genScopeId } from '../utils';
+import {ref, computed, withModifiers, watch, onMounted, nextTick, onUnmounted} from 'vue'
+import {genScopeId} from '../utils';
 import _ from 'lodash'
+import {ResizeObserver as ResizeObserverPolyfill} from '@juggle/resize-observer';
+
 export default {
-  name: 'ScrollSelect2',
+  name: 'ScrollSelect',
   props: {
     height: {
       type: Number,
@@ -15,18 +17,21 @@ export default {
     },
     modelValue: null,
     items: {
-      type: Array,
       default: () => ['item0', 'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9']
     },
     selectedColor: {
       type: String,
       default: '#00e5ff'
-    }
+    },
+    key: String
   },
-  setup(props, { emit }) {
+  setup(props, {emit, attrs}) {
+    const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill;
+    const resizeObserver = new ResizeObserver(scrollToValue);
+
     const container = ref(null)
     const computedList = computed(() => {
-      return ['', '',...props.items,'', '']
+      return ['', '', ...props.items, '', '']
     })
     const computedItemHeight = computed(() => {
       return isNaN(props.itemHeight) ? 0 : `${props.itemHeight}px`
@@ -35,13 +40,14 @@ export default {
       return isNaN(props.height) ? 0 : `${props.height}px`
     })
     const computedTop = computed(() => {
-      return isNaN(props.itemHeight) ? 0 : `calc(50% - ${props.itemHeight/2}px)`
+      return isNaN(props.itemHeight) ? 0 : `calc(50% - ${props.itemHeight / 2}px)`
     })
     const itemSelected = computed(() => {
       return !!_.find(props.items, item => item === props.modelValue)
     })
-
+    let disableHandleScroll = false;
     const handleScroll = _.debounce(function (event) {
+      if (disableHandleScroll) return;
       const precision = ('' + props.itemHeight).length - 1
       const index = _.round(event.target.scrollTop / props.itemHeight, precision)
       emit('update:modelValue', props.items[index])
@@ -50,20 +56,38 @@ export default {
     function scrollToValue() {
       const index = _.indexOf(props.items, props.modelValue)
       setTimeout(() => {
-        container.value.scrollTop = props.itemHeight * index
+        if (!forceDisableScroll) {
+          disableHandleScroll = true;
+          setTimeout(()  => disableHandleScroll = false, 500)
+          container.value.scrollTop = props.itemHeight * index
+        }
       }, 100)
     }
 
+    let forceDisableScroll = false;
+
     function chooseItem(item, index) {
       if (!item) return
+      forceDisableScroll = true;
+      setTimeout(() => forceDisableScroll = false, 500);
       emit('update:modelValue', item)
       container.value.scroll({top: props.itemHeight * (index - 2), behavior: 'smooth'})
     }
 
+    onMounted(() => resizeObserver.observe(container.value))
+    onUnmounted(() => resizeObserver.disconnect());
+
+    watch(() => props.modelValue, async () => {
+      await nextTick();
+      scrollToValue();
+    }, {
+      immediate: true
+    })
+
     const renderFn = genScopeId(() =>
         <div class="scroll-select__wrapper">
           <div class="scroll-select"
-               style={{ height: computedHeight.value }}
+               style={{height: computedHeight.value}}
                ref={container}
                onScroll={withModifiers(handleScroll, ['stop'])}>
             <div class="scroll-select__container">
@@ -72,7 +96,7 @@ export default {
                     <div class="scroll-select__container--item"
                          key={index} id={item}
                          onClick={() => chooseItem(item, index)}
-                         style={{ height: computedItemHeight.value, ...props.modelValue === item && { color: 'white', fontWeight: '700' } }}>
+                         style={{height: computedItemHeight.value, ...props.modelValue === item && {color: 'white', fontWeight: '700'}}}>
                       {item}
                     </div>
                   </slot>
@@ -80,8 +104,9 @@ export default {
           </div>
           {
             (itemSelected.value) &&
-            <div class="selected" style={{ height: computedHeight.value }}>
-              <div class="selected--item" style={{ height: computedItemHeight.value, top: computedTop.value, background: props.selectedColor }}></div>
+            <div class="selected" style={{height: computedHeight.value}}>
+              <div class="selected--item"
+                   style={{height: computedItemHeight.value, top: computedTop.value, background: props.selectedColor}}></div>
             </div>
           }
         </div>)

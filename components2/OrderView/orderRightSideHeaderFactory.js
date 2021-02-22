@@ -1,7 +1,15 @@
 import {editModeOL, saveOrderLayoutSetting, showSplitBtn} from "./order-layout-setting-logic";
 import {avatar, isMobile, username} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {actionList, disablePay, getCurrentOrder, hasOrderChange, payPrintMode, showIcon} from "./pos-logic-be";
+import {
+  actionList,
+  clearOrder,
+  disablePay,
+  getCurrentOrder,
+  hasOrderChange,
+  payPrintMode,
+  showIcon
+} from "./pos-logic-be";
 import {hooks, toggleTakeaway} from './pos-logic'
 import {ref, withModifiers, Transition as transition} from "vue";
 import {useRouter} from "vue-router";
@@ -31,9 +39,9 @@ export function orderRightSideHeader(props, {emit}) {
   const router = useRouter()
 
   function back() {
-    hooks.emit('resetOrderData');
+    clearOrder();
     saveOrderLayoutSetting()
-    router.go(-1)
+    router.push({path: '/pos-dashboard'})
   }
 
   //todo: fix

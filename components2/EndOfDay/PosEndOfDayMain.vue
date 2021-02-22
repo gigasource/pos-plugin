@@ -42,6 +42,7 @@ export default {
     onActivated(async () => {
       const currentDate = dayjs().format('YYYY-MM');
       await getEodReportsInMonthCalender(currentDate);
+      console.log('get eod');
     })
 
     function onSelectDate (date) {

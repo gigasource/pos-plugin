@@ -49,7 +49,11 @@ export const demoData = {
             "endTime": "21:30"
           }
         ]
+      },
+      "generalSetting": {
+        "beginHour": "06:00"
       }
+
     }
   ],
   "Terminal": [

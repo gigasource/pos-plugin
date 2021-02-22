@@ -220,6 +220,5 @@ export const onAddNewTable = async function() {
   await createAndAddNewTableToSelectingRoom()
 }
 
-
 const tableNameExistedErrorMsg = ref('')
 

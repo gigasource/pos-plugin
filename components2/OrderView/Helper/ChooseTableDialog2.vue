@@ -1,11 +1,12 @@
 <script>
-import {internalValueFactory} from '../../utils'
-import {computed, withModifiers, ref, watchEffect} from 'vue';
+import {genScopeId, internalValueFactory} from '../../utils'
+import {computed, withModifiers, ref, watchEffect, KeepAlive} from 'vue';
 import {selectingObject} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
 import {isTable, inProgressTables, isWall} from '../../TablePlan/RoomShared';
 import {useI18n} from 'vue-i18n';
-import {activeOrders} from "../../AppSharedStates";
+import {activeOrders, appHooks} from "../../AppSharedStates";
 import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom";
+import {fetchRooms, rooms} from "../../TablePlan/RoomState";
 
 
 export default {
@@ -14,9 +15,9 @@ export default {
     table: String,
     activeOrders: Array
   },
-  components: [RestaurantRoom],
+  components: {RestaurantRoom, KeepAlive},
   setup(props, {emit}) {
-    const {t: $t} = useI18n()
+    const {t} = useI18n()
     const chooseTableInput = ref('')
     const tabs = ref([])
     const tab = ref(null)
@@ -31,14 +32,15 @@ export default {
     //fill table:
     watchEffect(async () => {
       if (internalValue.value) {
-        const rooms = await cms.getModel('Room').find();
+        if (rooms.value.length === 0) await fetchRooms();
+        if (activeOrders.value.length === 0) await appHooks.emit('orderChange');
+        //const rooms = await cms.getModel('Room').find();
         tabs.value = [
-          ...rooms
+          ...rooms.value
               .sort((cur, next) => cur.order - next.order)
-              .map(i => ({ title: i.name, room: i.roomObjects })),
-          { title: 'Manual' }
+              .map(i => ({title: i.name, room: i.roomObjects, _id: i._id})),
+          {title: 'Manual'}
         ]
-        console.log(tabs.value);
         tab.value = tabs[0];
       }
     })
@@ -46,14 +48,22 @@ export default {
       return activeOrders.value.map(o => o.table);
     })
 
-    //todo: refactore room
+    function chooseTable(obj) {
+      emit('submit', obj.name);
+      internalValue.value = false;
+    }
+
+    //todo: refactor room
     return () =>
         <g-dialog v-model={internalValue.value} fullscreen content-class="choose-table-dialog">
+          {genScopeId(() => <>
           <g-card style="display: flex; flex-direction: column">
-            <g-card-text style="flex: 1 0 0">
-              <g-tabs v-model={tab.value} items={tabs.value} vertical style="height: 100%">
+            <div style="flex: 1 0 0">
+              <g-tabs v-model={tab.value} items={tabs.value} vertical style="height: 100%"
+                      text-color="#1d1d26" color="white" active-text-color="#1d1d26"
+                      slider-color="#1471ff" slider-size="3">
                 {tabs.value.map(item =>
-                    <g-tab-item item={item} class="pl-2 h-100" key={item.title}>
+                    <g-tab-item item={item} class="pl-0 h-100" key={item.title}>
                       {item.title === 'Manual' ?
                           <>
                             <pos-textfield-new v-model={chooseTableInput.value} label="Table" class="mb-5"/>
@@ -62,8 +72,12 @@ export default {
                               <pos-keyboard-full onEnterPressed={submit}/>
                             </div>
                           </> :
-                          tab.value === item && <restaurant-room
-                                disabledTables={disabledTables.value}>
+                          tab.value === item &&
+                          <restaurant-room
+                              roomId={item._id}
+                              disabledTables={disabledTables.value}
+                              choose-table={chooseTable}
+                          >
                             {{
                               'room-object': (obj) => (isTable(obj) || !isWall(obj)) && <div>
                                 <div>{obj.name}</div>
@@ -73,14 +87,15 @@ export default {
                       }
                     </g-tab-item>)}
               </g-tabs>
-            </g-card-text>
+            </div>
             <g-btn-bs style="position: absolute; left: 0; bottom: 0"
                       class="ml-3 mb-2"
                       icon="icon-back"
                       onClick={() => internalValue.value = false}>
-              {$t('ui.back')}
+              {t('ui.back')}
             </g-btn-bs>
           </g-card>
+          </>)()}
         </g-dialog>
   }
 }

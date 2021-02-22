@@ -25,7 +25,7 @@ export function orderRightSideItemsTable() {
   })
 
   function openConfigDialog(item) {
-    if (item.printed) return
+    //if (item.printed) return
     Object.assign(dialogConfigOrderItem, {
       product: item,
       value: true,

@@ -30,9 +30,9 @@ function createPureImageVirtualPrinter(printerInfo, type) {
 
 module.exports = (cms) => {
 
-  cms.on(PRINT_VIRTUAL_REPORT, async ({report, printData, printerInfo, type}) => {
+  cms.on(PRINT_VIRTUAL_REPORT, async ({report, printData, printerInfo, type, locale}) => {
     const canvasPrinter = createPureImageVirtualPrinter(printerInfo, type)
-    await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, 'canvas');
+    await report.printCanvas(canvasPrinter, printData, printerInfo.groupPrinter, locale);
     await canvasPrinter.cleanup();
   })
 

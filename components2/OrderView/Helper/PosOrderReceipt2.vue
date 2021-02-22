@@ -132,6 +132,9 @@ export default {
     async function print() {
       if (!props.split) {
         await hooks.emit('pay', true);
+        internalValue.value = false
+        printed.value = false
+        router.go(-1)
       } else {
 
       }
@@ -368,6 +371,12 @@ export default {
         </div>
       </div>
       <div class="blur-overlay" v-show={blurReceipt.value}/>
+    </>))
+
+    return genScopeId(() => <>
+      <g-dialog fullscreen v-model={internalValue.value}>
+        {contentRender()}
+      </g-dialog>
 
       <dialog-multi-payment
           rotate
@@ -392,11 +401,7 @@ export default {
           )
         }}
       </dialog-form-input>
-    </>))
-
-    return genScopeId(() => <g-dialog fullscreen v-model={internalValue.value}>
-      {contentRender()}
-    </g-dialog>)
+    </>)
   }
 }
 </script>

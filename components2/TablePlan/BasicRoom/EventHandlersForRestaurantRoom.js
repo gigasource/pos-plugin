@@ -8,7 +8,7 @@ import {
 import { isBusyTable, isWall } from '../RoomShared';
 import { isSameId } from '../../utils';
 
-const RestaurantRoomEventHandlers = () => {
+const RestaurantRoomEventHandlers = (props) => {
   const touchHandlers = function (item) {
     return {
       right: () => {
@@ -33,7 +33,8 @@ const RestaurantRoomEventHandlers = () => {
             swiping.value = false
           } else {
             //todo: check table is disable or not
-            await chooseTable(item)
+            await (props.chooseTable ? props.chooseTable(item) : chooseTable(item))
+            //await chooseTable(item)
           }
         }
       }

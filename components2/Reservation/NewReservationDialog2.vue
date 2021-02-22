@@ -7,7 +7,7 @@ import { genScopeId } from '../utils';
 import dayjs from 'dayjs'
 import _ from 'lodash'
 import cms from 'cms';
-import ScrollSelect from './ScrollSelect2';
+import ScrollSelect from './ScrollSelect';
 // TODO: remove for production: for debug only
 // import { appHooks } from '../AppSharedStates';
 // appHooks.emit('settingChange')

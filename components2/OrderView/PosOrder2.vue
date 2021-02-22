@@ -4,13 +4,14 @@ import {Touch} from 'pos-vue-framework';
 import {useRoute, useRouter} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
 import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
-import {clearOrder, overlay, prepareOrder, syncOrderChange} from "./pos-logic-be";
+import {clearOrder, getCurrentOrder, overlay, prepareOrder, syncOrderChange} from "./pos-logic-be";
 import {hooks} from './pos-logic'
 import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
 import {onActivated, onDeactivated} from "vue";
 import dialogConfigOrderItem from "./Helper/dialogConfigOrderItem";
+import {activeOrders} from "../AppSharedStates";
 
 export default {
   name: "posOrder2",
@@ -28,23 +29,21 @@ export default {
     onActivated(async () => {
       const route = useRoute()
       if (route.params.id) {
-        //let order = _.find(activeOrders.value, {table: route.params.id, status: 'inProgress'})
-        let order;
+        let order = _.cloneDeep(_.find(activeOrders.value, {table: route.params.id}));
         if (!order) {
           order = await cms.getModel('Order').findOne({table: route.params.id, status: 'inProgress'})
         }
-        console.log(_.cloneDeep(order))
         if (!order) {
-          prepareOrder(route.params.id)
+          prepareOrder({table: route.params.id, ...route.query.manual && {manual: true}})
         } else {
           prepareOrder(order)
         }
       }
     })
 
-    onDeactivated(() => {
+    /*onDeactivated(() => {
       clearOrder();
-    })
+    })*/
 
     hooks.on('printOrder', function () {
       router.go(-1)
@@ -72,14 +71,22 @@ export default {
     }
 
     const {renderHeader, overlayRender} = orderRightSideHeader(props, {emit});
-    return genScopeId(() => (
+    const _render = genScopeId(() => (
         root(<>
           {renderHeader()}
           {contentRender()}
           {renderRightOverLay()}
         </>)
     ))
+    const _order = getCurrentOrder();
 
+    return {
+      order: _order,
+      _render
+    }
+  },
+  render() {
+    return this._render();
   }
 }
 </script>

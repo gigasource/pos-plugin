@@ -7,7 +7,7 @@
 </template>
 <script>
   export default {
-    name: 'InputNumber2',
+    name: 'InputNumber',
     props: {
       label: String,
       modelValue: {

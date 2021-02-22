@@ -86,6 +86,11 @@ export function formatDatetime(date) {
   return dayjs(date).format(datetimeFormat.value);
 }
 
+export function formatTime(date) {
+  if (!date || !dayjs(date).isValid()) return ''
+  return dayjs(date).format(timeFormat.value);
+}
+
 export function initUtils() {
   const [] = [
     dateFormat.value,

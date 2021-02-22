@@ -60,7 +60,8 @@
       eager: {
         type: Boolean,
         default: true
-      }
+      },
+      forceDisableButtons: Boolean
     },
     data() {
       return {
@@ -78,6 +79,7 @@
         }
       },
       showButtons() {
+        if (this.forceDisableButtons) return false;
         return !this.showKeyboard
       },
       keyboard: {

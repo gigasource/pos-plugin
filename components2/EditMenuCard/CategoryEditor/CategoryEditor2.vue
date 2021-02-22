@@ -18,12 +18,12 @@ import {
 
 import {categoryColumns, categoryRows, changeCategoryColumn, changeCategoryRow,} from './category-editor-order-layout'
 import {genScopeId} from '../../utils';
-import InputNumber2 from "../InputNumber2";
+import InputNumber from "../InputNumber";
 import PosKeyboardFull from "../../pos-shared-components/PosKeyboardFull";
 
 export default {
   name: 'CategoryEditor2',
-  components: { PosKeyboardFull, InputNumber2, ColorSelector },
+  components: { PosKeyboardFull, InputNumber, ColorSelector },
   setup() {
     const { t } = useI18n()
 

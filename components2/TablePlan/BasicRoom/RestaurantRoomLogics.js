@@ -27,8 +27,11 @@ export function initRouter() {
   router = useRouter()
 }
 
-export function routeToOrder(table) {
-  setTimeout(() => router.push(`/pos-order/${getTableName(table)}`), 150) // wave effect
+export function routeToOrder(table, manual) {
+  //todo: table, query: manual: true
+  setTimeout(() => router.push({
+    path: `/pos-order/${getTableName(table)}`, ...manual && {query: {manual: true}}
+  }), 150) // wave effect
 }
 
 export async function chooseTable(obj) {

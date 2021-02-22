@@ -1,20 +1,20 @@
 <script>
 import PosKeyboardFull from '../../pos-shared-components/PosKeyboardFull';
-import { computed, onMounted, ref, watch } from 'vue'
-import { $filters, isMobile } from '../../AppSharedStates';
-import { useI18n } from 'vue-i18n';
+import {computed, onMounted, ref, watch} from 'vue'
+import {$filters, isMobile} from '../../AppSharedStates';
+import {useI18n} from 'vue-i18n';
 import PaymentLogicsFactory from '../payment-logics';
-import { GDivider, GIcon, GSpacer, GTable } from '../../../../../backoffice/pos-vue-framework';
+import {GDivider, GIcon, GSpacer, GTable} from '../../../../../backoffice/pos-vue-framework';
 import PosTextfieldNew from '../../pos-shared-components/POSInput/PosTextfieldNew';
-import { genScopeId, VModel_number } from '../../utils';
+import {genScopeId, VModel_number} from '../../utils';
 
 export default {
   name: 'PosPaymentScreenKeyboard2',
   components: [PosKeyboardFull, GTable, GSpacer, GIcon, PosTextfieldNew, GDivider],
-  setup: function (props, { emit }) {
+  setup: function (props, {emit}) {
 
     const cashTextfield = ref(null)
-    const { currentOrder, currentOrderChange, currentOrderPaymentList, currentOrderTip, selectedPayment } = PaymentLogicsFactory()
+    const {currentOrder, currentOrderChange, currentOrderPaymentList, currentOrderTip, selectedPayment} = PaymentLogicsFactory()
 
     onMounted(() => {
       watch(() => selectedPayment.value, () => {
@@ -27,9 +27,9 @@ export default {
 
           }, 500)
         }
-      }, { deep: true })
+      }, {deep: true})
     })
-    const { t } = useI18n()
+    const {t} = useI18n()
     const keyboardTemplate = 'grid-template-areas: " key7 key7 key8 key8 key9 key9" ' +
         '"key4 key4 key5 key5 key6 key6" ' +
         '"key1 key1 key2 key2 key3 key3" ' +
@@ -37,17 +37,17 @@ export default {
         'grid-auto-columns: 1fr; grid-gap: 5px'
     const keyboardItems = [
       ...Object.values({
-        key7: { content: ['7'], style: 'grid-area: key7' },
-        key8: { content: ['8'], style: 'grid-area: key8' },
-        key9: { content: ['9'], style: 'grid-area: key9' },
-        key4: { content: ['4'], style: 'grid-area: key4' },
-        key5: { content: ['5'], style: 'grid-area: key5' },
-        key6: { content: ['6'], style: 'grid-area: key6' },
-        key1: { content: ['1'], style: 'grid-area: key1' },
-        key2: { content: ['2'], style: 'grid-area: key2' },
-        key3: { content: ['3'], style: 'grid-area: key3' },
-        key0: { content: ['0'], style: 'grid-area: key0' },
-        keyDot: { content: ['.'], style: 'grid-area: keyDot' },
+        key7: {content: ['7'], style: 'grid-area: key7'},
+        key8: {content: ['8'], style: 'grid-area: key8'},
+        key9: {content: ['9'], style: 'grid-area: key9'},
+        key4: {content: ['4'], style: 'grid-area: key4'},
+        key5: {content: ['5'], style: 'grid-area: key5'},
+        key6: {content: ['6'], style: 'grid-area: key6'},
+        key1: {content: ['1'], style: 'grid-area: key1'},
+        key2: {content: ['2'], style: 'grid-area: key2'},
+        key3: {content: ['3'], style: 'grid-area: key3'},
+        key0: {content: ['0'], style: 'grid-area: key0'},
+        keyDot: {content: ['.'], style: 'grid-area: keyDot'},
       }),
       {
         content: [''],
@@ -69,15 +69,15 @@ export default {
         <>
           <div class="pos-payment-keyboard">
             <div style="position: relative" class="col-6">
-              <pos-keyboard-full template={keyboardTemplate} items={keyboardItems} gap="4px" style="height: 100%">
-              </pos-keyboard-full>
+              <pos-keyboard-full template={keyboardTemplate} items={keyboardItems} gap="4px" style="height: 100%"/>
               {
                 (disableKeyboard.value) &&
                 <div class="keyboard-overlay">
                 </div>
               }
             </div>
-            <div class={['col-flex', isMobile.value && 'payment-table--mobile']} style="height: 100%; margin-left: 8px; flex: 1">
+            <div class={['col-flex', isMobile.value && 'payment-table--mobile']}
+                 style="height: 100%; margin-left: 8px; flex: 1">
               <div class="payment-table__header">
                 <span>
                   {t('onlineOrder.total')} </span>
@@ -90,7 +90,8 @@ export default {
                 <tbody>
                 {currentOrderPaymentList.value.map((payment, index) =>
                     <tr>
-                      <div class={['payment-table__row', payment.type !== 'card' && payment.type !== 'cash' && 'text-blue']}>
+                      <div
+                          class={['payment-table__row', payment.type !== 'card' && payment.type !== 'cash' && 'text-blue']}>
                         <div class="flex-grow-1 row-flex align-items-center">
                           <span style="text-transform: capitalize">
                             {
@@ -99,12 +100,13 @@ export default {
                           </span>
                           {
                             (payment.type !== 'card' && payment.type !== 'cash') &&
-                            <g-icon class="ml-2" onClick={() => removePaymentItem(index)} color="#FF4452" size="16"> close </g-icon>
+                            <g-icon class="ml-2" onClick={() => removePaymentItem(index)} color="#FF4452"
+                                    size="16"> close </g-icon>
                           }
                         </div>
-                        <div class="value-input w-20">
+                        <div class="value-input w-20" style={payment.type === 'cash' ? '': 'text-align:end'}>
                           {
-                            (payment.type === 'cash') ?
+                            payment.type === 'cash' ?
                                 <pos-textfield-new v-model={VModel_number(payment).value}
                                                    ref={cashTextfield}>
                                 </pos-textfield-new>
@@ -176,13 +178,13 @@ export default {
   }
 }
 
-::v-deep .payment-table {
+:deep .payment-table {
   .g-table__wrapper {
     position: relative;
   }
 }
 
-.payment-table {
+:deep .payment-table {
   border: 1px solid #bdbdbd;
   border-bottom: 0;
   background-color: #EEEEEE;
@@ -221,7 +223,7 @@ export default {
     font-size: 14px;
     padding: 2px 8px;
 
-    ::v-deep .value-input {
+    .value-input {
       text-align: right;
 
       .bs-tf-wrapper {
@@ -243,7 +245,7 @@ export default {
   }
 }
 
-.payment-table--mobile {
+:deep .payment-table--mobile {
   .payment-table {
     &__header {
       padding: 5px 8px 2px 8px;
@@ -257,7 +259,7 @@ export default {
       font-size: 14px !important;
       padding: 2px 8px;
 
-      ::v-deep .value-input {
+      :deep .value-input {
         .g-tf-wrapper {
           margin: 0;
           width: 100%;
@@ -272,15 +274,15 @@ export default {
   }
 }
 
-.text-blue {
+:deep .text-blue {
   color: #1976D2;
 }
 
-.total-value {
+:deep .total-value {
   font-size: 18px;
 }
 
-.payment-footer {
+:deep .payment-footer {
   font-weight: bold;
   font-size: 16px !important;
 
@@ -300,7 +302,7 @@ export default {
   }
 }
 
-::v-deep .key {
+:deep .key {
   border: 1px solid #BDBDBD;
   border-radius: 2px;
   font-size: 24px;
@@ -309,7 +311,7 @@ export default {
 }
 
 @media screen and (max-height: 600px) {
-  .pos-payment-keyboard ::v-deep .key {
+  .pos-payment-keyboard :deep .key {
     font-size: 18px;
   }
 }
