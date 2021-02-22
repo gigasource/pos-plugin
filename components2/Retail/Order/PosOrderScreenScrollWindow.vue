@@ -1,5 +1,5 @@
 <script>
-import { ref, computed, onActivated, watch, withModifiers } from 'vue'
+import { computed, onActivated, ref, withModifiers } from 'vue'
 import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
 import { execGenScopeId, genScopeId } from '../../utils';
@@ -7,7 +7,7 @@ import { categories, products } from '../../Product/product-logic'
 import { selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
-import { retailLayoutSetting, loadRetailLayoutSetting } from './retail-layout-setting-logic';
+import { loadRetailLayoutSetting, retailLayoutSetting } from './retail-layout-setting-logic';
 
 export default {
   name: 'PosOrderScreenScrollWindow',
@@ -75,8 +75,6 @@ export default {
     }
 
     const productWindowsIndex = ref({})
-    window.productWindowsIndex = productWindowsIndex
-    window.selectedCategory = selectedCategory
 
     function getItemStyle(item) {
       const customizableStyle = {
@@ -99,15 +97,18 @@ export default {
 
       return customizableStyle
     }
+
     function getWindowStyle(category) {
       if (!selectedCategory.value || (selectedCategory.value._id !== category && selectedCategory.value.name !== category)) {
         return { display: 'none' }
       }
     }
+
     const windowGridLayoutStyle = computed(() => ({
       gridTemplateRows: `repeat(${retailLayoutSetting.productRow}, 1fr)`,
       gridTemplateColumns: `repeat(${retailLayoutSetting.productColumn}, 1fr)`
     }))
+
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
           <g-scroll-window
@@ -124,7 +125,7 @@ export default {
                         <div class="btn" key={`btn_${i}`}
                              style={getItemStyle(item)}
                              onClick={withModifiers(() => addProduct(item), ['stop'])}>
-                          { item.name }
+                          {item.name}
                         </div>)
                     )}
                   </g-scroll-window-item>
@@ -134,29 +135,22 @@ export default {
       )
     }
 
-    const activeProductsList = ref(null)
-    function renderDelimiter(productsList, category) {
+    function renderDelimiter(items, category) {
       return (
-          <g-item-group
-              returnObject={false}
-              mandatory
-              key={`group_${category}`}
-              items={productsList}
-              v-model={activeProductsList.value}
-              v-slots={{
-                default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
-                    <g-item isActive={active(item)} key={`${category}_item_${index}`}>
-                      { execGenScopeId(() => <g-btn
-                          uppercase={false}
-                          onClick={withModifiers(() => {
-                            console.log('toggle', category, index)
-                            toggle(item);
-                            productWindowsIndex.value[category] = index
-                          }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
-                    </g-item>
-                ))
-              }}>
-          </g-item-group>
+          <div class="g-item-group row-flex">
+            { items.map((item, index) =>
+                <div
+                    key={`${index}_${index === productWindowsIndex.value[category]}`}
+                    style={{ width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: index === productWindowsIndex.value[category] ? '#2196F3' : '#E0E0E0'
+                    }}
+                    class="mr-1"
+                    onClick={() => productWindowsIndex.value[category] = index}>
+                </div>
+            )}
+          </div>
       )
     }
 

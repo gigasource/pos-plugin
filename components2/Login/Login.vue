@@ -2,6 +2,7 @@
 import { genScopeId } from '../utils';
 import { incorrectPasscode, login } from './LoginLogic';
 import { appHooks, locale, version } from '../AppSharedStates';
+import { appType, currentAppType } from '../AppType';
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import PosLoginTextfield from './PosLoginTextfield'
@@ -51,10 +52,23 @@ export default {
     appHooks.emit('updateStoreId')
     appHooks.emit('updateVersion')
 
+    function renderAppSwitch(){
+      const imgSrc = `/plugins/pos-plugin/assets/app-mode--${ appType.POS_RESTAURANT === currentAppType.value ? 'restaurant' : 'retail'}.svg`
+      function toggleApp() {
+        currentAppType.value = (
+            currentAppType.value === appType.POS_RESTAURANT
+              ? appType.POS_RETAIL
+              : appType.POS_RESTAURANT
+        )
+      }
+      return <img onClick={toggleApp} src={imgSrc} style={{position: 'absolute', top: '20px', right: '20px', width: '50px'}}/>
+    }
+
     return genScopeId(() =>
         <div class="login">
           <div class="login-bg"></div>
           <div class="login-main">
+            { renderAppSwitch() }
             <div class="login-logo">
               <img alt src="/plugins/pos-plugin/assets/image/logo.svg"/>
             </div>
