@@ -41,10 +41,9 @@ module.exports = (cms) => {
     }, 300)
   })
 
-  cms.on('action:endOfDay', ({order, recent}, cb) => {
-
+  /*cms.on('action:endOfDay', ({order, recent}, cb) => {
     cb();
-  })
+  })*/
 
   cms.socket.on('connect', async (socket) => {
     feSocket = socket
@@ -64,10 +63,9 @@ module.exports = (cms) => {
       await cms.emit('run:pay-order', order);
       //emit on master ??
 
-      cms.emitAction('action:endOfDay', {order, recent}, () => {
-
+      /*cms.emitAction('action:endOfDay', {order, recent}, () => {
         cb();
-      });
+      });*/
 
       cb();
     })
