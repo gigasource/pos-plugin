@@ -19,13 +19,13 @@ export function tableExists() {
 }
 
 export function getOrderTime(tableName) {
-  const startTime = getTableOrderInfo(tableName)
-  return getDiffTime(startTime, new Date())
+  const order = getTableOrderInfo(tableName)
+  return getDiffTime(order.date, new Date())
 }
 
 export async function addTable() {
   if (!tableNameInput.value || tableExists()) return
-  routeToOrder(tableNameInput.value)
+  routeToOrder(tableNameInput.value, true)
 }
 
 export function focusTextField() {

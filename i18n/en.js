@@ -159,10 +159,17 @@ module.exports = {
     //reports
     report: {
       zNumber: 'Z-Number',
+      zReport: 'Z-Report',
       reportDate: 'Report Date',
+      ZNumber: 'Z-Number',
       firstOrder: 'First Order',
       lastOrder: 'Last Order',
+      printDate: 'Print date',
       totalSales: 'Total Sales',
+      total:'Total',
+      subtotal: 'Subtotal',
+      tax: 'Tax',
+      cancelledTotal: 'Canceled total',
       xReport: 'X-Report',
       productSold: 'Product Sold',
       printReport: 'Print Report',
@@ -181,6 +188,8 @@ module.exports = {
       vouchersSold: 'Vouchers Sold',
       vouchersUsed: 'Vouchers Used',
       returnedTotal: 'Returned Total',
+      dineIn: 'Dine in',
+      takeAway: 'Take Away',
     },
 
     order: {

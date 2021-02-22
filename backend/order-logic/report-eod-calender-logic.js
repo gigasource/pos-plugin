@@ -10,7 +10,7 @@ async function eodReportCalender(from, to) {
       ...from && {$gte: from},
       ...to && {$lte: to},
     },
-    status: "paid"
+    status: {$in: ["paid", "cancelled"]}
   };
   let orders = await Order.find(query);
   const ordersByDate = renderPivotTable({

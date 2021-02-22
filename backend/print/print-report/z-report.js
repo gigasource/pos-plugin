@@ -11,7 +11,11 @@ async function makePrintData(cms, _report) {
     report,
     reportByPayment,
     cancelledReport,
-    paidOrders
+    cancelledItemReport,
+    paidOrders,
+    voucherReport,
+    dineInReport,
+    takeAwayReport
   } = endOfDayReport
 
   if (!endOfDayReport) throw new Error(`report report number ${z} not found`);
@@ -38,7 +42,11 @@ async function makePrintData(cms, _report) {
     vTaxSum: report.vTaxSum,
     discount: report.vDiscount || 0,
     reportByPayment,
-    z: _report.z
+    z: _report.z,
+    cancelledItemReport,
+    voucherReport,
+    dineInReport,
+    takeAwayReport
   }
 }
 
@@ -118,7 +126,7 @@ async function printEscPos(escPrinter, printData) {
   await escPrinter.print();
 }
 
-async function printCanvas(canvasPrinter, printData) {
+async function printCanvas(canvasPrinter, printData, groupPrinter, locale) {
   const {
     companyName,
     companyAddress,
@@ -130,7 +138,11 @@ async function printCanvas(canvasPrinter, printData) {
     vTaxSum,
     discount,
     reportByPayment,
-    z
+    z,
+    cancelledItemReport,
+    voucherReport,
+    dineInReport,
+    takeAwayReport
   } = printData;
 
   function convertMoney(value) {
@@ -149,24 +161,26 @@ async function printCanvas(canvasPrinter, printData) {
   await canvasPrinter.newLine();
   await canvasPrinter.setTextDoubleHeight();
   await canvasPrinter.bold(true);
-  await canvasPrinter.println('Z-Report');
+  await canvasPrinter.println(locale.report.zReport);
 
   await canvasPrinter.newLine();
   await canvasPrinter.bold(false);
   await canvasPrinter.setTextNormal();
   await canvasPrinter.alignLeft();
-  await canvasPrinter.println(`Report Date: ${reportDate}`);
-  await canvasPrinter.println(`Z-Number: ${z}`);
-  await canvasPrinter.println(`First Order: ${firstOrderDateString}`);
-  await canvasPrinter.println(`Last Order: ${lastOrderDateString}`);
+  await canvasPrinter.println(`${locale.report.reportDate}: ${reportDate}`);
+  await canvasPrinter.println(`${locale.report.ZNumber}: ${z}`);
+  await canvasPrinter.println(`${locale.report.firstOrder}: ${firstOrderDateString}`);
+  await canvasPrinter.println(`${locale.report.lastOrder}: ${lastOrderDateString}`);
+  await canvasPrinter.println(`${locale.report.printDate}: ${dayjs().format(locale.dates.datetimeFormat)}`);
+
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
-  await canvasPrinter.println('Sales');
+  await canvasPrinter.println(locale.report.totalSales);
   await canvasPrinter.bold(false);
-  await canvasPrinter.leftRight("Total", convertMoney(vTaxSum.gross));
-  await canvasPrinter.leftRight("Sub-total", convertMoney(vTaxSum.net));
-  await canvasPrinter.leftRight("Tax", convertMoney(vTaxSum.tax));
+  await canvasPrinter.leftRight(locale.report.total, convertMoney(vTaxSum.gross));
+  await canvasPrinter.leftRight(locale.report.subtotal, convertMoney(vTaxSum.net));
+  await canvasPrinter.leftRight(locale.report.tax, convertMoney(vTaxSum.tax));
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
@@ -175,15 +189,18 @@ async function printCanvas(canvasPrinter, printData) {
   const groupTypes = Object.keys(vTaxSum.vTaxSum);
   for (let i = 0; i < groupTypes.length; i++) {
     const groupType = groupTypes[i];
-    await canvasPrinter.println(`Tax (${groupType}%)`);
-    await canvasPrinter.leftRight('Total', convertMoney(vTaxSum.vTaxSum[groupType]['gross']));
-    await canvasPrinter.leftRight('Sub-total', convertMoney(vTaxSum.vTaxSum[groupType]['net']));
-    await canvasPrinter.leftRight('Tax', convertMoney(vTaxSum.vTaxSum[groupType]['tax']));
+    await canvasPrinter.println(`${locale.report.tax} (${groupType}%)`);
+    await canvasPrinter.leftRight(locale.report.total, convertMoney(vTaxSum.vTaxSum[groupType]['gross']));
+    await canvasPrinter.leftRight(locale.report.subtotal, convertMoney(vTaxSum.vTaxSum[groupType]['net']));
+    await canvasPrinter.leftRight(locale.report.tax, convertMoney(vTaxSum.vTaxSum[groupType]['tax']));
     await canvasPrinter.newLine();
   }
 
   await canvasPrinter.bold(false);
-  await canvasPrinter.leftRight('Discount', `${convertMoney(discount)}`);
+  await canvasPrinter.leftRight(locale.report.vouchersUsed, `${convertMoney(voucherReport.used)}`);
+  await canvasPrinter.leftRight(locale.report.vouchersSold, `${convertMoney(voucherReport.sold)}`);
+
+  await canvasPrinter.leftRight(locale.discount.discount, `${convertMoney(discount)}`);
   await canvasPrinter.bold(true);
   await canvasPrinter.drawLine();
 
@@ -194,6 +211,31 @@ async function printCanvas(canvasPrinter, printData) {
     const paymentType = paymentTypes[i];
     await canvasPrinter.leftRight(`${capitalize(paymentType)}`, `${convertMoney(reportByPayment[paymentType])}`);
   }
+
+  //cancellation:
+  await canvasPrinter.println(`${locale.report.cancelledTotal}: ${convertMoney(cancelledItemReport)}`);
+
+  await canvasPrinter.newLine();
+  await canvasPrinter.newLine();
+
+  await canvasPrinter.drawLine();
+  await canvasPrinter.newLine();
+
+  //dineIn, takeAway:
+  await canvasPrinter.println(locale.report.dineIn);
+  await canvasPrinter.leftRight(locale.report.total, convertMoney(dineInReport['gross']));
+  await canvasPrinter.leftRight(locale.report.subtotal, convertMoney(dineInReport['net']));
+  await canvasPrinter.leftRight(locale.report.tax, convertMoney(dineInReport['tax']));
+
+  await canvasPrinter.newLine();
+  await canvasPrinter.println(locale.report.takeAway);
+  await canvasPrinter.leftRight(locale.report.total, convertMoney(takeAwayReport['gross']));
+  await canvasPrinter.leftRight(locale.report.subtotal, convertMoney(takeAwayReport['net']));
+  await canvasPrinter.leftRight(locale.report.tax, convertMoney(takeAwayReport['tax']));
+
+  await canvasPrinter.drawLine();
+  //await canvasPrinter.newLine();
+
 
   await canvasPrinter.print();
 }

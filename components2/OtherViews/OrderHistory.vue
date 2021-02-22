@@ -1,18 +1,19 @@
 <script>
-import { onBeforeMount } from 'vue';
+import {onActivated, onBeforeMount, ref, watch} from 'vue';
 import orderUtil from '../../components/logic/orderUtil';
-import { useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import {useRouter} from 'vue-router';
+import {useI18n} from 'vue-i18n';
+import {dateFormat, formatDatetime, genScopeId} from "../utils";
 
 export default {
 
   setup() {
-    const { t } = useI18n()
+    const {t} = useI18n()
     const orderHistoryOrders = ref([])
     const orderHistoryFilters = ref([])
     const orderHistoryCurrentOrder = ref(null)
     const totalOrders = ref(null)
-    const orderHistoryPagination = ref({ limit: 15, currentPage: 1 })
+    const orderHistoryPagination = ref({limit: 15, currentPage: 1})
     const dialog = ref({
       confirm: false,
       amount: false,
@@ -21,24 +22,15 @@ export default {
       staff: false,
       number: false,
     })
-    const dateFormat = ref(null)
-    const timeFormat = ref(null)
-    //todo: fix this
-    // async created() {
-    //   await this.getOrderHistory();
-    //   await this.getTotalOrders();
-    //
-    //   const cachedPageSize = localStorage.getItem('orderHistoryPageSize')
-    //   if (cachedPageSize) this.orderHistoryPagination.limit = parseInt(cachedPageSize)
-    // }
-    // async activated() {
-    //   await this.getOrderHistory();
-    //   await this.getTotalOrders();
-    // },
+
+    onActivated(() => {
+      getOrderHistory();
+      getTotalOrders();
+    })
 
     watch(() => orderHistoryPagination.value.limit, (newV) => {
       localStorage.setItem('orderHistoryPageSize', newV)
-    }, { deep: true })
+    }, {deep: true})
 
     function updateOrderHistoryFilter(filter) {
       const index = orderHistoryFilters.value.findIndex(f => f.title === filter.title);
@@ -52,19 +44,18 @@ export default {
 
     async function getOrderHistory() {
       const orderModel = cms.getModel('Order');
-      const condition = orderHistoryFilters.value.reduce((acc, filter) => (
-              { ...acc, ...filter['condition'] }),
-          { $or: [{ status: 'paid' }, { status: 'completed' }] });
-      const { limit, currentPage } = orderHistoryPagination.value;
-      const orders = await orderModel.find(condition).sort({ date: -1 }).skip(limit * (currentPage - 1)).limit(limit);
+      const condition = orderHistoryFilters.value.reduce((acc, filter) => ({...acc, ...filter['condition']}),
+          {$or: [{status: 'paid'}, {status: 'completed'}, {status: 'cancelled'}]});
+      const {limit, currentPage} = orderHistoryPagination.value;
+      const orders = await orderModel.find(condition).sort({date: -1}).skip(limit * (currentPage - 1)).limit(limit);
       orderHistoryOrders.value = orders.map(order => ({
         ...order,
         info: order.note,
-        tax: order.vTax ? order.vTax : orderUtil.calOrderTax(order.items),
-        dateTime: dayjs(order.date).format(`${dateFormat} ${timeFormat}`),
-        amount: order.vSum ? order.vSum : orderUtil.calOrderTotal(order.items),
+        tax: _.sumBy(_.values(order.vTaxSum), v => v.tax),
+        dateTime: formatDatetime(order.date),
+        amount: order.vSum,
         staff: order.user,
-        barcode: '',
+        barcode: order.bookingNumber,
         promotions: [],
       }));
       orderHistoryCurrentOrder.value = orderHistoryOrders.value[0];
@@ -73,24 +64,24 @@ export default {
     async function getTotalOrders() {
       const orderModel = cms.getModel('Order');
       const condition = orderHistoryFilters.value.reduce((acc, filter) => (
-              { ...acc, ...filter['condition'] }),
-          { $or: [{ status: 'paid' }, { status: 'completed' }] });
+              {...acc, ...filter['condition']}),
+          {$or: [{status: 'paid'}, {status: 'completed'}]});
       totalOrders.value = await orderModel.count(condition);
     }
 
     async function deleteOrder() {
       try {
-        const orderModel = cms.getModel('Order');
-        await orderModel.findOneAndUpdate({ '_id': orderHistoryCurrentOrder.value._id }, { status: 'cancelled' });
-        const index = orderHistoryOrders.value.findIndex(o => o._id === orderHistoryCurrentOrder.value._id);
+        const Order = cms.getModel('Order');
+        await Order.findOneAndUpdate({'_id': orderHistoryCurrentOrder.value._id}, {status: 'cancelled'});
+        /*const index = orderHistoryOrders.value.findIndex(o => o._id === orderHistoryCurrentOrder.value._id);
         orderHistoryOrders.value.splice(index, 1);
-        orderHistoryCurrentOrder.value = orderHistoryOrders.value[0];
+        orderHistoryCurrentOrder.value = orderHistoryOrders.value[0];*/
       } catch (e) {
         console.error(e)
       }
     }
 
-    const router = useRoute()
+    const router = useRouter()
 
     function back() {
       router.push('/pos-dashboard')
@@ -100,7 +91,8 @@ export default {
       dialog.value[name] = true
     }
 
-    function printOrderReport() {}
+    function printOrderReport() {
+    }
 
     function print() {
       if (orderHistoryCurrentOrder.value)
@@ -117,7 +109,7 @@ export default {
       const filter = {
         title: t('orderHistrory.orderNo'),
         text: val,
-        condition: { $where: '/.*' + val + '.*/.test(this.id)' }
+        condition: {$where: '/.*' + val + '.*/.test(this.id)'}
       }
       await applyFilter(filter)
     }
@@ -126,7 +118,7 @@ export default {
       const filter = {
         title: t('orderHistory.barcode'),
         text: val,
-        condition: { barcode: { '$regex': val } }
+        condition: {barcode: {'$regex': val}}
       }
       await applyFilter(filter)
     }
@@ -135,7 +127,7 @@ export default {
       const filter = {
         title: t('orderHistory.staff'),
         text: val,
-        condition: { 'user.name': { '$regex': val, $options: 'i' } }
+        condition: {'user.name': {'$regex': val, $options: 'i'}}
       }
       await applyFilter(filter)
     }
@@ -144,20 +136,20 @@ export default {
       const filter = {
         title: t('orderHistory.amount'),
         text: val[0] + ' - ' + val[1],
-        condition: { vSum: { '$gte': val[0], '$lte': val[1] } }
+        condition: {vSum: {'$gte': val[0], '$lte': val[1]}}
       }
       await applyFilter(filter)
     }
 
-    return () => <>
+    return genScopeId(() => <>
       <div class="order-history">
         <div class="order-history__main">
           <order-history-table class="col-9"
                                totalOrders={totalOrders.value}
                                orderHistoryOrders={orderHistoryOrders.value}
-                               v-model:order-history-current-order={orderHistoryCurrentOrder.value}
-                               v-model:order-history-filters={orderHistoryFilters.value}
-                               v-model:order-history-pagination={orderHistoryPagination.value}
+                               v-model={[orderHistoryCurrentOrder.value, 'orderHistoryCurrentOrder']}
+                               v-model={[orderHistoryFilters.value, 'orderHistoryFilters']}
+                               v-model={[orderHistoryPagination.value, 'orderHistoryPagination']}
                                onGetorderhistory={getOrderHistory}
                                onGettotalorders={getTotalOrders}
                                onUpdateorderhistoryfilter={updateOrderHistoryFilter}
@@ -166,7 +158,7 @@ export default {
           <order-history-detail class="col-3" orderHistoryCurrentOrder={orderHistoryCurrentOrder.value}>
           </order-history-detail>
         </div>
-        <g-toolbar color="#eeeeee" elevation="0">
+        <g-toolbar height={'50px'} color="#eeeeee" elevation="0">
           <g-btn-bs elevation="2" icon="icon-back" onClick={back}>
             {t('ui.back')} </g-btn-bs>
           <g-spacer>
@@ -184,7 +176,7 @@ export default {
         </dialog-confirm-delete>
 
         <dialog-date-time-picker v-model={dialog.value.datetime}
-                                 v-model:orderhistoryfilters={orderHistoryFilters.value}
+                                 v-model={[orderHistoryFilters.value, 'orderHistoryFilters']}
                                  nGetorderhistory={getOrderHistory}
                                  onGettotalorders={getTotalOrders}
                                  onUpdateorderhistoryfilter={updateOrderHistoryFilter}>
@@ -208,7 +200,7 @@ export default {
                              onSubmit={applyRangeFilter}>
         </dialog-range-filter>
       </div>
-    </>
+    </>)
   }
 }
 </script>
@@ -218,7 +210,7 @@ export default {
   height: 100%;
 
   &__main {
-    height: calc(100% - 64px);
+    height: calc(100% - 50px);
     display: flex;
   }
 

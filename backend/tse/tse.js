@@ -63,32 +63,30 @@ module.exports = async (cms) => {
     return item.groupPrinter !== 'Bar' && item.groupPrinter !== 'Getränk';
   }
 
-  cms.on('run:print', async (commit) => {
-    if (`${commit.action}@${commit.type}` === 'print@report') {
-      await tseInvoicePrintHandler(commit);
-    }
+  cms.on('run:print-to-kitchen', async (actionList, order, recent, device) => {
     OrderCommit = cms.getModel('OrderCommit');
-    if (!commit.order.items) return;
-    const items = commit.order.items.filter(i => !i.isVoucher);
-    const allItems = commit.oldOrder ? commit.oldOrder.items.concat(items) : items;
-    const order = commit.order;
-    const oldOrder = commit.oldOrder;
+    //todo : invoice
+    /*if (`${commit.action}@${commit.type}` === 'print@report') {
+      await tseInvoicePrintHandler(commit);
+    }*/
+    const items = recent.items.filter(i => !i.isVoucher);
+    const allItems = order.items;
+    const oldItems = order.items.filter(i => !_.find(recent.items, _i => _i._id.toString() === i._id.toString()))
 
     const {passthroughTse, passthroughTseComplete, updateOrderTseTemp} = await checkPassthroughTse(posSetting, order);
     if ((order.tseMethod === 'passthrough' && passthroughTse) || passthroughTseComplete) {
       order.tseMethod = 'passthrough';
       items.forEach(i => i.tseMethod = 'passthrough');
       await updateOrderTseTemp(order);
-      await updateOrder(order, {tseMethod: order.tseMethod});
     } else {
       order.tseMethod = 'auto';
-      await updateOrder(order, {tseMethod: order.tseMethod});
+      //todo: refactor updateOrder and updateItem
       if (order.tseMethod === 'auto') {
-        // check maxProcent
+        // check maxPercent
         // check numberOfCustomers
 
         if (passthroughTse) {
-          let hasItemAtLastTime = oldOrder && oldOrder.items.length > 0;
+          let hasItemAtLastTime = oldItems.length > 0;
           let hasFood = !!items.find(i => isFood(i));
 
           if (order.numberOfCustomers === 1) {
@@ -129,14 +127,14 @@ module.exports = async (cms) => {
       }
     }
 
-    for (const item of items) {
-      if (!item.tseMethod) continue;
-      await updateItem(order, item._id, {'items.$.tseMethod': item.tseMethod})
-    }
+    const _update = items.reduce((result, item, index) => {
+      if (item.tseMethod) result[`items.${index}.tseMethod`] = item.tseMethod;
+      return result;
+    }, {})
+    await Order.updateOne({_id: order._id}, {$set: {tseMethod: order.tseMethod, ..._update}})
 
     const content = makeKassenBestellung(items, []);
-    await sendContentToTse(content, commit.order._id);
-
+    await sendContentToTse(content, order._id);
   })
 
   async function tseInvoicePrintHandler(commit) {
@@ -325,12 +323,12 @@ module.exports = async (cms) => {
         orderTseTemp.sum = (orderTseTemp.sum || 0) + getSumme(order);
 
         let passthroughSum = (orderTseTemp.passthroughSum || 0) + getSumme(order);
-        let procent = (passthroughSum / (orderTseTemp.sum || 0)) * 100;
-        //console.log('procent: ', procent);
+        let percent = (passthroughSum / (orderTseTemp.sum || 0)) * 100;
+        //console.log('percent: ', percent);
         //passthroughTse = true;
         //check bar
 
-        if (procent < tseConfig.procent && getPayment(order) === 'cash' && tseConfig.passthroughEnable && method === 'finish') {
+        if (percent < tseConfig.percent && getPayment(order) === 'cash' && tseConfig.passthroughEnable && method === 'finish') {
           passthroughTse = true;
         }
 
@@ -481,13 +479,12 @@ module.exports = async (cms) => {
     orderTseTemp.sum = (orderTseTemp.sum || 0) + getSumme(order);
 
     let passthroughSum = (orderTseTemp.passthroughSum || 0)/* + Export.getSumme(filterJustSentItem(order))*/;
-    let procent = (passthroughSum / (orderTseTemp.sum || 0)) * 100;
+    let percent = (passthroughSum / (orderTseTemp.sum || 0)) * 100;
     await OrderTseTemp.findOneAndUpdate({_id: orderTseTemp._id}, orderTseTemp, {new: true});
 
-    //console.log('procent: ', procent);
+    //console.log('percent: ', percent);
     //passthroughTse = true;
-    tseConfig;
-    if (procent < tseConfig.procent && tseConfig.passthroughEnable) {
+    if (percent < tseConfig.percent && tseConfig.passthroughEnable) {
       passthroughTse = true;
       if (order.numberOfCustomers === 1) {
         orderTseTemp.onlyFoodHoldNumber = orderTseTemp.onlyFoodHoldNumber || 0;
@@ -505,7 +502,7 @@ module.exports = async (cms) => {
     const updateOrderTseTemp = async function (order) {
       orderTseTemp.passthroughSum = (orderTseTemp.passthroughSum || 0) + getSumme(filterPassthroughItem(order));
       //console.log('passthroughSum : ', orderTseTemp.passthroughSum);
-      await OrderTseTemp.findOneAndUpdate({_id: orderTseTemp._id}, orderTseTemp, {new: true});
+      await OrderTseTemp.findOneAndUpdate({_id: orderTseTemp._id}, orderTseTemp);
     }
 
     return {passthroughTse, orderTseTemp, passthroughTseComplete, updateOrderTseTemp};
@@ -598,7 +595,8 @@ module.exports = async (cms) => {
 
     async function initFirstTimeTse() {
       let tseConfig = await TseConfig.findOne({});
-      if (!tseConfig) tseConfig = {};
+
+      if (!tseConfig) tseConfig = {...global.TSE_CONFIG && global.TSE_CONFIG};
 
       tseConfig.inited = true;
       tseConfig.tsePublicKey = await tse.getTsePublicKey();

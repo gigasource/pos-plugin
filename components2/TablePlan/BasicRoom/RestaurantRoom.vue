@@ -31,7 +31,7 @@ export default {
     // appHooks.emit('updateTseConfig')
     initRouter()
     const {t, locale} = useI18n()
-    const {touchHandlers} = RestaurantRoomEventHandlers()
+    const {touchHandlers} = RestaurantRoomEventHandlers(props)
     const {selectingRoomStates, objectsInSelectingRoom} = roomsFactory(props);
     const {roomObjectContainerStyle, roomObjectStyle} = RoomStyleFactory(selectingRoomStates)
     const curTime = ref(new Date())

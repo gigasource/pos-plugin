@@ -66,6 +66,7 @@ async function prepareDb(orm) {
     addItem(order, rice, 2);
     removeItem(order, 1, 1);
     addModifier(order, ketchup);
+    makeTakeaway(order);
     await nextTick();
     addMultiPayment(order, {type: "card", value: 2});
     await nextTick();

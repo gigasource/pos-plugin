@@ -4,7 +4,7 @@ import {computed, withModifiers, ref, watchEffect, KeepAlive} from 'vue';
 import {selectingObject} from '../../TablePlan/EditableRoom/EditTablePlanLogics';
 import {isTable, inProgressTables, isWall} from '../../TablePlan/RoomShared';
 import {useI18n} from 'vue-i18n';
-import {activeOrders} from "../../AppSharedStates";
+import {activeOrders, appHooks} from "../../AppSharedStates";
 import RestaurantRoom from "../../TablePlan/BasicRoom/RestaurantRoom";
 import {fetchRooms, rooms} from "../../TablePlan/RoomState";
 
@@ -33,6 +33,7 @@ export default {
     watchEffect(async () => {
       if (internalValue.value) {
         if (rooms.value.length === 0) await fetchRooms();
+        if (activeOrders.value.length === 0) await appHooks.emit('orderChange');
         //const rooms = await cms.getModel('Room').find();
         tabs.value = [
           ...rooms.value
@@ -40,7 +41,6 @@ export default {
               .map(i => ({title: i.name, room: i.roomObjects, _id: i._id})),
           {title: 'Manual'}
         ]
-        console.log(tabs.value);
         tab.value = tabs[0];
       }
     })
@@ -62,32 +62,30 @@ export default {
               <g-tabs v-model={tab.value} items={tabs.value} vertical style="height: 100%"
                       text-color="#1d1d26" color="white" active-text-color="#1d1d26"
                       slider-color="#1471ff" slider-size="3">
-                {tabs.value.map(item => {
-                  console.log(item);
-                  return <g-tab-item item={item} class="pl-0 h-100" key={item.title}>
-                    {item.title === 'Manual' ?
-                        <>
-                          <pos-textfield-new v-model={chooseTableInput.value} label="Table" class="mb-5"/>
-                          <g-spacer/>
-                          <div class="keyboard">
-                            <pos-keyboard-full onEnterPressed={submit}/>
-                          </div>
-                        </> :
-                        tab.value === item &&
-                        <restaurant-room
-                            roomId={item._id}
-                            disabledTables={disabledTables.value}
-                            choose-table={chooseTable}
-                            >
-                          {{
-                            'room-object': (obj) => (isTable(obj) || !isWall(obj)) && <div>
-                              <div>{obj.name}</div>
+                {tabs.value.map(item =>
+                    <g-tab-item item={item} class="pl-0 h-100" key={item.title}>
+                      {item.title === 'Manual' ?
+                          <>
+                            <pos-textfield-new v-model={chooseTableInput.value} label="Table" class="mb-5"/>
+                            <g-spacer/>
+                            <div class="keyboard">
+                              <pos-keyboard-full onEnterPressed={submit}/>
                             </div>
-                          }}
-                        </restaurant-room>
-                    }
-                  </g-tab-item>;
-                })}
+                          </> :
+                          tab.value === item &&
+                          <restaurant-room
+                              roomId={item._id}
+                              disabledTables={disabledTables.value}
+                              choose-table={chooseTable}
+                          >
+                            {{
+                              'room-object': (obj) => (isTable(obj) || !isWall(obj)) && <div>
+                                <div>{obj.name}</div>
+                              </div>
+                            }}
+                          </restaurant-room>
+                      }
+                    </g-tab-item>)}
               </g-tabs>
             </div>
             <g-btn-bs style="position: absolute; left: 0; bottom: 0"

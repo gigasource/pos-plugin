@@ -29,7 +29,7 @@ module.exports = (cms) => {
     }
 
     if (commit.data.isLastCommit) {
-      feSocketLock.release() // Release lock
+      if (feSocketLock.acquired) feSocketLock.release() // Release lock
       await sendNewOrderToFE()
       return
     }
@@ -41,40 +41,34 @@ module.exports = (cms) => {
     }, 300)
   })
 
+  cms.on('action:endOfDay', ({order, recent}, cb) => {
+
+    cb();
+  })
+
   cms.socket.on('connect', async (socket) => {
     feSocket = socket
-    socket.on('print-to-kitchen', async (actionList, order, recent, device) => {
-      /*actionList.push({
-        modelName: 'Order',
-        action: orm('Order').updateOne({_id: order._id}, {
-          $set: {
-            'items.$[].sent': true, 'items.$[].printed': true,
-            'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
-          }
-        }).chain
-      });*/
+    socket.on('print-to-kitchen', async function (actionList, order, recent, device) {
       await execAllChain(actionList)
-      //action print should be here
-      //await printKitchen(cms, {order, device, recent});
-      //await printKitchenCancel(cms, {order, device, recent})
       //todo: how to get device
       //todo: use test
-      await cms.emit('post:print-to-kitchen');
+      await cms.emit('run:print-to-kitchen', ...arguments);
     })
 
-    // todo:
-    socket.on('pay-order', async (actionList, order, cb = () => null) => {
-      /*actionList.push({
-        modelName: 'Order',
-        action: orm('Order').updateOne({_id: order._id}, {
-          $set: {
-            'items.$[].sent': true, 'items.$[].printed': true,
-            'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
-          }
-        }).chain
-      });*/
+    // todo: recent ??
+    socket.on('pay-order', async (actionList, order, recent, cb = () => null) => {
       await execAllChain(actionList)
       //todo: when should call callback
+
+      //pay order : should work on master or not ??
+      await cms.emit('run:pay-order', order);
+      //emit on master ??
+
+      cms.emitAction('action:endOfDay', {order, recent}, () => {
+
+        cb();
+      });
+
       cb();
     })
 
@@ -89,7 +83,7 @@ module.exports = (cms) => {
   async function cancelOrder({_id, table}, cb = () => null) {
     if (!_id) return cb()
 
-    //fixme: refactore
+    //fixme: refactor
     await orm('Order').deleteOne({_id}).commit({table})
 
     cb()

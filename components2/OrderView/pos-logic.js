@@ -18,17 +18,17 @@ function calNet(gross, tax) {
 
 function calItemTax(item, price) {
   const unitGross = (price || item.price) + _.sumBy(item.modifiers, m => m.quantity * m.price);
-  return +(calTax(unitGross * item.quantity, item.tax || 0)).toFixed(2);
+  return _.round(calTax(unitGross * item.quantity, item.tax || 0), 2);
 }
 
 function calItemNet(item, price) {
   const unitGross = (price || item.price) + _.sumBy(item.modifiers, m => m.quantity * m.price);
-  return +(calNet(unitGross * item.quantity, item.tax || 0)).toFixed(2);
+  return _.round(calNet(unitGross * item.quantity, item.tax || 0), 2);
 }
 
 export function calItemVSum(item, price) {
   const unitGross = (price || item.price) + _.sumBy(item.modifiers, m => m.quantity * m.price);
-  return +(unitGross * item.quantity).toFixed(2);
+  return _.round(unitGross * item.quantity, 2);
 }
 
 export const hooks = new (require('schemahandler/hooks/hooks'))();
@@ -184,7 +184,7 @@ export const createOrder = function (_order) {
   watchEffect(() => {
     for (const item of order.items) {
       let vTaxSum = {
-        [item.tax]: {
+        [item.tax || 0]: {
           tax: calItemTax(item),
           net: calItemNet(item),
           gross: calItemVSum(item),
@@ -269,7 +269,7 @@ export function addItem(order, item, quantity) {
     merge = true;
   } else {
     //addItem
-    _item._id = new ObjectID();
+    _item._id = _item._id || new ObjectID();
     _item = reactive(_item);
     order.items.push(_item);
   }
@@ -336,7 +336,7 @@ export function addModifier(order, modifier) {
   }
 }
 
-export function addItemModifier(order,queryItem, modifier) {
+export function addItemModifier(order, queryItem, modifier) {
   if (typeof queryItem !== 'number') {
     queryItem = _.findIndex(order.items, queryItem);
   }

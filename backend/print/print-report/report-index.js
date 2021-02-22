@@ -87,9 +87,14 @@ module.exports.printInvoiceHandler = printHandler
 async function getLocale() {
   // store locale
   let locale = 'en'
-  const posSettings = await cms.getModel('PosSetting').findOne()
+  //fixme: use posSetting because of multi-languages on frontend
+  /*const posSettings = await cms.getModel('PosSetting').findOne()
   if (posSettings) {
     if (posSettings.onlineDevice.store && posSettings.onlineDevice.store.locale) locale = posSettings.onlineDevice.store.locale
+  }*/
+  const systemConfig = await cms.getModel('SystemConfig').findOne({})
+  if (systemConfig) {
+    locale = _.get(systemConfig, 'content.locale');
   }
   const localeFilePath = `../../../i18n/${locale}.js`
   const isLocaleFileExist = fs.existsSync(path.resolve(__dirname, localeFilePath))
@@ -150,7 +155,7 @@ async function printHandler(reportType, reportData, device, callback = () => nul
     const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
     for (const printerInfo of printers) {
       if (useVirtualPrinter) {
-        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, {report, printData, printerInfo, type})
+        await cms.emit(virtualPrinter.cmsHookEvents.PRINT_VIRTUAL_REPORT, {report, printData, printerInfo, type, locale})
       }
 
       const {escPOS} = printerInfo
@@ -165,7 +170,7 @@ async function printHandler(reportType, reportData, device, callback = () => nul
             print: escPrinter.print.bind(escPrinter),
           }
         });
-        await report.printCanvas(pureImagePrinter, printData, printerInfo.groupPrinter, 'canvas');
+        await report.printCanvas(pureImagePrinter, printData, printerInfo.groupPrinter, locale);
         pureImagePrinter.cleanup();
       }
     }

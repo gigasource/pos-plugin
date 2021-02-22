@@ -1,31 +1,31 @@
 //<editor-fold desc="declare">
-import {renderPivotTable} from "./pivot";
-import {eodReport} from "./report-eod-logic";
-import {eodReportCalender} from "./report-eod-calender-logic";
-import {monthReport} from "./report-month-report";
-import {staffReport} from "./report-staff-logic";
-import {xReport} from "./report-x-report-logic";
+import { renderPivotTable } from "./pivot";
+import { eodReport } from "./report-eod-logic";
+import { eodReportCalender } from "./report-eod-calender-logic";
+import { monthReport } from "./report-month-report";
+import { staffReport } from "./report-staff-logic";
+import { xReport } from "./report-x-report-logic";
 
 const _ = require("lodash");
 const moment = require("moment");
 
 const orm = require("schemahandler");
 
-const { prepareDb } = require('./report.prepare.test')
+const { prepareDb } = require("./report.prepare.test");
 
 const delay = require("delay");
 orm.connect("mongodb://localhost:27017", "tseReport");
 
 const items = [
-  {name: "A1", price: 10, quantity: 1, tax: 7, group: "G1", takeAway: true},
-  {name: "A2", price: 10, quantity: 1, tax: 19, group: "G2", takeAway: true},
-  {name: "A3", price: 10, quantity: 1, tax: 7, group: "G1", takeAway: true},
-  {name: "A4", price: 10, quantity: 1, tax: 7, group: "G2", takeAway: true},
-  {name: "A5", price: 10, quantity: 1, tax: 7, group: "G1"},
-  {name: "A6", price: 10, quantity: 1, tax: 19, group: "G2"},
-  {name: "A7", price: 10, quantity: 1, tax: 19, group: "G1"},
-  {name: "A8", price: 10, quantity: 1, tax: 19, group: "G2"},
-  {name: "A9", price: 10, quantity: 1, tax: 7, group: "G1"}
+  { name: "A1", price: 10, quantity: 1, tax: 7, group: "G1", takeAway: true },
+  { name: "A2", price: 10, quantity: 1, tax: 19, group: "G2", takeAway: true },
+  { name: "A3", price: 10, quantity: 1, tax: 7, group: "G1", takeAway: true },
+  { name: "A4", price: 10, quantity: 1, tax: 7, group: "G2", takeAway: true },
+  { name: "A5", price: 10, quantity: 1, tax: 7, group: "G1" },
+  { name: "A6", price: 10, quantity: 1, tax: 19, group: "G2" },
+  { name: "A7", price: 10, quantity: 1, tax: 19, group: "G1" },
+  { name: "A8", price: 10, quantity: 1, tax: 19, group: "G2" },
+  { name: "A9", price: 10, quantity: 1, tax: 7, group: "G1" }
 ];
 
 beforeAll(async () => {
@@ -38,8 +38,8 @@ function makeDate(str) {
 
 //</editor-fold>
 
-describe("pos-logic", function () {
-  it("case 0: test pivot", async function () {
+describe("pos-logic", function() {
+  it("case 0: test pivot", async function() {
     const pivot = {
       rows: ["tax"],
       columns: ["group"],
@@ -50,7 +50,7 @@ describe("pos-logic", function () {
     expect(result).toMatchSnapshot();
   });
 
-  it("case 0 b: test pivot", async function () {
+  it("case 0 b: test pivot", async function() {
     const pivot = {
       rows: ["tax"],
       columns: [
@@ -67,24 +67,34 @@ describe("pos-logic", function () {
   });
 
   //EOD
-  it("case 1: EOD", async function () {
-    const {report, reportByPayment, cancelledReport} = await eodReport();
+  it("case 1: EOD", async function() {
+    const {
+      report,
+      reportByPayment,
+      cancelledReport,
+      cancelledItemReport
+    } = await eodReport();
     expect(report).toMatchInlineSnapshot(`
       Object {
         "from": 2021-01-04T17:00:00.000Z,
-        "quantity": 3,
-        "to": 2021-01-05T17:00:00.000Z,
-        "vDiscount": 0.52,
-        "vSum": 20.38,
+        "quantity": 5,
+        "to": 2021-01-06T17:00:00.000Z,
+        "vDiscount": 3.17,
+        "vSum": 34.33,
         "vTaxSum": Object {
-          "gross": 20.38,
-          "net": 18.74,
-          "tax": 1.64,
+          "gross": 34.33,
+          "net": 32.14,
+          "tax": 2.19,
           "vTaxSum": Object {
+            "0": Object {
+              "gross": 10,
+              "net": 10,
+              "tax": 0,
+            },
             "16": Object {
-              "gross": 7.38,
-              "net": 6.36,
-              "tax": 1.02,
+              "gross": 11.33,
+              "net": 9.760000000000002,
+              "tax": 1.57,
             },
             "5": Object {
               "gross": 13,
@@ -98,8 +108,8 @@ describe("pos-logic", function () {
 
     expect(reportByPayment).toMatchInlineSnapshot(`
       Object {
-        "card": 2.78,
-        "cash": 17.6,
+        "card": 4.08,
+        "cash": 30.25,
       }
     `);
 
@@ -108,13 +118,14 @@ describe("pos-logic", function () {
         "cancelled": 1.3,
       }
     `);
+    expect(cancelledItemReport).toMatchInlineSnapshot(`1.3`);
   });
 
   //EOD calendar
   //from, to
-  it("case 4: ordersByDate", async function () {
+  it("case 4: ordersByDate", async function() {
     //query from/to/paid
-    const {ordersByDate} = await eodReportCalender();
+    const { ordersByDate } = await eodReportCalender();
 
     expect(ordersByDate).toMatchInlineSnapshot(`
       Object {
@@ -136,7 +147,7 @@ describe("pos-logic", function () {
     `);
   });
 
-  it("case 5: month report", async function () {
+  it("case 5: month report", async function() {
     const {
       total,
       salesByPayment,
@@ -186,8 +197,8 @@ describe("pos-logic", function () {
     `);
   });
 
-  it("case 7: staff report", async function () {
-    const {groupByPayment, groupByStatus, userSales} = await staffReport();
+  it("case 7: staff report", async function() {
+    const { groupByPayment, groupByStatus, userSales } = await staffReport();
 
     expect(groupByPayment).toMatchInlineSnapshot(`
       Object {
@@ -262,14 +273,14 @@ describe("pos-logic", function () {
     //thay đổi
   });
 
-  it("case 8: x report", async function () {
+  it("case 8: x report", async function() {
     const {
       groupItemsByCategory,
       sumByCategory,
       sumByPayment,
       sumByTakeout,
       report
-    } = await xReport()
+    } = await xReport();
 
     expect(groupItemsByCategory).toMatchInlineSnapshot(`
       Object {

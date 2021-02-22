@@ -29,6 +29,7 @@ import {
 import { selectingRoomStates } from '../TablePlan/RoomState';
 import { isTable } from '../TablePlan/RoomShared';
 import { getScopeAttrs } from '../../utils/helpers';
+import {backFn} from "../utils";
 
 export default {
   name: 'EditTablePlanSidebar',
@@ -117,7 +118,7 @@ export default {
       </div> : null}
 
       <div style="display: flex; margin: 5px; justify-content: space-between">
-        <g-btn uppercase={false} background-color="white" text-color="#1d1d26" onClick={onBack} style="flex: 1">
+        <g-btn uppercase={false} background-color="white" text-color="#1d1d26" onClick={backFn.value} style="flex: 1">
           <g-icon class="mr-2" svg>
             icon-back
           </g-icon>

@@ -173,7 +173,7 @@ export default {
                   <span class="sales-entry sales-type">
                     {paymentType} {t('common.sales')}:
                   </span>
-                  <span class="sales-entry">
+                  <span class="sales-entry sales-amount">
                     {$filters.formatCurrency(sale)}
                   </span>
                 </p>
@@ -181,7 +181,7 @@ export default {
             <span class="sales-entry sales-type">
               {t('report.returnedTotal')}:
             </span>
-            <span class="sales-entry">
+            <span class="sales-entry sales-amount">
               {$filters.formatCurrency(0)}
             </span>
           </p>
@@ -240,7 +240,7 @@ export default {
   position: relative;
   height: 100%;
 
-  .staff-report-content {
+  .staff-report-content :deep {
     height: 100%;
 
     .detail-header {
@@ -284,7 +284,7 @@ export default {
     }
 
     .g-tab {
-      height: 99px;
+      height: 60px;
       width: 190px;
       background-color: #ffffff;
     }
@@ -294,7 +294,7 @@ export default {
     }
 
     .g-tab:not(.g-tab__active) {
-      height: 99px;
+      height: 60px;
       width: 190px;
       background-color: #F9F9F9;
     }
@@ -304,7 +304,7 @@ export default {
       white-space: normal;
     }
 
-    ::v-deep .g-tabs-wrapper {
+    .g-tabs-wrapper {
       height: calc(100% - 64px);
 
       .g-tabs__vertical {
