@@ -7,6 +7,7 @@ import { categories, products } from '../../Product/product-logic'
 import { selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
+import { retailLayoutSetting } from './retail-layout-setting-logic';
 
 export default {
   name: 'PosOrderScreenScrollWindow',
@@ -48,12 +49,14 @@ export default {
       return result
     })
 
+    const numberOfProductsInWindows = computed(() => retailLayoutSetting.productColumn * retailLayoutSetting.productRow)
+
     const productWindows = computed(() => {
       const result = {}
       Object.keys(groupedProducts.value).forEach(category => {
-        result[category] = _.chunk(groupedProducts.value[category], 28)
+        result[category] = _.chunk(groupedProducts.value[category], numberOfProductsInWindows.value)
       })
-      result['Favorite'] = _.chunk(favoriteProducts.value, 28)
+      result['Favorite'] = _.chunk(favoriteProducts.value, numberOfProductsInWindows.value)
       return result
     })
 
@@ -73,13 +76,25 @@ export default {
     }
 
     function getItemStyle(item) {
+      const customizableStyle = {
+        fontSize: retailLayoutSetting.productFontSize + 'px'
+      }
+
+      if (retailLayoutSetting.showFullProductName) {
+        customizableStyle.overflow = 'initial'
+        customizableStyle.whiteSpace = 'initial'
+      }
+
       if (item.layouts) {
         return {
           order: item.layouts[0].order,
           ...(item.layouts[0].color === '#FFFFFF' || !item.layouts[0].color) && { border: '1px solid #979797', backgroundColor: '#FFF' },
-          ...item.layouts[0].color && item.layouts[0].color !== '#FFFFFF' && { backgroundColor: item.layouts[0].color }
+          ...item.layouts[0].color && item.layouts[0].color !== '#FFFFFF' && { backgroundColor: item.layouts[0].color },
+          ...customizableStyle
         }
       }
+
+      return customizableStyle
     }
 
     // const watcher = watch(() => scrollWindowProducts.value, {
@@ -134,9 +149,15 @@ export default {
           <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeProductWindow.value}>
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
-                  <g-scroll-window-item key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindow.value = windowIndex}>
+                  <g-scroll-window-item
+                      style={{
+                        gridTemplateRows: `repeat(${retailLayoutSetting.productRow}, 1fr)`,
+                        gridTemplateColumns: `repeat(${retailLayoutSetting.productColumn}, 1fr)`
+                      }}
+                      key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindow.value = windowIndex}>
                     {window.map((item, i) => execGenScopeId(() =>
-                        <div class="btn" key={`btn_${i}`} style={getItemStyle(item)}
+                        <div class="btn" key={`btn_${i}`}
+                             style={getItemStyle(item)}
                              onClick={withModifiers(() => addProduct(item), ['stop'])}>
                           { item.name }
                         </div>)
@@ -198,15 +219,17 @@ export default {
       margin-right: 6px;
 
       .btn {
-        white-space: normal;
+        text-overflow: ellipsis;
         padding: 0 8px !important;
         line-height: 0.9;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
         cursor: pointer;
+
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
   }
