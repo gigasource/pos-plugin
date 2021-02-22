@@ -5,7 +5,7 @@
       <pos-order-screen-scroll-window class="por__main__window"/>
       <pos-order-screen-number-keyboard class="por__main__keyboard"/>
       <pos-order-screen-button-group class="por__main__buttons"/>
-      <dialog-retail-refund-search v-model="showRefundSearch"></dialog-retail-refund-search>
+<!--      <dialog-retail-refund-search v-model="showRefundSearch"></dialog-retail-refund-search>-->
     </div>
     <pos-retail-cart class="por__detail"/>
 <!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->

@@ -6,13 +6,7 @@ import { execGenScopeId, genScopeId } from '../../utils'
 import { useI18n } from 'vue-i18n'
 import { getCurrentOrder } from '../../OrderView/pos-logic-be'
 import { changeItemQuantity } from '../../OrderView/pos-logic';
-import {
-  fontSize,
-  changeSize,
-  changeCategoryFontSize,
-  category,
-  saveOrderLayoutSetting
-} from '../../OrderView/order-layout-setting-logic';
+import { retailLayoutSetting, changeValue, loadRetailLayoutSetting, saveRetailLayoutSetting } from './retail-layout-setting-logic';
 
 export default {
   name: 'PosRetailCart',
@@ -43,16 +37,27 @@ export default {
     const showCtxMenu = ref(false)
     const showScreenSettingPanel = ref(false)
     function renderScreenSettingPanel() {
-      function renderPropSetting(title, prop, adjustMethod) {
+      function renderNumericPropSetting(title, prop) {
         const valueStyle = { width: '50px', fontSize: '12px', fontWeight: 'bold' }
         const propStyle = { fontSize: '12px' }
         return (
             <div class="row-flex align-items-center">
               <span style={propStyle}>{title}</span>
               <g-spacer/>
-              <g-icon onClick={() => adjustMethod(-0.5)}>remove_circle</g-icon>
-              <span style={valueStyle}>{prop.value}</span>
-              <g-icon onClick={() => adjustMethod(0.5)}>add_circle</g-icon>
+              <g-icon onClick={() => changeValue(prop, retailLayoutSetting[prop] - 1)}>remove_circle</g-icon>
+              <span style={valueStyle}>{retailLayoutSetting[prop]}</span>
+              <g-icon onClick={() => changeValue(prop, retailLayoutSetting[prop] + 1)}>add_circle</g-icon>
+            </div>
+        )
+      }
+
+      function renderBooleanPropSetting(title, prop) {
+        const propStyle = { fontSize: '12px' }
+        return (
+            <div class="row-flex align-items-center">
+              <span style={propStyle}>{title}</span>
+              <g-spacer/>
+              <g-switch v-model={retailLayoutSetting[prop]}></g-switch>
             </div>
         )
       }
@@ -63,27 +68,19 @@ export default {
 
       return <>
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>Category</div>
-          <div style={propSectionStyle}>
-            { renderPropSetting('Height:', category.fontSize, changeSize) }
-            { renderPropSetting('Width:', category.fontSize, changeSize) }
-            { renderPropSetting('Font size:', category.fontSize, changeSize) }
-          </div>
-        </div>
-
-        <div style={sectionStyle}>
           <div style={sectionTitleStyle}>Product</div>
           <div style={propSectionStyle}>
-            { renderPropSetting('Width:', fontSize, changeSize) }
-            { renderPropSetting('Height:', fontSize, changeSize) }
-            { renderPropSetting('Font size:', fontSize, changeSize) }
+            { renderNumericPropSetting('Rows', 'productRow') }
+            { renderNumericPropSetting('Columns', 'productColumn') }
+            { renderNumericPropSetting('Font size', 'productFontSize') }
+            { renderBooleanPropSetting('Show full name', 'showFullProductName' ) }
           </div>
         </div>
 
         <div class="row-flex justify-end">
           <g-btn-bs width="100" small style="margin-top: 10px; margin-right:0" background-color="#1271FF"
                     onClick={() => {
-                      saveOrderLayoutSetting()
+                      saveRetailLayoutSetting()
                       showScreenSettingPanel.value = false
                     }}>Save
           </g-btn-bs>
@@ -134,7 +131,10 @@ export default {
               default: () => (
                   <g-expand-x-transition>{ execGenScopeId(() =>
                       <div style="background-color: #FFF;">
-                        <g-btn-bs icon="icon-blue-cog" onClick={() => showScreenSettingPanel.value = true}>Edit Screen</g-btn-bs>
+                        <g-btn-bs icon="icon-blue-cog" onClick={() => {
+                          loadRetailLayoutSetting()
+                          showScreenSettingPanel.value = true
+                        }}>Edit Screen</g-btn-bs>
                       </div>
                   )}</g-expand-x-transition>
               ),
