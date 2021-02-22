@@ -122,9 +122,12 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'dialog-change-value': true,
         'dialog-choose-popup-modifier': true,
         "dialog-config-order-item": true,
+        'dialog-confirm-delete': true,
         'dialog-form-input': true,
         'dialog-multi-payment': true,
         'dialog-multi-payment2': true,
+        'dialog-new-payment': true,
+        'dialog-new-tax-category': true,
         'dialog-product-search-result': true,
         'dialog-text-filter': true,
         'g-avatar': true,
@@ -141,6 +144,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-divider': true,
         "g-icon": true,
         'g-item-group': true,
+        'g-file-input': true,
         'g-menu': true,
         "g-overlay": true,
         'g-radio': true,
@@ -158,6 +162,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-snackbar': true,
         'g-checkbox': true,
         'g-chip': true,
+        'pos-file-input-image': true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
         //'pos-order-split-order': true,
@@ -168,11 +173,14 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'pos-order-receipt': true,
         'pos-order-voucher-dialog': true,
         'pos-textfield-new': true,
+        'pos-time-picker': true,
         'g-grid-select': StubFactory('g-grid-select'),
         'pos-payment-screen-payment-methods2': true,
         'pos-payment-screen-keyboard2': true,
         'pos-restaurant-payment-order-detail2': true,
         'pos-restaurant-payment-toolbar2': true,
+        'g-sidebar': true,
+        'g-side-bar-tree-view': true,
         'scroll-select': true,
       },
       mocks: {
@@ -192,18 +200,3 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
 };
 
 beforeAll(() => (config.renderStubDefaultSlot = true));
-
-import fs from 'fs';
-import {PNG} from "pngjs";
-global.printFunctions = {
-  printPng: async (png) => {
-    try {
-      const bufferInBase64 = PNG.sync.write(png);
-      fs.writeFileSync(__dirname + '/EndOfDay/__test__/__snapshots__/report.png', bufferInBase64);
-
-    } catch (e) {
-      console.log('canvasprinter: printPng exception', e)
-    }
-  },
-  print: () => null
-}

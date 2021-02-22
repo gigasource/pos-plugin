@@ -1,7 +1,8 @@
 import {smallSidebar} from "./order-layout-setting-logic";
 import {$filters} from "../AppSharedStates";
 import {useI18n} from "vue-i18n";
-import {onActivated, ref, withModifiers} from "vue";
+import {useRouter} from 'vue-router';
+import {onActivated, ref, withModifiers, Transition} from "vue";
 import {
   getCurrentOrder,
   onlyCheckoutPrintedItems,
@@ -11,6 +12,8 @@ import {
   showIcon,
   togglePayPrintBtn
 } from "./pos-logic-be";
+import {orderViewDialog} from "./pos-ui-shared";
+import {addSinglePayment, clearPayment, getRestTotal} from "./pos-logic";
 
 export function payPrintBtnFactory() {
   let {t: $t, locale} = useI18n();
@@ -28,6 +31,17 @@ export function payPrintBtnFactory() {
     }
   })
 
+  const router = useRouter();
+  const _togglePayPrintBtn = () => {
+    togglePayPrintBtn(() => {
+      //todo: receiptView
+      //router.push({path: '/pos-dashboard'});
+      clearPayment(order);
+      addSinglePayment(order, {type: 'cash', value: getRestTotal(order)});
+      orderViewDialog.receipt = true;
+    });
+  }
+
   const renderPayBtn = () => {
     const btnAttrs = {
       width: 75,
@@ -35,44 +49,45 @@ export function payPrintBtnFactory() {
       'text-color': "#FFF",
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick: withModifiers(togglePayPrintBtn, ['stop'])
+      onClick: withModifiers(_togglePayPrintBtn, ['stop'])
     }
     const bigBtnAttrs = {
       width: '104',
       style: 'font-size: 14px; padding: 4px 0',
       'background-color': "#1271FF",
       disabled: !payBtnClickable.value,
-      onClick: withModifiers(togglePayPrintBtn, ['stop'])
+      onClick: withModifiers(_togglePayPrintBtn, ['stop'])
     }
 
     if (showQuickBtn.value) {
       if (smallSidebar.value) {
         if (payPrintMode.value === 'print') {
           return <g-btn-bs {...btnAttrs}>
-            <transition name="front">
+            <Transition name="front">
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
-            </transition>
-            <transition name="back">
+            </Transition>
+            <Transition name="back">
               {showIcon.value && <div class="animation-wrapper" style="background-color: #0EA76F">
                 <g-icon>icon-print</g-icon>
               </div>}
-            </transition>
+            </Transition>
           </g-btn-bs>
         }
         return (
           <g-btn-bs {...btnAttrs}>
-            <transition name="front">
+            <Transition name="front">
               {!showIcon.value && <div class="animation-wrapper">
                 <span>{$t('common.currency', locale)} {$filters.formatCurrency(order.vSum)}</span>
               </div>}
-            </transition>
-            <transition name="back">
+
+            </Transition>
+            <Transition name="back">
               {showIcon.value && <div class="animation-wrapper bg-pink">
                 <g-icon>icon-wallet</g-icon>
               </div>}
-            </transition>
+            </Transition>
           </g-btn-bs>
         )
       }
@@ -87,7 +102,8 @@ export function payPrintBtnFactory() {
         </g-btn-bs>
       )
     }
-    return <span class="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
+    return <span
+      class="order-detail__header-value text-red">{$t('common.currency', locale)}{$filters.formatCurrency(order.vSum)}</span>
   }
 
   return {

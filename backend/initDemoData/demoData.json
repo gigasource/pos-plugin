@@ -353,6 +353,9 @@
       ],
       "id": 1,
       "appType": "POS_RESTAURANT"
+      "id": 1,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "groupPrinter2": "5e7864c486e3ec0997b5e492"
     },
     {
       "category": [
@@ -370,6 +373,9 @@
       ],
       "id": 2,
       "appType": "POS_RESTAURANT"
+      "id": 2,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e",
+      "groupPrinter2": "5e7864c486e3ec0997b5e492"
     },
     {
       "_id": "5e784d7786e3ec0997b5e341",
@@ -389,6 +395,8 @@
       "id": "3",
       "isNoPrint": true,
       "appType": "POS_RESTAURANT"
+      "isNoPrint": true,
+      "groupPrinter": "5e7864b186e3ec0997b5e48e"
     },
     {
       "_id": "5e784d7786e3ec0997b5e343",
@@ -3660,7 +3668,7 @@
       "type": "kitchen",
       "printers": [
         {
-          "hardwares": [],
+          "hardwares": ["Terminal 1"],
           "includes": [],
           "_id": "5e81774685fb2d03dda95cd0",
           "printerType": "ip",

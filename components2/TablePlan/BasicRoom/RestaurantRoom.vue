@@ -5,7 +5,8 @@ import {
   initRouter,
   isTransferringTable,
   onCustomerDialogSubmit,
-  showNumberOfCustomersDialog
+  showNumberOfCustomersDialog,
+  chooseTable
 } from './RestaurantRoomLogics'
 import { getDiffTime } from '../../../utils/commons'
 import { onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue';
@@ -48,6 +49,7 @@ export default {
       const order = getTableOrderInfo(obj)
       const zoom = selectingRoomStates.value ? selectingRoomStates.value.zoom : 1
       const isUserTable = (order, user) => {
+        if (!user) return false
         //todo: check this logic: compare by name is correct ?
         return _.some(order.user, i => i.name === user.name)
       }
@@ -91,7 +93,7 @@ export default {
       return <div key={obj._id} id={obj.name}
                   style={_roomObjectContainerStyle(obj)}
                   class={classes(obj)}
-          // onClick={() => chooseTable(obj.name)}
+                  onClick={() => chooseTable(obj)}
                   v-touch={touchHandlers(obj)}
       >
         {objectContentRender(obj)}

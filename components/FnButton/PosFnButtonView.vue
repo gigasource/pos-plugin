@@ -224,7 +224,7 @@
   import _ from 'lodash'
   import fnButtonLayout from './fnButtonLayout'
   import cms from 'cms'
-  import PosTextField from '../pos-shared-components/POSInput/PosTextField';
+  import PosTextField from '../../components2/pos-shared-components/POSInput/PosTextField';
   import DialogFnButtonProductLookup from './components/dialogFnButtonProductLookup';
   import layoutConfigMixin from './common/layoutConfigMixin';
 

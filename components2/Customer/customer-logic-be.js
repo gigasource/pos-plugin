@@ -2,7 +2,7 @@ import { watch } from 'vue'
 import cms from 'cms'
 import {
   currentAppType
-} from '../AppSharedStates'
+} from '../AppType'
 import {
   customers
 } from './customer-logic-ui'

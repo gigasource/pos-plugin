@@ -457,3 +457,177 @@ exports[`order-view test case 2 orderLayout 1`] = `
   </g-overlay-stub>
 </div>
 `;
+
+exports[`order-view test case 3: split payment 1`] = `
+<g-dialog-stub fullscreen="true"
+               modelvalue="true"
+>
+  <div class="receipt">
+    <g-toolbar-stub color="#EFEFEF">
+      <g-btn-bs-stub width="120"
+                     icon="icon-back"
+                     class="elevation-2"
+      >
+        Back
+      </g-btn-bs-stub>
+      <g-btn-bs-stub width="120"
+                     icon="icon-print"
+                     class="elevation-2"
+      >
+        Print
+      </g-btn-bs-stub>
+      <g-btn-bs-stub width="120"
+                     icon="icon-receipt2"
+                     style="white-space: unset;"
+                     class="elevation-2"
+      >
+        <div style="line-height: 0.9;">
+          <p>
+            Company
+          </p>
+          <p>
+            Receipt
+          </p>
+        </div>
+      </g-btn-bs-stub>
+      <g-spacer-stub>
+      </g-spacer-stub>
+      <g-btn-bs-stub width="120"
+                     background-color="#0EA76F"
+                     icon="icon-complete"
+                     class="elevation-2"
+      >
+        Complete
+      </g-btn-bs-stub>
+    </g-toolbar-stub>
+    <div class="receipt-main">
+      <div class="receipt-main__header">
+        <div class="receipt-main__header-title">
+          Lotteria Nguyen Khanh Toan
+        </div>
+        <div class="receipt-main__header-subtitle">
+          103 DN11, Nguyen Khanh Toan, Quan Hoa, Cau Giay, Ha Noi
+        </div>
+        <div class="receipt-main__header-subtitle">
+          <span class="mr-3">
+            Tel: 0462.813.977
+          </span>
+          <span>
+            VAT Reg No: 123456789
+          </span>
+        </div>
+      </div>
+      <div class="receipt-main__title">
+        Table:
+      </div>
+      <div class="receipt-main__item">
+        <div class="row-flex align-items-center">
+          <g-menu-stub nudge-bottom="10"
+                       content-class="menu-receipt-action"
+          >
+            <div class="menu-seat-btn">
+              <div class="menu-seat-btn--payment">
+                <g-btn-bs-stub width="100"
+                               icon="icon-print"
+                               class="elevation-2"
+                >
+                  Print
+                </g-btn-bs-stub>
+                <g-btn-bs-stub width="100"
+                               class="elevation-2"
+                >
+                  Bewirtung
+                </g-btn-bs-stub>
+              </div>
+              <div class="menu-seat-btn--payment">
+                <g-btn-bs-stub width="100"
+                               icon="icon-credit_card"
+                               background-color="#fff"
+                               class="elevation-2"
+                >
+                  Card
+                </g-btn-bs-stub>
+                <g-btn-bs-stub width="100"
+                               icon="icon-cash"
+                               background-color="#1271ff"
+                               class="elevation-2"
+                >
+                  Cash
+                </g-btn-bs-stub>
+                <g-btn-bs-stub width="100"
+                               icon="icon-multi_payment"
+                               background-color="#fff"
+                               class="elevation-2"
+                >
+                  Multi
+                </g-btn-bs-stub>
+              </div>
+              <g-btn-bs-stub width="100"
+                             icon="icon-email"
+                             class="elevation-2"
+              >
+                Email
+              </g-btn-bs-stub>
+              <g-btn-bs-stub width="100"
+                             icon="icon-coin-box"
+                             class="elevation-2"
+              >
+                Trinkgeld
+              </g-btn-bs-stub>
+            </div>
+          </g-menu-stub>
+          <g-spacer-stub>
+          </g-spacer-stub>
+          <div class="receipt-main__item-total">
+            <g-icon-stub class="mr-1">
+              icon-cash
+            </g-icon-stub>
+            <span>
+              'common.currency' , 'en' 3.9
+            </span>
+          </div>
+        </div>
+        <div class="receipt-main__item-header">
+          <div class="col-1">
+            Q.ty
+          </div>
+          <div class="col-9 pl-2">
+            Item name
+          </div>
+          <div class="col-2 ta-right">
+            Total
+          </div>
+        </div>
+        <div class="receipt-main__item-row">
+          <div class="col-1">
+            3
+          </div>
+          <div class="col-9 pl-2">
+            <div>
+              Cola
+            </div>
+          </div>
+          <div class="col-2 ta-right">
+            3.90
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="blur-overlay"
+       style="display: none;"
+  >
+  </div>
+  <dialog-multi-payment-stub rotate="true"
+                             modelvalue="false"
+                             store-locale="en"
+  >
+  </dialog-multi-payment-stub>
+  <dialog-form-input-stub width="40%"
+                          keyboard-type="numeric"
+                          keyboard-width="100%"
+                          rotate="true"
+  >
+  </dialog-form-input-stub>
+</g-dialog-stub>
+`;

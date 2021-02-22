@@ -1,6 +1,6 @@
 <template>
   <LazyLoadContainer
-        class="virtualPrinterContainer"
+        class="virtualPrinterContainer w-100"
         :container-style="{ maxHeight: '100%' }"
         :threshold="50"
         :do-load="loadMoreReports">
@@ -53,7 +53,7 @@
     loadReportCount, loadPrinterGroups,
     dismiss, setReports, selectMode, selectPrinterGroup,
   } from '../../composition/useVirtualPrinterLogic'
-  
+
   export default {
     name: 'VirtualPrinterView',
     components: { LazyLoadContainer },
@@ -70,11 +70,11 @@
           ],
         },
       })
-      
+
       const printerGroupModel = computed(() => {
         return virtualPrinterState.printerGroups.map(v => ({ text: v.name, value: v._id }))
       })
-      
+
       const imgSrcs = computed(() => {
         return filteredReports.value.map(x => 'data:image/png;base64, ' + x.imageContent)
       })
@@ -82,11 +82,11 @@
       const receiptWidth = computed(() => {
         return state.zoom.current * 4;
       })
-      
+
       const receiptPadding = computed(() => {
         return Math.floor(15 * state.zoom.current / 100)
       })
-      
+
       const imageWrapperStyle = computed(() => {
         const pd = receiptPadding.value
         return {
@@ -97,16 +97,16 @@
           marginBottom: '15px',
         }
       })
-      
+
       const imgStyle = computed(() => ({
         width: receiptWidth.value + 'px',
       }))
-      
-      
+
+
       // created
       loadReports()
-      
-      
+
+
       return {
         // cpt
         state,
@@ -128,15 +128,15 @@
 
 <style scoped lang="scss">
   $headerHeight: 46px;
-  
+
   .virtualPrinterContainer {
     background-image: url('/plugins/pos-plugin/assets/out.png');
     background-attachment: fixed;
     min-height: 100%;
   }
-  
+
   .virtualPrinter {
-    
+
     &__header {
       height: $headerHeight;
       display: flex;
@@ -144,16 +144,16 @@
       align-items: center;
       background-color: rgba(0,0,0,0.3);
       padding: 10px;
-      
+
       &__btn {
         margin-right: 5px;
       }
-      
+
       &__select {
         box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
         margin-right: 5px;
       }
-  
+
       ::v-deep {
         .bs-tf-wrapper {
           margin: 0;
@@ -162,18 +162,18 @@
           display: flex;
           width: 100%;
         }
-    
+
         .bs-tf-input-group {
           width: 100%;
         }
-        
+
         .bs-tf-inner-input-group {
           height: 36px;
           padding-left: 8px;
           padding-right: 0;
           flex-wrap: nowrap;
           border-width: 0;
-  
+
           .input, .bs-tf-append-inner {
             cursor: pointer;
           }

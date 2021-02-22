@@ -1,16 +1,16 @@
 import { computed } from 'vue';
 import _ from 'lodash';
 
-import { user } from '../../AppSharedStates'
+import { generalSettings, user } from '../../AppSharedStates'
 
 import { roomsStates } from '../../TablePlan/RoomState'
-import { activeScreen, dashboardHooks } from '../DashboardSharedStates';
+import { dashboardHooks } from '../DashboardSharedStates';
 import { useI18n } from 'vue-i18n'
 
 
-const DashboardSidebarItemsFactory = () => {
+const DashboardSidebarFactory = () => {
   const { t } = useI18n()
-  const dashboardSidebarItems = computed(() => [
+  const defaultSidebarItems = computed(() => [
     {
       icon: 'icon-restaurant',
       items: roomsStates.value.map((r) => ({
@@ -20,7 +20,6 @@ const DashboardSidebarItemsFactory = () => {
         onClick() {
           dashboardHooks.emit('updateScreen', 'KeptAliveRoomViews')
           dashboardHooks.emit('selectRoom', r.room._id.toString())
-          // onSelectRoom(r)
         }
       })),
       title: t('sidebar.restaurant'),
@@ -45,17 +44,28 @@ const DashboardSidebarItemsFactory = () => {
           iconType: 'small',
 
           title: t('onlineOrder.dashboard'),
-          key: 'Orders'
+          key: 'Orders',
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderMainView')
+          }
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: t('onlineOrder.completedOrders')
+          title: t('onlineOrder.completedOrders'),
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderListCompletedView')
+            dashboardHooks.emit('changeOnlineOrderListStatus', 'completed')
+          }
         },
         {
           icon: 'radio_button_unchecked',
           iconType: 'small',
-          title: t('onlineOrder.declinedOrders')
+          title: t('onlineOrder.declinedOrders'),
+          onClick() {
+            dashboardHooks.emit('updateScreen', 'OnlineOrderListDeclinedView')
+            dashboardHooks.emit('changeOnlineOrderListStatus', 'declined')
+          }
         },
         {
           icon: 'icon-services',
@@ -74,30 +84,47 @@ const DashboardSidebarItemsFactory = () => {
     {
       icon: 'icon-functions',
       title: t('sidebar.functions'),
+      feature: 'functions',
       onClick() {
         dashboardHooks.emit('updateScreen', 'FunctionsView')
       }
     }
   ])
 
-  const refactoredDashboardSidebarItems = computed(() => {
-    let sidebar = _.cloneDeep(dashboardSidebarItems.value)
+  let showVirtualReportInSidebar = computed(() => {
+    return generalSettings.value.useVirtualPrinter
+  })
+
+  const sidebarItems = computed(() => {
+    let _sidebarItems = _.cloneDeep(defaultSidebarItems.value)
     if (user.value && user.value.role !== 'admin') {
       if (!user.value.viewOnlineOrderDashboard) {
-        sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Dashboard')
+        _sidebarItems = _sidebarItems.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Dashboard')
       } else if (!user.value.viewOrder) {
-        const onlineOrder = sidebar.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
+        const onlineOrder = _sidebarItems.find(s => s.feature === 'onlineOrdering' && s.items && s.items.length)
+        //todo: why 2?
         onlineOrder && onlineOrder.items.splice(1, 2)
       }
       if (!user.value.viewOnlineOrderMenu) {
-        sidebar = sidebar.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
+        _sidebarItems = _sidebarItems.filter(s => s.feature !== 'onlineOrdering' || s.key !== 'Service')
       }
       if (!user.value.viewReservation) {
-        sidebar = sidebar.filter(s => s.feature !== 'reservation' || s.key !== 'Reservation')
+        _sidebarItems = _sidebarItems.filter(s => s.feature !== 'reservation' || s.key !== 'Reservation')
       }
     }
 
-    return sidebar.map(item => {
+    if (showVirtualReportInSidebar.value) {
+      _sidebarItems.push({
+        icon: 'icon-printer',
+        onClick() {
+          dashboardHooks.emit('updateScreen', 'VirtualPrinter')
+        },
+        title: 'Virtual Printer'
+      })
+    }
+
+    //todo: fix badge count hard code ( 1 | 2)
+    return _sidebarItems.map(item => {
       switch (item.key) {
         case 'Reservation':
           return {
@@ -124,8 +151,8 @@ const DashboardSidebarItemsFactory = () => {
     })
   })
   return {
-    refactoredDashboardSidebarItems
+    sidebarItems
   }
 }
 
-export default DashboardSidebarItemsFactory
+export default DashboardSidebarFactory

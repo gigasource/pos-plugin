@@ -1,7 +1,8 @@
 import { DashboardFunctionFactory } from "../pos-dashboard-function-logics";
 import { nextTick } from "vue";
 import cms from "cms";
-import { appHooks, user, currentAppType, appType} from "../../../AppSharedStates";
+import { appHooks, user } from "../../../AppSharedStates";
+import { currentAppType, appType } from '../../../AppType'
 import delay from "delay";
 beforeAll(async () => {
   const orm = require("schemahandler");

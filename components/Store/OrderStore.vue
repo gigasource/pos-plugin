@@ -43,10 +43,10 @@
         :order="dialog.refundConfirm.order"
         :store-locale="storeLocale"
         @submit="doRefundOrder(dialog.refundConfirm.order, dialog.refundConfirm.status)"/>
-    
+
     <dialog-change-value ref="dlgDiscount" @submit="discountCurrentOrder"/>
     <dialog-change-value ref="dlgChangePrice" :new-value-editable="true" @submit="onChangePriceSubmit"/>
-    
+
     <dialog-product-lookup ref="dlgProductLookup" v-model="dialog.productLookup.show"/>
     <g-snackbar v-model="showDiscountMessage" color="#FFC107" :timeout="2000" top>
       <div :style="{color: '#ff4552',  display: 'flex','align-items': 'center'}">
@@ -60,7 +60,7 @@
 <script>
   import orderUtil from '../logic/orderUtil';
   import dialogCommon from './OrderStoreDialogs/dialogCommon';
-  import dialogChangeValue from '../pos-shared-components/dialogChangeValue';
+  import dialogChangeValue from '../../components2/pos-shared-components/dialogChangeValue';
   import dialogOrderTransactionRefundConfirm from './OrderStoreDialogs/dialogOrderTransactionRefundConfirm';
   import dialogOrderTransactionRefundFailed from './OrderStoreDialogs/dialogOrderTransactionRefundFailed';
   import { getBookingNumber, getProductGridOrder, getVDate } from '../logic/productUtils';

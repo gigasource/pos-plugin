@@ -1,16 +1,15 @@
 import cms from 'cms';
 import _ from 'lodash';
 
-import { getTableName, isBusyTable, isTable } from '../RoomShared';
-import { activeOrders, appHooks, tseConfig } from '../../AppSharedStates';
-import { useRouter } from 'vue-router'
-import { isSameId } from '../../utils';
-import { ref } from 'vue'
+import {getTableName, isBusyTable, isTable} from '../RoomShared';
+import {activeOrders, appHooks, tseConfig} from '../../AppSharedStates';
+import {useRouter} from 'vue-router'
+import {isSameId} from '../../utils';
+import {ref} from 'vue'
 
 export const showNumberOfCustomersDialog = ref(false)
 
 const selectingTable = ref(null)
-
 
 
 export const moveOrderToNewTable = async function (fromTable, toTable) {
@@ -18,7 +17,7 @@ export const moveOrderToNewTable = async function (fromTable, toTable) {
     return
   }
   const order = _.find(activeOrders.value, i => i.table === fromTable.name)
-  await cms.getModel('Order').updateOne({ _id: order._id }, { $set: { table: toTable.name } })
+  await cms.getModel('Order').updateOne({_id: order._id}, {$set: {table: toTable.name}})
   appHooks.emit('orderChange')
 }
 
@@ -33,12 +32,12 @@ export function routeToOrder(table) {
 }
 
 export async function chooseTable(obj) {
-  if (!isTable(obj) || isBusyTable(obj)) return
+  if (!isTable(obj)) return
   if (tseConfig.value && tseConfig.value.tseEnable && tseConfig.value.numberOfCustomersDialog) {
     showNumberOfCustomersDialog.value = true
     selectingTable.value = obj
   } else {
-    routeToOrder()
+    routeToOrder(obj)
   }
 }
 
@@ -49,11 +48,11 @@ export const isTransferringTable = (item) => {
   return transferTableFrom.value && isSameId(transferTableFrom.value, item)
 }
 
-export function onCustomerDialogSubmit( { numberOfCustomers, tseMethod }, emit) {
+export function onCustomerDialogSubmit({numberOfCustomers, tseMethod}, emit) {
   showNumberOfCustomersDialog.value = false
   emit('setInitOrderProps', {
-    ...numberOfCustomers && { numberOfCustomers: +numberOfCustomers },
+    ...numberOfCustomers && {numberOfCustomers: +numberOfCustomers},
     tseMethod: tseMethod || 'auto'
   })
-  routeToOrder()
+  routeToOrder(obj)
 }

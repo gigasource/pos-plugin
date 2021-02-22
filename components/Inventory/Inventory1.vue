@@ -146,9 +146,9 @@
 <script>
   import {units} from './unit'
   import _ from 'lodash'
-  import PosRangeSlider from '../pos-shared-components/POSInput/PosRangeSlider';
-  import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
-  import dialogFormInput from '../pos-shared-components/dialogFormInput';
+  import PosRangeSlider from '../../components2/pos-shared-components/POSInput/PosRangeSlider';
+  import PosTextfieldNew from '../../components2/pos-shared-components/POSInput/PosTextfieldNew';
+  import dialogFormInput from '../../components2/pos-shared-components/dialogFormInput';
   import dialogChangeStock from './dialogChangeStock';
   import dialogInventoryCategory from './dialogInventoryCategory';
 

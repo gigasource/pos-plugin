@@ -26,8 +26,6 @@ function cmsFactory(testName) {
       await this.initDemoData()
     },
     initDemoData: async function () {
-      const dataPath = path.resolve(__dirname, './dataMock/demoData.json')
-
       for (const collection in data) {
         await cms.getModel(collection).remove({})
         if (data.hasOwnProperty(collection)) {

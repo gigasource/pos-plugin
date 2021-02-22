@@ -1,3 +1,6 @@
+const dayjs = require('dayjs');
+const _ = require('lodash');
+
 async function makePrintData(cms, order, locale) {
   const posSetting = await cms.getModel('PosSetting').findOne({})
   if (!order) return null
@@ -6,11 +9,11 @@ async function makePrintData(cms, order, locale) {
   const orderDate = dayjs(order.date).format('DD.MM.YYYY')
   const orderTime = dayjs(order.date).format('HH:mm:ss')
   const orderNumber = order.id
-  const orderProductList = order.items.filter(i => i.quantity > 0)
+  const items = order.items.filter(i => i.quantity > 0)
   const {
     vSum: orderSum,
     vTax: orderTax,
-    vTaxGroups: orderTaxGroups,
+    vTaxSum: orderTaxGroups,
     receive: orderCashReceived,
     cashback: orderCashback,
     bookingNumber: orderBookingNumber,
@@ -18,6 +21,7 @@ async function makePrintData(cms, order, locale) {
     vDiscount: discount
   } = order
   const orderPaymentType = payment[0].type
+  //todo: orderTaxGroups, orderTax
 
   return {
     companyName,
@@ -27,7 +31,7 @@ async function makePrintData(cms, order, locale) {
     orderDate,
     orderTime,
     orderNumber,
-    orderProductList,
+    items,
     orderSum,
     orderTax,
     orderTaxGroups,
@@ -36,7 +40,8 @@ async function makePrintData(cms, order, locale) {
     orderPaymentType,
     orderBookingNumber,
     discount,
-    payment
+    payment,
+    order
   }
 }
 
@@ -49,7 +54,7 @@ async function printEscPos(escPrinter, printData) {
     orderDate,
     orderTime,
     orderNumber,
-    orderProductList,
+    items,
     orderSum,
     orderTax,
     orderTaxGroups,
@@ -100,7 +105,7 @@ async function printEscPos(escPrinter, printData) {
   escPrinter.drawLine();
 
   escPrinter.bold(false);
-  orderProductList.forEach(product => {
+  items.forEach(product => {
     const productUnitPrice = product.modifiers && product.modifiers.length > 0
       ? product.modifiers.reduce((totalPrice, modifier) => {
         const modifierPrice = modifier.price * modifier.quantity
@@ -158,7 +163,7 @@ async function printCanvas(canvasPrinter, printData) {
     orderDate,
     orderTime,
     orderNumber,
-    orderProductList,
+    items,
     orderSum,
     orderTax,
     orderTaxGroups,
@@ -167,7 +172,8 @@ async function printCanvas(canvasPrinter, printData) {
     orderPaymentType,
     orderBookingNumber,
     discount,
-    payment
+    payment,
+    order
   } = printData;
 
   function convertMoney(value) {
@@ -213,27 +219,19 @@ async function printCanvas(canvasPrinter, printData) {
 
   await canvasPrinter.bold(false);
 
-  for (let i = 0; i < orderProductList.length; i++) {
-    const product = orderProductList[i];
-    const productUnitPrice = product.modifiers && product.modifiers.length > 0
-      ? product.modifiers.reduce((totalPrice, modifier) => {
-        const modifierPrice = modifier.price * modifier.quantity
-        return totalPrice + modifierPrice;
-      }, product.originalPrice)
-      : product.originalPrice;
-
+  for (const item of items) {
     await canvasPrinter.tableCustom([
-      {text: product.name, align: 'LEFT', width: 0.4},
-      {text: product.quantity, align: 'RIGHT', width: 0.15},
-      {text: convertMoney(productUnitPrice), align: 'RIGHT', width: 0.2},
-      {text: convertMoney(product.quantity * productUnitPrice), align: 'RIGHT', width: 0.25},
+      {text: item.name, align: 'LEFT', width: 0.4},
+      {text: item.quantity, align: 'RIGHT', width: 0.15},
+      {text: convertMoney(item.vSum / item.quantity), align: 'RIGHT', width: 0.2},
+      {text: convertMoney(item.quantity * item.vSum), align: 'RIGHT', width: 0.25},
     ]);
     await canvasPrinter.newLine(4);
   }
 
   await canvasPrinter.drawLine();
-
-  await canvasPrinter.leftRight('Sub-total', convertMoney(orderSum - orderTax));
+  const net = _.sumBy(_.values(order.vTaxSum), 'net');
+  await canvasPrinter.leftRight('Sub-total', convertMoney(net));
   if (!isNaN(discount) && discount > 0) await canvasPrinter.leftRight('Discount', convertMoney(discount));
 
   for (let i = 0; i < orderTaxGroups.length; i++) {

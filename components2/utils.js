@@ -4,20 +4,18 @@ import dayjs from "dayjs";
 import {useRouter} from 'vue-router';
 import cms from 'cms';
 
-export const internalValueFactory = (props, {emit}) => {
-  const rawInternalValue = ref(props.modelValue);
+export const internalValueFactory = (props, {emit}, target = 'modelValue') => {
+  const rawInternalValue = ref(props[target]);
 
-  watch(() => props.modelValue, () => rawInternalValue.value = props.modelValue, { lazy: true });
+  watch(() => props[target], () => rawInternalValue.value = props[target], { lazy: true });
 
-  const internalValue = computed({
+  return computed({
     get: () => rawInternalValue.value,
     set: (value) => {
       rawInternalValue.value = value;
-      emit('update:modelValue', rawInternalValue.value)
+      emit(`update:${target}`, rawInternalValue.value)
     }
   });
-
-  return internalValue;
 }
 
 let inited = false;
@@ -120,3 +118,12 @@ export const backFn = computed(() => {
 export async function socketEmit() {
   return await new Promise(resolve => cms.socket.emit(...arguments, resolve));
 }
+
+export const attrComputed = (data, target, fallbackValue) => computed({
+  get() {
+    return (data.value && data.value[target]) || fallbackValue
+  },
+  set(val) {
+    data.value[target] = val
+  }
+})

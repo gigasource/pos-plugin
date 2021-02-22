@@ -30,8 +30,8 @@ const EditableRoomEventHandlersFactory = () => {
     if (action.value === 'move') {
       const curPosition = selectingObject.value.realLocation
       updateObjectLocation(selectingRoomStates.value.room, selectingObject.value, {
-        x: curPosition.x + change.offsetX,
-        y: curPosition.y + change.offsetY
+        x: Math.max(0, curPosition.x + change.offsetX),
+        y: Math.max(0, curPosition.y + change.offsetY)
       }, selectingRoomStates.value.zoom)
     } else {
       const curSize = selectingObject.value.realSize
