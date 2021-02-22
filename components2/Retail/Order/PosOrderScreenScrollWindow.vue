@@ -122,13 +122,17 @@ export default {
     //   immediate: true
     // })
 
-    const activeProductWindow = ref(0)
+    const activeProductsList = ref(null)
+    const activeProductWindowIndex = ref(0)
+    const activeProductWindow = ref(productWindows[0])
     function renderDelimiter(productsList, category) {
       return (
           <g-item-group
-              returnObject={false} mandatory
+              returnObject={false}
+              mandatory
               key={`group_${category}`}
               items={productsList}
+              v-model={activeProductsList.value}
               v-slots={{
                 default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
                     <g-item isActive={active(item)} key={`${category}_item_${index}`}>
@@ -136,7 +140,7 @@ export default {
                           uppercase={false}
                           onClick={withModifiers(() => {
                             toggle(item);
-                            activeProductWindow.value = index
+                            activeProductWindow.value = item
                           }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
                     </g-item>
                 ))
@@ -146,7 +150,10 @@ export default {
     }
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
-          <g-scroll-window showArrows={false} elevation="0" key={`window_${category}`} v-model={activeProductWindow.value}>
+          <g-scroll-window
+              showArrows={false} elevation="0"
+              key={`window_${category}`}
+              v-model={activeProductWindowIndex.value}>
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
                   <g-scroll-window-item
@@ -154,7 +161,7 @@ export default {
                         gridTemplateRows: `repeat(${retailLayoutSetting.productRow}, 1fr)`,
                         gridTemplateColumns: `repeat(${retailLayoutSetting.productColumn}, 1fr)`
                       }}
-                      key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindow.value = windowIndex}>
+                      key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindowIndex.value = windowIndex}>
                     {window.map((item, i) => execGenScopeId(() =>
                         <div class="btn" key={`btn_${i}`}
                              style={getItemStyle(item)}
