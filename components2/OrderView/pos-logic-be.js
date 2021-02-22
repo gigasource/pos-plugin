@@ -198,6 +198,7 @@ export function orderBeFactory(id = 0) {
     }
     clearOrder(clearActionList);
     order = createOrder(_.assign(order, __order));
+    order.appType = currentAppType.value
     hooks.emit(`pre:prepareOrder:${id}`, order);
     let _order = _.omit(_.cloneDeep(order), ['beforeSend']);
 
