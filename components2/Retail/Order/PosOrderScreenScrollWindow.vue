@@ -7,7 +7,7 @@ import { categories, products } from '../../Product/product-logic'
 import { selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
-import { retailLayoutSetting } from './retail-layout-setting-logic';
+import { retailLayoutSetting, loadRetailLayoutSetting } from './retail-layout-setting-logic';
 
 export default {
   name: 'PosOrderScreenScrollWindow',
@@ -38,7 +38,6 @@ export default {
         //   return getProductGridOrder()
         // })
       })
-      console.log('groupped products', result)
       return result
     })
 
@@ -50,7 +49,6 @@ export default {
     })
 
     const numberOfProductsInWindows = computed(() => retailLayoutSetting.productColumn * retailLayoutSetting.productRow)
-
     const productWindows = computed(() => {
       const result = {}
       Object.keys(groupedProducts.value).forEach(category => {
@@ -68,12 +66,18 @@ export default {
 
     onActivated(() => {
       prepareOrder(0)
+      loadRetailLayoutSetting()
     })
 
     function addProduct(item) {
       const order = getCurrentOrder()
       addItem(order, item, 1)
     }
+
+    const abc = ref(0)
+    const productWindowsIndex = ref({})
+    window.productWindowsIndex = productWindowsIndex
+    window.selectedCategory = selectedCategory
 
     function getItemStyle(item) {
       const customizableStyle = {
@@ -96,72 +100,27 @@ export default {
 
       return customizableStyle
     }
-
-    // const watcher = watch(() => scrollWindowProducts.value, {
-    //   handler: (newValue, oldValue) => {
-    //     if (!_.isEqual(newValue, oldValue)) {
-    //       const tempValue = Object.assign({}, productWindows.value, newValue);
-    //       for (const category in tempValue) {
-    //         if (tempValue.hasOwnProperty(category)) {
-    //           tempValue[category] = tempValue[category].map(window => window.map(product => ({
-    //             ...product,
-    //             layout: getProductLayout(product, { name: category })
-    //           })))
-    //         }
-    //       }
-    //
-    //       productWindows.value = Object.assign({}, productWindows.value, tempValue);
-    //       activeProductWindows.value = newValue && Object.keys(newValue).reduce((obj, key) => {
-    //         obj[key] = 0;
-    //         return obj
-    //       }, {})
-    //     }
-    //   },
-    //   deep: true,
-    //   sync: true,
-    //   immediate: true
-    // })
-
-    const activeProductsList = ref(null)
-    const activeProductWindowIndex = ref(0)
-    const activeProductWindow = ref(productWindows[0])
-    function renderDelimiter(productsList, category) {
-      return (
-          <g-item-group
-              returnObject={false}
-              mandatory
-              key={`group_${category}`}
-              items={productsList}
-              v-model={activeProductsList.value}
-              v-slots={{
-                default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
-                    <g-item isActive={active(item)} key={`${category}_item_${index}`}>
-                      { execGenScopeId(() => <g-btn
-                          uppercase={false}
-                          onClick={withModifiers(() => {
-                            toggle(item);
-                            activeProductWindow.value = item
-                          }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
-                    </g-item>
-                ))
-              }}>
-          </g-item-group>
-      )
+    function getWindowStyle(category) {
+      if (!selectedCategory.value || (selectedCategory.value._id !== category && selectedCategory.value.name !== category)) {
+        return { display: 'none' }
+      }
     }
+    const windowGridLayoutStyle = computed(() => ({
+      gridTemplateRows: `repeat(${retailLayoutSetting.productRow}, 1fr)`,
+      gridTemplateColumns: `repeat(${retailLayoutSetting.productColumn}, 1fr)`
+    }))
     function renderProducts(productsList, category) {
       return execGenScopeId(() =>
           <g-scroll-window
               showArrows={false} elevation="0"
               key={`window_${category}`}
-              v-model={activeProductWindowIndex.value}>
+              v-model={abc.value}>
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
                   <g-scroll-window-item
-                      style={{
-                        gridTemplateRows: `repeat(${retailLayoutSetting.productRow}, 1fr)`,
-                        gridTemplateColumns: `repeat(${retailLayoutSetting.productColumn}, 1fr)`
-                      }}
-                      key={`${category}_window_item_${windowIndex}`} onInput={() => activeProductWindowIndex.value = windowIndex}>
+                      style={windowGridLayoutStyle.value}
+                      key={`${category}_window_item_${windowIndex}`}
+                      onInput={() => productWindowsIndex.value[category] = windowIndex}>
                     {window.map((item, i) => execGenScopeId(() =>
                         <div class="btn" key={`btn_${i}`}
                              style={getItemStyle(item)}
@@ -176,16 +135,39 @@ export default {
       )
     }
 
-    function getWindowStyle(category) {
-      if (!selectedCategory.value || (selectedCategory.value._id !== category && selectedCategory.value.name !== category)) {
-        return { display: 'none' }
-      }
+    const activeProductsList = ref(null)
+    function renderDelimiter(productsList, category) {
+      return (
+          <g-item-group
+              returnObject={false}
+              mandatory
+              key={`group_${category}`}
+              items={productsList}
+              v-model={activeProductsList.value}
+              v-slots={{
+                default: ({ toggle, active }) => productsList.map((item, index) => execGenScopeId(() =>
+                    <g-item isActive={active(item)} key={`${category}_item_${index}`}>
+                      { execGenScopeId(() => <g-btn
+                          uppercase={false}
+                          onClick={withModifiers(() => {
+                            console.log('toggle', category, index)
+                            toggle(item);
+                            abc.value = index
+                            // productWindowsIndex.value[category] = index
+                          }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
+                    </g-item>
+                ))
+              }}>
+          </g-item-group>
+      )
     }
 
+    // <!-- <editor-fold desc='render fn'> -->
     return genScopeId(() => (
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
+            productWindowsIndex.value[category] = 0
             return (
                 <div key={category} ref={(el) => setItemRef(el, category)} style={getWindowStyle(category)}>
                   {renderProducts(productsList, category)}
@@ -195,6 +177,7 @@ export default {
           })}
         </div>
     ))
+    // <!-- </editor-fold> -->
   }
 }
 </script>
