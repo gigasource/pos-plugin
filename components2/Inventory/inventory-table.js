@@ -1,5 +1,6 @@
 import {useI18n} from 'vue-i18n'
-import {$filters, appType, currentAppType} from '../AppType'
+import { $filters } from '../AppSharedStates'
+import {appType, currentAppType} from '../AppType'
 import {useRouter} from 'vue-router'
 import {
 	checkBoxSelectedInventoryIDs,
