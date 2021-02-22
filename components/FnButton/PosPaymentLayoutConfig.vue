@@ -167,7 +167,7 @@
 <script>
   import GButtonMerger from './components/GButtonMerger';
   import paymentLayout from './paymentLayout'
-  import PosTextField from '../pos-shared-components/POSInput/PosTextField';
+  import PosTextField from '../../components2/pos-shared-components/POSInput/PosTextField';
   import PosSelect from '../pos-shared-components/POSInput/PosSelect';
   import layoutConfigMixin from './common/layoutConfigMixin';
 

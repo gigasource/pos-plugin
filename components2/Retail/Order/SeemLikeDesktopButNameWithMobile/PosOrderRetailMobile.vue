@@ -7,7 +7,7 @@ import PosOrderScreenAction from './PosOrderScreenAction';
 import PosOrderScreenReport from './PosOrderScreenReport';
 import dialogSavedList from '../../../../components/Order/components/dialogSavedList';
 import dialogProductSearchResult from '../../../../components/Order/components/dialogProductSearchResult';
-import dialogChangeValue from '../../../../components/pos-shared-components/dialogChangeValue';
+import dialogChangeValue from '../../../pos-shared-components/dialogChangeValue';
 import DialogProductLookup from '../../../../components/Order/components/dialogProductLookup';
 import { genScopeId } from '../../../utils';
 

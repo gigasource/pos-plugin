@@ -2,7 +2,8 @@ import { useI18n } from 'vue-i18n';
 
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router';
-import { appHooks, enabledFeatures, user, appType, currentAppType } from '../../AppSharedStates'
+import { appHooks, enabledFeatures, user } from '../../AppSharedStates'
+import { appType, currentAppType } from '../../AppType'
 import cms from 'cms';
 
 let t, locale

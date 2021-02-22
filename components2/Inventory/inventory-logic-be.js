@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 import {ObjectID} from "bson"
 import _ from 'lodash'
 import { createProduct, updateProductInfo, removeProductInfo } from '../Product/product-logic-be';
-import { currentAppType } from '../AppSharedStates';
+import { currentAppType } from '../AppType';
 
 const Inventory = cms.getModel('Inventory')
 const InventoryAction = cms.getModel('InventoryAction')

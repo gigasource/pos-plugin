@@ -14,9 +14,9 @@
   </div>
 </template>
 <script>
-import DialogSavedList from '../../../components/Order/components/dialogSavedList';
+import DialogSavedList from '../../../components/Order/components/dialogSavedList'
 import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
-import DialogChangeValue from '../../../components/pos-shared-components/dialogChangeValue';
+import DialogChangeValue from "../../pos-shared-components/dialogChangeValue";
 import PosOrderScreenNumberKeyboard from './PosOrderScreenNumberKeyboard';
 import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';

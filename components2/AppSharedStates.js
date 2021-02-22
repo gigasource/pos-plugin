@@ -7,12 +7,6 @@ import _ from 'lodash';
 
 export const appHooks = new Hooks()
 
-export const appType = {
-  POS_RESTAURANT: 'POS_RESTAURANT',
-  POS_RETAIL: 'POS_RETAIL'
-}
-export const currentAppType = ref(appType.POS_RETAIL)
-
 export const dateTime = ref(new Date())
 setInterval(() => {
   dateTime.value = new Date()
@@ -157,7 +151,6 @@ appHooks.on('updateEnabledFeatures', async () => {
   enabledFeatures.value = _enabledFeatures.map(feature => feature.name)
 })
 
-export const locale = ref('en')
 export const storeLocale = computed(() => {
   return ((posSettings.value
       && posSettings.value.onlineDevice

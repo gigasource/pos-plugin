@@ -24,7 +24,7 @@ import {
 import {
 	appType,
 	currentAppType
-} from '../../AppSharedStates'
+} from '../../AppType'
 
 const {stringify} = require("schemahandler/utils");
 require("mockdate").set(new Date("2021-01-05").getTime());

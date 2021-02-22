@@ -5,7 +5,7 @@ import { createInventory, deleteInventory, loadInventoryActions, updateInventory
 import dayjs from 'dayjs'
 import { genScopeId } from '../utils';
 import _ from 'lodash'
-import { appType, currentAppType } from '../AppSharedStates';
+import { appType, currentAppType } from '../AppType';
 
 /**
  * This variable control the state

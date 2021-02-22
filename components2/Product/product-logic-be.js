@@ -6,7 +6,7 @@ import {
 } from './product-logic'
 import {
   currentAppType
-} from '../AppSharedStates'
+} from '../AppType'
 import { ObjectID } from 'bson'
 import _ from 'lodash'
 

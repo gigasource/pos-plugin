@@ -14,7 +14,7 @@ import _ from 'lodash';
 import rdiff from 'recursive-diff';
 import Hooks from "schemahandler/hooks/hooks";
 import {v1} from 'uuid';
-import { currentAppType } from '../AppSharedStates';
+import { currentAppType } from '../AppType';
 import dayjs from "dayjs";
 import delay from "delay";
 import {socketEmit} from "../utils";
