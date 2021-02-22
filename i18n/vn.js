@@ -1,5 +1,5 @@
 module.exports = {
-  en: {
+  vn: {
     //login
     login: {
       network: 'Mạng',

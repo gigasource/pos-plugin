@@ -32,7 +32,7 @@ const createRoom = function (_room) {
     if (isRoomElInitialized && h1.value > 0 && w1.value > 0) {
       const zoomVerticalRatio = viewH.value / h1.value
       const zoomHorizontalRatio = viewW.value / w1.value
-      zoom.value = Math.min(zoomVerticalRatio, zoomHorizontalRatio)
+      zoom.value = Math.min(zoomVerticalRatio, zoomHorizontalRatio, 1)
     } else zoom.value = 1
   })
 

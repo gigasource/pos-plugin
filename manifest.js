@@ -2,6 +2,8 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+
+    { loader: { type: 'route' }, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     {loader: {type: 'route'}, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewUser/viewUser.vue', name: 'UserSetting', path: '/pos-view-user'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewTax/viewTax.vue', name: 'TaxSetting', path: '/pos-view-tax'},
@@ -11,7 +13,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/Modifiers/dialogEditPopupModifier/dialogEditPopupModifiers2.vue', name: 'Modifier', path: '/pos-modifier'},
     {loader: {type: 'route'}, filePath: 'components2/Modifiers/dialogChoosePopupModifier/dialogChoosePopupModifier.vue', name: 'ChooseModifier', path: '/pos-choose-modifier'},
     {loader: {type: 'route'}, filePath: 'components2/Payment/Payment2.vue', name: 'Payment2', path: '/pos-payment'},
-    {loader: {type: 'route'}, filePath: 'components2/Login/PosLogin.vue', name: 'Login', path: '/pos2-login'},
+    {loader: {type: 'route'}, filePath: 'components2/Login/Login.vue', name: 'Login', path: '/pos-login'},
     {loader: {type: 'route'}, filePath: 'components2/EditTablePlan/EditTablePlan.vue', name: 'EditTablePlan', path: '/pos-edit-table-plan'},
     {loader: {type: 'route'}, filePath: 'components2/EditMenuCard/EditMenuCard2.vue', name: 'EditMenuCard2', path: '/pos-edit-menu-card'},
     {loader: {type: 'route'}, filePath: 'components2/OrderView/Order2.vue', name: 'Order2', path: '/pos-order/:id?'},
@@ -42,7 +44,7 @@ module.exports = {
     // { loader: { type: 'route' }, filePath: 'components/View/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report' },
     {loader: {type: 'route'}, filePath: 'components2/MonthReport/posMonthReportView.vue', name: 'posMonthReportView', path: '/pos-month-report'},
 
-    { loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
+    //{ loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     //{ loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery1', path: '/pos1-order-delivery' },
     //{ loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     //{ loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },

@@ -11,6 +11,12 @@ const item1 = { _id: new ObjectID(), name: "i1" };
 const item2 = { _id: new ObjectID(), name: "i2" };
 const item3 = { _id: new ObjectID(), name: "i2" };
 
+async function getDbData(collection) {
+  const res = await cms.getModel(collection).find({});
+  return stringify(res);
+}
+
+let Modifier;
 beforeAll(async () => {
   const orm = require("schemahandler");
   await orm.connect("mongodb://localhost:27017", "modifier-test");
@@ -25,12 +31,13 @@ beforeAll(async () => {
   //     }]
   //   }],
   // })
-  const Modifier = cms.getModel("modifier-test");
+  Modifier = cms.getModel("modifier-test");
   await Modifier.remove({});
-  await Modifier.create({ groups: [] });
 });
 describe("test crud-db", () => {
   it("should word", async () => {
+    await Modifier.create({ groups: [] });
+
     const data = {};
     let dbData;
 
@@ -268,6 +275,8 @@ describe("test crud-db", () => {
   });
 
   it("should work for ref", async () => {
+    await Modifier.create({ groups: [] });
+
     const data = ref({});
     let dbData;
 
@@ -294,6 +303,217 @@ describe("test crud-db", () => {
           },
         ],
       }
+    `);
+  });
+  test("case path is empty", async () => {
+    await Modifier.create({ groups: [] });
+
+    const obj = ref([]);
+    const collectionName = "modifier-test";
+    const { create, remove, update } = CRUdDbFactory(
+      obj.value,
+      "",
+      collectionName
+    );
+    await create({
+      name: "item1"
+    });
+    expect(obj.value).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "0000000000000000000007d4",
+          "name": "item1",
+        },
+      ]
+    `);
+    const dbData = await cms.getModel(collectionName).find({});
+    expect(stringify(dbData)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "groups": Array [],
+        },
+        Object {
+          "_id": "ObjectID",
+          "name": "item1",
+        },
+      ]
+    `);
+  });
+
+  test("multiple document in collection", async () => {
+    let obj = [];
+    const collection = "test-crud-multi";
+    await cms.getModel(collection).remove({});
+    const { create, remove, update } = CRUdDbFactory(obj, "", collection);
+    const item1 = await create({
+      name: "item1",
+      childs: []
+    });
+
+    const item2 = await create({
+      name: "item2",
+      childs: []
+    });
+
+    let dbData = await getDbData(collection);
+    expect(dbData).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+    const {
+      create: createChild,
+      remove: removeChild,
+      update: updateChild
+    } = CRUdDbFactory(obj, "childs", collection, item1._id);
+    const child1 = await createChild({
+      name: "child1"
+    });
+
+    dbData = await getDbData(collection);
+    expect(dbData).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child1",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+
+    expect(stringify(obj)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child1",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+
+    await updateChild(child1, {
+      name: "child_modified"
+    });
+    dbData = await getDbData(collection);
+    expect(dbData).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child_modified",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+
+    const child2 = await createChild({
+      name: "child2"
+    });
+
+    dbData = await getDbData(collection);
+    expect(dbData).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child_modified",
+            },
+            Object {
+              "_id": "ObjectID",
+              "name": "child2",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+
+    await removeChild(child1);
+
+    expect(stringify(obj)).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child2",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
+    `);
+    dbData = await getDbData(collection);
+    expect(dbData).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [
+            Object {
+              "_id": "ObjectID",
+              "name": "child2",
+            },
+          ],
+          "name": "item1",
+        },
+        Object {
+          "_id": "ObjectID",
+          "childs": Array [],
+          "name": "item2",
+        },
+      ]
     `);
   });
 });

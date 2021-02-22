@@ -4,22 +4,22 @@ import EditableRoom from '../TablePlan/EditableRoom/EditableRoom';
 import PosDashboardSidebar from './DashboardSidebar/PosDashboardSidebar2';
 import OnlineOrderMain from '../OnlineOrder/OnlineOrderMain';
 import OnlineOrderList from '../OnlineOrder/OnlineOrderList'
-import { onBeforeMount, KeepAlive, computed, ref, watch } from 'vue';
+import { computed, h, KeepAlive, ref } from 'vue';
 import { fetchRooms, roomsStates } from '../TablePlan/RoomState';
 import { appHooks } from '../AppSharedStates';
 import { activeScreen, selectingRoomId } from './DashboardSharedStates';
-import DashboardSidebarItemsFactory from './DashboardSidebar/DashboardSidebarItems';
-import { getScopeAttrs } from '../../utils/helpers';
+import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems';
 import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
-import { h } from 'vue'
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
-import VirtualPrinterView from "../../components/VirtualPrinter/VirtualPrinterView";
+import VirtualPrinterView from '../../components/VirtualPrinter/VirtualPrinterView';
+
 export default {
   name: 'Dashboard',
   components: {
     VirtualPrinterView,
     OnlineOrderList,
-    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable },
+    OnlineOrderMain, PosDashboardFunction, RestaurantRoom, EditableRoom, PosDashboardSidebar, PosOrderManualTable
+  },
   setup() {
     fetchRooms().then(() => {
       //auto select first room
@@ -27,12 +27,14 @@ export default {
     })
 
     appHooks.emit('orderChange')
-    const { refactoredDashboardSidebarItems } = DashboardSidebarItemsFactory()
-    const sidebarRender = () =>
-        <pos-dashboard-sidebar
-            items={refactoredDashboardSidebarItems.value}
-            {...getScopeAttrs()}>
-        </pos-dashboard-sidebar>
+    const { sidebarItems } = DashboardSidebarFactory()
+    const sidebarSelectingPath = ref('')
+    sidebarItems.value.forEach((item, idx) => {
+      if (item.feature === 'functions') {
+        sidebarSelectingPath.value = `items.${idx}`
+      }
+    })
+    const sidebarRender = () => <pos-dashboard-sidebar v-model={sidebarSelectingPath.value} items={sidebarItems.value}/>
 
     const RoomsViews = computed(() => {
       const views = {};

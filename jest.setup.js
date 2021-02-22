@@ -17,6 +17,7 @@ jest.mock('vue-i18n', () => ({
       messages: {
         value: {
           'en': {
+            sidebar: {},
             dashboard: {},
             messages: {
               value: {
