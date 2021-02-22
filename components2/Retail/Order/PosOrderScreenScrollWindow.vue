@@ -74,7 +74,6 @@ export default {
       addItem(order, item, 1)
     }
 
-    const abc = ref(0)
     const productWindowsIndex = ref({})
     window.productWindowsIndex = productWindowsIndex
     window.selectedCategory = selectedCategory
@@ -114,7 +113,7 @@ export default {
           <g-scroll-window
               showArrows={false} elevation="0"
               key={`window_${category}`}
-              v-model={abc.value}>
+              v-model={productWindowsIndex.value[category]}>
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
                   <g-scroll-window-item
@@ -152,8 +151,7 @@ export default {
                           onClick={withModifiers(() => {
                             console.log('toggle', category, index)
                             toggle(item);
-                            abc.value = index
-                            // productWindowsIndex.value[category] = index
+                            productWindowsIndex.value[category] = index
                           }, ['native', 'stop'])} border-radius="50%"></g-btn>) }
                     </g-item>
                 ))
@@ -167,7 +165,6 @@ export default {
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
-            productWindowsIndex.value[category] = 0
             return (
                 <div key={category} ref={(el) => setItemRef(el, category)} style={getWindowStyle(category)}>
                   {renderProducts(productsList, category)}
