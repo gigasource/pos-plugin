@@ -7,11 +7,11 @@ import _ from 'lodash';
 import dayjs from 'dayjs'
 import { $filters } from '../AppSharedStates';
 import { useI18n } from 'vue-i18n'
-import {
-  inventoryCategories
-} from './inventory-logic-ui'
 import {genScopeId} from '../utils';
-import { formatDate, filteredInventoryHistories, historyFilter } from './inventory-ui-shared';
+import { formatDate, filteredInventoryActions, actionFilter } from './inventory-ui-shared';
+import {
+  categories
+} from '../Product/product-logic'
 
 export default {
   name: "InventoryReport",
@@ -30,11 +30,11 @@ export default {
     const selectedItem = ref({
       name: '',
       unit: '',
-      history: []
+      action: []
     })
 
     onActivated(async () => {
-      historyFilter.value = Object.assign(historyFilter.value, {
+      actionFilter.value = Object.assign(actionFilter.value, {
         fromDate: dayjs().format('YYYY-MM-DD'),
         toDate: dayjs().format('YYYY-MM-DD')
       })
@@ -42,7 +42,7 @@ export default {
     })
 
     onDeactivated(async () => {
-      historyFilter.value = Object.assign(historyFilter.value, {
+      actionFilter.value = Object.assign(actionFilter.value, {
         fromDate: dayjs().format('YYYY-MM-DD'),
         toDate: dayjs().format('YYYY-MM-DD')
       })
@@ -50,7 +50,7 @@ export default {
     })
 
     const sortedInventories = computed(() => {
-      let sorted = _.cloneDeep(filteredInventoryHistories.value)
+      let sorted = _.cloneDeep(filteredInventoryActions.value)
       if (searchText.value) {
         sorted = _.filter(sorted, item => item.name && item.name.toLowerCase().includes(searchText.value.toLowerCase()))
       }
@@ -77,7 +77,7 @@ export default {
       // await loadData()
     }
     const changeFilter = function (range) {
-      historyFilter.value = range
+      actionFilter.value = range
     }
     const selectItem = async function (item) {
       selectedItem.value = item
@@ -91,7 +91,7 @@ export default {
               <div class={['category-item', selectedCategory.value === 'all' && 'category-item--selected']} onClick={() => selectCategory('all')}>
                 ALL
               </div>
-              {inventoryCategories.value.map(category =>
+              {categories.value.map(category =>
                   <div key={category._id} onClick={() => selectCategory(category)} class={['category-item', selectedCategory.value === category && 'category-item--selected']}>
                     {category.name}
                   </div>
@@ -144,7 +144,7 @@ export default {
             </div>
           </div>
           <g-spacer/>
-          <date-range-picker from={historyFilter.value.fromDate} to={historyFilter.value.toDate} onSave={changeFilter}/>
+          <date-range-picker from={actionFilter.value.fromDate} to={actionFilter.value.toDate} onSave={changeFilter}/>
         </div>
     )
 
@@ -153,7 +153,7 @@ export default {
           {
             (display.value === 'list') && sortedInventories.value.map((inventory, i) =>
                 <div class="inventory-report-list-item" key={`list_${i}`} onClick={() => selectItem(inventory)}>
-                  <div class="inventory-report-list-item__name">{inventory.name}</div>
+                  <div class="inventory-report-list-item__name">{inventory.product.name}</div>
                   <div class="inventory-report-list-item__unit">{inventory.unit}</div>
                   <div class="inventory-report-list-item__add">
                     {(inventory.add || inventory.add === 0) && <g-icon size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>}
@@ -169,7 +169,7 @@ export default {
           {
             (display.value === 'grid') && sortedInventories.value.map((inventory, i) =>
                 <div class="inventory-report-grid-item" key={`grid_${i}`} onClick={() => selectItem(inventory)}>
-                  <div class="inventory-report-grid-item__name">{inventory.name}</div>
+                  <div class="inventory-report-grid-item__name">{inventory.product.name}</div>
                   <g-spacer/>
                   <div class="inventory-report-grid-item__detail">
                     <div class="inventory-report-grid-item__add">
@@ -211,8 +211,8 @@ export default {
               </div>
             </div>
             <div style="border-radius: 4px; overflow: auto;">
-              {selectedItem.value.history.map((item, i)  =>
-                  <div class="dialog-history-item" key={ `history_${i}` }>
+              {selectedItem.value.action.map((item, i)  =>
+                  <div class="dialog-action-item" key={ `action_${i}` }>
                     <div class="col-4 pl-2" >{ formatDate(item.date) }</div>
                     <div class="col-2">
                       <g-icon size="12" style="margin-bottom: 2px">{`icon-inventory-report-${item.type}`}</g-icon>
@@ -464,7 +464,7 @@ export default {
       }
     }
 
-    &-history-item {
+    &-action-item {
       display: flex;
       align-items: center;
       padding: 8px 0;
