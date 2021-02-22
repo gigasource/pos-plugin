@@ -1,7 +1,7 @@
 <script>
 import { ref, onActivated, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
-import PosKeyboardFull from '../../components/pos-shared-components/PosKeyboardFull';
+import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
 import DialogChangeStock from '../../components/Inventory/dialogChangeStock';
 import cms from 'cms'
 import _ from 'lodash';

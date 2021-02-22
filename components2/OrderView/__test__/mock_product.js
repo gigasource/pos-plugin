@@ -13,8 +13,8 @@ export const mockProduct = {
       {
         "_id": "5e81774685fb2d03dda95cd0",
         "printerType": "ip",
-        "ip": "192.168.10.60",
-        "escPOS": true,
+        "ip": "192.168.10.6",
+        "escPOS": false,
         "merge": "true"
       }
     ],

@@ -1,5 +1,6 @@
 //<editor-fold desc="declare">
 import {ObjectID} from "bson";
+import {v1} from "uuid";
 
 const {reactive, computed, watch, watchEffect, h, nextTick, ref, isProxy} = require('vue');
 const _ = require('lodash');
@@ -258,7 +259,6 @@ export function addItem(order, item, quantity) {
     _item.quantity = 1;
   }
 
-  hooks.emit('pre:order:update', order);
   const last = _.last(order.items);
   //logic: same -> merge, not same -> add
   let merge;
@@ -271,12 +271,8 @@ export function addItem(order, item, quantity) {
     //addItem
     _item._id = new ObjectID();
     _item = reactive(_item);
-    hooks.emit('pre:addItem', _item);
     order.items.push(_item);
   }
-  hooks.emit('post:order:update', order);
-
-  hooks.emit('addItem', order, item, quantity);
 
   return {merge, updatedItem: _item}
 }
@@ -288,10 +284,7 @@ export function updateItem(order, query, update) {
   } else {
     item = _.find(order.items, query);
   }
-
-  hooks.emit('pre:order:update', order);
   _.assign(item, update);
-  hooks.emit('post:order:update', order);
 }
 
 const isSameItem = (item1, item2, countSentProp = true) => {
@@ -311,37 +304,36 @@ export function changeItemQuantity(order, query, change, shouldRemoveWhenZero = 
   } else {
     item = _.find(order.items, query);
   }
-
-  hooks.emit('pre:order:update', order);
   item.quantity += change;
   if (shouldRemoveWhenZero && item.quantity === 0) {
     order.items.splice(order.items.indexOf(item), 1);
   }
-  hooks.emit('post:order:update', order);
 }
 
 export function makeTakeaway(order, takeAway = true) {
-  hooks.emit('pre:order:update', order);
   order.takeAway = takeAway;
-  hooks.emit('post:order:update', order);
 }
 
 export function toggleTakeaway(order) {
-  hooks.emit('pre:order:update', order);
   order.takeAway = !(!!order.takeAway)
-  hooks.emit('post:order:update', order);
+}
+
+export function makeLastItemTakeaway(order) {
+  const last = _.last(order.items);
+  if (last) {
+    last.course = 0;
+    last.takeAway = true;
+  }
 }
 
 export function addModifier(order, modifier) {
-  hooks.emit('pre:order:update', order);
   const _modifier = _.cloneDeep(modifier);
   if (!modifier.quantity) _modifier.quantity = 1;
   const last = _.last(order.items);
-  if (last) {
+  if (last && !last.sent) {
     last.modifiers = last.modifiers || [];
     last.modifiers.push(_modifier);
   }
-  hooks.emit('post:order:update', order);
 }
 
 export function removeModifier(order, queryItem, queryModifier, quantity = 1) {
@@ -354,35 +346,27 @@ export function removeModifier(order, queryItem, queryModifier, quantity = 1) {
   }
 
   const modifier = item.modifiers[queryModifier];
-  hooks.emit('pre:order:update', order);
   if (modifier.quantity > quantity) {
     modifier.quantity -= quantity;
   } else {
     item.modifiers.splice(queryModifier, 1);
   }
 
-  hooks.emit('post:order:update', order);
 }
 
 export function makeDiscount(order, discount) {
-  hooks.emit('pre:order:update', order, discount);
   order.discount = discount;
-  hooks.emit('post:order:update', order, discount);
 }
 
 export function makeLastItemDiscount(order, discount) {
-  hooks.emit('pre:order:update', order);
   const last = _.last(order.items);
   if (last) {
     last.discount = discount;
   }
-  hooks.emit('post:order:update', order);
 }
 
 export function makePaid(order) {
-  hooks.emit('pre:order:update', order);
   order.status = 'paid';
-  hooks.emit('post:order:update', order);
 }
 
 //design addPayment : value, tip, cashback,
@@ -395,7 +379,6 @@ export function makePaid(order) {
  * @param payment [type: ['cash', 'card'], value]
  */
 export function addSinglePayment(order, payment) {
-  hooks.emit('pre:order:update', order);
   order.multiPayment = false
   if (!payment.value) {
     payment.value = order.vSum + (order.cashback || 0) - getPaymentTotal(order);
@@ -406,7 +389,6 @@ export function addSinglePayment(order, payment) {
   }
 
   order.payment.splice(0, 0, payment)
-  hooks.emit('post:order:update', order);
 }
 
 /*hooks.on('createOrder', order => {
@@ -418,9 +400,7 @@ export function addSinglePayment(order, payment) {
 })*/
 
 export function addPayment(order, payment) {
-  hooks.emit('pre:order:update', order);
   order.payment.push(payment);
-  hooks.emit('post:order:update', order);
 }
 
 export function updateSinglePayment(order, payment) {
@@ -472,17 +452,13 @@ export function getPaymentTotal(order) {
 }
 
 export function updateOrderWithHooks(order, cb) {
-  hooks.emit('pre:order:update', order);
   cb();
-  hooks.emit('post:order:update', order);
 }
 
 export function clearPayment(order) {
-  hooks.emit('pre:order:update', order);
   order.cashback = 0;
   order.tip = 0;
   order.payment.length = 0;
-  hooks.emit('post:order:update', order);
 }
 
 /**
@@ -490,19 +466,20 @@ export function clearPayment(order) {
  * @param order
  * @param query
  * @param quantity
+ * @param force
  * @example
  * removeItem(order, 0, 10);
  * removeItem(order, {name: 'Cola'}, 3);
+ * force use only for testing
  */
-export function removeItem(order, query, quantity = 1) {
+export function removeItem(order, query, quantity = 1, force = false) {
   if (typeof query !== 'number') {
     query = _.findIndex(order.items, query);
   }
 
   const item = order.items[query];
   let _item;
-  hooks.emit('pre:order:update', order);
-  if (item.quantity > quantity) {
+  if ((item.quantity > quantity && !item.sent) || (item.quantity >= quantity && item.sent)) {
     //clone
     _item = _.assign(_.cloneDeep(item), {quantity});
     item.quantity -= quantity;
@@ -511,28 +488,26 @@ export function removeItem(order, query, quantity = 1) {
     order.items.splice(query, 1);
   }
   //todo: sent or not
-  if (item.sent && item.originalQuantity > item.quantity - quantity) {
+  if (force || (item.sent && item.originalQuantity > item.quantity - quantity)) {
     order.cancellationItems.push(_item);
   }
-  hooks.emit('post:order:update', order);
 }
 
+export function clearNullQuantityItems(order) {
+  order.items.splice(0, order.items.length, ...order.items.filter(i => i.quantity !== 0));
+}
+
+
 export function makeEOD(order, z) {
-  hooks.emit('pre:order:update', order);
   order.z = z;
-  hooks.emit('post:order:update', order);
 }
 
 export function cancelOrder(order) {
-  hooks.emit('pre:order:update', order);
   order.status = 'cancelled';
-  hooks.emit('post:order:update', order);
 }
 
 export function addUser(order, name, date = new Date()) {
-  hooks.emit('pre:order:update', order);
   order.user.push({name, date});
-  hooks.emit('post:order:update', order);
 }
 
 export function changeCourse(order, query, add = 1) {
@@ -541,7 +516,6 @@ export function changeCourse(order, query, add = 1) {
   }
 
   const item = order.items[query];
-  hooks.emit('pre:order:update', order);
   if (item.course + add >= -1) {
     item.course += add;
   }
@@ -552,34 +526,35 @@ export function changeCourse(order, query, add = 1) {
   } else {
     [item.takeAway, item.separate] = [false, false];
   }
-  hooks.emit('post:order:update', order);
 }
 
 export function addVoucher(order, value) {
-  hooks.emit('pre:order:update', order);
   addItem(order, {
     name: 'Voucher',
     price: +value,
     isVoucher: true
   })
-  hooks.emit('post:order:update', order);
 }
 
 export function redeemVoucher(order, value) {
-  hooks.emit('pre:order:update', order);
   addItem(order, {
     name: 'Voucher',
     price: -value,
     isVoucher: true
   })
-  hooks.emit('post:order:update', order);
+}
+
+export function genSplitId(order) {
+  order.splitId = order.splitId || v1();
 }
 
 export function simulateBackendPrint(order) {
   order.items.forEach(i => {
     i.sent = true;
     i.printed = true;
+    i.originalQuantity = i.quantity
   })
+  hooks.emit('pre:prepareOrder', order);
 }
 
 export function mergeSameItems(order, mutate = true) {

@@ -34,8 +34,8 @@
 
 <script>
   import ScrollSelect from './ScrollSelect';
-  import PosKeyboardFull from '../pos-shared-components/PosKeyboardFull';
-  
+  import PosKeyboardFull from '../../components2/pos-shared-components/PosKeyboardFull';
+
   export default {
     name: 'NewReservationDialog',
     props: {

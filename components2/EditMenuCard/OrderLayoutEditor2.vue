@@ -3,8 +3,8 @@ import { loadOrderLayout, orderLayout } from '../OrderView/pos-ui-shared';
 import constants from './EditMenuCardToolbar/constants';
 import { ref } from 'vue'
 import orderLayoutApi from './orderLayoutApi';
-import PosTextfieldNew from '../../components/pos-shared-components/POSInput/PosTextfieldNew';
-import dialogFormInput from '../../components/pos-shared-components/dialogFormInput';
+import PosTextfieldNew from '../pos-shared-components/POSInput/PosTextfieldNew';
+import dialogFormInput from '../pos-shared-components/dialogFormInput';
 import { useI18n } from 'vue-i18n'
 import { genScopeId } from '../utils';
 

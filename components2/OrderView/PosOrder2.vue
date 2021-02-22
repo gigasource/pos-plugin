@@ -1,6 +1,6 @@
 <script>
 import {Touch} from 'pos-vue-framework';
-import dialogConfigOrderItem from '../../components/posOrder/dialogConfigOrderItem';
+
 import {useRoute, useRouter} from 'vue-router'
 import {autoLoadOrderLayoutSetting, editModeOL} from "./order-layout-setting-logic";
 import {getRootStyle, renderOLSetting} from "./order-layout-setting-ui";
@@ -10,6 +10,7 @@ import {orderRightSideItemsTable} from "./orderRightSideItemsTable";
 import {orderRightSideHeader} from "./orderRightSideHeaderFactory";
 import {genScopeId} from "../utils";
 import {onActivated, onDeactivated} from "vue";
+import dialogConfigOrderItem from "./Helper/dialogConfigOrderItem";
 
 export default {
   name: "posOrder2",
@@ -39,10 +40,6 @@ export default {
           prepareOrder(order)
         }
       }
-      //todo: fix this
-      cms.socket.on('update-table', async function (order) {
-        await syncOrderChange(order)
-      })
     })
 
     onDeactivated(() => {

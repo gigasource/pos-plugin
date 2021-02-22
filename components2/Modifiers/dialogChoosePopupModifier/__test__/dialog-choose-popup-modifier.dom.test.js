@@ -1,6 +1,6 @@
 import cms from "cms";
 import { onCreateItem } from "../../dialogEditPopupModifier/modifier-ui-logics";
-import dialogChoosePopupModifier2 from "../dialogChoosePopupModifier2";
+import dialogChoosePopupModifier2 from "../dialogChoosePopupModifier";
 import dialogChoosePopupModifierLogicsFactory from "../dialog-choose-popup-modifier-logics";
 import * as Logics from "../dialog-choose-popup-modifier-logics";
 import { appHooks } from "../../../AppSharedStates";

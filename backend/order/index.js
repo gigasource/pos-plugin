@@ -1,7 +1,8 @@
-const orderUtil = require('../../components/logic/orderUtil')
 const _ = require('lodash')
 const JsonFn = require('json-fn');
-const mongoose = require('mongoose');
+const {printInvoiceHandler} = require("../print/print-report/report-index");
+const {printKitchenCancel} = require("../print/print-kitchen/kitchen-printer");
+const {printKitchen} = require("../print/print-kitchen/kitchen-printer");
 const AwaitLock = require('await-lock').default
 
 module.exports = (cms) => {
@@ -21,9 +22,9 @@ module.exports = (cms) => {
 
   orm.on('commit:handler:finish:Order', async function (result, commit) {
     const sendNewOrderToFE = async function () {
-      const condition = commit.data && commit.data.table ? { table: commit.data.table, status: 'inProgress' } : { _id: result._id, status: 'inProgress' }
+      const condition = commit.data && commit.data.table ? {table: commit.data.table, status: 'inProgress'} : {_id: result._id, status: 'inProgress'}
       const order = await orm('Order').findOne(condition)
-      if (feSocket && order)
+      if (feSocket)
         feSocket.emit('update-table', order)
     }
 
@@ -37,25 +38,49 @@ module.exports = (cms) => {
       if (!feSocketLock.acquired) return // Lock is released before debounce
       feSocketLock.release()
       await sendNewOrderToFE()
-    }, 500)
+    }, 300)
   })
 
   cms.socket.on('connect', async (socket) => {
     feSocket = socket
-    socket.on('print-to-kitchen', async (actionList, order) => {
+    socket.on('print-to-kitchen', async (actionList, order, recent, device) => {
+      /*actionList.push({
+        modelName: 'Order',
+        action: orm('Order').updateOne({_id: order._id}, {
+          $set: {
+            'items.$[].sent': true, 'items.$[].printed': true,
+            'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
+          }
+        }).chain
+      });*/
       await execAllChain(actionList)
-      await orm('Order').updateOne({_id: order._id}, {
-        $set: {
-          'items.$[].sent': true, 'items.$[].printed': true,
-          'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
-        }
-      });
       //action print should be here
+      //await printKitchen(cms, {order, device, recent});
+      //await printKitchenCancel(cms, {order, device, recent})
+      //todo: how to get device
+      //todo: use test
       await cms.emit('post:print-to-kitchen');
     })
 
-    socket.on('action-list', async (actionList) => {
+    // todo:
+    socket.on('pay-order', async (actionList, order, cb = () => null) => {
+      /*actionList.push({
+        modelName: 'Order',
+        action: orm('Order').updateOne({_id: order._id}, {
+          $set: {
+            'items.$[].sent': true, 'items.$[].printed': true,
+            'cancellationItems.$[].sent': true, 'cancellationItems.$[].printed': true
+          }
+        }).chain
+      });*/
       await execAllChain(actionList)
+      //todo: when should call callback
+      cb();
+    })
+
+    socket.on('action-list', async (actionList, cb = () => null) => {
+      await execAllChain(actionList)
+      cb();
     })
 
     socket.on('cancel-order', cancelOrder)
@@ -97,15 +122,14 @@ module.exports = (cms) => {
   }
 
   cms.on('run:print', async (commit) => {
-    // if (commit.printType === 'kitchenAdd') {
-    //   await printKitchen({ order: commit.order, device: commit.device });
-    // } else if (commit.printType === 'kitchenCancel') {
-    //   await printKitchenCancel({ order: commit.order, device: commit.device });
-    // } else if (commit.printType === 'invoice') {
-    //   await printInvoiceHandler('OrderReport', commit.order, commit.device);
-    // } else if (commit.type === 'report') {
-    //   const { data } = commit
-    //   await printInvoiceHandler(data.reportType, data.printData, data.device);
-    // }
+    if (commit.printType === 'kitchen') {
+      await printKitchen(cms, commit);
+      await printKitchenCancel(cms, commit);
+    } else if (commit.printType === 'invoice') {
+      await printInvoiceHandler('OrderReport', commit.order, commit.device);
+    } else if (commit.type === 'report') {
+      const {data} = commit
+      await printInvoiceHandler(data.reportType, data.printData, data.device);
+    }
   })
 }

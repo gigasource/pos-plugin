@@ -87,7 +87,7 @@
 <script>
   import _ from 'lodash'
   import DialogChangeStock from "./dialogChangeStock";
-  import PosKeyboardFull from "../pos-shared-components/PosKeyboardFull";
+  import PosKeyboardFull from "../../components2/pos-shared-components/PosKeyboardFull";
 
   export default {
     name: "InventoryStock1",

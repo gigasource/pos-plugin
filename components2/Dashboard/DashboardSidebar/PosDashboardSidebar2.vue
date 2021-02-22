@@ -1,72 +1,83 @@
 <script>
 
-import {GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer} from "../../../../../backoffice/pos-vue-framework";
-import {useI18n} from "vue-i18n";
-import DashboardSidebarItemsFactory from "./DashboardSidebarItems";
-import {onBeforeMount, onBeforeUnmount, ref} from "vue";
-import {avatar, user, username} from "../../AppSharedStates";
-import {login} from "../../Login/LoginLogic";
-import {getScopeAttrs} from "../../../utils/helpers";
-import {genScopeId} from "../../utils";
+import { GAvatar, GBtn, GImg, GSidebar, GSideBarTreeView, GSpacer } from '../../../../../backoffice/pos-vue-framework';
+import { useI18n } from 'vue-i18n';
+import { onBeforeMount, onBeforeUnmount, ref, withModifiers } from 'vue';
+import { avatar, user, username } from '../../AppSharedStates';
+import { login } from '../../Login/LoginLogic';
+import { genScopeId, internalValueFactory } from '../../utils';
+import dayjs from 'dayjs';
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'PosDashboardSidebar',
   components: [GImg, GAvatar, GSidebar, GSpacer, GSideBarTreeView, GBtn],
   props: {
-    items: Array
+    items: Array,
+    modelValue: {
+      type: String
+    }
   },
-  emit: ['toggle'],
-  setup(props, {slots, emit}) {
-    const {t: $t} = useI18n()
-    let timerInterval = ref(null)
+  emit: ['toggle', 'update:modelValue'],
+  setup(props, { slots, emit }) {
+    const router = useRouter()
+    const { t } = useI18n()
+    const internalValue = internalValueFactory(props, { emit })
+    let timerInterval
     const now = ref(dayjs().format('HH:mm'))
+
+    function logout() {
+      user.value = null
+      router.push('/pos-login')
+    }
+
     onBeforeMount(async function () {
       //todo: remove auto login
       if (!user.value) await login('0000')
-      timerInterval.value = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
+      timerInterval = setInterval(() => now.value = dayjs().format('HH:mm'), 1000)
     })
 
     onBeforeUnmount(() => {
-      if (timerInterval.value) timerInterval.value.clear()
+      if (timerInterval.value) clearInterval(timerInterval)
     })
 
-    const footerDefaultRenderFn = () => <g-btn uppercase={false} large text background-color="white"
-                                               text-color="#424242" width="100%" onClick={(e) => {
-      e.stopPropagation();
-      logout()
-    }}>
+    const footerDefaultRenderFn = () => <g-btn uppercase={false} large text
+                                               background-color="white"
+                                               text-color="#424242" width="100%"
+                                               onClick={withModifiers(logout, ['stop'])}>
       <g-icon svg>icon-logout</g-icon>
-      <span class="ml-2">{$t('sidebar.logOut')}</span>
+      <span class="ml-2">{t('sidebar.logOut')}</span>
     </g-btn>
 
     const sidebarSlots = {
-      header: () => <div class={['sidebar-header']} {...getScopeAttrs()}>
+      header: genScopeId(() => <div class={['sidebar-header']}>
         <g-avatar size="40">
           <g-img src={avatar.value}></g-img>
         </g-avatar>
         <span class="username">{username.value}</span>
         <g-spacer/>
         <span>{now.value}</span>
-      </div>,
-      default: () => <>
+      </div>),
+      default: genScopeId(() => <>
         {slots['above-tree-view'] ? slots['above-tree-view']() : null}
+        {
+          //todo: should provide target for each item, instead of providing onClick handler
+        }
         <g-side-bar-tree-view
-            {...getScopeAttrs()}
             data={props.items}
-            onNodeSelected={node => node.onClick()}
+            onNodeSelected={node => node.onClick && node.onClick()}
             onNodeExpansionToggled={() => emit('toggle')}
-        >
-        </g-side-bar-tree-view>
+            v-model={internalValue.value}
+        />
         <slot name="above-spacer"/>
         {slots['above-spacer'] && slots['above-spacer']()}
-        <g-spacer></g-spacer>
+        <g-spacer/>
         {slots['below-spacer'] && slots['below-spacer']()}
         {slots['footer'] ? slots['footer']() : footerDefaultRenderFn()}
-      </>
+      </>)
     }
     return genScopeId(() => <g-sidebar medium style="height: 100vh; z-index: 2"
-                                       v-slots={sidebarSlots}>
-    </g-sidebar>)
+                                       v-slots={sidebarSlots}/>)
   }
 }
 </script>

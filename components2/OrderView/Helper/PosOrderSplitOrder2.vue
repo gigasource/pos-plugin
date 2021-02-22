@@ -1,25 +1,28 @@
 <script>
-import dialogMultiPayment from '../../../components/posOrder/dialogMultiPayment';
-import {computed, ref, watch} from "vue";
-import {$filters, avatar, isMobile, username} from "../../AppSharedStates";
+
+import {computed, nextTick, ref, watch} from "vue";
+import {$filters, appHooks, avatar, isMobile, username} from "../../AppSharedStates";
 import {useI18n} from "vue-i18n";
 import {
   cancelSplitOrder,
-  finishSplitOrder,
   getCurrentOrder,
   makeSplitOrder,
-  moveItemToSecondOrder,
+  moveItemToSecondOrder, order,
   order2,
   returnItem
 } from "../pos-logic-be";
-import {getItemSubtext, isItemDiscounted, itemsRenderFactory} from "../pos-ui-shared";
+import {itemsRenderFactory} from "../pos-ui-shared";
 import {useRouter} from "vue-router";
 import {genScopeId, internalValueFactory} from "../../utils";
+import PosOrderReceipt2 from "./PosOrderReceipt2";
+import dialogMultiPayment from "../../Payment/Helpers/dialogMultiPayment";
+import {addMultiPayment, addSinglePayment, getRestTotal, hooks} from "../pos-logic";
+import delay from "delay";
 
 //todo: make run with new logic
 export default {
   name: 'PosOrderSplitOrder2',
-  components: {dialogMultiPayment},
+  components: {dialogMultiPayment, PosOrderReceipt2},
   props: {
     modelValue: Boolean,
   },
@@ -33,27 +36,24 @@ export default {
     //use for show receipt, why don't use router
     const showReceiptDialog = ref(false);
     const paying = ref(false);
+    const splitOrders = ref([]);
+    const cacheSplitId = ref();
 
     const disablePayment = computed(() => paying.value || !order2.vSum)
+
+    //fixme: remove
+    /*setTimeout(async () => {
+      internalValue.value = true;
+      await delay(500);
+      moveItemToSecondOrder(0);
+      await nextTick();
+      //await openReceiptDialog();
+      //showReceiptDialog.value = true;
+    }, 1000)*/
 
     const back = () => {
       cancelSplitOrder();
       internalValue.value = false;
-    }
-
-    function saveMultiPayment(payment) {
-      //fixme: maybe remove it later
-      const paymentMethod = _.map(payment, (value, key) => {
-        return {
-          type: key,
-          value
-        }
-      });
-
-      //todo: finishSplitOrder
-      finishSplitOrder();
-      //_createOrder(paymentMethod)
-      showMultiPaymentDialog.value = false
     }
 
     const router = useRouter();
@@ -75,10 +75,16 @@ export default {
     function updateSplitPayment() {
     }
 
-    watch(() => props.modelValue, () => {
+    let off;
+    watch(() => internalValue.value, async () => {
       paying.value = false;
-      if (props.modelValue) {
-        makeSplitOrder();
+      if (internalValue.value) {
+        cacheSplitId.value = null;
+        await makeSplitOrder();
+        await fetchSplitOrders();
+        off = appHooks.on('orderChange', fetchSplitOrders).off;
+      } else {
+        off && off();
       }
     })
 
@@ -87,19 +93,48 @@ export default {
     const splitterStyle = isMobile.value ? {height: 'calc(100% - 20px)'} : {height: 'calc(100% - 84px)'}
     //todo: removeModifier
 
+    async function fetchSplitOrders() {
+      splitOrders.value = await cms.getModel('Order').find({
+        splitId: order.splitId || cacheSplitId.value,
+        _id : {$ne: order._id}
+      });
+    }
+
+    const openReceiptDialog = async () => {
+      await fetchSplitOrders();
+      showReceiptDialog.value = true
+    }
+
+    async function saveMultiPayment(payments) {
+      payments = _.map(payments, (value, key) => ({type: key, value}));
+      for (const payment of payments) {
+        addMultiPayment(order2, payment);
+      }
+      await _createOrder();
+    }
+
+    async function _createOrder(payment) {
+      if (payment) addSinglePayment(order2, payment);
+      cacheSplitId.value = cacheSplitId.value || order.splitId;
+      await hooks.emit('pay-split', true)
+      if (isMobile.value && order.items.length === 0) {
+        await openReceiptDialog();
+      }
+    }
+
     const contentRender = genScopeId(() => (<>
       <div class="row-flex justify-end w-100">
         <div class="splitter" style={splitterStyle}>
           {isMobile.value ?
               <div class="splitter__header row-flex align-items-center">
                 <g-btn-bs uppercase={false}
-                          background-color="#1271ff" disabled={!order2.items.length}
-                          onClick={() => showReceiptDialog.value = true}>
+                          background-color="#1271ff" disabled={!splitOrders.value.length}
+                          onClick={openReceiptDialog}>
                   <g-icon size="20" class="mr-2">icon-receipt3</g-icon>
                   <span>{t('restaurant.viewReceipt')}</span>
                 </g-btn-bs>
-                {order2.items.length && <g-spacer/>}
-                {order2.items.length && <div>
+                {order2.items.length > 0 && <g-spacer/>}
+                {order2.items.length > 0 && <div>
                   <span style="font-weight: 700; font-size: 15px">Split: </span>
                   <span style="font-weight: 600; color: #ff4452">{order2.items.length}</span>
                 </div>}
@@ -126,11 +161,11 @@ export default {
           <div class="splitter__actions">
             <g-btn-bs class="splitter__actions-btn" background-color="#046EFF" disabled={disablePayment.value}
                       style="border-radius: 0 0 0 6px"
-                      onClick={() => _createOrder([{type: 'cash', value: order2.vSum}])}>
+                      onClick={() => _createOrder({type: 'cash', value: getRestTotal(order2)})}>
               <g-icon size="36">icon-cash</g-icon>
             </g-btn-bs>
             <g-btn-bs class="splitter__actions-btn" background-color="#0EA76F" disabled={disablePayment.value}
-                      onClick={() => _createOrder([{type: 'card', value: order2.vSum}])}>
+                      onClick={() => _createOrder({type: 'card', value: getRestTotal(order2)})}>
               <g-icon size="36">icon-credit_card</g-icon>
             </g-btn-bs>
             <g-btn-bs class="splitter__actions-btn" background-color="#795548" disabled={disablePayment.value}
@@ -173,8 +208,8 @@ export default {
         <g-btn-bs icon="icon-back" onClick={back}>{t('ui.back')}</g-btn-bs>
         <g-spacer/>
         {order2.items.length && <span class="ml-2 mr-2">Split: {order2.items.length}</span>}
-        <g-btn-bs uppercase={false} background-color="#1271ff" disabled={!order2.items.length}
-                  onClick={() => showReceiptDialog.value = true}>
+        <g-btn-bs uppercase={false} background-color="#1271ff" disabled={!splitOrders.value.length}
+                  onClick={openReceiptDialog}>
           View receipt
         </g-btn-bs>
       </g-toolbar>}
@@ -190,11 +225,13 @@ export default {
                                 total={order2.vSum}
                                 onSubmit={saveMultiPayment}/>
 
-          <pos-order-receipt v-model={showReceiptDialog.value} order={order2}
-                             store-locale={locale} split
-                             onUpdatePayment={updateSplitPayment}
-                             onComplete={complete}
-                             onPrint={printReceipt}/>
+          <pos-order-receipt2 v-model={showReceiptDialog.value}
+                              order={order2}
+                              split
+                              splitOrders={splitOrders.value}
+                              onUpdatePayment={updateSplitPayment}
+                              onComplete={complete}
+                              onPrint={printReceipt}/>
         </>
     ))
   }

@@ -5,7 +5,7 @@ const virtualPrinter = require('../print-utils/virtual-printer')
 const dayjs = require('dayjs')
 
 module.exports = async function (cms) {
-  cms.on('run:print', async function (commit) {
+  /*cms.on('run:print', async function (commit) {
     if (commit.printType === 'kitchenAdd') {
       await printKitchen({
         order: commit.order
@@ -15,19 +15,20 @@ module.exports = async function (cms) {
         order: commit.order
       })
     }
-  })
+  })*/
 }
 
 function createPureImagePrinter(escPrinter) {
   return new PureImagePrinter(560, {
-    printFunctions: {
+    printFunctions: global.printFunctions || {
       printPng: escPrinter.printPng.bind(escPrinter),
       print: escPrinter.print.bind(escPrinter),
     }
   });
 }
 
-async function printKitchen({order, device}, callback = () => null) {
+async function printKitchen(cms, {order, device, recent}, callback = () => null) {
+  if (recent.items.length === 0) return;
   let results = []
 
   try {
@@ -35,7 +36,7 @@ async function printKitchen({order, device}, callback = () => null) {
     const printerInfos = groupPrinters.map(e => {
       return {name: e.name, ...e.printers}
     })
-    const receipts = getReceiptsFromOrder(order);
+    const receipts = getReceiptsFromOrder(recent.items);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
     const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
@@ -75,7 +76,8 @@ async function printKitchen({order, device}, callback = () => null) {
   }
 }
 
-async function printKitchenCancel({order, device}, callback = () => null) {
+async function printKitchenCancel(cms, {order, device, recent}, callback = () => null) {
+  if (recent.cancellationItems.length === 0) return;
   let results = []
 
   try {
@@ -83,7 +85,7 @@ async function printKitchenCancel({order, device}, callback = () => null) {
     const printerInfos = groupPrinters.map(e => {
       return {name: e.name, ...e.printers}
     })
-    const receipts = getReceiptsFromOrder(order);
+    const receipts = getReceiptsFromOrder(recent.cancellationItems);
 
     const posSetting = await cms.getModel('PosSetting').findOne({}, {generalSetting: 1})
     const useVirtualPrinter = posSetting.generalSetting ? posSetting.generalSetting.useVirtualPrinter : null
@@ -121,8 +123,8 @@ async function printKitchenCancel({order, device}, callback = () => null) {
   }
 }
 
-function getReceiptsFromOrder(order) {
-  return _.reduce(order.items, function (obj, item) {
+function getReceiptsFromOrder(items) {
+  return _.reduce(items, function (obj, item) {
     function addItem(i) {
       if (!item.groupPrinter) return;
 
@@ -355,7 +357,7 @@ async function printCanvas(canvasPrinter, printData, printerInfo, cancel = false
         if (item.modifiers) {
           await canvasPrinter.setTextDoubleWidth();
 
-          for(let j = 0; j < item.modifiers.length; j++) {
+          for (let j = 0; j < item.modifiers.length; j++) {
             const mod = item.modifiers[j];
 
             let modifierText = `* ${mod.name}`
