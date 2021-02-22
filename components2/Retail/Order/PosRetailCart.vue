@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { execGenScopeId, genScopeId } from '../../utils'
 import { useI18n } from 'vue-i18n'
 import { getCurrentOrder } from '../../OrderView/pos-logic-be'
+import { changeItemQuantity } from '../../OrderView/pos-logic';
 import {
   fontSize,
   changeSize,
@@ -12,7 +13,6 @@ import {
   category,
   saveOrderLayoutSetting
 } from '../../OrderView/order-layout-setting-logic';
-
 
 export default {
   name: 'PosRetailCart',
@@ -33,7 +33,7 @@ export default {
     }
 
     function toPayment() {
-      router.push({ path: '/retail--order-payment' })
+      router.push({ path: '/pos-payment' })
     }
 
     function generateRandomColor() {
@@ -91,6 +91,16 @@ export default {
       </>
     }
 
+    function increaseQty(order, item) {
+      if (item.sent) return;
+      changeItemQuantity(order, item, 1)
+    }
+
+    function decreaseQty(order, item) {
+      if (item.sent) return;
+      changeItemQuantity(order, item, -1)
+    }
+
     function renderCartItems() {
       return (
           <div class="detail-table">
@@ -107,9 +117,9 @@ export default {
                       )} </p>
                   </div>
                   <div class="row-flex align-items-center">
-                    <g-icon color="#1d1d26">remove_circle_outline</g-icon>
+                    <g-icon color="#1d1d26" onClick={() => decreaseQty(order, item)}>remove_circle_outline</g-icon>
                     <div class="ta-center" style="width: 24px">{item.quantity}</div>
-                    <g-icon color="#1d1d26">add_circle_outline</g-icon>
+                    <g-icon color="#1d1d26" onClick={() => increaseQty(order, item)}>add_circle_outline</g-icon>
                   </div>
                 </div>
             )}
