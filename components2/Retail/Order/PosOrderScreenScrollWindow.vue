@@ -118,9 +118,10 @@ export default {
             {
               productsList.map((window, windowIndex) => execGenScopeId(() =>
                   <g-scroll-window-item
+                      data-index={windowIndex}
                       style={windowGridLayoutStyle.value}
                       key={`${category}_window_item_${windowIndex}`}
-                      onInput={() => productWindowsIndex.value[category] = windowIndex}>
+                      onUpdate:modelValue={val => productWindowsIndex.value[category] = val}>
                     {window.map((item, i) => execGenScopeId(() =>
                         <div class="btn" key={`btn_${i}`}
                              style={getItemStyle(item)}
@@ -159,6 +160,9 @@ export default {
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
+            if (selectedCategory.value && category !== selectedCategory.value._id)
+              return
+
             return (
                 <div key={category} ref={(el) => setItemRef(el, category)} style={getWindowStyle(category)}>
                   {renderProducts(productsList, category)}
