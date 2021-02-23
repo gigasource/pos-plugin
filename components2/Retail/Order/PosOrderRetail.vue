@@ -7,7 +7,7 @@ import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
 import PosRetailCart from './PosRetailCart';
 import PosRetailCategory from './PosRetailCategory';
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 import { genScopeId } from '../../utils';
