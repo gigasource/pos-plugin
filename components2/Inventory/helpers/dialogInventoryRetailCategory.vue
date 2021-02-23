@@ -65,6 +65,9 @@ export default {
     //<editor-fold desc="tree view code">
     const treeViewItemSelected = function (item, state) {
       selectedCategory.value = item
+    }
+
+    function toggleNode(item, state) {
       state.collapse = !state.collapse
     }
 
@@ -73,16 +76,35 @@ export default {
     }
 
     const genNode = function ({node, text, childrenVNodes, isLast, state, path}) {
-      console.log('genNode', state.selected)
       return <li>
-        <div class="row-flex align-items-center" style={{ backgroundColor: state.selected ? '#1271FF' : '#FFF', borderRadius: '4px'}}>
-          <div class="row-flex align-items-center mr-3" onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>
-            { !node.parentCategory && <g-icon style="width: 10px" small class="mr-2">{!state.collapse ? 'fas fa-angle-right': 'fas fa-angle-up'}</g-icon> }
-            { node.parentCategory && <span style="border-bottom: 2px solid #000; width: 15px; display: inline-block; margin-right: 5px"></span> }
-            <span style={{ fontWeight: node.parentCategory ? 'normal' : 'bold' }}>{node.name}</span>
+        <div class="row-flex align-items-center">
+          <div class="row-flex align-items-center mr-1">
+            { !node.parentCategory &&
+              <g-icon
+                  onClick={() => toggleNode(node, state)}
+                  style="width: 10px" small class="mr-2">
+                {!state.collapse ? 'fas fa-angle-right': 'fas fa-angle-up'}
+              </g-icon>
+            }
+            { node.parentCategory && <>
+              { isLast && <div style="margin-left: -2px;border: 1px solid #fff;width: 2px;height: 16px;display: inline-block; margin-top: 18px; "></div> }
+              <span style="border-bottom: 2px solid #000; width: 15px; display: inline-block; margin-right: 5px"></span>
+            </> }
+            <span
+                style={{
+                  padding: '4px 8px',
+                  fontWeight: node.parentCategory ? 'normal' : 'bold',
+                  borderRadius: '4px',
+                  color: selectedCategory.value && selectedCategory.value._id === node._id ? '#FFF' : '#000',
+                  backgroundColor: selectedCategory.value && selectedCategory.value._id === node._id ? '#1271FF' : '#FFF',
+                }}
+                onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}
+            >{node.name}</span>
           </div>
           { !node.parentCategory &&
-            <g-btn flat rounded elevation={0} background-color="#1271FF" style="width: 20px; min-width: 20px" x-small onClick={withModifiers(() => addSubCategory(node, path), ['stop'])}>
+            <g-btn flat rounded elevation={0} background-color="#1271FF" x-small
+                   style="width: 20px; min-width: 20px"
+                   onClick={withModifiers(() => addSubCategory(node, path), ['stop'])}>
               <g-icon x-small color="#FFF">add</g-icon>
             </g-btn>
           }
