@@ -125,6 +125,7 @@ export default {
       )
     }
 
+    // TODO: re-use renderPayButton if possible
     const payable = computed(() => {
       return order.items && order.items.length && _.some(order.items, i => i.quantity > 0)
     })

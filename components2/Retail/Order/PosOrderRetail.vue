@@ -1,18 +1,3 @@
-<template>
-  <div class="por">
-    <pos-retail-category class="por__category"/>
-    <div class="por__main">
-      <pos-order-screen-scroll-window class="por__main__window"/>
-      <pos-order-screen-number-keyboard class="por__main__keyboard"/>
-      <pos-order-screen-button-group class="por__main__buttons"/>
-<!--      <dialog-retail-refund-search v-model="showRefundSearch"></dialog-retail-refund-search>-->
-    </div>
-    <pos-retail-cart class="por__detail"/>
-<!--    <dialog-saved-list v-model="dialogProductSearchResult"/>-->
-<!--    <dialog-change-value v-model="dialogChangePrice" new-value-editable @submit="submit"/>-->
-<!--    <dialog-product-lookup v-model="dialogProductLookup"/>-->
-  </div>
-</template>
 <script>
 import DialogSavedList from '../../../components/Order/components/dialogSavedList'
 import DialogProductLookup from '../../../components/Order/components/dialogProductLookup';
@@ -25,6 +10,7 @@ import PosRetailCategory from './PosRetailCategory';
 import { onBeforeMount } from 'vue'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
+import { genScopeId } from '../../utils';
 
 export default {
   name: 'PosOrderRetail',
@@ -41,28 +27,37 @@ export default {
     DialogSavedList,
     PosOrderScreenNumberKeyboard,
   },
-  data: function () {
-    return {
-      showRefundSearch: true,
-      dialogProductSearchResult: false,
-      dialogChangePrice: false,
-      dialogProductLookup: false,
-    }
-  },
-  computed: {},
-  methods: {
-    submit() {
-      this.$getService('PosStore:updateNewPrice')(val);
-    },
-    updateNewPrice() {
-      console.log('PosStore:updateNewPrice was not injected!')
-    }
-  },
   setup() {
+    const showRefundSearch = ref(false)
+    const dialogProductSearchResult = ref(false)
+    const dialogChangePrice = ref(false)
+    const dialogProductLookup = ref(false)
+
+    function submit() {
+      this.$getService('PosStore:updateNewPrice')(val);
+    }
+
     onBeforeMount(async () => {
       await loadCategories()
       await loadProducts()
     })
+
+    return genScopeId(() => (
+        <div class="por">
+          <pos-retail-category class="por__category"/>
+          <div class="por__main">
+            <pos-order-screen-scroll-window class="por__main__window"/>
+            <pos-order-screen-number-keyboard class="por__main__keyboard"/>
+            <pos-order-screen-button-group class="por__main__buttons"/>
+          </div>
+          <pos-retail-cart class="por__detail"/>
+
+          <dialog-retail-refund-search v-model={showRefundSearch.value}/>
+          <dialog-saved-list v-model={dialogProductSearchResult.value}/>
+          <dialog-change-value v-model={dialogChangePrice.value} new-value-editable onSubmit={submit}/>
+          <dialog-product-lookup v-model={dialogProductLookup.value}/>
+        </div>
+    ))
   }
 }
 </script>
