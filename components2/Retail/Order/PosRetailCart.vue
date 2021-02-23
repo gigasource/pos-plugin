@@ -5,8 +5,13 @@ import { useRouter } from 'vue-router'
 import { execGenScopeId, genScopeId } from '../../utils'
 import { useI18n } from 'vue-i18n'
 import { getCurrentOrder } from '../../OrderView/pos-logic-be'
-import { changeItemQuantity } from '../../OrderView/pos-logic';
-import { retailLayoutSetting, changeValue, loadRetailLayoutSetting, saveRetailLayoutSetting } from './retail-layout-setting-logic';
+import { changeItemQuantity, removeItem } from '../../OrderView/pos-logic';
+import {
+  changeValue,
+  loadRetailLayoutSetting,
+  retailLayoutSetting,
+  saveRetailLayoutSetting
+} from './retail-layout-setting-logic';
 
 export default {
   name: 'PosRetailCart',
@@ -23,7 +28,7 @@ export default {
     const router = useRouter()
 
     function back() {
-      router.push({ path: '/pos-dashboard' })
+      router.go(-1)
     }
 
     function toPayment() {
@@ -36,6 +41,7 @@ export default {
 
     const showCtxMenu = ref(false)
     const showScreenSettingPanel = ref(false)
+
     function renderScreenSettingPanel() {
       function renderNumericPropSetting(title, prop) {
         const valueStyle = { width: '50px', fontSize: '12px', fontWeight: 'bold' }
@@ -63,17 +69,17 @@ export default {
       }
 
       const sectionStyle = { marginTop: '10px', position: 'relative', border: '1px solid #444', paddingBottom: '10px' }
-      const sectionTitleStyle = {  paddingLeft: '5px', backgroundColor: '#ddd', marginBottom: '8px' }
-      const propSectionStyle = { marginLeft: '5px'}
+      const sectionTitleStyle = { paddingLeft: '5px', backgroundColor: '#ddd', marginBottom: '8px' }
+      const propSectionStyle = { marginLeft: '5px' }
 
       return <>
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>Product</div>
           <div style={propSectionStyle}>
-            { renderNumericPropSetting('Rows', 'productRow') }
-            { renderNumericPropSetting('Columns', 'productColumn') }
-            { renderNumericPropSetting('Font size', 'productFontSize') }
-            { renderBooleanPropSetting('Show full name', 'showFullProductName' ) }
+            {renderNumericPropSetting('Rows', 'productRow')}
+            {renderNumericPropSetting('Columns', 'productColumn')}
+            {renderNumericPropSetting('Font size', 'productFontSize')}
+            {renderBooleanPropSetting('Show full name', 'showFullProductName')}
           </div>
         </div>
 
@@ -93,11 +99,6 @@ export default {
       changeItemQuantity(order, item, 1)
     }
 
-    function decreaseQty(order, item) {
-      if (item.sent) return;
-      changeItemQuantity(order, item, -1)
-    }
-
     function renderCartItems() {
       return (
           <div class="detail-table">
@@ -114,7 +115,7 @@ export default {
                       )} </p>
                   </div>
                   <div class="row-flex align-items-center">
-                    <g-icon color="#1d1d26" onClick={() => decreaseQty(order, item)}>remove_circle_outline</g-icon>
+                    <g-icon color="#1d1d26" onClick={() => removeItem(order, item)}>remove_circle_outline</g-icon>
                     <div class="ta-center" style="width: 24px">{item.quantity}</div>
                     <g-icon color="#1d1d26" onClick={() => increaseQty(order, item)}>add_circle_outline</g-icon>
                   </div>
@@ -124,21 +125,22 @@ export default {
       )
     }
 
-    return genScopeId(() => (
-        <div class="detail">
+    function renderHeader() {
+      return (
           <div class="detail-header">
             <g-menu v-model={showCtxMenu.value} close-on-content-click v-slots={{
               default: () => (
-                  <g-expand-x-transition>{ execGenScopeId(() =>
+                  <g-expand-x-transition>{execGenScopeId(() =>
                       <div style="background-color: #FFF;">
                         <g-btn-bs icon="icon-blue-cog" onClick={() => {
                           loadRetailLayoutSetting()
                           showScreenSettingPanel.value = true
-                        }}>Edit Screen</g-btn-bs>
+                        }}>Edit Screen
+                        </g-btn-bs>
                       </div>
                   )}</g-expand-x-transition>
               ),
-              activator: ({on}) => (
+              activator: ({ on }) => (
                   <div onClick={on.click}>
                     <g-avatar size="40">
                       <g-img src={avatar.value}></g-img>
@@ -152,9 +154,20 @@ export default {
             <g-btn-bs class="elevation-2" onClick={back} style={{ width: '36px', height: '36px', borderRadius: '50%' }}>
               <g-icon>icon-back</g-icon>
             </g-btn-bs>
-            <g-btn-bs style="margin: 0" icon="icon-wallet" background-color="#1271FF" onClick={toPayment}>{t('common.currency', storeLocale.value)}{total.value}</g-btn-bs>
+            <g-btn-bs
+                style="margin: 0" icon="icon-wallet" background-color="#1271FF"
+                disabled={!(order.items && order.items.length)}
+                onClick={toPayment}>
+              {t('common.currency', storeLocale.value)}{total.value}
+            </g-btn-bs>
           </div>
-          { showScreenSettingPanel.value ? renderScreenSettingPanel() : renderCartItems() }
+      )
+    }
+
+    return genScopeId(() => (
+        <div class="detail">
+          {renderHeader()}
+          {showScreenSettingPanel.value ? renderScreenSettingPanel() : renderCartItems()}
         </div>
     ))
   }
