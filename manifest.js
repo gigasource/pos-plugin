@@ -2,8 +2,8 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
-
-    { loader: { type: 'route' }, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
+    {loader: {type: 'route'}, filePath: 'components2/OrderHistory/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
+    {loader: { type: 'route' }, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     {loader: {type: 'route'}, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewUser/viewUser.vue', name: 'UserSetting', path: '/pos-view-user'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewTax/viewTax.vue', name: 'TaxSetting', path: '/pos-view-tax'},
@@ -23,7 +23,7 @@ module.exports = {
     {loader: {type: 'route'}, filePath: 'components2/Inventory/InventoryReport.vue', name: 'InventoryReport', path: '/pos-inventory-report'},
     {loader: {type: 'route'}, filePath: 'components2/Inventory/InventoryStock.vue', name: 'InventoryStock', path: '/pos-inventory-stock'},
     {loader: {type: 'route'}, filePath: 'components2/Reservation/ReservationsList2.vue', name: 'Reservation', path: '/pos-reservation'},
-    {loader: {type: 'route'}, filePath: 'components2/OtherViews/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
+    // {loader: {type: 'route'}, filePath: 'components2/OtherViews/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
     /// old components
     //{ loader: { type: 'route' }, filePath: 'components2/Dashboard/DashboardSidebar/PosDashboardSidebar2.vue', name: 'Dashboard2', path: '/pos2-dashboard' },
     //{ loader: { type: 'route' }, filePath: 'components/View/FirstTimeSetUp.vue', name: 'Setup', path: '/pos-setup' },
