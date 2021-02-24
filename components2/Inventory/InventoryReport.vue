@@ -33,16 +33,16 @@ export default {
 
     onActivated(async () => {
       actionFilter.value = Object.assign(actionFilter.value, {
-        fromDate: dayjs().format('YYYY-MM-DD'),
-        toDate: dayjs().format('YYYY-MM-DD')
+        fromDate: dayjs().startOf('day').format('YYYY-MM-DD HH:MM'),
+        toDate: dayjs().endOf('day').format('YYYY-MM-DD HH:MM')
       })
       selectedCategory.value = 'all'
     })
 
     onDeactivated(async () => {
       actionFilter.value = Object.assign(actionFilter.value, {
-        fromDate: dayjs().format('YYYY-MM-DD'),
-        toDate: dayjs().format('YYYY-MM-DD')
+        fromDate: dayjs().startOf('day').format('YYYY-MM-DD HH:MM'),
+        toDate: dayjs().endOf('day').format('YYYY-MM-DD HH:MM')
       })
       selectedCategory.value = 'all'
     })
@@ -65,15 +65,6 @@ export default {
       router.go(-1)
     }
 
-    const selectCategory = async function (category) {
-      if (selectedCategory.value === category) {
-        selectedCategory.value = null
-      } else {
-        selectedCategory.value = category
-      }
-      // TODO: impl
-      // await loadData()
-    }
     const changeFilter = function (range) {
       actionFilter.value = range
     }
