@@ -69,6 +69,10 @@ export async function createCategory(newCategory) {
   await Category.create(newCategory)
 }
 
+export async function updateCategory(_id, change) {
+  await Category.findOneAndUpdate({_id}, change)
+}
+
 export async function deleteCategory(categoryId) {
   await Category.remove({ _id: categoryId })
 }

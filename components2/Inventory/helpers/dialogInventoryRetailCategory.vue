@@ -1,17 +1,13 @@
 <script>
-import { watch, computed, ref, withModifiers } from 'vue'
+import { computed, ref, watch, withModifiers, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import _ from 'lodash'
 import GTreeFactory from 'pos-vue-framework/src/components/GTreeViewFactory/GTreeFactory'
-import {
-  formattedCategories
-} from '../../Product/product-logic'
+import { formattedCategories } from '../../Product/product-logic'
 import { genScopeId } from '../../utils';
-import { ObjectID } from 'bson'
-import { createCategory, deleteCategory } from '../../Product/product-logic-be';
+import { createCategory, updateCategory, deleteCategory } from '../../Product/product-logic-be';
 
 export default {
-  name: "dialogInventoryRetailCategory",
+  name: 'dialogInventoryRetailCategory',
   props: {
     modelValue: Boolean
   },
@@ -58,12 +54,19 @@ export default {
       }
     }
     const removeCategory = async function (category) {
-      if (!category.available) return
-      if(category._id) await deleteCategory(category._id)
+      if (!category.available)
+        return
+      if (category._id)
+        await deleteCategory(category._id)
     }
 
-    //<editor-fold desc="tree view code">
     const treeViewItemSelected = function (item, state) {
+      // skip select category when another category in edit mode
+      if (showKeyboard.value) {
+        return
+      }
+
+      // otherwise, select another category
       selectedCategory.value = item
     }
 
@@ -75,38 +78,56 @@ export default {
 
     }
 
-    const genNode = function ({node, text, childrenVNodes, isLast, state, path}) {
+    const editingCategoryName = ref(null)
+    const refInput = ref()
+
+    watch(() => [showKeyboard.value], async () => {
+      await nextTick();
+      if (refInput.value) {
+        refInput.value.$refs.input.focus()
+      }
+    })
+
+    function renderName(node, state) {
+      if (showKeyboard.value && selectedCategory.value && selectedCategory.value._id === node._id) {
+        return <g-text-field-bs v-model={editingCategoryName.value} ref={refInput}/>
+      } else {
+        const nonSelectedNodeStyle = { color: '#000', backgroundColor: '#FFF' }
+        const selectedNodeStyle = { color: '#FFF', backgroundColor: '#1271FF' }
+        const style = {
+          padding: '4px 8px',
+          fontWeight: node.parentCategory ? 'normal' : 'bold',
+          borderRadius: '4px',
+          ...(selectedCategory.value && selectedCategory.value._id === node._id ? selectedNodeStyle : nonSelectedNodeStyle)
+        }
+        return <span style={style} onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}>{node.name}</span>
+      }
+    }
+
+    const genNode = function ({ node, text, childrenVNodes, isLast, state, path }) {
       return <li>
         <div class="row-flex align-items-center">
           <div class="row-flex align-items-center mr-1">
-            { !node.parentCategory &&
-              <g-icon
-                  onClick={() => toggleNode(node, state)}
-                  style="width: 10px" small class="mr-2">
-                {!state.collapse ? 'fas fa-angle-right': 'fas fa-angle-up'}
-              </g-icon>
-            }
-            { node.parentCategory && <>
-              { isLast && <div style="margin-left: -2px;border: 1px solid #fff;width: 2px;height: 16px;display: inline-block; margin-top: 18px; "></div> }
+            {!node.parentCategory && <g-icon
+                onClick={() => toggleNode(node, state)}
+                style="width: 10px" small class="mr-2">
+              {!state.collapse ? 'fas fa-angle-right' : 'fas fa-angle-up'}
+            </g-icon>}
+
+            {node.parentCategory && <>
+              {isLast &&
+              <div style="margin-left: -2px;border: 1px solid #fff;width: 2px;height: 16px;display: inline-block; margin-top: 18px; "></div>}
               <span style="border-bottom: 2px solid #000; width: 15px; display: inline-block; margin-right: 5px"></span>
-            </> }
-            <span
-                style={{
-                  padding: '4px 8px',
-                  fontWeight: node.parentCategory ? 'normal' : 'bold',
-                  borderRadius: '4px',
-                  color: selectedCategory.value && selectedCategory.value._id === node._id ? '#FFF' : '#000',
-                  backgroundColor: selectedCategory.value && selectedCategory.value._id === node._id ? '#1271FF' : '#FFF',
-                }}
-                onClick={withModifiers(() => treeViewItemSelected(node, state), ['stop'])}
-            >{node.name}</span>
+            </>}
+
+            {renderName(node, state)}
           </div>
-          { !node.parentCategory &&
-            <g-btn flat rounded elevation={0} background-color="#1271FF" x-small
-                   style="width: 20px; min-width: 20px"
-                   onClick={withModifiers(() => addSubCategory(node, path), ['stop'])}>
-              <g-icon x-small color="#FFF">add</g-icon>
-            </g-btn>
+          {!node.parentCategory &&
+          <g-btn flat rounded elevation={0} background-color="#1271FF" x-small
+                 style="width: 20px; min-width: 20px"
+                 onClick={withModifiers(() => addSubCategory(node, path), ['stop'])}>
+            <g-icon x-small color="#FFF">add</g-icon>
+          </g-btn>
           }
         </div>
 
@@ -133,13 +154,18 @@ export default {
       genWrapper,
       itemChildren: 'subCategory'
     })
-    //</editor-fold>
+
+    function showEditCategoryNameKeyboard() {
+      console.log('showEditCategoryNameKeyboard', selectedCategory.value)
+      showKeyboard.value = true
+      editingCategoryName.value = selectedCategory.value.name
+    }
 
     return () => <>
       <g-dialog fullscreen v-model={internalValue.value} content-class="dialog-inventory-category">
         {/*todo: check this onClick */}
         {genScopeId(() => (
-            <div class="dialog" onClick={() => selectedCategory.value = null}>
+            <div class="dialog">
               <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
                 <div class="row-flex justify-between align-items-center">
                   <span style="font-size: 14px; font-weight: bold">Manage categories</span>
@@ -153,9 +179,9 @@ export default {
                 </div>
                 <p>* {t('inventory.onlyEmpty')}</p>
                 <div class="dialog-action">
-                  <g-btn-bs icon="edit" small background-color="#1271FF" onClick={() => showKeyboard.value = true}>{t('inventory.rename')}</g-btn-bs>
-                  <g-btn-bs small background-color="#FF4452" class={['category-item__btn', selectedCategory.value && selectedCategory.value.available && 'category-item__btn--delete']}
-                    onClick={withModifiers(() => removeCategory(selectedCategory.value), ['stop'])}>
+                  <g-btn-bs icon="edit" small background-color="#1271FF" onClick={() => showEditCategoryNameKeyboard()}>{t('inventory.rename')}</g-btn-bs>
+                  <g-btn-bs disabled={!selectedCategory.value} small background-color="#FF4452" class={['category-item__btn', selectedCategory.value && selectedCategory.value.available && 'category-item__btn--delete']}
+                            onClick={withModifiers(() => removeCategory(selectedCategory.value), ['stop'])}>
                     <g-icon small>icon-delete2</g-icon>
                     {t('inventory.remove')}
                   </g-btn-bs>
@@ -164,7 +190,11 @@ export default {
               {
                 (showKeyboard.value) &&
                 <div class="dialog-keyboard">
-                  <pos-keyboard-full type="alpha-number"></pos-keyboard-full>
+                  <pos-keyboard-full type="alpha-number" onEnterPressed={async val => {
+                    await updateCategory(selectedCategory.value._id, { name: val })
+                    // TODO: update current category name in UI
+                    showKeyboard.value = false
+                  }}/>
                 </div>
               }
               <div class="dialog-overlay" onClick={() => internalValue.value = false}></div>
