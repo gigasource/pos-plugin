@@ -5,6 +5,7 @@
 <script>
   export default {
     name: 'PosNumpad',
+    emits: ['update:modelValue'],
     data() {
       return {
         numpad: [

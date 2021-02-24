@@ -111,6 +111,12 @@ export function setComponent(_component) {
  * example: makeWrapper(Order2, {shallow: false});
  */
 export const makeWrapper = (_component, options, useDefaults = false) => {
+
+  const renderDefault = {
+    setup(props, { slots }) {
+      return () => <div> {slots.default && slots.default()} </div>
+    }
+  }
   const defaultOption = {
     props: {},
     global: {
@@ -149,7 +155,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         "g-overlay": true,
         'g-radio': true,
         'g-select': true,
-        'g-simple-table': true,
+        'g-simple-table': renderDefault,
         'g-spacer': true,
         'g-switch': true,
         'g-table': true,
@@ -165,6 +171,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'pos-file-input-image': true,
         'pos-order': true,
         'pos-quick-order-toolbar': true,
+        'pos-table-pagination': true,
         //'pos-order-split-order': true,
         'new-reservation-dialog': true,
         'pos-keyboard-full': true,
@@ -182,6 +189,7 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-sidebar': true,
         'g-side-bar-tree-view': true,
         'scroll-select': true,
+        'g-tooltip': true
       },
       mocks: {
         t: a => a,
