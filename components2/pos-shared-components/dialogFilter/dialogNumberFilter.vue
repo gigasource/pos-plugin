@@ -22,7 +22,7 @@
 
 <script>
 	import PosNumpad from '../PosNumpad';
-	
+
   export default {
     name: 'dialogNumberFilter',
 		components: {PosNumpad},
@@ -31,6 +31,7 @@
       modelValue: null,
 			rules: Array,
     },
+    emits: ['update:modelValue', 'submit'],
 		injectService: ['PosStore:(isMobile, isIOS)'],
     data() {
       return {

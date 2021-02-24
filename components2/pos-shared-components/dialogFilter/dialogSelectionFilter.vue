@@ -24,6 +24,7 @@
 <script>
   export default {
     name: "dialogSelectionFilter",
+    emits: ['update:modelValue', 'submit'],
     props: {
       modelValue: Boolean,
       multiple: Boolean,
