@@ -65,6 +65,7 @@ export async function createCategory(newCategory) {
   if (!newCategory._id)
     newCategory._id = new ObjectID()
   if (!!categories.value.find(category => category.name === newCategory.name)) return
+  newCategory.appType = currentAppType.value
   categories.value.push(newCategory)
   await Category.create(newCategory)
 }
