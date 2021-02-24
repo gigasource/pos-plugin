@@ -98,6 +98,7 @@ export async function submitInventory() {
     return
   }
   selectedInventory.value.stock = Number(selectedInventory.value.stock)
+  selectedInventory.value.product.price = Number(selectedInventory.value.product.price)
 	const inventory = _.cloneDeep(selectedInventory.value)
   if (dialog.value.mode === 'add') {
     await createInventory(inventory)
