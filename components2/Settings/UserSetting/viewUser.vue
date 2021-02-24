@@ -18,6 +18,7 @@ import { useI18n } from 'vue-i18n';
 import dialogSelectAvatar from './dialogSelectAvatar'
 import dialogUserDetail from './dialogUserDetail';
 import { onActivated } from 'vue';
+import { appType, currentAppType } from '../../AppType';
 
 export default {
   components: { dialogSelectAvatar, dialogUserDetail },
@@ -53,25 +54,28 @@ export default {
       </div>
     </div>)
 
+    const renderSwitch = (title, model) => (
+        <div class="user-edit__item">
+          <g-switch dense label={t(title)} v-model={model.value} onUpdate:modelValue={onSave}/>
+        </div>
+    )
+
     const editAreaRender = genScopeId(() => selectedUser.value &&
         <div class="user-edit">
           <div class="user-edit__title row-flex align-items-center pl-4 fw-700">
             {t('settings.editUser')}
           </div>
+
           <div class="user-edit__item">
             <g-text-field-bs label={t('settings.name')} v-model={selectedUser.value.name} onUpdate:modelValue={onSave} v-slots={{
-              'append-inner': () =>
-                  <g-icon style="cursor: pointer" onClick={onEditUsername}>
-                    icon-keyboard
-                  </g-icon>
-            }}>
-            </g-text-field-bs>
+              'append-inner': () =><g-icon style="cursor: pointer" onClick={onEditUsername}>icon-keyboard</g-icon>
+            }}/>
           </div>
-          {
+
+          { /*render user avatar*/
             (!selectedUserIsAdmin.value) &&
             <div class="user-edit__item">
-              <p class="mb-2">
-                {t('settings.userAvatar')} </p>
+              <p class="mb-2">{t('settings.userAvatar')}</p>
               <div class="row-flex align-items-center" style="height: 40px">
                 {
                   (selectedUser.value && selectedUser.value.avatar) &&
@@ -83,43 +87,52 @@ export default {
               </div>
             </div>
           }
+
+          {/* pass-code */}
           <div class="user-edit__item">
             <g-text-field-bs label={t('settings.passcode')} v-model={selectedUser.value.passcode} v-slots={{
-              'append-inner': () =>
-                  <g-icon style="cursor: pointer" onClick={onEditPasscode}>
-                    icon-keyboard
-                  </g-icon>
-            }}></g-text-field-bs>
+              'append-inner': () => <g-icon style="cursor: pointer" onClick={onEditPasscode}>icon-keyboard</g-icon>
+            }}/>
           </div>
-          {
+
+          {/*another settings*/
             (!selectedUserIsAdmin.value) && <>
-              <div class="user-edit__item">
-                <g-switch dense label={t('settings.viewOnlineOrderDashboard')} v-model={viewOnlineOrderDashboard.value} onUpdate:modelValue={onSave}/>
-              </div>
-              <div class="user-edit__item">
-                <g-switch dense label={t('settings.viewOrder')} v-model={viewOrder.value} onUpdate:modelValue={onSave}/>
-              </div>
-
-              <div class="user-edit__item">
-                <g-switch dense label={t('settings.viewOnlineOrderMenu')} v-model={viewOnlineOrderMenu.value} onUpdate:modelValue={onSave}/>
-              </div>
-
-              <div class="user-edit__item">
-                <g-switch dense label={t('settings.viewOrderHistory')} v-model={viewOrderHistory.value} onUpdate:modelValue={onSave}/>
-              </div>
-              <div class="user-edit__item">
-                <g-switch dense label={t('settings.viewReservation')} v-model={viewReservation.value} onUpdate:modelValue={onSave}/>
-              </div>
+              { appType.POS_RESTAURANT === currentAppType.value
+                  ? <>
+                      <div>{/*Blank to push next item to the next row*/}</div>
+                      { renderSwitch('settings.viewOnlineOrderDashboard', viewOnlineOrderDashboard) }
+                      { renderSwitch('settings.viewOrder', viewOrder) }
+                      { renderSwitch('settings.viewOnlineOrderMenu', viewOnlineOrderMenu) }
+                      { renderSwitch('settings.viewOrderHistory', viewOrderHistory) }
+                      { renderSwitch('settings.viewReservation', viewReservation) }
+                    </>
+                  : <>
+                      <div>{/*Blank to push next item to the next row*/}</div>
+                    </>
+              }
             </>
           }
         </div>)
+
+    // { renderSwitch('settings.viewOwnReport', viewOwnReport) }
+    // { renderSwitch('settings.viewOtherReport', viewOrderReport) }
+    // { renderSwitch('settings.editArticleTableLayout', editArticleTableLayout) }
+    // { renderSwitch('settings.accessZReport', accessZReport) }
+    // { renderSwitch('settings.itemCancellation', itemCancellation) }
+    // { renderSwitch('settings.allowTableTakeOver', allowTableTakeOver) }
+    // { renderSwitch('settings.allowItemCancellationAfterReactivePaidTable', allowItemCancellationAfterReactivePaidTable) }
+    // { renderSwitch('settings.allowMoveItem', allowMoveItem) }
+    // { renderSwitch('settings.reactivePaidTable', reactivePaidTable) }
+    // { renderSwitch('settings.allowTableSwitch', allowTableSwitch) }
+    // { renderSwitch('settings.openCashDrawerManually', openCashDrawerManually) }
+    // { renderSwitch('settings.discount', discount) }
+    // { renderSwitch('settings.cancelInvoice', cancelInvoice) }
+
     return genScopeId(() => <div class="user">
       {userListRender()}
-      {
-        editAreaRender()
-      }
-      <dialogUserDetail v-models={[[focusInput.value, 'focusInput'], [showDialogUserDetail.value]]}/>
+      {editAreaRender()}
       <dialogSelectAvatar v-model={showDialogSelectAvatar.value}/>
+      <dialogUserDetail v-models={[[focusInput.value, 'focusInput'], [showDialogUserDetail.value]]}/>
       <dialogUserDetail add v-models={[[focusInput.value, 'focusInput'], [showDialogNewUser.value]]}/>
     </div>)
   }
