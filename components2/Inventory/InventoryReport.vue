@@ -16,7 +16,7 @@ export default {
   components: { dateRangePicker, dialogTextFilter },
   setup() {
     const { t } = useI18n()
-    const selectedCategory = ref(null)
+    const selectedCategory = ref({ name: 'All' })
     const searchText = ref('')
     const reportDialog = ref({
       text: false,
@@ -33,24 +33,30 @@ export default {
 
     onActivated(async () => {
       actionFilter.value = Object.assign(actionFilter.value, {
-        fromDate: dayjs().format('YYYY-MM-DD'),
-        toDate: dayjs().format('YYYY-MM-DD')
+        fromDate: dayjs().startOf('day').format('YYYY-MM-DD HH:MM'),
+        toDate: dayjs().endOf('day').format('YYYY-MM-DD HH:MM')
       })
-      selectedCategory.value = 'all'
+      selectedCategory.value = { name: 'All' }
     })
 
     onDeactivated(async () => {
       actionFilter.value = Object.assign(actionFilter.value, {
-        fromDate: dayjs().format('YYYY-MM-DD'),
-        toDate: dayjs().format('YYYY-MM-DD')
+        fromDate: dayjs().startOf('day').format('YYYY-MM-DD HH:MM'),
+        toDate: dayjs().endOf('day').format('YYYY-MM-DD HH:MM')
       })
-      selectedCategory.value = 'all'
+      selectedCategory.value = { name: 'All' }
     })
 
     const sortedInventories = computed(() => {
       let sorted = _.cloneDeep(filteredInventoryActions.value)
       if (searchText.value) {
         sorted = _.filter(sorted, item => item.name && item.name.toLowerCase().includes(searchText.value.toLowerCase()))
+      }
+      if (selectedCategory.value.name !== 'All' && sorted.length) {
+        sorted = sorted.filter(action => {
+          return action.product && action.product.category &&
+              !!action.product.category.find((category) => category._id.toString() === selectedCategory.value._id.toString())
+        })
       }
       if (type.value === 'add') {
         sorted = _.map(sorted, item => _.omit(item, 'remove'))
@@ -65,15 +71,6 @@ export default {
       router.go(-1)
     }
 
-    const selectCategory = async function (category) {
-      if (selectedCategory.value === category) {
-        selectedCategory.value = null
-      } else {
-        selectedCategory.value = category
-      }
-      // TODO: impl
-      // await loadData()
-    }
     const changeFilter = function (range) {
       actionFilter.value = range
     }
@@ -123,7 +120,7 @@ export default {
             <g-select
                 class="mb-1 inventory-report__left__category"
                 text-field-component="GTextFieldBs"
-                items={categories.value}
+                items={[{name: 'All'}, ...categories.value]}
                 v-model={selectedCategory.value}
                 item-text="name"
                 return-object
