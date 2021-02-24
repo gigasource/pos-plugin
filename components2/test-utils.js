@@ -189,7 +189,8 @@ export const makeWrapper = (_component, options, useDefaults = false) => {
         'g-sidebar': true,
         'g-side-bar-tree-view': true,
         'scroll-select': true,
-        'g-tooltip': true
+        'g-tooltip': true,
+        'g-progress-circular': true
       },
       mocks: {
         t: a => a,

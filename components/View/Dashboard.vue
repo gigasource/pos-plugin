@@ -52,9 +52,6 @@
             @getPendingReservationsLength="getPendingReservationsLength"
         />
       </template>
-      <template v-slot:VirtualPrinter>
-        <VirtualPrinterView/>
-      </template>
     </content-render>
   </div>
 </template>
@@ -67,11 +64,9 @@
   import OnlineOrderList from "../OnlineOrder/OnlineOrderList";
   import OnlineOrderServices from "../OnlineOrder/OnlineOrderServices";
   import ReservationsList from "../Reservation/ReservationsList";
-  import VirtualPrinterView from "../VirtualPrinter/VirtualPrinterView";
   export default {
     name: "Dashboard",
     components: {
-      VirtualPrinterView,
       ReservationsList,
       OnlineOrderServices,
       OnlineOrderList,

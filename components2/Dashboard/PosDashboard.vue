@@ -11,7 +11,7 @@ import { activeScreen, selectingRoomId } from './DashboardSharedStates';
 import DashboardSidebarFactory from './DashboardSidebar/DashboardSidebarItems';
 import PosOrderManualTable from '../TablePlan/BasicRoom/ManualTable/PosOrderManualTable';
 import PosDashboardFunction from './DashboardFunctions/PosDashboardFunction';
-import VirtualPrinterView from '../../components/VirtualPrinter/VirtualPrinterView';
+import VirtualPrinterView from '../VirtualPrinter/VirtualPrinterView';
 
 export default {
   name: 'Dashboard',
@@ -54,12 +54,12 @@ export default {
             </KeepAlive>
       }
     };
-    const ManualTableView = () => <PosOrderManualTable> </PosOrderManualTable>
-    const FunctionsView = () => <PosDashboardFunction></PosDashboardFunction>
-    const OnlineOrderMainView = <OnlineOrderMain></OnlineOrderMain>
-    const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"></OnlineOrderList>
-    const OnlineOrderListCompletedView = <OnlineOrderList status="completed"></OnlineOrderList>
-    const VirtualPrinter = <VirtualPrinterView></VirtualPrinterView>
+    const ManualTableView = () => <PosOrderManualTable/>
+    const FunctionsView = () => <PosDashboardFunction/>
+    const OnlineOrderMainView = <OnlineOrderMain/>
+    const OnlineOrderListDeclinedView = <OnlineOrderList status="declined"/>
+    const OnlineOrderListCompletedView = <OnlineOrderList status="completed"/>
+    const VirtualPrinter = <VirtualPrinterView/>
     const DashBoardViews = {
       KeptAliveRoomViews,
       ManualTableView,
