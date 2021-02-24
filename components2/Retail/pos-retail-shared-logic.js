@@ -5,7 +5,6 @@ import Hooks from 'schemahandler/hooks/hooks'
 
 export const retailHook = new Hooks()
 export const refundOrder = ref(null)
-export const isRefundMode = ref(false)
 
 export const selectedCategory = ref({
   name: 'Favorite'

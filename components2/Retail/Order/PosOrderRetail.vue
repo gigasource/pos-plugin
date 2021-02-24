@@ -12,7 +12,7 @@ import { useRouter } from 'vue-router'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 import { genScopeId } from '../../utils';
-import {isRefundMode, refundOrder, retailHook} from '../pos-retail-shared-logic'
+import { refundOrder, retailHook} from '../pos-retail-shared-logic'
 import { prepareOrder, getCurrentOrder } from '../../OrderView/pos-logic-be'
 import {addItem, makeRefundOrder} from "../../OrderView/pos-logic";
 
@@ -36,6 +36,7 @@ export default {
     const dialogProductSearchResult = ref(false)
     const dialogChangePrice = ref(false)
     const dialogProductLookup = ref(false)
+    const isRefundMode = ref(false)
 
     retailHook.on('openRefundSearch', () => {
       showRefundSearch.value = true
@@ -46,9 +47,9 @@ export default {
     }
 
     const router = useRouter()
+    isRefundMode.value = router.currentRoute.value.path.includes('refund')
     onActivated(() => {
       prepareOrder(0)
-      isRefundMode.value = router.currentRoute.value.path.includes('refund')
       if (isRefundMode.value) {
         const order = getCurrentOrder()
         makeRefundOrder(order)
@@ -68,13 +69,14 @@ export default {
         <div class="por">
           <pos-retail-category class="por__category"/>
           <div class="por__main">
-            <pos-order-screen-scroll-window class="por__main__window"/>
+            <pos-order-screen-scroll-window is-refund-mode={isRefundMode.value} class="por__main__window"/>
             <pos-order-screen-number-keyboard class="por__main__keyboard"/>
-            <pos-order-screen-button-group class="por__main__buttons"/>
+            <pos-order-screen-button-group is-refund-mode={isRefundMode.value} class="por__main__buttons"/>
           </div>
-          <pos-retail-cart class="por__detail"/>
-
-          <dialog-retail-refund-search v-model={showRefundSearch.value}/>
+          <pos-retail-cart is-refund-mode={isRefundMode.value} class="por__detail"/>
+          {
+            !isRefundMode.value && <dialog-retail-refund-search v-model={showRefundSearch.value}/>
+          }
           <dialog-saved-list v-model={dialogProductSearchResult.value}/>
           <dialog-change-value v-model={dialogChangePrice.value} new-value-editable onSubmit={submit}/>
           <dialog-product-lookup v-model={dialogProductLookup.value}/>

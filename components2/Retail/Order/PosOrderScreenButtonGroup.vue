@@ -3,13 +3,16 @@ import { ref, onActivated } from 'vue'
 import { genScopeId } from '../../utils';
 import { appHooks, posSettings } from '../../AppSharedStates';
 import {
-  chooseFunction,
-  isRefundMode
+  chooseFunction
 } from '../pos-retail-shared-logic'
 
 export default {
     name: 'PosOrderScreenButtonGroup',
-    setup() {
+    props: {
+      isRefundMode: Boolean
+    },
+    setup(props) {
+      const { isRefundMode } = props
       const listBtn = ref([])
 
       const fixedBtnOrder = [
@@ -30,7 +33,7 @@ export default {
       })
 
       async function generateTemplate() {
-        if (isRefundMode.value)
+        if (isRefundMode)
           return listBtn.value = fixedBtnRefund
         const setting = posSettings.value;
         listBtn.value = []
