@@ -1,6 +1,6 @@
 <script>
-import {onBeforeMount, ref, watch, withModifiers} from 'vue';
-import {genScopeId, internalValueFactory, VModel_number} from '../../utils';
+import { onBeforeMount, ref, watch, withModifiers } from 'vue';
+import { genScopeId, internalValueFactory, VModel_number } from '../../utils';
 
 import {
   activeItem,
@@ -16,8 +16,7 @@ import {
   onUpdateActiveItem
 } from './modifier-ui-logics';
 
-import {getScopeAttrs} from '../../../utils/helpers';
-import {appHooks, groupPrinters} from '../../AppSharedStates';
+import { appHooks, groupPrinters } from '../../AppSharedStates';
 
 export default {
   props: {
@@ -43,16 +42,16 @@ export default {
 
     // console.log(getScopeAttrs())
     return genScopeId(() => <div>
-      <g-dialog fullscreen v-model={internalValue.value} {...getScopeAttrs()}>
-        <div class="col-flex flex-grow-1" style="background: #fff" {...getScopeAttrs()}>
-          <div class="header" {...getScopeAttrs()}>
+      <g-dialog fullscreen v-model={internalValue.value}>
+        {genScopeId(() => <div class="col-flex flex-grow-1" style="background: #fff">
+          <div class="header">
             {groups.value.map(group =>
                 <g-btn key={group._id}
                        outlined
                        uppercase={false}
                        background-color="#F0F0F0"
                        class={['mb-2', ...(isSelecting(group)) ? ['active-btn', 'edit-btn'] : []]}
-                       onClick={() => onSelect(group, 'group')} {...getScopeAttrs()}>
+                       onClick={() => onSelect(group, 'group')}>
                   {group.name}
                 </g-btn>
             )}
@@ -70,15 +69,13 @@ export default {
               <span> Group </span>
             </g-btn>
           </div>
-          <div class="content row-flex" {...getScopeAttrs()}>
-            <div class="content--main col-flex align-items-start" {...getScopeAttrs()}>
+          <div class="content row-flex">
+            <div class="content--main col-flex align-items-start">
               {categories.value.map((category, idx) =>
                   <>
                     <g-btn key={category._id} flat uppercase={false}
                            class={['mb-2', ...(isSelecting(category)) ? ['active-btn', 'edit-btn'] : []]}
-                           onClick={() => onSelect({ ...category, groupIdx: currentGroupIdx.value }, 'category')}
-                           {...getScopeAttrs()}
-                    >
+                           onClick={() => onSelect({ ...category, groupIdx: currentGroupIdx.value }, 'category')}>
                       {category.name}
                     </g-btn>
                     <div class="mb-3">
@@ -88,21 +85,17 @@ export default {
                       {category.items.map((mod) =>
                           <g-btn key={mod._id} flat uppercase={false}
                                  class={(isSelecting(mod)) ? ['active-btn', 'edit-btn'] : []}
-                                 onClick={() => onSelect({ ...mod, groupIdx: currentGroupIdx.value, categoryIdx: idx }, 'modifier')}
-                                 {...getScopeAttrs()}
-                          >
+                                 onClick={() => onSelect({ ...mod, groupIdx: currentGroupIdx.value, categoryIdx: idx }, 'modifier')}>
                             {mod.name}
                           </g-btn>
                       )}
                       <g-btn flat background-color="#1271ff"
                              text-color="#fff" uppercase={false}
-                             onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories.${idx}.items`, 'modifier')}
-                             {...getScopeAttrs()}>
+                             onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories.${idx}.items`, 'modifier')}>
                         <g-icon color="#fff" size="18" class="mr-2">
                           add
                         </g-icon>
-                        <span>
-                          Item </span>
+                        <span> Item </span>
                       </g-btn>
                     </div>
                   </>
@@ -111,26 +104,21 @@ export default {
                      text-color="#fff" uppercase={false}
                      onClick={() => onCreateItem(`groups.${currentGroupIdx.value}.categories`, 'category')}
                      v-show={currentGroup.value}>
-                <g-icon color="#fff" size="18" class="mr-2">
-                  add
-                </g-icon>
-                <span>
-                  Category </span>
+                <g-icon color="#fff" size="18" class="mr-2"> add </g-icon>
+                <span> Category </span>
               </g-btn>
             </div>
-            <div class="content--sidebar col-flex" {...getScopeAttrs()}>
+            <div class="content--sidebar col-flex">
               <div class="pa-2 col-flex">
                 {
                   (activeItem.value && activeItem.value.type === 'group') &&
                   <>
                     <g-text-field-bs label="Name" v-model={activeItem.value.name} required v-slots={{
-                      'append-inner': () => <>
-                        <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
-                          icon-keyboard
-                        </g-icon>
-                      </>
-                      ,
-                    }}></g-text-field-bs>
+                      'append-inner': genScopeId(() =>
+                          <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
+                            icon-keyboard
+                          </g-icon>)
+                    }}/>
                     <g-btn uppercase={false} flat background-color="#4FC3F7" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDuplicate}>
                       <g-icon color="#fff" size="18" class="mr-2">
                         file_copy
@@ -150,32 +138,23 @@ export default {
                 {
                   (activeItem.value && activeItem.value.type === 'category') &&
                   <>
-                    <g-switch label="Mandatory" v-model={activeItem.value.mandatory}>
-                    </g-switch>
-                    <g-switch label="Select one only" v-model={activeItem.value.selectOne}>
-                    </g-switch>
+                    <g-switch label="Mandatory" v-model={activeItem.value.mandatory}/>
+                    <g-switch label="Select one only" v-model={activeItem.value.selectOne}/>
                     <g-text-field-bs label="Name" required v-model={activeItem.value.name} v-slots={{
-                      'append-inner': () => <>
-                        <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
-                          icon-keyboard
-                        </g-icon>
-                      </>
-                      ,
-                    }}></g-text-field-bs>
+                      'append-inner': genScopeId(() =>
+                          <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
+                            icon-keyboard
+                          </g-icon>)
+                    }}/>
                     <g-text-field-bs label="No. of free items" v-model={activeItem.value.freeItems} v-slots={{
-                      'append-inner': () => <>
-                        <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
-                          icon-keyboard
-                        </g-icon>
-                      </>
-                      ,
-                    }}></g-text-field-bs>
+                      'append-inner': genScopeId(() =>
+                          <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
+                            icon-keyboard
+                          </g-icon>)
+                    }}/>
                     <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDeleteActiveItem}>
-                      <g-icon color="#fff" size="18" class="mr-2">
-                        delete
-                      </g-icon>
-                      <span>
-                        Delete this category </span>
+                      <g-icon color="#fff" size="18" class="mr-2"> delete</g-icon>
+                      <span> Delete this category </span>
                     </g-btn>
                   </>
                 }
@@ -189,23 +168,19 @@ export default {
                         </g-icon>
                       </>
                       ,
-                    }}></g-text-field-bs>
+                    }}/>
                     <g-text-field-bs label="Price" v-model={VModel_number(activeItem.value, 'price').value} v-slots={{
-                      'append-inner': () => <>
-                        <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
-                          icon-keyboard
-                        </g-icon>
-                      </>
-                      ,
-                    }}></g-text-field-bs>
+                      'append-inner': genScopeId(() =>
+                          <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
+                            icon-keyboard
+                          </g-icon>)
+                    }}/>
                     <g-text-field-bs label="Max items" v-model={VModel_number(activeItem.value, 'max').value} v-slots={{
-                      'append-inner': () => <>
-                        <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
-                          icon-keyboard
-                        </g-icon>
-                      </>
-                      ,
-                    }}></g-text-field-bs>
+                      'append-inner': genScopeId(() =>
+                          <g-icon style="cursor: pointer" onClick={withModifiers(() => showDialog.value = true, ['stop'])}>
+                            icon-keyboard
+                          </g-icon>)
+                    }}/>
                     {
                       <div>
                         <div style="font-size: 13px; margin: 12px 4px 2px 4px;">
@@ -213,23 +188,18 @@ export default {
                         </div>
                         <g-grid-select class="ml-1 mr-1 mb-2" v-model={activeItem.value.printer}
                                        grid={false} item-text="name" item-value="_id"
-                                       items={groupPrinters.value} itemcols="auto"  v-slots={{
-                          'default': ({ toggleSelect, item, index }) => <>
-                            <div class="prop-option" onClick={() => {toggleSelect(item)}} {...getScopeAttrs()}>
-                              {item.name} </div>
-                          </>,
-                          'selected': ({ toggleSelect, item, index }) => <>
-                            <div class="prop-option prop-option--active" {...getScopeAttrs()} onClick={() => {toggleSelect(item)}}>
-                              {item.name} </div>
-                          </>
-                        }}></g-grid-select>
+                                       items={groupPrinters.value} itemcols="auto" v-slots={{
+                          'default': genScopeId(({ toggleSelect, item, index }) =>
+                              <div class="prop-option" onClick={() => {toggleSelect(item)}}>
+                                {item.name} </div>),
+                          'selected': genScopeId(({ toggleSelect, item, index }) =>
+                              <div class="prop-option prop-option--active" onClick={() => {toggleSelect(item)}}>
+                                {item.name} </div>)
+                        }}/>
                       </div>}
                     <g-btn uppercase={false} flat background-color="#FF4452" text-color="#fff" style="margin: 8px 4px 0 4px" onClick={onDeleteActiveItem}>
-                      <g-icon color="#fff" size="18" class="mr-2">
-                        delete
-                      </g-icon>
-                      <span>
-                        Delete this item </span>
+                      <g-icon color="#fff" size="18" class="mr-2"> delete</g-icon>
+                      <span> Delete this item </span>
                     </g-btn>
                   </>
                 }
@@ -238,52 +208,39 @@ export default {
               </g-spacer>
               <div class="row-flex" style="position: sticky; z-index: 1">
                 <g-btn flat background-color="#ff4452" text-color="#fff" border-radius="0" onClick={close} style="flex: 1; margin: 0">
-
                   Close
                 </g-btn>
               </div>
             </div>
           </div>
-        </div>
+        </div>)()}
       </g-dialog>
       <dialog-form-input v-model={showDialog.value} onSubmit={() => showDialog.value = false} v-slots={{
-        'input': ({ changeKeyboard }) => <>
-          <div class="mb-4">
-            {
-              (activeItem.value && activeItem.value.type === 'group') ?
-                  <>
-                    <pos-textfield-new label="Name" v-model={activeItem.value.name} required clearable>
-                    </pos-textfield-new>
-                  </>
-                  :
-                  (
-                      (activeItem.value && activeItem.value.type === 'category') ?
-                          <>
+        'input': genScopeId(({ changeKeyboard }) =>
+            <div class="mb-4">
+              {
+                (activeItem.value && activeItem.value.type === 'group') ?
+                    <pos-textfield-new label="Name" v-model={activeItem.value.name} required clearable/>
+                    :
+                    (
+                        (activeItem.value && activeItem.value.type === 'category') ?
                             <div class="row-flex flex-wrap justify-between">
-                              <pos-textfield-new label="Name" required clearable v-model={activeItem.value.name} onClick={withModifiers(() => changeKeyboard('alpha'), ['native', 'stop'])}>
-                              </pos-textfield-new>
-                              <pos-textfield-new label="No. of free items" clearable v-model={activeItem.value.freeItems} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}>
-                              </pos-textfield-new>
+                              <pos-textfield-new label="Name" required clearable v-model={activeItem.value.name} onClick={withModifiers(() => changeKeyboard('alpha'), ['native', 'stop'])}/>
+                              <pos-textfield-new label="No. of free items" clearable v-model={activeItem.value.freeItems} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
                             </div>
-                          </>
-                          :
-                          (
-                              (activeItem.value && activeItem.value.type === 'modifier') &&
-                              <>
+                            :
+                            (
+                                (activeItem.value && activeItem.value.type === 'modifier') &&
                                 <div class="row-flex flex-wrap justify-between">
-                                  <pos-textfield-new style="width: 48%" label="Name" required clearable v-model={activeItem.value.name} onClick={withModifiers(() => changeKeyboard('alphanumeric'), ['native', 'stop'])}></pos-textfield-new>
-                                  <pos-textfield-new style="width: 48%" label="Price" clearable v-model={activeItem.value.price} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}>
-                                  </pos-textfield-new>
-                                  <pos-textfield-new style="width: 48%" label="Max items" clearable v-model={activeItem.value.max} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}>
-                                  </pos-textfield-new>
+                                  <pos-textfield-new style="width: 48%" label="Name" required clearable v-model={activeItem.value.name} onClick={withModifiers(() => changeKeyboard('alphanumeric'), ['native', 'stop'])}/>
+                                  <pos-textfield-new style="width: 48%" label="Price" clearable v-model={activeItem.value.price} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
+                                  <pos-textfield-new style="width: 48%" label="Max items" clearable v-model={activeItem.value.max} onClick={withModifiers(() => changeKeyboard('numeric'), ['native', 'stop'])}/>
                                 </div>
-                              </>
-                          )
-                  )
-            }
-          </div>
-        </>
-      }}></dialog-form-input>
+                            )
+                    )
+              }
+            </div>)
+      }}/>
     </div>)
   }
 }
