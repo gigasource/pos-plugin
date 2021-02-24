@@ -12,12 +12,15 @@ import {
   retailLayoutSetting,
   saveRetailLayoutSetting
 } from './retail-layout-setting-logic';
-import {isRefundMode, refundOrder} from "../pos-retail-shared-logic";
+import { refundOrder } from "../pos-retail-shared-logic";
 
 export default {
   name: 'PosRetailCart',
-  props: {},
-  setup() {
+  props: {
+    isRefundMode: Boolean
+  },
+  setup(props) {
+    const { isRefundMode } = props
     const { t } = useI18n()
     const order = getCurrentOrder()
     const total = computed(() => {
@@ -97,7 +100,7 @@ export default {
 
     function increaseQty(order, item) {
       if (item.sent) return;
-      if (isRefundMode.value) {
+      if (isRefundMode) {
         const foundItem = refundOrder.value.items.find(item => item._id.toString() === item._id.toString())
         if (foundItem && foundItem.quantity === item.quantity) return
       }

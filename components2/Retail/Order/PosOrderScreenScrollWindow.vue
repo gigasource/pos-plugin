@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
 import { execGenScopeId, genScopeId } from '../../utils';
 import { categories, products } from '../../Product/product-logic'
-import { isRefundMode, selectedCategory } from '../pos-retail-shared-logic'
+import { selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
 import { loadRetailLayoutSetting, retailLayoutSetting } from './retail-layout-setting-logic';
@@ -16,9 +16,11 @@ export default {
     value: {
       type: Number,
       default: 0
-    }
+    },
+    isRefundMode: Boolean
   },
   setup(props) {
+    const { isRefundMode } = props
     /**
      * Object key is category._id
      */
@@ -61,7 +63,7 @@ export default {
     })
 
     function addProduct(item) {
-      if (isRefundMode.value) return
+      if (isRefundMode) return
       const order = getCurrentOrder()
       addItem(order, item, 1)
     }
