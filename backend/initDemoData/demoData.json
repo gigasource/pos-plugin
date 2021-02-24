@@ -29,7 +29,8 @@
             1
           ],
           "backgroundColor": "#FFFFFF",
-          "text": "F1"
+          "text": "Refund order",
+          "buttonFunction": "openRefundSearch"
         },
         {
           "rows": [
@@ -114,45 +115,6 @@
           ],
           "backgroundColor": "#FFFFFF",
           "text": "F8"
-        },
-        {
-          "rows": [
-            5,
-            7
-          ],
-          "cols": [
-            1,
-            1
-          ],
-          "backgroundColor": "#7BB872",
-          "textColor": "#FFFFFF",
-          "text": "Quick Cash"
-        },
-        {
-          "rows": [
-            5,
-            5
-          ],
-          "cols": [
-            2,
-            2
-          ],
-          "backgroundColor": "#F9A825",
-          "textColor": "#FFFFFF",
-          "text": "Save"
-        },
-        {
-          "rows": [
-            6,
-            6
-          ],
-          "cols": [
-            2,
-            2
-          ],
-          "backgroundColor": "#1271FF",
-          "textColor": "#FFFFFF",
-          "text": "Pay"
         }
       ]
     }

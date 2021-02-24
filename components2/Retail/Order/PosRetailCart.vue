@@ -12,6 +12,7 @@ import {
   retailLayoutSetting,
   saveRetailLayoutSetting
 } from './retail-layout-setting-logic';
+import {isRefundMode, refundOrder} from "../pos-retail-shared-logic";
 
 export default {
   name: 'PosRetailCart',
@@ -96,6 +97,10 @@ export default {
 
     function increaseQty(order, item) {
       if (item.sent) return;
+      if (isRefundMode.value) {
+        const foundItem = refundOrder.value.items.find(item => item._id.toString() === item._id.toString())
+        if (foundItem && foundItem.quantity === item.quantity) return
+      }
       changeItemQuantity(order, item, 1)
     }
 

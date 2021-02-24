@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { GScrollWindow, GScrollWindowItem } from 'pos-vue-framework';
 import { execGenScopeId, genScopeId } from '../../utils';
 import { categories, products } from '../../Product/product-logic'
-import { selectedCategory } from '../pos-retail-shared-logic'
+import { isRefundMode, selectedCategory } from '../pos-retail-shared-logic'
 import { getCurrentOrder, prepareOrder } from '../../OrderView/pos-logic-be'
 import { addItem } from '../../OrderView/pos-logic';
 import { loadRetailLayoutSetting, retailLayoutSetting } from './retail-layout-setting-logic';
@@ -19,8 +19,6 @@ export default {
     }
   },
   setup(props) {
-    let itemRef = {}
-
     /**
      * Object key is category._id
      */
@@ -58,18 +56,12 @@ export default {
       return result
     })
 
-    function setItemRef(el, category) {
-      if (el) {
-        itemRef[category] = el
-      }
-    }
-
     onActivated(() => {
-      prepareOrder(0)
       loadRetailLayoutSetting()
     })
 
     function addProduct(item) {
+      if (isRefundMode.value) return
       const order = getCurrentOrder()
       addItem(order, item, 1)
     }
@@ -96,12 +88,6 @@ export default {
       }
 
       return customizableStyle
-    }
-
-    function getWindowStyle(category) {
-      if (!selectedCategory.value || (selectedCategory.value._id !== category && selectedCategory.value.name !== category)) {
-        return { display: 'none' }
-      }
     }
 
     const windowGridLayoutStyle = computed(() => ({
@@ -160,14 +146,14 @@ export default {
         <div class="main">
           {Object.keys(productWindows.value).map((category) => {
             const productsList = productWindows.value[category]
-            if (selectedCategory.value && category !== selectedCategory.value._id)
+            if (selectedCategory.value && category !== selectedCategory.value._id && category !== selectedCategory.value.name)
               return
 
             return (
-                <div key={category} ref={(el) => setItemRef(el, category)} style={getWindowStyle(category)}>
-                  {renderProducts(productsList, category)}
-                  {renderDelimiter(productsList, category)}
-                </div>
+              <div key={category}>
+                {renderProducts(productsList, category)}
+                {renderDelimiter(productsList, category)}
+              </div>
             )
           })}
         </div>

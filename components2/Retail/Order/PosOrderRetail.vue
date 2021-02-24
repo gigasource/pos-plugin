@@ -7,10 +7,14 @@ import PosOrderScreenButtonGroup from './PosOrderScreenButtonGroup';
 import PosOrderScreenScrollWindow from './PosOrderScreenScrollWindow';
 import PosRetailCart from './PosRetailCart';
 import PosRetailCategory from './PosRetailCategory';
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, onActivated } from 'vue'
+import { useRouter } from 'vue-router'
 import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 import { genScopeId } from '../../utils';
+import {isRefundMode, refundOrder, retailHook} from '../pos-retail-shared-logic'
+import { prepareOrder, getCurrentOrder } from '../../OrderView/pos-logic-be'
+import {addItem, makeRefundOrder} from "../../OrderView/pos-logic";
 
 export default {
   name: 'PosOrderRetail',
@@ -33,9 +37,27 @@ export default {
     const dialogChangePrice = ref(false)
     const dialogProductLookup = ref(false)
 
+    retailHook.on('openRefundSearch', () => {
+      showRefundSearch.value = true
+    })
+
     function submit() {
-      this.$getService('PosStore:updateNewPrice')(val);
+      //todo: add this
     }
+
+    const router = useRouter()
+    onActivated(() => {
+      prepareOrder(0)
+      isRefundMode.value = router.currentRoute.value.path.includes('refund')
+      if (isRefundMode.value) {
+        const order = getCurrentOrder()
+        makeRefundOrder(order)
+        refundOrder.value.items.forEach(item => {
+          if (item.option.nonRefundable) return
+          addItem(order, item, 0)
+        })
+      }
+    })
 
     onBeforeMount(async () => {
       await loadCategories()

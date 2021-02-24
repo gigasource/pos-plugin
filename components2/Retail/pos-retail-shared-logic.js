@@ -1,6 +1,11 @@
 import { ref } from 'vue'
 import { storeLocale } from '../AppSharedStates';
 import { execGenScopeId } from '../utils';
+import Hooks from 'schemahandler/hooks/hooks'
+
+export const retailHook = new Hooks()
+export const refundOrder = ref(null)
+export const isRefundMode = ref(false)
 
 export const selectedCategory = ref({
   name: 'Favorite'
@@ -63,8 +68,20 @@ export function renderDisplayOrderItemsTable(order, t) {
 }
 
 export function chooseFunction(functionName) {
-  //todo: add more function
-  if (!functionName) return
-  return () => {
+  if (!functionName || !configFunctionList[functionName]) return
+  return configFunctionList[functionName]
+}
+
+//<editor-fold desc="List function to config with button">
+export const configFunctionList = {
+  payOrder(order) {
+
+  },
+  refundOrder(order) {
+
+  },
+  openRefundSearch() {
+    retailHook.emit('openRefundSearch')
   }
 }
+//</editor-fold>

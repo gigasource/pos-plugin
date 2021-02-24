@@ -3,19 +3,35 @@ import { ref, onActivated } from 'vue'
 import { genScopeId } from '../../utils';
 import { appHooks, posSettings } from '../../AppSharedStates';
 import {
-  chooseFunction
+  chooseFunction,
+  isRefundMode
 } from '../pos-retail-shared-logic'
 
 export default {
     name: 'PosOrderScreenButtonGroup',
     setup() {
       const listBtn = ref([])
+
+      const fixedBtnOrder = [
+        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#7BB872", "textColor": "#FFFFFF", "text": "Quick Cash" },
+        { "rows": [5, 5], "cols": [2, 2], "backgroundColor": "#F9A825", "textColor": "#FFFFFF", "text": "Save" },
+        { "rows": [6, 6], "cols": [2, 2], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Pay" }
+      ]
+
+      const fixedBtnRefund = [
+        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Refund" },
+        { "rows": [5, 5], "cols": [2, 2], "backgroundColor": "#F9A825", "textColor": "#FFFFFF", "text": "Save" },
+        { "rows": [4, 4], "cols": [1, 3], "backgroundColor": "#FFFFFF", "textColor": "#000000", "text": "Change refund fee" }
+      ]
+
       onActivated(async() => {
         await appHooks.emit('settingChange')
         await generateTemplate();
       })
 
       async function generateTemplate() {
+        if (isRefundMode.value)
+          return listBtn.value = fixedBtnRefund
         const setting = posSettings.value;
         listBtn.value = []
         const rightFunctionButtons = setting.rightFunctionButtons
@@ -30,6 +46,8 @@ export default {
                 : btn
           );
         }
+
+        listBtn.value = [...listBtn.value, ...fixedBtnOrder]
       }
 
       function isActiveBtn(btn) {

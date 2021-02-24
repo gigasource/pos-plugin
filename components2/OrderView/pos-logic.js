@@ -507,6 +507,9 @@ export function removeItem(order, query, quantity = 1, force = false) {
     item.quantity -= quantity;
   } else {
     _item = _.assign(_.cloneDeep(item), {quantity});
+    if (item.quantity >= quantity)
+      item.quantity -= quantity
+    if (order.isRefundOrder) return // doesn't remove item in refund mode when quantity is 0
     order.items.splice(query, 1);
   }
   //todo: sent or not
@@ -595,6 +598,10 @@ export function mergeSameItems(order, mutate = true) {
   }, [])
   if (mutate) order.items = items;
   return items;
+}
+
+export function makeRefundOrder(order) {
+  order.isRefundOrder = true
 }
 
 //todo: recent items

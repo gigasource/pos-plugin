@@ -1,8 +1,10 @@
 <script>
-import { ref } from 'vue'
-import { genScopeId } from '../../../utils';
+import { ref, watch, nextTick } from 'vue'
+import { genScopeId, internalValueFactory } from '../../../utils';
 import { useRouter } from 'vue-router'
-import { mockSearchResult } from './retail-refund-logic';
+import { searchOrderByDateRange } from '../../../OrderView/pos-logic-be'
+import dayjs from 'dayjs'
+import { refundOrder } from '../../pos-retail-shared-logic'
 
 export default {
   name: 'dialogRetailRefundSearch',
@@ -10,12 +12,14 @@ export default {
     modelValue: Boolean
   },
   setup(props, { emit }) {
+    const internalValue = internalValueFactory(props, { emit })
     const searchTerms = [
       { text: 'Order No', value: 0 },
       { text: 'Item Name', value: 1 },
       { text: 'Customer name/phone', value: 2 },
     ]
     const searchTerm = ref(searchTerms[0])
+    const searchResult = ref([])
     const searchValue = ref('')
     const searchTimes = [
       { text: 'Today', value: 0 },
@@ -25,24 +29,53 @@ export default {
       { text: 'Last 90 days', value: 4 },
       { text: 'All time', value: 5 },
     ]
-    const searchTime = ref(searchTimes[0])
-
-
-    const searchResult = ref([])
-    // mock
-    searchResult.value = mockSearchResult
+    const searchTime = ref(null)
+    watch(() => searchTime.value, async (newVal, oldVal) => {
+      if (newVal === oldVal) return
+      const startOfToday = dayjs().startOf('day')
+      let to = dayjs().endOf('day')
+      let from
+      switch (searchTime.value) {
+        case searchTimes[0]:
+          from = startOfToday
+          break
+        case searchTimes[1]:
+          from = startOfToday.subtract(1, 'day')
+          break
+        case searchTimes[2]:
+          from = startOfToday.subtract(6, 'day')
+          break
+        case searchTimes[3]:
+          from = startOfToday.subtract(29, 'day')
+          break
+        case searchTimes[4]:
+          from = startOfToday.subtract(89, 'day')
+          break
+        case searchTimes[5]:
+          to = null
+          from = null
+          break
+        default:
+          from = startOfToday
+          break
+      }
+      searchResult.value = await searchOrderByDateRange(from, to)
+    })
+    searchTime.value = searchTimes[0]
 
     const router = useRouter()
+
     function showRefundForOrder(order) {
       // 2 way design:
       //  - passing order id as route params
       //  - store order in singleton variable
       // router.push({path: `retail--order-refund/{:${order}`})
-      emit('update:modelValue', false)
-      router.push({path: 'retail--order-refund'})
+      internalValue.value = false
+      refundOrder.value = order
+      nextTick(() => router.push({path: 'retail--order-refund'}))
     }
     return genScopeId(() => <>
-      <g-dialog v-model={props.modelValue}>
+      <g-dialog v-model={internalValue.value}>
         <div style="background-color: #FFF; padding: 30px;" class="col-flex">
           <div class="row-flex justify-between mb-3">
             <div>Search</div>
@@ -72,8 +105,8 @@ export default {
               searchResult.value.map((order, index) =>
                   <tr key={index}>
                     <td>{order.id}</td>
-                    <td>{order.datetime}</td>
-                    <td>{order.cashier}</td>
+                    <td>{dayjs(order.date).format('YYYY-MM-DD HH:MM')}</td>
+                    <td>{order.user.map(user => <span>{user.name}</span>)}</td>
                     <td>{order.customer}</td>
                     <td>{order.items.length}</td>
                     <td>

@@ -623,3 +623,18 @@ hooks.on('pay-split', async (printInvoice) => {
 })
 
 //</editor-fold>
+
+//<editor-fold desc="search">
+export async function searchOrderByDateRange(from, to) {
+  const query = {
+    status: {$in: ["paid" ]}
+  }
+  if (from && to)
+    query.date = {
+      ...from && {$gte: dayjs(from).format()},
+      ...to && {$lte: dayjs(to).format()},
+    }
+  const orders = await Order.find(query)
+  return orders
+}
+//</editor-fold>
