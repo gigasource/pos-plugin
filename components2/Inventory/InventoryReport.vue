@@ -91,7 +91,7 @@ export default {
 
             {/*type: All|Add/Remove*/}
             <div class="mb-1">
-              <g-menu v-model={menu.value} nudge-bottom="4" v-slots={{
+              <g-menu v-model={menu.value} close-on-content-click nudge-bottom="4" v-slots={{
                 default: genScopeId(() => <div class="type-menu">
                   <div class="type-menu-item" onClick={() => type.value = 'all'}>
                     <g-icon class="mr-2"> icon-inventory-report-all</g-icon>
@@ -135,49 +135,33 @@ export default {
       )
     }
 
-    const renderMainContent = () => (
-        <div class={['inventory-report__main-content', display.value === 'grid' && 'inventory-report__main-content--grid']}>
-          {
-            (display.value === 'list') && sortedInventories.value.map((inventory, i) =>
-                <div class="inventory-report-list-item" key={`list_${i}`} onClick={() => selectItem(inventory)}>
-                  <div class="inventory-report-list-item__name">{inventory.product.name}</div>
-                  <div class="inventory-report-list-item__unit">{inventory.unit}</div>
-                  <div class="inventory-report-list-item__add">
-                    {(inventory.add || inventory.add === 0) &&
-                    <g-icon size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>}
-                    {$filters.formatCurrency(inventory.add)}
-                  </div>
-                  <div class="inventory-report-list-item__remove">
-                    {(inventory.remove || inventory.remove === 0) &&
-                    <g-icon size="14" class="mr-1">icon-inventory-report-remove</g-icon>}
-                    {$filters.formatCurrency(inventory.remove)}
-                  </div>
-                </div>
-            )
-          }
-          {
-            (display.value === 'grid') && sortedInventories.value.map((inventory, i) =>
-                <div class="inventory-report-grid-item" key={`grid_${i}`} onClick={() => selectItem(inventory)}>
-                  <div class="inventory-report-grid-item__name">{inventory.product.name}</div>
-                  <g-spacer/>
-                  <div class="inventory-report-grid-item__detail">
-                    <div class="inventory-report-grid-item__add">
-                      {(inventory.add || inventory.add === 0) &&
-                      <g-icon size="12" style="margin-bottom: 2px">icon-inventory-report-add</g-icon>}
-                      {$filters.formatCurrency(inventory.add)}
-                    </div>
-                    <g-spacer/>
-                    <div class="inventory-report-grid-item__remove">
-                      {(inventory.remove || inventory.remove === 0) &&
-                      <g-icon size="14" class="mr-1">icon-inventory-report-remove</g-icon>}
-                      {$filters.formatCurrency(inventory.remove)}
-                    </div>
-                  </div>
-                </div>
-            )
-          }
-        </div>
-    )
+
+    const renderMainContent = () => {
+      const thStyle = {'border-bottom': '1px solid #E0E0E0'}
+      const qtyStyle = { width: '80px' }
+      return (
+          <g-table striped fixed-header style="flex: 1">
+            <thead>
+            <tr style="font-size: 12px;">
+              <th class="ta-left pl-2" style={thStyle}>Name</th>
+              <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Unit</th>
+              { (type.value === 'all' || type.value === 'add') && <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Added</th> }
+              { (type.value === 'all' || type.value === 'remove') && <th class="ta-right pr-2" style={[qtyStyle, thStyle]}>Removed</th> }
+            </tr>
+            </thead>
+            <tbody>
+            { sortedInventories.value.map((inventory, i) =>
+                <tr style="font-size: 12px" key={`list_${i}`} onClick={() => selectItem(inventory)}>
+                  <td class="ta-left pl-2">{inventory.product.name}</td>
+                  <td class="ta-right pr-2" style={qtyStyle}>{inventory.unit}</td>
+                  { (type.value === 'all' || type.value === 'add') && <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.add)}</td> }
+                  { (type.value === 'all' || type.value === 'remove') && <td class="ta-right pr-2" style={qtyStyle}>{$filters.formatCurrency(inventory.remove)}</td> }
+                </tr>
+            )}
+            </tbody>
+          </g-table>
+      )
+    }
 
     // const renderMain = () => (
     //     <div class="inventory-report__main">
