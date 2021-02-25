@@ -1,7 +1,7 @@
 <script>
 import { ref, onActivated, computed, onDeactivated } from 'vue'
 import { useRouter } from 'vue-router'
-import dateRangePicker from '../../components/OnlineOrder/dateRangePicker';
+import dateRangePicker from '../../components2/OnlineOrder/dateRangePicker';
 import dialogTextFilter from '../pos-shared-components/dialogFilter/dialogTextFilter';
 import _ from 'lodash';
 import dayjs from 'dayjs'
