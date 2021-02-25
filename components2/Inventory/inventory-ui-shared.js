@@ -149,8 +149,18 @@ export function renderInventoryDialog(t) {
           <pos-textfield-new style="width: 48%" label="Name" v-model={selectedInventory.value.product.name}/>
           <pos-textfield-new disabled={dialog.value.mode === 'edit'} rules={[val => !isNaN(val) || 'Must be a number!']}
                              style="width: 48%" label={t('inventory.stock')} v-model={selectedInventory.value.stock}/>
-          <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('article.category')}
-                    items={categories.value} item-text="name" return-object v-model={selectedInventory.value.product.category}/>
+          <g-select
+            label={t('article.category')}
+            required
+            multiple
+            chips
+            deletableChips
+            style={{gridColumn:'span 3'}}
+            text-field-component="g-text-field-bs"
+            menu-class="menu-select-inventory" outlined
+            items={categoriesWithParentName.value} item-text="name" return-object
+            modelValue={selectedInventory.value.product.category}
+            onUpdate:modelValue={updateSelectedInventoryCategory}/>
           <g-select menu-class="menu-select-inventory" outlined style="width: 48%" label={t('inventory.unit')}
                     items={units.value} v-model={selectedInventory.value.unit}/>
         </div>
@@ -172,19 +182,6 @@ export function renderInventoryDialog(t) {
                     rules={[val => !isNaN(val) || 'Must be a number!']}
                     v-model={selectedInventory.value.product.price}/>
               </div>
-
-              <g-select
-                  label={t('article.category')}
-                  required
-                  multiple
-                  chips
-                  deletableChips
-                  style={{gridColumn:'span 3'}}
-                  text-field-component="g-text-field-bs"
-                  menu-class="menu-select-inventory" outlined
-                  items={categoriesWithParentName.value} item-text="name" return-object
-                  modelValue={selectedInventory.value.product.category}
-                  onUpdate:modelValue={updateSelectedInventoryCategory}/>
 
               <div style={halfGrid}>
                 <g-select
