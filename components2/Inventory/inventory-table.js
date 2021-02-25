@@ -58,7 +58,7 @@ export function renderMainInventoryTable(props, { emit }) {
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.id}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.name}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{formatDate(inventory.lastUpdateTimestamp)}</td>
-					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.product.category.name}</td>
+					<td onClick={() => openDialogInventory(inventory, 'edit')}>{getCategoryText(inventory.product.category)}</td>
 					<td onClick={() => openDialogInventory(inventory, 'edit')}>{inventory.unit}</td>
 					<td onClick={() => openDialogStock(inventory)}>
 						<div className="row-flex justify-between">
