@@ -7,6 +7,7 @@ import {
   cancelOrder,
   clearPayment,
   getRestTotal,
+  makeRefundOrder,
   mergeSameItems,
   removeItem,
   simulateBackendPrint,

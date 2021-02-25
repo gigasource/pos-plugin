@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { searchOrderByDateRange } from '../../../OrderView/pos-logic-be'
 import dayjs from 'dayjs'
 import { refundOrder } from '../../pos-retail-shared-logic'
+import {makeRefundOrder} from "../../../OrderView/pos-logic";
 
 export default {
   name: 'dialogRetailRefundSearch',
@@ -36,22 +37,22 @@ export default {
       let to = dayjs().endOf('day')
       let from
       switch (searchTime.value) {
-        case searchTimes[0]:
+        case searchTimes[0].value:
           from = startOfToday
           break
-        case searchTimes[1]:
+        case searchTimes[1].value:
           from = startOfToday.subtract(1, 'day')
           break
-        case searchTimes[2]:
+        case searchTimes[2].value:
           from = startOfToday.subtract(6, 'day')
           break
-        case searchTimes[3]:
+        case searchTimes[3].value:
           from = startOfToday.subtract(29, 'day')
           break
-        case searchTimes[4]:
+        case searchTimes[4].value:
           from = startOfToday.subtract(89, 'day')
           break
-        case searchTimes[5]:
+        case searchTimes[5].value:
           to = null
           from = null
           break
@@ -61,7 +62,7 @@ export default {
       }
       searchResult.value = await searchOrderByDateRange(from, to)
     })
-    searchTime.value = searchTimes[0]
+    searchTime.value = searchTimes[0].value
 
     const router = useRouter()
 
@@ -72,7 +73,7 @@ export default {
       // router.push({path: `retail--order-refund/{:${order}`})
       internalValue.value = false
       refundOrder.value = order
-      nextTick(() => router.push({path: 'retail--order-refund'}))
+      router.push({path: 'retail--order-refund'})
     }
     return genScopeId(() => <>
       <g-dialog v-model={internalValue.value}>

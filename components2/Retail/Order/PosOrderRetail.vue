@@ -13,13 +13,11 @@ import { loadCategories, loadProducts } from '../../Product/product-logic-be'
 import DialogRetailRefundSearch from './Refund/dialogRetailRefundSearch';
 import { genScopeId } from '../../utils';
 import { refundOrder, retailHook} from '../pos-retail-shared-logic'
-import { prepareOrder, getCurrentOrder } from '../../OrderView/pos-logic-be'
-import {addItem, makeRefundOrder} from "../../OrderView/pos-logic";
+import {makeRefundOrder, prepareOrder} from '../../OrderView/pos-logic-be'
 
 export default {
   name: 'PosOrderRetail',
   props: {},
-  injectService: ['PosStore:updateNewPrice'],
   components: {
     DialogRetailRefundSearch,
     PosOrderScreenScrollWindow,
@@ -49,15 +47,7 @@ export default {
     const router = useRouter()
     isRefundMode.value = router.currentRoute.value.path.includes('refund')
     onActivated(() => {
-      prepareOrder(0)
-      if (isRefundMode.value) {
-        const order = getCurrentOrder()
-        makeRefundOrder(order)
-        refundOrder.value.items.forEach(item => {
-          if (item.option.nonRefundable) return
-          addItem(order, item, 0)
-        })
-      }
+      !isRefundMode.value ? prepareOrder(0) : prepareOrder(makeRefundOrder(refundOrder.value))
     })
 
     onBeforeMount(async () => {

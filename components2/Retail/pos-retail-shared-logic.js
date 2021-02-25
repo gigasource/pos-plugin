@@ -76,9 +76,6 @@ export const configFunctionList = {
   payOrder(order) {
 
   },
-  refundOrder(order) {
-
-  },
   openRefundSearch() {
     retailHook.emit('openRefundSearch')
   }

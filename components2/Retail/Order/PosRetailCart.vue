@@ -12,7 +12,6 @@ import {
   retailLayoutSetting,
   saveRetailLayoutSetting
 } from './retail-layout-setting-logic';
-import { refundOrder } from "../pos-retail-shared-logic";
 
 export default {
   name: 'PosRetailCart',
@@ -23,6 +22,7 @@ export default {
     const { isRefundMode } = props
     const { t } = useI18n()
     const order = getCurrentOrder()
+
     const total = computed(() => {
       return order.items.reduce((totalPrice, item) => {
         totalPrice += item.price * item.quantity
@@ -98,12 +98,13 @@ export default {
       </>
     }
 
-    function increaseQty(order, item) {
-      if (item.sent) return;
-      if (isRefundMode) {
-        const foundItem = refundOrder.value.items.find(item => item._id.toString() === item._id.toString())
-        if (foundItem && foundItem.quantity === item.quantity) return
-      }
+    function decreaseQty(item) {
+      changeItemQuantity(order, item, -1)
+    }
+
+    function increaseQty(item) {
+      if (isRefundMode && item.quantity === item.maxQuantity)
+        return
       changeItemQuantity(order, item, 1)
     }
 
@@ -123,9 +124,9 @@ export default {
                       )} </p>
                   </div>
                   <div class="row-flex align-items-center">
-                    <g-icon color="#1d1d26" onClick={() => removeItem(order, item)}>remove_circle_outline</g-icon>
+                    <g-icon color="#1d1d26" onClick={() => decreaseQty(item)}>remove_circle_outline</g-icon>
                     <div class="ta-center" style="width: 24px">{item.quantity}</div>
-                    <g-icon color="#1d1d26" onClick={() => increaseQty(order, item)}>add_circle_outline</g-icon>
+                    <g-icon color="#1d1d26" onClick={() => increaseQty(item)}>add_circle_outline</g-icon>
                   </div>
                 </div>
             )}

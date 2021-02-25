@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import delay from "delay";
 import {socketEmit} from "../utils";
 import {username} from "../AppSharedStates";
+import {ObjectID} from "bson";
 
 const Order = cms.getModel('Order');
 
@@ -116,6 +117,22 @@ export function addProduct(order, product, quantity) {
   const item = mapProduct(product);
   addItem(order, item, quantity);
   //todo: compare to old-version;
+}
+
+export function makeRefundOrder(order, newOrder = true) {
+  order = _.cloneDeep(order)
+  order.items = order.items.filter(item => !item.option.nonRefundable)
+  order.items.forEach(item => {
+    item.maxQuantity = item.quantity
+    item.quantity = 0
+  })
+  const refundOrder = createOrder(order)
+  refundOrder.status = 'refund'
+  refundOrder.originalOrderId = order._id
+  if (newOrder) {
+    refundOrder._id = new ObjectID()
+  }
+  return refundOrder
 }
 
 //</editor-fold>
@@ -470,6 +487,10 @@ export function togglePayPrintBtn(cb) {
   if (actionTimeout) clearTimeout(actionTimeout);
   [showIcon.value, overlay.value] = [false, false];
   hooks.emit('togglePayPrintBtn:step2', cb);
+}
+
+export async function toggleRefundOrder(refundOrder) {
+  await Order.create(refundOrder)
 }
 
 export const quickBtnAction = ref('pay');

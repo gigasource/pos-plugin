@@ -5,6 +5,9 @@ import { appHooks, posSettings } from '../../AppSharedStates';
 import {
   chooseFunction
 } from '../pos-retail-shared-logic'
+import {
+  useRouter
+} from 'vue-router'
 
 export default {
     name: 'PosOrderScreenButtonGroup',
@@ -22,10 +25,15 @@ export default {
       ]
 
       const fixedBtnRefund = [
-        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Refund" },
+        { "rows": [5, 7], "cols": [1, 1], "backgroundColor": "#1271FF", "textColor": "#FFFFFF", "text": "Refund", buttonFunction: toPayment },
         { "rows": [5, 5], "cols": [2, 2], "backgroundColor": "#F9A825", "textColor": "#FFFFFF", "text": "Save" },
         { "rows": [4, 4], "cols": [1, 3], "backgroundColor": "#FFFFFF", "textColor": "#000000", "text": "Change refund fee" }
       ]
+
+      const router = useRouter()
+      function toPayment() {
+        router.push({ path: '/pos-payment' })
+      }
 
       onActivated(async() => {
         await appHooks.emit('settingChange')
@@ -59,7 +67,11 @@ export default {
 
       function onClick(btn) {
         if (!btn || !btn.buttonFunction) return
-        chooseFunction(btn.buttonFunction)(btn.buttonFunctionValue)
+        if (typeof btn.buttonFunction === 'function') {
+          btn.buttonFunction()
+        } else {
+          chooseFunction(btn.buttonFunction)(btn.buttonFunctionValue)
+        }
       }
 
       return genScopeId(() => (

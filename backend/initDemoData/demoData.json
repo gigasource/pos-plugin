@@ -1332,7 +1332,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1358,7 +1358,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1385,7 +1385,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1412,7 +1412,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1439,7 +1439,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1466,7 +1466,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1493,7 +1493,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1520,7 +1520,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1547,7 +1547,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1574,7 +1574,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1601,7 +1601,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1628,7 +1628,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1655,7 +1655,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1682,7 +1682,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1709,7 +1709,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1736,7 +1736,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1763,7 +1763,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1789,7 +1789,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1815,7 +1815,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1841,7 +1841,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1867,7 +1867,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1893,7 +1893,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1919,7 +1919,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1945,7 +1945,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1971,7 +1971,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -1997,7 +1997,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2023,7 +2023,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2049,7 +2049,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2075,7 +2075,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2101,7 +2101,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2127,7 +2127,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2153,7 +2153,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2179,7 +2179,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2205,7 +2205,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2231,7 +2231,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2257,7 +2257,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2283,7 +2283,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2309,7 +2309,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2335,7 +2335,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2361,7 +2361,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2387,7 +2387,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2413,7 +2413,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2439,7 +2439,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2465,7 +2465,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2491,7 +2491,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2517,7 +2517,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2543,7 +2543,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2569,7 +2569,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2595,7 +2595,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2621,7 +2621,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2647,7 +2647,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2673,7 +2673,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2699,7 +2699,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2725,7 +2725,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2751,7 +2751,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2777,7 +2777,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2803,7 +2803,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2829,7 +2829,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2855,7 +2855,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2881,7 +2881,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2907,7 +2907,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2933,7 +2933,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2959,7 +2959,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -2985,7 +2985,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3011,7 +3011,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3037,7 +3037,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3063,7 +3063,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3089,7 +3089,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3115,7 +3115,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3141,7 +3141,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3167,7 +3167,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3193,7 +3193,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3219,7 +3219,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3245,7 +3245,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3271,7 +3271,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3297,7 +3297,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3323,7 +3323,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3349,7 +3349,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3375,7 +3375,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": false,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3401,7 +3401,7 @@
       "appType": "POS_RETAIL",
       "option": {
         "favorite": true,
-        "nonRefundable": true,
+        "nonRefundable": false,
         "active": true,
         "showOnOrderScreen": true,
         "manualPrice": false
@@ -3627,7 +3627,9 @@
       "type": "kitchen",
       "printers": [
         {
-          "hardwares": ["Terminal 1"],
+          "hardwares": [
+            "Terminal 1"
+          ],
           "includes": [],
           "_id": "5e81774685fb2d03dda95cd0",
           "printerType": "ip",
