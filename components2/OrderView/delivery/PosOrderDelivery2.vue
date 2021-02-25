@@ -4,7 +4,6 @@ import _ from "lodash";
 import {$filters, avatar, isIOS, isMobile, username} from "../../AppSharedStates";
 import {computed, withModifiers, ref} from "vue";
 import {useRouter} from 'vue-router';
-import {v4 as uuidv4} from "uuid";
 import {isItemDiscounted} from "../pos-ui-shared";
 import {useI18n} from "vue-i18n";
 import {

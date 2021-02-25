@@ -1,7 +1,6 @@
 import {
-	calls, kitchenOrders,
+	kitchenOrders,
 	pendingOrders,
-	missedCalls,
 	isPrepaidOrder,
 	hooks
 } from './online-order-main-logic'
@@ -27,19 +26,6 @@ hooks.on('timeoutOrder', async function (orderId) {
 export async function getPaymentMethod(payment) {
 	const paymentMethod = await cms.getModel('PosSetting').find()
 	return paymentMethod
-}
-
-export function deleteCall(index, { callId }) {
-	calls.value.splice(index, 1)
-	cancelMissedCallTimeout()
-}
-
-export function deleteMissedCall(index) {
-	missedCalls.value.splice(index, 1)
-}
-
-export function cancelMissedCallTimeout(callId) {
-	// todo: fill this
 }
 
 export async function completeOrder(order) {

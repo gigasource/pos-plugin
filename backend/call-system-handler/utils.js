@@ -1,3 +1,4 @@
+const csConstants = require('./call-system-contants')
 const phoneCallMap = {};
 
 // calls are considered missed if no action is taken during this time
@@ -20,11 +21,11 @@ async function getActiveMode(posSettings) {
 function emitNewCall(phoneNumber) {
   const callId = uuidv4();
 
-  cms.socket.emit('new-phone-call', phoneNumber, new Date(), callId);
+  cms.socket.emit(csConstants.NewPhoneCall, phoneNumber, new Date(), callId);
 
   phoneCallMap[callId] = setTimeout(() => {
     if (!phoneCallMap[callId]) return;
-    cms.socket.emit('new-missed-phone-call', callId);
+    cms.socket.emit(csConstants.NewMissedPhoneCall, callId);
   }, CALL_TIMEOUT_THRESHOLD);
 }
 

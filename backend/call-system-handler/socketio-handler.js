@@ -1,4 +1,5 @@
 module.exports = async (cms) => {
+  const csConstants = require('./call-system-contants')
   const {checkModeActive, emitNewCall, cancelMissedCallTimeout} = require('./utils');
   const ioClient = require('socket.io-client');
   let callMap = {};
@@ -6,9 +7,9 @@ module.exports = async (cms) => {
   let socketConnectStatus = '';
 
   cms.socket.on('connect', internalSocket => {
-    internalSocket.on('refresh-call-system-config', setupFritzboxSocket);
-    internalSocket.on('get-call-system-status', updateConnectionStatus);
-    internalSocket.on('cancel-missed-call-timeout', cancelMissedCallTimeout);
+    internalSocket.on(csConstants.RefreshCallSystemConfig, setupFritzboxSocket);
+    internalSocket.on(csConstants.GetCallSystemStatus, updateConnectionStatus);
+    internalSocket.on(csConstants.CancelMissedCallTimeout, cancelMissedCallTimeout);
   });
 
   async function updateConnectionStatus(cb, posSettings) {
@@ -16,7 +17,7 @@ module.exports = async (cms) => {
     const demoMode = await checkModeActive('demo-fritzbox', posSettings);
 
     if (cb && demoMode) cb(socketConnectStatus);
-    else cms.socket.emit('update-call-system-status', demoMode ? socketConnectStatus : null);
+    else cms.socket.emit(csConstants.UpdateCallSystemStatus, demoMode ? socketConnectStatus : null);
   }
 
   function reset() {

@@ -45,7 +45,3 @@ export function openDialog(mode, _address, _zipcode, index) {
 }
 
 export const autocompleteAddresses = ref([]);
-
-
-export const calls = ref([])
-export const missedCalls = ref([]) // this.missedCalls.unshift({customer, date}); OrderStore

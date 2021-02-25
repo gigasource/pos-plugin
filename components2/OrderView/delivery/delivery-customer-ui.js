@@ -1,20 +1,16 @@
 import {useI18n} from "vue-i18n";
-import {onActivated, ref, withModifiers} from "vue";
+import {ref} from "vue";
 import {isIOS} from "../../AppSharedStates";
+import { calls, missedCalls } from '../../Settings/CallSystem/call-system-logics'
 import {
   deliveryOrderMode, favorites, openDialog, selectedCustomer, showKeyboard,
   name, phone, address, zipcode, street, house, city, selectedAddress, placeId, autocompleteAddresses,
-  calls, missedCalls, dialog, dialogMode
+  dialog, dialogMode
 } from "./delivery-shared";
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
 import cms from 'cms';
 import {addProduct} from "../pos-logic-be";
-
-// test
-import { mockMissedCalls } from '../__test__/mock_delivery_data';
-missedCalls.value = mockMissedCalls
-// end test
 
 // TODO: split customerUiRender function into ->
 //  1. render selected customer
