@@ -45,7 +45,7 @@ export const callSystemStatusComputed = computed(() => {
   if (!callSystemConfigChanged.value && currentCallSystemMode.value === CALL_SYSTEM_MODES.OFF.value)
     return '';
   if (callSystemConfigChanged.value) {
-    return ' (Call system config has changed, press \'Update\' to apply changes)';
+    return ' Call system config has changed, press \'Update\' to apply new changes';
   } else {
     return ` (${callSystemStatus.value})`;
   }

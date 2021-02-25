@@ -1,4 +1,5 @@
 <script>
+import { computed } from 'vue'
 import { CALL_SYSTEM_MODES } from '../../../components/constants';
 import {
   callSystemStatus,
@@ -23,25 +24,18 @@ export default {
     loadData()
 
     const callSystemModesRender = genScopeId(() => <div class="row-flex align-items-center justify-start">
-        <g-grid-select class="mt-2" items={callSystemModes} mandatory grid={false} v-model={currentCallSystemMode.value} v-slots={{
-          default: genScopeId(({ toggleSelect, item }) =>
-              <g-btn class="mx-1 mb-1" onClick={() => toggleSelect(item)} disabled={item === 'auto'}>
-                {item.text}
-              </g-btn>
-          ),
-          selected: genScopeId(({ toggleSelect, item }) =>
-              <g-btn class="mx-1 mb-1" onClick={() => toggleSelect(item)} background-color="blue" text-color="white">
-                {item.text}
-              </g-btn>)
-        }}/>
+        <g-select label="Call system"
+                  style="width: 250px" class="mt-2 call_system"
+                  text-field-component="GTextFieldBs"
+                  mandatory
+                  items={callSystemModes} v-model={currentCallSystemMode.value}/>
       </div>
     )
 
     function renderFritzbox() {
       return (
           <div>
-            <p class="call-title">{callSystemIpText.value} </p>
-            <g-text-field-bs v-model={ipAddresses.value[currentCallSystemMode.value]} v-slots={{
+            <g-text-field-bs label={callSystemIpText.value} v-model={ipAddresses.value[currentCallSystemMode.value]} v-slots={{
               'append-inner': () => <g-icon onClick={() => dialog.ip = true}>icon-keyboard</g-icon>
             }}/>
           </div>
@@ -58,12 +52,11 @@ export default {
 
     return genScopeId(() =>
         <div class="call">
-          <div class="call-title mb-2">
-            <span>Call system</span>
-            { (callSystemStatus.value || callSystemConfigChanged.value) && <span> {callSystemStatusComputed.value} </span> }
-          </div>
-
           { callSystemModesRender() }
+
+          <div class="call-title mb-2">
+            {(callSystemStatus.value || callSystemConfigChanged.value) && <i style="color: red; font-size: 10px"> {callSystemStatusComputed.value} </i>}
+          </div>
 
           { isFritzBoxMode.value
                 ? renderFritzbox()
@@ -95,6 +88,7 @@ export default {
     width: 65%;
   }
 }
+
 .call {
   display: flex;
   flex-direction: column;
@@ -102,6 +96,12 @@ export default {
   padding-left: 24px;
   height: 100%;
   overflow: auto;
+
+  &_system :deep {
+    .bs-tf-wrapper {
+      margin: 0;
+    }
+  }
 
   &-title {
     font-size: 14px;
