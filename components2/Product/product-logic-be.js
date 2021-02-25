@@ -71,9 +71,26 @@ export async function createCategory(newCategory) {
 }
 
 export async function updateCategory(_id, change) {
+  const foundCategory = categories.value.find(_category => _category._id.toString() === _id.toString())
+  if (!foundCategory) return
+  Object.assign(foundCategory, change)
   await Category.findOneAndUpdate({_id}, change)
 }
 
+export async function updateAllCategory(newCategories) {
+  for (const category of newCategories) {
+    if (!category._id) category._id = new ObjectID()
+    category.appType = currentAppType.value
+    const foundCategory = categories.value.find(_category => _category._id.toString() === category._id.toString())
+    if (foundCategory)
+      Object.assign(foundCategory, category)
+    else
+      categories.value.push(category)
+    await Category.updateOne({ _id: category._id }, category, { upsert: true })
+  }
+}
+
 export async function deleteCategory(categoryId) {
+  _.remove(categories.value, category => category._id.toString() === categoryId.toString())
   await Category.remove({ _id: categoryId })
 }

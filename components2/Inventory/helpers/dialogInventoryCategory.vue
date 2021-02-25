@@ -4,16 +4,17 @@ import { useI18n } from 'vue-i18n'
 import { $filters } from '../../AppSharedStates';
 import _ from 'lodash'
 import {
-  inventoryCategories
-} from '../inventory-logic-ui'
-import {
-  deleteInventoryCategory,
-  updateInventoryCategories
-} from '../inventory-logic-be'
+  categories
+} from '../../Product/product-logic'
+
 import { genScopeId } from '../../utils';
 import {
   addedCategory
 } from './dialog-inventory-category-logic' // testing purpose
+import {
+  deleteCategory,
+  updateAllCategory
+} from '../../Product/product-logic-be'
 
 export default {
   name: "dialogInventoryCategory",
@@ -25,11 +26,11 @@ export default {
     const { t } = useI18n()
 
     const showKeyboard = ref(false)
-    const inventoryCategoriesClone = ref([])
+    const categoriesClone = computed(() => _.cloneDeep(categories.value))
 
     const rules = computed(() => {
       let rules = []
-      rules.push(val => inventoryCategories.value.filter(cate => cate === val).length <= 1 || '')
+      rules.push(val => categories.value.filter(cate => cate === val).length <= 1 || '')
       return rules
     })
 
@@ -46,7 +47,6 @@ export default {
     watch(internalValue, async (val) => {
       if (val) {
         addedCategory.value = []
-        inventoryCategoriesClone.value = _.cloneDeep(inventoryCategories.value)
       }
     })
 
@@ -58,14 +58,14 @@ export default {
     }
     const removeCategory = async function (category) {
       if (!category.available) return
-      if(category._id) await deleteInventoryCategory(category._id)
+      if(category._id) await deleteCategory(category._id)
     }
     const complete = async function () {
-      const mergedInventories = [...addedCategory.value, ...inventoryCategoriesClone.value]
+      const mergedInventories = [...addedCategory.value, ...categoriesClone.value]
       if(_.some(_.countBy(mergedInventories, 'name'), cate => cate > 1)) {
         return
       }
-      await updateInventoryCategories(mergedInventories)
+      await updateAllCategory(mergedInventories)
       internalValue.value = false
     }
 
@@ -75,7 +75,7 @@ export default {
             <div class="dialog">
               <div class={showKeyboard.value ? 'dialog-left' : 'dialog-center'}>
                 <div class="category">
-                  {[...addedCategory.value, ...inventoryCategoriesClone.value].map((category, i) =>
+                  {[...addedCategory.value, ...categoriesClone.value].map((category, i) =>
                       <div class="category-item" key={i}>
                         <g-text-field-bs rules={rules.value} onClick={() => showKeyboard.value = true} virtual-event v-model={category.name}></g-text-field-bs>
                         <div onClick={() => removeCategory(category, i)} class={['category-item__btn', category.available && 'category-item__btn--delete']}>

@@ -9,6 +9,7 @@ export const categories = ref([])
 watchEffect(() => {
   categories.value.forEach(category => {
     const product = products.value.find(product => {
+      if (!product.category) return false
       return !!product.category.find(categoryId => {
         return categoryId.toString() === category._id.toString()
       })
