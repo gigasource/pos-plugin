@@ -117,7 +117,7 @@ export async function updateModemDeviceStatus(connectionStatus) {
   if (callSystem.mode === CALL_SYSTEM_MODES.OFF.value) {
     modemDeviceConnected.value = null;
   } else {
-    modemDeviceConnected.value = typeof connectionStatus === 'string' && connectionStatus.toLowerCase() === 'connected';
+    modemDeviceConnected.value = typeof(connectionStatus) === 'string' && connectionStatus.toLowerCase() === 'connected';
   }
 }
 
