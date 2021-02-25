@@ -211,10 +211,6 @@ export function renderMainInventoryTable(props, { emit }) {
 						<g-icon small style="margin-right: 5px">icon-inventory-delete</g-icon>
 						{t('ui.delete')}
 					</g-btn>
-					<g-btn disabled={checkBoxSelectedInventoryIDs.value.length !== 1} uppercase={false} style="margin-right: 5px" onClick={() => openDialogInventory('edit')}>
-						<g-icon small style="margin-right: 5px">icon-inventory-edit</g-icon>
-						{t('ui.edit')}
-					</g-btn>
 					<g-btn uppercase={false} background-color="#4CAF50" text-color="#FFF" onClick={() => openDialogInventory('add')}>
 						<span style="font-size: 14px !important">+ {t('inventory.newProduct')} </span>
 					</g-btn>
