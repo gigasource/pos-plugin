@@ -2,6 +2,7 @@
 import { genScopeId } from '../../utils';
 import _ from 'lodash';
 import { ref, computed } from 'vue'
+
 export default {
   setup() {
     const items = ref([
@@ -99,54 +100,53 @@ export default {
           </div>
         </div>)
 
-    const dialogRender = genScopeId(() => <g-dialog fullscreen v-model={dialog.value.payment}>
-      <div class="dialog">
-        <g-icon class="dialog-icon--close" onClick={() => dialog.value.payment = false}>
-          icon-close
-        </g-icon>
-        <div class="dialog-image" style={getImageStyle()}></div>
-        <div class="dialog-detail">
-          <div class="dialog-title">
-            Payment screen
-          </div>
-          <div class="dialog-message">
-            We recommend using a photo with 3:2 aspect ratio
-          </div>
-          <div class="row-flex align-items-center">
-            <g-btn-bs icon="fas fa-upload" background-color="#1271FF">
-              Upload new photo
-            </g-btn-bs>
-            <g-btn-bs icon="icon-delete2" backgroundColor={photo.value ? '#FF4452' : '#9E9E9E'}>
-              Delete current photo
-            </g-btn-bs>
-          </div>
-          <div class="fs-small fw-700 mt-3">
-            Choose a fit
-          </div>
-          <div class="row-flex align-items-center">
-            {
-              //fixme: doesn't rerender when changing fit value
-            }
-            <div class={['dialog-item', fit.value === 'sketch' && 'dialog-item--selected']} onClick={() => fit.value = 'sketch'}>
-              Sketch
+    const dialogRender = genScopeId(() =>
+        <g-dialog fullscreen v-model={dialog.value.payment}>
+          {genScopeId(() => <div class="dialog">
+            <g-icon class="dialog-icon--close" onClick={() => dialog.value.payment = false}>
+              icon-close
+            </g-icon>
+            <div class="dialog-image" style={getImageStyle()}></div>
+            <div class="dialog-detail">
+              <div class="dialog-title">
+                Payment screen
+              </div>
+              <div class="dialog-message">
+                We recommend using a photo with 3:2 aspect ratio
+              </div>
+              <div class="row-flex align-items-center">
+                <g-btn-bs icon="fas fa-upload" background-color="#1271FF">
+                  Upload new photo
+                </g-btn-bs>
+                <g-btn-bs icon="icon-delete2" backgroundColor={photo.value ? '#FF4452' : '#9E9E9E'}>
+                  Delete current photo
+                </g-btn-bs>
+              </div>
+              <div class="fs-small fw-700 mt-3">
+                Choose a fit
+              </div>
+              <div class="row-flex align-items-center">
+                <div class={['dialog-item', fit.value === 'sketch' && 'dialog-item--selected']} onClick={() => fit.value = 'sketch'}>
+                  Sketch
+                </div>
+                <div class={['dialog-item', fit.value === 'fit' && 'dialog-item--selected']} onClick={() => fit.value = 'fit'}>
+                  Fit
+                </div>
+                <div class={['dialog-item', fit.value === 'fill' && 'dialog-item--selected']} onClick={() => fit.value = 'fill'}>
+                  Fill
+                </div>
+              </div>
             </div>
-            <div class={['dialog-item', fit.value === 'fit' && 'dialog-item--selected']} onClick={() => fit.value = 'fit'}>
-              Fit
-            </div>
-            <div class={['dialog-item', fit.value === 'fill' && 'dialog-item--selected']} onClick={() => fit.value = 'fill'}>
-              Fill
-            </div>
-          </div>
-        </div>
-      </div>
-    </g-dialog>)
+          </div>)()
+          }
+        </g-dialog>)
     return genScopeId(() =>
-      <div class="config">
-        {configHeaderRender()}
-        {configTableHeaderRender()}
-        {items.value.map((item, i) => itemRender(item, i)())}
-        {dialogRender()}
-      </div>)
+        <div class="config">
+          {configHeaderRender()}
+          {configTableHeaderRender()}
+          {items.value.map((item, i) => itemRender(item, i)())}
+          {dialogRender()}
+        </div>)
   }
 }
 </script>
@@ -155,6 +155,7 @@ export default {
 .config {
   overflow: auto;
   height: 100%;
+
   &-header {
     padding: 8px;
     display: flex;

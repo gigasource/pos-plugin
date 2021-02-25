@@ -204,6 +204,13 @@ export function orderBeFactory(id = 0) {
     }, {immediate: true, deep: true})*/
   }
 
+  watch(order, () => {
+    console.log('change')
+    cms.socket.emit('update-customer-order', order)
+  }, {
+    deep: true
+  })
+
   function setNeedCreate(needCreate) {
     _new = needCreate;
   }

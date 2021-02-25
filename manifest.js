@@ -2,8 +2,9 @@ module.exports = {
   onlyUpdateCollections: ['BuildForm', 'ComponentBuilder', 'ProcessData'],
   files: [
     // components 2
+    {loader: {type: 'route'}, filePath: 'components2/Customer/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     {loader: {type: 'route'}, filePath: 'components2/OrderHistory/OrderHistory.vue', name: 'OrderHistory', path: '/pos-order-history'},
-    {loader: { type: 'route' }, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
+    {loader: {type: 'route'}, filePath: 'components2/posPrinterSetting/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     {loader: {type: 'route'}, filePath: 'components2/Settings/Settings.vue', name: 'Settings', path: '/pos-settings'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewUser/viewUser.vue', name: 'UserSetting', path: '/pos-view-user'},
     {loader: {type: 'route'}, filePath: 'components2/Settings/view/viewTax/viewTax.vue', name: 'TaxSetting', path: '/pos-view-tax'},
@@ -46,7 +47,7 @@ module.exports = {
 
     //{ loader: { type: 'route' }, filePath: 'components/View/posPrinterSettingView.vue', name: 'posPrinterSettingView', path: '/pos-printer-setting' },
     //{ loader: { type: 'route' }, filePath: 'components/posOrder/PosOrderDelivery.vue', name: 'posOrderDelivery1', path: '/pos1-order-delivery' },
-    //{ loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
+    // { loader: { type: 'route' }, filePath: 'components/CustomerScreen/CustomerOrder.vue', name: 'posCustomerOrder', path: '/pos-customer-order' },
     //{ loader: { type: 'route' }, filePath: 'components/View/PosCustomer.vue', name: 'posCustomer', path: '/pos-customer' },
     {loader: {type: 'route'}, filePath: 'components2/ReportViews/StaffReportView.vue', name: 'StaffReport', path: '/pos-staff-report'},
     {loader: {type: 'init '}, path: 'composition/plugin-init.js'},
@@ -77,6 +78,7 @@ module.exports = {
     {loader: {type: 'backend-api'}, path: 'backend/rn-bridge/app-rn-bridge.js'},
     {loader: {type: 'backend-api'}, path: 'backend/order-logic/report-init-cms.js'},
     {loader: {type: 'backend-api'}, path: 'backend/commit/index.js'},
+    {loader: {type: 'backend-api'}, path: 'backend/customer-screen/customer-socket-handler.js'},
     // {
     //   loader: {
     //     type: 'backend-api'
